@@ -88,6 +88,7 @@ list_t sms_away = NULL;
 list_t buffers = NULL;
 list_t searches = NULL;
 
+int command_processing = 0;
 int in_autoexec = 0;
 int in_auto_away = 0;
 int config_auto_reconnect = 10;

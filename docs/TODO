@@ -9,9 +9,6 @@ rozwi±zanie.
   - sniffn±æ rejestracjê konta, zmieni³a siê (Carol)
 
 * klient:
-  - blokowanie od¶wie¿ania ekranu w obrêbie jednej komendy -- po co
-    przewijaæ linijka po linijce w /help zamiast zablokowaæ przed i
-    zwolniæ ekran po? (w)
   - informcja o opisie w /find (scooty/w)
   - dope³nianie w ¶rodku linii (sz)
   - wykrywanie niewidocznych jako opcja (wielu)

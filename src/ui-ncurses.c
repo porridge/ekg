@@ -1251,7 +1251,8 @@ crap:
 
 	if (!w->floating) {
 		window_redraw(w);
-		window_commit();
+		if (!command_processing)
+			window_commit();
 	}
 
 	if (config_speech_app && !w->floating && w->id)

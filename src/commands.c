@@ -3871,7 +3871,11 @@ int command_exec(const char *target, const char *xline, int quiet)
 		int res, len = strlen(last_params);
 
 		par = array_make(p, " \t", len, 1, 1);
+
+		command_processing = 1;
 		res = (last_abbr)(last_name, (const char**) par, target, quiet);
+		command_processing = 0;
+
 		array_free(par);
 
 		xfree(line_save);
