@@ -270,9 +270,10 @@ server
 	typ: tekst
 	domy¶lna warto¶æ: brak
 
-	adres IP serwera, z którym klient powinien siê po³±czyæ, pomijaj±c
-	w³a¶ciw± procedurê ³±czenia siê. przydane podczas awarii g³ównego
-	serwera.
+	adresy IP serwerów, z którym klient powinien próbowaæ siê po³±czyæ,
+	pomijaj±c w³a¶ciw± procedurê ³±czenia siê. przydane podczas awarii
+	g³ównego serwera. adresy nale¿y oddzielaæ przecinkami, ¶rednikami
+	lub spacjami. po dwukropku mo¿na podaæ port serwera.
 
 sms_away
 	typ: bool

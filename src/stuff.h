@@ -197,6 +197,7 @@ time_t last_action;
 int last_sysmsg;
 int private_mode;
 int connecting;
+int server_index;
 
 int use_proxy;
 int proxy_port;

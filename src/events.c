@@ -73,7 +73,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 	int width, next_width, i, j, mem_width = 0;
 	char *mesg, *buf, *line, *next, *format = NULL, *format_first = "", *next_format = NULL, *head = NULL, *foot = NULL, *timestamp = NULL, *save;
 	char *line_width = NULL, timestr[100], *target;
-	int separate = (e->event.msg.sender != config_uin || chat == 3);
+	int separate = ((e->event.msg.sender != config_uin && chat == 1) || chat == 3);
 	struct tm *tm;
 
 	if (e->event.msg.recipients) {

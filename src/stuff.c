@@ -143,6 +143,7 @@ int config_last_size = 10;
 int config_last = 0;
 int config_keep_reason = 0;
 int config_enter_scrolls = 0;
+int server_index = 0;
 
 static struct {
 	int event;
@@ -2328,22 +2329,29 @@ void do_connect()
 	p.last_sysmsg = last_sysmsg;
 
 	if (config_server) {
-		char *tmp = strchr(config_server, ':'), *foo = xstrdup(config_server);
-		int len = (int) tmp - (int) config_server;
+		char *server, **servers = array_make(config_server, ",; ", 0, 1, 0);
+
+		if (server_index >= array_count(servers))
+			server_index = 0;
+
+		if ((server = xstrdup(servers[server_index++]))) {
+			char *tmp = strchr(server, ':');
 			
-		if (foo) {
 			if (tmp) {
 				p.server_port = atoi(tmp + 1);
-				foo[len] = 0;
-				p.server_addr = inet_addr(foo);
-				gg_debug(GG_DEBUG_MISC, "-- server_addr=%s, server_port=%d\n", foo, p.server_port);
+				*tmp = 0;
+				p.server_addr = inet_addr(server);
+				gg_debug(GG_DEBUG_MISC, "-- server_addr=%s, server_port=%d\n", server, p.server_port);
 			} else {
 				p.server_port = GG_DEFAULT_PORT;
-				p.server_addr = inet_addr(config_server);
-				gg_debug(GG_DEBUG_MISC, "-- server_addr=%s, server_port=%d\n", config_server, p.server_port);
+				p.server_addr = inet_addr(server);
+				gg_debug(GG_DEBUG_MISC, "-- server_addr=%s, server_port=%d\n", server, p.server_port);
 			}
-			free(foo);
+
+			xfree(server);
 		}
+
+		array_free(servers);
 	}
 
 	if (!(sess = gg_login(&p))) {
@@ -2908,4 +2916,4 @@ const char *http_error_string(int h)
 
 	return "?";
 }
-	
+
