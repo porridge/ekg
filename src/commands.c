@@ -4695,7 +4695,7 @@ COMMAND(cmd_last)
 {
         list_t l;
 	uin_t uin = 0;
-	int show_sent = 0, last_n = 0, count = 0, i;
+	int show_sent = 0, last_n = 0, count = 0, i = 0;
 	const char *nick = params[0];
 	time_t n;
 	struct tm *now;
@@ -4766,14 +4766,14 @@ COMMAND(cmd_last)
 	n = time(NULL);
 	now = localtime(&n);
 
-        for (i = 0, l = lasts; l; l = l->next, i++) {
+        for (l = lasts; l; l = l->next) {
                 struct last *ll = l->data;
 		struct tm *tm, *st;
 		char buf[100], buf2[100], *time_str = NULL;
 
 		if (uin == 0 || uin == ll->uin) {
 
-			if (last_n && i < (count - last_n))
+			if (last_n && i++ < (count - last_n))
 				continue;
 
 			tm = localtime(&ll->time);
