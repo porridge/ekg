@@ -413,6 +413,7 @@ char *base64_decode(const char *buf)
 void binding_list(int quiet, const char *name, int all) 
 {
 	list_t l;
+	int found = 0;
 
 	if (!bindings)
 		printq("bind_seq_list_empty");
@@ -421,13 +422,24 @@ void binding_list(int quiet, const char *name, int all)
 		struct binding *b = l->data;
 
 		if (name) {
-			if (strcasestr(b->key, name))
+			if (strcasestr(b->key, name)) {
 				printq("bind_seq_list", b->key, b->action);
+				found = 1;
+			}
 			continue;
 		}
 
 		if (!b->internal || (all && b->internal))
 			printq("bind_seq_list", b->key, b->action);
+	}
+
+	if (name && !found) {
+		for (l = bindings; l; l = l->next) {
+			struct binding *b = l->data;
+
+			if (strcasestr(b->action, name))
+				printq("bind_seq_list", b->key, b->action);
+		}
 	}
 }
 
