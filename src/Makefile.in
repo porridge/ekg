@@ -6,34 +6,42 @@ mandir = @mandir@
 
 CC = @CC@ 
 CFLAGS = @CFLAGS@ -I.. -I../lib -DTHEMES_DIR=\"$(datadir)/ekg/themes\"
-LIBS = @LIBS@
+LIBS = @LIBS@ ../lib/libgadu.a
 
 MAKE = @MAKE@
 AR = @AR@
 INSTALL = @INSTALL@
 
 OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o ekg.o
-LOBJS = ../lib/libgadu.a
+
+#
 
 all:	ekg @ioctld@
 
-ekg:	$(OBJS) $(LOBJS)
-	$(CC) $(CFLAGS) -o ekg $(OBJS) $(LOBJS) $(LIBS) 
+ekg:	$(OBJS)
+	$(CC) $(CFLAGS) -o ekg $(OBJS) $(LIBS)
 
 ioctld:	ioctld.c
 	$(CC) $(CFLAGS) ioctld.c -o ioctld
 
-install: all install_ekg @install_ioctld@
+#
 
-install_ekg:
+install: all install-ekg @install_ioctld@
+
+install-ekg:
+	$(INSTALL) -m 755 -d $(prefix)/bin
 	$(INSTALL) -m 755 ekg $(prefix)/bin
 
-install_ioctld:
+install-ioctld:
+	$(INSTALL) -m 755 -d $(prefix)/bin
 	$(INSTALL) -m 4755 ioctld $(prefix)/bin
+
+#
+
+clean:
+	rm -f *.o ekg ioctld search core 
 
 distclean:	clean
 	rm -f *~ Makefile
 
-clean:
-	rm -f *.o ekg ioctld search core 
 

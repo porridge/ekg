@@ -1541,7 +1541,7 @@ COMMAND(command_dcc)
 		for (l = transfers; l; l = l->next) {
 			struct transfer *t = l->data;
 
-			if (!t->dcc || (t->dcc->state != GG_STATE_SENDING_FILE || t->dcc->state != GG_STATE_GETTING_FILE)) {
+			if (!t->dcc || (t->dcc->state != GG_STATE_SENDING_FILE && t->dcc->state != GG_STATE_GETTING_FILE)) {
 				if (!pending) {
 					my_printf("dcc_show_pending_header");
 					pending = 1;

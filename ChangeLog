@@ -9,6 +9,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - du¿e poprawki configure.in, */Makefile.in, przygotowuj±ce pod
   osobn± dystrybucjê libgadu (w)
+- drobne poprawki dcc (w)
 
 // 2002-06-10
 
