@@ -45,6 +45,8 @@
 #include "libgadu.h"
 #include "commands.h"
 #include "events.h"
+#include "mail.h"
+#include "msgqueue.h"
 #include "stuff.h"
 #include "themes.h"
 #include "ui.h"
@@ -55,8 +57,6 @@
 #ifdef WITH_PYTHON
 #  include "python.h"
 #endif
-#include "msgqueue.h"
-#include "mail.h"
 #ifdef HAVE_OPENSSL
 #  include "sim.h"
 #  include "simlite.h"
