@@ -684,6 +684,9 @@ fade_in
 	to 10ms na platformie i386. dzia³a wy³±cznie na terminalu typu
 	,,linux''.
 
+	terminal po wyj¶ciu z programu bêdzie posiada³ standardow± paletê
+	kolorów, niezale¿nie od wcze¶niejszych ustawieñ.
+
 	rozja¶nianie terminala jest wy³±cznie g³upim eksperymentem i
 	naprawdopodobniej bêdzie domy¶lnie wy³±czone w przysz³ych wersjach.
 	

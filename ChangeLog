@@ -8,6 +8,7 @@ zg³osi³ b³±d.
 
 // 2003-02-18
 
+- ,,fade_in'' jest domy¶lnie wy³±czone (ubanus,w/sz)
 - uaktualnianie timeout'ów sesji nie czê¶ciej ni¿ raz na sekundê, ¿eby
   timeout timeout'owi by³ równy (sz)
 - poprawka wczytywania pojedynczych zmiennych, m.in. ,,fade_in'' i

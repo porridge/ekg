@@ -472,7 +472,7 @@ void ekg_wait_for_key()
 		/* auto save */
 		if (config_auto_save && config_changed && time(NULL) - last_save > config_auto_save) {
 			last_save = time(NULL);
-			gg_debug(GG_DEBUG_MISC, "-- autosaving userlist and config after %d seconds.\n", config_auto_save);
+			gg_debug(GG_DEBUG_MISC, "-- autosaving userlist and config after %d seconds.\n", time(NULL) - last_save);
 
 			if (!userlist_write(NULL) && !config_write(NULL)) {
 				config_changed = 0;
