@@ -304,7 +304,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 				}
 				if (a2 == 30)
 					a2 += 16;
-				if (*p == 'm') {
+				if (*p == 'm' && config_display_color) {
 					if (a1 == 0 && a2 == -1)
 						wattrset(w->window, COLOR_PAIR(7));
 					else if (a1 == 1 && a2 == -1)
@@ -313,7 +313,9 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 						wattrset(w->window, COLOR_PAIR(a1 - 30));
 					else
 						wattrset(w->window, COLOR_PAIR(a2 - 30) | ((a1) ? A_BOLD : A_NORMAL));
-				}		
+				}
+				if (*p == 'm' && !config_display_color)
+					wattrset(w->window, (a1 == 1) ? A_BOLD : A_NORMAL);
 			} else {
 				while (*p && ((*p >= '0' && *p <= '9') || *p == ';'))
 					p++;
@@ -355,7 +357,10 @@ static void update_statusbar()
 	int i, nested = 0;
 
 	wmove(status, 0, 0);
-	wattrset(status, COLOR_PAIR(15));
+	if (config_display_color)
+		wattrset(status, COLOR_PAIR(15));
+	else
+		wattrset(status, A_REVERSE);
 
 	for (i = 0; i <= status->_maxx; i++)
 		waddch(status, ' ');
@@ -382,7 +387,7 @@ static void update_statusbar()
 	case x: wattrset(status, COLOR_PAIR(8+z)); break; \
 	case y: wattrset(status, COLOR_PAIR(8+z) | A_BOLD); break;
 
-		if (*p != '{') {
+		if (*p != '{' && config_display_color) {
 			switch (*p) {
 				__color('k', 'K', 0);
 				__color('r', 'R', 1);
@@ -393,12 +398,14 @@ static void update_statusbar()
 				__color('c', 'C', 6);
 				__color('w', 'W', 7);
 				case 'n':
-					wattrset(status, COLOR_PAIR(15));
+					wattrset(status, (config_display_color) ? COLOR_PAIR(15) : A_NORMAL);
 					break;
 			}
 			continue;
 		}
 #undef __color
+		if (*p != '{' && !config_display_color)
+			continue;
 
 		p++;
 		if (!*p)
