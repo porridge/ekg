@@ -9,6 +9,7 @@ zg³osi³ b³±d.
 // 2003-04-21
 
 - za³adowanie themu czy¶ci cache (rmrmg/w)
+- libgadu: poprawka obs³ugi b³êdu pthread_create() (scooty/w)
 
 // 2003-04-20
 
