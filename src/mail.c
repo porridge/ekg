@@ -332,6 +332,11 @@ int check_mail_maildir(const char **folders)
 	return 0;
 }
 
+/*
+ * changed_check_mail()
+ *
+ * wywo³ywane przy zmianie zmiennej check_mail
+ */
 void changed_check_mail(const char *var)
 {
 	if (config_check_mail) {
@@ -349,8 +354,6 @@ void changed_check_mail(const char *var)
 		 
 		 t = timer_add(config_check_mail_frequency, "check-mail-time", "check_mail");
 		 t->ui = 1;
-	}
-
-	else 
+	} else
 		timer_remove("check-mail-time", NULL);
 }			
