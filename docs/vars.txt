@@ -169,7 +169,7 @@ ctrld_quits
 
 contacts
 	typ: liczba
-	domy¶lna warto¶æ: 0
+	domy¶lna warto¶æ: 2
 
 	okre¶la, czy okienko z list± obecnych ma byæ wy¶wietlone z prawej
 	strony ekranu. je¶li jest równe 2, informacje o zmianie stanu nie
@@ -188,7 +188,7 @@ contacts_options
 	domy¶lna warto¶æ: brak
 
 	opcje listy kontaktów oddzielone przecinkiem lub spacj±. domy¶lne
-	ustawienia to ,,right, frame, margin=1, nowrap, nodescr, order=0123''.
+	ustawienia to ,,right, frame, margin=1, nowrap, nodescr, order=01234''.
 	mo¿liwe stany to: 0 - dostêpni, 1 - zajêci, 2 - niewidoczni, 3 -
 	blokuj±cy, 4 - niedostêpni). mo¿na pomin±æ niektóre stany -- nie
 	bêd± po prostu wy¶wietlane na li¶cie.
@@ -231,7 +231,7 @@ dcc_dir
 
 display_ack
 	typ: liczba
-	domy¶lna warto¶æ: 1
+	domy¶lna warto¶æ: 3
 
 	okre¶la, czy i które powiadomienia o wys³aniu wiadomo¶ci maj±
 	byæ wy¶wietlane. 0 - ¿adne, 1 - wszystkie, 2 - tylko kiedy wiadomo¶æ
@@ -290,7 +290,7 @@ display_pl_chars
 
 display_sent
 	typ: bool
-	domy¶lna warto¶æ: 0
+	domy¶lna warto¶æ: 1
 
 	je¶li w³±czone, wy¶wietlane s± równie¿ wysy³ane wiadomo¶ci. nale¿y
 	zwróciæ uwagê, ¿e przy make_window = 2, wys³anie wiadomo¶ci utworzy
@@ -417,12 +417,12 @@ log_timestamp
 
 make_window
 	typ: liczba
-	domy¶lna warto¶æ: 0
+	domy¶lna warto¶æ: 2
 
 	okre¶la czy bêd± tworzone nowe okienka dla nowych rozmów. dla 1 bêdzie
-	wykorzystane do nowego query pierwsze wolne okno (na którym z nikim
-	jeszcze siê nie rozmawia), lub tworzone nowe w przypadku braku wolnych.
-	dla 2 bezwarunkowo utworzone zostanie nowe okno.
+	wykorzystane pierwsze wolne okno (na którym z nikim jeszcze siê nie
+	rozmawia), lub tworzone nowe w przypadku braku wolnych.	dla 2
+	bezwarunkowo utworzone zostanie nowe okno.
 
 mesg
 	typ: liczba

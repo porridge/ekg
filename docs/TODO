@@ -24,8 +24,6 @@ Pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
   - mo¿liwo¶æ automagicznego wyrównywania kolejnych linii wiadomo¶ci w tematach
     ircopodobnych do d³ugo¶ci nazwy rozmówcy i timestampu (sz)
   - zmienna beep_*_away (rmrmg)
-  - zmieniæ domy¶lne ustawienia na: display_sent 1, make_window 2,
-    display_ack 3 (w)
   - osobna historia dla ka¿dego okna (koniu),
   - dalsza rozbudowa on (?) - zaprzeczenia i inne operatory (krzyk)
   - mo¿liwo¶æ definiowania kolorów p³ywaj±cych okien: t³o, ramka (w)

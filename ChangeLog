@@ -6,6 +6,13 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-03-20
+
+- zmiana domy¶lnych warto¶ci zmiennych: contacts = 2, display_ack = 3,
+  display_sent = 1, make_window = 2 (sz/w)
+- dodanie podstawowych informacji o obs³udze klienta przy pierwszym
+  uruchomieniu (sz/w)
+
 // 2003-03-18
 
 - ,,/_descr -'' prawid³owo wy³±cza stan opisowy (sz)

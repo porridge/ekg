@@ -186,7 +186,7 @@ static int ui_ncurses_debug = 0;	/* debugowanie */
 int config_backlog_size = 1000;		/* maksymalny rozmiar backloga */
 int config_display_transparent = 1;	/* czy chcemy przezroczyste t³o? */
 int config_contacts_size = 9;		/* szeroko¶æ okna kontaktów */
-int config_contacts = 0;		/* czy ma byæ okno kontaktów */
+int config_contacts = 2;		/* czy ma byæ okno kontaktów */
 char *config_contacts_options = NULL;	/* opcje listy kontaktów */
 char *config_contacts_groups = NULL;	/* grupy listy kontaktów */
 
