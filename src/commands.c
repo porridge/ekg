@@ -87,7 +87,7 @@ struct command commands[] = {
 	{ "disconnect", "", command_connect, "", "Roz³±cza siê z serwerem", "" },
 	{ "exec", "?", command_exec, " <polecenie>", "Uruchamia polecenie systemowe", "" },
 	{ "!", "?", command_exec, " <polecenie>", "Synonim dla %Wexec%n", "" },
-	{ "find", "u", command_find, " [opcje]", "Interfejs do katalogu publicznego", "  --uin <numerek>\n  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>\n  --city <miasto>\n  --birth <min:max>\n  --phone <telefon>\n  --email <e-mail>\n  --active\n" },
+	{ "find", "u", command_find, " [opcje]", "Interfejs do katalogu publicznego", "  --uin <numerek>\n  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>\n  --city <miasto>\n  --birth <min:max>\n  --phone <telefon>\n  --email <e-mail>\n  --active\n  --female\n  --male\n" },
 	{ "info", "u", command_find, " <numer/alias>", "Interfejs do katalogu publicznego", "" },
 	{ "help", "c", command_help, " [polecenie]", "Wy¶wietla informacjê o poleceniach", "" },
 	{ "?", "c", command_help, " [polecenie]", "Synonim dla %Whelp%n", "" },
@@ -621,7 +621,7 @@ COMMAND(command_find)
 		for (i = 0; argv[i]; i++) {
 			if (argv[i][0] == '-' && argv[i][1] == '-')
 				argv[i]++;
-			if (!strncmp(argv[i], "-f", 2) && argv[i + 1])
+			if (!strncmp(argv[i], "-f", 2) && argv[i][2] != 'e' && argv[i + 1])
 				r.first_name = argv[++i];
 			if (!strncmp(argv[i], "-l", 2) && argv[i + 1])
 				r.last_name = argv[++i];
@@ -635,11 +635,11 @@ COMMAND(command_find)
 				r.email = argv[++i];
 			if (!strncmp(argv[i], "-u", 2) && argv[i + 1])
 				r.uin = strtol(argv[++i], NULL, 0);
-			if (!strncmp(argv[i], "-f", 2) && argv[i + 1])
+			if (!strncmp(argv[i], "-fe", 3))
 				r.gender = GG_GENDER_FEMALE;
-			if (!strncmp(argv[i], "-m", 2) && argv[i + 1])
+			if (!strncmp(argv[i], "-m", 2))
 				r.gender = GG_GENDER_MALE;
-			if (!strncmp(argv[i], "-a", 2) && argv[i + 1])
+			if (!strncmp(argv[i], "-a", 2))
 				r.active = 1;
 			if (!strncmp(argv[i], "-b", 2) && argv[i + 1]) {
 				char *foo = strchr(argv[++i], ':');

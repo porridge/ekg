@@ -11,6 +11,9 @@
 - mo¿liwo¶æ zmiany gg_session->initial_status w libgg zaraz po wywo³aniu
   gg_login(). trochê nie³adne, ale ciê¿ko to zrobiæ inaczej ;/
 - posortowanie listy zmiennych (w)
+- bugfixy ,,find'', poprawnie akceptuje --male, --female, --active,
+  dodana p³eæ do helpa (w)
+- jest zmienna ,,display_notify'' (w)
 - popsucie 10 innych rzeczy (w)
 
 // 2001-11-19 
