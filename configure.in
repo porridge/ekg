@@ -42,8 +42,10 @@ LIBS="$LIBS $READLINE_LIBS"
 AC_CACHE_CHECK([for rl_set_prompt() in readline], ac_cv_has_rl_set_prompt,
 [AC_TRY_LINK([#include <stdio.h>
 #include <readline/readline.h>
-], [rl_set_prompt();], AC_DEFINE(HAS_RL_SET_PROMPT)
-[ac_cv_has_rl_set_prompt=yes], [ac_cv_has_rl_set_prompt=no])])
+], [rl_set_prompt("");], [ac_cv_has_rl_set_prompt=yes], [ac_cv_has_rl_set_prompt=no])])
+if test x"$ac_cv_has_rl_set_prompt" != xno; then
+    AC_DEFINE(HAS_RL_SET_PROMPT)
+fi
 LIBS="$SAVE_LIBS"
 
 AC_PATH_PROG(RM, rm, no)
