@@ -211,6 +211,8 @@ int check_mail_mbox()
 				continue;
 
 			while ((line = read_file(f))) {
+				char *line_save = line;
+
 				if (!strncmp(line, "From ", 5)) {
 					in_header = 1;
 					f_new++;
@@ -224,7 +226,7 @@ int check_mail_mbox()
 				if (strlen(line) == 0)
 					in_header = 0;
 
-				xfree(line);
+				xfree(line_save);
 			}
 
 			fclose(f);
