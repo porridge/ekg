@@ -406,7 +406,8 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 			if (v->notify)
 				(v->notify)(v->name);
 
-			ui_event("variable_changed", v->name);
+			if (ui_event)
+				ui_event("variable_changed", v->name);
 			
 			return 0;
 		}
@@ -426,7 +427,8 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 			if (v->notify)
 				(v->notify)(v->name);
 
-			ui_event("variable_changed", v->name);
+			if (ui_event)
+				ui_event("variable_changed", v->name);
 		
 			return 0;
 		}
