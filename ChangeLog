@@ -4,6 +4,15 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2004-12-21
+
+- libgadu: zamykanie gniazda nas³uchuj±cego dcc w przypadku problemów
+  z bindowanie/s³uchaniem (mslusarz/w)
+- libgadu: uproszczenie gg_send_packet() (mslusarz/w)
+- libgadu: uzupe³nienie sta³ych potwierdzeñ (mslusarz/w)
+- libgadu: usuniêcie kodu ustawiaj±cego gg_dcc_ip na auto w funkcji
+  gg_dcc_socket_create() (mslusarz/w)
+
 // 2004-12-19
 
 - uzupe³nienie dokumentacji protoko³u o tokenu (w)
