@@ -235,7 +235,7 @@ char *userlist_dump()
 		struct userlist *u = l->data;
 		char *groups, *line;
 		
-		groups = group_to_string(u->groups);
+		groups = group_to_string(u->groups, 1);
 		
 		line = saprintf("%s;%s;%s;%s;%s;%s;%lu\r\n",
 			(u->first_name) ?
@@ -396,7 +396,7 @@ void userlist_clear()
  *  - uin,
  *  - display.
  */
-int userlist_add(uin_t uin, const char *display)
+struct userlist *userlist_add(uin_t uin, const char *display)
 {
 	struct userlist u;
 
@@ -406,9 +406,7 @@ int userlist_add(uin_t uin, const char *display)
 	u.status = GG_STATUS_NOT_AVAIL;
 	u.display = xstrdup(display);
 
-	list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);
-	
-	return 0;
+	return list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);
 }
 
 /*
@@ -492,6 +490,31 @@ struct userlist *userlist_find(uin_t uin, const char *display)
 }
 
 /*
+ * userlist_type()
+ *
+ * zwraca rodzaj u¿ytkownika dla funkcji gg_*_notify_ex().
+ *
+ *  - u - wpis u¿ytkownika
+ *
+ * GG_USER_*
+ */
+char userlist_type(struct userlist *u)
+{
+	char res = GG_USER_NORMAL;
+
+	if (!u)
+		return res;
+	
+	if (group_member(u, "__offline"))
+		res = GG_USER_OFFLINE;
+		
+	if (group_member(u, "__blocked"))
+		res = GG_USER_BLOCKED;
+
+	return res;
+}
+
+/*
  * get_uin()
  *
  * je¶li podany tekst jest liczb±, zwraca jej warto¶æ. je¶li jest nazw±
@@ -549,18 +572,31 @@ const char *format_user(uin_t uin)
  */
 int ignored_remove(uin_t uin)
 {
+	struct userlist *u = userlist_find(uin, NULL);
 	list_t l;
 
-	for (l = ignored; l; l = l->next) {
-		struct ignored *i = l->data;
+	if (!u)
+		return -1;
 
-		if (i->uin == uin) {
-			list_remove(&ignored, i, 1);
-			return 0;
-		}
+	if (!ignored_check(uin))
+		return -1;
+
+	for (l = u->groups; l; ) {
+		struct group *g = l->data;
+
+		l = l->next;
+
+		if (!g || !g->name || strncasecmp(g->name, "__ignored", 9))
+			continue;
+
+		xfree(g->name);
+		list_remove(&u->groups, g, 1);
 	}
 
-	return -1;
+	if (!u->display && !u->groups)
+		userlist_remove(u);
+
+	return 0;
 }
 
 /*
@@ -569,21 +605,22 @@ int ignored_remove(uin_t uin)
  * dopisuje do listy ignorowanych numerków.
  *
  *  - uin.
+ *  - level.
  */
-int ignored_add(uin_t uin)
+int ignored_add(uin_t uin, int level)
 {
-	list_t l;
-	struct ignored i;
+	struct userlist *u;
+	char *tmp;
 
-	for (l = ignored; l; l = l->next) {
-		struct ignored *j = l->data;
+	if (ignored_check(uin))
+		return -1;
+	
+	if (!(u = userlist_find(uin, NULL)))
+		u = userlist_add(uin, NULL);
 
-		if (j->uin == uin)
-			return -1;
-	}
-
-	i.uin = uin;
-	list_add(&ignored, &i, sizeof(i));
+	tmp = saprintf("__ignored_%d", level);
+	group_add(u, tmp);
+	xfree(tmp);
 	
 	return 0;
 }
@@ -597,15 +634,91 @@ int ignored_add(uin_t uin)
  */
 int ignored_check(uin_t uin)
 {
+	struct userlist *u = userlist_find(uin, NULL);
 	list_t l;
 
-	for (l = ignored; l; l = l->next) {
-		struct ignored *i = l->data;
+	if (!u)
+		return 0;
 
-		if (i->uin == uin)
-			return 1;
+	for (l = u->groups; l; l = l->next) {
+		struct group *g = l->data;
+
+		if (!g->name)
+			continue;
+
+		if (!strcasecmp(g->name, "__ignored"))
+			return IGNORE_ALL;
+
+		if (!strncasecmp(g->name, "__ignored_", 10))
+			return atoi(g->name + 10);
 	}
 
+	return 0;
+}
+
+/*
+ * blocked_remove()
+ *
+ * usuwa z listy blokowanych numerków.
+ *
+ *  - uin.
+ */
+int blocked_remove(uin_t uin)
+{
+	struct userlist *u = userlist_find(uin, NULL);
+	list_t l;
+
+	if (!u)
+		return -1;
+
+	if (!group_member(u, "__blocked"))
+		return -1;
+
+	gg_remove_notify_ex(sess, u->uin, userlist_type(u));
+
+	for (l = u->groups; l; ) {
+		struct group *g = l->data;
+
+		l = l->next;
+
+		if (!g || !g->name || strcasecmp(g->name, "__blocked"))
+			continue;
+
+		xfree(g->name);
+		list_remove(&u->groups, g, 1);
+	}
+
+	if (!u->display && !u->groups)
+		userlist_remove(u);
+	else
+		gg_add_notify_ex(sess, u->uin, userlist_type(u));
+
+	return 0;
+}
+
+/*
+ * blocked_add()
+ *
+ * dopisuje do listy blokowanych numerków.
+ *
+ *  - uin.
+ */
+int blocked_add(uin_t uin)
+{
+	struct userlist *u = userlist_find(uin, NULL);
+
+	if (u && group_member(u, "__blocked"))
+		return 0;
+	
+	if (!u)
+		u = userlist_add(uin, NULL);
+	else
+		gg_remove_notify_ex(sess, uin, userlist_type(u));
+
+	group_add(u, "__blocked");
+
+	gg_add_notify_ex(sess, uin, userlist_type(u));
+	
 	return 0;
 }
 
@@ -618,19 +731,22 @@ void userlist_send()
 {
         list_t l;
         uin_t *uins;
+	char *types;
         int i, count;
 
 	count = list_count(userlist);
 
         uins = xmalloc(count * sizeof(uin_t));
+	types = xmalloc(count * sizeof(char));
 
 	for (i = 0, l = userlist; l; i++, l = l->next) {
 		struct userlist *u = l->data;
 
                 uins[i] = u->uin;
+		types[i] = userlist_type(u);
 	}
 
-        gg_notify(sess, uins, count);
+        gg_notify_ex(sess, uins, types, count);
 
         xfree(uins);
 }
@@ -661,17 +777,23 @@ static int group_compare(void *data1, void *data2)
  *
  *  - u - wpis usera,
  *  - group - nazwa grupy.
- *
- * zwraca 0 je¶li siê uda³o, inaczej -1.
  */
 int group_add(struct userlist *u, const char *group)
 {
 	struct group g;
+	list_t l;
+
+	for (l = u->groups; l; l = l->next) {
+		struct group *g = l->data;
+
+		if (!strcasecmp(g->name, group))
+			return -1;
+	}
 	
 	g.name = xstrdup(group);
 
 	list_add_sorted(&u->groups, &g, sizeof(g), group_compare);
-	
+
 	return 0;
 }
 
@@ -767,10 +889,11 @@ list_t group_init(const char *names)
  * zmienia listê grup na ci±g znaków rodzielony przecinkami.
  *
  *  - groups - lista grup.
+ *  - meta - czy do³±czyæ ,,meta-grupy''?
  *
  * zwraca zaalokowany ci±g znaków lub NULL w przypadku b³êdu.
  */
-char *group_to_string(list_t groups)
+char *group_to_string(list_t groups, int meta)
 {
 	string_t foo;
 	list_t l;
@@ -784,6 +907,9 @@ char *group_to_string(list_t groups)
 		if (!g || !g->name)
 			continue;
 		
+		if (!meta && !strncmp(g->name, "__", 2))
+			continue;
+
 		if (l != groups)
 			string_append_c(foo, ',');
 		

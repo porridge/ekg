@@ -770,16 +770,20 @@ struct gg_new_status {
 	
 struct gg_notify {
 	uint32_t uin;				/* numerek danej osoby */
-	uint8_t dunno1;			/* == 3 */
+	uint8_t dunno1;				/* rodzaj wpisu w li¶cie */
 } GG_PACKED;
+
+#define GG_USER_OFFLINE 0x01	/* bêdziemy niewidoczni dla u¿ytkownika */
+#define GG_USER_NORMAL 0x03	/* zwyk³y u¿ytkownik */
+#define GG_USER_BLOCKED 0x04	/* zablokowany u¿ytkownik */
 	
 #define GG_NOTIFY_REPLY 0x000c	/* tak, to samo co GG_LOGIN */
 	
 struct gg_notify_reply {
 	uint32_t uin;			/* numerek */
 	uint32_t status;		/* status danej osoby */
-	uint32_t remote_ip;	/* adres ip delikwenta */
-	uint16_t remote_port;	/* port, na którym s³ucha klient */
+	uint32_t remote_ip;		/* adres ip delikwenta */
+	uint16_t remote_port;		/* port, na którym s³ucha klient */
 	uint32_t version;		/* wersja klienta */
 	uint16_t dunno2;		/* znowu port? */
 } GG_PACKED;

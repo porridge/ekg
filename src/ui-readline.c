@@ -278,18 +278,21 @@ static char *ignored_uin_generator(char *text, int state)
 	struct userlist *u;
 
 	if (!state) {
-		l = ignored;
+		l = userlist;
 		len = strlen(text);
 	}
 
 	while (l) {
-		struct ignored *i = l->data;
+		struct userlist *u = l->data;
 
 		l = l->next;
 
-		if (!(u = userlist_find(i->uin, NULL))) {
-			if (!strncasecmp(text, itoa(i->uin), len))
-				return xstrdup(itoa(i->uin));
+		if (!ignored_check(u->uin))
+			continue;
+
+		if (!u->display) {
+			if (!strncasecmp(text, itoa(u->uin), len))
+				return xstrdup(itoa(u->uin));
 		} else {
 			if (u->display && !strncasecmp(text, u->display, len))
 				return xstrdup(u->display);

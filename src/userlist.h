@@ -43,13 +43,17 @@ struct userlist {
 	unsigned short port;	/* port */
 };
 
-struct ignored {
-	uin_t uin;		/* numer */
-	int level;		/* XXX poziom ignorowania, bêdzie kiedy¶ */
-};
-
 struct group {
 	char *name;
+};
+
+enum ignored_level_t {
+	IGNORE_STATUS = 1,
+	IGNORE_STATUS_DESCR = 2,
+	IGNORE_MSG = 4,
+	IGNORE_DCC = 8,
+	
+	IGNORE_ALL = 255
 };
 
 list_t userlist;
@@ -62,7 +66,7 @@ int userlist_write_wap();
 #endif
 void userlist_write_crash();
 void userlist_clear_status(void);
-int userlist_add(uin_t uin, const char *display);
+struct userlist *userlist_add(uin_t uin, const char *display);
 int userlist_remove(struct userlist *u);
 int userlist_replace(struct userlist *u);
 void userlist_send();
@@ -71,15 +75,19 @@ char *userlist_dump();
 void userlist_clear();
 #define userlist_free userlist_clear
 int userlist_set(char *contacts);
+char userlist_type(struct userlist *u);
 
-int ignored_add(uin_t uin);
+int ignored_add(uin_t uin, int level);
 int ignored_remove(uin_t uin);
 int ignored_check(uin_t uin);
+
+int blocked_add(uin_t uin);
+int blocked_remove(uin_t uin);
 
 int group_add(struct userlist *u, const char *group);
 int group_remove(struct userlist *u, const char *group);
 int group_member(struct userlist *u, const char *group);
-char *group_to_string(list_t l);
+char *group_to_string(list_t l, int meta);
 list_t group_init(const char *groups);
 
 uin_t get_uin(const char *text);

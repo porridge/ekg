@@ -870,13 +870,17 @@ void theme_init()
 	format_add("help_footer", " \n%> Gwiazdka (%T*%n) oznacza, ¿e mo¿na uzyskaæ wiêcej szczegó³ów\n\n", 1);
 	format_add("help_quick", "%> Przed u¿yciem przeczytaj ulotkê. Plik %Tdocs/ULOTKA%n zawiera krótki\n%> przewodnik po za³±czonej dokumentacji. Je¶li go nie masz, mo¿esz\n%> ¶ci±gn±æ pakiet ze strony %Thttp://dev.null.pl/ekg/%n\n", 1);
 
-	/* ignore, unignore */
+	/* ignore, unignore, block, unblock */
 	format_add("ignored_added", "%> Dodano %T%1%n do listy ignorowanych\n", 1);
 	format_add("ignored_deleted", "%> Usuniêto %1 z listy ignorowanych\n", 1);
 	format_add("ignored_list", "%> %1\n", 1);
 	format_add("ignored_list_empty", "%! Lista ignorowanych u¿ytkowników jest pusta\n", 1);
-	format_add("error_adding_ignored", "%! B³±d podczas dodawania do listy ignorowanych\n", 1);
 	format_add("error_not_ignored", "%! %1 nie jest na li¶cie ignorowanych\n", 1);
+	format_add("blocked_added", "%> Dodano %T%1%n do listy blokowanych\n", 1);
+	format_add("blocked_deleted", "%> Usuniêto %1 z listy blokowanych\n", 1);
+	format_add("blocked_list", "%> %1\n", 1);
+	format_add("blocked_list_empty", "%! Lista blokowanych u¿ytkowników jest pusta\n", 1);
+	format_add("error_not_blocked", "%! %1 nie jest na li¶cie blokowany\n", 1);
 
 	/* lista kontaktów */
 	format_add("list_empty", "%! Lista kontaktów jest pusta\n", 1);
@@ -890,6 +894,8 @@ void theme_init()
 	format_add("list_invisible_descr", "%> %1 %c(niewidoczn%@2: %n%5%c)%n %b%3:%4%n\n", 1);
 	format_add("list_blocked", "%> %1 %m(blokuj±c%@2)%n\n", 1);
 	format_add("list_unknown", "%> %1\n", 1);
+	format_add("modify_offline", "%> %1 nie bêdzie widzieæ naszego stanu\n", 1);
+	format_add("modify_online", "%> %1 bêdzie widzieæ nasz stan\n", 1);
 	format_add("modify_done", "%> Zmieniono wpis w li¶cie kontaktów\n", 1);
 
 	/* ¿egnamy siê, zapisujemy konfiguracjê */

@@ -1544,13 +1544,15 @@ void ignored_uin_generator(const char *text, int len)
 {
 	list_t l;
 
-	for (l = ignored; l; l = l->next) {
-		struct ignored *i = l->data;
-		struct userlist *u;
+	for (l = userlist; l; l = l->next) {
+		struct userlist *u = l->data;
 
-		if (!(u = userlist_find(i->uin, NULL))) {
-			if (!strncasecmp(text, itoa(i->uin), len))
-				array_add(&completions, xstrdup(itoa(i->uin)));
+		if (!ignored_check(u->uin))
+			continue;
+
+		if (!u->display) {
+			if (!strncasecmp(text, itoa(u->uin), len))
+				array_add(&completions, xstrdup(itoa(u->uin)));
 		} else {
 			if (u->display && !strncasecmp(text, u->display, len))
 				array_add(&completions, xstrdup(u->display));

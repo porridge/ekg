@@ -140,8 +140,16 @@ AC_TRY_RUN(
   {
     char tmp;
     return (snprintf(&tmp, sizeof(tmp), "test") != 4);
-  }], [AC_DEFINE(HAVE_C99_VSNPRINTF, 1, [define if you have C99-aware vsnprintf])
-  AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no])])
+  }], [
+	AC_DEFINE(HAVE_C99_VSNPRINTF, 1, [define if you have C99-aware vsnprintf])
+	AC_MSG_RESULT([yes])
+      	sed 's/#undef __GG_LIBGADU_HAVE_C99_VSNPRINTF/#define __GG_LIBGADU_HAVE_C99_VSNPRINTF/' < lib/libgadu-config.h > lib/libgadu-config.h-
+        mv -f lib/libgadu-config.h- lib/libgadu-config.h
+  ], [
+	AC_MSG_RESULT([no])
+        sed 's/#undef __GG_LIBGADU_HAVE_C99_VSNPRINTF/\/* & *\//' < lib/libgadu-config.h > lib/libgadu-config.h-
+        mv -f lib/libgadu-config.h- lib/libgadu-config.h
+  ])
 
 AC_ARG_WITH(pthread,
   [  --with-pthread          Use pthread in resolver])

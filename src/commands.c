@@ -826,15 +826,36 @@ COMMAND(cmd_modify)
 			ui_event("userlist_changed", u->display, u->display);
 			modified = 1;
 		}
+
+		if (match_arg(argv[i], 'o', "offline", 2)) {
+			gg_remove_notify_ex(sess, u->uin, userlist_type(u));
+			group_add(u, "__offline");
+			print("modify_offline", format_user(u->uin));
+			modified = 2;
+			gg_add_notify_ex(sess, u->uin, userlist_type(u));
+		}
+
+		if (match_arg(argv[i], 'O', "online", 2)) {
+			gg_remove_notify_ex(sess, u->uin, userlist_type(u));
+			group_remove(u, "__online");
+			print("modify_online", format_user(u->uin));
+			modified = 2;
+			gg_add_notify_ex(sess, u->uin, userlist_type(u));
+		}
+
 	}
 
 	if (strcasecmp(name, "add")) {
-		if (modified == 1) {
-			print("modify_done", params[0]);
-			config_changed = 1;
-		} else
-			if (modified == 0)
+		switch (modified) {
+			case 0:
 				print("not_enough_params", name);
+				break;
+			case 1:
+				print("modify_done", params[0]);
+			case 2:
+				config_changed = 1;
+				break;
+		}
 	} else
 		config_changed = 1;
 
@@ -911,14 +932,21 @@ COMMAND(cmd_ignore)
 	if (*name == 'i' || *name == 'I') {
 		if (!params[0]) {
 			list_t l;
+			int i = 0;
 
-			for (l = ignored; l; l = l->next) {
-				struct ignored *i = l->data;
+			for (l = userlist; l; l = l->next) {
+				struct userlist *u = l->data;
+				int level = ignored_check(u->uin);
 
-				print("ignored_list", format_user(i->uin));
+				if (!level)
+					continue;
+
+				i = 1;
+
+				print("ignored_list", format_user(u->uin));
 			}
 
-			if (!ignored) 
+			if (!i) 
 				print("ignored_list_empty");
 
 			return;
@@ -936,9 +964,9 @@ COMMAND(cmd_ignore)
 			return;
 		}
 		
-		if (!ignored_add(uin)) {
-			if (!in_autoexec) 
-				print("ignored_added", params[0]);
+		if (!ignored_add(uin, IGNORE_ALL)) {
+			print("ignored_added", params[0]);
+			config_changed = 1;
 		} else
 			print("error_adding_ignored");
 
@@ -961,10 +989,64 @@ COMMAND(cmd_ignore)
 		}
 		
 		if (!ignored_remove(uin)) {
-			if (!in_autoexec)
-				print("ignored_deleted", format_user(uin));
+			print("ignored_deleted", format_user(uin));
+			config_changed = 1;
 		} else
 			print("error_not_ignored", format_user(uin));
+	
+	}
+}
+
+COMMAND(cmd_block)
+{
+	uin_t uin;
+
+	if (*name == 'b' || *name == 'B') {
+		if (!params[0]) {
+			list_t l;
+			int i = 0;
+
+			for (l = userlist; l; l = l->next) {
+				struct userlist *u = l->data;
+				
+				if (!group_member(u, "__blocked"))
+					continue;
+
+				i = 1;
+
+				print("blocked_list", format_user(u->uin));
+			}
+
+			if (!i) 
+				print("blocked_list_empty");
+
+			return;
+		}
+
+		if (!(uin = get_uin(params[0]))) {
+			print("user_not_found", params[0]);
+			return;
+		}
+		
+		blocked_add(uin);
+		print("blocked_added", params[0]);
+		config_changed = 1;
+	} else {
+		if (!params[0]) {
+			print("not_enough_params", name);
+			return;
+		}
+
+		if (!(uin = get_uin(params[0]))) {
+			print("user_not_found", params[0]);
+			return;
+		}
+		
+		if (!blocked_remove(uin)) {
+			print("blocked_deleted", format_user(uin));
+			config_changed = 1;
+		} else
+			print("error_not_blocked", format_user(uin));
 	
 	}
 }
@@ -972,7 +1054,7 @@ COMMAND(cmd_ignore)
 COMMAND(cmd_list)
 {
 	list_t l;
-	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, show_descr = 0, j, p;
+	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, show_descr = 0, show_blocked = 0, show_offline = 0, j, p;
 	char *tmp, **argv = NULL, *show_group = NULL;
 
 	if (params[0] && *params[0] != '-') {
@@ -1050,7 +1132,7 @@ COMMAND(cmd_list)
 				status = format_string(format_find("user_info_unknown"), (u->first_name) ? u->first_name : u->display);
 		}
 		
-		groups = group_to_string(u->groups);
+		groups = group_to_string(u->groups, 0);
 
 		print("user_info", u->first_name, u->last_name, (u->nickname) ? u->nickname : u->display, u->display, u->mobile, groups, itoa(u->uin), status);
 		
@@ -1096,7 +1178,7 @@ COMMAND(cmd_list)
 		return;
 	}
 
-	/* list --active | --busy | --inactive | --invisible | --description | --member */
+	/* list --active | --busy | --inactive | --invisible | --description | --member | --blocked | --offline */
 	for (j = 0; params[j]; j++) {
 		int i;
 
@@ -1123,6 +1205,21 @@ COMMAND(cmd_list)
 				show_invisible = 1;
 			}
 
+			if (match_arg(argv[i], 'B', "blocked", 2)) {
+				show_all = 0;
+				show_blocked = 1;
+			}
+
+			if (match_arg(argv[i], 'o', "offline", 2)) {
+				show_all = 0;
+				show_offline = 1;
+			}
+
+			if (match_arg(argv[i], 'r', "ignored", 2)) {
+				show_all = 0;
+				show_offline = 1;
+			}
+
 			if (match_arg(argv[i], 'm', "member", 2)) {
 				if (j && argv[i+1]) {
 					int off = (argv[i+1][0] == '@' && strlen(argv[i+1]) > 1) ? 1 : 0;
@@ -1147,6 +1244,7 @@ COMMAND(cmd_list)
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
 		struct in_addr in;
+		int show;
 
 		tmp = "list_unknown";
 		switch (u->status) {
@@ -1196,7 +1294,27 @@ COMMAND(cmd_list)
 				}
 		}
 
-		if ((show_all || (show_busy && GG_S_B(u->status)) || (show_active && GG_S_A(u->status)) || (show_inactive && GG_S_NA(u->status)) || (show_invisible && GG_S_I(u->status))) && !(show_descr && !GG_S_D(u->status)) && !(show_group && !group_member(u, show_group))) {
+		show = show_all;
+
+		if (show_busy && GG_S_B(u->status))
+			show = 1;
+
+		if (show_active && GG_S_A(u->status))
+			show = 1;
+
+		if (show_inactive && GG_S_NA(u->status))
+			show = 1;
+
+		if (show_invisible && GG_S_I(u->status))
+			show = 1;
+
+		if (show_descr && !GG_S_D(u->status))
+			show = 0;
+
+		if (show_group && !group_member(u, show_group))
+			show = 0;
+
+		if (show) {
 			print(tmp, format_user(u->uin), (u->first_name) ? u->first_name : u->display, inet_ntoa(in), itoa(p), u->descr);
 			count++;
 		}
@@ -3215,6 +3333,11 @@ void command_init()
 	  "wzglêdu na ustawienia zmiennych.");
 	  
 	command_add
+	( "block", "u", cmd_block, 0,
+	  " [numer/alias]", "dodaje do listy blokowanych",
+	  "");
+
+	command_add
 	( "bind", "???", cmd_bind, 0,
 	  " <opcja> [sekwencja] [komenda]", "przypisywanie akcji klawiszom",
 	  "  -a, --add <sekwencja> <komenda>  przypisuje now± sekwencjê\n"
@@ -3334,8 +3457,10 @@ void command_init()
 	 
 	command_add
 	( "ignore", "u", cmd_ignore, 0,
-	  " [numer/alias]", "dodaje do listy ignorowanych lub j± wy¶wietla",
-	  "");
+	  " [opcje] [numer/alias]", "dodaje do listy ignorowanych",
+	  "\n"
+	  "W przysz³o¶ci bêdzie mo¿liwe wybranie zdarzeñ zwi±zanych z dan±\n"
+	  "osob±, takich jak wiadomo¶ci, zmiana stanu, zmiana opisu itp.");
 	  
 	command_add
 	( "invisible", "?", cmd_away, 0,
@@ -3365,6 +3490,7 @@ void command_init()
 	  "  -i, --inactive        niedostêpne\n"
 	  "  -d, --description     osoby z opisem\n"
 	  "  -m, --member <@grupa> osoby nale¿±ce do danej grupy\n"
+	  "  -o, --offline         osoby dla których jeste¶my niedostêpni\n"
 	  "\n"
 	  "Wy¶wietlanie cz³onków grupy: \"list @grupa\"\n"
 	  "\n"
@@ -3377,6 +3503,8 @@ void command_init()
 	  "  -g, --group [+/-]<@grupa>  dodaje lub usuwa z grupy\n"
 	  "                             mo¿na podaæ wiêcej grup po przecinku\n"
 	  "  -p, --phone <numer>        numer telefonu komórkowego\n"
+	  "  -o, --offline              b±d¼ niedostêpny dla danej osoby\n"
+	  "  -O, --online               b±d¼ dostêpny dla danej osoby\n"
 	  "\n"
 	  "Lista kontaktów na serwerze \"list [-p|-g]\":\n"
 	  "  -p, --put  umieszcza na serwerze\n"
@@ -3501,6 +3629,11 @@ void command_init()
 	command_add
 	( "unignore", "i", cmd_ignore, 0,
 	  " <numer/alias>", "usuwa z listy ignorowanych osób",
+	  "");
+	  
+	command_add
+	( "unblock", "b", cmd_block, 0,
+	  " <numer/alias>", "usuwa z listy blokowanych osób",
 	  "");
 	  
 	command_add

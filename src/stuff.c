@@ -503,7 +503,7 @@ int config_read()
 			}
 		} else if (!strcasecmp(buf, "ignore")) {
 			if (atoi(foo))
-				ignored_add(atoi(foo));
+				ignored_add(atoi(foo), IGNORE_ALL);
 		} else if (!strcasecmp(buf, "alias")) {
 			alias_add(foo, 1, 1);
 		} else if (!strcasecmp(buf, "on")) {
@@ -624,12 +624,6 @@ void config_write_main(FILE *f, int base64)
 
 	for (l = variables; l; l = l->next)
 		config_write_variable(f, l->data, base64);
-
-	for (l = ignored; l; l = l->next) {
-		struct ignored *i = l->data;
-
-		fprintf(f, "ignore %u\n", i->uin);
-	}
 
 	for (l = aliases; l; l = l->next) {
 		struct alias *a = l->data;
