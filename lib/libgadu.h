@@ -638,6 +638,7 @@ __attribute__ ((packed))
 #define GG_CLASS_MSG 0x0004
 #define GG_CLASS_CHAT 0x0008
 #define GG_CLASS_CTCP 0x0010
+#define GG_CLASS_EXT_MSG 0x0020 	/* EXT = extended */
 
 #define GG_MSG_MAXSIZE 2000
 
@@ -649,6 +650,32 @@ struct gg_send_msg {
 #ifdef __GNUC__
 __attribute__ ((packed))
 #endif
+;
+
+struct gg_send_ext_msg {
+	char flag;		
+	unsigned int length;	  
+	unsigned int position;	
+	char font;
+} 
+#ifdef __GNUC__
+ __attribute__ ((packed))
+#endif 
+;
+
+#define GG_FONT_BOLD 0x01
+#define GG_FONT_ITALIC 0x02
+#define GG_FONT_UNDERLINE 0x04
+#define GG_FONT_COLOR 0x08
+
+struct gg_ext_msg_color { 
+	char red;
+	char green;
+	char blue;
+} 
+#ifdef __GNUC__
+ __attribute__ ((packed))
+#endif 
 ;
 
 struct gg_msg_recipients {
