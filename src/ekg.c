@@ -63,6 +63,15 @@ void reaper_user(void *foo)
 	xfree(foo);
 }
 
+/*
+ * usuwanie sesji wyszukiwania.
+ */
+void reaper_search(struct gg_http *s)
+{
+	gg_search_request_free((struct gg_search_request*) s->user_data);
+	gg_search_free(s);
+}
+
 #define VV void(*)(void*)
 
 /*
@@ -80,7 +89,7 @@ static struct {
 	{ GG_SESSION_DCC_SEND, (VV) handle_dcc, (VV) gg_dcc_free },
 	{ GG_SESSION_DCC_GET, (VV) handle_dcc, (VV) gg_dcc_free },
 	{ GG_SESSION_DCC_VOICE, (VV) handle_dcc, (VV) gg_dcc_free },
-	{ GG_SESSION_SEARCH, (VV) handle_search, (VV) gg_search_free },
+	{ GG_SESSION_SEARCH, (VV) handle_search, (VV) reaper_search },
 	{ GG_SESSION_REGISTER, (VV) handle_pubdir, (VV) gg_register_free },
 	{ GG_SESSION_PASSWD, (VV) handle_pubdir, (VV) gg_change_passwd_free },
 	{ GG_SESSION_REMIND, (VV) handle_pubdir, (VV) gg_remind_passwd_free },

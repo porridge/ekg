@@ -1,7 +1,8 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>,
+ *                          Piotr Wysocki <wysek@linux.bydg.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -717,6 +718,7 @@ void handle_event(struct gg_session *s)
  */
 void handle_search(struct gg_http *h)
 {
+	struct gg_search_request *r;
 	struct gg_search *s = NULL;
 	int i;
 
@@ -724,7 +726,8 @@ void handle_search(struct gg_http *h)
 		print("search_failed", strerror(errno));
 		free(h->user_data);
 		list_remove(&watches, h, 0);
-		gg_free_search(h);
+		gg_search_request_free((struct gg_search_request*) h->user_data);
+		gg_search_free(h);
 		return;
 	}
 	
@@ -775,9 +778,43 @@ void handle_search(struct gg_http *h)
 		free(gender);
 	}
 
-	free(h->user_data);
+	r = (void*) h->user_data;
+
+	gg_debug(GG_DEBUG_MISC, "s->count = %d, start = 0x%.8x\n", s->count, r->start);
+	if (s->count > 19 && (r->start & 0x80000000L)) {
+		struct gg_http *h2;
+		list_t l;
+		int id = 1;
+		
+		r->start = s->results[19].uin | 0x80000000L;
+		list_remove(&watches, h, 0);
+		gg_free_search(h);
+		
+		for (l = watches; l; l = l->next)
+		{
+			struct gg_http *h3 = l->data;
+
+			if (h3->type != GG_SESSION_SEARCH)
+				continue;
+
+			if (h3->id / 2 >= id)
+				id = h3->id / 2 + 1;
+		}
+		if (!(h2 = gg_search(r, 1)))
+		{
+			print("search_failed", strerror(errno));
+			gg_search_request_free(r);
+			return;
+		}
+		h2->id = id;
+		h2->user_data = (char*) r;
+		list_add(&watches, h2, 0);
+		return;
+	}
+	
 	list_remove(&watches, h, 0);
-	gg_free_search(h);
+	gg_search_request_free(r);
+	gg_search_free(h);
 }
 
 /*

@@ -28,6 +28,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawka rzucania wiadomo¶ci do innych okienek. tak, przyznajê, moja
   wina. g³upi b³±d. (w)
 - matik.theme (matik/s)
+- ,,find -A'' wy¶wietla wszystkie wyniki (wysek/w)
+- wynik wyszukiwania nie jest ju¿ rozstrzelony co dwie linijki (w)
+- dodanie gg_search_request_free(), podbicie API (w)
 
 // 2002-09-10
 

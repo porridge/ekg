@@ -303,8 +303,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 		update_statusbar();
 	}
 
-	set_cursor(w);
-
+#if 0
 	if (config_timestamp) {
 		time_t t;
 		struct tm *tm;
@@ -320,7 +319,8 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 			x++;
 		}
 	}
-
+#endif
+	
 	for (p = line; *p; p++) {
 		if (*p == 27) {
 			p++;
@@ -361,10 +361,15 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 			x = 0;
 			set_cursor(w);
 		} else {
+			if (!x)
+				set_cursor(w);
 			waddch(w->window, (unsigned char) *p);
 			x++;
 			if (x == stdscr->_maxx + 1) {
-				w->y++;
+				if (*(p + 1) == 10) 
+					p++;
+				else
+					w->y++;
 				x = 0;
 				set_cursor(w);
 			}

@@ -5,6 +5,7 @@
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *                          Wojciech Bojdol <wojboj@htc.net.pl>
+ *                          Piotr Wysocki <wysek@linux.bydg.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -472,7 +473,7 @@ COMMAND(cmd_exec)
 
 COMMAND(cmd_find)
 {
-	struct gg_search_request r;
+	struct gg_search_request *r;
 	struct gg_http *h;
 	list_t l;
 	char **argv = NULL, *query = NULL;
@@ -492,22 +493,25 @@ COMMAND(cmd_find)
 	if (params[0])
 		query = xstrdup(params[0]);
 	
-	memset(&r, 0, sizeof(r));
+	r = xmalloc(sizeof(*r));
+	memset(r, 0, sizeof(*r));
 
 	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
 		/* XXX nie pasuje do nowego wygl±du UI
 		r.uin = (query_nick) ? ((strchr(query_nick, ',')) ? config_uin : get_uin(query_nick)) : config_uin;
 		id = id * 2;
 		*/
+		free(r);
 		return;
 
 	} else {
 		if (argv[0] && !argv[1] && argv[0][0] != '-') {
 			id = id * 2;	/* single search */
-			if (!(r.uin = get_uin(params[0]))) {
+			if (!(r->uin = get_uin(params[0]))) {
 				print("user_not_found", params[0]);
 				free(query);
 				array_free(argv);
+				free(r);
 				return;
 			}
 		} else {
@@ -516,63 +520,67 @@ COMMAND(cmd_find)
 				char *arg = argv[i];
 				
 				if (match_arg(arg, 'f', "first", 2) && argv[i + 1])
-					r.first_name = argv[++i];
+					r->first_name = xstrdup(argv[++i]);
 				if (match_arg(arg, 'l', "last", 2) && argv[i + 1])
-					r.last_name = argv[++i];
+					r->last_name = xstrdup(argv[++i]);
 				if (match_arg(arg, 'n', "nickname", 2) && argv[i + 1])
-					r.nickname = argv[++i];
+					r->nickname = xstrdup(argv[++i]);
 				if (match_arg(arg, 'c', "city", 2) && argv[i + 1])
-					r.city = argv[++i];
+					r->city = xstrdup(argv[++i]);
 				if (match_arg(arg, 'p', "phone", 2) && argv[i + 1])
-					r.phone = argv[++i];
+					r->phone = xstrdup(argv[++i]);
 				if (match_arg(arg, 'e', "email", 2) && argv[i + 1])
-					r.email = argv[++i];
+					r->email = xstrdup(argv[++i]);
 				if (match_arg(arg, 'u', "uin", 2) && argv[i + 1])
-					r.uin = strtol(argv[++i], NULL, 0);
+					r->uin = strtol(argv[++i], NULL, 0);
 				if (match_arg(arg, 's', "start", 2) && argv[i + 1])
-					r.start = strtol(argv[++i], NULL, 0);
+					r->start = strtol(argv[++i], NULL, 0);
 				if (match_arg(arg, 'F', "female", 2))
-					r.gender = GG_GENDER_FEMALE;
+					r->gender = GG_GENDER_FEMALE;
 				if (match_arg(arg, 'M', "male", 2))
-					r.gender = GG_GENDER_MALE;
+					r->gender = GG_GENDER_MALE;
 				if (match_arg(arg, 'a', "active", 2))
-					r.active = 1;
+					r->active = 1;
 				if (match_arg(arg, 'b', "born", 2) && argv[i + 1]) {
 					char *foo = strchr(argv[++i], ':');
 		
 					if (!foo) {
-						r.min_birth = atoi(argv[i]);
-						r.max_birth = atoi(argv[i]);
+						r->min_birth = atoi(argv[i]);
+						r->max_birth = atoi(argv[i]);
 					} else {
 						*foo = 0;
-						r.min_birth = atoi(argv[i]);
-						r.max_birth = atoi(++foo);
+						r->min_birth = atoi(argv[i]);
+						r->max_birth = atoi(++foo);
 					}
-					if (r.min_birth < 100)
-						r.min_birth += 1900;
-					if (r.max_birth < 100)
-						r.max_birth += 1900;
+					if (r->min_birth < 100)
+						r->min_birth += 1900;
+					if (r->max_birth < 100)
+						r->max_birth += 1900;
 				}
+				if (match_arg(arg, 'A', "all", 3))
+					r->start |= 0x80000000L;
 			}
 		}
 	}
 
-	iso_to_cp(r.first_name);
-	iso_to_cp(r.last_name);
-	iso_to_cp(r.nickname);
-	iso_to_cp(r.city);
-	iso_to_cp(r.phone);
-	iso_to_cp(r.email);
+	iso_to_cp(r->first_name);
+	iso_to_cp(r->last_name);
+	iso_to_cp(r->nickname);
+	iso_to_cp(r->city);
+	iso_to_cp(r->phone);
+	iso_to_cp(r->email);
 
-	if (!(h = gg_search(&r, 1))) {
+	if (!(h = gg_search(r, 1))) {
 		print("search_failed", strerror(errno));
 		free(query);
 		array_free(argv);
+		gg_search_request_free(r);
+		free(r);
 		return;
 	}
 
 	h->id = id;
-	h->user_data = query;
+	h->user_data = (char*) r;
 
 	list_add(&watches, h, 0);
 	
@@ -2493,6 +2501,7 @@ void command_init()
 	  "  -F, --female            kobiety\n"
 	  "  -M, --male              mê¿czy¼ni\n"
 	  "  --start <n>             wy¶wietla od n-tego wyniku\n"
+	  "  -A, --all               wy¶wietla wszystkich\n"
 	  "\n"
 	  "  Ze wzglêdu na organizacjê katalogu publicznego, niektórych\n"
 	  "  opcji nie mo¿na ze sob± ³±czyæ");

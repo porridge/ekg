@@ -4,7 +4,8 @@
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>,
  *                          Robert J. Wo¼ny <speedy@ziew.org>,
  *                          Arkadiusz Mi¶kiewicz <misiek@pld.org.pl>,
- *                          Tomasz Chiliñski <chilek@chilan.com>
+ *                          Tomasz Chiliñski <chilek@chilan.com>,
+ *                          Piotr Wysocki <wysek@linux.bydg.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License Version
@@ -414,7 +415,8 @@ void gg_http_free(struct gg_http *h);
  */
 struct gg_search_request {
 	int active;		/* czy ma szukaæ tylko aktywnych? */
-	int start;		/* od którego wyniku pokazywaæ? */
+	unsigned int start;	/* od którego wyniku pokazywaæ? biblioteka
+				   bierze pod uwagê 31 dolnych bitów. */
 
 	/* mode 0 */
 	char *nickname;		/* pseudonim */
@@ -464,15 +466,16 @@ struct gg_search_result {
 /*
  * funkcje wyszukiwania.
  */
-struct gg_http *gg_search(struct gg_search_request *r, int async);
+struct gg_http *gg_search(const struct gg_search_request *r, int async);
 int gg_search_watch_fd(struct gg_http *f);
 void gg_free_search(struct gg_http *f);
 #define gg_search_free gg_free_search
 
-struct gg_search_request *gg_search_request_mode_0(char *nickname, char *first_name, char *last_name, char *city, int gender, int min_birth, int max_birth, int active, int start);
-struct gg_search_request *gg_search_request_mode_1(char *email, int active, int start);
-struct gg_search_request *gg_search_request_mode_2(char *phone, int active, int start);
-struct gg_search_request *gg_search_request_mode_3(uin_t uin, int active, int start);
+const struct gg_search_request *gg_search_request_mode_0(char *nickname, char *first_name, char *last_name, char *city, int gender, int min_birth, int max_birth, int active, int start);
+const struct gg_search_request *gg_search_request_mode_1(char *email, int active, int start);
+const struct gg_search_request *gg_search_request_mode_2(char *phone, int active, int start);
+const struct gg_search_request *gg_search_request_mode_3(uin_t uin, int active, int start);
+void gg_search_request_free(struct gg_search_request *r);
 
 /*
  * operacje na katalogu publicznym.
