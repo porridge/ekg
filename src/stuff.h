@@ -45,7 +45,9 @@ enum {
 	EVENT_AWAY = 16,
 	EVENT_DCC = 32,
 	EVENT_INVISIBLE = 64,
-	EVENT_EXEC = 128
+	EVENT_EXEC = 128,
+	EVENT_SIGUSR1 = 256,
+	EVENT_SIGUSR2 = 512
 };
 
 struct process {
@@ -192,7 +194,7 @@ int add_event(int flags, uin_t uin, char *action, int quiet);
 int del_event(int flags, uin_t uin);
 int get_flags(char *events);
 char *format_events(int flags);
-int check_event(int event, uin_t uin);
+int check_event(int event, uin_t uin, const char *data);
 int run_event(char *action);
 int send_event(char *seq, int act);
 int correct_event(char *action);

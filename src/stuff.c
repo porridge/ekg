@@ -1041,6 +1041,10 @@ char *format_events(int flags)
 		strcat(buff, *buff ? "|dcc" : "dcc");
         if (flags & EVENT_EXEC)
 		strcat(buff, *buff ? "|exec" : "exec");
+        if (flags & EVENT_SIGUSR1)
+		strcat(buff, *buff ? "|sigusr1" : "sigusr1");
+        if (flags & EVENT_SIGUSR2)
+		strcat(buff, *buff ? "|sigusr2" : "sigusr2");
         if (strlen(buff) > 37)
 		strcpy(buff, "*");
 
@@ -1076,6 +1080,10 @@ int get_flags(char *events)
 		flags |= EVENT_DCC;
 	if (strstr(events, "invisible") || strstr(events, "INVISIBLE"))
 	    	flags |= EVENT_INVISIBLE;
+	if (strstr(events, "sigusr1") || strstr(events, "SIGUSR1"))
+	    	flags |= EVENT_SIGUSR1;
+	if (strstr(events, "sigusr2") || strstr(events, "SIGUSR2"))
+	    	flags |= EVENT_SIGUSR2;
 
         return flags;
 }
@@ -1161,7 +1169,7 @@ int del_event(int flags, uin_t uin)
  * - event
  * - uin
  */
-int check_event(int event, uin_t uin)
+int check_event(int event, uin_t uin, const char *data)
 {
         char *evt_ptr = NULL, *uin_number = NULL, *uin_display = NULL;
 	struct userlist *u;
@@ -1190,7 +1198,7 @@ int check_event(int event, uin_t uin)
 		int i = 0;
 		
                 while (events[i]) {
-			char *tmp = format_string(events[i], uin_number, uin_display);
+			char *tmp = format_string(events[i], uin_number, uin_display, (data) ? data : "");
 			run_event(tmp);
 			free(tmp);
 			i++;
@@ -1198,7 +1206,7 @@ int check_event(int event, uin_t uin)
 		
 		array_free(events);
         } else {
-		char *tmp = format_string(evt_ptr, uin_number, uin_display);
+		char *tmp = format_string(evt_ptr, uin_number, uin_display, (data) ? data : "");
 		run_event(tmp);
 		free(tmp);
 	}
@@ -1254,14 +1262,12 @@ int run_event(char *act)
 		array_free(acts);
 		return res;
 	}
-#endif	//IOCTL
+#endif /* IOCTL */
  	
 	if (!strncasecmp(acts[0], "play", 4)) {
 		gg_debug(GG_DEBUG_MISC, "//   playing sound\n");
 		play_sound(acts[1]);
-		free(action);
-		array_free(acts);
-		return 0;
+		goto cleanup;
 	} 
 
 	if (!strncasecmp(acts[0], "exec", 4)) {
@@ -1275,9 +1281,13 @@ int run_event(char *act)
                 }
                 add_process(pid, "\002");
 #endif
-		free(action);
-		array_free(acts);
-		return 0;
+		goto cleanup;
+	} 
+
+	if (!strncasecmp(acts[0], "command", 7)) {
+		gg_debug(GG_DEBUG_MISC, "//   executing program\n");
+		execute_line(action + 8);
+		goto cleanup;
 	} 
 
 	if (!strncasecmp(acts[0], "chat", 4) || !strncasecmp(acts[0], "msg", 3)) {
@@ -1287,23 +1297,17 @@ int run_event(char *act)
 
 		gg_debug(GG_DEBUG_MISC, "//   chatting/mesging\n");
 		
-                if (!strchr(acts[1], ' ')) {
-			free(action);
-			array_free(acts);
-                        return 1;
-		}
+                if (!strchr(acts[1], ' '))
+			goto fail;
 
 		while (isalnum(acts[1][i]))
 		    	i++;
 		acts[1][i++] = '\0';
 		
-                if (!(uin = get_uin(acts[1]))) {
-			free(action);
-			array_free(acts);
-                        return 1;
-		}
-		data = acts[1] + i;
-	
+                if (!(uin = get_uin(acts[1])))
+			goto fail;
+
+		data = acts[1] + i;	
 
 		u = userlist_find(uin, NULL);
 
@@ -1311,25 +1315,26 @@ int run_event(char *act)
 
                 iso_to_cp(data);
                 gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, data);
-
-		free(action);
-		array_free(acts);
-                return 0;
+		goto cleanup;
         }
 
         if (!strncasecmp(acts[0], "beep", 4)) {
                 gg_debug(GG_DEBUG_MISC, "//   BEEP\n");
 		my_puts("\007");
-                free(action);
-                array_free(acts);
-                return 0;
+		goto cleanup;
         }
 
 	gg_debug(GG_DEBUG_MISC, "//   unknown action\n");
 
+cleanup:
 	free(action);
 	array_free(acts);
         return 0;
+
+fail:
+	free(action);
+	array_free(acts);
+        return 1;
 }
 
 #ifdef IOCTL
@@ -1454,6 +1459,15 @@ int correct_event(char *act)
 			}
 		} 
 		else if (!strncasecmp(acts[0], "exec", 4)) {
+			if (!acts[1]) {
+				my_printf("events_act_no_params", acts[0]);
+				free(action);
+				array_free(acts);
+				array_free(events);
+				return 1; 
+			}
+		} 
+		else if (!strncasecmp(acts[0], "command", 7)) {
 			if (!acts[1]) {
 				my_printf("events_act_no_params", acts[0]);
 				free(action);

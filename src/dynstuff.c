@@ -344,9 +344,10 @@ char *itoa(long int i)
  * zaalokowan± tablicê z zaalokowanymi ci±gami znaków lub NULL w przypadku
  * b³êdu.
  */
-char **array_make(char *string, char *sep, int max, int trim, int quotes)
+char **array_make(const char *string, const char *sep, int max, int trim, int quotes)
 {
-	char *p, *q, **result = NULL, **tmp;
+	const char *p, *q;
+	char **result = NULL, **tmp;
 	int items, last = 0;
 
 	for (p = string, items = 0; ; ) {

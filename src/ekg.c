@@ -297,13 +297,25 @@ int my_getc(FILE *f)
 	return -1;
 }
 
-void sigcont()
+void sigusr1_handler()
 {
-	rl_forced_update_display();
-	signal(SIGCONT, sigcont);
+	check_event(EVENT_SIGUSR1, 1, "SIGUSR1");
+	signal(SIGUSR1, sigusr1_handler);
 }
 
-void sighup()
+void sigusr2_handler()
+{
+	check_event(EVENT_SIGUSR2, 1, "SIGUSR2");
+	signal(SIGUSR1, sigusr2_handler);
+}
+
+void sigcont_handler()
+{
+	rl_forced_update_display();
+	signal(SIGCONT, sigcont_handler);
+}
+
+void sighup_handler()
 {
 	if (sess && sess->state != GG_STATE_IDLE) {
 		my_printf("disconected");
@@ -313,7 +325,7 @@ void sighup()
 		sess = NULL;
 	}
 	
-	signal(SIGHUP, sighup);
+	signal(SIGHUP, sighup_handler);
 }
 
 void kill_ioctl_daemon()
@@ -390,6 +402,13 @@ int main(int argc, char **argv)
 	}
 
 	signal(SIGSEGV, sigsegv_handler);
+	signal(SIGCONT, sigcont_handler);
+	signal(SIGHUP, sighup_handler);
+	signal(SIGINT, sigint_handler);
+	signal(SIGUSR1, sigusr1_handler);
+	signal(SIGUSR2, sigusr2_handler);
+	signal(SIGALRM, SIG_IGN);
+	signal(SIGPIPE, SIG_IGN);
 
 	if (screen_lines < 1)
 		screen_lines = 24;
@@ -525,12 +544,6 @@ IOCTL_HELP
 	
 	reset_theme_cache();
 		
-	signal(SIGCONT, sigcont);
-	signal(SIGHUP, sighup);
-	signal(SIGALRM, SIG_IGN);
-	signal(SIGPIPE, SIG_IGN);
-	signal(SIGINT, sigint_handler);
-
 	time(&last_action);
 
 	/* dodajemy stdin do ogl±danych deskryptorów */

@@ -8,6 +8,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-05-16
 
 - poprawka endianów w kolorkowych pakietach (murphy/w)
+- dodane zdarzenia ,,sigusr1'' i ,,sigusr2'' odpowiadaj±ce sygna³om (joshua/w)
+- dodana akcja ,,command'', która wywo³uje podan± komendê (w)
 
 // 2002-05-15
 

@@ -52,7 +52,7 @@ char *string_free(struct string *s, int free_string);
 
 /* tablice stringów */
 
-char **array_make(char *string, char *sep, int max, int trim, int quotes);
+char **array_make(const char *string, const char *sep, int max, int trim, int quotes);
 void array_free(char **array);
 
 /* rozszerzenia libców */

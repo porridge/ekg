@@ -2036,6 +2036,11 @@ char *strip_spaces(char *line)
 	return buf;
 }
 
+/*
+ * execute_line()
+ *
+ * zmienia zawarto¶æ bufora line.
+ */
 int execute_line(char *line)
 {
 	char *cmd = NULL, *tmp, *p = NULL, short_cmd[2] = ".", *last_name = NULL, *last_params = NULL;
