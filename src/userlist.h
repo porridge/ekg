@@ -88,7 +88,7 @@ int blocked_remove(uin_t uin);
 int group_add(struct userlist *u, const char *group);
 int group_remove(struct userlist *u, const char *group);
 int group_member(struct userlist *u, const char *group);
-char *group_to_string(list_t l, int meta);
+char *group_to_string(list_t l, int meta, int sep);
 list_t group_init(const char *groups);
 
 uin_t get_uin(const char *text);

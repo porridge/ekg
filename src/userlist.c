@@ -232,7 +232,7 @@ char *userlist_dump()
 		struct userlist *u = l->data;
 		char *groups, *line;
 		
-		groups = group_to_string(u->groups, 1);
+		groups = group_to_string(u->groups, 1, 0);
 		
 		line = saprintf("%s;%s;%s;%s;%s;%s;%lu\r\n",
 			(u->first_name) ? u->first_name : "",
@@ -910,10 +910,11 @@ list_t group_init(const char *names)
  *
  *  - groups - lista grup.
  *  - meta - czy do³±czyæ ,,meta-grupy''?
+ *  - sep - czy oddzielaæ przecinkiem _i_ spacj±?
  *
  * zwraca zaalokowany ci±g znaków lub NULL w przypadku b³êdu.
  */
-char *group_to_string(list_t groups, int meta)
+char *group_to_string(list_t groups, int meta, int sep)
 {
 	string_t foo;
 	list_t l;
@@ -934,7 +935,7 @@ char *group_to_string(list_t groups, int meta)
 		}
 
 		if (comma)
-			string_append(foo, ", ");
+			string_append(foo, (sep) ? ", " : ",");
 
 		comma = 1;
 

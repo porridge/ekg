@@ -1098,6 +1098,16 @@ void theme_init()
 
 	/* szczegó³owe informacje o u¿ytkowniku */
 	format_add("user_info", "%) Pseudonim: %T%1%n\n%) Numer: %T%2%n\n%) Stan: %3\n%) Adres IP: %T%4%n\n%) Imiê i nazwisko: %T%5 %6%n\n%) Alias: %T%7%n\n%) Numer telefonu: %T%8%n\n%) Grupy: %T%9%n\n", 1);
+			
+	format_add("user_info_header", "%K.--%n %T%1%n/%2 %K--- -- -%n\n", 1);
+	format_add("user_info_nickname", "%K| %nPseudonim: %T%1%n\n", 1);
+	format_add("user_info_name", "%K| %nImiê i nazwisko: %T%1 %2%n\n", 1);
+	format_add("user_info_status", "%K| %nStan: %T%1%n\n", 1);
+	format_add("user_info_ip", "%K| %nAdres: %T%1%n\n", 1);
+	format_add("user_info_mobile", "%K| %nTelefon: %T%1%n\n", 1);
+	format_add("user_info_groups", "%K| %nGrupy: %T%1%n\n", 1);
+	format_add("user_info_footer", "%K`----- ---- --- -- -%n\n", 1);
+
 	format_add("user_info_avail", "%Ydostêpn%@1%n", 1);
 	format_add("user_info_avail_descr", "%Ydostêpn%@1%n (%2)", 1);
 	format_add("user_info_busy", "%Gzajêt%@1%n", 1);

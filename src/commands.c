@@ -1316,11 +1316,27 @@ COMMAND(cmd_list)
 
 		status = format_string(format_find(ekg_status_label(u->status, "user_info_")), (u->first_name) ? u->first_name : u->display, u->descr);
 
-		groups = group_to_string(u->groups, 0);
+		groups = group_to_string(u->groups, 0, 1);
 
 		ip_str = saprintf("%s:%s", inet_ntoa(u->ip), itoa(u->port));
 
+		print("user_info_header", u->display, itoa(u->uin));
+		if (u->nickname && strcmp(u->nickname, u->display)) 
+			print("user_info_nickname", u->nickname);
+		if (u->first_name || u->last_name)
+			print("user_info_name", u->first_name, u->last_name);
+		print("user_info_status", status);
+		if (u->ip.s_addr)
+			print("user_info_ip", ip_str);
+		if (u->mobile)
+			print("user_info_mobile", u->mobile);
+		if (strcmp(groups, ""))
+			print("user_info_groups", groups);
+		print("user_info_footer", u->display, itoa(u->uin));
+		
+#if 0
 		print("user_info", (u->nickname) ? u->nickname : u->display, itoa(u->uin), status, ip_str, u->first_name, u->last_name, u->display, u->mobile, groups);
+#endif
 		
 		xfree(ip_str);
 		xfree(groups);
