@@ -754,14 +754,32 @@ struct gg_login_ext {
 #define GG_STATUS_DESCR_MAXSIZE 45
 
 /*
- * makra do szybkiego sprawdzania stanu. ich znaczenie powinno byæ jasne.
+ * makra do ³atwego i szybkiego sprawdzania stanu.
  */
-#define GG_S_A(x) ((x) == GG_STATUS_AVAIL || (x) == GG_STATUS_AVAIL_DESCR)
-#define GG_S_NA(x) ((x) == GG_STATUS_NOT_AVAIL || (x) == GG_STATUS_NOT_AVAIL_DESCR)
-#define GG_S_B(x) ((x) == GG_STATUS_BUSY || (x) == GG_STATUS_BUSY_DESCR)
-#define GG_S_I(x) ((x) == GG_STATUS_INVISIBLE || (x) == GG_STATUS_INVISIBLE_DESCR)
-#define GG_S_D(x) ((x) == GG_STATUS_NOT_AVAIL_DESCR || (x) == GG_STATUS_AVAIL_DESCR || (x) == GG_STATUS_BUSY_DESCR || (x) == GG_STATUS_INVISIBLE_DESCR)
-#define GG_S_BL(x) ((x) == GG_STATUS_BLOCKED)
+
+/* GG_S_F() tryb tylko dla znajomych */
+#define GG_S_F(x) (((x) & GG_STATUS_FRIENDS_MASK) != 0)
+
+/* GG_S() stan bez uwzglêdnienia trybu tylko dla znajomych */
+#define GG_S(x) ((x) & ~GG_STATUS_FRIENDS_MASK)
+
+/* GG_S_A() dostêpny */
+#define GG_S_A(x) (GG_S(x) == GG_STATUS_AVAIL || GG_S(x) == GG_STATUS_AVAIL_DESCR)
+
+/* GG_S_NA() niedostêpny */
+#define GG_S_NA(x) (GG_S(x) == GG_STATUS_NOT_AVAIL || GG_S(x) == GG_STATUS_NOT_AVAIL_DESCR)
+
+/* GG_S_B() zajêty */
+#define GG_S_B(x) (GG_S(x) == GG_STATUS_BUSY || GG_S(x) == GG_STATUS_BUSY_DESCR)
+
+/* GG_S_I() niewidoczny */
+#define GG_S_I(x) (GG_S(x) == GG_STATUS_INVISIBLE || GG_S(x) == GG_STATUS_INVISIBLE_DESCR)
+
+/* GG_S_D() stan opisowy */
+#define GG_S_D(x) (GG_S(x) == GG_STATUS_NOT_AVAIL_DESCR || GG_S(x) == GG_STATUS_AVAIL_DESCR || GG_S(x) == GG_STATUS_BUSY_DESCR || GG_S(x) == GG_STATUS_INVISIBLE_DESCR)
+
+/* GG_S_BL() blokowany lub blokuj±cy */
+#define GG_S_BL(x) (GG_S(x) == GG_STATUS_BLOCKED)
 
 struct gg_new_status {
 	uint32_t status;			/* na jaki zmieniæ? */

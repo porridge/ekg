@@ -235,12 +235,10 @@ int config_windows_save;
 
 char *home_dir;
 char *config_dir;
-int away;
 int in_autoexec;
 int reconnect_timer;
 time_t last_action;
 int last_sysmsg;
-int private_mode;
 int connecting;
 time_t last_conn_event;
 int server_index;
@@ -282,6 +280,7 @@ const char *http_error_string(int h);
 void update_status();
 void update_status_myip();
 void change_status(int status, const char *arg, int autom);
+const char *ekg_status_label(int status, const char *prefix);
 
 int process_add(int pid, const char *name);
 int process_remove(int pid);

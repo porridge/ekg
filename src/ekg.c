@@ -250,7 +250,7 @@ void ekg_wait_for_key()
 #endif
 
 	for (;;) {
-		/* przejrzyj timery */
+		/* przejrzyj timery u¿ytkownika, ui, skryptów */
 		for (l = timers; l; ) {
 			struct timer *t = l->data;
 			struct timeval tv;
@@ -292,10 +292,148 @@ void ekg_wait_for_key()
 			}
 		}
 
-		FD_ZERO(&rd);
-		FD_ZERO(&wd);
+		/* sprawd¼ timeouty ró¿nych sesji */
+		for (l = watches; l; l = l->next) {
+			struct gg_session *s = l->data;
+			struct gg_common *c = l->data;
+			struct gg_http *h = l->data;
+			struct gg_dcc *d = l->data;
+
+			if (!c || c->timeout == -1)
+				continue;
+
+			c->timeout--;
+
+			if (c->timeout > 0)
+				continue;
+			
+			switch (c->type) {
+				case GG_SESSION_GG:
+					print("conn_timeout");
+					list_remove(&watches, s, 0);
+					gg_free_session(s);
+					userlist_clear_status();
+					sess = NULL;
+					do_reconnect();
+					break;
+
+				case GG_SESSION_SEARCH:
+					print("search_timeout");
+					xfree(h->user_data);
+					list_remove(&watches, h, 0);
+					gg_free_search(h);
+					break;
+
+				case GG_SESSION_REGISTER:
+					print("register_timeout");
+					list_remove(&watches, h, 0);
+					gg_free_pubdir(h);
+
+					xfree(reg_password);
+					reg_password = NULL;
+					xfree(reg_email);
+					reg_email = NULL;
+
+					break;
+
+				case GG_SESSION_UNREGISTER:
+					print("unregister_timeout");
+					list_remove(&watches, h, 0);
+					gg_free_pubdir(h);
+					break;
+
+				case GG_SESSION_PASSWD:
+					print("passwd_timeout");
+					list_remove(&watches, h, 0);
+					gg_free_pubdir(h);
+
+					xfree(reg_password);
+					reg_password = NULL;
+					xfree(reg_email);
+					reg_email = NULL;
+
+					break;
+
+				case GG_SESSION_REMIND:
+					print("remind_timeout");
+					list_remove(&watches, h, 0);
+					gg_free_pubdir(h);
+					break;
+
+				case GG_SESSION_CHANGE:
+					print("change_timeout");
+					list_remove(&watches, h, 0);
+					gg_free_pubdir(h);
+					break;
+					
+				case GG_SESSION_DCC:
+				case GG_SESSION_DCC_GET:
+				case GG_SESSION_DCC_SEND:
+					/* XXX informowaæ który */
+					print("dcc_timeout");
+					list_remove(&watches, d, 0);
+					gg_free_dcc(d);
+					break;
+			}
+
+			break;
+		}
 		
-		maxfd = 0;
+		/* timeout reconnectu */
+		if (!sess && reconnect_timer && time(NULL) - reconnect_timer >= config_auto_reconnect && config_uin && config_password) {
+			reconnect_timer = 0;
+			print("connecting");
+			connecting = 1;
+			do_connect();
+		}
+
+		/* timeout pinga */
+		if (sess && sess->state == GG_STATE_CONNECTED && time(NULL) - last_ping > 60) {
+			if (last_ping)
+				gg_ping(sess);
+			last_ping = time(NULL);
+		}
+
+		/* timeout autoawaya */
+		if (config_auto_away && GG_S_A(config_status) && time(NULL) - last_action > config_auto_away && sess->state == GG_STATE_CONNECTED)
+			change_status(GG_STATUS_BUSY, NULL, config_auto_away);
+
+		/* auto save */
+		if (config_auto_save && config_changed && time(NULL) - last_save > config_auto_save) {
+			last_save = time(NULL);
+			gg_debug(GG_DEBUG_MISC, "-- autosaving userlist and config after %d seconds.\n", config_auto_save);
+
+			if (!userlist_write(NULL) && !config_write(NULL)) {
+				config_changed = 0;
+				print("autosaved");
+			} else
+				print("error_saving");
+		}
+
+		/* przegl±danie zdech³ych dzieciaków */
+		while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
+			for (l = children; l; l = m) {
+				struct process *p = l->data;
+
+				m = l->next;
+
+				if (pid != p->pid)
+					continue;
+
+				switch (p->name[0]) {
+					case 1:
+						print((!(WEXITSTATUS(status))) ? "sms_sent" : "sms_failed", p->name + 1);
+						break;
+					case 2:
+						break;
+					default:
+						print("process_exit", itoa(p->pid), p->name, itoa(WEXITSTATUS(status)));
+				}
+
+				xfree(p->name);
+				list_remove(&children, p, 1);
+			}
+		}
 
 #ifdef WITH_WAP
 		/* co jaki¶ czas zrzuæ userlistê dla frontendu wap */
@@ -309,7 +447,10 @@ void ekg_wait_for_key()
 #endif
 
 		/* zerknij na wszystkie niezbêdne deskryptory */
-		for (l = watches; l; l = l->next) {
+		FD_ZERO(&rd);
+		FD_ZERO(&wd);
+
+		for (maxfd = 0, l = watches; l; l = l->next) {
 			struct gg_common *w = l->data;
 
 			if (!w || w->state == GG_STATE_ERROR || w->state == GG_STATE_IDLE || w->state == GG_STATE_DONE)
@@ -329,28 +470,45 @@ void ekg_wait_for_key()
 
 		/* ale je¶li który¶ timer ma wyst±piæ wcze¶niej ni¿ za sekundê
 		 * to skróæmy odpowiednio czas oczekiwania */
-
+		
 		for (l = timers; l; l = l->next) {
 			struct timer *t = l->data;
 			struct timeval tv2;
 			struct timezone tz;
-			long usec = 0;
+			int usec = 0;
 
 			gettimeofday(&tv2, &tz);
 
-			if (t->ends.tv_usec - tv2.tv_usec < 0)
-				usec = (t->ends.tv_sec - tv2.tv_sec - 1) * 1000000 + t->ends.tv_usec + tv2.tv_usec;
-			else
-				usec = (t->ends.tv_sec - tv2.tv_sec) * 1000000 + t->ends.tv_usec - tv2.tv_usec;
+			/* ¿eby unikn±æ przekrêcenia licznika mikrosekund przy
+			 * wiêkszych czasach, pomijamy d³ugie timery */
 
-			if (usec < 1000000 && (tv.tv_sec == 1 || tv.tv_usec > usec)) {
+			if (t->ends.tv_usec - tv2.tv_usec > 5)
+				continue;
+			
+			/* zobacz, ile zosta³o do wywo³ania timera */
+
+			usec = (t->ends.tv_sec - tv2.tv_sec) * 1000000 + (t->ends.tv_usec - tv2.tv_usec);
+
+			/* je¶li wiêcej ni¿ sekunda to nie ma znacznia */
+			
+			if (usec >= 1000000)
+				continue;
+
+			/* je¶li mniej ni¿ aktualny timeout, zmniejsz */
+
+			if (tv.tv_sec * 1000000 + tv.tv_usec > usec) {
 				tv.tv_sec = 0;
 				tv.tv_usec = usec;
 			}
 		}
 
+		/* na wszelki wypadek sprawd¼ warto¶ci */
+
+		if (tv.tv_sec < 0)
+			tv.tv_sec = 0;
+
 		if (tv.tv_usec < 0)
-			tv.tv_usec = 1;
+			tv.tv_usec = 0;
 
 		ret = select(maxfd + 1, &rd, &wd, NULL, &tv);
 	
@@ -361,127 +519,6 @@ void ekg_wait_for_key()
 		}
 
 		if (!ret) {
-			/* timeouty danych sesji */
-			for (l = watches; l; l = l->next) {
-				struct gg_session *s = l->data;
-				struct gg_common *c = l->data;
-				struct gg_http *h = l->data;
-				struct gg_dcc *d = l->data;
-				char *errmsg = "";
-
-				if (!c || c->timeout == -1 || --c->timeout)
-					continue;
-				
-				switch (c->type) {
-					case GG_SESSION_GG:
-						print("conn_timeout");
-						list_remove(&watches, s, 0);
-						gg_free_session(s);
-						userlist_clear_status();
-						sess = NULL;
-						do_reconnect();
-						break;
-
-					case GG_SESSION_SEARCH:
-						print("search_timeout");
-						xfree(h->user_data);
-						list_remove(&watches, h, 0);
-						gg_free_search(h);
-						break;
-
-					case GG_SESSION_REGISTER:
-						if (!errmsg)
-							errmsg = "register_timeout";
-					case GG_SESSION_UNREGISTER:
-						if (!errmsg)
-							errmsg = "unregister_timeout";
-					case GG_SESSION_PASSWD:
-						if (!errmsg)
-							errmsg = "passwd_timeout";
-					case GG_SESSION_REMIND:
-						if (!errmsg)
-							errmsg = "remind_timeout";
-					case GG_SESSION_CHANGE:
-						if (!errmsg)
-							errmsg = "change_timeout";
-
-						print(errmsg);
-						if (h->type == GG_SESSION_REGISTER || h->type == GG_SESSION_PASSWD) {
-							xfree(reg_password);
-							reg_password = NULL;
-							xfree(reg_email);
-							reg_email = NULL;
-						}
-						list_remove(&watches, h, 0);
-						gg_free_pubdir(h);
-						break;
-						
-					case GG_SESSION_DCC:
-					case GG_SESSION_DCC_GET:
-					case GG_SESSION_DCC_SEND:
-						/* XXX informowaæ który */
-						print("dcc_timeout");
-						list_remove(&watches, d, 0);
-						gg_free_dcc(d);
-						break;
-				}
-				break;
-			}
-			
-			/* timeout reconnectu */
-			if (!sess && reconnect_timer && time(NULL) - reconnect_timer >= config_auto_reconnect && config_uin && config_password) {
-				reconnect_timer = 0;
-				print("connecting");
-				connecting = 1;
-				do_connect();
-			}
-
-			/* timeout pinga */
-			if (sess && sess->state == GG_STATE_CONNECTED && time(NULL) - last_ping > 60) {
-				if (last_ping)
-					gg_ping(sess);
-				last_ping = time(NULL);
-			}
-
-			/* timeout autoawaya */
-			if (sess && config_auto_away && (away == 0 || away == 4) && time(NULL) - last_action > config_auto_away && sess->state == GG_STATE_CONNECTED)
-				change_status(GG_STATUS_BUSY, NULL, config_auto_away);
-
-			/* auto save */
-			if (config_changed && config_auto_save && time(NULL) - last_save > config_auto_save) {
-				last_save = time(NULL);
-				gg_debug(GG_DEBUG_MISC, "-- autosaving userlist and config after %d seconds.\n", config_auto_save);
-
-				if (!userlist_write(NULL) && !config_write(NULL)) {
-					config_changed = 0;
-					print("autosaved");
-				} else
-					print("error_saving");
-			}
-
-			/* przegl±danie zdech³ych dzieciaków */
-			while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
-				for (l = children; l; l = m) {
-					struct process *p = l->data;
-
-					m = l->next;
-
-					if (pid != p->pid)
-						continue;
-					
-					if (p->name[0] == '\001') {
-						print((!(WEXITSTATUS(status))) ? "sms_sent" : "sms_failed", p->name + 1);
-					} else if (p->name[0] == '\002') {
-						// do nothing
-					} else {	
-						print("process_exit", itoa(p->pid), p->name, itoa(WEXITSTATUS(status)));
-					}
-
-					xfree(p->name);
-					list_remove(&children, p, 1);
-				}
-			}
-
 			if (batch_mode && !batch_line)
 				break;
 		} else {
@@ -493,7 +530,7 @@ void ekg_wait_for_key()
 					continue;
 
 				if (c->type == GG_SESSION_USER0) {
-					if (config_auto_back == 2 && (away == 1 || away == 3)) 
+					if (config_auto_back == 2 && GG_S_B(config_status))
 						change_status(GG_STATUS_AVAIL, NULL, 1);
 
 					if (config_auto_back == 2)
@@ -942,30 +979,6 @@ int main(int argc, char **argv)
 		config_reason = new_reason;
 	}
 
-	switch (config_status & ~GG_STATUS_FRIENDS_MASK) {
-		case GG_STATUS_AVAIL:
-			away = 0;
-			break;
-		case GG_STATUS_AVAIL_DESCR:
-			away = 4;
-			break;
-		case GG_STATUS_BUSY:
-			away = 1;
-			break;
-		case GG_STATUS_BUSY_DESCR:
-			away = 3;
-			break;
-		case GG_STATUS_INVISIBLE:
-			away = 2;
-			break;
-		case GG_STATUS_INVISIBLE_DESCR:
-			away = 5;
-			break;
-	}
-	
-	if ((config_status & GG_STATUS_FRIENDS_MASK))
-		private_mode = 1;
-	
 	/* czy w³±czyæ debugowanie? */	
 	setup_debug();
 	

@@ -555,7 +555,7 @@ void handle_msg(struct gg_event *e)
 	put_log(e->event.msg.sender, "%s,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), tmp);
 	xfree(tmp);
 
-	if (away && away != 4 && config_sms_away && config_sms_app && config_sms_number) {
+	if (config_sms_away && !GG_S_A(config_status) && config_sms_app && config_sms_number) {
 		char *foo, sender[100];
 
 		sms_away_add(e->event.msg.sender);
@@ -926,7 +926,7 @@ void handle_success(struct gg_event *e)
 	userlist_send();
 
 	/* je¶li mieli¶my zachowany stan i/lub opis, zrób z niego u¿ytek */
-	if (away || private_mode) {
+	if (config_status != GG_STATUS_AVAIL) {
 		if (!config_reason || !GG_S_D(config_status)) 
 			gg_change_status(sess, config_status);
 		else {

@@ -274,7 +274,7 @@ COMMAND(cmd_away)
 		int tmp;
 
 		if (!params[0]) {
-			print((private_mode) ? "private_mode_is_on" : "private_mode_is_off");
+			print(GG_S_F(config_status) ? "private_mode_is_on" : "private_mode_is_off");
 			return;
 		}
 		
@@ -283,12 +283,11 @@ COMMAND(cmd_away)
 			return;
 		}
 
-		private_mode = tmp;
-		print((private_mode) ? "private_mode_on" : "private_mode_off");
-		ui_event("my_status", "private", (private_mode) ? "on" : "off");
+		print((tmp) ? "private_mode_on" : "private_mode_off");
+		ui_event("my_status", "private", (tmp) ? "on" : "off");
 
-		config_status = config_status & ~GG_STATUS_FRIENDS_MASK;
-		config_status |= ((private_mode) ? GG_STATUS_FRIENDS_MASK : 0);
+		config_status = GG_S(config_status);
+		config_status |= ((tmp) ? GG_STATUS_FRIENDS_MASK : 0);
 
 		if (sess && sess->state == GG_STATE_CONNECTED) {
 			gg_debug(GG_DEBUG_MISC, "-- config_status = 0x%.2x\n", config_status);
@@ -311,15 +310,8 @@ COMMAND(cmd_status)
 	struct in_addr i;
 	struct tm *lce;
 	int mqc;
-	char *tmp, *priv, *r1, *r2, buf[100], *status_table[6] = {
-		"show_status_avail",
-		"show_status_busy",
-		"show_status_invisible",
-		"show_status_busy_descr",
-		"show_status_avail_descr",
-		"show_status_invisible_descr"
-	};
-	
+	char *tmp, *priv, *r1, *r2, buf[100];
+
 	if (config_user && strcmp(config_user, ""))
 		print("show_status_profile", config_user);
 
@@ -346,7 +338,7 @@ COMMAND(cmd_status)
 		return;
 	}
 
-	if (private_mode)
+	if (GG_S_F(config_status))
 		priv = format_string(format_find("show_status_private_on"));
 	else
 		priv = format_string(format_find("show_status_private_off"));
@@ -354,7 +346,7 @@ COMMAND(cmd_status)
 	r1 = xstrmid(config_reason, 0, GG_STATUS_DESCR_MAXSIZE);
 	r2 = xstrmid(config_reason, GG_STATUS_DESCR_MAXSIZE, -1);
 
-	tmp = format_string(format_find(status_table[away]), r1, r2);
+	tmp = format_string(format_find(ekg_status_label(config_status, "show_status_")), r1, r2);
 
 	xfree(r1);
 	xfree(r2);
@@ -1185,37 +1177,7 @@ COMMAND(cmd_list)
 			return;
 		}
 
-		switch (u->status) {
-			case GG_STATUS_AVAIL:
-				status = format_string(format_find("user_info_avail"), (u->first_name) ? u->first_name : u->display);
-				break;
-			case GG_STATUS_AVAIL_DESCR:
-				status = format_string(format_find("user_info_avail_descr"), (u->first_name) ? u->first_name : u->display, u->descr);
-				break;
-			case GG_STATUS_BUSY:
-				status = format_string(format_find("user_info_busy"), (u->first_name) ? u->first_name : u->display);
-				break;
-			case GG_STATUS_BUSY_DESCR:
-				status = format_string(format_find("user_info_busy_descr"), (u->first_name) ? u->first_name : u->display, u->descr);
-				break;
-			case GG_STATUS_NOT_AVAIL:
-				status = format_string(format_find("user_info_not_avail"), (u->first_name) ? u->first_name : u->display);
-				break;
-			case GG_STATUS_NOT_AVAIL_DESCR:
-				status = format_string(format_find("user_info_not_avail_descr"), (u->first_name) ? u->first_name : u->display, u->descr);
-				break;
-			case GG_STATUS_INVISIBLE:
-				status = format_string(format_find("user_info_invisible"), (u->first_name) ? u->first_name : u->display);
-				break;
-			case GG_STATUS_INVISIBLE_DESCR:
-				status = format_string(format_find("user_info_invisible_descr"), (u->first_name) ? u->first_name : u->display, u->descr);
-				break;
-			case GG_STATUS_BLOCKED:
-				status = format_string(format_find("user_info_blocked"), (u->first_name) ? u->first_name : u->display);
-				break;
-			default:
-				status = format_string(format_find("user_info_unknown"), (u->first_name) ? u->first_name : u->display);
-		}
+		status = format_string(format_find(ekg_status_label(u->status, "user_info_")), (u->first_name) ? u->first_name : u->display, u->descr);
 
 		groups = group_to_string(u->groups, 0);
 
@@ -1472,7 +1434,7 @@ COMMAND(cmd_msg)
 		return;
 	}
 
-	if (config_auto_back == 1 && (away == 1 || away == 3))
+	if (config_auto_back == 1 && GG_S_B(config_status))
 		change_status(GG_STATUS_AVAIL, NULL, 1);
 
 	nick = xstrdup(params[0]);

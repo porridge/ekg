@@ -1212,13 +1212,13 @@ static void update_statusbar()
 				matched = (config_reason != NULL);
 				p += 5;
 			} else if (!strncmp(p, "away ", 5)) {
-				matched = (away == 1 || away == 3);
+				matched = GG_S_B(config_status);
 				p += 4;
 			} else if (!strncmp(p, "avail ", 6)) {
-				matched = (away == 0 || away == 4);
+				matched = GG_S_A(config_status);
 				p += 5;
 			} else if (!strncmp(p, "invisible ", 10)) {
-				matched = (away == 2 || away == 5);
+				matched = GG_S_I(config_status);
 				p += 9;
 			} else if (!strncmp(p, "notavail ", 9)) {
 				matched = (!sess || sess->state != GG_STATE_CONNECTED);

@@ -1091,7 +1091,7 @@ void theme_init()
 	format_add("exec_error", "%! B³±d uruchamiania procesu: %1\n", 1);
 
 	/* szczegó³owe informacje o u¿ytkowniku */
-	format_add("user_info", "%) Pseudonim: %T%1%n\n%) Numer: %T%2%n\n%) Stan: %3\n%) Adres IP: %b%4%n\n%) Imiê i nazwisko: %T%5 %6%n\n%) Alias: %T%7%n\n%) Numer telefonu: %T%8%n\n%) Grupy: %T%9%n\n", 1);
+	format_add("user_info", "%) Pseudonim: %T%1%n\n%) Numer: %T%2%n\n%) Stan: %3\n%) Adres IP: %T%4%n\n%) Imiê i nazwisko: %T%5 %6%n\n%) Alias: %T%7%n\n%) Numer telefonu: %T%8%n\n%) Grupy: %T%9%n\n", 1);
 	format_add("user_info_avail", "%Ydostêpn%@1%n", 1);
 	format_add("user_info_avail_descr", "%Ydostêpn%@1%n (%2)", 1);
 	format_add("user_info_busy", "%Gzajêt%@1%n", 1);
@@ -1101,6 +1101,7 @@ void theme_init()
 	format_add("user_info_invisible", "%cniewidoczn%@1%n", 1);
 	format_add("user_info_invisible_descr", "%cniewidoczn%@1%n (%2)", 1);
 	format_add("user_info_blocked", "%mblokuj±c%@1%n", 1);
+	format_add("user_info_unknown", "%Mnieznany%n", 1);
 
 	format_add("group_members", "%) Grupa %T%1%n: %2\n", 1);
 	format_add("group_member_already", "%! %1 nale¿y ju¿ do grupy %T%2%n\n", 1);

@@ -3622,3 +3622,54 @@ void binding_free()
 	list_destroy(bindings, 1);
 	bindings = NULL;
 }
+
+/*
+ * ekg_status_label()
+ *
+ * tworzy etykietê opisuj±c± stan, z podanym prefiksem.
+ *
+ *  - status,
+ *  - prefix.
+ *
+ * zwraca statyczny tekst.
+ */
+const char *ekg_status_label(int status, const char *prefix)
+{
+	static char buf[100];
+	char *label = "unknown";
+	
+	switch (GG_S(status)) {
+		case GG_STATUS_AVAIL:
+			label = "avail";
+			break;
+		case GG_STATUS_AVAIL_DESCR:
+			label = "avail_descr";
+			break;
+		case GG_STATUS_NOT_AVAIL:
+			label = "not_avail";
+			break;
+		case GG_STATUS_NOT_AVAIL_DESCR:
+			label = "not_avail_descr";
+			break;
+		case GG_STATUS_BUSY:
+			label = "busy";
+			break;
+		case GG_STATUS_BUSY_DESCR:
+			label = "busy_descr";
+			break;
+		case GG_STATUS_INVISIBLE:
+			label = "invisible";
+			break;
+		case GG_STATUS_INVISIBLE_DESCR:
+			label = "invisible_descr";
+			break;
+		case GG_STATUS_BLOCKED:
+			label = "blocked";
+			break;
+	}
+
+	snprintf(buf, sizeof(buf), "%s%s", (prefix) ? prefix : "", label);
+
+	return buf;
+}
+
