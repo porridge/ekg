@@ -496,6 +496,7 @@ int gg_search_watch_fd(struct gg_search *f)
 			res = f->data_size - strlen(f->data_buf);
 		}
 
+		f->data_buf[strlen(f->data_buf) + res] = 0;
 		memcpy(f->data_buf + strlen(f->data_buf), buf, res);
 
 		gg_debug(GG_DEBUG_MISC, "=> strlen(data_buf)=%d, data_size=%d\n", strlen(f->data_buf), f->data_size);
