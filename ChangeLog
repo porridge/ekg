@@ -8,8 +8,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-02-17
 
 - poprawka segfaulta w variable_add() (smiechu@rtr.fsi.pl/w)
-- wywalenei komendy ,,info'' (w)
+- wywalenie komendy ,,info'' (w)
 - poprawka command_set() i variable_find() (eileen/w)
+- poprawka zachowania ,,find'' (dawid@jarosz.one.pl/w)
 
 // 2002-02-16
 

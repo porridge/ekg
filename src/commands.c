@@ -668,20 +668,6 @@ COMMAND(command_find)
 	
 	memset(&r, 0, sizeof(r));
 
-	if (!strcasecmp(name, "info") && !params[0]) {
-		r.uin = config_uin;
-		if (!(h = gg_search(&r, 1))) {
-			my_printf("search_failed", strerror(errno));
-			free(query);
-			return 0;
-		}
-		h->id = id * 2;
-		h->user_data = strdup("self");
-		list_add(&watches, h, 0);
-		free(query);
-		return 0;
-	};
-	
 	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
 		my_printf("not_enough_params");
 		array_free(argv);
@@ -700,7 +686,8 @@ COMMAND(command_find)
 		return 0;
 	}
 */
-	if (!argv[1]) {
+	if (argv[0] && !argv[1] && argv[0][0] != '-') {
+		id = id * 2;	/* single search */
 		if (!(r.uin = get_uin(params[0]))) {
 			my_printf("user_not_found", params[0]);
 			free(query);
@@ -708,6 +695,7 @@ COMMAND(command_find)
 			return 0;
 		}
 	} else {
+		id = id * 2 + 1;	/* multiple search */
 		for (i = 0; argv[i]; i++) {
 			char *arg = argv[i];
 			
@@ -760,7 +748,7 @@ COMMAND(command_find)
 		return 0;
 	}
 
-	h->id = id * 2 + ((argv[1]) ? 1 : 0);
+	h->id = id;
 	h->user_data = query;
 
 	list_add(&watches, h, 0);
