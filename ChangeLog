@@ -14,6 +14,7 @@ zg³osi³ b³±d.
 - libgadu: s/fix16/gg_fix16/, s/fix32/gg_fix32/ (w)
 - pozbycie siê s³owa ,,status'' z themów. nastêpnym etapiem bêdzie pozbycie
   siê s³owa ,,theme'' ;) (w)
+- dok³adniejszy opis /passwd (sz/w)
 
 // 2003-02-04
 

@@ -4771,7 +4771,10 @@ void command_init()
 	command_add
 	( "passwd", "??", cmd_passwd, 0,
 	  " <has³o> [e-mail]", "zmienia has³o i adres e-mail u¿ytkownika",
-	  "");
+	  "\n"
+	  "Do zmiany has³a niezbêdne jest ustawienie prawid³owego (podanego "
+	  "podczas rejestracji lub pó¼niej zmienionego) adresu e-mail w "
+	  "zmiennej %Temail%n. Bez tego zmiana has³a siê nie powiedzie.");
 
 	command_add
 	( "play", "f", cmd_play, 0,
