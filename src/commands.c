@@ -215,7 +215,6 @@ char *ignored_uin_generator(char *text, int state)
 	static struct list *l;
 	static int len;
 	struct userlist *u;
-	char buf[16];
 
 	if (!state) {
 		l = ignored;
@@ -228,9 +227,8 @@ char *ignored_uin_generator(char *text, int state)
 		l = l->next;
 
 		if (!(u = find_user(i->uin, NULL))) {
-			snprintf(buf, sizeof(buf), "%lu", i->uin);
-			if (!strncasecmp(text, buf, len))
-				return strdup(buf);
+			if (!strncasecmp(text, itoa(i->uin), len))
+				return strdup(itoa(i->uin));
 		} else {
 			if (!strncasecmp(text, u->comment, len))
 				return strdup(u->comment);
@@ -621,10 +619,8 @@ COMMAND(command_exec)
 	} else {
 		for (l = children; l; l = l->next) {
 			struct process *p = l->data;
-			char buf[10];
 
-			snprintf(buf, sizeof(buf), "%d", p->pid);
-			my_printf("process", buf, p->name);
+			my_printf("process", itoa(p->pid), p->name);
 		}
 		if (!children)
 			my_printf("no_processes");
@@ -931,7 +927,6 @@ COMMAND(command_list)
 
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
-		char __ip[16], __port[16];
 		struct in_addr in;
 
 		tmp = "list_unknown";
@@ -948,11 +943,9 @@ COMMAND(command_list)
 		}
 
 		in.s_addr = u->ip;
-		snprintf(__ip, sizeof(__ip), "%s", inet_ntoa(in));
-		snprintf(__port, sizeof(__port), "%d", u->port);
 
 		if (show_all || (show_busy && u->status == GG_STATUS_BUSY) || (show_active && u->status == GG_STATUS_AVAIL) || (show_inactive && u->status == GG_STATUS_NOT_AVAIL)) {
-			my_printf(tmp, format_user(u->uin), __ip, __port);
+			my_printf(tmp, format_user(u->uin), inet_ntoa(in), itoa(u->port));
 			count++;
 		}
 	}
@@ -1094,12 +1087,7 @@ COMMAND(command_set)
 						tmp = "(...)";
 					my_printf("variable", v->name, tmp);
 				} else {
-					char buf[16];
-
-					snprintf(buf, sizeof(buf) - 1, "%d", *(int*)(v->ptr));
-					if (!v->display)
-						strcpy(buf, "(...)");
-					my_printf("variable", v->name, buf);
+					my_printf("variable", v->name, (!v->display) ? "(...)" : itoa(*(int*)(v->ptr)));
 				}
 			}
 
@@ -1172,14 +1160,12 @@ COMMAND(command_dcc)
 
 	if (!strncasecmp(params[0], "sh", 2)) {		/* show */
 		int pending = 0, active = 0;
-		char buf[16];
 
 		if (params[1] && params[1][0] == 'd') {	/* show debug */
 			for (l = transfers; l; l = l->next) {
 				struct transfer *t = l->data;
 				
-				snprintf(buf, sizeof(buf), "%d", t->id);
-				my_printf("dcc_show_debug", buf, (t->type == GG_SESSION_DCC_SEND) ? "SEND" : "GET", t->filename, format_user(t->uin), (t->dcc) ? "yes" : "no");
+				my_printf("dcc_show_debug", itoa(t->id), (t->type == GG_SESSION_DCC_SEND) ? "SEND" : "GET", t->filename, format_user(t->uin), (t->dcc) ? "yes" : "no");
 			}
 
 			return 0;
@@ -1193,8 +1179,7 @@ COMMAND(command_dcc)
 					my_printf("dcc_show_pending_header");
 					pending = 1;
 				}
-				snprintf(buf, sizeof(buf), "%d", t->id);
-				my_printf((t->type == GG_SESSION_DCC_SEND) ? "dcc_show_pending_send" : "dcc_show_pending_get", buf, format_user(t->uin), (t->filename) ? t->filename : "(?)");
+				my_printf((t->type == GG_SESSION_DCC_SEND) ? "dcc_show_pending_send" : "dcc_show_pending_get", itoa(t->id), format_user(t->uin), (t->filename) ? t->filename : "(?)");
 			}
 		}
 
@@ -1206,8 +1191,7 @@ COMMAND(command_dcc)
 					my_printf("dcc_show_active_header");
 					active = 1;
 				}
-				snprintf(buf, sizeof(buf), "%d", t->id);
-				my_printf((t->type == GG_SESSION_DCC_SEND) ? "dcc_show_active_send" : "dcc_show_active_get", buf, format_user(t->uin), t->filename);
+				my_printf((t->type == GG_SESSION_DCC_SEND) ? "dcc_show_active_send" : "dcc_show_active_get", itoa(t->id), format_user(t->uin), t->filename);
 			}
 		}
 
@@ -1299,11 +1283,7 @@ COMMAND(command_dcc)
 				break;
 
 			if ((u = find_user(t->uin, NULL))) {
-				char buf[16];
-
-				snprintf(buf, sizeof(buf), "%ld", u->uin);
-
-				if (!strcasecmp(params[1], buf) || !strcasecmp(params[1], u->comment))
+				if (!strcasecmp(params[1], itoa(u->uin)) || !strcasecmp(params[1], u->comment))
 					break;
 			}
 		}

@@ -17,6 +17,7 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #ifndef _AIX
@@ -283,3 +284,28 @@ char *string_free(struct string *s, int free_string)
 	return tmp;
 }
 
+/*
+ * itoa()
+ *
+ * prosta funkcja, która zwraca tekstow± reprezentacjê liczby. w obrêbie
+ * danego wywo³ania jakiej¶ funkcji lub wyra¿enia mo¿e byæ wywo³ania 10
+ * razy, poniewa¿ tyle mamy statycznych buforów. lepsze to ni¿ ci±g³e
+ * tworzenie tymczasowych buforów na stosie i sprintf()owanie.
+ *
+ *  - i - liczba do zamiany.
+ *
+ * zwraca adres do bufora, którego _NIE_NALE¯Y_ zwalniaæ.
+ */
+char *itoa(long int i)
+{
+	static char bufs[10][16];
+	static int index = 0;
+	char *tmp = bufs[index++];
+
+	if (index > 9)
+		index = 0;
+	
+	snprintf(tmp, 16, "%ld", i);
+
+	return tmp;
+}

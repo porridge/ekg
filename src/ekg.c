@@ -217,7 +217,6 @@ int my_getc(FILE *f)
 			while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
 				for (l = children; l; l = m) {
 					struct process *p = l->data;
-					char buf1[10], buf2[10];
 
 					m = l->next;
 
@@ -229,9 +228,7 @@ int my_getc(FILE *f)
 					} else if (p->name[0] == '\002') {
 						// do nothing
 					} else {	
-						snprintf(buf1, sizeof(buf1), "%d", p->pid);
-						snprintf(buf2, sizeof(buf2), "%d", WEXITSTATUS(status));
-						my_printf("process_exit", buf1, p->name, buf2);
+						my_printf("process_exit", itoa(p->pid), p->name, itoa(WEXITSTATUS(status)));
 					}
 
 					free(p->name);

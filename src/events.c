@@ -169,12 +169,8 @@ void handle_msg(struct gg_event *e)
 			
 	if (u)
 		add_send_nick(u->comment);
-	else {
-		char tmp[20];
-
-		snprintf(tmp, sizeof(tmp), "%lu", e->event.msg.sender);
-		add_send_nick(tmp);
-	}	
+	else
+		add_send_nick(itoa(e->event.msg.sender));
 
 	tm = localtime(&e->event.msg.time);
 	strftime(czas, 100, find_format("timestamp"), tm);
@@ -420,21 +416,14 @@ void handle_search(struct gg_http *h)
 		my_printf("search_not_found");
 
 	for (i = 0; i < s->count; i++) {
-		char uin[16], born[16], *active, *gender, *name;
+		char *active, *gender, *name;
 
-		snprintf(uin, sizeof(uin), "%lu", s->results[i].uin);
-		
 		cp_to_iso(s->results[i].first_name);
 		cp_to_iso(s->results[i].last_name);
 		cp_to_iso(s->results[i].nickname);
 		cp_to_iso(s->results[i].city);
 
 		name = gg_alloc_sprintf("%s %s", s->results[i].first_name, s->results[i].last_name);
-
-		if (s->results[i].born)
-			snprintf(born, sizeof(born), "%d", s->results[i].born);
-		else
-			snprintf(born, sizeof(born), "-");
 
 		if (!(h->id & 1)) {
 			active = find_format((s->results[i].active) ? "search_results_single_active" : "search_results_single_inactive");
@@ -457,7 +446,7 @@ void handle_search(struct gg_http *h)
 		active = format_string(active);
 		gender = format_string(gender);
 
-		my_printf((h->id & 1) ? "search_results_multi" : "search_results_single", uin, (name) ? name : "", s->results[i].nickname, s->results[i].city, born, gender, active);
+		my_printf((h->id & 1) ? "search_results_multi" : "search_results_single", itoa(s->results[i].uin), (name) ? name : "", s->results[i].nickname, s->results[i].city, (s->results[i].born) ? itoa(s->results[i].born) : "-", gender, active);
 
 		free(name);
 		free(active);
@@ -481,7 +470,7 @@ void handle_search(struct gg_http *h)
 void handle_pubdir(struct gg_http *h)
 {
 	struct gg_pubdir *s = NULL;
-	char uin[16], *good = "", *bad = "";
+	char *good = "", *bad = "";
 
 	if (!h)
 		return;
@@ -543,8 +532,7 @@ void handle_pubdir(struct gg_http *h)
 		}
 	}
 	
-	snprintf(uin, sizeof(uin), "%lu", s->uin);
-	my_printf(good, uin);
+	my_printf(good, itoa(s->uin));
 
 	list_remove(&watches, h, 0);
 	if (h->type == GG_SESSION_REGISTER || h->type == GG_SESSION_PASSWD) {
@@ -610,7 +598,7 @@ void handle_dcc(struct gg_dcc *d)
 	struct gg_event *e;
 	struct transfer *t, tt;
 	struct list *l;
-	char buf1[16], buf2[16], *p;
+	char *p;
 	int tmp;
 
 	if (!(e = gg_dcc_watch_fd(d))) {
@@ -689,15 +677,13 @@ void handle_dcc(struct gg_dcc *d)
 				}
 			}
 			
-			snprintf(buf1, sizeof(buf1), "%d", t->id);
-			snprintf(buf2, sizeof(buf2), "%ld", d->file_info.size);
 			t->filename = strdup(d->file_info.filename);
 
 			for (p = d->file_info.filename; *p; p++)
 				if (*p < 32 || *p == '\\' || *p == '/')
 					*p = '_';
 
-			my_printf("dcc_get_offer", format_user(t->uin), t->filename, buf2, buf1);
+			my_printf("dcc_get_offer", format_user(t->uin), t->filename, itoa(d->file_info.size), itoa(t->id));
 
 			break;
 			

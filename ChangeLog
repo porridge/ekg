@@ -5,6 +5,12 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm).
 ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'', ,,i/nick''
 oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2001-12-26
+
+- tak sobie podczas ¶wi±tecznego obiadu wymy¶li³em, ¿e napiszê funkcjê
+  itoa(), która zast±pi ¶mieszne konstrukcje typu { char buf[16];
+  snprintf(buf, 16, "%d", x); return x; }. i napisa³em. (w)
+
 // 2001-12-18
 
 - encode_base64() i decode_base64() ju¿ dzia³aj± (w)

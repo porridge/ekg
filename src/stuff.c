@@ -803,12 +803,10 @@ char *format_user(uin_t uin)
 	struct userlist *u = find_user(uin, NULL);
 	static char buf[100], *tmp;
 	
-	snprintf(buf, sizeof(buf), "%lu", uin);
-	
 	if (!u)
-		tmp = format_string(find_format("unknown_user"), buf);
+		tmp = format_string(find_format("unknown_user"), itoa(uin));
 	else
-		tmp = format_string(find_format("known_user"), u->comment, buf);
+		tmp = format_string(find_format("known_user"), u->comment, itoa(uin));
 	
 	strncpy(buf, tmp, sizeof(buf) - 1);
 	
