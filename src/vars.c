@@ -67,6 +67,7 @@ void variable_init()
 	variable_add("log_ignored", VAR_INT, 1, &config_log_ignored, NULL);
 	variable_add("log_status", VAR_BOOL, 1, &config_log_status, NULL);
 	variable_add("log_path", VAR_STR, 1, &config_log_path, NULL);
+	variable_add("last_count", VAR_INT, 1, &config_last_count, NULL);
 	variable_add("make_window", VAR_INT, 1, &config_make_window, NULL);
 	variable_add("proxy", VAR_STR, 1, &config_proxy, changed_proxy);
 	variable_add("random_reason", VAR_INT, 1, &config_random_reason, NULL);

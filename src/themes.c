@@ -989,5 +989,8 @@ void theme_init()
 
 	/* timery */
 	format_add("timer_list", "%> %1, %2s, %3\n", 1);
+	format_add("last_list", "%> [%1] %2 %3\n", 1);
+	format_add("last_list_empty", "%! Nie zalogowano ¿adnych wiadomo¶ci.\n", 1);
+	format_add("last_list_empty_nick", "%! Nie zalogowano ¿adnych wiadomo¶ci z %W%1%n.\n", 1);
 	
 };

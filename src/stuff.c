@@ -60,6 +60,7 @@ list_t transfers = NULL;
 list_t events = NULL;
 list_t emoticons = NULL;
 list_t sequences = NULL;
+list_t lasts = NULL;
 
 int away = 0;
 int in_autoexec = 0;
@@ -127,6 +128,8 @@ int config_save_password = 1;
 char *config_timestamp = NULL;
 int config_display_sent = 0;
 int config_sort_windows = 0;
+int config_last_count = 10;
+int last_count = 0;
 
 static struct {
 	int event;
@@ -2242,4 +2245,47 @@ char *log_escape(const char *str)
 	*q = 0;
 
 	return res;
+}
+
+int last_add(uin_t uin, time_t t, const char *msg)
+{
+	struct history h;
+	list_t l;
+
+	/* usuwamy ostatni± wiadomo¶æ, w razie potrzeby... */
+	if (last_count >= config_last_count) {
+		time_t tmp_time = 0;
+		
+		/* najpierw j± znajdziemy... */
+		for (l = lasts; l; l = l->next) {
+			struct history *ll = l->data;
+
+			if (!tmp_time)
+				tmp_time = ll->time;
+
+			if (ll->time < tmp_time)
+				tmp_time = ll->time;
+		}
+		
+		/* ...by teraz usun±æ */
+		for (l = lasts; l; l = l->next) {
+			struct history *ll = l->data;
+
+			if (ll->time == tmp_time) {
+				xfree(ll->message);
+				list_remove(&lasts, ll, 1);
+				break;
+			}
+		}
+
+	}
+
+	h.uin = uin;
+	h.time = t;
+	h.message = xstrdup(msg);
+	
+	list_add(&lasts, &h, sizeof(h));
+	last_count++;
+
+	return 0;
 }

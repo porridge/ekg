@@ -2188,6 +2188,41 @@ COMMAND(cmd_test_python)
 
 #endif
 
+COMMAND(cmd_last)
+{
+        list_t l;
+	uin_t uin = -1;
+	int count = 0;
+
+	if (params[0]) 
+		if (!(uin = get_uin(params[0]))) {
+			print("user_not_found", params[0]);
+			return;
+		}
+	
+	if (last_count == 0) {
+		print("last_list_empty");
+		return;
+	}
+
+        for (l = lasts; l; l = l->next) {
+                struct history *h = l->data;
+		struct tm *tm;
+		char buf[100];
+
+		if (uin == -1 || (uin != 0 && uin == h->uin)) {
+			tm = localtime(&h->time);
+			strftime(buf, sizeof(buf), "%m-%d-%Y %H:%M", tm);
+			print("last_list", buf, format_user(h->uin), h->message);
+			count++;
+		}
+        }
+
+	if (count == 0 && params[0]) 
+		print("last_list_empty_nick", params[0]);
+
+}
+
 /*
  * command_add_compare()
  *
@@ -2562,6 +2597,11 @@ void command_init()
 	  "  clear\n"
 	  "  refresh\n"
 	  "  list");
+
+	command_add
+	( "last", "u", cmd_last, 0,
+	  " [numer/alias] ", "wy¶wietla ostatnie mesgi od wszystkich lub od [numer/alias] ",
+	  "");
   
 	command_add
 	( "_add", "?", cmd_test_add, 0, "", "",
@@ -2616,5 +2656,3 @@ void command_free()
 	list_destroy(commands, 1);
 	commands = NULL;
 }
-
-

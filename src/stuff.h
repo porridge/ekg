@@ -94,6 +94,12 @@ struct timer {
 	char *command;	/* komenda do wywo³ania */
 };
 
+struct history {
+	uin_t uin;		/* w³a¶ciciel */
+	time_t time;		/* czas */
+	unsigned char *message;	/* wiadomo¶æ */
+};
+
 list_t children;
 list_t aliases;
 list_t watches;
@@ -102,6 +108,7 @@ list_t events;
 list_t emoticons;
 list_t sequences;
 list_t timers;
+list_t lasts;
 struct gg_session *sess;
 
 int config_dcc;
@@ -155,6 +162,7 @@ int config_save_password;
 char *config_timestamp;
 int config_display_sent;
 int config_sort_windows;
+int config_last_count;
 
 char *home_dir;
 char *config_dir;
@@ -178,6 +186,7 @@ char *batch_line;
 int immediately_quit;
 int ekg_segv_handler;
 int ioctld_sock;
+int last_count;
 
 void unidle();
 const char *timestamp(const char *format);
