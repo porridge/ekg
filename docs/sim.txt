@@ -21,11 +21,6 @@ NIE NALE¯Y NIKOMU WYSY£AÆ NIKOMU KLUCZA PRYWATNEGO Z PLIKU PRIVATE.PEM.
 by w³±czyæ szyfrowanie, nale¿y ju¿ tylko wpisaæ:
 
 	set encryption 1
-lub
-	set encryption 2
-
-warto¶æ 2 w³±czy now± obs³ugê szyfrowanych wiadomo¶ci, która nie stara siê
-oszczêdzaæ zasobów za wszelk± cenê, ale dziêki temu powinna byæ mniej zawodna.
 
 dalej wszystko bêdzie siê dzia³o automagicznie. szyfrowane wiadomo¶ci s±
 odpowiednio oznaczane -- domy¶lnie jest to ¿ó³ty tekst ,,szyfrowane'' w
