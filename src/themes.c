@@ -1186,17 +1186,16 @@ void theme_init()
 	format_add("events_list_inactive", "%> on %G%1 %T%2 %B%3 %g(nieaktywne)%n\n", 1);
         format_add("events_incorrect", "%! Nieprawid³owo zdefiniowane zdarzenie\n", 1);
         format_add("events_add", "%> Dodano zdarzenie\n", 1);
-        format_add("events_exist", "%! Zdarzenie %1 istnieje dla %2\n", 1);
         format_add("events_del", "%> Usuniêto zdarzenie\n", 1);
-        format_add("events_del_flags", "%> Flagi %G%1%n usuniête\n", 1);
+        format_add("events_exist", "%! Zdarzenie %T%1%n istnieje dla %2\n", 1);
         format_add("events_add_flags", "%> Flagi %G%1%n dodane\n", 1);
-        format_add("events_noexist", "%! Nieznane zdarzenie\n", 1);
-        format_add("events_del_noexist", "%! Zdarzenie %T%1%n nie istnieje dla u¿ytkownika %G%2%n\n", 1);
+        format_add("events_del_flags", "%> Flagi %G%1%n usuniête\n", 1);
+        format_add("events_del_noexist", "%! Zdarzenie %T%1%n nie istnieje dla u¿ytkownika %2\n", 1);
         format_add("events_seq_not_found", "%! Sekwencja %T%1%n nie znaleziona\n", 1);
+	format_add("events_act_wrong", "%! Nieprawid³owa akcja\n", 1);
         format_add("events_act_no_params", "%! Brak parametrów\n", 1);
 	format_add("events_act_toomany_params", "%! Za du¿o parametrów\n", 1);
 	format_add("events_seq_incorrect", "%! Nieprawid³owa sekwencja\n", 1);
-        format_add("temporary_run_event", "%) Startujemy z akcj± '%B%1%n'\n", 1);
 
 	/* lista kontaktów z serwera */
 	format_add("userlist_put_ok", "%) Listê kontaktów zachowano na serwerze\n", 1);

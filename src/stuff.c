@@ -513,7 +513,7 @@ int config_read(const char *filename)
                         uin_t uin;
                         char **pms = array_make(foo, " \t", 3, 1, 0);
                         if (pms && pms[0] && pms[1] && pms[2] && (flags = event_flags(pms[0])) && (uin = atoi(pms[1]))) {
-				if (event_correct(pms[2]))
+				if (event_correct(pms[2], 1))
 					flags |= INACTIVE_EVENT; /* nieaktywne */
                                 event_add(flags, atoi(pms[1]), pms[2], 1);
 			}
@@ -2155,8 +2155,10 @@ int event_flags(const char *events)
 		return 0;
 
 	for (j = 0; a[j]; j++) {
-		if (!strcmp(a[j], "*"))
-			flags |= EVENT_ALL;
+		if (!strcmp(a[j], "*")) {
+			flags = EVENT_ALL;
+			break;
+		}
 		for (i = 0; event_labels[i].name; i++)
 			if (!strcasecmp(a[j], event_labels[i].name))
 				flags |= event_labels[i].event;
@@ -2200,7 +2202,7 @@ int event_add(int flags, uin_t uin, const char *action, int quiet)
         list_add(&events, &e, sizeof(e));
 
 	if (!quiet)
-	    	print("events_add", event_format(flags), (uin == 1) ? "*"  : format_user(uin), action);
+	    	print("events_add", event_format(flags), (uin == 1) ? "*" : format_user(uin), action);
 
         return 0;
 }
@@ -2216,28 +2218,31 @@ int event_add(int flags, uin_t uin, const char *action, int quiet)
 int event_remove(int flags, uin_t uin)
 {
         list_t l;
+	int removed = 0;
 
         for (l = events; l; l = l->next) {
                 struct event *e = l->data;
+		int event_flags = e->flags & ~INACTIVE_EVENT;
 
                 if (e && e->uin == uin && e->flags & flags) {
-                        if ((e->flags &= ~flags) == 0) {
+                        if ((event_flags &= ~flags) == 0) {
                                 print("events_del", event_format(flags), (uin == 1) ? "*" : format_user(uin), e->action);
 				xfree(e->action);
                                 list_remove(&events, e, 1);
-                                return 0;
+				removed = 1;
                         } else {
                                 print("events_del_flags", event_format(flags));
-                                list_remove(&events, e, 0);
-                                list_add_sorted(&events, e, 0, NULL);
+				e->flags = event_flags;
                                 return 0;
                         }
                 }
         }
 
-        print("events_del_noexist", event_format(flags), (uin == 1) ? "3"  : format_user(uin));
-
-        return 1;
+	if (!removed) {
+        	print("events_del_noexist", event_format(flags), (uin == 1) ? "*" : format_user(uin));
+        	return 1;
+	} else
+		return 0;
 }
 
 /*
@@ -2420,9 +2425,10 @@ int event_check(int event, uin_t uin, const char *data)
  *
  * sprawdza czy akcja na zdarzenie jest poprawna.
  *
- * - action.
+ * - action,
+ * - quiet.
  */
-int event_correct(const char *action)
+int event_correct(const char *action, int quiet)
 {
         char *event, **events = NULL, **acts = NULL;
 	int i = 0;
@@ -2446,17 +2452,20 @@ int event_correct(const char *action)
         		struct action_data test;
 
                         if (!acts[1]) {
-                                print("events_act_no_params", acts[0]);
+				if (!quiet)
+                                	print("events_act_no_params", acts[0]);
 				goto fail;
 			}
 
                         if (*acts[1] == '$') {
                                 if (!strcmp(format_find(acts[1] + 1), "")) {
-                                        print("events_seq_not_found", acts[1] + 1);
+					if (!quiet)
+                                        	print("events_seq_not_found", acts[1] + 1);
 					goto fail;
 				}
                         } else if (ioctld_parse_seq(acts[1], &test)) {
-                                print("events_seq_incorrect", acts[1]);
+				if (!quiet)
+                                	print("events_seq_incorrect", acts[1]);
 				goto fail;
                         }
 
@@ -2466,7 +2475,8 @@ int event_correct(const char *action)
 
 		if (!strncasecmp(acts[0], "play", 4) || !strcasecmp(acts[0], "exec") || !strcasecmp(acts[0], "command")) {
 			if (!acts[1]) {
-				print("events_act_no_params", acts[0]);
+				if (!quiet)
+					print("events_act_no_params", acts[0]);
 				goto fail;
 			}
 			goto check;
@@ -2474,11 +2484,13 @@ int event_correct(const char *action)
 
 		if (!strcasecmp(acts[0], "chat") || !strcasecmp(acts[0], "msg")) {
                         if (!acts[1]) {
-                                print("events_act_no_params", acts[0]);
+				if (!quiet)
+                                	print("events_act_no_params", acts[0]);
 				goto fail;
                         }
                         if (!strchr(acts[1], ' ')) {
-                                print("events_act_no_params", acts[0]);
+				if (!quiet)
+                               		print("events_act_no_params", acts[0]);
 				goto fail;
                         }
 			goto check;
@@ -2486,13 +2498,15 @@ int event_correct(const char *action)
 
 		if (!strcasecmp(acts[0], "beep")) {
 		    	if (acts[1]) {
-			    	print("events_act_toomany_params", acts[0]);
+				if (!quiet)
+			    		print("events_act_toomany_params", acts[0]);
 				goto fail;
 			}
 			goto check;
 		}
 				
-		print("events_noexist");
+		if (!quiet)
+			print("events_act_wrong");
 		goto fail;
 
 check:

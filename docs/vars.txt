@@ -273,6 +273,12 @@ display_welcome
 
 	mówi, czy ekg ma wy¶wietliæ tekst powitalny.
 
+display_transparent
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	mówi, czy w interfejsie ncurses t³o ma byæ prze¼roczyste.
+
 emoticons
 	typ: bool
 	domy¶lna warto¶æ: 1

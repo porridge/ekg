@@ -3,17 +3,18 @@ sk³adnia komendy on:
 on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 
 	zdarzenie:
-		msg, chat - wiadomo¶æ od kogo¶;
-		avail - zmiana przez kogo¶ statusu na 'dostêpny';
-		away  -            -//-               'zajêty';
-		invisible -        -//-               'niewidoczny';
-		disconnect -       -//-	              'niedostêpny';
-		descr - zmiana przez kogo¶ swojego opisu;
-		dcc - otrzymanie od kogo¶ dcc;
-		sigusr1, sigusr2 - otrzymanie podanego sygna³u;
-		delivered, queued - wiadomo¶æ dostarczona lub zakolejkowana;
-		new_mail - otrzymanie nowej wiadomo¶ci e-mail;
-		* - wszystkie zdarzenia;
+		msg, chat - wiadomo¶æ od kogo¶
+		avail - zmiana przez kogo¶ statusu na 'dostêpny'
+		away  -            -//-               'zajêty'
+		invisible -        -//-               'niewidoczny'
+		disconnect -       -//-	              'niedostêpny'
+		descr - zmiana przez kogo¶ swojego opisu
+		dcc - otrzymanie od kogo¶ dcc
+		sigusr1, sigusr2 - otrzymanie podanego sygna³u
+		delivered, queued - wiadomo¶æ dostarczona lub zakolejkowana
+		                    na serwerze.
+		new_mail - otrzymanie nowej wiadomo¶ci e-mail
+		* - wszystkie zdarzenia
 	zdarzenia mo¿na ³±czyæ ze sob± operatorem '|'.
 
 	user - nazwa u¿ytkownika z listy lub uin, * oznacza dowolnego 
@@ -21,10 +22,10 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
                indywidualn± akcjê - ta z * nie brana jest pod uwagê.
 	
 	akcja:
-		clear - usuñ dane zdarzenie (lub jedn± flagê);
-		beep - wysy³a \007 na terminal czyli zwyk³e beepniêcie;
-		play [plik] - odtwórz dany d¼wiêk; 
-		chat [user] [tekst] - wy¶lij tekst do danego usera;
+		clear - usuñ dane zdarzenie (lub jedn± flagê)
+		beep - wysy³a \007 na terminal czyli zwyk³e beepniêcie
+		play [plik] - odtwórz dany d¼wiêk
+		chat [user] [tekst] - wy¶lij tekst do danego usera
 		msg  [user] [tekst] -            -//- 
 		blink_leds [sekwencja] - zapalaj kontorlki NumLock, CapsLock
 		      i ScrollLock na klawiaturze 'w rytm' podanej sekwencji.
@@ -50,11 +51,12 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 		je¶li w akcji wyst±pi %1, jest zastêpowane przez numer sprawcy
 		zdarzenia. %2 jest jego pseudonimem, je¶li figuruje w naszej
 		li¶cie kontaktów, lub numerkiem w przeciwnym razie. %3
-		wystêpuje tylko przy wiadomo¶ciach i zawiera jej tre¶æ.
+		wystêpuje przy wiadomo¶ciach i zawiera jej tre¶æ. w przypadku 
+		zmiany przez kogo¶ opisu, %3 zawiera nowy opis stanu.
 		%4 jest tym samym co %3, lecz wszystkie niebezpieczne znaki,
 		które mog³yby zostaæ zinterpretowane przez shella zostaj±
 		poprzedzone backslashem. dlatego chc±c wkleiæ tre¶æ wiadomo¶ci
-		do akcji ,,exec'' nale¿y u¿yæ %4.
+		lub opis do akcji ,,exec'' nale¿y u¿yæ %4.
 
 akcje blink_leds oraz beeps_spk musz± mieæ dostêp do /dev/console, wiêc
 uruchamiany jest specjalny daemon (ioctld) z prawami roota. po wyj¶ciu 

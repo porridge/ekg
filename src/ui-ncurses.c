@@ -170,6 +170,7 @@ int config_contacts_size = 8;		/* szeroko¶æ okna kontaktów */
 static int last_contacts_size = 0;	/* poprzedni rozmiar przed zmian± */
 int config_contacts = 0;		/* czy ma byæ okno kontaktów */
 int config_contacts_descr = 0;		/* i czy maj± byæ wy¶wietlane opisy */
+int config_display_transparent = 1;	/* czy chcemy prze¼roczyste t³o? */
 struct binding *binding_map[KEY_MAX + 1];	/* mapa bindowanych klawiszy */
 struct binding *binding_map_meta[KEY_MAX + 1];	/* j.w. z altem */
 
@@ -1496,6 +1497,7 @@ static void ui_ncurses_beep()
 void ui_ncurses_init()
 {
 	struct timer *t;
+	int background = COLOR_DEFAULT;
 
 	ui_postinit = ui_ncurses_postinit;
 	ui_print = ui_ncurses_print;
@@ -1520,14 +1522,18 @@ void ui_ncurses_init()
 	keypad(input, TRUE);
 
 	start_color();
-	init_pair(16, COLOR_BLACK, COLOR_DEFAULT);
-	init_pair(1, COLOR_RED, COLOR_DEFAULT);
-	init_pair(2, COLOR_GREEN, COLOR_DEFAULT);
-	init_pair(3, COLOR_YELLOW, COLOR_DEFAULT);
-	init_pair(4, COLOR_BLUE, COLOR_DEFAULT);
-	init_pair(5, COLOR_MAGENTA, COLOR_DEFAULT);
-	init_pair(6, COLOR_CYAN, COLOR_DEFAULT);
-	init_pair(7, COLOR_WHITE, COLOR_DEFAULT);
+
+	if (!config_display_transparent)
+		background = COLOR_BLACK;
+
+	init_pair(16, COLOR_BLACK, background);
+	init_pair(1, COLOR_RED, background);
+	init_pair(2, COLOR_GREEN, background);
+	init_pair(3, COLOR_YELLOW, background);
+	init_pair(4, COLOR_BLUE, background);
+	init_pair(5, COLOR_MAGENTA, background);
+	init_pair(6, COLOR_CYAN, background);
+	init_pair(7, COLOR_WHITE, background);
 
 	init_pair(8, COLOR_BLACK, COLOR_BLUE);
 	init_pair(9, COLOR_RED, COLOR_BLUE);

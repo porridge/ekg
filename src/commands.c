@@ -2649,7 +2649,7 @@ COMMAND(cmd_on)
                 return;
         }
 
-        if (event_correct(params[2]))
+        if (event_correct(params[2], 0))
                 return;
 
 	event_add(flags, uin, params[2], 0);
@@ -3078,16 +3078,37 @@ cleanup:
 	}
 
 	if (match_arg(params[0], 'd', "del", 2)) {
+		int ret = 1;
+		int del_all = 0;
+
 		if (!params[1]) {
 			print("not_enough_params", name);
 			return;
 		}
 
-		if (!timer_remove(params[1], NULL)) {
+		if (!strcmp(params[1], "*")) {
+			list_t l;
+
+			del_all = 1;
+
+			for (l = timers; l; l = l->next) {
+				struct timer *t = l->data;
+
+				/* nie psujmy ui */
+				if (t->type == TIMER_COMMAND)
+					ret = timer_remove(t->name, NULL);
+			}
+		} else
+			ret = timer_remove(params[1], NULL);
+		
+		if (!ret) {
 			print((at) ? "at_deleted" : "timer_deleted", params[1]);
 			config_changed = 1;
 		} else
-			print((at) ? "at_noexist" : "timer_noexist", params[1]);
+			if (del_all)
+				print((at) ? "at_empty" : "timer_empty");
+			else
+				print((at) ? "at_noexist" : "timer_noexist", params[1]);
 
 		return;
 	}
@@ -3610,7 +3631,7 @@ void command_init()
 	  " [opcje]", "planuje wykonanie komend",
 	  "\n"
 	  "  -a, --add [nazwa] <czas> <komenda>  tworzy nowy plan\n"
-	  "  -d, --del <numer/nazwa>             usuwa plan\n"
+	  "  -d, --del <numer/nazwa>|*           usuwa plan lub wszystkie\n"
 	  " [-l, --list]                         wy¶wietla listê planów\n"
 	  "\n"
 	  "Czas podaje siê w formacie [[[yyyy]mm]dd]HH[:]MM[.SS], gdzie "
@@ -3934,8 +3955,8 @@ void command_init()
 	  " [opcje]", "zarz±dzanie timerami",
 	  "\n"
 	  "  -a, --add [nazwa] [*/]<czas> <komenda>  tworzy nowy timer\n"
-	  "  -d, --del <numer/nazwa>                 zatrzymuje timer\n"
-	  " [-l, --list]                             wy¶wietla listê timerów\n"
+	  "  -d, --del <numer/nazwa>|*           zatrzymuje timer lub wszystkie\n"
+	  " [-l, --list]                         wy¶wietla listê timerów\n"
 	  "\n"
 	  "Czas podaje siê w sekundach. Mo¿na te¿ u¿yæ przyrostków d, h, m, s, "
 	  "oznaczaj±cych dni, godziny, minuty, sekundy, np. 5h20m. Timer po "

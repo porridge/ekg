@@ -134,6 +134,9 @@ void variable_init()
 	variable_add("display_pl_chars", "dp", VAR_INT, 1, &config_display_pl_chars, NULL, NULL, NULL);
 	variable_add("display_sent", "ds", VAR_BOOL, 1, &config_display_sent, NULL, NULL, NULL);
 	variable_add("display_welcome", "dw", VAR_BOOL, 1, &config_display_welcome, NULL, NULL, NULL);
+#ifdef WITH_UI_NCURSES
+	variable_add("display_transparent", "dt", VAR_BOOL, 1, &config_display_transparent, NULL, NULL, NULL);
+#endif
 	variable_add("emoticons", "eM", VAR_BOOL, 1, &config_emoticons, NULL, NULL, NULL);
 #ifdef HAVE_OPENSSL
 	variable_add("encryption", "en", VAR_INT, 1, &config_encryption, NULL, variable_map(2, 0, 0, "none", 1, 0, "sim"), NULL);

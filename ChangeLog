@@ -6,6 +6,13 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-01-11
+
+- zmienna ,,display_transparent'' (MP/sz)
+- poprawki /on, aby by³o bardziej userfriendly. dodanie przekazywania
+  nowego opisu w parametrach %3 i %4 (sz)
+- ,,*'' w nazwie timera i at usuwa wszystkie (ale nie timery UI) (sz)
+
 // 2003-01-10
 
 - timery (oraz at) u¿ytkownika s± zapisywane przy /save (sz)

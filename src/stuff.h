@@ -183,6 +183,7 @@ int config_display_notify;
 int config_display_pl_chars;
 int config_display_sent;
 int config_display_welcome;
+int config_display_transparent;
 char *config_email;
 int config_emoticons;
 int config_encryption;
@@ -327,7 +328,7 @@ int event_remove(int flags, uin_t uin);
 int event_flags(const char *events);
 const char *event_format(int flags);
 int event_check(int event, uin_t uin, const char *data);
-int event_correct(const char *action);
+int event_correct(const char *action, int quiet);
 void event_free();
 int ioctld_socket();
 
