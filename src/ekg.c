@@ -468,6 +468,7 @@ void ekg_wait_for_key()
 					} else 
 						tmp = saprintf("%s:%d", inet_ntoa(addr), port);
 					print("dcc_timeout", tmp);
+					xfree(tmp);
 					remove_transfer(d);
 					list_remove(&watches, d, 0);
 					gg_free_dcc(d);
