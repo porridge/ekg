@@ -26,10 +26,13 @@ change_not_enough_params %! %RPolecenie wymaga podania %Wwszystkich%n %Rparametr
 change_timeout %! %RPrzekroczono limit czasu operacji zmiany katalogu publicznego!%n\n
 change %> %YInformacje w katalogu publicznym zostaly zmienione.%n\n
 chat_footer %c`----- ---- --- -- -%n\n
-chat_header %> %W%1%n: %c(%n%#/%2%c)%n\n
+chat_header %> %W%1%n: %c(%#%2)%n \n
 chat_line %c|%n %1\n
-cgat_line,irc         %1\n
+chat_line,irc         %1\n
 chat_line_width 72
+chat_timestamp [%H:%M]
+chat_timestamp_today [%H:%M]
+chat_timestamp_now 
 conn_broken %! %c%#%n %W--/%n%r*%n%W/---%n %RPo³±czenie z serwerem przerwane\n
 connected %c%#%n %> [%G OK %n] %Y<-%n %GPo³±czono z serwerem\n
 connecting %> %YTrwa ³±czenie z serwerem...%n\n
@@ -70,12 +73,15 @@ list_invisible %mINV%n %W[ ]%n %m%[18]1%n [%K%[,-15]3%n]\n
 list_not_avail_descr %RN/A%n %W[%n%R-%n%W]%n %R%[18]1%n [%R...............%n] [%[26]5]\n
 list_not_avail %RN/A%n %W[%n%R-%n%W]%n %R%[18]1%n [%R...............%n]\n
 message_footer %Y`----- ---- --- -- -%n\n
-message_header %b%x %1: (%#/%2) %n\n
+message_header %> %1: %c(%Y%#%2%c)%n \n
 message_line_first,irc %c%3%n %G<%n%2%G>%n %1\n
 message_line,irc         %1\n
 message_line %Y|%n %1\n
 message_line_width 72
 message_line_width,irc 78
+message_timestamp [%H:%M]
+message_timestamp_today [%H:%M]
+message_timestamp_now 
 modify_done %> %YDane zmienione%n\n
 not_connected %! %RNie jeste¶ po³±czony z serwerem%n\n
 not_enough_params %! %RZa ma³o parametrów%n\n
@@ -132,13 +138,16 @@ search_results_single_unknown %W?%n
 search_results_single %Y%7%n%W%[-10]1%n %K|%n %[12]3 %K|%n %6 %K|%n %[20]2 %K|%n %[4]5 %K|%n %c%[16]4%n\n
 search_stopped %) Szukanie zosta³o przerwane.\n
 search_timeout %! %RPrzekroczono limit czasu operacji szukania!%n\n
-sent_footer %M+------------%n\n
-sent_header %M+------------%n Msg sent: %W%1%n %c(%C%#%c/%2)%n %M------------%n\n
+sent_footer %M`----- ---- --- -- -%n\n
+sent_header %> Sent: %W%1%n %c(%M%#%2%c)%n\n
 sent_line_first,irc %c%3%n %G<%n%2%G>%n %1\n
 sent_line,irc         %1\n
 sent_line %M|%n %1\n
 sent_line_width 72
 sent_line_width,irc 78
+sent_timestamp [%H:%M]
+sent_timestamp_today [%H:%M]
+sent_timestamp_now 
 show_status_avail_descr  %W[%n%G+%n%W]%n   %Gdostêpny: %1%n
 show_status_avail %W[%n%G+%n%W]%n   %Gdostêpny%n
 show_status_busy_descr %W[%n%C?%n%W]%n   %Czajêty: %1%n
