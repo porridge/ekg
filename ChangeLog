@@ -8,6 +8,8 @@ zg³osi³ b³±d.
 
 // 2002-12-11
 
+- nie wy¶wietlajmy komunikatu o zakolejkowaniu wiadomo¶ci do 
+  nieprawid³owego adresata (sz)
 - stan ,,zajêty'' bez opisu by³ ¼le ustawiany (sz)
 
 // 2002-12-10
