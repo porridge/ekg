@@ -389,7 +389,7 @@ dnl	CFLAGS=${CFLAGS--O}
 		search_readline=false
 	  elif test "x$withval" != "xyes" ; then
 		READLINE_LIBS="$LIBS -L$withval/lib -lreadline"
-		READLINE_INCLUDES="-I$withval/include"
+		READLINE_INCLUDES="-I$withval/include -I$withval/include/readline"
 		search_readline=false
 		AC_DEFINE(HAS_READLINE)
 		has_readline=true

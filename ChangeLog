@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawka inkludów readline (seiko/w)
 - obs³uga niewidocznych u¿ytkowników (klith/w)
 - poprawka poprawki mkdir (wasyl/w)
+- kolejna poprawka wykrywania readline (wojboj/w)
 
 // 2002-03-23
 
