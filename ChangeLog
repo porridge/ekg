@@ -24,6 +24,10 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - s/libgg/libgadu/ w examples/ (w)
 - wywalenie ekg.c do ekg.o, niech siê na koñcu linkuje wszystko
   i niech rekompilacja pakietu bêdzie szybsza (w)
+- przeniesienie zmiennych do listy. dziêki temu bêdzie zachowywa³
+  grzecznie wszystkie ustawienia innyc klientów, g³ównie GNU Gadu (w)
+- porzadki w zmiennych -- wszystkie funkcje variable_* (w)
+- porzadki w konfiguracji -- wszystkie zmienne config_* (w)
 
 // 2002-02-03
 

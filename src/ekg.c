@@ -41,6 +41,7 @@
 #include "themes.h"
 #include "version.h"
 #include "userlist.h"
+#include "vars.h"
 
 time_t last_action = 0;
 int ioctl_daemon_pid = 0;
@@ -179,7 +180,7 @@ int my_getc(FILE *f)
 			}
 			
 			/* timeout reconnectu */
-			if (!sess && reconnect_timer && time(NULL) - reconnect_timer >= auto_reconnect && config_uin && config_password) {
+			if (!sess && reconnect_timer && time(NULL) - reconnect_timer >= config_auto_reconnect && config_uin && config_password) {
 				reconnect_timer = 0;
 				my_printf("connecting");
 				connecting = 1;
@@ -188,7 +189,7 @@ int my_getc(FILE *f)
 					my_printf("conn_failed", strerror(errno));
 					do_reconnect();
 				} else {
-					sess->initial_status = default_status;
+					sess->initial_status = config_status;
 				}
 				list_add(&watches, sess, 0);
 			}
@@ -201,17 +202,17 @@ int my_getc(FILE *f)
 			}
 
 			/* timeout autoawaya */
-			if (sess && auto_away && !away && time(NULL) - last_action > auto_away && sess->state == GG_STATE_CONNECTED) {
+			if (sess && config_auto_away && !away && time(NULL) - last_action > config_auto_away && sess->state == GG_STATE_CONNECTED) {
 				char tmp[16];
 				
 				away = 1;
 				reset_prompt();
 				gg_change_status(sess, GG_STATUS_BUSY | (private_mode ? GG_STATUS_FRIENDS_MASK : 0));
 				
-				if (!(auto_away % 60))
-					snprintf(tmp, sizeof(tmp), "%dm", auto_away / 60);
+				if (!(config_auto_away % 60))
+					snprintf(tmp, sizeof(tmp), "%dm", config_auto_away / 60);
 				else
-					snprintf(tmp, sizeof(tmp), "%ds", auto_away);
+					snprintf(tmp, sizeof(tmp), "%ds", config_auto_away);
 				
 				my_printf("auto_away", tmp);
 			}
@@ -306,6 +307,8 @@ int main(int argc, char **argv)
 	struct passwd *pw; 
 	struct gg_common si;
 	
+	variable_init();
+
 	config_user = "";
 
 	for (i = 1; i < argc; i++) {
@@ -361,7 +364,7 @@ IOCTL_HELP
         ekg_pid = getpid();
 
         userlist_read(NULL);
-	read_config(NULL);
+	config_read(NULL);
 	read_sysmsg(NULL);
 
 #ifdef IOCTL
@@ -379,9 +382,9 @@ IOCTL_HELP
 
 	/* okre¶lanie stanu klienta po w³±czeniu */
 	if (new_status)
-		default_status = new_status;
+		config_status = new_status;
 
-	switch (default_status & ~GG_STATUS_FRIENDS_MASK) {
+	switch (config_status & ~GG_STATUS_FRIENDS_MASK) {
 		case GG_STATUS_AVAIL:
 			away = 0;
 			break;
@@ -393,25 +396,25 @@ IOCTL_HELP
 			break;
 	}
 	
-	if ((default_status & GG_STATUS_FRIENDS_MASK))
+	if ((config_status & GG_STATUS_FRIENDS_MASK))
 		private_mode = 1;
 	
 	/* czy w³±czyæ debugowanie? */	
 	if (gg_debug_level)
-		display_debug = 1;
+		config_debug = 1;
 
 	if (force_debug)
 		gg_debug_level = 255;
 	
-	if (display_debug)
+	if (config_debug)
 		gg_debug_level = 255;
 	
 	init_theme();
 	if (load_theme)
 		read_theme(load_theme, 1);
 	else
-		if (default_theme)
-			read_theme(default_theme, 1);
+		if (config_theme)
+			read_theme(config_theme, 1);
 	
 	reset_theme_cache();
 		
@@ -443,12 +446,12 @@ IOCTL_HELP
 	if (!config_uin || !config_password)
 		my_printf("no_config");
 
-	if (!log_path) {
+	if (!config_log_path) {
 	    if (!home) { pw = getpwuid(getuid()); home = pw->pw_dir; }
 	    if (config_user != "") {
-		log_path = gg_alloc_sprintf("%s/.gg/%s/history", home, config_user);
+		config_log_path = gg_alloc_sprintf("%s/.gg/%s/history", home, config_user);
 	    } else {
-		log_path = gg_alloc_sprintf("%s/.gg/history", home);
+		config_log_path = gg_alloc_sprintf("%s/.gg/history", home);
 	    }
 	}
 	
@@ -462,7 +465,7 @@ IOCTL_HELP
 			my_printf("conn_failed", strerror(errno));
 			do_reconnect();
 		} else {
-			sess->initial_status = default_status;
+			sess->initial_status = config_status;
 		}
 		list_add(&watches, sess, 0);
 	}
@@ -509,7 +512,7 @@ IOCTL_HELP
 
 		if ((line = readline(prompt))) {
 			if (!strcasecmp(line, "tak") || !strcasecmp(line, "yes") || !strcasecmp(line, "t") || !strcasecmp(line, "y")) {
-				if (!userlist_write(NULL) && !write_config(NULL))
+				if (!userlist_write(NULL) && !config_write(NULL))
 					my_printf("saved");
 				else
 					my_printf("error_saving");
@@ -520,7 +523,7 @@ IOCTL_HELP
 			printf("\n");
 	}
 
-	free(log_path);	
+	free(config_log_path);	
 	return 0;
 }
 

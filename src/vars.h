@@ -21,24 +21,25 @@
 #define __VARS_H
 
 enum {
-	VAR_STR,
-	VAR_INT,
-	VAR_BOOL,
+	VAR_STR,		/* ci±g znaków */
+	VAR_INT,		/* liczba ca³kowita */
+	VAR_BOOL,		/* 0/1, tak/nie, yes/no, on/off */
+	VAR_FOREIGN,		/* nieznana zmienna */
 };
 
 struct variable {
 	char *name;		/* nazwa zmiennej */
-	int type;		/* rodzaj: VAR_STR, VAR_INT, VAR_BOOL */
+	int type;		/* rodzaj */
 	int display;		/* 0 bez warto¶ci, 1 pokazuje, 2 w ogóle */
 	void *ptr;		/* wska¼nik do zmiennej */
 	void (*notify)(char*);	/* funkcja wywo³ywana przy zmianie */
 };
 
-#define MAX_VARS 50		/* ¿eby siê g³upi gcc nie plu³ */
+struct list *variables;
 
-struct variable variables[MAX_VARS];	/* XXX zmieniæ na dynamiczn± tablicê */
-
-struct variable *find_variable(char *name);
-int set_variable(char *name, char *value);
+void variable_init();
+struct variable *variable_find(char *name);
+int variable_add(char *name, int type, int display, void *ptr, void (*notify)(char *name));
+int variable_set(char *name, char *value);
 
 #endif

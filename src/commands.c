@@ -199,16 +199,22 @@ char *unknown_uin_generator(char *text, int state)
 
 char *variable_generator(char *text, int state)
 {
-	static int index = 0, len;
+	static struct list *l;
+	static int len;
 
 	if (!state) {
-		index = 0;
+		l = variables;
 		len = strlen(text);
 	}
 
-	while (variables[index++].name)
-		if (!strncasecmp(text, variables[index - 1].name, len))
-			return strdup(variables[index - 1].name);
+	while (l) {
+		struct variable *v = l->data;
+		
+		l = l->next;
+		
+		if (!strncasecmp(text, v->name, len))
+			return strdup(v->name);
+	}
 
 	return NULL;
 }
@@ -509,10 +515,10 @@ COMMAND(command_away)
 		my_printf((private_mode) ? "private_mode_on" : "private_mode_off");
 	}
 
-	default_status = status_table[away] | ((private_mode) ? GG_STATUS_FRIENDS_MASK : 0);
+	config_status = status_table[away] | ((private_mode) ? GG_STATUS_FRIENDS_MASK : 0);
 
 	if (sess && sess->state == GG_STATE_CONNECTED)
-		gg_change_status(sess, default_status);
+		gg_change_status(sess, config_status);
 
 	return 0;
 }
@@ -561,7 +567,7 @@ COMMAND(command_connect)
 	                        my_printf("conn_failed", strerror(errno));
 	                        do_reconnect();
 	                } else {
-				sess->initial_status = default_status;
+				sess->initial_status = config_status;
 			}
 			list_add(&watches, sess, 0);
 		} else
@@ -1079,7 +1085,7 @@ COMMAND(command_msg)
 
 COMMAND(command_save)
 {
-	if (!userlist_write(NULL) && !write_config(NULL)) {
+	if (!userlist_write(NULL) && !config_write(NULL)) {
 		my_printf("saved");
 		config_changed = 0;
 	} else
@@ -1114,7 +1120,7 @@ COMMAND(command_theme)
 
 COMMAND(command_set)
 {
-	struct variable *v = variables;
+	struct list *l;
 	int unset = 0;
 
 	if (params[0] && params[0][0] == '-') {
@@ -1123,7 +1129,9 @@ COMMAND(command_set)
 	}
 
 	if (!params[1] && !unset) {
-		while (v->name) {
+		for (l = variables; l; l = l->next) {
+			struct variable *v = l->data;
+			
 			if ((!params[0] || !strcasecmp(params[0], v->name)) && v->display != 2) {
 				if (v->type == VAR_STR) {
 					char *tmp = *(char**)(v->ptr);
@@ -1137,12 +1145,10 @@ COMMAND(command_set)
 					my_printf("variable", v->name, (!v->display) ? "(...)" : itoa(*(int*)(v->ptr)));
 				}
 			}
-
-			v++;
 		}
 	} else {
 		reset_theme_cache();
-		switch (set_variable(params[0], params[1])) {
+		switch (variable_set(params[0], params[1])) {
 			case 0:
 				if (!in_autoexec) {
 					my_printf("variable", params[0], params[1]);

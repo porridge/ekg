@@ -118,7 +118,7 @@ char *va_format_string(char *format, va_list ap)
 				string_append(buf, error_cache);
 			if (*p == '#')
 				string_append(buf, timestamp(timestamp_cache));
-			if (display_color) {
+			if (config_display_color) {
 				if (*p == 'k')
 					string_append(buf, "\033[0;30m");
 				if (*p == 'K')

@@ -143,7 +143,7 @@ void handle_msg(struct gg_event *e)
 		return;
 	
 	if (ignored_check(e->event.msg.sender)) {
-		if (log_ignored) {
+		if (config_log_ignored) {
 			cp_to_iso(e->event.msg.message);
 			if (u)
 				snprintf(sender, sizeof(sender), "%s/%lu", u->display, u->uin);
@@ -164,9 +164,9 @@ void handle_msg(struct gg_event *e)
 		    print_message_body(e->event.msg.message, 2);
 		    my_printf("sysmsg_footer");
 
-		    if (enable_beep)
+		    if (config_beep)
 			    my_puts("\007");
-		    play_sound(sound_sysmsg_file);
+		    play_sound(config_sound_sysmsg_file);
 		    last_sysmsg = e->event.msg.msgclass;
 		    write_sysmsg(NULL);
 		};
@@ -187,10 +187,10 @@ void handle_msg(struct gg_event *e)
 	print_message_body(e->event.msg.message, chat);
 	my_printf((chat) ? "chat_footer" : "message_footer");
 
-	if (enable_beep && ((chat) ? enable_beep_chat : enable_beep_msg))
+	if (config_beep && ((chat) ? config_beep_chat : config_beep_msg))
 		my_puts("\007");
 
-	play_sound((chat) ? sound_chat_file : sound_msg_file);
+	play_sound((chat) ? config_sound_chat_file : config_sound_msg_file);
 
 	if (u)
 		snprintf(sender, sizeof(sender), "%s/%lu", u->display, u->uin);
@@ -203,17 +203,17 @@ void handle_msg(struct gg_event *e)
 		"Rozmowa od" : "Wiadomo¶æ od", sender, full_timestamp(),
 		e->event.msg.message);
 
-	if (away && sms_away && sms_send_app && sms_number) {
+	if (away && config_sms_away && config_sms_app && config_sms_number) {
 		char *foo;
 
-		if (strlen(e->event.msg.message) > sms_max_length)
-			e->event.msg.message[sms_max_length] = 0;
+		if (strlen(e->event.msg.message) > config_sms_max_length)
+			e->event.msg.message[config_sms_max_length] = 0;
 
 		foo = format_string(find_format((chat) ? "sms_chat" : "sms_msg"), sender, e->event.msg.message);
 
 		/* niech nie wysy³a smsów, je¶li brakuje formatów */
 		if (strcmp(foo, ""))
-			send_sms(sms_number, foo, 0);
+			send_sms(config_sms_number, foo, 0);
 
 		free(foo);
 	}
@@ -236,13 +236,13 @@ void handle_ack(struct gg_event *e)
 	if (!e->event.ack.seq)	/* ignorujemy potwierdzenia ctcp */
 		return;
 
-	if (!display_ack)
+	if (!config_display_ack)
 		return;
 
-	if (display_ack == 2 && queued)
+	if (config_display_ack == 2 && queued)
 		return;
 
-	if (display_ack == 3 && !queued)
+	if (config_display_ack == 3 && !queued)
 		return;
 
 	tmp = queued ? "ack_queued" : "ack_delivered";
@@ -276,9 +276,9 @@ void handle_notify(struct gg_event *e)
 		}
 		if (n->status == GG_STATUS_AVAIL) {
 			my_printf("status_avail", format_user(n->uin));
-			if (u && completion_notify)
+			if (u && config_completion_notify)
 				add_send_nick(u->display);
-			if (enable_beep && enable_beep_notify)
+			if (config_beep && config_beep_notify)
 				my_puts("\007");
 		} else if (n->status == GG_STATUS_BUSY)
 			my_printf("status_busy", format_user(n->uin));
@@ -305,13 +305,13 @@ void handle_status(struct gg_event *e)
 	if (!(u = userlist_find(e->event.status.uin, NULL)))
 		return;
 
-	if (display_notify) {
+	if (config_display_notify) {
 		if (e->event.status.status == GG_STATUS_AVAIL && u->status != GG_STATUS_AVAIL) {
 		    	check_event(EVENT_AVAIL, e->event.status.uin);
-			if (completion_notify)
+			if (config_completion_notify)
 				add_send_nick(u->display);
 			my_printf("status_avail", format_user(e->event.status.uin));
-			if (enable_beep && enable_beep_notify)
+			if (config_beep && config_beep_notify)
 				my_puts("\007");
 		} else if (e->event.status.status == GG_STATUS_BUSY && u->status != GG_STATUS_BUSY) 
 		{
@@ -569,7 +569,7 @@ void handle_disconnect(struct gg_event *e)
 {
 	my_printf("disconn_warning");
 
-	auto_reconnect = 0;
+	config_auto_reconnect = 0;
 	gg_logoff(sess);	/* a zobacz.. mo¿e siê uda ;> */
 	list_remove(&watches, sess, 0);
 	userlist_clear_status();

@@ -27,67 +27,102 @@
 #include "stuff.h"
 #include "vars.h"
 #include "libgadu.h"
+#include "dynstuff.h"
 
-struct variable variables[MAX_VARS] = {
-	{ "uin", VAR_INT, 1, &config_uin, NULL },
-	{ "password", VAR_STR, 0, &config_password, NULL },
-
-	{ "auto_away", VAR_INT, 1, &auto_away, NULL },
-	{ "auto_reconnect", VAR_INT, 1, &auto_reconnect, NULL },
-	{ "beep", VAR_BOOL, 1, &enable_beep, NULL },
-	{ "beep_msg", VAR_BOOL, 1, &enable_beep_msg, NULL },
-	{ "beep_chat", VAR_BOOL, 1, &enable_beep_chat, NULL },
-	{ "beep_notify", VAR_BOOL, 1, &enable_beep_notify, NULL },
-	{ "completion_notify", VAR_BOOL, 1, &completion_notify, NULL },
-	{ "dcc", VAR_BOOL, 1, &use_dcc, changed_dcc },
-	{ "display_ack", VAR_INT, 1, &display_ack, NULL },
-	{ "display_color", VAR_BOOL, 1, &display_color, NULL },
-	{ "display_notify", VAR_BOOL, 1, &display_notify, NULL },
-	{ "log", VAR_INT, 1, &log, NULL },
-	{ "log_ignored", VAR_INT, 1, &log_ignored, NULL },
-	{ "log_path", VAR_STR, 1, &log_path, NULL },
-	{ "use_proxy", VAR_INT, 1, &gg_http_use_proxy, NULL },
-	{ "proxy_port", VAR_INT, 1, &gg_http_proxy_port, NULL },
-	{ "proxy_host", VAR_STR, 1, &gg_http_proxy_host, NULL },
-	{ "sms_away", VAR_BOOL, 1, &sms_away, NULL },
-	{ "sms_max_length", VAR_INT, 1, &sms_max_length, NULL },
-	{ "sms_number", VAR_STR, 1, &sms_number, NULL },
-	{ "sms_send_app", VAR_STR, 1, &sms_send_app, NULL },
-	{ "sound_msg_file", VAR_STR, 1, &sound_msg_file, NULL },
-	{ "sound_chat_file", VAR_STR, 1, &sound_chat_file, NULL },
-	{ "sound_sysmsg_file", VAR_STR, 1, &sound_sysmsg_file, NULL },
-	{ "sound_app", VAR_STR, 1, &sound_app, NULL },
-	{ "theme", VAR_STR, 1, &default_theme, changed_theme },
-
-	{ "default_status", VAR_INT, 2, &default_status, NULL },
-	{ "bold_font", VAR_STR, 2, &bold_font, NULL },	/* GNU Gadu */
-	{ "debug", VAR_BOOL, 2, &display_debug, changed_debug },
-
-	{ NULL, 0, 0, NULL, NULL }
-};
+struct list *variables = NULL;
 
 /*
- * find_variable()
+ * variable_init()
+ *
+ * inicjuje listê zmiennych.
+ */
+void variable_init()
+{
+	variable_add("uin", VAR_INT, 1, &config_uin, NULL);
+	variable_add("password", VAR_STR, 0, &config_password, NULL);
+
+	variable_add("auto_away", VAR_INT, 1, &config_auto_away, NULL);
+	variable_add("auto_reconnect", VAR_INT, 1, &config_auto_reconnect, NULL);
+	variable_add("beep", VAR_BOOL, 1, &config_beep, NULL);
+	variable_add("beep_msg", VAR_BOOL, 1, &config_beep_msg, NULL);
+	variable_add("beep_chat", VAR_BOOL, 1, &config_beep_chat, NULL);
+	variable_add("beep_notify", VAR_BOOL, 1, &config_beep_notify, NULL);
+	variable_add("completion_notify", VAR_BOOL, 1, &config_completion_notify, NULL);
+	variable_add("dcc", VAR_BOOL, 1, &config_dcc, changed_dcc);
+	variable_add("display_ack", VAR_INT, 1, &config_display_ack, NULL);
+	variable_add("display_color", VAR_BOOL, 1, &config_display_color, NULL);
+	variable_add("display_notify", VAR_BOOL, 1, &config_display_notify, NULL);
+	variable_add("log", VAR_INT, 1, &config_log, NULL);
+	variable_add("log_ignored", VAR_INT, 1, &config_log_ignored, NULL);
+	variable_add("config_log_path", VAR_STR, 1, &config_log_path, NULL);
+	variable_add("use_proxy", VAR_INT, 1, &gg_http_use_proxy, NULL);
+	variable_add("proxy_port", VAR_INT, 1, &gg_http_proxy_port, NULL);
+	variable_add("proxy_host", VAR_STR, 1, &gg_http_proxy_host, NULL);
+	variable_add("sms_away", VAR_BOOL, 1, &config_sms_away, NULL);
+	variable_add("sms_max_length", VAR_INT, 1, &config_sms_max_length, NULL);
+	variable_add("sms_number", VAR_STR, 1, &config_sms_number, NULL);
+	variable_add("sms_send_app", VAR_STR, 1, &config_sms_app, NULL);
+	variable_add("sound_msg_file", VAR_STR, 1, &config_sound_msg_file, NULL);
+	variable_add("sound_chat_file", VAR_STR, 1, &config_sound_chat_file, NULL);
+	variable_add("sound_sysmsg_file", VAR_STR, 1, &config_sound_sysmsg_file, NULL);
+	variable_add("sound_app", VAR_STR, 1, &config_sound_app, NULL);
+	variable_add("theme", VAR_STR, 1, &config_theme, changed_theme);
+
+	variable_add("status", VAR_INT, 2, &config_status, NULL);
+	variable_add("debug", VAR_BOOL, 2, &config_debug, changed_debug);
+}
+
+/*
+ * variable_find()
  *
  * znajduje strukturê `variable' opisuj±c± zmienn± o podanej nazwie.
  *
  * - name.
  */
-struct variable *find_variable(char *name)
+struct variable *variable_find(char *name)
 {
-	struct variable *v = variables;
-	
-	while (v->name) {
+	struct list *l;
+
+	for (l = variables; l; l = l->next) {
+		struct variable *v = l->data;
+
 		if (!strcasecmp(v->name, name))
 			return v;
-		v++;
 	}
 
 	return NULL;
 }
 
 /*
- * set_variable()
+ * variable_add()
+ *
+ * dodaje zmienn± do listy zmiennych.
+ *
+ *  - name - nazwa,
+ *  - type - typ zmiennej,
+ *  - display - czy i jak ma wy¶wietlaæ,
+ *  - ptr - wska¼nik do zmiennej,
+ *  - notify - funkcja powiadomienia,
+ *
+ * zwraca 0 je¶li siê uda³o, je¶li nie to -1.
+ */
+int variable_add(char *name, int type, int display, void *ptr, void (*notify)(char*))
+{
+	struct variable v;
+
+	gg_debug(GG_DEBUG_FUNCTION, "// variable_add(\"%s\", ...);\n", name);
+
+	v.name = strdup(name);
+	v.type = type;
+	v.display = display;
+	v.ptr = ptr;
+	v.notify = notify;
+
+	return (list_add(&variables, &v, sizeof(v)) != NULL);
+}
+
+/*
+ * variable_set()
  *
  * ustawia warto¶æ podanej zmiennej. je¶li to zmienna liczbowa lub binarna,
  * zmienia ci±g na liczbê. w przypadku binarnych, rozumie zwroty typu `on',
@@ -96,61 +131,81 @@ struct variable *find_variable(char *name)
  * - name,
  * - value.
  */
-int set_variable(char *name, char *value)
+int variable_set(char *name, char *value)
 {
-	struct variable *v = find_variable(name);
+	struct variable *v = variable_find(name);
 
-	if (!v)	
+	gg_debug(GG_DEBUG_FUNCTION, "// variable_set(\"%s\", \"%s\");\n", name, value);
+
+	if (!v)	{
+		variable_add(name, VAR_FOREIGN, 2, strdup(value), NULL);
 		return -1;
+	}
 
-	if (v->type == VAR_INT) {
-		char *p = value;
+	switch (v->type) {
+		case VAR_INT:
+		{
+			char *p = value;
 
-		if (!p)
-			return -2;
-
-		while (*p) {
-			if (*p < '0' || *p > '9')
+			if (!value)
 				return -2;
-			p++;
+
+			while (*p) {
+				if (*p < '0' || *p > '9')
+					return -2;
+				p++;
+			}
+
+			*(int*)(v->ptr) = atoi(value);
+
+			if (v->notify)
+				(v->notify)(v->name);
+
+			return 0;
 		}
 
-		*(int*)(v->ptr) = atoi(value);
-
-		if (v->notify)
-			(v->notify)(v->name);
-
-		return 0;
-	}
-
-	if (v->type == VAR_BOOL) {
-		int tmp;
+		case VAR_BOOL:
+		{
+			int tmp;
 		
-		if (!value)
-			return -2;
+			if (!value)
+				return -2;
 		
-		if ((tmp = on_off(value)) == -1)
-			return -2;
+			if ((tmp = on_off(value)) == -1)
+				return -2;
 
-		*(int*)(v->ptr) = tmp;
+			*(int*)(v->ptr) = tmp;
 
-		if (v->notify)
-			(v->notify)(v->name);
+			if (v->notify)
+				(v->notify)(v->name);
 		
-		return 0;
-	}
+			return 0;
+		}
 
-	free(*(char**)(v->ptr));
-	if (value) {
-		if (!(*(char**)(v->ptr) = (*value == 1) ? decode_base64(value + 1) : strdup(value)))
-			return -3;
-	} else
-		*(char**)(v->ptr) = NULL;
+		case VAR_STR:
+		{
+			char **tmp = (char**)(v->ptr);
+			
+			free(*tmp);
+			
+			if (value) {
+				if (*value == 1)
+					*tmp = base64_decode(value + 1);
+				else
+					*tmp = strdup(value);
+
+				if (!*tmp)
+					return -3;
+			} else
+				*tmp = NULL;
 	
-	if (v->notify)
-		(v->notify)(v->name);
+			if (v->notify)
+				(v->notify)(v->name);
 
-	return 0;
+			return 0;
+		}
+	}
+
+	return -1;
 }
-
 

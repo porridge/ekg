@@ -50,41 +50,41 @@ struct list *aliases = NULL;
 struct list *watches = NULL;
 struct list *transfers = NULL;
 struct list *events = NULL;
+
 int in_readline = 0;
 int no_prompt = 0;
 int away = 0;
 int in_autoexec = 0;
-int auto_reconnect = 10;
+int config_auto_reconnect = 10;
 int reconnect_timer = 0;
-int auto_away = 600;
-int log = 0;
-int log_ignored = 0;
-char *log_path = NULL;
-int display_color = 1;
-int enable_beep = 1, enable_beep_msg = 1, enable_beep_chat = 1, enable_beep_notify = 1;
-char *sound_msg_file = NULL;
-char *sound_chat_file = NULL;
-char *sound_sysmsg_file = NULL;
-char *sound_app = NULL;
+int config_auto_away = 600;
+int config_log = 0;
+int config_log_ignored = 0;
+char *config_log_path = NULL;
+int config_display_color = 1;
+int config_beep = 1, config_beep_msg = 1, config_beep_chat = 1, config_beep_notify = 1;
+char *config_sound_msg_file = NULL;
+char *config_sound_chat_file = NULL;
+char *config_sound_sysmsg_file = NULL;
+char *config_sound_app = NULL;
 int config_uin = 0;
 int last_sysmsg = 0;
 char *config_password = NULL;
-int sms_away = 0;
-char *sms_number = NULL;
-char *sms_send_app = NULL;
-int sms_max_length = 100;
+int config_sms_away = 0;
+char *config_sms_number = NULL;
+char *config_sms_app = NULL;
+int config_sms_max_length = 100;
 int search_type = 0;
 int config_changed = 0;
-int display_ack = 1;
-int completion_notify = 1;
-char *bold_font = NULL;		/* dla kompatybilno¶ci z gnu gadu */
+int config_display_ack = 1;
+int config_completion_notify = 1;
 int private_mode = 0;
 int connecting = 0;
-int display_notify = 1;
-char *default_theme = NULL;
-int default_status = GG_STATUS_AVAIL;
+int config_display_notify = 1;
+char *config_theme = NULL;
+int config_status = GG_STATUS_AVAIL;
 char *reg_password = NULL;
-int use_dcc = 0;
+int config_dcc = 0;
 char *query_nick = NULL;
 uin_t query_uin = 0;
 int sock = 0;
@@ -221,24 +221,24 @@ char *prepare_path(char *filename)
  * put_log()
  *
  * wrzuca do logów informacjê od/do danego numerka. podaje siê go z tego
- * wzglêdu, ¿e gdy `log = 2', informacje lec± do $log_path/$uin.
+ * wzglêdu, ¿e gdy `log = 2', informacje lec± do $config_log_path/$uin.
  *
  * - uin,
  * - format...
  */
 void put_log(uin_t uin, char *format, ...)
 {
- 	char *home = getenv("HOME"), *lp = log_path;
+ 	char *home = getenv("HOME"), *lp = config_log_path;
 	char path[PATH_MAX];
 	struct passwd *pw;
 	va_list ap;
 	FILE *f;
 
-	if (!log)
+	if (!config_log)
 		return;
 	
 	if (!lp) {
-		if (log == 2)
+		if (config_log == 2)
 			lp = ".";
 		else
 			lp = "gg.log";
@@ -254,7 +254,7 @@ void put_log(uin_t uin, char *format, ...)
 	} else
 		strncpy(path, lp, sizeof(path));
 
-	if (log == 2) {
+	if (config_log == 2) {
 		mkdir(path, 0700);
 		snprintf(path + strlen(path), sizeof(path) - strlen(path), "/%lu", uin);
 	}
@@ -288,14 +288,14 @@ char *full_timestamp()
 }
 
 /*
- * read_config()
+ * config_read()
  *
  * czyta z pliku ~/.gg/config lub podanego konfiguracjê i listê ignorowanych
  * u¿yszkodników.
  *
  *  - filename.
  */
-int read_config(char *filename)
+int config_read(char *filename)
 {
 	char *buf, *foo;
 	FILE *f;
@@ -309,7 +309,7 @@ int read_config(char *filename)
 		return -1;
 
 	while ((buf = read_file(f))) {
-		if (buf[0] == '#') {
+		if (buf[0] == '#' || buf[0] == ';' || (buf[0] == '/' || buf[1] == '/')) {
 			free(buf);
 			continue;
 		}
@@ -321,7 +321,16 @@ int read_config(char *filename)
 
 		*foo++ = 0;
 
-		if (!strcasecmp(buf, "ignore")) {
+		if (!strcasecmp(buf, "set")) {
+			char *bar;
+
+			if (!(bar = strchr(foo, ' ')))
+				variable_set(foo, NULL);
+			else {
+				*bar++ = 0;
+				variable_set(foo, bar);
+			}
+		} else if (!strcasecmp(buf, "ignore")) {
 			if (atoi(foo))
 				ignored_add(atoi(foo));
 		} else if (!strcasecmp(buf, "alias")) {
@@ -336,7 +345,7 @@ int read_config(char *filename)
                         else
                             my_printf("config_line_incorrect");
                 } else
-			set_variable(buf, foo);
+			variable_set(buf, foo);
 
 		free(buf);
 	}
@@ -391,16 +400,15 @@ int read_sysmsg(char *filename)
 
 
 /*
- * write_config()
+ * config_write()
  *
  * zapisuje aktualn± konfiguracjê -- zmienne i listê ignorowanych do pliku
  * ~/.gg/config lub podanego.
  *
  *  - filename.
  */
-int write_config(char *filename)
+int config_write(char *filename)
 {
-	struct variable *v = variables;
 	struct list *l;
 	char *tmp;
 	FILE *f;
@@ -419,19 +427,22 @@ int write_config(char *filename)
 	
 	fchmod(fileno(f), 0600);
 
-	while (v->name) {
+	for (l = variables; l; l = l->next) {
+		struct variable *v = l->data;
+		
 		if (v->type == VAR_STR) {
 			if (*(char**)(v->ptr)) {
 				if (!v->display) {
-					char *tmp = encode_base64(*(char**)(v->ptr));
+					char *tmp = base64_encode(*(char**)(v->ptr));
 					fprintf(f, "%s \001%s\n", v->name, tmp);
 					free(tmp);
 				} else 	
 					fprintf(f, "%s %s\n", v->name, *(char**)(v->ptr));
 			}
-		} else
+		} else if (v->type == VAR_FOREIGN)
+			fprintf(f, "%s %s\n", v->name, (char*) v->ptr);
+		else
 			fprintf(f, "%s %d\n", v->name, *(int*)(v->ptr));
-		v++;
 	}	
 
 	for (l = ignored; l; l = l->next) {
@@ -642,7 +653,7 @@ void parse_autoexec(char *filename)
  */
 void do_reconnect()
 {
-	if (auto_reconnect && connecting)
+	if (config_auto_reconnect && connecting)
 		reconnect_timer = time(NULL);
 }
 
@@ -656,7 +667,7 @@ int send_sms(char *recipient, char *message, int show_result)
 	int pid;
 	char buf[50];
 
-	if (!sms_send_app) {
+	if (!config_sms_app) {
 		errno = EINVAL;
 		return -1;
 	}
@@ -675,7 +686,7 @@ int send_sms(char *recipient, char *message, int show_result)
 		for (i = 0; i < 255; i++)
 			close(i);
 			
-		execlp(sms_send_app, sms_send_app, recipient, message, NULL);
+		execlp(config_sms_app, config_sms_app, recipient, message, NULL);
 		exit(1);
 	}
 
@@ -698,7 +709,7 @@ int play_sound(char *sound_path)
 {
 	int pid;
 
-	if (!sound_app || !sound_path) {
+	if (!config_sound_app || !sound_path) {
 		errno = EINVAL;
 		return -1;
 	}
@@ -712,7 +723,7 @@ int play_sound(char *sound_path)
 		for (i = 0; i < 255; i++)
 			close(i);
 			
-		execlp(sound_app, sound_app, sound_path, NULL);
+		execlp(config_sound_app, config_sound_app, sound_path, NULL);
 		exit(1);
 	}
 
@@ -1364,21 +1375,21 @@ int init_socket(char *sock_path)
         return 0;
 }
 
-static char base64_set[] =
+static char base64_charset[] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 /*
- * encode_base64()
+ * base64_encode()
  *
  * zapisuje ci±g znaków w base64. alokuje pamiêæ. 
  */
-char *encode_base64(char *buf)
+char *base64_encode(char *buf)
 {
 	char *out, *res;
 	int i = 0, j = 0, k = 0, len = strlen(buf);
 	
 	if (!(res = out = malloc((len / 3 + 1) * 4 + 2))) {
-		gg_debug(GG_DEBUG_MISC, "// encode_base64() not enough memory\n");
+		gg_debug(GG_DEBUG_MISC, "// base64_encode() not enough memory\n");
 		return NULL;
 	}
 	
@@ -1397,7 +1408,7 @@ char *encode_base64(char *buf)
 				k = buf[j++] & 63;
 				break;
 		}
-		*out++ = base64_set[k];
+		*out++ = base64_charset[k];
 		i++;
 	}
 
@@ -1411,17 +1422,17 @@ char *encode_base64(char *buf)
 }
 
 /*
- * decode_base64()
+ * base64_decode()
  *
  * wczytuje ci±g znaków base64, zwraca zaalokowany buforek.
  */
-char *decode_base64(char *buf)
+char *base64_decode(char *buf)
 {
 	char *res, *save, *end, *foo, val;
 	int index = 0;
 	
 	if (!(save = res = calloc(1, (strlen(buf) / 4 + 1) * 3 + 2))) {
-		gg_debug(GG_DEBUG_MISC, "// decode_base64() not enough memory\n");
+		gg_debug(GG_DEBUG_MISC, "// base64_decode() not enough memory\n");
 		return NULL;
 	}
 
@@ -1432,9 +1443,9 @@ char *decode_base64(char *buf)
 			buf++;
 			continue;
 		}
-		if (!(foo = strchr(base64_set, *buf)))
-			foo = base64_set;
-		val = (int)foo - (int)base64_set;
+		if (!(foo = strchr(base64_charset, *buf)))
+			foo = base64_charset;
+		val = (int)foo - (int)base64_charset;
 		*buf = 0;
 		buf++;
 		switch (index) {
@@ -1469,7 +1480,7 @@ char *decode_base64(char *buf)
  */
 void changed_debug(char *var)
 {
-	if (display_debug)
+	if (config_debug)
 		gg_debug_level = 255;
 	else
 		gg_debug_level = 0;
@@ -1492,12 +1503,12 @@ void changed_dcc(char *var)
 			dcc = l->data;
 	}
 
-	if (!use_dcc && dcc) {
+	if (!config_dcc && dcc) {
 		list_remove(&watches, dcc, 0);
 		gg_free_dcc(dcc);
 	}
 
-	if (use_dcc && !dcc) {
+	if (config_dcc && !dcc) {
 		if (!(dcc = gg_dcc_create_socket(config_uin, 0))) {
 			my_printf("dcc_create_error", strerror(errno));
 		} else
@@ -1514,10 +1525,10 @@ void changed_theme(char *var)
 {
     init_theme();
     reset_theme_cache();
-    if(default_theme) {
-	if(!read_theme(default_theme, 1)) {
+    if(config_theme) {
+	if(!read_theme(config_theme, 1)) {
 	    reset_theme_cache();
-    	    my_printf("theme_loaded", default_theme);
+    	    my_printf("theme_loaded", config_theme);
 	} else
 	    my_printf("error_loading_theme", strerror(errno));
     }
