@@ -23,7 +23,7 @@
 #include <errno.h>
 
 #ifndef PATH_MAX
-# define PATH_MAX _POSIX_PATH_MAX
+#  define PATH_MAX _POSIX_PATH_MAX
 #endif
 
 char *dirname(const char *path)
