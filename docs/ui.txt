@@ -14,6 +14,8 @@ ui_costam_init()
 	ui_deinit, ui_print, ui_event, ui_loop, ui_beep adresy funkcji
 	danego interfejsu. nawet je¶li funkcja nic nie robi, musi byæ
 	zdefiniowana. zmiennym tym NIE WOLNO przypisaæ warto¶ci NULL.
+	nale¿y te¿ utrzymywaæ w zmiennych ui_screen_width oraz
+	ui_screen_height aktualny rozmiar ekranu.
 
 ui_deinit()
 	pozamykanie wszystkiego.

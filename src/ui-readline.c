@@ -678,6 +678,11 @@ void ui_readline_init()
 #endif
 	if (screen_lines < 1)
 		screen_lines = 24;
+	if (screen_columns < 1)
+		screen_columns = 80;
+
+	ui_screen_width = screen_columns;
+	ui_screen_height = screen_lines;
 }
 
 /*

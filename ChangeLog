@@ -28,6 +28,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - dodanie GG_STATUS_BLOCKED (Chilek/w)
 - dodanie funkcji gg_notify_ex(), gg_add_notify_ex() i gg_remove_notify_ex().
   podbicie API (Chilek/w)
+- ujemna warto¶æ formatów _line_width powoduje odjêcie ich od szeroko¶ci
+  ekranu (czach/w)
+- naprawienie rozrzucania mesgów po okienkach, zepsutego jednym z patchy (w)
 
 // 2002-09-11
 

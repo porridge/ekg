@@ -28,6 +28,9 @@ void (*ui_beep)(void);
 int (*ui_event)(const char *event, ...);
 void (*ui_deinit)(void);
 
+int ui_screen_width;
+int ui_screen_height;
+
 extern void ui_none_init();
 extern void ui_batch_init();
 

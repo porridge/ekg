@@ -620,6 +620,9 @@ void ui_ncurses_init()
 	noecho();
 	nonl();
 
+	ui_screen_width = stdscr->_maxx + 1;
+	ui_screen_height = stdscr->_maxy + 1;
+	
 	window_current = window_new(NULL);
 	status = newwin(1, stdscr->_maxx + 1, stdscr->_maxy - 1, 0);
 	input = newwin(1, stdscr->_maxx + 1, stdscr->_maxy, 0);

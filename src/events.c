@@ -71,8 +71,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 {
 	int width, next_width, i, j, mem_width = 0;
 	char *mesg, *buf, *line, *next, *format = NULL, *format_first = "", *next_format = NULL, *head = NULL, *foot = NULL, *save;
-	char *line_width = NULL, timestr[100];
-	const char *target;
+	char *line_width = NULL, timestr[100], *target;
 	struct tm *tm;
 
 	if (e->event.msg.recipients) {
@@ -99,11 +98,11 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 		} 
 		
 		if (c)
-			target = c->name;
+			target = xstrdup(c->name);
 		else
-			target = (chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender));
+			target = xstrdup((chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender)));
 	} else
-	        target = (chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender));
+	        target = xstrdup((chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender)));
 	
 	switch (chat) {
 		case 0:
@@ -143,7 +142,10 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 	strftime(timestr, sizeof(timestr), format_find((chat) ? "chat_timestamp" : "message_timestamp"), tm);
 
 	if (!(width = atoi(format_find(line_width))))
-		width = 78;
+		width = ui_screen_width - 2;
+
+	if (width < 0)
+		width = ui_screen_width + width;
 
 	next_width = width;
 	
@@ -243,6 +245,8 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 
 	if (!strcmp(format_find(format_first), ""))
 		print_window(target, 1, foot);
+
+	xfree(target);
 }
 
 /*
