@@ -53,6 +53,7 @@
 #endif
 #include <ncurses.h>
 #include <signal.h>
+#include <sys/ioctl.h>
 #ifndef _AIX
 #  include <string.h>
 #endif
@@ -2869,6 +2870,23 @@ static void ui_ncurses_loop()
 
 			if (ch == 27)
 				b = binding_map[27];
+
+			/* je¶li dostali¶my \033O to albo mamy Alt-O, albo
+			 * pokaleczone klawisze funkcyjne (\033OP do \033OS).
+			 * ogólnie rzecz bior±c, nieciekawa sytuacja ;) */
+
+			if (ch == 'O') {
+				int tmp = ekg_getch(ch);
+
+				if (tmp >= 'P' && tmp <= 'S')
+					b = binding_map[KEY_F(tmp - 'P' + 1)];
+				else if (tmp == 'H')
+					b = binding_map[KEY_HOME];
+				else if (tmp == 'F')
+					b = binding_map[KEY_END];
+				else
+					ungetch(tmp);
+			}
 
 			if (b && b->action) {
 				if (b->function)

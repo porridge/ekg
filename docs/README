@@ -152,6 +152,10 @@ KLAWIATURA
     Dodatkowo, okre¶lonym kombinacjom klawiszy mo¿na przypisaæ ró¿ne
     komendy za pomoc± polecenia ,,bind''.
 
+    Ze wzglêdu na niestandardowe zachowanie niektórych typów terminali,
+    mog± wyst±piæ problemy z kombinacj± Alt-Shift-O lub Alt-O przy
+    w³±czonym Caps Locku.
+
     [1] Klawisz F3 zmienia warto¶æ zmiennej ,,contacts''. Je¶li warto¶æ tej
         zmiennej by³a równa 0, wci¶niêcie klawisza zmienia jej warto¶æ na 2.
 	Je¶li by³a równa 1, kolejne wci¶niêcia F3 bêd± zmienia³y warto¶æ
