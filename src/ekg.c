@@ -1041,6 +1041,7 @@ int main(int argc, char **argv)
 "  -u, --user=NAZWA           korzysta z profilu u¿ytkownika o podanej nazwie\n"
 "  -t, --theme=PLIK           ³aduje opis wygl±du z podanego pliku\n"
 "  -c, --control-pipe=PLIK    potok nazwany sterowania\n"
+"  -o, --no-pipe              wy³±czenie potoku nazwanego sterowania\n"
 "  -n, --no-auto              nie ³±czy siê automatycznie z serwerem\n"
 "  -a, --away[=OPIS]          domy¶lnie zmienia stan na ,,zajêty''\n"
 "  -b, --back[=OPIS]          domy¶lnie zmienia stan na ,,dostêpny''\n"

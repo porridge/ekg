@@ -4,6 +4,12 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek).
 
+// 2004-11-11
+
+- usuniêcie dziur w numeracji zdarzeñ (gophi/w)
+- poprawka zachowania readline (gophi/w)
+- dodanie opisu opcji -o (gophi/w)
+
 // 2004-10-31
 
 - usuniêcie wycieku pamiêci przy korzystaniu z formatów contacts_header*

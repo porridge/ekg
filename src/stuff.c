@@ -1584,6 +1584,16 @@ int event_remove(const char *name, int quiet)
 	} else {
 		if (remove_all)
 			printq("events_del_all");
+		else {
+			int num = 1;
+
+			for (l = events; l; l = l->next) {
+				struct event *e = l->data;
+
+				xfree(e->name);
+				e->name = xstrdup(itoa(num++));
+			}
+		}
 
 		return 0;
 	}

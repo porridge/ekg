@@ -681,7 +681,11 @@ static void ui_readline_print(const char *target, int separate, const char *xlin
 
 		old_prompt = xstrdup(rl_prompt);
                 rl_end = 0;
+#ifdef HAVE_RL_SET_PROMPT
 /*		rl_set_prompt(NULL); */
+#else
+/*		rl_expand_prompt(NULL); */
+#endif
 		rl_redisplay();
 		printf("\r");
 		for (i = 0; i < strlen(old_prompt); i++)
@@ -699,7 +703,12 @@ static void ui_readline_print(const char *target, int separate, const char *xlin
 			char *tmp;
 			
 			in_readline++;
+/*		rl_set_prompt(NULL); */
+#ifdef HAVE_RL_SET_PROMPT
 		        rl_set_prompt((char *) prompt);
+#else
+		        rl_expand_prompt((char *) prompt);
+#endif
 			pager_lines = -1;
 			tmp = readline((char *) prompt);
 			in_readline--;
@@ -717,7 +726,11 @@ static void ui_readline_print(const char *target, int separate, const char *xlin
 	/* je¶li jeste¶my w readline, poka¿ z powrotem prompt */
 	if (in_readline) {
 		rl_end = old_end;
+#ifdef HAVE_RL_SET_PROMPT
 		rl_set_prompt(old_prompt);
+#else
+		rl_expand_prompt(old_prompt);
+#endif
 		xfree(old_prompt);
 		rl_forced_update_display();
 	}
@@ -814,7 +827,11 @@ static char *my_readline()
         char *res, *tmp;
 
         in_readline = 1;
+#ifdef HAVE_RL_SET_PROMPT
 	rl_set_prompt(prompt);
+#else
+	rl_expand_prompt(prompt);
+#endif
         res = readline((char *) prompt);
         in_readline = 0;
 
