@@ -311,7 +311,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 {
 	struct window *w;
 	const char *p;
-	int x = 0;
+	int x = 0, count = 0;
 	list_t l;
 
 	switch (config_make_window) {
@@ -399,6 +399,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 			if (!x)
 				x += print_timestamp(w);
 			waddch(w->window, (unsigned char) *p);
+			count++;
 			x++;
 			if (x == stdscr->_maxx + 1) {
 				if (*(p + 1) == 10)
@@ -410,6 +411,11 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 				wmove(w->window, w->y, x);
 			}
 		}
+	}
+
+	if (!count) {
+		print_timestamp(w);
+		set_cursor(w);
 	}
 
 	w->y++;
