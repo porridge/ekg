@@ -1610,6 +1610,7 @@ COMMAND(cmd_msg)
 
 	array_free(nicks);
 
+	unidle();
 }
 
 COMMAND(cmd_save)
