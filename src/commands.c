@@ -5453,7 +5453,7 @@ void command_init()
 
 	command_add
 	( "sms", "u?", cmd_sms, 0,
-	  " <numer/alias> <tre¶æ>", "wysy³a smsa do podanej osoby",
+	  " <numer/alias/telefon> <tre¶æ>", "wysy³a smsa do podanej osoby",
 	  "\n"
 	  "Polecenie wymaga zdefiniowana zmiennej %Tsms_send_app%n");
 

@@ -929,7 +929,8 @@ static void window_switch(int id)
 		if (id != w->id || w->floating)
 			continue;
 
-		window_last_id = window_current->id;
+		if (id != window_current->id)
+			window_last_id = window_current->id;
 
 		window_current = w;
 
