@@ -115,6 +115,7 @@ char *config_server = NULL;
 int my_printf_lines = -1;
 int quit_message_send = 0;
 int registered_today = 0;
+int config_protocol = 0;
 
 /*
  * my_puts()
@@ -1828,6 +1829,7 @@ void do_connect()
 	p.password = config_password;
 	p.status = config_status;
 	p.async = 1;
+	p.client_version = config_protocol;
 
 	if (config_server) {
 		char *tmp = strchr(config_server, ':'), *foo = strdup(config_server);

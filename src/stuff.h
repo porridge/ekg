@@ -119,6 +119,7 @@ int config_random_reason;
 int config_query_commands;
 char *config_proxy;
 char *config_server;
+int config_protocol;
 
 char *home_dir;
 int in_readline;

@@ -13,6 +13,10 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - mo¿na tylko raz zarejestrowaæ numerek w ci±gu sesji, by dzieciom trochê
   utrudniæ zabawê w polowanie na numerki (w)
 - rozpoznawanie p³ci. szczegó³y w docs/themes.txt (w)
+- ukryta zmienna ,,protocol'' w ekg pozwala szybko zmieniæ wersjê protoko³u,
+  ¿eby sprawdziæ jaki¶ egzotyczny ficzer (w)
+- zmienne liczbowe mo¿na wpisywaæ jako heksadecymalne, poprzedzaj±ce je
+  tekstem ,,0x'' (w)
 
 // 2002-05-14
 

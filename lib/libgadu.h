@@ -89,6 +89,8 @@ struct gg_session {
 	char *recv_buf;		/* bufor na otrzymywane pakiety */
 	int recv_done;		/* ile ju¿ wczytano do bufora */
         int recv_left;		/* i ile jeszcze trzeba wczytaæ */
+
+	int version;		/* wersja klienta */
 };
 
 /*
@@ -253,6 +255,7 @@ struct gg_login_params {
 	unsigned short server_port;	/* port serwera gg */
 	unsigned long client_addr;	/* adres dcc klienta */
 	unsigned short client_port;	/* port dcc klienta */
+	int client_version;		/* wersja klienta */
 };
 
 struct gg_session *gg_login(const struct gg_login_params *p);
@@ -593,7 +596,7 @@ unsigned short fix16(unsigned short x);
 #define GG_HTTPS_PORT 443
 #define GG_HTTP_USERAGENT "Mozilla/4.7 [en] (Win98; I)"
 
-#define GG_CLIENT_VERSION 0x16
+#define GG_DEFAULT_CLIENT_VERSION 0x16
 #define GG_DEFAULT_TIMEOUT 30
 
 #define GG_DEFAULT_DCC_PORT 1550

@@ -77,6 +77,7 @@ void variable_init()
 
 	variable_add("status", VAR_INT, 2, &config_status, NULL);
 	variable_add("debug", VAR_BOOL, 2, &config_debug, changed_debug);
+	variable_add("protocol", VAR_INT, 2, &config_protocol, NULL);
 }
 
 /*
@@ -160,13 +161,16 @@ int variable_set(char *name, char *value, int allow_foreign)
 			if (!value)
 				return -2;
 
+			if (!strncmp(p, "0x", 2))
+				p += 2;
+
 			while (*p) {
 				if (*p < '0' || *p > '9')
 					return -2;
 				p++;
 			}
 
-			*(int*)(v->ptr) = atoi(value);
+			*(int*)(v->ptr) = strtol(value, NULL, 0);
 
 			if (v->notify)
 				(v->notify)(v->name);
