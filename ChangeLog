@@ -8,6 +8,8 @@ zg³osi³ b³±d.
 
 // 2003-01-29
 
+- dodanie klawisza Ctrl-K (bies/w)
+- poprawienie docs/protocol.html. jest zgodne z XHTML 1.0 Transitional (w)
 - zmienna ,,sound_mail_file'' (sz)
 - kosmetyka konferencji. nie tworzy kolejnych nazw #confX przy b³êdach.
   /find w oknie z konferencj± wyszuka wszystkich uczestników (sz)

@@ -97,6 +97,7 @@ KLAWIATURA
         Ctrl-D, Delete		usuñ znak pod kursorem
         Ctrl-H, Backspace	usuñ znak przed kursorem
         Ctrl-I, Tab		dope³nianie
+	Ctrl-K			usuwa tekst od kursora do koñca linii
         Ctrl-L			czyszczenie/od¶wie¿anie ekranu
         Ctrl-M, Enter		zatwierdzenie linii
         Ctrl-Q			odblokowanie terminala

@@ -2525,7 +2525,11 @@ static void ui_ncurses_loop()
 				}
 				break;
 
-			case 'Y' - 64:
+			case 'K' - 64:	/* Ctrl-K */
+				line[line_index] = 0;
+				break;
+
+			case 'Y' - 64:	/* Ctrl-Y */
 				if (yanked && strlen(yanked) + strlen(line) + 1 < LINE_MAXLEN) {
 					memmove(line + line_index + strlen(yanked), line + line_index, LINE_MAXLEN - line_index - strlen(yanked));
 					memcpy(line + line_index, yanked, strlen(yanked));
