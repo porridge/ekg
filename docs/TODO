@@ -27,6 +27,7 @@ Pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
   - Ctrl-W powinno wrzucaæ do yankbuffera (w)
   - dope³nianie w ¶rodku linii (sz)
   - wykrywanie niewidocznych jako opcja (wielu)
+  - opcja, ¿eby zbyt d³ugi opis nie ustawia³ nowego, tylko informowa³ (wielu)
   - czas powrotu w stanach opisowych (?)
   - zmienna wy³±czaj±ca pytanie o zapisanie konfiguracji (Tohver)
   - autofind - szukanie osób, które do nas pisz±, a nie mamy ich w li¶cie
