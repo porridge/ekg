@@ -15,6 +15,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - dodany ,,last_list_timestamp'' do themes (d)
 - poprawne zapisywanie polskich znaków mesgów wychodz±cych w last (d)
 - s/get_last_count/last_count_get/ (d)
+- brakuj±ce sent_line_first (dawjar/w)
 	
 // 2002-09-06
 

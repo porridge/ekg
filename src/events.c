@@ -97,6 +97,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 			break;
 		case 3:
 			format = "sent_line"; 
+			format_first = "sent_line_first";
 			line_width = "sent_line_width";
 			head = "sent_header";
 			foot = "sent_footer";
