@@ -36,7 +36,7 @@
 #include "dynstuff.h"
 #include "ioctld.h"
 
-#define DEBUG_MAX_LINES	"50"	/* ile linii z debug zrzucaæ po wysypaniu siê ekg */
+#define DEBUG_MAX_LINES	"50"	/* ile linii z debug zrzucaæ do pliku */
 
 enum event_t {
 	EVENT_MSG = 1,
@@ -168,7 +168,6 @@ char *config_profile;
 int config_changed;
 
 int old_stderr;
-int debug_max_lines;
 
 char *config_audio_device;
 char *config_away_reason;
@@ -284,7 +283,7 @@ void alias_free();
 char *base64_encode(const char *buf);
 char *base64_decode(const char *buf);
 
-void binding_list();
+void binding_list(int quiet);
 void binding_free();
 
 int buffer_add(int type, const char *target, const char *line, int max_lines);
@@ -299,12 +298,12 @@ void changed_uin(const char *var);
 void changed_xxx_reason(const char *var);
 
 struct conference *conference_add(const char *string, const char *nicklist, int quiet);
-int conference_remove(const char *name);
+int conference_remove(const char *name, int quiet);
 struct conference *conference_create(const char *nicks);
 struct conference *conference_find(const char *name);
 struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int count);
-int conference_set_ignore(const char *name, int flag);
-int conference_rename(const char *oldname, const char *newname);
+int conference_set_ignore(const char *name, int flag, int quiet);
+int conference_rename(const char *oldname, const char *newname, int quiet);
 void conference_free();
 
 int config_read();

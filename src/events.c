@@ -1142,7 +1142,7 @@ void handle_search(struct gg_http *h)
 void handle_pubdir(struct gg_http *h)
 {
 	struct gg_pubdir *s = NULL;
-	char *good = "", *bad = "";
+	const char *good = "", *bad = "";
 
 	if (!h)
 		return;

@@ -229,8 +229,7 @@ int alias_add(const char *string, int quiet, int append)
 
 		if (!strcasecmp(string, j->name)) {
 			if (!append) {
-				if (!quiet)
-					print("aliases_exist", string);
+				printq("aliases_exist", string);
 				return -1;
 			} else {
 				list_t l;
@@ -247,9 +246,8 @@ int alias_add(const char *string, int quiet, int append)
 						break;
 					}
 				}
-				
-				if (!quiet)
-					print("aliases_append", string);
+			
+				printq("aliases_append", string);
 
 				return 0;
 			}
@@ -260,8 +258,7 @@ int alias_add(const char *string, int quiet, int append)
 		struct command *c = l->data;
 
 		if (!strcasecmp(string, c->name) && !c->alias) {
-			if (!quiet)
-				print("aliases_command", string);
+			printq("aliases_command", string);
 			return -1;
 		}
 
@@ -278,8 +275,7 @@ int alias_add(const char *string, int quiet, int append)
 	
 	xfree(params);
 
-	if (!quiet)
-		print("aliases_add", a.name, "");
+	printq("aliases_add", a.name, "");
 
 	return 0;
 }
@@ -432,17 +428,17 @@ char *base64_decode(const char *buf)
  *
  * wy¶wietla listê przypisanych komend.
  */
-void binding_list() 
+void binding_list(int quiet) 
 {
 	list_t l;
 
 	if (!bindings)
-		print("bind_seq_list_empty");
+		printq("bind_seq_list_empty");
 
 	for (l = bindings; l; l = l->next) {
 		struct binding *b = l->data;
 
-		print("bind_seq_list", b->key, b->action);
+		printq("bind_seq_list", b->key, b->action);
 	}
 }
 
@@ -762,14 +758,12 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 	memset(&c, 0, sizeof(c));
 
 	if (!name || !nicklist) {
-		if (!quiet)
-			print("not_enough_params", "conference");
+		printq("not_enough_params", "conference");
 		return NULL;
 	}
 
 	if (name[0] != '#') {
-		if (!quiet) 
-			print("conferences_name_error");
+		printq("conferences_name_error");
 		return NULL;
 	}
 
@@ -777,8 +771,7 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 	buf = strip_spaces(buf);
 	
 	if (buf[0] == ',' || buf[strlen(buf)-1] == ',') {
-		if (!quiet)
-			print("invalid_params", "chat");
+		printq("invalid_params", "chat");
 		xfree(buf);
 		return NULL;
 	}
@@ -817,10 +810,8 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 			}
 
 			if (!nig) {
-				if (!quiet) {
-					print("group_empty", gname);
-					print("conferences_not_added", name);
-				}
+				printq("group_empty", gname);
+				printq("conferences_not_added", name);
 
 				xfree(gname);
 
@@ -837,8 +828,7 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 		struct conference *cf = l->data;
 		
 		if (!strcasecmp(name, cf->name)) {
-			if (!quiet)
-				print("conferences_exist", name);
+			printq("conferences_exist", name);
 
 			array_free(nicks);
 
@@ -853,8 +843,7 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 		        continue;
 
 		if (!(uin = get_uin(*p))) {
-			if (!quiet)
-			        print("user_not_found", *p);
+			printq("user_not_found", *p);
 			continue;
 		}
 
@@ -866,14 +855,12 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 	array_free(nicks);
 
 	if (i != count) {
-		if (!quiet)
-			print("conferences_not_added", name);
+		printq("conferences_not_added", name);
 
 		return NULL;
 	}
 
-	if (!quiet)
-		print("conferences_add", name);
+	printq("conferences_add", name);
 
 	c.name = xstrdup(name);
 
@@ -887,11 +874,12 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
  *
  * usuwa konferencje z listy konferencji.
  *
- *  - name - konferencja lub NULL dla wszystkich.
+ *  - name - konferencja lub NULL dla wszystkich,
+ *  - quiet.
  *
  * 0/-1
  */
-int conference_remove(const char *name)
+int conference_remove(const char *name, int quiet)
 {
 	list_t l;
 	int removed = 0;
@@ -902,7 +890,7 @@ int conference_remove(const char *name)
 		l = l->next;
 
 		if (!name || !strcasecmp(c->name, name)) {
-			if (name)
+			if (name && !quiet)
 				print("conferences_del", name);
 			remove_send_nick(c->name);
 			xfree(c->name);
@@ -913,6 +901,9 @@ int conference_remove(const char *name)
 	}
 
 	if (!removed) {
+		if (quiet)
+			return -1;
+			
 		if (name)
 			print("conferences_noexist", name);
 		else
@@ -921,7 +912,7 @@ int conference_remove(const char *name)
 		return -1;
 	}
 
-	if (removed && !name) {
+	if (removed && !name && !quiet) {
 		print("conferences_del_all");
 		return 0;
 	}
@@ -1013,28 +1004,29 @@ struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int co
  * ustawia stan konferencji na ignorowany lub nie.
  *
  *  - name - nazwa konferencji,
- *  - flag - 1 ignorowaæ, 0 nie ignorowaæ.
+ *  - flag - 1 ignorowaæ, 0 nie ignorowaæ,
+ *  - quiet.
  *
  * 0/-1
  */
-int conference_set_ignore(const char *name, int flag)
+int conference_set_ignore(const char *name, int flag, int quiet)
 {
 	struct conference *c = NULL;
 
 	if (name[0] != '#') {
-		print("conferences_name_error");
+		printq("conferences_name_error");
 		return -1;
 	}
 
 	c = conference_find(name);
 
 	if (!c) {
-		print("conferences_noexist", name);
+		printq("conferences_noexist", name);
 		return -1;
 	}
 
 	c->ignore = flag ? 1 : 0;
-	print(flag ? "conferences_ignore" : "conferences_unignore", name);
+	printq(flag ? "conferences_ignore" : "conferences_unignore", name);
 
 	return 0;
 }
@@ -1045,26 +1037,27 @@ int conference_set_ignore(const char *name, int flag)
  * zmienia nazwê instniej±cej konferencji.
  * 
  *  - oldname - stara nazwa,
- *  - newname - nowa nazwa.
+ *  - newname - nowa nazwa,
+ *  - quiet.
  *
  * 0/-1
  */
-int conference_rename(const char *oldname, const char *newname)
+int conference_rename(const char *oldname, const char *newname, int quiet)
 {
 	struct conference *c;
 	
 	if (oldname[0] != '#' || newname[0] != '#') {
-		print("conferences_name_error");
+		printq("conferences_name_error");
 		return -1;
 	}
 	
 	if (conference_find(newname)) {
-		print("conferences_exist", newname);
+		printq("conferences_exist", newname);
 		return -1;
 	}
 
 	if (!(c = conference_find(oldname))) {
-		print("conference_noexist", oldname);
+		printq("conference_noexist", oldname);
 		return -1;
 	}
 
@@ -1072,8 +1065,8 @@ int conference_rename(const char *oldname, const char *newname)
 	c->name = xstrdup(newname);
 	remove_send_nick(oldname);
 	add_send_nick(newname);
-
-	print("conferences_rename", oldname, newname);
+	
+	printq("conferences_rename", oldname, newname);
 
 	ui_event("conference_rename", oldname, newname);
 	
@@ -1174,7 +1167,7 @@ int config_read(const char *filename, const char *var)
 			gg_debug(GG_DEBUG_MISC, "bind %s %s\n", pms[0], pms[1]);
 
 			if (pms && pms[0] && pms[1]) 
-				ui_event("command", "bind", "--add-quiet", pms[0], pms[1], NULL);
+				ui_event("command", 1, "bind", "--add", pms[0], pms[1], NULL);
 
 			array_free(pms);
 		} else if (!strcasecmp(buf, "timer") || !strcasecmp(buf, "at")) {
@@ -1205,7 +1198,7 @@ int config_read(const char *filename, const char *var)
 					}
 		
 				if (period > 0) {
-					tmp = saprintf("%s --add-quiet %s %s %s", (at) ? "at" : "timer", (name) ? name : "", period_str, p[2]);
+					tmp = saprintf("^%s --add %s %s %s", (at) ? "at" : "timer", (name) ? name : "", period_str, p[2]);
 					command_exec(NULL, tmp);
 					xfree(tmp);
 				}
@@ -1936,8 +1929,7 @@ int event_add(int flags, uin_t uin, const char *action, int quiet)
                 struct event *ev = l->data;
 
                 if (ev->uin == uin && (f = ev->flags & flags) != 0) {
-		    	if (!quiet)
-			    	print("events_exist", event_format(f), (uin == 1) ? "*" : format_user(uin));
+			printq("events_exist", event_format(f), (uin == 1) ? "*" : format_user(uin));
                         return -1;
                 }
         }
@@ -1948,8 +1940,7 @@ int event_add(int flags, uin_t uin, const char *action, int quiet)
 
         list_add(&events, &e, sizeof(e));
 
-	if (!quiet)
-	    	print("events_add", event_format(flags), (uin == 1) ? "*" : format_user(uin), action);
+	printq("events_add", event_format(flags), (uin == 1) ? "*" : format_user(uin), action);
 
         return 0;
 }
@@ -1980,14 +1971,12 @@ int event_remove(int flags, uin_t uin, int quiet)
 
 		if (e && e->uin == uin && e->flags & flags) {
 			if ((event_flags &= ~flags) == 0) {
-				if (!quiet)
-					print("events_del", event_format(flags), (uin == 1) ? "*" : format_user(uin), e->action);
+				printq("events_del", event_format(flags), (uin == 1) ? "*" : format_user(uin), e->action);
 				xfree(e->action);
 				list_remove(&events, e, 1);
 				removed = 1;
 			} else {
-				if (!quiet)
-					print("events_del_flags", event_format(flags));
+				printq("events_del_flags", event_format(flags));
 				e->flags = event_flags;
 				return 0;
                         }
@@ -1995,8 +1984,7 @@ int event_remove(int flags, uin_t uin, int quiet)
         }
 
 	if (!removed) {
-		if (!quiet)
-        		print("events_del_noexist", event_format(flags), (uin == 1) ? "*" : format_user(uin));
+        	printq("events_del_noexist", event_format(flags), (uin == 1) ? "*" : format_user(uin));
         	return 1;
 	} else
 		return 0;
@@ -2285,20 +2273,17 @@ int event_correct(const char *action, int quiet)
         		struct action_data test;
 
                         if (!acts[1]) {
-				if (!quiet)
-                                	print("events_act_no_params", acts[0]);
+                                printq("events_act_no_params", acts[0]);
 				goto fail;
 			}
 
                         if (*acts[1] == '$') {
                                 if (!strcmp(format_find(acts[1] + 1), "")) {
-					if (!quiet)
-                                        	print("events_seq_not_found", acts[1] + 1);
+                                        printq("events_seq_not_found", acts[1] + 1);
 					goto fail;
 				}
                         } else if (ioctld_parse_seq(acts[1], &test)) {
-				if (!quiet)
-                                	print("events_seq_incorrect", acts[1]);
+                                printq("events_seq_incorrect", acts[1]);
 				goto fail;
                         }
 
@@ -2308,8 +2293,7 @@ int event_correct(const char *action, int quiet)
 
 		if (!strncasecmp(acts[0], "play", 4) || !strcasecmp(acts[0], "exec") || !strcasecmp(acts[0], "command")) {
 			if (!acts[1]) {
-				if (!quiet)
-					print("events_act_no_params", acts[0]);
+				printq("events_act_no_params", acts[0]);
 				goto fail;
 			}
 			goto check;
@@ -2317,13 +2301,11 @@ int event_correct(const char *action, int quiet)
 
 		if (!strcasecmp(acts[0], "chat") || !strcasecmp(acts[0], "msg")) {
                         if (!acts[1]) {
-				if (!quiet)
-                                	print("events_act_no_params", acts[0]);
+                                printq("events_act_no_params", acts[0]);
 				goto fail;
                         }
                         if (!strchr(acts[1], ' ')) {
-				if (!quiet)
-                               		print("events_act_no_params", acts[0]);
+                               	printq("events_act_no_params", acts[0]);
 				goto fail;
                         }
 			goto check;
@@ -2331,15 +2313,13 @@ int event_correct(const char *action, int quiet)
 
 		if (!strcasecmp(acts[0], "beep")) {
 		    	if (acts[1]) {
-				if (!quiet)
-			    		print("events_act_toomany_params", acts[0]);
+			    	printq("events_act_toomany_params", acts[0]);
 				goto fail;
 			}
 			goto check;
 		}
 				
-		if (!quiet)
-			print("events_act_wrong");
+		printq("events_act_wrong");
 		goto fail;
 
 check:

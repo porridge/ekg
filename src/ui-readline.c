@@ -1020,7 +1020,7 @@ static int ui_readline_event(const char *event, ...)
 					bind_sequence(p2, NULL, 0);
 			
 			} else 
-				binding_list();
+				binding_list(!strcasecmp(p1, "--add-quiet"));
 
 			result = 1;
 		}

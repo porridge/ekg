@@ -67,8 +67,6 @@ int quit_command = 0;
 
 list_t commands = NULL;
 
-#define printq(x...) { if (!quiet) { print(x); } }
-
 int match_arg(const char *arg, char shortopt, const char *longopt, int longoptlen)
 {
 	if (!arg || *arg != '-')
@@ -228,7 +226,7 @@ COMMAND(cmd_alias)
 			return -1;
 		}
 
-		if (!alias_add(params[1], 0, 1)) {
+		if (!alias_add(params[1], quiet, 1)) {
 			config_changed = 1;
 			return 0;
 		}
@@ -245,9 +243,9 @@ COMMAND(cmd_alias)
 		}
 
 		if (!strcmp(params[1], "*"))
-			ret = alias_remove(NULL, 0);
+			ret = alias_remove(NULL, quiet);
 		else
-			ret = alias_remove(params[1], 0);
+			ret = alias_remove(params[1], quiet);
 
 		if (!ret) {
 			config_changed = 1;
@@ -1079,7 +1077,7 @@ COMMAND(cmd_help)
 					foo = bar;
 
 					while ((tmp = gg_get_line(&foo)))
-						print("help_more", tmp);
+						printq("help_more", tmp);
 
 					xfree(bar);
 				}
@@ -1142,7 +1140,7 @@ COMMAND(cmd_ignore)
 		if (params[0][0] == '#') {
 			int res;
 			
-			tmp = saprintf("conference --ignore %s", params[0]);
+			tmp = saprintf("%cconference --ignore %s", ((quiet) ? '^' : ' '), params[0]);
 			res = command_exec(NULL, tmp);
 			xfree(tmp);
 			return res;
@@ -1178,7 +1176,7 @@ COMMAND(cmd_ignore)
 		if (params[0][0] == '#') {
 			int res;
 			
-			tmp = saprintf("conference --unignore %s", params[0]);
+			tmp = saprintf("%cconference --unignore %s", ((quiet) ? '^' : ' '), params[0]);
 			res = command_exec(NULL, tmp);
 			xfree(tmp);
 			return res;
@@ -2889,8 +2887,10 @@ COMMAND(cmd_query)
 	if (params[0] && (params[0][0] == '@' || strchr(params[0], ','))) {
 		struct conference *c = conference_create(params[0]);
 		
-		if (!c)
+		if (!c) {
+			res = -1;
 			goto cleanup;
+		}
 
 		ui_event("command", quiet, "query", c->name, NULL);
 
@@ -2903,6 +2903,7 @@ COMMAND(cmd_query)
 
 			if (!c) {
 				printq("conferences_noexist", params[0]);
+				res = -1;
 				goto cleanup;
 			}
 		
@@ -2977,15 +2978,15 @@ COMMAND(cmd_on)
 	}
 
         if (!strncasecmp(params[2], "clear", 5)) {
-		event_remove(flags, uin, 0);
+		event_remove(flags, uin, quiet);
 		config_changed = 1;
 		return 0;
         }
 
-	if (event_correct(params[2], 0))
+	if (event_correct(params[2], quiet))
 		return -1;
 
-	event_add(flags, uin, params[2], 0);
+	event_add(flags, uin, params[2], quiet);
 	config_changed = 1;
 
 	return 0;
@@ -3258,19 +3259,16 @@ COMMAND(cmd_alias_exec)
 
 COMMAND(cmd_timer)
 {
-	int addquiet = 0, count = 0, res = 0;
+	int count = 0, res = 0;
 	int at = !strcasecmp(name, "at");
 	list_t l;
 
-	if (match_arg(params[0], 'a', "add", 2) || (addquiet = match_arg(params[0], 'a', "add-quiet", 5))) {
+	if (match_arg(params[0], 'a', "add", 2)) {
 		const char *p = params[1];
 		char *t_command = NULL, *t_name = NULL;
 		time_t period = 0;
 		struct timer *t;
 		int persistent = 0;
-
-		if (addquiet)
-			quiet = 1;
 
 		if ((!params[1] || !params[2])) {
 			printq("not_enough_params", name);
@@ -3396,6 +3394,7 @@ COMMAND(cmd_timer)
 							break;
 						default:
 							printq("invalid_params", name);
+							res = -1;
 							goto cleanup;
 					}
 				}
@@ -3420,8 +3419,8 @@ cleanup:
 	}
 
 	if (match_arg(params[0], 'd', "del", 2)) {
-		int ret = 1;
 		int del_all = 0;
+		int ret = 1;
 
 		if (!params[1]) {
 			printq("not_enough_params", name);
@@ -3669,7 +3668,7 @@ COMMAND(cmd_conference)
 		}
 
 		if (params[2])
-			conference_add(params[1], params[2], 0);
+			conference_add(params[1], params[2], quiet);
 		else
 			conference_create(params[1]);
 
@@ -3683,9 +3682,9 @@ COMMAND(cmd_conference)
 		}
 
 		if (!strcmp(params[1], "*"))
-			conference_remove(NULL);
+			conference_remove(NULL, quiet);
 		else
-			conference_remove(params[1]);
+			conference_remove(params[1], quiet);
 
 		return 0;
 	}
@@ -3696,7 +3695,7 @@ COMMAND(cmd_conference)
 			return -1;
 		}
 		
-		conference_rename(params[1], params[2]);
+		conference_rename(params[1], params[2], quiet);
 
 		return 0;
 	}
@@ -3707,7 +3706,7 @@ COMMAND(cmd_conference)
 			return -1;
 		}
 
-		conference_set_ignore(params[1], 1);
+		conference_set_ignore(params[1], 1, quiet);
 
 		return 0;
 	}
@@ -3718,7 +3717,7 @@ COMMAND(cmd_conference)
 			return -1;
 		}
 
-		conference_set_ignore(params[1], 0);
+		conference_set_ignore(params[1], 0, quiet);
 
 		return 0;
 	}

@@ -80,6 +80,7 @@ static int get_char_from_pipe(struct gg_common *c);
 extern FILE *gg_debug_file;
 
 int old_stderr = 0;
+static int debug_max_lines;
 
 /*
  * usuwanie sesji GG_SESSION_USERx. wystarczy zwolniæ.
