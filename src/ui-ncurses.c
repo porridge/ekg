@@ -179,6 +179,7 @@ static char **completions = NULL;	/* lista dope³nieñ */
 static list_t windows = NULL;		/* lista okien */
 static struct window *window_current;	/* wska¼nik na aktualne okno */
 static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
+static int ui_ncurses_debug = 0;	/* debugowanie */
 
 int config_backlog_size = 1000;		/* maksymalny rozmiar backloga */
 int config_display_transparent = 1;	/* czy chcemy przezroczyste t³o? */
@@ -1177,8 +1178,10 @@ crap:
 
 	w->overflow -= count;
 
-	if (w->overflow < 0)
+	if (w->overflow < 0) {
+		bottom = 1;
 		w->overflow = 0;
+	}
 
 	if (bottom)
 		w->start = w->lines_count - w->height;
@@ -1786,7 +1789,12 @@ static void update_statusbar(int commit)
 			xfree(tmp);
 		}
 
-		window_printat(status, 0, y, p, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
+		if (ui_ncurses_debug) {
+			char *tmp = saprintf(" lines_count=%d start=%d height=%d overflow=%d", window_current->id, window_current->lines_count, window_current->start, window_current->height, window_current->overflow);
+			window_printat(status, 0, y, tmp, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
+			xfree(tmp);
+		} else
+			window_printat(status, 0, y, p, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
 	}
 
 	for (i = 0; formats[i].name; i++)
@@ -3079,6 +3087,12 @@ static void binding_next_contacts_group(const char *arg)
 	window_commit();
 }
 
+static void binding_ui_ncurses_debug_toggle(const char *arg)
+{
+	ui_ncurses_debug = !ui_ncurses_debug;
+	update_statusbar(1);
+}
+
 /*
  * ui_ncurses_loop()
  *
@@ -3383,6 +3397,7 @@ static void binding_parse(struct binding *b, const char *action)
 	__action("toggle-contacts", binding_toggle_contacts_wrapper);
 	__action("next-contacts-group", binding_next_contacts_group);
 	__action("ignore-query", binding_ignore_query);
+	__action("ui-ncurses-debug-toggle", binding_ui_ncurses_debug_toggle);
 
 #undef __action
 
@@ -4239,4 +4254,5 @@ static void binding_default()
 	binding_add("F3", "toggle-contacts", 1, 1);
 	binding_add("F4", "next-contacts-group", 1, 1);
 	binding_add("F12", "/window switch 0", 1, 1);
+	binding_add("F11", "ui-ncurses-debug-toggle", 1, 1);
 }

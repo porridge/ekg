@@ -16,6 +16,7 @@ zg³osi³ b³±d.
   pocz±tku (K.Gibas/sz)
 - poprawka segfaultów i b³êdów z w³±czonym sort_windows (*/w)
 - dodanie zmiennej ,,fade_in'' (w)
+- poprawka przewijania ekranu w ncurses (sz/w)
 
 // 2003-02-08
 
