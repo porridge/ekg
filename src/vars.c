@@ -370,7 +370,7 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 			if (!value)
 				return -2;
 
-			if (v->map && v->type == VAR_INT && !isdigit((int) *p)) {
+			if (v->map && v->type == VAR_INT && !xisdigit(*p)) {
 				int i;
 
 				for (i = 0; v->map[i].label; i++)
@@ -378,7 +378,7 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 						value = itoa(v->map[i].value);
 			}
 
-			if (v->map && v->type == VAR_MAP && !isdigit((int) *p)) {
+			if (v->map && v->type == VAR_MAP && !xisdigit(*p)) {
 				int i, k = *(int*)(v->ptr);
 				int mode = 0; /* 0 set, 1 add, 2 remove */
 				char **args;
@@ -429,10 +429,10 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 				p += 2;
 
 			while (*p && *p != ' ') {
-				if (hex && !isxdigit((int) *p))
+				if (hex && !xisxdigit(*p))
 					return -2;
 				
-				if (!hex && !isdigit((int) *p))
+				if (!hex && !xisdigit(*p))
 					return -2;
 				p++;
 			}

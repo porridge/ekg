@@ -237,7 +237,7 @@ static char *unknown_uin_generator(char *text, int state)
 	}
 
 	while (index < send_nicks_count)
-		if (isdigit((int) send_nicks[index++][0]))
+		if (xisdigit(send_nicks[index++][0]))
 			if (!strncasecmp(text, send_nicks[index - 1], len))
 				return xstrdup(send_nicks[index - 1]);
 
@@ -1486,7 +1486,7 @@ static int bind_sequence(const char *seq, const char *command, int quiet)
 		return -1;
 	}
 	
-	if (!strncasecmp(seq, "Ctrl-", 5) && strlen(seq) == 6 && isalpha((int) seq[5])) {
+	if (!strncasecmp(seq, "Ctrl-", 5) && strlen(seq) == 6 && xisalpha(seq[5])) {
 		int key = CTRL(toupper(seq[5]));
 
 		if (command) {

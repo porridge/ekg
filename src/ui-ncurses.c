@@ -2255,7 +2255,7 @@ void unknown_uin_generator(const char *text, int len)
 	int i;
 
 	for (i = 0; i < send_nicks_count; i++) {
-		if (send_nicks[i] && isdigit((int) send_nicks[i][0]) && !strncasecmp(text, send_nicks[i], len))
+		if (send_nicks[i] && xisdigit(send_nicks[i][0]) && !strncasecmp(text, send_nicks[i], len))
 			if (!array_contains(completions, send_nicks[i], 0))
 				array_add(&completions, xstrdup(send_nicks[i]));
 	}
@@ -3529,7 +3529,7 @@ int binding_key(struct binding *b, const char *key, int add)
 
 		if (add) {
 			binding_map_meta[ch] = list_add(&bindings, b, sizeof(struct binding));
-			if (isalpha((int) ch))
+			if (xisalpha(ch))
 				binding_map_meta[tolower(ch)] = binding_map_meta[ch];
 		}
 

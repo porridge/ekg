@@ -190,7 +190,7 @@ COMMAND(cmd_add)
 	struct userlist *u;
 	uin_t uin;
 
-	if (params[0] && !isdigit((int) params[0][0]) && !match_arg(params[0], 'f', "find", 2)) {
+	if (params[0] && !xisdigit(params[0][0]) && !match_arg(params[0], 'f', "find", 2)) {
 		ui_event("command", quiet, "add", params[0], NULL);
 
 		if (params[1]) {
@@ -2034,12 +2034,12 @@ COMMAND(cmd_msg)
 
 					p++;
 
-					if (isdigit(*p)) {
+					if (xisdigit(*p)) {
 						p++;
 						i++;
 					}
 
-					if (isdigit(*p)) {
+					if (xisdigit(*p)) {
 						p++;
 						i++;
 					}
@@ -3905,7 +3905,7 @@ COMMAND(cmd_at)
 			return -1;
 		}
 
-		if (!strncmp(params[2], "*/", 2) || isdigit((int) params[2][0])) {
+		if (!strncmp(params[2], "*/", 2) || xisdigit(params[2][0])) {
 			a_name = params[1];
 
 			if (!strcmp(a_name, "(null)")) {
@@ -4006,7 +4006,7 @@ COMMAND(cmd_at)
 				for (;;) {
 					time_t _period = 0;
 
-					if (isdigit((int) *freq_str))
+					if (xisdigit(*freq_str))
 						_period = atoi(freq_str);
 					else {
 						printq("invalid_params", name);
@@ -4244,7 +4244,7 @@ COMMAND(cmd_timer)
 			return -1;
 		}
 
-		if (isdigit((int) params[2][0]) || !strncmp(params[2], "*/", 2)) {
+		if (xisdigit(params[2][0]) || !strncmp(params[2], "*/", 2)) {
 			t_name = params[1];
 
 			if (!strcmp(t_name, "(null)")) {
@@ -4274,7 +4274,7 @@ COMMAND(cmd_timer)
 		for (;;) {
 			time_t _period = 0;
 
-			if (isdigit((int) *p))
+			if (xisdigit(*p))
 				_period = atoi(p);
 			else {
 				printq("invalid_params", name);

@@ -1435,7 +1435,7 @@ void config_write_main(FILE *f, int base64)
 			continue;
 
 		/* posortuje, je¶li nie ma nazwy */
-		if (t->name && !isdigit((int) t->name[0]))
+		if (t->name && !xisdigit(t->name[0]))
 			name = t->name;
 		else
 			name = "(null)";
@@ -3410,7 +3410,7 @@ int ioctld_send(const char *seq, int act, int quiet)
 	if (*seq == '$')	/* dla kompatybilno¶ci ze starym zachowaniem */
 		seq++;
 
-	if (!isdigit(*seq)) {
+	if (!xisdigit(*seq)) {
 		const char *tmp = format_find(seq);
 
 		if (!strcmp(tmp, "")) {
@@ -4132,4 +4132,22 @@ char *strcasestr(const char *haystack, const char *needle)
 	}
 
 	return NULL;
+}
+
+/*
+ * xis*()
+ *
+ * to samo, co funkcje z ctype, ale bez g³upich
+ * warningów.
+ */
+int xisdigit(unsigned char c) {
+	return isdigit((int) c);
+}
+
+int xisxdigit(unsigned char c) {
+	return isxdigit((int) c);
+}
+
+int xisalpha(unsigned char c) {
+	return isalpha((int) c);
 }

@@ -419,6 +419,9 @@ char *xstrmid(const char *str, int start, int length);
 const char *http_error_string(int h);
 char color_map(unsigned char r, unsigned char g, unsigned char b);
 char *strcasestr(const char *haystack, const char *needle);
+int xisdigit(unsigned char c);
+int xisxdigit(unsigned char c);
+int xisalpha(unsigned char c);
 
 struct timer *timer_add(time_t period, int persistent, int type, int at, const char *name, const char *command);
 int timer_remove(const char *name, int at, const char *command);
