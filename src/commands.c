@@ -2621,6 +2621,7 @@ int binding_help(int a, int b)
 int binding_toggle_debug(int a, int b)
 {
 	config_debug = !config_debug;
+	changed_debug("debug");
 	ui_event("variable_changed", "debug", NULL);
 
 	return 0;
