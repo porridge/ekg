@@ -30,7 +30,7 @@ AC_DEFUN(AC_CHECK_PYTHON,[
 		
 		if test "$PYTHON_VERSION" != ""; then 
 			for i in $with_arg \
-				/usr/include: \
+				/usr/include:-L/usr/lib \
 				/usr/local/include:-L/usr/local/lib \
 				/usr/freeware/include:-L/usr/freeware/lib32 \
 				/usr/pkg/include:-L/usr/pkg/lib \
