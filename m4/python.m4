@@ -19,7 +19,10 @@ AC_DEFUN(AC_CHECK_PYTHON,[
 
 	if test "x$with_python" = "xyes"; then			    
 		
-		AC_PATH_PROG(PYTHON, python python2.2 python2.1 python2.0 python1.6)
+		AC_PATH_PROG(PYTHON, python)
+		if test "$PYTHON" = ""; then AC_PATH_PROG(PYTHON, python2.2) fi
+		if test "$PYTHON" = ""; then AC_PATH_PROG(PYTHON, python2.1) fi
+		if test "$PYTHON" = ""; then AC_PATH_PROG(PYTHON, python2.0) fi
 		
 		if test "$PYTHON" != ""; then 
 			PYTHON_VERSION=`$PYTHON -c "import sys; print sys.version[[0:3]]"`
