@@ -10,6 +10,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - co¶ mi siê dziwnie zapêtli³o i rzuca³o ,,header recv() = -1'' ca³y
   czas, co nie powinno siê zdarzyæ, ale na wszelki wypadek dorzuci³em
   ograniczenie do 10 prób recv()owania. (w)
+- dorzucony plik docs/devel-hints.txt bêd±cy moim pierwszym postem na
+  listê ekg-devel ze wskazówkami dla developerów. (w)
 
 // 2002-01-05
 
