@@ -37,26 +37,24 @@ struct variable variables[MAX_VARS] = {
 	{ "beep_msg", VAR_BOOL, 1, &enable_beep_msg },
 	{ "beep_chat", VAR_BOOL, 1, &enable_beep_chat },
 	{ "beep_notify", VAR_BOOL, 1, &enable_beep_notify },
-	{ "sound_msg_file", VAR_STR, 1, &sound_msg_file },
-	{ "sound_chat_file", VAR_STR, 1, &sound_chat_file },
-	{ "sound_app", VAR_STR, 1, &sound_app },
 	{ "completion_notify", VAR_BOOL, 1, &completion_notify },
 	{ "display_ack", VAR_INT, 1, &display_ack },
 	{ "display_color", VAR_BOOL, 1, &display_color },
+	{ "display_notify", VAR_BOOL, 1, &display_notify },
 	{ "log", VAR_INT, 1, &log },
 	{ "log_path", VAR_STR, 1, &log_path },
-
-	{ "debug", VAR_BOOL, 2, &display_debug },
-	
 	{ "sms_away", VAR_BOOL, 1, &sms_away },
 	{ "sms_max_length", VAR_INT, 1, &sms_max_length },
 	{ "sms_number", VAR_STR, 1, &sms_number },
 	{ "sms_send_app", VAR_STR, 1, &sms_send_app },
-
-	{ "away", VAR_INT, 2, &away },
-	{ "bold_font", VAR_STR, 2, &bold_font },
-	{ "private", VAR_BOOL, 2, &private_mode },
+	{ "sound_msg_file", VAR_STR, 1, &sound_msg_file },
+	{ "sound_chat_file", VAR_STR, 1, &sound_chat_file },
+	{ "sound_app", VAR_STR, 1, &sound_app },
 	{ "theme", VAR_STR, 1, &default_theme },
+
+	{ "default_status", VAR_INT, 2, &default_status },
+	{ "bold_font", VAR_STR, 2, &bold_font },	/* GNU Gadu */
+	{ "debug", VAR_BOOL, 2, &display_debug },
 
 	{ NULL, 0, 0, NULL }
 };

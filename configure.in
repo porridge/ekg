@@ -35,8 +35,8 @@ if test "x$TERMCAP_LIB" = "x"; then
    AC_CHECK_CURSES
 fi
 
-
 AC_CHECK_READLINE
+AC_TRY_LINK_FUNC(readline, rl_set_prompt, AC_DEFINE(HAS_RL_SET_PROMPT), )
 
 AC_PATH_PROG(RM, rm, no)
 if test "x$RM" = "xno"; then

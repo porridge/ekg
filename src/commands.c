@@ -442,11 +442,6 @@ COMMAND(command_away)
 {
 	int status_table[3] = { GG_STATUS_AVAIL, GG_STATUS_BUSY, GG_STATUS_INVISIBLE };
 
-	if (!sess || sess->state != GG_STATE_CONNECTED) {
-		my_printf("not_connected");
-		return 0;
-	}
-
 	unidle();
 	
 	if (!strcasecmp(name, "away")) {
@@ -475,7 +470,10 @@ COMMAND(command_away)
 		my_printf((private_mode) ? "private_mode_on" : "private_mode_off");
 	}
 
-	gg_change_status(sess, status_table[away] | ((private_mode) ? GG_STATUS_FRIENDS_MASK : 0));
+	default_status = status_table[away] | ((private_mode) ? GG_STATUS_FRIENDS_MASK : 0);
+
+	if (sess && sess->state == GG_STATE_CONNECTED)
+		gg_change_status(sess, default_status);
 
 	return 0;
 }
@@ -522,7 +520,9 @@ COMMAND(command_connect)
 			if (!(sess = gg_login(config_uin, config_password, 1))) {
 	                        my_printf("conn_failed", strerror(errno));
 	                        do_reconnect();
-	                }
+	                } else {
+				sess->initial_status = default_status;
+			}
 		} else
 			my_printf("no_config");
 	} else if (sess) {
@@ -929,6 +929,7 @@ COMMAND(command_msg)
 		no_prompt = 0;
 
 		if (!line) {
+			printf("\n");
 			string_free(s, 1);
 			return 0;
 		}

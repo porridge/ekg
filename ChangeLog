@@ -1,3 +1,12 @@
+// 2001-11-20
+
+- mocno poprawiona obs³uga ustawieñ pocz±tkowych (w)
+- ¿egnamy siê z ~/.gg/autoexec, skoro mamy zmienn± ,,theme'' (w)
+- przy readline 4.x bêdzie ³adnie zmieniaæ prompta przy awayu (w)
+- ,,ekg --help'' i okolice (w)
+- dodany include do libgg.h, poprawka INADDR_NONE (w)
+- popsucie 10 innych rzeczy (w)
+
 // 2001-11-19 
 
 - wiecej instalowania... (i/drake)

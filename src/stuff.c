@@ -30,6 +30,8 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <signal.h>
+#include "config.h"
+#include "libgg.h"
 #include "stuff.h"
 #include "dynstuff.h"
 #include "themes.h"
@@ -69,6 +71,9 @@ int completion_notify = 1;
 char *bold_font = NULL;		/* dla kompatybilno¶ci z gnu gadu */
 int private_mode = 0;
 int connecting = 0;
+int display_notify = 1;
+char *default_theme = NULL;
+int default_status = GG_STATUS_AVAIL;
 
 /*
  * my_puts()
@@ -104,17 +109,14 @@ void my_puts(char *format, ...)
 }
 
 /*
- * my_readline()
+ * current_prompt() // funkcja wewnêtrzna
  *
- * malutki wrapper na readline(), który przygotowuje odpowiedniego prompta
- * w zale¿no¶ci od tego, czy jeste¶my zajêci czy nie i informuje resztê
- * programu, ¿e jeste¶my w trakcie czytania linii i je¶li chc± wy¶wietlaæ,
- * powinny najpierw sprz±tn±æ.
+ * zwraca wska¼nik aktualnego prompta. statyczny bufor, nie zwalniaæ.
  */
-char *my_readline()
+static char *current_prompt()
 {
-        char *prompt, *res;
-
+	char *prompt;
+	
 	if (!readline_prompt)
 		readline_prompt = find_format("readline_prompt");
 	if (!readline_prompt_away)
@@ -125,11 +127,42 @@ char *my_readline()
 	if (no_prompt || !prompt)
 		prompt = "";
 
+	return prompt;
+}
+
+/*
+ * my_readline()
+ *
+ * malutki wrapper na readline(), który przygotowuje odpowiedniego prompta
+ * w zale¿no¶ci od tego, czy jeste¶my zajêci czy nie i informuje resztê
+ * programu, ¿e jeste¶my w trakcie czytania linii i je¶li chc± wy¶wietlaæ,
+ * powinny najpierw sprz±tn±æ.
+ */
+char *my_readline()
+{
+        char *res, *prompt = current_prompt();
+
         in_readline = 1;
+#ifdef HAS_RL_SET_PROMPT
+	rl_set_prompt(prompt);
+#endif
         res = readline(prompt);
         in_readline = 0;
 
         return res;
+}
+
+/*
+ * reset_prompt()
+ *
+ * dostosowuje prompt aktualnego my_readline() do awaya.
+ */
+void reset_prompt()
+{
+#ifdef HAS_RL_SET_PROMPT
+	rl_set_prompt(current_prompt());
+	rl_redisplay();
+#endif
 }
 
 /*

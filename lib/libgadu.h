@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-#ifndef INADDR_NONE
+#if defined(sun) && !defined(INADDR_NONE)
   #define INADDR_NONE 0xffffffff
 #endif
 
@@ -46,11 +46,12 @@ struct gg_session {
 	int seq, async;
 	int last_pong;
 
-	/* powinno byæ ,,in_addr'', ale nie chcê inkludowaæ niczego tutaj */
+	/* powinno byæ ,,in_addr'', ale nie chcê inkludowaæ sieci tutaj */
 	unsigned long server_ip;
 
 	uin_t uin;
 	char *password;
+	int initial_status;
 
 	char *recv_buf;
 	int recv_done, recv_left;

@@ -172,16 +172,18 @@ void handle_status(struct gg_event *e)
 	if (!(u = find_user(e->event.status.uin, NULL)))
 		return;
 
-	if (e->event.status.status == GG_STATUS_AVAIL && u->status != GG_STATUS_AVAIL) {
-		if (u && completion_notify)
-			add_send_nick(u->comment);
-		my_printf("status_avail", format_user(e->event.status.uin));
-		if (enable_beep && enable_beep_notify)
-			my_puts("\007");
-	} else if (e->event.status.status == GG_STATUS_BUSY && u->status != GG_STATUS_BUSY)
-		my_printf("status_busy", format_user(e->event.status.uin));
-	else if (e->event.status.status == GG_STATUS_NOT_AVAIL && u->status != GG_STATUS_NOT_AVAIL)
-		my_printf("status_not_avail", format_user(e->event.status.uin));
+	if (display_notify) {
+		if (e->event.status.status == GG_STATUS_AVAIL && u->status != GG_STATUS_AVAIL) {
+			if (u && completion_notify)
+				add_send_nick(u->comment);
+			my_printf("status_avail", format_user(e->event.status.uin));
+			if (enable_beep && enable_beep_notify)
+				my_puts("\007");
+		} else if (e->event.status.status == GG_STATUS_BUSY && u->status != GG_STATUS_BUSY)
+			my_printf("status_busy", format_user(e->event.status.uin));
+		else if (e->event.status.status == GG_STATUS_NOT_AVAIL && u->status != GG_STATUS_NOT_AVAIL)
+			my_printf("status_not_avail", format_user(e->event.status.uin));
+	}
 	
 	u->status = e->event.status.status;
 }

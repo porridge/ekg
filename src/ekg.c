@@ -78,11 +78,10 @@ int my_getc(FILE *f)
 		tv.tv_usec = 0;
 		
 		if (display_debug) {
-		    gg_debug_level = 255;
+			gg_debug_level = 255;
 		} else 
-		    gg_debug_level = 0;
-		
-		    
+			gg_debug_level = 0;
+
 		ret = select(maxfd + 1, &rd, &wd, NULL, &tv);
 	
 		if (!ret) {
@@ -93,7 +92,9 @@ int my_getc(FILE *f)
 				if (!(sess = gg_login(config_uin, config_password, 1))) {
 					my_printf("conn_failed", strerror(errno));
 					do_reconnect();
-				}	
+				} else {
+					sess->initial_status = default_status;
+				}
 			}
 			if (sess && sess->state == GG_STATE_CONNECTED && time(NULL) - last_ping > 60) {
 				if (last_ping)
@@ -105,11 +106,14 @@ int my_getc(FILE *f)
 				char tmp[16];
 				
 				away = 1;
-				gg_change_status(sess, GG_STATUS_BUSY);
+				reset_prompt();
+				gg_change_status(sess, GG_STATUS_BUSY | (private_mode ? GG_STATUS_FRIENDS_MASK : 0));
+				
 				if (!(auto_away % 60))
 					snprintf(tmp, sizeof(tmp), "%dm", auto_away / 60);
 				else
 					snprintf(tmp, sizeof(tmp), "%ds", auto_away);
+				
 				my_printf("auto_away", tmp);
 			}
 
@@ -189,28 +193,84 @@ void sighup()
 
 int main(int argc, char **argv)
 {
-	int auto_connect = 1, i;
-	char *home = getenv("HOME");
+	int auto_connect = 1, i, new_status = 0;
+	char *home = getenv("HOME"), *load_theme = NULL;
 	struct passwd *pw; 
 	
 	config_user = "";
-	init_theme();
-	read_theme(NULL, 1);
 
 	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
+			printf("\
+u¿ycie: %s [OPCJE]
+  -u, --user [NAZWA]   korzysta z profilu u¿ytkownika o podanej nazwie
+  -t, --theme [PLIK]   ³aduje opis wygl±du z podanego pliku
+  -n, --no-auto        nie ³±czy siê automatycznie z serwerem
+  -a, --away           po po³±czeniu zmienia stan na ,,zajêty''
+  -b, --back           po po³±czeniu zmienia stan na ,,dostêpny''
+  -i, --invisible      po po³±czeniu zmienia stan na ,,niewidoczny''
+  -p, --private        po po³±czeniu zmienia stan na ,,tylko dla przyjació³''
+  -d, --debug          w³±cza wy¶wietlanie dodatkowych informacji
+
+", argv[0]);
+			return 0;	
+		}
+		if (!strcmp(argv[i], "-b") || !strcmp(argv[i], "--back"))
+			new_status = GG_STATUS_AVAIL;
+		if (!strcmp(argv[i], "-a") || !strcmp(argv[i], "--away"))
+			new_status = GG_STATUS_BUSY;
+		if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--invisible"))
+			new_status = GG_STATUS_INVISIBLE;
+		if (!strcmp(argv[i], "-p") || !strcmp(argv[i], "--private"))
+			new_status |= GG_STATUS_FRIENDS_MASK;
 		if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--debug"))
 			gg_debug_level = 255;
 		if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "--no-auto"))
 			auto_connect = 0;
 		if (!strcmp(argv[i], "-u") || !strcmp(argv[i], "--user")){ 
-		  if (argv[i+1]){ 
-		    config_user = argv[i+1]; i++;
-		  } else {
-		   my_printf("user_not_given");
-		   return 1;
-		  }
+			if (argv[i+1]) { 
+				config_user = argv[i+1];
+				i++;
+			} else {
+				fprintf(stderr, "Nie podano nazwy u¿ytkownika.\n");
+		   		return 1;
+			}
 		}
+		if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "--theme"))
+			load_theme = argv[++i];
 	}
+	
+	read_config(NULL);
+
+	if (new_status)
+		default_status = new_status;
+
+	switch (default_status & ~GG_STATUS_FRIENDS_MASK) {
+		case GG_STATUS_AVAIL:
+			away = 0;
+			break;
+		case GG_STATUS_BUSY:
+			away = 1;
+			break;
+		case GG_STATUS_INVISIBLE:
+			away = 2;
+			break;
+	}
+	
+	if ((default_status & GG_STATUS_FRIENDS_MASK))
+		private_mode = 1;
+	
+	if (gg_debug_level)
+		display_debug = 1;
+	if (display_debug)
+		gg_debug_level = 255;
+	
+	init_theme();
+	if (load_theme)
+		read_theme(load_theme, 1);
+	else
+		if (default_theme)
+			read_theme(default_theme, 1);
 	
 	signal(SIGCONT, sigcont);
 	signal(SIGHUP, sighup);
@@ -225,27 +285,14 @@ int main(int argc, char **argv)
 	rl_completion_entry_function = (void*) empty_generator;
 //	rl_parse_and_bind("set bell-style none\n");
 
-	init_theme();
-	read_theme(NULL, 1);
-
-	parse_autoexec(NULL);
-
+	if (load_theme)
+		read_theme(load_theme, 1);
+	
 	my_printf("welcome", VERSION);
-	
-	read_config(NULL);
-	
-	if (default_theme) 
-		read_theme(default_theme, 1);
 	
 	if (!config_uin || !config_password)
 		my_printf("no_config");
 
-	if (display_debug)
-		gg_debug_level = 255;
-
-	if (gg_debug_level == 255) 
-		display_debug = 1;
-			
 	read_userlist(NULL);
 		
 	if (!log_path) {
@@ -263,6 +310,8 @@ int main(int argc, char **argv)
 		if (!(sess = gg_login(config_uin, config_password, 1))) {
 			my_printf("conn_failed", strerror(errno));
 			do_reconnect();
+		} else {
+			sess->initial_status = default_status;
 		}
 	}
 
@@ -291,6 +340,8 @@ int main(int argc, char **argv)
 	printf("\n");
 	gg_logoff(sess);
 	gg_free_session(sess);
+	sess = NULL;
+	search = NULL;
 
 	if (config_changed) {
 		char *line;

@@ -13,4 +13,7 @@
 #undef NO_COLOR_CURSES
 #undef SCO_FLAVOR
 
+/* readline stuff */
 #undef HAS_READLINE
+#undef HAS_RL_SET_PROMPT
+

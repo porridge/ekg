@@ -81,6 +81,8 @@ int connecting;
 char *sound_msg_file;
 char *sound_chat_file;
 char *sound_app;
+int display_notify;
+int default_status;
 
 void my_puts(char *format, ...);
 char *my_readline();
@@ -120,5 +122,6 @@ char *is_alias(char *foo);
 int play_sound(char *sound_path);
 char *encode_base64(char *buf);
 char *decode_base64(char *buf);
+void reset_prompt();
 
 #endif
