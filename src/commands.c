@@ -5604,6 +5604,9 @@ void command_init()
 	( "_queue", "uu", cmd_queue, 0, " [opcje]",
 	  "pozwala obserwowaæ kolejkê wiadomo¶ci podczas po³±czenia", "");
 	command_add
+	( "_ctcp", "u", cmd_test_ctcp, 0, " <numer/alias>",
+	"wysy³a ¿±danie bezpo¶redniego po³±czenia", "");
+	command_add
 	( "_descr", "?", cmd_away, 0, " <opis>",
 	  "zmienia opis bez zmiany stanu", "");
 }
