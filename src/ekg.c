@@ -158,21 +158,34 @@ void get_char_from_pipe(struct gg_common *c)
  */
 void get_line_from_pipe(struct gg_exec *c)
 {
-	char ch;
+	char buf[1024];
 	int ret;
   
 	if (!c)
   		return;
 
-	while ((ret = read(c->fd, &ch, 1)) > 0) {
-		if (ch != '\n' && ch != '\r')
-			string_append_c(c->buf, ch);
-		if (ch == '\n') {
+	while ((ret = read(c->fd, buf, sizeof(buf) - 1)) > 0) {
+		char *tmp;
+
+		buf[ret] = 0;
+		string_append(c->buf, buf);
+
+		while ((tmp = strchr(c->buf->str, '\n'))) {
+			int index = tmp - c->buf->str;
+			char *line = xstrmid(c->buf->str, 0, index);
+			string_t new;
+			
+			if (line[strlen(line) - 1] == '\r')
+				line[strlen(line) - 1] = 0;
+
 			if (c->id)
-				print("exec", c->buf->str, itoa(c->id));
+				print("exec", line, itoa(c->id));
 			else
-				print_window("debug", 0, "debug", c->buf->str);
-			string_clear(c->buf);
+				print_window("debug", 0, "debug", line);
+
+			new = string_init(c->buf->str + index + 1);
+			string_free(c->buf, 1);
+			c->buf = new;
 		}
 	}
 
