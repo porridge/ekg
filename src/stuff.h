@@ -232,6 +232,7 @@ int config_ctrld_quits;
 int config_dcc;
 char *config_dcc_ip;
 char *config_dcc_dir;
+int config_dcc_filter;
 char *config_dcc_limit;
 int config_dcc_port;
 int config_display_ack;

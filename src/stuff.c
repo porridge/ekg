@@ -204,6 +204,7 @@ int config_display_token = 1;
 int config_ioctld_enable = 1;
 int config_ioctld_net_port = 22004;
 #endif
+int config_dcc_filter = 1;
 
 char *last_search_first_name = NULL;
 char *last_search_last_name = NULL;

@@ -285,6 +285,16 @@ dcc_dir
 
 	okre¶la katalog, do którego bêd± zapisywane pobierane pliki.
 
+dcc_filter
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	okre¶la czy klient bêdzie filtrowa³ po³±czenia bezpo¶rednie z adresów
+	innych ni¿ w li¶cie kontaktów. zmienna ta mo¿e byæ przydatna, gdy
+	osoba, która chce nam przes³aæ plik znajduje siê za ¼le
+	skonfigurowanym firewallem, nie potrafi ustawiæ przekierowania portów
+	lub podobnych sytuacjach. nale¿y wtedy chwilowo j± wy³±czyæ.
+
 dcc_limit
 	typ: tekst
 	domy¶lna warto¶æ: 30/30

@@ -58,7 +58,8 @@ do wysy³ania:
 	dcc rsend <pseudonim/numer> <nazwa_pliku>
 
 które wy¶le do Gadu-Gadu ¿±danie po³±czenia za po¶rednictwem serwera
-Gadu-Gadu i windowsowy klient sam siê z nami po³±czy. ekg nie jest a¿
-tak restrykcyjne, ale mo¿e siê to zmieniæ.
+Gadu-Gadu i windowsowy klient sam siê z nami po³±czy. ekg domy¶lnie
+odrzuci po³±czenie z innego adresu, ale mo¿na zmieniæ to zachowanie
+zmienn± ,,dcc_filter''.
 
 $Id$

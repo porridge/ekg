@@ -4,6 +4,17 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2004-12-28
+
+- libgadu: dodanie funkcji gg_dcc_fill_file_info2() pozwalaj±cej na podanie
+  lokalnej nazwy pliku innej ni¿ przesy³anej zdalnemu klientowi, na przyk³ad
+  gdy lokalne kodowanie jest inne ni¿ CP1250 (mslusarz/w)
+- libgadu: poprawka zachowania przy wysy³aniu pustych plików (mslusarz/w)
+- libgadu: poprawka tworzenia krótkiej nazwy przesy³anych plików (w)
+- nazwy przesy³anych plików s± t³umaczone na CP1250 (mslusarz/w)
+- dodanie zmiennej ,,dcc_filter'' pozwalaj±cej na chwilowe wy³±czenie
+  filtrowania nieznanych adresów IP w po³±czeniach bezpo¶rednich (w)
+
 // 2004-12-21
 
 - libgadu: zamykanie gniazda nas³uchuj±cego dcc w przypadku problemów

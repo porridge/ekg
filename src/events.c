@@ -1799,7 +1799,7 @@ void handle_dcc(struct gg_dcc *d)
 				return;
 			}
 
-			if (d->remote_addr != u->ip.s_addr) {
+			if (config_dcc_filter && d->remote_addr != u->ip.s_addr) {
 				char tmp[20];
 
 				snprintf(tmp, sizeof(tmp), "%s", inet_ntoa(*((struct in_addr*) &d->remote_addr)));
@@ -1846,14 +1846,23 @@ void handle_dcc(struct gg_dcc *d)
 				struct transfer *t = l->data;
 
 				if (t->dcc == d) {
-					if (gg_dcc_fill_file_info(d, t->filename) == -1) {
+					char *remote;
+
+					remote = xstrdup(t->filename);
+					iso_to_cp(remote);
+
+					if (gg_dcc_fill_file_info2(d, remote, t->filename) == -1) {
 						gg_debug(GG_DEBUG_MISC, "## gg_dcc_fill_file_info() failed (%s)\n", strerror(errno));
 						print("dcc_open_error", t->filename);
 						remove_transfer(d);
 						list_remove(&watches, d, 0);
 						gg_free_dcc(d);
+						xfree(remote);
 						break;
 					}
+
+					xfree(remote);
+					
 					break;
 				}
 			}
@@ -1886,6 +1895,7 @@ void handle_dcc(struct gg_dcc *d)
 
 			t->type = GG_SESSION_DCC_GET;
 			t->filename = xstrdup(d->file_info.filename);
+			cp_to_iso(t->filename);
 
 			print("dcc_get_offer", format_user(t->uin), t->filename, itoa(d->file_info.size), itoa(t->id));
 

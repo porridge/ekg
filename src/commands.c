@@ -2434,7 +2434,8 @@ COMMAND(cmd_msg)
 		u.uin = 0;
 		u.display = xstrdup(nick);
 		
-		print_message(&e, &u, (chat) ? 3 : 4, secure);
+		if (!quiet)
+			print_message(&e, &u, (chat) ? 3 : 4, secure);
 
 		xfree(e.event.msg.message);
 		xfree(u.display);
@@ -2821,17 +2822,24 @@ COMMAND(cmd_dcc)
 			gg_dcc_request(sess, uin);
 		} else {
 			struct gg_dcc *d;
+			char *remote;
 			
 			if (!(d = gg_dcc_send_file(u->ip.s_addr, u->port, config_uin, uin))) {
 				printq("dcc_error", strerror(errno));
 				return -1;
 			}
 
-			if (gg_dcc_fill_file_info(d, params[2]) == -1) {
+			remote = xstrdup(params[2]);
+			iso_to_cp(remote);
+			
+			if (gg_dcc_fill_file_info2(d, remote, params[2]) == -1) {
 				printq("dcc_open_error", params[2], strerror(errno));
 				gg_free_dcc(d);
+				xfree(remote);
 				return -1;
 			}
+
+			xfree(remote);
 
 			list_add(&watches, d, 0);
 
