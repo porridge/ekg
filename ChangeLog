@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-01-26
+
+- poprawienie wy¶wietlania informacji na temat zakolejkowania wiadomo¶ci 
+  (teraz wy¶wietlana jest pod wiadomo¶ci±) (gophi)
+
 // 2005-01-21
 
 - libgadu: podbicie wersji API z 3.0 do 3.1 (porridge/w)

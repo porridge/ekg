@@ -2415,9 +2415,6 @@ COMMAND(cmd_msg)
 
 	xfree(add_send);
 
-	if (valid && (!sess || sess->state != GG_STATE_CONNECTED))
-		printq("not_connected_msg_queued");
-
 	if (valid && config_display_sent) {
 		struct gg_event e;
 		struct userlist u;
@@ -2440,6 +2437,9 @@ COMMAND(cmd_msg)
 		xfree(e.event.msg.message);
 		xfree(u.display);
 	}
+
+	if (valid && (!sess || sess->state != GG_STATE_CONNECTED))
+		printq("not_connected_msg_queued");
 
 	xfree(msg);
 	xfree(raw_msg);
