@@ -16,6 +16,7 @@
 
 int main()
 {
+	struct gg_login_params p;
 	struct gg_session *sess;
 	struct timeval tv;
 	struct gg_event *e;
@@ -24,7 +25,12 @@ int main()
 
 	gg_debug_level = ~0;
 	
-	sess = gg_login(123456, "dupa.8", 1);
+	memset(&p, 0, sizeof(p));
+	p.uin = 123456;
+	p.password = "dupa.8";
+	p.async = 1;
+	
+	sess = gg_login(&p);
 
 	for (;;) {
 		FD_ZERO(&rd);

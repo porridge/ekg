@@ -13,6 +13,7 @@ int main(int argc, char **argv)
 {
 	struct gg_session *sess;
 	struct gg_event *e;
+	struct gg_login_params p;
 
 	if (argc < 5) {
 		fprintf(stderr, "u¿ycie: %s <mójnumerek> <mojehas³o> <numerek> <wiadomo¶æ>\n", argv[0]);
@@ -21,7 +22,11 @@ int main(int argc, char **argv)
 
 	gg_debug_level = 255;
 
-	if (!(sess = gg_login(atoi(argv[1]), argv[2], 0))) {
+	memset(&p, 0, sizeof(p));
+	p.uin = atoi(argv[1]);
+	p.password = argv[2];
+	
+	if (!(sess = gg_login(&p))) {
 		printf("Nie uda³o siê po³±czyæ: %s\n", strerror(errno));
 		gg_free_session(sess);
 		return 1;

@@ -22,7 +22,8 @@ int main()
 {
 	struct gg_http *h;
 	struct gg_search *s;
-	struct gg_search_request *r = gg_search_request_mode_0(NULL, "Ania", NULL, NULL, GG_GENDER_NONE, 0, 0, 0);
+	struct gg_search_request *r = gg_search_request_mode_0(NULL, "Ania", NULL, NULL, GG_GENDER_NONE, 0, 0, 0, 0);
+	
 	int i;
 
 	gg_debug_level = 255;
