@@ -16,6 +16,7 @@ zg³osi³ b³±d.
 - s/gg_remove_notify/gg_remove_notify_ex, ¿eby nie zostawiaæ ¶mieæi np. po
   usuniêciu z listy osoby, któr± blokujemy (sz)
 - ekg ostrzega o mo¿liwo¶ci filtrowania wiadomo¶ci przez serwer (joshua/w)
+- informacja dla nowych u¿ytkowników o konieczno¶ci podania adresu e-mail (w)
 
 // 2003-02-09
 
