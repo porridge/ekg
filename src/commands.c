@@ -235,7 +235,7 @@ COMMAND(cmd_add)
 			gg_add_notify_ex(sess, uin, userlist_type(u));
 		remove_send_nick(itoa(uin));
 		config_changed = 1;
-		ui_event("userlist_changed", itoa(uin), params[1]);
+		ui_event("userlist_changed", itoa(uin), params[1], NULL);
 	} else
 		printq("error_adding");
 
@@ -383,7 +383,7 @@ COMMAND(cmd_away)
 		}
 
 		printq((tmp) ? "private_mode_on" : "private_mode_off");
-		ui_event("my_status", "private", (tmp) ? "on" : "off");
+		ui_event("my_status", "private", (tmp) ? "on" : "off", NULL);
 
 		config_status = GG_S(config_status);
 		config_status |= ((tmp) ? GG_STATUS_FRIENDS_MASK : 0);
@@ -535,7 +535,7 @@ COMMAND(cmd_connect)
 		userlist_clear_status(0);
 		sess = NULL;
 		reconnect_timer = 0;
-		ui_event("disconnected");
+		ui_event("disconnected", NULL);
 	}
 
 	return 0;
@@ -588,7 +588,7 @@ COMMAND(cmd_del)
 		remove_send_nick(itoa(uin));
 		remove_send_nick(nick);
 		config_changed = 1;
-		ui_event("userlist_changed", nick, itoa(uin));
+		ui_event("userlist_changed", nick, itoa(uin), NULL);
 	} else {
 		printq("error_deleting");
 		xfree(nick);
@@ -971,7 +971,7 @@ COMMAND(cmd_modify)
 				}
 			}
 			
-			ui_event("userlist_changed", u->display, argv[i]);
+			ui_event("userlist_changed", u->display, argv[i], NULL);
 			xfree(u->display);
 			u->display = xstrdup(argv[i]);
 			userlist_replace(u);
@@ -1069,7 +1069,7 @@ COMMAND(cmd_modify)
 
 			gg_add_notify_ex(sess, u->uin, userlist_type(u));
 
-			ui_event("userlist_changed", u->display, u->display);
+			ui_event("userlist_changed", u->display, u->display, NULL);
 			modified = 1;
 		}
 
@@ -2236,7 +2236,7 @@ COMMAND(cmd_quit)
 		tmp = NULL;
 	}
 		
-	ui_event("disconnected");
+	ui_event("disconnected", NULL);
 
 	/* nie wychodzimy tutaj, ¿eby command_exec() mia³o szansê zwolniæ
 	 * u¿ywan± przez siebie pamiêæ. */

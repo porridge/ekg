@@ -1115,7 +1115,7 @@ static void update_contacts(int commit)
 				mvwaddch(contacts, y, x + 2, (unsigned char) u->descr[z]);
 
 		if (GG_S_D(u->status)) {
-			wattrset(contacts, color_pair(COLOR_BLACK, 0, COLOR_BLACK));
+			wattrset(contacts, color_pair(COLOR_BLACK, 1, COLOR_BLACK));
 			mvwaddch(contacts, y, 1, 'i');
 		}
 		

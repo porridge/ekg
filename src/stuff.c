@@ -1044,7 +1044,7 @@ int conference_rename(const char *oldname, const char *newname, int quiet)
 	
 	printq("conferences_rename", oldname, newname);
 
-	ui_event("conference_rename", oldname, newname);
+	ui_event("conference_rename", oldname, newname, NULL);
 	
 	return 0;
 }
@@ -1111,7 +1111,7 @@ int config_read(const char *filename, const char *var)
 			l = l->next;
 
 			if (!b->internal)
-				ui_event("command", 1, "bind", "--del", b->key, NULL);
+				ui_event("command", 1, "bind", "--del", b->key, NULL, NULL);
 		}
 
 		alias_free();
@@ -1171,7 +1171,7 @@ int config_read(const char *filename, const char *var)
 			char **pms = array_make(foo, " \t", 2, 1, 0);
 
 			if (pms && pms[0] && pms[1]) {
-				ui_event("command", 1, "bind", "--add", pms[0], pms[1]);
+				ui_event("command", 1, "bind", "--add", pms[0], pms[1], NULL);
 				gg_debug(GG_DEBUG_MISC, "\tbind %s %s\n", pms[0], pms[1]);
 			}
 
@@ -2885,7 +2885,7 @@ int valid_nick(const char *nick)
 {
 	int i;
 	const char *wrong[] = { "(null)", "__debug", "__status",
-				 "__current", NULL };
+				 "__current", "*", NULL };
 
 	if (!nick)
 		return 0;
@@ -3875,8 +3875,8 @@ void change_status(int status, const char *arg, int autom)
 	}
 
 	if (!ignored_check(config_uin)) {
-		ui_event("my_status", (reason) ? format_descr : format, reason);
-		ui_event("my_status_raw", status, reason);
+		ui_event("my_status", (reason) ? format_descr : format, reason, NULL);
+		ui_event("my_status_raw", status, reason, NULL);
 	}
 
 	xfree(config_reason);
