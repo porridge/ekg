@@ -33,18 +33,12 @@ extern void ui_batch_init();
 
 #ifdef WITH_UI_READLINE
 
-#define MAX_WINDOWS 20
 #define MAX_LINES_PER_SCREEN 50
-
-struct wbuff {
-        char *line[MAX_LINES_PER_SCREEN];
-        int last;
-};
 
 struct window {
         int id;
         char *query_nick;
-        struct wbuff buff;
+        char *line[MAX_LINES_PER_SCREEN];
 };
 
 extern void ui_readline_init();

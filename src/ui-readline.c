@@ -45,9 +45,9 @@ static void ui_readline_beep();
 static int ui_readline_event(const char *event, ...);
 static void ui_readline_deinit();
 
-static int in_readline = 0, no_prompt = 0, pager_lines = -1, screen_lines = 24, screen_columns = 80, curr_window = 1, windows_count = 0;
+static int in_readline = 0, no_prompt = 0, pager_lines = -1, screen_lines = 24, screen_columns = 80;
 list_t windows = NULL;
-struct window *win;
+struct window *window_current = NULL;
 
 /* kod okienek napisany jest na podstawie ekg-windows nilsa */
 static struct window *window_add();
@@ -55,23 +55,24 @@ static int window_del(int id);
 static int window_switch(int id);
 static int window_refresh();
 static int window_write(int id, const char *line);
-static int window_clear();
-static int window_sort();
+static void window_clear();
+/* static int window_sort(); */
 static int window_query_id(const char *qnick);
 static void window_list();
 static int window_make_query(const char *nick);
 static void window_free();
+static struct window *window_find(int id);
 
 /* a jak ju¿ przy okienkach jeste¶my... */
-static void window_01() { if (curr_window == 1) return; window_switch(1); }
-static void window_02() { if (curr_window == 2) return; window_switch(2); }
-static void window_03() { if (curr_window == 3) return; window_switch(3); }
-static void window_04() { if (curr_window == 4) return; window_switch(4); } 
-static void window_05() { if (curr_window == 5) return; window_switch(5); }
-static void window_06() { if (curr_window == 6) return; window_switch(6); }
-static void window_07() { if (curr_window == 7) return; window_switch(7); }
-static void window_08() { if (curr_window == 8) return; window_switch(8); }
-static void window_09() { if (curr_window == 9) return; window_switch(9); }
+static void window_01() { window_switch(1); }
+static void window_02() { window_switch(2); }
+static void window_03() { window_switch(3); }
+static void window_04() { window_switch(4); } 
+static void window_05() { window_switch(5); }
+static void window_06() { window_switch(6); }
+static void window_07() { window_switch(7); }
+static void window_08() { window_switch(8); }
+static void window_09() { window_switch(9); }
 
 static char *seq_get_command(char *seq);
 static int bind_sequence(char *seq, char *command, int quiet);
@@ -161,10 +162,10 @@ static char *command_generator(char *text, int state)
 		if (state)
 			return NULL;
 		if (send_nicks_count < 1)
-			return xstrdup((win->query_nick) ? "/msg" : "msg");
+			return xstrdup((window_current->query_nick) ? "/msg" : "msg");
 		send_nicks_index = (send_nicks_count > 1) ? 1 : 0;
 
-		return saprintf((win->query_nick) ? "/chat %s" : "chat %s", send_nicks[0]);
+		return saprintf((window_current->query_nick) ? "/chat %s" : "chat %s", send_nicks[0]);
 	}
 
 	if (!state) {
@@ -177,7 +178,7 @@ static char *command_generator(char *text, int state)
 
 		if (!strncasecmp(text, c->name, len)) {
 			l = l->next;
-			return (win->query_nick) ? saprintf("/%s", c->name) : xstrdup(c->name);
+			return (window_current->query_nick) ? saprintf("/%s", c->name) : xstrdup(c->name);
 		}
 	}
 
@@ -418,25 +419,24 @@ static char **my_completion(char *text, int start, int end)
  */
 static void ui_readline_print(const char *target, const char *line)
 {
-        int old_end = rl_end, i, win_id = -1;
+        int old_end = rl_end, i, id = 0;
 	char *old_prompt = rl_prompt;
-
-        if ((win->query_nick && target && !strcmp(win->query_nick, target)))
-                win_id = 0;
-        else if (windows_count > 1)
-                win_id = window_query_id(target);
-
-	if (config_make_window > 0 && win_id < 0 && windows_count < MAX_WINDOWS && strncmp(target, "__", 2))
-		win_id = window_make_query(target);
 	
-        if (win_id > 0 && win_id != curr_window) {
-                window_write(win_id, line);
-                /* trzeba jeszcze waln±æ od¶wie¿enie prompta */
+	if (target)
+		id = window_query_id(target);
+
+	if (config_make_window > 0 && !id && strncmp(target, "__", 2))
+		id = window_make_query(target);
+	
+	/* je¶li nie piszemy do aktualnego, to zapisz do bufora i wyjd¼ */
+        if (id && id != window_current->id) {
+                window_write(id, line);
+                /* XXX trzeba jeszcze waln±æ od¶wie¿enie prompta */
                 return;
         }
 
 	if (pager_lines != -2) {
-		window_write(curr_window, line);
+		window_write(window_current->id, line);
 
 	        if (in_readline) {
 	                rl_end = 0;
@@ -502,56 +502,43 @@ static const char *current_prompt()
 {
 	static char buf[80];	/* g³upio strdup()owaæ wszystko */
 	const char *prompt = buf;
+	int count = list_count(windows);
 	char *tmp;
-	static char w[16]; /* stosunkowo du¿y, mo¿na wsadziæ aktywne okna */
 
-	*w = 0;
-
-        if (windows_count > 1)
-                sprintf(w, "%d", curr_window);
-
-        if (win->query_nick) {
-                if ((tmp = (*w) ? format_string(format_find("readline_prompt_query_win"), win->query_nick, w) : format_string(format_find("readline_prompt_query"), win->query_nick, NULL))) {
-                        strncpy(buf, tmp, sizeof(buf) - 1);
-			xfree(tmp);
-                }
+        if (window_current->query_nick) {
+		if (count > 1)
+			tmp = format_string(format_find("readline_prompt_query_win"), window_current->query_nick, itoa(window_current->id));
+		else
+			tmp = format_string(format_find("readline_prompt_query"), window_current->query_nick, NULL);
+		strncpy(buf, tmp, sizeof(buf) - 1);
+		xfree(tmp);
         } else {
-                switch (away) {
-                        case 1:
-                        case 3:
-				if (*w) {
-                                	tmp = format_string(format_find("readline_prompt_away_win"), w);
-					strncpy(buf, tmp, sizeof(buf) - 1);
-					xfree(tmp);
-				} else
-					strncpy(buf, format_find("readline_prompt_away"), sizeof(buf) - 1);
-                                break;
-                        case 2:
-                        case 5:
-				if (*w) {
-                                	tmp = format_string(format_find("readline_prompt_invisible_win"), w);
-					strncpy(buf, tmp, sizeof(buf) - 1);
-					xfree(tmp);
-				} else
-					strncpy(buf, format_find("readline_prompt_invisible"), sizeof(buf) - 1);
-                                break;
-                        default:
-				if (*w) {
-                                	tmp = format_string(format_find("readline_prompt_win"), w);
-					strncpy(buf, tmp, sizeof(buf) - 1);
-					xfree(tmp);
-				} else
-					strncpy(buf, format_find("readline_prompt"), sizeof(buf) - 1);
-                                break;
-                }
+		char *format_win = "readline_prompt_win", *format_nowin = "readline_prompt";
+			
+		if (away == 1 || away == 3) {
+			format_win = "readline_prompt_away_win";
+			format_nowin = "readline_prompt_away";
+		}
+
+		if (away == 2 || away == 5) {
+			format_win = "readline_prompt_invisible_win";
+			format_nowin = "readline_prompt_invisible";
+		}
+		
+		if (count > 1) {
+			tmp = format_string(format_find(format_win), itoa(window_current->id));
+			strncpy(buf, tmp, sizeof(buf) - 1);
+			xfree(tmp);
+		} else
+			strncpy(buf, format_find(format_nowin), sizeof(buf) - 1);
         }
 
         if (no_prompt)
                 prompt = "";
 
         return prompt;
-
 }
+
 /*
  * my_readline()
  *
@@ -562,8 +549,8 @@ static const char *current_prompt()
  */
 static char *my_readline()
 {
-        char *res, buff[4096];
 	const char *prompt = current_prompt();
+        char *res, *tmp;
 
         in_readline = 1;
 #ifdef HAVE_RL_SET_PROMPT
@@ -572,8 +559,9 @@ static char *my_readline()
         res = readline(prompt);
         in_readline = 0;
 
-        snprintf(buff, 4096, "%s%s\n", current_prompt(), (res) ? res : "");
-        window_write(curr_window, buff);
+	tmp = saprintf("%s%s\n", prompt, (res) ? res : "");
+        window_write(window_current->id, tmp);
+	xfree(tmp);
 
         return res;
 }
@@ -585,8 +573,7 @@ static char *my_readline()
  */
 void ui_readline_init()
 {
-        window_add();
-        win = (struct window *)windows->data;
+        window_current = window_add();
         window_refresh();
 
 	ui_print = ui_readline_print;
@@ -669,8 +656,10 @@ static void ui_readline_deinit()
 
 	window_free();
 
-	for (i = 0; i < SEND_NICKS_MAX; i++)
+	for (i = 0; i < SEND_NICKS_MAX; i++) {
 		xfree(send_nicks[i]);
+		send_nicks[i] = NULL;
+	}
 }
 
 /*
@@ -684,8 +673,13 @@ static void ui_readline_loop()
 	for (;;) {
 		char *line = my_readline();
 
-		if (!line && win->query_nick) {
+		if (!line && window_current->query_nick) {
 			ui_event("command", "query", NULL);
+			continue;
+		}
+
+		if (!line && list_count(windows) > 1) {
+			window_del(window_current->id);
 			continue;
 		}
 
@@ -728,7 +722,7 @@ static void ui_readline_loop()
 		
 		pager_lines = 0;
 		
-		if (command_exec(win->query_nick, line)) {
+		if (command_exec(window_current->query_nick, line)) {
 			xfree(line);
 			break;
 		}
@@ -759,32 +753,25 @@ static int ui_readline_event(const char *event, ...)
 
 		if (!strcasecmp(command, "query")) {
 			char *param = va_arg(ap, char*);	
-		
-			if (!param && !win->query_nick)
+			
+			if (!param && !window_current->query_nick)
 				goto cleanup;
 
 			if (param) {
-				list_t l;
+				int id;
 
-				for (l = windows; l; l = l->next) {
-					struct window *w = l->data;
-
-					if (w->query_nick && !strcmp(param, w->query_nick)) {
-						char w_id[4];
-
-						sprintf(w_id, "%d", w->id);
-						print("query_exist", w->query_nick, w_id);
-						return 1;
-					}
-				}		
-						
+				if ((id = window_query_id(param))) {
+					print("query_exist", param, itoa(id));
+					return 1;
+				}
+				
 				print("query_started", param);
-				free(win->query_nick);
-				win->query_nick = xstrdup(param);
+				xfree(window_current->query_nick);
+				window_current->query_nick = xstrdup(param);
 			} else {
-				print("query_finished", win->query_nick);
-				xfree(win->query_nick);
-				win->query_nick = NULL;
+				print("query_finished", window_current->query_nick);
+				xfree(window_current->query_nick);
+				window_current->query_nick = NULL;
 			}
 
 			result = 1;
@@ -803,13 +790,13 @@ static int ui_readline_event(const char *event, ...)
 		                window_add();
  
 			} else if (!strcasecmp(p1, "next")) {
-		                window_switch(curr_window + 1);
+		                window_switch(window_current->id + 1);
 
 			} else if (!strcasecmp(p1, "prev")) {
-		                window_switch(curr_window - 1);
+		                window_switch(window_current->id - 1);
 				
 		        } else if (!strcasecmp(p1, "kill")) {
-		                int id = (p2) ? atoi(p2) : curr_window;
+		                int id = (p2) ? atoi(p2) : window_current->id;
 
 				window_del(id);
 				
@@ -871,59 +858,125 @@ cleanup:
 	return result;
 }
 
+/*
+ * window_find()
+ *
+ * szuka struct window dla okna o podanym numerku.
+ *
+ *  - id - numer okna.
+ *
+ * struct window dla danego okna.
+ */
+static struct window *window_find(int id)
+{
+	list_t l;
+
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data;
+
+		if (w->id == id)
+			return w;
+	}
+
+	return NULL;
+}
+
+/*
+ * window_add()
+ *
+ * tworzy nowe okno.
+ *
+ * zwraca zaalokowan± struct window.
+ */
 static struct window *window_add()
 {
-        int j;
         struct window w;
+	int id = 1;
 
-        if (windows_count > MAX_WINDOWS) {
-                print("windows_max");
-                return NULL;
-        }
+	/* wyczy¶æ. */
+	memset(&w, 0, sizeof(w));
 
-        w.id = windows_count + 1;
-        w.query_nick = NULL;
-        windows_count++;
+	/* znajd¼ pierwszy wolny id okienka. */
+	while (window_find(id))
+		id++;
+	w.id = id;
 
-        for (j = 0; j < MAX_LINES_PER_SCREEN; j++)
-                w.buff.line[j] = NULL;
-
-	w.buff.last = 0;
-
+	/* dopisz, zwróæ. */
         return list_add(&windows, &w, sizeof(w));
 }
 
+/*
+ * window_del()
+ *
+ * usuwa okno o podanym numerze.
+ */
 static int window_del(int id)
 {
-        list_t l;
+	struct window *w;
+	int i;
 
-        if (windows_count <= 1) {
+	/* je¶li zosta³o jedno okienko, nie usuwaj niczego. */
+        if (list_count(windows) < 2) {
                 print("window_no_windows");
-                return 1;
+                return -1;
         }
 
-        for (l = windows; l; l = l->next) {
-                struct window *w = l->data;
+	/* je¶li nie ma takiego okienka, id¼ sobie. */
+	if (!(w = window_find(id))) {
+        	print("window_noexist");
+		return -1;
+	}
 
-                if (w->id == id) {
-                        print("window_del");
-                        list_remove(&windows, w, 1);
-                        window_sort();
-                        windows_count--;
-                        if (curr_window == id)
-                                window_switch((id > 1 || curr_window > windows_count) ? id-1 : 1);
-                        return 0;
+	/* je¶li usuwano aktualne okienko, nie kombinuj tylko ustaw 1-sze. */
+	if (window_current == w) {
+		struct window *newwin = windows->data;
 
-                }
-        }
+		/* je¶li usuwane jest pierwszy, we¼ drugie. */
+		if (newwin == w)
+			newwin = windows->next->data;
+		
+		window_switch(newwin->id);
+	}
 
-        print("window_noexist");
+	/* usuñ dane zajmowane przez okno. */
+	for (i = 0; i < MAX_LINES_PER_SCREEN; i++) {
+		xfree(w->line[i]);
+		w->line[i] = NULL;
+	}
+	xfree(w->query_nick);
+	w->query_nick = NULL;
+	
+	list_remove(&windows, w, 1);
 
-        return 1;
+        return 0;
 }
 
+/*
+ * window_switch()
+ *
+ * prze³±cza do okna o podanym id.
+ */
 static int window_switch(int id)
 {
+	struct window *w = window_find(id);
+
+	if (!w) {
+		print("window_noexist");
+		return -1;
+	}
+
+	window_current = w;
+	window_refresh();
+#ifdef HAVE_RL_SET_PROMPT
+	rl_set_prompt(current_prompt());
+#else
+	rl_expand_prompt(current_prompt());
+#endif
+	rl_initialize();
+
+	return 0;
+
+#if 0
         list_t l, tmp = windows;
 
         for (l = windows; l; l = l->next) {
@@ -945,78 +998,79 @@ static int window_switch(int id)
                         return 0;
                 }
         }
-
         print("window_noexist");
 
         return 1;
+#endif
 }
 
+/*
+ * window_refresh()
+ *
+ * wy¶wietla ponownie zawarto¶æ okna.
+ *
+ * XXX podpi±æ pod Ctrl-L.
+ */
 static int window_refresh()
 {
-        int j;
+        int i;
 
-        printf("\033[H\033[J"); /* blah */
+        printf("\033[H\033[J"); /* XXX */
 
-        for (j = win->buff.last; j < MAX_LINES_PER_SCREEN; j++) {
-                if (win->buff.line[j])
-                        printf("%s", win->buff.line[j]);
-        }
-
-        for (j=0; j < win->buff.last; j++) {
-                if (win->buff.line[j])
-                        printf("%s", win->buff.line[j]);
-        }
+	for (i = 0; i < MAX_LINES_PER_SCREEN; i++)
+		if (window_current->line[i])
+			printf("%s", window_current->line[i]);
 
         return 0;
 }
 
+/*
+ * window_write()
+ *
+ * dopisuje liniê do bufora danego okna.
+ */
 static int window_write(int id, const char *line)
 {
-        int j = 1;
-        list_t l;
-        struct window *w = NULL;
+        struct window *w = window_find(id);
+        int i = 1;
 
-        if (!line)
-                return 1;
+        if (!line || !w)
+                return -1;
 
-        if (id == curr_window)
-                w = win;
-        else
-                for (l = windows; l; l = l->next) {
-                        w = l->data;
-                        if (w->id == id)
-                                break;
-                }
-
-	if (!w)
-		w = win;
-
-        j = w->buff.last;
-        if (w->buff.line[j])
-                xfree(w->buff.line[j]);
-
-        w->buff.line[j] = xstrdup(line);
-
-        w->buff.last++;
-
-        if(w->buff.last >= MAX_LINES_PER_SCREEN - 1)
-                w->buff.last = 0;
-
-        return 0;
-}
-
-static int window_clear()
-{
-        int j;
-
-        for (j = 0; j < MAX_LINES_PER_SCREEN; j++) {
-		xfree(win->buff.line[j]);
-                win->buff.line[j] = NULL;
+	/* je¶li ca³y bufor zajêty, zwolnij pierwsz± liniê i przesuñ do góry */
+	if (w->line[MAX_LINES_PER_SCREEN - 1]) {
+		xfree(w->line[0]);
+		for (i = 1; i < MAX_LINES_PER_SCREEN; i++)
+			w->line[i - 1] = w->line[i];
+		w->line[MAX_LINES_PER_SCREEN - 1] = NULL;
 	}
 
+	/* znajd¼ pierwsz± woln± liniê i siê wpisz. */
+	for (i = 0; i < MAX_LINES_PER_SCREEN; i++)
+		if (!w->line[i]) {
+			w->line[i] = xstrdup(line);
+			break;
+		}
+
         return 0;
 }
 
+/*
+ * window_clear()
+ *
+ * czy¶ci zawarto¶æ aktualnego okna.
+ */
+static void window_clear()
+{
+        int i;
+
+        for (i = 0; i < MAX_LINES_PER_SCREEN; i++) {
+		xfree(window_current->line[i]);
+                window_current->line[i] = NULL;
+	}
+}
+
+#if 0
 static int window_sort()
 {
         list_t l;
@@ -1042,27 +1096,36 @@ static int window_sort()
         
 	return 0;
 }
+#endif
 
-static int window_query_id(const char *qnick)
+/*
+ * window_query_id()
+ *
+ * znajduje id okna, w którym prowadzona jest rozmowa z dan± osob±. je¶li
+ * nie ma takiego, zwraca zero.
+ */
+static int window_query_id(const char *nick)
 {
         list_t l;
 
-        if (!qnick)
-                return -1;
+        if (!nick)
+                return 0;
 
         for (l = windows; l; l = l->next) {
                 struct window *w = l->data;
 
-                if (!w->query_nick)
-                        continue;
-
-                if (!strcmp(w->query_nick, qnick))
-                        return w->id;
+		if (w->query_nick && !strcmp(w->query_nick, nick))
+			return w->id;
         }
 
-        return -2;
+        return 0;
 }
 
+/*
+ * window_list()
+ *
+ * wy¶wietla listê okien.
+ */
 static void window_list()
 {
 	list_t l;
@@ -1077,8 +1140,14 @@ static void window_list()
 	}
 }		
 
+/*
+ * window_make_query()
+ *
+ * tworzy nowe okno rozmowy w zale¿no¶ci od aktualnych ustawieñ.
+ */
 static int window_make_query(const char *nick)
 {
+	/* szuka pierwszego wolnego okienka i je zajmuje */
 	if (config_make_window == 1) {
 		list_t l;
 
@@ -1088,11 +1157,11 @@ static int window_make_query(const char *nick)
 			if (!w->query_nick) {
 				w->query_nick = xstrdup(nick);
 				
-				if (w->id == curr_window) {
+				if (w == window_current) {
 					print("query_started", nick);
 #ifdef HAVE_RL_SET_PROMPT
 					rl_set_prompt(current_prompt());
-#else /*#elif HAVE_RL_EXPAND_PROMPT*/
+#else
 					rl_expand_prompt(current_prompt());
 #endif									
 				} else
@@ -1111,15 +1180,7 @@ static int window_make_query(const char *nick)
 		
 		w->query_nick = xstrdup(nick);
 		
-		if (w->id == curr_window) {
-			print("query_started", nick);
-#ifdef HAVE_RL_SET_PROMPT
-			rl_set_prompt(current_prompt());
-#else /*#elif HAVE_RL_EXPAND_PROMPT*/
-			rl_expand_prompt(current_prompt());
-#endif								
-		} else
-			print("window_id_query_started", itoa(w->id), nick);
+		print("window_id_query_started", itoa(w->id), nick);
 			
 		return w->id;
 	}
@@ -1127,21 +1188,32 @@ static int window_make_query(const char *nick)
 	return 0;
 }
 
+/*
+ * window_free()
+ *
+ * zwalnia pamiêæ po wszystkich strukturach okien.
+ */
 static void window_free()
 {
 	list_t l;
+
+	window_current = NULL;
 
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
 		int i;
 
 		xfree(w->query_nick);
+		w->query_nick = NULL;
 
-		for (i = 0; i < MAX_LINES_PER_SCREEN; i++)
-			xfree(w->buff.line[i]);
+		for (i = 0; i < MAX_LINES_PER_SCREEN; i++) {
+			xfree(w->line[i]);
+			w->line[i] = NULL;
+		}
 	}
 
 	list_destroy(windows, 1);
+	windows = NULL;
 }
 
 static char *seq_get_command(char *seq)

@@ -636,10 +636,10 @@ void theme_init()
 	format_add("readline_prompt_away", "/ ", 1);
 	format_add("readline_prompt_invisible", ". ", 1);
 	format_add("readline_prompt_query", "%1> ", 1);
-	format_add("readline_prompt_win", "[%1%%] ", 1);
-	format_add("readline_prompt_away_win", "[%1/] ", 1);
-	format_add("readline_prompt_invisible_win", "[%1.] ", 1);
-	format_add("readline_prompt_query_win", "[%2] %1> ", 1);
+	format_add("readline_prompt_win", "%1%% ", 1);
+	format_add("readline_prompt_away_win", "%1/ ", 1);
+	format_add("readline_prompt_invisible_win", "%1. ", 1);
+	format_add("readline_prompt_query_win", "%2:%1> ", 1);
 	format_add("readline_more", "-- wci¶nij enter by kontynuowaæ --", 1);
 
 	format_add("known_user", "%T%1%n/%2", 1);

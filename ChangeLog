@@ -17,6 +17,11 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - speedy mnie zabije za zepsucie /status. poprawione (w)
 - naprawienie odbioru dcc. nag³ówek chunka mo¿e byæ ju¿ podzielony na
   dwa pakiety. po tylu latach. przepraszam. (Chilek/w)
+- Traalala.. mozecie bic, ale na bialym tle biale literki zle wygladaja ;>
+  zaor zwrocil uwage i stwierdzil ze pogrubione znaczy tluste jest lepsze (s)
+- rewrite du¿ej czê¶ci kodu okienek. ju¿ wolê posiedzieæ, zrozumieæ co
+  robi która funkcja, ni¿ czytaæ codziennie na ekg-users kolejne porcje
+  core'ów. przy okazji Ctrl-D w okienku zamyka je. (w)
 
 // 2002-08-06
 
