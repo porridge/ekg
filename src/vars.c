@@ -150,7 +150,6 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 {
 	struct variable *v = variable_find(name);
 
-	printf("variable_set(\"%s\", \"%s\", %d);\n", name, value, allow_foreign);
 	if (!v && allow_foreign) {
 		variable_add(name, VAR_FOREIGN, 2, xstrdup(value), NULL);
 		return -1;
