@@ -865,6 +865,12 @@ extern char *gg_proxy_username;		/* okre¶la nazwê u¿ytkownika przy autoryzacji s
 extern char *gg_proxy_password;		/* okre¶la has³o u¿ytkownika przy autoryzacji serwera proxy */
 extern int gg_proxy_http_only;		/* w³±cza obs³ugê proxy wy³±cznie dla us³ug HTTP */
 
+
+/* 
+ * adres, z którego ¶lemy pakiety (np ³±czymy siê z serwerem)
+ * u¿ywany przy gg_connect()
+ */
+extern unsigned long gg_local_ip; 
 /*
  * -------------------------------------------------------------------------
  * poni¿ej znajduj± siê wewnêtrzne sprawy biblioteki. zwyk³y klient nie
