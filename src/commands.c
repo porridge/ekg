@@ -187,7 +187,7 @@ COMMAND(cmd_add)
 
 	if (u || userlist_add(uin, params[1])) {
 		print("user_added", params[1]);
-		gg_add_notify(sess, uin);
+		gg_add_notify_ex(sess, uin, userlist_type(u));
 		config_changed = 1;
 		ui_event("userlist_changed", itoa(uin), params[1]);
 	} else
@@ -1011,7 +1011,7 @@ COMMAND(cmd_modify)
 
 			u->uin = new_uin;
 
-			gg_add_notify(sess, u->uin);
+			gg_add_notify_ex(sess, u->uin, userlist_type(u));
 
 			ui_event("userlist_changed", u->display, u->display);
 			modified = 1;
