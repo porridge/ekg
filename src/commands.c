@@ -5492,7 +5492,7 @@ void command_init()
           "znak procenta w aliasie, nale¿y zastosowaæ zapis %T%%%%%n.");
 	  
 	command_add
-	( "away", "?", cmd_away, 0,
+	( "away", "r", cmd_away, 0,
 	  " [powód/-]", "zmienia stan na zajêty",
 	  "\n"
 	  "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie "
@@ -5519,7 +5519,7 @@ void command_init()
 	  "pierwszego wykonania.");
  
 	command_add
-	( "back", "?", cmd_away, 0,
+	( "back", "r", cmd_away, 0,
 	  " [powód/-]", "zmienia stan na dostêpny",
 	  "\n"
           "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie "
@@ -5644,7 +5644,7 @@ void command_init()
 	  "");
 	
 	command_add
-	( "disconnect", "?", cmd_connect, 0,
+	( "disconnect", "r", cmd_connect, 0,
 	  " [powód/-]", "roz³±cza siê z serwerem",
 	  "\n"
 	  "Parametry identyczne jak dla komendy %Tquit%n.\n"
@@ -5723,7 +5723,7 @@ void command_init()
           "poziomów ignorowania.");
 	  
 	command_add
-	( "invisible", "?", cmd_away, 0,
+	( "invisible", "r", cmd_away, 0,
 	  " [powód/-]", "zmienia stan na niewidoczny",
 	  "\n"
           "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie "
@@ -5894,7 +5894,7 @@ void command_init()
 	  "konferencji wy¶wietla wszystkich uczestników.");
 	  
 	command_add
-	( "quit", "?", cmd_quit, 0,
+	( "quit", "r", cmd_quit, 0,
 	  " [powód/-]", "wychodzi z programu",
 	  "\n"
           "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie "
@@ -6105,7 +6105,7 @@ void command_init()
 	( "_ctcp", "u", cmd_test_ctcp, 0, " <numer/alias>",
 	  "wysy³a ¿±danie bezpo¶redniego po³±czenia", "");
 	command_add
-	( "_descr", "?", cmd_away, 0, " <opis>",
+	( "_descr", "r", cmd_away, 0, " <opis>",
 	  "zmienia opis bez zmiany stanu", "");
 	command_add
 	( "_imagereq", "u??", cmd_test_imagereq, 0, " <numer/alias> <rozmiar> <crc>", 

@@ -427,6 +427,20 @@ static char *python_generator(char *text, int state)
 	return NULL;
 }
 
+static char *reason_generator(char *text, int state)
+{
+	static int len;
+
+	if (!state) {
+		len = strlen(text);
+
+		if (config_reason && !strncasecmp(text, config_reason, len))
+			return xstrdup(config_reason);
+	}
+
+	return NULL;
+}
+
 static char *empty_generator(char *text, int state)
 {
 	return NULL;
@@ -558,6 +572,9 @@ static char **my_completion(char *text, int start, int end)
 						break;
 					case 'w':
 						func = window_generator;
+						break;
+					case 'r':
+						func = reason_generator;
 						break;
 					default:
 						func = empty_generator;

@@ -2548,6 +2548,12 @@ void window_generator(const char *text, int len)
 			array_add(&completions, xstrdup(words[i]));
 }
 
+void reason_generator(const char *text, int len)
+{
+	if (config_reason && !strncasecmp(text, config_reason, len))
+		array_add(&completions, xstrdup(config_reason));
+}
+
 static struct {
 	char ch;
 	void (*generate)(const char *text, int len);
@@ -2565,6 +2571,7 @@ static struct {
 	{ 'f', file_generator },
 	{ 'e', events_generator },
 	{ 'I', ignorelevels_generator },
+	{ 'r', reason_generator },
 	{ 0, NULL }
 };
 
