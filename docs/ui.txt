@@ -1,9 +1,9 @@
 od 20020627 ekg jest przygotowane do obs³ugi ró¿nych interfejsów u¿ytkowika.
-zrobi³em ca³kiem spor± reorganizacjê kodu, dziêki czemu nie trzeba bêdzie
-psuæ zbyt du¿o, ¿eby dodaæ frontend w ncurses czy jakikolwiek inny.
+przeprowadzono ca³kiem spor± reorganizacjê kodu, dziêki czemu nie trzeba
+bêdzie psuæ zbyt du¿o, ¿eby dodaæ frontend w ncurses czy jakikolwiek inny.
 
 je¶li kto¶ chce napisaæ w³asny interfejs (chocia¿by w gtk+, chocia¿ nie
-wiem po co, skoro jest GNU Gadu -- http://gadu.gnu.pl/), musi napisaæ
+wiadomo po co, skoro jest GNU Gadu -- http://gadu.gnu.pl/), musi napisaæ
 ui-costam.c, zawieraj±cy poni¿ej podane funkcje i dopisaæ parê linijek
 do ekg.c.
 
@@ -23,15 +23,15 @@ ui_post_init()
 ui_deinit()
 	pozamykanie wszystkiego.
 
-ui_print(const char *target, const char *line)
-	wy¶wietlenie tekstu ,,line'' w oknie ,,target''. póki co, obs³ugi
-	okien nie ma, ale kod jest przygotowany tak, ¿e wiadomo¶ci s± ju¿
-	wysy³ane w odpowiednie miejsce. przewidziano te¿ dwa specjalne
-	okna -- ,,__status'' dla pierwszego okna statusowego oraz
-	,,__current'' dla aktualnego. do pierwszego powinny byæ wysy³ane
-	informacje dotycz±ce stanu po³±czenia itd, itd, do aktualnego
-	wszystko to, co jest zwi±zane z komendami wywo³ywanymi przez
-	u¿ytkownika.
+ui_print(const char *target, int separate, const char *line)
+	wy¶wietlenie tekstu ,,line'' w oknie ,,target''. przewidziano
+	trzy specjalne okna -- ,,__status'' dla pierwszego okna statusowego,
+	,,__current'' dla aktualnego oraz ,,__debug'' dla okna z komunikatami
+	dla developerów. parametr ,,separate'' mówi, czy wy¶wietlany tekst
+	jest na	tyle wa¿ny, ¿eby otwieraæ nowe okno -- np. wiadomo¶æ. do
+	pierwszego powinny byæ wysy³ane	informacje dotycz±ce stanu
+	po³±czenia itd, itd, do aktualnego wszystko to, co jest zwi±zane
+	z komendami wywo³ywanymi przez u¿ytkownika.
 
 ui_beep()
 	d¼wiêk. niestety to, jak go wytworzyæ zale¿y od interfejsu. przy
