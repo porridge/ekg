@@ -4124,7 +4124,7 @@ void command_init()
 	  " [opcje]", "planuje wykonanie komend",
 	  "\n"
 	  "  -a, --add [nazwa] <czas> <komenda>  tworzy nowy plan\n"
-	  "  -d, --del <numer/nazwa>|*           usuwa plan lub wszystkie\n"
+	  "  -d, --del <nazwa>|*                 usuwa plan lub wszystkie\n"
 	  " [-l, --list, <nazwa>]                wy¶wietla listê planów\n"
 	  "\n"
 	  "Czas podaje siê w formacie [[[yyyy]mm]dd]HH[:]MM[.SS], gdzie "
@@ -4467,7 +4467,7 @@ void command_init()
 	  " [opcje]", "zarz±dzanie timerami",
 	  "\n"
 	  "  -a, --add [nazwa] [*/]<czas> <komenda>  tworzy nowy timer\n"
-	  "  -d, --del <numer/nazwa>|*           zatrzymuje timer lub wszystkie\n"
+	  "  -d, --del <nazwa>|*                 zatrzymuje timer lub wszystkie\n"
 	  " [-l, --list, <nazwa>]                wy¶wietla listê timerów\n"
 	  "\n"
 	  "Czas podaje siê w sekundach. Mo¿na te¿ u¿yæ przyrostków %Td%n, %Th%n, %Tm%n, %Ts%n, "
