@@ -693,6 +693,20 @@ static int ui_readline_event(const char *event, ...)
 				goto cleanup;
 
 			if (param) {
+				struct list *l;
+
+				for (l = windows; l; l = l->next) {
+					struct window *w = l->data;
+
+					if (w->query_nick && !strcmp(param, w->query_nick)) {
+						char w_id[4];
+
+						sprintf(w_id, "%d", w->id);
+						print("query_exist", w->query_nick, w_id);
+						return 1;
+					}
+				}		
+						
 				print("query_started", param);
 				free(win->query_nick);
 				win->query_nick = xstrdup(param);

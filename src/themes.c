@@ -777,6 +777,7 @@ void init_theme()
 
 	add_format("query_started", "%) Rozpoczêto rozmowê z %W%1%n. Aby zakoñczyæ, wci¶nij Ctrl-D\n", 1);
 	add_format("query_finished", "\n%) Zakoñczono rozmowê z %W%1%n\n", 1);
+	add_format("query_exist", "%! Rozmowa z %W%1%n jest ju¿ prowadzona w okienku nr %W%2%n.\n", 1);
 
         add_format("events_list_empty", "%! Brak zdarzeñ\n", 1);
         add_format("events_list", "%> on %G%1 %W%2 %B%3%n\n", 1);
