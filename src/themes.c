@@ -875,7 +875,7 @@ void theme_init()
 	format_add("search_results_multi_unknown", "-", 1);
 	format_add("search_results_multi_female", "k", 1);
 	format_add("search_results_multi_male", "m", 1);
-	format_add("search_results_multi", "%7 %[-10]1 %K/%n %[12]3 %K/%n %6 %K/%n %[20]2 %K/%n %[4]5 %K/%n %[16]4\n", 1);
+	format_add("search_results_multi", "%7 %[-10]1%K|%n%[12]3%K|%n%6%K|%n%[20]2%K|%n%[4]5%K|%n%[16]4\n", 1);
 
 	format_add("search_results_single_active", "%G(aktywn%@1)%n", 1);
 	format_add("search_results_single_busy", "%g(zajêt%@1)%n", 1);

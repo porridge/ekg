@@ -596,9 +596,11 @@ static void setup_debug()
 	se.timeout = -1;
 	se.buf = string_init(NULL);
 
-	fcntl(se.fd, F_SETFL, O_NONBLOCK);
+	fcntl(fd[0], F_SETFL, O_NONBLOCK);
+	fcntl(fd[1], F_SETFL, O_NONBLOCK);
 	
 	gg_debug_file = fdopen(fd[1], "w");
+	setbuf(gg_debug_file, NULL);
 
 	list_add(&watches, &se, sizeof(se));
 }
