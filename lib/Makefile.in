@@ -1,0 +1,33 @@
+# $Id$
+
+INCLUDES = -I.. @CURSES_INCLUDEDIR@ @READLINE_INCLUDES@
+LIBS = @LIBS@ @CURSES_LIBS@ @READLINE_LIBS@
+CC = @CC@ 
+prefix = @prefix@
+datadir = @datadir@
+mandir = @mandir@
+NAME = libgg
+VERSION = 0.90
+RM = @RM@
+MAKE = @MAKE@
+AR = @AR@
+install = @INSTALL@
+
+CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) 
+OBJS = libgg.o libgg_search.o
+
+all:	static shared
+
+distclean:	clean
+	$(RM) -f *~ Makefile
+
+clean:
+	$(RM) -f *.o libgg.so* libgg.a
+
+shared:
+	$(CC) $(CFLAGS) -fPIC -c libgg.c -o libgg.o
+	$(CC) $(CFLAGS) -fPIC -c libgg_search.c -o libgg_search.o
+	$(CC) -g -shared -Wl,-soname,libgg.so -o libgg.so.0.9.0 $(OBJS) -lc
+
+static:	$(OBJS)
+	$(AR) r libgg.a $(OBJS) 

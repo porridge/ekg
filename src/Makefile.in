@@ -1,6 +1,6 @@
 # $Id$
 
-INCLUDES = @CURSES_INCLUDEDIR@ @READLINE_INCLUDES@
+INCLUDES = -I.. -I../lib @CURSES_INCLUDEDIR@ @READLINE_INCLUDES@
 LIBS = @LIBS@ @CURSES_LIBS@ @READLINE_LIBS@
 CC = @CC@ 
 prefix = @prefix@
@@ -15,18 +15,15 @@ install = @INSTALL@
 
 CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -DTHEMES_DIR=\"$(datadir)/ekg/themes\"
 OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o
-LOBJS = libgg.o libgg_search.o
+LOBJS = ../lib/libgg.a
 
-all:	libgg ekg
+all:	ekg
 
-ekg:	
-	(cd src; $(MAKE) all)
-
-libgg:	
-	(cd lib; $(MAKE) all)
+ekg:	$(OBJS) $(LOBJS) ekg.c
+	$(CC) $(CFLAGS) ekg.c -o $(NAME) $(OBJS) $(LOBJS) $(LIBS) 
 
 install: ekg
-	$(install) -m 755 src/ekg $(prefix)/bin
+	$(install) -m 755 ekg $(prefix)/bin
 	$(install) -m 755 docs/ekl.pl $(prefix)/bin
 	@$(install) -d $(datadir)/ekg/themes/
 	$(install) -m 644 themes/*.theme $(datadir)/ekg/themes
@@ -34,12 +31,8 @@ install: ekg
 	$(install) -m 644 docs/ekg.man $(mandir)/mann
 
 distclean:	clean
-	$(RM) -f *~ config.log config.cache config.status config.h Makefile
-	(cd lib; $(MAKE) distclean)
-	(cd src; $(MAKE) distclean)
-	(cd examples; $(MAKE) distclean)
+	$(RM) -f *~ Makefile
 
 clean:
-	(cd lib; $(MAKE) clean)
-	(cd src; $(MAKE) clean)
-	(cd examples; $(MAKE) clean) 
+	$(RM) -f *.o ekg search core 
+
