@@ -2201,8 +2201,6 @@ static void complete(int *line_start, int *line_index)
 
 	xfree(cmd);
 
-	fprintf(stderr, "word = %d\n", word);
-
 	/* pocz±tek komendy? */
 	if (word == 0)
 		command_generator(line, strlen(line));
@@ -2239,12 +2237,13 @@ static void complete(int *line_start, int *line_index)
 					break;
 		}
 
-		if (params && abbrs == 1 && word < strlen(params)) {
-			for (i = 0; generators[i].ch; i++)
+		if (params && abbrs == 1 && word < strlen(params) + 1) {
+			for (i = 0; generators[i].ch; i++) {
 				if (generators[i].ch == params[word - 1]) {
 					generators[i].generate(words[word], strlen(words[word]));
 					break;
 				}
+			}
 		}
 	}
 
