@@ -13,6 +13,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - omijanie braku FIONBIO fcntlem (adwol/w)
 - poprawka pagera, o jedn± liniê za ma³o (neeo/w)
 - spacja nie wywo³uje aliasu (perry/w)
+- kod obs³ugi konferencji (Chilek/w)
+- podbicie libgadu.so.0.10 (w)
 
 // 2002-07-18
 
