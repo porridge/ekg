@@ -868,7 +868,6 @@ COMMAND(cmd_modify)
 					} else {
 						/* zmieniamy komu¶ uin, a taki uin jest ju¿ blokowany/ignorowany
 					 	   ale nie jest widoczny na naszej li¶cie */
-
 						int level;
 
 						if (group_member(_u, "__blocked"))
@@ -876,9 +875,6 @@ COMMAND(cmd_modify)
 
 						if (group_member(_u, "__offline"))
 							group_add(u, "__offline");
-
-						if (group_member(_u, "__online"))
-							group_add(u, "__online");
 
 						if ((level = ignored_check(_u->uin)))
 							ignored_add(u->uin, level);
@@ -908,7 +904,7 @@ COMMAND(cmd_modify)
 
 		if (match_arg(argv[i], 'O', "online", 2)) {
 			gg_remove_notify_ex(sess, u->uin, userlist_type(u));
-			group_remove(u, "__online");
+			group_remove(u, "__offline");
 			print("modify_online", format_user(u->uin));
 			modified = 2;
 			gg_add_notify_ex(sess, u->uin, userlist_type(u));
