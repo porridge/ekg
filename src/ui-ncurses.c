@@ -803,6 +803,7 @@ static void window_clear(struct window *w, int full)
 
 	w->start = 0;
 	w->redraw = 1;
+	w->more = 0;
 }
 
 /*

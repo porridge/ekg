@@ -771,8 +771,8 @@ static void handle_sigsegv()
 	ioctld_kill();
 
 	if (!killing_ui) {
-		ui_deinit();
 		killing_ui = 1;
+		ui_deinit();
 	}
 	
 	signal(SIGSEGV, SIG_DFL);
