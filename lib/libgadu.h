@@ -2,7 +2,8 @@
 
 /*
  *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>,
- *                     Robert J. Wo¼ny <speedy@ziew.org>
+ *                     Robert J. Wo¼ny <speedy@ziew.org>,
+ *                     Arkadiusz Mi¶kiewicz <misiek@pld.ORG.PL>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -302,6 +303,9 @@ struct gg_event {
 			int msgclass;
 			time_t time;
                         unsigned char *message;
+			/* konferencyjne */
+			int recipients_count;
+			uin_t *recipients;
                 } msg;
                 struct gg_notify_reply *notify;
                 struct {
@@ -640,6 +644,15 @@ struct gg_send_msg {
 }
 #ifdef __GNUC__
 __attribute__ ((packed))
+#endif
+;
+
+struct gg_msg_recipients {
+	char flag;
+	unsigned int count;
+}
+#ifdef __GNUC__
+ __attribute__ ((packed))
 #endif
 ;
 
