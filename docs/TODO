@@ -32,6 +32,7 @@ Pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
   - autofind - szukanie osób, które do nas pisz±, a nie mamy ich w li¶cie
     kontaktów (mateusza)
   - odpowiednik ircowego /whowas (ostatni IP, opis, ...) (joshua)
+  - wariant /list, który w query bez parameterów poka¿e info rozmówcy (weirdo)
   - uporz±dkowane i dobrze dzia³aj±ce okna p³ywaj±ce (sz?)
   - mo¿liwo¶æ automagicznego wyrównywania kolejnych linii wiadomo¶ci w tematach
     ircopodobnych do d³ugo¶ci nazwy rozmówcy i timestampu (sz)
