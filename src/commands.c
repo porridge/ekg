@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2004 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *                          Wojciech Bojdo³ <wojboj@htc.net.pl>
@@ -5100,7 +5100,7 @@ COMMAND(cmd_conference)
 		}
 
 		if (!(c = conference_find(params[1]))) {
-			printq("conferences_noexist");
+			printq("conferences_noexist", params[1]);
 			return -1;
 		}
 
