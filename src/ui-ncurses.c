@@ -71,6 +71,7 @@ static void ui_ncurses_loop();
 static void ui_ncurses_print(const char *target, int separate, const char *line);
 static void ui_ncurses_beep();
 static int ui_ncurses_event(const char *event, ...);
+static void ui_ncurses_postinit();
 static void ui_ncurses_deinit();
 
 static void window_switch(int id);
@@ -1023,6 +1024,7 @@ void ui_ncurses_init()
 {
 	struct timer *t;
 
+	ui_postinit = ui_ncurses_postinit;
 	ui_print = ui_ncurses_print;
 	ui_loop = ui_ncurses_loop;
 	ui_beep = ui_ncurses_beep;
@@ -1038,23 +1040,7 @@ void ui_ncurses_init()
 	ui_screen_width = stdscr->_maxx + 1;
 	ui_screen_height = stdscr->_maxy + 1;
 	
-	if (config_windows_save && config_windows_layout) {
-		char **targets = array_make(config_windows_layout, "|", 0, 0, 0);
-		int i;
-
-		for (i = 0; targets[i]; i++) {
-			if (!strcmp(targets[i], "-"))
-				continue;
-			window_new((strcmp(targets[i], "")) ? targets[i] : NULL, i + 1);
-		}
-
-		array_free(targets);
-	}
-
-	if (!windows)
-		window_new(NULL, 0);
-
-	window_current = windows->data;
+	window_current = window_new(NULL, 0);
 
 	status = newwin(1, stdscr->_maxx + 1, stdscr->_maxy - 1, 0);
 	input = newwin(1, stdscr->_maxx + 1, stdscr->_maxy, 0);
@@ -1096,6 +1082,35 @@ void ui_ncurses_init()
 	memset(binding_map_meta, 0, sizeof(binding_map_meta));
 
 	contacts_rebuild();
+}
+
+/*
+ * ui_ncurses_postinit()
+ *
+ * uruchamiana po wczytaniu konfiguracji.
+ */
+static void ui_ncurses_postinit()
+{
+	if (config_windows_save && config_windows_layout) {
+		char **targets = array_make(config_windows_layout, "|", 0, 0, 0);
+		int i;
+
+		if (targets[0] && strcmp(targets[0], "")) {
+			xfree(window_current->target);
+			xfree(window_current->prompt);
+			window_current->target = xstrdup(targets[0]);
+			window_current->prompt = format_string(format_find("ncurses_prompt_query"), targets[0]);
+			window_current->prompt_len = strlen(window_current->prompt);
+		}
+
+		for (i = 1; targets[i]; i++) {
+			if (!strcmp(targets[i], "-"))
+				continue;
+			window_new((strcmp(targets[i], "")) ? targets[i] : NULL, i + 1);
+		}
+
+		array_free(targets);
+	}
 }
 
 /*

@@ -11,11 +11,14 @@ ui_costam_init()
 	inicjalizacja interfejsu u¿ytkownika. dla ui-readline bêdzie to
 	ustawienie wszystkich zmiennych. dla ui-ncurses pewnie jakie¶
 	initscr(), przygotowanie okienek itd. nale¿y przypisaæ zmiennym
-	ui_deinit, ui_print, ui_event, ui_loop, ui_beep adresy funkcji
-	danego interfejsu. nawet je¶li funkcja nic nie robi, musi byæ
-	zdefiniowana. zmiennym tym NIE WOLNO przypisaæ warto¶ci NULL.
-	nale¿y te¿ utrzymywaæ w zmiennych ui_screen_width oraz
+	ui_post_init, ui_deinit, ui_print, ui_event, ui_loop, ui_beep
+	adresy funkcji danego interfejsu. nawet je¶li funkcja nic nie robi,
+	musi byæ zdefiniowana. zmiennym tym NIE WOLNO przypisaæ warto¶ci
+	NULL. nale¿y te¿ utrzymywaæ w zmiennych ui_screen_width oraz
 	ui_screen_height aktualny rozmiar ekranu.
+
+ui_post_init()
+	funkcja wywo³ywana po wczytaniu konfiguracji.
 
 ui_deinit()
 	pozamykanie wszystkiego.

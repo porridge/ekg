@@ -22,6 +22,7 @@
 
 #include "config.h"
 
+void (*ui_postinit)(void);
 void (*ui_loop)(void);
 void (*ui_print)(const char *target, int separate, const char *line);
 void (*ui_beep)(void);

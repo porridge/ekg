@@ -106,6 +106,15 @@ static void ui_automaton_beep()
 }
 
 /*
+ * ui_automaton_postinit()
+ *
+ * uruchamiana po wczytaniu konfiguracji.
+ */
+static void ui_automaton_postinit()
+{
+}
+
+/*
  * ui_automaton_deinit()
  *
  * zamyka to, co zwi±zane z interfejsem.
@@ -227,6 +236,7 @@ static int ui_automaton_event(const char *event, ...)
  */
 void ui_automaton_init()
 {
+	ui_postinit = ui_automaton_postinit;
 	ui_print = ui_automaton_print;
 	ui_loop = ui_automaton_loop;
 	ui_beep = ui_automaton_beep;

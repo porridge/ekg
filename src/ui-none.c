@@ -42,6 +42,7 @@ static int event(const char *foo, ...)
 
 void ui_none_init()
 {
+	ui_postinit = nop;
 	ui_print = nop;
 	ui_loop = loop;
 	ui_beep = nop;

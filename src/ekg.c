@@ -827,9 +827,6 @@ int main(int argc, char **argv)
 
 	theme_init();
 
-	ui_none_init(); /* na wypadek, gdyby co¶ mia³o siê pokazaæ */
-	config_read();
-
 	ui_screen_width = getenv("COLUMNS") ? atoi(getenv("COLUMNS")) : 80;
 	ui_screen_height = getenv("LINES") ? atoi(getenv("LINES")) : 24;
 	ui_init();
@@ -839,12 +836,15 @@ int main(int argc, char **argv)
 	config_display_color_map = xstrdup("nTgGbBrR");
 
 	in_autoexec = 1;
+	config_read();
         userlist_read();
 	update_status();
 	sysmsg_read();
 	emoticon_read();
 	msg_queue_read();
 	in_autoexec = 0;
+
+	ui_postinit();
 
 	ui_event("xterm_update");
 	

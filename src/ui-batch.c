@@ -43,6 +43,7 @@ static void print(const char *target, int separate, const char *line)
 
 void ui_batch_init()
 {
+	ui_postinit = nop;
 	ui_print = print;
 	ui_loop = loop;
 	ui_beep = nop;
