@@ -4989,7 +4989,7 @@ void command_init()
 	  
 	command_add
 	( "echo", "?", cmd_echo, 0,
-	  " <tekst>", "wy¶wietla podany tekst",
+	  " [tekst]", "wy¶wietla podany tekst",
 	  "");
 	  
 	command_add
