@@ -1191,3 +1191,62 @@ char *is_alias(char *foo)
 	return NULL;
 }
 
+static char base64_set[] =
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+/*
+ * encode_base64()
+ *
+ * zapisuje ci±g znaków w base64. alokuje pamiêæ. 
+ */
+char *encode_base64(char *buf)
+{
+	return strdup(buf);	/* fix me, baby. */
+}
+
+/*
+ * decode_base64()
+ *
+ * wczytuje ci±g znaków base64, zwraca zaalokowany buforek.
+ */
+char *decode_base64(char *buf)
+{
+	char *res, *save, *end, *foo, val;
+	int index = 0;
+
+	if (!(save = res = strdup(buf)))  /* ¿re wiêcej pamiêci, whatever. */
+		return NULL;
+
+	end = buf + strlen(buf);
+
+	while (*buf && buf < end) {
+		if (*buf == '\r' || *buf == '\n') {
+			buf++;
+			continue;
+		}
+		if (!(foo = strchr(base64_set, *buf)))
+			foo = base64_set;
+		val = (int)foo - (int)base64_set;
+		*buf = 0;
+		buf++;
+		switch (index) {
+			case 0:
+				*res |= val << 2;
+				break;
+			case 1:
+				*res++ |= val >> 4;
+				*res |= val << 4;
+				break;
+			case 2:
+				*res++ |= val >> 2;
+				*res |= val << 6;
+				break;
+			case 3:
+				*res++ |= val;
+				break;
+		}
+		index = ++index % 4;
+	}
+	*res = 0;
+	return res;
+}

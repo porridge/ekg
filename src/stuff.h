@@ -117,5 +117,7 @@ int add_alias(char *string, int quiet);
 int del_alias(char *name);
 char *is_alias(char *foo);
 int play_sound(char *sound_path);
+char *encode_base64(char *buf);
+char *decode_base64(char *buf);
 
 #endif
