@@ -5,6 +5,12 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-03-11
+
+- mam drania! nie powinno segfaulciæ przy zmianie stanu z tekstem. (w)
+- poprawka kodu kolorków. teoretycznie nie powinno wywalaæ b³êdów,
+  ale g³owy nie dam, bo nie mam jak tego sprawdziæ. (w)
+
 // 2002-03-10
 
 - dodanie ³adniej obs³ugi segfaultów - wy¶wietla komunikat i zrzuca
@@ -15,9 +21,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-03-09
 
 - tab completion przy query nie dope³nia do nicka rozmówcy, bo i po co,
-  i zostawia w spokoju ,,/'' przy dope³nianiu komend (yoyo/w)
+  i zostawia w spokoju ,,/'' przy dope³nianiu komend (jojo/w)
 - wci¶niêcie enter w pustej linii w query nie wysy³a niczego (w)
-- literówka w helpie (yoyo/w)
+- literówka w helpie (jojo/w)
 - ,,const char'' w libgadu, gdzie trzeba (tomee/w)
 - poprawka komendy ,,status'' (w)
 
