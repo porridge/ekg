@@ -12,6 +12,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawki debugowania (sdas/w)
 - ma³y cleanup w ekgsearch (wysek)
 - je¶li pubdir jest przeci±¿ony, ekgsearch napisze o tym (w/wysek)
+- drobne poprawki w docach (w)
 
 // 2002-09-23
 

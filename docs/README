@@ -16,7 +16,7 @@ LICENCJA
     ani nie dekompilowali oryginalnego klienta. Projekt powsta³ przy
     u¿yciu darmowych i wolnodostêpnych narzêdzi.
 
-    Gadu-gadu jest zastrze¿onym znakiem towarowym sms-express sp. z o.o.
+    Gadu-Gadu jest zastrze¿onym znakiem towarowym sms-express sp. z o.o.
 
 INSTALACJA
 
@@ -159,17 +159,12 @@ WYSY£ANIE SMSÓW
 
 ZNANE PROBLEMY
 
-    Je¶li nie mo¿esz wpisywaæ polskich liter, dopisz do pliku /etc/inputrc
-    lub ~/.inputrc nastêpuj±ce linie:
+    Je¶li nie mo¿esz wpisywaæ polskich liter w interfejsie readline,
+    dopisz do pliku /etc/inputrc lub ~/.inputrc nastêpuj±ce linie:
 
 	set meta-flag on
 	set convert-meta off
 	set output-meta on
-
-    Je¶li podczas pisania d³ugich linii przychodz±ce wiadomo¶ci powoduj±
-    ¶mietnik na ekranie, dopisz te¿:
-
-        set horizontal-scroll-mode on
 
 ROZPOZNAWANIE P£CI
 
