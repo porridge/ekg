@@ -305,7 +305,12 @@ COMMAND(cmd_alias)
 	if (!params[0] || match_arg(params[0], 'l', "list", 2) || params[0][0] != '-') {
 		list_t l;
 		int count = 0;
-		const char *aname = ((params[0] && params[0][0] != '-') ? params[0] : NULL);
+		const char *aname = NULL;
+
+		if (params[0] && params[0][0] != '-')
+			aname = params[0];
+		else if (params[0] && match_arg(params[0], 'l', "list", 2))
+			aname = params[1];
 
 		for (l = aliases; l; l = l->next) {
 			struct alias *a = l->data;
@@ -313,7 +318,7 @@ COMMAND(cmd_alias)
 			int first = 1, i;
 			char *tmp = xcalloc(strlen(a->name) + 1, 1);
 			
-			if (aname && strcmp(aname, a->name))
+			if (aname && strcasecmp(aname, a->name))
 				continue;
 
 			for (i = 0; i < strlen(a->name); i++)
@@ -3287,12 +3292,22 @@ COMMAND(cmd_on)
 			return -1;
 	}
 
-	if (!params[0] || match_arg(params[0], 'l', "list", 2)) {
+	if (!params[0] || match_arg(params[0], 'l', "list", 2) || params[0][0] != '-') {
 		list_t l;
                 int count = 0;
+		const char *ename = NULL;
+
+		if (params[0] && params[0][0] != '-')
+			ename = params[0];
+		else if (params[0] && match_arg(params[0], 'l', "list", 2))
+			ename = params[1];
 
 		for (l = events; l; l = l->next) {
 			struct event *ev = l->data;
+
+			if (ename && strcasecmp(ev->name, ename))
+				continue;
+
 			printq((ev->flags & INACTIVE_EVENT) ? "events_list_inactive" : "events_list", event_format(abs(ev->flags)), event_format_target(ev->target), ev->action, ev->name);
 			count++;
 		}
@@ -3771,7 +3786,12 @@ cleanup:
 	}
 
 	if (!params[0] || match_arg(params[0], 'l', "list", 2) || params[0][0] != '-') {
-		const char *tname = ((params[0] && params[0][0] != '-') ? params[0] : NULL);
+		const char *tname = NULL;
+
+		if (params[0] && params[0][0] != '-')
+			tname = params[0];
+		else if (params[0] && match_arg(params[0], 'l', "list", 2))
+			tname = params[1];
 
 		for (l = timers; l; l = l->next) {
 			struct timer *t = l->data;
@@ -3920,7 +3940,12 @@ COMMAND(cmd_conference)
 	if (!params[0] || match_arg(params[0], 'l', "list", 2) || params[0][0] == '#') {
 		list_t l, r;
 		int count = 0;
-		const char *cname = ((params[0] && params[0][0] == '#') ? params[0] : NULL);
+		const char *cname = NULL;
+	
+		if (params[0] && params[0][0] == '#')
+			cname = params[0];
+		else if (params[0] && match_arg(params[0], 'l', "list", 2))
+			cname = params[1];
 
 		for (l = conferences; l; l = l->next) {
 			struct conference *c = l->data;
@@ -3930,7 +3955,7 @@ COMMAND(cmd_conference)
 
 			recipients = string_init(NULL);
 
-			if (cname && strcmp(cname, c->name))
+			if (cname && strcasecmp(cname, c->name))
 				continue;
 			
 			for (r = c->recipients; r; r = r->next) {
@@ -4373,7 +4398,7 @@ void command_init()
 	  "  -a, --add <alias> <komenda>     dodaje alias\n"
           "  -A, --append <alias> <komenda>  dodaje komendê do aliasu\n"
 	  "  -d, --del <alias>|*             usuwa alias lub wszystkie\n"
-	  " [-l, --list, <alias>]            wy¶wietla listê aliasów\n");
+	  " [-l, --list] [alias]             wy¶wietla listê aliasów\n");
 	  
 	command_add
 	( "away", "?", cmd_away, 0,
@@ -4390,7 +4415,7 @@ void command_init()
 	  "\n"
 	  "  -a, --add [nazwa] <czas> <komenda>  tworzy nowy plan\n"
 	  "  -d, --del <nazwa>|*                 usuwa plan lub wszystkie\n"
-	  " [-l, --list, <nazwa>]                wy¶wietla listê planów\n"
+	  " [-l, --list] [nazwa]                 wy¶wietla listê planów\n"
 	  "\n"
 	  "Czas podaje siê w formacie [[[yyyy]mm]dd]HH[:]MM[.SS], gdzie "
 	  "%Tyyyy%n to rok, %Tmm%n to miesi±c, %Tdd%n to dzieñ, %THH:MM%n "
@@ -4450,7 +4475,7 @@ void command_init()
 	  "\n"
 	  "  -a, --add <sekwencja> <akcja>   przypisuje now± sekwencjê\n"
 	  "  -d, --del <sekwencja>           usuwa podan± sekwencjê\n"
-	  " [-l, --list, <sekwencja>]        wy¶wietla przypisane sekwencje\n"
+	  " [-l, --list] [sekwencja]         wy¶wietla przypisane sekwencje\n"
 	  "  -L, --list-default [sekwencja]  j.w. plus domy¶lne sekwencje\n"
 	  "\n"
 	  "Dostêpne sekwencje to: Ctrl-<znak>, Alt-<znak>, F<liczba>, Enter, "
@@ -4666,7 +4691,7 @@ void command_init()
 	  "\n"
 	  "  -a, --add <zdarzenie> <numer/alias/@grupa> <komenda>  dodaje zdarzenie\n"
 	  "  -d, --del <numer>|*         usuwa zdarzenie o podanym numerze\n"
-	  " [-l, --list]                 wy¶wietla listê zdarzeñ\n"
+	  " [-l, --list] [numer]         wy¶wietla listê zdarzeñ\n"
 	  "\n"
 	  "Dostêpne zdarzenia to:\n"
 	  "  - avail, away, notavail - zmiana stanu na podany (bez przypadku ,,online'')\n"
@@ -4815,7 +4840,7 @@ void command_init()
 	  "  -u, --unignore <#nazwa>     oznacza konferencjê jako nieingorowan±\n"
 	  "  -r, --rename <#old> <#new>  zmienia nazwê konferencji\n"
 	  "  -f, --find <#nazwa>         wyszukuje uczestnikow w katalogu\n"
-	  " [-l, --list, <#nazwa>]       wy¶wietla listê konferencji\n"
+	  " [-l, --list ] [#nazwa]       wy¶wietla listê konferencji\n"
 	  "\n"
 	  "Dodaje nazwê konferencji i definiuje, kto bierze w niej udzia³. "
 	  "Kolejne numery, pseudonimy lub grupy mog± byc odzielone "
@@ -4827,7 +4852,7 @@ void command_init()
 	  "\n"
 	  "  -a, --add [nazwa] [*/]<czas> <komenda>  tworzy nowy timer\n"
 	  "  -d, --del <nazwa>|*                 zatrzymuje timer lub wszystkie\n"
-	  " [-l, --list, <nazwa>]                wy¶wietla listê timerów\n"
+	  " [-l, --list] [nazwa]                 wy¶wietla listê timerów\n"
 	  "\n"
 	  "Czas podaje siê w sekundach. Mo¿na te¿ u¿yæ przyrostków %Td%n, %Th%n, %Tm%n, %Ts%n, "
 	  "oznaczaj±cych dni, godziny, minuty, sekundy, np. 5h20m. Timer po "
