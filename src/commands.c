@@ -1831,8 +1831,6 @@ COMMAND(cmd_quit)
 	/* nie wychodzimy tutaj, ¿eby command_exec() mia³o szansê zwolniæ
 	 * u¿ywan± przez siebie pamiêæ. */
 	quit_command = 1;
-
-	return;
 }
 
 COMMAND(cmd_dcc)
@@ -3276,17 +3274,19 @@ COMMAND(cmd_last)
 			return;
 		}
 
-		if ((uin && !last_count_get(uin)) || !list_count(lasts)) {
+		if ((uin && !last_count(uin)) || !list_count(lasts)) {
 			(uin) ? print("last_list_empty_nick", format_user(uin)) : print("last_list_empty");
 			return;
 		}
 
-		last_del(uin);
 		
-		if (uin)
+		if (uin) {
+			last_del(uin);	
 			print("last_clear_uin", format_user(uin));
-		else
+		} else {
+			last_free();
 			print("last_clear");
+		}
 
 		return;
 	}		
@@ -3304,7 +3304,7 @@ COMMAND(cmd_last)
 		return;
 		}
 		
-	if (!((uin > 0) ? last_count_get(uin) : list_count(lasts))) {
+	if (!((uin > 0) ? last_count(uin) : list_count(lasts))) {
 		(uin) ? print("last_list_empty_nick", format_user(uin)) : print("last_list_empty");
 		return;
 	}

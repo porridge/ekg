@@ -81,7 +81,6 @@ list_t bindings = NULL;
 list_t sequences = NULL;
 list_t timers = NULL;
 list_t lasts = NULL;
-list_t lasts_count = NULL;
 list_t conferences = NULL;
 list_t sms_away = NULL;
 
@@ -1120,29 +1119,26 @@ void mesg_changed()
  * podczas naszej nieobecno¶ci. je¶li jest ju¿ na li¶cie, to zwiêksza 
  * przyporz±dkowany mu licznik.
  *
- * - uin
+ * - uin.
  */
 void sms_away_add(uin_t uin)
 {
-	struct sms_away_count sac;
+	struct sms_away sa;
 	list_t l;
 
-	/* nic nie robimy, skoro brak limitu */
-	if (config_sms_away_limit == 0)
+	if (!config_sms_away_limit)
 		return;
 
-	sac.uin = uin;
-	sac.count = 1;
+	sa.uin = uin;
+	sa.count = 1;
 
-	/* lista pusta, wiêc dodajemy pierwsz± osobê */
 	if (!sms_away) {
-		list_add(&sms_away, &sac, sizeof(sac));
+		list_add(&sms_away, &sa, sizeof(sa));
 		return;
 	}
 
-	/* szukamy delikwenta i zwiekszamy mu licznik ... */
 	for (l = sms_away; l; l = l->next) {
-		struct sms_away_count *s = l->data;
+		struct sms_away *s = l->data;
 
 		if (s->uin == uin) {
 			s->count += 1;
@@ -1150,21 +1146,7 @@ void sms_away_add(uin_t uin)
 		}
 	}
 
-	/* ... lub dodajemy z pocz±tkowym licznikiem, je¶li nie by³ na li¶cie */
-	list_add(&sms_away, &sac, sizeof(sac));
-}
-
-/*
- * sms_away_free()
- *
- * pozbywa siê listy sms_away.
- */
-void sms_away_free()
-{
-	if (sms_away) {
-		list_destroy(sms_away, 1);
-		sms_away = NULL;
-	}
+	list_add(&sms_away, &sa, sizeof(sa));
 }
 
 /*
@@ -1183,14 +1165,13 @@ int sms_away_check(uin_t uin)
 	int x = 0;
 	list_t l;
 
-	/* nie ustawiony limit lub pusta lista */
 	if (!config_sms_away_limit || !sms_away)
 		return 1;
 
 	/* limit dotyczy ³±cznej liczby sms'ów */
 	if (config_sms_away == 1) {
 		for (l = sms_away; l; l = l->next) {
-			struct sms_away_count *s = l->data;
+			struct sms_away *s = l->data;
 
 			x += s->count;
 		}
@@ -1203,7 +1184,7 @@ int sms_away_check(uin_t uin)
 
 	/* limit dotyczy liczby sms'ów od jednej osoby */
 	for (l = sms_away; l; l = l->next) {
-		struct sms_away_count *s = l->data;
+		struct sms_away *s = l->data;
 
 		if (s->uin == uin) {
 			if (s->count > config_sms_away_limit)
@@ -1214,6 +1195,20 @@ int sms_away_check(uin_t uin)
 	}
 
 	return 1;
+}
+
+/*
+ * sms_away_free()
+ *
+ * pozbywa siê listy sms_away.
+ */
+void sms_away_free()
+{
+	if (!sms_away)
+		return;
+
+	list_destroy(sms_away, 1);
+	sms_away = NULL;
 }
 
 /*
@@ -3150,45 +3145,6 @@ char *log_escape(const char *str)
 }
 
 /*
- * last_del()
- *
- * usuwa wiadomo¶ci skojarzone z dan± osob± lub wszystkie (uin==0)
- *
- * - uin - numerek osoby.
- *
- */
-void last_del(uin_t uin)
-{
-	list_t l;
-
-	for (l = lasts; l; ) {
-		struct last *ll = l->data;
-
-		l = l->next;
-
-		if (uin == 0 || uin == ll->uin) {
-			xfree(ll->message);
-			list_remove(&lasts, ll, 1);
-		}
-	}
-
-	if (uin == 0) {
-		list_destroy(lasts_count, 1);
-		lasts_count = NULL;
-		return;
-	}
-
-	for (l = lasts_count; l; l = l->next) {
-		struct last_count *lc = l->data;
-
-		if (lc->uin == uin)  {
-			list_remove(&lasts_count, lc, 1);
-			return;
-		}
-	}
-}
-
-/*
  * last_add()
  *
  * dodaje wiadomo¶æ do listy ostatnio otrzymanych.
@@ -3199,23 +3155,23 @@ void last_del(uin_t uin)
  *  - st - czas nadania,
  *  - msg - tre¶æ wiadomo¶ci.
  */
-void last_add(unsigned int type, uin_t uin, time_t t, time_t st, const char *msg)
+void last_add(int type, uin_t uin, time_t t, time_t st, const char *msg)
 {
 	list_t l;
 	struct last ll;
-	int last_count = 0;
+	int count = 0;
 
 	/* nic nie zapisujemy, je¿eli user sam nie wie czego chce. */
 	if (config_last_size <= 0)
 		return;
 	
 	if (config_last & 2) 
-		last_count = last_count_get(uin);
+		count = last_count(uin);
 	else
-		last_count = list_count(lasts);
+		count = list_count(lasts);
 				
 	/* usuwamy ostatni± wiadomo¶æ, w razie potrzeby... */
-	if (last_count >= config_last_size) {
+	if (count >= config_last_size) {
 		time_t tmp_time = 0;
 		
 		/* najpierw j± znajdziemy... */
@@ -3239,7 +3195,6 @@ void last_add(unsigned int type, uin_t uin, time_t t, time_t st, const char *msg
 			if (lll->time == tmp_time && lll->uin == uin) {
 				xfree(lll->message);
 				list_remove(&lasts, lll, 1);
-				last_count_del(uin);
 				break;
 			}
 		}
@@ -3253,81 +3208,70 @@ void last_add(unsigned int type, uin_t uin, time_t t, time_t st, const char *msg
 	ll.message = xstrdup(msg);
 	
 	list_add(&lasts, &ll, sizeof(ll));
-	last_count_add(uin);
 
 	return;
 }
 
 /*
- * last_count_add()
+ * last_del()
  *
- * XXX
- */
-void last_count_add(uin_t uin)
-{
-	list_t l;
-	int add = 0;
-
-	for (l = lasts_count; l; l = l->next) {
-		struct last_count *lc = l->data;
-
-		if (lc->uin == uin) {
-			lc->count++;
-			add++;
-		}
-	}
-
-	if (!add) {
-		struct last_count lc;
-
-		lc.uin = uin;
-		lc.count = 1;
-
-		list_add(&lasts_count, &lc, sizeof(lc));
-	}
-}
-
-/*
- * last_count_del()
+ * usuwa wiadomo¶ci skojarzone z dan± osob±.
  *
- * XXX
+ * - uin - numerek osoby.
  */
-void last_count_del(uin_t uin) 
+void last_del(uin_t uin)
 {
 	list_t l;
 
-	for (l = lasts_count; l; l = l->next) {
-		struct last_count *lc = l->data;
+	for (l = lasts; l; l = l->next) {
+		struct last *ll = l->data;
 
-		if (lc->uin == uin) { 
-			lc->count--;
-			
-			if (lc->count <= 0)
-				list_remove(&lasts_count, lc, 1);
+		if (uin == ll->uin) {
+			xfree(ll->message);
+			list_remove(&lasts, ll, 1);
 		}
 	}
 }
 
 /*
- * last_count_get()
- *
- * XXX
+ * last_count()
  */
-int last_count_get(uin_t uin) 
+int last_count(uin_t uin)
 {
-	int last_count = 0;
+	int count = 0;
 	list_t l;
 
-	for (l = lasts_count; l; l = l->next) {
-		struct last_count *lc = l->data;
+	for (l = lasts; l; l = l->next) {
+		struct last *ll = l->data;
+
+		if (uin == ll->uin)
+			count++;
+	}
+
+	return count;
+}
+
+/*
+ * last_free()
+ *
+ * zwalnia miejsce po last.
+ */
+void last_free()
+{
+	list_t l;
+
+	if (!lasts)
+		return;
+
+	for (l = lasts; l; l = l->next) {
+		struct last *ll = l->data;
 		
-		if (lc->uin == uin) {
-			last_count = lc->count;
-			break;
-		}
+		xfree(ll->message);
+		list_remove(&lasts, ll, 1);
 	}
 
-	return last_count;
+	list_destroy(lasts, 1);
+	lasts = NULL;
 }
 
 /* 

@@ -62,7 +62,7 @@ list_t mail_folders = NULL;
 int check_mail()
 {
 	if (!config_check_mail)
-		return -1;
+		return 1;
 
 	if (config_check_mail & 1)
 		check_mail_mbox();
@@ -87,10 +87,13 @@ int check_mail_update(const char *s, int more)
 	if (!s)
 		return 1;
 
-	buf = array_make(s, ",", 0, 0, 0);
-
-	if (!(buf[0] && buf[1]))
+	if (!(buf = array_make(s, ",", 0, 0, 0)))
 		return 1;
+
+	if (!buf[1]) {
+		array_free(buf);
+		return 1;
+	}
 
 	h = atoi(buf[0]);
 	c = atoi(buf[1]);

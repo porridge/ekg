@@ -108,19 +108,14 @@ struct timer {
 };
 
 struct last {
-	unsigned int type;	/* 0 - przychodz±ca, 1 - wychodz±ca */
+	int type;		/* 0 - przychodz±ca, 1 - wychodz±ca */
 	uin_t uin;		/* od kogo, lub do kogo przy wysy³anych */
 	time_t time;		/* czas */
 	time_t sent_time;	/* czas wys³ania wiadomo¶ci przychodz±cej */
 	unsigned char *message;	/* wiadomo¶æ */
 };
 
-struct last_count {
-	uin_t uin;
-	int count;
-};
-
-struct sms_away_count {
+struct sms_away {
 	uin_t uin;
 	int count;
 };
@@ -147,7 +142,6 @@ list_t emoticons;
 list_t bindings;
 list_t timers;
 list_t lasts;
-list_t lasts_count;
 list_t conferences;
 list_t sms_away;
 struct gg_session *sess;
@@ -344,15 +338,14 @@ struct timer *timer_add(time_t period, int persistent, int type, const char *nam
 int timer_remove(const char *name, const char *command);
 void timer_free();
 
+void last_add(int type, uin_t uin, time_t t, time_t st, const char *msg);
 void last_del(uin_t uin);
-void last_add(unsigned int type, uin_t uin, time_t t, time_t st, const char *msg);
-int last_count_get(uin_t uin);
-void last_count_del(uin_t uin);
-void last_count_add(uin_t uin);
+int last_count(uin_t uin);
+void last_free();
 
 void sms_away_add(uin_t uin);
-void sms_away_free();
 int sms_away_check(uin_t uin);
+void sms_away_free();
 
 void contacts_rebuild();
 

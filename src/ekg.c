@@ -1154,6 +1154,7 @@ void ekg_exit()
 	command_free();
 	timer_free();
 	binding_free();
+	last_free();
 
 	xfree(home_dir);
 

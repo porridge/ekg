@@ -8,6 +8,7 @@ zg³osi³ b³±d.
 
 // 2003-01-10
 
+- uproszczenie kodu ,,last'' (sz)
 - przepisanie kodu wy¶wietlaj±cego pasek stanu od nowa. mo¿na zagnie¿d¿aæ,
   dodano nowe formaty (w)
 - nag³ówek okna mo¿na opisaæ formatami ,,header<n>'', podobnie jak pasek

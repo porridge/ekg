@@ -1248,10 +1248,10 @@ void theme_init()
 	format_add("last_list_in", "%) %Y <<%n [%1] %2 %3\n", 1);
 	format_add("last_list_out", "%) %G >>%n [%1] %2 %3\n", 1);
 	format_add("last_list_empty", "%! Nie zalogowano ¿adnych wiadomo¶ci\n", 1);
-	format_add("last_list_empty_nick", "%! Nie zalogowano ¿adnych wiadomo¶ci od/do %T%1%n\n", 1);
+	format_add("last_list_empty_nick", "%! Nie zalogowano ¿adnych wiadomo¶ci dla %T%1%n\n", 1);
 	format_add("last_list_timestamp", "%m-%d-%Y %H:%M", 1);
 	format_add("last_list_timestamp_today", "%H:%M", 1);
-	format_add("last_clear_uin", "%) Wiadomo¶ci od/do %T%1%n wyczyszczone\n", 1);
+	format_add("last_clear_uin", "%) Wiadomo¶ci dla %T%1%n wyczyszczone\n", 1);
 	format_add("last_clear", "%) Wszystkie wiadomo¶ci wyczyszczone\n", 1);
 
 	/* queue */
