@@ -206,18 +206,36 @@ int my_getc(FILE *f)
 
 			/* timeout autoawaya */
 			if (sess && config_auto_away && !away && time(NULL) - last_action > config_auto_away && sess->state == GG_STATE_CONNECTED) {
-				char tmp[16];
+				char tmp[16], *reason = NULL;
+
+
+				if (config_random_reason & 2) {
+				    	char *path = prepare_path("away.reasons");
+
+					reason = get_random_reason(path);
+					if (!reason && config_quit_reason)
+					    	reason = strdup(config_quit_reason);
+				}
+				else if (config_quit_reason)
+				    	reason = strdup(config_quit_reason);
 				
 				away = 1;
 				reset_prompt();
-				gg_change_status(sess, GG_STATUS_BUSY | (private_mode ? GG_STATUS_FRIENDS_MASK : 0));
+
+				if (reason) {
+				    	iso_to_cp(reason);
+					gg_change_status_descr(sess, GG_STATUS_BUSY_DESCR | (private_mode ? GG_STATUS_FRIENDS_MASK : 0), reason);
+					cp_to_iso(reason);
+				} else
+				    	gg_change_status(sess, GG_STATUS_BUSY | (private_mode ? GG_STATUS_FRIENDS_MASK : 0));
 				
 				if (!(config_auto_away % 60))
 					snprintf(tmp, sizeof(tmp), "%dm", config_auto_away / 60);
 				else
 					snprintf(tmp, sizeof(tmp), "%ds", config_auto_away);
 				
-				my_printf("auto_away", tmp);
+				my_printf((reason) ? "auto_away_descr" : "auto_away", tmp, reason);
+				free(reason);
 			}
 
 			/* auto save */
