@@ -427,6 +427,40 @@ char **array_make(const char *string, const char *sep, int max, int trim, int qu
 }
 
 /*
+ * array_count()
+ *
+ * zwraca ilo¶æ elementów tablicy.
+ */
+int array_count(char **array)
+{
+	int result = 0;
+
+	if (!array)
+		return 0;
+
+	while (*array) {
+		result++;
+		array++;
+	}
+
+	return result;
+}
+
+/* 
+ * array_add()
+ *
+ * dodaje element do tablicy.
+ */
+void array_add(char ***array, char *string)
+{
+	int count = array_count(*array);
+
+	*array = xrealloc(*array, (count + 2) * sizeof(char*));
+	(*array)[count + 1] = NULL;
+	(*array)[count] = string;
+}
+
+/*
  * array_free()
  *
  * zwalnia pamieæ zajmowan± przez tablicê.

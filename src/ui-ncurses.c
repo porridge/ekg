@@ -19,7 +19,6 @@
 
 /*
  * roadmap:
- * - dope³nianie tabem,
  * - okienka,
  * - konfigurowalny statusbar,
  * - mo¿liwo¶æ w³±czenia listy kontaktów po prawej,
@@ -33,9 +32,11 @@
 #ifndef _AIX
 #  include <string.h>
 #endif
+#include <ctype.h>
 #include "config.h"
 #include "stuff.h"
 #include "commands.h"
+#include "userlist.h"
 #include "xmalloc.h"
 #include "themes.h"
 #include "vars.h"
@@ -49,10 +50,11 @@ static void ui_ncurses_deinit();
 
 static WINDOW *status = NULL, *input = NULL, *output = NULL;
 #define HISTORY_MAX 1000
-char *history[HISTORY_MAX];
-int history_index = 0;
-int lines = 0, x = 0, y = 0, start = 0;
-char line[1000] = "";
+static char *history[HISTORY_MAX];
+static int history_index = 0;
+static int lines = 0, y = 0, start = 0;
+static char line[1000] = "";
+static char **completions = NULL;	/* lista dope³nieñ */
 
 #define output_size (stdscr->_maxy - 1)
 
@@ -208,6 +210,298 @@ static void ui_ncurses_deinit()
 		line_start = strlen(line) - strlen(line) % 70; \
 }
 
+#define ui_debug(x...) { \
+	char *ui_debug_tmp = saprintf(x); \
+	ui_ncurses_print(NULL, ui_debug_tmp); \
+	xfree(ui_debug_tmp); \
+}
+
+void dcc_generator(const char *text, int len)
+{
+	char *words[] = { "close", "get", "send", "show", "voice", NULL };
+	int i;
+
+	for (i = 0; words[i]; i++)
+		if (!strncasecmp(text, words[i], len))
+			array_add(&completions, xstrdup(words[i]));
+}
+
+void command_generator(const char *text, int len)
+{
+	char *slash = "";
+	list_t l;
+
+	if (*text == '/') {
+		slash = "/";
+		text++;
+		len--;
+	}
+
+	for (l = commands; l; l = l->next) {
+		struct command *c = l->data;
+
+		if (!strncasecmp(text, c->name, len))
+			array_add(&completions, saprintf("%s%s", slash, c->name));
+	}
+}
+
+void known_uin_generator(const char *text, int len)
+{
+	list_t l;
+
+	for (l = userlist; l; l = l->next) {
+		struct userlist *u = l->data;
+
+		if (u->display && !strncasecmp(text, u->display, len))
+			array_add(&completions, xstrdup(u->display));
+	}
+}
+
+void unknown_uin_generator(const char *text, int len)
+{
+	int i;
+
+	for (i = 0; i < send_nicks_count; i++) {
+		if (isdigit(send_nicks[i][0]) && !strncasecmp(text, send_nicks[i], len))
+			array_add(&completions, send_nicks[i]);
+	}
+}
+
+void variable_generator(const char *text, int len)
+{
+	list_t l;
+
+	for (l = variables; l; l = l->next) {
+		struct variable *v = l->data;
+
+		if (v->type == VAR_FOREIGN)
+			continue;
+
+		if (*text == '-') {
+			if (!strncasecmp(text + 1, v->name, len - 1))
+				array_add(&completions, saprintf("-%s", v->name));
+		} else {
+			if (!strncasecmp(text, v->name, len))
+				array_add(&completions, xstrdup(v->name));
+		}
+	}
+}
+
+void ignored_uin_generator(const char *text, int len)
+{
+	list_t l;
+
+	for (l = ignored; l; l = l->next) {
+		struct ignored *i = l->data;
+		struct userlist *u;
+
+		if (!(u = userlist_find(i->uin, NULL))) {
+			if (!strncasecmp(text, itoa(i->uin), len))
+				array_add(&completions, xstrdup(itoa(i->uin)));
+		} else {
+			if (u->display && !strncasecmp(text, u->display, len))
+				array_add(&completions, xstrdup(u->display));
+		}
+	}
+}
+
+void empty_generator(const char *text, int len)
+{
+
+}
+
+void file_generator(const char *text, int len)
+{
+
+}
+
+static struct {
+	char ch;
+	void (*generate)(const char *text, int len);
+} generators[] = {
+	{ 'u', known_uin_generator },
+	{ 'U', unknown_uin_generator },
+	{ 'c', command_generator },
+	{ 's', empty_generator },
+	{ 'i', ignored_uin_generator },
+	{ 'v', variable_generator },
+	{ 'd', dcc_generator },
+	{ 'f', file_generator },
+	{ 0, NULL }
+};
+
+/*
+ * complete()
+ *
+ * funkcja obs³uguj±ca dope³nianie klawiszem tab.
+ */
+static void complete(int *line_start, int *line_index)
+{
+	int i, blanks = 0, count;
+	char *p, *start = line;
+
+	/* nie obs³ugujemy dope³niania w ¶rodku tekstu */
+	if (*line_index != strlen(line))
+		return;
+
+	/* je¶li uzbierano ju¿ co¶ */
+	if (completions) {
+		int maxlen = 0, cols, rows;
+		char *tmp;
+
+		for (i = 0; completions[i]; i++)
+			if (strlen(completions[i]) + 2 > maxlen)
+				maxlen = strlen(completions[i]) + 2;
+
+		cols = (stdscr->_maxx + 1) / maxlen;
+		if (cols == 0)
+			cols = 1;
+
+		rows = array_count(completions) / cols + 1;
+
+		tmp = xmalloc(cols * maxlen + 2);
+
+		for (i = 0; i < rows; i++) {
+			int j;
+
+			strcpy(tmp, "");
+
+			for (j = 0; j < cols; j++) {
+				int cell = j * rows + i;
+
+				if (cell < array_count(completions)) {
+					int k;
+
+					strcat(tmp, completions[cell]); 
+
+					for (k = 0; k < maxlen - strlen(completions[cell]); k++)
+						strcat(tmp, " ");
+				}
+			}
+
+			if (strcmp(tmp, "")) {
+				strcat(tmp, "\n");
+				ui_ncurses_print(NULL, tmp);
+			}
+		}
+
+		xfree(tmp);
+
+		return;
+	}
+	
+	/* policz spacje */
+	for (p = line; *p; p++) {
+		if (*p == ' ')
+			blanks++;
+	}
+
+	/* nietypowe dope³nienie nicków przy rozmowach */
+	if (!strcmp(line, "") || (!strncasecmp(line, "chat ", 5) && blanks < 3 && send_nicks_count > 0)) {
+		if (send_nicks_count)
+			snprintf(line, sizeof(line), "chat %s ", send_nicks[send_nicks_index++]);
+		else
+			snprintf(line, sizeof(line), "chat ");
+		*line_start = 0;
+		*line_index = strlen(line);
+		if (send_nicks_index >= send_nicks_count)
+			send_nicks_index = 0;
+
+		array_free(completions);
+		completions = NULL;
+
+		return;
+	}
+
+	/* pocz±tek komendy? */
+	if (!blanks)
+		command_generator(line, strlen(line));
+	else {
+		char *params = NULL;
+		int abbrs = 0, word = 0;
+		list_t l;
+
+		start = line + strlen(line);
+
+		while (start > line && *(start - 1) != ' ')
+			start--;
+
+		for (p = line + 1; *p; p++)
+			if (isspace(*p) && !isspace(*(p - 1)))
+				word++;
+		word--;
+
+		for (l = commands; l; l = l->next) {
+			struct command *c = l->data;
+			int len = strlen(c->name);
+			char *cmd = (line[0] == '/') ? line + 1 : line;
+
+			if (!strncasecmp(cmd, c->name, len) && isspace(cmd[len])) {
+				params = c->params;
+				abbrs = 1;
+				break;
+			}
+
+			for (len = 0; cmd[len] && cmd[len] != ' '; len++);
+
+			if (!strncasecmp(cmd, c->name, len)) {
+				params = c->params;
+				abbrs++;
+			} else
+				if (params && abbrs == 1)
+					break;
+		}
+
+		if (params && abbrs == 1 && word < strlen(params)) {
+			for (i = 0; generators[i].ch; i++)
+				if (generators[i].ch == params[word]) {
+					generators[i].generate(start, strlen(start));
+					break;
+				}
+		}
+	}
+
+	count = array_count(completions);
+
+	if (count == 1) {
+		snprintf(start, sizeof(line) - (start - line), "%s ", completions[0]);
+		*line_index = strlen(line);
+		array_free(completions);
+		completions = NULL;
+	}
+
+	if (count > 1) {
+		int common = 0, minlen = strlen(completions[0]);
+
+		for (i = 1; i < count; i++) {
+			if (strlen(completions[i]) < minlen)
+				minlen = strlen(completions[i]);
+		}
+
+		for (i = 0; i < minlen; i++, common++) {
+			char c = completions[0][i];
+			int j, out = 0;
+
+			for (j = 1; j < count; j++) {
+				if (completions[j][i] != c) {
+					out = 1;
+					break;
+				}
+			}
+			
+			if (out)
+				break;
+		}
+
+		if (common > strlen(start) && start - line + common < sizeof(line)) {
+			snprintf(start, common + 1, "%s", completions[0]);
+			*line_index = strlen(line);
+		}
+	}
+
+	return;
+}
+
 static void ui_ncurses_loop()
 {
 	int line_start = 0, line_index = 0;
@@ -256,13 +550,8 @@ static void ui_ncurses_loop()
 			case 'L' - 64:
 				break;
 			case 9:
-				if (send_nicks_count > 0) {
-					snprintf(line, sizeof(line), "chat %s ", send_nicks[send_nicks_index++]);
-					line_start = 0;
-					line_index = strlen(line);
-					if (send_nicks_index >= send_nicks_count)
-						send_nicks_index = 0;
-				}
+				complete(&line_start, &line_index);
+
 				break;
 			case KEY_LEFT:
 				if (line_index > 0)
@@ -325,6 +614,13 @@ static void ui_ncurses_loop()
 
 				line[line_index++] = ch;
 		}
+
+		/* je¶li siê co¶ zmieni³o, wygeneruj dope³nienia na nowo */
+		if (ch != 9) {
+			array_free(completions);
+			completions = NULL;
+		}
+
 		if (line_index - line_start > 70)
 			line_start += 60;
 		if (line_index - line_start < 10) {

@@ -1389,6 +1389,8 @@ cleanup:
 	array_free(acts);
         return 0;
 
+	goto fail;	/* ¿eby gcc nie wyrzuca³ warningów */
+
 fail:
 	free(action);
 	array_free(acts);
@@ -1552,6 +1554,8 @@ check:
 
 	array_free(events);
 	return 0;
+
+	goto fail;	/* ¿eby gcc nie wyrzuca³ ostrze¿eñ */
 
 fail:
 	array_free(events);

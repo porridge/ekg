@@ -14,6 +14,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   wiêcej k³opotów ni¿ po¿ytku (w)
 - segfault w _msg (w)
 - mo¿liwo¶æ robienia theme'ów ircopodobnych. przyk³ad w themes/irc.theme (w)
+- jest ju¿ dope³nianie tabem w ui-ncurses. niniejszym og³aszam ten interfejs
+  u¿ywalnym. jak zwykle, prosimy zapi±æ pasy, spodziewamy siê nieznacznych
+  turbulencji (w)
 
 // 2002-08-15
 
