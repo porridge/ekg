@@ -756,16 +756,19 @@ void theme_init()
 
 	/* przychodz±ce wiadomo¶ci */
 	format_add("message_header", "%g.-- %n%1 %c(%C%#%c/%2)%n %g--- -- -%n\n", 1);
+	format_add("message_conference_header", "%g.-- %g[%T%3%g] -- %n%1 %c(%C%#%c/%2)%n %g--- -- -%n\n", 1);
 	format_add("message_footer", "%g`----- ---- --- -- -%n\n", 1);
 	format_add("message_line", "%g|%n %1\n", 1);
 	format_add("message_line_width", "-8", 1);
 	format_add("message_timestamp", "%Y-%m-%d %H:%M", 1);
 	format_add("chat_header", "%c.-- %n%1 %c(%C%#%c/%2)%n %c--- -- -%n\n", 1);
+	format_add("chat_conference_header", "%c.-- %c[%T%3%c] -- %n%1 %c(%C%#%c/%2)%n %c--- -- -%n\n", 1);
 	format_add("chat_footer", "%c`----- ---- --- -- -%n\n", 1);
 	format_add("chat_line", "%c|%n %1\n", 1);
 	format_add("chat_line_width", "-8", 1);
 	format_add("chat_timestamp", "%Y-%m-%d %H:%M", 1);
 	format_add("sent_header", "%b.-- %n%1 %c(%C%#%c)%n %b--- -- -%n\n", 1);
+	format_add("sent_conference_header", "%b.-- %b[%T%3%b] -- %n%1 %c(%C%#%c)%n %b--- -- -%n\n", 1);
 	format_add("sent_footer", "%b`----- ---- --- -- -%n\n", 1);
 	format_add("sent_line", "%b|%n %1\n", 1);
 	format_add("sent_line_width", "-8", 1);

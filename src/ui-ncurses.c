@@ -39,6 +39,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <dirent.h>
+#include <libgen.h>
 #include <ncurses.h>
 #include <signal.h>
 #ifndef _AIX
@@ -906,7 +908,40 @@ void empty_generator(const char *text, int len)
 
 void file_generator(const char *text, int len)
 {
+	struct dirent **namelist;
+	char *dirc, *basec, *file;
+	const char *dname, *bname;
+	int count, i;
 
+	dirc = xstrdup(text);
+	basec = xstrdup(text);
+	bname = basename(basec);
+	dname = dirname(dirc);
+
+	if (text[len - 1] == '/') {
+		dname = text;
+		bname = text + len - 1;
+	}
+
+	if (*bname == '.')
+		bname = "/";
+    
+	count = scandir(dname, &namelist, NULL, alphasort);
+
+	for (i = 0; i < count; i++) {
+		file = namelist[i]->d_name;
+
+		if (!strncmp(bname, file, strlen(bname)) || *bname == '/') {
+			file = saprintf(dname[strlen(dname) - 1] == '/' ? "%s%s" : "%s/%s", dname, file);
+			array_add(&completions, file);
+		}
+
+		xfree(namelist[i]);
+        }
+
+	xfree(dirc);
+	xfree(basec);
+	xfree(namelist);
 }
 
 void window_generator(const char *text, int len)

@@ -26,6 +26,7 @@ change_failed %! %RB³±d podczas zmiany informacji w katalogu publicznym!%n\n
 change_not_enough_params %! %RPolecenie wymaga podania %Wwszystkich%n %Rparametrów!%n\n
 change_timeout %! %RPrzekroczono limit czasu operacji zmiany katalogu publicznego!%n\n
 chat_line_first %Y%#%W:%g%[,10]2%W:%n %1\n
+chat_conference_line_first %Y%#%W:%g%[,10]2%W:%n %1\n
 chat_line       %1\n
 chat_line_width -1
 conn_broken %! %c%#%n: %W---/%n%r*%n%W/---%n %RPo³±czenie z serwerem przerwane%n\n
@@ -66,6 +67,7 @@ list_invisible %> %mniewidoczn%@2%n   %W<%n%M*%n%W>%n   %m%[12]1%n |%K..........
 list_not_avail %> %Kniedostêpn%@2%n   %W<%n%R-%n%W>%n   %K%[12]1%n |%K...............%n|\n
 list_not_avail_descr %> %Kniedostêpn%@1%n   %W<%n%R-%n%W>%n   %K%[12]1%n |%K...............%n| %K[%5]%n\n
 message_line_first %Y%#%W:%G%[,10]2%W:%n %1\n
+message_conference_line_first %Y%#%W:%G%[,10]2%W:%n %1\n
 message_line       %1\n
 message_line_width -1
 modify_done %> %WDane zmienione%n\n
@@ -173,6 +175,7 @@ userlist_put_ok %) %WListê kontaktów zachowano na serwerze.%n\n
 variable %> %K%[_20]1%n%W%2%n\n
 variable_invalid %! %Wset:%n %r[%1]%n <- z³a warto¶æ.\n
 variable_not_found %! %RNieznana zmienna%n%W:%n %K[%n%W%1%n%K]%n\n
-sent_line_first %Y%#%W:%mJA........%W:%n %1\n
+sent_line_first %Y%#%W:%m%[,10]2%W:%n %1\n
+sent_conference_line_first %Y%#%W:%m%[,10]2%W:%n %1\n
 sent_line       %1\n
 sent_line_width -1

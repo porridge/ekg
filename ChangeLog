@@ -9,6 +9,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - s/csae/case/ przy WITH_IOCTLD (d)
 - wy¶wietlanie wyniku wysy³ania smsów (wojboj/w)
+- poprawki konferencji, wy¶wietlanie jej nazwy (DJ/w)
 
 // 2002-10-02
 

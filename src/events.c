@@ -38,6 +38,7 @@
 #include "voice.h"
 #include "xmalloc.h"
 #include "ui.h"
+#include "db.h"
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure();
@@ -72,12 +73,13 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 {
 	int width, next_width, i, j, mem_width = 0;
 	char *mesg, *buf, *line, *next, *format = NULL, *format_first = "", *next_format = NULL, *head = NULL, *foot = NULL, *timestamp = NULL, *save;
-	char *line_width = NULL, timestr[100], *target;
+	char *line_width = NULL, timestr[100], *target, *cname;
 	int separate = ((e->event.msg.sender != config_uin && chat == 1) || chat == 3);
 	struct tm *tm;
+	struct conference *c = NULL;
 
 	if (e->event.msg.recipients) {
-		struct conference *c = conference_find_by_uins(e->event.msg.sender, 
+		c = conference_find_by_uins(e->event.msg.sender, 
 			e->event.msg.recipients, e->event.msg.recipients_count);
 
 		if (!c) {
@@ -105,21 +107,22 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 			target = xstrdup((chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender)));
 	} else
 	        target = xstrdup((chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender)));
+	cname = (c ? c->name : "");
 	
 	switch (chat) {
 		case 0:
 			format = "message_line";
-			format_first = "message_line_first";
+			format_first = (c) ? "message_conference_line_first" : "message_line_first";
 			line_width = "message_line_width";
-			head = "message_header";
+			head = (c) ? "message_conference_header" : "message_header";
 			foot = "message_footer";
 			timestamp = "message_timestamp";
 			break;		
 		case 1:
 			format = "chat_line"; 
-			format_first = "chat_line_first";
+			format_first = (c) ? "chat_conference_line_first" : "chat_line_first";
 			line_width = "chat_line_width";
-			head = "chat_header";
+			head = (c) ? "chat_conference_header" : "chat_header";
 			foot = "chat_footer";
 			timestamp = "chat_timestamp";
 			break;
@@ -132,9 +135,9 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 		case 3:
 		case 4:
 			format = "sent_line"; 
-			format_first = "sent_line_first";
+			format_first = (c) ? "sent_conference_line_first" : "sent_line_first";
 			line_width = "sent_line_width";
-			head = "sent_header";
+			head = (c) ? "sent_conference_header" : "sent_header";
 			foot = "sent_footer";
 			timestamp = "sent_timestamp";
 			break;
@@ -156,7 +159,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 	next_width = width;
 	
 	if (!strcmp(format_find(format_first), "")) {
-		print_window(target, separate, head, format_user(e->event.msg.sender), timestr);
+		print_window(target, separate, head, format_user(e->event.msg.sender), timestr, cname);
 		next_format = format;
 		mem_width = width + 1;
 	} else {
@@ -166,7 +169,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 		format = format_first;
 
 		/* zmniejsz d³ugo¶æ pierwszej linii o d³ugo¶æ prefiksu z rozmówc±, timestampem itd. */
-		tmp = format_string(format_find(format), "", format_user(e->event.msg.sender), timestr);
+		tmp = format_string(format_find(format), "", format_user(e->event.msg.sender), timestr, cname);
 		mem_width = width + strlen(tmp);
 		for (p = tmp; *p && *p != '\n'; p++) {
 			if (*p == 27) {
@@ -179,7 +182,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 		
 		xfree(tmp);
 
-		tmp = format_string(format_find(next_format), "", "", "");
+		tmp = format_string(format_find(next_format), "", "", "", "");
 		next_width -= strlen(tmp);
 		xfree(tmp);
 	}
@@ -236,7 +239,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 					next++;
 			}
 
-			print_window(target, separate, format, buf, format_user(e->event.msg.sender), timestr);
+			print_window(target, separate, format, buf, format_user(e->event.msg.sender), timestr, cname);
 
 			width = next_width;
 			format = next_format;
@@ -274,10 +277,9 @@ void handle_msg(struct gg_event *e)
 		return;
 
 	if (e->event.msg.recipients_count) {
-		struct conference *c =
-			conference_find_by_uins(e->event.msg.sender,
-				e->event.msg.recipients,
-				e->event.msg.recipients_count);
+		struct conference *c = conference_find_by_uins(
+			e->event.msg.sender, e->event.msg.recipients,
+			e->event.msg.recipients_count);
 
 		if (c && c->ignore)
 			return;
