@@ -11,6 +11,9 @@ zg³osi³ b³±d.
 - dodanie zmiennej sound_notify_file (sz)
 - obs³uga konferencji w /queue (sz)
 - kosmetyczne poprawki w tematach (sz)
+- /set nie wy¶wietla ju¿ nieaktywnych opcji (np. log_path przy wy³±czonym
+  logowaniu, beep_notify przy wy³±czonym beepaniu). ¿eby wy¶wietliæ
+  wszystkie zmienne, wpisujemy ,,/set -a'' (Arim/w)
 
 // 2002-11-25
 

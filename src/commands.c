@@ -1405,25 +1405,36 @@ COMMAND(cmd_save)
 
 COMMAND(cmd_set)
 {
-	const char *arg;
-	int unset = 0;
+	const char *arg = NULL, *val = NULL;
+	int unset = 0, show_all = 0;
 	char *value = NULL;
 	list_t l;
 
-	if ((arg = params[0]) && *arg == '-') {
+	if (match_arg(params[0], 'a', "all", 1)) {
+		show_all = 1;
+		arg = params[1];
+		if (arg)
+			val = params[2];
+	} else {
+		arg = params[0];
+		if (arg)
+			val = params[1];
+	}
+
+	if (arg && arg[0] == '-') {
 		unset = 1;
 		arg++;
 	}
 
-	if (params[0] && params[1]) {
-		char **tmp = array_make(params[1], "", 0, 0, 1);
+	if (arg && val) {
+		char **tmp = array_make(val, "", 0, 0, 1);
 
 		value = tmp[0];
 		tmp[0] = NULL;
 		array_free(tmp);
 	}
 
-	if ((!params[0] || !params[1]) && !unset) {
+	if ((!arg || !val) && !unset) {
 		int displayed = 0;
 
 		for (l = variables; l; l = l->next) {
@@ -1432,6 +1443,9 @@ COMMAND(cmd_set)
 			if ((!arg || !strcasecmp(arg, v->name)) && (v->display != 2 || strcmp(name, "set"))) {
 				char *string = *(char**)(v->ptr);
 				int value = *(int*)(v->ptr);
+
+				if (!show_all && v->dyndisplay && !(*v->dyndisplay)(v->name))
+					continue;
 
 				if (!v->display) {
 					print("variable", v->name, "(...)");
@@ -3313,7 +3327,9 @@ void command_init()
 	  "U¿ycie %Tset -zmienna%n czy¶ci zawarto¶æ zmiennej. Dla zmiennych\n"
 	  "bêd±cymi mapami bitowymi mo¿na okre¶liæ, czy warto¶æ ma byæ\n"
 	  "dodana (poprzedzone plusem), usuniêta (minusem) czy ustawiona\n"
-	  "(bez prefiksu). Warto¶æ zmiennej mo¿na wzi±æ w cudzys³ów.");
+	  "(bez prefiksu). Warto¶æ zmiennej mo¿na wzi±æ w cudzys³ów.\n"
+	  "Poprzedzenie opcji parametrem %T-a%n lub %T--all%n spowoduje\n"
+	  "wy¶wietlenie wszystkich, nawet aktualnie nieaktywnych zmiennych.\n");
 
 	command_add
 	( "sms", "u?", cmd_sms, 0,

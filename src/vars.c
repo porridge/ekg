@@ -35,6 +35,31 @@
 
 list_t variables = NULL;
 
+static int dd_beep(const char *name)
+{
+	return (config_beep);
+}
+
+static int dd_dcc(const char *name)
+{
+	return (config_dcc);
+}
+
+static int dd_sound(const char *name)
+{
+	return (config_sound_app != NULL);
+}
+
+static int dd_sms(const char *name)
+{
+	return (config_sms_app != NULL);
+}
+
+static int dd_log(const char *name)
+{
+	return (config_log);
+}
+
 /*
  * variable_init()
  *
@@ -42,79 +67,79 @@ list_t variables = NULL;
  */
 void variable_init()
 {
-	variable_add("uin", VAR_INT, 1, &config_uin, changed_uin, NULL);
-	variable_add("password", VAR_STR, 0, &config_password, NULL, NULL);
-	variable_add("email", VAR_STR, 1, &config_email, NULL, NULL);
+	variable_add("uin", VAR_INT, 1, &config_uin, changed_uin, NULL, NULL);
+	variable_add("password", VAR_STR, 0, &config_password, NULL, NULL, NULL);
+	variable_add("email", VAR_STR, 1, &config_email, NULL, NULL, NULL);
 
 #ifdef HAVE_VOIP
-	variable_add("audio_device", VAR_STR, 1, &config_audio_device, NULL, NULL);
+	variable_add("audio_device", VAR_STR, 1, &config_audio_device, NULL, NULL, NULL);
 #endif
-	variable_add("auto_away", VAR_INT, 1, &config_auto_away, NULL, NULL);
-	variable_add("auto_reconnect", VAR_INT, 1, &config_auto_reconnect, NULL, NULL);
-	variable_add("auto_save", VAR_INT, 1, &config_auto_save, NULL, NULL);
-	variable_add("away_reason", VAR_STR, 1, &config_away_reason, changed_xxx_reason, NULL);
-	variable_add("back_reason", VAR_STR, 1, &config_back_reason, changed_xxx_reason, NULL);
-	variable_add("beep", VAR_BOOL, 1, &config_beep, NULL, NULL);
-	variable_add("beep_msg", VAR_BOOL, 1, &config_beep_msg, NULL, NULL);
-	variable_add("beep_chat", VAR_BOOL, 1, &config_beep_chat, NULL, NULL);
-	variable_add("beep_notify", VAR_BOOL, 1, &config_beep_notify, NULL, NULL);
-	variable_add("completion_notify", VAR_MAP, 1, &config_completion_notify, NULL, variable_map(4, 0, 0, "none", 1, 2, "add", 2, 1, "addremove", 4, 0, "busy"));
-	variable_add("ctrld_quits", VAR_BOOL, 1, &config_ctrld_quits, NULL, NULL);
+	variable_add("auto_away", VAR_INT, 1, &config_auto_away, NULL, NULL, NULL);
+	variable_add("auto_reconnect", VAR_INT, 1, &config_auto_reconnect, NULL, NULL, NULL);
+	variable_add("auto_save", VAR_INT, 1, &config_auto_save, NULL, NULL, NULL);
+	variable_add("away_reason", VAR_STR, 1, &config_away_reason, changed_xxx_reason, NULL, NULL);
+	variable_add("back_reason", VAR_STR, 1, &config_back_reason, changed_xxx_reason, NULL, NULL);
+	variable_add("beep", VAR_BOOL, 1, &config_beep, NULL, NULL, NULL);
+	variable_add("beep_msg", VAR_BOOL, 1, &config_beep_msg, NULL, NULL, dd_beep);
+	variable_add("beep_chat", VAR_BOOL, 1, &config_beep_chat, NULL, NULL, dd_beep);
+	variable_add("beep_notify", VAR_BOOL, 1, &config_beep_notify, NULL, NULL, dd_beep);
+	variable_add("completion_notify", VAR_MAP, 1, &config_completion_notify, NULL, variable_map(4, 0, 0, "none", 1, 2, "add", 2, 1, "addremove", 4, 0, "busy"), NULL);
+	variable_add("ctrld_quits", VAR_BOOL, 1, &config_ctrld_quits, NULL, NULL, NULL);
 #ifdef WITH_UI_NCURSES
-	variable_add("contacts_size", VAR_INT, 1, &config_contacts_size, contacts_rebuild, NULL);
-	variable_add("contacts", VAR_INT, 1, &config_contacts, contacts_rebuild, NULL);
+	variable_add("contacts_size", VAR_INT, 1, &config_contacts_size, contacts_rebuild, NULL, NULL);
+	variable_add("contacts", VAR_INT, 1, &config_contacts, contacts_rebuild, NULL, NULL);
 #endif
-	variable_add("dcc", VAR_BOOL, 1, &config_dcc, changed_dcc, NULL);
-	variable_add("dcc_ip", VAR_STR, 1, &config_dcc_ip, changed_dcc, NULL);
-	variable_add("dcc_dir", VAR_STR, 1, &config_dcc_dir, NULL, NULL);
-	variable_add("display_ack", VAR_INT, 1, &config_display_ack, NULL, variable_map(4, 0, 0, "none", 1, 0, "all", 2, 0, "delivered", 3, 0, "queued"));
-	variable_add("display_color", VAR_BOOL, 1, &config_display_color, NULL, NULL);
-	variable_add("display_notify", VAR_INT, 1, &config_display_notify, NULL, variable_map(3, 0, 0, "none", 1, 0, "all", 2, 0, "significant"));
-	variable_add("display_welcome", VAR_BOOL, 1, &config_display_welcome, NULL, NULL);
-	variable_add("display_sent", VAR_BOOL, 1, &config_display_sent, NULL, NULL);
-	variable_add("emoticons", VAR_BOOL, 1, &config_emoticons, NULL, NULL);
+	variable_add("dcc", VAR_BOOL, 1, &config_dcc, changed_dcc, NULL, NULL);
+	variable_add("dcc_ip", VAR_STR, 1, &config_dcc_ip, changed_dcc, NULL, dd_dcc);
+	variable_add("dcc_dir", VAR_STR, 1, &config_dcc_dir, NULL, NULL, dd_dcc);
+	variable_add("display_ack", VAR_INT, 1, &config_display_ack, NULL, variable_map(4, 0, 0, "none", 1, 0, "all", 2, 0, "delivered", 3, 0, "queued"), NULL);
+	variable_add("display_color", VAR_BOOL, 1, &config_display_color, NULL, NULL, NULL);
+	variable_add("display_notify", VAR_INT, 1, &config_display_notify, NULL, variable_map(3, 0, 0, "none", 1, 0, "all", 2, 0, "significant"), NULL);
+	variable_add("display_welcome", VAR_BOOL, 1, &config_display_welcome, NULL, NULL, NULL);
+	variable_add("display_sent", VAR_BOOL, 1, &config_display_sent, NULL, NULL, NULL);
+	variable_add("emoticons", VAR_BOOL, 1, &config_emoticons, NULL, NULL, NULL);
 #ifdef HAVE_OPENSSL
-	variable_add("encryption", VAR_INT, 1, &config_encryption, NULL, variable_map(2, 0, 0, "none", 1, 0, "sim"));
+	variable_add("encryption", VAR_INT, 1, &config_encryption, NULL, variable_map(2, 0, 0, "none", 1, 0, "sim"), NULL);
 #endif
-	variable_add("enter_scrolls", VAR_BOOL, 1, &config_enter_scrolls, NULL, NULL);
-	variable_add("keep_reason", VAR_BOOL, 1, &config_keep_reason, NULL, NULL);
-	variable_add("last", VAR_MAP, 1, &config_last, NULL, variable_map(4, 0, 0, "none", 1, 2, "all", 2, 1, "separate", 4, 0, "sent"));
-	variable_add("last_size", VAR_INT, 1, &config_last_size, NULL, NULL);
-	variable_add("log", VAR_MAP, 1, &config_log, NULL, variable_map(4, 0, 0, "none", 1, 2, "file", 2, 1, "dir", 4, 0, "gzip"));
-	variable_add("log_ignored", VAR_INT, 1, &config_log_ignored, NULL, NULL);
-	variable_add("log_status", VAR_BOOL, 1, &config_log_status, NULL, NULL);
-	variable_add("log_path", VAR_STR, 1, &config_log_path, NULL, NULL);
-	variable_add("log_timestamp", VAR_STR, 1, &config_log_timestamp, NULL, NULL);
-	variable_add("make_window", VAR_INT, 1, &config_make_window, NULL, variable_map(3, 0, 0, "none", 1, 0, "usefree", 2, 0, "always"));
-	variable_add("mesg_allow", VAR_INT, 1, &config_mesg_allow, mesg_changed, variable_map(3, 0, 0, "no", 1, 0, "yes", 2, 0, "default"));
-	variable_add("proxy", VAR_STR, 1, &config_proxy, changed_proxy, NULL);
-	variable_add("random_reason", VAR_MAP, 1, &config_random_reason, NULL, variable_map(5, 0, 0, "none", 1, 0, "away", 2, 0, "notavail", 4, 0, "avail", 8, 0, "invisible"));
-	variable_add("quit_reason", VAR_STR, 1, &config_quit_reason, changed_xxx_reason, NULL);
-	variable_add("query_commands", VAR_BOOL, 1, &config_query_commands, NULL, NULL);
-	variable_add("save_password", VAR_BOOL, 1, &config_save_password, NULL, NULL);
-	variable_add("server", VAR_STR, 1, &config_server, NULL, NULL);
-	variable_add("server_save", VAR_BOOL, 1, &config_server_save, NULL, NULL);
-	variable_add("sms_away", VAR_MAP, 1, &config_sms_away, NULL, variable_map(3, 0, 0, "none", 1, 2, "all", 2, 1, "separate"));
-	variable_add("sms_away_limit", VAR_INT, 1, &config_sms_away_limit, NULL, NULL);
-	variable_add("sms_max_length", VAR_INT, 1, &config_sms_max_length, NULL, NULL);
-	variable_add("sms_number", VAR_STR, 1, &config_sms_number, NULL, NULL);
-	variable_add("sms_send_app", VAR_STR, 1, &config_sms_app, NULL, NULL);
-	variable_add("sort_windows", VAR_BOOL, 1, &config_sort_windows, NULL, NULL);
-	variable_add("sound_msg_file", VAR_STR, 1, &config_sound_msg_file, NULL, NULL);
-	variable_add("sound_chat_file", VAR_STR, 1, &config_sound_chat_file, NULL, NULL);
-	variable_add("sound_sysmsg_file", VAR_STR, 1, &config_sound_sysmsg_file, NULL, NULL);
-	variable_add("sound_notify_file", VAR_STR, 1, &config_sound_notify_file, NULL, NULL);
-	variable_add("sound_app", VAR_STR, 1, &config_sound_app, NULL, NULL);
-	variable_add("speech_app", VAR_STR, 1, &config_speech_app, NULL, NULL);
-	variable_add("tab_command", VAR_STR, 1, &config_tab_command, NULL, NULL);
-	variable_add("theme", VAR_STR, 1, &config_theme, changed_theme, NULL);
-	variable_add("time_deviation", VAR_INT, 1, &config_time_deviation, NULL, NULL);
-	variable_add("timestamp", VAR_STR, 1, &config_timestamp, NULL, NULL);
+	variable_add("enter_scrolls", VAR_BOOL, 1, &config_enter_scrolls, NULL, NULL, NULL);
+	variable_add("keep_reason", VAR_BOOL, 1, &config_keep_reason, NULL, NULL, NULL);
+	variable_add("last", VAR_MAP, 1, &config_last, NULL, variable_map(4, 0, 0, "none", 1, 2, "all", 2, 1, "separate", 4, 0, "sent"), NULL);
+	variable_add("last_size", VAR_INT, 1, &config_last_size, NULL, NULL, NULL);
+	variable_add("log", VAR_MAP, 1, &config_log, NULL, variable_map(4, 0, 0, "none", 1, 2, "file", 2, 1, "dir", 4, 0, "gzip"), NULL);
+	variable_add("log_ignored", VAR_INT, 1, &config_log_ignored, NULL, NULL, dd_log);
+	variable_add("log_status", VAR_BOOL, 1, &config_log_status, NULL, NULL, dd_log);
+	variable_add("log_path", VAR_STR, 1, &config_log_path, NULL, NULL, dd_log);
+	variable_add("log_timestamp", VAR_STR, 1, &config_log_timestamp, NULL, NULL, dd_log);
+	variable_add("make_window", VAR_INT, 1, &config_make_window, NULL, variable_map(3, 0, 0, "none", 1, 0, "usefree", 2, 0, "always"), NULL);
+	variable_add("mesg_allow", VAR_INT, 1, &config_mesg_allow, mesg_changed, variable_map(3, 0, 0, "no", 1, 0, "yes", 2, 0, "default"), NULL);
+	variable_add("proxy", VAR_STR, 1, &config_proxy, changed_proxy, NULL, NULL);
+	variable_add("random_reason", VAR_MAP, 1, &config_random_reason, NULL, variable_map(5, 0, 0, "none", 1, 0, "away", 2, 0, "notavail", 4, 0, "avail", 8, 0, "invisible"), NULL);
+	variable_add("quit_reason", VAR_STR, 1, &config_quit_reason, changed_xxx_reason, NULL, NULL);
+	variable_add("query_commands", VAR_BOOL, 1, &config_query_commands, NULL, NULL, NULL);
+	variable_add("save_password", VAR_BOOL, 1, &config_save_password, NULL, NULL, NULL);
+	variable_add("server", VAR_STR, 1, &config_server, NULL, NULL, NULL);
+	variable_add("server_save", VAR_BOOL, 1, &config_server_save, NULL, NULL, NULL);
+	variable_add("sms_away", VAR_MAP, 1, &config_sms_away, NULL, variable_map(3, 0, 0, "none", 1, 2, "all", 2, 1, "separate"), dd_sms);
+	variable_add("sms_away_limit", VAR_INT, 1, &config_sms_away_limit, NULL, NULL, dd_sms);
+	variable_add("sms_max_length", VAR_INT, 1, &config_sms_max_length, NULL, NULL, dd_sms);
+	variable_add("sms_number", VAR_STR, 1, &config_sms_number, NULL, NULL, dd_sms);
+	variable_add("sms_send_app", VAR_STR, 1, &config_sms_app, NULL, NULL, NULL);
+	variable_add("sort_windows", VAR_BOOL, 1, &config_sort_windows, NULL, NULL, NULL);
+	variable_add("sound_msg_file", VAR_STR, 1, &config_sound_msg_file, NULL, NULL, dd_sound);
+	variable_add("sound_chat_file", VAR_STR, 1, &config_sound_chat_file, NULL, NULL, dd_sound);
+	variable_add("sound_sysmsg_file", VAR_STR, 1, &config_sound_sysmsg_file, NULL, NULL, dd_sound);
+	variable_add("sound_notify_file", VAR_STR, 1, &config_sound_notify_file, NULL, NULL, dd_sound);
+	variable_add("sound_app", VAR_STR, 1, &config_sound_app, NULL, NULL, NULL);
+	variable_add("speech_app", VAR_STR, 1, &config_speech_app, NULL, NULL, NULL);
+	variable_add("tab_command", VAR_STR, 1, &config_tab_command, NULL, NULL, NULL);
+	variable_add("theme", VAR_STR, 1, &config_theme, changed_theme, NULL, NULL);
+	variable_add("time_deviation", VAR_INT, 1, &config_time_deviation, NULL, NULL, NULL);
+	variable_add("timestamp", VAR_STR, 1, &config_timestamp, NULL, NULL, NULL);
 
-	variable_add("status", VAR_INT, 2, &config_status, NULL, NULL);
-	variable_add("debug", VAR_BOOL, 2, &config_debug, changed_debug, NULL);
-	variable_add("protocol", VAR_INT, 2, &config_protocol, NULL, NULL);
-	variable_add("reason", VAR_STR, 2, &config_reason, NULL, NULL);
+	variable_add("status", VAR_INT, 2, &config_status, NULL, NULL, NULL);
+	variable_add("debug", VAR_BOOL, 2, &config_debug, changed_debug, NULL, NULL);
+	variable_add("protocol", VAR_INT, 2, &config_protocol, NULL, NULL, NULL);
+	variable_add("reason", VAR_STR, 2, &config_reason, NULL, NULL, NULL);
 }
 
 /*
@@ -191,7 +216,7 @@ struct value_map *variable_map(int count, ...)
  *
  * zwraca 0 je¶li siê uda³o, je¶li nie to -1.
  */
-int variable_add(const char *name, int type, int display, void *ptr, void (*notify)(const char*), struct value_map *map)
+int variable_add(const char *name, int type, int display, void *ptr, void (*notify)(const char*), struct value_map *map, int (*dyndisplay)(const char *name))
 {
 	struct variable v;
 
@@ -202,6 +227,7 @@ int variable_add(const char *name, int type, int display, void *ptr, void (*noti
 	v.ptr = ptr;
 	v.notify = notify;
 	v.map = map;
+	v.dyndisplay = dyndisplay;
 
 	return (list_add(&variables, &v, sizeof(v)) != NULL) ? 0 : -1;
 }
@@ -223,7 +249,7 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 	struct variable *v = variable_find(name);
 
 	if (!v && allow_foreign) {
-		variable_add(name, VAR_FOREIGN, 2, xstrdup(value), NULL, NULL);
+		variable_add(name, VAR_FOREIGN, 2, xstrdup(value), NULL, NULL, NULL);
 		return -1;
 	}
 

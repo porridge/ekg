@@ -44,6 +44,7 @@ struct variable {
 	void *ptr;		/* wska¼nik do zmiennej */
 	void (*notify)(const char*);	/* funkcja wywo³ywana przy zmianie */
 	struct value_map *map;	/* mapa warto¶ci i etykiet */
+	int (*dyndisplay)(const char*);	/* funkcja sprawdzaj±ca, czy wy¶wietliæ zmienn± na li¶cie */
 };
 
 list_t variables;
@@ -51,7 +52,7 @@ list_t variables;
 void variable_init();
 struct variable *variable_find(const char *name);
 struct value_map *variable_map(int count, ...);
-int variable_add(const char *name, int type, int display, void *ptr, void (*notify)(const char *name), struct value_map *map);
+int variable_add(const char *name, int type, int display, void *ptr, void (*notify)(const char *name), struct value_map *map, int (*dyndisplay)(const char *name));
 int variable_set(const char *name, const char *value, int allow_foreign);
 void variable_free();
 
