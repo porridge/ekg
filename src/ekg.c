@@ -716,16 +716,7 @@ static void handle_sigusr2()
 
 static void handle_sighup()
 {
-	if (sess && sess->state != GG_STATE_IDLE) {
-		print("disconected");
-		ekg_logoff(sess, NULL);
-		list_remove(&watches, sess, 0);
-		gg_free_session(sess);
-		userlist_clear_status(0);
-		sess = NULL;
-	}
-	
-	signal(SIGHUP, handle_sighup);
+	ekg_exit();
 }
 
 /*
