@@ -13,6 +13,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - ignorowanie autom4te.cache z autoconfa 2.53 (w)
 - zapomniany patch na wrzucanie ioctld do libexecdir (porridge/w)
 - s/struct list \*/list_t / (w)
+- s/AUTHOR/AUTOR/ w docs/ekgsearch.man.pl (w)
 
 // 2002-08-05
 
