@@ -372,12 +372,12 @@ COMMAND(cmd_alias)
 			struct alias *a = l->data;
 			list_t m;
 			int first = 1, i;
-			char *tmp = xcalloc(strlen(a->name) + 1, 1);
+			char *tmp;
 			
-			if (aname && strcasecmp(aname, a->name)) {
-				xfree(tmp);
+			if (aname && strcasecmp(aname, a->name))
 				continue;
-			}
+
+			tmp = xcalloc(strlen(a->name) + 1, 1);
 
 			for (i = 0; i < strlen(a->name); i++)
 				strlcat(tmp, " ", strlen(a->name) + 1);
@@ -3111,8 +3111,10 @@ COMMAND(cmd_test_send)
 {
 	struct gg_event *e = xmalloc(sizeof(struct gg_event));
 
-	if (!params[0] || !params[1])
+	if (!params[0] || !params[1]) {
+		xfree(e);
 		return -1;
+	}
 
 	memset(e, 0, sizeof(*e));
 	e->type = GG_EVENT_MSG;
