@@ -288,7 +288,7 @@ void sighup()
 
 int main(int argc, char **argv)
 {
-	int auto_connect = 1, i, new_status = 0;
+	int auto_connect = 1, force_debug = 0, i, new_status = 0 ;
 	char *home = getenv("HOME"), *load_theme = NULL;
 	struct passwd *pw; 
 	struct gg_common si;
@@ -320,7 +320,7 @@ u¿ycie: %s [OPCJE]
 		if (!strcmp(argv[i], "-p") || !strcmp(argv[i], "--private"))
 			new_status |= GG_STATUS_FRIENDS_MASK;
 		if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--debug"))
-			gg_debug_level = 255;
+			force_debug = 1;
 		if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "--no-auto"))
 			auto_connect = 0;
 		if (!strcmp(argv[i], "-u") || !strcmp(argv[i], "--user")){ 
@@ -358,9 +358,13 @@ u¿ycie: %s [OPCJE]
 	if ((default_status & GG_STATUS_FRIENDS_MASK))
 		private_mode = 1;
 	
-	/* czy w³±czyæ debugowanie? */
+	/* czy w³±czyæ debugowanie? */	
 	if (gg_debug_level)
 		display_debug = 1;
+
+	if (force_debug)
+		gg_debug_level = 255;
+	
 	if (display_debug)
 		gg_debug_level = 255;
 	
@@ -394,9 +398,6 @@ u¿ycie: %s [OPCJE]
 	rl_readline_name = "gg";
 	rl_attempted_completion_function = (CPPFunction *) my_completion;
 	rl_completion_entry_function = (void*) empty_generator;
-
-	if (load_theme)
-		read_theme(load_theme, 1);
 	
 	my_printf("welcome", VERSION);
 	
