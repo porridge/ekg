@@ -1147,7 +1147,7 @@ int config_read(const char *filename, const char *var)
 				ignored_add(atoi(foo), IGNORE_ALL);
 		} else if (!strcasecmp(buf, "alias")) {
 			alias_add(foo, 1, 1);
-			gg_debug(GG_DEBUG_MISC, "\talias %s %s\n", foo, foo + strlen(foo) + 1);
+			gg_debug(GG_DEBUG_MISC, "\talias %s\n", foo);
 		} else if (!strcasecmp(buf, "on")) {
                         int flags;
                         char **pms = array_make(foo, " \t", 3, 1, 0);
