@@ -40,6 +40,9 @@ struct gg_session {
 	int seq, async;
 	int last_pong;
 
+	/* powinno byæ ,,in_addr'', ale nie chcê inkludowaæ niczego tutaj */
+	unsigned long server_ip;
+
 	uin_t uin;
 	char *password;
 

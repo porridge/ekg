@@ -1,3 +1,8 @@
+// 2001-11-02
+
+- w razie b³êdu po³±czenia z appmsg:80, próbuje siê ³±czyæ po :8074 z
+  tym samym hostem (wojtekka).
+
 // 2001-11-01
 
 - plumk, dodatkowe parametry ,,list'' (wojtekka).
