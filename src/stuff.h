@@ -83,12 +83,18 @@ struct emoticon {
 	char *value;
 };
 
+struct sequence {
+	char *seq;
+	char *command;
+};
+
 struct list *children;
 struct list *aliases;
 struct list *watches;
 struct list *transfers;
 struct list *events;
 struct list *emoticons;
+struct list *sequences;
 struct gg_session *sess;
 
 int config_dcc;

@@ -59,6 +59,7 @@ struct list *watches = NULL;
 struct list *transfers = NULL;
 struct list *events = NULL;
 struct list *emoticons = NULL;
+struct list *sequences = NULL;
 
 int away = 0;
 int in_autoexec = 0;
@@ -345,6 +346,10 @@ int config_read()
                         if (pms && pms[0] && pms[1] && pms[2] && (flags = event_flags(pms[0])) && (uin = atoi(pms[1])) && !event_correct(pms[2]))
                                 event_add(event_flags(pms[0]), atoi(pms[1]), xstrdup(pms[2]), 1);
 			array_free(pms);
+		} else if (!strcasecmp(buf, "bind")) {
+			char **pms = array_make(foo, " \t", 2, 1, 0);
+			if (pms && pms[0] && pms[1]) 
+				ui_event("command", "bind", "-a", pms[0], pms[1]);
                 } else 
 			variable_set(buf, foo, 1);
 
@@ -447,6 +452,13 @@ void config_write_main(FILE *f, int base64)
 
                 fprintf(f, "on %s %u %s\n", event_format(e->flags), e->uin, e->action);
         }
+
+	for (l = sequences; l; l = l->next) {
+		struct sequence *s = l->data;
+
+		fprintf(f, "bind %s %s", s->seq, s->command);
+	}
+
 }
 
 /*

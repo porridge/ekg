@@ -46,7 +46,7 @@ static int ui_readline_event(const char *event, ...);
 static void ui_readline_deinit();
 
 static int in_readline = 0, no_prompt = 0, pager_lines = -1, screen_lines = 24, screen_columns = 80, curr_window = 1, windows_count = 0;
-struct list *windows = NULL, *sequences = NULL;
+struct list *windows = NULL;
 struct window *win;
 
 /* kod okienek napisany jest na podstawie ekg-windows nilsa */
