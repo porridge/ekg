@@ -564,6 +564,8 @@ COMMAND(cmd_connect)
 		    	tmp = xstrdup(params[0]);
 
 		if (params && params[0] && !strcmp(params[0], "-")) {
+			xfree(config_reason);
+			config_reason = NULL;
 			xfree(tmp);
 			tmp = NULL;
 		} else if (config_keep_reason && config_reason && !tmp)
@@ -2367,6 +2369,8 @@ COMMAND(cmd_quit)
 		tmp = xstrdup(config_reason);
 
 	if (params[0] && !strcmp(params[0], "-")) {
+		xfree(config_reason);
+		config_reason = NULL;
 		xfree(tmp);
 		tmp = NULL;
 	}

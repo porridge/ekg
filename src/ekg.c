@@ -818,8 +818,6 @@ static int ekg_ui_set(const char *name)
 		ui_init = ui_none_init;
 	else if (!strcasecmp(name, "batch"))
 		ui_init = ui_batch_init;
-	else if (!strcasecmp(name, "automaton"))
-		ui_init = ui_automaton_init;
 #ifdef WITH_UI_READLINE
 	else if (!strcasecmp(name, "readline"))
 		ui_init = ui_readline_init;
@@ -965,7 +963,7 @@ int main(int argc, char **argv)
 "  -I, --ioctld-path=¦CIE¯KA  ustawia ¶cie¿kê do ioctld\n"
 #endif
 "  -f, --frontend=NAZWA       wybiera jeden z dostêpnych interfejsów\n"
-"                             (none, batch, automaton"
+"                             (none, batch"
 #ifdef WITH_UI_READLINE
 ", readline"
 #endif

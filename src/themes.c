@@ -37,8 +37,6 @@
 #  define PATH_MAX _POSIX_PATH_MAX
 #endif
 
-int automaton_color_escapes;
-
 char *prompt_cache = NULL, *prompt2_cache = NULL, *error_cache = NULL;
 const char *timestamp_cache = NULL;
 
@@ -285,10 +283,7 @@ char *va_format_string(const char *format, va_list ap)
 				string_append(buf, "\033[000m");	/* jeszcze g³upsze */
 			if (*p == '#')
 				string_append(buf, timestamp(timestamp_cache));
-			if (config_display_color && isalpha(*p) && automaton_color_escapes) {
-				string_append_c(buf, '\033');
-				string_append_c(buf, *p);
-			} else if (config_display_color) {
+			else if (config_display_color) {
 				string_append(buf, format_ansi(*p));
 			}
 

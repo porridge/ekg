@@ -18,7 +18,7 @@ AR = @AR@
 INSTALL = @INSTALL@
 STRIP = @STRIP@
 
-OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o ekg.o xmalloc.o mail.o msgqueue.o @OBJS@ ui-batch.o ui-none.o ui-automaton.o
+OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o ekg.o xmalloc.o mail.o msgqueue.o @OBJS@ ui-batch.o ui-none.o
 SRCS = $(OBJS:.o=.c)
 
 #

@@ -57,8 +57,6 @@ int theme_read(const char *filename, int replace);
 void theme_cache_reset();
 void theme_free();
 
-extern int automaton_color_escapes;
-
 fstring_t reformat_string(const char *str);
 
 /*
