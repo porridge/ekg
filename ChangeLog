@@ -12,7 +12,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - dodanie zmiennej ,,last'' (d)
 - zmiana ,,last_count'' na ,,last_size'' (d)
 - uaktualniony ,,docs/vars.txt'' (d)
-
+- dodany ,,last_list_timestamp'' do themes (d)
+- poprawne zapisywanie polskich znaków mesgów wychodz±cych w last (d)
+	
 // 2002-09-06
 
 - update arim.theme (Arim/w)

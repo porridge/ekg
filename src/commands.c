@@ -1064,7 +1064,7 @@ COMMAND(cmd_msg)
 		put_log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), escaped);
 
 		if (config_last & 4)
-			last_add(1, uin, time(NULL), escaped);
+			last_add(1, uin, time(NULL), msg);
 
 		if (!chat || count == 1)
 			gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
@@ -2214,7 +2214,7 @@ COMMAND(cmd_last)
 
 		if (uin == 0 || uin == ll->uin) {
 			tm = localtime(&ll->time);
-			strftime(buf, sizeof(buf), "%m-%d-%Y %H:%M", tm);
+			strftime(buf, sizeof(buf), format_find("last_list_timestamp"), tm);
 			if (config_last & 4 && ll->type == 1)
 				print("last_list_out", buf, format_user(ll->uin), ll->message);
 			else
