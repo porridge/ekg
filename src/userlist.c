@@ -243,8 +243,10 @@ int userlist_set(const char *contacts, int config)
 		
 		gg_debug(GG_DEBUG_MISC, "// received ekg variables digest: %s\n", tmp);
 
-		if (variable_undigest(tmp))
+		if (variable_undigest(tmp)) {
+			xfree(tmp);
 			return -1;
+		}
 
 		if (sess && sess->state == GG_STATE_CONNECTED) {
 			if (config_reason) {

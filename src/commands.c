@@ -700,10 +700,8 @@ COMMAND(cmd_exec)
 			int big_match = 0;
 			args = array_make(params[0], " \t", 3, 1, 1);
 
-			if (match_arg(args[0], 'M', "MSG", 2) || (buf = match_arg(args[0], 'B', "BMSG", 2))) {
-				add_commandline = 1;
-				big_match = 1;
-			}
+			if (match_arg(args[0], 'M', "MSG", 2) || (buf = match_arg(args[0], 'B', "BMSG", 2)))
+				big_match = add_commandline = 1;
 
 			if (big_match || match_arg(args[0], 'm', "msg", 2) || (buf = match_arg(args[0], 'b', "bmsg", 2))) {
 				struct userlist *u;
@@ -854,7 +852,7 @@ COMMAND(cmd_find)
 		return -1;
 	}
 
-	if (argv[0] && !argv[1] && argv[0][0] == '#') { /* konferencja */
+	if (argv[0] && !argv[1] && argv[0][0] == '#') {
 		char *tmp = saprintf("/conference --find %s", argv[0]);
 		int res = command_exec(target, tmp, quiet);
 		xfree(tmp);
@@ -1580,7 +1578,7 @@ COMMAND(cmd_list)
 				}
 			}
 			
-			__group = saprintf("%s%s", (invert) ? "!" : "", group + 1);
+			__group = saprintf("%s%s", ((invert) ? "!" : ""), group + 1);
 
 			if (count)
 				printq("group_members", __group, members->str);
@@ -1623,9 +1621,9 @@ COMMAND(cmd_list)
 		printq("user_info_status", status);
 
 		if (group_member(u, "__blocked"))
-			printq("user_info_block", (u->first_name) ? u->first_name : u->display);
+			printq("user_info_block", ((u->first_name) ? u->first_name : u->display));
 		if (group_member(u, "__offline"))
-			printq("user_info_offline", (u->first_name) ? u->first_name : u->display);
+			printq("user_info_offline", ((u->first_name) ? u->first_name : u->display));
 		if (u->port == 2)
 			printq("user_info_not_in_contacts");
 		if (u->port == 1)
@@ -1913,7 +1911,7 @@ static void msg_all_wrapper(int chat, const char *msg, int quiet)
 	char **nicks = NULL;
 	int i;
 
-	ui_event("command", 0, "query-nicks", &nicks, NULL);
+	ui_event("command", quiet, "query-nicks", &nicks, NULL);
 	
 	if (!nicks)
 		return;
@@ -2127,7 +2125,7 @@ COMMAND(cmd_msg)
 		
 	        u = userlist_find(uin, NULL);
 
-		put_log(uin, "%s,%ld,%s,%s,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u && u->display) ? u->display : "", log_timestamp(time(NULL)), raw_msg);
+		put_log(uin, "%s,%ld,%s,%s,%s\n", ((chat) ? "chatsend" : "msgsend"), uin, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), raw_msg);
 
 		if (config_last & 4)
 			last_add(1, uin, time(NULL), 0, raw_msg);
@@ -2144,7 +2142,7 @@ COMMAND(cmd_msg)
 			else
 				msg_seq = -1;
 
-			msg_queue_add((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, msg_seq, 1, &uin, raw_msg, secure, format, formatlen);
+			msg_queue_add(((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG), msg_seq, 1, &uin, raw_msg, secure, format, formatlen);
 			valid++;
 			xfree(__msg);
 		}
@@ -2163,7 +2161,7 @@ COMMAND(cmd_msg)
 		else
 			msg_seq = -1;
 
-		msg_queue_add((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, msg_seq, count, uins, raw_msg, 0, format, formatlen);
+		msg_queue_add(((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG), msg_seq, count, uins, raw_msg, 0, format, formatlen);
 		valid++;
 
 		xfree(uins);
@@ -4470,9 +4468,8 @@ COMMAND(cmd_timer)
 			if (t_name) {
 				printq("timer_noexist", t_name);
 				return -1;
-			} else {
+			} else
 				printq("timer_empty");
-			}
 		}
 
 		return 0;
@@ -4799,11 +4796,10 @@ COMMAND(cmd_last)
 			} else
 				time_str = xstrdup(buf);
 
-			if (config_last & 4 && ll->type == 1) {
+			if (config_last & 4 && ll->type == 1)
 				printq("last_list_out", time_str, format_user(ll->uin), ll->message);
-			} else {
+			else
 				printq("last_list_in", time_str, format_user(ll->uin), ll->message);
-			}
 
 			xfree(time_str);
 		}

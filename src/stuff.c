@@ -1805,6 +1805,7 @@ static char *log_escape(const char *str)
  *
  * wrzuca do logów informacjê od/do danego numerka. podaje siê go z tego
  * wzglêdu, ¿e gdy `log = 2', informacje lec± do $config_log_path/$uin.
+ * automatycznie eskejpuje, co trzeba.
  *
  *  - uin - numer delikwenta,
  *  - format... - akceptuje tylko %s, %d i %ld.
@@ -1814,7 +1815,7 @@ void put_log(uin_t uin, const char *format, ...)
  	char *lp = config_log_path;
 	char path[PATH_MAX], *buf;
 	const char *p;
-	int size = 0;
+	size_t size = 0;
 	va_list ap;
 	FILE *f;
 
@@ -1824,6 +1825,8 @@ void put_log(uin_t uin, const char *format, ...)
 	/* oblicz d³ugo¶æ tekstu */
 	va_start(ap, format);
 	for (p = format; *p; p++) {
+		int long_int = 0;
+
 		if (*p == '%') {
 			p++;
 			if (!*p)
@@ -1831,6 +1834,7 @@ void put_log(uin_t uin, const char *format, ...)
 			
 			if (*p == 'l') {
 				p++;
+				long_int = 1;
 				if (!*p)
 					break;
 			}
@@ -1844,7 +1848,7 @@ void put_log(uin_t uin, const char *format, ...)
 			}
 			
 			if (*p == 'd') {
-				int tmp = va_arg(ap, int);
+				int tmp = ((long_int) ? va_arg(ap, long) : va_arg(ap, int));
 
 				size += strlen(itoa(tmp));
 			}
@@ -1860,12 +1864,15 @@ void put_log(uin_t uin, const char *format, ...)
 	/* utwórz tekst z logiem */
 	va_start(ap, format);
 	for (p = format; *p; p++) {
+		int long_int = 0;
+
 		if (*p == '%') {
 			p++;
 			if (!*p)
 				break;
 			if (*p == 'l') {
 				p++;
+				long_int = 1;
 				if (!*p)
 					break;
 			}
@@ -1879,7 +1886,7 @@ void put_log(uin_t uin, const char *format, ...)
 			}
 
 			if (*p == 'd') {
-				int tmp = va_arg(ap, int);
+				int tmp = ((long_int) ? va_arg(ap, long) : va_arg(ap, int));
 
 				strcat(buf, itoa(tmp));
 			}
