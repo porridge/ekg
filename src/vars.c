@@ -29,6 +29,9 @@
 #include "dynstuff.h"
 #include "libgadu.h"
 #include "mail.h"
+#ifndef HAVE_STRLCAT
+#  include "../compat/strlcat.h"
+#endif
 #ifndef HAVE_STRLCPY
 #  include "../compat/strlcpy.h"
 #endif
@@ -222,7 +225,8 @@ void variable_init()
 /*
  * variable_set_default()
  *
- * ustawia pewne standardowe warto¶ci zmiennych.
+ * ustawia pewne standardowe warto¶ci zmiennych
+ * nieliczbowych.
  */
 void variable_set_default()
 {
@@ -616,7 +620,7 @@ int variable_undigest(const char *digest)
 {
 	const char *p = digest;
 
-	if (!digest)
+	if (!digest || strlen(digest) != 2)
 		return -1;
 
 	while (*p) {

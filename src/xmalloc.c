@@ -55,7 +55,7 @@ void ekg_oom_handler()
 	exit(1);
 }
 
-void *xcalloc(int nmemb, size_t size)
+void *xcalloc(size_t nmemb, size_t size)
 {
 	void *tmp = calloc(nmemb, size);
 

@@ -27,7 +27,7 @@
 
 void ekg_oom_handler();
 
-void *xcalloc(int nmemb, size_t size);
+void *xcalloc(size_t nmemb, size_t size);
 void *xmalloc(size_t size);
 void xfree(void *ptr);
 void *xrealloc(void *ptr, size_t size);

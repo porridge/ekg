@@ -389,10 +389,11 @@ void userlist_write_crash()
 		list_t m;
 		
 		fprintf(f, "%s;%s;%s;%s;%s;", 
-			(u->first_name) ? u->first_name : u->display,
-			(u->last_name) ? u->last_name : "", (u->nickname) ?
-			u->nickname : u->display, u->display, (u->mobile) ?
-			u->mobile : "");
+			(u->first_name) ? u->first_name : "",
+			(u->last_name) ? u->last_name : "",
+			(u->nickname) ? u->nickname : ((u->display) ? u->display: ""),
+			(u->display) ? u->display: "",
+			(u->mobile) ? u->mobile : "");
 		
 		for (m = u->groups; m; m = m->next) {
 			struct group *g = m->data;
