@@ -526,8 +526,8 @@ int config_read(const char *filename)
 					 pms[0], pms[1], NULL);
 			array_free(pms);
 		} else if (!strcasecmp(buf, "timer") || !strcasecmp(buf, "at")) {
-			char **p = array_make(foo, " \t", 0, 1, 0);
-			char *tmp = NULL, *period_str = NULL, *rest = NULL, *name = NULL;
+			char **p = array_make(foo, " \t", 3, 1, 0);
+			char *tmp = NULL, *period_str = NULL, *name = NULL;
 			time_t period;
 			int at = !strcasecmp(buf, "at");
 
@@ -553,11 +553,9 @@ int config_read(const char *filename)
 					}
 		
 				if (period > 0) {
-					rest = array_join(p + 2, " ");
-					tmp = saprintf("%s --add-quiet %s %s %s", (at) ? "at" : "timer", (name) ? name : "", period_str, rest);
+					tmp = saprintf("%s --add-quiet %s %s %s", (at) ? "at" : "timer", (name) ? name : "", period_str, p[2]);
 					command_exec(NULL, tmp);
 					xfree(tmp);
-					xfree(rest);
 				}
 
 				xfree(period_str);
@@ -1893,7 +1891,8 @@ int alias_add(const char *string, int quiet, int append)
 	a.commands = NULL;
 	list_add(&a.commands, cmd, strlen(cmd) + 1);
 	list_add(&aliases, &a, sizeof(a));
-	command_add(a.name, (params) ? params : "?", cmd_alias_exec, 1, "", "", "");
+
+	command_add(a.name, (params) ? params: "?", cmd_alias_exec, 1, "", "", "");
 	
 	xfree(params);
 
@@ -3081,13 +3080,14 @@ int ekg_hash(const char *name)
  *  - period - za jaki czas w sekundach ma byæ uruchomiony,
  *  - persistent - czy sta³y timer,
  *  - type - rodzaj timera,
+ *  - at - zwyk³y timer czy at?
  *  - name - nazwa timera w celach identyfikacji. je¶li jest równa NULL,
  *           zostanie przyznany pierwszy numerek z brzegu.
  *  - command - komenda wywo³ywana po up³yniêciu czasu.
  *
  * zwraca zaalokowan± struct timer.
  */
-struct timer *timer_add(time_t period, int persistent, int type, const char *name, const char *command)
+struct timer *timer_add(time_t period, int persistent, int type, int at, const char *name, const char *command)
 {
 	struct timer t;
 	struct timeval tv;
@@ -3125,6 +3125,7 @@ struct timer *timer_add(time_t period, int persistent, int type, const char *nam
 	t.name = xstrdup(name);
 	t.command = xstrdup(command);
 	t.type = type;
+	t.at = at;
 	t.persistent = persistent;
 
 	return list_add(&timers, &t, sizeof(t));
@@ -3136,21 +3137,20 @@ struct timer *timer_add(time_t period, int persistent, int type, const char *nam
  * usuwa timer.
  *
  *  - name - nazwa timera, mo¿e byæ NULL,
+ *  - at - zwyk³y timer czy at?
  *  - command - komenda timera, mo¿e byæ NULL.
  *
  * 0/-1.
  */
-int timer_remove(const char *name, const char *command)
+int timer_remove(const char *name, int at, const char *command)
 {
 	list_t l;
 	int removed = 0;
 
-	for (l = timers; l; ) {
+	for (l = timers; l; l = l->next) {
 		struct timer *t = l->data;
 
-		l = l->next;
-
-		if ((name && !strcmp(name, t->name)) || (command && !strcmp(command, t->command))) {
+		if ((at == t->at) && ((name && !strcmp(name, t->name)) || (command && !strcmp(command, t->command)))) {
 			xfree(t->name);
 			xfree(t->command);
 			xfree(t->id);

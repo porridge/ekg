@@ -44,7 +44,6 @@
 #include "xmalloc.h"
 
 list_t userlist = NULL;
-list_t ignored = NULL;
 
 /*
  * userlist_compare()
@@ -113,6 +112,8 @@ int userlist_read()
 			u.mobile = NULL;
 			u.groups = NULL;
 			u.descr = NULL;
+			memset(&u.ip, 0, sizeof(struct in_addr));
+			u.port = 0;
 
 		} else {
 			char **entry = array_make(buf, ";", 7, 0, 0);
@@ -138,6 +139,8 @@ int userlist_read()
 			u.mobile = xstrdup(entry[4]);
 			u.groups = group_init(entry[5]);
 			u.descr = NULL;
+			memset(&u.ip, 0, sizeof(struct in_addr));
+			u.port = 0;
 
 			array_free(entry);
 		}
@@ -214,6 +217,8 @@ int userlist_set(char *contacts, int config)
 			u.mobile = NULL;
 			u.groups = NULL;
 			u.descr = NULL;
+			memset(&u.ip, 0, sizeof(struct in_addr));
+			u.port = 0;
 
 		} else {
 			char *q, **entry = array_make(buf, ";", 7, 0, 0);
@@ -233,6 +238,8 @@ int userlist_set(char *contacts, int config)
 			u.mobile = xstrdup(entry[4]);
 			u.groups = group_init(entry[5]);
 			u.descr = NULL;
+			memset(&u.ip, 0, sizeof(struct in_addr));
+			u.port = 0;
 
 			array_free(entry);
 		}
@@ -412,6 +419,8 @@ void userlist_clear_status()
                 struct userlist *u = l->data;
 
                 u->status = GG_STATUS_NOT_AVAIL;
+		memset(&u->ip, 0, sizeof(struct in_addr));
+		u->port = 0;
         }
 }
 
@@ -473,8 +482,8 @@ int userlist_remove(struct userlist *u)
 
 		xfree(g->name);
 	}
-	list_destroy(u->groups, 1);
 
+	list_destroy(u->groups, 1);
 	list_remove(&userlist, u, 1);
 
 	return 0;

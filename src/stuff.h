@@ -102,7 +102,7 @@ struct timer {
 	int period;		/* ile sekund ma trwaæ czekanie */
 	int persistent;		/* czy ma byæ na zawsze? */
 	int type;		/* rodzaj timera */
-	int at;			/* at czy zwyk³y timer ? */
+	int at;			/* at czy zwyk³y timer? */
 	char *name;		/* nazwa timera */
 	char *command;		/* komenda do wywo³ania */
 	char *id;		/* identyfikator timera */
@@ -336,8 +336,8 @@ int emoticon_read();
 char *emoticon_expand(const char *s);
 void emoticon_free();
 
-struct timer *timer_add(time_t period, int persistent, int type, const char *name, const char *command);
-int timer_remove(const char *name, const char *command);
+struct timer *timer_add(time_t period, int persistent, int type, int at, const char *name, const char *command);
+int timer_remove(const char *name, int at, const char *command);
 void timer_free();
 
 void last_add(int type, uin_t uin, time_t t, time_t st, const char *msg);

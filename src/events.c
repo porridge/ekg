@@ -747,6 +747,11 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 		if (status != s->status)
 			continue;
 
+		if (GG_S_NA(s->status)) {
+			memset(&u->ip, 0, sizeof(struct in_addr));
+			u->port = 0;
+		}
+
 		/* je¶li nie jest opisowy i taki sam, ignoruj */
 		if (!GG_S_D(s->status) && prev_status == s->status)
 			break;

@@ -878,7 +878,7 @@ void theme_init()
 	format_add("descr_too_long", "%! D³ugo¶æ opisu przekracza limit. Ilo¶æ uciêtych znaków: %T%1%n\n", 1);
 	
 	/* pomoc */
-	format_add("help", "%> %1%2 - %3%4\n", 1);
+	format_add("help", "%> %T%1%n%2 - %3%4\n", 1);
 	format_add("help_more", "%) %|%1\n", 1);
 	format_add("help_alias", "%) %T%1%n jest aliasem i nie posiada opisu\n", 1);
 	format_add("help_footer", "\n%> Gwiazdka (%T*%n) oznacza, ¿e mo¿na uzyskaæ wiêcej szczegó³ów\n\n", 1);

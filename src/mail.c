@@ -415,9 +415,9 @@ void changed_check_mail(const char *var)
 			}
 		}
 		 
-		t = timer_add(config_check_mail_frequency, 0, TIMER_UI, "check-mail-time", "check_mail");
+		t = timer_add(config_check_mail_frequency, 1, TIMER_UI, 0, "check-mail-time", "check_mail");
 	} else
-		timer_remove("check-mail-time", NULL);
+		timer_remove("check-mail-time", 0, NULL);
 }
 
 /*

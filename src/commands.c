@@ -2863,7 +2863,7 @@ void command_exec(const char *target, const char *xline)
 		if (!strcasecmp(c->name, cmd)) {
 			last_abbr = c->function;
 			last_name = c->name;
-			last_params = c->params;
+			last_params = (c->alias) ? "?" : c->params;
 			abbrs = 1;		
 			break;
 		}
@@ -2871,7 +2871,7 @@ void command_exec(const char *target, const char *xline)
 			abbrs++;
 			last_abbr = c->function;
 			last_name = c->name;
-			last_params = c->params;
+			last_params = (c->alias) ? "?" : c->params;
 		} else {
 			if (last_abbr && abbrs == 1)
 				break;
@@ -3041,10 +3041,7 @@ COMMAND(cmd_timer)
 			p = params[2];
 			t_command = xstrdup(params[3]);
 		} else
-			if (params[3])
-				t_command = saprintf("%s %s", params[2], params[3]);
-			else
-				t_command = xstrdup(params[2]);
+			t_command = array_join((char **) params + 2, " ");
 
 		if (at) {
 			struct tm *lt;
@@ -3158,11 +3155,10 @@ COMMAND(cmd_timer)
 			}
 		}
 
-		if ((t = timer_add(period, persistent, TIMER_COMMAND, t_name, t_command))) {
+		if ((t = timer_add(period, persistent, TIMER_COMMAND, at, t_name, t_command))) {
 			if (!quiet)
 				print((at) ? "at_added" : "timer_added", t->name);
 
-			t->at = at;
 			config_changed = 1;
 		}
 
@@ -3190,12 +3186,12 @@ cleanup:
 			for (l = timers; l; l = l->next) {
 				struct timer *t = l->data;
 
-				/* nie psujmy ui */
+				/* nie psujmy ui i skryptów */
 				if (t->type == TIMER_COMMAND)
-					ret = timer_remove(t->name, NULL);
+					ret = timer_remove(t->name, at, NULL);
 			}
 		} else
-			ret = timer_remove(params[1], NULL);
+			ret = timer_remove(params[1], at, NULL);
 		
 		if (!ret) {
 			if (del_all)
@@ -3234,6 +3230,7 @@ cleanup:
 			strftime(tmp, 100, format_find("at_timestamp"), foo);
 
 		} else {
+
 			if (t->ends.tv_usec < tv.tv_usec) {
 				sec = t->ends.tv_sec - tv.tv_sec - 1;
 				usec = (t->ends.tv_usec - tv.tv_usec + 1000000) / 1000;

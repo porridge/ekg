@@ -1021,11 +1021,8 @@ static int ui_readline_event(const char *event, ...)
 		}
 	}
 
-	if (!strcasecmp(event, "check_mail")) {
-		struct timer *t = timer_add(config_check_mail_frequency, 0, TIMER_UI, "check-mail-time", "check_mail");
-
+	if (!strcasecmp(event, "check_mail"))
 		check_mail();
-	}
 
 cleanup:
 	va_end(ap);

@@ -57,7 +57,6 @@ enum ignored_level_t {
 };
 
 list_t userlist;
-list_t ignored;
 
 int userlist_read();
 int userlist_write();
@@ -65,7 +64,7 @@ int userlist_write();
 int userlist_write_wap();
 #endif
 void userlist_write_crash();
-void userlist_clear_status(void);
+void userlist_clear_status();
 struct userlist *userlist_add(uin_t uin, const char *display);
 int userlist_remove(struct userlist *u);
 int userlist_replace(struct userlist *u);
