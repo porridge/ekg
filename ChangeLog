@@ -11,6 +11,8 @@ zg³osi³ b³±d.
 - wykoñczenie wyciszania niektórych komend (sz)
 - ignorowanie znaków nowej linii w opisie, niektóre klienty jabbera
   pozwalaj± na to i psuje nam to wy¶wietlanie m.in. /list (sz)
+- w zmiennej systemowej ,,EKG_DEBUG'' mo¿na umie¶ciæ nazwê pliku, do
+  którego poleci debug (sz)
 - naprawienie /bind nie wczytuj±cego konfiguracji z pliku (pmb/sz)
 - mo¿na wysy³aæ wynik exec do rozmówcy z aktualnego okna (pmb/sz)
 - klawisze Alt-Q do Alt-P prze³±czaj± do okienek 11..20 (gozda/w)

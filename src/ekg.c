@@ -781,7 +781,9 @@ static void setup_debug()
 
 	dup2(fd[1], 2);
 	
-	gg_debug_file = stderr;
+	if (!gg_debug_file)
+		gg_debug_file = stderr;
+
 	setbuf(gg_debug_file, NULL);		/* XXX leak */
 
 	list_add(&watches, &se, sizeof(se));
@@ -1004,6 +1006,9 @@ int main(int argc, char **argv)
 			ekg_ui_set(config_interface);
 
 	}
+
+	if (getenv("EKG_DEBUG"))
+		gg_debug_file = fopen(getenv("EKG_DEBUG"), "w");
 
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
