@@ -1185,7 +1185,7 @@ int event_check(int event, uin_t uin, const char *data)
 		char *q;
 
 		for (p = data; *p; p++) {
-			if (strchr("`!#$&*?|\\\'\"{}[]", *p))
+			if (strchr("`!#$&*?|\\\'\"{}[]<>", *p))
 				size += 2;
 			else
 				size++;
@@ -1194,7 +1194,7 @@ int event_check(int event, uin_t uin, const char *data)
 		edata = xmalloc(size);
 
 		for (p = data, q = edata; *p; p++, q++) {
-			if (strchr("`!#$&*?|\\\'\"{}[]", *p))
+			if (strchr("`!#$&*?|\\\'\"{}[]<>", *p))
 				*q++ = '\\';
 			*q = *p;
 		}
