@@ -9,6 +9,10 @@ zg³osi³ b³±d.
 // 2002-03-10
 
 - poprawiona kompilacja ui-readline (Charvel/w)
+- dodanie /window last (cowboy/w)
+- usuniêcie informacji o p³ywaj±cych oknach z pomocy. bez sensu siê
+  w nie bawiæ przed 1.0. wiêcej z nimi k³opotów, ni¿ po¿ytku. je¶li
+  kto¶ chce to s±, ale nieudokumentowane (sz?/w)
 
 // 2003-03-09
 

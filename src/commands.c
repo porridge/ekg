@@ -5520,16 +5520,20 @@ void command_init()
 	( "window", "w?", cmd_window, 0,
 	  " <komenda> [numer_okna]", "zarz±dzanie okienkami",
 	  "\n"
-	  "  new [*opcje]         tworzy nowe okno\n"
+	  "  active               prze³±cza do pierwszego okna,\n"
+	  "                       w którym co¶ siê dzieje\n"
+	  "  clear                czy¶ci aktualne okno\n"
 	  "  kill [numer_okna]    zamyka aktualne lub podane okno\n"
+	  "  last                 prze³±cza do ostatnio wy¶wietlanego\n"
+	  "                       okna\n"
+	  "  list                 wy¶wietla listê okien\n"
+/*	  "  new [*opcje]         tworzy nowe okno\n" */
+	  "  new [nazwa]          tworzy nowe okno\n"
 	  "  next                 prze³±cza do nastêpnego okna\n"
 	  "  prev                 prze³±cza do poprzedniego okna\n"
 	  "  switch <numer_okna>  prze³±cza do podanego okna\n"
-	  "  active               prze³±cza do pierwszego okna, w\n"
-	  "                       którym co¶ siê dzieje\n"
-	  "  clear                czy¶ci aktualne okno\n"
-	  "  refresh              od¶wie¿a aktualne okno\n"
-	  "  list                 wy¶wietla listê okien\n"
+	  "  refresh              od¶wie¿a aktualne okno\n");
+/*
 	  "\n"
 	  "Argumenty dla %Tnew%n to %T*x,y,w,h[,f],/komenda%n, gdzie %Tx%n i "
 	  "%Ty%n to "
@@ -5538,6 +5542,7 @@ void command_init()
 	  "z której strony wystêpuj± ramki (1 - lewo, 2 - góra, 4 - prawo, "
           "8 - dó³), a komenda okre¶la, jakiej komendy wynik ma byæ "
 	  "wy¶wietlany regularnie w oknie.");
+*/
 
 
 	command_add
