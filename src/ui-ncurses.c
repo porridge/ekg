@@ -757,7 +757,7 @@ static void update_statusbar()
 				matched = (config_debug);
 				p += 5;
 			} else if (!strncmp(p, "descr ", 6)) {
-				matched = (config_reason);
+				matched = (config_reason != NULL);
 				p += 5;
 			} else if (!strncmp(p, "away ", 5)) {
 				matched = (away == 1 || away == 3);

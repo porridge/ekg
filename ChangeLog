@@ -21,6 +21,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawka polskich znaków w ncurses (robson/w)
 - dodany format %{descr} do statusu w ncurses (FIG/w)
 - Alt-K w pierwszym oknie zamknie query (rmrmg/w)
+- libgadu: usuniêcie -g z CFLAGS przy --disable-debug (adrians/w)
 
 // 2002-11-18
 
