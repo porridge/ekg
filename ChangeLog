@@ -19,6 +19,8 @@ zg³osi³ b³±d.
 - wykrywanie <sys/kbio.h> dla FreeBSD (d/w)
 - ioctld na li¶cie wkompilowanych opcji (d/w)
 - porz±dki w autoconfie, s/true/yes/ (w)
+- przywrócenie /list --phone (FIG/w)
+- zmiana numeru w li¶cie kontaktów usuwa stary numer (FIG/w)
 
 // 2002-11-30
 

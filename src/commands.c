@@ -852,6 +852,11 @@ COMMAND(cmd_modify)
 			u->nickname = xstrdup(argv[++i]);
 		}
 		
+		if ((match_arg(argv[i], 'p', "phone", 2) || match_arg(argv[i], 'm', "mobile", 2)) && argv[i + 1]) {
+			xfree(u->mobile);
+			u->mobile = xstrdup(argv[++i]);
+		}
+		
 		if (match_arg(argv[i], 'd', "display", 2) && argv[i + 1]) {
 			ui_event("userlist_changed", u->display, argv[++i]);
 			xfree(u->display);
@@ -872,8 +877,19 @@ COMMAND(cmd_modify)
 			}
 		}
 		
-		if (match_arg(argv[i], 'u', "uin", 2) && argv[i + 1])
+		if (match_arg(argv[i], 'u', "uin", 2) && argv[i + 1]) {
+			if (sess)
+				gg_remove_notify(sess, u->uin);
+			
 			u->uin = strtol(argv[++i], NULL, 0);
+			
+			if (sess)
+				gg_add_notify(sess, u->uin);
+
+			u->status = GG_STATUS_NOT_AVAIL;
+
+			ui_event("userlist_changed", u->display, u->display);
+		}
 	}
 
 	if (strcasecmp(name, "add"))
@@ -3293,6 +3309,7 @@ void command_init()
 	  "  -d, --display <nazwa>     wy¶wietlana nazwa\n"
 	  "  -u, --uin <numerek>\n"
 	  "  -g, --group [+/-]<grupa>  dodaje lub usuwa z grupy\n"
+	  "  -p, --phone <numer>       numer telefonu komórkowego\n"
 	  "\n"
 	  "Lista kontaktów na serwerze \"list [-p|-g]\":\n"
 	  "  -p, --put  umieszcza na serwerze\n"
