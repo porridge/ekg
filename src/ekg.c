@@ -650,7 +650,7 @@ static void handle_sigsegv()
 "\n"
 "Spróbujê zapisaæ ustawienia, ale nie obiecujê, ¿e cokolwiek z tego\n"
 "wyjdzie. Trafi± one do plików %s/config.%d\n"
-"oraz %s/userlist.%d.\n"
+"oraz %s/userlist.%d\n"
 "\n"
 "Do pliku %s/debug.%d zapiszê ostatanie komunikaty\n"
 "z okna debugowania.\n"
