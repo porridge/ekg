@@ -27,3 +27,5 @@
 /* ioctld */
 #undef HAVE_LINUX_KD_H
 
+/* ekgwap */
+#undef WITH_WAP
