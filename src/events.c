@@ -631,13 +631,13 @@ void handle_ack(struct gg_event *e)
 	if (!(ignored_check(e->event.ack.recipient) & IGNORE_EVENTS))
 		event_check((queued) ? EVENT_QUEUED : EVENT_DELIVERED, e->event.ack.recipient, NULL);
 
-	if (!config_display_ack)
-		return;
-
-	if (u && !queued && GG_S_NA(u->status)) {
+	if (u && !queued && GG_S_NA(u->status) && !(ignored_check(u->uin) & IGNORE_STATUS)) {
 		filtered = 1;
 		print_window(target, 0, "ack_filtered", format_user(e->event.ack.recipient));
 	}
+
+	if (!config_display_ack)
+		return;
 
 	if (config_display_ack == 2 && queued)
 		return;
