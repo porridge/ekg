@@ -6,6 +6,10 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-01-02
+
+- generowanie kluczy dla SIM na maszynach bez /dev/urandom (sz)
+
 // 2003-01-01
 
 - poprawka ,,odszyfrowywania'' wiadomo¶ci systemowych w sim.c (pmb/sz)

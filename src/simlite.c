@@ -41,7 +41,29 @@ char *sim_key_path = NULL;
 int sim_errno = 0;
 
 /*
- * sim_keygen()
+ * sim_seed_prng()
+ */
+static int sim_seed_prng()
+{
+	char rubbish[512];
+	struct {
+		time_t time;
+		void * foo;
+		void * foo2;
+	} data;
+
+	data.time = time(NULL);
+	data.foo = (void *) &data;
+	data.foo2 = (void *) &rubbish;
+
+	RAND_seed((const void *) &data, sizeof(data));
+	RAND_seed((const void *) &rubbish, sizeof(rubbish));
+
+	return sizeof(data) + sizeof(rubbish);
+}
+
+/*
+ * sim_key_generate()
  *
  * tworzy parê kluczy i zapisuje je na dysku.
  *
@@ -55,6 +77,9 @@ int sim_key_generate(uint32_t uin)
 	RSA *keys = NULL;
 	int res = -1;
 	FILE *f = NULL;
+
+	if (!RAND_status())
+		sim_seed_prng();
 
 	if (!(keys = RSA_generate_key(1024, RSA_F4, NULL, NULL))) {
 		sim_errno = SIM_ERROR_RSA;
@@ -101,7 +126,6 @@ cleanup:
 
 	return res;
 }
-
 
 /*
  * sim_key_read()
@@ -232,28 +256,6 @@ const char *sim_strerror(int error)
 	}
 
 	return result;
-}
-
-/*
- * sim_seed_prng()
- */
-static int sim_seed_prng()
-{
-	char rubbish[512];
-	struct {
-		time_t time;
-		void * foo;
-		void * foo2;
-	} data;
-
-	data.time = time(NULL);
-	data.foo = (void *) &data;
-	data.foo2 = (void *) &rubbish;
-
-	RAND_seed((const void *) &data, sizeof(data));
-	RAND_seed((const void *) &rubbish, sizeof(rubbish));
-
-	return sizeof(data) + sizeof(rubbish);
 }
 
 /*
