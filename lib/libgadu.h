@@ -450,8 +450,8 @@ void gg_free_pubdir(struct gg_http *f);
  * FUNKCJE DOTYCZ¡CE KOMUNIKACJI MIÊDZY KLIENTAMI
  */
 
-int gg_dcc_port;
-unsigned long gg_dcc_ip;
+extern int gg_dcc_port;
+extern unsigned long gg_dcc_ip;
 
 int gg_dcc_request(struct gg_session *sess, uin_t uin);
 
