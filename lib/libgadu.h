@@ -37,6 +37,10 @@ extern "C" {
 #include <stdio.h>
 #include <stdarg.h>
 
+#ifdef __GG_LIBGADU_HAVE_OPENSSL
+#include <openssl/ssl.h>
+#endif
+
 /*
  * typedef uin_t
  *
@@ -112,6 +116,14 @@ struct gg_session {
 
 	char *header_buf;	/* bufor na pocz±tek nag³ówka */
 	int header_done;	/* ile ju¿ mamy */
+
+#ifdef __GG_LIBGADU_HAVE_OPENSSL
+	SSL *ssl;		/* sesja TLS */
+	SSL_CTX *ssl_ctx;	/* kontekst sesji? */
+#else
+	void *ssl;		/* zachowujemy ABI */
+	void *ssl_ctx;
+#endif
 };
 
 /*
@@ -278,7 +290,10 @@ enum gg_state_t {
 	GG_STATE_READING_VOICE_DATA,	/* czeka na dane voip */
 	GG_STATE_SENDING_VOICE_ACK,	/* wysy³a potwierdzenie voip */
 	GG_STATE_SENDING_VOICE_REQUEST,	/* wysy³a ¿±danie voip */
-	GG_STATE_READING_TYPE		/* czeka na typ po³±czenia */
+	GG_STATE_READING_TYPE,		/* czeka na typ po³±czenia */
+
+	/* nowe. bez sensu jest to API. */
+	GG_STATE_TLS_NEGOTIATION	/* negocjuje po³±czenie TLS */
 };
 
 /*
@@ -315,6 +330,11 @@ struct gg_login_params {
 	int last_sysmsg;		/* ostatnia wiadomo¶æ systemowa */
 	uint32_t external_addr;		/* adres widziany na zewnatrz */
 	uint16_t external_port;		/* port widziany na zewnatrz */
+	int tls;			/* czy ³±czymy po TLS? */
+
+	char dummy[8 * sizeof(int)];	/* miejsce na kolejnych 8 zmiennych,
+					 * ¿eby z dodaniem parametru nie 
+					 * zmienia³ siê rozmiar struktury */
 };
 
 struct gg_session *gg_login(const struct gg_login_params *p);
@@ -377,7 +397,9 @@ enum gg_failure_t {
 	GG_FAILURE_WRITING,		/* zerwano po³±czenie podczas zapisu */
 	GG_FAILURE_PASSWORD,		/* nieprawid³owe has³o */
 
-	GG_FAILURE_404 			/* XXX nieu¿ywane */
+	GG_FAILURE_404, 		/* XXX nieu¿ywane */
+
+	GG_FAILURE_TLS			/* b³±d negocjacji TLS */
 };
 
 /*
@@ -784,8 +806,10 @@ char *gg_read_line(int sock, char *buf, int length);
 void gg_chomp(char *line);
 char *gg_urlencode(const char *str);
 int gg_http_hash(const char *format, ...);
+int gg_read(struct gg_session *sess, char *buf, int length);
+int gg_write(struct gg_session *sess, const char *buf, int length);
 void *gg_recv_packet(struct gg_session *sess);
-int gg_send_packet(int sock, int type, ...);
+int gg_send_packet(struct gg_session *sess, int type, ...);
 unsigned int gg_login_hash(const unsigned char *password, unsigned int seed);
 uint32_t gg_fix32(uint32_t x);
 uint16_t gg_fix16(uint16_t x);

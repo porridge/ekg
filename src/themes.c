@@ -1075,6 +1075,7 @@ void theme_init()
 	format_add("conn_failed_disconnected", "Serwer zerwa³ po³±czenie", 1);
 	format_add("conn_failed_password", "Nieprawid³owe has³o", 1);
 	format_add("conn_failed_404", "B³±d serwera HTTP", 1);
+	format_add("conn_failed_tls", "B³±d negocjacji TLS", 1);
 	format_add("conn_failed_memory", "Brak pamiêci", 1);
 	format_add("conn_stopped", "%! Przerwano ³±czenie\n", 1);
 	format_add("conn_timeout", "%! Przekroczono limit czasu operacji ³±czenia z serwerem\n", 1);

@@ -257,6 +257,19 @@ AC_TRY_RUN(
 ])
 
 dnl
+dnl  Sprawdzamy OpenSSL
+dnl
+
+AC_CHECK_OPENSSL
+
+if test "x$have_openssl" = "xyes"; then
+	OBJS="$OBJS simlite.o"
+	LDFLAGS="$OPENSSL_LIBS $LDFLAGS"
+	CFLAGS="$CFLAGS $OPENSSL_INCLUDES"
+	AC_LIBGADU_DEFINE([HAVE_OPENSSL])
+fi
+
+dnl
 dnl  Zachowujemy opcje dla libgadu
 dnl
 
@@ -406,18 +419,6 @@ if test "x$have_python" = "xyes"; then
 	OBJS="$OBJS python.o"
 	LDFLAGS="$PYTHON_LIBS $LDFLAGS"
 	CFLAGS="$CFLAGS $PYTHON_INCLUDES"
-fi
-
-dnl
-dnl  Sprawdzamy OpenSSL
-dnl
-
-AC_CHECK_OPENSSL
-
-if test "x$have_openssl" = "xyes"; then
-	OBJS="$OBJS simlite.o"
-	LDFLAGS="$OPENSSL_LIBS $LDFLAGS"
-	CFLAGS="$CFLAGS $OPENSSL_INCLUDES"
 fi
 
 dnl

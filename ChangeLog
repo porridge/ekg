@@ -4,6 +4,18 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-05-15
+
+- libgadu: obs³uga po³±czeñ szyfrowanych TLSv1. wystarczy podaæ konkretny
+  serwer i ustawiæ ,,gg_login_params->tls = 1''. oczywi¶cie wypada³oby mieæ
+  zainstalowan± bibliotekê OpenSSL w systemie. ABI i API s± zgodne poza
+  zmian± deklaracji wewnêtrznej funkcji gg_send_packet(). mo¿na sprawdziæ
+  istnienie sta³ej __GG_LIBGADU_HAVE_OPENSSL, ¿eby mieæ pewno¶æ, czy dana
+  wersja libgadu obs³uguje TLSv1 (w)
+- libgadu: podbicie wersji API (w)
+- obs³uga po³±czeñ szyfrowanych TLSv1. nale¿y podaæ adres serwera poprzedzony
+  tekstem ,,tls:'' (w)
+
 // 2003-05-14
 
 - poprawka helpa /dcc (jojo/w)

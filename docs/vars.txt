@@ -519,7 +519,9 @@ server
 	adresy IP serwerów, z którym klient powinien próbowaæ siê po³±czyæ,
 	pomijaj±c w³a¶ciw± procedurê ³±czenia siê. przydane podczas awarii
 	g³ównego serwera. adresy nale¿y oddzielaæ przecinkami, ¶rednikami
-	lub spacjami. po dwukropku mo¿na podaæ port serwera.
+	lub spacjami. po dwukropku mo¿na podaæ port serwera. je¶li adres i
+	port serwera zostan± poprzedzone tekstem ,,tls:'', klient spróbuje
+	wynegocjowaæ bezpieczne po³±czenie TLSv1 z serwerem.
 
 server_save
 	typ: bool

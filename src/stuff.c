@@ -1214,25 +1214,32 @@ void ekg_connect()
 	p.last_sysmsg = config_last_sysmsg;
 
 	if (config_server) {
-		char *server, **servers = array_make(config_server, ",; ", 0, 1, 0);
+		char *server, *sserver, *tmp, **servers = array_make(config_server, ",; ", 0, 1, 0);
 
 		if (server_index >= array_count(servers))
 			server_index = 0;
 
-		if ((server = xstrdup(servers[server_index++]))) {
-			char *tmp = strchr(server, ':');
-			
-			if (tmp) {
-				p.server_port = atoi(tmp + 1);
-				*tmp = 0;
-				p.server_addr = inet_addr(server);
-			} else {
-				p.server_port = GG_DEFAULT_PORT;
-				p.server_addr = inet_addr(server);
-			}
+		server = sserver = xstrdup(servers[server_index++]);
 
-			xfree(server);
+		if (!strncasecmp(server, "tls:", 4)) {
+#ifdef __GG_LIBGADU_HAVE_OPENSSL
+			p.tls = 1;
+#endif
+			server += 4;
 		}
+			
+		tmp = strchr(server, ':');
+			
+		if (tmp) {
+			p.server_port = atoi(tmp + 1);
+			*tmp = 0;
+			p.server_addr = inet_addr(server);
+		} else {
+			p.server_port = GG_DEFAULT_PORT;
+			p.server_addr = inet_addr(server);
+		}
+
+		xfree(sserver);
 
 		array_free(servers);
 	}
