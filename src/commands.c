@@ -576,7 +576,7 @@ COMMAND(cmd_connect)
 	} else if (!strcasecmp(name, "reconnect")) {
 		cmd_connect("__disconnect", NULL, NULL, quiet);
 		cmd_connect("connect", NULL, NULL, quiet);
-	} else if (sess) {
+	} else {
 	    	char *tmp = NULL;
 
 		if (!strcasecmp(name, "disconnect")) {
@@ -611,7 +611,7 @@ COMMAND(cmd_connect)
 
 		connecting = 0;
 
-		if (sess->state == GG_STATE_CONNECTED) {
+		if (sess && sess->state == GG_STATE_CONNECTED) {
 			if (tmp) {
 				char *r1, *r2;
 
@@ -623,15 +623,17 @@ COMMAND(cmd_connect)
 			} else
 				printq("disconnected");
 			
-		} else if (sess->state != GG_STATE_IDLE)
+		} else if (reconnect_timer || (sess && sess->state != GG_STATE_IDLE))
 			printq("conn_stopped");
 
-		ekg_logoff(sess, tmp);
-		xfree(tmp);
-		list_remove(&watches, sess, 0);
-		gg_free_session(sess);
-		userlist_clear_status(0);
-		sess = NULL;
+		if (sess) {
+			ekg_logoff(sess, tmp);
+			xfree(tmp);
+			list_remove(&watches, sess, 0);
+			gg_free_session(sess);
+			userlist_clear_status(0);
+			sess = NULL;
+		}
 		reconnect_timer = 0;
 		ui_event("disconnected", NULL);
 	}

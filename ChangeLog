@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-05-21
+
+- poprawka /disconnect przy auto_reconnect != 0 (scooty/w)
+
 // 2003-05-20
 
 - poprawka segfaulta przy /set server "" (tiroy/w)

@@ -1714,7 +1714,7 @@ void handle_search50(struct gg_event *e)
 				active = format_string(format_find(__format("_inactive")), (__firstname) ? __firstname : nickname);
 		}
 
-		gender = format_string(format_find(__format("_unknown")));
+		gender = format_string(format_find(__format("_unknown")), "");
 		
 		print(__format(""), uin, name, nickname, city, birthyear, gender, active);
 
