@@ -3498,6 +3498,17 @@ static void spellcheck(char *what, char *where)
 			i--;
 			goto aspell_loop_end;
 		}
+		
+		/* sprawdzanie czy nastêpny wyraz nie rozpoczyna adresu ftp */ 
+		else if (what[i] == 'f' && what[i + 1] && what[i + 1] == 't' && what[i + 2] && what[i + 2] == 'p' && what[i + 3] && what[i + 3] == ':' && what[i + 4] && what[i + 4] == '/' && what[i + 5] && what[i + 5] == '/')
+		{
+			for(; what[i] != ' ' && what[i] != '\n' && what[i] != '\r' && what[i] != '\0'; i++);
+			i--;
+			goto aspell_loop_end;
+		}
+		
+		
+
 		    
 				
 		/* wrzucamy aktualny wyraz do zmiennej word */		    
