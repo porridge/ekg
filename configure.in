@@ -590,7 +590,7 @@ else
 	echo " - ui-ncurses: disabled"
 fi
 
-if text "x$enable_wap" = "xyes"; then
+if test "x$enable_wap" = "xyes"; then
 	echo " - rtg: enabled"
 fi
 
