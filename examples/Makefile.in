@@ -6,18 +6,33 @@ CC = @CC@
 RM = @RM@
 MAKE = @MAKE@
 
-OBJS = ../lib/libgg.o ../lib/common.o ../lib/search.o ../lib/http.o ../lib/register.o
+OBJS = ../lib/libgg.a
 
-all:	$(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) search.c -o search-sync
-	$(CC) $(CFLAGS) $(OBJS) -DASYNC search.c -o search-async
-	$(CC) $(CFLAGS) $(OBJS) register.c -o register-sync
-	$(CC) $(CFLAGS) $(OBJS) -DASYNC register.c -o register-async
-	$(CC) $(CFLAGS) $(OBJS) send.c -o send
-	$(CC) $(CFLAGS) $(OBJS) conn-async.c -o conn-async
+all:	search-sync search-async register-sync register-async conn-async send
+
+search-sync:	search.c $(OBJS)
+	$(CC) $(CFLAGS) search.c -o search-sync $(OBJS)
+
+search-async:	search.c $(OBJS)
+	$(CC) $(CFLAGS) search.c -o search-async -DASYNC $(OBJS)
+
+register-sync:	register.c $(OBJS)
+	$(CC) $(CFLAGS) register.c -o register-sync $(OBJS)
+
+register-async:	register.c $(OBJS)
+	$(CC) $(CFLAGS) register.c -o register-async -DASYNC $(OBJS)
+
+send:	send.c $(OBJS)
+	$(CC) $(CFLAGS) send.c -o send $(OBJS)
+
+conn-async:	conn-async.c $(OBJS)
+	$(CC) $(CFLAGS) conn-async.c -o conn-async $(OBJS)
+
+$(OBJS):
+	(cd ../lib; $(MAKE))
 
 clean: 	
-	$(RM) -f *~ *.o search-sync search-async send conn-async
+	$(RM) -f *~ *.o search-{sync,async} send conn-async register-{sync,async}
 
 distclean: clean
 	$(RM) Makefile

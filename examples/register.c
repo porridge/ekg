@@ -22,7 +22,6 @@ int main()
 {
 	struct gg_register *foo;
 	char email[100], password[100];
-	int i;
 
 	gg_debug_level = 255;
 	
@@ -80,7 +79,7 @@ int main()
 				return 1;
 			}
 			if (foo->state == GG_STATE_FINISHED) {
-				printf("uin=%u\n", foo->uin);
+				printf("uin=%ld\n", foo->uin);
 				gg_free_register(foo);
 				break;
 			}
