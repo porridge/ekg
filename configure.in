@@ -440,6 +440,12 @@ else
   echo " - ioctld: disabled"
 fi
 
+if test "x$have_python" = "xyes"; then
+  echo " - python: enabled"
+else
+  echo " - python: disabled"
+fi
+
 if test "x$ui_readline_enabled" = "xyes"; then
   if test "x$ui_readline_default" = "xyes"; then
     echo " - ui-readline: enabled (default)"
@@ -459,13 +465,5 @@ if test "x$ui_ncurses_enabled" = "xyes"; then
 else
   echo " - ui-ncurses: disabled"
 fi
-
-echo
-echo "******************************************************************"
-echo "** Uwaga! Zmieniony zosta³ domy¶lny interfejs ekg z readline na **"
-echo "** ncurses. Je¶li z jakiego¶ powodu chcesz u¿ywaæ poprzedniego  **"
-echo "** interfejsu, uruchom ,,./configure --disable-ui-ncurses''     **"
-echo "******************************************************************"
-echo
 
 dnl </ekg>
