@@ -300,7 +300,7 @@ unsigned char hide_pl(const unsigned char *c);
 char *strip_spaces(char *line);
 
 int alias_add(const char *string, int quiet, int append);
-int alias_remove(const char *name);
+int alias_remove(const char *name, int quiet);
 list_t alias_check(const char *foo);
 void alias_free();
 
@@ -324,7 +324,7 @@ void changed_uin(const char *var);
 void changed_xxx_reason(const char *var);
 
 int event_add(int flags, uin_t uin, const char *action, int quiet);
-int event_remove(int flags, uin_t uin);
+int event_remove(int flags, uin_t uin, int quiet);
 int event_flags(const char *events);
 const char *event_format(int flags);
 int event_check(int event, uin_t uin, const char *data);

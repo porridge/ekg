@@ -513,18 +513,22 @@ int config_read(const char *filename, const char *var)
                         int flags;
                         uin_t uin;
                         char **pms = array_make(foo, " \t", 3, 1, 0);
+
                         if (pms && pms[0] && pms[1] && pms[2] && (flags = event_flags(pms[0])) && (uin = atoi(pms[1]))) {
 				if (event_correct(pms[2], 1))
 					flags |= INACTIVE_EVENT; /* nieaktywne */
                                 event_add(flags, atoi(pms[1]), pms[2], 1);
 			}
+
 			array_free(pms);
 		} else if (!strcasecmp(buf, "bind")) {
 			char **pms = array_make(foo, " \t", 2, 1, 0);
+
 			gg_debug(GG_DEBUG_MISC, "bind %s %s\n", pms[0], pms[1]);
+
 			if (pms && pms[0] && pms[1]) 
-				ui_event("command", "bind", "--add-quiet", 
-					 pms[0], pms[1], NULL);
+				ui_event("command", "bind", "--add-quiet", pms[0], pms[1], NULL);
+
 			array_free(pms);
 		} else if (!strcasecmp(buf, "timer") || !strcasecmp(buf, "at")) {
 			char **p = array_make(foo, " \t", 3, 1, 0);
@@ -1856,7 +1860,7 @@ struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int co
  * dopisuje alias do listy aliasów.
  *
  *  - string - linia w formacie 'alias cmd',
- *  - quiet - czy wypluwaæ mesgi na stdout.
+ *  - quiet - czy wypluwaæ mesgi na stdout,
  *  - append - czy dodajemy kolejn± komendê?
  *
  * 0/-1
@@ -1868,11 +1872,8 @@ int alias_add(const char *string, int quiet, int append)
 	struct alias a;
 	char *params = NULL;
 
-	if (!string || !(cmd = strchr(string, ' '))) {
-		if (!quiet)
-			print("not_enough_params", "alias");
+	if (!string || !(cmd = strchr(string, ' ')))
 		return -1;
-	}
 
 	*cmd++ = 0;
 
@@ -1902,6 +1903,7 @@ int alias_add(const char *string, int quiet, int append)
 				
 				if (!quiet)
 					print("aliases_append", string);
+
 				return 0;
 			}
 		}
@@ -1911,7 +1913,8 @@ int alias_add(const char *string, int quiet, int append)
 		struct command *c = l->data;
 
 		if (!strcasecmp(string, c->name) && !c->alias) {
-			print("aliases_command", string);
+			if (!quiet)
+				print("aliases_command", string);
 			return -1;
 		}
 
@@ -1939,11 +1942,12 @@ int alias_add(const char *string, int quiet, int append)
  *
  * usuwa alias z listy aliasów.
  *
- *  - name - alias lub NULL.
+ *  - name - alias lub NULL,
+ *  - quiet.
  *
  * 0/-1
  */
-int alias_remove(const char *name)
+int alias_remove(const char *name, int quiet)
 {
 	list_t l;
 	int removed = 0;
@@ -1954,7 +1958,7 @@ int alias_remove(const char *name)
 		l = l->next;
 
 		if (!name || !strcasecmp(a->name, name)) {
-			if (name)
+			if (name && !quiet)
 				print("aliases_del", name);
 			command_remove(a->name);
 			xfree(a->name);
@@ -1965,6 +1969,9 @@ int alias_remove(const char *name)
 	}
 
 	if (!removed) {
+		if (quiet)
+			return -1;
+
 		if (name)
 			print("aliases_noexist", name);
 		else
@@ -1973,7 +1980,7 @@ int alias_remove(const char *name)
 		return -1;
 	}
 
-	if (removed && !name)
+	if (removed && !name && !quiet)
 		print("aliases_del_all");
 
 	return 0;
@@ -1982,8 +1989,8 @@ int alias_remove(const char *name)
 /*
  * alias_check()
  *
- * sprawdza czy komenda w line jest aliasem, je¶li tak - zwraca listê
- * komend, innaczej NULL.
+ * sprawdza, czy komenda w line jest aliasem, je¶li tak - zwraca listê
+ * komend, inaczej NULL.
  *
  *  - line - linia z komend±.
  */
@@ -1991,6 +1998,9 @@ list_t alias_check(const char *line)
 {
 	list_t l;
 	int i = 0;
+
+	if (!line)
+		return NULL;
 
 	while (*line == ' ')
 		line++;
@@ -2172,8 +2182,8 @@ const char *event_format(int flags)
 	for (i = 0; event_labels[i].name; i++) {
 		if ((flags & event_labels[i].event)) {
 			if (!first)
-				strcat(buf, ",");
-			strcat(buf, event_labels[i].name);
+				strncat(buf, ",", sizeof(buf) - 1 - strlen(buf));
+			strncat(buf, event_labels[i].name, sizeof(buf) - 1 - strlen(buf));
 			first = 0;
 		}
 	}
@@ -2208,7 +2218,7 @@ int event_flags(const char *events)
 
 	array_free(a);
 
-        return flags;
+	return flags;
 }
 
 /*
@@ -2257,11 +2267,12 @@ int event_add(int flags, uin_t uin, const char *action, int quiet)
  * usuwa zdarzenie z listy zdarzeñ.
  *
  *  - flags,
- *  - uin.
+ *  - uin,
+ *  - quiet.
  *
  * 0/-1
  */
-int event_remove(int flags, uin_t uin)
+int event_remove(int flags, uin_t uin, int quiet)
 {
 	list_t l;
 	int removed = 0;
@@ -2276,12 +2287,14 @@ int event_remove(int flags, uin_t uin)
 
 		if (e && e->uin == uin && e->flags & flags) {
 			if ((event_flags &= ~flags) == 0) {
-				print("events_del", event_format(flags), (uin == 1) ? "*" : format_user(uin), e->action);
+				if (!quiet)
+					print("events_del", event_format(flags), (uin == 1) ? "*" : format_user(uin), e->action);
 				xfree(e->action);
 				list_remove(&events, e, 1);
 				removed = 1;
 			} else {
-				print("events_del_flags", event_format(flags));
+				if (!quiet)
+					print("events_del_flags", event_format(flags));
 				e->flags = event_flags;
 				return 0;
                         }
@@ -2289,7 +2302,8 @@ int event_remove(int flags, uin_t uin)
         }
 
 	if (!removed) {
-        	print("events_del_noexist", event_format(flags), (uin == 1) ? "*" : format_user(uin));
+		if (!quiet)
+        		print("events_del_noexist", event_format(flags), (uin == 1) ? "*" : format_user(uin));
         	return 1;
 	} else
 		return 0;

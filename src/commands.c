@@ -202,6 +202,11 @@ COMMAND(cmd_add)
 COMMAND(cmd_alias)
 {
 	if (match_arg(params[0], 'a', "add", 2)) {
+		if (!params[1] || !strchr(params[1], ' ')) {
+			print("not_enough_params", name);
+			return;
+		}
+
 		if (!alias_add(params[1], 0, 0))
 			config_changed = 1;
 
@@ -209,6 +214,11 @@ COMMAND(cmd_alias)
 	}
 
 	if (match_arg(params[0], 'A', "append", 2)) {
+		if (!params[1] || !strchr(params[1], ' ')) {
+			print("not_enough_params", name);
+			return;
+		}
+
 		if (!alias_add(params[1], 0, 1))
 			config_changed = 1;
 
@@ -224,9 +234,9 @@ COMMAND(cmd_alias)
 		}
 
 		if (!strcmp(params[1], "*"))
-			ret = alias_remove(NULL);
+			ret = alias_remove(NULL, 0);
 		else
-			ret = alias_remove(params[1]);
+			ret = alias_remove(params[1], 0);
 
 		if (!ret)
 			config_changed = 1;
@@ -717,7 +727,7 @@ COMMAND(cmd_find)
 	if (argv[0] && !argv[1] && argv[0][0] != '-') {
 		uin_t uin = get_uin(params[0]);
 
-		if (!get_uin(params[0])) {
+		if (!uin) {
 			print("user_not_found", params[0]);
 			array_free(argv);
 			return;
@@ -2826,7 +2836,7 @@ COMMAND(cmd_on)
 	}
 
         if (!strncasecmp(params[2], "clear", 5)) {
-		event_remove(flags, uin);
+		event_remove(flags, uin, 0);
 		config_changed = 1;
 		return;
         }
@@ -3215,7 +3225,7 @@ COMMAND(cmd_timer)
 				p += strlen(itoa(_period));
 
 				if (strlen(p)) {
-					switch (*p++) {
+					switch (tolower(*p++)) {
 						case 'd':
 							_period *= 86400;
 							break;
