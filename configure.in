@@ -45,7 +45,9 @@ if test "x$READLINE_LIBS" = "x"; then
 fi
 
 SAVE_LIBS="$LIBS"
+SAVE_CFLAGS="$CFLAGS"
 LIBS="$LIBS $READLINE_LIBS"
+CFLAGS="$CFLAGS $READLINE_INCLUDES"
 
 AC_CACHE_CHECK([for rl_set_prompt() in readline], ac_cv_has_rl_set_prompt,
 [AC_TRY_LINK([#include <stdio.h>
@@ -64,6 +66,7 @@ if test x"$ac_cv_has_rl_completion" != xno; then
 fi
 
 LIBS="$SAVE_LIBS"
+CFLAGS="$SAVE_CFLAGS"
 
 AC_PATH_PROG(RM, rm, no)
 if test "x$RM" = "xno"; then
