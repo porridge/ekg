@@ -37,6 +37,7 @@
 #include "commands.h"
 #include "events.h"
 #include "themes.h"
+#include "version.h"
 
 time_t last_action = 0;
 
@@ -179,14 +180,26 @@ void sighup()
 int main(int argc, char **argv)
 {
 	int auto_connect = 1, i;
+	
+	config_user = "";
+	init_theme();
+	read_theme(NULL, 1);
 
 	for (i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--debug"))
 			gg_debug_level = 255;
 		if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "--no-auto"))
 			auto_connect = 0;
+		if (!strcmp(argv[i], "-u") || !strcmp(argv[i], "--user")){ 
+		  if (argv[i+1]){ 
+		    config_user = argv[i+1]; i++;
+		  } else {
+		   my_printf("user_not_given");
+		   return 1;
+		  }
+		}
 	}
-
+	
 	signal(SIGCONT, sigcont);
 	signal(SIGHUP, sighup);
 	signal(SIGALRM, SIG_IGN);
@@ -205,7 +218,7 @@ int main(int argc, char **argv)
 
 	parse_autoexec(NULL);
 
-	my_printf("welcome");
+	my_printf("welcome", VERSION);
 	
 	read_config(NULL);
 

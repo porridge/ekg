@@ -60,6 +60,7 @@ int display_color;
 int enable_beep, enable_beep_msg, enable_beep_chat, enable_beep_notify;
 int config_uin;
 char *config_password;
+char *config_user;
 int sms_away;
 char *sms_number;
 char *sms_send_app;

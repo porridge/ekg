@@ -1,3 +1,9 @@
+// 20001-10-17
+
+- czyszczenie userlist [statusow] (i/agaran)
+- mozliwosc wyboru usera ekg -u <user> - konfig pobiera z ~/.gg/<user>/config
+- cvs  ;>
+ 
 // 2001-10-14
 
 - dodana komenda ,,alias'' (p/drg).
