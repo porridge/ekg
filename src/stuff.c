@@ -666,6 +666,7 @@ void changed_proxy(const char *var)
 	gg_proxy_username = NULL;
 	xfree(gg_proxy_password);
 	gg_proxy_password = NULL;
+	gg_proxy_enabled = 0;	
 
 	if (!config_proxy)
 		return;
