@@ -1870,8 +1870,10 @@ COMMAND(cmd_msg)
 		memset(&e, 0, sizeof(e));
 		e.type = GG_EVENT_MSG;
 		e.event.msg.sender = config_uin;
-		e.event.msg.message = xstrdup(params[1]);
+		e.event.msg.message = xstrdup(raw_msg);
 		e.event.msg.time = time(NULL);
+		e.event.msg.formats = format + 3;
+		e.event.msg.formats_length = formatlen - 3;
 
 		memset(&u, 0, sizeof(u));
 		u.uin = 0;
