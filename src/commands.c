@@ -1143,7 +1143,7 @@ COMMAND(cmd_set)
 		arg++;
 	}
 
-	if (params[1]) {
+	if (params[0] && params[1]) {
 		char **tmp = array_make(params[1], "", 0, 0, 1);
 
 		xfree(params[1]);
