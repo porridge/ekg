@@ -83,10 +83,12 @@ static int dd_color(const char *name)
 	return (config_display_color);
 }
 
+#ifdef WITH_UI_NCURSES
 static int dd_contacts(const char *name)
 {
 	return (config_contacts);
 }
+#endif
 
 /*
  * variable_init()

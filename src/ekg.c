@@ -861,8 +861,10 @@ int main(int argc, char **argv)
 
 #ifdef WITH_UI_READLINE
 	ui_init = ui_readline_init;
-#else
+#elif defined(WITH_UI_NCURSES)
 	ui_init = ui_ncurses_init;
+#else
+	ui_init = ui_batch_init;
 #endif
 
 #ifdef WITH_FORCE_NCURSES
