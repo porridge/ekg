@@ -290,22 +290,6 @@ int strncasecmp_pl(const char * cs,const char * ct,size_t count)
 }
 
 /*
- * zamienia wszystkie znaki ci±gu na ma³e
- * zwraca ci±g po zmianach
- */
-static char *str_tolower(const char *text) {
-        int i;
-        char *tmp;
-
-        tmp = xmalloc(strlen(text) + 1);
-
-        for(i=0; i < strlen(text); i++)
-                tmp[i] = tolower_pl(text[i]);
-        tmp[i] = '\0';
-        return tmp;
-}
-
-/*
  * contacts_size()
  *
  * liczy szeroko¶æ okna z list± kontaktów.
@@ -3066,7 +3050,7 @@ static void complete(int *line_start, int *line_index)
 					if(completions[0][common - 1] == '"')
 						common--;
 						
-					strncat(line, str_tolower(completions[0]), common);
+					strncat(line, completions[0], common);
 					*line_index = strlen(line);
 				} else {
 					if(strrchr(words[i], ' '))
