@@ -215,6 +215,7 @@ enum gg_session_enum {
 	GG_SESSION_USERLIST_GET,	/* pobieranie userlisty */
 	GG_SESSION_USERLIST_PUT,	/* wysy³anie userlisty */
 	GG_SESSION_UNREGISTER,	/* usuwanie konta */
+	GG_SESSION_USERLIST_REMOVE,	/* usuwanie userlisty */
 	
 	GG_SESSION_USER0 = 256,	/* zdefiniowana dla u¿ytkownika */
 	GG_SESSION_USER1,	/* j.w. */
@@ -660,6 +661,10 @@ void gg_userlist_get_free(struct gg_http *f);
 struct gg_http *gg_userlist_put(uin_t uin, const char *password, const char *contacts, int async);
 int gg_userlist_put_watch_fd(struct gg_http *f);
 void gg_userlist_put_free(struct gg_http *f);
+
+struct gg_http *gg_userlist_remove(uin_t uin, const char *password, int async);
+int gg_userlist_remove_watch_fd(struct gg_http *f);
+void gg_userlist_remove_free(struct gg_http *f);
 
 /*
  * funkcje dotycz±ce komunikacji miêdzy klientami.
