@@ -2769,7 +2769,6 @@ static void ui_ncurses_loop()
 					ch = wgetch(input);
 					if (ch >= 107 && ch <= 118)
 						window_switch(ch - 106);
-					break;
 				}
 			}
 		} else {

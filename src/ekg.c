@@ -901,6 +901,7 @@ int main(int argc, char **argv)
 	signal(SIGUSR2, handle_sigusr2);
 	signal(SIGALRM, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
 
 	while ((c = getopt_long(argc, argv, "b::a::i::pdnc:f:hI:ot:u:vN", ekg_options, NULL)) != -1) {
 		switch (c) {
