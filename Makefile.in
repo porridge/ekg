@@ -5,6 +5,8 @@ datadir = @datadir@
 mandir = @mandir@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
+libdir = @libdir@
+includedir = @includedir@
 
 MAKE = @MAKE@
 INSTALL = @INSTALL@
@@ -47,6 +49,17 @@ install-ekg-man:
 install-ekgsearch:
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) -m 755 contrib/ekgsearch $(DESTDIR)$(bindir)
+
+#
+
+uninstall:	@uninstall_ekg@
+	rm -f $(DESTDIR)$(libdir)/libgadu.{a,so*}
+	rm -f $(DESTDIR)$(includedir)/libgadu.h
+
+uninstall-ekg:
+	rm -f $(DESTDIR)$(bindir)/{ekg,ekgsearch,ioctld}
+	rm -rf $(DESTDIR)$(datadir)/ekg
+	rm -f $(DESTDIR)$(mandir){/pl,}/man1/ekg{,search}
 
 #
 

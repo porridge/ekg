@@ -1,3 +1,4 @@
 Makefile
 libgadu.so*
 so_locations
+*.lo

@@ -11,15 +11,18 @@ VERSION_MAJOR=0
 VERSION_MINOR=10
 
 CC = @CC@ 
-CFLAGS = @CFLAGS_LIBGADU@ -I.. -fPIC -Wall
+CFLAGS = @CFLAGS_LIBGADU@ -I.. -Wall
 LIBS = @LIBS_LIBGADU@
 
 MAKE = @MAKE@
 AR = @AR@
 INSTALL = @INSTALL@
 RANLIB = @RANLIB@
+STRIP = @STRIP@
+LN_S = @LN_S@
 
 OBJS = common.o libgadu.o search.o pubdir.o http.o dcc.o userlist.o events.o
+LOBJS = common.lo libgadu.lo search.lo pubdir.lo http.lo dcc.lo userlist.lo events.lo
 
 SHARED = libgadu.so.$(VERSION_MAJOR).$(VERSION_MINOR)
 STATIC = libgadu.a
@@ -29,7 +32,7 @@ all:	@static@ @shared@
 #
 
 clean:
-	rm -f *.o *.a *.so *.so.* *~ core
+	rm -f *.o *.lo *.a *.so *.so.* *~ core
 
 distclean:	clean
 	rm -f Makefile
@@ -44,11 +47,14 @@ $(STATIC): $(OBJS)
 
 #
 
+%.lo:	%.c
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -fPIC $< -o $@
+
 shared:	$(SHARED)
 
-$(SHARED): $(OBJS)
-	$(CC) -g -shared -Wl,-soname=libgadu.so.$(VERSION_MAJOR) -o $(SHARED) $(OBJS) $(LIBS) -lc
-	ln -s $(SHARED) libgadu.so
+$(SHARED): $(LOBJS)
+	$(CC) -g -shared -Wl,-soname=libgadu.so.$(VERSION_MAJOR) -o $(SHARED) $(LOBJS) $(LIBS) -lc
+	$(LN_S) $(SHARED) libgadu.so
 
 #
 
@@ -59,9 +65,13 @@ install-common:
 	$(INSTALL) -m 644 libgadu.h $(DESTDIR)$(includedir)
 	$(INSTALL) -d $(DESTDIR)$(libdir)
 
-install-shared:	install-common
+install-shared:	install-common @strip_libgadu_so@
 	$(INSTALL) -m 755 $(SHARED) $(DESTDIR)$(libdir)
+	ldconfig || true
 
 install-static:	install-common
 	$(INSTALL) -m 755 $(STATIC) $(DESTDIR)$(libdir)
-	
+
+strip-libgadu-so:
+	$(STRIP) $(SHARED)
+

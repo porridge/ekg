@@ -14,6 +14,11 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - literówki (porridge/w)
 - ioctld nie jest instalowany z suidem (w)
 - instalacja manów ekgsearch (w)
+- du¿o psucia autoconfów i Makefile'i (w)
+- dodanie ,,make uninstall'', które usuwa pozosta³o¶ci po ró¿nych
+  wersjach i konfiguracjach ekg (w)
+- wersja statyczna libgadu jest kompilowana bez -fPIC, dzielona z -fPIC,
+  przez co w najgorszym wypadku bêdzie kompilowana dwa razy (porridge/w)
 
 // 2002-07-25
 
