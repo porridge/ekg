@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - wywalenie warninga przy ,,changed_dcc'' (d)
 - dodana zmienna ,,dcc_dir'' (d)
 - update docs/vars.txt (d)
+- poprawka quita (chilek/w)
 
 // 2002-06-12
 

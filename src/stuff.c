@@ -2034,6 +2034,9 @@ void ekg_logoff(struct gg_session *sess, char *reason)
 	if (!sess)
 		return;
 
+	if (sess->state != GG_STATE_CONNECTED || sess->status == GG_STATUS_NOT_AVAIL || sess->status == GG_STATUS_NOT_AVAIL_DESCR)
+		return;
+
 	if (reason)
 		tmp = strdup(reason);
 	
