@@ -17,10 +17,10 @@ STATIC = libgadu.a
 all:	static @shared@
 
 distclean:	clean
-	$(RM) -f *~ Makefile
+	rm -f *~ Makefile
 
 clean:
-	$(RM) -f *.o libgadu.so* libgadu.a
+	rm -f *.o libgadu.so* libgadu.a
 
 shared:	$(SHARED)
 
