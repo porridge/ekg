@@ -589,6 +589,8 @@ void gg_pubdir50_free(gg_pubdir50_t res);
 #define GG_PUBDIR50_GENDER "gender"
 #define GG_PUBDIR50_GENDER_FEMALE "1"
 #define GG_PUBDIR50_GENDER_MALE "2"
+#define GG_PUBDIR50_GENDER_SET_FEMALE "2"
+#define GG_PUBDIR50_GENDER_SET_MALE "1"
 #define GG_PUBDIR50_ACTIVE "ActiveOnly"
 #define GG_PUBDIR50_ACTIVE_TRUE "1"
 #define GG_PUBDIR50_START "fmstart"

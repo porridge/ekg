@@ -1046,12 +1046,12 @@ COMMAND(cmd_change)
 			}
 			
 			if (match_arg(argv[i], 'F', "female", 2)) {
-				gg_pubdir50_add(req, GG_PUBDIR50_GENDER, GG_PUBDIR50_GENDER_FEMALE);
+				gg_pubdir50_add(req, GG_PUBDIR50_GENDER, GG_PUBDIR50_GENDER_SET_FEMALE);
 				continue;
 			}
 
 			if (match_arg(argv[i], 'M', "male", 2)) {
-				gg_pubdir50_add(req, GG_PUBDIR50_GENDER, GG_PUBDIR50_GENDER_MALE);
+				gg_pubdir50_add(req, GG_PUBDIR50_GENDER, GG_PUBDIR50_GENDER_SET_MALE);
 				continue;
 			}
 
