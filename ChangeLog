@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-09-12
+
+- libgadu: wysy³anie listy kontaktów ju¿ dzia³a (Chilek/w)
+
 // 2003-09-11
 
 - libgadu: obs³uga listy kontaktów na serwerze zgodnej z GG 6.0. wysy³anie
