@@ -1006,9 +1006,11 @@ void handle_dcc(struct gg_dcc *d)
 					my_printf("dcc_error_unknown", "");
 			}
 
+#ifdef HAVE_VOIP
 			if (d->type == GG_SESSION_DCC_VOICE)
 				voice_close();
-			
+#endif  /* HAVE_VOIP */
+
 			list_remove(&watches, d, 0);
 			remove_transfer(d);
 			gg_free_dcc(d);
