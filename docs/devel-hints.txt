@@ -1,22 +1,18 @@
-parê wskazówek dla developerów:
+parê wymagañ dla developerów:
 
 1) jak co¶ poprawiacie/dodajecie, zachowujcie jaki¶tam ,,coding style''.
    g³upio siê patrzy na ¼ród³o, w którym czê¶æ ma styl K&R z wciêciami
    tabami, a czê¶æ ma nie wiadomo jaki, z wciêciami 2/3 spacje na zmianê.
 
-2) dopisujcie siê do copyrightów na pocz±tku pliku.
+2) dopisujcie siê do copyrightów na pocz±tku pliku. inaczej zak³adam, ¿e
+   zrzekacie siê praw do podes³anych kawa³ków kodu. oczywi¶cie podsy³any
+   kod musi byæ na takiej samej licencji, jak reszta.
 
 3) zachowujcie przyjêt± konwencjê. je¶li wszystkie zmienne danej struktury
    siê nazywaj± ,,foobar_count'', nie dodawajcie ,,foocount'', czy
    ,,nfoo''.
 
-4) nie zmieniajcie api bez powodu. je¶li co¶ wymaga³oby potwornych hacków,
-   jak na przyk³ad zmiana gg_session->initial_status zaraz po gg_login()
-   i ich ilo¶æ zaczê³aby siê zwiêkszaæ, wypada³oby o tym pomy¶leæ. warto
-   te¿ stosowaæ funkcjê typu _ex(). przyk³ad: chcemy dodaæ kolejny
-   parametr do gg_login(). g³upio zmieniaæ API nagle. zamiast tego mo¿na
-   s/gg_login/gg_login_ex/, dodaæ parametry i napisaæ gg_login(), która
-   bêdzie wrapperem i dopisze brakuj±ce parametry.
+4) nie zmieniajcie api bez powodu.
 
 5) tworz±c wiêkszy kawa³ek/modu³/plik przeznaczony do jakiej¶ konkretnej
    funkcji, starajcie siê nazywaæ funkcje i zmienne tak, by by³o wiadomo,

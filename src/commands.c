@@ -2165,7 +2165,11 @@ int binding_help(int a, int b)
 {
 	/* XXX proszê siê nie czepiaæ tego kodu. za jaki¶ czas poprawiê. */
 
-	my_printf("generic", "Póki co, przeczytaj plik README za³±czony do programu.");
-	my_printf("generic", "Je¶li go nie masz, zajrzyj na \033[1mhttp://dev.null.pl/ekg/\033[0m");
+	my_printf("generic", "---------------------------------------------------------------------");
+	my_printf("generic", "Przed u¿yciem przeczytaj ulotkê. Plik \033[1mdocs/ULOTKA\033[0m zawiera krótki");
+	my_printf("generic", "po za³±czonej dokumentacji. Je¶li go nie masz, mo¿esz ¶ci±gn±æ pakiet");
+	my_printf("generic", "ze strony \033[1mhttp://dev.null.pl/ekg/\033[0m");
+	my_printf("generic", "---------------------------------------------------------------------");
+
 	return 0;
 }

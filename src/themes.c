@@ -34,6 +34,8 @@
 char *prompt_cache = NULL, *prompt2_cache = NULL, *error_cache = NULL, *timestamp_cache = NULL;
 char *readline_prompt = NULL, *readline_prompt_away = NULL, *readline_prompt_invisible = NULL;
 
+int no_prompt_cache = 0;
+
 struct list *formats = NULL;
 
 /*
@@ -68,6 +70,7 @@ char *find_format(char *name)
  */
 char *va_format_string(char *format, va_list ap)
 {
+	static int dont_resolve = 0;
 	struct string *buf;
 	char *p, *args[9];
 	int i;
@@ -81,20 +84,27 @@ char *va_format_string(char *format, va_list ap)
 			break;
 	}
 
-	if (!prompt_cache) {
-		prompt_cache = "dummy";
-		prompt_cache = format_string(find_format("prompt"));
+	if (!dont_resolve) {
+		dont_resolve = 1;
+		if (no_prompt_cache) {
+			/* zawsze czytaj */
+			timestamp_cache = find_format("timestamp");
+			prompt_cache = format_string(find_format("prompt"));
+			prompt2_cache = format_string(find_format("prompt2"));
+			error_cache = format_string(find_format("error"));
+		} else {
+			/* tylko je¶li nie s± keszowanie */
+			if (!timestamp_cache)
+				timestamp_cache = find_format("timestamp");
+			if (!prompt_cache)
+				prompt_cache = format_string(find_format("prompt"));
+			if (!prompt2_cache)
+				prompt2_cache = format_string(find_format("prompt2"));
+			if (!error_cache)
+				error_cache = format_string(find_format("error"));
+		}
+		dont_resolve = 0;
 	}
-	if (!prompt2_cache) {
-		prompt2_cache = "dummy";
-		prompt2_cache = format_string(find_format("prompt2"));
-	}
-	if (!error_cache) {
-		error_cache = "dummy";
-		error_cache = format_string(find_format("error"));
-	}
-	if (!timestamp_cache)
-		timestamp_cache = find_format("timestamp");
 	
 	if (!(buf = string_init("")))
 		return NULL;
@@ -324,6 +334,11 @@ int add_format(char *name, char *value, int replace)
 	struct format f;
 	struct list *l;
 
+	if (!strcasecmp(name, "no_prompt_cache")) {
+		no_prompt_cache = 1;
+		return 0;
+	}
+	
 	for (l = formats; l; l = l->next) {
 		struct format *g = l->data;
 
@@ -557,7 +572,7 @@ void init_theme()
 	add_format("conn_broken", "%! Serwer zerwa³ po³±czenie: %1 %c(%C%#%c)%n\n", 1);
 	add_format("auto_away", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci %c(%C%#%c)%n\n", 1);
 	add_format("auto_away_descr", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci %c(%C%#%c)%n: %2\n", 1);
-	add_format("welcome", "%> EKG-%1 (Eksperymentalny Klient Gadu-gadu)\n%> (C) Copyright 2001, 2002 Wojtek Kaniewski <wojtekka@irc.pl> i inni\n%> Program jest rozprowadzany na zasadach licencji GPL\n\n", 1);
+	add_format("welcome", "%> %WEKG-%1%n (Eksperymentalny Klient Gadu-gadu)\n%> (C) Copyright 2001, 2002 Wojtek Kaniewski <wojtekka@irc.pl> i inni\n%> Program jest rozprowadzany na zasadach licencji GPL\n%> %RPrzed u¿yciem przeczytaj ulotkê (polecenie ,,help'' lub F1)%n\n\n", 1);
 	add_format("error_reading_config", "%! Nie mo¿na odczytaæ pliku konfiguracyjnego: %1\n", 1);
 	add_format("offline_mode", "%! Tryb off-line\n", 1);
 	add_format("connecting", "%> £±czê siê z serwerem...\n", 1);

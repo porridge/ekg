@@ -1,0 +1,212 @@
+# jeszcze nie jest dokoñczone
+
+no_prompt_cache 1
+prompt %K(%w%#%K)%n
+prompt2 %c(%C%#%c)%n
+error %r(%R%#%r)%n
+timestamp %H:%M
+readline_prompt > 
+readline_prompt_away away> 
+readline_prompt_invisible inv> 
+readline_prompt_query %1> 
+readline_more -- wci¶nij enter by kontynuowaæ --
+known_user %C%1%K/%c%2%n
+unknown_user %C%1%n
+
+none %1\n
+generic %> %1\n
+
+welcome %> %WEKG-%1%n (Eksperymentalny Klient Gadu-gadu)\n%> (C) Copyright 2001, 2002 Wojtek Kaniewski <wojtekka@irc.pl> i inni\n%> Program jest rozprowadzany na zasadach licencji GPL\n%> %RPrzed u¿yciem przeczytaj ulotkê (polecenie ,,help'' lub F1)%n\n\n
+
+user_not_given Nie podany u¿ytkownik!\n
+not_enough_params %! Za ma³o parametrów\n
+invalid_uin %! Nieprawid³owy numer u¿ytkownika\n
+user_added %> U¿ytkownik %1 zosta³ dopisany do listy kontaktów\n
+error_adding %! Wyst±pi³ b³±d podczas dopisywania u¿ytkownika\n
+away %> Zmieniono stan na zajêty\n
+away_descr %> Zmieniono stan na zajêty: %1\n
+back %> Zmieniono stan na dostêpny\n
+back_descr %> Zmieniono stan na dostêpny: %1\n
+invisible %> Zmieniono stan na niewidoczny\n
+invisible_descr %> Zmieniono stan na niewidoczny: %1\n
+user_not_found %! Nie znaleziono u¿ytkownika %W%1%n\n
+user_deleted %> U¿ytkownik %1 zosta³ usuniêty z listy kontaktów\n
+error_deleting %! Wyst±pi³ b³±d podczas usuwania u¿ytkownika\n
+user_exists %! U¿ytkownik %W%1%n ju¿ istnieje w li¶cie kontaktów\n
+help %> %W%1%C%2%n - %3\n
+help_more %) %1\n
+ignored_list %> %1\n
+ignored_list_empty %! Lista ignorowanych u¿ytkowników jest pusta\n
+ignored_added %> U¿ytkownika %W%1%n dodano do listy ignorowanych\n
+error_adding_ignored %! Dodanie do listy ignorowanych nie powiod³o siê\n
+ignored_deleted %> U¿ytkownika %W%1%n usuniêto z listy ignorowanych\n
+error_not_ignored %! U¿ytkownik %W%1%n nie jest ignorowany\n
+list_empty %! Lista kontaktów jest pusta\n
+list_avail %> %1 %Y(dostêpny)%n %b%2:%3%n\n
+list_avail_descr %> %1 %Y(dostêpny: %n%4%Y)%n %b%2:%3%n\n
+list_busy %> %1 %G(zajêty)%n %b%2:%3%n\n
+list_busy_descr %> %1 %G(zajêty: %n%4%G)%n %b%2:%3%n\n
+list_not_avail %> %1 %r(niedostêpny)%n\n
+list_not_avail_descr %> %1 %r(niedostêpny: %n%4%r)%n\n
+list_invisible %> %1 %c(niewidoczny)%n %b%2:%3%n\n
+list_unknown %> %1\n
+saved %> Zapisano ustawienia\n
+error_saving %! Podczas zapisu ustawieñ wyst±pi³ b³±d\n
+quit %> Papa\n
+quit_descr %> Papa: %1\n
+message_header %g.-- %n%1 %c(%C%#%c/%2)%n %g--- -- -\n
+message_footer %g`----- ---- --- -- -%n\n
+message_line %g|%n %1\n
+message_line_width 75
+chat_header %c.-- %n%1 %c(%C%#%c/%2)%n %c--- -- -\n
+chat_footer %c`----- ---- --- -- -%n\n
+chat_line %c|%n %1\n
+chat_line_width 75
+sysmsg_header %m.-- %WWiadomo¶æ systemowa %m--- -- -\n
+sysmsg_line %m|%n %1\n
+sysmsg_line_width 75
+sysmsg_footer %m`----- ---- --- -- -%n\n	
+ack_queued %> Wiadomo¶æ do %1 zostanie dostarczona pó¼niej%n\n
+ack_delivered %> Wiadomo¶æ do %1 zosta³a dostarczona%n\n
+status_avail %> %1 jest dostêpny%n\n
+status_avail_descr %> %1 jest dostêpny: %2%n\n
+status_busy %> %1 jest zajêty%n\n
+status_busy_descr %> %1 jest zajêty: %2\n
+status_not_avail %> %1 jest niedostêpny\n
+status_not_avail_descr %> %1 jest niedostêpny: %2\n
+status_invisible %> %1 jest niewidoczny\n
+status_invisible_descr %> %1 jest niewidoczny: %2\n
+conn_broken %! Serwer zerwa³ po³±czenie: %1\n
+auto_away %> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci\n
+auto_away_descr %> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci: %2\n
+error_reading_config %! Nie mo¿na odczytaæ pliku konfiguracyjnego: %1\n
+offline_mode %! Tryb off-line\n
+connecting %> £±czê siê z serwerem...\n
+conn_failed %! Po³±czenie nie uda³o siê: %1\n
+conn_stopped %! Przerwano ³±czenie\n
+conn_timeout %! Przekroczono limit czasu operacji ³±czenia z serwerem\n
+disconn_warning %! Serwer roz³±czy³ nas.\n 
+connected %> Po³±czono\n
+disconnected %> Roz³±czono\n
+disconnected_descr %> Roz³±czono: %1%n\n
+theme_loaded %> Wczytano opis wygl±du o nazwie %W%1%n\n
+theme_default %> Ustawiono domy¶lny opis wygl±du\n
+error_loading_theme %! Wyst±pi³ b³±d podczas ³adowania opisu wygl±du: %1\n
+not_connected %! Brak po³±czenia z serwerem\n
+variable %> %1 = %2\n
+variable_not_found %! Nieznana zmienna: %1\n
+variable_invalid %! Nieprawid³owa warto¶æ zmiennej\n
+not_implemented %! Tej funkcji jeszcze nie ma\n
+no_config %! Niekompletna konfiguracja. Wpisz:\n%!   %Wset uin <numerek-gg>%n\n%!   %Wset password <has³o>%n\n%!   %Wsave%n\n%! Nastêpnie wydaj polecenie:\n%!   %Wconnect%n\n%! Je¶li nie masz swojego numerka, wpisz:\n%!   %Wregister <e-mail> <has³o>%n\n\n
+register %> Rejestracja poprawna: Wygrany numerek: %W%1%n\n
+register_failed %! B³±d podczas rejestracji\n
+register_pending %! Rejestracja w toku\n
+register_timeout %! Przekroczono limit czasu operacji szukania\n
+remind %> Has³o zosta³o wys³ane\n
+remind_failed %! B³±d podczas wysy³ania has³a\n
+remind_timeout %! Przekroczono limit czasu operacji wys³ania has³a\n
+passwd %> Has³o zosta³o zmienione\n
+passwd_failed %! B³±d podczas zmiany has³a\n
+passwd_timeout %! Przekroczono limit czasu operacji zmiany has³a\n
+change %> Informacje w katalogu publicznym zosta³y zmienione\n
+change_failed %! B³±d podczas zmiany informacji w katalogu publicznym\n
+change_timeout %! Przekroczono limit czasu operacji zmiany katalogu publicznego\n
+sms_msg EKG: msg %1 %# >> %2
+sms_chat EKG: chat %1 %# >> %2
+sms_error %! B³±d wysy³ania SMS\n
+sms_unknown %! U¿ytkownik %1 nie ma podanego numeru komórki\n
+sms_sent %> SMS do %W%1%n zosta³ wys³any\n
+sms_failed %! SMS do %W%1%n nie zosta³ wys³any\n
+already_connected %! Klient jest ju¿ po³±czony\n
+during_connect %! £±czenie trwa\n
+search_failed %! Wyst±pi³ b³±d podczas szukania: %1\n
+search_timeout %! Przekroczono limit czasu operacji szukania\n
+search_not_found %! Nie znaleziono\n
+unknown_command %! Nieznane polecenie: %W%1%n\n
+already_searching %! Szukanie trwa. Poczekaj, albo u¿yj %Wfind -stop%n\n
+search_results_multi_active %G!%n
+search_results_multi_inactive  
+search_results_multi_unknown -
+search_results_multi_female k
+search_results_multi_male m
+search_results_multi %7 %[-10]1 %K/%n %[12]3 %K/%n %6 %K/%n %[20]2 %K/%n %[4]5 %K/%n %[16]4\n
+search_results_single_active %G(aktywny)%n
+search_results_single_inactive %r(nieaktywny)%n
+search_results_single_unknown %W-%n
+search_results_single_female %Mkobieta%n
+search_results_single_male %Cmê¿czyzna%n
+search_results_single %) Nick: %W%3%n\n%) Numerek: %W%1%n\n%) Imiê i nazwisko: %W%2%n\n%) Miejscowo¶æ: %W%4%n\n%) Rok urodzenia: %W%5%n\n%) P³eæ: %6\n
+search_stopped %) Zatrzymano szukanie\n
+process %> %(-5)1 %2\n
+no_processes %! Nie ma dzia³aj±cych procesów\n
+process_exit %> Proces %1 (%2) zakoñczy³ dzia³anie z wynikiem %3\n
+modify_done %> Zmieniono wpis w li¶cie kontaktów\n
+user_info %) Pseudonim: %W%3%n\n%) Numer: %W%7%n\n%) Stan: %8\n%) Imiê i nazwisko: %W%1 %2%n\n%) Alias: %W%4%n\n%) Numer telefonu: %W%5%n\n%) Grupy: %W%6%n\n
+user_info_avail %Ydostêpny%n
+user_info_avail_descr %Ydostêpny%n (%1)
+user_info_busy %Gzajêty%n
+user_info_busy_descr %Gzajêty%n (%1)
+user_info_not_avail %rniedostêpny%n
+user_info_not_avail_descr %rniedostêpny%n (%1)
+user_info_invisible %cniewidoczny%n
+config_changed Zapisaæ now± konfiguracjê? (tak/nie) 
+config_unknown %! Zmiana tego ustawienia mo¿e nie odnie¶æ zamierzonego efektu\n
+private_mode_is_on %> Tryb ,,tylko dla przyjació³'' jest w³±czony\n
+private_mode_is_off %> Tryb ,,tylko dla przyjació³'' jest wy³±czony\n
+private_mode_on %> W³±czono tryb ,,tylko dla przyjació³''\n
+private_mode_off %> Wy³±czono tryb ,,tylko dla przyjació³''\n
+private_mode_invalid %! Nieprawid³owa warto¶æ\n
+show_status %) Aktualny stan: %1%2\n
+show_status_avail %Ydostêpny%n
+show_status_avail_descr %Ydostêpny%n (%1)
+show_status_busy %Gzajêty%n
+show_status_busy_descr %Gzajêty%n (%1)
+show_status_invisible %bniewidoczny%n
+show_status_invisible_descr %bniewidoczny%n (%1)
+show_status_not_avail %rniedostêpny%n
+show_status_private_on , tylko dla znajomych
+show_status_private_off 
+aliases_invalid %! Nieprawid³owy parametr\n
+aliases_list_empty %! Brak aliasów\n
+aliases_list %> %W%1 %G-%Y %2%n\n
+aliases_add %> Dodano alias %W%1 %n-> %2\n
+aliases_del %) Usuniêto alias %W%1%n\n
+aliases_exist %! Alias %W%1%n ju¿ istnieje\n
+aliases_noexist %! Alias %W%1%n nie istnieje\n
+dcc_create_error %! Nie mo¿na w³±czyæ DCC: %1\n
+dcc_error_unknown %! B³±d krytyczny obs³ugi DCC: %1\n
+dcc_error_handshake %! Nie mo¿na nawi±zaæ po³±cznienia z %1\n
+dcc_timeout %! Timeout DCC\n
+dcc_unknown_command %! Nieznana opcja: %W%1%n\n
+dcc_not_supported %! Opcja %W%1%n nie jest jeszcze obs³ugiwana\n
+dcc_open_error %! Nie mo¿na otworzyæ %W%1%n: %2\n
+dcc_open_directory %! Nie mo¿na otworzyæ %W%1%n: Jest katalogiem\n
+dcc_show_pending_header %> Po³±czenia oczekuj±ce:\n
+dcc_show_pending_send %) #%1, %2, wysy³anie %W%3%n\n
+dcc_show_pending_get %) #%1, %2, odbiór %W%3%n\n
+dcc_show_active_header %> Po³±czenia aktywne:\n
+dcc_show_active_send %) #%1, %2, wysy³anie %W%3%n\n
+dcc_show_active_get %) #%1, %2, odbiór %W%3%n\n
+dcc_show_empty %> Brak bezpo¶rednich po³±czeñ\n
+dcc_show_debug %> id=%1, type=%2, filename=%3, uin=%4, dcc=%5\n
+dcc_done_get %> Zakoñczono pobieranie pliku %W%2%n od %1\n
+dcc_done_send %> Zakoñczono wysy³anie pliku %W%2%n do %1\n
+dcc_get_offer %) %1 przesy³a plik %W%2%n o rozmiarze %W%3%n\n%) Wpisz %Wdcc get #%4%n by go odebraæ, lub %Wdcc close #%4%n by anulowaæ\n
+dcc_get_not_found %! Nie znaleziono po³±czenia %W%1%n\n
+dcc_get_getting %) Rozpoczêto pobieranie pliku %W%2%n od %1\n
+dcc_get_cant_create %! Nie mo¿na utworzyæ pliku %W%1%n\n
+query_started %) Rozpoczêto rozmowê z %1. Aby zakoñczyæ, wci¶nij Ctrl-D\n
+query_finished \n%) Zakoñczono rozmowê z %1\n
+events_act_toomany_params %! %W%1%n - za du¿o parametrów.\n
+events_seq_incorrect %W%1%n - nieprawid³owa sekwencja\n
+autosaved %> Automatycznie zapisano ustawienia\n
+userlist_put_ok %) Listê kontaktów zachowano na serwerze\n
+userlist_put_error %! B³±d podczas wysy³ania listy kontaktów\n
+userlist_get_ok %) Listê kontaktów wczytano z serwera\n
+userlist_get_error %! B³±d podczas pobierania listy kontaktów\n
+change_not_enough_params %! Polecenie wymaga podania %wwszystkich%n parametrów\n
+window_change_size %) Uaktualniono informacjê o rozmiarach okna.\n
+quick_list %)%1\n
+quick_list_avail  %W%1%n
+quick_list_busy  %w%1%n
+quick_list_invisible  %K%1%n

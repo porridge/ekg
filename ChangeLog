@@ -5,6 +5,15 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-04-30
+
+- poprawki docs/devel-hints.txt, dodanie docs/ULOTKA, na czerwono ka¿e
+  na pocz±tku czytaæ pomoc itd. (w)
+- skrypt themes/extract.pl (w)
+- je¶li w themie bêdzie ,,no_prompt_cache 1'', prompty nie bêd± keszowane
+  (a to dopiero nowina!) i mo¿na przez to w nich dawaæ timestampy (w)
+- niedorobiony theme 2k2 (w)
+
 // 2002-04-28
 
 - dok³adniejsze ifdefowanie kodu dla ioctldaemona (w)

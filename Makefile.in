@@ -22,12 +22,12 @@ libgadu:
 	(cd lib; $(MAKE) all)
 
 install: all 
-	(cd src; $(MAKE) install)
 	@$(install) -d $(prefix)/bin	
 	@$(install) -d $(datadir)/ekg/themes/
 	$(install) -m 644 themes/*.theme $(datadir)/ekg/themes
 	@$(install) -d $(mandir)/man1
 	$(install) -m 644 docs/ekg.man.en $(mandir)/man1/ekg.1
+	(cd src; $(MAKE) install)
 	
 distclean:	clean
 	$(RM) -f *~ config.log config.cache config.status config.h Makefile
