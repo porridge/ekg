@@ -55,6 +55,7 @@ list_t userlist = NULL;
 struct ignore_label ignore_labels[IGNORE_LABELS_MAX] = {
 	{ IGNORE_STATUS, "status" },
 	{ IGNORE_STATUS_DESCR, "descr" },
+	{ IGNORE_NOTIFY, "notify" },
 	{ IGNORE_MSG, "msg" },
 	{ IGNORE_DCC, "dcc" },
 	{ IGNORE_EVENTS, "events" },

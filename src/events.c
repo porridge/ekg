@@ -685,7 +685,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 	};
 	struct status_table *s;
 	int prev_status, hide = 0;
-	int ignore_status = 0, ignore_status_descr = 0, ignore_events = 0;
+	int ignore_status, ignore_status_descr, ignore_events, ignore_notify;
 	char *descr = NULL;
 #ifdef WITH_PYTHON
 	list_t l;
@@ -698,6 +698,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 	ignore_status = ignored_check(uin) & IGNORE_STATUS;
 	ignore_status_descr = ignored_check(uin) & IGNORE_STATUS_DESCR;
 	ignore_events = ignored_check(uin) & IGNORE_EVENTS;
+	ignore_notify = ignored_check(uin) & IGNORE_NOTIFY;
 
 #ifdef WITH_PYTHON
 	for (l = modules; l; l = l->next) {
@@ -827,22 +828,11 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 			add_send_nick(u->display);
 		if (GG_S_NA(s->status) && (config_completion_notify & 2))
 			remove_send_nick(u->display);
-		
-		if (hide)
+
+		/* wy¶wietlaæ na ekranie ? */
+		if (!config_display_notify || ignore_notify || hide)
 			break;
 
-		/* daj znaæ d¿wiêkiem */
-		if (config_beep && config_beep_notify)
-			ui_beep();
-
-		/* i muzyczk± */
-		if (config_sound_notify_file && strcmp(config_sound_notify_file, "") && (!config_events_delay || (time(NULL) - last_conn_event) >= config_events_delay))
-			play_sound(config_sound_notify_file);
-
-		/* czy mamy wy¶wietlaæ na ekranie? */
-		if (!config_display_notify || config_contacts == 2)
-			break;
-		
 		if (config_display_notify == 2) {
 			/* je¶li na zajêty, ignorujemy */
 			if (GG_S_B(s->status) && !GG_S_NA(prev_status))
@@ -860,6 +850,17 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 			else
 				hide_notavail = 0;
 		}
+
+		/* daj znaæ d¿wiêkiem */
+		if (config_beep && config_beep_notify)
+			ui_beep();
+
+		/* i muzyczk± */
+		if (config_sound_notify_file && strcmp(config_sound_notify_file, "") && (!config_events_delay || (time(NULL) - last_conn_event) >= config_events_delay))
+			play_sound(config_sound_notify_file);
+
+		if (config_contacts == 2)
+			break;
 			
 		/* no dobra, poka¿ */
 		print_window(u->display, 0, s->format, format_user(uin), (u->first_name) ? u->first_name : u->display, descr);

@@ -6,6 +6,13 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-02-14
+
+- d¿wiêki przy zmianach stanu zachowuj± siê tak, jak to nakazuje zmienna
+  ,,display_notify''. nie s± natomiast wy³±czane przy ukrywaniu zmian
+  poprzez ,,contacts'' równe 2 (sz)
+- poziom ignorowania ,,notify'' (sz)
+
 // 2003-02-13
 
 - lepsze wykrywanie pthread (adrians/w)

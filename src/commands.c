@@ -5034,6 +5034,7 @@ void command_init()
 	  "Dostêpne poziomy ignorowania:\n"
 	  "  - status - ca³kowicie ignoruje stan\n"
 	  "  - descr - ignoruje tylko opisy\n"
+	  "  - notify - nie wy¶wietla zmian stanu\n"
 	  "  - msg - ignoruje wiadomo¶ci\n"
 	  "  - dcc - ignoruje po³±czenia DCC\n"
 	  "  - events - ignoruje zdarzenia zwi±zane z u¿ytkownikiem\n"

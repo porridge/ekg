@@ -55,11 +55,12 @@ enum ignore_t {
 	IGNORE_MSG = 4,
 	IGNORE_DCC = 8,
 	IGNORE_EVENTS = 16,
+	IGNORE_NOTIFY = 32,
 	
 	IGNORE_ALL = 255
 };
 
-#define	IGNORE_LABELS_MAX 6
+#define	IGNORE_LABELS_MAX 7
 struct ignore_label ignore_labels[IGNORE_LABELS_MAX];
 
 struct ignore_label {
