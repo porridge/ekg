@@ -23,6 +23,7 @@ zg³osi³ b³±d.
 - poprawka zale¿no¶ci w Makefile'ach (FIG/w)
 - poprawka b³êdu autoconfa w m4/stdint.m4 (Brzezi/w)
 - poprawiona kompilacja przy braku openssl (boncur/w)
+- poprawka gg_saprintf() dla PPC (mmazur/w)
 
 // 2003-01-10
 
