@@ -32,6 +32,20 @@ conn_stopped %! %B£±czenie przerwane!%n\n
 conn_timeout %! %BSerwer nie odpowiada. Spróbuj jeszcze raz.%n\n
 connected %c%#%n %> [%G OK %n] %W<-%n %GPo³±czono z serwerem%n\n
 connecting %> %WTrwa ³±czenie z serwerem...%n\n
+contacts_header_group %W %1%n
+contacts_avail  %G%1%n
+contacts_avail_descr %Ki%G%1%n
+contacts_avail_descr_full %Ki%G%1%n %2
+contacts_busy  %C%1%n
+contacts_busy_descr %Ki%C%1%n
+contacts_busy_descr_full %Ki%C%1%n %2
+contacts_not_avail  %K%1%n
+contacts_not_avail_descr %Ki%1%n
+contacts_not_avail_descr_full %Ki%1%n %2
+contacts_invisible  %M%1%n
+contacts_invisible_descr %Ki%M%1%n
+contacts_invisible_descr_full %Ki%M%1%n %2
+contacts_blocking  %r%1%n
 disconn_warning %! %BRoz³±czono nas.%n\n
 disconnected %> %c%#%n %WRoz³±czono%n %R---| |---%n\n
 disconnected_descr %> %c%#%n %WRoz³±czono: %1%n %R---| |---%n\n
@@ -55,15 +69,15 @@ invalid_uin %! %RNiew³a¶ciwy numer%n %Wuin%n\n
 invisible %c%#%n %> %MJestem niewidzialny :)%n\n
 invisible_descr %c%#%n %> %MJestem niewidzialny: %1%n\n
 known_user %1
-list_avail %gdostêpn%@2%K...   %W<%G+%W>   %g%[12]1%n |%K%[,-15]3%n|\n
-list_avail_descr %gdostêpn%@2%K...   %W<%G+%W>   %g%[12]1%n |%K%[,-15]3%n| %K[%5]%n\n
-list_busy %czajêt%@2%K.....   %W<%C?%W>   %c%[12]1%n |%K%[,-15]3%n|\n
-list_busy_descr %czajêt%@2%K.....   %W<%C?%W>   %c%[12]1%n |%K%[,-15]3%n| %K[%5]%n\n
+list_avail %gdostêpn%@2%K...   %G<+>%n   %g%[12]1%n |%K%[,-15]3%n|\n
+list_avail_descr %gdostêpn%@2%K...   %G<+>%n   %g%[12]1%n |%K%[,-15]3%n| %K[%5]%n\n
+list_busy %czajêt%@2%K.....   %C<?>%n   %c%[12]1%n |%K%[,-15]3%n|\n
+list_busy_descr %czajêt%@2%K.....   %C<?>%n   %c%[12]1%n |%K%[,-15]3%n| %K[%5]%n\n
 list_empty %> %WTwoja lista jest pusta%n\n
-list_not_avail %Kniedostêpn%@2   %W<%R-%W>   %K%[12]1%n |%K...............%n|\n
-list_not_avail_descr %Kniedostêpn%@2   %W<%R-%W>   %K%[12]1%n |%K...............%n| %K[%5]%n\n
-list_invisible %mniewidoczn%@2   %W<%M*%W>   %m%[12]1%n |%K...............%n|\n
-list_invisible_descr %mniewidoczn%@2   %W<%M*%W>   %m%[12]1%n |%K...............%n| %K[%5]%n\n
+list_not_avail %Kniedostêpn%@2   %R<->%n   %K%[12]1%n |%K...............%n|\n
+list_not_avail_descr %Kniedostêpn%@2   %R<->%n   %K%[12]1%n |%K...............%n| %K[%5]%n\n
+list_invisible %mniewidoczn%@2   %M<*>%n   %m%[12]1%n |%K...............%n|\n
+list_invisible_descr %mniewidoczn%@2   %M<*>%n   %m%[12]1%n |%K...............%n| %K[%5]%n\n
 modify_done %> %WDane zmienione%n\n
 not_connected %! %RNie jeste¶ po³±czony z serwerem!%n\n
 not_enough_params %! %RZa ma³o parametrów%n\n
@@ -105,29 +119,30 @@ saved %> %WUstawienia zapisane.%n\n
 search_failed %! %RB³±d podczas przeszukiwania%n%W: %1%n\n
 search_not_found %! %RNie znaleziono nikogo o takich danych%n\n
 search_results_multi %W%7%[-10]1%n %K|%n %[12]3 %K|%n %6 %K|%n %[20]2 %K|%n %[4]5 %K|%n %c%[16]4%n\n
-search_results_multi_active %W<%G+%W>%n
-search_results_multi_busy %W<%c?%W>%n
+search_results_multi_active %G<+>%n
+search_results_multi_busy %C<?>%n
 search_results_multi_female %MK%n
-search_results_multi_inactive %W<%R-%W>%n
+search_results_multi_inactive %R<->%n
 search_results_multi_male %BM%n
 search_results_multi_unknown ?
 search_results_single %W%7%[-10]1%n %K|%n %[12]3 %K|%n %6 %K|%n %[20]2 %K|%n %[4]5 %K|%n %c%[16]4%n\n
-search_results_single_active %W<%G+%W>%n
-search_results_single_busy %W<%c?%W>%n
+search_results_single_active %G<+>%n
+search_results_single_busy %C<?>%n
 search_results_single_female %MK%n
-search_results_single_inactive %W<%R-%W>%n
+search_results_single_inactive %R<->%n
 search_results_single_male %BM%n
 search_results_single_unknown ?
 search_stopped %) Nie to nie. Dalej nie szukam.\n
 search_timeout %! %RPrzekroczono limit czasu operacji szukania!%n\n
 show_status %> %WTwój status:%n %1 %2\n%> %WJeste¶ zalogowany na serwerze %g%3%W.%n\n
-show_status_avail %W<%n%G+%n%W>%n  %gdostêpny%n
-show_status_avail_descr %W<%n%G+%n%W>%n  %gdostêpny: %1%n
-show_status_busy %W<%n%C?%n%W>%n  %Czajêty%n
-show_status_busy_descr %W<%n%C?%n%W>%n  %Czajêty: %1%n
-show_status_invisible %W<%n%M*%n%W>%n  %Mniewidoczny%n
-show_status_invisible_descr %W<%n%M*%n%W>%n  %Mniewidoczny: %1%n
-show_status_not_avail %W<%n%R-%n%W>%n  %Rniedostêpny%n
+show_status_avail %G<+>%n  %gdostêpny%n
+show_status_avail_descr %G<+>%n  %gdostêpny: %1%n
+show_status_busy %C<?>%n  %Czajêty%n
+show_status_busy_descr %C<?>%n  %Czajêty: %1%n
+show_status_invisible %M<*>%n  %Mniewidoczny%n
+show_status_invisible_descr %M<*>%n  %Mniewidoczny: %1%n
+show_status_not_avail %R<->%n  %Kniedostêpny%n
+show_status_not_avail_descr %R<->%n  %Kniedostêpny: %1%n
 show_status_private_off 
 show_status_private_on %K[%n%Btylko dla przyjació³%n%K]%n
 sms_chat EKG: %# chat %1: %2
@@ -136,14 +151,14 @@ sms_failed %! %RSms do u¿ytkownika%n %W%1%n %Rnie zosta³ dostarczony!%n\n
 sms_msg EKG: %# msg %1: %2
 sms_sent %> %GSms dostarczony do u¿ytkownika %n %W%1%n\n
 sms_unknown %! %W%1%n %Rnie ma podanego numeru we wpisie%n\n
-status_avail %c%#%n %> %g%[12]1%n%W<%n%G+%n%W>%n   %gdostêpn%@2%n \n
-status_avail_descr %c%#%n %> %g%[12]1%n%W<%n%G+%n%W>%n   %gdostêpn%@2%n    %K[%3]%n \n
-status_busy %c%#%n %> %c%[12]1%n%W<%n%C?%n%W>%n   %czajêt%@2%n\n
-status_busy_descr %c%#%n %> %c%[12]1%n%W<%n%C?%n%W>%n   %czajêt%@2%n      %K[%3]%n \n
-status_invisible %c%#%n %> %M%[12]1%n%W<%n%M*%n%W>%n   %Mniewidoczn%@2%n \n
-status_invisible_descr %c%#%n %> %M%[12]1%n%W<%n%M*%n%W>%n   %Mniewidoczn%@2%n %K[%3]%n \n
-status_not_avail %c%#%n %> %K%[12]1%n%W<%n%R-%n%W>%n   %Kniedostêpn%@2%n\n
-status_not_avail_descr %c%#%n %> %K%[12]1%n%W<%n%R-%n%W>%n   %Kniedostêpn%@2%n %K[%3]%n \n
+status_avail %c%#%n %> %g%[12]1%G<+>%n   %gdostêpn%@2%n \n
+status_avail_descr %c%#%n %> %g%[12]1%G<+>%n   %gdostêpn%@2%n    %K[%3]%n \n
+status_busy %c%#%n %> %c%[12]1%C<?>%n   %czajêt%@2%n\n
+status_busy_descr %c%#%n %> %c%[12]1%C<?>%n   %czajêt%@2%n      %K[%3]%n \n
+status_invisible %c%#%n %> %M%[12]1%M<*>%n   %Mniewidoczn%@2%n \n
+status_invisible_descr %c%#%n %> %M%[12]1%M<*>%n   %Mniewidoczn%@2%n %K[%3]%n \n
+status_not_avail %c%#%n %> %K%[12]1%R<->%n   %Kniedostêpn%@2%n\n
+status_not_avail_descr %c%#%n %> %K%[12]1%R<->%n   %Kniedostêpn%@2%n %K[%3]%n \n
 sysmsg_footer %R+------------%n\n
 sysmsg_header %R+----------------%n Gadu-gadu system message %R----------------%n\n
 sysmsg_line %R|%n %1\n
