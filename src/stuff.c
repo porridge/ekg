@@ -1333,6 +1333,24 @@ void changed_dcc(char *var)
 }
 
 /*
+ * changed_theme()
+ *
+ * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,theme''.
+ */
+void changed_theme(char *var)
+{
+    init_theme();
+    reset_theme_cache();
+    if(default_theme) {
+	if(!read_theme(default_theme, 1)) {
+	    reset_theme_cache();
+    	    my_printf("theme_loaded", default_theme);
+	} else
+	    my_printf("error_loading_theme", strerror(errno));
+    }
+}
+
+/*
  * prepare_connect()
  *
  * przygotowuje wszystko pod po³±czenie gg_login.

@@ -138,6 +138,7 @@ char *decode_base64(char *buf);
 void reset_prompt();
 void changed_debug(char *var);
 void changed_dcc(char *var);
+void changed_theme(char *var);
 void prepare_connect();
 
 #endif

@@ -57,7 +57,7 @@ struct variable variables[MAX_VARS] = {
 	{ "sound_chat_file", VAR_STR, 1, &sound_chat_file, NULL },
 	{ "sound_sysmsg_file", VAR_STR, 1, &sound_sysmsg_file, NULL },
 	{ "sound_app", VAR_STR, 1, &sound_app, NULL },
-	{ "theme", VAR_STR, 1, &default_theme, NULL },
+	{ "theme", VAR_STR, 1, &default_theme, changed_theme },
 
 	{ "default_status", VAR_INT, 2, &default_status, NULL },
 	{ "bold_font", VAR_STR, 2, &bold_font, NULL },	/* GNU Gadu */
