@@ -37,8 +37,8 @@ INSTALACJA
     program gotowy do uruchomienia bêdzie znajdowa³ siê w katalogu
     ekg/bin w katalogu domowym. Je¶li chcemy mieæ mo¿liwo¶æ u¿ywania
     poleceñ ,,beeps_spk'' i ,,blink_leds'', s³u¿±cych m.in do
-    manipulowania diodami LED na klawiaturze, nale¿y u¿yæ parametru
-    ,,--enable-ioctld''.
+    manipulowania diodami LED na klawiaturze, nale¿y przy uruchomieniu
+    u¿yæ parametru ,,--enable-ioctld''.
 
     Proste? Proste. Po pierwszym uruchomieniu ekg powie, jak go
     skonfigurowaæ.

@@ -25,7 +25,7 @@ email
 
 audio_device
 	typ: tekst
-	domy¶lna warto¶æ: /dev/dsp
+	domy¶lna warto¶æ: "/dev/dsp"
 
 	urz±dzenie d¼wiêkowe, którego nale¿y u¿ywaæ przy rozmowach g³osowych.
 	je¶li poprzedzi siê je minusem ,,-'', sygna³ z wej¶cia urz±dzenia nie
@@ -93,7 +93,7 @@ aspell
 
 aspell_lang
 	typ: tekst
-	domy¶lna warto¶æ: pl
+	domy¶lna warto¶æ: "pl"
 
 	okre¶la jêzyk wykorzystywany przez s³ownik.
 
@@ -215,9 +215,9 @@ contacts
 	domy¶lna warto¶æ: 2
 
 	okre¶la, czy okienko z list± obecnych ma byæ wy¶wietlone z prawej
-	strony ekranu. je¶li jest równe 2, informacje o zmianie stanu nie
-	s± wy¶wietlane, ignoruj±c warto¶æ zmiennej ,,display_notify''.
-	dzia³a tylko w interfejsie ncurses.
+	strony ekranu, je¶li jest równe 1. je¶li jest równe 2, informacje
+	o zmianie stanu nie s± wy¶wietlane, ignoruj±c warto¶æ zmiennej
+	,,display_notify''. dzia³a tylko w interfejsie ncurses.
 
 contacts_groups
 	typ: tekst
@@ -231,7 +231,7 @@ contacts_options
 	domy¶lna warto¶æ: brak
 
 	opcje listy kontaktów oddzielone przecinkiem lub spacj±. domy¶lne
-	ustawienia to ,,right, frame, margin=1, nowrap, nodescr, order=01234''.
+	ustawienia to ,,right, frame, margin=1, nowrap, nodescr, order=0123''.
 	mo¿liwe stany to: 0 - dostêpni, 1 - zajêci, 2 - niewidoczni, 3 -
 	blokuj±cy, 4 - niedostêpni). mo¿na pomin±æ niektóre stany -- nie
 	bêd± po prostu wy¶wietlane na li¶cie.
