@@ -112,6 +112,17 @@ fi
 AC_ARG_ENABLE(dynamic,
   [  --enable-dynamic        Link ekg dynamically with libgadu])
 
+AC_MSG_CHECKING([for C99-compatible vsnprintf()])
+AC_TRY_RUN(
+ [#include <stdio.h>
+ 
+  int main()
+  {
+    char tmp;
+    return (snprintf(&tmp, sizeof(tmp), "test") != 4);
+  }], [AC_DEFINE(HAVE_C99_VSNPRINTF)
+  AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no])])
+
 # i zaczynamy wykrywaæ ¶mieci dla ekg
 
 if test -d src; then

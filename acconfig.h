@@ -9,6 +9,9 @@
 /* define if you have readline */
 #undef HAVE_READLINE
 
+/* define if you have C99-compatible vsnprintf() */
+#undef HAVE_C99_VSNPRINTF
+
 /* define if you have python */
 #undef WITH_PYTHON
 
@@ -23,3 +26,4 @@
 
 /* define if you want VOIP support */
 #undef HAVE_VOIP
+
