@@ -3479,7 +3479,9 @@ COMMAND(cmd_on)
 {
 	if (match_arg(params[0], 'a', "add", 2)) {
 		int flags, res;
-
+		struct userlist *u = NULL;
+		const char *t = params[2];
+		
 		if (!params[1] || !params[2] || !params[3]) {
 			printq("not_enough_params", name);
 			return -1;
@@ -3490,12 +3492,15 @@ COMMAND(cmd_on)
 			return -1;
 		}
 
-		if (!get_uin(params[2]) && strcmp(params[2], "*") && params[2][0] != '@') {
+		if (!(u = userlist_find(get_uin(params[2]), NULL)) && strcmp(params[2], "*") && params[2][0] != '@') {
 			printq("user_not_found", params[2]);
 			return -1;
 		}
 
-		if (!(res = event_add(flags, params[2], params[3], quiet)))
+		if (u)
+			t = ((u->display) ? u->display : itoa(u->uin));
+
+		if (!(res = event_add(flags, t, params[3], quiet)))
 			config_changed = 1;
 
 		return res;
