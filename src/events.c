@@ -517,6 +517,8 @@ void handle_failure(struct gg_event *e)
 void handle_success(struct gg_event *e)
 {
 	print("connected");
+	ui_event("connected");
+
 	userlist_send();
 
 	if (away || private_mode) {
@@ -553,6 +555,7 @@ void handle_event(struct gg_session *s)
 		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
 		sess = NULL;
+		ui_event("disconnected");
 		do_reconnect();
 
 		return;
@@ -772,6 +775,7 @@ void handle_userlist(struct gg_http *h)
 void handle_disconnect(struct gg_event *e)
 {
 	print("disconn_warning");
+	ui_event("disconnected");
 
 	gg_logoff(sess);	/* a zobacz.. mo¿e siê uda ;> */
 	list_remove(&watches, sess, 0);

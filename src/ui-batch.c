@@ -31,6 +31,11 @@ static void nop()
 
 }
 
+static int event(const char *foo, ...)
+{
+	return 0;
+}
+
 static void print(const char *target, const char *line)
 {
 	printf("%s", line);
@@ -41,8 +46,7 @@ void ui_batch_init()
 	ui_print = print;
 	ui_loop = loop;
 	ui_beep = nop;
-	ui_new_target = nop;
-	ui_query = nop;
+	ui_event = event;
 	ui_deinit = nop;
 }
 

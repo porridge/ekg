@@ -295,6 +295,7 @@ COMMAND(command_away)
 		
 		away = (reason) ? 3 : 1;
 		print((reason) ? "away_descr" : "away", reason);
+		ui_event("my_status", "away", reason);
 	} else if (!strcasecmp(name, "invisible")) {
 	    	if (!params[0]) {
 		    	if (config_random_reason & 8) {
@@ -309,6 +310,7 @@ COMMAND(command_away)
 		
 		away = (reason) ? 5 : 2;
 		print((reason) ? "invisible_descr" : "invisible", reason);
+		ui_event("my_status", "invisible", reason);
 	} else if (!strcasecmp(name, "back")) {
 	    	if (!params[0]) {
 		    	if (config_random_reason & 4) {
@@ -324,6 +326,7 @@ COMMAND(command_away)
 		
 		away = (reason) ? 4 : 0;
 		print((reason) ? "back_descr" : "back", reason);
+		ui_event("my_status", "back", reason);
 	} else {
 		int tmp;
 
@@ -339,6 +342,7 @@ COMMAND(command_away)
 
 		private_mode = tmp;
 		print((private_mode) ? "private_mode_on" : "private_mode_off");
+		ui_event("my_status", "private", (private_mode) ? "on" : "off");
 	}
 
 	config_status = status_table[away] | ((private_mode) ? GG_STATUS_FRIENDS_MASK : 0);
@@ -353,8 +357,10 @@ COMMAND(command_away)
 			gg_change_status(sess, config_status);
 	}
 
+	ui_event("my_status_raw", config_status, reason);
+
 	if (reason)
-		busy_reason = (params[0] ? xstrdup(params[0]) : reason);
+		busy_reason = reason;
 
 	return 0;
 }
@@ -446,6 +452,7 @@ COMMAND(command_connect)
 		userlist_clear_status();
 		sess = NULL;
 		reconnect_timer = 0;
+		ui_event("disconnected");
 	}
 
 	return 0;
@@ -626,8 +633,7 @@ COMMAND(command_change)
 		return 0;
 	}
 
-	if (!(argv = array_make(params[0], " \t", 0, 1, 1)))
-		return 0;
+	argv = array_make(params[0], " \t", 0, 1, 1);
 
 	r = xcalloc(1, sizeof(*r));
 	
@@ -709,9 +715,8 @@ COMMAND(command_modify)
 		free(groups);
 
 		return 0;
-	} else {
+	} else 
 		argv = array_make(params[1], " \t", 0, 1, 1);
-	}
 
 	for (i = 0; argv[i]; i++) {
 		
@@ -965,32 +970,32 @@ COMMAND(command_list)
 
 	/* list --active | --busy | --inactive | --invisible */
 	for (j = 0; params[j]; j++) {
-      		if ((argv = array_make(params[j], " \t", 0, 1, 1))) {
-			int i;
+		int i;
 
-	 		for (i = 0; argv[i]; i++) {
-				if (match_arg(argv[i], 'a', "active", 2)) {
-					show_all = 0;
-					show_active = 1;
-				}
-				
-				if (match_arg(argv[i], 'i', "inactive", 2) || match_arg(argv[i], 'n', "notavail", 2)) {
-					show_all = 0;
-					show_inactive = 1;
-				}
-				
-				if (match_arg(argv[i], 'b', "busy", 2)) {
-					show_all = 0;
-					show_busy = 1;
-				}
-				
-				if (match_arg(argv[i], 'I', "invisible", 2)) {
-					show_all = 0;
-					show_invisible = 1;
-				}
+		argv = array_make(params[j], " \t", 0, 1, 1);
+
+	 	for (i = 0; argv[i]; i++) {
+			if (match_arg(argv[i], 'a', "active", 2)) {
+				show_all = 0;
+				show_active = 1;
 			}
-			array_free(argv);
+				
+			if (match_arg(argv[i], 'i', "inactive", 2) || match_arg(argv[i], 'n', "notavail", 2)) {
+				show_all = 0;
+				show_inactive = 1;
+			}
+			
+			if (match_arg(argv[i], 'b', "busy", 2)) {
+				show_all = 0;
+				show_busy = 1;
+			}
+			
+			if (match_arg(argv[i], 'I', "invisible", 2)) {
+				show_all = 0;
+				show_invisible = 1;
+			}
 		}
+		array_free(argv);
 	}
 
 	for (l = userlist; l; l = l->next) {
@@ -1243,6 +1248,8 @@ COMMAND(command_quit)
 	}
 
 	ekg_logoff(sess, tmp);
+
+	ui_event("disconnected");
 
 	return -1;
 }
@@ -1850,7 +1857,7 @@ COMMAND(command_remind)
 
 COMMAND(command_query)
 {
-	ui_query(params[0]);
+	ui_event("command", "query", params[0]);
 
 	return 0;
 }
@@ -2005,10 +2012,9 @@ int old_execute(char *target, char *line)
 
 		c--;
 			
-		if ((par = array_make(p, " \t", len, 1, 1))) {
-			res = (last_abbr)(last_name, par);
-			array_free(par);
-		}
+		par = array_make(p, " \t", len, 1, 1);
+		res = (last_abbr)(last_name, par);
+		array_free(par);
 
 		return res;
 	}
@@ -2135,4 +2141,4 @@ int ekg_execute(char *target, char *line)
 
 	return old_execute(target, line);
 }
-	
+

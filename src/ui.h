@@ -25,8 +25,7 @@
 void (*ui_loop)(void);
 void (*ui_print)(const char *target, const char *line);
 void (*ui_beep)(void);
-void (*ui_new_target)(const char *target);
-void (*ui_query)(const char *target);
+int (*ui_event)(const char *event, ...);
 void (*ui_deinit)(void);
 
 extern void ui_none_init();

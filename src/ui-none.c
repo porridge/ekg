@@ -35,13 +35,17 @@ static void nop()
 
 }
 
+static int event(const char *foo, ...)
+{
+	return 0;
+}
+
 void ui_none_init()
 {
 	ui_print = nop;
 	ui_loop = loop;
 	ui_beep = nop;
-	ui_new_target = nop;
-	ui_query = nop;
+	ui_event = event;
 	ui_deinit = nop;
 }
 

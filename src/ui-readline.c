@@ -42,8 +42,7 @@
 static void ui_readline_loop();
 static void ui_readline_print(const char *target, const char *line);
 static void ui_readline_beep();
-static void ui_readline_new_target(const char *target);
-static void ui_readline_query(const char *param);
+static int ui_readline_event(const char *event, ...);
 static void ui_readline_deinit();
 
 static int in_readline = 0, no_prompt = 0, pager_lines = -1, screen_lines = 24, screen_columns = 80;
@@ -482,8 +481,7 @@ void ui_readline_init()
 	ui_print = ui_readline_print;
 	ui_loop = ui_readline_loop;
 	ui_beep = ui_readline_beep;
-	ui_new_target = ui_readline_new_target;
-	ui_query = ui_readline_query;
+	ui_event = ui_readline_event;
 	ui_deinit = ui_readline_deinit;
 		
 	rl_initialize();
@@ -555,7 +553,7 @@ void ui_readline_loop()
 		char *line = my_readline();
 
 		if (!line && query_nick) {
-			ui_readline_query(NULL);
+			ui_event("command", "query", NULL);
 			continue;
 		}
 
@@ -617,23 +615,43 @@ void ui_readline_loop()
 
 }
 
-void ui_readline_new_target(const char *target)
+int ui_readline_event(const char *event, ...)
 {
+	va_list ap;
+	int result = 0;
 
-}
+	va_start(ap, event);
+	
+	if (!strcasecmp(event, "command")) {
+		char *command = va_arg(ap, char*);
 
-void ui_readline_query(const char *param)
-{
-	if (!param && !query_nick)
-		return;
+		if (!strcasecmp(command, "query")) {
+			char *param = va_arg(ap, char*);	
+		
+			if (!param && !query_nick)
+				goto cleanup;
 
-	if (param) {
-		print("query_started", param);
-		free(query_nick);
-		query_nick = xstrdup(param);
-	} else {
-		print("query_finished", query_nick);
-		xfree(query_nick);
-		query_nick = NULL;
+			if (param) {
+				print("query_started", param);
+				free(query_nick);
+				query_nick = xstrdup(param);
+			} else {
+				print("query_finished", query_nick);
+				xfree(query_nick);
+				query_nick = NULL;
+			}
+
+			result = 1;
+		}
+
+		if (!strcasecmp(command, "window"))
+			/* tutaj kiedy¶ bêdzie obs³uga tego polecenia */
+			result = 0;
 	}
+
+cleanup:
+	va_end(ap);
+
+	return result;
 }
+

@@ -37,12 +37,17 @@ ui_beep()
 	d¼wiêk. niestety to, jak go wytworzyæ zale¿y od interfejsu. przy
 	u¿yciu ncurses zwyk³e putchar('\a') nie zadzia³a.
 
-ui_new_target(const char *target)
-	je¶li dany frontend obs³uguje okienka, powinien utworzyæ nowe okno
-	dla ,,target''.
-
-ui_query(const char *param)
-	wywo³ywana, gdy u¿ytkownik wykona polecenie ,,query''.
+ui_event(const char *event, ...)
+	interfejs u¿ytkownika mo¿e obs³ugiwaæ pewne zdarzenia:
+	- "command" (char *cmd, ...) u¿ytkownik wykona³ komendê, aktualnie
+	  obs³ugiwana to "query".
+	- "my_status" (char *status, char *reason) u¿ytkownik zmieni³
+	  stan na "away", "back", "invisible", "private_on", "private_off".
+	- "my_status_raw" (int status, char *reason) u¿ytkownik zmieni³
+	  stan, podawany w liczbach rozumanych przez protokó³.
+	- "connecting" () klient próbuje siê ³±czyæ.
+	- "connected" () klient po³±czy³ siê.
+	- "disconnected" () klient roz³±czy³ siê lub zosta³ roz³±czony.
 
 ui_loop()
 	g³ówna pêtla interfejsu, wywo³ywana zaraz po w³±czeniu klienta.

@@ -5,6 +5,10 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-07-03
+
+- pocz±tek ui_event() (w)
+
 // 2002-07-02
 
 - usuniêto problem z select()em przy wychodzeniu (ekg-users/w)

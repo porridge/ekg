@@ -36,8 +36,7 @@
 static void ui_ncurses_loop();
 static void ui_ncurses_print(const char *target, const char *line);
 static void ui_ncurses_beep();
-static void ui_ncurses_new_target(const char *target);
-static void ui_ncurses_query(const char *param);
+static int ui_ncurses_event(const char *event, ...);
 static void ui_ncurses_deinit();
 
 static WINDOW *status = NULL, *input = NULL, *output = NULL;
@@ -131,8 +130,7 @@ void ui_ncurses_init()
 	ui_print = ui_ncurses_print;
 	ui_loop = ui_ncurses_loop;
 	ui_beep = ui_ncurses_beep;
-	ui_new_target = ui_ncurses_new_target;
-	ui_query = ui_ncurses_query;
+	ui_event = ui_ncurses_event;
 	ui_deinit = ui_ncurses_deinit;
 		
 	initscr();
@@ -337,13 +335,9 @@ static void ui_ncurses_loop()
 	}
 }
 
-static void ui_ncurses_new_target(const char *target)
+static int ui_ncurses_event(const char *event, ...)
 {
 
-}
-
-static void ui_ncurses_query(const char *param)
-{
-
+	return 0;
 }
 
