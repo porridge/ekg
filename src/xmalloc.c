@@ -29,14 +29,13 @@
 
 void ekg_oom_handler()
 {
-	fprintf(stderr, "
-*** Brak pamiêci ***
-
-Próbujê zapisaæ ustawienia do pliku %s/config.%d i listê kontaktów
-do pliku %s/userlist.%d, ale nie obiecujê, ¿e cokolwiek z tego
-wyjdzie.
-
-", config_dir, getpid(), config_dir, getpid());
+	fprintf(stderr,
+"*** Brak pamiêci ***\n"
+"\n"
+"Próbujê zapisaæ ustawienia do pliku %s/config.%d i listê kontaktów\n"
+"do pliku %s/userlist.%d, ale nie obiecujê, ¿e cokolwiek z tego\n"
+"wyjdzie.\n"
+"\n", config_dir, getpid(), config_dir, getpid());
 
 	config_write_crash();
 	userlist_write_crash();
