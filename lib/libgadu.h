@@ -388,6 +388,7 @@ struct gg_search50_entry {
 struct gg_search50_s {
 	int count;
 	int next;
+	uint32_t seq;
 	struct gg_search50_entry *entries;
 	int entries_count;
 };
@@ -539,12 +540,13 @@ void gg_search_request_free(struct gg_search_request *r);
  *
  * NIE NALE¯Y SIÊ ODWO£YWAÆ DO PÓL gg_search50_t BEZPO¦REDNIO!
  */
-int gg_search50(struct gg_session *sess, gg_search50_t req);
+uint32_t gg_search50(struct gg_session *sess, gg_search50_t req);
 gg_search50_t gg_search50_new();
 int gg_search50_add(gg_search50_t req, const char *field, const char *value);
 const char *gg_search50_get(gg_search50_t res, int num, const char *field);
 int gg_search50_count(gg_search50_t res);
 uin_t gg_search50_next(gg_search50_t res);
+uint32_t gg_search50_seq(gg_search50_t res);
 void gg_search50_free(gg_search50_t res);
 
 #define GG_SEARCH50_UIN "FmNumber"

@@ -145,9 +145,10 @@ void gg_search50_free(gg_search50_t s)
  *
  * numer sekwencyjny wyszukiwania lub 0 w przypadku b³êdu.
  */
-int gg_search50(struct gg_session *sess, gg_search50_t req)
+uint32_t gg_search50(struct gg_session *sess, gg_search50_t req)
 {
-	int i, size = 5, res;
+	int i, size = 5;
+	uint32_t res;
 	char *buf, *p;
 	struct gg_search50_request *r;
 
@@ -180,8 +181,8 @@ int gg_search50(struct gg_session *sess, gg_search50_t req)
 	}
 
 	r = (struct gg_search50_request*) buf;
-	res = (random() & 0xffffff00) | 0x00000003;
-	r->dunno1 = gg_fix32(res);
+	res = (random() & 0xffffff00);
+	r->dunno1 = gg_fix32(res | 0x03);
 	r->dunno2 = '>';
 
 	for (i = 0, p = buf + 5; i < req->entries_count; i++) {
@@ -218,6 +219,7 @@ int gg_search50(struct gg_session *sess, gg_search50_t req)
 int gg_search50_handle_reply(struct gg_event *e, const char *packet, int length)
 {
 	const char *end = packet + length, *p;
+	struct gg_search50_reply *r;
 	gg_search50_t res;
 	int num = 0;
 	
@@ -241,6 +243,10 @@ int gg_search50_handle_reply(struct gg_event *e, const char *packet, int length)
 	}
 
 	e->event.search50 = res;
+
+	r = (struct gg_search50_reply*) packet;
+
+	res->seq = (fix32(r->dunno1) & 0xffffff00);
 
 	/* pomiñ pocz±tek odpowiedzi */
 	p = packet + 5;
@@ -365,6 +371,20 @@ int gg_search50_count(gg_search50_t res)
 uin_t gg_search50_next(gg_search50_t res)
 {
 	return (!res) ? -1 : res->next;
+}
+
+/*
+ * gg_search50_seq()
+ *
+ * zwraca numer sekwencyjny wyszukiwania.
+ *
+ *  - res - wynik szukania.
+ *
+ * numer lub -1 w przypadku b³êdu.
+ */
+uint32_t gg_search50_seq(gg_search50_t res)
+{
+	return (!res) ? -1 : res->seq;
 }
 
 /*
