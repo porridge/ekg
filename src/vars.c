@@ -480,9 +480,6 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 					*tmp = base64_decode(value + 1);
 				else
 					*tmp = xstrdup(value);
-
-				if (!*tmp)
-					return -3;
 			} else
 				*tmp = NULL;
 	

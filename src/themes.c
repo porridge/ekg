@@ -934,7 +934,7 @@ void theme_init()
 
 	/* lista kontaktów z boku ekranu */
 	format_add("contacts_header", "", 1);
-	format_add("contacts_header_group", "%W_%1________________________%n", 1);
+	format_add("contacts_header_group", "%K %1%n", 1);
 	format_add("contacts_avail_header", "", 1);
 	format_add("contacts_avail", " %Y%1%n", 1);
 	format_add("contacts_avail_descr", "%Ki%Y%1%n", 1);
