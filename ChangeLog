@@ -9,6 +9,7 @@ d - drg, sz - szalik, del - deletek).
 - usuniêcie dziur w numeracji zdarzeñ (gophi/w)
 - poprawka zachowania readline (gophi/w)
 - dodanie opisu opcji -o (gophi/w)
+- poprawka od¶wie¿ania ekranu podczas u¿ywaniu control-pipe (gophi/sz)
 
 // 2004-10-31
 

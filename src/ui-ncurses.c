@@ -2047,7 +2047,7 @@ static void update_statusbar(int commit)
 #ifdef SIGWINCH
 static void sigwinch_handler()
 {
-	ui_resize_term = 1;
+	ui_need_refresh = 1;
 	signal(SIGWINCH, sigwinch_handler);
 }
 #endif
@@ -2116,7 +2116,7 @@ void ui_ncurses_init()
 
 	ui_screen_width = stdscr->_maxx + 1;
 	ui_screen_height = stdscr->_maxy + 1;
-	ui_resize_term = 0;
+	ui_need_refresh = 0;
 	
 #ifndef GG_DEBUG_DISABLE
 	window_new(NULL, -1);
@@ -3771,8 +3771,8 @@ static void ui_ncurses_loop()
 
 		ekg_wait_for_key();
 
-		if (ui_resize_term) {
-			ui_resize_term = 0;
+		if (ui_need_refresh) {
+			ui_need_refresh = 0;
 			endwin();
 			refresh();
 			keypad(input, TRUE);
@@ -3780,7 +3780,7 @@ static void ui_ncurses_loop()
 			header_statusbar_resize();
 			changed_backlog_size("backlog_size");
 
-			continue;
+			goto redraw_prompt;
 		}
 
 		ch = ekg_getch(0);
@@ -3867,6 +3867,8 @@ static void ui_ncurses_loop()
 			array_free(completions);
 			completions = NULL;
 		}
+
+redraw_prompt:
 
 		if (line_index - line_start > input->_maxx - 9 - window_current->prompt_len)
 			line_start += input->_maxx - 19 - window_current->prompt_len;

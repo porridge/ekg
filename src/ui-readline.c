@@ -171,7 +171,7 @@ static void sigint_handler()
  */
 static void sigwinch_handler()
 {
-	ui_resize_term = 1;
+	ui_need_refresh = 1;
 	signal(SIGWINCH, sigwinch_handler);
 }
 #endif
@@ -185,8 +185,8 @@ static int my_getc(FILE *f)
 {
 	ekg_wait_for_key();
 
-	if (ui_resize_term) {
-		ui_resize_term = 0;
+	if (ui_need_refresh) {
+		ui_need_refresh = 0;
 		rl_get_screen_size(&screen_lines, &screen_columns);
 		if (screen_lines < 1)
 			screen_lines = 24;
@@ -897,7 +897,7 @@ void ui_readline_init()
 
 	ui_screen_width = screen_columns;
 	ui_screen_height = screen_lines;
-	ui_resize_term = 0;
+	ui_need_refresh = 0;
 }
 
 /*

@@ -188,6 +188,7 @@ static int get_char_from_pipe(struct gg_common *c)
 	if ((ch == '\n' && !escaped) || (strlen(buf) >= sizeof(buf) - 2)) {
 		command_exec(NULL, buf, 0);
 		memset(buf, 0, sizeof(buf));
+		ui_need_refresh = 1;
 	}
 
 	if (ch == '\\') {
@@ -530,7 +531,7 @@ void ekg_wait_for_key()
 #endif
 
 		/* dostali¶my sygna³, wracamy do ui */
-		if (ui_resize_term)
+		if (ui_need_refresh)
 			break;
 
 		/* zerknij na wszystkie niezbêdne deskryptory */

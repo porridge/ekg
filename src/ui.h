@@ -33,7 +33,7 @@ void (*ui_deinit)(void);
 int ui_screen_width;
 int ui_screen_height;
 
-int ui_resize_term;
+int ui_need_refresh;
 
 extern void ui_none_init();
 extern void ui_batch_init();

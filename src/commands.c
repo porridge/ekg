@@ -3463,7 +3463,7 @@ COMMAND(cmd_test_imagemsg)
 
 COMMAND(cmd_test_resize)
 {
-	ui_resize_term = 1;
+	ui_need_refresh = 1;
 	return 0;
 }
 
