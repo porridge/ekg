@@ -40,7 +40,10 @@ A: Bo nie. Je¶li chcesz mieæ mo¿liwo¶æ przewijania, ale za to nieznacznie
    narzekaj. Ta opcja jest jeszcze ca³y czas rozwijana.
 
 Q: Mo¿na otworzyæ osobne okienko do rozmowy?
-A: Nie.
+A: W ui-readline mo¿na. Tworzymy nowe okno (,,window new''), prze³±czamy siê 
+   na nie (,,window nex'', ,,window switch NR'', lub alt+1-9) i query nick.
+   Istnieje te¿ zmienna ,,make_window'', dziêki której ka¿da nowa rozmowa
+   tworzona jest w osobnym okienku (zobacz vars.txt).
 
 Q: Kiedy bêdzie mo¿na?
 A: Gdy kto¶ z nadmiarem wolnego czasu i odpowiedni± ilo¶ci± chêci znajdzie

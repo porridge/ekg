@@ -8,6 +8,10 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-07-22
 
 - dodanie komendy ,,bind'' (d)
+- dopisywanie do konfiga bindowanych klawiszy (d)
+- drobne zmiany w ,,bind'' (d)
+- dalsze poprawki (d)
+- uaktualnienie ,,docs/FAQ'' (d)
 
 // 2002-07-21
 
