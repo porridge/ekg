@@ -37,7 +37,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#ifdef IOCTL
 #include <sys/un.h>
+#endif
 #include "config.h"
 #include "libgadu.h"
 #include "stuff.h"
@@ -96,7 +98,9 @@ char *query_nick = NULL;
 uin_t query_uin = 0;
 int sock = 0;
 int length = 0;
+#ifdef IOCTL
 struct sockaddr_un addr;
+#endif
 char *busy_reason = NULL;
 char *home_dir = NULL;
 int screen_lines = 24;
@@ -1325,6 +1329,7 @@ int run_event(char *act)
         return 0;
 }
 
+#ifdef IOCTL
 /*
  * send_event()
  *
@@ -1357,6 +1362,7 @@ int send_event(char *seq, int act)
 
         return 0;
 }
+#endif
 
 /*
  * correct_event()
@@ -1569,6 +1575,8 @@ int events_parse_seq(char *seq, struct action_data *data)
         return 0;
 }
 
+#ifdef IOCTL
+
 /*
  * init_socket()
  *
@@ -1588,6 +1596,8 @@ int init_socket(char *sock_path)
 
         return 0;
 }
+
+#endif
 
 static char base64_charset[] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";

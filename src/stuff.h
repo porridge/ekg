@@ -27,7 +27,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#ifdef IOCTL
 #include <sys/un.h>
+#endif
 #include "libgadu.h"
 #include "dynstuff.h"
 #include "ioctl_daemon.h"
@@ -137,7 +139,9 @@ char *query_nick;
 uin_t query_uin;
 int sock;
 int length;
+#ifdef IOCTL
 struct sockaddr_un addr;
+#endif
 char *busy_reason;
 int screen_lines;
 int screen_columns;
