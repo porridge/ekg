@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-02-22
+
+- mo¿liwo¶æ dodawania niewidocznych do listy dope³nieñ (zigi/sz)
+- mniej ,,¶miec±ce'' wykrywanie niewidocznych (sz)
+
 // 2005-02-21
 
 - libgadu: podbicie wersji API (porridge/w)

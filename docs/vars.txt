@@ -218,8 +218,9 @@ completion_notify
 	ma byæ dopisywany do listy dope³niania klawiszem Tab. je¶li jest
 	równa 2, jest równie¿ usuwany po przej¶ciu w stan niedostêpny.
 	dodanie warto¶ci 4 spowoduje, ¿e dopisywani bêd± tak¿e ci, którzy
-	pojawi± siê na li¶cie ze stanem ,,zajêty''. wszystkie dostêpne
-	warto¶ci to: 0, 1, 2, 5, 6.
+	pojawi± siê na li¶cie ze stanem ,,zajêty''. dodanie warto¶ci 8 spowoduje
+	dopisywanie tak¿e tych, którzy maj± stan ,,niewidoczny''. wszystkie dostêpne
+	warto¶ci to: 0, 1, 2, 5, 6, 9, 10, 13, 14.
 
 ctrld_quits
 	typ: bool

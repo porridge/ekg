@@ -826,6 +826,30 @@ void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_
 	ignore_events = ignored_check(uin) & IGNORE_EVENTS;
 	ignore_notify = ignored_check(uin) & IGNORE_NOTIFY;
 
+	if (GG_S_B(status) || GG_S_A(status)) {
+		list_t l;
+
+		for (l = spiedlist; l; l = l->next) {
+			struct spied *s = l->data;
+
+			if (s->uin == uin) {
+				list_remove(&spiedlist, s, 1);
+				break;
+			}
+		}
+	}
+
+	/* je¶li kto¶ odchodzi albo dostajemy powiadomienie, ¿e go nie ma (i go nie by³o)... */
+	if (GG_S_NA(status)) {
+
+		/* je¶li go podgl±damy, to sprawd¼my, czy siê nie ukrywa */
+		if (group_member(u, "spied"))
+
+			/* je¶li rozpoczêli¶my sprawdanie, to na razie nie informuj o zmianie stanu */
+			if (check_conn(u->uin) == 0)
+				ignore_notify = 1;
+	}
+
 #ifdef WITH_PYTHON
 	for (l = modules; l; l = l->next) {
 		struct module *m = l->data;
@@ -877,14 +901,6 @@ void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_
 	if (__USER_QUITING) {
 		u->last_ip.s_addr = u->ip.s_addr;
 		u->last_port = u->port;
-	}
-
-	/* je¶li kto¶ odchodzi albo dostajemy powiadomienie, ¿e go nie ma (i go nie by³o)... */
-	if (GG_S_NA(status)) {
-
-		/* ... i je¶li go podgl±damy, to sprawd¼my, czy siê nie ukrywa */
-		if (!GG_S_I(u->status) && group_member(u, "spied"))
-			check_conn(u->uin);
 	}
 
 	if (ip)
@@ -989,6 +1005,8 @@ void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_
 			if (GG_S_A(s->status) && config_completion_notify && u->display) 
 				add_send_nick(u->display);
 			if (GG_S_B(s->status) && (config_completion_notify & 4) && u->display)
+				add_send_nick(u->display);
+			if (GG_S_I(s->status) && (config_completion_notify & 8) && u->display)
 				add_send_nick(u->display);
 			if (GG_S_NA(s->status) && (config_completion_notify & 2) && u->display)
 				remove_send_nick(u->display);
@@ -2274,6 +2292,12 @@ void handle_image_reply(struct gg_event *e)
 	if (u && group_member(u, "spied")) {
 		list_t l;
 
+		if (GG_S_NA(u->status)) {
+			int status = (GG_S_D(u->status)) ? GG_STATUS_INVISIBLE_DESCR : GG_STATUS_INVISIBLE;
+			iso_to_cp(u->descr);
+			handle_common(u->uin, status, u->descr, time(NULL), u->ip.s_addr, u->port, u->protocol, u->image_size);
+		}
+
 		for (l = spiedlist; l; l = l->next) {
 			struct spied *s = l->data;
 
@@ -2281,12 +2305,6 @@ void handle_image_reply(struct gg_event *e)
 				list_remove(&spiedlist, s, 1);
 				break;
 			}
-		}
-
-		if (GG_S_NA(u->status)) {
-			int status = (GG_S_D(u->status)) ? GG_STATUS_INVISIBLE_DESCR : GG_STATUS_INVISIBLE;
-			iso_to_cp(u->descr);
-			handle_common(u->uin, status, u->descr, time(NULL), u->ip.s_addr, u->port, u->protocol, u->image_size);
 		}
 
 	} else if (e->event.image_request.crc32 == GG_CRC32_INVISIBLE) {

@@ -537,10 +537,14 @@ void ekg_wait_for_key()
 
 				l = l->next;
 
+				if (s->timeout == -1)
+					continue;
+
 				s->timeout--;
 
 				if (s->timeout == 0) {
 					struct userlist *u = userlist_find(s->uin, NULL);
+					char *tmp = NULL;
 
 					if (!u) {
 						list_remove(&spiedlist, s, 1);
@@ -548,14 +552,30 @@ void ekg_wait_for_key()
 					}
 
 					gg_debug(GG_DEBUG_MISC, "// ekg: spying %d timeout\n", s->uin);
+
+					/* wymu¶ pokazanie zmiany na niedostêpny */
+					if (GG_S_NA(u->status)) {
+						u->status = (GG_S_D(u->status)) ? GG_STATUS_INVISIBLE_DESCR : GG_STATUS_INVISIBLE;
+
+						if (u->last_descr)
+							tmp = xstrdup(u->last_descr);
+
+						u->ip = u->last_ip;
+						u->port = u->last_port;
+					}
 			
 					if (GG_S_I(u->status)) {
 						int status = (GG_S_D(u->status)) ? GG_STATUS_NOT_AVAIL_DESCR : GG_STATUS_NOT_AVAIL;
 						iso_to_cp(u->descr);
 						handle_common(u->uin, status, u->descr, time(NULL), u->ip.s_addr, u->port, u->protocol, u->image_size);
+
+						if (tmp) {
+							xfree(u->last_descr);
+							u->last_descr = tmp;
+						}
 					}
 
-					list_remove(&spiedlist, s, 1);
+					s->timeout = -1;
 				}
 			}
 		}

@@ -139,7 +139,7 @@ void variable_init()
 	variable_add("check_mail", "cm", VAR_MAP, 1, &config_check_mail, changed_check_mail, variable_map(4, 0, 0, "no", 1, 2, "mbox", 2, 1, "maildir", 4, 0, "notify"), NULL);
 	variable_add("check_mail_frequency", "cf", VAR_INT, 1, &config_check_mail_frequency, changed_check_mail, NULL, dd_check_mail);
 	variable_add("check_mail_folders", "cF", VAR_STR, 1, &config_check_mail_folders, changed_check_mail_folders, NULL, dd_check_mail);
-	variable_add("completion_notify", "cn", VAR_MAP, 1, &config_completion_notify, NULL, variable_map(4, 0, 0, "none", 1, 2, "add", 2, 1, "addremove", 4, 0, "busy"), NULL);
+	variable_add("completion_notify", "cn", VAR_MAP, 1, &config_completion_notify, NULL, variable_map(5, 0, 0, "none", 1, 2, "add", 2, 1, "addremove", 4, 0, "busy", 8, 0, "invisible"), NULL);
 #ifdef WITH_UI_READLINE
 	if (ui_init == ui_readline_init)
 		variable_add("ctrld_quits", "cq", VAR_BOOL, 1, &config_ctrld_quits, NULL, NULL, NULL);

@@ -5533,8 +5533,12 @@ int check_conn(uin_t uin)
 		for (l = spiedlist; l; l = l->next) {
 			struct spied *s = l->data;
 
-			if (uin == s->uin)
-				return -1;
+			if (uin == s->uin) {
+				if (s->timeout == -1)
+					return 0;
+				else
+					return -1;
+			}
 		}
 
 		s.uin = uin;
