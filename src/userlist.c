@@ -285,6 +285,41 @@ int userlist_write()
 	return 0;
 }
 
+#ifdef WITH_WAP
+/*
+ * userlist_write_wap()
+ *
+ * zapisuje listê kontaktów w pliku ~/.gg/wapstatus
+ */
+int userlist_write_wap()
+{
+	const char *filename;
+	list_t l;
+	FILE *f;
+
+	if (!(filename = prepare_path("wapstatus", 1)))
+		return -1;
+
+	if (!(f = fopen(filename, "w"))) {
+		free(contacts);
+		return -1;
+	}
+
+	fchmod(fileno(f), 0600);
+	fprintf(f, "%s\n", (sess) ? "C" : "D");
+
+	for (l = userlist; l; l = l->next) {
+		struct userlist *u = l->data;
+		
+		fprintf(f, "%s:%d%s%s\n", u->display, u->status,(u->descr)?":":"" ,(u->descr)?u->descr:"");
+	}
+
+	fclose(f);
+
+	return 0;
+}
+#endif
+
 /*
  * userlist_write_crash()
  *

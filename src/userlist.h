@@ -57,6 +57,9 @@ list_t ignored;
 
 int userlist_read();
 int userlist_write();
+#ifdef WITH_WAP
+int userlist_write_wap();
+#endif
 void userlist_write_crash();
 void userlist_clear_status(void);
 int userlist_add(uin_t uin, const char *display);

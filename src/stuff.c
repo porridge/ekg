@@ -220,12 +220,16 @@ const char *prepare_path(const char *filename, int do_mkdir)
 	static char path[PATH_MAX];
 	
 	if (do_mkdir) {
-		if (mkdir(config_dir, 0700) && errno != EEXIST)
-			return NULL;
+		if (mkdir(config_dir, 0700) && errno != EEXIST) {
+			snprintf(path, sizeof(path), filename);
+			return path;
+		}
 		if (config_user && *config_user) {
 			snprintf(path, sizeof(path), "%s/%s", config_dir, config_user);
-			if (mkdir(path, 0700) && errno != EEXIST)
-				return NULL;
+			if (mkdir(path, 0700) && errno != EEXIST) {
+				snprintf(path, sizeof(path), filename);
+				return path;
+			}
 		}
 	}
 	

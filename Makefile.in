@@ -13,7 +13,7 @@ INSTALL = @INSTALL@
 
 #
 
-all:	libgadu @ekg@
+all:	libgadu @ekg@ @make_ekgwap@
 
 libgadu:
 	cd lib && $(MAKE) all
@@ -21,12 +21,15 @@ libgadu:
 ekg:	
 	cd src && $(MAKE) all
 
+make-ekgwap:
+	cd ekgwap && $(MAKE) all
+
 examples:
 	cd examples && $(MAKE) all
 
 #
 
-install:	all install-libgadu @install_ekg@
+install:	all install-libgadu @install_ekg@ @install_ekgwap@
 
 install-libgadu:
 	cd lib && $(MAKE) install
@@ -50,6 +53,10 @@ install-ekgsearch:
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) -m 755 contrib/ekgsearch $(DESTDIR)$(bindir)
 
+install-ekgwap:
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+	$(INSTALL) -m 755 ekgwap/ekgwapd $(DESTDIR)$(bindir)
+
 #
 
 uninstall:	@uninstall_ekg@
@@ -57,7 +64,7 @@ uninstall:	@uninstall_ekg@
 	rm -f $(DESTDIR)$(includedir)/libgadu.h
 
 uninstall-ekg:
-	rm -f $(DESTDIR)$(bindir)/{ekg,ekgsearch}
+	rm -f $(DESTDIR)$(bindir)/{ekg,ekgsearch,ekgwapd}
 	rm -f $(DESTDIR)$(libexecdir)/ioctld
 	rm -rf $(DESTDIR)$(datadir)/ekg
 	rm -f $(DESTDIR)$(mandir){/pl,}/man1/ekg{,search}

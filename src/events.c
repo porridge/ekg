@@ -113,7 +113,20 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 
 		if (config_emoticons && (new_line = emoticon_expand(line)))
 			line = new_line;
-		
+
+#ifdef WITH_WAP
+		{
+			FILE *wap;
+			char waplog[50];
+
+			sprintf(waplog,"%.30s/wap%5s",config_dir,timestr);
+			if(wap=fopen(waplog,"a")) {
+				fprintf(wap,"%s(%s):%s\n",target,timestr,line);
+				fclose(wap);
+			}
+		}
+#endif
+
 		for (; strlen(line); line = next) {
 			if (strlen(line) <= width) {
 				strcpy(buf, line);
@@ -300,11 +313,20 @@ void handle_notify(struct gg_event *e)
 	struct userlist *u;
 	struct in_addr in;
 	int prev_status;
+#ifdef WITH_WAP
+	FILE *wap;
+	char wapulist[50];
+#endif
 
 	if (batch_mode)
 		return;
 
 	n = (e->type == GG_EVENT_NOTIFY) ? e->event.notify : e->event.notify_descr.notify;
+
+#ifdef WITH_WAP
+	sprintf(wapulist,"%.30s/wapulist",config_dir);
+	wap=fopen(wapulist,"w");
+#endif
 
 	while (n->uin) {
 		if (ignored_check(n->uin) || !(u = userlist_find(n->uin, NULL))) {
@@ -316,6 +338,10 @@ void handle_notify(struct gg_event *e)
 
 		/* je¶li taki sam stan i rizony takie same, to olej */
 		if (u->status == n->status && (e->type == GG_EVENT_NOTIFY || (u->descr && e->type == GG_EVENT_NOTIFY_DESCR && !strcmp(u->descr, e->event.notify_descr.descr)))) {
+#ifdef WITH_WAP
+			/* no nie calkiem bo na page musi leciec */
+			if(wap!=NULL)fprintf(wap,"%s %d\n",format_user(n->uin),n->status);
+#endif
 			n++;
 			continue;
 		}
@@ -330,6 +356,10 @@ void handle_notify(struct gg_event *e)
 			free(u->descr);
 			u->descr = NULL;
 		}
+
+#ifdef WITH_WAP
+		if(wap!=NULL)fprintf(wap,"%s %d\n",format_user(n->uin),n->status);
+#endif
 		
 		if (n->status == GG_STATUS_BUSY) {
 			event_check(EVENT_AWAY, u->uin, NULL);
@@ -398,6 +428,10 @@ void handle_notify(struct gg_event *e)
 
 		n++;
 	}
+
+#ifdef WITH_WAP
+	if(wap!=NULL)fclose(wap);
+#endif
 }
 
 /*

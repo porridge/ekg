@@ -136,12 +136,26 @@ void ekg_wait_for_key()
 	list_t l, m;
 	fd_set rd, wd;
 	int ret, maxfd, pid, status;
+#ifdef WITH_WAP
+	static int wap_userlist_timer = 0;
+#endif
 
 	for (;;) {
 		FD_ZERO(&rd);
 		FD_ZERO(&wd);
 		
 		maxfd = 0;
+
+#ifdef WITH_WAP
+		/* co jaki¶ czas zrzuæ userlistê dla frontendu wap */
+		if (!wap_userlist_timer)
+			wap_userlist_timer = time(NULL);
+
+		if (wap_userlist_timer + 60 > time(NULL)) {
+			userlist_write_wap();
+			wap_userlist_timer = time(NULL);
+		}
+#endif
 
 		/* zerknij na wszystkie niezbêdne deskryptory */
 		for (l = watches; l; l = l->next) {
