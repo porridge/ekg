@@ -5978,7 +5978,7 @@ void command_init()
 	  "  - sigusr1, sigusr2 - otrzymanie przez ekg danego sygna³u\n"
 	  "  - newmail - otrzymanie nowej wiadomo¶ci e-mail\n"
 	  "  - connected - uda³o siê po³±czyæ z serwerem\n"
-	  "  - disconnected - serwer nas roz³±czy³\n" 
+	  "  - disconnected - po³±czenie zosta³o zerwane\n" 
 	  "\n"
 	  "W przypadku sigusr i newmail nale¿y podaæ ,,%T*%n'' jako sprawcê zdarzenia\n"
 	  "\n"
