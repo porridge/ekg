@@ -75,6 +75,7 @@ int config_changed;
 int display_ack;
 int completion_notify;
 char *bold_font;
+char *default_theme;
 int private_mode;
 int connecting;
 char *sound_msg_file;

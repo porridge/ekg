@@ -56,6 +56,7 @@ struct variable variables[MAX_VARS] = {
 	{ "away", VAR_INT, 2, &away },
 	{ "bold_font", VAR_STR, 2, &bold_font },
 	{ "private", VAR_BOOL, 2, &private_mode },
+	{ "theme", VAR_STR, 1, &default_theme },
 
 	{ NULL, 0, 0, NULL }
 };

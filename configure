@@ -2158,8 +2158,8 @@ if test "${with_ncurses+set}" = set; then
     then
         if test -f $withval/include/ncurses.h
 	then
-	    echo "$as_me:2161: result: Found ncurses on $withval/include/ncurses.h" >&5
-echo "${ECHO_T}Found ncurses on $withval/include/ncurses.h" >&6
+	    echo "$as_me:2161: result: $withval/include/ncurses.h" >&5
+echo "${ECHO_T}$withval/include/ncurses.h" >&6
 
 	    CURSES_LIBS="-L$withval/lib -lncurses"
 
@@ -2281,7 +2281,7 @@ fi
 
 	    CURSES_INCLUDEDIR="-I$withval/include"
 	    search_ncurses=false
-	    screen_manager="ncurses on $withval/include"
+	    screen_manager=$withval/include
             cat >>confdefs.h <<\EOF
 #define HAS_CURSES 1
 EOF
@@ -2302,15 +2302,15 @@ fi;
 	if $search_ncurses
 	then
 
-    { echo "$as_me:2305: checking \"location of ncurses.h file\"..." >&5
-echo "$as_me: checking \"location of ncurses.h file\"..." >&6;}
+    echo "$as_me:2305: checking for location of ncurses.h" >&5
+echo $ECHO_N "checking for location of ncurses.h... $ECHO_C" >&6
 
     if $search_ncurses
     then
         if test -f /usr/include/ncurses.h
 	then
-	    echo "$as_me:2312: result: Found ncurses on /usr/include/ncurses.h" >&5
-echo "${ECHO_T}Found ncurses on /usr/include/ncurses.h" >&6
+	    echo "$as_me:2312: result: /usr/include/ncurses.h" >&5
+echo "${ECHO_T}/usr/include/ncurses.h" >&6
 
 	    CURSES_LIBS="-lncurses"
 
@@ -2432,7 +2432,7 @@ fi
 
 	    CURSES_INCLUDEDIR=""
 	    search_ncurses=false
-	    screen_manager="ncurses on /usr/include"
+	    screen_manager=/usr/include
             cat >>confdefs.h <<\EOF
 #define HAS_CURSES 1
 EOF
@@ -2450,8 +2450,8 @@ EOF
     then
         if test -f /usr/include/ncurses/ncurses.h
 	then
-	    echo "$as_me:2453: result: Found ncurses on /usr/include/ncurses/ncurses.h" >&5
-echo "${ECHO_T}Found ncurses on /usr/include/ncurses/ncurses.h" >&6
+	    echo "$as_me:2453: result: /usr/include/ncurses/ncurses.h" >&5
+echo "${ECHO_T}/usr/include/ncurses/ncurses.h" >&6
 
 	    CURSES_LIBS="-lncurses"
 
@@ -2573,7 +2573,7 @@ fi
 
 	    CURSES_INCLUDEDIR="-I/usr/include/ncurses"
 	    search_ncurses=false
-	    screen_manager="ncurses on /usr/include/ncurses"
+	    screen_manager=/usr/include/ncurses
             cat >>confdefs.h <<\EOF
 #define HAS_CURSES 1
 EOF
@@ -2591,8 +2591,8 @@ EOF
     then
         if test -f /usr/local/include/ncurses.h
 	then
-	    echo "$as_me:2594: result: Found ncurses on /usr/local/include/ncurses.h" >&5
-echo "${ECHO_T}Found ncurses on /usr/local/include/ncurses.h" >&6
+	    echo "$as_me:2594: result: /usr/local/include/ncurses.h" >&5
+echo "${ECHO_T}/usr/local/include/ncurses.h" >&6
 
 	    CURSES_LIBS="-L/usr/local/lib -lncurses"
 
@@ -2714,7 +2714,7 @@ fi
 
 	    CURSES_INCLUDEDIR="-I/usr/local/include"
 	    search_ncurses=false
-	    screen_manager="ncurses on /usr/local"
+	    screen_manager=/usr/local
             cat >>confdefs.h <<\EOF
 #define HAS_CURSES 1
 EOF
@@ -2732,8 +2732,8 @@ EOF
     then
         if test -f /usr/pkg/include/ncurses.h
 	then
-	    echo "$as_me:2735: result: Found ncurses on /usr/pkg/include/ncurses.h" >&5
-echo "${ECHO_T}Found ncurses on /usr/pkg/include/ncurses.h" >&6
+	    echo "$as_me:2735: result: /usr/pkg/include/ncurses.h" >&5
+echo "${ECHO_T}/usr/pkg/include/ncurses.h" >&6
 
 	    CURSES_LIBS="-L/usr/pkg/lib -lncurses"
 
@@ -2855,7 +2855,7 @@ fi
 
 	    CURSES_INCLUDEDIR="-I/usr/pkg/include"
 	    search_ncurses=false
-	    screen_manager="ncurses on /usr/pkg"
+	    screen_manager=/usr/pkg
             cat >>confdefs.h <<\EOF
 #define HAS_CURSES 1
 EOF
@@ -2873,8 +2873,8 @@ EOF
     then
         if test -f /usr/contrib/include/ncurses.h
 	then
-	    echo "$as_me:2876: result: Found ncurses on /usr/contrib/include/ncurses.h" >&5
-echo "${ECHO_T}Found ncurses on /usr/contrib/include/ncurses.h" >&6
+	    echo "$as_me:2876: result: /usr/contrib/include/ncurses.h" >&5
+echo "${ECHO_T}/usr/contrib/include/ncurses.h" >&6
 
 	    CURSES_LIBS="-L/usr/contrib/lib -lncurses"
 
@@ -2996,7 +2996,7 @@ fi
 
 	    CURSES_INCLUDEDIR="-I/usr/contrib/include"
 	    search_ncurses=false
-	    screen_manager="ncurses on /usr/contrib"
+	    screen_manager=/usr/contrib
             cat >>confdefs.h <<\EOF
 #define HAS_CURSES 1
 EOF
@@ -3014,8 +3014,8 @@ EOF
     then
         if test -f /usr/local/include/ncurses/ncurses.h
 	then
-	    echo "$as_me:3017: result: Found ncurses on /usr/local/include/ncurses/ncurses.h" >&5
-echo "${ECHO_T}Found ncurses on /usr/local/include/ncurses/ncurses.h" >&6
+	    echo "$as_me:3017: result: /usr/local/include/ncurses/ncurses.h" >&5
+echo "${ECHO_T}/usr/local/include/ncurses/ncurses.h" >&6
 
 	    CURSES_LIBS="-L/usr/local/lib -L/usr/local/lib/ncurses -lncurses"
 
@@ -3137,7 +3137,7 @@ fi
 
 	    CURSES_INCLUDEDIR="-I/usr/local/include/ncurses"
 	    search_ncurses=false
-	    screen_manager="ncurses on /usr/local/include/ncurses"
+	    screen_manager=/usr/local/include/ncurses
             cat >>confdefs.h <<\EOF
 #define HAS_CURSES 1
 EOF
@@ -3155,8 +3155,8 @@ EOF
     then
         if test -f /usr/freeware/include/ncurses/curses.h
 	then
-	    echo "$as_me:3158: result: Found ncurses on /usr/freeware/include/ncurses/curses.h" >&5
-echo "${ECHO_T}Found ncurses on /usr/freeware/include/ncurses/curses.h" >&6
+	    echo "$as_me:3158: result: /usr/freeware/include/ncurses/curses.h" >&5
+echo "${ECHO_T}/usr/freeware/include/ncurses/curses.h" >&6
 
 	    CURSES_LIBS="-L/usr/freeware/lib32 -lncurses"
 
@@ -3278,7 +3278,7 @@ fi
 
 	    CURSES_INCLUDEDIR="-I/usr/freeware/include"
 	    search_ncurses=false
-	    screen_manager="ncurses on /usr/freeware"
+	    screen_manager=/usr/freeware
             cat >>confdefs.h <<\EOF
 #define HAS_CURSES 1
 EOF
@@ -3296,8 +3296,8 @@ EOF
     then
         if test -f /usr/local/include/ncurses/curses.h
 	then
-	    echo "$as_me:3299: result: Found ncurses on /usr/local/include/ncurses/curses.h" >&5
-echo "${ECHO_T}Found ncurses on /usr/local/include/ncurses/curses.h" >&6
+	    echo "$as_me:3299: result: /usr/local/include/ncurses/curses.h" >&5
+echo "${ECHO_T}/usr/local/include/ncurses/curses.h" >&6
 
 	    CURSES_LIBS="-L/usr/local/lib -lncurses"
 
@@ -3419,7 +3419,7 @@ fi
 
 	    CURSES_INCLUDEDIR="-I/usr/local/include/ncurses -DRENAMED_NCURSES"
 	    search_ncurses=false
-	    screen_manager="renamed ncurses on /usr/local/.../ncurses"
+	    screen_manager=renamed ncurses on /usr/local/.../ncurses
             cat >>confdefs.h <<\EOF
 #define HAS_CURSES 1
 EOF
@@ -3437,8 +3437,8 @@ EOF
     then
         if test -f /usr/include/ncurses/curses.h
 	then
-	    echo "$as_me:3440: result: Found ncurses on /usr/include/ncurses/curses.h" >&5
-echo "${ECHO_T}Found ncurses on /usr/include/ncurses/curses.h" >&6
+	    echo "$as_me:3440: result: /usr/include/ncurses/curses.h" >&5
+echo "${ECHO_T}/usr/include/ncurses/curses.h" >&6
 
 	    CURSES_LIBS="-lncurses"
 
@@ -3560,7 +3560,7 @@ fi
 
 	    CURSES_INCLUDEDIR="-I/usr/include/ncurses -DRENAMED_NCURSES"
 	    search_ncurses=false
-	    screen_manager="renamed ncurses on /usr/include/ncurses"
+	    screen_manager=renamed ncurses on /usr/include/ncurses
             cat >>confdefs.h <<\EOF
 #define HAS_CURSES 1
 EOF
@@ -3715,15 +3715,15 @@ fi;
 	if $search_readline
 	then
 
-    { echo "$as_me:3718: checking \"location of readline.h file\"..." >&5
-echo "$as_me: checking \"location of readline.h file\"..." >&6;}
+    echo "$as_me:3718: checking for location of readline.h" >&5
+echo $ECHO_N "checking for location of readline.h... $ECHO_C" >&6
 
     if $search_readline
     then
         if test -f /usr/include/readline.h
 	then
-	    echo "$as_me:3725: result: Found readline on /usr/include/readline.h" >&5
-echo "${ECHO_T}Found readline on /usr/include/readline.h" >&6
+	    echo "$as_me:3725: result: /usr/include/readline.h" >&5
+echo "${ECHO_T}/usr/include/readline.h" >&6
  	    READLINE_LIBS="-lreadline"
 	    READLINE_INCLUDES=""
 	    search_readline=false
@@ -3739,8 +3739,8 @@ EOF
     then
         if test -f /usr/include/readline/readline.h
 	then
-	    echo "$as_me:3742: result: Found readline on /usr/include/readline/readline.h" >&5
-echo "${ECHO_T}Found readline on /usr/include/readline/readline.h" >&6
+	    echo "$as_me:3742: result: /usr/include/readline/readline.h" >&5
+echo "${ECHO_T}/usr/include/readline/readline.h" >&6
  	    READLINE_LIBS="-lreadline"
 	    READLINE_INCLUDES="-I/usr/include/readline"
 	    search_readline=false
@@ -3756,8 +3756,8 @@ EOF
     then
         if test -f /usr/local/include/readline.h
 	then
-	    echo "$as_me:3759: result: Found readline on /usr/local/include/readline.h" >&5
-echo "${ECHO_T}Found readline on /usr/local/include/readline.h" >&6
+	    echo "$as_me:3759: result: /usr/local/include/readline.h" >&5
+echo "${ECHO_T}/usr/local/include/readline.h" >&6
  	    READLINE_LIBS="-L/usr/local/lib -lreadline"
 	    READLINE_INCLUDES="-I/usr/local/include"
 	    search_readline=false
@@ -3773,8 +3773,8 @@ EOF
     then
         if test -f /usr/local/include/readline/readline.h
 	then
-	    echo "$as_me:3776: result: Found readline on /usr/local/include/readline/readline.h" >&5
-echo "${ECHO_T}Found readline on /usr/local/include/readline/readline.h" >&6
+	    echo "$as_me:3776: result: /usr/local/include/readline/readline.h" >&5
+echo "${ECHO_T}/usr/local/include/readline/readline.h" >&6
  	    READLINE_LIBS="-L/usr/local/lib -L/usr/local/lib/readline -lreadline"
 	    READLINE_INCLUDES="-I/usr/local/include/readline"
 	    search_readline=false
@@ -3790,8 +3790,8 @@ EOF
     then
         if test -f /usr/freeware/include/readline/readline.h
 	then
-	    echo "$as_me:3793: result: Found readline on /usr/freeware/include/readline/readline.h" >&5
-echo "${ECHO_T}Found readline on /usr/freeware/include/readline/readline.h" >&6
+	    echo "$as_me:3793: result: /usr/freeware/include/readline/readline.h" >&5
+echo "${ECHO_T}/usr/freeware/include/readline/readline.h" >&6
  	    READLINE_LIBS="-L/usr/freeware/lib32 -lreadline"
 	    READLINE_INCLUDES="-I/usr/freeware/include"
 	    search_readline=false
