@@ -43,7 +43,7 @@ struct variable variables[MAX_VARS] = {
 	{ "log", VAR_INT, 1, &log },
 	{ "log_path", VAR_STR, 1, &log_path },
 
-	{ "debug", VAR_BOOL, 1, &display_debug },
+	{ "debug", VAR_BOOL, 2, &display_debug },
 	
 	{ "sms_away", VAR_BOOL, 1, &sms_away },
 	{ "sms_max_length", VAR_INT, 1, &sms_max_length },
