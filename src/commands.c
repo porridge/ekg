@@ -528,13 +528,33 @@ COMMAND(cmd_exec)
 
 	if (params[0]) {
 		char *tmp;
-		int fd[2] = { 0, 0 };
+		int fd[2] = { 0, 0 }, buf = 0, msg = 0;
 		struct gg_exec s;
+		char *p = NULL, *tg = NULL;
 
 		if (pipe(fd)) {
 			print("exec_error", strerror(errno));
 			return;
 		}
+
+		if (match_arg(params[0], 'm', "msg", 2) || (buf = match_arg(params[0], 'b', "bmsg", 2))) {
+			int uin;
+
+			if (!params[1] || !params[2]) {
+				print("not_enough_params", name);
+				return;
+			}
+
+			if (!(uin = get_uin(params[1]))) {
+				print("user_not_found", params[1]);
+				return;
+			}
+
+			tg = xstrdup(itoa(uin));
+			msg = (buf) ? 2 : 1;
+			p = array_join((char **) params + 2, " ");
+		} else
+			p = array_join((char **) params, " ");
 
 		if (!(pid = fork())) {
 			if (fd[1]) {
@@ -543,12 +563,14 @@ COMMAND(cmd_exec)
 				dup2(fd[1], 1);
 				close(fd[1]);
 			}	
-			execl("/bin/sh", "sh", "-c", (params[0][0] == '^') ? params[0] + 1 : params[0], (void *) NULL);
+			execl("/bin/sh", "sh", "-c", (p[0] == '^') ? p + 1 : p, (void *) NULL);
 			exit(1);
 		}
 
 		if (pid < 0) {
 			print("exec_error", strerror(errno));
+			xfree(p);
+			xfree(tg);
 			return;
 		}
 	
@@ -559,20 +581,24 @@ COMMAND(cmd_exec)
 		s.id = pid;
 		s.timeout = 60;
 		s.buf = string_init(NULL);
-		s.target = xstrdup(target);
+		s.target = xstrdup(tg);
+		s.msg = msg;
 
 		fcntl(s.fd, F_SETFL, O_NONBLOCK);
 
 		list_add(&watches, &s, sizeof(s));
 		close(fd[1]);
 		
-		if (params[0][0] == '^')
-			tmp = saprintf("\002%s", params[0] + 1);
+		if (p[0] == '^')
+			tmp = saprintf("\002%s", p + 1);
 		else
-			tmp = xstrdup(params[0]);
+			tmp = xstrdup(p);
 
 		process_add(pid, tmp);
+
 		xfree(tmp);
+		xfree(p);
+		xfree(tg);
 	} else {
 		for (l = children; l; l = l->next) {
 			struct process *p = l->data;
@@ -2470,6 +2496,15 @@ COMMAND(cmd_test_add)
 		add_send_nick(params[0]);
 }
 
+COMMAND(cmd_test_debug_dump)
+{
+	char *tmp = saprintf("Zrzuci³em debug do pliku debug.%d", getpid());
+
+	debug_write_crash();
+	print("generic", tmp);
+	xfree(tmp);
+}
+
 COMMAND(cmd_test_watches)
 {
 	list_t l;
@@ -3918,10 +3953,15 @@ void command_init()
 	  "");
 	  
 	command_add
-	( "exec", "?", cmd_exec, 0,
-	  " <polecenie>", "uruchamia polecenie systemowe",
+	( "exec", "?u?", cmd_exec, 0,
+	  " [opcje] <polecenie>", "uruchamia polecenie systemowe",
 	  "\n"
-	  "Poprzedzenie polecenia znakiem %T^%n ukryje informacjê o zakoñczeniu.");
+	  "  -m, --msg  [numer/alias] wysy³a wynik do danej osoby\n"
+	  "  -b, --bmsg [numer/alias] wysy³a wynik w jednej wiadomo¶ci\n"
+	  "\n"
+	  "Poprzedzenie polecenia znakiem %T^%n ukryje informacjê o zakoñczeniu. "
+	  "W przypadku opcji %T--bmsg%n wynik jest buforowany, dziêki czemu zostanie "
+	  "wys³any w ca³o¶ci w jednej wiadomo¶ci.");
 	  
 	command_add
 	( "!", "?", cmd_exec, 0,
@@ -4216,6 +4256,9 @@ void command_init()
 	command_add
 	( "_debug", "", cmd_test_debug, 0, "",
 	  "wy¶wietla tekst", "");
+	command_add
+	( "_debug_dump", "", cmd_test_debug_dump, 0, "",
+	  "zapisuje do pliku ostatnie " DEBUG_MAX_LINES " linii z debug", "");
 	command_add
 	( "_vars", "", cmd_test_vars, 0, "",
 	  "wy¶wietla skrót zmiennych", "");

@@ -1,12 +1,13 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *                          Adam Osuchowski <adwol@polsl.gliwice.pl>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *                          Wojciech Bojdo³ <wojboj@htcon.pl>
+ *                          Piotr Domagalski <szalik@szalik.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -194,9 +195,9 @@ static void get_line_from_pipe(struct gg_exec *c)
 {
 	char buf[1024];
 	int ret;
-  
+
 	if (!c)
-  		return;
+		return;
 
 	if ((ret = read(c->fd, buf, sizeof(buf) - 1)) > 0) {
 		char *tmp;
@@ -215,10 +216,25 @@ static void get_line_from_pipe(struct gg_exec *c)
 			if (c->id) {
 				if (c->type == GG_SESSION_USER4)
 					check_mail_update(line, 1);
-				else
-					print_window(c->target, 0, "exec", line, itoa(c->id));
+				else {
+					switch (c->msg) {
+						case 0:
+							print_window(c->target, 0, "exec", line, itoa(c->id));
+							break;
+						case 1:
+						{
+							char *tmp = saprintf("chat %s %s", c->target, line);
+							command_exec(NULL, tmp);
+							xfree(tmp);
+							break;
+						}
+						case 2:
+							buffer_add(BUFFER_EXEC, c->target, line, 0);
+							break;
+					}
+				}
 			} else {
-				buffer_add(BUFFER_DEBUG, line, 50);
+				buffer_add(BUFFER_DEBUG, NULL, line, debug_max_lines);
 				print_window("__debug", 0, "debug", line);
 			}
 
@@ -234,13 +250,39 @@ static void get_line_from_pipe(struct gg_exec *c)
 			if (c->id) {
 				if (c->type == GG_SESSION_USER4)
 					check_mail_update(c->buf->str, 0);
-				else
-					print_window(c->target, 0, "exec", c->buf->str, itoa(c->id));
+				else {
+					switch (c->msg) {
+						case 0:
+							print_window(c->target, 0, "exec", c->buf->str, itoa(c->id));
+							break;
+						case 1:
+						{
+							char *tmp = saprintf("chat %s %s", c->target, c->buf->str);
+							command_exec(NULL, tmp);
+							xfree(tmp);
+							break;
+						}
+						case 2:
+							buffer_add(BUFFER_EXEC, c->target, c->buf->str, 0);
+							break;
+					}
+				}
 			} else {
-				buffer_add(BUFFER_DEBUG, c->buf->str, 50);
+				buffer_add(BUFFER_DEBUG, NULL, c->buf->str, debug_max_lines);
 				print_window("__debug", 0, "debug", c->buf->str);
 			}
 		}
+
+		if (c->msg == 2) {
+			char *out = buffer_flush(BUFFER_EXEC, c->target);
+			char *tmp = saprintf("chat %s %s", c->target, out);
+
+			command_exec(NULL, tmp);
+			
+			xfree(out);
+			xfree(tmp);
+		}
+		
 		close(c->fd);
 		xfree(c->target);
 		string_free(c->buf, 1);
@@ -445,6 +487,7 @@ void ekg_wait_for_key()
 						break;
 					default:
 						print("process_exit", itoa(p->pid), p->name, itoa(WEXITSTATUS(status)));
+						break;
 				}
 
 				xfree(p->name);
@@ -970,6 +1013,8 @@ int main(int argc, char **argv)
 #else
 	gg_debug_level = 0;
 #endif
+
+	debug_max_lines = atoi(DEBUG_MAX_LINES);
 
         ekg_pid = getpid();
 	mesg_startup = mesg_set(2);

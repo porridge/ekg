@@ -1525,15 +1525,12 @@ static void winch_handler()
 {
 	beep();
 
-	endwin();
-	initscr();
-        ui_screen_width = stdscr->_maxx + 1;
-        ui_screen_height = stdscr->_maxy + 1;
-
-	resizeterm(stdscr->_maxx + 1, stdscr->_maxy + 1);
-
-	window_commit();
-	touchwin(window_current->window);
+	window_refresh();
+	if (contacts)
+		wnoutrefresh(contacts);
+	wnoutrefresh(status);
+	wnoutrefresh(input);
+	doupdate();
 	wrefresh(curscr);
 }
 

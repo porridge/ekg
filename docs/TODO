@@ -9,7 +9,6 @@ biblioteka:
 
 klient:
 - upro¶ciæ ,,on'', akcje dostêpne (jako komendy?) tak¿e dla timer/at,
-- mo¿liwo¶æ przekierowania exec'a do okna/usera,
 - mo¿liwo¶æ cichego wywo³ania ka¿dej komendy (^komenda), potrzebne
   pó¼niej w skryptach pythonowych,
 - dzieliæ d³ugie wiadomo¶ci, ¿eby serwer nas nie roz³±cza³,

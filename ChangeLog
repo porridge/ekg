@@ -10,6 +10,11 @@ zg³osi³ b³±d.
 
 - dodanie ukrytej zmiennej ,,interface'' przechowuj±cej nazwê u¿ywanego
   interfejsu (a.latanski/w)
+- mo¿liwo¶æ wys³ania komu¶ wyniku /exec. szczegó³y: help exec (sz)
+- dodanie komendy _debug_dump (sz)
+- przywrócenie dawnego zachowania przy zmianie rozmiaru terminala.
+  wci±¿ nie dzia³a, ale przynajmniej rzadziej siê wszystko
+  wysypuje (spaceman/sz)
 - kosmetyka (sz)
 - poprawki zwi±zane z strncpy() i strncat() (sz)
 - poprawka kodowania argumentów /find (zuko_wski/w)

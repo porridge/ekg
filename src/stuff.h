@@ -36,6 +36,8 @@
 #include "dynstuff.h"
 #include "ioctld.h"
 
+#define DEBUG_MAX_LINES	"50"	/* ile linii z debug zrzucaæ po wysypaniu siê ekg */
+
 enum event_t {
 	EVENT_MSG = 1,
 	EVENT_CHAT = 2,
@@ -131,6 +133,7 @@ struct conference {
 struct gg_exec {
 	gg_common_head(struct gg_exec)
 	
+	int msg;	/* czy wysy³amy stdout komu¶? 1 - tak, 2 - tak, buforujemy */
 	string_t buf;	/* bufor na stdout procesu */
 	char *target;	/* okno, do którego ma lecieæ wynik */
 };
@@ -142,6 +145,7 @@ enum buffer_type {
 
 struct buffer {
 	int type;
+	char *target;
 	char *line;
 };
 
@@ -164,6 +168,7 @@ char *config_profile;
 int config_changed;
 
 int old_stderr;
+int debug_max_lines;
 
 char *config_audio_device;
 char *config_away_reason;
@@ -282,8 +287,9 @@ char *base64_decode(const char *buf);
 void binding_list();
 void binding_free();
 
-int buffer_add(int type, const char *line, int max_lines);
+int buffer_add(int type, const char *target, const char *line, int max_lines);
 int buffer_count(int type);
+char *buffer_flush(int type, const char *target);
 void buffer_free();
 
 void changed_dcc(const char *var);

@@ -481,7 +481,7 @@ void binding_free()
  *
  * 0/-1
  */
-int buffer_add(int type, const char *line, int max_lines)
+int buffer_add(int type, const char *target, const char *line, int max_lines)
 {
 	struct buffer b;
 
@@ -493,9 +493,46 @@ int buffer_add(int type, const char *line, int max_lines)
 	}
 
 	b.type = type;
+	b.target = xstrdup(target);
 	b.line = xstrdup(line);
 
 	return ((list_add(&buffers, &b, sizeof(b)) ? 0 : -1));
+}
+
+/* 
+ * buffer_flush()
+ *
+ * zwraca zaalokowany ³ancuch zawieraj±cy wszystkie linie
+ * z bufora danego typu.
+ *
+ *  - type,
+ *  - target - dla kogo by³ bufor? NULL, je¶li olewamy.
+ */
+char *buffer_flush(int type, const char *target)
+{
+	string_t str = string_init(NULL);
+	list_t l;
+
+	for (l = buffers; l; ) {
+		struct buffer *b = l->data;
+
+		l = l->next;
+
+		if (type != b->type)
+			continue;
+
+		if (target && b->target && strcmp(target, b->target))
+			continue;
+
+		string_append(str, b->line);
+		string_append_c(str, '\n');
+
+		xfree(b->line);
+		xfree(b->target);
+		list_remove(&buffers, b, 1);
+	}
+
+	return string_free(str, 0);
 }
 
 /*
@@ -534,6 +571,7 @@ void buffer_free()
 		struct buffer *b = l->data;
 
 		xfree(b->line);
+		xfree(b->target);
 	}
 
 	list_destroy(buffers, 1);
