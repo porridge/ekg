@@ -249,20 +249,13 @@ if test -d src; then
 
   # sprawdzamy openssl
 
-AC_CHECK_OPENSSL
+  AC_CHECK_OPENSSL
 
-#  AC_ARG_WITH(openssl,
-#    [  --without-openssl       Compile without OpenSSL])
-#
-# if test "x$with_openssl" != "xno"; then
-#    AC_CHECK_LIB(ssl, RSA_new, [
-#      AC_CHECK_HEADERS(openssl/rsa.h, [
-#        AC_DEFINE(HAVE_OPENSSL, 1, [define if you have OpenSSL])
-#	LDFLAGS="-lssl -lcrypto $LDFLAGS"
-#	OBJS="$OBJS sim.o"
-#      ])
-#    ])
-#  fi
+  if test "x$have_openssl" = "xtrue"; then
+    OBJS="$OBJS sim.o"
+    LDFLAGS="$OPENSSL_LIBS $LDFLAGS"
+    CFLAGS="$CFLAGS $OPENSSL_INCLUDES"
+  fi
 
   # sprawdzamy libz.so, <zlib.h>
   

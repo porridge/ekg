@@ -1,0 +1,44 @@
+// format historii ekg
+
+w zale¿no¶ci od ustawienia klienta, historia mo¿e byæ umieszczona
+w pojedynczym pliku (domy¶lnie ~/.gg/history) lub w osobnych plikach,
+po ka¿dym na osobny numerek rozmówcy (domy¶lnie ~/.gg/history/<numer>).
+
+pliki mog± byæ skompresowane za pomoc± gzip. w takim wypadku maj±
+rozszerzenie ,,.gz''.
+
+wpisy s± w formacie CSV, tj. ka¿dy wpis znajduje siê w oddzielnej linii,
+a jego poszczególne kolumny s± oddzielone przecinkami. je¿eli która¶
+kolumna zawiera znak przecinka, nowej linii, cudzys³owia, backslash, to
+ca³e zawarto¶æ kolumny zostaje umieszczona w cudzys³owiach i zapisana
+jak ci±g znaków jêzyka C.
+
+mo¿liwe wpisy to:
+
+- wysy³ana wiadomo¶æ lub rozmowa:
+
+	chatsend,<numer>,<nick>,<czas>,<tre¶æ>
+	msgsend,<numer>,<nick>,<czas>,<tre¶æ>
+
+- odebrana wiadomo¶æ lub rozmowa:
+
+	chatrecv,<numer>,<nick>,<czas_otrzymania>,<czas_nadania>,<tre¶æ>
+	msgrecv,<numer>,<nick>,<czas_otrzymania>,<czas_nadania>,<tre¶æ>
+
+- ignorowana wiadomo¶æ lub rozmowa, gdy w³±czono opcjê log_ignored:
+
+	chatrecvign,<numer>,<nick>,<czas_otrzymania>,<czas_nadania>,<tre¶æ>
+	msgrecvign,<numer>,<nick>,<czas_otrzymania>,<czas_nadania>,<tre¶æ>
+
+- zmiana stanu:
+
+	status,<numer>,<nick>,<adres_ip>,<czas>,<stan>
+	status,<numer>,<nick>,<adres_ip>,<czas>,<stan>,<opis>
+
+gdzie:
+- <numer> - numer nadawcy, odbiorcy lub osoby zmieniaj±cej stan,
+- <nick> - pseudonim osoby,
+- <czas> - domy¶lnie ilo¶æ sekund od 1 stycznia 1970r. UTC, ale u¿ytkownik
+           mo¿e zmieniæ format tego pola za pomoc± zmiennej log_timestamp.
+
+
