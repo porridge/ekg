@@ -446,10 +446,12 @@ COMMAND(command_add)
 
 COMMAND(command_alias)
 {
-	if (params[0] && params[0][0] == '-' && params[0][1] == '-')
-		params[0]++;
+	char *arg;
+	
+	if ((arg = params[0]) && *arg == '-' && *(arg + 1) == '-')
+		arg++;
 
-	if (!params[0] || !strncasecmp(params[0], "-l", 2)) {
+	if (!arg || !strncasecmp(arg, "-l", 2)) {
 		struct list *l;
 		int count = 0;
 
@@ -466,14 +468,14 @@ COMMAND(command_alias)
 		return 0;
 	}
 
-	if (!strncasecmp(params[0], "-a", 2)) {
+	if (!strncasecmp(arg, "-a", 2)) {
 		if (!add_alias(params[1], 0))
 			config_changed = 1;
 
 		return 0;
 	}
 
-	if (!strncasecmp(params[0], "-d", 2)) {
+	if (!strncasecmp(arg, "-d", 2)) {
 		if (!del_alias(params[1]))
 			config_changed = 1;
 
@@ -707,29 +709,32 @@ COMMAND(command_find)
 		}
 	} else {
 		for (i = 0; argv[i]; i++) {
-			if (argv[i][0] == '-' && argv[i][1] == '-')
-				argv[i]++;
-			if (!strncmp(argv[i], "-f", 2) && argv[i][2] != 'e' && argv[i + 1])
+			char *arg = argv[i];
+			
+			if (*arg == '-' && *(arg + 1) == '-')
+				arg++;
+
+			if (!strncmp(arg, "-f", 2) && arg[2] != 'e' && argv[i + 1])
 				r.first_name = argv[++i];
-			if (!strncmp(argv[i], "-l", 2) && argv[i + 1])
+			if (!strncmp(arg, "-l", 2) && argv[i + 1])
 				r.last_name = argv[++i];
-			if (!strncmp(argv[i], "-n", 2) && argv[i + 1])
+			if (!strncmp(arg, "-n", 2) && argv[i + 1])
 				r.nickname = argv[++i];
-			if (!strncmp(argv[i], "-c", 2) && argv[i + 1])
+			if (!strncmp(arg, "-c", 2) && argv[i + 1])
 				r.city = argv[++i];
-			if (!strncmp(argv[i], "-p", 2) && argv[i + 1])
+			if (!strncmp(arg, "-p", 2) && argv[i + 1])
 				r.phone = argv[++i];
-			if (!strncmp(argv[i], "-e", 2) && argv[i + 1])
+			if (!strncmp(arg, "-e", 2) && argv[i + 1])
 				r.email = argv[++i];
-			if (!strncmp(argv[i], "-u", 2) && argv[i + 1])
+			if (!strncmp(arg, "-u", 2) && argv[i + 1])
 				r.uin = strtol(argv[++i], NULL, 0);
-			if (!strncmp(argv[i], "-fe", 3))
+			if (!strncmp(arg, "-fe", 3))
 				r.gender = GG_GENDER_FEMALE;
-			if (!strncmp(argv[i], "-m", 2))
+			if (!strncmp(arg, "-m", 2))
 				r.gender = GG_GENDER_MALE;
-			if (!strncmp(argv[i], "-a", 2))
+			if (!strncmp(arg, "-a", 2))
 				r.active = 1;
-			if (!strncmp(argv[i], "-b", 2) && argv[i + 1]) {
+			if (!strncmp(arg, "-b", 2) && argv[i + 1]) {
 				char *foo = strchr(argv[++i], ':');
 	
 				if (!foo) {
@@ -795,36 +800,38 @@ COMMAND(command_modify)
 	}
 
 	for (i = 0; argv[i]; i++) {
-		if (argv[i][0] == '-' && argv[i][1] == '-')
-			argv[i]++;
+		char *arg = argv[i];
 		
-		if (!strncmp(argv[i], "-f", 2) && argv[i + 1]) {
+		if (*arg == '-' && *(arg + 1) == '-')
+			arg++;
+		
+		if (!strncmp(arg, "-f", 2) && argv[i + 1]) {
 			free(u->first_name);
 			u->first_name = strdup(argv[++i]);
 		}
 		
-		if (!strncmp(argv[i], "-l", 2) && argv[i + 1]) {
+		if (!strncmp(arg, "-l", 2) && argv[i + 1]) {
 			free(u->last_name);
 			u->last_name = strdup(argv[++i]);
 		}
 		
-		if (!strncmp(argv[i], "-n", 2) && argv[i + 1]) {
+		if (!strncmp(arg, "-n", 2) && argv[i + 1]) {
 			free(u->nickname);
 			u->nickname = strdup(argv[++i]);
 		}
 		
-		if (!strncmp(argv[i], "-d", 2) && argv[i + 1]) {
+		if (!strncmp(arg, "-d", 2) && argv[i + 1]) {
 			free(u->display);
 			u->display = strdup(argv[++i]);
 			userlist_replace(u);
 		}
 		
-		if ((!strncmp(argv[i], "-p", 2) || !strncmp(argv[i], "-m", 2) || !strncmp(argv[i], "-s", 2)) && argv[i + 1]) {
+		if ((!strncmp(arg, "-p", 2) || !strncmp(arg, "-m", 2) || !strncmp(arg, "-s", 2)) && argv[i + 1]) {
 			free(u->mobile);
 			u->mobile = strdup(argv[++i]);
 		}
 		
-		if (!strncmp(argv[i], "-g", 2) && argv[i + 1]) {
+		if (!strncmp(arg, "-g", 2) && argv[i + 1]) {
 			switch (*argv[++i]) {
 				case '-':
 					group_remove(u, argv[i] + 1);
@@ -837,7 +844,7 @@ COMMAND(command_modify)
 			}
 		}
 		
-		if (!strncmp(argv[i], "-u", 2) && argv[i + 1])
+		if (!strncmp(arg, "-u", 2) && argv[i + 1])
 			u->uin = strtol(argv[++i], NULL, 0);
 	}
 
@@ -1010,18 +1017,20 @@ COMMAND(command_list)
 		int i;
 
 		for (i = 0; argv[i]; i++) {
-			if (argv[i][0] == '-' && argv[i][1] == '-')
-				argv[i]++;
+			char *arg = argv[i];
 			
-			if (argv[i][0] == '-' && argv[i][1] == 'a') {
+			if (*arg == '-' && *(arg + 1) == '-')
+				arg++;
+			
+			if (!strncasecmp(arg, "-a", 2)) {
 				show_all = 0;
 				show_active = 1;
 			}
-			if (argv[i][0] == '-' && (argv[i][1] == 'i' || argv[i][1] == 'u' || argv[i][1] == 'n')) {
+			if (!strncasecmp(arg, "-u", 2) || !strncasecmp(arg, "-i", 2) || !strncasecmp(arg, "-n", 2)) {
 				show_all = 0;
 				show_inactive = 1;
 			}
-			if (argv[i][0] == '-' && argv[i][1] == 'b') {
+			if (!strncasecmp(arg, "-b", 2)) {
 				show_all = 0;
 				show_busy = 1;
 			}
@@ -1171,17 +1180,18 @@ COMMAND(command_set)
 {
 	struct list *l;
 	int unset = 0;
+	char *arg;
 
-	if (params[0] && params[0][0] == '-') {
+	if ((arg = params[0]) && *arg == '-') {
 		unset = 1;
-		params[0]++;
+		arg++;
 	}
 
 	if (!params[1] && !unset) {
 		for (l = variables; l; l = l->next) {
 			struct variable *v = l->data;
 			
-			if ((!params[0] || !strcasecmp(params[0], v->name)) && v->display != 2) {
+			if ((!arg || !strcasecmp(arg, v->name)) && v->display != 2) {
 				if (v->type == VAR_STR) {
 					char *tmp = *(char**)(v->ptr);
 					
@@ -1197,18 +1207,18 @@ COMMAND(command_set)
 		}
 	} else {
 		reset_theme_cache();
-		switch (variable_set(params[0], params[1], 0)) {
+		switch (variable_set(arg, params[1], 0)) {
 			case 0:
 				if (!in_autoexec) {
-					my_printf("variable", params[0], params[1]);
+					my_printf("variable", arg, params[1]);
 					config_changed = 1;
 				}
 				break;
 			case -1:
-				my_printf("variable_not_found", params[0]);
+				my_printf("variable_not_found", arg);
 				break;
 			case -2:
-				my_printf("variable_invalid", params[0]);
+				my_printf("variable_invalid", arg);
 				break;
 		}
 	}
