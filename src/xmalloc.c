@@ -27,6 +27,7 @@
 
 #include "stuff.h"
 #include "userlist.h"
+#include "libgadu.h"
 
 void ekg_oom_handler()
 {
@@ -103,9 +104,6 @@ char *xstrdup(const char *s)
 
 	return tmp;
 }
-
-/* nie jest w nag³ówkach, ¿eby <libgadu.h> nie wymaga³o <stdarg.h> */
-extern char *gg_vsaprintf(const char *format, va_list ap);
 
 char *saprintf(const char *format, ...)
 {

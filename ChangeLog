@@ -14,6 +14,9 @@ zg³osi³ b³±d.
 - libgadu: maksymalna d³ugo¶æ opisu (GG_STATUS_DESCR_MAXSIZE) to 70
   znaków (*/sz)
 - usuniêcie ,,fade_in'' (w/sz)
+- libgadu: dodanie zmiennej ,,gg_debug_handler'' pozwalaj±cej przej±æ
+  wywo³ania gg_debug() (hao/w)
+- libgadu: wyeksportowanie funkcji gg_vsaprintf() i zmiennej gg_debug_file (w)
 
 // 2003-03-06
 

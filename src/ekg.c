@@ -94,9 +94,6 @@ char *pipe_file = NULL;
 static void get_line_from_pipe(struct gg_exec *c);
 static int get_char_from_pipe(struct gg_common *c);
 
-extern FILE *gg_debug_file;
-char *gg_debug_file_buf;
-
 int old_stderr = 0;
 
 /*
@@ -149,7 +146,7 @@ static struct {
 	EKG_HANDLER(GG_SESSION_USER0, NULL, reaper_user)		/* stdin */
 	EKG_HANDLER(GG_SESSION_USER1, get_char_from_pipe, reaper_user)	/* control pipe */
 	EKG_HANDLER(GG_SESSION_USER2, handle_voice, reaper_user)	/* voice */
-	EKG_HANDLER(GG_SESSION_USER3, get_line_from_pipe, reaper_user3)	/* exec, debug, stderr */
+	EKG_HANDLER(GG_SESSION_USER3, get_line_from_pipe, reaper_user3)	/* exec, stderr */
 	EKG_HANDLER(GG_SESSION_USER4, get_line_from_pipe, reaper_user3)	/* mail */
 
 #undef EKG_HANDLER
@@ -240,29 +237,24 @@ static void get_line_from_pipe(struct gg_exec *c)
 			if (strlen(line) > 1 && line[strlen(line) - 1] == '\r')
 				line[strlen(line) - 1] = 0;
 
-			if (c->id) {
-				if (c->type == GG_SESSION_USER4)
-					check_mail_update(line, 1);
-				else if (!c->quiet) {
-					switch (c->msg) {
-						case 0:
-							print_window(c->target, 0, "exec", line, itoa(c->id));
-							break;
-						case 1:
-						{
-							char *tmp = saprintf("/chat %s %s", c->target, line);
-							command_exec(NULL, tmp, 0);
-							xfree(tmp);
-							break;
-						}
-						case 2:
-							buffer_add(BUFFER_EXEC, c->target, line, 0);
-							break;
+			if (c->type == GG_SESSION_USER4)
+				check_mail_update(line, 1);
+			else if (!c->quiet) {
+				switch (c->msg) {
+					case 0:
+						print_window(c->target, 0, "exec", line, itoa(c->id));
+						break;
+					case 1:
+					{
+						char *tmp = saprintf("/chat %s %s", c->target, line);
+						command_exec(NULL, tmp, 0);
+						xfree(tmp);
+						break;
 					}
+					case 2:
+						buffer_add(BUFFER_EXEC, c->target, line, 0);
+						break;
 				}
-			} else {
-				buffer_add(BUFFER_DEBUG, NULL, line, DEBUG_MAX_LINES);
-				print_window("__debug", 0, "debug", line);
 			}
 
 			new = string_init(c->buf->str + index + 1);
@@ -274,29 +266,24 @@ static void get_line_from_pipe(struct gg_exec *c)
 
 	if ((ret == -1 && errno != EAGAIN) || ret == 0) {
 		if (c->buf->len) {
-			if (c->id) {
-				if (c->type == GG_SESSION_USER4)
-					check_mail_update(c->buf->str, 0);
-				else if (!c->quiet) {
-					switch (c->msg) {
-						case 0:
-							print_window(c->target, 0, "exec", c->buf->str, itoa(c->id));
-							break;
-						case 1:
-						{
-							char *tmp = saprintf("/chat %s %s", c->target, c->buf->str);
-							command_exec(NULL, tmp, 0);
-							xfree(tmp);
-							break;
-						}
-						case 2:
-							buffer_add(BUFFER_EXEC, c->target, c->buf->str, 0);
-							break;
+			if (c->type == GG_SESSION_USER4)
+				check_mail_update(c->buf->str, 0);
+			else if (!c->quiet) {
+				switch (c->msg) {
+					case 0:
+						print_window(c->target, 0, "exec", c->buf->str, itoa(c->id));
+						break;
+					case 1:
+					{
+						char *tmp = saprintf("/chat %s %s", c->target, c->buf->str);
+						command_exec(NULL, tmp, 0);
+						xfree(tmp);
+						break;
 					}
+					case 2:
+						buffer_add(BUFFER_EXEC, c->target, c->buf->str, 0);
+						break;
 				}
-			} else {
-				buffer_add(BUFFER_DEBUG, NULL, c->buf->str, DEBUG_MAX_LINES);
-				print_window("__debug", 0, "debug", c->buf->str);
 			}
 		}
 
@@ -783,37 +770,43 @@ static char *prepare_batch_line(int argc, char *argv[], int n)
 }
 
 /*
- * setup_debug()
+ * debug_handler()
  *
- * ustawia wszystko, co niezbêdne do debugowania.
+ * obs³uguje informacje debugowania libgadu i klienta.
  */
-static void setup_debug()
+static void debug_handler(int level, const char *format, va_list ap)
 {
-	struct gg_exec se;
-	int fd[2];
+	static string_t line = NULL;
+	char *tmp;
 
-	if (pipe(fd) == -1)
+	tmp = gg_vsaprintf(format, ap);
+
+	if (line) {
+		string_append(line, tmp);
+		xfree(tmp);
+		tmp = NULL;
+
+		if (line->str[strlen(line->str) - 1] == '\n') {
+			tmp = string_free(line, 0);
+			line = NULL;
+		}
+	} else {
+		if (tmp[strlen(tmp) - 1] != '\n') {
+			line = string_init(tmp);
+			xfree(tmp);
+			tmp = NULL;
+		}
+	}
+		
+	if (!tmp)
 		return;
 
-	memset(&se, 0, sizeof(se));
+	tmp[strlen(tmp) - 1] = 0;
 
-	se.fd = fd[0];
-	se.check = GG_CHECK_READ;
-	se.state = GG_STATE_READING_DATA;
-	se.type = GG_SESSION_USER3;
-	se.id = 0;
-	se.timeout = -1;
-	se.buf = string_init(NULL);
-
-	fcntl(fd[0], F_SETFL, O_NONBLOCK);
-	fcntl(fd[1], F_SETFL, O_NONBLOCK);
-	
-	gg_debug_file = fdopen(fd[1], "w");
-
-	gg_debug_file_buf = xcalloc(4096, sizeof(char));
-	setvbuf(gg_debug_file, gg_debug_file_buf, _IOLBF, 4096);
-
-	list_add(&watches, &se, sizeof(se));
+	buffer_add(BUFFER_DEBUG, NULL, tmp, DEBUG_MAX_LINES);
+	if (ui_print)
+		print_window("__debug", 0, "debug", tmp);
+	xfree(tmp);
 }
 
 /*
@@ -865,7 +858,6 @@ int main(int argc, char **argv)
 		{ "away", optional_argument, 0, 'a' },
 		{ "invisible", optional_argument, 0, 'i' },
 		{ "private", no_argument, 0, 'p' },
-		{ "debug", no_argument, 0, 'd' },
 		{ "no-auto", no_argument, 0, 'n' },
 		{ "control-pipe", no_argument, 0, 'c' },
 		{ "frontend", required_argument, 0, 'f' },
@@ -1054,7 +1046,7 @@ int main(int argc, char **argv)
 		}
 
 		if (!gg_debug_file)
-			setup_debug();
+			gg_debug_handler = debug_handler;
 
 		gg_debug_level = 255;
 	} else
@@ -1393,7 +1385,6 @@ void ekg_exit()
 	if (gg_debug_file) {
 		fclose(gg_debug_file);
 		gg_debug_file = NULL;
-		xfree(gg_debug_file_buf);
 	}
 
 	if (config_mesg_allow != mesg_startup)

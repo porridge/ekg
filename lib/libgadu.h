@@ -34,6 +34,8 @@ extern "C" {
 
 #include <libgadu-config.h>
 #include <sys/types.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 /*
  * uin_t
@@ -699,6 +701,18 @@ void gg_dcc_free(struct gg_dcc *c);
  */
 extern int gg_debug_level;	/* poziom debugowania. mapa bitowa sta³ych GG_DEBUG_* */
 
+/*
+ * mo¿na podaæ wska¼nik do funkcji obs³uguj±cej wywo³ania gg_debug().
+ * nieoficjalne, nieudokumentowane, mo¿e siê zmieniæ. je¶li kto¶ jest 
+ * zainteresowany, niech da znaæ na ekg-devel.
+ */
+extern void (*gg_debug_handler)(int level, const char *format, va_list ap);
+
+/*
+ * mo¿na podaæ plik, do którego bêd± zapisywane teksty z gg_debug().
+ */
+extern FILE *gg_debug_file;
+
 #define GG_DEBUG_NET 1
 #define GG_DEBUG_TRAFFIC 2
 #define GG_DEBUG_DUMP 4
@@ -747,6 +761,8 @@ char *gg_saprintf(const char *format, ...) __attribute__ ((format (printf, 1, 2)
 #else
 char *gg_saprintf(const char *format, ...);
 #endif
+
+char *gg_vsaprintf(const char *format, va_list ap);
 
 #define gg_alloc_sprintf gg_saprintf
 
