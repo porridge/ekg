@@ -28,7 +28,7 @@ extern "C" {
 /*
  * typ zmiennej okre¶laj±cej numerek danej osoby.
  */
-typedef unsigned int uin_t;
+typedef unsigned long uin_t;
 
 /*
  * co¶tam.
@@ -84,17 +84,17 @@ int gg_send_message(struct gg_session *sess, int msgclass, uin_t recipient, unsi
 int gg_ping(struct gg_session *sess);
 
 struct gg_notify_reply {
-	uin_t uin;		/* numerek */
-	int status;		/* status danej osoby */
-	int remote_ip;		/* adres ip delikwenta */
-	short remote_port;	/* port, na którym s³ucha klient */
-	int dunno1;		/* == 0x0b */
-	short dunno2;		/* znowu port? */
+	uin_t uin;			/* numerek */
+	unsigned long status;		/* status danej osoby */
+	unsigned long remote_ip;	/* adres ip delikwenta */
+	unsigned short remote_port;	/* port, na którym s³ucha klient */
+	unsigned long dunno1;		/* == 0x0b */
+	unsigned short dunno2;		/* znowu port? */
 } __attribute__ ((packed));
 
 struct gg_status {
 	uin_t uin;		/* numerek */
-	int status;		/* nowy stan */
+	unsigned long status;	/* nowy stan */
 } __attribute__ ((packed));
 
 enum {
@@ -229,25 +229,25 @@ char *gg_alloc_sprintf(char *format, ...);
 #define GG_DEFAULT_PORT 8074
 
 struct gg_header {
-	int type;		/* typ pakietu */
-	int length;		/* d³ugo¶æ reszty pakietu */
+	unsigned long type;		/* typ pakietu */
+	unsigned long length;		/* d³ugo¶æ reszty pakietu */
 } __attribute__ ((packed));
 
 #define GG_WELCOME 0x0001
 
 struct gg_welcome {
-	int key;		/* klucz szyfrowania has³a */
+	unsigned long key;		/* klucz szyfrowania has³a */
 } __attribute__ ((packed));
 	
 #define GG_LOGIN 0x000c
 
 struct gg_login {
 	uin_t uin;		/* twój numerek */
-	int hash;		/* hash has³a */
-	int status;		/* status na dzieñ dobry */
-	int dunno;		/* == 0x0b */
-	int local_ip;		/* mój adres ip */
-	short local_port;	/* port, na którym s³ucham */
+	unsigned long hash;		/* hash has³a */
+	unsigned long status;		/* status na dzieñ dobry */
+	unsigned long dunno;		/* == 0x0b */
+	unsigned long local_ip;		/* mój adres ip */
+	unsigned short local_port;	/* port, na którym s³ucham */
 } __attribute__ ((packed));
 
 #define GG_LOGIN_OK 0x0003
@@ -264,7 +264,7 @@ struct gg_login {
 #define GG_STATUS_FRIENDS_MASK 0x8000	/* tylko dla znajomych (GG 4.6) */
 
 struct gg_new_status {
-	int status;			/* na jaki zmieniæ? */
+	unsigned long status;			/* na jaki zmieniæ? */
 } __attribute__ ((packed));
 
 #define GG_NOTIFY 0x0010
@@ -296,9 +296,9 @@ struct gg_add_remove {
 #define GG_CLASS_CHAT 0x0008
 
 struct gg_send_msg {
-	int recipient;
-	int seq;
-	int msgclass;
+	unsigned long recipient;
+	unsigned long seq;
+	unsigned long msgclass;
 } __attribute__ ((packed));
 
 #define GG_SEND_MSG_ACK 0x0005
@@ -307,18 +307,18 @@ struct gg_send_msg {
 #define GG_ACK_QUEUED 0x0003
 	
 struct gg_send_msg_ack {
-	int status;
-	int recipient;
-	int seq;
+	unsigned long status;
+	unsigned long recipient;
+	unsigned long seq;
 } __attribute__ ((packed));
 
 #define GG_RECV_MSG 0x000a
 	
 struct gg_recv_msg {
-	int sender;
-	int dunno1;
-	int dunno2;
-	int msgclass;
+	unsigned long sender;
+	unsigned long seq;
+	unsigned long time;
+	unsigned long msgclass;
 } __attribute__ ((packed));
 
 #define GG_PING 0x0008

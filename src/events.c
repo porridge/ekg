@@ -69,7 +69,7 @@ void handle_msg(struct gg_event *e)
 	else {
 		char tmp[20];
 
-		snprintf(tmp, sizeof(tmp), "%u", e->event.msg.sender);
+		snprintf(tmp, sizeof(tmp), "%lu", e->event.msg.sender);
 		add_send_nick(tmp);
 	}	
 
@@ -83,9 +83,9 @@ void handle_msg(struct gg_event *e)
 		my_puts("\007");
 
 	if (u)
-		snprintf(sender, sizeof(sender), "%s/%u", u->comment, u->uin);
+		snprintf(sender, sizeof(sender), "%s/%lu", u->comment, u->uin);
 	else
-		snprintf(sender, sizeof(sender), "%u", e->event.msg.sender);
+		snprintf(sender, sizeof(sender), "%lu", e->event.msg.sender);
 
 	/* wiem, niegramatycznie, ale jako¶ trzeba rozró¿niæ */
 
@@ -224,7 +224,7 @@ void handle_search(struct gg_search *s)
 	for (i = 0; i < s->count; i++) {
 		char uin[16], born[16], *active, *gender, *name;
 
-		snprintf(uin, sizeof(uin), "%u", s->results[i].uin);
+		snprintf(uin, sizeof(uin), "%lu", s->results[i].uin);
 
 		name = gg_alloc_sprintf("%s %s", s->results[i].first_name, s->results[i].last_name);
 

@@ -211,7 +211,7 @@ char *ignored_uin_generator(char *text, int state)
 		l = l->next;
 
 		if (!(u = find_user(i->uin, NULL))) {
-			snprintf(buf, sizeof(buf), "%u", i->uin);
+			snprintf(buf, sizeof(buf), "%lu", i->uin);
 			if (!strncasecmp(text, buf, len))
 				return strdup(buf);
 		} else {
@@ -853,9 +853,9 @@ COMMAND(command_msg)
 	}
 
         if ((u = find_user(uin, NULL)))
-                snprintf(sender, sizeof(sender), "%s/%u", u->comment, u->uin);
+                snprintf(sender, sizeof(sender), "%s/%lu", u->comment, u->uin);
         else
-                snprintf(sender, sizeof(sender), "%u", uin);
+                snprintf(sender, sizeof(sender), "%lu", uin);
 
 	if (!strcmp(params[1], "\\")) {
 		struct string *s;

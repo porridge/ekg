@@ -195,7 +195,7 @@ void put_log(uin_t uin, char *format, ...)
 
 	if (log == 2) {
 		mkdir(path, 0700);
-		snprintf(path + strlen(path), sizeof(path) - strlen(path), "/%u", uin);
+		snprintf(path + strlen(path), sizeof(path) - strlen(path), "/%lu", uin);
 	}
 
 	if (!(f = fopen(path, "a")))
@@ -318,7 +318,7 @@ int write_config(char *filename)
 	for (l = ignored; l; l = l->next) {
 		struct ignored *i = l->data;
 
-		fprintf(f, "ignore %u\n", i->uin);
+		fprintf(f, "ignore %lu\n", i->uin);
 	}
 
 	for (l = aliases; l; l = l->next) {
@@ -477,7 +477,7 @@ int write_userlist(char *filename)
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
 
-		fprintf(f, "%s;%s;%s;%s;%s;%s;%u\r\n", (u->first_name) ?
+		fprintf(f, "%s;%s;%s;%s;%s;%s;%lu\r\n", (u->first_name) ?
 			u->first_name : u->comment, (u->last_name) ?
 			u->last_name : "", (u->nickname) ? u->nickname :
 			u->comment, u->comment, (u->mobile) ? u->mobile :
@@ -625,7 +625,7 @@ char *format_user(uin_t uin)
 	struct userlist *u = find_user(uin, NULL);
 	static char buf[100], *tmp;
 	
-	snprintf(buf, sizeof(buf), "%u", uin);
+	snprintf(buf, sizeof(buf), "%lu", uin);
 	
 	if (!u)
 		tmp = format_string(find_format("unknown_user"), buf);
