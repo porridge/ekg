@@ -334,19 +334,8 @@ void ekg_wait_for_key()
 			gettimeofday(&tv, &tz);
 
 			if (tv.tv_sec > t->ends.tv_sec || (tv.tv_sec == t->ends.tv_sec && tv.tv_usec >= t->ends.tv_usec)) {
-				switch (t->type) {
-					case TIMER_SCRIPT:
-#ifdef WITH_PYTHON
-						python_function(t->command, t->id);
-#endif
-						break;
-					case TIMER_UI:
-						ui_event(t->command, NULL);
-						break;
-
-					default:
-						command_exec(NULL, t->command, 0);
-				}
+				char *command = xstrdup(t->command), *id = xstrdup(t->id);
+				int type = t->type;
 
 				if (!t->persistent) {
 					xfree(t->name);
@@ -362,6 +351,22 @@ void ekg_wait_for_key()
 					tv.tv_sec += t->period;
 					memcpy(&t->ends, &tv, sizeof(tv));
 				}
+
+				switch (type) {
+					case TIMER_SCRIPT:
+#ifdef WITH_PYTHON
+						python_function(command, id);
+#endif
+						break;
+					case TIMER_UI:
+						ui_event(command, NULL);
+						break;
+					default:
+						command_exec(NULL, command, 0);
+				}
+
+				xfree(command);
+				xfree(id);
 			}
 		}
 

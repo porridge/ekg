@@ -3143,7 +3143,7 @@ static void binding_ignore_query(const char *arg)
 		return;
 	
 	tmp = saprintf("/ignore %s", window_current->target);
-	command_exec(NULL, tmp, 0);
+	command_exec(window_current->target, tmp, 0);
 	xfree(tmp);
 }
 
@@ -3227,7 +3227,7 @@ static void ui_ncurses_loop()
 				if (b->function)
 					b->function(b->arg);
 				else
-					command_exec(NULL, b->action, 0);
+					command_exec(window_current->target, b->action, 0);
 			} else {
 				/* obs³uga Ctrl-F1 - Ctrl-F12 na FreeBSD */
 				if (ch == '[') {
@@ -3241,7 +3241,7 @@ static void ui_ncurses_loop()
 				if (b->function)
 					b->function(b->arg);
 				else
-					command_exec(NULL, b->action, 0);
+					command_exec(window_current->target, b->action, 0);
 			} else if (ch < 255 && strlen(line) < LINE_MAXLEN - 1) {
 					
 				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
@@ -3882,7 +3882,7 @@ static int ui_ncurses_event(const char *event, ...)
 
 				if (!u) {
 					char *tmp = saprintf("add %s %s", window_current->target, p);
-					command_exec(NULL, tmp, quiet);
+					command_exec(window_current->target, tmp, quiet);
 					xfree(tmp);
 				} else
 					printq("user_exists", format_user(u->uin));
@@ -3938,7 +3938,7 @@ static int ui_ncurses_event(const char *event, ...)
 			if (!tmp)
 				tmp = saprintf("find %d", config_uin);
 
-			command_exec(NULL, tmp, 0);
+			command_exec(window_current->target, tmp, 0);
 
 			xfree(tmp);
 

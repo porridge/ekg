@@ -6,6 +6,12 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-01-03
+
+- poprawka np. /exec -b $ w przypadku bindowania (krzyk/sz)
+- bezpieczniejsze wywo³ywanie timerów, gdyby czasem mia³ on sam siebie
+  usuwaæ... tak na wszelki wypadek ;> (sz)
+
 // 2003-01-02
 
 - nowe man'y dla ekl2 (porridge/sz)
