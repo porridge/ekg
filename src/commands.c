@@ -1195,9 +1195,9 @@ COMMAND(cmd_list)
 COMMAND(cmd_msg)
 {
 	struct userlist *u;
-	char **nicks = NULL, **p, *msg = NULL, *escaped, *nick, *raw_msg = NULL;
+	char **nicks = NULL, **p, *msg = NULL, *escaped, *nick, *raw_msg = NULL, *format = NULL;
 	uin_t uin;
-	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0, msg_seq;
+	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0, msg_seq, formatlen = 0;
 
 	if (!params[0] || !params[1]) {
 		print("not_enough_params", name);
@@ -1278,6 +1278,50 @@ COMMAND(cmd_msg)
 	}
 
 	msg = xstrdup(params[1]);
+
+	/* analizê tekstu zrobimy w osobnym bloku dla porz±dku */
+	{
+		unsigned char attr = 0, last_attr = 0;
+		const unsigned char *p = params[1];
+		int msglen = 0, i;
+
+		for (i = 0; i < strlen(params[1]); i++, p++) {
+			if (*p == 2)
+				attr ^= GG_FONT_BOLD;
+			if (*p == 20)
+				attr ^= GG_FONT_ITALIC;
+			if (*p == 31)
+				attr ^= GG_FONT_UNDERLINE;
+
+			if (*p >= 32) {
+				if (attr != last_attr) {
+					if (!format) {
+						format = xmalloc(3);
+						format[0] = 2;
+						formatlen = 3;
+					}
+
+					format = xrealloc(format, formatlen + 3);
+					format[formatlen] = (msglen & 255);
+					format[formatlen + 1] = ((msglen >> 8) & 255);
+					format[formatlen + 2] = attr;
+					formatlen += 3;
+
+					last_attr = attr;
+				}
+
+				msg[msglen++] = *p;
+			}
+		}
+
+		msg[msglen] = 0;
+
+		if (format && formatlen) {
+			format[1] = (formatlen - 3) & 255;
+			format[2] = ((formatlen - 3) << 8) & 255;
+		}
+	}
+
 	raw_msg = xstrdup(params[1]);
 	escaped = log_escape(msg);
 	iso_to_cp(msg);
@@ -1306,7 +1350,7 @@ COMMAND(cmd_msg)
 
 		if (!chat || count == 1) {
 			if (sess)
-				msg_seq = gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
+				msg_seq = gg_send_message_richtext(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg, format, formatlen);
 			else
 				msg_seq = -1;
 
@@ -1327,7 +1371,7 @@ COMMAND(cmd_msg)
 				uins[realcount++] = uin;
 		
 		if (sess)
-			msg_seq = gg_send_message_confer(sess, GG_CLASS_CHAT, realcount, uins, msg);
+			msg_seq = gg_send_message_confer_richtext(sess, GG_CLASS_CHAT, realcount, uins, msg, format, formatlen);
 		else
 			msg_seq = -1;
 

@@ -92,6 +92,7 @@ KLAWIATURA
 	Up, Down		przegl±danie historii poleceñ
 	Left, Right		poruszanie siê po aktualnej linii
         Ctrl-A, Home		id¼ pocz±tek linii
+	Ctrl-B			pogrubiona czcionka
         Ctrl-D, Delete		usuñ znak pod kursorem
         Ctrl-H, Backspace	usuñ znak przed kursorem
         Ctrl-I, Tab		dope³nianie
@@ -99,10 +100,12 @@ KLAWIATURA
         Ctrl-M, Enter		zatwierdzenie linii
         Ctrl-Q			odblokowanie terminala
         Ctrl-S			zablokowanie terminala
+	Ctrl-T			pochy³a czcionka
         Ctrl-U			usuniêcie aktualnej linii
         Ctrl-W			usuniêcie s³owa przed kursorem
         Ctrl-Y			wklejenie ostatnio usuniêtego bloku
         Ctrl-Z			przeniesienie programu w t³o
+	Ctrl-_			podkre¶lona czcionka
 	Alt-cyfra		prze³±czenie do podanego okna
 	F1			pomoc
 	F2			krótka lista dostêpnych i zajêtych

@@ -443,7 +443,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 {
 	struct window *w;
 	const char *p;
-	int x = 0, count = 0;
+	int x = 0, count = 0, attr = A_NORMAL;
 	string_t s = NULL;
 	list_t l;
 	
@@ -519,16 +519,16 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 					a2 += 16;
 				if (*p == 'm' && config_display_color) {
 					if (a1 == 0 && a2 == -1)
-						wattrset(w->window, COLOR_PAIR(7));
+						attr = COLOR_PAIR(7);
 					else if (a1 == 1 && a2 == -1)
-						wattrset(w->window, COLOR_PAIR(7) | A_BOLD);
+						attr = COLOR_PAIR(7) | A_BOLD;
 					else if (a2 == -1)
-						wattrset(w->window, COLOR_PAIR(a1 - 30));
+						attr = COLOR_PAIR(a1 - 30);
 					else
-						wattrset(w->window, COLOR_PAIR(a2 - 30) | ((a1) ? A_BOLD : A_NORMAL));
+						attr = COLOR_PAIR(a2 - 30) | ((a1) ? A_BOLD : A_NORMAL);
 				}
 				if (*p == 'm' && !config_display_color)
-					wattrset(w->window, (a1 == 1) ? A_BOLD : A_NORMAL);
+					attr = (a1 == 1) ? A_BOLD : A_NORMAL;
 			} else {
 				while (*p && ((*p >= '0' && *p <= '9') || *p == ';'))
 					p++;
@@ -546,14 +546,30 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 			x = print_timestamp(w);
 			
 		} else {
-			
+			unsigned char ch;
+
 			if (config_speech_app)
 				string_append_c(s, *p);
 		    			
 			if (!x)
 				x += print_timestamp(w);
 		     
-			waddch(w->window, (unsigned char) *p);
+			wattrset(w->window, attr);
+			
+			ch = *p;
+
+			if (ch < 32) {
+				wattrset(w->window, attr ^ A_REVERSE);
+				ch += 64;
+			}
+
+			if (ch >= 128 && ch < 160) {
+				wattrset(w->window, attr ^ A_REVERSE);
+				ch = '?';
+			}
+
+			waddch(w->window, ch);
+
 			count++;
 			x++;
 			if (x == stdscr->_maxx - CONTACTS_SIZE + 1) {
@@ -1525,8 +1541,29 @@ static void update_input()
 	doupdate();
 }
 
+/*
+ * print_char()
+ *
+ * wy¶wietla w danym okienku znak, bior±c pod uwagê znaki ,,niewy¶wietlalne''.
+ */
+void print_char(WINDOW *w, int y, int x, unsigned char ch)
+{
+	wattrset(w, A_NORMAL);
 
-	
+	if (ch < 32) {
+		wattrset(w, A_REVERSE);
+		ch += 64;
+	}
+
+	if (ch >= 128 && ch < 160) {
+		ch = '?';
+		wattrset(w, A_REVERSE);
+	}
+
+	mvwaddch(w, y, x, ch);
+	wattrset(w, A_NORMAL);
+}
+
 /*
  * ui_ncurses_loop()
  *
@@ -1932,8 +1969,6 @@ static void ui_ncurses_loop()
 				break;
 				
 			default:
-				if (ch < 32)
-					break;
 				if (strlen(line) >= LINE_MAXLEN - 1)
 					break;
 				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
@@ -1968,16 +2003,19 @@ static void ui_ncurses_loop()
 				if (!lines[lines_start + i])
 					break;
 				for (j = 0, p = lines[lines_start + i] + line_start; *p && j < input->_maxx + 1; p++, j++)
-					mvwaddch(input, i, j, *p);
+					print_char(input, i, j, *p);
 			}
 
 			wmove(input, lines_index - lines_start, line_index - line_start);
 		} else {
-			if (window_current->prompt) {
+			int i;
+
+			if (window_current->prompt)
 				mvwaddstr(input, 0, 0, window_current->prompt);
-				mvwaddstr(input, 0, window_current->prompt_len, line + line_start);
-			} else
-				mvwaddstr(input, 0, 0, line + line_start);
+
+			for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++)
+				print_char(input, 0, i + window_current->prompt_len, line[line_start + i]);
+
 			wattrset(input, COLOR_PAIR(16) | A_BOLD);
 			if (line_start > 0)
 				mvwaddch(input, 0, window_current->prompt_len, '<');
