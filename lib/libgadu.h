@@ -32,6 +32,10 @@ extern "C" {
 
 typedef uint32_t uin_t;
 
+#ifdef sun
+#  define INADDR_NONE   ((in_addr_t) 0xffffffff)
+#endif
+
 /*
  * ogólna struktura opisuj±ca ró¿ne sesje. przydatna w klientach.
  */
