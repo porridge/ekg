@@ -84,7 +84,7 @@ struct transfer {
 
 struct event {
 	char *name;	/* identyfikator */
-        uin_t uin;	/* numerek dla którego zdarzenie zachodzi */
+        char *targets;	/* rozdzielona przecinkami lista uinów, aliasów lub grup */
         int flags;	/* flagi zdarzenia */
         char *action;	/* akcja! */
 };
@@ -360,9 +360,10 @@ int emoticon_read();
 char *emoticon_expand(const char *s);
 void emoticon_free();
 
-int event_add(int flags, uin_t uin, const char *action, int quiet);
+int event_add(int flags, const char *targets, const char *action, int quiet);
 int event_remove(const char *name, int quiet);
 const char *event_format(int flags);
+char *event_format_targets(const char *targets);
 int event_flags(const char *events);
 int event_check(int event, uin_t uin, const char *data);
 void event_free();
@@ -417,6 +418,7 @@ char color_map(unsigned char r, unsigned char g, unsigned char b);
 
 struct timer *timer_add(time_t period, int persistent, int type, int at, const char *name, const char *command);
 int timer_remove(const char *name, int at, const char *command);
+int timer_remove_user(int at);
 void timer_free();
 
 void update_status();

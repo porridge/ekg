@@ -3225,8 +3225,8 @@ cleanup:
 COMMAND(cmd_on)
 {
 	if (match_arg(params[0], 'a', "add", 2)) {
-		int flags;
-		uin_t uin = 1;
+		int flags, i, res = -1;
+		char **arr;
 
 		if (!params[1] || !params[2] || !params[3]) {
 			printq("not_enough_params", name);
@@ -3238,19 +3238,30 @@ COMMAND(cmd_on)
 			return -1;
 		}
 
-		if (strcmp(params[2], "*"))
-			uin = get_uin(params[2]);
+		arr = array_make(params[2], ",", 0, 1, 1);
 
-		if (!uin) {
-			printq("user_not_found", params[2]);
+		if (!arr || !arr[0]) {
+			printq("invalid_params", name);
+			array_free(arr);
 			return -1;
 		}
 
-		if (!event_add(flags, uin, params[3], quiet)) {
+		for (i = 0; arr[i]; i++) {
+			int uin = get_uin(arr[i]);
+			
+			if (!uin && strcmp(arr[i], "*") && arr[i][0] != '@' && strlen(arr[i]) > 1) {
+				printq("user_not_found", arr[i]);
+				array_free(arr);
+				return -1;
+			}
+		}
+
+		array_free(arr);
+
+		if (!(res = event_add(flags, params[2], params[3], quiet)))
 			config_changed = 1;
-			return 0;
-		} else
-			return -1;
+
+		return res;
 	}
 
 	if (match_arg(params[0], 'd', "del", 2)) {
@@ -3273,8 +3284,10 @@ COMMAND(cmd_on)
 
 		for (l = events; l; l = l->next) {
 			struct event *ev = l->data;
+			char *tmp = event_format_targets(ev->targets);
 
-			printq((ev->flags & INACTIVE_EVENT) ? "events_list_inactive" : "events_list", event_format(abs(ev->flags)), (ev->uin == 1) ? "*" : format_user(ev->uin), ev->action, ev->name);
+			printq((ev->flags & INACTIVE_EVENT) ? "events_list_inactive" : "events_list", event_format(abs(ev->flags)), tmp, ev->action, ev->name);
+			xfree(tmp);
 			count++;
 		}
 
@@ -3726,19 +3739,8 @@ cleanup:
 		}
 
 		if (!strcmp(params[1], "*")) {
-			list_t l;
-
 			del_all = 1;
-
-			for (l = timers; l; ) {
-				struct timer *t = l->data;
-
-				l = l->next;
-
-				/* nie psujmy ui i skryptów */
-				if (t->type == TIMER_COMMAND)
-					ret = timer_remove(t->name, at, NULL);
-			}
+			ret = timer_remove_user(at);
 		} else
 			ret = timer_remove(params[1], at, NULL);
 		
@@ -4653,7 +4655,7 @@ void command_init()
         ( "on", "?euc", cmd_on, 0,
 	  " [opcje]", "zarz±dzanie zdarzeniami",
 	  "\n"
-	  "  -a, --add <zdarzenie> <numer/alias> <komenda>  dodaje zdarzenie\n"
+	  "  -a, --add <zdarzenie> <numer/alias/@grupa> <komenda>  dodaje zdarzenie\n"
 	  "  -d, --del <numer>|*         usuwa zdarzenie o podanym numerze\n"
 	  " [-l, --list]                 wy¶wietla listê zdarzeñ\n"
 	  "\n"
@@ -4675,6 +4677,7 @@ void command_init()
 	  "\n"
 	  "Zdarzenia mo¿na ³±czyæ ze sob± za pomoc± przecinka lub ,,|''. Jako numer/alias "
 	  "mo¿na podaæ ,,*'', dziêki czemu zdarzenie bêdzie dotyczyæ ka¿dego u¿ytkownika. "
+	  "Wiêksz± ilo¶æ u¿ytkowników lub grup nale¿y rozdzieliæ przecinkiem bez spacji.  "
 	  "Je¶li kto¶ posiada indywidualn± akcjê na dane zdarzenie, to tylko ona zostanie "
 	  "wykonana. Mo¿na podaæ wiêcej komend, oddzielaj±c je ¶rednikiem. W komendzie, %T\\%1%n "
 	  "zostanie zast±pione numerkiem sprawcy zdarzenia, a je¶li istnieje on na naszej "

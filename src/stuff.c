@@ -1093,6 +1093,8 @@ int config_read(const char *filename, const char *var)
 	if (!(f = fopen(filename, "r")))
 		return -1;
 
+	gg_debug(GG_DEBUG_MISC, "// config_read(%s);\n", ((var) ? var : ""));
+
 	if (!in_autoexec && !var) {
 		list_t l;
 
@@ -1104,11 +1106,13 @@ int config_read(const char *filename, const char *var)
 		}
 
 		alias_free();
-		timer_free();
+		timer_remove_user(-1);
 		event_free();
 		variable_free();
 		variable_init();
 		variable_set_default();
+
+		gg_debug(GG_DEBUG_MISC, "\tflushed previous config\n");
 	}
 
 	while ((buf = read_file(f))) {
@@ -1143,22 +1147,24 @@ int config_read(const char *filename, const char *var)
 				ignored_add(atoi(foo), IGNORE_ALL);
 		} else if (!strcasecmp(buf, "alias")) {
 			alias_add(foo, 1, 1);
+			gg_debug(GG_DEBUG_MISC, "\talias %s %s\n", foo, foo + strlen(foo) + 1);
 		} else if (!strcasecmp(buf, "on")) {
                         int flags;
-                        uin_t uin;
                         char **pms = array_make(foo, " \t", 3, 1, 0);
 
-                        if (pms && pms[0] && pms[1] && pms[2] && (flags = event_flags(pms[0])) && (uin = atoi(pms[1])))
-                                event_add(flags, atoi(pms[1]), pms[2], 1);
+                        if (pms && pms[0] && pms[1] && pms[2] && (flags = event_flags(pms[0]))) {
+                                event_add(flags, pms[1], pms[2], 1);
+				gg_debug(GG_DEBUG_MISC, "\ton %s %s %s\n", pms[0], pms[1], pms[2]);
+			}
 
 			array_free(pms);
 		} else if (!strcasecmp(buf, "bind")) {
 			char **pms = array_make(foo, " \t", 2, 1, 0);
 
-			gg_debug(GG_DEBUG_MISC, "bind %s %s\n", pms[0], pms[1]);
-
-			if (pms && pms[0] && pms[1]) 
+			if (pms && pms[0] && pms[1]) {
 				ui_event("command", 1, "bind", "--add", pms[0], pms[1], NULL);
+				gg_debug(GG_DEBUG_MISC, "\tbind %s %s\n", pms[0], pms[1]);
+			}
 
 			array_free(pms);
 		} else if (!strcasecmp(buf, "timer") || !strcasecmp(buf, "at")) {
@@ -1168,6 +1174,7 @@ int config_read(const char *filename, const char *var)
 			int at = !strcasecmp(buf, "at");
 
 			if (p && p[0] && p[1] && p[2]) {
+				gg_debug(GG_DEBUG_MISC, "\t%s %s %s %s\n", ((at) ? "at" : "timer"), p[0], p[1], p[2]);
 
 				if (strcmp(p[0], "(null)"))
 					name = p[0];
@@ -1267,7 +1274,7 @@ void config_write_main(FILE *f, int base64)
         for (l = events; l; l = l->next) {
                 struct event *e = l->data;
 
-                fprintf(f, "on %s %u %s\n", event_format(e->flags), e->uin, e->action);
+                fprintf(f, "on %s %s %s\n", event_format(e->flags), e->targets, e->action);
         }
 
 	for (l = bindings; l; l = l->next) {
@@ -1931,13 +1938,13 @@ void emoticon_free()
  * dodaje zdarzenie do listy zdarzeñ.
  *
  *  - flags,
- *  - uin,
+ *  - targets,
  *  - action,
  *  - quiet.
  *
  * 0/-1
  */
-int event_add(int flags, uin_t uin, const char *action, int quiet)
+int event_add(int flags, const char *targets, const char *action, int quiet)
 {
         int f;
         list_t l;
@@ -1946,8 +1953,10 @@ int event_add(int flags, uin_t uin, const char *action, int quiet)
         for (l = events; l; l = l->next) {
                 struct event *ev = l->data;
 
-                if (ev->uin == uin && (f = ev->flags & flags) != 0) {
-			printq("events_exist", event_format(f), (uin == 1) ? "*" : format_user(uin));
+                if (!strcasecmp(targets, ev->targets) && (f = ev->flags & flags) != 0) {
+			char *tmp = event_format_targets(ev->targets);
+			printq("events_exist", event_format(f), tmp);
+			xfree(tmp);
                         return -1;
                 }
         }
@@ -1969,7 +1978,7 @@ int event_add(int flags, uin_t uin, const char *action, int quiet)
 	}
 
 	e.name = xstrdup(itoa(f));
-        e.uin = uin;
+        e.targets = xstrdup(targets);
         e.flags = flags;
         e.action = xstrdup(action);
 
@@ -2060,6 +2069,47 @@ const char *event_format(int flags)
 }
 
 /*
+ * event_format_targets()
+ *
+ * zwraca zaalokowany ³añcuch ze sformatowanymi
+ * uinami, aliasami.
+ */
+char *event_format_targets(const char *targets)
+{
+	int i;
+	string_t ftargets;
+	char **arr;
+
+	if (!targets)
+		return xstrdup("");
+
+        arr = array_make(targets, ",", 0, 1, 1);
+
+        if (!arr || !arr[0]) {
+                array_free(arr);
+                return xstrdup("");
+        }
+
+	ftargets = string_init(NULL);
+
+        for (i = 0; arr[i]; i++) {
+		int uin = get_uin(arr[i]);
+
+		if (i)
+			string_append(ftargets, ",");
+
+		if (!uin && (arr[i][0] == '@' || !strcmp(arr[i], "*")))
+			string_append(ftargets, arr[i]);
+		else
+                	string_append(ftargets, format_user(uin));
+        }
+
+        array_free(arr);
+
+	return string_free(ftargets, 0);
+}
+
+/*
  * event_flags()
  *
  * zwraca flagi na podstawie ³añcucha.
@@ -2122,15 +2172,31 @@ int event_check(int event, uin_t uin, const char *data)
 			return 0;
 		
                 if (e->flags & event) {
-			if (e->uin == 1)
+
+			if (strchr(e->targets, '*'))
 				action = e->action;
 
-			if (e->uin == uin) {
+			if (strstr(e->targets, uin_number) || strstr(e->targets, uin_display)) {
 				action = e->action;
 				break;
 			}
-                }
-        }
+
+			if (u) {
+				list_t l;
+
+				for (l = u->groups; l; l = l->next) {
+					struct group *g = l->data;
+
+					if (strstr(e->targets, g->name)) {
+						action = e->action;
+						goto out;
+					}
+				}
+                	}
+        	}
+	}
+
+out:
 
         if (!action)
                 return -1;
@@ -3462,7 +3528,7 @@ struct timer *timer_add(time_t period, int persistent, int type, int at, const c
  *  - at - zwyk³y timer czy at?
  *  - command - komenda timera, mo¿e byæ NULL.
  *
- * 0/-1.
+ * 0/-1
  */
 int timer_remove(const char *name, int at, const char *command)
 {
@@ -3474,7 +3540,7 @@ int timer_remove(const char *name, int at, const char *command)
 
 		l = l->next;
 
-		if ((at == t->at) && ((name && !strcmp(name, t->name)) || (command && !strcmp(command, t->command)))) {
+		if ((at == t->at) && ((name && !strcmp(name, t->name)) || (command && !strcmp(command, t->command)))) { 
 			xfree(t->name);
 			xfree(t->command);
 			xfree(t->id);
@@ -3483,7 +3549,38 @@ int timer_remove(const char *name, int at, const char *command)
 		}
 	}
 
-	return (removed) ? 0 : -1;
+	return ((removed) ? 0 : -1);
+}
+
+/*
+ * timer_remove_user()
+ *
+ * usuwa wszystkie timery u¿ytkownika.
+ *
+ *  - at - czy to at? nie ma znaczenia, je¶li równe -1
+ *
+ * 0/-1
+ */
+int timer_remove_user(int at)
+{
+	list_t l;
+	int removed = 0;
+
+	for (l = timers; l; ) {
+		struct timer *t = l->data;
+
+		l = l->next;
+
+		if (t->type == TIMER_COMMAND && (at == -1 || at == t->at)) { 
+			xfree(t->name);
+			xfree(t->command);
+			xfree(t->id);
+			list_remove(&timers, t, 1);
+			removed = 1;
+		}
+	}
+
+	return ((removed) ? 0 : -1);
 }
 
 /*

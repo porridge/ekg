@@ -11,6 +11,7 @@ zg³osi³ b³±d.
 - komenda ,,key'' do obs³ugi kluczy SIM (sz)
 - poprawka zachowania po ,,reload'' (m.in. duplikaty aliasów) (sz)
 - kolejna poprawka tabów podczas czytania z potoku (sz)
+- mo¿na podaæ wiele numerów/aliasów/grup jako parametr /on (sz)
 - wy¶wietlanie fingerprintu kluczy (w)
 - poprawka analizy parametrów klienta. rozumie ju¿ --away "powód",
   -a "powód" i -a"powód" (w)
