@@ -9,6 +9,8 @@ zg³osi³ b³±d.
 // 2002-01-08
 
 - poprawka ostrze¿eñ przy kompilacji gcc 3.x (MuchaR/w)
+- kosmetyka komunikatów o b³êdach niektórych komend (sz)
+- rozszerzenie mo¿liwo¶ci /timer (sz)
 
 // 2002-01-07
 

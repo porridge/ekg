@@ -3106,7 +3106,7 @@ static int ui_ncurses_event(const char *event, ...)
 				goto cleanup;
 			}
 			
-			print("window_invalid");
+			print("invalid_params", "window");
 		}
 	}
 

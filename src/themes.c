@@ -165,14 +165,6 @@ const char *format_ansi(char ch)
 }
 
 /*
- * isalpha_pl_PL()
- * 
- * makro udaj±ce isalpha() z LC_CTYPE="pl_PL". niestety ncurses co¶ psuje
- * i ¼le wykrywa p³eæ.
- */
-#define isalpha_pl_PL(x) ((x >= 'a' && x <= 'z') || (x >= 'A' && x <= 'Z') || x == '±' || x == 'æ' || x == 'ê' || x == '³' || x == 'ñ' || x == 'ó' || x == '¶' || x == '¿' || x == '¼' || x == '¡' || x == 'Æ' || x == 'Ê' || x == '£' || x == 'Ñ' || x == 'Ó' || x == '¦' || x == '¯' || x == '¬')
-
-/*
  * va_format_string()
  *
  * formatuje zgodnie z podanymi parametrami ci±g znaków.
@@ -856,6 +848,8 @@ void theme_init()
 	format_add("ekg_version", "%) EKG - Eksperymentalny Klient Gadu-Gadu (%T%1%n)\n%) libgadu-%1 (protokó³ %2, klient %3)\n", 1);
 	format_add("group_empty", "%! Grupa %T%1%n jest pusta\n", 1);
 	format_add("secure", "%Y(szyfrowane)%n ", 1);
+
+	/* mail */
 	format_add("new_mail_one", "%) Masz now± wiadomo¶æ email\n", 1);
 	format_add("new_mail_two_four", "%) Masz %1 nowe wiadomo¶ci email\n", 1);
 	format_add("new_mail_more", "%) Masz %1 nowych wiadomo¶ci email\n", 1);
@@ -1134,7 +1128,6 @@ void theme_init()
 	format_add("show_status_msg_queue", "%) Ilo¶æ wiadomo¶ci w kolejce do wys³ania: %T%1%n\n", 1);
 
 	/* aliasy */
-	format_add("aliases_invalid", "%! Nieprawid³owy parametr\n", 1);
 	format_add("aliases_list_empty", "%! Brak aliasów\n", 1);
 	format_add("aliases_list", "%> %T%1%n: %2\n", 1);
 	format_add("aliases_list_next", "%> %3  %2\n", 1);
@@ -1231,7 +1224,6 @@ void theme_init()
 	format_add("window_list_query", "%) %1: rozmowa z %T%2%n\n", 1);
 	format_add("window_list_nothing", "%) %1: brak rozmowy\n", 1);
 	format_add("window_list_floating", "%) %1: p³ywaj±ce %4x%5 w %2,%3 %T%6%n\n", 1);
-	format_add("window_invalid", "%! Nieprawid³owy parametr\n", 1);
 	format_add("window_id_query_started", "%) Rozmowa z %T%2%n rozpoczêta w oknie %W%1%n\n", 1);
 	format_add("window_kill_status", "%! Nie mo¿na zamkn±æ okna statusowego\n", 1);
 
@@ -1239,13 +1231,18 @@ void theme_init()
 	format_add("bind_seq_incorrect", "%! Sekwencja %T%1%n jest nieprawid³owa\n", 1); 
 	format_add("bind_seq_add", "%) Dodano sekwencjê %T%1%n\n", 1);
 	format_add("bind_seq_remove", "%) Usuniêto sekwencjê %T%1%n\n", 1);	
-	format_add("bind_invalid", "%! Nieprawid³owy parametr\n", 1);
 	format_add("bind_seq_list", "%) %1: %T%2%n\n", 1);
 	format_add("bind_seq_exist", "%! Sekwencja %T%1%n ma ju¿ przypisan± akcjê\n", 1);
 	format_add("bind_seq_list_empty", "%! Brak przypisanych akcji\n", 1);
 
-	/* timery */
-	format_add("timer_list", "%> %1, %2s, %3\n", 1);
+	/* timer */
+	format_add("timer_list", "%> %1, %2s, %3 %K(%4)%n %T%5%n\n", 1);
+	format_add("timer_added", "%> Utworzono timer %T%1%n\n", 1);
+	format_add("timer_deleted", "%> Usuniêto timer %T%1%n\n", 1);
+	format_add("timer_exist", "%! Timer %T%1%n ju¿ istnieje\n", 1);
+	format_add("timer_noexist", "%! Timer %T%1%n nie istnieje\n", 1);
+
+	/* last */
 	format_add("last_list_in", "%) %Y <<%n [%1] %2 %3\n", 1);
 	format_add("last_list_out", "%) %G >>%n [%1] %2 %3\n", 1);
 	format_add("last_list_empty", "%! Nie zalogowano ¿adnych wiadomo¶ci\n", 1);
@@ -1266,7 +1263,6 @@ void theme_init()
 	format_add("queue_flush", "%) Wys³ano zaleg³e wiadomo¶ci z kolejki\n", 1);
 
 	/* conference */
-	format_add("conferences_invalid", "%! Nieprawid³owy parametr\n", 1);
 	format_add("conferences_list_empty", "%! Brak konferencji\n", 1);
 	format_add("conferences_list", "%> %T%1%n: %2\n", 1);
 	format_add("conferences_list_ignored", "%> %T%1%n: %2 (%yingorowana%n)\n", 1);

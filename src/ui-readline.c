@@ -994,7 +994,7 @@ static int ui_readline_event(const char *event, ...)
 				window_list();
 				
 			} else
-				print("window_invalid");
+				print("invalid_params", "window");
 
 			result = 1;
 		}

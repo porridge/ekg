@@ -249,7 +249,7 @@ COMMAND(cmd_alias)
 		return;
 	}
 
-	print("aliases_invalid");
+	print("invalid_params", name);
 }
 
 COMMAND(cmd_away)
@@ -487,7 +487,7 @@ COMMAND(cmd_exec)
 			print("exec_error", strerror(errno));
 			return;
 		}
-		
+
 		if (!(pid = fork())) {
 			if (fd[1]) {
 				close(fd[0]);
@@ -1834,7 +1834,7 @@ COMMAND(cmd_sms)
 	struct userlist *u;
 	const char *number = NULL;
 
-	if (!params[0] || !params[1]) {
+	if (!params[0] || !params[1] || !config_sms_app) {
 		print("not_enough_params", name);
 		return;
 	}
@@ -3023,8 +3023,10 @@ COMMAND(cmd_timer)
 	list_t l;
 
 	if (match_arg(params[0], 'a', "add", 2)) {
-		const char *p = params[1];
-		time_t t = 0;
+		const char *p = params[1], *t_name = NULL;
+		char *t_command;
+		time_t period = 0;
+		struct timer *t;
 		int persistent = 0;
 
 		if (!params[1] || !params[2]) {
@@ -3032,33 +3034,54 @@ COMMAND(cmd_timer)
 			return;
 		}
 
+		/* timer --add name ... */
+		if (isalpha_pl_PL(*p)) {
+			t_name = p;
+
+			for (l = timers; l; l = l->next) {
+				t = l->data;
+
+				if (t->name && !strcasecmp(t->name, t_name)) {
+					print("timer_exist", t_name);
+					return;
+				}
+			}
+
+			p = params[2];
+			t_command = xstrdup(params[3]);
+		} else
+			if (params[3])
+				t_command = saprintf("%s %s", params[2], params[3]);
+			else
+				t_command = xstrdup(params[2]);
+
 		if (!strncmp(p, "*/", 2)) {
 			p += 2;
 			persistent = 1;
 		}
 
 		for (;;) {
-			time_t tmp_t = 0;
+			time_t _period = 0;
 
 			if (isdigit(*p))
-				tmp_t = atoi(p);
+				_period = atoi(p);
 			else {
 				print("invalid_params", name);
 				return;
 			}
 
-			p += strlen(itoa(tmp_t));
+			p += strlen(itoa(_period));
 
 			if (strlen(p)) {
 				switch (*p++) {
 					case 'd':
-						tmp_t *= 86400;
+						_period *= 86400;
 						break;
 					case 'h':
-						tmp_t *= 3600;
+						_period *= 3600;
 						break;
 					case 'm':
-						tmp_t *= 60;
+						_period *= 60;
 						break;
 					case 's':
 						break;
@@ -3068,13 +3091,16 @@ COMMAND(cmd_timer)
 				}
 			}
 
-			t += tmp_t;
+			period += _period;
 			
 			if (*p == '\0')
 				break;
 		}
 
-		timer_add(t, persistent, TIMER_COMMAND, NULL, params[2]);
+		if ((t = timer_add(period, persistent, TIMER_COMMAND, t_name, t_command)))
+			print("timer_added", t->name);
+
+		xfree(t_command);
 
 		return;
 	}
@@ -3084,7 +3110,12 @@ COMMAND(cmd_timer)
 			print("not_enough_params", name);
 			return;
 		}
-		timer_remove(params[1], NULL);
+
+		if (!timer_remove(params[1], NULL))
+			print("timer_deleted", params[1]);
+		else
+			print("timer_noexist", params[1]);
+
 		return;
 	}
 
@@ -3093,15 +3124,60 @@ COMMAND(cmd_timer)
 		struct timeval tv;
 		struct timezone tz;
 		char *tmp;
+		const char *type_str;
+		int usec, sec, minutes = 0, hours = 0, days = 0;
 
 		gettimeofday(&tv, &tz);
-	
-		if (t->ends.tv_usec < tv.tv_usec)
-			tmp = saprintf("%d.%.3d", t->ends.tv_sec - tv.tv_sec - 1, (t->ends.tv_usec - tv.tv_usec + 1000000) / 1000);
-		else
-			tmp = saprintf("%d.%.3d", t->ends.tv_sec - tv.tv_sec, (t->ends.tv_usec - tv.tv_usec) / 1000);
 
-		print("timer_list", t->name, tmp, t->command);
+		if (t->ends.tv_usec < tv.tv_usec) {
+			sec = t->ends.tv_sec - tv.tv_sec - 1;
+			usec = (t->ends.tv_usec - tv.tv_usec + 1000000) / 1000;
+		} else {
+			sec = t->ends.tv_sec - tv.tv_sec;
+			usec = (t->ends.tv_usec - tv.tv_usec) / 1000;
+		}
+
+		if (sec > 86400) {
+			days = sec / 86400;
+			sec -= days * 86400;
+		}
+
+		if (sec > 3600) {
+			hours = sec / 3600;
+			sec -= hours * 3600;
+		}
+	
+		if (sec > 60) {
+			minutes = sec / 60;
+			sec -= minutes * 60;
+		}
+
+		if (days)
+			tmp = saprintf("%dd %dh %dm %d.%.3d", days, hours, minutes, sec, usec);
+		else
+			if (hours)
+				tmp = saprintf("%dh %dm %d.%.3d", hours, minutes, sec, usec);
+			else
+				if (minutes)
+					tmp = saprintf("%dm %d.%.3d", minutes, sec, usec);
+				else
+					tmp = saprintf("%d.%.3d", sec, usec);
+
+		switch (t->type) {
+			case TIMER_UI:
+				type_str = "ui";
+				break;
+			case TIMER_SCRIPT:
+				type_str = "script";
+				break;
+			case TIMER_COMMAND:
+				type_str = "command";
+				break;
+			default:
+				type_str = "unknown";
+		}
+		
+		print("timer_list", t->name, tmp, t->command, type_str, (t->persistent) ? "*" : "");
 
 		xfree(tmp);
 	}
@@ -3272,7 +3348,7 @@ COMMAND(cmd_conference)
 		return;
 	}
 
-	print("conferences_invalid");
+	print("invalid_params", name);
 }
 
 COMMAND(cmd_last)
@@ -3636,7 +3712,7 @@ void command_init()
 	( "exec", "?", cmd_exec, 0,
 	  " <polecenie>", "uruchamia polecenie systemowe",
 	  "\n"
-	  "Poprzedzenie znakiem %T^%n ukryje informacjê o zakoñczeniu.");
+	  "Poprzedzenie polecenia znakiem %T^%n ukryje informacjê o zakoñczeniu.");
 	  
 	command_add
 	( "!", "?", cmd_exec, 0,
@@ -3848,18 +3924,18 @@ void command_init()
 	  "przecinkiem lub spacj±.");
 
 	command_add
-	( "timer", "???", cmd_timer, 0,
+	( "timer", "????", cmd_timer, 0,
 	  " [opcje]", "zarz±dzanie timerami",
 	  "\n"
-	  "  -a, --add [*/]<czas> <komenda>  tworzy nowy timer\n"
-	  "  -d, --del <numer>               zatrzymuje timer\n"
-	  " [-l, --list]                     wy¶wietla listê timerów\n"
+	  "  -a, --add [nazwa] [*/]<czas> <komenda>  tworzy nowy timer\n"
+	  "  -d, --del <numer/nazwa>                 zatrzymuje timer\n"
+	  " [-l, --list]                             wy¶wietla listê timerów\n"
 	  "\n"
 	  "Czas podaje siê w sekundach. Mo¿na te¿ u¿yæ przyrostków d, h, m, s, "
 	  "oznaczaj±cych dni, godziny, minuty, sekundy, np. 5h20m. Timer po "
 	  "jednorazowym uruchomieniu jest usuwany, chyba ¿e czas poprzedzimy "
 	  "wyra¿eniem ,,*/''. Wtedy timer bêdzie uruchamiany w zadanych odstêpach "
-	  "czasu.");
+	  "czasu (na li¶cie jest on oznaczony gwiazdk±).");
 
 	command_add
 	( "unignore", "i", cmd_ignore, 0,
@@ -3880,7 +3956,7 @@ void command_init()
 	( "window", "w?", cmd_window, 0,
 	  " <komenda> [numer_okna]", "zarz±dzanie okienkami",
 	  "\n"
-	  "  new [*opcje]          tworzy nowe okno\n"
+	  "  new [*opcje]         tworzy nowe okno\n"
 	  "  kill [numer_okna]    zamyka aktualne lub podane okno\n"
 	  "  next                 prze³±cza do nastêpnego okna\n"
 	  "  prev                 prze³±cza do poprzedniego okna\n"

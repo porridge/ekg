@@ -60,4 +60,10 @@ extern int automaton_color_escapes;
 
 fstring_t reformat_string(const char *str);
 
+/*
+ * makro udaj±ce isalpha() z LC_CTYPE="pl_PL". niestety ncurses co¶ psuje
+ * i ¼le wykrywa p³eæ.
+ */
+#define isalpha_pl_PL(x) ((x >= 'a' && x <= 'z') || (x >= 'A' && x <= 'Z') || x == '±' || x == 'æ' || x == 'ê' || x == '³' || x == 'ñ' || x == 'ó' || x == '¶' || x == '¿' || x == '¼' || x == '¡' || x == 'Æ' || x == 'Ê' || x == '£' || x == 'Ñ' || x == 'Ó' || x == '¦' || x == '¯' || x == '¬')
+
 #endif /* __THEMES_H */

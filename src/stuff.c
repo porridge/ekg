@@ -1508,7 +1508,7 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 	
 	if (buf[0] == ',' || buf[strlen(buf)-1] == ',') {
 		if (!quiet)
-			print("conferences_invalid");
+			print("invalid_params", "chat");
 		xfree(buf);
 		return NULL;
 	}
