@@ -106,6 +106,11 @@ struct last_count {
 	int count;
 };
 
+struct conference {
+	char *name;
+	list_t recipients;
+};
+
 list_t children;
 list_t aliases;
 list_t watches;
@@ -116,6 +121,7 @@ list_t sequences;
 list_t timers;
 list_t lasts;
 list_t lasts_count;
+list_t conferences;
 struct gg_session *sess;
 
 int config_dcc;
@@ -234,6 +240,13 @@ int alias_add(const char *string, int quiet, int append);
 int alias_remove(const char *name);
 list_t alias_check(const char *foo);
 void alias_free();
+
+struct conference *conference_add(const char *string, const char *nicklist, int quiet);
+int conference_remove(const char *name);
+void conference_free();
+struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int count);
+struct conference *conference_find(const char *name);
+struct conference *conference_create(const char *nicks);
 
 char *base64_encode(const char *buf);
 char *base64_decode(const char *buf);

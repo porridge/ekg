@@ -550,7 +550,6 @@ static FILE *try_open(FILE *prevfd, const char *prefix, const char *filename)
  */
 int theme_read(const char *filename, int replace)
 {
-	const char *tmp;
         char *buf;
         FILE *f = NULL;
 
@@ -559,14 +558,11 @@ int theme_read(const char *filename, int replace)
 		if (!filename || !(f = fopen(filename, "r")))
 			return -1;
         } else {
-		if (strchr(filename, '/'))
-			f = try_open(NULL, NULL, filename);
-		else {
-			f = try_open(NULL, THEMES_DIR, filename);
-			tmp = prepare_path("", 0);
-			f = try_open(f, tmp, filename);
-			tmp = prepare_path("themes", 0);
-			f = try_open(f, tmp, filename);
+		f = try_open(NULL, NULL, filename);
+		if (!strchr(filename, '/')) {
+			f = try_open(f, prepare_path("", 0), filename);
+			f = try_open(f, prepare_path("themes", 0), filename);
+			f = try_open(f, THEMES_DIR, filename);
 		}
 		if (!f)
 			return -1;
@@ -998,4 +994,15 @@ void theme_init()
 	format_add("last_list_empty", "%! Nie zalogowano ¿adnych wiadomo¶ci.\n", 1);
 	format_add("last_list_empty_nick", "%! Nie zalogowano ¿adnych wiadomo¶ci od %W%1%n.\n", 1);
 	format_add("last_list_timestamp", "%m-%d-%Y %H:%M", 1);
+
+	/* conference */
+	format_add("conferences_invalid", "%! Nieprawid³owy parametr\n", 1);
+	format_add("conferences_list_empty", "%! Brak konferencji\n", 1);
+	format_add("conferences_list", "%> %T%1%n: %2\n", 1);
+	format_add("conferences_add", "%> Utworzono konferencjê %T%1%n\n", 1);
+	format_add("conferences_not_added", "%> Nie utworzono konferencji %T%1%n\n", 1);
+	format_add("conferences_del", "%) Usuniêto konferencjê %T%1%n\n", 1);
+	format_add("conferences_exist", "%! Konferencja %T%1%n ju¿ istnieje\n", 1);
+	format_add("conferences_noexist", "%! Konferencja %T%1%n nie istnieje\n", 1);
+	format_add("conferences_name_error", "%! Nazwa konferencji powinna zaczynaæ siê od %T#%n\n", 1);
 };

@@ -72,8 +72,38 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 	int width, next_width, i, j, mem_width = 0;
 	char *mesg, *buf, *line, *next, *format = NULL, *format_first = "", *next_format = NULL, *head = NULL, *foot = NULL, *save;
 	char *line_width = NULL, timestr[100];
-	char *target = xstrdup((chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender)));
+	const char *target;
 	struct tm *tm;
+
+	if (e->event.msg.recipients) {
+		struct conference *c = conference_find_by_uins(e->event.msg.sender, 
+			e->event.msg.recipients, e->event.msg.recipients_count);
+
+		if (!c) {
+			string_t tmp = string_init(NULL);
+			int first = 0, i;
+
+			for (i = 0; i < e->event.msg.recipients_count; i++) {
+				if (first++) 
+					string_append_c(tmp, ',');
+
+			        string_append(tmp, itoa(e->event.msg.recipients[i]));
+			}
+
+			string_append_c(tmp, ' ');
+			string_append(tmp, itoa(e->event.msg.sender));
+
+			c = conference_create(tmp->str);
+
+			string_free(tmp, 1);
+		} 
+		
+		if (c)
+			target = c->name;
+		else
+			target = (chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender));
+	} else
+	        target = (chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender));
 	
 	switch (chat) {
 		case 0:
@@ -213,8 +243,6 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 
 	if (!strcmp(format_find(format_first), ""))
 		print_window(target, 1, foot);
-
-	xfree(target);
 }
 
 /*

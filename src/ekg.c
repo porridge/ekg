@@ -857,6 +857,7 @@ void ekg_exit()
 		unlink(pipe_file);
 	
 	alias_free();
+	conference_free();
 	userlist_free();
 	theme_free();
 	variable_free();

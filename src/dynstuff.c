@@ -470,6 +470,32 @@ void array_add(char ***array, char *string)
 }
 
 /*
+ * array_join()
+ *
+ * ³±czy elementy tablicy w jeden string oddzielaj±c elementy odpowiednim
+ * separatorem.
+ *
+ *  - array - wska¼nik do tablicy,
+ *  - sep - seperator.
+ *
+ * zwrócony ci±g znaków nale¿y zwolniæ.
+ */
+char *array_join(char **array, const char *sep)
+{
+	string_t s = string_init(NULL);
+	int i;
+
+	for (i = 0; array[i]; i++) {
+		if (i)
+			string_append(s, sep);
+
+		string_append(s, array[i]);
+	}
+
+	return string_free(s, 0);
+}
+
+/*
  * array_free()
  *
  * zwalnia pamieæ zajmowan± przez tablicê.

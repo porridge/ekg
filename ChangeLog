@@ -20,6 +20,11 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   Alt-Enter lub Esc-Enter. wysy³ane t± sam± kombinacj±, anulowane
   samym Esc. teoretycznie mo¿e powodowaæ segfaulty, ale sprawdzi³em
   valgrindem i niczego niebezpiecznego nie znalaz³. (w)
+- konferencje. wynalazek ten obs³uguje siê poleceniem ,,conference''.
+  okienka bêda automagicznie tworzone, je¶li mamy odpowiednie
+  ustawienia. (dawjar/w)
+- zmiana kolejno¶ci poszukiwania themeów (dawjar/w)
+- update dj.theme (dawjar/w)
 
 // 2002-09-11
 

@@ -70,6 +70,7 @@ list_t emoticons = NULL;
 list_t sequences = NULL;
 list_t lasts = NULL;
 list_t lasts_count = NULL;
+list_t conferences = NULL;
 
 int away = 0;
 int in_autoexec = 0;
@@ -1015,6 +1016,263 @@ int on_off(const char *value)
 		return 0;
 
 	return -1;
+}
+
+/*
+ * conference_add()
+ *
+ * dopisuje konferencje do listy konferencji.
+ *
+ *  - name - nazwa konferencji,
+ *  - nicklist - lista nicków, grup, czegokolwiek.
+ *  - quiet - czy wypluwaæ mesgi na stdout.
+ *
+ * zaalokowan± struct conference lub NULL w przypadku b³êdu.
+ */
+struct conference *conference_add(const char *name, const char *nicklist, int quiet)
+{
+	struct conference c;
+	char **nicks, **p;
+	list_t l;
+	int i, count;
+
+	memset(&c, 0, sizeof(c));
+
+	if (!name || !nicklist) {
+		if (!quiet)
+			print("not_enough_params", "conference");
+		return NULL;
+	}
+
+	if (name[0] != '#') {
+		if (!quiet) 
+			print("conferences_name_error");
+		return NULL;
+	}
+
+	nicks = array_make(nicklist, " ,", 0, 1, 0);
+
+	/* grupy zamieniamy na niki */
+	for (i = 0; nicks[i]; i++) {
+		if (nicks[i][0] == '@') {
+			char *gname = xstrdup(nicks[i] + 1);
+			int first = 0;
+			int nig = 0; /* nicks in group */
+
+		        for (l = userlist; l; l = l->next) {
+				struct userlist *u = l->data;
+				list_t m;
+
+				for (m = u->groups; m; m = m->next) {
+					struct group *g = m->data;
+
+					if (!strcasecmp(gname, g->name)) {
+						if (first++)
+							array_add(&nicks, xstrdup(u->display));
+						else {
+							xfree(nicks[i]);
+							nicks[i] = xstrdup(u->display);
+						}
+
+						nig++;
+
+						break;
+					}
+				}
+			}
+
+			if (!nig) {
+				if (!quiet) {
+					print("group_empty", gname);
+					print("conferences_not_added", name);
+				}
+				xfree(gname);
+
+				return NULL;
+			}
+
+			xfree(gname);
+		}
+	}
+
+	count = array_count(nicks);
+
+	for (l = conferences; l; l = l->next) {
+		struct conference *cf = l->data;
+		
+		if (!strcasecmp(name, cf->name)) {
+			if (!quiet)
+				print("conferences_exist", name);
+
+			array_free(nicks);
+
+			return NULL;
+		}
+	}
+
+	for (p = nicks, i = 0; *p; p++) {
+		uin_t uin;
+
+		if (!strcmp(*p, ""))
+		        continue;
+
+		if (!(uin = get_uin(*p))) {
+			if (!quiet)
+			        print("user_not_found", *p);
+			continue;
+		}
+
+
+		list_add(&(c.recipients), &uin, sizeof(uin));
+		i++;
+	}
+
+	array_free(nicks);
+
+	if (i != count) {
+		if (!quiet)
+			print("conferences_not_added", name);
+
+		return NULL;
+	}
+
+	if (!quiet)
+		print("conferences_add", name);
+
+	c.name = xstrdup(name);
+
+	return list_add(&conferences, &c, sizeof(c));
+}
+
+/*
+ * conference_free()
+ *
+ * usuwa pamiêæ zajêt± przez konferencje.
+ */
+void conference_free()
+{
+	list_t l;
+
+	for (l = conferences; l; l = l->next) {
+		struct conference *c = l->data;
+		
+		xfree(c->name);
+		list_destroy(c->recipients, 1);
+	}
+
+	list_destroy(conferences, 1);
+	conferences = NULL;
+}
+
+/*
+ * conference_remove()
+ *
+ * usuwa konferencje z listy konferencji.
+ *
+ * - name - konferencja.
+ */
+int conference_remove(const char *name)
+{
+	list_t l;
+
+	if (!name) {
+		print("not_enough_params", "conference");
+		return -1;
+	}
+
+	for (l = conferences; l; l = l->next) {
+		struct conference *c = l->data;
+
+		if (!strcasecmp(c->name, name)) {
+			print("conferences_del", name);
+			xfree(c->name);
+			list_destroy(c->recipients, 1);
+			list_remove(&conferences, c, 1);
+			return 0;
+		}
+	}
+
+	print("conferences_noexist", name);
+
+	return -1;
+}
+
+/*
+ * conference_create()
+ *
+ * Tworzy nowa konferencje z wygenerowana nazwa.
+ *
+ * - nicksstr - lista nikow tak jak dla polecenia conference.
+ */
+struct conference *conference_create(const char *nicks)
+{
+	struct conference *c;
+	static int count = 1;
+	char *name = saprintf("#%d", count++);
+
+	c = conference_add(name, nicks, 0);
+
+	xfree(name);
+
+	return c;
+}
+
+/*
+ * conference_find()
+ *
+ * znajduje i zwraca wska¼nik do konferencji lub NULL.
+ *
+ *  - name - nazwa konferencji.
+ */
+struct conference *conference_find(const char *name) 
+{
+	list_t l;
+
+	for (l = conferences; l; l = l->next) {
+		struct conference *c = l->data;
+
+		if (!strcmp(c->name, name))
+			return c;
+	}
+	
+	return NULL;
+}
+
+/*
+ * conference_find_by_uins()
+ *
+ * znajduje konferencjê, do której nale¿± podane uiny. je¿eli nie znaleziono,
+ * zwracany jest NULL.
+ * 
+ * - from - kto jest nadawc± wiadomo¶ci,
+ * - recipients - tablica numerów nale¿±cych do konferencji,
+ * - count - ilo¶æ numerów.
+ */
+struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int count) 
+{
+	int i;
+	list_t l, r;
+
+	for (l = conferences; l; l = l->next) {
+		struct conference *c = l->data;
+		int matched = 0;
+
+		for (r = c->recipients; r; r = r->next) {
+			for (i = 0; i <= count; i++) {
+				uin_t uin = (i == count) ? from : recipients[i];
+				
+				if (uin == *((uin_t *) (r->data))) {
+					matched++;
+					break;
+				}
+			}
+		}
+
+		if (matched == list_count(c->recipients)) 
+			return l->data;
+	}
+
+	return NULL;
 }
 
 /*

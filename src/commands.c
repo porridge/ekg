@@ -1012,7 +1012,7 @@ COMMAND(cmd_list)
 COMMAND(cmd_msg)
 {
 	struct userlist *u;
-	char **nicks, **p, *msg, *escaped;
+	char **nicks = NULL, **p, *msg, *escaped;
 	uin_t uin;
 	int count, chat = (!strcasecmp(name, "chat"));
 
@@ -1026,29 +1026,29 @@ COMMAND(cmd_msg)
 		return;
 	}
 
-	if (params[0][0] == '@') {
+	if (params[0][0] == '@' || strchr(params[0], ',')) {
+		struct conference *c = conference_create(params[0]);
 		list_t l;
+
+		if (!c)
+			return;
 		
-		nicks = NULL;
+		xfree(params[0]);
+		params[0] = xstrdup(c->name);
 
-		for (l = userlist; l; l = l->next) {
-			struct userlist *u = l->data;
-			list_t m;
+		for (l = c->recipients; l; l = l->next)
+			array_add(&nicks, xstrdup(itoa(*((uin_t *) (l->data)))));
+	} else if (params[0][0] == '#') {
+		struct conference *c = conference_find(params[0]);
+		list_t l;
 
-			for (m = u->groups; m; m = m->next) {
-				struct group *g = m->data;
-
-				if (!strcasecmp(params[0] + 1, g->name)) {
-					array_add(&nicks, xstrdup(u->display));
-					break;
-				}
-			}
-		}
-
-		if (!nicks) {
-			print("group_empty", params[0] + 1);
+		if (!c) {
+			print("conferences_noexist", params[0]);
 			return;
 		}
+
+		for (l = c->recipients; l; l = l->next)
+			array_add(&nicks, xstrdup(itoa(*((uin_t *) (l->data)))));
 	} else 
 		nicks = array_make(params[0], ",", 0, 0, 0);
 
@@ -1890,6 +1890,21 @@ COMMAND(cmd_remind)
 
 COMMAND(cmd_query)
 {
+	if (!params[0]) {
+		print("not_enough_params", name);
+		return;
+	}
+
+	if (params[0][0] == '@' || strchr(params[0], ',')) {
+		struct conference *c = conference_create(params[0]);
+
+		if (!c)
+			return;
+		
+		xfree(params[0]);
+		params[0] = xstrdup(c->name);
+	}
+
 	ui_event("command", "query", params[0]);
 }
 
@@ -2241,6 +2256,73 @@ COMMAND(cmd_test_python)
 }
 
 #endif
+
+COMMAND(cmd_conference) 
+{
+	if (!params[0] || match_arg(params[0], 'l', "list", 2)) {
+		list_t l, r;
+		int count = 0;
+
+		for (l = conferences; l; l = l->next) {
+			struct conference *c = l->data;
+			string_t recipients;
+			const char *recipient;
+			int first = 0;
+
+			recipients = string_init(NULL);
+			
+			for (r = c->recipients; r; r = r->next) {
+				uin_t uin = *((uin_t *) (r->data));
+				struct userlist *u = userlist_find(uin, NULL);
+
+				if (u)
+					recipient = u->display;
+				else
+					recipient = itoa(uin);
+
+				if (first++)
+					string_append_c(recipients, ',');
+				
+				string_append(recipients, recipient);
+
+				count++;
+			}
+
+			print("conferences_list", c->name, recipients->str);
+
+			string_free(recipients, 1);
+		}
+
+		if (!count)
+			print("conferences_list_empty");
+
+		return;
+	}
+
+	if (match_arg(params[0], 'a', "add", 2)) {
+		if (!params[1] || !params[2]) {
+			print("not_enough_params", name);
+			return;
+		}
+		
+		conference_add(params[1], params[2], 0);
+
+		return;
+	}
+
+	if (match_arg(params[0], 'd', "del", 2)) {
+		if (!params[1]) {
+			print("not_enough_params", name);
+			return;
+		}
+
+		conference_remove(params[1]);
+
+		return;
+	}
+
+	print("conferences_invalid");
+}
 
 COMMAND(cmd_last)
 {
@@ -2624,6 +2706,17 @@ void command_init()
 	( "status", "", cmd_status, 0,
 	  "", "wy¶wietla aktualny stan",
 	  "");
+
+	command_add
+	( "conference", "???", cmd_conference, 0,
+	  " [opcje]", "zarz±dzanie konferencjami",
+	  "  -a, --add <#nazwa> <nick/uin/@grupa>  tworzy now± konferencjê\n"
+	  "  -d, --del <#nazwa>                    usuwa konferencjê\n"
+	  " [-l, --list]                           wy¶wietla listê konferencji\n"
+	  "\n"
+	  "Dodaje nazwê konferencji i definiuje, kto bierze w niej udzia³.\n"
+	  "Kolejne numery, pseudonimy lub grupy mog± byc odzielone\n"
+	  "przecinkiem lub spacj±.");
 
 	command_add
 	( "timer", "???", cmd_timer, 0,
