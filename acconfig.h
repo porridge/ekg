@@ -20,3 +20,6 @@
 
 /* define if you want default ui_readline */
 #undef WITH_FORCE_READLINE
+
+/* define if you want VOIP support */
+#undef HAVE_VOIP
