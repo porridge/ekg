@@ -1299,11 +1299,6 @@ COMMAND(cmd_list)
 				show_offline = 1;
 			}
 
-			if (match_arg(argv[i], 'r', "ignored", 2)) {
-				show_all = 0;
-				show_offline = 1;
-			}
-
 			if (match_arg(argv[i], 'm', "member", 2)) {
 				if (j && argv[i+1]) {
 					int off = (argv[i+1][0] == '@' && strlen(argv[i+1]) > 1) ? 1 : 0;
@@ -1412,11 +1407,17 @@ fail:
 		if (show_invisible && GG_S_I(u->status))
 			show = 1;
 
+		if (show_blocked && GG_S_BL(u->status))
+			show = 1;
+
 		if (show_descr && !GG_S_D(u->status))
 			show = 0;
 
 		if (show_group && !group_member(u, show_group))
 			show = 0;
+
+		if (show_offline && group_member(u, "__offline"))
+			show = 1;
 
 		if (show) {
 			print(tmp, format_user(u->uin), (u->first_name) ? u->first_name : u->display, inet_ntoa(in), itoa(p), u->descr);
@@ -3604,21 +3605,21 @@ void command_init()
 	( "last", "uu", cmd_last, 0,
 	  " [opcje]", "wy¶wietla lub czy¶ci ostatnie wiadomo¶ci",
 	  "\n"
-	  " [numer/alias]             wy¶wietla ostatnie wiadomo¶ci\n"
-	  " -s, --stime [numer/alias] wy¶wietla czas wys³ania wiadomo¶ci przychodz±cych\n"
-	  " -c, --clear [numer/alias] czy¶ci wiadomo¶ci od/do numer/alias lub wszystkie\n"
-	  "W przypadku opcji %T-s%n lub %T--stime%n czas wy¶wietlany jest ,,inteligentnie''"
-	  "zgodnie ze zmienn± %Ttime_deviation.%n"
-	  );
+	  "  [numer/alias]             wy¶wietla ostatnie wiadomo¶ci\n"
+	  "  -s, --stime [numer/alias] wy¶wietla czas wys³ania wiadomo¶ci\n"
+	  "  -c, --clear [numer/alias] czy¶ci podane wiadomo¶ci lub wszystkie\n"
+	  "W przypadku opcji %T-s%n lub %T--stime%n czas wy¶wietlany jest "
+	  ",,inteligentnie'' zgodnie ze zmienn± %Ttime_deviation.%n");
 
 	command_add
 	( "list", "u?", cmd_list, 0,
           " [alias|@grupa|opcje]", "zarz±dzanie list± kontaktów",
 	  "\n"
-	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i|-d|-m|-o]\":\n"
+	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i|-B|-d|-m|-o]\":\n"
 	  "  -a, --active          dostêpne\n"
 	  "  -b, --busy            zajête\n"
 	  "  -i, --inactive        niedostêpne\n"
+	  "  -B, --blocked         blokuj±ce nas\n"
 	  "  -d, --description     osoby z opisem\n"
 	  "  -m, --member <@grupa> osoby nale¿±ce do danej grupy\n"
 	  "  -o, --offline         osoby dla których jeste¶my niedostêpni\n"
@@ -3800,7 +3801,7 @@ void command_init()
 	  "%Ty%n to "
 	  "pozycja okna na ekranie, %Tw%n i %Th%n to odpowiednio szeroko¶æ "
 	  "i wysoko¶æ okna w znakach, a %Tf%n jest map± bitow± okre¶laj±c± "
-	  "z której strony wystêpuj± ramki (1 - lewo, 2 - prawo, 4 - góra, "
+	  "z której strony wystêpuj± ramki (1 - lewo, 2 - góra, 4 - prawo, "
           "8 - dó³), a komenda okre¶la, jakie komendy wynik ma byæ "
 	  "wy¶wietlany regularnie w oknie.");
 

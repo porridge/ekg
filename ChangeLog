@@ -18,6 +18,9 @@ zg³osi³ b³±d.
 - informowanie o zapisie lub odczycie konfiguracji z serwera (FIG/w)
 - poprawki helpów, ¿eby u¿ywa³y %| i wygl±da³y ³adnie po zmianie
   rozmiaru okna (w)
+- libgadu: dodanie makra GG_S_BL() (w)
+- libgadu: podbicie wersji API do 2.9 (w)
+- dokoñczenie kilku zapomnianych rzeczy w /list (sz/w)
 
 // 2003-01-03
 

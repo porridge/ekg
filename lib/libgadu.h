@@ -761,6 +761,7 @@ struct gg_login_ext {
 #define GG_S_B(x) ((x) == GG_STATUS_BUSY || (x) == GG_STATUS_BUSY_DESCR)
 #define GG_S_I(x) ((x) == GG_STATUS_INVISIBLE || (x) == GG_STATUS_INVISIBLE_DESCR)
 #define GG_S_D(x) ((x) == GG_STATUS_NOT_AVAIL_DESCR || (x) == GG_STATUS_AVAIL_DESCR || (x) == GG_STATUS_BUSY_DESCR || (x) == GG_STATUS_INVISIBLE_DESCR)
+#define GG_S_BL(x) ((x) == GG_STATUS_BLOCKED)
 
 struct gg_new_status {
 	uint32_t status;			/* na jaki zmieniæ? */

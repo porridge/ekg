@@ -12,8 +12,6 @@ zalecane ustawienia:
 	set display_sent 1
 	set make_window 2
 
-NIE MO¯NA JESZCZE BINDOWAÆ KLAWISZY!
-
 pasek stanu zawiera zegar, informacje o w³asnym numerku (kolor okre¶la
 stan: czarny -- niedostêpny, bia³y -- dostêpny, szary -- zajêty, ciemnoszary
 -- niewidoczny), numer aktualnego okna, informacje o aktywno¶ci w innych
