@@ -397,8 +397,11 @@ void gg_event_free(struct gg_event *e);
 /*
  * funkcje obs³ugi listy kontaktów.
  */
+int gg_notify_ex(struct gg_session *sess, uin_t *userlist, char *types, int count);
 int gg_notify(struct gg_session *sess, uin_t *userlist, int count);
+int gg_add_notify_ex(struct gg_session *sess, uin_t uin, char type);
 int gg_add_notify(struct gg_session *sess, uin_t uin);
+int gg_remove_notify_ex(struct gg_session *sess, uin_t uin, char type);
 int gg_remove_notify(struct gg_session *sess, uin_t uin);
 
 /*
