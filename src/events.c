@@ -1678,7 +1678,7 @@ void handle_search50(struct gg_event *e)
 
 #define __format(x) ((count == 1) ? "search_results_single" x : "search_results_multi" x)
 
-#define GG_SEARCH_FRIENDS_MASK	0x80
+#define GG_SEARCH_FRIENDS_MASK	0x0080
 
 		switch (status & ~GG_SEARCH_FRIENDS_MASK) {
 			case GG_STATUS_AVAIL:

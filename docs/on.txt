@@ -62,7 +62,7 @@ on [opcje]
 		akcji ,,exec'' jest NIEBEZPIECZNE. je¶li naprawdê musisz to
 		zrobiæ, u¿yj "%4" (w cudzys³owiach!) pamiêtaj tylko, ¿e
 		¿aden program nie jest idealny, wiêc który¶ znak specjalnie
-		interpertowany przez shella móg³ zostaæ przypadkowo pominiêty.
+		interpretowany przez shella móg³ zostaæ przypadkowo pominiêty.
 
 akcje blink_leds oraz beeps_spk musz± mieæ dostêp do /dev/console, wiêc
 uruchamiany jest specjalny daemon (ioctld) z prawami roota. po wyj¶ciu 

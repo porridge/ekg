@@ -11,6 +11,7 @@ zg³osi³ b³±d.
 - dodanie klawisza Ctrl-K (bies/w)
 - poprawienie docs/protocol.html. jest zgodne z XHTML 1.0 Transitional (w)
 - zmienna ,,sound_mail_file'' (sz)
+- wzmianka o statusie ,,tylko dla znajomych'' w search50 w docs/api.txt (sz)
 - kosmetyka konferencji. nie tworzy kolejnych nazw #confX przy b³êdach.
   /find w oknie z konferencj± wyszuka wszystkich uczestników (sz)
 - /bind mo¿e ju¿ przypisywaæ domy¶lne akcje klienta innym klawiszom,
