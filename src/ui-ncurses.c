@@ -583,25 +583,26 @@ void window_redraw(struct window *w)
 		for (x = 0; l->ts && x < l->ts_len; x++)
 			mvwaddch(w->window, top + y, left + x, (unsigned char) l->ts[x]);
 
-		/* XXX po³±czyæ wy¶wietlanie prompta i linii w jeden kod */
-
-		for (x = 0; x < l->prompt_len; x++) {
+		for (x = 0; x < l->prompt_len + l->len; x++) {
 			int attr = A_NORMAL;
-			unsigned char ch;
+			unsigned char ch, chattr;
 			
-			if (!l->prompt_str)
-				continue;
+			if (x < l->prompt_len) {
+				if (!l->prompt_str)
+					continue;
 				
-			ch = l->prompt_str[x];
+				ch = l->prompt_str[x];
+				chattr = l->prompt_attr[x];
+			} else {
+				ch = l->str[x - l->prompt_len];
+				chattr = l->attr[x - l->prompt_len];
+			}
 
-			if ((l->prompt_attr[x] & 64))
+			if ((chattr & 64))
 				attr |= A_BOLD;
 
-			if (!(l->prompt_attr[x] & 128)) {
-				int fg = l->prompt_attr[x] & 7;
-
-				attr |= color_pair(fg, 0, COLOR_BLACK);
-			}
+			if (!(chattr & 128))
+				attr |= color_pair(chattr & 7, 0, COLOR_BLACK);
 
 			if (ch < 32) {
 				ch += 64;
@@ -614,36 +615,7 @@ void window_redraw(struct window *w)
 			}
 
 			wattrset(w->window, attr);
-
 			mvwaddch(w->window, top + y, left + x + l->ts_len, ch);
-		}
-
-		for (x = 0; x < l->len; x++) {
-			int attr = A_NORMAL;
-			unsigned char ch = l->str[x];
-
-			if ((l->attr[x] & 64))
-				attr |= A_BOLD;
-
-			if (!(l->attr[x] & 128)) {
-				int fg = l->attr[x] & 7;
-
-				attr |= color_pair(fg, 0, COLOR_BLACK);
-			}
-
-			if (ch < 32) {
-				ch += 64;
-				attr |= A_REVERSE;
-			}
-
-			if (ch > 127 && ch < 160) {
-				ch = '?';
-				attr |= A_REVERSE;
-			}
-
-			wattrset(w->window, attr);
-
-			mvwaddch(w->window, top + y, left + x + l->ts_len + l->prompt_len, ch);
 		}
 	}
 
@@ -1956,9 +1928,6 @@ void unknown_uin_generator(const char *text, int len)
 	}
 }
 
-/*
- * XXX nie obs³uguje eskejpowania znaków, dope³nia tylko pierwszy wyraz.
- */
 void known_uin_generator(const char *text, int len)
 {
 	list_t l;

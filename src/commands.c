@@ -1850,7 +1850,6 @@ COMMAND(cmd_msg)
 			
 			add_send = xstrdup(c->name);
 		}
-
 	} else if (*nick == '#') {
 		struct conference *c = conference_find(nick);
 		list_t l;
@@ -2621,7 +2620,6 @@ COMMAND(cmd_dcc)
 		else
 		    	path = xstrdup(t->filename);
 		
-		/* XXX wiêcej sprawdzania */
 		if ((t->dcc->file_fd = open(path, O_WRONLY | O_CREAT, 0600)) == -1) {
 			printq("dcc_get_cant_create", path);
 			gg_free_dcc(t->dcc);
