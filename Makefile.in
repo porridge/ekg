@@ -22,11 +22,11 @@ install: ekg
 
 distclean:	clean
 	$(RM) -f *~ config.log config.cache config.status config.h Makefile
-	$(MAKE) -C examples distclean
+	(cd examples; $(MAKE) distclean)
 
 clean:
 	$(RM) -f *.o ekg search core libgg.so*
-	$(MAKE) -C examples clean 
+	(cd examples; $(MAKE) clean) 
 
 shared:
 	$(CC) -fPIC -g -c libgg.c -o libgg.o
