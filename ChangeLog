@@ -9,6 +9,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - completion_notify ma now± flagê 4 (busy), która bierze pod uwagê
   równie¿ zajêtych (Murphy,kameleon/w)
+- ,,window clear'' dzia³a w ui-ncurses. wzorowane na irssi, gdzie
+  zawarto¶æ okna nie jest kompletnie czyszczona, tylko przewijana
+  poza obszar ekranu (w)
 
 // 2002-09-11
 

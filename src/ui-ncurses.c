@@ -72,9 +72,15 @@ static void window_switch(int id);
 static void update_statusbar();
 
 struct window {
-	WINDOW *window;
-	char *target, *prompt;
-	int lines, y, start, id, act, prompt_len;
+	WINDOW *window;		/* okno okna */
+	char *target;		/* nick query albo inna nazwa albo NULL */
+	int lines;		/* ilo¶æ linii okna */
+	int y;			/* aktualna pozycja */
+	int start;		/* od której linii zaczyna siê wy¶wietlanie */
+	int id;			/* numer okna */
+	int act;		/* czy co¶ siê zmieni³o? */
+	char *prompt;		/* sformatowany prompt lub NULL */
+	int prompt_len;		/* d³ugo¶æ prompta lub 0 */
 };
 
 static WINDOW *status = NULL, *input = NULL;
@@ -109,7 +115,7 @@ static void set_cursor(struct window *w)
 	if (w->y == w->lines) {
 		if (w->start == w->lines - output_size)
 			w->start++;
-		wresize(w->window, w->y + 1, stdscr->_maxx + 1);
+		wresize(w->window, w->y + 1, w->window->_maxx + 1);
 		w->lines++;
 	}
 	wmove(w->window, w->y, 0);
@@ -1033,7 +1039,7 @@ static void ui_ncurses_loop()
 					ui_event("command", "window", "kill", NULL);
 
 				if (ch == 'n')
-					ui_event("command", "window", "new", NULL);
+					ui_event("command", "window", "new");
 
 				break;
 				
@@ -1460,7 +1466,20 @@ static int ui_ncurses_event(const char *event, ...)
 			}
 
 			if (!strcasecmp(p1, "clear")) {
-				print("not_implemented");
+				struct window *w = window_current;
+				int count = output_size - (w->lines - w->y);
+				
+				w->lines += count;
+				w->start += count;
+				
+				wresize(w->window, w->lines, w->window->_maxx + 1);
+				wmove(w->window, w->y, 0);
+
+				window_refresh();
+				wnoutrefresh(status);
+				wnoutrefresh(input);
+				doupdate();
+
 				goto cleanup;
 			}
 			
