@@ -1087,6 +1087,7 @@ int config_read(const char *filename, const char *var)
 {
 	char *buf, *foo;
 	FILE *f;
+	int wrong = 0;
 
 	if (!filename && !(filename = prepare_path("config", 0)))
 		return -1;
@@ -1214,8 +1215,17 @@ int config_read(const char *filename, const char *var)
 				xfree(period_str);
 			}
 				array_free(p);
-                } else 
-			variable_set(buf, foo, 1);
+                } else {
+			if (variable_set(buf, foo, 1))
+				wrong++;
+
+			if (wrong > 15) {	/* to na pewno plik z konfiguracj± ? */
+				xfree(buf);
+				fclose(f);
+				errno = EINVAL;
+				return -1;
+			}	
+		}
 
 		xfree(buf);
 	}
@@ -3353,12 +3363,12 @@ int ioctld_send(const char *seq, int act, int quiet)
 		seq = tmp;
 	}
 
-	data.act = act;
-
 	if (ioctld_parse_seq(seq, &data)) {
 		printq("events_seq_incorrect", seq);
 		return -1;
 	}
+
+	data.act = act;
 
 	return send(ioctld_sock, &data, sizeof(data), 0);
 }

@@ -16,6 +16,10 @@ zg³osi³ b³±d.
   lepiej u¿yæ o wiele lepszego python'a ;> (sz)
 - przekazywanie liczby nowych maili w zdarzeniu ,,newmail'' (sz)
 - drobne poprawki dokumentacji (sz)
+- nie czytajmy ca³ego pliku np. w /reload, je¶li nie wygl±da
+  to na plik z konfiguracj± - po co zawieszaæ ekg. sam tak zrobi³em,
+  przez przypadek daj±c za parametr plik wielko¶ci 150 MB... (sz
+- poprawka /blink_leds i /beeps_spk (sz)
 - sensowna lista kluczy publicznych (FIG/w)
 - wykrywanie p³ci w wynikach wyszukiwania (FIG/w)
 - libgadu: usuniêcie leaków w gg_pubdir50() (w)
