@@ -251,6 +251,7 @@ enum {
 	GG_EVENT_PONG,
 	GG_EVENT_CONN_FAILED,
 	GG_EVENT_CONN_SUCCESS,
+	GG_EVENT_DISCONNECT,
 
 	GG_EVENT_DCC_NEW,		/* nowe po³±czenie miêdzy klientami */
 	GG_EVENT_DCC_ERROR,		/* b³±d */

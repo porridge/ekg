@@ -43,6 +43,7 @@ static struct handler handlers[] = {
 	{ GG_EVENT_NOTIFY, handle_notify },
 	{ GG_EVENT_CONN_SUCCESS, handle_success },
 	{ GG_EVENT_CONN_FAILED, handle_failure },
+	{ GG_EVENT_DISCONNECT, handle_disconnect },
 	{ 0, NULL }
 };
 
@@ -540,6 +541,26 @@ void handle_pubdir(struct gg_http *h)
 		reg_password = NULL;
 	}
 	gg_free_pubdir(h);
+}
+
+/*
+ * handle_disconnect()
+ *
+ * funkcja obs³uguje ostrze¿enie o roz³±czeniu.
+ *
+ *  - e - opis zdarzenia.
+ *
+ * nie zwraca niczego.
+ */
+void handle_disconnect(struct gg_event *e)
+{
+	my_printf("disconn_warning");
+
+	auto_reconnect = 0;
+	gg_logoff(sess);	/* a zobacz.. mo¿e siê uda ;> */
+	list_remove(&watches, sess, 0);
+	gg_free_session(sess);
+	sess = NULL;	
 }
 
 /*
