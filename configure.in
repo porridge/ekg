@@ -395,11 +395,13 @@ if test -d src; then
   fi
 fi
 
-echo
-echo "******************************************************************"
-echo "** Uwaga! Zmieniony zosta³ domy¶lny interfejs ekg z readline na **"
-echo "** ncurses. Je¶li z jakiego¶ powodu chcesz u¿ywaæ poprzedniego  **"
-echo "** interfejsu, uruchom ,,./configure --disable-ui-ncurses''     **"
-echo "******************************************************************"
-echo
+if test -d src; then
+  echo
+  echo "******************************************************************"
+  echo "** Uwaga! Zmieniony zosta³ domy¶lny interfejs ekg z readline na **"
+  echo "** ncurses. Je¶li z jakiego¶ powodu chcesz u¿ywaæ poprzedniego  **"
+  echo "** interfejsu, uruchom ,,./configure --disable-ui-ncurses''     **"
+  echo "******************************************************************"
+  echo
+fi
 

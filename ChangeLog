@@ -10,6 +10,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - ctxwindow - okienko z dostepnymi osobami (wojboj/s)
 - dodanie opcji --clear do ,,last'' (d)
+- configure nie wyrzuca informacji o interfejsie w libgadu (adrians/w)
+- poprawki okienka z osobami (w)
 
 // 2002-11-14
 

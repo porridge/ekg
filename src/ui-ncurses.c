@@ -86,9 +86,7 @@ struct window {
 
 static WINDOW *status = NULL;		/* okno stanu */
 static WINDOW *input = NULL;		/* okno wpisywania tekstu */
-static struct window ctx = { NULL, 
-	"__ctx", 0,  0, 0, 0, 0, 0, 
-	NULL, 0 } ;			/* okno kontaktow */
+static WINDOW *contacts = NULL;		/* okno kontaktow */
 
 #define HISTORY_MAX 1000		/* maksymalna ilo¶æ wpisów historii */
 static char *history[HISTORY_MAX];	/* zapamiêtane linie */
@@ -107,9 +105,11 @@ static list_t windows = NULL;		/* lista okien */
 static struct window *window_current;	/* wska¼nik na aktualne okno */
 static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 
-int config_ctxwin_size = 10;		/* szerokosc okna kontaktow */
-static int last_ctxwin_size = 10;	/* poprzedni rozmiar przed zmiana */
-int config_ctxwin_enabled = 0;		/* czy ma byc okno kontaktow */
+int config_contacts_size = 8;		/* szeroko¶æ okna kontaktów */
+static int last_contacts_size = 8;	/* poprzedni rozmiar przed zmian± */
+int config_contacts = 0;		/* czy ma byæ okno kontaktów */
+
+#define CONTACTS_SIZE ((config_contacts) ? (config_contacts_size + 3): 0)
 
 /* rozmiar okna wy¶wietlaj±cego tekst */
 #define output_size (stdscr->_maxy - input_size)
@@ -156,9 +156,6 @@ static struct window *window_find(const char *target)
 	if (!strcasecmp(target, "__status"))
 		return windows->data;
 		
-	if (!strcasecmp(target, "__ctx"))
-		return &ctx;
-	
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
 
@@ -183,7 +180,7 @@ static void window_refresh()
 		struct window *w = l->data;
 
 		if (window_current->id == w->id)
-			pnoutrefresh(w->window, w->start, 0, 0, 0, output_size - 1, stdscr->_maxx - ((config_ctxwin_enabled) ? config_ctxwin_size : 0) + 1);
+			pnoutrefresh(w->window, w->start, 0, 0, 0, output_size - 1, stdscr->_maxx - CONTACTS_SIZE + 1);
 		else
 			pnoutrefresh(w->window, 0, 0, 0, 81, 0, 0);
 	}
@@ -211,8 +208,9 @@ static void window_switch(int id)
 			w->act = 0;
 
 			window_refresh();
+			if (contacts)
+				wnoutrefresh(contacts);
 			wnoutrefresh(status);
-			if (config_ctxwin_enabled) wnoutrefresh(ctx.window);
 			wnoutrefresh(input);
 			doupdate();
 			update_statusbar();
@@ -277,7 +275,7 @@ static struct window *window_new(const char *target)
 		}
 	}
 	w.lines = stdscr->_maxy - 1;
-	w.window = newpad(w.lines, stdscr->_maxx - ((config_ctxwin_enabled) ? config_ctxwin_size : 0) + 1);
+	w.window = newpad(w.lines, stdscr->_maxx - CONTACTS_SIZE + 1);
 
 	return list_add_sorted(&windows, &w, sizeof(w), window_new_compare);
 }
@@ -424,33 +422,32 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 				break;
 			w->y++;
 			
-			if ((!target)||(strcasecmp(target,"__ctx")))
-				x = print_timestamp(w);
+			x = print_timestamp(w);
 			
 		} else {
 			
 			if (config_speech_app)
 				string_append_c(s, *p);
 		    			
-			if ((!x)&&((!target)||(strcasecmp(target,"__ctx"))))
+			if (!x)
 				x += print_timestamp(w);
 		     
 			waddch(w->window, (unsigned char) *p);
 			count++;
 			x++;
-			if (x == stdscr->_maxx - ((config_ctxwin_enabled) ? config_ctxwin_size : 0) + 1) {
-				if (*(p + 1) == 10)
+			if (x == stdscr->_maxx - CONTACTS_SIZE + 1) {
+				if (*(p + 1) == 10) 
 					p++;
 				else
 					w->y++;
 				set_cursor(w);
-				x = 4;
+x = 4;
 				wmove(w->window, w->y, x);
 			}
 		}
 	}
 
-	if ((!count)&&((!target)|| (strcasecmp(target,"__ctx")))) {
+	if (!count) {
 		print_timestamp(w);
 		set_cursor(w);
 	}
@@ -461,6 +458,8 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 		w->more = 1;
 	
 	window_refresh();
+	if (contacts)
+		wnoutrefresh(contacts);
 	update_statusbar();
 	wnoutrefresh(input);
 	doupdate();
@@ -482,58 +481,69 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 
 
 /*
- * update_ctxlist()
+ * update_contacts()
  *
- * uaktualnia liste kontaktow po prawej
+ * uaktualnia listê kontaktów po prawej.
  */
-static void update_ctxlist()
+static void update_contacts()
 {
+	int y = 0;
 	list_t l;
-	int count = 0, show_all = 0, show_busy = 1, 
-		show_active = 1, show_inactive = 0, 
-		show_invisible = 1;
-	//char *tmp;
 		
-	if (!ctx.window) return;
+	if (!config_contacts || !contacts)
+		return;
 	
-	werase(ctx.window);
-	wmove(ctx.window, 0, 1);
-	waddstr(ctx.window, "Obecni:");
+	werase(contacts);
 
-	for (l = userlist; l; l = l->next) {
+	wattrset(contacts, COLOR_PAIR(4));
+
+	for (y = 0; y <= contacts->_maxy; y++)
+		mvwaddch(contacts, y, 0, ACS_VLINE);
+
+	wattrset(contacts, COLOR_PAIR(0));
+	
+	for (l = userlist, y = 0; l; l = l->next) {
 		struct userlist *u = l->data;
-		struct in_addr in;
 
-		in.s_addr = u->ip.s_addr;
-
-		if (show_all || (show_busy && (u->status == GG_STATUS_BUSY || u->status == GG_STATUS_BUSY_DESCR)) || (show_active && (u->status == GG_STATUS_AVAIL || u->status == GG_STATUS_AVAIL_DESCR)) || (show_inactive && (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)) || (show_invisible && (u->status == GG_STATUS_INVISIBLE))) {
-			wmove(ctx.window,count+1,1);
-	//		tmp=strdup(u->display); tmp[config_ctxwin_size]='\0'; waddstr(ctx, tmp); free(tmp);
-			ui_ncurses_print("__ctx", 2, u->display);
-			count++;
-		}
+		if (!GG_S_A(u->status))
+			continue;
+		
+		mvwaddstr(contacts, y++, 2, u->display);
 	}
-	wnoutrefresh(ctx.window);
 	
+	wnoutrefresh(contacts);
 }
 
-
 /*
- * ctxwin_rebuild() - wywolywane przy zmianach wartosci enable/size
+ * contacts_rebuild()
  *
+ * wywo³ywane przy zmianach rozmiaru.
  */
-void ctxwin_rebuild()
+void contacts_rebuild()
 {
-if (config_ctxwin_size!=last_ctxwin_size) {
-	if (ctx.window) delwin(ctx.window);
-	ctx.window = newwin(stdscr->_maxy-2, config_ctxwin_size, 0, stdscr->_maxx - config_ctxwin_size + 1);
-	}
-if ((config_ctxwin_enabled)&&(config_ctxwin_size)) {
-	if (!ctx.window) 
-		ctx.window = newwin(stdscr->_maxy-2, config_ctxwin_size, 0, stdscr->_maxx - config_ctxwin_size + 1);
+	if (!config_contacts) {
+		if (contacts)
+			delwin(contacts);
+
+		contacts = NULL;
+
+		last_contacts_size = 0;
+		
+		return;
 	}
 
-if ((!config_ctxwin_enabled)&&(ctx.window)) delwin(ctx.window);
+	if (config_contacts_size == last_contacts_size)
+		return;
+		
+	last_contacts_size = config_contacts_size;
+	
+	if (contacts)
+		delwin(contacts);
+	
+	contacts = newwin(output_size, config_contacts_size + 2, 0, stdscr->_maxx - config_contacts_size - 1);
+
+	update_contacts();
+	doupdate();
 }
 
 /*
@@ -736,7 +746,8 @@ static void update_statusbar()
 	}
 	
 	wnoutrefresh(status);
-	if (config_ctxwin_enabled) wnoutrefresh(ctx.window);
+	if (config_contacts)
+		wnoutrefresh(contacts);
 	wnoutrefresh(input);
 	doupdate();
 }
@@ -799,7 +810,8 @@ void ui_ncurses_init()
 	init_pair(15, COLOR_WHITE, COLOR_BLUE);
 
 	wnoutrefresh(status);
-	if (config_ctxwin_enabled) wnoutrefresh(ctx.window);
+	if (contacts)
+		wnoutrefresh(contacts);
 	wnoutrefresh(input);
 	doupdate();
 
@@ -840,7 +852,7 @@ static void ui_ncurses_deinit()
 	doupdate();
 	delwin(input);
 	delwin(status);
-	delwin(ctx.window);
+	delwin(contacts);
 	endwin();
 
 	for (i = 0; i < HISTORY_MAX; i++)
@@ -1307,8 +1319,9 @@ static void update_input()
 
 
 	window_refresh();
+	if (contacts)
+		wnoutrefresh(contacts);
 	wnoutrefresh(status);
-	if (config_ctxwin_enabled) wnoutrefresh(ctx.window);
 	wnoutrefresh(input);
 	doupdate();
 }
@@ -1335,8 +1348,9 @@ static void ui_ncurses_loop()
 			case KEY_RESIZE:  /* zmiana rozmiaru terminala */
 				beep();
 				window_refresh();
+				if (contacts)
+					wnoutrefresh(contacts);
 				wnoutrefresh(status);
-				if (config_ctxwin_enabled) update_ctxlist();
 				wnoutrefresh(input);
 				doupdate();
 				wrefresh(curscr);
@@ -1721,6 +1735,8 @@ static void ui_ncurses_loop()
 				line_start = 0;
 		}
 		window_refresh();
+		if (contacts)
+			wnoutrefresh(contacts);
 		werase(input);
 		wattrset(input, COLOR_PAIR(7));
 
@@ -1752,8 +1768,9 @@ static void ui_ncurses_loop()
 			wattrset(input, COLOR_PAIR(7));
 			wmove(input, 0, line_index - line_start + window_current->prompt_len);
 		}
+		if (contacts)
+			wnoutrefresh(contacts);
 		wnoutrefresh(status);
-		if (config_ctxwin_enabled) wnoutrefresh(ctx.window);
 		wnoutrefresh(input);
 		doupdate();
 	}
@@ -2063,6 +2080,8 @@ static int ui_ncurses_event(const char *event, ...)
 				wmove(w->window, w->y, 0);
 
 				window_refresh();
+				if (contacts)
+					wnoutrefresh(contacts);
 				wnoutrefresh(input);
 				doupdate();
 
@@ -2076,7 +2095,7 @@ static int ui_ncurses_event(const char *event, ...)
 cleanup:
 	va_end(ap);
 
-	if (config_ctxwin_enabled) update_ctxlist();
+	update_contacts();
 	update_statusbar();
 	
 	return 0;

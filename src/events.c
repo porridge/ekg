@@ -543,9 +543,12 @@ static void handle_common(uin_t uin, int status, const char *descr, struct gg_no
 	}
 
 	/* zapamiêtaj stary stan, ustaw nowy */
-	prev_status = u->status;	
+	prev_status = u->status;
 	u->status = status;
 
+	/* poinformuj ui */
+	ui_event("status", u->uin, u->display, status, u->descr);
+	
 	for (s = st; s->status; s++) {
 		/* je¶li nie ten, sprawdzaj dalej */
 		if (status != s->status)
