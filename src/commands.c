@@ -632,7 +632,7 @@ COMMAND(cmd_del)
 			l = l->next;
 
 			if (sess)
-				gg_remove_notify_ex(sess, uin, userlist_type(u));
+				gg_remove_notify_ex(sess, u->uin, userlist_type(u));
 			userlist_remove(u);
 		}
 
