@@ -1645,7 +1645,14 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 						x++;
 					}
 					break;
+				case '}':
+					waddch(w, '}');
+					p++;
+					x++;
+					break;
+
 			}
+
 			p++;
 
 			wattrset(w, color_pair(fgcolor, bold, bgcolor));

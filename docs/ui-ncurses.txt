@@ -69,4 +69,10 @@ mo¿liwe jest te¿ w³±czenie nag³ówka okna, tj. paska wy¶wietlanego u góry
 ekranu, nad oknami. jest on opisany formatami ,,header'', ,,header1'',
 ,,header2'' itd., analogicznie do paska stanu. dostêpne formaty s± identyczne.
 
+%|  w pasku stanu lub nag³ówku okna dope³nia do koñca linii. przydatne, gdy
+    zmieniamy kolor t³a, poniewa¿ domy¶lnym kolorem jest niebieski.
+
+%}  w pasku stanu lub nag³ówku okna wy¶wietla znak '}'
+
+
 $Id$

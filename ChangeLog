@@ -7,6 +7,7 @@ d - drg, sz - szalik).
 // 2003-07-03
 
 - poprawka obs³ugi zdarzeñ w pythonie (rmrmg/w)
+- dodanie show_status_{header,footer} i %} w tematach (viraptor/w)
 
 // 2003-07-02
 
