@@ -219,8 +219,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 				else if (!c->quiet) {
 					switch (c->msg) {
 						case 0:
-							if (!c->quiet)
-								print_window(c->target, 0, "exec", line, itoa(c->id));
+							print_window(c->target, 0, "exec", line, itoa(c->id));
 							break;
 						case 1:
 						{
@@ -485,9 +484,7 @@ void ekg_wait_for_key()
 				switch (p->name[0]) {
 					case '\001':
 						print((!(WEXITSTATUS(status))) ? "sms_sent" : "sms_failed", p->name + 1);
-						break;
 					case '\002':
-						break;
 					case '\003':
 						break;
 					default:

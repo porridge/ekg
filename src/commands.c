@@ -2831,7 +2831,7 @@ COMMAND(cmd_beeps_spk)
 		return -1;
 	}
 
-	return ((ioctld_send(params[0], ACT_BEEPS_SPK) == -1) ? -1 : 0);
+	return ((ioctld_send(params[0], ACT_BEEPS_SPK, quiet) == -1) ? -1 : 0);
 }
 
 COMMAND(cmd_blink_leds)
@@ -2841,7 +2841,7 @@ COMMAND(cmd_blink_leds)
 		return -1;
 	}
 
-	return ((ioctld_send(params[0], ACT_BLINK_LEDS) == -1) ? -1 : 0);
+	return ((ioctld_send(params[0], ACT_BLINK_LEDS, quiet) == -1) ? -1 : 0);
 }
 
 #endif
