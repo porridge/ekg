@@ -1665,15 +1665,17 @@ void handle_search50(struct gg_event *e)
 
 #define __format(x) ((count == 1) ? "search_results_single" x : "search_results_multi" x)
 
-		switch (status) {
+		switch (GG_S(status)) {
 			case GG_STATUS_AVAIL:
+			case GG_STATUS_AVAIL_DESCR:
 				active = format_string(format_find(__format("_active")), nickname);
 				break;
-
 			case GG_STATUS_BUSY:
+			case GG_STATUS_BUSY_DESCR:
 				active = format_string(format_find(__format("_busy")), nickname);
 				break;
 			case GG_STATUS_INVISIBLE:
+			case GG_STATUS_INVISIBLE_DESCR:
 				active = format_string(format_find(__format("_invisible")), nickname);
 				break;
 			default:
@@ -1696,4 +1698,3 @@ void handle_search50(struct gg_event *e)
 		xfree(city);
 	}
 }
-

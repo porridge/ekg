@@ -1069,18 +1069,18 @@ void theme_init()
 
 	/* 1 uin, 2 name, 3 nick, 4 city, 5 born, 6 gender, 7 active */
 	format_add("search_results_multi_active", "%Y<>%n", 1);
-	format_add("search_results_multi_busy", "%y<>%n", 1);
-	format_add("search_results_multi_invisible", "%K<>%n", 1);
+	format_add("search_results_multi_busy", "%G<>%n", 1);
+	format_add("search_results_multi_invisible", "%c<>%n", 1);
 	format_add("search_results_multi_inactive", "  ", 1);
 	format_add("search_results_multi_unknown", "-", 1);
 	format_add("search_results_multi_female", "k", 1);
 	format_add("search_results_multi_male", "m", 1);
 	format_add("search_results_multi", "%7 %[-7]1 %K|%n %[12]3 %K|%n %[12]2 %K|%n %[4]5 %K|%n %[12]4\n", 1);
 
-	format_add("search_results_single_active", "%G(aktywn%@1)%n", 1);
-	format_add("search_results_single_busy", "%g(zajêt%@1)%n", 1);
+	format_add("search_results_single_active", "%Y(aktywn%@1)%n", 1);
+	format_add("search_results_single_busy", "%G(zajêt%@1)%n", 1);
 	format_add("search_results_single_inactive", "%r(nieaktywn%@1)%n", 1);
-	format_add("search_results_single_invisible", "%K(niewidoczn%@1)%n", 1);
+	format_add("search_results_single_invisible", "%c(niewidoczn%@1)%n", 1);
 	format_add("search_results_single_unknown", "%T-%n", 1);
 	format_add("search_results_single_female", "%Mkobieta%n", 1);
 	format_add("search_results_single_male", "%Cmê¿czyzna%n", 1);

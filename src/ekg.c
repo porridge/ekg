@@ -164,13 +164,14 @@ static int get_char_from_pipe(struct gg_common *c)
 	if (!c)
   		return -1;
 
-	if (read(c->fd, &ch, 1) != -1)
+	if (read(c->fd, &ch, 1) == -1)
 		return -1;
 	
 	if (ch != '\n' && ch != '\r') {
 		if (strlen(buf) < sizeof(buf) - 1)
 			buf[strlen(buf)] = ch;
 	}
+
 	if (ch == '\n' || (strlen(buf) >= sizeof(buf) - 1)) {
 		command_exec(NULL, buf);
 		memset(buf, 0, sizeof(buf));
