@@ -1921,7 +1921,7 @@ COMMAND(cmd_save)
 {
 	last_save = time(NULL);
 
-	if (!userlist_write(NULL) && !config_write(NULL)) {
+	if (!userlist_write(NULL) && !config_write(params[0])) {
 		printq("saved");
 		config_changed = 0;
 	} else {
@@ -4550,11 +4550,12 @@ void command_init()
 	  "");
 	  
 	command_add
-	( "save", "", cmd_save, 0,
-	  "", "zapisuje ustawienia programu",
+	( "save", "?", cmd_save, 0,
+	  " [plik]", "zapisuje ustawienia programu",
 	  "\n"
 	  "Aktualny stan zostanie zapisany i zostanie przywrócony przy "
-	  "nastêpnym uruchomieniu programu.");
+	  "nastêpnym uruchomieniu programu. Mo¿na podaæ plik, do którego "
+	  "ma byæ zapisana konfiguracja.");
 	  
 	command_add
 	( "set", "v?", cmd_set, 0,

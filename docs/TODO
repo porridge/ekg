@@ -21,7 +21,6 @@ pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
 * klient:
   - wykrywanie niewidocznych jako opcja,
   - dodaæ ,,list --add'', które dopisuje informacje do listy kontaktów,
-  - zapisywanie konfiguracji do innego pliku,
   - zmienna beep_*_away (rmrmg)
   - zmieniæ domy¶lne ustawienia na: display_sent 1, make_window 2,
     display_ack 3,

@@ -1288,12 +1288,11 @@ void config_write_main(FILE *f, int base64)
  *
  * 0/-1
  */
-int config_write()
+int config_write(const char *filename)
 {
-	const char *filename;
 	FILE *f;
 
-	if (!(filename = prepare_path("config", 1)))
+	if (!filename && !(filename = prepare_path("config", 1)))
 		return -1;
 	
 	if (!(f = fopen(filename, "w")))
