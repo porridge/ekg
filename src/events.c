@@ -959,13 +959,16 @@ void handle_failure(struct gg_event *e)
 
 	/* je¶li siê nie powiod³o, usuwamy nasz serwer i ³±czymy przez huba */
 	if (config_server_save) {
-		xfree(config_server);
 #ifdef __GG_LIBGADU_HAVE_OPENSSL
-		if (sess->ssl && !strncasecmp(config_server, "tls", 3))
+		if (sess->ssl && config_server && !strncasecmp(config_server, "tls", 3)) {
+			xfree(config_server);
 			config_server = xstrdup("tls");	
-		else
+		} else
 #endif
+		{
+			xfree(config_server);
 			config_server = NULL;
+		}
 	}
 
 	list_remove(&watches, sess, 0);
