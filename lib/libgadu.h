@@ -135,6 +135,12 @@ struct gg_http {
 	void *resolver;		/* wska¼nik na informacje resolvera */
 };
 
+#ifdef __GNUC__
+#define GG_PACKED __attribute__ ((packed))
+#else
+#define GG_PACKED
+#endif
+
 #define GG_MAX_PATH 276
 
 /*
@@ -152,8 +158,9 @@ struct gg_file_info {
 	uint32_t size;			/* nFileSizeLow */
 	uint32_t reserved0;		/* dwReserved0 */
 	uint32_t reserved1;		/* dwReserved1 */
-	unsigned char filename[GG_MAX_PATH];	/* cFileName */
-};
+	unsigned char filename[GG_MAX_PATH - 14];	/* cFileName */
+	unsigned char short_filename[14];		/* cAlternateFileName */
+} GG_PACKED;
 
 /*
  * struct gg_dcc
@@ -769,12 +776,6 @@ char *gg_base64_decode(const char *buf);
 #define GG_LIBGADU_VERSION "CVS"
 
 #define GG_DEFAULT_DCC_PORT 1550
-
-#ifdef __GNUC__
-#define GG_PACKED __attribute__ ((packed))
-#else
-#define GG_PACKED
-#endif
 
 struct gg_header {
 	uint32_t type;			/* typ pakietu */

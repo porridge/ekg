@@ -15,6 +15,7 @@ zg³osi³ b³±d.
 - mniej ra¿±cy w oczy theme dla nazwy grupy w li¶cie kontaktów (sz)
 - ,,stderr'' wêdruje do aktualnego okna (w/sz)
 - zabezpieczenie przed zalewem po³±czeñ dcc (segfault/w)
+- libgadu: wype³nianie wszystkich pól file_info przy wysy³aniu pliku (Chile/w)
 
 // 2003-02-13
 

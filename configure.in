@@ -209,6 +209,28 @@ if test "x$libgadu_have_pthread" != "xyes"; then
   mv -f lib/libgadu-config.h- lib/libgadu-config.h
 fi
 
+# sprawdzamy, czy jest ,,long long'' na potrzeby obliczeñ czasów dcc
+
+AC_MSG_CHECKING([for long long])
+
+AC_TRY_RUN([
+  int main() {
+    long long a = 1LL;
+    unsigned long long b = 1LL;
+    return 0;
+  }
+], [
+  AC_MSG_RESULT([yes])
+  sed 's/#undef __GG_LIBGADU_HAVE_LONG_LONG/#define __GG_LIBGADU_HAVE_LONG_LONG/' < lib/libgadu-config.h > lib/libgadu-config.h-
+  mv -f lib/libgadu-config.h- lib/libgadu-config.h
+], [
+  AC_MSG_RESULT([no])
+  sed 's/#undef __GG_LIBGADU_HAVE_LONG_LONG.*/\/* & *\//' < lib/libgadu-config.h > lib/libgadu-config.h-
+  mv -f lib/libgadu-config.h- lib/libgadu-config.h
+])
+
+AC_CHECK_TYPE(long long, )
+
 # zachowujemy opcje dla libgadu
 
 CFLAGS_LIBGADU="$CFLAGS_LIBGADU $CFLAGS"
