@@ -840,7 +840,7 @@ COMMAND(cmd_help)
 	list_t l;
 	
 	if (params[0]) {
-		const char *p = (params[0][0] == '/' && strlen(params[0])) ? params[0] + 1 : params[0];
+		const char *p = (params[0][0] == '/' && strlen(params[0]) > 1) ? params[0] + 1 : params[0];
 		for (l = commands; l; l = l->next) {
 			struct command *c = l->data;
 			
