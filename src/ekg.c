@@ -229,7 +229,8 @@ int my_getc(FILE *f)
 					snprintf(tmp, sizeof(tmp), "%ds", config_auto_away);
 				
 				my_printf((reason) ? "auto_away_descr" : "auto_away", tmp, reason);
-				free(reason);
+				free(busy_reason);
+				busy_reason = reason;
 			}
 
 			/* auto save */
@@ -534,9 +535,11 @@ IOCTL_HELP
 	rl_set_key("\033[[A", binding_help, rl_get_keymap());
 	rl_set_key("\033OP", binding_help, rl_get_keymap());
 	rl_set_key("\033[11~", binding_help, rl_get_keymap());
+	rl_set_key("\033[M", binding_help, rl_get_keymap());
 	rl_set_key("\033[[B", binding_quick_list, rl_get_keymap());
 	rl_set_key("\033OQ", binding_quick_list, rl_get_keymap());
 	rl_set_key("\033[12~", binding_quick_list, rl_get_keymap());
+	rl_set_key("\033[N", binding_quick_list, rl_get_keymap());
 #endif
 	
 #ifdef HAS_RL_GET_SCREEN_SIZE

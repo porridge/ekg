@@ -521,7 +521,7 @@ void init_theme()
 	add_format("error_not_ignored", "%! U¿ytkownik %W%1%n nie jest ignorowany\n", 1);
 	add_format("list_empty", "%! Lista kontaktów jest pusta\n", 1);
 	add_format("list_avail", "%> %1 %Y(dostêpny)%n %b%2:%3%n\n", 1);
-	add_format("list_avail_descr", "%> %1 %Y(dostêpny: %n%4%G)%n %b%2:%3%n\n", 1);
+	add_format("list_avail_descr", "%> %1 %Y(dostêpny: %n%4%Y)%n %b%2:%3%n\n", 1);
 	add_format("list_busy", "%> %1 %G(zajêty)%n %b%2:%3%n\n", 1);
 	add_format("list_busy_descr", "%> %1 %G(zajêty: %n%4%G)%n %b%2:%3%n\n", 1);
 	add_format("list_not_avail", "%> %1 %r(niedostêpny)%n\n", 1);
