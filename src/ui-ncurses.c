@@ -162,17 +162,19 @@ void ui_ncurses_init()
 	wattrset(status, COLOR_PAIR(8) | A_BOLD);
 	mvwaddstr(status, 0, 0, " ekg XP");
 	wattrset(status, COLOR_PAIR(8));
-	waddstr(status, " :: http://dev.null.pl/ekg/ :: wlaz³ kotek na p³otek i mruga...          ");
+	waddstr(status, " :: próbna jazda na gapê                                                 ");
 	
 	wnoutrefresh(output);
 	wnoutrefresh(status);
 	wnoutrefresh(input);
 	doupdate();
 
-	ui_ncurses_print("__current", "\033[1m\n\
-    *** Ten interfejs u¿ytkownika jest jeszcze w bardzo wczesnym stadium ***\n\
-    *** rozwoju! NIE PISZ, JE¦LI JAKA¦ OPCJA NIE DZIA£A. Doskonale o tym ***\n\
-    *** wiadomo. Po prostu cierpliwie poczekaj, a¿ zostanie napisany.    ***\n\
+	ui_ncurses_print("__current", "\033[1m
+    ************************************************************************
+    *** Ten interfejs u¿ytkownika jest jeszcze w bardzo wczesnym stadium ***
+    *** rozwoju! NIE PISZ, JE¦LI JAKA¦ OPCJA NIE DZIA£A. Doskonale o tym ***
+    *** wiadomo. Po prostu cierpliwie poczekaj, a¿ zostanie napisany.    ***
+    ************************************************************************
 \033[0m");
 
 	signal(SIGINT, SIG_IGN);
@@ -186,6 +188,15 @@ static void ui_ncurses_deinit()
 	wnoutrefresh(input);
 	doupdate();
 	endwin();
+}
+
+#define adjust() \
+{ \
+	line_index = strlen(line); \
+	if (strlen(line) < 70) \
+		line_start = 0; \
+	else \
+		line_start = strlen(line) - strlen(line) % 70; \
 }
 
 static void ui_ncurses_loop()
@@ -227,11 +238,11 @@ static void ui_ncurses_loop()
 				history[0] = line;
 				history_index = 0;
 				line[0] = 0;
-				line_index = 0;
+				adjust();
 				break;	
 			case 'U' - 64:
 				line[0] = 0;
-				line_index = 0;
+				adjust();
 				break;
 			case 'L' - 64:
 				break;
@@ -254,11 +265,12 @@ static void ui_ncurses_loop()
 				break;
 			case 'E' - 64:
 			case KEY_END:
-				line_index = strlen(line);
+				adjust();
 				break;
 			case 'A' - 64:
 			case KEY_HOME:
 				line_index = 0;
+				line_start = 0;
 				break;
 			case KEY_UP:
 				if (history[history_index + 1]) {
@@ -266,14 +278,14 @@ static void ui_ncurses_loop()
 						history[0] = xstrdup(line);
 					history_index++;
 					strcpy(line, history[history_index]);
-					line_index = strlen(line);
+					adjust();
 				}
 				break;
 			case KEY_DOWN:
 				if (history_index > 0) {
 					history_index--;
 					strcpy(line, history[history_index]);
-					line_index = strlen(line);
+					adjust();
 					if (history_index == 0) {
 						xfree(history[0]);
 						history[0] = line;
@@ -291,16 +303,32 @@ static void ui_ncurses_loop()
 					start = lines - output_size;
 				break;
 			default:
+				if (ch < 32)
+					break;
 				if (strlen(line) >= sizeof(line) - 1)
 					break;
 				memmove(line + line_index + 1, line + line_index, sizeof(line) - line_index - 1);
 
 				line[line_index++] = ch;
 		}
+		if (line_index - line_start > 70)
+			line_start += 60;
+		if (line_index - line_start < 10) {
+			line_start -= 60;
+			if (line_start < 0)
+				line_start = 0;
+		}
 		pnoutrefresh(output, start, 0, 0, 0, output_size - 1, 80);
 		werase(input);
+		wattrset(input, COLOR_PAIR(7));
 		mvwaddstr(input, 0, 0, line + line_start);
-		wmove(input, 0, line_index);
+		wattrset(input, COLOR_PAIR(2));
+		if (line_start > 0)
+			mvwaddch(input, 0, 0, '<');
+		if (strlen(line) - line_start > 80)
+			mvwaddch(input, 0, 79, '>');
+		wattrset(input, COLOR_PAIR(7));
+		wmove(input, 0, line_index - line_start);
 		wnoutrefresh(status);
 		wnoutrefresh(input);
 		doupdate();
