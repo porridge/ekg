@@ -282,8 +282,8 @@ void handle_notify(struct gg_event *e)
 
 		in.s_addr = n->remote_ip;
 		
-		if (n->status == GG_STATUS_NOT_AVAIL)
-			n->status = GG_STATUS_INVISIBLE;
+//		if (n->status == GG_STATUS_NOT_AVAIL)
+//			n->status = GG_STATUS_INVISIBLE;
 		
 		if (n->status == GG_STATUS_BUSY_DESCR) {
 			check_event(EVENT_AWAY, u->uin);
@@ -294,7 +294,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
 			if (config_display_notify)
-			    	my_printf("status_busy_descr", format_user(n->uin), u->descr);
+			    	my_printf("status_busy_descr", format_user(n->uin), u->display, u->descr);
 		}
 
 		if (n->status == GG_STATUS_AVAIL_DESCR) {
@@ -306,7 +306,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
 			if (config_display_notify)
-			    	my_printf("status_avail_descr", format_user(n->uin), u->descr);
+			    	my_printf("status_avail_descr", format_user(n->uin), u->display, u->descr);
 		}
 
 		if (n->status == u->status && n->remote_port == u->port) {
@@ -326,7 +326,7 @@ void handle_notify(struct gg_event *e)
 			    	put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail");
 			check_event(EVENT_AVAIL, u->uin);
 			if (config_display_notify)
-			    	my_printf("status_avail", format_user(u->uin));
+			    	my_printf("status_avail", format_user(u->uin), u->display);
 			
 			if (config_completion_notify)
 				add_send_nick(u->display);
@@ -337,13 +337,13 @@ void handle_notify(struct gg_event *e)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away");
 			check_event(EVENT_AWAY, u->uin);
 			if (config_display_notify)
-			    	my_printf("status_busy", format_user(n->uin));
+			    	my_printf("status_busy", format_user(n->uin), u->display);
 		} else if (n->status == GG_STATUS_INVISIBLE) {
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%ld,%s\n", n->uin, u->display, time(NULL), "invisible");
 		   	check_event(EVENT_INVISIBLE, u->uin); 
 			if (config_display_notify)
-			    	my_printf("status_invisible", format_user(n->uin));
+			    	my_printf("status_invisible", format_user(n->uin), u->display);
 		}
 		
 		n++;
@@ -396,7 +396,7 @@ void handle_status(struct gg_event *e)
 		    	check_event(EVENT_AVAIL, e->event.status.uin);
 			if (config_completion_notify)
 				add_send_nick(u->display);
-			my_printf("status_avail", format_user(e->event.status.uin));
+			my_printf("status_avail", format_user(e->event.status.uin), u->display);
 			if (config_beep && config_beep_notify)
 				my_puts("\007");
 		} else if (e->event.status.status == GG_STATUS_AVAIL_DESCR) {
@@ -405,7 +405,7 @@ void handle_status(struct gg_event *e)
 		    	check_event(EVENT_AVAIL, e->event.status.uin);
 			if (config_completion_notify)
 				add_send_nick(u->display);
-			my_printf("status_avail_descr", format_user(e->event.status.uin), u->descr);
+			my_printf("status_avail_descr", format_user(e->event.status.uin), u->display, u->descr);
 			if (config_beep && config_beep_notify)
 				my_puts("\007");
 		} else if (e->event.status.status == GG_STATUS_BUSY && u->status != GG_STATUS_BUSY) 
@@ -413,25 +413,25 @@ void handle_status(struct gg_event *e)
                         if (config_log_status)
 			    	put_log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "away");
 		    	check_event(EVENT_AWAY, e->event.status.uin);
-			my_printf("status_busy", format_user(e->event.status.uin));
+			my_printf("status_busy", format_user(e->event.status.uin), u->display);
 		} else if (e->event.status.status == GG_STATUS_BUSY_DESCR)
 		{
                         if (config_log_status)
                                 put_log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
 		    	check_event(EVENT_AWAY, e->event.status.uin);
-			my_printf("status_busy_descr", format_user(e->event.status.uin), u->descr);
+			my_printf("status_busy_descr", format_user(e->event.status.uin), u->display, u->descr);
 		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL)
 		{
                         if (config_log_status)
 			    	put_log(e->event.status.uin, "status,%ld,%s,%ld,%s\n", e->event.status.uin, u->display, time(NULL), "notavail");
 		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin);
-			my_printf("status_not_avail", format_user(e->event.status.uin));
+			my_printf("status_not_avail", format_user(e->event.status.uin), u->display);
 		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL_DESCR)
 		{
                         if (config_log_status)
 			    	put_log(e->event.status.uin, "status,%ld,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, time(NULL), "notavail", u->descr);
 		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin);
-			my_printf("status_not_avail_descr", format_user(e->event.status.uin), u->descr);
+			my_printf("status_not_avail_descr", format_user(e->event.status.uin), u->display, u->descr);
 		}
 	}
 	
@@ -565,7 +565,7 @@ void handle_search(struct gg_http *h)
 				gender = find_format("search_results_multi_unknown");
 		}
 
-		active = format_string(active);
+		active = format_string(active, s->results[i].nickname);
 		gender = format_string(gender);
 
 		my_printf((h->id & 1) ? "search_results_multi" : "search_results_single", itoa(s->results[i].uin), (name) ? name : "", s->results[i].nickname, s->results[i].city, (s->results[i].born) ? itoa(s->results[i].born) : "-", gender, active);
@@ -644,6 +644,7 @@ void handle_pubdir(struct gg_http *h)
 			config_uin = s->uin;
 			config_password = reg_password;
 			reg_password = NULL;
+			registered_today = 1;
 		}
 	}
 	

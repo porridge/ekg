@@ -1148,28 +1148,28 @@ COMMAND(command_list)
 			
 			switch (u->status) {
 				case GG_STATUS_AVAIL:
-					status = format_string(find_format("user_info_avail"));
+					status = format_string(find_format("user_info_avail"), u->display);
 					break;
 				case GG_STATUS_AVAIL_DESCR:
-					status = format_string(find_format("user_info_avail_descr"), u->descr);
+					status = format_string(find_format("user_info_avail_descr"), u->display, u->descr);
 					break;
 				case GG_STATUS_BUSY:
-					status = format_string(find_format("user_info_busy"));
+					status = format_string(find_format("user_info_busy"), u->display);
 					break;
 				case GG_STATUS_BUSY_DESCR:
-					status = format_string(find_format("user_info_busy_descr"), u->descr);
+					status = format_string(find_format("user_info_busy_descr"), u->display, u->descr);
 					break;
 				case GG_STATUS_NOT_AVAIL:
-					status = format_string(find_format("user_info_not_avail"));
+					status = format_string(find_format("user_info_not_avail"), u->display);
 					break;
 				case GG_STATUS_NOT_AVAIL_DESCR:
-					status = format_string(find_format("user_info_not_avail_descr"), u->descr);
+					status = format_string(find_format("user_info_not_avail_descr"), u->display, u->descr);
 					break;
 				case GG_STATUS_INVISIBLE:
-					status = format_string(find_format("user_info_invisble"));
+					status = format_string(find_format("user_info_invisble"), u->display);
 					break;
 				default:
-					status = format_string(find_format("user_info_unknown"));
+					status = format_string(find_format("user_info_unknown"), u->display);
 			}
 		
 			my_printf("user_info", u->first_name, u->last_name, u->nickname, u->display, u->mobile, groups, itoa(u->uin), status);
@@ -1283,7 +1283,7 @@ COMMAND(command_list)
 
 		in.s_addr = u->ip.s_addr;
 
-		if (show_all || (show_busy && (u->status == GG_STATUS_BUSY || u->status == GG_STATUS_BUSY_DESCR)) || (show_active && u->status == GG_STATUS_AVAIL) || (show_inactive && (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)) || (show_invisible && (u->status == GG_STATUS_INVISIBLE))) {
+		if (show_all || (show_busy && (u->status == GG_STATUS_BUSY || u->status == GG_STATUS_BUSY_DESCR)) || (show_active && (u->status == GG_STATUS_AVAIL || u->status == GG_STATUS_AVAIL_DESCR)) || (show_inactive && (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)) || (show_invisible && (u->status == GG_STATUS_INVISIBLE))) {
 			my_printf(tmp, format_user(u->uin), inet_ntoa(in), itoa(u->port), u->descr);
 			count++;
 		}
@@ -1871,6 +1871,11 @@ COMMAND(command_register)
 {
 	struct gg_http *h;
 	struct list *l;
+
+	if (registered_today) {
+		my_printf("registered_today");
+		return 0;
+	}
 	
 	if (!params[0] || !params[1]) {
 		my_printf("not_enough_params");
@@ -2180,11 +2185,11 @@ int binding_help(int a, int b)
 {
 	/* XXX proszê siê nie czepiaæ tego kodu. za jaki¶ czas poprawiê. */
 
-	my_printf("generic", "---------------------------------------------------------------------");
+	my_printf("generic", "-----------------------------------------------------------------");
 	my_printf("generic", "Przed u¿yciem przeczytaj ulotkê. Plik \033[1mdocs/ULOTKA\033[0m zawiera krótki");
-	my_printf("generic", "po za³±czonej dokumentacji. Je¶li go nie masz, mo¿esz ¶ci±gn±æ pakiet");
-	my_printf("generic", "ze strony \033[1mhttp://dev.null.pl/ekg/\033[0m");
-	my_printf("generic", "---------------------------------------------------------------------");
+	my_printf("generic", "przewodnik po za³±czonej dokumentacji. Je¶li go nie masz, mo¿esz");
+	my_printf("generic", "¶ci±gn±æ pakiet ze strony \033[1mhttp://dev.null.pl/ekg/\033[0m");
+	my_printf("generic", "-----------------------------------------------------------------");
 
 	return 0;
 }

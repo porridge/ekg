@@ -12,6 +12,9 @@ TODO		lista rzeczy, które czekaj± w kolejce na realizacjê. je¶li
 		zajrzyj tutaj. mo¿liwe, ¿e kto¶ wcze¶niej zg³osi³
 		,,zapotrzebowanie''.
 
+ChangeLog	lista zmian w kolejnych wersjach. czêsto zawiera informacje
+		wa¿ne, a nie wymienione w innych plikach.
+
 vars.txt	opis zmiennych u¿ywanych przez program.
 
 on.txt		opis sk³adni polecenia /on.

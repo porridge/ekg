@@ -457,9 +457,11 @@ IOCTL_HELP
 
 	init_theme();
 
+	in_autoexec = 1;
         userlist_read(NULL);
 	config_read(NULL);
 	read_sysmsg(NULL);
+	in_autoexec = 0;
 
 #ifdef IOCTL
         sock_path = prepare_path(".socket");

@@ -184,6 +184,24 @@ char *va_format_string(char *format, va_list ap)
 					string_append(buf, "\033[0m");
 			}
 
+			if (*p == '@') {
+				char *str = (char*) args[*(p + 1) - '1'];
+
+				if (str) {
+					char *q = str + strlen(str) - 1;
+
+					while (q >= str && !isalpha(*q))
+						q--;
+
+					if (*q == 'a')
+						string_append(buf, "a");
+					else
+						string_append(buf, "y");
+				}
+				p += 2;
+				continue;
+			}
+
 			fill_before = 0;
 			fill_after = 0;
 			fill_length = 0;
@@ -539,13 +557,13 @@ void init_theme()
 	add_format("ignored_deleted", "%> U¿ytkownika %W%1%n usuniêto z listy ignorowanych\n", 1);
 	add_format("error_not_ignored", "%! U¿ytkownik %W%1%n nie jest ignorowany\n", 1);
 	add_format("list_empty", "%! Lista kontaktów jest pusta\n", 1);
-	add_format("list_avail", "%> %1 %Y(dostêpny)%n %b%2:%3%n\n", 1);
-	add_format("list_avail_descr", "%> %1 %Y(dostêpny: %n%4%Y)%n %b%2:%3%n\n", 1);
-	add_format("list_busy", "%> %1 %G(zajêty)%n %b%2:%3%n\n", 1);
-	add_format("list_busy_descr", "%> %1 %G(zajêty: %n%4%G)%n %b%2:%3%n\n", 1);
-	add_format("list_not_avail", "%> %1 %r(niedostêpny)%n\n", 1);
-	add_format("list_not_avail_descr", "%> %1 %r(niedostêpny: %n%4%r)%n\n", 1);
-	add_format("list_invisible", "%> %1 %c(niewidoczny)%n %b%2:%3%n\n", 1);
+	add_format("list_avail", "%> %1 %Y(dostêpn%@1)%n %b%2:%3%n\n", 1);
+	add_format("list_avail_descr", "%> %1 %Y(dostêpn%@1: %n%4%Y)%n %b%2:%3%n\n", 1);
+	add_format("list_busy", "%> %1 %G(zajêt%@1)%n %b%2:%3%n\n", 1);
+	add_format("list_busy_descr", "%> %1 %G(zajêt%@1: %n%4%G)%n %b%2:%3%n\n", 1);
+	add_format("list_not_avail", "%> %1 %r(niedostêpn%@1)%n\n", 1);
+	add_format("list_not_avail_descr", "%> %1 %r(niedostêpn%@1: %n%4%r)%n\n", 1);
+	add_format("list_invisible", "%> %1 %c(niewidoczn%@1)%n %b%2:%3%n\n", 1);
 	add_format("list_unknown", "%> %1\n", 1);
 	add_format("saved", "%> Zapisano ustawienia\n", 1);
 	add_format("error_saving", "%! Podczas zapisu ustawieñ wyst±pi³ b³±d\n", 1);
@@ -565,14 +583,14 @@ void init_theme()
 	add_format("sysmsg_footer", "%m`----- ---- --- -- -%n\n", 1);	
 	add_format("ack_queued", "%> Wiadomo¶æ do %1 zostanie dostarczona pó¼niej %c(%C%#%c)%n\n", 1);
 	add_format("ack_delivered", "%> Wiadomo¶æ do %1 zosta³a dostarczona %c(%C%#%c)%n\n", 1);
-	add_format("status_avail", "%> %1 jest dostêpny %c(%C%#%c)%n\n", 1);
-	add_format("status_avail_descr", "%> %1 jest dostêpny: %2 %c(%C%#%c)%n\n", 1);
-	add_format("status_busy", "%> %1 jest zajêty %c(%C%#%c)%n\n", 1);
-	add_format("status_busy_descr", "%> %1 jest zajêty: %2 %c(%C%#%c)%n\n", 1);
-	add_format("status_not_avail", "%> %1 jest niedostêpny %c(%C%#%c)%n\n", 1);
-	add_format("status_not_avail_descr", "%> %1 jest niedostêpny: %2 %c(%C%#%c)%n\n", 1);
-	add_format("status_invisible", "%> %1 jest niewidoczny %c(%C%#%c)%n\n", 1);
-	add_format("status_invisible_descr", "%> %1 jest niewidoczny: %2 %c(%C%#%c)%n\n", 1);
+	add_format("status_avail", "%> %1 jest dostêpn%@2 %c(%C%#%c)%n\n", 1);
+	add_format("status_avail_descr", "%> %1 jest dostêpn%@2: %3 %c(%C%#%c)%n\n", 1);
+	add_format("status_busy", "%> %1 jest zajêt%@2 %c(%C%#%c)%n\n", 1);
+	add_format("status_busy_descr", "%> %1 jest zajêt%@2: %3 %c(%C%#%c)%n\n", 1);
+	add_format("status_not_avail", "%> %1 jest niedostêpn%@2 %c(%C%#%c)%n\n", 1);
+	add_format("status_not_avail_descr", "%> %1 jest niedostêpn%@2: %3 %c(%C%#%c)%n\n", 1);
+	add_format("status_invisible", "%> %1 jest niewidoczn%@2 %c(%C%#%c)%n\n", 1);
+	add_format("status_invisible_descr", "%> %1 jest niewidoczn%@2: %3 %c(%C%#%c)%n\n", 1);
 	add_format("conn_broken", "%! Serwer zerwa³ po³±czenie: %1 %c(%C%#%c)%n\n", 1);
 	add_format("auto_away", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci %c(%C%#%c)%n\n", 1);
 	add_format("auto_away_descr", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci %c(%C%#%c)%n: %2\n", 1);
@@ -583,7 +601,7 @@ void init_theme()
 	add_format("conn_failed", "%! Po³±czenie nie uda³o siê: %1\n", 1);
 	add_format("conn_stopped", "%! Przerwano ³±czenie\n", 1);
 	add_format("conn_timeout", "%! Przekroczono limit czasu operacji ³±czenia z serwerem\n", 1);
-	add_format("disconn_warning", "%! Serwer roz³±czy³ nas.\n", 1); 
+	add_format("disconn_warning", "%! Serwer zerwa³ po³±czenie\n", 1); 
 	add_format("connected", "%> Po³±czono %c(%C%#%c)%n\n", 1);
 	add_format("disconnected", "%> Roz³±czono %c(%C%#%c)%n\n", 1);
 	add_format("disconnected_descr", "%> Roz³±czono %c(%C%#%c): %1%n\n", 1);
@@ -597,7 +615,7 @@ void init_theme()
 	add_format("not_implemented", "%! Tej funkcji jeszcze nie ma\n", 1);
 	add_format("no_config", "%! Niekompletna konfiguracja. Wpisz:\n%!   %Wset uin <numerek-gg>%n\n%!   %Wset password <has³o>%n\n%!   %Wsave%n\n%! Nastêpnie wydaj polecenie:\n%!   %Wconnect%n\n%! Je¶li nie masz swojego numerka, wpisz:\n%!   %Wregister <e-mail> <has³o>%n\n\n", 1);
 	
-	add_format("register", "%> Rejestracja poprawna: Wygrany numerek: %W%1%n\n", 1);
+	add_format("register", "%> Rejestracja poprawna. Wygrany numerek: %W%1%n\n", 1);
 	add_format("register_failed", "%! B³±d podczas rejestracji\n", 1);
 	add_format("register_pending", "%! Rejestracja w toku\n", 1);
 	add_format("register_timeout", "%! Przekroczono limit czasu operacji szukania\n", 1);
@@ -638,8 +656,8 @@ void init_theme()
 	add_format("search_results_multi_male", "m", 1);
 	add_format("search_results_multi", "%7 %[-10]1 %K/%n %[12]3 %K/%n %6 %K/%n %[20]2 %K/%n %[4]5 %K/%n %[16]4\n", 1);
 
-	add_format("search_results_single_active", "%G(aktywny)%n", 1);
-	add_format("search_results_single_inactive", "%r(nieaktywny)%n", 1);
+	add_format("search_results_single_active", "%G(aktywn%@1)%n", 1);
+	add_format("search_results_single_inactive", "%r(nieaktywn%@1)%n", 1);
 	add_format("search_results_single_unknown", "%W-%n", 1);
 	add_format("search_results_single_female", "%Mkobieta%n", 1);
 	add_format("search_results_single_male", "%Cmê¿czyzna%n", 1);
@@ -653,13 +671,13 @@ void init_theme()
 
 	add_format("modify_done", "%> Zmieniono wpis w li¶cie kontaktów\n", 1);
 	add_format("user_info", "%) Pseudonim: %W%3%n\n%) Numer: %W%7%n\n%) Stan: %8\n%) Imiê i nazwisko: %W%1 %2%n\n%) Alias: %W%4%n\n%) Numer telefonu: %W%5%n\n%) Grupy: %W%6%n\n", 1);
-	add_format("user_info_avail", "%Ydostêpny%n", 1);
-	add_format("user_info_avail_descr", "%Ydostêpny%n (%1)", 1);
-	add_format("user_info_busy", "%Gzajêty%n", 1);
-	add_format("user_info_busy_descr", "%Gzajêty%n (%1)", 1);
-	add_format("user_info_not_avail", "%rniedostêpny%n", 1);
-	add_format("user_info_not_avail_descr", "%rniedostêpny%n (%1)", 1);
-	add_format("user_info_invisible", "%cniewidoczny%n", 1);
+	add_format("user_info_avail", "%Ydostêpn%@1%n", 1);
+	add_format("user_info_avail_descr", "%Ydostêpn%@1%n (%2)", 1);
+	add_format("user_info_busy", "%Gzajêt%@1%n", 1);
+	add_format("user_info_busy_descr", "%Gzajêt%@1%n (%2)", 1);
+	add_format("user_info_not_avail", "%rniedostêpn%@1%n", 1);
+	add_format("user_info_not_avail_descr", "%rniedostêpn%@1%n (%2)", 1);
+	add_format("user_info_invisible", "%cniewidoczn%@1%n", 1);
 
 	add_format("config_changed", "Zapisaæ now± konfiguracjê? (tak/nie) ", 1);
 	add_format("config_unknown", "%! Zmiana tego ustawienia mo¿e nie odnie¶æ zamierzonego efektu\n", 1);
@@ -747,6 +765,7 @@ void init_theme()
 	add_format("quick_list_avail", " %W%1%n", 1);
 	add_format("quick_list_busy", " %w%1%n", 1);
 	add_format("quick_list_invisible", " %K%1%n", 1);
-	add_format("ekg_version", "%)EKG - Eksperymentalny Klient Gadu-Gadu (%W%1%n)\n", 1);
+	add_format("ekg_version", "%) EKG - Eksperymentalny Klient Gadu-Gadu (%W%1%n)\n", 1);
+	add_format("registered_today", "%! Ju¿ zarejestrowano jeden numer. Nie nadu¿ywaj.\n", 1);
 };
 

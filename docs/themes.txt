@@ -31,6 +31,19 @@ siê ich u¿ywaæ przy dope³nianiu parametrów.
 
 * * *
 
+je¶li chce siê rozró¿niaæ przymiotniki dla ró¿nych p³ci, mo¿na u¿yæ
+%@n, gdzie ,,n'' to numer formatu, który bierzemy pod uwagê. je¶li
+ostatni± liter± bêdzie ,,a'', %@n zostanie zast±pione przez ,,a'',
+w innym przypadku przez ,,y''. przyk³ad:
+
+  %> %1 jest dostêpn%@1.
+
+nale¿y wzi±æ uwagê, ¿e w wielu wypadkach pseudonimy s± najpierw
+formatowane przez known_user i unknown_user, wiêc trzeba podaæ osobny
+parametr z samym pseudonimem.
+
+* * *
+
 %>  prompt (domy¶lnie zó³tozielony)
 %!  error (domy¶lnie czerwony)
 %)  prompt2 (domy¶lnie turkusowy)

@@ -114,6 +114,7 @@ char *config_proxy = NULL;
 char *config_server = NULL;
 int my_printf_lines = -1;
 int quit_message_send = 0;
+int registered_today = 0;
 
 /*
  * my_puts()
@@ -1759,9 +1760,11 @@ void changed_theme(char *var)
 	} else {
 		if (!read_theme(config_theme, 1)) {
 			reset_theme_cache();
-			my_printf("theme_loaded", config_theme);
+			if (!in_autoexec)
+				my_printf("theme_loaded", config_theme);
 		} else
-			my_printf("error_loading_theme", strerror(errno));
+			if (!in_autoexec)
+				my_printf("error_loading_theme", strerror(errno));
 	}
 }
 

@@ -77,7 +77,7 @@ WYSY£ANIE SMSÓW
     parametr i wiadomo¶æ za drugi. Ten ze strony http://ceti.pl/~miki/
     spe³nia podane wymagania.
 
-PROBLEMY
+ZNANE PROBLEMY
 
     Je¶li nie mo¿esz wpisywaæ polskich liter, dopisz do pliku /etc/inputrc
     lub ~/.inputrc nastêpuj±ce linie:
@@ -86,7 +86,7 @@ PROBLEMY
 	set convert-meta off
 	set output-meta on
     
-BUGREPORTY
+ZG£ASZANIE B£ÊDÓW
 
     Proszê, nie przysy³ajcie informacji, ¿e mo¿na by dodaæ co¶, co jest
     ju¿ wymienione w TODO. Nie przysy³ajcie informacji, ¿e jest jaki¶
