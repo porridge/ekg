@@ -81,6 +81,7 @@ static void get_line_from_pipe(struct gg_exec *c);
 static int get_char_from_pipe(struct gg_common *c);
 
 extern FILE *gg_debug_file;
+char *gg_debug_file_buf;
 
 int old_stderr = 0;
 
@@ -787,7 +788,9 @@ static void setup_debug()
 	fcntl(fd[1], F_SETFL, O_NONBLOCK);
 	
 	gg_debug_file = fdopen(fd[1], "w");
-	setbuf(gg_debug_file, NULL);		/* XXX leak */
+
+	gg_debug_file_buf = xcalloc(4096, sizeof(char));
+	setvbuf(gg_debug_file, gg_debug_file_buf, _IOLBF, 4096);
 
 	list_add(&watches, &se, sizeof(se));
 }
@@ -1399,6 +1402,7 @@ void ekg_exit()
 	if (gg_debug_file) {
 		fclose(gg_debug_file);
 		gg_debug_file = NULL;
+		xfree(gg_debug_file_buf);
 	}
 
 	if (config_mesg_allow != mesg_startup)
