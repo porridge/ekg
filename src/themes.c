@@ -304,9 +304,11 @@ void my_printf(char *theme, ...)
 	
 	va_start(ap, theme);
 	tmp = va_format_string(find_format(theme), ap);
-	my_puts("%s", (tmp) ? tmp : "");
+	
+	if (my_printf_lines != -2)
+		my_puts("%s", (tmp) ? tmp : "");
 
-	if (my_printf_lines != -1) {
+	if (my_printf_lines >= 0) {
 		for (p = tmp; *p; p++)
 			if (*p == '\n')
 				my_printf_lines++;
@@ -321,8 +323,14 @@ void my_printf(char *theme, ...)
 			my_printf_lines = -1;
 			tmp = readline(prompt);
 			in_readline = 0;
-			free(tmp);
-			my_printf_lines = 0;
+			if (tmp) {
+				free(tmp);
+				my_printf_lines = 0;
+			} else {
+				printf("\n");
+				my_printf_lines = -2;
+			}
+			printf("\033[A\033[K");		/* XXX */
 		}
 	}
 	
@@ -747,9 +755,9 @@ void init_theme()
         add_format("events_list_empty", "%! Brak zdarzeñ\n", 1);
         add_format("events_list", "%> on %G%1 %W%2 %B%3%n\n", 1);
         add_format("events_incorrect", "%! Nieprawid³owo zdefiniowane zdarzenie.\n", 1);
-        add_format("events_add", "%> 'on %G%1 %W%2 %Y%3'%n - zdarzenie dodane.\n", 1);
+        add_format("events_add", "%> 'on %G%1 %W%2 %Y%3%n' - zdarzenie dodane.\n", 1);
         add_format("events_exist", "%! Zdarzenie %1 istnieje dla %2.\n", 1);
-        add_format("events_del", "%> on %G%1 %W%2 %Y%3'%n - zdarzenie usuniête.\n", 1);
+        add_format("events_del", "%> 'on %G%1 %W%2 %Y%3%n' - zdarzenie usuniête.\n", 1);
         add_format("events_del_flags", "%> Flagi %G%1%n usuniête.\n", 1);
         add_format("events_add_flags", "%> Flagi %G%1%n dodane.\n", 1);
         add_format("events_noexist", "%! Niezidentyfikowane zdarzenie.\n", 1);

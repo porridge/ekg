@@ -18,6 +18,7 @@ klient:
 - escapowanie tre¶ci mesgów.
 - anulowanie |more jakim¶ ^C albo ^D.
 - wykrywanie niewidocznych jako opcja.
+- aliasy w query.
 
 
 $Id$

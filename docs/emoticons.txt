@@ -3,7 +3,7 @@
 	-------------------------------------------------
 
 Za pomoc± oryginalnego klienta GG mo¿na wys³aæ sekwencje znakowe, które bêd±
-sie zamieniaæ na odpowiednie ikony. Z oczywistych wzglêdów w ekg wykonaæ siê
+siê zamieniaæ na odpowiednie ikony. Z oczywistych wzglêdów w ekg wykonaæ siê
 tego nie da (mo¿e kto¶ kiedy¶ zrobi wsparcie dla aaliba ;))). Sekwencje te,
 zamieniane s± wiêc na inne sekwencje. Np. sekwencja:
 
@@ -15,7 +15,7 @@ mo¿e byæ zamieniona na:
 
 lub podobn±, wedle uznania u¿ytkownika.
 
-Aby skorzystaæ z mo¿liwo¶ci rozwiajania tego typu makr w otrzymywanych
+Aby skorzystaæ z mo¿liwo¶ci rozwijania tego typu makr w otrzymywanych
 wiadomo¶ciach, nale¿y je sobie wcze¶niej zdefiniowaæ. Robi siê to w pliku
 ~/.gg/emoticons. Ka¿da linia tego pliku definiuje jedno makro, a jej format
 jest nastêpuj±cy:
