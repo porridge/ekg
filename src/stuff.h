@@ -146,6 +146,7 @@ char *busy_reason;
 int screen_lines;
 int screen_columns;
 int my_printf_lines;
+int quit_message_send;
 
 int config_read(char *filename);
 int config_write(char *filename);

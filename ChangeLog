@@ -8,6 +8,11 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-05-09
 
 - dodanie debian/ (phantomik/w)
+- Ctrl-C zachowuje siê jak w bashu -- czy¶ci liniê, nie wychodzi (adwol/w)
+- ujednolicone zachowanie Ctrl-D i ,,quit'' (adwol/w)
+- usuniêcie u¿ytkownika zaznacza zmianê konfiguracji (adwol/w)
+- poprawka array_make() (adwol/w)
+- poprawka stanów po reconnekcie (gawrysz/w)
 
 // 2002-05-07
 

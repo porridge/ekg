@@ -469,14 +469,11 @@ void handle_failure(struct gg_event *e)
  */
 void handle_success(struct gg_event *e)
 {
-        int status_table[4] = { GG_STATUS_AVAIL, GG_STATUS_BUSY, GG_STATUS_INVISIBLE, GG_STATUS_BUSY_DESCR };
-
 	my_printf("connected");
 	userlist_send();
 
 	if (away || private_mode)
-		gg_change_status(sess, status_table[away] | ((private_mode) ? GG_STATUS_FRIENDS_MASK : 0));
-
+		gg_change_status(sess, config_status);
 }
 
 /*

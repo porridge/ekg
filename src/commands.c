@@ -630,7 +630,14 @@ COMMAND(command_status)
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		my_printf("show_status", na, "");
 	} else {
-		char *foo[6] = { av, bs, in, bd, ad, id };
+		char *foo[6];
+
+		foo[0] = av;
+		foo[1] = bs;
+		foo[2] = in;
+		foo[3] = bd;
+		foo[4] = ad;
+		foo[5] = id;
 
 		my_printf("show_status", foo[away], (private_mode) ? pr : np);
 	}
@@ -719,6 +726,7 @@ COMMAND(command_del)
 	if (!userlist_remove(u)) {
 		my_printf("user_deleted", tmp);
 		gg_remove_notify(sess, uin);
+		config_changed = 1;
 	} else
 		my_printf("error_deleting");
 
@@ -1494,15 +1502,12 @@ COMMAND(command_quit)
 	else
 	    	tmp = strdup(params[0]);
 	
-	my_printf((tmp) ? "quit_descr" : "quit", tmp);
+	if (!quit_message_send) {
+		my_printf((tmp) ? "quit_descr" : "quit", tmp);
+		putchar('\n');
+		quit_message_send = 1;
+	}
 
-	ekg_logoff(sess, tmp);
-	free(tmp);
-	
-	list_remove(&watches, sess, 0);
-	gg_free_session(sess);
-	sess = NULL;
-	
 	return -1;
 }
 

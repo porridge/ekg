@@ -113,6 +113,7 @@ int config_query_commands = 0;
 char *config_proxy = NULL;
 char *config_server = NULL;
 int my_printf_lines = -1;
+int quit_message_send = 0;
 
 /*
  * my_puts()

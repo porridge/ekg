@@ -309,7 +309,11 @@ void my_printf(char *theme, ...)
  *
  * usuwa cache'owane prompty. przydaje siê przy zmianie theme'u.
  */
+#ifdef __GNUC__
 inline void reset_theme_cache()
+#else
+void reset_theme_cache()
+#endif
 {
 	free(prompt_cache);
 	free(prompt2_cache);

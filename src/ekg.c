@@ -352,6 +352,15 @@ void sigwinch_handler()
 #endif
 }
 
+void sigint_handler()
+{
+	rl_delete_text(0, rl_end);
+	rl_point = rl_end = 0;
+	putchar('\n');
+	rl_forced_update_display();
+	signal(SIGINT, sigint_handler);
+}
+
 int main(int argc, char **argv)
 {
 	int auto_connect = 1, force_debug = 0, i, new_status = 0 ;
@@ -518,6 +527,7 @@ IOCTL_HELP
 	signal(SIGHUP, sighup);
 	signal(SIGALRM, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
+	signal(SIGINT, sigint_handler);
 
 	time(&last_action);
 
@@ -611,7 +621,12 @@ IOCTL_HELP
 		free(line);
 	}
 
-	printf("\n");
+	if (!quit_message_send) {
+		putchar('\n');
+		my_printf("quit");
+		putchar('\n');
+		quit_message_send = 1;
+	}
 	ekg_logoff(sess, NULL);
 	list_remove(&watches, sess, 0);
 	gg_free_session(sess);
