@@ -73,18 +73,18 @@ if ($help) {
 }
 
 if (!$nohdrs and !$ptext) {
-print '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+print '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-2" />
   <title>log</title>
 ';
 print '  <style type="text/css">
-    dt { background: lightgrey }
+    dt { background: #DDD; margin: 5px }
     .avail { color: yellow }
     .busy { color: green }
     .notavail { color: red }
-    .invisible { color: cyan }
+    .invisible { color: teal }
   </style>
 ' if !$nocss;
 print '</head>
