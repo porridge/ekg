@@ -2882,7 +2882,6 @@ COMMAND(cmd_queue)
 {
 	list_t l;
 	uin_t uin = 0;
-	char *tmp = NULL;
 
 	if (sess && sess->state == GG_STATE_CONNECTED) {
 		print("queue_wrong_use");
@@ -2931,9 +2930,6 @@ COMMAND(cmd_queue)
 			tm = localtime(&m->time);
 			strftime(buf, sizeof(buf), format_find("queue_list_timestamp"), tm);
 
-			tmp = xstrdup(m->msg);
-			cp_to_iso(tmp);
-
 			if (m->uin_count > 1) {
 				string_t s = string_init(format_user(*(m->uins)));
 				int i;
@@ -2948,8 +2944,7 @@ COMMAND(cmd_queue)
 			} else
 				fu = (char *)format_user(*(m->uins));
 				
-			print("queue_list_message", buf, fu, tmp);
-			xfree(tmp);
+			print("queue_list_message", buf, fu, m->msg);
 
 			if (m->uin_count > 1)
 				xfree(fu);
