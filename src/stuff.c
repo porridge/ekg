@@ -1162,7 +1162,7 @@ int config_read(const char *filename, const char *var)
 			}
 
 			if (ret)
-				gg_debug(GG_DEBUG_MISC, "\tunknown variable %s %s\n", buf, foo);
+				gg_debug(GG_DEBUG_MISC, "\tunknown variable %s\n", foo);
 		
 		} else if (!strcasecmp(buf, "alias")) {
 			gg_debug(GG_DEBUG_MISC, "\talias %s\n", foo);
@@ -1228,7 +1228,7 @@ int config_read(const char *filename, const char *var)
 			ret = variable_set(buf, foo, 1);
 
 			if (ret)
-				gg_debug(GG_DEBUG_MISC, "\tunknown variable %s %s\n", buf, foo);
+				gg_debug(GG_DEBUG_MISC, "\tunknown variable %s\n", buf);
 
 		}
 
