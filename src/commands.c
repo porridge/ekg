@@ -506,7 +506,7 @@ COMMAND(cmd_status)
 	int mqc, now_days;
 	char *tmp, *priv, *r1, *r2, buf[100], buf1[100];
 
-	if(strcmp(format_find("show_status_header"), ""))
+	if (strcmp(format_find("show_status_header"), ""))
 		printq("show_status_header");
 
 	if (config_profile)
@@ -538,7 +538,8 @@ COMMAND(cmd_status)
 		if ((mqc = msg_queue_count()))
 			printq("show_status_msg_queue", itoa(mqc)); 
 
-		printq("show_status_footer");
+	        if (strcmp(format_find("show_status_footer"), ""))
+			printq("show_status_footer");
 
 		xfree(tmp);
 
