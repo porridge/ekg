@@ -44,6 +44,7 @@ struct variable variables[MAX_VARS] = {
 	{ "display_notify", VAR_BOOL, 1, &display_notify },
 	{ "log", VAR_INT, 1, &log },
 	{ "log_path", VAR_STR, 1, &log_path },
+	{ "use_proxy", VAR_INT, 1, &gg_http_use_proxy },
 	{ "proxy_port", VAR_INT, 1, &gg_http_proxy_port },
 	{ "proxy_host", VAR_STR, 1, &gg_http_proxy_host },
 	{ "sms_away", VAR_BOOL, 1, &sms_away },
@@ -54,7 +55,6 @@ struct variable variables[MAX_VARS] = {
 	{ "sound_chat_file", VAR_STR, 1, &sound_chat_file },
 	{ "sound_app", VAR_STR, 1, &sound_app },
 	{ "theme", VAR_STR, 1, &default_theme },
-	{ "use_proxy", VAR_INT, 1, &use_proxy },
 
 	{ "default_status", VAR_INT, 2, &default_status },
 	{ "bold_font", VAR_STR, 2, &bold_font },	/* GNU Gadu */
