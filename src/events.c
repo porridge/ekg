@@ -776,6 +776,10 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 		return;
 	}
 
+	/* jesli kto¶ nam znika, to sobie to zapamietujemy */
+	if ((GG_S_NA(status) || GG_S_I(status)) && !(GG_S_NA(u->status) || GG_S_I(u->status)))
+		u->last_seen = time(NULL);
+
 	prev_status = u->status;
 	
 	for (s = st; s->status; s++) {

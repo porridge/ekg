@@ -8,6 +8,7 @@
  *                          Piotr Wysocki <wysek@linux.bydg.org>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *                          Piotr Domagalski <szalik@szalik.net>
+ *                          Kuba Kowalski <qbq@kofeina.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -1659,6 +1660,17 @@ COMMAND(cmd_list)
 			printq("user_info_mobile", u->mobile);
 		if (strcmp(groups, ""))
 			printq("user_info_groups", groups);
+		if (GG_S_I(u->status) || GG_S_NA(u->status)) {
+			char buf[100];
+			struct tm *last_seen_time;
+			if (u->last_seen) {
+				last_seen_time = localtime(&(u->last_seen));
+				strftime(buf, sizeof(buf), format_find("user_info_last_seen_time"), last_seen_time);
+				printq("user_info_last_seen", buf);
+			} else 
+				printq("user_info_never_seen");
+		}
+
 		printq("user_info_footer", u->display, itoa(u->uin));
 		
 		xfree(ip_str);

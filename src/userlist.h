@@ -42,6 +42,7 @@ struct userlist {
 	list_t groups;		/* grupy, do których nale¿y */
 	uin_t uin;		/* numer */
 	int status;		/* aktualny stan */
+	time_t last_seen;	/* jesli jest niedostepny/ukryty to od kiedy */
 	char *descr;		/* opis/powód stanu */
 	struct in_addr ip;	/* adres ip */
 	unsigned short port;	/* port */
