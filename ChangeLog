@@ -9,6 +9,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - poprawka logowania w iso (wielu/w)
 - poprawka synchronicznych po³±czeñ (hao/w)
+- dodanie kolejnego ui-automaton przeznaczonego do wspó³pracy z pluginem
+  do irssi (malekith/w)
 
 // 2002-10-05
 

@@ -15,6 +15,7 @@ klient:
 - ustawianie stanu bez opisów przy w³±czynych opcjach ,,*reason*'',
 - kolejka wiadomo¶ci wysy³anych podczas roz³±czenia (Murphy).
 - dodaæ mo¿liwo¶æ ustawienia powodu przy wywo³ywaniu ekg (jojo),
+- poprawiæ getopt(), ¿eby rozumia³ ,,--back "powód"'',
 
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,

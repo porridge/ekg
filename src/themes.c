@@ -33,6 +33,8 @@
 #include "xmalloc.h"
 #include "ui.h"
 
+int automaton_color_escapes;
+
 char *prompt_cache = NULL, *prompt2_cache = NULL, *error_cache = NULL;
 const char *timestamp_cache = NULL;
 
@@ -194,7 +196,11 @@ char *va_format_string(const char *format, va_list ap)
 				string_append(buf, error_cache);
 			if (*p == '#')
 				string_append(buf, timestamp(timestamp_cache));
-			if (config_display_color) {
+			if (config_display_color && isalpha(*p) && 
+			    automaton_color_escapes) {
+				string_append_c(buf, '\033');
+				string_append_c(buf, *p);
+			} else if (config_display_color) {
 				if (*p == 'k')
 					string_append(buf, "\033[0;30m");
 				if (*p == 'K')
@@ -248,7 +254,7 @@ char *va_format_string(const char *format, va_list ap)
 				if (*p == 'n')
 					string_append(buf, "\033[0m");
 		                if (*p == 'T')
-					string_append(buf, "\033[1m");			
+					string_append(buf, "\033[1m");
 			}
 
 			if (*p == '@') {

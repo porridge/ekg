@@ -33,6 +33,7 @@ int ui_screen_height;
 
 extern void ui_none_init();
 extern void ui_batch_init();
+extern void ui_automaton_init();
 
 #ifdef WITH_UI_READLINE
 

@@ -736,7 +736,7 @@ int main(int argc, char **argv)
 "  -I, --ioctld-path=¦CIE¯KA  ustawia ¶cie¿kê do ioctld\n"
 #endif
 "  -f, --frontend=NAZWA       wybiera jeden z dostêpnych interfejsów\n"
-"                             (none, batch"
+"                             (none, batch, automaton"
 #ifdef WITH_UI_READLINE
 ", readline"
 #endif
@@ -774,6 +774,8 @@ int main(int argc, char **argv)
 					ui_init = ui_none_init;
 				else if (!strcasecmp(optarg, "batch"))
 					ui_init = ui_batch_init;
+				else if (!strcasecmp(optarg, "automaton"))
+					ui_init = ui_automaton_init;
 #ifdef WITH_UI_READLINE
 				else if (!strcasecmp(optarg, "readline"))
 					ui_init = ui_readline_init;
