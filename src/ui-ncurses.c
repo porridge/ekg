@@ -2985,12 +2985,12 @@ static void binding_word_rubout(const char *arg)
 	int eaten = 0;
 
 	p = line + line_index;
-	while (xisspace(*(p-1)) && p > line) {
+	while (p > line && xisspace(*(p-1))) {
 		p--;
 		eaten++;
 	}
 	if (p > line) {
-		while (!xisspace(*(p-1)) && p > line) {
+		while (p > line && !xisspace(*(p-1))) {
 			p--;
 			eaten++;
 		}

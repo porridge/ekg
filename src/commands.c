@@ -2037,11 +2037,11 @@ COMMAND(cmd_msg)
 	/* analizê tekstu zrobimy w osobnym bloku dla porz±dku */
 	{
 		unsigned char attr = 0, last_attr = 0;
-		const unsigned char *p = params[1], *end = p + strlen(p);
+		const unsigned char *p = msg, *end = p + strlen(p);
 		int msglen = 0;
 		unsigned char rgb[3], last_rgb[3];
 
-		for (p = params[1]; p < end; ) {
+		for (p = msg; p < end; ) {
 			if (*p == 18) {		/* Ctrl-R */
 				p++;
 
@@ -2214,8 +2214,8 @@ COMMAND(cmd_msg)
 		e.event.msg.sender = config_uin;
 		e.event.msg.message = xstrdup(raw_msg);
 		e.event.msg.time = time(NULL);
-		e.event.msg.formats = format + 3;
-		e.event.msg.formats_length = formatlen - 3;
+		e.event.msg.formats = (format) ? (format + 3) : NULL;
+		e.event.msg.formats_length = (formatlen) ? (formatlen - 3) : 0;
 
 		memset(&u, 0, sizeof(u));
 		u.uin = 0;

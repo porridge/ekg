@@ -1674,6 +1674,10 @@ int msg_encrypt(uin_t uin, unsigned char **msg)
 		if (res) {
 			xfree(*msg);
 			*msg = res;
+			
+			if (strlen(*msg) > 1989)	/* XXX informowaæ o tym u¿ytkownika */
+				(*msg)[1989] = 0;
+			
 			gg_debug(GG_DEBUG_MISC, "// ekg: simlite encrypted: %s\n", res);
 			return 1;
 		}

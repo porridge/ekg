@@ -6,6 +6,12 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-03-29
+
+- poprawka Ctrl-W (w)
+- ucinanie zbyt d³ugich szyfrowanych wiadomo¶ci (sz/w)
+- poprawka segfaultów przy wysy³aniu d³ugich wiadomo¶ci (w)
+
 // 2003-03-28
 
 - libgadu: usuniêcie starych sta³ych i nazw struktur zachowanych dla
