@@ -1469,6 +1469,8 @@ int event_remove(const char *name, int quiet)
 			if (!remove_all)
 				printq("events_del", name);
 			xfree(e->action);
+			xfree(e->target);
+			xfree(e->name);
 			list_remove(&events, e, 1);
 			removed = 1;
         	}
