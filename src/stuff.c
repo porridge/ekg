@@ -456,7 +456,7 @@ void config_write_main(FILE *f, int base64)
 	for (l = sequences; l; l = l->next) {
 		struct sequence *s = l->data;
 
-		fprintf(f, "bind %s %s", s->seq, s->command);
+		fprintf(f, "bind %s %s\n", s->seq, s->command);
 	}
 
 }
