@@ -1395,6 +1395,8 @@ void theme_init()
 	format_add("conferences_rename", "%> Nazwa konferencji zmieniona: %T%1%n --> %T%2%n\n", 1);
 	format_add("conferences_ignore", "%> Konferencja %T%1%n bêdzie ignorowana\n", 1);
 	format_add("conferences_unignore", "%> Konferencja %T%1%n nie bêdzie ignorowana\n", 1);
+	format_add("conferences_joined", "%> Do³±czono %1 do konferencji %T%2%n\n", 1);
+	format_add("conferences_already_joined", "%> %1 uczestniczy ju¿ w konferencji %T%2%n\n", 1);
 	
 	/* wspólne dla us³ug http */
 	format_add("http_failed_resolving", "Nie znaleziono serwera", 1);

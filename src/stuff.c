@@ -988,10 +988,36 @@ struct conference *conference_find(const char *name)
 }
 
 /*
+ * conference_participant()
+ *
+ * sprawdza, czy dany numer jest uczestnikiem konferencji.
+ *
+ *  - c - konferencja,
+ *  - uin - numer.
+ *
+ * 1 je¶li jest, 0 je¶li nie.
+ */
+int conference_participant(struct conference *c, uin_t uin)
+{
+	list_t l;
+	
+	for (l = c->recipients; l; l = l->next) {
+		uin_t *u = l->data;
+
+		if (uin == *u)
+			return 1;
+	}
+
+	return 0;
+
+}
+
+/*
  * conference_find_by_uins()
  *
  * znajduje konferencjê, do której nale¿± podane uiny. je¿eli nie znaleziono,
- * zwracany jest NULL.
+ * zwracany jest NULL. je¶li numerów jest wiêcej, zostan± dodane do
+ * konferencji, bo najwyra¼niej kto¶ do niej do³±czy³.
  * 
  *  - from - kto jest nadawc± wiadomo¶ci,
  *  - recipients - tablica numerów nale¿±cych do konferencji,
@@ -1000,25 +1026,34 @@ struct conference *conference_find(const char *name)
 struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int count) 
 {
 	int i;
-	list_t l, r;
+	list_t l;
 
 	for (l = conferences; l; l = l->next) {
 		struct conference *c = l->data;
 		int matched = 0;
 
-		for (r = c->recipients; r; r = r->next) {
-			for (i = 0; i <= count; i++) {
-				uin_t uin = (i == count) ? from : recipients[i];
-				
-				if (uin == *((uin_t *) (r->data))) {
-					matched++;
-					break;
-				}
-			}
-		}
+		for (i = 0; i < count; i++)
+			if (conference_participant(c, recipients[i]))
+				matched++;
 
-		if (matched == list_count(c->recipients) && matched == (from == config_uin ? count : count + 1))
-			return l->data;
+		if (conference_participant(c, from))
+			matched++;
+
+		gg_debug(GG_DEBUG_MISC, "// conference_find_by_uins(): from=%d, rcpt count=%d, matched=%d, list_count(c->recipients)=%d\n", from, count, matched, list_count(c->recipients));
+
+		if (matched == list_count(c->recipients) && matched <= (from == config_uin ? count : count + 1)) {
+			if (from != config_uin && !conference_participant(c, from))
+				list_add(&c->recipients, &from, sizeof(from));
+
+			for (i = 0; i < count; i++) {
+				if (recipients[i] != config_uin && !conference_participant(c, recipients[i]))
+					list_add(&c->recipients, &recipients[i], sizeof(recipients[0]));
+			}
+
+			gg_debug(GG_DEBUG_MISC, "// conference_find_by_uins(): matching #%s\n", c->name);
+
+			return c;
+		}
 	}
 
 	return NULL;

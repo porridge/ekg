@@ -347,6 +347,7 @@ struct conference *conference_find(const char *name);
 struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int count);
 int conference_set_ignore(const char *name, int flag, int quiet);
 int conference_rename(const char *oldname, const char *newname, int quiet);
+int conference_participant(struct conference *c, uin_t uin);
 void conference_free();
 
 void ekg_connect();

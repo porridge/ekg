@@ -10,6 +10,8 @@ zg³osi³ b³±d.
 
 - za³adowanie themu czy¶ci cache (rmrmg/w)
 - libgadu: poprawka obs³ugi b³êdu pthread_create() (scooty/w)
+- poprawki opisu poleceñ wsadowych (Lordzik/w)
+- poprawka konferencji, dodanie /conf --join (w)
 
 // 2003-04-20
 

@@ -94,11 +94,11 @@ U¯YCIE
 
     Je¶li w linii poleceñ shella podasz po nazwie programu i parametrach
     zaczynaj±cych siê od my¶lnika co¶ jeszcze, to zostanie to zinterpretowane
-    jako komenda wsadowa. ekg wykona tylko tê komendê i od razu wyjdzie.
-    Je¶li na serwerze czekaj± na Ciebie jakie¶ wiadomo¶ci, to serwer je
-    przy¶le zaraz po po³±czeniu i w trybie wsadowym ekg wypisze je na
-    terminal. Je¶li wiêc zamierzasz przekierowaæ wyj¶cie do /dev/null i nie
-    masz loga z wiadomo¶ci, to licz siê z tym, ¿e mog± one zgin±æ bezpowrotnie.
+    jako komenda wsadowa. ekg po³±czy siê z serwerem, wykona tylko tê komendê
+    i od razu wyjdzie. Je¶li na serwerze czekaj± na Ciebie jakie¶ wiadomo¶ci,
+    to serwer je przy¶le zaraz po po³±czeniu i w trybie wsadowym ekg wypisze
+    je na terminal. Je¶li zamierzasz przekierowaæ wyj¶cie do /dev/null i nie
+    masz w³±czonego logowania, wiadomo¶ci zgin± bezpowrotnie.
 
 KLAWIATURA
 
@@ -306,12 +306,19 @@ ZG£ASZANIE B£ÊDÓW
     Je¶li nie wyst±pi ¿adne trzêsienie ziemi, brak pr±du ani barykady na
     drogach, powinny byæ robione co 24 godziny, wieczorem.
 
-    Czê¶æ jest ³adnie udokumentowana, czê¶æ nie. Komentarze czasami s±
-    bardzo g³upie, ale je¶li siê do trzeciej rano siedzi nad dziwnym
+    Poza snapshotami, co jaki¶ czas bêd± umieszczane na serwerze kolejne
+    wersje klienta. Ze wzglêdu na organizacjê prac nad programem, w praktyce
+    nie bêd± siê one ró¿niæ znacznie od snapshotów. Przed wydaniem ka¿dej
+    wersji wstrzymane bêdzie dodawanie nowych opcji, by skupiæ siê na
+    usuwaniu b³êdów. Poza tym, u³atwi to pracê niektórym osobom zajmuj±cym
+    siê tworzeniem paczek dla dystrybucji -- zamiast uaktualniania ich do
+    nowych snapshotów, bêd± mia³y mo¿liwo¶æ pakowania ,,stabilnych'' wersji.
+
+    Czê¶æ kodu jest ³adnie udokumentowana, czê¶æ nie. Komentarze czasami
+    s± bardzo g³upie, ale je¶li siê do trzeciej rano siedzi nad dziwnym
     segfaultem, ciê¿ko siê pohamowaæ. Je¶li napiszesz jakiegokolwiek
-    klienta, frontend czy co¶ takiego, by³bym wdziêczny za informacje
-    o nim. Chêtnie umieszczê odno¶niki do innych tego typu projektów
-    na stronie.
+    klienta, frontend czy co¶ takiego, daj znaæ -- odno¶nik do projektu
+    zostanie umieszczony na stronie ekg.
 
 LISTA DYSKUSYJNA
 

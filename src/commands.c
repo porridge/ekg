@@ -4634,6 +4634,37 @@ COMMAND(cmd_conference)
 		return 0;
 	}
 
+	if (match_arg(params[0], 'j', "join", 2)) {
+		struct conference *c;
+		uin_t uin;
+
+		if (!params[1] || !params[2]) {
+			printq("not_enough_params", name);
+			return -1;
+		}
+
+		if (!(c = conference_find(params[1]))) {
+			printq("conferences_name_error");
+			return -1;
+		}
+
+		if (!(uin = get_uin(params[2]))) {
+			printq("unknown_user", params[2]);
+			return -1;
+		}
+
+		if (conference_participant(c, uin)) {
+			printq("conferences_already_joined", format_user(uin), params[1]);
+			return -1;
+		}
+
+		list_add(&c->recipients, &uin, sizeof(uin));
+
+		printq("conferences_joined", format_user(uin), params[1]);
+
+		return 0;
+	}
+
 	if (match_arg(params[0], 'a', "add", 2)) {
 		if (!params[1]) {
 			printq("not_enough_params", name);
@@ -5554,6 +5585,7 @@ void command_init()
 	  " [opcje]", "zarz±dzanie konferencjami",
 	  "\n"
 	  "  -a, --add [#nazwa] <numer/alias/@grupa>  tworzy now± konferencjê\n"
+	  "  -j, --join [#nazwa] <numer/alias>  przy³±cza osobê do konferencji\n"
 	  "  -d, --del <#nazwa>|*        usuwa konferencjê\n"
 	  "  -i, --ignore <#nazwa>       oznacza konferencjê jako ignorowan±\n"
 	  "  -u, --unignore <#nazwa>     oznacza konferencjê jako nieignorowan±\n"
