@@ -20,7 +20,6 @@
 /*
  * roadmap:
  * - okienka,
- * - konfigurowalny statusbar,
  * - mo¿liwo¶æ w³±czenia listy kontaktów po prawej,
  */
 
@@ -130,6 +129,147 @@ static void ui_ncurses_print(const char *target, const char *line)
 	doupdate();
 }
 
+/*
+ * update_statusbar()
+ *
+ * uaktualnia pasek stanu i wy¶wietla go ponownie.
+ */
+static void update_statusbar()
+{
+	const char *p;
+	int i, nested = 0;
+
+	wmove(status, 0, 0);
+	wattrset(status, COLOR_PAIR(15));
+
+	for (i = 0; i <= status->_maxx; i++)
+		waddch(status, ' ');
+	
+	wmove(status, 0, 0);
+
+	for (p = format_find("statusbar"); *p; p++) {
+		if (*p == '}' && nested) {
+			nested--;
+			continue;
+		}
+
+		if (*p != '%') {
+			waddch(status, *p);
+			continue;
+		}
+	
+		p++;
+
+		if (!*p)
+			break;
+
+#define __color(x,y,z) \
+	case x: wattrset(status, COLOR_PAIR(8+z)); break; \
+	case y: wattrset(status, COLOR_PAIR(8+z) | A_BOLD); break;
+
+		if (*p != '{') {
+			switch (*p) {
+				__color('k', 'K', 0);
+				__color('r', 'R', 1);
+				__color('g', 'G', 2);
+				__color('y', 'Y', 3);
+				__color('b', 'B', 4);
+				__color('m', 'M', 5);
+				__color('c', 'C', 6);
+				__color('w', 'W', 7);
+				case 'n':
+					wattrset(status, COLOR_PAIR(15));
+					break;
+			}
+			continue;
+		}
+#undef __color
+
+		p++;
+		if (!*p)
+			break;
+
+		if (!strncmp(p, "time}", 5)) {
+			struct tm *tm;
+			time_t t = time(NULL);
+			char tmp[16];
+
+			tm = localtime(&t);
+
+			strftime(tmp, sizeof(tmp), "%H:%M", tm);
+			waddstr(status, tmp);
+			p += 4;
+		} else if (!strncmp(p, "time ", 5)) {	/* XXX naprawiæ */
+			struct tm *tm;
+			time_t t = time(NULL);
+			char tmp[100], *fmt;
+			const char *q;
+
+			tm = localtime(&t);
+
+			p += 5;
+
+			for (q = p; *q && *q != '}'; q++);
+
+			fmt = xmalloc(q - p + 1);
+			strncpy(fmt, p, q - p);
+			fmt[q - p] = 0;
+
+			strftime(tmp, sizeof(tmp), fmt, tm);
+
+			xfree(fmt);
+			p = q - 1;
+		} else if (!strncmp(p, "uin}", 4)) {
+			waddstr(status, itoa(config_uin));
+			p += 3;
+		} else if (*p == '?') {
+			int matched = 0, neg = 0;
+
+			p++;
+			if (!*p)
+				break;
+
+			if (*p == '!') {
+				neg = 1;
+				p++;
+				if (!*p)
+					break;
+			}
+			
+			if (!strncmp(p, "away ", 5)) {
+				matched = (away == 1 || away == 3);
+				p += 4;
+			} else if (!strncmp(p, "avail ", 6)) {
+				matched = (away == 0 || away == 4);
+				p += 5;
+			} else if (!strncmp(p, "invisible ", 10)) {
+				matched = (away == 2 || away == 5);
+				p += 9;
+			} else if (!strncmp(p, "notavail ", 9)) {
+				matched = (!sess || sess->state != GG_STATE_CONNECTED);
+				p += 8;
+			}
+
+			if (!matched) {
+				while (*p && *p != '}')
+					p++;
+				if (!*p)
+					break;
+			} else 
+				nested++;
+		} else {
+			while (*p && *p != '}')
+				p++;
+			if (!*p)
+				break;
+		}
+	}
+	
+	wnoutrefresh(status);
+	wnoutrefresh(input);
+	doupdate();
+}
+
 static void ui_ncurses_beep()
 {
 	beep();
@@ -137,6 +277,8 @@ static void ui_ncurses_beep()
 
 void ui_ncurses_init()
 {
+	struct timer *t;
+
 	ui_print = ui_ncurses_print;
 	ui_loop = ui_ncurses_loop;
 	ui_beep = ui_ncurses_beep;
@@ -165,29 +307,28 @@ void ui_ncurses_init()
 	init_pair(6, COLOR_CYAN, COLOR_BLACK);
 	init_pair(7, COLOR_WHITE, COLOR_BLACK);
 
-	init_pair(8, COLOR_WHITE, COLOR_BLUE);
+	init_pair(8, COLOR_BLACK, COLOR_BLUE);
+	init_pair(9, COLOR_RED, COLOR_BLUE);
+	init_pair(10, COLOR_GREEN, COLOR_BLUE);
+	init_pair(11, COLOR_YELLOW, COLOR_BLUE);
+	init_pair(12, COLOR_BLUE, COLOR_BLUE);
+	init_pair(13, COLOR_MAGENTA, COLOR_BLUE);
+	init_pair(14, COLOR_CYAN, COLOR_BLUE);
+	init_pair(15, COLOR_WHITE, COLOR_BLUE);
 	
-	wattrset(status, COLOR_PAIR(8) | A_BOLD);
-	mvwaddstr(status, 0, 0, " ekg XP");
-	wattrset(status, COLOR_PAIR(8));
-	waddstr(status, " :: próbna jazda na gapê                                                 ");
-	
+	format_add("statusbar", " %c(%w%{time}%c)%w %{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%n", 1);
+
 	wnoutrefresh(output);
 	wnoutrefresh(status);
 	wnoutrefresh(input);
 	doupdate();
 
-	ui_ncurses_print("__current", "\033[1m
-    ************************************************************************
-    *** Ten interfejs u¿ytkownika jest jeszcze w bardzo wczesnym stadium ***
-    *** rozwoju! NIE PISZ, JE¦LI JAKA¦ OPCJA NIE DZIA£A. Doskonale o tym ***
-    *** wiadomo. Po prostu cierpliwie poczekaj, a¿ zostanie napisany.    ***
-    ************************************************************************
-\033[0m");
-
 	signal(SIGINT, SIG_IGN);
 	
 	memset(history, 0, sizeof(history));
+
+	t = timer_add(1, "ui-ncurses-time", "refresh_time");
+	t->ui = 1;
 }
 
 static void ui_ncurses_deinit()
@@ -657,6 +798,12 @@ static void ui_ncurses_loop()
 
 static int ui_ncurses_event(const char *event, ...)
 {
+	update_statusbar();
+
+	if (event && !strcmp(event, "refresh_time")) {
+		struct timer *t = timer_add(1, "ui-ncurses-time", "refresh_time");
+		t->ui = 1;
+	}
 
 	return 0;
 }

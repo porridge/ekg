@@ -370,12 +370,12 @@ COMMAND(cmd_connect)
 			return;
 		}
 
-		if (params[0] && params[1]) {
+		if (params && params[0] && params[1]) {
 			variable_set("uin", params[0], 0);
 			variable_set("password", params[1], 0);
 		}
 
-		if (params[0] && !params[1])
+		if (params && params[0] && !params[1])
 			variable_set("password", params[0], 0);
 			
                 if (config_uin && config_password) {

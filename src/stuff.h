@@ -89,6 +89,7 @@ struct timer {
 	int started;	/* kiedy ustawiono timer */
 	int period;	/* ile sekund ma trwaæ czekanie */
 	int script;	/* czy obs³ugiwany przez skrypt */
+	int ui;		/* czy obs³ugiwany przez ui */
 	char *name;	/* nazwa timera */
 	char *command;	/* komenda do wywo³ania */
 };

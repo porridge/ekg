@@ -153,6 +153,9 @@ void ekg_wait_for_key()
 					python_function(t->command);
 				else
 #endif
+				if (t->ui)
+					ui_event(t->command);
+				else
 					command_exec(NULL, t->command);
 
 				xfree(t->name);
@@ -308,6 +311,8 @@ void ekg_wait_for_key()
 					snprintf(tmp, sizeof(tmp), "%ds", config_auto_away);
 				
 				print((reason) ? "auto_away_descr" : "auto_away", tmp, reason);
+				ui_event("my_status", "away", reason);
+				ui_event("my_status_raw", GG_STATUS_BUSY, reason);	/* XXX */
 				free(config_reason);
 				config_reason = reason;
 			}
@@ -766,6 +771,8 @@ int main(int argc, char **argv)
 
 	if (!config_uin || !config_password)
 		print("no_config");
+
+	ui_event("config_changed");
 
 	if (!config_log_path) {
 		if (config_user != "")

@@ -15,6 +15,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - dodanie zmiennej save_password (FIG/w)
 - dodanie argumentów do connect (FIG/w)
 - polecenia przy braku parametrów proponuj± zajrzeæ do pomocy (FIG/w)
+- pseudokonfigurowalny statusbar w ui-ncurses, szczegó³y w ¼ród³ach.
+  póki co, pokazuje zegarek, numerek i kolorem okre¶la stan (w)
 
 // 2002-09-02
 
