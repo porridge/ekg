@@ -814,6 +814,7 @@ void theme_init()
 	format_add("conn_stopped", "%! Przerwano ³±czenie\n", 1);
 	format_add("conn_timeout", "%! Przekroczono limit czasu operacji ³±czenia z serwerem\n", 1);
 	format_add("connected", "%> Po³±czono\n", 1);
+	format_add("connected_descr", "%> Po³±czono: %T%1%n%2\n", 1);
 	format_add("disconnected", "%> Roz³±czono\n", 1);
 	format_add("disconnected_descr", "%> Roz³±czono: %T%1%n%2\n", 1);
 	format_add("already_connected", "%! Klient jest ju¿ po³±czony. Wpisz %Treconnect%n aby po³±czyæ ponownie\n", 1);

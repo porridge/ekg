@@ -628,7 +628,17 @@ void handle_failure(struct gg_event *e)
  */
 void handle_success(struct gg_event *e)
 {
-	print("connected");
+	if (config_reason && GG_S_D(config_status)) {
+		char *r1, *r2;
+
+		r1 = xstrmid(config_reason, 0, GG_STATUS_DESCR_MAXSIZE);
+		r2 = xstrmid(config_reason, GG_STATUS_DESCR_MAXSIZE, -1);
+		print("connected_descr", r1, r2);
+		xfree(r2);
+		xfree(r1);
+	} else
+		print("connected");
+	
 	ui_event("connected");
 
 	userlist_send();

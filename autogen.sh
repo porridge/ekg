@@ -2,7 +2,9 @@
 if test $*; then
   ARGS="$*"
 else
-  ARGS=`grep '^  \$ \./configure ' config.log | sed 's/^  \$ \.\/configure //' 2> /dev/null`
+  if test -f config.log; then
+    ARGS=`grep '^  \$ \./configure ' config.log | sed 's/^  \$ \.\/configure //' 2> /dev/null`
+  fi
 fi
 aclocal -I m4
 autoheader
