@@ -150,6 +150,12 @@ display_sent
 	zwróciæ uwagê, ¿e przy make_window = 2, wys³anie wiadomo¶ci utworzy
 	automatycznie okienko rozmowy.
 
+last_count
+	typ: liczba
+	domy¶lna warto¶æ: 0
+
+	wskazuje ile ma byæ zapisywanych wiadomo¶ci dla komendy ,,last''.
+
 log
 	typ: liczba
 	domy¶lna warto¶æ: 0

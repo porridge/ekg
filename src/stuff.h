@@ -252,5 +252,6 @@ void emoticon_free();
 struct timer *timer_add(int period, const char *name, const char *command);
 int timer_remove(const char *name, const char *command);
 void timer_free();
+int last_add(uin_t uin, time_t t, const char *msg);
 
 #endif /* __STUFF_H */

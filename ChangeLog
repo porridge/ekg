@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-09-07
 
 - dodane komendy ,,last'' oraz zmiennej ,,last_count'' (d)
+- update ,,docs/vars.txt'' (d)
 
 // 2002-09-06
 
