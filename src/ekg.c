@@ -1113,8 +1113,23 @@ int main(int argc, char **argv)
 		pipe_fd = init_control_pipe(pipe_file);
 
 	/* okre¶lanie stanu klienta po w³±czeniu */
-	if (new_status)
+	if (new_status) {
+		if (config_keep_reason && config_reason) {
+			switch (new_status) {
+				case GG_STATUS_AVAIL:
+					new_status = GG_STATUS_AVAIL_DESCR;
+					break;
+				case GG_STATUS_BUSY:
+					new_status = GG_STATUS_BUSY_DESCR;
+					break;
+				case GG_STATUS_INVISIBLE:
+					new_status = GG_STATUS_INVISIBLE_DESCR;
+					break;
+			}
+		}
+
 		config_status = new_status | (GG_S_F(config_status) ? GG_STATUS_FRIENDS_MASK : 0);
+	}
 
 	if (new_reason) {
 		xfree(config_reason);

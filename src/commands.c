@@ -764,7 +764,7 @@ COMMAND(cmd_find)
 {
 	char **argv = NULL;
 	gg_pubdir50_t req;
-	int i, res = 0, all = 0;
+	int i, res = 0, all = 0, match = 0;
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		printq("not_connected");
@@ -823,32 +823,50 @@ COMMAND(cmd_find)
 	for (i = 0; argv[i]; i++) {
 		char *arg = argv[i];
 				
-		if (match_arg(arg, 'f', "first", 2) && argv[i + 1])
+		if (match_arg(arg, 'f', "first", 2) && argv[i + 1]) {
 			gg_pubdir50_add(req, GG_PUBDIR50_FIRSTNAME, argv[++i]);
+			match = 1;
+		}
 
-		if (match_arg(arg, 'l', "last", 2) && argv[i + 1])
+		if (match_arg(arg, 'l', "last", 2) && argv[i + 1]) {
 			gg_pubdir50_add(req, GG_PUBDIR50_LASTNAME, argv[++i]);
+			match = 1;
+		}
 
-		if (match_arg(arg, 'n', "nickname", 2) && argv[i + 1])
+		if (match_arg(arg, 'n', "nickname", 2) && argv[i + 1]) {
 			gg_pubdir50_add(req, GG_PUBDIR50_NICKNAME, argv[++i]);
+			match = 1;
+		}
 		
-		if (match_arg(arg, 'c', "city", 2) && argv[i + 1])
+		if (match_arg(arg, 'c', "city", 2) && argv[i + 1]) {
 			gg_pubdir50_add(req, GG_PUBDIR50_CITY, argv[++i]);
+			match = 1;
+		}
 
-		if (match_arg(arg, 'u', "uin", 2) && argv[i + 1])
+		if (match_arg(arg, 'u', "uin", 2) && argv[i + 1]) {
 			gg_pubdir50_add(req, GG_PUBDIR50_UIN, argv[++i]);
+			match = 1;
+		}
 		
-		if (match_arg(arg, 's', "start", 3) && argv[i + 1])
+		if (match_arg(arg, 's', "start", 3) && argv[i + 1]) {
 			gg_pubdir50_add(req, GG_PUBDIR50_START, argv[++i]);
+			match = 1;
+		}
 		
-		if (match_arg(arg, 'F', "female", 2))
+		if (match_arg(arg, 'F', "female", 2)) {
 			gg_pubdir50_add(req, GG_PUBDIR50_GENDER, GG_PUBDIR50_GENDER_FEMALE);
+			match = 1;
+		}
 
-		if (match_arg(arg, 'M', "male", 2))
+		if (match_arg(arg, 'M', "male", 2)) {
 			gg_pubdir50_add(req, GG_PUBDIR50_GENDER, GG_PUBDIR50_GENDER_MALE);
+			match = 1;
+		}
 
-		if (match_arg(arg, 'a', "active", 2))
+		if (match_arg(arg, 'a', "active", 2)) {
 			gg_pubdir50_add(req, GG_PUBDIR50_ACTIVE, GG_PUBDIR50_ACTIVE_TRUE);
+			match = 1;
+		}
 
 		if (match_arg(arg, 'b', "born", 2) && argv[i + 1]) {
 			char *foo = strchr(argv[++i], ':');
@@ -857,13 +875,20 @@ COMMAND(cmd_find)
 				*foo = ' ';
 
 			gg_pubdir50_add(req, GG_PUBDIR50_BIRTHYEAR, argv[i]);
+			match = 1;
 		}
 
 		if (match_arg(arg, 'A', "all", 3)) {
 			if (!gg_pubdir50_get(req, 0, GG_PUBDIR50_START))
 				gg_pubdir50_add(req, GG_PUBDIR50_START, "0");
 			all = 1;
+			match = 1;
 		}
+	}
+
+	if (!match) {
+		printq("invalid_params", name);
+		return -1;
 	}
 
 search:
@@ -947,7 +972,7 @@ COMMAND(cmd_change)
 	}
 
 	if (!match && strcmp(params[0], "-")) {
-		printq("not_enough_params", name);
+		printq("invalid_params", name);
 		return -1;
 	}
 
