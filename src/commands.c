@@ -4174,11 +4174,11 @@ void command_init()
 {
 	command_add
 	( "add", "U??", cmd_add, 0,
-	  " <numer> <alias> [opcje]", "dodaje u¿ytkownika do listy kontaktów",
+	  " [numer] <alias> [opcje]", "dodaje u¿ytkownika do listy kontaktów",
 	  "\n"
-	  "Opcje identyczne jak dla polecenia %Tlist%n (dotycz±ce wpisu). W oknie
-	  rozmowy z kim¶ spoza naszej listy kontaktów jako parametr mo¿na podaæ
-	  sam alias.");
+	  "Opcje identyczne jak dla polecenia %Tlist%n (dotycz±ce wpisu). "
+	  "W oknie rozmowy z kim¶ spoza naszej listy kontaktów jako parametr "
+	  "mo¿na podaæ sam alias.");
 	  
 	command_add
 	( "alias", "??", cmd_alias, 0,
