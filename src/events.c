@@ -1010,7 +1010,7 @@ void handle_success(struct gg_event *e)
 	}
 	
 	if (batch_mode && batch_line) {
- 		command_exec(NULL, batch_line);
+ 		command_exec(NULL, batch_line, 0);
  		xfree(batch_line);
  		batch_line = NULL;
  	}
@@ -1147,7 +1147,7 @@ void handle_pubdir(struct gg_http *h)
 			config_uin = 0;
 			config_password = 0;
 			config_changed = 1;
-			command_exec(NULL, "disconnect");
+			command_exec(NULL, "disconnect", 0);
 			print("no_config");
 		}
 	}

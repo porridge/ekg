@@ -156,7 +156,7 @@ static void ui_automaton_loop()
 			buf_pos = i;
 			       
 			if (buf_pos < buf_len) {
-				command_exec(NULL, line);
+				command_exec(NULL, line, 0);
 				xfree(line);
 				line = NULL;
 				linesz = 0;

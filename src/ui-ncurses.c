@@ -852,7 +852,7 @@ static void window_floating_update(int n)
 		window_clear(w, 1);
 		tmp = window_current;
 		window_current = w;
-		command_exec(w->target, w->target);
+		command_exec(w->target, w->target, 0);
 		window_current = tmp;
 
 		window_redraw(w);
@@ -2787,7 +2787,7 @@ static void binding_toggle_input(const char *arg)
 		input_size = 1;
 		update_input();
 
-		command_exec(window_current->target, tmp);
+		command_exec(window_current->target, tmp, 0);
 		xfree(tmp);
 	}
 }
@@ -2887,7 +2887,7 @@ static void binding_accept_line(const char *arg)
 		return;
 	}
 				
-	command_exec(window_current->target, line);
+	command_exec(window_current->target, line, 0);
 
 	if (strcmp(line, "")) {
 		if (history[0] != line)
@@ -3115,7 +3115,7 @@ static void binding_ignore_query(const char *arg)
 		return;
 	
 	tmp = saprintf("/ignore %s", window_current->target);
-	command_exec(NULL, tmp);
+	command_exec(NULL, tmp, 0);
 	xfree(tmp);
 }
 
@@ -3199,7 +3199,7 @@ static void ui_ncurses_loop()
 				if (b->function)
 					b->function(b->arg);
 				else
-					command_exec(NULL, b->action);
+					command_exec(NULL, b->action, 0);
 			} else {
 				/* obs³uga Ctrl-F1 - Ctrl-F12 na FreeBSD */
 				if (ch == '[') {
@@ -3213,7 +3213,7 @@ static void ui_ncurses_loop()
 				if (b->function)
 					b->function(b->arg);
 				else
-					command_exec(NULL, b->action);
+					command_exec(NULL, b->action, 0);
 			} else if (ch < 255 && strlen(line) < LINE_MAXLEN - 1) {
 					
 				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
@@ -3833,8 +3833,8 @@ static int ui_ncurses_event(const char *event, ...)
 				struct userlist *u = userlist_find(0, window_current->target);
 
 				if (!u) {
-					char *tmp = saprintf("%sadd %s %s", ((quiet) ? "^" : ""), window_current->target, p);
-					command_exec(NULL, tmp);
+					char *tmp = saprintf("add %s %s", window_current->target, p);
+					command_exec(NULL, tmp, quiet);
 					xfree(tmp);
 				} else
 					printq("user_exists", format_user(u->uin));
@@ -3890,7 +3890,7 @@ static int ui_ncurses_event(const char *event, ...)
 			if (!tmp)
 				tmp = saprintf("find %d", config_uin);
 
-			command_exec(NULL, tmp);
+			command_exec(NULL, tmp, 0);
 
 			xfree(tmp);
 

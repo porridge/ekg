@@ -1241,8 +1241,8 @@ int config_read(const char *filename, const char *var)
 					}
 		
 				if (period > 0) {
-					tmp = saprintf("^%s --add %s %s %s", (at) ? "at" : "timer", (name) ? name : "", period_str, p[2]);
-					ret = command_exec(NULL, tmp);
+					tmp = saprintf("%s --add %s %s %s", (at) ? "at" : "timer", (name) ? name : "", period_str, p[2]);
+					ret = command_exec(NULL, tmp, 1);
 					xfree(tmp);
 				}
 
@@ -2391,7 +2391,7 @@ int event_check(int event, uin_t uin, const char *data)
 			gg_debug(GG_DEBUG_MISC, "// event_check();\n");
 
 		gg_debug(GG_DEBUG_MISC, "//    event: %d doing: %s\n", event, tmp);
-		command_exec(NULL, tmp);
+		command_exec(NULL, tmp, 0);
 		xfree(tmp);
 	}
 

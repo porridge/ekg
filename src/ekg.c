@@ -169,7 +169,7 @@ static int get_char_from_pipe(struct gg_common *c)
 	}
 
 	if (ch == '\n' || (strlen(buf) >= sizeof(buf) - 1)) {
-		command_exec(NULL, buf);
+		command_exec(NULL, buf, 0);
 		memset(buf, 0, sizeof(buf));
 	}
 
@@ -236,7 +236,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 						case 1:
 						{
 							char *tmp = saprintf("chat %s %s", c->target, line);
-							command_exec(NULL, tmp);
+							command_exec(NULL, tmp, 0);
 							xfree(tmp);
 							break;
 						}
@@ -270,7 +270,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 						case 1:
 						{
 							char *tmp = saprintf("chat %s %s", c->target, c->buf->str);
-							command_exec(NULL, tmp);
+							command_exec(NULL, tmp, 0);
 							xfree(tmp);
 							break;
 						}
@@ -289,7 +289,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 			char *out = buffer_flush(BUFFER_EXEC, c->target);
 			char *tmp = saprintf("chat %s %s", c->target, out);
 
-			command_exec(NULL, tmp);
+			command_exec(NULL, tmp, 0);
 			
 			xfree(out);
 			xfree(tmp);
@@ -344,7 +344,7 @@ void ekg_wait_for_key()
 						break;
 
 					default:
-						command_exec(NULL, t->command);
+						command_exec(NULL, t->command, 0);
 				}
 
 				if (!t->persistent) {

@@ -44,7 +44,7 @@ int command_add(const char *name, const char *params, command_func_t function, i
 int command_remove(const char *name);
 void command_init();
 void command_free();
-int command_exec(const char *target, const char *line);
+int command_exec(const char *target, const char *line, int quiet);
 
 COMMAND(cmd_alias_exec);
 

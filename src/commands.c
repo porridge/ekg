@@ -624,7 +624,7 @@ COMMAND(cmd_del)
 		}
 
 		printq("user_cleared_list");
-		command_exec(NULL, "^cleartab");
+		command_exec(NULL, "cleartab", 0);
 		config_changed = 1;
 		return 0;
 	}
@@ -811,8 +811,8 @@ COMMAND(cmd_find)
 	}
 
 	if (argv[0] && !argv[1] && argv[0][0] == '#') { /* konferencja */
-		char *tmp = saprintf("%sconference --find %s", ((quiet) ? "^" : ""), argv[0]);
-		int res = command_exec(NULL, tmp);
+		char *tmp = saprintf("conference --find %s", argv[0]);
+		int res = command_exec(NULL, tmp, quiet);
 		xfree(tmp);
 		array_free(argv);
 		return res;
@@ -1322,8 +1322,8 @@ COMMAND(cmd_ignore)
 		if (params[0][0] == '#') {
 			int res;
 			
-			tmp = saprintf("%sconference --ignore %s", ((quiet) ? "^" : ""), params[0]);
-			res = command_exec(NULL, tmp);
+			tmp = saprintf("conference --ignore %s", params[0]);
+			res = command_exec(NULL, tmp, quiet);
 			xfree(tmp);
 			return res;
 		}
@@ -1364,8 +1364,8 @@ COMMAND(cmd_ignore)
 		if (params[0][0] == '#') {
 			int res;
 			
-			tmp = saprintf("%sconference --unignore %s", ((quiet) ? "^" : ""), params[0]);
-			res = command_exec(NULL, tmp);
+			tmp = saprintf("conference --unignore %s", params[0]);
+			res = command_exec(NULL, tmp, quiet);
 			xfree(tmp);
 			return res;
 		}
@@ -3502,18 +3502,17 @@ COMMAND(cmd_test_ctcp)
  *
  *  - target - w którym oknie nast±pi³o (NULL je¶li to nie query)
  *  - xline - linia tekstu.
+ *  - quiet - mamy ukryæ wynik.
  *
  * 0/-1.
  */
-int command_exec(const char *target, const char *xline)
+int command_exec(const char *target, const char *xline, int quiet)
 {
 	char *cmd = NULL, *tmp, *p = NULL, short_cmd[2] = ".", *last_name = NULL, *last_params = NULL, *line_save = NULL, *line = NULL;
 	command_func_t *last_abbr = NULL;
 	int abbrs = 0;
 	int correct_command = 0;
 	list_t l;
-
-	int quiet = 0;	/* XXX póki nie stanie siê argumentem funkcji */
 
 	if (!xline)
 		return 0;
@@ -3721,9 +3720,9 @@ COMMAND(cmd_alias_exec)
 	}
 	
 	for (; m; ) {
-		char *tmp = saprintf("%s%s%s%s%s", ((*((char *) m->data) == '/') ? "" : "/"), ((quiet) ? "^" : ""), (char *) m->data, ((params[0]) ? " " : ""), ((params[0]) ? params[0] : ""));
+		char *tmp = saprintf("%s%s%s%s", ((*((char *) m->data) == '/') ? "" : "/"), (char *) m->data, ((params[0]) ? " " : ""), ((params[0]) ? params[0] : ""));
 		m = m->next;
-		command_exec(target, tmp);
+		command_exec(target, tmp, quiet);
 		xfree(tmp);
 	}
 
@@ -4245,8 +4244,8 @@ COMMAND(cmd_conference)
 
 		if (c) {
 			for (l = c->recipients; l; l = l->next) {
-				tmp = saprintf("%sfind --uin %d", ((quiet) ? "^" : ""), *((uin_t *) (l->data)));
-				command_exec(NULL, tmp);
+				tmp = saprintf("find --uin %d", *((uin_t *) (l->data)));
+				command_exec(NULL, tmp, quiet);
 				xfree(tmp);
 			}
 		} else {

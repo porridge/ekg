@@ -860,7 +860,7 @@ static void ui_readline_loop()
 		
 		pager_lines = 0;
 		
-		command_exec(window_current->query_nick, line);
+		command_exec(window_current->query_nick, line, 0);
 
 		pager_lines = -1;
 
@@ -952,7 +952,7 @@ static int ui_readline_event(const char *event, ...)
 			if (!tmp)
 				tmp = saprintf("find %d", config_uin);
 
-			command_exec(NULL, tmp);
+			command_exec(NULL, tmp, 0);
 
 			xfree(tmp);
 
@@ -1431,7 +1431,7 @@ static int bind_handler_ctrl(int a, int key)
 
 	if (foo < 0)
 		pager_lines = 0;
-	command_exec(NULL, bind_find_command(tmp));
+	command_exec(NULL, bind_find_command(tmp), 0);
 	if (foo < 0)
 		pager_lines = foo;
 	xfree(tmp);
@@ -1451,7 +1451,7 @@ static int bind_handler_alt(int a, int key)
 
 	if (foo < 0)
 		pager_lines = 0;
-	command_exec(NULL, bind_find_command(tmp));
+	command_exec(NULL, bind_find_command(tmp), 0);
 	if (foo < 0)
 		pager_lines = foo;
 	xfree(tmp);

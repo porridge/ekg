@@ -49,7 +49,7 @@ static PyObject* ekg_disconnect(PyObject *self, PyObject *args)
 	if (!PyArg_ParseTuple(args, "|s", &reason))
 		return NULL;
 
-	command_exec("disconnect", reason);
+	command_exec("disconnect", reason, 0);
 
 	return Py_BuildValue("");
 }
@@ -70,20 +70,6 @@ static PyObject* ekg_printf(PyObject *self, PyObject *pyargs)
 	return Py_BuildValue("");
 }
 
-#if 0
-static PyObject* ekg_print(PyObject *self, PyObject *pyargs)
-{
-	char *arg;
-
-	if (!PyArg_ParseTuple(pyargs, "s:print", &arg))
-		return NULL;
-
-	print("generic", arg);
-
-	return Py_BuildValue("");
-}
-#endif
-
 static PyObject* ekg_command(PyObject *self, PyObject *args)
 {
 	char *command = NULL;
@@ -91,7 +77,7 @@ static PyObject* ekg_command(PyObject *self, PyObject *args)
 	if (!PyArg_ParseTuple(args, "s", &command))
 		return NULL;
 
-	command_exec(NULL, command);
+	command_exec(NULL, command, 0);
 
 	return Py_BuildValue("");
 }
