@@ -5462,14 +5462,14 @@ void command_init()
 	  "\n"
 	  "  -a, --add [#nazwa] <numer/alias/@grupa>  tworzy now± konferencjê\n"
 	  "  -d, --del <#nazwa>|*        usuwa konferencjê\n"
-	  "  -i, --ignore <#nazwa>       oznacza konferencjê jako ingorowan±\n"
-	  "  -u, --unignore <#nazwa>     oznacza konferencjê jako nieingorowan±\n"
+	  "  -i, --ignore <#nazwa>       oznacza konferencjê jako ignorowan±\n"
+	  "  -u, --unignore <#nazwa>     oznacza konferencjê jako nieignorowan±\n"
 	  "  -r, --rename <#old> <#new>  zmienia nazwê konferencji\n"
-	  "  -f, --find <#nazwa>         wyszukuje uczestnikow w katalogu\n"
+	  "  -f, --find <#nazwa>         wyszukuje uczestników w katalogu\n"
 	  " [-l, --list] [#nazwa]        wy¶wietla listê konferencji\n"
 	  "\n"
 	  "Dodaje nazwê konferencji i definiuje, kto bierze w niej udzia³. "
-	  "Kolejne numery, pseudonimy lub grupy mog± byc odzielone "
+	  "Kolejne numery, pseudonimy lub grupy mog± byæ oddzielone "
 	  "przecinkiem lub spacj±.");
 
 	command_add
