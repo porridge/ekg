@@ -91,13 +91,6 @@ aspell
 	okre¶la, czy s³ownik ma zostaæ w³±czony. 
 	wiêcej o samym s³owniku w slownik.txt.	
 
-aspell_allowed 
-	typ: tekst
-	domy¶lna warto¶æ: "()[]',.`\"<>!?"
-	
-	pozwala na ustawienie skrajnych znaków, które maj± byæ ignorowane 
-	przez s³ownik (np skrajne nawiasy, cudzys³owia).
-
 aspell_lang
 	typ: tekst
 	domy¶lna warto¶æ: pl

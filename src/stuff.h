@@ -211,7 +211,6 @@ int config_auto_reconnect;
 int config_auto_save;
 #ifdef WITH_ASPELL
 int config_aspell;
-char *config_aspell_allowed;
 char *config_aspell_lang;
 char *config_aspell_encoding;
 #endif
