@@ -40,7 +40,7 @@ list_t mail_folders;
 int mail_count;
 int last_mail_count;
 
-int check_mail();
+void check_mail();
 int check_mail_mbox();
 int check_mail_maildir();
 int check_mail_update(const char *s, int more);

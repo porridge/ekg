@@ -59,24 +59,24 @@ list_t mail_folders = NULL;
  *
  * wywo³uje odpowiednie sprawdzanie poczty.
  */
-int check_mail()
+void check_mail()
 {
 	if (!config_check_mail)
-		return -1;
+		return;
 
 	if (config_check_mail & 1)
 		check_mail_mbox();
 	else
 		if (config_check_mail & 2)
 			check_mail_maildir();
-
-	return 0;
 }
 
 /*
  * check_mail_update()
  *
  * modyfikuje liczbê nowych emaili i daje o tym znaæ.
+ *
+ * 0/-1 
  */
 int check_mail_update(const char *s, int more)
 {
@@ -110,7 +110,7 @@ int check_mail_update(const char *s, int more)
 	}
 
 	if (new_count == mail_count)
-		return -2;
+		return 0;
 
 	last_mail_count = mail_count;
 	mail_count = new_count;
@@ -143,6 +143,8 @@ int check_mail_update(const char *s, int more)
  * mbox i liczy ile jest nowych wiadomo¶ci, potem zwraca
  * wynik rurk±. sprawdza tylko te pliki, które by³y
  * modyfikowane od czasu ostatniego sprawdzania.
+ *
+ * 0/-1
  */
 int check_mail_mbox()
 {
@@ -155,17 +157,14 @@ int check_mail_mbox()
 		struct stat st;
 
 		/* plik móg³ zostaæ usuniêty, uaktualnijmy */
-		if (stat(m->fname, &st) == -1) {
-			if (m->count != 0) {
+		if (stat(m->fname, &st)) {
+			if (m->count) {
 				char *buf = saprintf("%d,%d", m->fhash, 0);
 				check_mail_update(buf, 0);
 				xfree(buf);
 			}	
 
-			m->mtime = 0;
-			m->size = 0;
-			m->check = 0;
-			m->count = 0;
+			memset(m, 0, sizeof(m));
 
 			continue;
 		}
@@ -179,10 +178,7 @@ int check_mail_mbox()
 			m->check = 0;
 	}
 
-	if (!to_check)
-		return -2;
-
-	if (pipe(fd))
+	if (!to_check || pipe(fd))
 		return -1;
 
  	if ((pid = fork()) < 0) {
@@ -207,7 +203,7 @@ int check_mail_mbox()
 
 			i++;
 
-			if ((stat(m->fname, &st) == -1) || !(f = fopen(m->fname, "r")))
+			if (stat(m->fname, &st) || !(f = fopen(m->fname, "r")))
 				continue;
 
 			while ((line = read_file(f))) {
@@ -238,6 +234,7 @@ int check_mail_mbox()
 
 				utimes(m->fname, foo);
 			}
+
 #elif defined (HAVE_UTIME)
 			{
 				struct utimbuf foo;
@@ -302,6 +299,8 @@ int check_mail_mbox()
  * tworzy dzieciaka, który sprawdza wszystkie 
  * katalogi typu Maildir i liczy, ile jest w nich
  * nowych wiadomo¶ci. zwraca wynik rurk±.
+ *
+ * 0/-1
  */
 int check_mail_maildir()
 {
@@ -433,6 +432,7 @@ void changed_check_mail_folders(const char *var)
 	struct mail_folder foo;
 
 	check_mail_free();
+	memset(&foo, 0, sizeof(foo));
 
 	if (config_check_mail_folders) {
 		char **f = NULL;
@@ -443,16 +443,12 @@ void changed_check_mail_folders(const char *var)
 		for (i = 0; f[i]; i++) {
 			if (f[i][0] != '/') {
 				char *buf = saprintf("%s/%s", home_dir, f[i]);
-				
 				xfree(f[i]);
 				f[i] = buf;
 			}
 
 			foo.fhash = ekg_hash(f[i]);
 			foo.fname = f[i];
-			foo.mtime = 0;
-			foo.size = 0;
-			foo.count = 0;
 			foo.check = 1;
 
 			list_add(&mail_folders, &foo, sizeof(foo));
@@ -475,25 +471,20 @@ void changed_check_mail_folders(const char *var)
 
 		foo.fhash = ekg_hash(inbox);
 		foo.fname = inbox;
-		foo.mtime = 0;
-		foo.size = 0;
-		foo.count = 0;
 		foo.check = 1;
 
 		list_add(&mail_folders, &foo, sizeof(foo));
-	} else
+	} else {
 		if (config_check_mail & 2) {
 			char *inbox = saprintf("%s/Maildir", home_dir);
 			
 			foo.fhash = ekg_hash(inbox);
 			foo.fname = inbox;
-			foo.mtime = 0;
-			foo.size = 0;
-			foo.count = 0;
 			foo.check = 1;
 
 			list_add(&mail_folders, &foo, sizeof(foo));
 		}
+	}
 }
 
 /*
@@ -503,16 +494,17 @@ void changed_check_mail_folders(const char *var)
  */
 void check_mail_free()
 {
-	if (mail_folders) {
-		list_t l;
+	list_t l;
 
-		for (l = mail_folders; l; l = l->next) {
-			struct mail_folder *m = l->data;
+	if (!mail_folders)
+		return;
 
-			xfree(m->fname);
-		}
+	for (l = mail_folders; l; l = l->next) {
+		struct mail_folder *m = l->data;
 
-		list_destroy(mail_folders, 1);
-		mail_folders = NULL;
+		xfree(m->fname);
 	}
+
+	list_destroy(mail_folders, 1);
+	mail_folders = NULL;
 }

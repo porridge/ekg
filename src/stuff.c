@@ -79,7 +79,6 @@ list_t transfers = NULL;
 list_t events = NULL;
 list_t emoticons = NULL;
 list_t bindings = NULL;
-list_t sequences = NULL;
 list_t timers = NULL;
 list_t lasts = NULL;
 list_t conferences = NULL;
@@ -203,9 +202,9 @@ static struct {
 /*
  * emoticon_expand()
  *
- * rozwija definicje makr (najczê¶ciej to bêd± emoticony)
+ * rozwija definicje makr (najczê¶ciej bêd± to emoticony)
  *
- * - s - string z makrami
+ *  - s - string z makrami.
  *
  * zwraca zaalokowany, rozwiniêty string.
  */
@@ -310,7 +309,7 @@ const char *prepare_path(const char *filename, int do_mkdir)
  *  - t - czas, który mamy zamieniæ.
  *
  * zwraca na przemian jeden z dwóch statycznych buforów, wiêc w obrêbie
- * jednego wyra¿enia mo¿na wywo³aæ t± funkcjê dwukrotnie.
+ * jednego wyra¿enia mo¿na wywo³aæ tê funkcjê dwukrotnie.
  */
 const char *log_timestamp(time_t t)
 {
@@ -469,6 +468,8 @@ cleanup:
  *
  *  - filename,
  *  - var - zmienna lub NULL, je¶li wszystkie.
+ *
+ * 0/-1
  */
 int config_read(const char *filename, const char *var)
 {
@@ -576,6 +577,8 @@ int config_read(const char *filename, const char *var)
  * sysmsg_read()
  *
  *  - filename.
+ *
+ * 0/-1
  */
 int sysmsg_read()
 {
@@ -685,7 +688,7 @@ void config_write_main(FILE *f, int base64)
 
 	for (l = timers; l; l = l->next) {
 		struct timer *t = l->data;
-		char *name = NULL;
+		const char *name = NULL;
 
 		if (t->type != TIMER_COMMAND)
 			continue;
@@ -745,6 +748,8 @@ void config_write_crash()
  *
  * zapisuje aktualn± konfiguracjê -- zmienne i listê ignorowanych do pliku
  * ~/.gg/config lub podanego.
+ *
+ * 0/-1
  */
 int config_write()
 {
@@ -880,6 +885,8 @@ pass:
  * sysmsg_write()
  *
  *  - filename.
+ *
+ * 0/-1
  */
 int sysmsg_write()
 {
@@ -957,7 +964,7 @@ void iso_to_cp(unsigned char *buf)
  *
  * maskuje polsk± literkê w iso.
  *
- * - c.
+ *  - c.
  */
 unsigned char hide_pl(const unsigned char *c)
 {
@@ -1155,18 +1162,18 @@ int valid_nick(const char *nick)
  *
  * - what - 0 wy³±cza, 1 w³±cza, 2 zwraca aktualne ustawienie.
  * 
- * -2 je¶li b³ad, -1 jesli wszystko w porzadku, lub aktualny stan (0/1)
+ * -1 je¶li b³ad, lub aktualny stan (0/1)
 */
 int mesg_set(int what)
 {
 	const char *tty;
 	struct stat s;
 
-	if ((tty = ttyname(1)) == NULL)
-		return -2;
+	if (!(tty = ttyname(1)))
+		return -1;
 
-	if (stat(tty, &s) < 0)
-		return -2;
+	if (!stat(tty, &s))
+		return -1;
 
 	switch (what) {
 		case 0:
@@ -1179,7 +1186,7 @@ int mesg_set(int what)
 			return ((s.st_mode & S_IWGRP) ? 1 : 0);
 	}
 
-	return -1;
+	return 0;
 }
 
 /*
@@ -1232,7 +1239,7 @@ void sms_away_add(uin_t uin)
  * na sms podczas naszej nieobecno¶ci, czy te¿ mo¿e przekroczono
  * ju¿ limit.
  *
- * - uin
+ *  - uin
  *
  * 1 je¶li tak, 0 je¶li nie.
  */
@@ -1291,6 +1298,8 @@ void sms_away_free()
  * send_sms()
  *
  * wysy³a sms o podanej tre¶ci do podanej osoby.
+ *
+ * 0/-1
  */
 int send_sms(const char *recipient, const char *message, int show_result)
 {
@@ -1354,6 +1363,8 @@ int send_sms(const char *recipient, const char *message, int show_result)
  * play_sound()
  *
  * odtwarza dzwiêk o podanej nazwie.
+ *
+ * 0/-1
  */
 int play_sound(const char *sound_path)
 {
@@ -1385,8 +1396,8 @@ int play_sound(const char *sound_path)
 /*
  * read_file()
  *
- * czyta linijkê tekstu z pliku alokuj±c przy tym odpowiedni buforek. usuwa
- * znaki koñca linii.
+ * czyta i zwraca linijkê tekstu z pliku alokuj±c przy tym odpowiedni buforek.
+ * usuwa znaki koñca linii.
  */
 char *read_file(FILE *f)
 {
@@ -1420,6 +1431,8 @@ char *read_file(FILE *f)
  *
  *  - pid.
  *  - name.
+ *
+ * 0/-1
  */
 int process_add(int pid, const char *name)
 {
@@ -1437,6 +1450,8 @@ int process_add(int pid, const char *name)
  * usuwa proces z listy dzieciaków.
  *
  *  - pid.
+ * 
+ * 0/-1
  */
 int process_remove(int pid)
 {
@@ -1478,10 +1493,12 @@ int on_off(const char *value)
 /*
  * conference_set_ignore()
  *
- * Ustawia stan konferencji na ignorowany lub nie.
+ * ustawia stan konferencji na ignorowany lub nie.
  *
  * - name - nazwa konferencji,
  * - flag - 1 ignorowaæ, 0 nie ignorowaæ.
+ *
+ * 0/-1
  */
 int conference_set_ignore(const char *name, int flag)
 {
@@ -1512,6 +1529,8 @@ int conference_set_ignore(const char *name, int flag)
  * 
  *  - oldname - stara nazwa,
  *  - newname - nowa nazwa.
+ *
+ * 0/-1
  */
 int conference_rename(const char *oldname, const char *newname)
 {
@@ -1712,6 +1731,8 @@ void conference_free()
  * usuwa konferencje z listy konferencji.
  *
  * - name - konferencja lub NULL dla wszystkich.
+ *
+ * 0/-1
  */
 int conference_remove(const char *name)
 {
@@ -1798,9 +1819,9 @@ struct conference *conference_find(const char *name)
  * znajduje konferencjê, do której nale¿± podane uiny. je¿eli nie znaleziono,
  * zwracany jest NULL.
  * 
- * - from - kto jest nadawc± wiadomo¶ci,
- * - recipients - tablica numerów nale¿±cych do konferencji,
- * - count - ilo¶æ numerów.
+ *  - from - kto jest nadawc± wiadomo¶ci,
+ *  - recipients - tablica numerów nale¿±cych do konferencji,
+ *  - count - ilo¶æ numerów.
  */
 struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int count) 
 {
@@ -1834,9 +1855,11 @@ struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int co
  *
  * dopisuje alias do listy aliasów.
  *
- * - string - linia w formacie 'alias cmd',
- * - quiet - czy wypluwaæ mesgi na stdout.
- * - append - czy dodajemy kolejn± komendê?
+ *  - string - linia w formacie 'alias cmd',
+ *  - quiet - czy wypluwaæ mesgi na stdout.
+ *  - append - czy dodajemy kolejn± komendê?
+ *
+ * 0/-1
  */
 int alias_add(const char *string, int quiet, int append)
 {
@@ -1916,7 +1939,9 @@ int alias_add(const char *string, int quiet, int append)
  *
  * usuwa alias z listy aliasów.
  *
- * - name - alias lub NULL.
+ *  - name - alias lub NULL.
+ *
+ * 0/-1
  */
 int alias_remove(const char *name)
 {
@@ -2065,7 +2090,7 @@ int ioctld_parse_seq(const char *seq, struct action_data *data)
  *
  * inicjuje gniazdo dla ioctld.
  *
- * - path - ¶cie¿ka do gniazda.
+ *  - path - ¶cie¿ka do gniazda.
  *
  * 0/-1.
  */
@@ -2097,8 +2122,8 @@ int ioctld_socket(char *path)
  *
  * wysy³a do ioctld polecenie uruchomienia danej akcji.
  *
- * - seq - sekwencja danych,
- * - act - rodzaj akcji.
+ *  - seq - sekwencja danych,
+ *  - act - rodzaj akcji.
  *
  * 0/-1.
  */
@@ -2161,7 +2186,7 @@ const char *event_format(int flags)
  *
  * zwraca flagi na podstawie ³añcucha.
  *
- * - events.
+ *  - events.
  */
 int event_flags(const char *events)
 {
@@ -2189,12 +2214,14 @@ int event_flags(const char *events)
 /*
  * event_add()
  *
- * Dodaje zdarzenie do listy zdarzeñ.
+ * dodaje zdarzenie do listy zdarzeñ.
  *
- * - flags,
- * - uin,
- * - action,
- * - quiet.
+ *  - flags,
+ *  - uin,
+ *  - action,
+ *  - quiet.
+ *
+ * 0/-1
  */
 int event_add(int flags, uin_t uin, const char *action, int quiet)
 {
@@ -2229,8 +2256,10 @@ int event_add(int flags, uin_t uin, const char *action, int quiet)
  *
  * usuwa zdarzenie z listy zdarzeñ.
  *
- * - flags,
- * - uin.
+ *  - flags,
+ *  - uin.
+ *
+ * 0/-1
  */
 int event_remove(int flags, uin_t uin)
 {
@@ -2271,7 +2300,9 @@ int event_remove(int flags, uin_t uin)
  *
  * wykonuje dan± akcjê.
  *
- * - act - tre¶æ akcji.
+ *  - act - tre¶æ akcji.
+ *
+ * 0/-1
  */
 static int event_run(const char *act)
 {
@@ -2362,7 +2393,7 @@ cleanup:
 fail:
 	xfree(action);
 	array_free(acts);
-        return 1;
+        return -1;
 }
 
 /*
@@ -2370,9 +2401,11 @@ fail:
  *
  * sprawdza i ewentualnie uruchamia akcjê na podane zdarzenie.
  *
- * - event,
- * - uin,
- * - data.
+ *  - event,
+ *  - uin,
+ *  - data.
+ *
+ * 0/-1
  */
 int event_check(int event, uin_t uin, const char *data)
 {
@@ -2401,7 +2434,7 @@ int event_check(int event, uin_t uin, const char *data)
         }
 
         if (!action)
-                return 1;
+                return -1;
 
 	if (data) {
 		int size = 1;
@@ -2456,8 +2489,10 @@ int event_check(int event, uin_t uin, const char *data)
  *
  * sprawdza czy akcja na zdarzenie jest poprawna.
  *
- * - action,
- * - quiet.
+ *  - action,
+ *  - quiet.
+ *
+ * 0/-1
  */
 int event_correct(const char *action, int quiet)
 {
@@ -2465,7 +2500,7 @@ int event_correct(const char *action, int quiet)
 	int i = 0;
 
         if (!strncasecmp(action, "clear", 5))
-                return 1;
+                return -1;
 	
 	events = array_make(action, ";", 0, 0, 0);
 
@@ -2552,7 +2587,7 @@ check:
 fail:
 	array_free(events);
 	array_free(acts);
-        return 1;
+        return -1;
 }
 
 /*
@@ -2579,9 +2614,9 @@ void event_free()
  *
  * inicjuje potok nazwany do zewnêtrznej kontroli ekg.
  *
- * - pipe_file.
+ *  - pipe_file.
  *
- * zwraca deskryptor otwartego potoku lub warto¶æ b³êdu.
+ * zwraca deskryptor otwartego potoku lub -1.
  */
 int init_control_pipe(const char *pipe_file)
 {
@@ -2911,8 +2946,6 @@ int transfer_id()
  *
  *  - sess - opis sesji,
  *  - reason - powód, mo¿e byæ NULL.
- *
- * niczego nie zwraca.
  */
 void ekg_logoff(struct gg_session *sess, const char *reason)
 {
@@ -2978,8 +3011,10 @@ char *random_line(const char *path)
  *
  *  - name - nazwa,
  *  - value - warto¶æ,
+ *
+ * 0/-1
  */
-int emoticon_add(char *name, char *value)
+int emoticon_add(const char *name, const char *value)
 {
 	struct emoticon e;
 	list_t l;
@@ -3006,8 +3041,10 @@ int emoticon_add(char *name, char *value)
  * usuwa emoticon o danej nazwie.
  *
  *  - name.
+ *
+ * 0/-1
  */
-int emoticon_remove(char *name)
+int emoticon_remove(const char *name)
 {
 	list_t l;
 
@@ -3030,6 +3067,8 @@ int emoticon_remove(char *name)
  *
  * ³aduje do listy wszystkie makra z pliku ~/.gg/emoticons
  * format tego pliku w dokumentacji.
+ *
+ * 0/-1
  */
 int emoticon_read()
 {
@@ -3123,7 +3162,7 @@ int ekg_hash(const char *name)
  *           zostanie przyznany pierwszy numerek z brzegu.
  *  - command - komenda wywo³ywana po up³yniêciu czasu.
  *
- * zwraca zaalokowan± struct timer.
+ * zwraca zaalokowan± struct timer lub NULL.
  */
 struct timer *timer_add(time_t period, int persistent, int type, int at, const char *name, const char *command)
 {
@@ -3352,7 +3391,7 @@ void last_add(int type, uin_t uin, time_t t, time_t st, const char *msg)
  *
  * usuwa wiadomo¶ci skojarzone z dan± osob±.
  *
- * - uin - numerek osoby.
+ *  - uin - numerek osoby.
  */
 void last_del(uin_t uin)
 {
@@ -3375,7 +3414,7 @@ void last_del(uin_t uin)
  *
  * zwraca ilo¶æ wiadomo¶ci w last dla danej osoby.
  *
- * - uin.
+ *  - uin.
  */
 int last_count(uin_t uin)
 {
@@ -3736,7 +3775,7 @@ void binding_free()
 const char *ekg_status_label(int status, const char *prefix)
 {
 	static char buf[100];
-	char *label = "unknown";
+	const char *label = "unknown";
 	
 	switch (GG_S(status)) {
 		case GG_STATUS_AVAIL:
@@ -3772,4 +3811,3 @@ const char *ekg_status_label(int status, const char *prefix)
 
 	return buf;
 }
-
