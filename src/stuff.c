@@ -2068,7 +2068,7 @@ int ioctld_socket(char *path)
 
 	for (i = 0; i <= retry; i++) {
 		if (connect(ioctld_sock, (struct sockaddr*) &sockun, sizeof(sockun)) != -1)
-		return 0;
+			return 0;
 		usleep(usecs);
 	}
 
@@ -2224,7 +2224,7 @@ int event_remove(int flags, uin_t uin)
                 struct event *e = l->data;
 		int event_flags;
 
-		event_flags =  e->flags & ~INACTIVE_EVENT;
+		event_flags = e->flags & ~INACTIVE_EVENT;
 
                 if (e && e->uin == uin && e->flags & flags) {
                         if ((event_flags &= ~flags) == 0) {
@@ -2880,7 +2880,7 @@ void ekg_logoff(struct gg_session *sess, const char *reason)
 	if (!sess)
 		return;
 
-	if (sess->state != GG_STATE_CONNECTED || sess->status == GG_STATUS_NOT_AVAIL || sess->status == GG_STATUS_NOT_AVAIL_DESCR)
+	if (sess->state != GG_STATE_CONNECTED || GG_S_NA(sess->status))
 		return;
 
 	if (reason) {
