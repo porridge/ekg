@@ -791,6 +791,21 @@ static int ui_readline_event(const char *event, ...)
 
 	va_start(ap, event);
 	
+        if (!strcmp(event, "variable_changed")) {
+		char *name = va_arg(ap, char*);
+
+		if (!strcasecmp(name, "sort_windows") && config_sort_windows) {
+			list_t l;
+			int id = 1;
+
+			for (l = windows; l; l = l->next) {
+				struct window *w = l->data;
+
+				w->id = id++;
+			}
+		}
+	}
+
 	if (!strcasecmp(event, "command")) {
 		char *command = va_arg(ap, char*);
 
@@ -961,6 +976,19 @@ static int window_remove(int id)
 	if (!(w = window_find(id))) {
         	print("window_noexist");
 		return -1;
+	}
+
+	/* i sortujemy okienka, w razie potrzeby... */
+        if (config_sort_windows) {
+		list_t l;
+		int wid = w->id;
+
+		for (l = windows; l; l = l->next) {
+			struct window *w = l->data;
+			
+			if (w->id > wid)
+				w->id--;
+		}
 	}
 
 	/* je¶li usuwano aktualne okienko, nie kombinuj tylko ustaw 1-sze. */
