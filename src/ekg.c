@@ -176,16 +176,15 @@ static int get_char_from_pipe(struct gg_common *c)
 		return -1;
 	
 	if (ch != '\n' && ch != '\r') {
-		if (strlen(buf) < sizeof(buf) - 1)
+		if (strlen(buf) < sizeof(buf) - 2)
 			buf[strlen(buf)] = ch;
 	}
 
 	if (ch == '\n' && escaped) {	/* zamazuje \\ */
-		buf[strlen(buf) - 1] = '\r';
-		buf[strlen(buf) - 1] = '\n';
+		strcpy(buf + strlen(buf) - 1, "\r\n");
 	}
 
-	if ((ch == '\n' && !escaped) || (strlen(buf) >= sizeof(buf) - 1)) {
+	if ((ch == '\n' && !escaped) || (strlen(buf) >= sizeof(buf) - 2)) {
 		command_exec(NULL, buf, 0);
 		memset(buf, 0, sizeof(buf));
 	}
