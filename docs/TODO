@@ -20,6 +20,7 @@ klient:
   nie tylko komend,
 - taby w stderr,
 - auto_back wracaj±ce z away tylko, je¶li by³ z auto_awaya (Tohver)
+- mo¿liwo¶æ podania portu forwardingu (fidor)
 
 klient (ncurses):
 - reakcja na zmianê rozmiaru terminala,
