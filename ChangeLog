@@ -8,6 +8,10 @@ d - drg, sz - szalik, del - deletek).
 
 - dodanie zmiennej local_ip, pozwalajaj±cej na ustawienie adresu lokalnego (del)
 - dodanie dokumentacji s³ownika aspell (del)
+- poprawka teoretycznej mo¿liwo¶ci segfaulta w module aspell'a (del)
+- poprawka w module aspell'a dotycz±ca sprawdzania pisowni przy zawijanych wierszach (del)
+- dodanie zmiennej aspell_allowed okre¶laj±cej jakie znaki maj± byæ ignorowane 
+  (np. nawiasy czy cudzys³owia) (del)
 
 // 2004-02-25
 
