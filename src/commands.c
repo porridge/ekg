@@ -181,19 +181,9 @@ COMMAND(cmd_add)
 		return;
 	}
 
-	/* kto¶ istnieje, bo jest np. ignorowany, ale nie ma nazwy */
+	/* kto¶ by³ tylko ignorowany/blokowany, nadajmy mu nazwê */
 	if (u) {
-		char *foo = saprintf("-d %s", params[1]);
-		char **p = xcalloc(sizeof(char *), 2);
-
-		p[0] = (char *) itoa(u->uin);
-		p[1] = foo;
-
-		cmd_modify("add", (const char **) p, NULL);
-
-		xfree(foo);
-		xfree(p);
-
+		u->display = xstrdup(params[1]);	
 		fallthrough = 1;
 	}
 
