@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2004 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Adam Wysocki <gophi@ekg.apcoh.org>
  *
@@ -197,7 +197,7 @@ void variable_init()
 	variable_add("local_ip", "ld", VAR_STR, 1, &config_local_ip, changed_local_ip, NULL, NULL);
 	variable_add("log", "lo", VAR_MAP, 1, &config_log, NULL, variable_map(4, 0, 0, "none", 1, 2, "file", 2, 1, "dir", 4, 0, "gzip"), NULL);
 	variable_add("log_ignored", "li", VAR_INT, 1, &config_log_ignored, NULL, NULL, dd_log);
-	variable_add("log_status", "lS", VAR_BOOL, 1, &config_log_status, NULL, NULL, dd_log);
+	variable_add("log_status", "lS", VAR_INT, 1, &config_log_status, NULL, variable_map(3, 0, 0, "no", 1, 2, "yes", 2, 1, "descr"), dd_log);
 	variable_add("log_path", "lp", VAR_STR, 1, &config_log_path, NULL, NULL, dd_log);
 	variable_add("log_timestamp", "lt", VAR_STR, 1, &config_log_timestamp, NULL, NULL, dd_log);
 	variable_add("make_window", "mw", VAR_INT, 1, &config_make_window, NULL, variable_map(3, 0, 0, "none", 1, 2, "usefree", 2, 1, "always"), NULL);
