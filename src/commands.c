@@ -211,7 +211,7 @@ char *variable_generator(char *text, int state)
 		
 		l = l->next;
 		
-		if (!strncasecmp(text, v->name, len))
+		if (v->type != VAR_FOREIGN && !strncasecmp(text, v->name, len))
 			return strdup(v->name);
 	}
 
