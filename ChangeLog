@@ -17,6 +17,9 @@ zg³osi³ b³±d.
 - konwersja has³a na CP1250 podczas ³±czenia (Mati/w)
 - dodanie zmiennej ,,password_cp1250'', któr± nale¿y w³±czyæ, je¶li serwer
   odrzuca has³o z polskimi literami (w)
+- plik /etc/ekg.conf jest ³adowany _przed_ konfiguracj± u¿ytkownika, plik
+  /etc/ekg-override.conf _po_ konfiguracji u¿ytkownika (porridge/w)
+- dodanie do dokumentacji informacji o kolejno¶ci ³adowania konfiguracji (w)
 
 // 2002-01-31
 

@@ -2213,7 +2213,8 @@ static void complete(int *line_start, int *line_index)
 		command_generator(line, strlen(line));
 	else {
 		char *params = NULL;
-		int abbrs = 0, word = 0;
+		char **words;
+		int abbrs = 0, word = 0, i;
 		list_t l;
 
 		start = line + strlen(line);
@@ -2221,10 +2222,18 @@ static void complete(int *line_start, int *line_index)
 		while (start > line && *(start - 1) != ' ')
 			start--;
 
-		for (p = line + 1; *p; p++)
-			if (isspace(*p) && !isspace(*(p - 1)))
-				word++;
-		word--;
+		fprintf(stderr, "line \"%s\"\n", line);
+		words = array_make(line, " \t", 0, 1, 1);
+		word = array_count(words) - 2;
+		if (word < 0)
+			word = 0;
+		if (strlen(line) > 1 && line[strlen(line) - 1] == ' ')
+			word++;
+		for (i = 0; i < array_count(words); i++)
+			fprintf(stderr, "word %d \"%s\"\n", i - 1, words[i]);
+		array_free(words);
+
+		fprintf(stderr, "word = %d\n", word);
 
 		for (l = commands; l; l = l->next) {
 			struct command *c = l->data;

@@ -1058,10 +1058,13 @@ int main(int argc, char **argv)
 	config_timestamp = xstrdup("%H:%M ");
 	config_display_color_map = xstrdup("nTgGbBrR");
 
+	if (!no_global_config)
+		config_read(SYSCONFDIR "/ekg.conf", NULL);
+
 	config_read(NULL, NULL);
 
 	if (!no_global_config)
-		config_read(SYSCONFDIR "/ekg.conf", NULL);
+		config_read(SYSCONFDIR "/ekg-override.conf", NULL);
 	
         userlist_read();
 	update_status();

@@ -161,6 +161,19 @@ KLAWIATURA
     [3] W miejscu wci¶niêcia klawisza pojawi siê znak oznaczaj±cy kod
         klawisza w negatywie.
 
+PLIK KONFIGURACYJNY
+
+    Kolejno¶æ ³adowania plików konfiguracyjnych jest nastêpuj±ca:
+    1) /etc/ekg.conf (lub z innego katalogu wskazanego przez opcjê
+       --sysconfdir przekazan± skryptowi ./configure),
+    2) ~/.gg/config lub ~/.gg/<profil>/config,
+    3) /etc/ekg-override.conf
+
+    Dziêki temu administrator mo¿e wymusiæ pewne opcje na klientach
+    u¿ytkowników, jak na przyk³ad ,,server'' czy ,,proxy''. Globalne
+    pliki konfiguracyjne mo¿na ignorowaæ przez uruchomienie klienta
+    z opcja ,,-N''.
+
 GDZIE SZUKAÆ POMOCY
 
     Dobra rada numer jeden: zanim zaczniesz narzekaæ, ¿e czego¶ nie ma,
