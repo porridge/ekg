@@ -6,6 +6,13 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-02-21
+
+- szyfrowanie dzia³a tak¿e wtedy, gdy wysy³amy do wielu osób za pomoc± 
+  /msg (sz)
+- /msg oraz /chat z adresatem wiadomo¶ci w postaci ,,*'' roze¶le do
+  wszystkich aktualnych rozmówców (rmrmg/sz)
+
 // 2003-02-20
 
 - poprawka segfault'a przy braku niektórych zmiennych w pliku

@@ -66,6 +66,7 @@
 #  include "../compat/strlcat.h"
 #endif
 
+COMMAND(cmd_msg);
 COMMAND(cmd_modify);
 
 char *send_nicks[SEND_NICKS_MAX] = { NULL };
@@ -1889,6 +1890,30 @@ COMMAND(cmd_list)
 	return 0;
 }
 
+/*
+ * msg_all_wrapper()
+ *
+ * rozsy³a wiadomo¶æ do wszystkich rozmówców w oknach.
+ */
+static void msg_all_wrapper(int chat, const char *msg, int quiet)
+{
+	char **nicks = NULL;
+	int i;
+
+	ui_event("command", 0, "query-nicks", &nicks, NULL);
+	
+	if (!nicks)
+		return;
+
+	for (i = 0; nicks[i]; i++) {
+		const char *params[] = { nicks[i], msg, NULL };
+
+		cmd_msg(((chat) ? "chat" : "msg"), params, NULL, quiet);
+	}
+
+	array_free(nicks);
+}
+
 COMMAND(cmd_msg)
 {
 	struct userlist *u;
@@ -1897,10 +1922,14 @@ COMMAND(cmd_msg)
 	uin_t uin;
 	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0, msg_seq, formatlen = 0;
 
-
 	if (!params[0] || !params[1]) {
 		printq("not_enough_params", name);
 		return -1;
+	}
+
+	if (!strcmp(params[0], "*")) {
+		msg_all_wrapper(chat, params[1], quiet);
+		return 0;
 	}
 
 	if (config_auto_back == 1 && GG_S_B(config_status) && in_auto_away)
@@ -1976,6 +2005,7 @@ COMMAND(cmd_msg)
 		return 0;
 	}
 
+	/* XXX dla szyfrowanych */
 	if (strlen(params[1]) > 1989) {
 		printq("message_too_long");
 	}
@@ -2075,11 +2105,6 @@ COMMAND(cmd_msg)
 
 	count = array_count(nicks);
 
-#ifdef HAVE_OPENSSL
-	if (config_encryption && array_count(nicks) == 1 && (uin = get_uin(nicks[0])) && (msg_encrypt(uin, &msg) > 0))
-		secure = 1;
-#endif
-
 	for (p = nicks; *p; p++) {
 		if (!strcmp(*p, ""))
 			continue;
@@ -2097,13 +2122,20 @@ COMMAND(cmd_msg)
 			last_add(1, uin, time(NULL), 0, raw_msg);
 
 		if (!chat || count == 1) {
+			unsigned char *__msg = xstrdup(msg);
+			secure = 0;
+#ifdef HAVE_OPENSSL
+			if (config_encryption && msg_encrypt(uin, &__msg) > 0)
+				secure = 1;
+#endif
 			if (sess)
-				msg_seq = gg_send_message_richtext(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg, format, formatlen);
+				msg_seq = gg_send_message_richtext(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, __msg, format, formatlen);
 			else
 				msg_seq = -1;
 
 			msg_queue_add((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, msg_seq, 1, &uin, raw_msg, secure, format, formatlen);
 			valid++;
+			xfree(__msg);
 		}
 	}
 
@@ -4958,7 +4990,9 @@ void command_init()
 	  "\n"
 	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub "
 	  "pseudonimy przecinkiem (ale bez odstêpów). W takim wypadku "
-	  "zostanie rozpoczêta rozmowa grupowa.");
+	  "zostanie rozpoczêta rozmowa grupowa. Je¶li zamiast odbiorcy "
+	  "podany zostanie znak ,,%T*%n'', to wiadomo¶æ bêdzie wys³ana do "
+	  "wszystkich aktualnych rozmówców.");
 	  
 	command_add
 	( "cleartab", "?", cmd_cleartab, 0,
@@ -5146,7 +5180,9 @@ void command_init()
 	  " <numer/alias/@grupa> <wiadomo¶æ>", "wysy³a wiadomo¶æ",
 	  "\n"
 	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub "
-	  "pseudonimy przecinkiem (ale bez odstêpów).");
+	  "pseudonimy przecinkiem (ale bez odstêpów). Je¶li zamiast odbiorcy "
+	  "podany zostanie znak ,,%T*%n'', to wiadomo¶æ bêdzie wys³ana do "
+	  "wszystkich aktualnych rozmówców.");
 
 	command_add
         ( "on", "?euc", cmd_on, 0,

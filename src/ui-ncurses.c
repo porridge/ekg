@@ -3946,6 +3946,22 @@ static int ui_ncurses_event(const char *event, ...)
 			goto cleanup;
 		}
 
+		if (!strcasecmp(command, "query-nicks")) {
+			char ***param = va_arg(ap, char***);
+			list_t l;
+
+			for (l = windows; l; l = l->next) {
+				struct window *w = l->data;
+
+				if (w->floating || !w->target)
+					continue;
+
+				array_add(param, xstrdup(w->target));
+			}
+
+			goto cleanup;
+		}
+
 		if (!strcasecmp(command, "query")) {
 			char *param = va_arg(ap, char*);
 
