@@ -1423,6 +1423,10 @@ void handle_dcc(struct gg_dcc *d)
 			break;
 			
 		case GG_EVENT_DCC_NEED_FILE_ACK:
+		{
+			char *path;
+			struct stat st;
+
 			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_NEED_FILE_ACK\n");
 			/* ¿eby nie sprawdza³o, póki luser nie odpowie */
 			list_remove(&watches, d, 0);
@@ -1448,10 +1452,21 @@ void handle_dcc(struct gg_dcc *d)
 
 			print("dcc_get_offer", format_user(t->uin), t->filename, itoa(d->file_info.size), itoa(t->id));
 
+			if (config_dcc_dir)
+				path = saprintf("%s/%s", config_dcc_dir, t->filename);
+			else
+				path = xstrdup(t->filename);
+
+			if (!stat(path, &st) && st.st_size < d->file_info.size)
+				print("dcc_get_offer_resume", format_user(t->uin), t->filename, itoa(d->file_info.size), itoa(t->id));
+			
+			xfree(path);
+
 			if (!(ignored_check(t->uin) & IGNORE_EVENTS))
 				event_check(EVENT_DCC, t->uin, t->filename);
 
 			break;
+		}
 			
 		case GG_EVENT_DCC_NEED_VOICE_ACK:
 			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_NEED_VOICE_ACK\n");

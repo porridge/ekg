@@ -2739,7 +2739,7 @@ COMMAND(cmd_dcc)
 		return -1;
 	}
 
-	if (!strncasecmp(params[0], "g", 1)) {		/* get */
+	if (!strncasecmp(params[0], "g", 1) || !strncasecmp(params[0], "re", 2)) {		/* get */
 		struct transfer *t = NULL;
 		char *path;
 		
@@ -2791,7 +2791,13 @@ COMMAND(cmd_dcc)
 		else
 		    	path = xstrdup(t->filename);
 		
-		if ((t->dcc->file_fd = open(path, O_WRONLY | O_CREAT, 0600)) == -1) {
+		if (params[0][0] == 'r') {
+			t->dcc->file_fd = open(path, O_WRONLY);
+			t->dcc->offset = lseek(t->dcc->file_fd, 0, SEEK_END);
+		} else
+			t->dcc->file_fd = open(path, O_WRONLY | O_CREAT, 0600);
+
+		if (t->dcc->file_fd == -1) {
 			printq("dcc_get_cant_create", path);
 			gg_free_dcc(t->dcc);
 			list_remove(&transfers, t, 1);

@@ -372,7 +372,7 @@ static char *blocked_uin_generator(char *text, int state)
 
 static char *dcc_generator(char *text, int state)
 {
-	char *commands[] = { "close", "get", "send", "list", "rsend", "rvoice", "voice", NULL };
+	char *commands[] = { "close", "get", "send", "list", "resume", "rsend", "rvoice", "voice", NULL };
 	static int len, i;
 
 	if (!state) {

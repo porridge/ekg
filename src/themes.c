@@ -1274,6 +1274,7 @@ void theme_init()
 	format_add("dcc_voice_running", "%! Mo¿na prowadziæ tylko jedn± rozmowê g³osow± na raz\n", 1);
 	format_add("dcc_voice_unsupported", "%! Nie wkompilowano obs³ugi rozmów g³osowych. Przeczytaj %Tdocs/voip.txt%n\n", 1);
 	format_add("dcc_get_offer", "%) %1 przesy³a plik %T%2%n o rozmiarze %T%3b%n\n%) Wpisz %Tdcc get #%4%n, by go odebraæ, lub %Tdcc close #%4%n, by anulowaæ\n", 1);
+	format_add("dcc_get_offer_resume", "%) Plik istnieje ju¿ na dysku, wiêc mo¿na wznowiæ pobieranie poleceniem %Tdcc resume #%4%n\n", 1);
 	format_add("dcc_get_getting", "%) Rozpoczêto pobieranie pliku %T%2%n od %1\n", 1);
 	format_add("dcc_get_cant_create", "%! Nie mo¿na utworzyæ pliku %T%1%n\n", 1);
 	format_add("dcc_not_found", "%! Nie znaleziono po³±czenia %T%1%n\n", 1);
