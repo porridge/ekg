@@ -22,7 +22,7 @@ zg³osi³ b³±d.
   szczegó³y w ,,/bind -L'' (w)
 - libgadu: dodanie funkcji gg_pubdir50_seq_set() (mmazur/w)
 - libgadu: podbicie wersji API (w)
-- reakcja na zmianê rozmiaru terminala (sz)
+- reakcja na zmianê rozmiaru terminala (w)
 - poprawka Alt-G i zapisywania bindów (sz/w)
 
 // 2003-01-28
