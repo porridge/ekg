@@ -509,6 +509,10 @@ int main(int argc, char **argv)
 	ui_init = ui_readline_init;
 #endif
 
+#ifdef WITH_FORCE_READLINE
+	ui_init = ui_readline_init;
+#endif 
+
 	srand(time(NULL));
 
 	strncpy(argv0, argv[0], sizeof(argv0) - 1);

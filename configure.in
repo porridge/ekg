@@ -119,6 +119,9 @@ if test -d src; then
   AC_ARG_ENABLE(ui-readline,
     [  --disable-ui-readline   Disable readline UI])
 
+  AC_ARG_ENABLE(fui-readline,
+    [  --enable-force-readline Force use of readline])
+
   AC_ARG_ENABLE(ui-ncurses,
     [  --enable-ui-ncurses     Enable ncurses UI])
 
@@ -131,7 +134,13 @@ if test -d src; then
     AC_DEFINE(WITH_UI_NCURSES)
     ui_ncurses_o="ui-ncurses.o"
   fi
-    
+  
+  if test "x$enable_ui_ncurses" = "xyes"; then 
+    if test "x$enable_fui_readline_default"; then 
+      AC_DEFINE(WITH_FORCE_READLINE)
+    fi
+  fi
+  
   if test "x$enable_ui_ncurses" = "xyes"; then 
     AC_CHECK_NCURSES
 
