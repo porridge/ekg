@@ -96,7 +96,7 @@ struct command commands[] = {
 	{ "chat", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ w ramach rozmowy", "" },
 	{ "cleartab", "", command_cleartab, "", "Czy¶ci listê nicków do dope³nienia", "" },
 	{ "connect", "", command_connect, "", "£±czy siê z serwerem", "" },
-	{ "dcc", "duf?", command_dcc, " [opcje]", "Obs³uga bezpo¶rednich po³±czeñ", "  send <numer/alias> <¶cie¿ka>\n  get [numer/alias]\n  close [numer/alias/id]\n  show\n" },
+	{ "dcc", "duf?", command_dcc, " [opcje]", "Obs³uga bezpo¶rednich po³±czeñ", "  send <numer/alias> <¶cie¿ka>\n  get [numer/alias]\n  voice <numer/alias>  \nclose [numer/alias/id]\n  show\n" },
 	{ "del", "u", command_del, " <numer/alias>", "Usuwa u¿ytkownika z listy kontaktów", "" },
 	{ "disconnect", "?", command_connect, " [powód]", "Roz³±cza siê z serwerem", "" },
 	{ "exec", "?", command_exec, " <polecenie>", "Uruchamia polecenie systemowe", "" },
@@ -1621,6 +1621,53 @@ COMMAND(command_dcc)
 			if (gg_dcc_fill_file_info(d, params[2]) == -1) {
 				my_printf("dcc_open_error", params[2], strerror(errno));
 				gg_free_dcc(d);
+				return 0;
+			}
+
+			list_add(&watches, d, 0);
+
+			t.dcc = d;
+		}
+
+		list_add(&transfers, &t, sizeof(t));
+
+		return 0;
+	}
+
+	if (params[0][0] == 'v') {			/* voice */
+		struct userlist *u;
+
+		if (!params[1]) {
+			my_printf("not_enough_params");
+			return 0;
+		}
+		
+		/* XXX sprawdzaæ przychodz±ce po³±czenia */
+
+		if (!(uin = get_uin(params[1])) || !(u = userlist_find(uin, NULL))) {
+			my_printf("user_not_found", params[1]);
+			return 0;
+		}
+
+		if (!sess || sess->state != GG_STATE_CONNECTED) {
+			my_printf("not_connected");
+			return 0;
+		}
+
+		t.uin = uin;
+		t.id = transfer_id();
+		t.type = GG_SESSION_DCC_VOICE;
+		t.filename = NULL;
+		t.dcc = NULL;
+
+		if (u->port < 10 || (params[2] && !strcmp(params[2], "--reverse"))) {
+			/* nie mo¿emy siê z nim po³±czyæ, wiêc on spróbuje */
+			gg_dcc_request(sess, uin);
+		} else {
+			struct gg_dcc *d;
+			
+			if (!(d = gg_dcc_voice_chat(u->ip.s_addr, u->port, config_uin, uin))) {
+				my_printf("dcc_error", strerror(errno));
 				return 0;
 			}
 

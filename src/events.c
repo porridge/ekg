@@ -928,6 +928,29 @@ void handle_dcc(struct gg_dcc *d)
 
 			break;
 			
+		case GG_EVENT_DCC_NEED_VOICE_ACK:
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_NEED_VOICE_ACK\n");
+			/* ¿eby nie sprawdza³o, póki luser nie odpowie */
+			list_remove(&watches, d, 0);
+
+			if (!(t = find_transfer(d))) {
+				tt.uin = d->peer_uin;
+				tt.type = GG_SESSION_DCC_VOICE;
+				tt.filename = NULL;
+				tt.dcc = d;
+				tt.id = transfer_id();
+				if (!(t = list_add(&transfers, &tt, sizeof(tt)))) {
+					gg_free_dcc(d);
+					break;
+				}
+			}
+			
+			t->type = GG_SESSION_DCC_VOICE;
+
+			my_printf("dcc_voice_offer", format_user(t->uin), itoa(t->id));
+
+			break;
+			
 		case GG_EVENT_DCC_DONE:
 			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_DONE\n");
 

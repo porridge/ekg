@@ -165,6 +165,7 @@ enum gg_session_enum {
 	GG_SESSION_DCC_SOCKET,	/* nas³uchuj±cy socket */
 	GG_SESSION_DCC_SEND,	/* wysy³anie pliku */
 	GG_SESSION_DCC_GET,	/* odbieranie pliku */
+	GG_SESSION_DCC_VOICE,	/* rozmowa g³osowa */
 	GG_SESSION_USERLIST_GET,	/* pobieranie userlisty */
 	GG_SESSION_USERLIST_PUT,	/* wysy³anie userlisty */
 	
@@ -218,6 +219,12 @@ enum gg_state_enum {
 	GG_STATE_READING_FILE_HEADER,	/* czeka na nag³ówek */
 	GG_STATE_GETTING_FILE,		/* odbiera plik */
 	GG_STATE_SENDING_FILE,		/* wysy³a plik */
+	GG_STATE_READING_VOICE_ACK,	/* czeka na potwierdzenie voip */
+	GG_STATE_READING_VOICE_HEADER,	/* czeka na rodzaj bloku voip */
+	GG_STATE_READING_VOICE_SIZE,	/* czeka na rozmiar bloku voip */
+	GG_STATE_READING_VOICE_DATA,	/* czeka na dane voip */
+	GG_STATE_SENDING_VOICE_ACK,	/* wysy³a potwierdzenie voip */
+	GG_STATE_SENDING_VOICE_REQUEST,	/* wysy³a ¿±danie voip */
 };
 
 /*
@@ -282,7 +289,9 @@ enum {
 	GG_EVENT_DCC_DONE,		/* skoñczy³ */
 	GG_EVENT_DCC_CLIENT_ACCEPT,	/* moment akceptacji klienta */
 	GG_EVENT_DCC_NEED_FILE_INFO,	/* trzeba wype³niæ file_info */
-	GG_EVENT_DCC_NEED_FILE_ACK,	/* czeka na potwierdzenie */
+	GG_EVENT_DCC_NEED_FILE_ACK,	/* czeka na potwierdzenie pliku */
+	GG_EVENT_DCC_NEED_VOICE_ACK,	/* czeka na potwierdzenie voip */
+	GG_EVENT_DCC_VOICE_FRAME,	/* ramka danych voip */
 };
 
 /*
@@ -314,6 +323,7 @@ enum {
 	GG_ERROR_DCC_FILE,		/* b³±d odczytu/zapisu pliku */
 	GG_ERROR_DCC_EOF,		/* plik siê skoñczy³? */
 	GG_ERROR_DCC_NET,		/* b³±d wysy³ania/odbierania */
+	GG_ERROR_DCC_REFUSED,		/* po³±czenie odrzucone przez usera */
 };
 
 /*
@@ -513,6 +523,7 @@ int gg_dcc_request(struct gg_session *sess, uin_t uin);
 
 struct gg_dcc *gg_dcc_send_file(unsigned long ip, unsigned short port, uin_t my_uin, uin_t peer_uin);
 struct gg_dcc *gg_dcc_get_file(unsigned long ip, unsigned short port, uin_t my_uin, uin_t peer_uin);
+struct gg_dcc *gg_dcc_voice_chat(unsigned long ip, unsigned short port, uin_t my_uin, uin_t peer_uin);
 int gg_dcc_fill_file_info(struct gg_dcc *d, const char *filename);
 
 struct gg_dcc *gg_dcc_socket_create(uin_t uin, unsigned int port);
@@ -589,7 +600,7 @@ unsigned short fix16(unsigned short x);
 #define GG_HTTPS_PORT 443
 #define GG_HTTP_USERAGENT "Mozilla/4.7 [en] (Win98; I)"
 
-#define GG_DEFAULT_CLIENT_VERSION 0x16
+#define GG_DEFAULT_CLIENT_VERSION 0x18
 #define GG_DEFAULT_TIMEOUT 30
 
 #define GG_DEFAULT_DCC_PORT 1550
@@ -804,6 +815,10 @@ __attribute__ ((packed))
  * pakiety, sta³e, struktury dla DCC
  */
 
+struct gg_dcc_tiny_packet {
+	u_int8_t type;		/* rodzaj pakietu */
+};
+
 struct gg_dcc_small_packet {
 	u_int32_t type;		/* rodzaj pakietu */
 };
@@ -829,6 +844,7 @@ struct gg_dcc_big_packet {
 #define GG_DCC_TIMEOUT_SEND 1800	/* 30 minut */
 #define GG_DCC_TIMEOUT_GET 1800		/* 30 minut */
 #define GG_DCC_TIMEOUT_FILE_ACK 300	/* 5 minut */
+#define GG_DCC_TIMEOUT_VOICE_ACK 300	/* 5 minut */
 
 #ifdef __cplusplus
 }
