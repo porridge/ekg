@@ -462,12 +462,12 @@ static void ui_readline_print(const char *target, const char *line)
                 rl_end = 0;
 		rl_set_prompt("");
 		/* rl_redisplay(); */
-		printf("\r");
+		printf("\r\033[K");
                 
-		for (i = 0; i < strlen(old_prompt); i++)
+/*		for (i = 0; i < strlen(old_prompt); i++)
                         printf(" ");
 		
-		printf("\r");
+		printf("\r");*/
         }
 
 	printf("%s", line);

@@ -12,6 +12,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawka b³êdu w rozwijaniu emotikonów (theKnight/w)
 - wysy³anie rozmów grupowych (stforek/w)
 - wyra¼ne zaznaczenie wersji licencji (L)GPL (w)
+- poprawka wy¶wietlania mesgów w ui-readline (dawjar/w)
 
 // 2002-08-18
 
