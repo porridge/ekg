@@ -38,6 +38,4 @@ void add_send_nick(char *nick);
 char **my_completion(char *text, int start, int end);
 char *empty_generator(char *text, int state);
 
-char **split_params(char *line, int count);
-
 #endif

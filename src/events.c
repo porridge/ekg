@@ -149,8 +149,8 @@ void handle_msg(struct gg_event *e)
 				snprintf(sender, sizeof(sender), "%s/%lu", u->display, u->uin);
 			else
 				snprintf(sender, sizeof(sender), "%lu", e->event.msg.sender);
-			put_log(e->event.msg.sender, ">> ignorowana %s %s (%s)\n%s\n", (chat) ?
-			    "Rozmowa od" : "Wiadomo¶æ od", sender, full_timestamp(), e->event.msg.message);
+			/* XXX eskejpowanie */
+			put_log(e->event.msg.sender, "%sign,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgsend", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, e->event.msg.message);
 		}
 		return;
 	};
@@ -197,11 +197,8 @@ void handle_msg(struct gg_event *e)
 	else
 		snprintf(sender, sizeof(sender), "%lu", e->event.msg.sender);
 
-	/* wiem, niegramatycznie, ale jako¶ trzeba rozró¿niæ */
-
-	put_log(e->event.msg.sender, ">> %s %s (%s)\n%s\n", (chat) ?
-		"Rozmowa od" : "Wiadomo¶æ od", sender, full_timestamp(),
-		e->event.msg.message);
+	/* XXX eskejpowanie */
+	put_log(e->event.msg.sender, "%s,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, e->event.msg.message);
 
 	if (away && config_sms_away && config_sms_app && config_sms_number) {
 		char *foo;

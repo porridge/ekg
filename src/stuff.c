@@ -340,12 +340,12 @@ int config_read(char *filename)
 		} else if (!strcasecmp(buf, "on")) {
                         int flags;
                         uin_t uin;
-                        char **pms = split_params(foo, 3);
-                        if ((flags = get_flags(pms[0])) && (uin = atoi(pms[1]))
-&& !correct_event(pms[2]))
+                        char **pms = array_make(foo, " \t", 3, 1, 0);
+                        if (pms && pms[0] && pms[1] && pms[2] && (flags = get_flags(pms[0])) && (uin = atoi(pms[1])) && !correct_event(pms[2]))
                                 add_event(get_flags(pms[0]), atoi(pms[1]), strdup(pms[2]));
                         else
                             my_printf("config_line_incorrect");
+			array_free(pms);
                 } else
 			variable_set(buf, foo, 1);
 
@@ -1139,7 +1139,7 @@ int run_event(char *act)
 	} 
 	else if(!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
                 struct userlist *u;
-                char sender[50];
+		int chat = (!strcasecmp(cmd, "chat"));
 
                 if (!strstr(arg, " "))
                         return 1;
@@ -1150,16 +1150,12 @@ int run_event(char *act)
                 if (!(uin = get_uin(arg)))
                         return 1;
 
-                if ((u = userlist_find(uin, NULL)))
-                        snprintf(sender, sizeof(sender), "%s/%lu", u->display, u->uin);
-                else
-                        snprintf(sender, strlen(sender), "%s", arg);
+		u = userlist_find(uin, NULL);
 
-                put_log(uin, "<<* %s %s (%s)\n%s\n", (!strcasecmp(cmd, "chat"))
-? "Rozmowa do" : "Wiadomo¶æ do", sender, full_timestamp(), data);
+                put_log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), data);
 
                 iso_to_cp(data);
-                gg_send_message(sess, (!strcasecmp(cmd, "msg")) ? GG_CLASS_MSG : GG_CLASS_CHAT, uin, data);
+                gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, data);
 
                 return 0;
         }

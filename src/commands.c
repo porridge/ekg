@@ -648,7 +648,7 @@ COMMAND(command_find)
 	struct gg_search_request r;
 	struct gg_http *h;
 	struct list *l;
-	char **argv, *query = NULL;
+	char **argv = NULL, *query = NULL;
 	int i, id = 1;
 
 	/* wybieramy sobie identyfikator sercza */
@@ -681,8 +681,9 @@ COMMAND(command_find)
 		return 0;
 	};
 	
-	if (!params[0] || !(argv = split_params(params[0], -1)) || !argv[0]) {
+	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
 		my_printf("not_enough_params");
+		array_free(argv);
 		free(query);
 		return 0;
 	}
@@ -702,6 +703,7 @@ COMMAND(command_find)
 		if (!(r.uin = get_uin(params[0]))) {
 			my_printf("user_not_found", params[0]);
 			free(query);
+			array_free(argv);
 			return 0;
 		}
 	} else {
@@ -750,6 +752,7 @@ COMMAND(command_find)
 	if (!(h = gg_search(&r, 1))) {
 		my_printf("search_failed", strerror(errno));
 		free(query);
+		array_free(argv);
 		return 0;
 	}
 
@@ -758,13 +761,15 @@ COMMAND(command_find)
 
 	list_add(&watches, h, 0);
 	
+	array_free(argv);
+
 	return 0;
 }
 
 COMMAND(command_modify)
 {
 	struct userlist *u;
-	char **argv;
+	char **argv = NULL;
 	uin_t uin;
 	int i;
 
@@ -787,7 +792,7 @@ COMMAND(command_modify)
 
 		return 0;
 	} else {
-		argv = split_params(params[1], -1);
+		argv = array_make(params[1], " \t", 0, 1, 1);
 	}
 
 	for (i = 0; argv[i]; i++) {
@@ -841,6 +846,8 @@ COMMAND(command_modify)
 		my_printf("modify_done", params[0]);
 
 	config_changed = 1;
+
+	array_free(argv);
 
 	return 0;
 }
@@ -936,7 +943,7 @@ COMMAND(command_list)
 {
 	struct list *l;
 	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0;
-	char *tmp, **argv;
+	char *tmp, **argv = NULL;
 
 	if (params[0] && *params[0] != '-') {
 		struct userlist *u;
@@ -957,7 +964,7 @@ COMMAND(command_list)
 		return 0;
 	}
 
-        if (params[0] && (argv = split_params(params[0], -1))) {
+        if (params[0] && (argv = array_make(params[0], " \t", 0, 1, 1))) {
 		int i;
 
 		for (i = 0; argv[i]; i++) {
@@ -1006,15 +1013,17 @@ COMMAND(command_list)
 	if (!count && show_all)
 		my_printf("list_empty");
 
+	array_free(argv);
+
 	return 0;
 }
 
 COMMAND(command_msg)
 {
 	struct userlist *u;
-	char sender[50], *msg = NULL;
+	char *msg = NULL;
 	uin_t uin;
-	int free_msg = 0;
+	int free_msg = 0, chat = (!strcasecmp(name, "chat"));
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		my_printf("not_connected");
@@ -1030,11 +1039,6 @@ COMMAND(command_msg)
 		my_printf("user_not_found", params[0]);
 		return 0;
 	}
-
-        if ((u = userlist_find(uin, NULL)))
-                snprintf(sender, sizeof(sender), "%s/%lu", u->display, u->uin);
-        else
-                snprintf(sender, sizeof(sender), "%lu", uin);
 
 	if (!strcmp(params[1], "\\")) {
 		struct string *s;
@@ -1067,13 +1071,13 @@ COMMAND(command_msg)
 	} else
 		msg = params[1];
 
-        put_log(uin, "<< %s %s (%s)\n%s\n", (!strcasecmp(name, "chat")) ?
-                "Rozmowa do" : "Wiadomo¶æ do", sender, full_timestamp(),
-                msg);
+        u = userlist_find(uin, NULL);
+
+	put_log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), msg);
 
 	add_send_nick(params[0]);
 	iso_to_cp(msg);
-	gg_send_message(sess, (!strcasecmp(name, "msg")) ? GG_CLASS_MSG : GG_CLASS_CHAT, uin, msg);
+	gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
 
 	if (free_msg)
 		free(msg);
@@ -1639,56 +1643,6 @@ char *strip_spaces(char *line)
 	return buf;
 }
 
-char **split_params(char *line, int count)
-{
-	char **res;
-	char *p = line;
-	int i;
-
-	if (count == -1) {
-		char *q;
-
-		for (count = 1, q = line; *q; q++)
-			if (isspace(*q))
-				count++;
-	}
-
-	if (!(res = malloc((count + 2) * sizeof(char*))))
-		return NULL;
-
-	for (i = 0; i < count + 2; i++)
-		res[i] = 0;
-	
-	if (!strcmp(strip_spaces(line), ""))
-		return res;
-	
-	if (count < 2) {
-		res[0] = p;
-		return res;
-	}
-	
-	for (i = 0; *p && i < count; i++) {
-		while (isspace(*p))
-			p++;
-
-		res[i] = p;
-		
-		while (*p && !isspace(*p))
-			p++;
-
-		if (!*p)
-			break;
-
-		if (i != count - 1)
-			*p++ = 0;
-
-		while (isspace(*p))
-			p++;
-	}
-
-	return res;
-}
-
 int execute_line(char *line)
 {
 	char *cmd = NULL, *tmp, *p = NULL, short_cmd[2] = ".", *last_name = NULL, *last_params = NULL;
@@ -1747,13 +1701,14 @@ int execute_line(char *line)
 
 	if (last_abbr && abbrs == 1) {
 		char **par;
-		int res;
+		int res = 0, len = strlen(last_params);
 
 		c--;
 			
-		par = split_params(p, strlen(last_params));
-		res = (last_abbr)(last_name, par);
-		free(par);
+		if ((par = array_make(p, " \t", len, 1, 1))) {
+			res = (last_abbr)(last_name, par);
+			array_free(par);
+		}
 
 		return res;
 	}

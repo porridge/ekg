@@ -5,6 +5,13 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-02-29
+
+- nowe funkcje array_make() i array_free() s³u¿± do ³adnego dzielenia
+  tekstów na pola. obs³uguje eskejpowanie, cudzys³owie itp. dziêki
+  czemu dzia³aj± konstrukcje typu ,,msg "mi¶ yogi" cze¶æ'' (w)
+- nowe logowanie wiadomo¶ci, tak jak wspomnia³em na ekg-devel (w)
+
 // 2002-02-08
 
 - dopisane externy do zmiennych w libgadu.h (tomee/w)

@@ -116,27 +116,22 @@ int userlist_read(char *filename)
 			u.groups = NULL;
 
 		} else {
-			char *first_name, *last_name, *nickname, *display, *mobile, *groups, *uin, *foo = buf;
-
-			first_name = get_token(&foo, ';');
-			last_name = get_token(&foo, ';');
-			nickname = get_token(&foo, ';');
-			display = get_token(&foo, ';');
-			mobile = get_token(&foo, ';');
-			groups = get_token(&foo, ';');
-			uin = get_token(&foo, ';');
-
-			if (!uin || !(u.uin = strtol(uin, NULL, 0))) {
+			char **entry = array_make(buf, ";", 7, 0, 0);
+			
+			if (!entry[0] || !entry[1] || !entry[2] || !entry[3] || !entry[4] || !entry[5] || !entry[6] || !(u.uin = strtol(entry[6], NULL, 0))) {
+				array_free(entry);
 				free(buf);
 				continue;
 			}
+			
+			u.first_name = strdup_null(entry[0]);
+			u.last_name = strdup_null(entry[1]);
+			u.nickname = strdup_null(entry[2]);
+			u.display = strdup_null(entry[3]);
+			u.mobile = strdup_null(entry[4]);
+			u.groups = group_init(entry[5]);
 
-			u.first_name = strdup_null(first_name);
-			u.last_name = strdup_null(last_name);
-			u.nickname = strdup_null(nickname);
-			u.display = strdup_null(display);
-			u.mobile = strdup_null(mobile);
-			u.groups = group_init(groups);
+			array_free(entry);
 		}
 
 		free(buf);

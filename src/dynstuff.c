@@ -344,11 +344,99 @@ char *itoa(long int i)
  * zaalokowan± tablicê z zaalokowanymi ci±gami znaków lub NULL w przypadku
  * b³êdu.
  */
-char **array_make(char *string, char *sep, int max, int trim)
+char **array_make(char *string, char *sep, int max, int trim, int quotes)
 {
-	/* XXX develujê sobie gdzie indziej, ¿eby cvsa nie za¶miecaæ. */
+	char *p, *q, **result = NULL, **tmp;
+	int items, last = 0;
 
-	return NULL;
+	for (p = string, items = 0; ; ) {
+		int len = 0;
+		char *token = NULL;
+
+		if (max && items >= max - 1)
+			last = 1;
+		
+		if (trim) {
+			while (*p && strchr(sep, *p))
+				p++;
+			if (!*p)
+				break;
+		}
+
+		if (quotes && (*p == '\'' || *p == '\"')) {
+			char sep = *p;
+
+			for (q = p + 1, len = 0; *q; q++, len++) {
+				if (*q == '\\') {
+					q++;
+					if (!*q)
+						break;
+				} else if (*q == sep)
+					break;
+			}
+
+			if ((token = calloc(1, len + 1))) {
+				char *r = token;
+			
+				for (q = p + 1; *q; q++, r++) {
+					if (*q == '\\') {
+						q++;
+						
+						if (!*q)
+							break;
+						
+						switch (*q) {
+							case 'n':
+								*r = '\n';
+								break;
+							case 'r':
+								*r = '\r';
+								break;
+							case 't':
+								*r = '\t';
+								break;
+							default:
+								*r = *q;
+						}
+					} else if (*q == sep) {
+						break;
+					} else 
+						*r = *q;
+				}
+				
+				*r = 0;
+			}
+			
+			p = q + 1;
+			
+		} else {
+			for (q = p, len = 0; *q && (last || !strchr(sep, *q)); q++, len++);
+			if ((token = calloc(1, len + 1))) {
+				strncpy(token, p, len);
+				token[len] = 0;
+			}
+			p = q;
+		}
+		
+		if (!(tmp = realloc(result, (items + 2) * sizeof(char*)))) {
+			free(token);
+			break;
+		}
+
+		result = tmp;
+		result[items] = token;
+		result[++items] = NULL;
+
+		if (!*p)
+			break;
+
+		p++;
+	}
+
+	if (!items)
+		result = calloc(1, sizeof(char*));
+
+	return result;
 }
 
 /*
@@ -359,6 +447,9 @@ char **array_make(char *string, char *sep, int max, int trim)
 void array_free(char **array)
 {
 	char **tmp;
+
+	if (!array)
+		return;
 
 	for (tmp = array; *tmp; tmp++)
 		free(*tmp);
