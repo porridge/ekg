@@ -184,6 +184,11 @@ char *config_proxy_forwarding = NULL;
 int config_password_cp1250 = 0;
 char *config_interface = NULL;
 
+char *last_search_first_name = NULL;
+char *last_search_last_name = NULL;
+char *last_search_nickname = NULL;
+uin_t last_search_uin = 0;
+
 struct event_label event_labels[] = {
 	{ EVENT_MSG, "msg" },
 	{ EVENT_CHAT, "chat" },

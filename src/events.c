@@ -1030,136 +1030,6 @@ void handle_event(struct gg_session *s)
 }
 
 /*
- * handle_search()
- *
- * funkcja obs³uguje zdarzenia dotycz±ce wyszukiwania u¿ytkowników.
- *
- *  - e - opis zdarzenia.
- *
- * nie zwraca niczego.
- */
-void handle_search(struct gg_http *h)
-{
-	struct gg_search_request *r;
-	struct gg_search *s = NULL;
-	int i;
-
-	if (gg_search_watch_fd(h) || h->state == GG_STATE_ERROR) {
-		print("search_failed", http_error_string((h) ? h->state : 0));
-		list_remove(&watches, h, 0);
-		gg_search_request_free((struct gg_search_request*) h->user_data);
-		gg_search_free(h);
-		return;
-	}
-	
-	if (h->state != GG_STATE_DONE)
-		return;
-
-	gg_debug(GG_DEBUG_MISC, "++ gg_search()... done\n");
-
-	if (!h || !(s = h->data) || !(s->count))
-		print("search_not_found");
-
-	for (i = 0; i < s->count; i++) {
-		const char *active_format, *gender_format;
-		char *name, *active, *gender;
-
-		cp_to_iso(s->results[i].first_name);
-		cp_to_iso(s->results[i].last_name);
-		cp_to_iso(s->results[i].nickname);
-		cp_to_iso(s->results[i].city);
-
-		name = saprintf("%s %s", s->results[i].first_name, s->results[i].last_name);
-
-		if (!(h->id & 1)) {
-			switch (s->results[i].active) {
-				case GG_STATUS_AVAIL:
-					active_format = format_find("search_results_single_active");
-					break;
-
-				case GG_STATUS_BUSY:
-					active_format = format_find("search_results_single_busy");
-					break;
-				default:
-					active_format = format_find("search_results_single_inactive");
-			}
-
-			if (s->results[i].gender == GG_GENDER_FEMALE)
-				gender_format = format_find("search_results_single_female");
-			else if (s->results[i].gender == GG_GENDER_MALE)
-				gender_format = format_find("search_results_single_male");
-			else
-				gender_format = format_find("search_results_single_unknown");
-		} else {
-			switch (s->results[i].active) {
-				case GG_STATUS_AVAIL:
-					active_format = format_find("search_results_multi_active");
-					break;
-
-				case GG_STATUS_BUSY:
-					active_format = format_find("search_results_multi_busy");
-					break;
-				default:
-					active_format = format_find("search_results_multi_inactive");
-			}
-
-			if (s->results[i].gender == GG_GENDER_FEMALE)
-				gender_format = format_find("search_results_multi_female");
-			else if (s->results[i].gender == GG_GENDER_MALE)
-				gender_format = format_find("search_results_multi_male");
-			else
-				gender_format = format_find("search_results_multi_unknown");
-		}
-
-		active = format_string(active_format, s->results[i].nickname);
-		gender = format_string(gender_format);
-
-		print((h->id & 1) ? "search_results_multi" : "search_results_single", itoa(s->results[i].uin), (name) ? name : "", s->results[i].nickname, s->results[i].city, (s->results[i].born) ? itoa(s->results[i].born) : "-", gender, active);
-
-		xfree(name);
-		xfree(active);
-		xfree(gender);
-	}
-
-	r = (void*) h->user_data;
-
-	if (s->count > 19 && (r->start & 0x80000000L)) {
-		struct gg_http *h2;
-		list_t l;
-		int id = 1;
-		
-		r->start = s->results[19].uin | 0x80000000L;
-		list_remove(&watches, h, 0);
-		gg_free_search(h);
-		
-		for (l = watches; l; l = l->next)
-		{
-			struct gg_http *h3 = l->data;
-
-			if (h3->type != GG_SESSION_SEARCH)
-				continue;
-
-			if (h3->id / 2 >= id)
-				id = h3->id / 2 + 1;
-		}
-		if (!(h2 = gg_search(r, 1)))
-		{
-			print("search_failed", http_error_string(0));
-			gg_search_request_free(r);
-			return;
-		}
-		h2->id = id;
-		h2->user_data = (char*) r;
-		list_add(&watches, h2, 0);
-		return;
-	}
-	
-	list_remove(&watches, h, 0);
-	gg_search_request_free(r);
-	gg_search_free(h);
-}
-
-/*
  * handle_pubdir()
  *
  * funkcja zajmuj±ca siê wszelkimi zdarzeniami http oprócz szukania.
@@ -1695,6 +1565,16 @@ void handle_search50(struct gg_event *e)
 		cp_to_iso(lastname);
 		cp_to_iso(nickname);
 		cp_to_iso(city);
+
+		if (count == 1) {
+			xfree(last_search_first_name);
+			xfree(last_search_last_name);
+			xfree(last_search_nickname);
+			last_search_first_name = xstrdup(firstname);
+			last_search_last_name = xstrdup(lastname);
+			last_search_nickname = xstrdup(nickname);
+			last_search_uin = atoi(uin);
+		}
 
 		name = saprintf("%s %s", firstname, lastname);
 

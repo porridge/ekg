@@ -157,27 +157,46 @@ COMMAND(cmd_cleartab)
 
 COMMAND(cmd_add)
 {
-	uin_t uin;
+	int params_free = 0, result = 0;
 	struct userlist *u;
+	uin_t uin;
 
 	if (params[0] && !params[1] && isalpha_pl_PL(params[0][0])) {
 		ui_event("command", quiet, "add", params[0], NULL);
 		return 0;
 	}
 
+	if (params[0] && match_arg(params[0], 'f', "find", 2)) {
+		if (!last_search_uin || !last_search_nickname) {
+			printq("search_no_last");
+			return -1;
+		}
+
+		params_free = 1;
+
+		params = xmalloc(4 * sizeof(char*));
+		params[0] = itoa(last_search_uin);
+		params[1] = last_search_nickname;
+		params[2] = saprintf("-f \"%s\" -l \"%s\"", (last_search_first_name) ? last_search_first_name : "", (last_search_last_name) ? last_search_last_name : "");
+		params[3] = NULL;
+	}
+
 	if (!params[0] || !params[1]) {
 		printq("not_enough_params", name);
-		return -1;
+		result = -1;
+		goto cleanup;
 	}
 
 	if (!(uin = str_to_uin(params[0]))) {
 		printq("invalid_uin");
-		return -1;
+		result = -1;
+		goto cleanup;
 	}
 
 	if (!valid_nick(params[1])) {
 		printq("invalid_nick");
-		return -1;
+		result = -1;
+		goto cleanup;
 	}
 
 	if ((u = userlist_find(uin, params[1])) && u->display) {
@@ -187,7 +206,8 @@ COMMAND(cmd_add)
 			printq("user_exists_other", params[1], format_user(u->uin));
 		}
 
-		return -1;
+		result = -1;
+		goto cleanup;
 	}
 
 	/* kto¶ by³ tylko ignorowany/blokowany, nadajmy mu nazwê */
@@ -204,12 +224,16 @@ COMMAND(cmd_add)
 	} else
 		printq("error_adding");
 
-	if (params[2]) {
-		params++;
-		cmd_modify("add", params, NULL, quiet);
+	if (params[2])
+		cmd_modify("add", &params[1], NULL, quiet);
+
+cleanup:
+	if (params_free) {
+		xfree((char*) params[2]);
+		xfree(params);
 	}
 
-	return 0;
+	return result;
 }
 
 COMMAND(cmd_alias)
@@ -4307,11 +4331,14 @@ void command_init()
 {
 	command_add
 	( "add", "U??", cmd_add, 0,
-	  " [numer] <alias> [opcje]", "dodaje u¿ytkownika do listy kontaktów",
+	  " [numer] [alias] [opcje]", "dodaje u¿ytkownika do listy kontaktów",
 	  "\n"
-	  "Opcje identyczne jak dla polecenia %Tlist%n (dotycz±ce wpisu). "
-	  "W oknie rozmowy z kim¶ spoza naszej listy kontaktów jako parametr "
-	  "mo¿na podaæ sam alias.");
+	  "  -f, --find  Dodanie do listy kontaktów u¿ytkownika ostatnio\n"
+	  "              znalezionego w katalogu publicznym.\n"
+	  "\n"
+	  "Pozosta³e opcje identyczne jak dla polecenia %Tlist%n (dotycz±ce "
+	  "wpisu). W oknie rozmowy z kim¶ spoza naszej listy kontaktów jako "
+	  "parametr mo¿na podaæ sam alias.\n");
 	  
 	command_add
 	( "alias", "??", cmd_alias, 0,
@@ -4340,8 +4367,8 @@ void command_init()
 	  " [-l, --list, <nazwa>]                wy¶wietla listê planów\n"
 	  "\n"
 	  "Czas podaje siê w formacie [[[yyyy]mm]dd]HH[:]MM[.SS], gdzie "
-	  "%Tyyyy%n to rok, %Tmm%n to miesi±c, %Tdd%n to dzieñ, %THH:MM%n to godzina, "
-          "a %T.SS%n to sekundy. "
+	  "%Tyyyy%n to rok, %Tmm%n to miesi±c, %Tdd%n to dzieñ, %THH:MM%n "
+	  "to godzina, a %T.SS%n to sekundy. "
 	  "Minimalny format to %THH:MM%n (dwukropek mo¿na pomin±æ). "
 	  "Po kropce mo¿na podaæ sekundy, a przed godzin± odpowiednio: dzieñ "
 	  "miesi±ca, miesi±c, rok.");

@@ -104,15 +104,6 @@ static void reaper_user3(struct gg_exec *e)
 }
 
 /*
- * usuwanie sesji wyszukiwania.
- */
-static void reaper_search(struct gg_http *s)
-{
-	gg_search_request_free((struct gg_search_request*) s->user_data);
-	gg_search_free(s);
-}
-
-/*
  * struktura zawieraj±ca adresy funkcji obs³uguj±cych ró¿ne sesje
  * i zwalniaj±cych pamiêæ po nich.
  */
@@ -130,7 +121,6 @@ static struct {
 	EKG_HANDLER(GG_SESSION_DCC_SEND, handle_dcc, gg_dcc_free)
 	EKG_HANDLER(GG_SESSION_DCC_GET, handle_dcc, gg_dcc_free)
 	EKG_HANDLER(GG_SESSION_DCC_VOICE, handle_dcc, gg_dcc_free)
-	EKG_HANDLER(GG_SESSION_SEARCH, handle_search, reaper_search)
 	EKG_HANDLER(GG_SESSION_REGISTER, handle_pubdir, gg_register_free)
 	EKG_HANDLER(GG_SESSION_UNREGISTER, handle_pubdir, gg_pubdir_free)
 	EKG_HANDLER(GG_SESSION_PASSWD, handle_pubdir, gg_change_passwd_free)
@@ -386,12 +376,6 @@ void ekg_wait_for_key()
 					userlist_clear_status(0);
 					sess = NULL;
 					do_reconnect();
-					break;
-
-				case GG_SESSION_SEARCH:
-					print("search_timeout");
-					list_remove(&watches, h, 0);
-					reaper_search(h);
 					break;
 
 				case GG_SESSION_REGISTER:
@@ -1218,6 +1202,10 @@ void ekg_exit()
 	ui_deinit();
 
 	msg_queue_write();
+
+	xfree(last_search_first_name);
+	xfree(last_search_last_name);
+	xfree(last_search_nickname);
 
 	if (config_keep_reason) {
 		array_add(&vars, xstrdup("status"));

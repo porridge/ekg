@@ -304,6 +304,11 @@ int ekg_segv_handler;
 int ioctld_sock;
 struct color_map default_color_map[16+10];
 
+char *last_search_first_name;
+char *last_search_last_name;
+char *last_search_nickname;
+uin_t last_search_uin;
+
 int alias_add(const char *string, int quiet, int append);
 int alias_remove(const char *name, int quiet);
 void alias_free();
