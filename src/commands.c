@@ -52,7 +52,6 @@
 #  include "python.h"
 #endif
 #ifdef HAVE_OPENSSL
-#  include "sim.h"
 #  include "simlite.h"
 #endif
 #ifndef HAVE_STRLCAT
@@ -2959,8 +2958,6 @@ COMMAND(cmd_key)
 			printq("key_public_deleted", format_user(uin));
 		
 		xfree(tmp);
-
-		SIM_KC_Free(SIM_KC_Find(uin));
 
 		return 0;
 	}

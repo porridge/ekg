@@ -42,7 +42,6 @@
 #  include "python.h"
 #endif
 #ifdef HAVE_OPENSSL
-#  include "sim.h"
 #  include "simlite.h"
 #endif
 #ifndef HAVE_STRLCPY
@@ -444,31 +443,7 @@ void handle_msg(struct gg_event *e)
 	}
 
 #ifdef HAVE_OPENSSL
-	if (config_encryption == 1) {
-		char *dec;
-		int len = strlen(e->event.msg.message);
-
-		dec = xmalloc(len);
-		memset(dec, 0, len);
-		
-		len = SIM_Message_Decrypt(e->event.msg.message, dec, len, e->event.msg.sender);
-
-		if (len > 0) {
-			strcpy(e->event.msg.message, dec);
-			secure = 1;
-		}
-
-		xfree(dec);
-
-		if (len == -1)
-			gg_debug(GG_DEBUG_MISC, "// ekg: private key not found\n");
-		if (len == -2)
-			gg_debug(GG_DEBUG_MISC, "// ekg: rsa decryption failed\n");
-		if (len == -3)
-			gg_debug(GG_DEBUG_MISC, "// ekg: magic number mismatch\n");
-	}
-
-	if (config_encryption == 2) {
+	if (config_encryption) {
 		char *msg = sim_message_decrypt(e->event.msg.message, e->event.msg.sender);
 
 		if (msg) {
@@ -547,8 +522,6 @@ void handle_msg(struct gg_event *e)
 		fprintf(f, "%s", e->event.msg.message);
 		fclose(f);
 		xfree(name);
-
- 		SIM_KC_Free(SIM_KC_Find(e->event.msg.sender));
 
 		return;
 	}

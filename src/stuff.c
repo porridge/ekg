@@ -55,7 +55,6 @@
 #include "dynstuff.h"
 #include "libgadu.h"
 #ifdef HAVE_OPENSSL
-#  include "sim.h"
 #  include "simlite.h"
 #endif
 #ifndef HAVE_STRLCAT
@@ -2005,40 +2004,21 @@ int mesg_set(int what)
 int msg_encrypt(uin_t uin, unsigned char **msg)
 {
 #ifdef HAVE_OPENSSL
-	int len;
-		
-	if (config_encryption == 1) {
-		unsigned char *enc = xmalloc(4096);	/* sad but true */
-		memset(enc, 0, 4096);
-		
-		len = SIM_Message_Encrypt(*msg, enc, strlen(*msg), uin);
-		
-		gg_debug(GG_DEBUG_MISC, "// encrypted length: %d\n", len);
+	if (config_encryption) {
+		unsigned char *res = sim_message_encrypt(*msg, uin);
 
-		if (len > 0) {
-			xfree(*msg);
-			*msg = enc;
-			gg_debug(GG_DEBUG_MISC, "// encrypted message: %s\n", enc);
-		} else
-			xfree(enc);
-
-		return len;
-	} else {
-		char *res;
-
-		res = sim_message_encrypt(*msg, uin);
 		if (res) {
 			xfree(*msg);
 			*msg = res;
-			gg_debug(GG_DEBUG_MISC, "// simlite encrypted: %s\n", res);
+			gg_debug(GG_DEBUG_MISC, "// ekg: simlite encrypted: %s\n", res);
 			return 1;
 		}
-		gg_debug(GG_DEBUG_MISC, "// simlite encryption error: %s\n", sim_strerror(sim_errno));
+
+		gg_debug(GG_DEBUG_MISC, "// ekg: simlite encryption error: %s\n", sim_strerror(sim_errno));
 		return 0;
 	}
-#else
-	return 0;
 #endif
+	return 0;
 }
 
 /*

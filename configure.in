@@ -414,7 +414,7 @@ dnl
 AC_CHECK_OPENSSL
 
 if test "x$have_openssl" = "xyes"; then
-	OBJS="$OBJS sim.o simlite.o"
+	OBJS="$OBJS simlite.o"
 	LDFLAGS="$OPENSSL_LIBS $LDFLAGS"
 	CFLAGS="$CFLAGS $OPENSSL_INCLUDES"
 fi

@@ -59,7 +59,6 @@
 #  include "python.h"
 #endif
 #ifdef HAVE_OPENSSL
-#  include "sim.h"
 #  include "simlite.h"
 #endif
 #ifndef HAVE_STRLCPY
@@ -1215,8 +1214,6 @@ int main(int argc, char **argv)
 		config_log_path = xstrdup(prepare_path("history", 0));
 
 #ifdef HAVE_OPENSSL
-	SIM_KC_Init();
-	strlcpy(SIM_Key_Path, prepare_path("keys/", 0), sizeof(SIM_Key_Path));
 	sim_key_path = xstrdup(prepare_path("keys/", 0));
 #endif
 
@@ -1364,10 +1361,6 @@ void ekg_exit()
 
 #ifdef WITH_PYTHON
 	python_finalize();
-#endif
-
-#ifdef HAVE_OPENSSL
-	SIM_KC_Finish();
 #endif
 
 	/* kapitan schodzi ostatni */
