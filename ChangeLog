@@ -18,8 +18,10 @@ zg³osi³ b³±d.
 - drobne poprawki dokumentacji (sz)
 - nie czytajmy ca³ego pliku np. w /reload, je¶li nie wygl±da
   to na plik z konfiguracj± - po co zawieszaæ ekg. sam tak zrobi³em,
-  przez przypadek daj±c za parametr plik wielko¶ci 150 MB... (sz)
-- poprawka /blink_leds i /beeps_spk (sz)
+  przez przypadek daj±c za parametr plik wielko¶ci 150 MB...
+  je¶li co¶ pojdzie z³e podczas ,,reload plik'', wczytana zostanie
+  ponownie konfiguracja z ~/.gg/config (sz)
+- poprawka /blink_leds i /beeps_spk (nadal pozosta³ gdzies b³±d?) (sz)
 - usuniêcie nieaktualnego przyk³adu search.c (sz)
 - ujednolicenie opcji --list w niektórych komendach (sz)
 - mo¿liwo¶æ wy¶wietlania tylko wybranej sekwencji w /bind (FIG/w)
@@ -67,7 +69,8 @@ zg³osi³ b³±d.
 - komenda reload (stforek/sz)
 - poprawka kodowania eksportowanej listy kontaktów (Sero/sz)
 - dalsza reorganizacja zdarzeñ, ulepszenie logiki, opis w /help on 
-  i troche innych mniej powa¿nych zmian. zdarzenie ,,blocked'' (sz)
+  i troche innych mniej powa¿nych zmian. zdarzenie ,,blocked''.
+  zmiana ,,new_mail'' na ,,newmail'' i ,,disconnect'' na ,,notavail'' (sz)
 - zmienna ,,events_delay'' (sz)
 - usuniêcie ekgsearch (sz)
 - poprawka wy¶wietlania tabów (w)
