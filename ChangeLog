@@ -25,6 +25,7 @@ zg³osi³ b³±d.
 - dodanie mo¿liwo¶ci zapisu konfiguracji ekg na serwerze (opcje
   --put-config i --get-config komendy /list) (w)
 - zmienna sms_max_length przy warto¶ci 0 usuwa limit (rmrmg/w)
+- poprawka wysy³ania wielolinijkowych (pmb/w)
 
 // 2002-12-24
 

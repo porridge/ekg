@@ -1465,7 +1465,7 @@ COMMAND(cmd_msg)
 			if (*p == 31)
 				attr ^= GG_FONT_UNDERLINE;
 
-			if (*p >= 32) {
+			if (*p >= 32 || *p == 13 || *p == 10 || *p == 9) {
 				if (attr != last_attr) {
 					if (!format) {
 						format = xmalloc(3);
