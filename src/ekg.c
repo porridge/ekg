@@ -747,13 +747,13 @@ void ekg_wait_for_key()
 
 static void handle_sigusr1()
 {
-	event_check(EVENT_SIGUSR1, 1, "SIGUSR1");
+	event_check(EVENT_SIGUSR1, 0, "SIGUSR1");
 	signal(SIGUSR1, handle_sigusr1);
 }
 
 static void handle_sigusr2()
 {
-	event_check(EVENT_SIGUSR2, 1, "SIGUSR2");
+	event_check(EVENT_SIGUSR2, 0, "SIGUSR2");
 	signal(SIGUSR2, handle_sigusr2);
 }
 

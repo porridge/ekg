@@ -1,8 +1,9 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2003 Piotr Domagalski <szalik@szalik.net>
+ *  (C) Copyright 2001-2004 Piotr Domagalski <szalik@szalik.net>
  *                          Pawe³ Maziarz <drg@infomex.pl>
+ *                          Adam Wysocki <gophi@ekg.apcoh.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -132,7 +133,7 @@ int check_mail_update(const char *s, int more)
 
 		play_sound(config_sound_mail_file);
 
-		event_check(EVENT_NEWMAIL, 1, itoa(mail_count));
+		event_check(EVENT_NEWMAIL, 0, itoa(mail_count));
 	}
 
 	return 0;

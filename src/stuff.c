@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2004 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@o2.pl>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
@@ -1009,7 +1009,7 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 	add_send_nick(name);
 
-	event_check(EVENT_CONFERENCE, 1, name);
+	event_check(EVENT_CONFERENCE, 0, name);
 
 	return list_add(&conferences, &c, sizeof(c));
 }
@@ -1727,7 +1727,7 @@ int event_check(int event, uin_t uin, const char *data)
 		
                 if (e->flags & event) {
 
-			if (!strcmp(e->target, "*") || uin == 1)
+			if (!strcmp(e->target, "*") || uin == 0)
 				action = e->action;
 
 			if (!strcmp(e->target, uin_number) || !strcasecmp(e->target, uin_display) || (u && group_member(u, e->target + 1))) {
