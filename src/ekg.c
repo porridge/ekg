@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2004 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *                          Adam Osuchowski <adwol@polsl.gliwice.pl>
@@ -9,6 +9,7 @@
  *                          Wojciech Bojdo³ <wojboj@htcon.pl>
  *                          Piotr Domagalski <szalik@szalik.net>
  *			    Piotr Kupisiewicz <deli@rzepaknet.us>
+ *                          Adam Wysocki <gophi@ekg.apcoh.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -257,12 +258,13 @@ static void get_line_from_pipe(struct gg_exec *c)
 						print_window(c->target, 0, "exec", line, itoa(c->id));
 						break;
 					case 1:
-					{
-						char *tmp = saprintf("/chat \"%s\" %s", c->target, line);
-						command_exec(NULL, tmp, 0);
-						xfree(tmp);
+						if (*line) {
+							char *tmp = saprintf("/chat \"%s\" %s", c->target, line);
+							command_exec(NULL, tmp, 0);
+							xfree(tmp);
+						}
+
 						break;
-					}
 					case 2:
 						buffer_add(BUFFER_EXEC, c->target, line, 0);
 						break;
@@ -286,12 +288,13 @@ static void get_line_from_pipe(struct gg_exec *c)
 						print_window(c->target, 0, "exec", c->buf->str, itoa(c->id));
 						break;
 					case 1:
-					{
-						char *tmp = saprintf("/chat \"%s\" %s", c->target, c->buf->str);
-						command_exec(NULL, tmp, 0);
-						xfree(tmp);
+						if (*(c->buf->str)) {
+							char *tmp = saprintf("/chat \"%s\" %s", c->target, c->buf->str);
+							command_exec(NULL, tmp, 0);
+							xfree(tmp);
+						}
+
 						break;
-					}
 					case 2:
 						buffer_add(BUFFER_EXEC, c->target, c->buf->str, 0);
 						break;
@@ -301,14 +304,16 @@ static void get_line_from_pipe(struct gg_exec *c)
 
 		if (!c->quiet && c->msg == 2) {
 			char *out = buffer_flush(BUFFER_EXEC, c->target);
-			char *tmp = saprintf("/chat \"%s\" %s", c->target, out);
 
-			command_exec(NULL, tmp, 0);
-			
+			if (*out) {
+				char *tmp = saprintf("/chat \"%s\" %s", c->target, out);
+				command_exec(NULL, tmp, 0);
+				xfree(tmp);
+			}
+
 			xfree(out);
-			xfree(tmp);
 		}
-		
+
 		close(c->fd);
 		xfree(c->target);
 		string_free(c->buf, 1);
