@@ -627,7 +627,7 @@ static struct window *window_find(const char *target)
 		if (w->id == 1 && status)
 			return w;
 
-		if (w->target && !strcasecmp(target, w->target))
+		if (w->target && target && !strcasecmp(target, w->target))
 			return w;
 	}
 
