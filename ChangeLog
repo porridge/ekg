@@ -13,6 +13,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - rozszerzenie komend /version i /status (FIG/w)
 - poprawka ^D w pagerze (FIG/w)
 - dodanie komentarzy i \$Id\$ w win32/*.h (speedy/w)
+- speedy mnie zabije za zepsucie /status. poprawione (w)
 
 // 2002-08-06
 
