@@ -2724,7 +2724,9 @@ static void complete(int *line_start, int *line_index)
 	
 	start = xmalloc(strlen(line) + 1);
 	
-	/* je¶li uzbierano ju¿ co¶ */
+	/* 
+	 * je¶li uzbierano ju¿ co¶ to próbujemy wy¶wietliæ wszystkie mo¿liwo¶ci 
+	 */
 	if (completions) {
 		int maxlen = 0, cols, rows;
 		char *tmp;
@@ -2769,29 +2771,32 @@ static void complete(int *line_start, int *line_index)
 		return;
 	}
 	
-	words = xcalloc(1, sizeof(char *));
+	/* zerujemy co mamy */
+	words = NULL;
 
 	/* podziel (uwzglêdniaj±c cudzys³owia)*/
 	for (i = 0; i < strlen(line); i++) {
-		if(line[i] == '"') {
+		if(line[i] == '"') 
 			for(j = 0,  i++; i < strlen(line) && line[i] != '"'; i++, j++)
 				start[j] = line[i];
-		}
 		else
 			for(j = 0; i < strlen(line) && !xisspace(line[i]) && line[i] != ','; j++, i++) 
 				start[j] = line[i];
 		start[j] = '\0';
+		/* "przewijamy" wiêksz± ilo¶æ spacji */
 		for(i++; i < strlen(line) && (xisspace(line[i]) || line[i] == ','); i++);
 		i--;
 		array_add(&words, saprintf("%s", start));
 	}
 
-/*	 for(i = 0; i < array_count(words); i++)
-		gg_debug(GG_DEBUG_MISC, "words[i = %d] = \"%s\"\n", i, words[i]);    */
-
-	if (strlen(line) > 1 && line[strlen(line) - 1] == ' ')
+	/* je¿eli ostatnie znaki to spacja, albo przecinek to trzeba dodaæ jeszcze pusty wyraz do words */
+	if (strlen(line) > 1 && (line[strlen(line) - 1] == ' ' || line[strlen(line) - 1] == ','))
 		array_add(&words, xstrdup(""));
 
+/*	 for(i = 0; i < array_count(words); i++)
+		gg_debug(GG_DEBUG_MISC, "words[i = %d] = \"%s\"\n", i, words[i]);     */
+
+	/* inicjujemy pamiêc dla separators */
 	separators = xmalloc(array_count(words));
 		
 	/* sprawd¼, gdzie jeste¶my (uwzgêdniaj±c cudzys³owia) i dodaj separatory*/
@@ -2799,26 +2804,44 @@ static void complete(int *line_start, int *line_index)
 		if(line[i] == '"')  {
 			for(j = 0, i++; i < strlen(line) && line[i] != '"'; j++, i++)
 				start[j] = line[i];
-			separators[word] = line[i+1];
 		}
-				
 		else {
 			for(j = 0; i < strlen(line) && !xisspace(line[i]) && line[i] != ','; j++, i++) 
 				start[j] = line[i];
-			separators[word] = line[i];
 		}
-
+		/* "przewijamy */
 		for(i++; i < strlen(line) && (xisspace(line[i]) || line[i] == ','); i++);
+		/* ustawiamy znak koñca */
 		start[j] = '\0';
+		/* je¿eli to koniec linii, to koñczymy t± zabawê */
 		if(i >= strlen(line))
 	    		break;
+		/* obni¿amy licznik o 1, ¿eby wszystko by³o okey, po "przewijaniu" */
 		i--;
+		/* hmm, jeste¶my ju¿ na wyrazie wskazywany przez kursor ? */
                 if(i >= *line_index)
             		break;
 	}
-	if(xisspace(line[strlen(line) - 1])) 
-		word++;
 	
+	/* dodajmy separatory - pewne rzeczy podobne do pêtli powy¿ej */
+	for (i = 0, j = 0; i < strlen(line); i++, j++) {
+		if(line[i] == '"')  {
+			for(i++; i < strlen(line) && line[i] != '"'; i++);
+			if(i < strlen(line)) 
+				separators[j] = line[i + 1];
+		}
+		else {
+			for(; i < strlen(line) && !xisspace(line[i]) && line[i] != ','; i++);
+			separators[j] = line[i];
+		}
+
+		for(i++; i < strlen(line) && (xisspace(line[i]) || line[i] == ','); i++);
+		i--;
+	}
+
+	separators[j] = '\0'; // koniec ciagu 	
+	
+	/* aktualny wyraz bez uwzgledniania przecinkow */
 	for (i = 0, words_count = 0, word_current = 0; i < strlen(line); i++, words_count++) {
 		for(; i < strlen(line) && !xisspace(line[i]); i++)
 			if(line[i] == '"') 
@@ -2828,15 +2851,21 @@ static void complete(int *line_start, int *line_index)
 			word_current = words_count + 1;
 		i--;
 	}
+
+	/* trzeba pododawaæ trochê do liczników w spefycicznych (patrz warunki) sytuacjach */
+	if((xisspace(line[strlen(line) - 1]) || line[strlen(line) - 1] == ',') && word + 1== array_count(words) -1 ) 
+		word++;
 	if(xisspace(line[strlen(line) - 1]) && words_count == word_current) 
 		word_current++;
 	if(xisspace(line[strlen(line) - 1])) 
 		words_count++;
-
-	
+		
 /*	gg_debug(GG_DEBUG_MISC, "word = %d\n", word);
 	gg_debug(GG_DEBUG_MISC, "start = \"%s\"\n", start);   
-	gg_debug(GG_DEBUG_MISC, "words_count = %d\n", words_count);	 */
+	gg_debug(GG_DEBUG_MISC, "words_count = %d\n", words_count);	 
+	
+	 for(i = 0; i < strlen(separators); i++)
+		gg_debug(GG_DEBUG_MISC, "separators[i = %d] = \"%c\"\n", i, separators[i]);   */
 	
 	cmd = saprintf("/%s ", (config_tab_command) ? config_tab_command : "chat");
 	
@@ -2931,34 +2960,48 @@ static void complete(int *line_start, int *line_index)
 		}
 	}
 problem:
+	
 	count = array_count(completions);
 
+	/* 
+	 * je¶li jest tylko jedna mo¿lwio¶æ na dope³nienie to drukujemy co mamy, 
+	 * ewentualnie bierzemy czê¶æ wyrazów w cudzys³owia ... 
+	 * i uwa¿amy oczywi¶cie na \001 (patrz funkcje wy¿ej 
+	 */
 	if (count == 1) {
-
 		line[0] = '\0';		
 		for(i = 0; i < array_count(words); i++) {
 			if(i == word) {
-				strcat(line, completions[0]);
+				if(strchr(completions[0],  '\001')) {
+					if(completions[0][0] == '"')
+						strncat(line, completions[0] + 2, strlen(completions[0]) - 2 - 1 );
+					else
+						strncat(line, completions[0] + 1, strlen(completions[0]) - 1);
+				}
+				else
+			    		strcat(line, completions[0]);
 				*line_index = strlen(line) + 1;
 			}
-			else
+			else {
 				if(strchr(words[i], ' '))
 					strcat(line, saprintf("\"%s\"", words[i]));
 				else
 					strcat(line, words[i]);
-			if(i == array_count(words) - 1 && line[strlen(line) - 1] != ' ')
-				strcat(line, " ");
-			else if (line[strlen(line) - 1] != ' ') {
-				char tmp[2];
-				tmp[0] = separators[i];
-				tmp[1] = '\0';
-				strcat(line, tmp);
 			}
+			if((i == array_count(words) - 1 && line[strlen(line) - 1] != ' ' ))
+				strcat(line, " ");
+			else if (line[strlen(line) - 1] != ' ') 
+                                strcat(line, saprintf("%c", separators[i]));
 		}
 		array_free(completions);
 		completions = NULL;
 	}
 
+	/* 
+	 * gdy jest wiêcej mo¿liwo¶ci to robimy podobnie jak wy¿ej tyle, ¿e czasem
+	 * trzeba u¿yæ cudzys³owia tylko z jednej storny, no i trzeba dope³niæ do pewnego miejsca
+	 * w sumie proste rzeczy, ale jak widaæ jest trochê opcji ... 
+	 */
 	if (count > 1) {
 		int common = 0;
 		int tmp = 0;
@@ -2972,9 +3015,9 @@ problem:
 			for(j=1; j < count; j++) {
 				if(completions[j][0] == '"') 
 					quotes = 1;
-				if(completions[j][0] == '"' && completions[0][0] != '"')					
+				if(completions[j][0] == '"' && completions[0][0] != '"')
 					tmp = strncasecmp(completions[0], completions[j] + 1, i); 
-				else if(completions[0][0] == '"' && completions[j][0] != '"')					
+				else if(completions[0][0] == '"' && completions[j][0] != '"')
 					tmp = strncasecmp(completions[0] + 1, completions[j], i); 
 				else
 					tmp = strncasecmp(completions[0], completions[j], i); 
@@ -2986,8 +3029,6 @@ problem:
 				break;
 		} 
 		
-
-		
 		/* gg_debug(GG_DEBUG_MISC,"common :%d\n", common); */
 
 		if (strlen(line) + common < LINE_MAXLEN) {
@@ -2995,10 +3036,12 @@ problem:
 			line[0] = '\0';		
 			for(i = 0; i < array_count(words); i++) {
 				if(i == word) {
-					if(quotes == 1 && completions[0][0] != '"')
+					if(quotes == 1 && completions[0][0] != '"') 
 						strcat(line, "\"");
 					if(completions[0][0] == '"')
 						common++;
+					if(completions[0][common - 1] == '"')
+						common--;
 					strncat(line, str_tolower(completions[0]), common);
 					*line_index = strlen(line);
 				}
@@ -3008,14 +3051,8 @@ problem:
 					else
 						strcat(line, words[i]);
 				}
-				if(i != array_count(words) - 1) {
-					/* 
-					 * zmienna tymczasowa, tylko i wy³±cznie po to, aby dalej u¿ywaæ strcat'a 
-					 */
-					char tmp[2];
-					tmp[0] = separators[i];
-					tmp[1] = '\0';
-					strcat(line, tmp);
+				if(separators[i]) {
+					strcat(line, saprintf("%c", separators[i]));
 				}
 			}
 		}
@@ -3042,7 +3079,6 @@ static void update_input()
 			xfree(lines[i]);
 		xfree(lines);
 		lines = NULL;
-
 		line = xmalloc(LINE_MAXLEN);
 		strlcpy(line, "", LINE_MAXLEN);
 
