@@ -170,7 +170,7 @@ COMMAND(cmd_add)
 		return;
 	}
 
-	if (!userlist_add(uin, params[1])) {
+	if (userlist_add(uin, params[1])) {
 		print("user_added", params[1]);
 		gg_add_notify(sess, uin);
 		config_changed = 1;
