@@ -473,15 +473,34 @@ COMMAND(cmd_del)
 	struct userlist *u;
 	const char *tmp;
 	char *nick;
-	uin_t uin;
+	uin_t uin = 0;
+	int del_all = ((params[0] && !strcmp(params[0], "*")) ? 1 : 0);
 
 	if (!params[0]) {
 		print("not_enough_params", name);
 		return;
 	}
 
-	if (!(u = userlist_find((uin = get_uin(params[0])), NULL))) {
+	if (!del_all && !(u = userlist_find((uin = get_uin(params[0])), NULL))) {
 		print("user_not_found", params[0]);
+		return;
+	}
+
+	if (del_all) {
+		list_t l;
+
+		for (l = userlist; l; ) {
+			struct userlist *u = l->data;
+		
+			l = l->next;
+
+			if (sess)
+				gg_remove_notify(sess, uin);
+			userlist_remove(u);
+		}
+
+		print("user_cleared_list");
+		config_changed = 1;
 		return;
 	}
 
@@ -490,7 +509,8 @@ COMMAND(cmd_del)
 
 	if (!userlist_remove(u)) {
 		print("user_deleted", tmp);
-		gg_remove_notify(sess, uin);
+		if (sess)
+			gg_remove_notify(sess, uin);
 		config_changed = 1;
 		ui_event("userlist_changed", nick, itoa(uin));
 	} else
@@ -1132,7 +1152,7 @@ COMMAND(cmd_help)
 COMMAND(cmd_ignore)
 {
 	char *tmp;
-	uin_t uin;
+	uin_t uin = 0;
 
 	if (*name == 'i' || *name == 'I') {
 		if (!params[0]) {
@@ -1184,6 +1204,8 @@ COMMAND(cmd_ignore)
 			print("error_adding_ignored");
 
 	} else {
+		int unignore_all = ((params[0] && !strcmp(params[0], "*")) ? 1 : 0);
+
 		if (!params[0]) {
 			print("not_enough_params", name);
 			return;
@@ -1196,8 +1218,38 @@ COMMAND(cmd_ignore)
 			return;
 		}
 		
-		if (!(uin = get_uin(params[0]))) {
+		if (!unignore_all && !(uin = get_uin(params[0]))) {
 			print("user_not_found", params[0]);
+			return;
+		}
+
+		if (unignore_all) {
+			list_t l;
+			int x = 0;
+
+			for (l = userlist; l; ) {
+				struct userlist *u = l->data;
+
+				l = l->next;
+
+				if (!ignored_remove(u->uin))
+					x = 1;
+
+				if (sess) {
+					gg_remove_notify(sess, uin);
+					gg_add_notify(sess, uin);
+				}
+
+				if (uin == config_uin)
+					update_status();
+			}
+
+			if (x) {
+				print("ignored_deleted_all");
+				config_changed = 1;
+			} else
+				print("ignored_list_empty");
+			
 			return;
 		}
 		
@@ -1254,14 +1306,38 @@ COMMAND(cmd_block)
 		print("blocked_added", params[0]);
 		config_changed = 1;
 	} else {
+		int unblock_all = ((params[0] && !strcmp(params[0], "*")) ? 1 : 0);
+
 		if (!params[0]) {
 			print("not_enough_params", name);
 			return;
 		}
 
-		if (!(uin = get_uin(params[0]))) {
+		if (!unblock_all && !(uin = get_uin(params[0]))) {
 			print("user_not_found", params[0]);
 			return;
+		}
+
+		if (unblock_all) {
+			list_t l;
+			int x = 0;
+
+			for (l = userlist; l; ) {
+				struct userlist *u = l->data;
+			
+				l = l->next;
+	
+				if (!blocked_remove(u->uin))
+					x = 1;
+			}
+
+			if (x) {
+				print("blocked_deleted_all");
+				config_changed = 1;
+			} else
+				print("blocked_list_empty");
+
+			return;			
 		}
 		
 		if (!blocked_remove(uin)) {
@@ -3938,7 +4014,7 @@ void command_init()
 	  
 	command_add
 	( "del", "u", cmd_del, 0,
-	  " <numer/alias>", "usuwa u¿ytkownika z listy kontaktów",
+	  " <numer/alias>|*", "usuwa u¿ytkownika z listy kontaktów lub czy¶ci listê",
 	  "");
 	
 	command_add
@@ -4188,12 +4264,12 @@ void command_init()
 
 	command_add
 	( "unignore", "i", cmd_ignore, 0,
-	  " <numer/alias>", "usuwa z listy ignorowanych osób",
+	  " <numer/alias>|*", "usuwa z listy ignorowanych osób",
 	  "");
 	  
 	command_add
 	( "unblock", "b", cmd_block, 0,
-	  " <numer/alias>", "usuwa z listy blokowanych osób",
+	  " <numer/alias>|*", "usuwa z listy blokowanych osób",
 	  "");
 	  
 	command_add

@@ -12,6 +12,7 @@ zg³osi³ b³±d.
 - libgadu: poprawki kompilacji na BeOSie (w)
 - dodanie formatu ,,sms_conf'' przy wiadomo¶ci konferencyjnej (rmrmg/sz)
 - ,,on nasz_nick descr'' te¿ zadzia³a (krzyk/sz)
+- dodanie parametru ,,*'' do del, unignore, unblock (sz)
 
 // 2003-01-18
 
