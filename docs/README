@@ -115,7 +115,7 @@ KLAWIATURA
 	Ctrl-T			pochy³a czcionka [3]
 	Ctrl-V			pozwala wpisaæ dowolny znak [2]
         Ctrl-U			usuniêcie aktualnej linii
-        Ctrl-W			usuniêcie s³owa przed kursorem
+        Ctrl-W, Alt-Backspace	usuniêcie s³owa przed kursorem
         Ctrl-Y			wklejenie ostatnio usuniêtego bloku
         Ctrl-Z			przeniesienie programu w t³o
 	Ctrl-_			podkre¶lona czcionka [3]
