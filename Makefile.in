@@ -30,8 +30,8 @@ install: ekg
 	$(install) -m 755 docs/ekl.pl $(prefix)/bin
 	@$(install) -d $(datadir)/ekg/themes/
 	$(install) -m 644 themes/*.theme $(datadir)/ekg/themes
-	@$(install) -d $(mandir)/mann
-	$(install) -m 644 docs/ekg.man $(mandir)/mann
+	@$(install) -d $(mandir)/man1
+	$(install) -m 644 docs/ekg.man.en $(mandir)/man1/ekg.1
 
 distclean:	clean
 	$(RM) -f *~ config.log config.cache config.status config.h Makefile

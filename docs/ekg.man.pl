@@ -1,4 +1,4 @@
-.TH EKG n "31 pa¼dziernik 2001" 
+.TH EKG n "31 pa¼dziernika 2001" 
 .SH NAZWA
 ekg \- Eksperymentalny Klient Gadu-Gadu
 .SH SK£ADNIA

@@ -1,0 +1,40 @@
+.TH EKG n "31 october 2001" 
+.SH NAME
+ekg \- A Gadu-Gadu compatible client.
+.SH SYNTAX
+.B ekg [
+.BI options
+.B ]
+
+.SH SUMMARY
+.B ekg
+This is experimental Gadu-Gadu client.
+
+.SH OPTIONS
+.TP
+.BI \-d\ [\-\-debug]
+Enables "debug" mode - this is special verbose mode.
+.TP
+.BI \-n\ [\-\-no-auto]
+Don't connect automagically. After starting program won't automatically 
+connect to the gg servers. 
+.TP
+.BI \-u "\ " username\ [\-\-user\ username]
+Starts ekg with other \"user\". 
+By default config files are stored in ~/.gg; this option gives 
+ability to create subdirectories structure with other setups.
+.TP
+.BI \-t\ theme\ [\-\-theme\ theme]
+loads theme from specified file
+.TP
+.BI \-a\ [\-\-away]
+after connect goes away
+.TP
+.BI \-b\ [\-\-back]
+after connect goes back
+.TP
+.BI \-i\ [\-\-invisible]
+after connect goes invisible
+.TP
+.BI \-p\ [\-\-private]
+after connect changes to private
