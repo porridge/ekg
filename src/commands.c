@@ -2789,6 +2789,22 @@ COMMAND(cmd_last)
 	uin_t uin = 0;
 	int count = 0, last_count;
 
+	if (match_arg(params[0], 'c', "clear", 2)) {
+		if (params[1] && (!(uin = get_uin(params[1])))) {
+			print("user_not_found", params[1]);
+			return;
+		}
+
+		last_del(uin);
+		
+		if (uin)
+			print("last_clear_uin", format_user(uin));
+		else
+			print("last_clear");
+
+		return;
+	}		
+
 	if (params[0] && (!(uin = get_uin(params[0])))) {
 		print("user_not_found", params[0]);
 		return;
@@ -3224,9 +3240,11 @@ void command_init()
 	  "  list");
 
 	command_add
-	( "last", "u", cmd_last, 0,
-	  " [numer/alias]", "wy¶wietla ostatnio otrzymane wiadomo¶ci",
-	  "");
+	( "last", "uu", cmd_last, 0,
+	  " [opcje]", "wy¶wietl lub wyczy¶æ ostatnie wiadomo¶ci",
+	  " [numer/alias]             wy¶wietla ostatnio otrzymane wiadomo¶ci\n"
+	  " -c, --clear [numer/alias] czy¶ci wiadomo¶ci od numer/alias lub wszystkie\n"
+	  );
   
 	command_add
 	( "_add", "?", cmd_test_add, 0, "",

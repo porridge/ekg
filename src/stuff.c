@@ -2926,6 +2926,45 @@ char *log_escape(const char *str)
 }
 
 /*
+ * last_del()
+ *
+ * usuwa wiadomo¶ci skojarzone z dan± osob± lub wszystkie (uin==0)
+ *
+ * - uin - numerek osoby
+ *
+ */
+void last_del(uin_t uin)
+{
+	list_t l;
+
+	for (l = lasts; l; ) {
+		struct last *ll = l->data;
+
+		l = l->next;
+
+		if (uin == 0 || uin == ll->uin) {
+			xfree(ll->message);
+			list_remove(&lasts, ll, 1);
+		}
+	}
+
+	if (uin == 0) {
+		list_destroy(lasts_count, 1);
+		lasts_count = NULL;
+		return;
+	}
+
+	for (l = lasts_count; l; l = l->next) {
+		struct last_count *lc = l->data;
+
+		if (lc->uin == uin)  {
+			list_remove(&lasts_count, lc, 1);
+			return;
+		}
+	}
+}
+
+/*
  * last_add()
  *
  * dodaje wiadomo¶æ do listy ostatnio otrzymanych.

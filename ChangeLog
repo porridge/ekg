@@ -9,6 +9,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-11-15
 
 - ctxwindow - okienko z dostepnymi osobami (wojboj/s)
+- dodanie opcji --clear do ,,last'' (d)
 
 // 2002-11-14
 
@@ -19,7 +20,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 // 2002-11-13
 
-- dodany eileen.theme (d)
+- dodany eileen.theme (en/d)
 - poprawki wykrywania openssl (Arim/w)
 
 // 2002-11-12
