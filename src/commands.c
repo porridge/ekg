@@ -3249,6 +3249,13 @@ int command_exec(const char *target, const char *xline)
 	return -1;
 }
 
+int binding_help(int a, int b)  
+{
+	print("help_quick");  
+
+	return 0;  
+}
+
 /*
  * binding_quick_list()
  *
