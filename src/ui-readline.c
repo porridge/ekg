@@ -73,7 +73,7 @@ static void window_08() { if (curr_window == 8) return; window_switch(8); }
 static void window_09() { if (curr_window == 9) return; window_switch(9); }
 
 static char *seq_get_command(char *seq);
-static int bind_sequence(char *seq, char *command);
+static int bind_sequence(char *seq, char *command, int quiet);
 static int bind_seq_list();
 
 /* pro¶ciej siê chyba nie da... */
@@ -809,17 +809,17 @@ static int ui_readline_event(const char *event, ...)
 				goto cleanup;
 			}
 
-			if (!strcasecmp(p1, "-a") || !strcasecmp(p1, "--add")) {
+			if (!strcasecmp(p1, "-a") || !strcasecmp(p1, "--add") ||!strcasecmp(p1, "--add-quiet")) {
 				if (!p2 || !p3) 
 					print("bind_not_enough_params");
 				else
-					bind_sequence(p2, p3);
+					bind_sequence(p2, p3, (!strcasecmp(p1, "--add-quiet")) ? 1 : 0);
 			
 			} else if (!strcasecmp(p1, "-d") || !strcasecmp(p1, "--del")) {
 				if (!p2)
 					print("bind_not_enough_params");
 				else
-					bind_sequence(p2, NULL);
+					bind_sequence(p2, NULL, 0);
 			
 			} else if (!strcasecmp(p1, "-l") || !strcasecmp(p1, "--list")) {
 				bind_seq_list();
@@ -1112,7 +1112,7 @@ static char *seq_get_command(char *seq)
 	return NULL;
 }
 		
-static int bind_sequence(char *seq, char *command)
+static int bind_sequence(char *seq, char *command, int quiet)
 {
 	int real_seq = 0;
 	char c = 0;
@@ -1121,12 +1121,14 @@ static int bind_sequence(char *seq, char *command)
 		return 1;
 
 	if (command && seq_get_command(seq)) {
-		print("bind_seq_exist");
+		if (!quiet)
+			print("bind_seq_exist");
 		return 1;
 	}
 	
 	if (command && strlen(command) > 128) /* zeby nie bylo... */ {
-		print("bind_seq_command_too_long");
+		if (!quiet)
+			print("bind_seq_command_too_long");
 		return 1;
 	}
 		
@@ -1134,7 +1136,8 @@ static int bind_sequence(char *seq, char *command)
 		c = toupper(seq[5]);
 		real_seq = CTRL(c);
 	} else {
-		print("bind_seq_incorrect", seq);
+		if (!quiet)
+			print("bind_seq_incorrect", seq);
 		return 1;
 	}
 
@@ -1164,7 +1167,9 @@ static int bind_sequence(char *seq, char *command)
 		case 'W': (command) ? rl_bind_key(real_seq, seq_execute_w) : rl_unbind_key(real_seq); break;
 		case 'Y': (command) ? rl_bind_key(real_seq, seq_execute_y) : rl_unbind_key(real_seq); break;
 		case 'Z': (command) ? rl_bind_key(real_seq, seq_execute_z) : rl_unbind_key(real_seq); break;
-		default: print("bind_seq_incorrect", seq); return 1;
+		default: if (!quiet)
+				 print("bind_seq_incorrect", seq); 
+			 return 1;
 	}
 	
 	if (command) {
@@ -1174,8 +1179,10 @@ static int bind_sequence(char *seq, char *command)
 		s.command = xstrdup(command);
 
 		list_add(&sequences, &s, sizeof(s));
-		print("bind_seq_add", seq);
-		config_changed = 1;
+		if (!quiet) {
+			print("bind_seq_add", seq);
+			config_changed = 1;
+		}
 	} 
 	else {
 		struct list *l;
@@ -1185,8 +1192,10 @@ static int bind_sequence(char *seq, char *command)
 
 			if (s->seq && !strcasecmp(s->seq, seq)) {
 				list_remove(&sequences, s, 1);
-				print("bind_seq_remove", seq);
-				config_changed = 1;
+				if (!quiet) {
+					print("bind_seq_remove", seq);
+					config_changed = 1;
+				}
 				return 0;
 			}
 		}

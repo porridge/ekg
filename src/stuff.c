@@ -349,7 +349,7 @@ int config_read()
 		} else if (!strcasecmp(buf, "bind")) {
 			char **pms = array_make(foo, " \t", 2, 1, 0);
 			if (pms && pms[0] && pms[1]) 
-				ui_event("command", "bind", "-a", pms[0], pms[1]);
+				ui_event("command", "bind", "--add-quiet", pms[0], pms[1]);
                 } else 
 			variable_set(buf, foo, 1);
 
