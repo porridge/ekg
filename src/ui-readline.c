@@ -759,6 +759,7 @@ static int ui_readline_event(const char *event, ...)
 
 			} else if (!strcasecmp(p1, "clear")) {
 		                window_clear();
+				window_refresh();
 
 			} else if (!strcasecmp(p1, "list")) {
 				window_list();
@@ -846,6 +847,7 @@ static int window_switch(int id)
 #else /*#elif HAVE_RL_EXPAND_PROMPT*/
 			rl_expand_prompt(current_prompt());
 #endif
+			rl_initialize(); /* reinitialize rl's internal state */
                         return 0;
                 }
         }
