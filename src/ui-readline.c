@@ -100,8 +100,8 @@ struct window *window_current = NULL;
 
 /* kod okienek napisany jest na podstawie ekg-windows nilsa */
 static struct window *window_add();
-static int window_remove(int id);
-static int window_switch(int id);
+static int window_remove(int id, int quiet);
+static int window_switch(int id, int quiet);
 static int window_refresh();
 static int window_write(int id, const char *line);
 static void window_clear();
@@ -569,9 +569,9 @@ static void ui_readline_print(const char *target, int separate, const char *xlin
 			char *tmp;
 			
 			in_readline++;
-		        rl_set_prompt(prompt);
+		        rl_set_prompt((char *) prompt);
 			pager_lines = -1;
-			tmp = readline(prompt);
+			tmp = readline((char *) prompt);
 			in_readline--;
 			if (tmp) {
 				xfree(tmp);
@@ -698,7 +698,7 @@ static char *my_readline()
 
         in_readline = 1;
 	rl_set_prompt(prompt);
-        res = readline(prompt);
+        res = readline((char *) prompt);
         in_readline = 0;
 
 	tmp = saprintf("%s%s\n", prompt, (res) ? res : "");
@@ -801,13 +801,13 @@ static void ui_readline_loop()
 
 		/* je¶li wci¶niêto Ctrl-D i jeste¶my w query, wyjd¼my */
 		if (!line && window_current->query_nick) {
-			ui_event("command", "query", NULL);
+			ui_event("command", 0, "query", NULL);
 			continue;
 		}
 
 		/* je¶li wci¶niêto Ctrl-D, to zamknij okienko */
 		if (!line && list_count(windows) > 1) {
-			window_remove(window_current->id);
+			window_remove(window_current->id, 0);
 			continue;
 		}
 
@@ -918,16 +918,17 @@ static int ui_readline_event(const char *event, ...)
 				int id;
 
 				if ((id = window_find_query(param))) {
-					print("query_exist", param, itoa(id));
+					printq("query_exist", param, itoa(id));
 					return 1;
 				}
 				
-				print("query_started", param);
+				printq("query_started", param);
 				xfree(window_current->query_nick);
 				window_current->query_nick = xstrdup(param);
 			} else {
-				printf("\n");	/* XXX brzydkie */
-				print("query_finished", window_current->query_nick);
+				if (!quiet)
+					printf("\n");	/* XXX brzydkie */
+				printq("query_finished", window_current->query_nick);
 				xfree(window_current->query_nick);
 				window_current->query_nick = NULL;
 			}
@@ -963,7 +964,7 @@ static int ui_readline_event(const char *event, ...)
 			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*);
 
 			if (!p1) {
-		                print("not_enough_params", "window");
+		                printq("not_enough_params", "window");
 				result = 1;
 				goto cleanup;
 		        }
@@ -972,21 +973,21 @@ static int ui_readline_event(const char *event, ...)
 		                window_add();
  
 			} else if (!strcasecmp(p1, "next")) {
-		                window_switch(window_current->id + 1);
+		                window_switch(window_current->id + 1, quiet);
 
 			} else if (!strcasecmp(p1, "prev")) {
-		                window_switch(window_current->id - 1);
+		                window_switch(window_current->id - 1, quiet);
 				
 		        } else if (!strcasecmp(p1, "kill")) {
 		                int id = (p2) ? atoi(p2) : window_current->id;
 
-				window_remove(id);
+				window_remove(id, quiet);
 				
 		        } else if (!strcasecmp(p1, "switch")) {
-		                if (!p2)
-		                        print("not_enough_params", "window");
-		                else
-		                	window_switch(atoi(p2));
+		                if (!p2) {
+		                        printq("not_enough_params", "window");
+		                } else
+		                	window_switch(atoi(p2), quiet);
 
 			} else if (!strcasecmp(p1, "refresh")) {
 		                window_refresh();
@@ -996,10 +997,11 @@ static int ui_readline_event(const char *event, ...)
 				window_refresh();
 
 			} else if (!strcasecmp(p1, "list")) {
-				window_list();
+				if (!quiet)
+					window_list();
 				
 			} else
-				print("invalid_params", "window");
+				printq("invalid_params", "window");
 
 			result = 1;
 		}
@@ -1007,20 +1009,20 @@ static int ui_readline_event(const char *event, ...)
 		if (!strcasecmp(command, "bind")) {
 			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*), *p3 = va_arg(ap, char*);
 			
-			if (p1 && (!strcasecmp(p1, "-a") || !strcasecmp(p1, "--add") ||!strcasecmp(p1, "--add-quiet"))) {
-				if (!p2 || !p3)
+			if (p1 && (!strcasecmp(p1, "-a") || !strcasecmp(p1, "--add"))) {
+				if ((!p2 || !p3) && !quiet)
 					print("not_enough_params", "bind");
 				else
-					bind_sequence(p2, p3, (!strcasecmp(p1, "--add-quiet")) ? 1 : 0);
+					bind_sequence(p2, p3, quiet);
 			
 			} else if (p1 && (!strcasecmp(p1, "-d") || !strcasecmp(p1, "--del"))) {
-				if (!p2)
+				if (!p2 && !quiet)
 					print("not_enough_params", "bind");
 				else
-					bind_sequence(p2, NULL, 0);
+					bind_sequence(p2, NULL, quiet);
 			
 			} else 
-				binding_list(!strcasecmp(p1, "--add-quiet"));
+				binding_list(quiet);
 
 			result = 1;
 		}
@@ -1087,20 +1089,20 @@ static struct window *window_add()
  *
  * usuwa okno o podanym numerze.
  */
-static int window_remove(int id)
+static int window_remove(int id, int quiet)
 {
 	struct window *w;
 	int i;
 
 	/* je¶li zosta³o jedno okienko, nie usuwaj niczego. */
         if (list_count(windows) < 2) {
-                print("window_no_windows");
+                printq("window_no_windows");
                 return -1;
         }
 
 	/* je¶li nie ma takiego okienka, id¼ sobie. */
 	if (!(w = window_find(id))) {
-        	print("window_noexist");
+        	printq("window_noexist");
 		return -1;
 	}
 
@@ -1112,7 +1114,7 @@ static int window_remove(int id)
 		if (newwin == w) 
 			newwin = windows->next->data;
 		
-		window_switch(newwin->id);
+		window_switch(newwin->id, 0);
 	}
 
 	/* i sortujemy okienka, w razie potrzeby... */
@@ -1146,12 +1148,12 @@ static int window_remove(int id)
  *
  * prze³±cza do okna o podanym id.
  */
-static int window_switch(int id)
+static int window_switch(int id, int quiet)
 {
 	struct window *w = window_find(id);
 
 	if (!w) {
-		print("window_noexist");
+		printq("window_noexist");
 		return -1;
 	}
 
@@ -1159,9 +1161,9 @@ static int window_switch(int id)
 	w->act = 0;
 	window_refresh();
 #ifdef HAVE_RL_SET_PROMPT
-	rl_set_prompt(current_prompt());
+	rl_set_prompt((char *) current_prompt());
 #else
-	rl_expand_prompt(current_prompt());
+	rl_expand_prompt((char *) current_prompt());
 #endif
 	rl_initialize();
 
@@ -1219,9 +1221,9 @@ static int window_write(int id, const char *line)
 	if (w != window_current) {
 		w->act = 1;
 #ifdef HAVE_RL_SET_PROMPT
-		rl_set_prompt(current_prompt());
+		rl_set_prompt((char *) current_prompt());
 #else
-		rl_expand_prompt(current_prompt());
+		rl_expand_prompt((char *) current_prompt());
 #endif
 		rl_redisplay();
 	}
@@ -1306,9 +1308,9 @@ static int window_make_query(const char *nick)
 				if (w == window_current) {
 					print("query_started", nick);
 #ifdef HAVE_RL_SET_PROMPT
-					rl_set_prompt(current_prompt());
+					rl_set_prompt((char *) current_prompt());
 #else
-					rl_expand_prompt(current_prompt());
+					rl_expand_prompt((char *) current_prompt());
 #endif									
 				} else
 					print("window_id_query_started", itoa(w->id), nick);
@@ -1462,9 +1464,9 @@ static int bind_handler_alt(int a, int key)
 static int bind_handler_window(int a, int key)
 {
 	if (key > '0' && key <= '9')
-		window_switch(key - '0');
+		window_switch(key - '0', 0);
 	else
-		window_switch(10);
+		window_switch(10, 0);
 
 	return 0;
 }
@@ -1477,9 +1479,7 @@ static int bind_sequence(const char *seq, const char *command, int quiet)
 		return -1;
 
 	if (command && bind_find_command(seq)) {
-		if (!quiet)
-			print("bind_seq_exist", seq);
-
+		printq("bind_seq_exist", seq);
 		return -1;
 	}
 	
@@ -1505,8 +1505,7 @@ static int bind_sequence(const char *seq, const char *command, int quiet)
 			rl_unbind_key_in_map(seq[4], emacs_meta_keymap);
 		
 	} else {
-		if (!quiet)
-			print("bind_seq_incorrect", seq);
+		printq("bind_seq_incorrect", seq);
 
 		return -1;
 	}

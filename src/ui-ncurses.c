@@ -2831,7 +2831,7 @@ void window_kill(struct window *w, int quiet)
 		goto cleanup;
 
 	if (id == 1 && w->target) {
-		print("query_finished", window_current->target);
+		printq("query_finished", window_current->target);
 		xfree(window_current->target);
 		xfree(window_current->prompt);
 		window_current->target = NULL;
@@ -2841,7 +2841,7 @@ void window_kill(struct window *w, int quiet)
 	}
 	
 	if (id == 1) {
-		print("window_kill_status");
+		printq("window_kill_status");
 		return;
 	}
 
