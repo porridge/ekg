@@ -39,16 +39,16 @@
  *
  * zwraca wska¼nik zaalokowanego elementu lub NULL w przpadku b³êdu.
  */
-void *list_add_sorted(struct list **list, void *data, int alloc_size, int (*comparision)(void *, void *))
+void *list_add_sorted(list_t *list, void *data, int alloc_size, int (*comparision)(void *, void *))
 {
-	struct list *new, *tmp;
+	list_t new, tmp;
 
 	if (!list) {
 		errno = EFAULT;
 		return NULL;
 	}
 
-	new = xmalloc(sizeof(struct list));
+	new = xmalloc(sizeof(list_t));
 
 	new->data = data;
 	new->next = NULL;
@@ -66,7 +66,7 @@ void *list_add_sorted(struct list **list, void *data, int alloc_size, int (*comp
 				tmp = tmp->next;
 			tmp->next = new;
 		} else {
-			struct list *prev = NULL;
+			list_t prev = NULL;
 			
 			while (comparision(new->data, tmp->data) > 0) {
 				prev = tmp;
@@ -94,7 +94,7 @@ void *list_add_sorted(struct list **list, void *data, int alloc_size, int (*comp
  *
  * wrapper do list_add_sorted(), który zachowuje poprzedni± sk³adniê.
  */
-void *list_add(struct list **list, void *data, int alloc_size)
+void *list_add(list_t *list, void *data, int alloc_size)
 {
 	return list_add_sorted(list, data, alloc_size, NULL);
 }
@@ -108,9 +108,9 @@ void *list_add(struct list **list, void *data, int alloc_size)
  *  - data - element,
  *  - free_data - zwolniæ pamiêæ po elemencie.
  */
-int list_remove(struct list **list, void *data, int free_data)
+int list_remove(list_t *list, void *data, int free_data)
 {
-	struct list *tmp, *last = NULL;
+	list_t tmp, last = NULL;
 
 	if (!list) {
 		errno = EFAULT;
@@ -144,7 +144,7 @@ int list_remove(struct list **list, void *data, int free_data)
  *
  *  - list - lista.
  */
-int list_count(struct list *list)
+int list_count(list_t list)
 {
 	int count = 0;
 
@@ -162,9 +162,9 @@ int list_count(struct list *list)
  *  - list - lista,
  *  - free_data - czy zwalniaæ bufor danych?
  */
-int list_destroy(struct list *list, int free_data)
+int list_destroy(list_t list, int free_data)
 {
-	struct list *tmp;
+	list_t tmp;
 	
 	while (list) {
 		if (free_data)
@@ -186,10 +186,10 @@ int list_destroy(struct list *list, int free_data)
  * dodaje do danego ci±gu jeden znak, alokuj±c przy tym odpowiedni± ilo¶æ
  * pamiêci.
  *
- *  - s - wska¼nik do `struct string',
+ *  - s - ci±g znaków.
  *  - c - znaczek do dopisania.
  */
-int string_append_c(struct string *s, char c)
+int string_append_c(string_t s, char c)
 {
 	char *new;
 
@@ -217,11 +217,11 @@ int string_append_c(struct string *s, char c)
  *
  * dodaje tekst do bufora alokuj±c odpowiedni± ilo¶æ pamiêci.
  *
- *  - s - wska¼nik `struct string',
+ *  - s - ci±g znaków,
  *  - str - tekst do dopisania,
  *  - count - ile znaków tego tekstu dopisaæ? (-1 znaczy, ¿e ca³y).
  */
-int string_append_n(struct string *s, const char *str, int count)
+int string_append_n(string_t s, const char *str, int count)
 {
 	char *new;
 
@@ -247,7 +247,7 @@ int string_append_n(struct string *s, const char *str, int count)
 	return 0;
 }
 
-int string_append(struct string *s, const char *str)
+int string_append(string_t s, const char *str)
 {
 	return string_append_n(s, str, -1);
 }
@@ -261,9 +261,9 @@ int string_append(struct string *s, const char *str)
  *
  * zwraca zaalokowan± strukturê `string'.
  */
-struct string *string_init(const char *value)
+string_t string_init(const char *value)
 {
-	struct string *tmp = xmalloc(sizeof(struct string));
+	string_t tmp = xmalloc(sizeof(string_t));
 
 	if (!value)
 		value = "";
@@ -285,7 +285,7 @@ struct string *string_init(const char *value)
  *
  * je¶li free_string=0 zwraca wska¼nik do ci±gu, inaczej NULL.
  */
-char *string_free(struct string *s, int free_string)
+char *string_free(string_t s, int free_string)
 {
 	char *tmp = NULL;
 

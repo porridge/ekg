@@ -46,7 +46,7 @@ static int ui_readline_event(const char *event, ...);
 static void ui_readline_deinit();
 
 static int in_readline = 0, no_prompt = 0, pager_lines = -1, screen_lines = 24, screen_columns = 80, curr_window = 1, windows_count = 0;
-struct list *windows = NULL;
+list_t windows = NULL;
 struct window *win;
 
 /* kod okienek napisany jest na podstawie ekg-windows nilsa */
@@ -186,7 +186,7 @@ static char *command_generator(char *text, int state)
 
 static char *known_uin_generator(char *text, int state)
 {
-	static struct list *l;
+	static list_t l;
 	static int len;
 
 	if (!state) {
@@ -225,7 +225,7 @@ static char *unknown_uin_generator(char *text, int state)
 
 static char *variable_generator(char *text, int state)
 {
-	static struct list *l;
+	static list_t l;
 	static int len;
 
 	if (!state) {
@@ -255,7 +255,7 @@ static char *variable_generator(char *text, int state)
 
 static char *ignored_uin_generator(char *text, int state)
 {
-	static struct list *l;
+	static list_t l;
 	static int len;
 	struct userlist *u;
 
@@ -688,7 +688,7 @@ static void ui_readline_loop()
 			break;
 
 		if (strlen(line) > 1 && line[strlen(line) - 1] == '\\' && line[strlen(line) - 2] == ' ') {
-			struct string *s = string_init(NULL);
+			string_t s = string_init(NULL);
 
 			line[strlen(line) - 1] = 0;
 
@@ -759,7 +759,7 @@ static int ui_readline_event(const char *event, ...)
 				goto cleanup;
 
 			if (param) {
-				struct list *l;
+				list_t l;
 
 				for (l = windows; l; l = l->next) {
 					struct window *w = l->data;
@@ -890,7 +890,7 @@ static struct window *window_add()
 
 static int window_del(int id)
 {
-        struct list *l;
+        list_t l;
 
         if (windows_count <= 1) {
                 print("window_no_windows");
@@ -919,7 +919,7 @@ static int window_del(int id)
 
 static int window_switch(int id)
 {
-        struct list *l, *tmp = windows;
+        list_t l, tmp = windows;
 
         for (l = windows; l; l = l->next) {
                 struct window *w = l->data;
@@ -968,7 +968,7 @@ static int window_refresh()
 static int window_write(int id, const char *line)
 {
         int j = 1;
-        struct list *l;
+        list_t l;
         struct window *w = NULL;
 
         if (!line)
@@ -1014,7 +1014,7 @@ static int window_clear()
 
 static int windows_sort()
 {
-        struct list *l;
+        list_t l;
         int id = 1, new_id = 0;
 
         for (l = windows; l; l = l->next) {
@@ -1036,7 +1036,7 @@ static int windows_sort()
 
 static int window_query_id(const char *qnick)
 {
-        struct list *l;
+        list_t l;
 
         if (!qnick)
                 return -1;
@@ -1056,7 +1056,7 @@ static int window_query_id(const char *qnick)
 
 static void window_list()
 {
-	struct list *l;
+	list_t l;
 
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
@@ -1073,7 +1073,7 @@ static void window_list()
 static int window_make_query(const char *nick)
 {
 	if (config_make_window == 1) {
-		struct list *l;
+		list_t l;
 
 		for (l = windows; l; l = l->next) {
 			struct window *w = l->data;
@@ -1139,7 +1139,7 @@ static void window_free()
 
 static char *seq_get_command(char *seq)
 {
-	struct list *l;
+	list_t l;
 
 	if (!seq)
 		return NULL;
@@ -1227,7 +1227,7 @@ static int bind_sequence(char *seq, char *command, int quiet)
 		}
 	} 
 	else {
-		struct list *l;
+		list_t l;
 
 		for (l = sequences; l; l = l->next) {
 			struct sequence *s = l->data;
@@ -1248,7 +1248,7 @@ static int bind_sequence(char *seq, char *command, int quiet)
 
 static int bind_seq_list() 
 {
-	struct list *l;
+	list_t l;
 	int count = 0;
 
 	for (l = sequences; l; l = l->next) {

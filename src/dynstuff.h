@@ -28,11 +28,12 @@ struct list {
 };
 
 typedef struct list * list_t;
-void *list_add(struct list **list, void *data, int alloc_size);
-void *list_add_sorted(struct list **list, void *data, int alloc_size, int (*comparision)(void *, void *));
-int list_remove(struct list **list, void *data, int free_data);
-int list_count(struct list *list);
-int list_destroy(struct list *list, int free_data);
+
+void *list_add(list_t *list, void *data, int alloc_size);
+void *list_add_sorted(list_t *list, void *data, int alloc_size, int (*comparision)(void *, void *));
+int list_remove(list_t *list, void *data, int free_data);
+int list_count(list_t list);
+int list_destroy(list_t list, int free_data);
 
 /* stringi */
 
@@ -43,11 +44,11 @@ struct string {
 
 typedef struct string * string_t;
 
-struct string *string_init(const char *str);
-int string_append(struct string *s, const char *str);
-int string_append_n(struct string *s, const char *str, int count);
-int string_append_c(struct string *s, char ch);
-char *string_free(struct string *s, int free_string);
+string_t string_init(const char *str);
+int string_append(string_t s, const char *str);
+int string_append_n(string_t s, const char *str, int count);
+int string_append_c(string_t s, char ch);
+char *string_free(string_t s, int free_string);
 
 /* tablice stringów */
 

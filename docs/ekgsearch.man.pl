@@ -67,7 +67,7 @@ Pokazuj informacje diagnostyczne.
 .SH PATRZ TE¯
 .BR ekg (1).
 .br
-.SH AUTHOR
+.SH AUTOR
 Piotr Wysocki <wysek@linux.bydg.org>.
 .br
 Ta strona podrêcznika zosta³a napisana przez Marcina Owsianego <porridge@debian.org>
