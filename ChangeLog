@@ -1,7 +1,9 @@
 // 2001-10-27 
+
 - popsulem configure [kompatybilnosc z termcapem + wymuszenie curses 
   --without-termcap + mozliwosc wylaczenia -Wall -ggdb --without-debug]
   pierwsze (i/wojtekka), drugie (i/undefined)
+- poprawione gg_alloc_sprintf() na maszynach pre-C99 (p/wojtekka).
 
 // 2001-10-26
 
