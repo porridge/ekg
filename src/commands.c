@@ -4833,7 +4833,8 @@ void command_init()
 	  "oznaczaj±cych dni, godziny, minuty, sekundy, np. 5h20m. Timer po "
 	  "jednorazowym uruchomieniu jest usuwany, chyba ¿e czas poprzedzimy "
 	  "wyra¿eniem ,,*/''. Wtedy timer bêdzie uruchamiany w zadanych odstêpach "
-	  "czasu, a na li¶cie bêdzie oznaczony gwiazdk±.");
+	  "czasu, a na li¶cie bêdzie oznaczony gwiazdk±. Nazwa nie mo¿e siê "
+	  "zaczynaæ cyfr±.");
 
 	command_add
 	( "unignore", "i", cmd_ignore, 0,
