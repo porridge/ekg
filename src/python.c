@@ -101,7 +101,8 @@ static PyObject* ekg_cmd_print_header(PyObject *self, PyObject *args)
 		return NULL;
 
 #ifdef WITH_UI_NCURSES
-	window_printat(header, x, y, text, NULL, COLOR_WHITE, 0, COLOR_BLUE, 1);
+	if (header)
+		window_printat(header, x, y, text, NULL, COLOR_WHITE, 0, COLOR_BLUE, 1);
 #endif
 
 	return Py_BuildValue("");
