@@ -1,4 +1,11 @@
-// 20001-10-17
+// 2001-10-21
+
+- nudne niedzielne popo³unie... hmm, popsujê mo¿e cvsa vinilowi, hehe ;)
+  (?/wojtekka)
+- dodane wszystko, co le¿a³o u mnie w ~/src/gg, a nie by³o do³±czane do
+  snapshotów (p/wojtekka)
+
+// 2001-10-17
 
 - czyszczenie userlist [statusow] (i/agaran)
 - mozliwosc wyboru usera ekg -u <user> - konfig pobiera z ~/.gg/<user>/config
