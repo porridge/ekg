@@ -9,6 +9,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - poprawka includów dla FreeBSD (argasek/w)
 - poprawka edycji linii w ui-ncurses (w)
+- poprawka dcc (Chilek/w)
 
 // 2002-06-28
 
