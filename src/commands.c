@@ -3901,6 +3901,23 @@ COMMAND(cmd_at)
 		else
 			a_command = array_join((char **) params + 2, " ");
 
+		if (a_command) {
+			char *tmp = a_command;
+
+			a_command = strip_spaces(a_command);
+			
+			if (!strcmp(a_command, "")) {
+				printq("not_enough_params", name);
+				xfree(tmp);
+				return -1;
+			}
+
+			a_command = tmp;
+		} else {
+			printq("not_enough_params", name);
+			return -1;
+		}
+
 		if ((t = timer_add(period, ((freq) ? 1 : 0), TIMER_COMMAND, 1, a_name, a_command))) {
 			printq("at_added", t->name);
 			if (freq)
@@ -4123,6 +4140,23 @@ COMMAND(cmd_timer)
 			
 			if (!*p)
 				break;
+		}
+
+		if (t_command) {
+			char *tmp = t_command;
+
+			t_command = strip_spaces(t_command);
+
+			if (!strcmp(t_command, "")) {
+				printq("not_enough_params", name);
+				xfree(tmp);
+				return -1;
+			}
+
+			t_command = tmp;
+		} else {
+			printq("not_enough_params", name);
+			return -1;
 		}
 
 		if ((t = timer_add(period, persistent, TIMER_COMMAND, 0, t_name, t_command))) {
