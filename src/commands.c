@@ -458,13 +458,14 @@ COMMAND(cmd_del)
 	struct userlist *u;
 	const char *tmp;
 	char *nick;
+	uin_t uin;
 
 	if (!params[0]) {
 		print("not_enough_params", name);
 		return;
 	}
 
-	if (!(u = userlist_find(get_uin(params[0]), NULL))) {
+	if (!(u = userlist_find((uin = get_uin(params[0])), NULL))) {
 		print("user_not_found", params[0]);
 		return;
 	}
@@ -474,9 +475,9 @@ COMMAND(cmd_del)
 
 	if (!userlist_remove(u)) {
 		print("user_deleted", tmp);
-		gg_remove_notify(sess, u->uin);
+		gg_remove_notify(sess, uin);
 		config_changed = 1;
-		ui_event("userlist_changed", nick, itoa(u->uin));
+		ui_event("userlist_changed", nick, itoa(uin));
 	} else
 		print("error_deleting");
 

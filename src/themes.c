@@ -1075,7 +1075,7 @@ void theme_init()
 	format_add("search_results_single_unknown", "%T-%n", 1);
 	format_add("search_results_single_female", "%Mkobieta%n", 1);
 	format_add("search_results_single_male", "%Cmê¿czyzna%n", 1);
-	format_add("search_results_single", "%) Nick: %T%3%n\n%) Numerek: %T%1%n\n%) Imiê i nazwisko: %T%2%n\n%) Miejscowo¶æ: %T%4%n\n%) Rok urodzenia: %T%5%n\n%) P³eæ: %6\n", 1);
+	format_add("search_results_single", "%) Pseudonim: %T%3%n\n%) Numerek: %T%1%n\n%) Imiê i nazwisko: %T%2%n\n%) Miejscowo¶æ: %T%4%n\n%) Rok urodzenia: %T%5%n\n%) P³eæ: %6\n", 1);
 
 	/* exec */
 	format_add("process", "%> %(-5)1 %2\n", 1);
