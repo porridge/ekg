@@ -478,8 +478,8 @@ char **array_make(const char *string, const char *sep, int max, int trim, int qu
 				*r = 0;
 			}
 			
-			p = q + 1;
-			
+			p = (*q) ? q + 1 : q;
+
 		} else {
 			for (q = p, len = 0; *q && (last || !strchr(sep, *q)); q++, len++);
 			token = xcalloc(1, len + 1);

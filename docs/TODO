@@ -3,7 +3,7 @@ zosta³o wymienione na poni¿szych listach. listy lub wiadomo¶ci, ¿eby co¶
 nich dostaæ bêd± albo ignorowane, albo odpowied¼ mo¿e byæ wulgarna. im dana
 sprawa jest wy¿ej na li¶cie, tym wa¿niejsze jest jej rozwi±zanie.
 
-lista rzeczy, które wypada³oby zrobiæ _przed_ wydaniem wersji 1.0:
+lista rzeczy, które TRZEBA zrobiæ przed wydaniem wersji 1.0:
 
 * biblioteka:
   - uaktualniæ dokumentacjê: opis API, protoko³u,
@@ -11,7 +11,6 @@ lista rzeczy, które wypada³oby zrobiæ _przed_ wydaniem wersji 1.0:
 * klient:
   - obs³uga kolorowego tekstu.
   - poprawiæ getopt(), ¿eby rozumia³ ,,--back "powód"'',
-  - uzupe³niæ dope³nienia (w tym nicki ze spacjami, lista nicków (joshua)),
   - sensowna obs³uga kluczy dla SIM.
 
 pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:

@@ -20,6 +20,8 @@ zg³osi³ b³±d.
 - plik /etc/ekg.conf jest ³adowany _przed_ konfiguracj± u¿ytkownika, plik
   /etc/ekg-override.conf _po_ konfiguracji u¿ytkownika (porridge/w)
 - dodanie do dokumentacji informacji o kolejno¶ci ³adowania konfiguracji (w)
+- spore zmiany w kodzie dope³niania Tabem. prosimy zapi±æ pasy i w przypadku
+  b³êdów pokazaæ _dok³adn±_ liniê i opis tego, co powinno siê staæ (w)
 
 // 2002-01-31
 

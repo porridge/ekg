@@ -1936,23 +1936,13 @@ void unknown_uin_generator(const char *text, int len)
  */
 void known_uin_generator(const char *text, int len)
 {
-	int escaped = 0;
 	list_t l;
 
-	if (text[0] == '"') {
-		escaped = 1;
-		text++;
-		len--;
-
-		if (len > 0 && text[len - 1] == '"')
-			len--;
-	}
-       	       
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
 
 		if (u->display && !strncasecmp(text, u->display, len))
-			array_add(&completions, (escaped || strchr(u->display, ' ')) ? saprintf("\"%s\"", u->display) : xstrdup(u->display));
+			array_add(&completions, (strchr(u->display, ' ')) ? saprintf("\"%s\"", u->display) : xstrdup(u->display));
 	}
 
 	for (l = conferences; l; l = l->next) {
@@ -2126,8 +2116,8 @@ static struct {
  */
 static void complete(int *line_start, int *line_index)
 {
-	int i, blanks = 0, count;
-	char *p, *start = line, *cmd;
+	char *start = line, *cmd, **words;
+	int i, count, word;
 
 	/* nie obs³ugujemy dope³niania w ¶rodku tekstu */
 	if (*line_index != strlen(line))
@@ -2178,29 +2168,32 @@ static void complete(int *line_start, int *line_index)
 
 		return;
 	}
+
+	/* podziel, sprawd¼, gdzie jeste¶my */
+	words = array_make(line, " \t", 0, 1, 1);
+	if (strlen(line) > 1 && line[strlen(line) - 1] == ' ')
+		array_add(&words, xstrdup(""));
+	word = array_count(words) - 1;
 	
-	/* policz spacje */
-	for (p = line; *p; p++) {
-		if (*p == ' ')
-			blanks++;
-	}
-
 	/* nietypowe dope³nienie nicków przy rozmowach */
-	cmd = saprintf("%s%s ", (line[0] == '/') ? "/" : "", (config_tab_command) ? config_tab_command : "chat");
+	cmd = saprintf("/%s ", (config_tab_command) ? config_tab_command : "chat");
 
-	if (!strcmp(line, "") || (!strncasecmp(line, cmd, strlen(cmd)) && blanks == 2 && send_nicks_count > 0) || !strcasecmp(line, cmd)) {
+	if (!strcmp(line, "") || (!strncasecmp(line, cmd, strlen(cmd)) && array_count(words) == 2 && send_nicks_count > 0) || (!strcasecmp(line, cmd) && send_nicks_count > 0)) {
 		if (send_nicks_index >= send_nicks_count)
 			send_nicks_index = 0;
 
-		if (send_nicks_count)
-			snprintf(line, LINE_MAXLEN, (window_current->target && line[0] != '/') ? "/%s%s " : "%s%s ", cmd, send_nicks[send_nicks_index++]);
-		else
-			snprintf(line, LINE_MAXLEN, (window_current->target && line[0] != '/') ? "/%s" : "%s", cmd);
+		if (send_nicks_count) {
+			char *nick = send_nicks[send_nicks_index++];
+
+			snprintf(line, LINE_MAXLEN, (strchr(nick, ' ')) ? "%s\"%s\" " : "%s%s ", cmd, nick);
+		} else
+			snprintf(line, LINE_MAXLEN, "%s", cmd);
 		*line_start = 0;
 		*line_index = strlen(line);
 
 		xfree(cmd);
 		array_free(completions);
+		array_free(words);
 		completions = NULL;
 
 		return;
@@ -2208,32 +2201,22 @@ static void complete(int *line_start, int *line_index)
 
 	xfree(cmd);
 
+	fprintf(stderr, "word = %d\n", word);
+
 	/* pocz±tek komendy? */
-	if (!blanks)
+	if (word == 0)
 		command_generator(line, strlen(line));
 	else {
 		char *params = NULL;
-		char **words;
-		int abbrs = 0, word = 0, i;
+		int abbrs = 0, i;
 		list_t l;
 
-		start = line + strlen(line);
-
-		while (start > line && *(start - 1) != ' ')
-			start--;
-
-		fprintf(stderr, "line \"%s\"\n", line);
-		words = array_make(line, " \t", 0, 1, 1);
-		word = array_count(words) - 2;
-		if (word < 0)
-			word = 0;
-		if (strlen(line) > 1 && line[strlen(line) - 1] == ' ')
-			word++;
-		for (i = 0; i < array_count(words); i++)
-			fprintf(stderr, "word %d \"%s\"\n", i - 1, words[i]);
-		array_free(words);
-
-		fprintf(stderr, "word = %d\n", word);
+		for (start = line, i = 0; i < word; i++) {
+			while (!isspace(*start) && *start)
+				start++;
+			while (isspace(*start))
+				start++;
+		}
 
 		for (l = commands; l; l = l->next) {
 			struct command *c = l->data;
@@ -2258,8 +2241,8 @@ static void complete(int *line_start, int *line_index)
 
 		if (params && abbrs == 1 && word < strlen(params)) {
 			for (i = 0; generators[i].ch; i++)
-				if (generators[i].ch == params[word]) {
-					generators[i].generate(start, strlen(start));
+				if (generators[i].ch == params[word - 1]) {
+					generators[i].generate(words[word], strlen(words[word]));
 					break;
 				}
 		}
