@@ -192,7 +192,7 @@ user_info_busy_descr %czajêt%@1%n [%2]
 user_info_invisible %mniewidoczn%@1%n
 user_info_not_avail_descr %Rniedostêpn%@1%n [%2]
 user_info_not_avail %Rniedostêpn%@1%n
-user_info %)       %YPseudonim%n%W:%n %W%3%n\n%)           %YNumer%n%W:%n %W%7%n\n%)            %YStan%n%W:%n %8\n%) %YImiê i nazwisko%n%W: %1 %2%n\n%)  %YNumer telefonu%n%W: %5%n\n
+user_info %)       %YPseudonim%n%W:%n %W%1%n\n%)           %YNumer%n%W:%n %W%2%n\n%)            %YStan%n%W:%n %3\n%)        %YAdres IP%n%W:%n %4\n%) %YImiê i nazwisko%n%W: %5 %6%n\n%)           %YAlias%n%W:%n %7\n%)  %YNumer telefonu%n%W: %8%n\n%)           %YGrupy%n%W:%n %9\n
 userlist_get_error %! %RB³±d podczas pobierania listy kontaktów!%n\n
 userlist_get_ok %) %YListê kontaktów wczytano z serwera.%n\n
 userlist_put_error %! %RB³±d podczas wysy³ania listy kontaktów!%n\n
