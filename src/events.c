@@ -2256,8 +2256,12 @@ void handle_image_request(struct gg_event *e)
  */
 void handle_image_reply(struct gg_event *e)
 {
+	struct userlist *u;
+
 	gg_debug(GG_DEBUG_MISC, "// ekg: image_reply: sender=%d, filename=\"%s\", size=%d, crc32=%.8x\n", e->event.image_reply.sender, e->event.image_reply.filename, e->event.image_reply.size, e->event.image_reply.crc32);
 
-	if (e->event.image_request.crc32 == GG_CRC32_INVISIBLE)
-		print("user_is_connected", format_user(e->event.image_reply.sender)); 
+	u = userlist_find(e->event.image_reply.sender, NULL);
+
+	if (u && e->event.image_request.crc32 == GG_CRC32_INVISIBLE)
+		print("user_is_connected", format_user(e->event.image_reply.sender), (u->first_name) ? u->first_name : u->display); 
 }
