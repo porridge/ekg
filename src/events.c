@@ -977,6 +977,7 @@ void handle_success(struct gg_event *e)
 			config_server = array_join(new_servers, ", ");
 			array_free(servers);
 			array_free(new_servers);
+			server_index = 0;
 		} else
 			config_server = xstrdup(inet_ntoa(addr));
 	}
