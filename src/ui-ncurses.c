@@ -2337,7 +2337,7 @@ void ignored_uin_generator(const char *text, int len)
 				array_add(&completions, xstrdup(itoa(u->uin)));
 		} else {
 			if (u->display && !strncasecmp(text, u->display, len))
-				array_add(&completions, xstrdup(u->display));
+				array_add(&completions, ((strchr(u->display, ' ')) ? saprintf("\"%s\"", u->display) : xstrdup(u->display)));
 		}
 	}
 }
@@ -2357,7 +2357,7 @@ void blocked_uin_generator(const char *text, int len)
 				array_add(&completions, xstrdup(itoa(u->uin)));
 		} else {
 			if (u->display && !strncasecmp(text, u->display, len))
-				array_add(&completions, xstrdup(u->display));
+				array_add(&completions, ((strchr(u->display, ' ')) ? saprintf("\"%s\"", u->display) : xstrdup(u->display)));
 		}
 	}
 

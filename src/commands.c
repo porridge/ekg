@@ -5074,7 +5074,7 @@ void command_init()
 #endif
 	  
 	command_add
-	( "block", "u", cmd_block, 0,
+	( "block", "u?", cmd_block, 0,
 	  " [numer/alias]", "dodaje do listy blokowanych",
 	  "");
 
@@ -5151,7 +5151,7 @@ void command_init()
 	  "Dok³adny opis znajduje siê w pliku %Tdocs/dcc.txt%n");
 	  
 	command_add
-	( "del", "u", cmd_del, 0,
+	( "del", "u?", cmd_del, 0,
 	  " <numer/alias>|*", "usuwa u¿ytkownika z listy kontaktów",
 	  "");
 	
@@ -5493,12 +5493,12 @@ void command_init()
 	  "czasu, a na li¶cie bêdzie oznaczony gwiazdk±.");
 
 	command_add
-	( "unignore", "i", cmd_ignore, 0,
+	( "unignore", "i?", cmd_ignore, 0,
 	  " <numer/alias>|*", "usuwa z listy ignorowanych osób",
 	  "");
 	  
 	command_add
-	( "unblock", "b", cmd_block, 0,
+	( "unblock", "b?", cmd_block, 0,
 	  " <numer/alias>|*", "usuwa z listy blokowanych osób",
 	  "");
 	  
@@ -5537,10 +5537,10 @@ void command_init()
 
 
 	command_add
-	( "_add", "?", cmd_test_add, 0, "",
+	( "_add", "??", cmd_test_add, 0, "",
 	  "dodaje do listy dope³niania TABem", "");
 	command_add
-	( "_del", "?", cmd_test_del, 0, "",
+	( "_del", "??", cmd_test_del, 0, "",
 	  "usuwa z listy dope³niania TABem", "");
 #if 0
 	command_add
@@ -5553,9 +5553,11 @@ void command_init()
 	command_add
 	( "_ping", "", cmd_test_ping, 0, "", 
 	  "wysy³a pakiet ping do serwera", "");
+#if 0
 	command_add
 	( "_segv", "", cmd_test_segv, 0, "", 
 	  "wywo³uje naruszenie segmentacji pamiêci", "");
+#endif
 	command_add
 	( "_watches", "", cmd_test_watches, 0, "", 
 	  "wy¶wietla listê sprawdzanych deskryptorów", "");
