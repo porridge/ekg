@@ -38,7 +38,7 @@ nazwa zmiennej, po której wystêpuje jej warto¶æ -- chodzi o zachowanie
 kompatybilno¶ci z innymi klientami.
 
 Je¶li warto¶æ zmiennej zaczyna siê od znaku o kodzie 1, to nastêpuj±ca
-po nim warto¶æ zminnej jest zakodowana u¿ywaj±c base64.
+po nim warto¶æ zmiennej jest zakodowana u¿ywaj±c base64.
 
 * * *
 
@@ -89,9 +89,9 @@ rozszerzenie ,,.gz''.
 
 Wpisy s± w formacie CSV, tj. ka¿dy wpis znajduje siê w oddzielnej linii,
 a jego poszczególne kolumny s± oddzielone przecinkami. Je¿eli która¶
-kolumna zawiera znak przecinka, nowej linii, cudzys³owia, backslash, to
-ca³e zawarto¶æ kolumny zostaje umieszczona w cudzys³owiach i zapisana
-jak ci±g znaków jêzyka C.
+kolumna zawiera znak przecinka, nowej linii, cudzys³ów, backslash, to
+ca³a zawarto¶æ kolumny zostaje ujêta w cudzys³ów i zapisana jak ci±g
+znaków jêzyka C.
 
 Mo¿liwe wpisy to:
 

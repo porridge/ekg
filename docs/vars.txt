@@ -143,7 +143,7 @@ check_mail_folders
 
 	zawiera pliki (mbox) lub katalogi (Maildir) rozdzielone przecinkiem lub
 	spacj±, które ekg ma sprawdzaæ, poza g³ówn± skrzynk± pocztow±. mo¿e to
-	byæ scie¿ka bezwzglêdna lub wzglêdem katalogu domowego.
+	byæ ¶cie¿ka bezwzglêdna lub wzglêdem katalogu domowego.
 	g³ówna w przypadku mbox to ta zapisana w zmiennej systemowej MAIL lub
 	/var/mail/user przy braku tej zmiennej. dla Maildir z kolei, to katalog
 	Maildir w katalogu domowym u¿ytkownika.
@@ -267,7 +267,7 @@ display_crap
 	domy¶lna warto¶æ: 1
 
 	mówi, czy w oknie rozmowy maj± byæ wy¶wietlane komunikaty niezwi±zane
-	z rozmowc±. je¶li jest równe 0, w oknie rozmowy s± wy¶wietlane tylko
+	z rozmówc±. je¶li jest równe 0, w oknie rozmowy s± wy¶wietlane tylko
 	wiadomo¶ci i informacje o zmianie stanu rozmówcy.
 
 display_notify

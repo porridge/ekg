@@ -1,4 +1,4 @@
-od 20020627 ekg jest przygotowane do obs³ugi ró¿nych interfejsów u¿ytkowika.
+od 20020627 ekg jest przygotowane do obs³ugi ró¿nych interfejsów u¿ytkownika.
 przeprowadzono ca³kiem spor± reorganizacjê kodu, dziêki czemu nie trzeba
 bêdzie psuæ zbyt du¿o, ¿eby dodaæ frontend w ncurses czy jakikolwiek inny.
 
@@ -44,7 +44,7 @@ ui_event(const char *event, ...)
 	- "my_status" (char *status, char *reason) u¿ytkownik zmieni³
 	  stan na "away", "back", "invisible", "private_on", "private_off".
 	- "my_status_raw" (int status, char *reason) u¿ytkownik zmieni³
-	  stan, podawany w liczbach rozumanych przez protokó³.
+	  stan, podawany w liczbach rozumianych przez protokó³.
 	- "connecting" () klient próbuje siê ³±czyæ.
 	- "connected" () klient po³±czy³ siê.
 	- "disconnected" () klient roz³±czy³ siê lub zosta³ roz³±czony.
