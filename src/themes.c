@@ -1104,4 +1104,9 @@ void theme_init()
 	format_add("http_failed_reading", "Serwer zerwa³ po³±czenie", 1);
 	format_add("http_failed_writing", "Serwer zerwa³ po³±czenie", 1);
 	format_add("http_failed_memory", "Brak pamiêci", 1);
+
+	/* szyfrowanie */
+	format_add("public_key_received", "%> %1 wys³a³ swój klucz publiczny", 1);
+	format_add("public_key_write_failed", "%! Nie uda³o siê zapisaæ klucza publicznego: %1", 1);
+
 };

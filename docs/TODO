@@ -17,6 +17,7 @@ klient:
 - dodaæ mo¿liwo¶æ ustawienia powodu przy wywo³ywaniu ekg (jojo),
 - poprawiæ getopt(), ¿eby rozumia³ ,,--back "powód"'',
 - dodaæ ,,list --add'',
+- sensowna obs³uga kluczy dla SIM,
 
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,

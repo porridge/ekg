@@ -28,6 +28,8 @@
 #include <errno.h>
 #include <signal.h>
 #include <errno.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "config.h"
 #include "libgadu.h"
 #include "stuff.h"
@@ -324,6 +326,27 @@ void handle_msg(struct gg_event *e)
 	}
 
 #ifdef HAVE_OPENSSL
+	if (config_encryption == 1 && !strncmp(e->event.msg.message, "-----BEGIN RSA PUBLIC KEY-----", 20)) {
+		char *name;
+		const char *target = (u) ? u->display : itoa(e->event.msg.sender);
+		FILE *f;
+
+		print_window(target, 0, "public_key_received", format_user(e->event.msg.sender));	
+
+		mkdir(prepare_path("keys", 1), 0700);
+		name = saprintf("%s/%d.pem", prepare_path("keys", 0), e->event.msg.sender);
+
+		if (!(f = fopen(name, "w"))) {
+			print_window(target, 0, "public_key_write_failed");
+			return;
+		}
+		
+		fprintf(f, "%s", e->event.msg.message);
+		fclose(f);
+
+		return;
+	}
+
 	if (config_encryption == 1) {
 		char *dec;
 		int len = strlen(e->event.msg.message);

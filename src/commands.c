@@ -1861,7 +1861,9 @@ COMMAND(cmd_test_keygen)
 		print("not_enough_params", name);
 		return;
 	}
-
+	
+	print("generic", "Chwilka, generujê klucze...");
+	
 	key = SIM_RSA_GenKey(atoi(params[0]));
 
 	if (!key) {
@@ -1869,12 +1871,14 @@ COMMAND(cmd_test_keygen)
 		return;
 	}
 
-	fn = saprintf("%s/private.pem", prepare_path("keys", 1));
+	mkdir(prepare_path("keys", 1), 0700);
+
+	fn = saprintf("%s/private.pem", prepare_path("keys", 0));
 	SIM_RSA_WriteKey(key, fn, PRIVATE);
 	chmod(fn, 0400);
 	xfree(fn);
 
-	name = saprintf("%s/%d.pem", prepare_path("keys", 1), config_uin);
+	name = saprintf("%s/%d.pem", prepare_path("keys", 0), config_uin);
 	SIM_RSA_WriteKey(key, fn, PUBLIC);
 	xfree(fn);
 
