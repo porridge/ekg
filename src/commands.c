@@ -1359,8 +1359,7 @@ COMMAND(command_msg)
 			continue;
 		}
 		
-	        if (!(u = userlist_find(uin, NULL)))
-			continue;
+	        u = userlist_find(uin, NULL);
 
 		put_log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), msg);
 
