@@ -58,6 +58,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <termios.h>
 #include <unistd.h>
 
 #include "commands.h"
@@ -183,8 +184,9 @@ static int window_last_id = -1;		/* numer ostatnio wybranego okna */
 static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 static int ui_ncurses_debug = 0;	/* debugowanie */
 
+static struct termios old_tio;
 #ifdef SIGWINCH
-static int need_resize_term = 0;
+static int ui_resize_term = 0;
 #endif
 
 int config_backlog_size = 1000;		/* maksymalny rozmiar backloga */
@@ -1885,24 +1887,10 @@ static void update_statusbar(int commit)
 }
 
 #ifdef SIGWINCH
-static void ncurses_resize_term()
+static void sigwinch_handler()
 {
-	need_resize_term = 0;
-
-	endwin();
-	refresh();
-	keypad(input, TRUE);
-
-	window_resize();
-	window_commit();
-	header_statusbar_resize();
-
-	changed_backlog_size("backlog_size");
-}
-
-static void winch_handler()
-{
-	need_resize_term = 1;
+	ui_needs_refresh = 1;
+	ui_resize_term = 1;
 }
 #endif
 
@@ -1924,6 +1912,7 @@ static void ui_ncurses_beep()
 void ui_ncurses_init()
 {
 	int background = COLOR_BLACK;
+	struct termios tio;
 
 	ui_postinit = ui_ncurses_postinit;
 	ui_print = ui_ncurses_print;
@@ -1987,9 +1976,25 @@ void ui_ncurses_init()
 	contacts_changed();
 	window_commit();
 
-	signal(SIGINT, SIG_IGN);
+	/* deaktywujemy klawisze INTR, QUIT, SUSP i DSUSP */
+	if (!tcgetattr(0, &old_tio)) {
+		memcpy(&tio, &old_tio, sizeof(tio));
+		tio.c_cc[VINTR] = _POSIX_VDISABLE;
+		tio.c_cc[VQUIT] = _POSIX_VDISABLE;
+#ifdef VDSUSP
+		tio.c_cc[VDSUSP] = _POSIX_VDISABLE;
+#endif
+#ifdef VSUSP
+		tio.c_cc[VSUSP] = _POSIX_VDISABLE;
+#endif
+
+		tcsetattr(0, TCSADRAIN, &tio);
+	}
+
+	ui_needs_refresh = 0;
+
 #ifdef SIGWINCH
-	signal(SIGWINCH, winch_handler);
+	signal(SIGWINCH, sigwinch_handler);
 #endif
 	
 	memset(history, 0, sizeof(history));
@@ -2100,6 +2105,8 @@ static void ui_ncurses_deinit()
 
 	list_destroy(windows, 1);
 
+	tcsetattr(0, TCSADRAIN, &old_tio);
+
 	keypad(input, FALSE);
 
 	werase(input);
@@ -2108,7 +2115,8 @@ static void ui_ncurses_deinit()
 
 	delwin(input);
 	delwin(status);
-	delwin(contacts);
+	if (contacts)
+		delwin(contacts);
 	if (header)
 		delwin(header);
 	endwin();
@@ -3195,10 +3203,21 @@ static void ui_ncurses_loop()
 
 		ekg_wait_for_key();
 
+		if (ui_needs_refresh) {
+			ui_needs_refresh = 0;
 #ifdef SIGWINCH
-		if (need_resize_term)
-			ncurses_resize_term(); 
+			if (ui_resize_term) {
+				ui_resize_term = 0;
+
+				endwin();
+				refresh();
+				keypad(input, TRUE);
+				/* wywo³a wszystko, co potrzebne */
+				header_statusbar_resize();
+				changed_backlog_size("backlog_size");
+			}
 #endif
+		}
 
 		ch = ekg_getch(0);
 

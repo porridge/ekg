@@ -57,6 +57,10 @@ int rl_bind_key_in_map(int key, void *function, void *keymap)
 }
 #endif
 
+#ifdef SIGWINCH
+static int ui_resize_term = 0;
+#endif
+
 #ifndef HAVE_RL_GET_SCREEN_SIZE
 int rl_get_screen_size(int *columns, int *lines)
 {
@@ -122,7 +126,7 @@ static int bind_sequence(const char *seq, const char *command, int quiet);
 static int bind_handler_window(int a, int key);
 
 /*
- * sigcont_handler()
+ * sigcont_handler() //XXX mo¿e wywalaæ
  *
  * os³uguje powrót z t³a poleceniem ,,fg'', ¿eby od¶wie¿yæ ekran.
  */
@@ -133,7 +137,7 @@ static void sigcont_handler()
 }
 
 /*
- * sigint_handler()
+ * sigint_handler() //XXX mo¿e wywalaæ 
  *
  * obs³uguje wci¶niêcie Ctrl-C.
  */
@@ -146,6 +150,8 @@ static void sigint_handler()
 	signal(SIGINT, sigint_handler);
 }
 
+#ifdef HAVE_RL_GET_SCREEN_SIZE
+#  ifdef SIGWINCH
 /*
  * sigwinch_handler()
  *
@@ -153,11 +159,11 @@ static void sigint_handler()
  */
 static void sigwinch_handler()
 {
-	rl_get_screen_size(&screen_lines, &screen_columns);
-#ifdef SIGWINCH
-	signal(SIGWINCH, sigwinch_handler);
-#endif
+	ui_needs_refresh = 1;
+	ui_resize_term = 1;
 }
+#  endif
+#endif
 
 /*
  * my_getc()
@@ -814,6 +820,8 @@ void ui_readline_init()
 	signal(SIGINT, sigint_handler);
 	signal(SIGCONT, sigcont_handler);
 
+	ui_needs_refresh = 0;
+
 #ifdef HAVE_RL_GET_SCREEN_SIZE
 #  ifdef SIGWINCH
 	signal(SIGWINCH, sigwinch_handler);
@@ -859,6 +867,19 @@ static void ui_readline_loop()
 {
 	for (;;) {
 		char *line = my_readline();
+
+		if (ui_needs_refresh) {
+			ui_needs_refresh = 0;
+#ifdef SIGWINCH
+			if (ui_resize_term) {
+				ui_resize_term = 0;
+				rl_get_screen_size(&screen_lines, &screen_columns);
+
+				ui_screen_width = screen_columns;
+				ui_screen_height = screen_lines;
+			}
+#endif
+		}
 
 		/* je¶li wci¶niêto Ctrl-D i jeste¶my w query, wyjd¼my */
 		if (!line && window_current->query_nick) {

@@ -578,6 +578,9 @@ void ekg_wait_for_key()
 			if (batch_mode && !batch_line)
 				break;
 
+			if (ui_needs_refresh)
+				break;
+
 			continue;
 		}
 
@@ -917,7 +920,6 @@ int main(int argc, char **argv)
 	signal(SIGUSR2, handle_sigusr2);
 	signal(SIGALRM, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
-	signal(SIGQUIT, SIG_IGN);
 
 	while ((c = getopt_long(argc, argv, "b::a::i::pdnc:f:hI:ot:u:vN", ekg_options, NULL)) != -1) {
 		switch (c) {
