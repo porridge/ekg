@@ -3347,7 +3347,7 @@ void change_status(int status, const char *arg, int autom)
 			filename = "away.reasons";
 			config_x_reason = config_away_reason;
 			away1 = 3;
-			away2 = 3;
+			away2 = 1;
 			format = "away";
 			format_descr = "away_descr";
 			auto_format = "auto_away";
