@@ -1,2 +1,312 @@
-w search jest &start=50 itd.
+===============OPIS CZÊ¦CI HTTP PROTOKO£U GADU-GADU===============
 
+Piotr Mach <pm@gadu-gadu.com> 
+
+Opis powsta³ na podstawie analizy pakietów i ¼róde³ ekg, opis dla wersji 
+4.9.3 (0x18),  starsze klienty u¿ywaj± innych skryptów o podobnej funkcjonalno¶ci.
+
+
+Spis tre¶ci:
+
+  0. Wstêp
+  1. Szukanie osób w katalogu publicznym
+      1.1 Wed³ug imiê, nazwisko, nick, p³eæ, miasto, rok ur.
+      1.2 Wed³ug numerka
+  2. Sprawdzanie/zmiana danych w kat publicznym
+      2.1 Sprawdzenie
+      2.2 Zmiana
+  3. Rejestrowanie konta, usuniêcie i zmiana has³a dla konta
+      3.1 Rejestracja
+      3.2 Usuniêcie konta
+      3.3 Zmiana has³a
+  4. Operacje zwi±zane z przechowywaniem listy kontaktów na serwerze
+      4.1 Wys³anie
+      4.2 Pobranie
+      4.3 Usuniêcie
+  5. Wysy³anie has³a na email
+
+
+0. WSTÊP
+
+    Komunikacja z appmsg.gadu-gadu.pl metod± GET HTTP 1.0 zosta³a opisana w protocol.html,
+    pozosta³e pakiety u¿ywaj± POST dla HTTP 1.1 i zosta³y opisane w tym dokumencie.
+
+    Wszystkie zapytanie http metod± post maj± postaæ:
+
+        POST $PATH HTTP/1.0
+        Host: $HOST
+        Content-Type: application/x-www-form-urlencoded
+        User-Agent: $AGENT
+        Content-Length: $LENGTH
+        Pragma: no-cache
+
+        $DATA
+
+    AGENT to np: Mozilla/4.0 (compatible; MSIE 5.0; Windows 98)
+    lub inne wymienione w protocol.html
+    LENGTH oczywi¶cie trzeba sobie wyliczyæ = strlen (DATA)
+
+    Je¶li bêdzie mowa o wysy³aniu danych do serwera to chodzi o ca³y
+    powy¿szy pakiet, opisane zostan± tylko: HOST, PATH, DATA
+    Pisz±c 'wysy³amy pola: pole1, pole2' mowa o DATA o warto¶ci pole1=aaa&pole2=bbb itp.
+    Pamiêtaj ¿e wypada³oby zastosowaæ urlencode przed wys³aniem.
+    Dla jasno¶ci, pakiet jest wysy³any na hosta o IP
+    odpowiadaj±cemu HOST na port 80.
+
+    Odpowiedzi serwera na powy¿sze zapytania maj± mniej wiêcej postaæ:
+
+        HTTP/1.1 200 OK
+        Server: Microsoft-IIS/5.0
+	Date: Mon, 01 Jul 2002 22:30:31 GMT        
+        Connection: Keep-Alive
+        Content-Length: $LENGTH
+        Content-Type: text/html
+        Set-Cookie: ASPSESSIONIDQQGGGLJC=CAEKMBGDJCFBEOKCELEFCNKH; path=/
+        Cache-control: private
+
+        $RESPONSE
+
+    lub podobnie :), nag³ówki nie s± dla nas wa¿ne, mo¿na zauwa¿yæ
+    tylko to ¿e czasami ustawia Cookie. Pisz±c dalej ¿e serwer "odpowie warto¶ci±",
+    mowa tylko o RESPONSE
+
+
+1. Szukanie osób w katalogu publicznym
+
+    1.1 Wed³ug imiê, nazwisko, nick, p³eæ, miasto, rok ur.
+
+        HOST = pubdir.gadu-gadu.pl
+        PATH = /appsvc/fmpubquery2.asp
+
+        Wysy³amy nastêpuj±ce pola:
+
+        Mode            o warto¶ci '0'
+        FirstName	imiê      - mo¿e byæ puste
+        LastName        nazwisko  - mo¿e byæ puste
+        NickName        pseudo    - mo¿e byæ puste
+        Gender          p³eæ      - '1'-kobieta, '2'-mezczyzna, '-1'-nieokre¶lone
+        City            miasto    - mo¿e byæ puste
+        MinBirth        od rok ur.- '0' gdy nie podajemy
+        MaxBirth        do rok ur.- '0' gdy nie podajemy
+        ActiveOnly      Tylko dostêpne '1'-tak, puste-nie
+        start           uin od którego zacz±æ szukanie, puste-brak
+
+        PRZYK£AD: Mode=0&FirstName=aga&LastName=&NickName=&Gender=1&City=wawa&MinBirth=1980&MaxBirth=1984&ActiveOnly=&start=
+
+        Serwer odpowie:
+
+        query_results:
+        $REKORDY
+        NextStart:$UIN
+
+        UIN na koñcu mówi na którym uin'ie zakoñczono szukanie,
+        mo¿na to wykorzystaæ podaj±c nastêpnym razem t± warto¶æ w polu 'start'
+
+        REKORDY to 0-50 kolejnych 8 linijkowych rekordów w formacie
+
+        cyfra statusu  1-niedostepny, 2-zaraz wracam, 3-dostepny
+        uin
+        imiê
+        nazwisko
+        nick
+        rok ur
+        cyfra p³eæ     1-kobieta, 2-mezczyzma, 0-nieokreslone
+        miasto
+
+        PRZYK£AD jednego rekordu:
+        1
+        1000
+        jas
+        fasola
+        bean
+        1900
+        2
+        warszawa
+
+        Je¶li której¶ danej brak, linia bêdzie pusta.
+
+
+    1.2 Wed³ug numerka
+
+        HOST = pubdir.gadu-gadu.pl
+        PATH = /appsvc/fmpubquery2.asp
+
+        Wysy³amy nastêpuj±ce pola:
+        Mode 		o warto¶ci '3'
+        UserId		uin
+        start		uin od którego zacz±æ szukanie, puste-brak
+
+        PRZYK£AD: Mode=3&UserId=1000&start=
+
+        Odpowiedzi± jest taki sam jak dla pkt 1.1 z tym
+        ze bêdzie to najwy¿ej jeden 8 linijkowy rekord
+
+
+2. Sprawdzanie/zmiana danych w kat. publicznym
+
+    2.1 Sprawdzenie
+
+        HOST = pubdir.gadu-gadu.pl
+        PATH = /appsvc/fmpubdetails3.asp
+
+        Wysy³amy nastêpuj±ce pola
+
+        FmNum		numerek
+        Pass		has³o, plain-text (sic!)
+
+        PRZYK£AD:FmNum=1000&Pass=sekret
+
+        Je¶li has³o jest prawid³owe serwer powinien odpowiedzieæ:
+        query_result:
+        imie
+        nazwisko
+        nick
+        rok
+        p³eæ
+        miasto
+
+    2.2 Zmiana
+
+        HOST = pubdir.gadu-gadu.pl
+        PATH = /appsvc/fmpubreg2.asp
+
+        Wysy³amy pola:
+
+        FmNum          uin
+        Pass           haslo uin'a, plain text
+        FirstName      imiê     - mo¿e byæ puste
+        LastName       nazwisko - mo¿e byæ puste
+        NickName       nick     - mo¿e byæ puste
+        BirthYear      rok ur.  - mo¿e byæ puste
+        Gender         p³eæ - warto¶ci jak w pkt 1.1
+        City           miasto   - mo¿e byæ puste
+
+        PRZYK£AD: FmNum=1000&Pass=sekret&FirstName=imie&LastName=nazwisko&NickName=nick&BirthYear=1000&Gender=1&City=miasto
+
+        Je¶li siê uda³o serwer odpowie:
+        reg_sucess:
+
+3. Rejestrowanie konta, usuniêcie i zmiana has³a dla konta
+
+    3.1 Rejestracja
+
+        HOST = register.gadu-gadu.pl
+        PATH = /appsvc/fmregister.asp
+
+        Wysy³amy pola:
+        pwd         has³o dla nowego uin'a
+        email       email do przypominania has³a
+        code        hash http liczony z email+pwd
+                    (algorytmu szukaj w ¼ród³ach EKG lib/common.c)
+
+        PRZYK£AD: pwd=sekret&email=moj@adres.email.pl&code=1104465363
+
+        Je¶li wszystko przepieg³o poprawnie serwer odpowie:
+        reg_success:$UIN
+
+        UIN - nowy uin, który w³a¶nie otrzymali¶my
+
+    3.2 Usuniêcie konta
+
+        HOST = register.gadu-gadu.pl
+        PATH = /appsvc/fmregister.asp
+
+        Wysy³amy pola:
+
+        fmnumber     $UIN
+        fmpwd        haslo, plain text
+        delete       1
+        pwd          nowe przypadkowe has³o ???
+        email        deletedaccount@gadu.gadu.pl
+        code         http hash liczony z email+pwd
+
+        PRZYKLAD: fmnumber=1400545&fmpwd=sekret&delete=1&pwd=1400460480&email=deletedaccount@gadu%2Dgadu.pl&code=335674957
+
+        Je¶li siê uda³o serwer odpowie:
+        reg_success:$UIN
+
+        UIN - uin który w³a¶nie skasowali¶my
+
+    3.3 Zmiana has³a
+
+        HOST = register.gadu-gadu.pl
+        PATH = /appsvc/fmregister.asp
+
+        Wysy³amy pola:
+
+        fmnumber      $UIN
+        fmpwd         stare haslo, plain text
+        pwd           nowe haslo, plain text
+        email         nowy email do przypominania has³a
+        code          http hash liczony z  email+pwd
+
+        je¶li siê uda³o serwer odpowie:
+        reg_success:$UIN
+
+4. Operacje zwi±zane z przechowywaniem listy kontaktów na serwerze
+
+    4.1 Wys³anie list kont.
+
+        HOST = pubdir.gadu-gadu.pl
+        PATH = /appsvc/fmcontactsput.asp
+
+        Wysy³amy pola:
+        FmNum       nasz uin
+        Pass        haslo uin'a
+        Contacts    dowolna ilo¶æ rekordów z kontaktami rozdzielone "\r\n"
+                    format pojedynczego rekordu:
+
+        imie;nazwisko;pseudo;wyswietlane;telefon;grupa;uin;adres@email;0;;0;
+
+        PRZYKLAD: FmNum=1000&Pass=sekret&Contacts=imie;nazwisko;pseudo;wyswietlane;+48123123123;grupa1;1000;adres@email.pl;0;;0;
+
+        Je¶li siê uda³o serwer odpowie
+        put_success:
+
+    4.2 Pobranie listy kont.
+
+        HOST = pubdir.gadu-gadu.pl
+        PATH = /appsvc/fmcontactsget.asp
+
+        Wysy³amy pola:
+        FmNum      nasz uin
+        Pass       haslo uin'a
+
+        PRZYK£AD:  FmNum=1000&Pass=sekret
+
+        Je¶li siê uda³o serwer odpowie
+        get_results:rekord_1
+        rekord_2
+        rekord_N
+
+        rekord ma taki sam format jak w pkt 4.1
+
+    4.3 Usuniêcie listy kont. z serwera
+
+        HOST = pubdir.gadu-gadu.pl
+        PATH = /appsvc/fmcontactsput.asp
+
+        Wysy³amy pola:
+        FmNum       o warto¶ci uin
+        Pass        haslo, plain text
+        Delete      o warto¶ci '1'
+
+        PRZYKLAD:   FmNum=1000&Pass=sekret&Delete=1
+
+        Je¶li siê uda³o serwer odpowie
+        put_success:
+
+5. Wysy³anie has³a na email
+
+        HOST = retr.gadu-gadu.pl
+        PATH = /appsvc/fmsendpwd.asp
+
+        Wysy³amy dwa pola:
+        userid      uin
+        code        hash_http liczony z uin'a jako string
+
+        Je¶li siê uda³o serwer odpowie
+
+        pwdsend_success
+
+	

@@ -9,6 +9,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - usuniêto problem z select()em przy wychodzeniu (ekg-users/w)
 - dostêpny z opisem idzie do dope³nienia ju¿ (joshua/w)
+- dodane docs/http.txt (pm/w)
 
 // 2002-06-29
 
