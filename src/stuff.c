@@ -166,9 +166,8 @@ char *emoticon_expand(const char *s)
 
 			e = l->data;
 			nn = strlen(e->name);
-			if (ns < nn)
-				nn = ns;
-			ret = strncmp(ss, e->name, nn);
+			if (ns >= nn)
+				ret = strncmp(ss, e->name, nn);
 		}
 
 		if (l) {
@@ -191,9 +190,8 @@ char *emoticon_expand(const char *s)
 
 			e = l->data;
 			n = strlen(e->name);
-			if (ns < n)
-				n = ns;
-			ret = strncmp(ss, e->name, n);
+			if (ns >= n)
+				ret = strncmp(ss, e->name, n);
 		}
 
 		if (l) {
