@@ -116,6 +116,12 @@ log
 	jej braku. dla 2, bêd± logowane w katalogu wskazanym przez zmienn±
 	,,log_path'', a nazwa pliku bêdzie numerem rozmówcy.
 
+log_ignored 
+	typ: liczba
+	domyslna wartosc: 0 
+	    
+	okresla czy logujemy ignorowane wiadomosci 
+	
 log_path
 	typ: tekst
 	domy¶lna warto¶æ: brak
