@@ -692,6 +692,11 @@ protocol
 	do udawania nowszego klienta, gdy biblioteka jeszcze jej nie zna.
 	zmienna ta nie powinna byæ u¿ywana przez zwyk³ych u¿ytkowników.
 
+last_sysmsg
+	typ: liczba, zmienna wewnêtrzna, ukryta
+
+	okre¶la numer ostatniej wiadomo¶ci systemowej.
+
 windows_layout
 	typ: tekst, zmienna wewnêtrzna, ukryta
 

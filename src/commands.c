@@ -74,7 +74,7 @@ COMMAND(cmd_modify);
 
 char *send_nicks[SEND_NICKS_MAX] = { NULL };
 int send_nicks_count = 0, send_nicks_index = 0;
-int quit_command = 0;
+static int quit_command = 0;
 int change_quiet = 0;
 
 list_t commands = NULL;
