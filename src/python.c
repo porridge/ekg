@@ -502,6 +502,9 @@ void python_autorun()
 
 		xfree(tmp);
 
+		if (!strcmp(d->d_name, "__init__.py"))
+			continue;
+
 		if (strlen(d->d_name) < 3 || strcmp(d->d_name + strlen(d->d_name) - 3, ".py"))
 			continue;
 
