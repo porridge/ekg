@@ -3185,9 +3185,9 @@ const char *ekg_status_label(int status, const char *prefix)
  */
 int ekg_hide_descr_status(int status)
 {
-	int ret = status;
+	int ret = status, private_mask = (GG_S_F(status) ? GG_STATUS_FRIENDS_MASK : 0);
 
-	switch (status) {
+	switch (GG_S(status)) {
 		case GG_STATUS_AVAIL_DESCR:
 			ret = GG_STATUS_AVAIL;
 			break;
@@ -3202,7 +3202,7 @@ int ekg_hide_descr_status(int status)
 			break;
 	}
 
-	return ret;
+	return (ret | private_mask);
 }
 
 struct color_map default_color_map[26] = {

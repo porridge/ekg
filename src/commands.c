@@ -2423,26 +2423,6 @@ COMMAND(cmd_quit)
 
 	if (config_keep_reason)
 		config_reason = xstrdup(tmp);
-	else if (config_uin) {
-		char **arr = NULL, *t;
-		int __config_status = config_status;
-
-		/* ka¿± nie zapisywaæ opisu, wiêc przy kolejnym
-		   uruchomieniu ma on byæ pusty. musimy w tym
-		   miejscu to poprawiæ */
-
-		if ((t = config_read_variable("status"))) {
-			config_status = ekg_hide_descr_status(atoi(t));
-			array_add(&arr, xstrdup("status"));
-			xfree(t);
-		}
-
-		array_add(&arr, xstrdup("reason"));
-		config_write_partly(arr);
-		array_free(arr);
-
-		config_status = ekg_hide_descr_status(__config_status);
-	}
 	
 	if (!quit_message_send) {
 		if (tmp) {

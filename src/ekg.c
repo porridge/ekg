@@ -1120,6 +1120,12 @@ int main(int argc, char **argv)
 	if (!batch_mode && pipe_file)
 		pipe_fd = init_control_pipe(pipe_file);
 
+	if (!config_keep_reason) {
+		xfree(config_reason);
+		config_reason = NULL;
+		config_status = ekg_hide_descr_status(config_status);
+	}
+
 	/* okre¶lanie stanu klienta po w³±czeniu */
 	if (new_status) {
 		if (config_keep_reason && config_reason) {
