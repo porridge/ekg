@@ -221,7 +221,9 @@ if test -d src; then
   if test "x$have_python" = "xtrue"; then
     python_o="python.o"
     LIBS="$LIBS $PYTHON_LIBS"
+    LDFLAGS="$PYTHON_LIBS $LDFLAGS"
     CFLAGS="$CFLAGS $PYTHON_INCLUDES"
+    echo $LIBS
   fi
 
   # sprawdzamy libz.so, <zlib.h>
