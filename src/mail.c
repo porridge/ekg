@@ -87,7 +87,7 @@ int check_mail()
 			}
 
 			/* oby¶my trafili w dobre miejsce... */
-			inbox = saprintf("%s/%s", "/var/mail/", pw->pw_name);
+			inbox = saprintf("%s/%s", "/var/mail", pw->pw_name);
 		}
 	
 		array_add(&folders, inbox);
