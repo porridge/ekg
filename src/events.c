@@ -2262,6 +2262,10 @@ void handle_image_reply(struct gg_event *e)
 
 	u = userlist_find(e->event.image_reply.sender, NULL);
 
-	if (u && e->event.image_request.crc32 == GG_CRC32_INVISIBLE)
-		print("user_is_connected", format_user(e->event.image_reply.sender), (u->first_name) ? u->first_name : u->display); 
+	if (e->event.image_request.crc32 == GG_CRC32_INVISIBLE) {
+		if (u)
+			print("user_is_connected", format_user(e->event.image_reply.sender), (u->first_name) ? u->first_name : u->display); 
+		else
+			print("user_is_connected", format_user(e->event.image_reply.sender), itoa(e->event.image_reply.sender)); 
+	}
 }
