@@ -593,6 +593,18 @@ void buffer_free()
 }
 
 /*
+ * changed_auto_save()
+ *
+ * wywo³ywane po zmianie warto¶ci zmiennej ,,auto_save''.
+ */
+void changed_auto_save(const char *var)
+{
+	/* oszukujemy, ale takie zachowanie wydaje siê byæ
+	   bardziej ,,naturalne'' */
+	last_save = time(NULL);
+}
+
+/*
  * changed_backlog_size()
  *
  * wywo³ywane po zmianie warto¶ci zmiennej ,,backlog_size''.

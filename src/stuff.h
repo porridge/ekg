@@ -330,6 +330,7 @@ char *buffer_flush(int type, const char *target);
 char *buffer_tail(int type);
 void buffer_free();
 
+void changed_auto_save(const char *var);
 void changed_backlog_size(const char *var);
 void changed_dcc(const char *var);
 void changed_mesg(const char *var);

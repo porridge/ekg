@@ -109,7 +109,7 @@ void variable_init()
 	variable_add("auto_away", "aa", VAR_INT, 1, &config_auto_away, NULL, NULL, NULL);
 	variable_add("auto_back", "ab", VAR_INT, 1, &config_auto_back, NULL, NULL, NULL);
 	variable_add("auto_reconnect", "ac", VAR_INT, 1, &config_auto_reconnect, NULL, NULL, NULL);
-	variable_add("auto_save", "as", VAR_INT, 1, &config_auto_save, NULL, NULL, NULL);
+	variable_add("auto_save", "as", VAR_INT, 1, &config_auto_save, changed_auto_save, NULL, NULL);
 	variable_add("away_reason", "ar", VAR_STR, 1, &config_away_reason, changed_xxx_reason, NULL, NULL);
 	variable_add("back_reason", "br", VAR_STR, 1, &config_back_reason, changed_xxx_reason, NULL, NULL);
 #ifdef WITH_UI_NCURSES
