@@ -2289,8 +2289,8 @@ void command_init()
 	  "  -e, --email <adres>\n"
 	  "  -b, --born <rok urodzenia>\n"
 	  "  -c, --city <miasto>\n"
-	  "  -f, --female                 kobieta\n"
-	  "  -m, --male                   mê¿czyzna\n"
+	  "  -F, --female                 kobieta\n"
+	  "  -M, --male                   mê¿czyzna\n"
 	  "\n"
 	  "nale¿y podaæ %wwszystkie%n opcje.");
 	  
@@ -2360,8 +2360,8 @@ void command_init()
 	  "  -p, --phone <telefon>\n"
 	  "  -e, --email <e-mail>\n"
 	  "  -a, --active            tylko dostêpni\n"
-	  "  -f, --female            kobiety\n"
-	  "  -m, --male              mê¿czy¼ni\n"
+	  "  -F, --female            kobiety\n"
+	  "  -M, --male              mê¿czy¼ni\n"
 	  "  --start <n>             wy¶wietla od n-tego wyniku\n"
 	  "\n"
 	  "  ze wzglêdu na organizacjê katalogu publicznego, niektórych\n"
