@@ -9,6 +9,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - ui-ncurses respektuje zmienn± display_color (w)
 - dodanie zmiennej display_sent (w)
+- zniesienie ograniczeñ rozmiaru ekranu. póki co, jeszcze nie bêdzie
+  siê dostosowywa³ do zmian rozmiaru terminala (w)
 
 // 2002-09-04
 

@@ -99,7 +99,7 @@ static void set_cursor(struct window *w)
 	if (w->y == w->lines) {
 		if (w->start == w->lines - output_size)
 			w->start++;
-		wresize(w->window, w->y + 1, 80);
+		wresize(w->window, w->y + 1, stdscr->_maxx + 1);
 		w->lines++;
 	}
 	wmove(w->window, w->y, 0);
@@ -144,7 +144,7 @@ static void window_refresh()
 		struct window *w = l->data;
 		
 		if (window_current->id == w->id)
-			pnoutrefresh(w->window, w->start, 0, 0, 0, output_size - 1, 80);
+			pnoutrefresh(w->window, w->start, 0, 0, 0, output_size - 1, stdscr->_maxx + 1);
 		else
 			pnoutrefresh(w->window, 0, 0, 0, 81, 0, 0);
 	}
@@ -219,7 +219,7 @@ static struct window *window_new(const char *target)
 	w.id = id;
 	w.target = xstrdup(target);
 	w.lines = stdscr->_maxy - 1;
-	w.window = newpad(w.lines, 80);
+	w.window = newpad(w.lines, stdscr->_maxx + 1);
 
 	return list_add(&windows, &w, sizeof(w));
 }
@@ -555,8 +555,8 @@ void ui_ncurses_init()
 	nonl();
 
 	window_current = window_new(NULL);
-	status = newwin(1, 80, stdscr->_maxy - 1, 0);
-	input = newwin(1, 80, stdscr->_maxy, 0);
+	status = newwin(1, stdscr->_maxx + 1, stdscr->_maxy - 1, 0);
+	input = newwin(1, stdscr->_maxx + 1, stdscr->_maxy, 0);
 	keypad(input, TRUE);
 
 	start_color();
@@ -1108,10 +1108,10 @@ static void ui_ncurses_loop()
 			completions = NULL;
 		}
 
-		if (line_index - line_start > 70)
-			line_start += 60;
+		if (line_index - line_start > input->_maxx - 9)
+			line_start += input->_maxx - 19;
 		if (line_index - line_start < 10) {
-			line_start -= 60;
+			line_start -= input->_maxx - 19;
 			if (line_start < 0)
 				line_start = 0;
 		}
@@ -1122,8 +1122,8 @@ static void ui_ncurses_loop()
 		wattrset(input, COLOR_PAIR(2));
 		if (line_start > 0)
 			mvwaddch(input, 0, 0, '<');
-		if (strlen(line) - line_start > 80)
-			mvwaddch(input, 0, 79, '>');
+		if (strlen(line) - line_start > input->_maxx + 1)
+			mvwaddch(input, 0, input->_maxx, '>');
 		wattrset(input, COLOR_PAIR(7));
 		wmove(input, 0, line_index - line_start);
 		wnoutrefresh(status);
