@@ -5,6 +5,11 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm).
 ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'', ,,i/nick''
 oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2001-12-17
+
+- gg_send_packet() o zmiennej ilo¶ci parametrów (a)
+- informowanie o wiadomo¶ciach konferencyjnych przez API libgg (a)
+
 // 2001-12-16
  
 - zmiana has³a komend± ,,passwd'' (w)
