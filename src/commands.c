@@ -696,8 +696,6 @@ COMMAND(cmd_find)
 					r->nickname = xstrdup(argv[++i]);
 				if (match_arg(arg, 'c', "city", 2) && argv[i + 1])
 					r->city = xstrdup(argv[++i]);
-				if (match_arg(arg, 'p', "phone", 2) && argv[i + 1])
-					r->phone = xstrdup(argv[++i]);
 				if (match_arg(arg, 'e', "email", 2) && argv[i + 1])
 					r->email = xstrdup(argv[++i]);
 				if (match_arg(arg, 'u', "uin", 2) && argv[i + 1])
@@ -736,7 +734,6 @@ COMMAND(cmd_find)
 	iso_to_cp(r->last_name);
 	iso_to_cp(r->nickname);
 	iso_to_cp(r->city);
-	iso_to_cp(r->phone);
 	iso_to_cp(r->email);
 
 	if (!(h = gg_search(r, 1))) {
@@ -865,11 +862,6 @@ COMMAND(cmd_modify)
 			xfree(u->display);
 			u->display = xstrdup(argv[i]);
 			userlist_replace(u);
-		}
-		
-		if (match_arg(argv[i], 'p', "phone", 2) && argv[i + 1]) {
-			xfree(u->mobile);
-			u->mobile = xstrdup(argv[++i]);
 		}
 		
 		if (match_arg(argv[i], 'g', "group", 2) && argv[i + 1]) {
@@ -3184,7 +3176,6 @@ void command_init()
 	  "  -n, --nick <pseudonim>\n"
 	  "  -c, --city <miasto>\n"
 	  "  -b, --born <min:max>    zakres roku urodzenia\n"
-	  "  -p, --phone <telefon>\n"
 	  "  -e, --email <e-mail>\n"
 	  "  -a, --active            tylko dostêpni\n"
 	  "  -F, --female            kobiety\n"
@@ -3240,7 +3231,6 @@ void command_init()
 	  "  -l, --last <nazwisko>\n"
 	  "  -n, --nick <pseudonim>    pseudonim (nie jest u¿ywany)\n"
 	  "  -d, --display <nazwa>     wy¶wietlana nazwa\n"
-	  "  -p, --phone <telefon>\n"
 	  "  -u, --uin <numerek>\n"
 	  "  -g, --group [+/-]<grupa>  dodaje lub usuwa z grupy\n"
 	  "\n"

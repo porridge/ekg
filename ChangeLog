@@ -6,6 +6,10 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2002-11-29
+
+- usuniêcie opcji --phone z /find i /change (mateusza/w)
+
 // 2002-11-28
 
 - ma³a poprawka opcji --debug w ekgsearch (wysek)
