@@ -1021,8 +1021,12 @@ static int ui_readline_event(const char *event, ...)
 				else
 					bind_sequence(p2, NULL, quiet);
 			
-			} else 
-				binding_list(quiet, p1, 0);
+			} else {
+				if (p1 && (!strcasecmp(p1, "-l") || !strcasecmp(p1, "--list")))
+					binding_list(quiet, p2, 0);
+				else
+					binding_list(quiet, p1, 0);
+			}
 
 			result = 1;
 		}

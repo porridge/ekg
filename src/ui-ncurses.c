@@ -3520,8 +3520,12 @@ static int ui_ncurses_event(const char *event, ...)
 					binding_delete(p2, quiet);
 			} else if (match_arg(p1, 'L', "list-default", 5)) {
 				binding_list(quiet, p2, 1);
-			} else
-				binding_list(quiet, p1, 0);
+			} else {
+				if (match_arg(p1, 'l', "list", 2))
+					binding_list(quiet, p2, 0);
+				else
+					binding_list(quiet, p1, 0);
+			}
 
 			goto cleanup;
 		}

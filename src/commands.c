@@ -4450,7 +4450,7 @@ void command_init()
 	  "\n"
 	  "  -a, --add <sekwencja> <akcja>   przypisuje now± sekwencjê\n"
 	  "  -d, --del <sekwencja>           usuwa podan± sekwencjê\n"
-	  " [-l, --list] [sekwencja]         wy¶wietla przypisane sekwencje\n"
+	  " [-l, --list, <sekwencja>]        wy¶wietla przypisane sekwencje\n"
 	  "  -L, --list-default [sekwencja]  j.w. plus domy¶lne sekwencje\n"
 	  "\n"
 	  "Dostêpne sekwencje to: Ctrl-<znak>, Alt-<znak>, F<liczba>, Enter, "
