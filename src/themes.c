@@ -1237,6 +1237,7 @@ void theme_init()
 
 	format_add("dcc_done_get", "%> Zakoñczono pobieranie pliku %T%2%n od %1\n", 1);
 	format_add("dcc_done_send", "%> Zakoñczono wysy³anie pliku %T%2%n do %1\n", 1);
+	format_add("dcc_close", "%) Zamkniêto po³±czenie z %1\n", 1);
 
 	format_add("dcc_voice_offer", "%) %1 chce rozmawiaæ\n%) Wpisz %Tdcc voice #%2%n, by rozpocz±æ rozmowê, lub %Tdcc close #%2%n, by anulowaæ\n", 1);
 	format_add("dcc_voice_running", "%! Mo¿na prowadziæ tylko jedn± rozmowê g³osow± na raz\n", 1);
