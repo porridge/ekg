@@ -726,6 +726,27 @@ static void ui_ncurses_loop()
 				line[0] = 0;
 				adjust();
 				break;
+			case 'W' - 64:
+			{
+				char *p;
+				int eaten = 0;
+
+				p = line + line_index;
+				while (isspace(*(p-1)) && p > line) {
+					p--;
+					eaten++;
+				}
+				if (p > line) {
+					while (!isspace(*(p-1)) && p > line) {
+						p--;
+						eaten++;
+					}
+				}
+				memmove(p, line + line_index, strlen(line) - line_index + 1);
+				line_index -= eaten;
+
+				break;
+			}
 			case 'L' - 64:
 				break;
 			case 9:
