@@ -603,6 +603,15 @@ COMMAND(command_find)
 		return 0;
 	}
 
+	if (!strncasecmp(argv[0], "--s", 3) || !strncasecmp(argv[0], "-s", 2)) {
+		if (search)
+			gg_search_cancel(search);
+		gg_free_search(search);
+		search = NULL;
+		my_printf("search_stopped");
+		return 0;
+	}
+
 	if (search) {
 		my_printf("already_searching");
 		return 0;

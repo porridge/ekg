@@ -568,6 +568,8 @@ void init_theme()
 	add_format("search_results_single_male", "%Cmê¿czyzna%n", 1);
 	add_format("search_results_single", "%) Nick: %W%3%n\n%) Numerek: %W%1%n\n%) Imiê i nazwisko: %W%2%n\n%) Miejscowo¶æ: %W%4%n\n%) Rok urodzenia: %W%5%n\n%) P³eæ: %6\n", 1);
 
+	add_format("search_stopped", "%) Zatrzymano szukanie\n", 1);
+
 	add_format("process", "%> %(-5)1 %2\n", 1);
 	add_format("no_processes", "%! Nie ma dzia³aj±cych procesów\n", 1);
 	add_format("process_exit", "%> Proces %1 (%2) zakoñczy³ dzia³anie z wynikiem %3\n", 1);
