@@ -527,7 +527,7 @@ void init_theme()
 	add_format("status_not_avail", "%> %1 jest niedostêpny %c(%C%#%c)%n\n", 1);
 	add_format("conn_broken", "%! Serwer zerwa³ po³±czenie: %1 %c(%C%#%c)%n\n", 1);
 	add_format("auto_away", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci %c(%C%#%c)%n\n", 1);
-	add_format("welcome", "%> EKG-%1 (Eksperymentalny Klient Gadu-gadu)\n%> (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>\n%> Program jest rozprowadzany na zasadach licencji GPL\n\n", 1);
+	add_format("welcome", "%> EKG-%1 (Eksperymentalny Klient Gadu-gadu)\n%> (C) Copyright 2001, 2002 Wojtek Kaniewski <wojtekka@irc.pl> i inni\n%> Program jest rozprowadzany na zasadach licencji GPL\n\n", 1);
 	add_format("error_reading_config", "%! Nie mo¿na odczytaæ pliku konfiguracyjnego: %1\n", 1);
 	add_format("offline_mode", "%! Tryb off-line\n", 1);
 	add_format("connecting", "%> £±czê siê z serwerem...\n", 1);

@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-02-26
 
 - poprawka segfaulta, gdy dane watcha == NULL (kfazi/w)
+- theme (jojo/w)
 
 // 2002-02-21
 
