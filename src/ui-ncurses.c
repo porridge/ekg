@@ -484,7 +484,8 @@ static void update_ctxlist()
 		show_invisible = 1;
 	char *tmp;
 	wmove(ctx, 0, 1);
-//	waddstr(ctx, "Obecni:");
+	werase(ctx);
+	waddstr(ctx, "Obecni:");
 
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
