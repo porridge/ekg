@@ -928,7 +928,7 @@ int main(int argc, char **argv)
 		{ "invisible", optional_argument, 0, 'i' },
 		{ "private", no_argument, 0, 'p' },
 		{ "no-auto", no_argument, 0, 'n' },
-		{ "control-pipe", no_argument, 0, 'c' },
+		{ "control-pipe", required_argument, 0, 'c' },
 		{ "frontend", required_argument, 0, 'f' },
 		{ "help", no_argument, 0, 'h' },
 		{ "ioctld-path", required_argument, 0, 'I' },
