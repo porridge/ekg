@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-10-08
 
 - poprawka konferencji (DJ/w)
+- poprawka ,,-c'' w getopt (serek/w)
 
 // 2002-10-07
 

@@ -693,7 +693,7 @@ int main(int argc, char **argv)
 
 	config_user = "";
 
-	while ((c = getopt_long(argc, argv, "b::a::i::pdncf:hI:ot:u:v", ekg_options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "b::a::i::pdnc:f:hI:ot:u:v", ekg_options, NULL)) != -1) {
 		switch (c) {
 			case 'b':
 				new_status = GG_STATUS_AVAIL;
