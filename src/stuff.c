@@ -210,14 +210,14 @@ char *prepare_path(char *filename)
 		home = pw->pw_dir;
 	}
 	
-	if (filename == "") {
-		if (config_user != "") {
+	if (filename == "" || !filename) {
+		if (config_user != "" || !config_user) {
 			snprintf(path, sizeof(path), "%s/.gg/%s", home, config_user);
 		} else {
 			snprintf(path, sizeof(path), "%s/.gg", home);
 		}
 	} else {
-		if (config_user != "") {
+		if (config_user != "" || !config_user) {
 			snprintf(path, sizeof(path), "%s/.gg/%s/%s", home, config_user, filename);
 		} else {
 			snprintf(path, sizeof(path), "%s/.gg/%s", home, filename);
