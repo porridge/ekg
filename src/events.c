@@ -548,7 +548,7 @@ void handle_search(struct gg_http *h)
 		cp_to_iso(s->results[i].nickname);
 		cp_to_iso(s->results[i].city);
 
-		name = gg_alloc_sprintf("%s %s", s->results[i].first_name, s->results[i].last_name);
+		name = saprintf("%s %s", s->results[i].first_name, s->results[i].last_name);
 
 		if (!(h->id & 1)) {
 			active = find_format((s->results[i].active) ? "search_results_single_active" : "search_results_single_inactive");

@@ -27,6 +27,8 @@ struct list {
 	struct list *next;
 };
 
+typedef struct list * List;
+
 void *list_add(struct list **list, void *data, int alloc_size);
 void *list_add_sorted(struct list **list, void *data, int alloc_size, int (*comparision)(void *, void *));
 int list_remove(struct list **list, void *data, int free_data);
@@ -39,6 +41,8 @@ struct string {
 	char *str;
 	int size;
 };
+
+typedef struct string * String;
 
 struct string *string_init(char *str);
 int string_append(struct string *s, char *str);

@@ -14,7 +14,6 @@ klient:
 - mo¿liwo¶æ zrobienia theme'u a'la irc,
 - kilka komend w aliasach,
 - osobny program ekgsearch, lub ekg --search,
-- dodaæ --more-- tam, gdzie siê da i ujednoliciæ.
 - wielolinijkowe komendy do historii.
 - lastlog, awaylog.
 - tryb nieinteraktywny przez jakie¶ --exec albo co¶ takiego.

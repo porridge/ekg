@@ -38,4 +38,7 @@ void add_send_nick(char *nick);
 char **my_completion(char *text, int start, int end);
 char *empty_generator(char *text, int state);
 
+int binding_quick_list(int a, int b);
+int binding_help(int a, int b);
+
 #endif

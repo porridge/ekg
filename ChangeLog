@@ -5,6 +5,14 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-04-23
+
+- libgadu: s/gg_alloc_sprintf/gg_saprintf/ (w)
+- ekg: s/gg_alloc_sprintf/saprintf/ (w)
+- sensowny pager reaguj±cy na zmiany rozmiaru terminala (w)
+- podbindowanie prostego helpa pod F1 (w)
+- krótka i zwiêz³a lista aktywnych i zajêtych u¿ytkowników pod F2 (w)
+
 // 2002-04-22
 
 - poprawka ,,dostêpny z opisem'' (gawrysz/w)

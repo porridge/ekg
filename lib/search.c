@@ -112,7 +112,7 @@ struct gg_http *gg_search(struct gg_search_request *r, int async)
 			return NULL;
 		}
 
-		form = gg_alloc_sprintf("Mode=0&FirstName=%s&LastName=%s&Gender=%d&NickName=%s&City=%s&MinBirth=%d&MaxBirth=%d%s", __first_name, __last_name, gender, __nickname, __city, r->min_birth, r->max_birth, __suffix);
+		form = gg_saprintf("Mode=0&FirstName=%s&LastName=%s&Gender=%d&NickName=%s&City=%s&MinBirth=%d&MaxBirth=%d%s", __first_name, __last_name, gender, __nickname, __city, r->min_birth, r->max_birth, __suffix);
 
 		free(__first_name);
 		free(__last_name);
@@ -127,7 +127,7 @@ struct gg_http *gg_search(struct gg_search_request *r, int async)
 			return NULL;
 		}
 
-		form = gg_alloc_sprintf("Mode=1&Email=%s%s", __email, __suffix);
+		form = gg_saprintf("Mode=1&Email=%s%s", __email, __suffix);
 
 		free(__email);
 
@@ -139,12 +139,12 @@ struct gg_http *gg_search(struct gg_search_request *r, int async)
 			return NULL;
 		}
 
-		form = gg_alloc_sprintf("Mode=2&MobilePhone=%s%s", __phone, __suffix);
+		form = gg_saprintf("Mode=2&MobilePhone=%s%s", __phone, __suffix);
 
 		free(__phone);
 
 	} else
-		form = gg_alloc_sprintf("Mode=3&UserId=%u%s", r->uin, __suffix);
+		form = gg_saprintf("Mode=3&UserId=%u%s", r->uin, __suffix);
 
 	if (!form) {
 		gg_debug(GG_DEBUG_MISC, "=> search, not enough memory for form query\n");
@@ -153,7 +153,7 @@ struct gg_http *gg_search(struct gg_search_request *r, int async)
 
 	gg_debug(GG_DEBUG_MISC, "=> search, %s\n", form);
 
-	query = gg_alloc_sprintf(
+	query = gg_saprintf(
 		"Host: " GG_PUBDIR_HOST "\r\n"
 		"Content-Type: application/x-www-form-urlencoded\r\n"
 		"User-Agent: " GG_HTTP_USERAGENT "\r\n"

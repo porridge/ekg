@@ -58,7 +58,7 @@ struct gg_http *gg_userlist_get(uin_t uin, const char *passwd, int async)
 		return NULL;
 	}
 	
-	if (!(form = gg_alloc_sprintf("FmNum=%ld&Pass=%s", uin, __passwd))) {
+	if (!(form = gg_saprintf("FmNum=%ld&Pass=%s", uin, __passwd))) {
 		gg_debug(GG_DEBUG_MISC, "=> userlist_get, not enough memory for form fields\n");
 		free(__passwd);
 		errno = ENOMEM;
@@ -69,7 +69,7 @@ struct gg_http *gg_userlist_get(uin_t uin, const char *passwd, int async)
 	
 	gg_debug(GG_DEBUG_MISC, "=> userlist_get, %s\n", form);
 
-        query = gg_alloc_sprintf(
+        query = gg_saprintf(
 		"Host: " GG_PUBDIR_HOST "\r\n"
                 "Content-Type: application/x-www-form-urlencoded\r\n"
                 "User-Agent: " GG_HTTP_USERAGENT "\r\n"
@@ -200,7 +200,7 @@ struct gg_http *gg_userlist_put(uin_t uin, const char *passwd, const char *conta
 		return NULL;
 	}
 	
-	if (!(form = gg_alloc_sprintf("FmNum=%ld&Pass=%s&Contacts=%s", uin, __passwd, __contacts))) {
+	if (!(form = gg_saprintf("FmNum=%ld&Pass=%s&Contacts=%s", uin, __passwd, __contacts))) {
 		gg_debug(GG_DEBUG_MISC, "=> userlist_put, not enough memory for form fields\n");
 		free(__passwd);
 		free(__contacts);
@@ -213,7 +213,7 @@ struct gg_http *gg_userlist_put(uin_t uin, const char *passwd, const char *conta
 	
 	gg_debug(GG_DEBUG_MISC, "=> userlist_put, %s\n", form);
 
-        query = gg_alloc_sprintf(
+        query = gg_saprintf(
 		"Host: " GG_PUBDIR_HOST "\r\n"
                 "Content-Type: application/x-www-form-urlencoded\r\n"
                 "User-Agent: " GG_HTTP_USERAGENT "\r\n"

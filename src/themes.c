@@ -25,6 +25,7 @@
 #endif
 #include <stdarg.h>
 #include <limits.h>
+#include <readline.h>
 #include "stuff.h"
 #include "dynstuff.h"
 #include "themes.h"
@@ -271,11 +272,24 @@ char *format_string(char *format, ...)
 void my_printf(char *theme, ...)
 {
 	va_list ap;
-	char *tmp;
+	char *tmp, *p;
 	
 	va_start(ap, theme);
 	tmp = va_format_string(find_format(theme), ap);
 	my_puts("%s", (tmp) ? tmp : "");
+
+	if (my_printf_lines != -1) {
+		for (p = tmp; *p; p++)
+			if (*p == '\n')
+				my_printf_lines++;
+
+		if (my_printf_lines > screen_lines - 2) {
+			char *tmp = readline(find_format("readline_more"));
+			free(tmp);
+			my_printf_lines = 0;
+		}
+	}
+	
 	free(tmp);
 	va_end(ap);
 }
@@ -475,6 +489,7 @@ void init_theme()
 	add_format("readline_prompt_away", "/ ", 1);
 	add_format("readline_prompt_invisible", ". ", 1);
 	add_format("readline_prompt_query", "%1> ", 1);
+	add_format("readline_more", "-- wci¶nij enter by kontynuowaæ --", 1);
 
 	add_format("known_user", "%W%1%n/%2", 1);
 	add_format("unknown_user", "%W%1%n", 1);
@@ -707,7 +722,11 @@ void init_theme()
 	add_format("userlist_get_error", "%! B³±d podczas pobierania listy kontaktów\n", 1);
 	add_format("change_not_enough_params", "%! Polecenie wymaga podania %wwszystkich%n parametrów\n", 1);
 
-	add_format("more", "-- Wci¶nij Enter by kontynuowaæ --", 1);
 	add_format("window_change_size", "%) Uaktualniono informacjê o rozmiarach okna.\n", 1);
+
+	add_format("quick_list", "%)%1\n", 1);
+	add_format("quick_list_avail", " %W%1%n", 1);
+	add_format("quick_list_busy", " %w%1%n", 1);
+	add_format("quick_list_invisible", " %K%1%n", 1);
 };
 

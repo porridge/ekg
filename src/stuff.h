@@ -32,7 +32,19 @@
 #include "dynstuff.h"
 #include "ioctl_daemon.h"
 
-enum { EVENT_MSG = 1, EVENT_CHAT = 2, EVENT_AVAIL = 4, EVENT_NOT_AVAIL = 8, EVENT_AWAY = 16, EVENT_DCC = 32, EVENT_INVISIBLE = 64, EVENT_EXEC = 128 };
+/* malutki aliasik, ¿eby nie rzucaæ d³ugimi nazwami wszêdzie */
+#define saprintf gg_alloc_sprintf
+
+enum {
+	EVENT_MSG = 1,
+	EVENT_CHAT = 2,
+	EVENT_AVAIL = 4,
+	EVENT_NOT_AVAIL = 8,
+	EVENT_AWAY = 16,
+	EVENT_DCC = 32,
+	EVENT_INVISIBLE = 64,
+	EVENT_EXEC = 128
+};
 
 struct process {
 	int pid;
@@ -128,6 +140,8 @@ int length;
 struct sockaddr_un addr;
 char *busy_reason;
 int screen_lines;
+int screen_columns;
+int my_printf_lines;
 
 int config_read(char *filename);
 int config_write(char *filename);

@@ -43,6 +43,7 @@
 #include "version.h"
 #include "userlist.h"
 #include "vars.h"
+#include "config.h"
 
 time_t last_action = 0;
 int ioctl_daemon_pid = 0;
@@ -314,20 +315,6 @@ void sighup()
 	signal(SIGHUP, sighup);
 }
 
-void sigwinch()
-{
-    	int lines;
-       
-	lines = atoi(getenv("LINES"));
-
-	if (lines > 1) {
-	    	screen_lines = lines;
-		my_printf("window_change_size");
-	}
-	
-	signal(SIGWINCH, sigwinch);
-}
-
 void kill_ioctl_daemon()
 {
         if (ioctl_daemon_pid > 0 && ekg_pid == getpid())
@@ -355,6 +342,13 @@ to unikn±æ tego typu b³êdów w przysz³o¶ci.\n\
 	userlist_write_crash();
 
 	raise(SIGSEGV);			/* niech zrzuci core */
+}
+
+void sigwinch_handler()
+{
+#ifdef HAS_RL_GET_SCREEN_SIZE
+	rl_get_screen_size(&screen_lines, &screen_columns);
+#endif
 }
 
 int main(int argc, char **argv)
@@ -455,7 +449,7 @@ IOCTL_HELP
 #ifdef IOCTL
         sock_path = prepare_path(".socket");
 
-        if(!(ioctl_daemon_pid = fork())) {
+        if (!(ioctl_daemon_pid = fork())) {
 		execl(ioctl_daemon_path, "ioctl_daemon", sock_path, NULL);
 		exit(0);
 	}
@@ -516,7 +510,6 @@ IOCTL_HELP
 		
 	signal(SIGCONT, sigcont);
 	signal(SIGHUP, sighup);
-	signal(SIGWINCH, sigwinch);
 	signal(SIGALRM, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
 
@@ -537,10 +530,19 @@ IOCTL_HELP
 	rl_readline_name = "gg";
 	rl_attempted_completion_function = (CPPFunction *) my_completion;
 	rl_completion_entry_function = (void*) empty_generator;
-
-	if (getenv("LINES"))
-	    	screen_lines = atoi(getenv("LINES"));
-		
+#ifdef HAS_RL_SET_KEY
+	rl_set_key("\033[[A", binding_help, rl_get_keymap());
+	rl_set_key("\033OP", binding_help, rl_get_keymap());
+	rl_set_key("\033[[B", binding_quick_list, rl_get_keymap());
+	rl_set_key("\033OQ", binding_quick_list, rl_get_keymap());
+#endif
+	
+#ifdef HAS_RL_GET_SCREEN_SIZE
+#  ifdef SIGWINCH
+	signal(SIGWINCH, sigwinch_handler);
+#  endif
+	rl_get_screen_size(&screen_lines, &screen_columns);
+#endif
 	
 	my_printf("welcome", VERSION);
 	
@@ -549,9 +551,9 @@ IOCTL_HELP
 
 	if (!config_log_path) {
 		if (config_user != "")
-			config_log_path = gg_alloc_sprintf("%s/.gg/%s/history", home_dir, config_user);
+			config_log_path = saprintf("%s/.gg/%s/history", home_dir, config_user);
 		else
-			config_log_path = gg_alloc_sprintf("%s/.gg/history", home_dir);
+			config_log_path = saprintf("%s/.gg/history", home_dir);
 	}
 	
 	changed_dcc("dcc");
@@ -587,10 +589,14 @@ IOCTL_HELP
 			line = tmp;
 		}
 
+		my_printf_lines = 0;
+
 		if (execute_line(line)) {
 			free(line);
 			break;
 		}
+		
+		my_printf_lines = -1;
 		
 		free(line);
 	}

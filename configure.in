@@ -73,6 +73,14 @@ if test x"$ac_cv_has_rl_get_screen_size" != xno; then
     AC_DEFINE(HAS_RL_GET_SCREEN_SIZE)
 fi
 
+AC_CACHE_CHECK([for rl_set_key() in readline], ac_cv_has_rl_set_key,
+[AC_TRY_LINK([#include <stdio.h>
+#include <readline/readline.h>
+], [rl_set_key("foo",(void*)0,rl_get_keymap());], [ac_cv_has_rl_set_key=yes], [ac_cv_has_rl_set_key=no])])
+if test x"$ac_cv_has_rl_set_key" != xno; then
+    AC_DEFINE(HAS_RL_SET_KEY)
+fi
+
 LIBS="$SAVE_LIBS"
 CFLAGS="$SAVE_CFLAGS"
 

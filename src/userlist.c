@@ -236,7 +236,7 @@ char *userlist_dump()
 		
 		groups = group_to_string(u->groups);
 		
-		line = gg_alloc_sprintf("%s;%s;%s;%s;%s;%s;%lu\r\n",
+		line = saprintf("%s;%s;%s;%s;%s;%s;%lu\r\n",
 			(u->first_name) ?
 			u->first_name : u->display, (u->last_name) ?
 			u->last_name : "", (u->nickname) ? u->nickname :

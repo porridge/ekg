@@ -100,6 +100,7 @@ struct sockaddr_un addr;
 char *busy_reason = NULL;
 char *home_dir = NULL;
 int screen_lines = 24;
+int screen_columns = 80;
 char *config_quit_reason = NULL;
 char *config_away_reason = NULL;
 char *config_back_reason = NULL;
@@ -107,6 +108,7 @@ int config_random_reason = 0;
 int config_query_commands = 0;
 char *config_proxy = NULL;
 char *config_server = NULL;
+int my_printf_lines = -1;
 
 /*
  * my_puts()
@@ -982,7 +984,7 @@ int del_alias(char *name)
 char *is_alias(char *foo)
 {
 	struct list *l;
-	char *param = NULL, *buf, *line = strdup(foo);
+	char *param = NULL, *line = strdup(foo);
 
 	if ((param = strchr(line, ' ')))
 		*param++ = 0;
@@ -991,14 +993,9 @@ char *is_alias(char *foo)
 		struct alias *j = l->data;
 
 		if (!strcmp(line, j->alias)) {
-			buf = malloc(strlen(j->cmd) + ((param) ? strlen(param) : 0) + 4);
-			strcpy(buf, j->cmd);
-			if (param) {
-				strcat(buf, " ");
-				strcat(buf, param);
-			}
+			char *tmp = saprintf("%s %s", j->cmd, (param) ? param : "");
 			free(line);
-			return buf;
+			return tmp;
 		}
 	}
 

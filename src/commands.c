@@ -164,11 +164,8 @@ char *command_generator(char *text, int state)
 		if (send_nicks_count < 1)
 			return strdup((query_nick) ? "/msg" : "msg");
 		send_nicks_index = (send_nicks_count > 1) ? 1 : 0;
-		if (!(name = malloc(8 + strlen(send_nicks[0]))))
-			return NULL;
-		sprintf(name, (query_nick) ? "/chat %s" : "chat %s", send_nicks[0]);
-		
-		return name;
+
+		return saprintf((query_nick) ? "/chat %s" : "chat %s", send_nicks[0]);
 	}
 
 	if (!state) {
@@ -177,20 +174,8 @@ char *command_generator(char *text, int state)
 	}
 
 	while ((name = commands[index++].name))
-		if (!strncasecmp(text, name, len)) {
-			char *tmp = malloc(strlen(name) + 3);
-			
-			if (!tmp)
-				return NULL;
-			
-			if (query_nick) {
-				strcpy(tmp, "/");
-				strcat(tmp, name);
-			} else
-				strcpy(tmp, name);
-			
-			return tmp;
-		}
+		if (!strncasecmp(text, name, len))
+			return (query_nick) ? saprintf("/%s", name) : strdup(name);
 
 	return NULL;
 }
@@ -254,7 +239,7 @@ char *variable_generator(char *text, int state)
 
 		if (*text == '-') {
 			if (!strncasecmp(text + 1, v->name, len - 1))
-				return gg_alloc_sprintf("-%s", v->name);
+				return saprintf("-%s", v->name);
 		} else {
 			if (!strncasecmp(text, v->name, len))
 				return strdup(v->name);
@@ -1030,7 +1015,6 @@ COMMAND(command_modify)
 COMMAND(command_help)
 {
 	struct command *c;
-	int width = 0, height = screen_lines, lines = 0;
 	
 	if (params[0]) {
 		for (c = commands; c->name; c++)
@@ -1061,10 +1045,6 @@ COMMAND(command_help)
 			}
 	}
 
-#if HAS_RL_GET_SCREEN_SIZE
-	rl_get_screen_size(&height, &width);
-#endif
-
 	for (c = commands; c->name; c++)
 		if (isalnum(*c->name)) {
 		    	char *blah = NULL;
@@ -1074,13 +1054,6 @@ COMMAND(command_help)
 	
 			my_printf("help", c->name, c->params_help, blah ? blah : c->brief_help);
 			free(blah);
-
-			if (++lines > height - 2) {
-				char *foo = readline(find_format("more"));
-				free(foo);
-
-				lines = 0;
-			}
 		}
 
 	return 0;
@@ -1302,10 +1275,7 @@ COMMAND(command_list)
 
 		if (show_all || (show_busy && (u->status == GG_STATUS_BUSY || u->status == GG_STATUS_BUSY_DESCR)) || (show_active && u->status == GG_STATUS_AVAIL) || (show_inactive && (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)) || (show_invisible && (u->status == GG_STATUS_INVISIBLE))) {
 			my_printf(tmp, format_user(u->uin), inet_ntoa(in), itoa(u->port), u->descr);
-			if ((++count % (screen_lines - 1)) == 0 && page_wait) {
-				char *foo = readline(find_format("more"));
-				free(foo);
-			}
+			count++;
 		}
 	}
 
@@ -2142,3 +2112,60 @@ int execute_line(char *line)
 	return 0;
 }
 
+/*
+ * binding_quick_list()
+ *
+ * wy¶wietla krótk± i zwiêz³a listê dostêpnych, zajêtych i niewidocznych
+ * ludzi z listy kontaktów.
+ */
+int binding_quick_list(int a, int b)
+{
+	String list = string_init(NULL);
+	List l;
+
+	for (l = userlist; l; l = l->next) {
+		struct userlist *u = l->data;
+		char *tmp, *format = NULL;
+		
+		switch (u->status) {
+			case GG_STATUS_AVAIL:
+			case GG_STATUS_AVAIL_DESCR:
+				format = find_format("quick_list_avail");
+				break;
+			case GG_STATUS_BUSY:
+			case GG_STATUS_BUSY_DESCR:
+				format = find_format("quick_list_busy");
+				break;
+			case GG_STATUS_INVISIBLE:
+			case GG_STATUS_INVISIBLE_DESCR:
+				format = find_format("quick_list_invisible");
+				break;
+		}
+
+		if (!format)
+			continue;
+
+		if (!(tmp = format_string(format, u->display)))
+			continue;
+
+		string_append(list, tmp);
+
+		free(tmp);
+	}
+	
+	if (strlen(list->str) > 0)
+		my_printf("quick_list", list->str);
+
+	string_free(list, 1);
+
+	return 0;
+}
+
+int binding_help(int a, int b)
+{
+	/* XXX proszê siê nie czepiaæ tego kodu. za jaki¶ czas poprawiê. */
+
+	my_printf("generic", "Póki co, przeczytaj plik README za³±czony do programu.");
+	my_printf("generic", "Je¶li go nie masz, zajrzyj na \033[1mhttp://dev.null.pl/ekg/\033[0m");
+	return 0;
+}

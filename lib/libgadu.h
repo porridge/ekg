@@ -566,7 +566,8 @@ extern int gg_proxy_port;
  */
 
 int gg_resolve(int *fd, int *pid, const char *hostname);
-char *gg_alloc_sprintf(const char *format, ...);
+char *gg_saprintf(const char *format, ...);
+#define gg_alloc_sprintf gg_saprintf
 char *gg_get_line(char **ptr);
 int gg_connect(void *addr, int port, int async);
 char *gg_read_line(int sock, char *buf, int length);
