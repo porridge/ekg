@@ -1,11 +1,12 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *                          Adam Osuchowski <adwol@polsl.gliwice.pl>
  *                          Wojtek Bojdo³ <wojboj@htcon.pl>
+ *                          Piotr Domagalski <szalik@szalik.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -22,6 +23,8 @@
  */
 
 #include "config.h"
+
+#include <sys/ioctl.h>
 
 #include <signal.h>
 #include <stdarg.h>
@@ -62,10 +65,21 @@ static int ui_resize_term = 0;
 #endif
 
 #ifndef HAVE_RL_GET_SCREEN_SIZE
-int rl_get_screen_size(int *columns, int *lines)
+int rl_get_screen_size(int *lines, int *columns)
 {
+#ifdef TIOCGWINSZ
+	struct winsize ws;
+
+	memset(&ws, 0, sizeof(ws));
+
+	ioctl(0, TIOCGWINSZ, &ws);
+
+	*columns = ws.ws_col;
+	*lines = ws.ws_row;
+#else
 	*columns = 80;
 	*lines = 24;
+#endif
 	return 0;
 }
 #endif
@@ -150,8 +164,7 @@ static void sigint_handler()
 	signal(SIGINT, sigint_handler);
 }
 
-#ifdef HAVE_RL_GET_SCREEN_SIZE
-#  ifdef SIGWINCH
+#ifdef SIGWINCH
 /*
  * sigwinch_handler()
  *
@@ -162,7 +175,6 @@ static void sigwinch_handler()
 	ui_needs_refresh = 1;
 	ui_resize_term = 1;
 }
-#  endif
 #endif
 
 /*
@@ -173,6 +185,23 @@ static void sigwinch_handler()
 static int my_getc(FILE *f)
 {
 	ekg_wait_for_key();
+
+	if (ui_needs_refresh) {
+		ui_needs_refresh = 0;
+#ifdef SIGWINCH
+		if (ui_resize_term) {
+			ui_resize_term = 0;
+			rl_get_screen_size(&screen_lines, &screen_columns);
+			if (screen_lines < 1)
+				screen_lines = 24;
+			if (screen_columns < 1)
+				screen_columns = 80;
+			ui_screen_width = screen_columns;
+			ui_screen_height = screen_lines;
+		}
+#endif
+	}
+
 	return rl_getc(f);
 }
 
@@ -822,12 +851,12 @@ void ui_readline_init()
 
 	ui_needs_refresh = 0;
 
-#ifdef HAVE_RL_GET_SCREEN_SIZE
-#  ifdef SIGWINCH
+#ifdef SIGWINCH
 	signal(SIGWINCH, sigwinch_handler);
-#  endif
-	rl_get_screen_size(&screen_lines, &screen_columns);
 #endif
+
+	rl_get_screen_size(&screen_lines, &screen_columns);
+
 	if (screen_lines < 1)
 		screen_lines = 24;
 	if (screen_columns < 1)
@@ -867,20 +896,6 @@ static void ui_readline_loop()
 {
 	for (;;) {
 		char *line = my_readline();
-
-		if (ui_needs_refresh) {
-			ui_needs_refresh = 0;
-#ifdef SIGWINCH
-			if (ui_resize_term) {
-				ui_resize_term = 0;
-				rl_get_screen_size(&screen_lines, &screen_columns);
-
-				ui_screen_width = screen_columns;
-				ui_screen_height = screen_lines;
-			}
-#endif
-			continue;
-		}
 
 		/* je¶li wci¶niêto Ctrl-D i jeste¶my w query, wyjd¼my */
 		if (!line && window_current->query_nick) {
