@@ -205,13 +205,13 @@ char *prepare_path(char *filename)
 {
 	static char path[PATH_MAX];
 	
-	if (filename == "" || !filename) {
-		if (config_user != "" || !config_user)
+	if (!filename || !*filename) {
+		if (config_user && *config_user)
 			snprintf(path, sizeof(path), "%s/.gg/%s", home_dir, config_user);
 		else
 			snprintf(path, sizeof(path), "%s/.gg", home_dir);
 	} else {
-		if (config_user != "" || !config_user)
+		if (config_user && *config_user)
 			snprintf(path, sizeof(path), "%s/.gg/%s/%s", home_dir, config_user, filename);
 		else
 			snprintf(path, sizeof(path), "%s/.gg/%s", home_dir, filename);
@@ -252,7 +252,8 @@ void put_log(uin_t uin, char *format, ...)
 		strncpy(path, lp, sizeof(path));
 
 	if (config_log == 2) {
-		mkdir(path, 0700);
+		if (mkdir(path, 0700))
+			return;
 		snprintf(path + strlen(path), sizeof(path) - strlen(path), "/%lu", uin);
 	}
 

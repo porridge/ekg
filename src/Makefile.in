@@ -21,7 +21,7 @@ LOBJS = ../lib/libgadu.a
 all:	ekg @do_ioctl@
 
 ekg:	$(OBJS) $(LOBJS)
-	$(CC) -o $(NAME) $(OBJS) $(LOBJS) $(LIBS) 
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LOBJS) $(LIBS) 
 
 ioctl_daemon:	ioctl_daemon.c
 	$(CC) ioctl_daemon.c -o $(IOCTL_DAEMON_NAME)

@@ -20,7 +20,7 @@ LICENCJA
 
 INSTALACJA
 
-    Skompilowaæ i odpaliæ. Proste? Proste. Po pierwszym uruchomieni
+    Skompilowaæ i odpaliæ. Proste? Proste. Po pierwszym uruchomieniu
     ekg powie, jak go skonfigurowaæ.
 
     ekg powinien dzia³aæ na wiêkszo¶ci systemów un*xowych, jak Linux,
@@ -34,7 +34,7 @@ INSTALACJA
     readline zwykle polega te¿ na innych bibliotekach do obs³ugi
     terminala, jak np. libtermcap czy ncurses. Oczywi¶cie niezbêdny
     jest te¿ zestaw narzêdzi do kompilacji programów napisanych w
-    jêzyki C -- kompilator, preprocesor, linker, pliki nag³ówkowe,
+    jêzyku C -- kompilator, preprocesor, linker, pliki nag³ówkowe,
     biblioteki systemowe itd.
 
 U¯YCIE
@@ -151,5 +151,7 @@ PODZIÊKOWANIA
 	Marcin Miku³a (meecash@meecash.prv.pl)
 	Krzysztof Wójtowicz (misiolek@misiolki.prv.pl)
 	Tomasz Dudzisz (eileen@ds1.agh.edu.pl)
+	Wojciech Bojdo³ (wojboj@htcon.pl)
+	Jacek Pospycha³a (tri10o@bsod.org)
 
 $Id$

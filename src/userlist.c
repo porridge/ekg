@@ -271,7 +271,9 @@ int userlist_write(char *filename)
 		free(contacts);
 		return -1;
 	}
-	mkdir(tmp, 0700);
+
+	if (mkdir(tmp, 0700))
+		return -1;
 
 	if (!filename) {
 		if (!(filename = prepare_path("userlist"))) {
