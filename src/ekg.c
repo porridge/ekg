@@ -1029,7 +1029,7 @@ int main(int argc, char **argv)
 			xfree(config_interface);
 			config_interface = tmp;
 		}
-				
+			
 		if (config_interface && strcmp(config_interface, ""))
 			ekg_ui_set(config_interface);
 	}

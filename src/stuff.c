@@ -1321,7 +1321,7 @@ char *config_read_variable(const char *name)
 
 		*tmp++ = 0;
 
-		if (!strcasecmp(tmp, name)) {
+		if (!strcasecmp(line, name)) {
 			char *result = xstrdup(tmp);
 
 			xfree(line);
