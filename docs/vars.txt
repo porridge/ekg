@@ -386,8 +386,9 @@ irssi_set_mode
 
 	je¶li 1, to podczas wykonania komendy /set arg1 wy¶wietlane
 	bêd± wszystkie ustawienia, które w swojej nazwie zawieraj± arg1
-	(domy¶lnie arg1 musi byæ równe tej nazwie). pomys³ zaczerpniêty
-	z irssi.
+	(domy¶lnie arg1 musi byæ równe tej nazwie). /set arg1 arg2,
+	przypisuj±ce zmiennej arg1 warto¶æ arg2 pozostaje bez zmian.
+	pomys³ zaczerpniêty z irssi.
 
 keep_reason
 	typ: liczba

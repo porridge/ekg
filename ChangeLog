@@ -4,6 +4,9 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-09-30
+- poprawienie zachowania siê /set dla irssi_set_mode == 1 (weirdo/wysek)
+
 // 2003-09-21
 
 - nowa zmienna irssi_set_mode, je¶li ustawiona na 1, to zmienia zachowanie
