@@ -429,9 +429,9 @@ random_reason
 	typ: liczba
 	domy¶lna warto¶æ: 0
 
-	okre¶la czy przy zmianie stanu ma byæ losowany opis (z 
-        ~/.gg/quit.reasons dla komend ,,quit'', ,,disconnect'', ,,invisible'', 
-        ~/.gg/away.reasons dla ,,away'' i ~/.gg/back.reasons dla ,,back'').
+	okre¶la czy przy zmianie stanu i po³±czeniu ma byæ losowany opis (z 
+	~/.gg/quit.reasons dla komend ,,quit'', ,,disconnect'', ,,invisible'', 
+	~/.gg/away.reasons dla ,,away'' i ~/.gg/back.reasons dla ,,back'').
 	dla 0 nie jest losowany, dla 1 losowany jest opis dotycz±cy stanu
 	zajêty, dla 2 niedostêpny, dla 4 dostêpny, dla 8 niewidoczny.
 	warto¶ci te mo¿na ze sob± dodawaæ, np. 11 bêdzie dotyczyæ stanów

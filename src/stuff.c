@@ -1567,6 +1567,9 @@ void do_connect()
 		}
 	}
 
+	if (config_random_reason)
+		change_status(config_status, NULL, 2);
+
 	memset(&p, 0, sizeof(p));
 
 	p.uin = config_uin;
@@ -2881,36 +2884,36 @@ const char *prepare_path(const char *filename, int do_mkdir)
 
 char *random_line(const char *path)
 {
-        int max = 0, item, tmp = 0;
+	int max = 0, item, tmp = 0;
 	char *line;
-        FILE *f;
+	FILE *f;
 
 	if (!path)
 		return NULL;
 
-        if ((f = fopen(path, "r")) == NULL)
-                return NULL;
-
-        while ((line = read_file(f))) {
+	if ((f = fopen(path, "r")) == NULL)
+		return NULL;
+	
+	 while ((line = read_file(f))) {
 		xfree(line);
-                max++;
+		max++;
 	}
 
-        rewind(f);
+	rewind(f);
 
-        item = rand() % max;
+	item = rand() % max;
 
-        while ((line = read_file(f))) {
-                if (tmp == item) {
+	while ((line = read_file(f))) {
+		if (tmp == item) {
 			fclose(f);
 			return line;
 		}
 		xfree(line);
 		tmp++;
-        }
+	}
 
-        fclose(f);
-        return NULL;
+	fclose(f);
+	return NULL;
 }
 
 /*
@@ -3677,20 +3680,32 @@ void change_status(int status, const char *arg, int autom)
 		r1 = xstrmid(reason, 0, GG_STATUS_DESCR_MAXSIZE);
 		r2 = xstrmid(reason, GG_STATUS_DESCR_MAXSIZE, -1);
 
-		if (autom)
-			print(auto_format_descr, tmp, r1, r2);
-		else
-			print(format_descr, r1, r2);
+		switch (autom) {
+			case 0:
+				print(format_descr, r1, r2);
+				break;
+			case 1:
+				print(auto_format_descr, tmp, r1, r2);
+				break;
+			case 2:
+				break;
+		}
 	
 		xfree(reason);
 		reason = r1;
 
 		xfree(r2);
 	} else {
-		if (autom)
-			print(auto_format, tmp);
-		else
-			print(format);
+		switch (autom) {
+			case 0:
+				print(format);
+				break;
+			case 1:
+				print(auto_format, tmp);
+				break;
+			case 2:
+				break;
+		}
 	}
 
 	if (!ignored_check(config_uin)) {

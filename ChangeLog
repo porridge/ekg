@@ -28,6 +28,8 @@ zg³osi³ b³±d.
 - rewrite kodu parsowania zdarzeñ dla ioctld (w)
 - poprawki helpów nowych komend (w)
 - poprawka przenoszenia atrybutów do nowej linii wiadomo¶ci (*/w)
+- poprawka zachowania zmiennej ,,random_reason''. teraz losuje nowy
+  opis przy ka¿dym po³±czeniu (w)
 
 // 2003-01-29
 
