@@ -326,6 +326,14 @@ display_welcome
 
 	mówi, czy ekg ma wy¶wietliæ tekst powitalny po uruchomieniu.
 
+display_token
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	zmienna dostêpna tylko gdy w systemie jest biblioteka pozwalaj±ca
+	dekodowaæ pliki JPEG. wy³±czenie jej spowoduje dzia³anie ekg tak,
+	jakby biblioteki nie by³o, tj. zapisywanie tokenów do pliku.
+
 display_transparent
 	typ: bool
 	domy¶lna warto¶æ: 1
