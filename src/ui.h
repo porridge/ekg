@@ -47,7 +47,13 @@ extern void ui_readline_init();
 
 #ifdef WITH_UI_NCURSES
 
-#include <ncurses.h>
+#ifdef HAVE_NCURSES_H
+#  include <ncurses.h>
+#else
+#  ifdef HAVE_NCURSES_NCURSES_H
+#    include <ncurses/ncurses.h>
+#  endif
+#endif
 
 WINDOW *header, *status;
 

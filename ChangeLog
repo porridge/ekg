@@ -4,6 +4,12 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-06-24
+
+- przepisanie wykrywania ncurses, ¿eby dzia³a³o dobrze przy crosskompilacji.
+  u¿ywa teraz AC_CHECK_HEADERS, zamiast sprawdzania obecno¶ci plików
+  (pliszka/w)
+
 // 2003-06-23
 
 - poprawki crosskompilacji (pliszka/w)

@@ -51,7 +51,6 @@
 #else
 #  include "../compat/dirname.h"
 #endif
-#include <ncurses.h>
 #ifndef HAVE_SCANDIR
 #  include "../compat/scandir.h"
 #endif

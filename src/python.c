@@ -24,9 +24,6 @@
 #include <sys/stat.h>
 
 #include <dirent.h>
-#ifdef WITH_UI_NCURSES
-#  include <ncurses.h>
-#endif
 #include <Python.h>
 #include <string.h>
 
