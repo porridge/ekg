@@ -1866,7 +1866,9 @@ COMMAND(cmd_msg)
 	if (!add_send)
 		add_send = xstrdup(nick);
 
-	add_send_nick(add_send);
+	if (valid)
+		add_send_nick(add_send);
+
 	xfree(add_send);
 
 	if (valid && (!sess || sess->state != GG_STATE_CONNECTED))

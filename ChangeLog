@@ -15,6 +15,7 @@ zg³osi³ b³±d.
   teraz dostêpne jako zwyk³e komendy (sz)
 - parametr /exec % zamieniony na $, ¿eby unikn±æ ew. konfliktów z
   formatami (sz)
+- nie dodawajmy do listy dope³nieñ przy b³êdnym nicku w chat/msg (sz)
 - poprawka kombinacji Ctrl-<kursor> na terminalach BSD (sz/w)
 - ignorowanie SIGQUIT, przez co Ctrl-4 i Ctrl-\ nie bêd± wychodziæ (sz/w)
 - libgadu: usuniêcie kodu gg_search50() (w)

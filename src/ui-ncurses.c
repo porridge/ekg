@@ -1893,7 +1893,7 @@ void variable_generator(const char *text, int len)
 	for (l = variables; l; l = l->next) {
 		struct variable *v = l->data;
 
-		if (v->type == VAR_FOREIGN || v->display == 2)
+		if (v->type == VAR_FOREIGN)
 			continue;
 
 		if (*text == '-') {
