@@ -8,6 +8,10 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-05-22
 
 - poprawka wysy³ania do nieznajomych (kalkos/w)
+- dodanie ostrze¿eñ do dokumentacji themów (theKnight/w)
+- potok steruj±cy za pomoc± parametru -c (adwol/w)
+- wykonywanie komend w trybie wsadowym (adwol/w)
+- obs³uga emotikonów (adwol/w)
 
 // 2002-05-19
 

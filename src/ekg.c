@@ -4,6 +4,7 @@
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@infomex.pl>
+ *                          Adam Osuchowski <adwol@polsl.gliwice.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -70,6 +71,38 @@ static struct {
 	{ GG_SESSION_USERLIST_PUT, (void (*)(void*)) handle_userlist, },
 	{ -1, NULL, }, 
 };
+
+#define PIPE_MSG_MAX_BUF_LEN 1024
+
+/*
+ * get_char_from_pipe()
+ *
+ * funkcja pobiera z potoku steruj±cego znak do bufora, a gdy siê zape³ni
+ * bufor wykonuje go tak jakby tekst w buforze wpisany by³ z terminala.
+ *
+ * - c - struktura steruj±ca przechowuj±ca m.in. deskryptor potoku.
+ */
+int get_char_from_pipe(struct gg_common *c)
+{
+	static char buf[PIPE_MSG_MAX_BUF_LEN + 1];
+	char ch;
+	int ret = 0;
+  
+	if (!c)
+  		return 0;
+
+	if (read(c->fd, &ch, 1) > 0) {
+		if (ch != '\n') {
+			if (strlen(buf) < PIPE_MSG_MAX_BUF_LEN)
+				buf[strlen(buf)] = ch;
+		}
+		if (ch == '\n' || (strlen(buf) >= PIPE_MSG_MAX_BUF_LEN)) {
+			ret = execute_line(buf);
+			memset(buf, 0, PIPE_MSG_MAX_BUF_LEN + 1);
+		}
+	}
+	return ret;
+}
 
 /*
  * my_getc()
@@ -268,6 +301,8 @@ int my_getc(FILE *f)
 				}
 			}
 
+			if (batch_mode && !batch_line)
+				break;
 		} else {
 			for (l = watches; l; l = l->next) {
 				struct gg_common *c = l->data;
@@ -278,6 +313,14 @@ int my_getc(FILE *f)
 
 				if (c->type == GG_SESSION_USER0) 
 					return rl_getc(f);
+
+				if (c->type == GG_SESSION_USER1) {
+					if (get_char_from_pipe(c)) {
+						immediately_quit = 1;
+						return '\n';
+					}
+					break;
+				}
 
 				for (i = 0; handlers[i].type != -1; i++)
 					if (c->type == handlers[i].type) {
@@ -372,10 +415,45 @@ void sigint_handler()
 	signal(SIGINT, sigint_handler);
 }
 
+/*
+ * prepare_batch_line()
+ *
+ * funkcja bierze podane w linii poleceñ argumenty i robi z nich pojedyñcz±
+ * liniê poleceñ.
+ *
+ * - argc - wiadomo co ;)
+ * - argv - wiadomo co ;)
+ * - n - numer argumentu od którego zaczyna siê polecenie.
+ *
+ * zwraca stworzon± linie w zaalokowanym buforze lub NULL przy b³êdzie.
+ */
+char *prepare_batch_line(int argc, char *argv[], int n)
+{
+	int i;
+	size_t m = 0;
+	char *bl;
+
+	for (i = n; i < argc; i++)
+		m += strlen(argv[i]) + 1;
+
+	bl = malloc(m);
+	if (!bl)
+		return NULL;
+
+	for (i = n; i < argc; i++) {
+		strcat(bl, argv[i]);
+		if (i < argc - 1)
+			strcat(bl, " ");
+	}
+
+	return bl;
+}
+
 int main(int argc, char **argv)
 {
 	int auto_connect = 1, force_debug = 0, i, new_status = 0 ;
 	char *load_theme = NULL;
+	char *pipe_file = NULL;
 #ifdef WITH_IOCTLD
     	char *sock_path = NULL, *ioctl_daemon_path = IOCTLD_PATH;
 #	define IOCTLD_HELP "  -I, --ioctl-daemon-path [¦CIE¯KA]    ustawia ¶cie¿kê do ioctl_daemon-a\n"
@@ -414,12 +492,14 @@ int main(int argc, char **argv)
 
 	config_user = "";
 
-	for (i = 1; i < argc; i++) {
+	for (i = 1; i < argc && *argv[i] == '-'; i++) {
 		if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
 			printf(""
 "u¿ycie: %s [OPCJE]\n"
 "  -u, --user [NAZWA]   korzysta z profilu u¿ytkownika o podanej nazwie\n"
 "  -t, --theme [PLIK]   ³aduje opis wygl±du z podanego pliku\n"
+"  -c, --control-pipe [PLIK]	potok nazwany sterowania\n"
+"  -o, --no-pipe        nie tworzy potoku sterowania\n"
 "  -n, --no-auto        nie ³±czy siê automatycznie z serwerem\n"
 "  -a, --away           po po³±czeniu zmienia stan na ,,zajêty''\n"
 "  -b, --back           po po³±czeniu zmienia stan na ,,dostêpny''\n"
@@ -452,6 +532,17 @@ IOCTLD_HELP
 		   		return 1;
 			}
 		}
+		if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--control-pipe")) {
+			if (argv[i + 1]) {
+				pipe_file = argv[i + 1];
+				i++;
+			} else {
+				fprintf(stderr, "Nie podano nazwy potoku kontrolnego");
+				return 1;
+			}
+		}
+		if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--no-pipe"))
+			pipe_file = NULL;
 		if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "--theme"))
 			load_theme = argv[++i];
 		if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version")) {
@@ -470,6 +561,14 @@ IOCTLD_HELP
                 }
 #endif
 	}
+	if (i < argc && *argv[i] != '-') {
+		batch_line = prepare_batch_line(argc, argv, i);
+		if (!batch_line) {
+			fprintf(stderr, "Nie mogê zaalokowac pamiêci dla polecenia wsadowego");
+			return 1;
+		}
+		batch_mode = 1;
+	}
 	
         ekg_pid = getpid();
 
@@ -479,20 +578,26 @@ IOCTLD_HELP
         userlist_read(NULL);
 	config_read(NULL);
 	read_sysmsg(NULL);
+	emoticon_read();
 	in_autoexec = 0;
 
 #ifdef WITH_IOCTLD
-        sock_path = prepare_path(".socket");
-
-        if (!(ioctl_daemon_pid = fork())) {
-		execl(ioctl_daemon_path, "ioctl_daemon", sock_path, NULL);
-		exit(0);
+	if (!batch_mode) {
+	        sock_path = prepare_path(".socket");
+	
+	        if (!(ioctl_daemon_pid = fork())) {
+			execl(ioctl_daemon_path, "ioctl_daemon", sock_path, NULL);
+			exit(0);
+		}
+	
+		init_socket(sock_path);
+	
+	        atexit(kill_ioctl_daemon);
 	}
-
-        init_socket(sock_path);
-
-        atexit(kill_ioctl_daemon);
 #endif // WITH_IOCTLD
+
+	if (!batch_mode && pipe_file)
+		pipe_fd = init_control_pipe(pipe_file);
 
 	/* okre¶lanie stanu klienta po w³±czeniu */
 	if (new_status)
@@ -546,13 +651,26 @@ IOCTLD_HELP
 	time(&last_action);
 
 	/* dodajemy stdin do ogl±danych deskryptorów */
-	si.fd = 0;
-	si.check = GG_CHECK_READ;
-	si.state = GG_STATE_READING_DATA;
-	si.type = GG_SESSION_USER0;
-	si.id = 0;
-	si.timeout = -1;
-	list_add(&watches, &si, sizeof(si));
+	if (!batch_mode) {
+		si.fd = 0;
+		si.check = GG_CHECK_READ;
+		si.state = GG_STATE_READING_DATA;
+		si.type = GG_SESSION_USER0;
+		si.id = 0;
+		si.timeout = -1;
+		list_add(&watches, &si, sizeof(si));
+	}
+
+	/* dodajemy otwarty potok sterujacy do ogl±danych deskryptorów */
+	if (!batch_mode && pipe_fd > 0) {
+		si.fd = pipe_fd;
+		si.check = GG_CHECK_READ;
+		si.state = GG_STATE_READING_DATA;
+		si.type = GG_SESSION_USER1;
+		si.id = 0;
+		si.timeout = -1;
+		list_add(&watches, &si, sizeof(si));
+	}
 
 	/* inicjujemy readline */
 	rl_initialize();
@@ -578,7 +696,8 @@ IOCTLD_HELP
 	rl_get_screen_size(&screen_lines, &screen_columns);
 #endif
 	
-	my_printf("welcome", VERSION);
+	if (!batch_mode)
+		my_printf("welcome", VERSION);
 	
 	if (!config_uin || !config_password)
 		my_printf("no_config");
@@ -600,7 +719,7 @@ IOCTLD_HELP
 
 	if (config_auto_save)
 		last_save = time(NULL);
-
+	
 	for (;;) {
 		char *line, *tmp = NULL;
 		
@@ -616,6 +735,10 @@ IOCTLD_HELP
 
 		if (strcmp(line, ""))
 			add_history(line);
+		else if (batch_mode && !batch_line) {
+			quit_message_send = 1;
+			break;
+		}
 
 		if (!query_nick && (tmp = is_alias(line))) {
 			free(line);
@@ -634,12 +757,13 @@ IOCTLD_HELP
 		free(line);
 	}
 
-	if (!quit_message_send) {
+	if (!batch_mode && !quit_message_send) {
 		putchar('\n');
 		my_printf("quit");
 		putchar('\n');
 		quit_message_send = 1;
 	}
+
 	ekg_logoff(sess, NULL);
 	list_remove(&watches, sess, 0);
 	gg_free_session(sess);
@@ -666,6 +790,11 @@ IOCTLD_HELP
 
 		kill(p->pid, SIGTERM);
 	}
+
+	if (pipe_fd > 0)
+		close(pipe_fd);
+	if (pipe_file)
+		unlink(pipe_file);
 	
 	free(config_log_path);	
 	return 0;

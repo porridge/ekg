@@ -55,6 +55,7 @@ struct list *aliases = NULL;
 struct list *watches = NULL;
 struct list *transfers = NULL;
 struct list *events = NULL;
+struct list *emoticons = NULL;
 
 int in_readline = 0;
 int no_prompt = 0;
@@ -115,6 +116,11 @@ int my_printf_lines = -1;
 int quit_message_send = 0;
 int registered_today = 0;
 int config_protocol = 0;
+int pipe_fd = -1;
+int batch_mode = 0;
+char *batch_line = NULL;
+int immediately_quit = 0;
+int config_emoticons = 1;
 
 /*
  * my_puts()
@@ -186,10 +192,79 @@ static char *current_prompt()
 		}
 	}
 
-	if (no_prompt || !prompt)
+	if (no_prompt || !prompt || batch_mode)
 		prompt = "";
 
 	return prompt;
+}
+
+/*
+ * emoticon_expand()
+ *
+ * rozwija definicje makr (najczesciej to beda emoticony)
+ *
+ * - s - string z makrami
+ *
+ * zwraca zaalokowany, rozwiniety string, NULL je¶li siê nie powiod³o.
+ */
+char *emoticon_expand(char *s)
+{
+	struct list *l = NULL;
+	char *ms, *ss;
+	size_t n = 0;
+
+	for (ss = s; *ss; ss++) {
+		struct emoticon *e = NULL;
+		size_t ns = strlen(ss);
+		int ret = 1;
+
+		for (l = emoticons; l && ret; l = (ret ? l->next : l)) {
+			size_t nn;
+
+			e = l->data;
+			nn = strlen(e->name);
+			if (ns < nn)
+				nn = ns;
+			ret = strncmp(ss, e->name, nn);
+		}
+
+		if (l) {
+			e = l->data;
+			n += strlen(e->value);
+			ss += strlen(e->name) - 1;
+		} else
+			n++;
+	}
+
+	ms = malloc(n + 1);
+	if (!ms)
+		return NULL;
+	memset(ms, 0, n + 1);
+
+	for (ss = s; *ss; ss++) {
+		struct emoticon *e = NULL;
+		size_t ns = strlen(ss);
+		int ret = 1;
+
+		for (l = emoticons; l && ret; l = (ret ? l->next : l)) {
+			size_t n;
+
+			e = l->data;
+			n = strlen(e->name);
+			if (ns < n)
+				n = ns;
+			ret = strncmp(ss, e->name, n);
+		}
+
+		if (l) {
+			e = l->data;
+			strcat(ms, e->value);
+			ss += strlen(e->name) - 1;
+		} else
+			ms[strlen(ms)] = *ss;
+	}
+
+	return ms;
 }
 
 /*
@@ -1591,6 +1666,32 @@ int events_parse_seq(char *seq, struct action_data *data)
         return 0;
 }
 
+/*
+ * init_control_pipe()
+ *
+ * inicjuje potok nazwany do zewnêtrznej kontroli ekg
+ *
+ * - pipe_file
+ *
+ * zwraca deskryptor otwartego potoku lub warto¶æ b³êdu
+ */
+int init_control_pipe(char *pipe_file)
+{
+	int fd;
+
+	if (!pipe_file)
+		return 0;
+	if (mkfifo(pipe_file, 0600) < 0 && errno != EEXIST) {
+		fprintf(stderr, "Nie mogê stworzyæ potoku %s: %s. Ignorujê.\n", pipe_file, strerror(errno));
+		return -1;
+	}
+	if ((fd = open(pipe_file, O_RDWR | O_NDELAY)) < 0) {
+		fprintf(stderr, "Nie mogê otworzyæ potoku %s: %s. Ignorujê.\n", pipe_file, strerror(errno));
+		return -1;
+	}
+	return fd;
+}
+
 #ifdef WITH_IOCTLD
 
 /*
@@ -1972,5 +2073,100 @@ char *get_random_reason(char *path)
 
         fclose(f);
         return NULL;
+}
+
+/*
+ * emoticon_add()
+ *
+ * dodaje dany emoticon do listy.
+ *
+ *  - name - nazwa,
+ *  - value - warto¶æ,
+ */
+int emoticon_add(char *name, char *value)
+{
+	struct emoticon e;
+	struct list *l;
+
+	for (l = emoticons; l; l = l->next) {
+		struct emoticon *g = l->data;
+
+		if (!strcasecmp(name, g->name)) {
+			free(g->value);
+			g->value = strdup(value);
+			return 0;
+		}
+	}
+
+	e.name = strdup(name);
+	e.value = strdup(value);
+	list_add(&emoticons, &e, sizeof(e));
+
+	return 0;
+}
+
+/*
+ * emoticon_remove()
+ *
+ * usuwa emoticon o danej nazwie.
+ *
+ *  - name.
+ */
+int emoticon_remove(char *name)
+{
+	struct list *l;
+
+	for (l = emoticons; l; l = l->next) {
+		struct emoticon *f = l->data;
+
+		if (!strcasecmp(f->name, name)) {
+			free(f->value);
+			free(f->name);
+			list_remove(&emoticons, f, 1);
+
+			return 0;
+		}
+	}
+	
+	return -1;
+}
+
+/*
+ * emoticon_read()
+ *
+ * ³aduje do listy wszystkie makra z pliku ~/.gg/emoticons
+ * format tego pliku w dokumentacji
+ */
+int emoticon_read()
+{
+	char *buf, **emot;
+	FILE *f;
+
+	if (!(f = fopen(prepare_path("emoticons"), "r")))
+		return -1;
+
+	while ((buf = read_file(f))) {
+	
+		if (buf[0] == '#') {
+			free(buf);
+			continue;
+		}
+
+		emot = array_make(buf, "\t", 2, 1, 1);
+	
+		if (emot) {
+			if (emot[1])
+				emoticon_add(emot[0], emot[1]);
+			else
+				emoticon_remove(emot[0]);
+			free(emot[0]);
+			free(emot[1]);
+			free(emot);
+		}
+	}
+	
+	fclose(f);
+	
+	return 0;
 }
 

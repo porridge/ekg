@@ -94,6 +94,13 @@ void print_message_body(char *str, int chat)
 	
 	while ((line = gg_get_line(&mesg))) {
 		for (; strlen(line); line = next) {
+			char *new_line;
+			
+			if (config_emoticons && (new_line = emoticon_expand(line))) {
+				free(line);
+				line = new_line;
+			}
+			
 			if (strlen(line) <= width) {
 				strcpy(buf, line);
 				next = line + strlen(line);
@@ -271,6 +278,9 @@ void handle_notify(struct gg_event *e)
 	struct userlist *u;
 	struct in_addr in;
 
+	if (batch_mode)
+		return;
+
 	n = (e->type == GG_EVENT_NOTIFY) ? e->event.notify : e->event.notify_descr.notify;
 
 	while (n->uin) {
@@ -376,6 +386,9 @@ void handle_status(struct gg_event *e)
 {
 	struct userlist *u;
 	struct in_addr in;
+
+	if (batch_mode)
+		return;
 
 	if (ignored_check(e->event.status.uin))
 		return;
@@ -491,6 +504,13 @@ void handle_success(struct gg_event *e)
 		else
 			gg_change_status_descr(sess, config_status, busy_reason);
 	}
+
+	if (batch_mode && batch_line) {
+ 		execute_line(batch_line);
+ 		free(batch_line);
+ 	}
+	
+ 	batch_line = NULL;
 }
 
 /*

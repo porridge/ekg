@@ -74,11 +74,17 @@ struct event {
         char *action;
 };
 
+struct emoticon {
+	char *name;
+	char *value;
+};
+
 struct list *children;
 struct list *aliases;
 struct list *watches;
 struct list *transfers;
 struct list *events;
+struct list *emoticons;
 struct gg_session *sess;
 
 int config_dcc;
@@ -122,6 +128,7 @@ int config_query_commands;
 char *config_proxy;
 char *config_server;
 int config_protocol;
+int config_emoticons;
 
 char *home_dir;
 int in_readline;
@@ -150,6 +157,10 @@ int screen_columns;
 int my_printf_lines;
 int quit_message_send;
 int registered_today;
+int pipe_fd;
+int batch_mode;
+char *batch_line;
+int immediately_quit;
 
 int config_read(char *filename);
 int config_write(char *filename);
@@ -199,9 +210,12 @@ int send_event(char *seq, int act);
 int correct_event(char *action);
 int events_parse_seq(char *seq, struct action_data *data);
 int init_socket();
+int init_pipe(char *path);
 char *get_token(char **ptr, char sep);
 char *strdup_null(char *ptr);
 void ekg_logoff(struct gg_session *sess, char *reason);
 char *get_random_reason(char *path);
+char *emoticon_expand(char *s);
+int emoticon_read();
 
 #endif
