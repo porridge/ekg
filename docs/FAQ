@@ -18,11 +18,11 @@ A: Klient jeszcze nie rozró¿nia cudzys³owiów, ani '\ ' w parametrach
    wpisaæ ,,modify <numerek> --alias bezspacji''.
  
 Q: Jak zarejestrowaæ nowego u¿ytkownika?
-A: Póki co, nie da siê. Trzeba u¿yæ oryginalnego klienta (dzia³a pod wine,
-   vmware i pod Windows).
+A: Uzyæ polecenia "register <email> <haslo>"
 
 Q: Jak wys³aæ plik, zmieniæ has³o, informacje w katalogu publicznym?
-A: j.w.
+A: Póki co, nie da siê. Trzeba u¿yæ oryginalnego klienta (dzia³a pod wine,
+   vmware i pod Windows).
 
 Q: Dlaczego PageUp nie dzia³a?
 A: Bo nie. Nie ma takiej mo¿liwo¶ci. Nie wiadomo, czy w ogóle bêdzie.
