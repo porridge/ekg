@@ -3862,7 +3862,7 @@ static void binding_default()
 	binding_add("Alt-6", "/window switch 6", 1, 1);
 	binding_add("Alt-7", "/window switch 7", 1, 1);
 	binding_add("Alt-8", "/window switch 8", 1, 1);
-	binding_add("Alt-9", "/window switch 0", 1, 1);
+	binding_add("Alt-9", "/window switch 9", 1, 1);
 	binding_add("Alt-0", "/window switch 10", 1, 1);
 	binding_add("Alt-Q", "/window switch 11", 1, 1);
 	binding_add("Alt-W", "/window switch 12", 1, 1);
