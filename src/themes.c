@@ -1284,6 +1284,7 @@ void theme_init()
 	format_add("conferences_add", "%> Utworzono konferencjê %T%1%n\n", 1);
 	format_add("conferences_not_added", "%) Nie utworzono konferencji %T%1%n\n", 1);
 	format_add("conferences_del", "%> Usuniêto konferencjê %T%1%n\n", 1);
+	format_add("conferences_del_all", "%> Usuniêto wszystkie konferencje\n", 1);
 	format_add("conferences_exist", "%! Konferencja %T%1%n ju¿ istnieje\n", 1);
 	format_add("conferences_noexist", "%! Konferencja %T%1%n nie istnieje\n", 1);
 	format_add("conferences_name_error", "%! Nazwa konferencji powinna zaczynaæ siê od %T#%n\n", 1);

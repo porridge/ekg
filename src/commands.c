@@ -1434,15 +1434,12 @@ COMMAND(cmd_list)
 
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
-		struct in_addr in;
 		int show;
 
 		if (!u->display)
 			continue;
 
 		tmp = ekg_status_label(u->status, "list_");
-
-		in.s_addr = u->ip.s_addr;
 
 		if (u->uin == config_uin && sess && sess->state == GG_STATE_CONNECTED)
 			tmp = ekg_status_label(config_status, "list_");
@@ -1474,7 +1471,7 @@ COMMAND(cmd_list)
 			show = 1;
 
 		if (show) {
-			print(tmp, format_user(u->uin), (u->first_name) ? u->first_name : u->display, inet_ntoa(in), itoa(u->port), u->descr);
+			print(tmp, format_user(u->uin), (u->first_name) ? u->first_name : u->display, inet_ntoa(u->ip), itoa(u->port), u->descr);
 			count++;
 		}
 	}
@@ -3182,8 +3179,10 @@ cleanup:
 
 			del_all = 1;
 
-			for (l = timers; l; l = l->next) {
+			for (l = timers; l; ) {
 				struct timer *t = l->data;
+
+				l = l->next;
 
 				/* nie psujmy ui i skryptów */
 				if (t->type == TIMER_COMMAND)
@@ -3377,12 +3376,15 @@ COMMAND(cmd_conference)
 	}
 
 	if (match_arg(params[0], 'a', "add", 2)) {
-		if (!params[1] || !params[2]) {
+		if (!params[1]) {
 			print("not_enough_params", name);
 			return;
 		}
-		
-		conference_add(params[1], params[2], 0);
+
+		if (params[2])
+			conference_add(params[1], params[2], 0);
+		else
+			conference_create(params[1]);
 
 		return;
 	}
@@ -3393,7 +3395,10 @@ COMMAND(cmd_conference)
 			return;
 		}
 
-		conference_remove(params[1]);
+		if (!strcmp(params[1], "*"))
+			conference_remove(NULL);
+		else
+			conference_remove(params[1]);
 
 		return;
 	}
@@ -4031,8 +4036,8 @@ void command_init()
 	( "conference", "???", cmd_conference, 0,
 	  " [opcje]", "zarz±dzanie konferencjami",
 	  "\n"
-	  "  -a, --add <#nazwa> <numer/alias/@grupa>  tworzy now± konferencjê\n"
-	  "  -d, --del <#nazwa>          usuwa konferencjê\n"
+	  "  -a, --add [#nazwa] <numer/alias/@grupa>  tworzy now± konferencjê\n"
+	  "  -d, --del <#nazwa>|*        usuwa konferencjê lub wszystkie\n"
 	  "  -i, --ignore <#nazwa>       oznacza konferencjê jako ingorowan±\n"
 	  "  -u, --unignore <#nazwa>     oznacza konferencjê jako nieingorowan±\n"
 	  "  -r, --rename <#old> <#new>  zmienia nazwê konferencji\n"

@@ -1711,33 +1711,44 @@ void conference_free()
  *
  * usuwa konferencje z listy konferencji.
  *
- * - name - konferencja.
+ * - name - konferencja lub NULL dla wszystkich.
  */
 int conference_remove(const char *name)
 {
 	list_t l;
+	int removed = 0;
 
-	if (!name) {
-		print("not_enough_params", "conference");
-		return -1;
-	}
-
-	for (l = conferences; l; l = l->next) {
+	for (l = conferences; l; ) {
 		struct conference *c = l->data;
 
-		if (!strcasecmp(c->name, name)) {
-			print("conferences_del", name);
+		l = l->next;
+
+		if (!name || !strcasecmp(c->name, name)) {
+			if (name)
+				print("conferences_del", name);
+			remove_send_nick(c->name);
 			xfree(c->name);
 			list_destroy(c->recipients, 1);
 			list_remove(&conferences, c, 1);
-			remove_send_nick(name);
-			return 0;
+			removed = 1;
 		}
 	}
 
-	print("conferences_noexist", name);
+	if (!removed) {
+		if (name)
+			print("conferences_noexist", name);
+		else
+			print("conferences_list_empty");
+		
+		return -1;
+	}
 
-	return -1;
+	if (removed && !name) {
+		print("conferences_del_all");
+		return 0;
+	}
+
+	return 0;
 }
 
 /*
