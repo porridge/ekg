@@ -679,11 +679,11 @@ void theme_init()
 	theme_cache_reset();
 
 	/* wykorzystywane w innych formatach */
-	format_add("prompt", "%g-%G>%g-%n", 1);
+	format_add("prompt", "%K:%g:%G:%n", 1);
 	format_add("prompt,speech", " ", 1);
-	format_add("prompt2", "%c-%C>%c-%n", 1);
+	format_add("prompt2", "%K:%c:%C:%n", 1);
 	format_add("prompt2,speech", " ", 1);
-	format_add("error", "%r-%R>%r-%n", 1);
+	format_add("error", "%K:%r:%R:%n", 1);
 	format_add("error,speech", "b³±d!", 1);
 	format_add("timestamp", "%H:%M", 1);
 	format_add("timestamp,speech", " ", 1);
@@ -703,6 +703,11 @@ void theme_init()
 	format_add("readline_prompt_query_win_act", "%2:%1 (act/%3)> ", 1);
 					
 	format_add("readline_more", "-- Wci¶nij Enter by kontynuowaæ lub Ctrl-D by przerwaæ --", 1);
+
+	/* prompty i statusy dla ui-ncurses */
+	format_add("ncurses_prompt_none", "", 1);
+	format_add("ncurses_prompt_query", "[%1] ", 1);
+	format_add("statusbar", " %c(%w%{time}%c)%w %c(%wuin%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) (%wwin%c/%w%{window}%{?query %c:%W}%{query}%c)%w%{?activity  %c(%wact%c/%w}%{activity}%{?activity %c)%w}%{?more  %c(%Gmore%c)}", 1);
 
 	/* dla funkcji format_user() */
 	format_add("known_user", "%T%1%n/%2", 1);

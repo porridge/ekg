@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-10-23
 
 - timestampy w ui-readline (Joshua/w)
+- wrzucenie ncursesowych promptów do g³ównego themu (w)
 
 // 2002-10-21
 

@@ -27,8 +27,6 @@ klient:
   + w³±czyæ domy¶lnie ,,set display_sent 1'',
   + w³±czyæ domy¶lnie ,,set make_window 2'',
   + w³±czyæ domy¶lnie ,,set display_ack 3'',
-  + zmieniæ domy¶lne formaty prompt* i error na nowe,
-  + przerzuciæ statusbar do domy¶lnego themu,
 
 - posty z czasu padniêtej domeny:
   + /window next nie dzia³a je¶li jest przerwa miêdzy oknami (mateusza),
