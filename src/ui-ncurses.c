@@ -712,13 +712,6 @@ void window_redraw(struct window *w)
 		w->start = 0;
 
 	for (y = 0; y < height && w->start + y < w->lines_count; y++) {
-				FILE *f=fopen("/tmp/ekg", "a+");
-				fprintf(f,"\nw->start=%d\n", w->start);
-				fprintf(f,"y=%d\n", y);
-				fprintf(f,"height=%d\n", height);
-				fprintf(f,"w->overflow=%d\n", w->overflow);
-				fclose(f);
-
 		struct screen_line *l = &w->lines[w->start + y];
 
 		wattrset(w->window, A_NORMAL);
