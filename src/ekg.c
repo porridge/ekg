@@ -916,9 +916,6 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (set_private)
-		new_status |= GG_STATUS_FRIENDS_MASK;
-
 	if (optind < argc) {
 		batch_line = prepare_batch_line(argc, argv, optind);
 		batch_mode = 1;
@@ -983,7 +980,10 @@ int main(int argc, char **argv)
 
 	/* okre¶lanie stanu klienta po w³±czeniu */
 	if (new_status)
-		config_status = new_status;
+		config_status = new_status | (GG_S_F(config_status) ? GG_STATUS_FRIENDS_MASK : 0);
+
+	if (set_private)
+		config_status |= GG_STATUS_FRIENDS_MASK;
 
 	if (new_reason) {
 		xfree(config_reason);
