@@ -281,7 +281,7 @@ encryption
 	wybiera rodzaj szyfrowania wiadomo¶ci. je¶li w systemie jest
 	zainstalowana biblioteka OpenSSL mo¿liwe jest u¿ywanie SIM
 	(warto¶æ 1). opis tego szyfrowania znajduje siê na stronie
-	http://gg.wha.la/ggcrypt/.
+	http://gg.wha.la/crypt/.
 	
 enter_scrolls
 	typ: bool
