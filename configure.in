@@ -123,6 +123,11 @@ AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
 dnl BeOS
 AC_CHECK_LIB(bind, __inet_addr, LIBS="$LIBS -lbind")
 
+dnl QNX i inne ,,dziwne'' systemy
+AC_CHECK_HEADERS(strings.h, [
+	AC_LIBGADU_DEFINE([HAVE_STRINGS_H])
+])
+
 dnl threadsafe
 AC_CHECK_FUNCS([gethostbyname_r], [AC_LIBGADU_DEFINE([HAVE_GETHOSTBYNAME_R])])
 
