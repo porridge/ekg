@@ -938,6 +938,14 @@ int main(int argc, char **argv)
 			ui_init = ui_batch_init;
 	}
 
+	/* czy w³±czyæ debugowanie? */	
+	setup_debug();
+	
+	if (force_debug || gg_debug_level || config_debug) {
+		gg_debug_level = 255;
+		config_debug = 1;
+	}
+
         ekg_pid = getpid();
 
 	mesg_startup = mesg_set(2);
@@ -1009,13 +1017,7 @@ int main(int argc, char **argv)
 		config_reason = new_reason;
 	}
 
-	/* czy w³±czyæ debugowanie? */	
-	setup_debug();
-	
-	if (force_debug || gg_debug_level || config_debug) {
-		gg_debug_level = 255;
-		config_debug = 1;
-	}
+
 	
 	/* je¶li ma byæ theme, niech bêdzie theme */
 	if (load_theme)
