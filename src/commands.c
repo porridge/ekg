@@ -1943,10 +1943,6 @@ int old_execute(char *target, char *line)
 	int abbrs = 0;
 	int correct_command = 0;
 
-	tmp = saprintf(">> old_execute(\"%s\", \"%s\");\n", target, line);
-	ui_print("__current", tmp);
-	xfree(tmp);
-
 	if (target && *line != '/') {
 	
 		/* wykrywanie przypadkowo wpisanych poleceñ */
