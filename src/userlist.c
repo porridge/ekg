@@ -409,18 +409,25 @@ void userlist_write_crash()
 /*
  * userlist_clear_status()
  *
- * czy¶ci stan u¿ytkowników na li¶cie.
+ * czy¶ci stan u¿ytkowników na li¶cie. je¶li uin != 0 to
+ * to czy¶ci danego u¿ytkownika.
+ *
+ *  - uin.
  */
-void userlist_clear_status()
+void userlist_clear_status(uin_t uin)
 {
         list_t l;
 
         for (l = userlist; l; l = l->next) {
                 struct userlist *u = l->data;
 
-                u->status = GG_STATUS_NOT_AVAIL;
-		memset(&u->ip, 0, sizeof(struct in_addr));
-		u->port = 0;
+		if (!uin || uin == u->uin) {
+			u->status = GG_STATUS_NOT_AVAIL;
+			memset(&u->ip, 0, sizeof(struct in_addr));
+			u->port = 0;
+			xfree(u->descr);
+			u->descr = NULL;
+		}
         }
 }
 

@@ -64,7 +64,7 @@ int userlist_write();
 int userlist_write_wap();
 #endif
 void userlist_write_crash();
-void userlist_clear_status();
+void userlist_clear_status(uin_t uin);
 struct userlist *userlist_add(uin_t uin, const char *display);
 int userlist_remove(struct userlist *u);
 int userlist_replace(struct userlist *u);

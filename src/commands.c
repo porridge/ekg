@@ -426,7 +426,7 @@ COMMAND(cmd_connect)
 		xfree(tmp);
 		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
-		userlist_clear_status();
+		userlist_clear_status(0);
 		sess = NULL;
 		reconnect_timer = 0;
 		ui_event("disconnected");
@@ -974,10 +974,11 @@ COMMAND(cmd_modify)
 			}
 
 			gg_remove_notify(sess, u->uin);
-			u->uin = new_uin;
-			gg_add_notify(sess, u->uin);
+			userlist_clear_status(u->uin);
 
-			u->status = GG_STATUS_NOT_AVAIL;
+			u->uin = new_uin;
+
+			gg_add_notify(sess, u->uin);
 
 			ui_event("userlist_changed", u->display, u->display);
 			modified = 1;
@@ -1130,10 +1131,9 @@ COMMAND(cmd_ignore)
 
 			print("ignored_added", params[0]);
 
-			if (u) {
-				if (sess)
-					gg_remove_notify(sess, uin);
-				u->status = GG_STATUS_NOT_AVAIL;
+			if (u && sess) {
+				gg_remove_notify(sess, uin);
+				userlist_clear_status(uin);
 			}
 
 			config_changed = 1;
