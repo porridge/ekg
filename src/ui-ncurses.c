@@ -504,11 +504,15 @@ static void update_contacts()
 	
 	for (l = userlist, y = 0; l; l = l->next) {
 		struct userlist *u = l->data;
+		int x;
 
 		if (!GG_S_A(u->status))
 			continue;
 		
-		mvwaddstr(contacts, y++, 2, u->display);
+		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
+			mvwaddch(contacts, y, x + 2, u->display[x]);
+	
+		y++;
 	}
 	
 	wnoutrefresh(contacts);
