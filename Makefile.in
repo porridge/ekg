@@ -50,7 +50,7 @@ install:	all install-libgadu @install_ekg@ @install_ekgwap@
 install-libgadu:
 	cd lib && $(MAKE) install
 
-install-ekg:	install-ekg-data install-ekg-man install-ekgsearch
+install-ekg:	install-ekg-data install-ekg-man
 	cd src && $(MAKE) install
 
 install-ekg-data:
@@ -61,14 +61,8 @@ install-ekg-data:
 install-ekg-man:
 	$(INSTALL) -d $(DESTDIR)$(mandir)/man1
 	$(INSTALL) -m 644 docs/ekg.man.en $(DESTDIR)$(mandir)/man1/ekg.1
-	$(INSTALL) -m 644 docs/ekgsearch.man.en $(DESTDIR)$(mandir)/man1/ekgsearch.1
 	$(INSTALL) -d $(DESTDIR)$(mandir)/pl/man1
 	$(INSTALL) -m 644 docs/ekg.man.pl $(DESTDIR)$(mandir)/pl/man1/ekg.1
-	$(INSTALL) -m 644 docs/ekgsearch.man.pl $(DESTDIR)$(mandir)/pl/man1/ekgsearch.1
-
-install-ekgsearch:
-	$(INSTALL) -d $(DESTDIR)$(bindir)
-	$(INSTALL) -m 755 contrib/ekgsearch $(DESTDIR)$(bindir)
 
 install-ekgwap:
 	$(INSTALL) -d $(DESTDIR)$(bindir)
@@ -81,10 +75,10 @@ uninstall:	@uninstall_ekg@
 	rm -f $(DESTDIR)$(includedir)/libgadu{,-config,-stdint}.h
 
 uninstall-ekg:
-	rm -f $(DESTDIR)$(bindir)/{ekg,ekgsearch,ekgwapd}
+	rm -f $(DESTDIR)$(bindir)/{ekg,ekgwapd}
 	rm -f $(DESTDIR)$(libexecdir)/ioctld
 	rm -rf $(DESTDIR)$(datadir)/ekg
-	rm -f $(DESTDIR)$(mandir){/pl,}/man1/ekg{,search}.1
+	rm -f $(DESTDIR)$(mandir){/pl,}/man1/ekg.1
 
 #
 

@@ -187,17 +187,17 @@ struct event_label event_labels[] = {
 	{ EVENT_MSG, "msg" },
 	{ EVENT_CHAT, "chat" },
 	{ EVENT_AVAIL, "avail" },
-	{ EVENT_NOT_AVAIL, "disconnect" },
+	{ EVENT_NOT_AVAIL, "notavail" },
 	{ EVENT_AWAY, "away" },
 	{ EVENT_DCC, "dcc" },
 	{ EVENT_INVISIBLE, "invisible" },
 	{ EVENT_DESCR, "descr" },
-	{ EVENT_EXEC, "exec" },
+	{ EVENT_ONLINE, "online" },
 	{ EVENT_SIGUSR1, "sigusr1" },
 	{ EVENT_SIGUSR2, "sigusr2" },
 	{ EVENT_DELIVERED, "delivered" },
 	{ EVENT_QUEUED, "queued" },
-	{ EVENT_NEW_MAIL, "new_mail" },
+	{ EVENT_NEW_MAIL, "newmail" },
 	{ EVENT_QUERY, "query" },
 	{ INACTIVE_EVENT, NULL },
 	{ 0, NULL }
@@ -2090,9 +2090,14 @@ int event_check(int event, uin_t uin, const char *data)
 		if (e->flags & INACTIVE_EVENT)
 			return 0;
 		
-                if ((e->flags & event) && (e->uin == uin || e->uin == 1)) {
-			action = e->action;
-			break;
+                if (e->flags & event) {
+			if (e->uin == 1)
+				action = e->action;
+
+			if (e->uin == uin) {
+				action = e->action;
+				break;
+			}
                 }
         }
 

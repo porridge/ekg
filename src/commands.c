@@ -4251,7 +4251,7 @@ void command_init()
 	  "wzglêdu na ustawienia zmiennych.");
 
 	command_add
-	( "at", "????", cmd_timer, 0,
+	( "at", "???c", cmd_timer, 0,
 	  " [opcje]", "planuje wykonanie komend",
 	  "\n"
 	  "  -a, --add [nazwa] <czas> <komenda>  tworzy nowy plan\n"
@@ -4261,7 +4261,7 @@ void command_init()
 	  "Czas podaje siê w formacie [[[yyyy]mm]dd]HH[:]MM[.SS], gdzie "
 	  "%Tyyyy%n to rok, %Tmm%n to miesi±c, %Tdd%n to dzieñ, %THH:MM%n to godzina, "
           "a %T.SS%n to sekundy. "
-	  "Minimalny format to HH:MM (dwukropek mo¿na pomin±æ). "
+	  "Minimalny format to %THH:MM%n (dwukropek mo¿na pomin±æ). "
 	  "Po kropce mo¿na podaæ sekundy, a przed godzin± odpowiednio: dzieñ "
 	  "miesi±ca, miesi±c, rok.");
  
@@ -4523,7 +4523,32 @@ void command_init()
 	  "  -d, --del <numer>|*         usuwa zdarzenie o podanym numerze\n"
 	  " [-l, --list]                 wy¶wietla listê zdarzeñ\n"
 	  "\n"
-	  "Szczegó³y dotycz±ce tego polecenia w pliku %Tdocs/on.txt%n");
+	  "Dostêpne zdarzenia to:\n"
+	  "  - avail, away, notavail - zmiana stanu na podany\n"
+	  "  - online - zmiana stanu z ,,niedostêpny'' na ,,dostêpny''\n"
+	  "  - descr - zmiana opisu\n"
+	  "  - msg, chat - wiadomo¶æ\n"
+	  "  - query - nowa rozmowa\n"
+	  "  - delivered, queued - wiadomo¶æ dostarczona lub zakolejkowana na serwerze\n"
+	  "  - dcc - otrzymanie dcc\n"
+	  "\n"
+	  "Zdarzenia, dla których numer/alias nie ma znaczenia:\n"
+	  "  - sigusr1, sigusr2 - otrzymanie przez ekg danego sygna³u\n"
+	  "  - newmail - otrzymanie nowej wiadomo¶æ e-mail\n"
+	  "\n"
+	  "  - * - wszystkie zdarzenia\n"
+	  "\n"
+	  "Zdarzenia mo¿na ³±czyæ ze sob± za pomoc± przecinka lub ,,|''. Jako numer/alias "
+	  "mo¿na podaæ ,,*'', dziêki czemu zdarzenie bêdzie dotyczyæ ka¿dego u¿ytkownika. "
+	  "Je¶li kto¶ posiada indywidualn± akcjê na dane zdarzenie, to tylko ona zostanie "
+	  "wykonana. Mo¿na podaæ wiêcej komend, oddzielaj±c je ¶rednikiem. W komendzie, %T\\%1%n "
+	  "zostanie zast±pione numerkiem sprawcy zdarzenia, a je¶li istnieje on na naszej "
+	  "li¶cie kontaktów, %T\\%2%n bêdzie zast±pione jego pseudonimem. Zamiast %T\\%3%n i "
+	  "%T\\%4%n wpisana bêdzie tre¶æ wiadomo¶ci lub opis u¿ytkownika, w zale¿no¶ci od "
+	  "zdarzenia. Format %T\\%4%n ró¿ni siê od %T\\%3%n tym, ¿e wszystkie niebiezpieczne znaki, "
+	  "które mog³yby zostaæ zinterpretowane przez shell, zostan± poprzedzone backslashem. "
+	  "U¿ywanie %T\\%3%n w przypadku komendy ,,exec'' jest %Tniebezpieczne%n i, je¶li naprawdê "
+	  "musisz wykorzystaæ tre¶æ wiadomo¶ci lub opis, u¿yj %T\"\\%4\"%n (w cudzys³owach).");
 	 
 	command_add
 	( "passwd", "??", cmd_passwd, 0,
@@ -4548,7 +4573,7 @@ void command_init()
 	  "  unload <skrypt>  usuwa skrypt z pamiêci\n"
 	  "  run <plik>       uruchamia skrypt\n"
 	  "  exec <komenda>   uruchamia komendê\n"
-	  "  list             wy¶wietla listê za³adowanych skryptów");
+	  "  list             wy¶wietla listê za³adowanych skryptów\n");
 #endif
 
 	command_add
@@ -4650,7 +4675,7 @@ void command_init()
 	  "przecinkiem lub spacj±.");
 
 	command_add
-	( "timer", "????", cmd_timer, 0,
+	( "timer", "???c", cmd_timer, 0,
 	  " [opcje]", "zarz±dzanie timerami",
 	  "\n"
 	  "  -a, --add [nazwa] [*/]<czas> <komenda>  tworzy nowy timer\n"

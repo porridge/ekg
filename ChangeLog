@@ -26,6 +26,9 @@ zg³osi³ b³±d.
 - w oknie rozmowy z nieznan± osob± wystarczy /add alias (krzyk/sz)
 - komenda reload (stforek/sz)
 - poprawka kodowania eksportowanej listy kontaktów (Sero/sz)
+- dalsza reorganizacja zdarzeñ, ulepszenie logiki, opis w /help on 
+  i troche innych mniej powa¿nych zmian (sz)
+- usuniêcie ekgsearch (sz)
 - poprawka wy¶wietlania tabów (w)
 - dodanie parametru do /save, który mówi, gdzie zapisaæ konfiguracjê (w)
 - po uruchomieniu drugiej sesji ekg nie bêdzie próbowa³o siê ³±czyæ
