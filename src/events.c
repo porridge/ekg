@@ -1434,7 +1434,7 @@ void handle_dcc(struct gg_dcc *d)
 			print("dcc_get_offer", format_user(t->uin), t->filename, itoa(d->file_info.size), itoa(t->id));
 
 			if (!(ignored_check(t->uin) & IGNORE_EVENTS))
-				event_check(EVENT_DCC, t->uin, NULL);
+				event_check(EVENT_DCC, t->uin, t->filename);
 
 			break;
 			
@@ -1494,14 +1494,20 @@ void handle_dcc(struct gg_dcc *d)
 		case GG_EVENT_DCC_ERROR:
 		{
 			struct in_addr addr;
+			short int port = d->remote_port;
 			char *tmp;
 		
 			addr.s_addr = d->remote_addr;
 
-			if (d->peer_uin)
-				tmp = saprintf("%s (%s:%d)", xstrdup(format_user(d->peer_uin)), inet_ntoa(addr), d->remote_port);
-			else 
-				tmp = saprintf("%s:%d", inet_ntoa(addr), d->remote_port);
+			if (d->peer_uin) {
+				struct userlist *u = userlist_find(d->peer_uin, NULL);
+				if (!addr.s_addr && u) {
+					addr.s_addr = u->ip.s_addr;
+					port = u->port;
+				}
+				tmp = saprintf("%s (%s:%d)", xstrdup(format_user(d->peer_uin)), inet_ntoa(addr), port);
+			} else 
+				tmp = saprintf("%s:%d", inet_ntoa(addr), port);
 			
 			switch (e->event.dcc_error) {
 				case GG_ERROR_DCC_HANDSHAKE:
