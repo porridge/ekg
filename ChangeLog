@@ -15,6 +15,7 @@ zg³osi³ b³±d.
 - libgadu: drobne poprawki parametrów gg_saprintf() (w)
 - ekg: j.w. do funkcji saprintf() (w)
 - libgadu: obs³uga fragmentacji nag³ówków pakietów (speedy/w)
+- poprawka nazwy struktury w opisie protoko³u (solaris/w)
 
 // 2003-02-14
 

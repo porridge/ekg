@@ -108,8 +108,8 @@ struct gg_session {
 
 	void *resolver;		/* wska¼nik na informacje resolvera */
 
-	char header_buf[8];	/* bufor na czê¶æ nag³ówka pakietu */
-	int header_left;	/* ile zosta³o */
+	char *header_buf;	/* bufor na pocz±tek nag³ówka */
+	int header_done;	/* ile ju¿ mamy */
 };
 
 /*
