@@ -2574,7 +2574,7 @@ COMMAND(cmd_query)
 	for (i = 0; params[i]; i++)
 		p[i] = xstrdup(params[i]);
 
-	p[i + 1] = NULL;
+	p[i] = NULL;
 
 	if (params[0] && (params[0][0] == '@' || strchr(params[0], ','))) {
 		struct conference *c = conference_create(params[0]);
