@@ -287,6 +287,7 @@ void handle_notify(struct gg_event *e)
 			my_printf("status_busy", format_user(n->uin));
 		} else if (n->status == GG_STATUS_BUSY_DESCR) {
 			u->descr = strdup(e->event.notify_descr.descr);
+			cp_to_iso(u->descr);
 			my_printf("status_busy_descr", format_user(n->uin), u->descr);
 		}
 		
@@ -316,6 +317,18 @@ void handle_status(struct gg_event *e)
 	free(u->descr);
 	u->descr = NULL;
 
+	
+	if (e->event.status.status == GG_STATUS_BUSY_DESCR && !e->event.status.descr)
+		e->event.status.status = GG_STATUS_BUSY;
+	
+	if (e->event.status.status == GG_STATUS_NOT_AVAIL_DESCR && !e->event.status.descr)
+		e->event.status.status = GG_STATUS_NOT_AVAIL;
+	
+	if (e->event.status.descr) {
+		u->descr = strdup(e->event.status.descr);
+		cp_to_iso(u->descr);
+	}
+
 	if (config_display_notify) {
 		if (e->event.status.status == GG_STATUS_AVAIL && u->status != GG_STATUS_AVAIL) {
 		    	check_event(EVENT_AVAIL, e->event.status.uin);
@@ -331,13 +344,7 @@ void handle_status(struct gg_event *e)
 		} else if (e->event.status.status == GG_STATUS_BUSY_DESCR)
 		{
 		    	check_event(EVENT_AWAY, e->event.status.uin);
-			if (u->descr) {
-				u->descr = strdup(e->event.status.descr);
-				my_printf("status_busy_descr", format_user(e->event.status.uin), u->descr);
-			} else {
-				e->event.status.status = GG_STATUS_BUSY;
-				my_printf("status_busy", format_user(e->event.status.uin), u->descr);
-			}
+			my_printf("status_busy_descr", format_user(e->event.status.uin), u->descr);
 		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL && u->status != GG_STATUS_NOT_AVAIL)
 		{
 		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin);
@@ -345,7 +352,6 @@ void handle_status(struct gg_event *e)
 		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL_DESCR)
 		{
 		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin);
-			u->descr = strdup(e->event.status.descr);
 			my_printf("status_not_avail_descr", format_user(e->event.status.uin), u->descr);
 		}
 	}

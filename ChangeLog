@@ -8,6 +8,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-03-18
 
 - poprawka b³êdu w obs³ugi statusu (kuki/w)
+- konwersja cp-iso w opisach stanów (noname/w)
+- powód nieaktywno¶ci w ,,quit'' (klith/w)
 
 // 2002-03-17
 

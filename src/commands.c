@@ -116,7 +116,7 @@ struct command commands[] = {
 	{ "set", "v?", command_set, " <zmienna> <warto¶æ>", "Wy¶wietla lub zmienia ustawienia", "" },
 	{ "sms", "u?", command_sms, " <numer/alias> <tre¶æ>", "Wysy³a SMSa do podanej osoby", "" },
 	{ "status", "", command_status, "", "Wy¶wietla aktualny stan", "" },
-	{ "quit", "", command_quit, "", "Wychodzi z programu", "" },
+	{ "quit", "?", command_quit, " [powód]", "Wychodzi z programu", "" },
 	{ "unignore", "i", command_ignore, " <numer/alias>", "Usuwa z listy ignorowanych osób", "" },
 	{ "_msg", "u?", command_test_send, "", "", "" },
 	{ "_add", "?", command_test_add, "", "", "" },
@@ -553,9 +553,10 @@ COMMAND(command_away)
 	config_status = status_table[away] | ((private_mode) ? GG_STATUS_FRIENDS_MASK : 0);
 
 	if (sess && sess->state == GG_STATE_CONNECTED) {
-		if (reason)
+		if (reason) {
+			iso_to_cp(reason);
 			gg_change_status_descr(sess, config_status, reason);
-		else
+		} else
 			gg_change_status(sess, config_status);
 	}
 
@@ -1368,6 +1369,10 @@ COMMAND(command_sms)
 COMMAND(command_quit)
 {
 	my_printf("quit");
+	if (params[0]) {
+		iso_to_cp(params[0]);
+		gg_change_status_descr(sess, GG_STATUS_NOT_AVAIL_DESCR, params[0]);
+	}
 	gg_logoff(sess);
 	list_remove(&watches, sess, 0);
 	gg_free_session(sess);
