@@ -19,6 +19,9 @@ Pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
   - czas powrotu w stanach opisowych,
 
 * klient:
+  - blokowanie od¶wie¿ania ekranu w obrêbie jednej komendy -- po co
+    przewijaæ linijka po linijce w /help zamiast zablokowaæ przed i
+    zwolniæ ekran po? (w)
   - dope³nianie w ¶rodku linii (sz)
   - wykrywanie niewidocznych jako opcja (wielu),
   - czas powrotu w stanach opisowych,
@@ -30,6 +33,7 @@ Pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
   - mo¿liwo¶æ automagicznego wyrównywania kolejnych linii wiadomo¶ci w tematach
     ircopodobnych do d³ugo¶ci nazwy rozmówcy i timestampu (sz)
   - zmienna beep_*_away (rmrmg)
+  - zapis do historii zgodny z http://kadu.net/history_format.html (Chilek)
   - /bind -a Alt-A /window active (gozda)
   - lista kontaktów w pierwszym oknie, rozmowy w kolejnych (jojo)
   - osobna historia dla ka¿dego okna (koniu)
