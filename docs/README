@@ -8,22 +8,20 @@
 
 LICENCJA
 
-    program jest udostêpniony na zasadach licencji GPL, która jest
-    do³±czona w pliku COPYING. program i biblioteka obs³uguj±ca
+    program jest udostêpniony na zasadach licencji GPL, której tre¶æ
+    za³±czono w pliku COPYING. program i biblioteka obs³uguj±ca
     protokó³ Gadu-gadu zosta³y napisane na podstawie informacji
-    uzyskanych z badañ pakietów miêdzy klientem a serwerem. ¿aden
-    klient Gadu-gadu nie by³ disasemblowany, ani dekompilowany. ca³y
-    projekt powsta³ przy u¿yciu darmowych i wolnodostêpnych narzêdzi.
+    uzyskanych przez badanie pakietów wysy³anych miêdzy klientem
+    a serwerem. autorzy nie disasemblowali, ani nie dekompilowali
+    oryginalnego klienta. projekt powsta³ przy u¿yciu darmowych
+    i wolnodostêpnych narzêdzi.
 
     Gadu-gadu jest zastrze¿onym znakiem towarowym sms-express sp. z o.o.
 
 INSTALACJA
 
     skompilowaæ i odpaliæ. proste? proste. po pierwszym uruchomieni
-    ekg powie, jak go skonfigurowaæ. niestety jeszcze nie mo¿na zak³adaæ
-    kont gg. trzeba u¿yæ windzianego klienta. ka¿dy list w tej sprawie
-    bêdzie IGNOROWANY. po co czytaæ listy od ludzi, którym nie chce siê
-    nawet czytaæ do³±czonej dokumentacji.
+    ekg powie, jak go skonfigurowaæ.
 
     ekg powinien dzia³aæ na wiêkszo¶ci systemów un*xowych, jak Linux,
     *BSD, SunOS, IRIX itp. je¶li uda Ci siê skompilowaæ go na jakim¶
@@ -113,15 +111,15 @@ PODZIÊKOWANIA
 
     Robert J. Wo¼ny (speedy@atman.pl)
     Darek Jackowski (ascent@linux.pl)
+    Arkadiusz Mi¶kiewicz (misiek@pld.org.pl)
+    Tomasz Jarzynka (tomee@cpi.pl)
     Leszek Urbañski (tygrys@moo.pl)
     Kuba Jermak (kooba@irc.pl)
     Tomasz Torcz (zdzichu@irc.pl)
-    Tomasz Jarzynka (tomee@cpi.pl)
     Adam Kruszewski (phantom@linux.bydg.org)
     Piotr Wysocki (wysek@tower.braxis.co.uk)
     Marcin Chojnowski (martii@obgyn.edu.pl)
     Jaros³aw Kamper (jack@jack.eu.org)
-    Arkadiusz Mi¶kiewicz (misiek@pld.org.pl)
     Pawe³ Kot (pkot@linuxnews.pl)
     Piotr Stolc (socrtp@sedez.iq.pl)
     Artur Pietruk (arturp@plukwa.net)

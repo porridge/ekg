@@ -39,12 +39,11 @@
 #include "vars.h"
 
 struct gg_session *sess = NULL;
-struct gg_http *search = NULL;
-struct gg_http *reg_req = NULL;
 struct list *userlist = NULL;
 struct list *ignored = NULL;
 struct list *children = NULL;
 struct list *aliases = NULL;
+struct list *watches = NULL;
 int in_readline = 0;
 int no_prompt = 0;
 int away = 0;
@@ -75,7 +74,7 @@ int connecting = 0;
 int display_notify = 1;
 char *default_theme = NULL;
 int default_status = GG_STATUS_AVAIL;
-char *reg_req_password = NULL;
+char *reg_password = NULL;
 
 /*
  * my_puts()
@@ -1285,3 +1284,5 @@ char *decode_base64(char *buf)
 	*res = 0;
 	return res;
 }
+
+

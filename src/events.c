@@ -247,6 +247,7 @@ void handle_status(struct gg_event *e)
 void handle_failure(struct gg_event *e)
 {
 	my_printf("conn_failed", strerror(errno));
+	list_remove(&watches, sess, 0);
 	gg_free_session(sess);
 	sess = NULL;
 	do_reconnect();
@@ -264,19 +265,19 @@ void handle_success(struct gg_event *e)
 
 }
 
-int handle_event()
+void handle_event(struct gg_session *s)
 {
 	struct gg_event *e;
 	struct handler *h;
 
 	if (!(e = gg_watch_fd(sess))) {
 		my_printf("conn_broken", strerror(errno));
+		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
-		clear_userlist();
 		sess = NULL;
 		do_reconnect();
 
-		return 0;
+		return;
 	}
 
 	for (h = handlers; h->type; h++)
@@ -284,8 +285,6 @@ int handle_event()
 			(h->handler)(e);
 
 	gg_free_event(e);
-
-	return 0;
 }
 
 void handle_search(struct gg_http *h)
@@ -313,7 +312,7 @@ void handle_search(struct gg_http *h)
 		else
 			snprintf(born, sizeof(born), "-");
 
-		if (search_type == 1) {
+		if (!(h->id & 1)) {
 			active = find_format((s->results[i].active) ? "search_results_single_active" : "search_results_single_inactive");
 			if (s->results[i].gender == GG_GENDER_FEMALE)
 				gender = find_format("search_results_single_female");
@@ -334,7 +333,7 @@ void handle_search(struct gg_http *h)
 		active = format_string(active);
 		gender = format_string(gender);
 
-		my_printf((search_type == 1) ? "search_results_single" : "search_results_multi", uin, (name) ? name : "", s->results[i].nickname, s->results[i].city, born, gender, active);
+		my_printf((h->id & 1) ? "search_results_multi" : "search_results_single", uin, (name) ? name : "", s->results[i].nickname, s->results[i].city, born, gender, active);
 
 		free(name);
 		free(active);
@@ -348,11 +347,11 @@ void handle_register(struct gg_http *h)
 	char uin[16];
 
 	if (!h || !(s = h->data) || !s->success || !s->uin)
-		my_printf("error_register");
+		my_printf("register_error");
 	
-	if (!config_uin && !config_password && reg_req_password) {
+	if (!config_uin && !config_password && reg_password) {
 		config_uin = s->uin;
-		config_password = reg_req_password;
+		config_password = reg_password;
 	}
 	
 	snprintf(uin, sizeof(uin), "%lu", s->uin);

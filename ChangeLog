@@ -1,6 +1,9 @@
 // 2001-12-06
 
 - dodana funkcja wysy³ania has³a juzerom do libgg (thrull/w)
+- dodana lista ,,watches'' w kliencie. dziêki niej sobie grzeczie
+  przemiata wa¿ne deskyptory. dziêki niej mo¿e chodziæ równocze¶nie
+  kilka searczy. i ³atwiej siê po³apaæ. (w)
 
 // 2001-12-04
 

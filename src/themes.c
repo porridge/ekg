@@ -538,7 +538,8 @@ void init_theme()
 	add_format("not_implemented", "%! Tej funkcji jeszcze nie ma\n", 1);
 	add_format("no_config", "%! Niekompletna konfiguracja. Wpisz:\n%!   %Wset uin <numerek-gg>%n\n%!   %Wset password <has³o>%n\n%!   %Wsave%n\n%! Nastêpnie wydaj polecenie:\n%!   %Wconnect%n\n\n", 1);
 	add_format("register", "%> Rejestracja poprawna: Wygrany numerek: %W%1%n\n", 1);
-	add_format("error_register", "%! B³±d podczas rejestracji\n", 1);
+	add_format("register_failed", "%! B³±d podczas rejestracji\n", 1);
+	add_format("register_pending", "%! Rejestracja w toku\n", 1);
 	
 	add_format("sms_msg", "EKG: msg %1 %# >> %2", 1);
 	add_format("sms_chat", "EKG: chat %1 %# >> %2", 1);

@@ -27,7 +27,7 @@ struct handler {
 	void (*handler)(struct gg_event *e);
 };
 
-int handle_event();
+void handle_event(struct gg_session *s);
 void handle_msg(struct gg_event *e);
 
 void handle_search(struct gg_http *s);

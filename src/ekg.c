@@ -56,31 +56,18 @@ int my_getc(FILE *f)
 		FD_SET(0, &rd);
 		maxfd = 0;
 
-		if (sess && sess->state != GG_STATE_IDLE) {
-			if (sess->fd > maxfd)
-				maxfd = sess->fd;
-			if ((sess->check & GG_CHECK_READ))
-				FD_SET(sess->fd, &rd);
-			if ((sess->check & GG_CHECK_WRITE))
-				FD_SET(sess->fd, &wd);
-		}
+		for (l = watches; l; l = l->next) {
+			struct gg_common *w = l->data;
 
-		if (search && search->state != GG_STATE_IDLE) {
-			if (search->fd > maxfd)
-				maxfd = search->fd;
-			if ((search->check & GG_CHECK_READ))
-				FD_SET(search->fd, &rd);
-			if ((search->check & GG_CHECK_WRITE))
-				FD_SET(search->fd, &wd);
-		}
-
-		if (reg_req && reg_req->state != GG_STATE_IDLE) {
-			if (reg_req->fd > maxfd)
-				maxfd = reg_req->fd;
-			if ((reg_req->check & GG_CHECK_READ))
-				FD_SET(reg_req->fd, &rd);
-			if ((reg_req->check & GG_CHECK_WRITE))
-				FD_SET(reg_req->fd, &wd);
+			if (w->state == GG_STATE_ERROR || w->state == GG_STATE_IDLE || w->state == GG_STATE_DONE)
+				continue;
+			
+			if (w->fd > maxfd)
+				maxfd = w->fd;
+			if ((w->check & GG_CHECK_READ))
+				FD_SET(w->fd, &rd);
+			if ((w->check & GG_CHECK_WRITE))
+				FD_SET(w->fd, &wd);
 		}
 
 		tv.tv_sec = 1;
@@ -94,6 +81,7 @@ int my_getc(FILE *f)
 		ret = select(maxfd + 1, &rd, &wd, NULL, &tv);
 	
 		if (!ret) {
+			/* timeout reconnectu */
 			if (!sess && reconnect_timer && time(NULL) - reconnect_timer >= auto_reconnect && config_uin && config_password) {
 				reconnect_timer = 0;
 				my_printf("connecting");
@@ -104,13 +92,17 @@ int my_getc(FILE *f)
 				} else {
 					sess->initial_status = default_status;
 				}
+				list_add(&watches, sess, 0);
 			}
+
+			/* timeout pinga */
 			if (sess && sess->state == GG_STATE_CONNECTED && time(NULL) - last_ping > 60) {
 				if (last_ping)
 					gg_ping(sess);
 				last_ping = time(NULL);
 			}
 
+			/* timeout autoawaya */
 			if (sess && auto_away && !away && time(NULL) - last_action > auto_away && sess->state == GG_STATE_CONNECTED) {
 				char tmp[16];
 				
@@ -126,6 +118,7 @@ int my_getc(FILE *f)
 				my_printf("auto_away", tmp);
 			}
 
+			/* przegl±danie zdech³ych dzieciaków */
 			while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
 				for (l = children; l; l = m) {
 					struct process *p = l->data;
@@ -152,57 +145,70 @@ int my_getc(FILE *f)
 			}
 
 		} else {
-			if (FD_ISSET(0, &rd))
-				return rl_getc(stdin);
+			for (l = watches; l; l = l->next) {
+				struct gg_session *s = l->data;
+				struct gg_common *c = l->data;
+				struct gg_http *h = l->data;
 
-			if (sess && (FD_ISSET(sess->fd, &rd) || FD_ISSET(sess->fd, &wd))) {
-				if (handle_event()) {
-					gg_logoff(sess);
-					gg_free_session(sess);
-					exit(1);
-				}
-			}
+				if (!FD_ISSET(c->fd, &rd) && !FD_ISSET(c->fd, &wd))
+					continue;
 
-			if (search && (FD_ISSET(search->fd, &rd) || FD_ISSET(search->fd, &wd))) {
-				if (gg_search_watch_fd(search) == -1) {
-					my_printf("search_failed", strerror(errno));
-					gg_free_search(search);
-					search = NULL;
-				} else {
-					if (search->state == GG_STATE_ERROR) {
-						gg_debug(GG_DEBUG_MISC, "++ gg_search()... error\n");
-						my_printf("search_failed", strerror(errno));
-						gg_free_search(search);
-						search = NULL;
-					}
-					if (search->state == GG_STATE_DONE) {	
-						gg_debug(GG_DEBUG_MISC, "++ gg_search()... done\n");
-						handle_search(search);
-						gg_free_search(search);
-						search = NULL;
-					}
-				}
-			}
+				switch (c->type) {
+					case GG_SESSION_USER0:
+						return rl_getc(stdin);
+					
+					case GG_SESSION_GG:
+						handle_event(s);
+						break;
 
-			if (reg_req && (FD_ISSET(reg_req->fd, &rd) || FD_ISSET(reg_req->fd, &wd))) {
-				if (gg_register_watch_fd(reg_req) == -1) {
-					my_printf("register_failed", strerror(errno));
-					gg_free_register(reg_req);
-					reg_req = NULL;
-					free(reg_req_password);
-				} else {
-					if (reg_req->state == GG_STATE_ERROR) {
-						my_printf("register_failed", strerror(errno));
-						gg_free_register(reg_req);
-						reg_req = NULL;
-						free(reg_req_password);
+					case GG_SESSION_SEARCH:
+						if (gg_search_watch_fd(h) == -1) {
+							my_printf("search_failed", strerror(errno));
+							free(h->user_data);
+							gg_free_search(h);
+							list_remove(&watches, h, 0);
+							break;
+						}
+						if (h->state == GG_STATE_ERROR) {
+							gg_debug(GG_DEBUG_MISC, "++ gg_search()... error\n");
+							my_printf("search_failed", strerror(errno));
+							free(h->user_data);
+							gg_free_search(h);
+							list_remove(&watches, h, 0);
+							break;
+						}
+						if (h->state == GG_STATE_DONE) {	
+							gg_debug(GG_DEBUG_MISC, "++ gg_search()... done\n");
+							handle_search(h);
+							free(h->user_data);
+							gg_free_search(h);
+							list_remove(&watches, h, 0);
+							break;
+						}
+						break;
+
+					case GG_SESSION_REGISTER:
+						if (gg_register_watch_fd(h)) {
+							my_printf("register_failed", strerror(errno));
+							gg_free_register(h);
+							list_remove(&watches, h, 0);
+							free(reg_password);
+							break;
+						}
+						if (s->state == GG_STATE_ERROR) {
+							my_printf("register_failed", strerror(errno));
+							gg_free_register(h);
+							list_remove(&watches, h, 0);
+							free(reg_password);
+							break;
+						}
+						if (s->state == GG_STATE_DONE) {	
+							handle_register(h);
+							gg_free_register(h);
+							list_remove(&watches, h, 0);
+							break;
+						}
 					}
-					if (reg_req->state == GG_STATE_DONE) {	
-						handle_register(reg_req);
-						gg_free_register(reg_req);
-						reg_req = NULL;
-					}
-				}
 			}
 		}
 	}
@@ -218,8 +224,14 @@ void sigcont()
 
 void sighup()
 {
-	if (sess && sess->fd)
-		close(sess->fd);
+	if (sess && sess->state != GG_STATE_IDLE) {
+		my_printf("disconected");
+		gg_logoff(sess);
+		list_remove(&watches, sess, 0);
+		gg_free_session(sess);
+		sess = NULL;
+	}
+	
 	signal(SIGHUP, sighup);
 }
 
@@ -228,6 +240,7 @@ int main(int argc, char **argv)
 	int auto_connect = 1, i, new_status = 0;
 	char *home = getenv("HOME"), *load_theme = NULL;
 	struct passwd *pw; 
+	struct gg_common si;
 	
 	config_user = "";
 
@@ -310,6 +323,13 @@ u¿ycie: %s [OPCJE]
 
 	time(&last_action);
 
+	/* dodajemy stdin do ogl±danych deskryptorów */
+	si.fd = 0;
+	si.check = GG_CHECK_READ;
+	si.state = GG_STATE_IDLE;
+	si.type = GG_SESSION_USER0;
+	list_add(&watches, &si, sizeof(si));
+
 	rl_initialize();
 	rl_getc_function = my_getc;
 	rl_readline_name = "gg";
@@ -345,6 +365,7 @@ u¿ycie: %s [OPCJE]
 		} else {
 			sess->initial_status = default_status;
 		}
+		list_add(&watches, sess, 0);
 	}
 
 	for (;;) {
@@ -371,9 +392,9 @@ u¿ycie: %s [OPCJE]
 
 	printf("\n");
 	gg_logoff(sess);
+	list_remove(&watches, sess, 0);
 	gg_free_session(sess);
 	sess = NULL;
-	search = NULL;
 
 	if (config_changed) {
 		char *line;

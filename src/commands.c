@@ -62,7 +62,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_save(), command_msg(), command_quit(), command_test_send(),
 	command_test_add(), command_theme(), command_set(), command_connect(),
 	command_sms(), command_find(), command_modify(), command_cleartab(),
-	command_status(), command_register();
+	command_status(), command_register(), command_test_watches();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -97,6 +97,7 @@ struct command commands[] = {
 	{ "msg", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ do podanego u¿ytkownika", "" },
 	{ "modify", "u?", command_modify, " <alias> [opcje]", "Zmienia informacje w li¶cie kontaktów", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n  --alias <alias>  // nazwa w li¶cie kontaktów\n  --phone <telefon>\n  --uin <numerek>\n" },
 	{ "private", "", command_away, " [on/off]", "W³±cza/wy³±cza tryb ,,tylko dla przyjació³''", "" },
+	{ "register", "??", command_register, " <email> <has³o>", "Rejestruje nowy uin", "" },
 	{ "save", "", command_save, "", "Zapisuje ustawienia programu", "" },
 	{ "set", "v?", command_set, " <zmienna> <warto¶æ>", "Wy¶wietla lub zmienia ustawienia", "" },
 	{ "sms", "u?", command_sms, " <numer/alias> <tre¶æ>", "Wysy³a SMSa do podanej osoby", "" },
@@ -104,9 +105,9 @@ struct command commands[] = {
 	{ "theme", "f", command_theme, " <plik>", "£aduje opis wygl±du z podanego pliku", "" },
 	{ "quit", "", command_quit, "", "Wychodzi z programu", "" },
 	{ "unignore", "i", command_ignore, " <numer/alias>", "Usuwa z listy ignorowanych osób", "" },
-	{ "register", "??", command_register, " <email> <has³o>", "Rejestruje nowy uin", "" },
 	{ "_send", "u?", command_test_send, "", "", "" },
 	{ "_add", "?", command_test_add, "", "", "" },
+	{ "_watches", "", command_test_watches, "", "", "" },
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 
@@ -522,6 +523,7 @@ COMMAND(command_connect)
 	                } else {
 				sess->initial_status = default_status;
 			}
+			list_add(&watches, sess, 0);
 		} else
 			my_printf("no_config");
 	} else if (sess) {
@@ -529,6 +531,7 @@ COMMAND(command_connect)
 		if (sess->state == GG_STATE_CONNECTED)
 			my_printf("disconnected");
 		gg_logoff(sess);
+		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
 		sess = NULL;
 		reconnect_timer = 0;
@@ -592,26 +595,49 @@ COMMAND(command_exec)
 COMMAND(command_find)
 {
 	struct gg_search_request r;
-	char **argv;
-	int i;
+	struct gg_http *h;
+	struct list *l;
+	char **argv, *query = NULL;
+	int i, id = 1;
 
+	/* wybieramy sobie identyfikator sercza */
+	for (l = watches; l; l = l->next) {
+		struct gg_http *h = l->data;
+
+		if (h->type != GG_SESSION_SEARCH)
+			continue;
+
+		if (h->id / 2 >= id)
+			id = h->id / 2 + 1;
+	}
+	
+	if (params[0])
+		query = strdup(params[0]);
+	
 	memset(&r, 0, sizeof(r));
 
 	if (!strcasecmp(name, "info") && !params[0]) {
-	    search_type = 1;
-	    r.uin = config_uin;
-	    if (!(search = gg_search(&r, 1))) {
-		my_printf("search_failed", strerror(errno));
+		r.uin = config_uin;
+		if (!(h = gg_search(&r, 1))) {
+			my_printf("search_failed", strerror(errno));
+			free(query);
+			return 0;
+		}
+		h->id = id * 2;
+		h->user_data = strdup("self");
+		list_add(&watches, h, 0);
+		free(query);
 		return 0;
-	    }
-	    return 0;
 	};
 	
 	if (!params[0] || !(argv = split_params(params[0], -1)) || !argv[0]) {
 		my_printf("not_enough_params");
+		free(query);
 		return 0;
 	}
 
+/*	XXX przerobiæ to na watches 
+	
 	if (!strncasecmp(argv[0], "--s", 3) || !strncasecmp(argv[0], "-s", 2)) {
 		if (search)
 			gg_http_stop(search);
@@ -620,22 +646,14 @@ COMMAND(command_find)
 		my_printf("search_stopped");
 		return 0;
 	}
-
-	if (search) {
-		my_printf("already_searching");
-		return 0;
-	}
-
+*/
 	if (!argv[1]) {
-		search_type = 1;
-
 		if (!(r.uin = get_uin(params[0]))) {
 			my_printf("user_not_found", params[0]);
+			free(query);
 			return 0;
 		}
 	} else {
-		search_type = 2;
-
 		for (i = 0; argv[i]; i++) {
 			if (argv[i][0] == '-' && argv[i][1] == '-')
 				argv[i]++;
@@ -678,11 +696,15 @@ COMMAND(command_find)
 		}
 	}
 
-	if (!(search = gg_search(&r, 1))) {
+	if (!(h = gg_search(&r, 1))) {
 		my_printf("search_failed", strerror(errno));
+		free(query);
 		return 0;
 	}
 
+	h->id = id * 2 + ((argv[1]) ? 1 : 0);
+	h->user_data = query;
+	
 	return 0;
 }
 
@@ -1090,7 +1112,9 @@ COMMAND(command_quit)
 {
 	my_printf("quit");
 	gg_logoff(sess);
+	list_remove(&watches, sess, 0);
 	gg_free_session(sess);
+	sess = NULL;
 	return -1;
 }
 
@@ -1115,20 +1139,85 @@ COMMAND(command_test_add)
 	return 0;
 }
 
+COMMAND(command_test_watches)
+{
+	struct list *l;
+	char buf[200], *type, *state, *check;
+	int no = 0;
+
+	for (l = watches; l; l = l->next, no++) {
+		struct gg_common *s = l->data;
+		
+		switch (s->type) {
+			case GG_SESSION_GG: type = "GG"; break;
+			case GG_SESSION_HTTP: type = "HTTP"; break;
+			case GG_SESSION_SEARCH: type = "SEARCH"; break;
+			case GG_SESSION_REGISTER: type = "REGISTER"; break;
+			case GG_SESSION_REMIND: type = "REMIND"; break;
+			case GG_SESSION_CHANGE: type = "CHANGE"; break;
+			case GG_SESSION_PASSWD: type = "PASSWD"; break;
+			case GG_SESSION_USER0: type = "USER0"; break;
+			case GG_SESSION_USER1: type = "USER1"; break;
+			case GG_SESSION_USER2: type = "USER2"; break;
+			case GG_SESSION_USER3: type = "USER3"; break;
+			default: type = "(unknown)"; break;
+		}
+		switch (s->check) {
+			case GG_CHECK_READ: check = "R"; break;
+			case GG_CHECK_WRITE: check = "W"; break;
+			case GG_CHECK_READ | GG_CHECK_WRITE: check = "RW"; break;
+			default: check = "?"; break;
+		}
+		switch (s->state) {
+			case GG_STATE_IDLE: state = "IDLE"; break;
+			case GG_STATE_RESOLVING: state = "RESOLVING"; break;
+			case GG_STATE_CONNECTING: state = "CONNECTING"; break;
+			case GG_STATE_READING_DATA: state = "READING_DATA"; break;
+			case GG_STATE_ERROR: state = "ERROR"; break;
+			case GG_STATE_CONNECTING_GG: state = "CONNECTING_GG"; break;
+			case GG_STATE_READING_KEY: state = "READING_KEY"; break;
+			case GG_STATE_READING_REPLY: state = "READING_REPLY"; break;
+			case GG_STATE_CONNECTED: state = "CONNECTED"; break;
+			case GG_STATE_READING_HEADER: state = "READING_HEADER"; break;
+			case GG_STATE_PARSING: state = "PARSING"; break;
+			case GG_STATE_DONE: state = "DONE"; break;
+			default: state = "(unknown)"; break;
+		}
+		
+		snprintf(buf, sizeof(buf), "%d: type=%s, fd=%d, state=%s, check=%s, id=%d", no, type, s->fd, state, check, s->id);
+		my_printf("generic", buf);
+	}
+
+	return 0;
+}
+
 COMMAND(command_register)
 {
-
+	struct gg_http *h;
+	struct list *l;
+	
 	if (!params[0] || !params[1]) {
 		my_printf("not_enough_params");
 		return 0;
 	}
+
+	for (l = watches; l; l = l->next) {
+		struct gg_common *s = l->data;
+
+		if (s->type == GG_SESSION_REGISTER) {
+			my_printf("register_pending");
+			return 0;
+		}
+	}
 	
-	if (!(reg_req = gg_register(params[0], params[1], 1))) {
+	if (!(h = gg_register(params[0], params[1], 1))) {
 		my_printf("register_failed", strerror(errno));
 		return 0;
 	}
 
-	reg_req_password = strdup(params[1]);
+	list_add(&watches, h, 0);
+
+	reg_password = strdup(params[1]);
 	
 	return 0;
 }

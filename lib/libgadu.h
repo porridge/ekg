@@ -45,6 +45,7 @@ struct gg_session {
         int state;      	/* aktualny stan maszynki */
         int error;      	/* kod b³êdu dla GG_STATE_ERROR */
 	int type;		/* rodzaj sesji. == GG_SESSION_GG */
+	int id;			/* identyfikator */
 	
         int async;      	/* czy po³±czenie jest asynchroniczne */
 	int pid;        	/* pid procesu resolvera */
@@ -75,6 +76,7 @@ struct gg_http {
         int state;              /* aktualny stan maszynki */
         int error;              /* kod b³êdu dla GG_STATE_ERROR */
  	int type;		/* rodzaj sesji. == GG_SESSION_HTTP */
+	int id;			/* identyfikator */
 	
         int async;              /* czy po³±czenie asynchroniczne */
 	int pid;                /* pid procesu resolvera */
@@ -87,6 +89,8 @@ struct gg_http {
         int body_size;          /* ilo¶æ informacji */
 
         void *data;             /* dane danej operacji http */
+
+	char *user_data;	/* dane u¿ytkownika */
 };
 
 /*
@@ -98,6 +102,7 @@ struct gg_common {
         int state;              /* aktualny stan maszynki */
         int error;              /* kod b³êdu dla GG_STATE_ERROR */
 	int type;		/* rodzaj sesji */
+	int id;			/* identyfikator */
 };
 
 /*
@@ -109,6 +114,13 @@ enum {
 	GG_SESSION_SEARCH,	/* szukanie */
 	GG_SESSION_REGISTER,	/* rejestrowanie */
 	GG_SESSION_REMIND,	/* przypominanie has³a */
+	GG_SESSION_PASSWD,	/* zmiana has³a */
+	GG_SESSION_CHANGE,	/* zmiana informacji o sobie */
+	
+	GG_SESSION_USER0 = 256,	/* zdefiniowana dla u¿ytkownika */
+	GG_SESSION_USER1,	/* j.w. */
+	GG_SESSION_USER2,	/* j.w. */
+	GG_SESSION_USER3,	/* j.w. */
 };
 
 /*
