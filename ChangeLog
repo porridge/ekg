@@ -7,6 +7,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 // 2002-08-07
 
+- poprawka standardowego theme + nowy przelacznik (zaor/s)
 - poprawka bezpo¶redniego po³±czenia z serwerem dla synchronicznych (hao/w)
 - poprawka wywo³añ gg_free_event (w)
 - dodanie win32, szczegó³y w README (hao/w)
