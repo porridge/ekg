@@ -84,7 +84,7 @@ uninstall-ekg:
 	rm -f $(DESTDIR)$(bindir)/{ekg,ekgsearch,ekgwapd}
 	rm -f $(DESTDIR)$(libexecdir)/ioctld
 	rm -rf $(DESTDIR)$(datadir)/ekg
-	rm -f $(DESTDIR)$(mandir){/pl,}/man1/ekg{,search}
+	rm -f $(DESTDIR)$(mandir){/pl,}/man1/ekg{,search}.1
 
 #
 
