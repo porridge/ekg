@@ -63,7 +63,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_remind(), command_dcc(), command_query(), command_passwd(),
 	command_test_ping(), command_on(), command_change(),
 	command_test_fds(), command_test_segv(), command_version(), 
-	command_history(), command_window();
+	command_history(), command_window(), command_echo();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -79,48 +79,231 @@ int command_add(), command_away(), command_del(), command_alias(),
  */
 
 struct command commands[] = {
-	{ "add", "U??", command_add, " <numer> <alias> [opcje]", "Dodaje u¿ytkownika do listy kontaktów", "Opcje identyczne jak dla polecenia %Wlist%n (dotycz±ce wpisu)" },
-	{ "alias", "??", command_alias, " [opcje]", "Zarz±dzanie aliasami", "  -a, --add <alias> <komenda>\n  -A, --append <alias> <komenda>\n  -d, --del <alias>\n  [-l, --list]\n" },
-	{ "away", "?", command_away, " [powód]", "Zmienia stan na zajêty", "" },
-	{ "back", "?", command_away, " [powód]", "Zmienia stan na dostêpny", "" },
-	{ "change", "?", command_change, " <opcje>", "Zmienia informacje w katalogu publicznym", "  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>\n  -e, --email <adres>\n  -b, --born <rok urodzenia>\n  -c, --city <miasto>\n  -F, --female  \n  -M, --male" },
-	{ "chat", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ w ramach rozmowy", "" },
-	{ "cleartab", "", command_cleartab, "", "Czy¶ci listê nicków do dope³nienia", "" },
-	{ "connect", "", command_connect, "", "£±czy siê z serwerem", "" },
-	{ "dcc", "duf?", command_dcc, " [opcje]", "Obs³uga bezpo¶rednich po³±czeñ", "  send <numer/alias> <¶cie¿ka>\n  get [numer/alias]\n  voice <numer/alias>  \nclose [numer/alias/id]\n  show\n" },
-	{ "del", "u", command_del, " <numer/alias>", "Usuwa u¿ytkownika z listy kontaktów", "" },
-	{ "disconnect", "?", command_connect, " [powód]", "Roz³±cza siê z serwerem", "" },
-	{ "exec", "?", command_exec, " <polecenie>", "Uruchamia polecenie systemowe", "" },
-	{ "!", "?", command_exec, " <polecenie>", "Synonim dla %Wexec%n", "" },
-	{ "find", "u", command_find, " [opcje]", "Interfejs do katalogu publicznego", "  -u, --uin <numerek>\n  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>\n  -c, --city <miasto>\n  -b, --born <min:max>\n  -p, --phone <telefon>\n  -e, --email <e-mail>\n  -a, --active\n  -F, --female\n  -M, --male\n  --start <od>" },
-	{ "help", "c", command_help, " [polecenie]", "Wy¶wietla informacjê o poleceniach", "" },
-	{ "history", "u?", command_history, " <numer/alias> [n]", "Wy¶wietla ostatnie n wypowiedzi w rozmowie z podan± osob±", ""},
-	{ "?", "c", command_help, " [polecenie]", "Synonim dla %Whelp%n", "" },
-	{ "ignore", "u", command_ignore, " [numer/alias]", "Dodaje do listy ignorowanych lub j± wy¶wietla", "" },
-	{ "invisible", "?", command_away, " [powód]", "Zmienia stan na niewidoczny", "" },
-	{ "list", "u?", command_list, " [alias|opcje]", "Zarz±dzanie list± kontaktów", "\nWy¶wietlanie osób o podanym stanie \"list [-a|-b|-i]\":\n  -a, --active\n  -b, --busy\n  -i, --inactive\n\nZmiana wpisów listy kontaktów \"list <alias> <opcje...>\":\n  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>  // tylko informacja\n  -d, --display <nazwa>  // wy¶wietlana nazwa\n  -p, --phone <telefon>\n  -u, --uin <numerek>\n  -g, --group [+/-]<grupa>\n\nLista kontaktów na serwerze \"list [-p|-g]\":\n  -p, --put\n  -g, --get" },
-	{ "msg", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ do podanego u¿ytkownika", "" },
-        { "on", "?u?", command_on, " <zdarzenie|...> <numer/alias> <akcja>|clear", "Dodaje lub usuwa zdarzenie", "" },
-	{ "passwd", "??", command_passwd, " <has³o> <e-mail>", "Zmienia has³o i adres e-mail u¿ytkownika", "" },
-	{ "private", "", command_away, " [on/off]", "W³±cza/wy³±cza tryb ,,tylko dla przyjació³''", "" },
-	{ "query", "u", command_query, " <numer/alias>", "W³±cza rozmowê z dan± osob±", "" },
-	{ "quit", "?", command_quit, " [powód]", "Wychodzi z programu", "" },
-	{ "reconnect", "", command_connect, "", "Roz³±cza i ³±czy ponownie", "" },
-	{ "register", "??", command_register, " <email> <has³o>", "Rejestruje nowy uin", "" },
-	{ "remind", "", command_remind, "", "Wysy³a has³o na skrzynkê pocztow±", "" },
-	{ "save", "", command_save, "", "Zapisuje ustawienia programu", "" },
-	{ "set", "v?", command_set, " <zmienna> <warto¶æ>", "Wy¶wietla lub zmienia ustawienia", "U¿ycie ,,set -zmienna'' czy¶ci zawarto¶æ." },
-	{ "sms", "u?", command_sms, " <numer/alias> <tre¶æ>", "Wysy³a SMSa do podanej osoby", "" },
-	{ "status", "", command_status, "", "Wy¶wietla aktualny stan", "" },
-	{ "unignore", "i", command_ignore, " <numer/alias>", "Usuwa z listy ignorowanych osób", "" },
-	{ "version", "", command_version, "", "Wy¶wietla wersje programu", "" },
-	{ "window", "??", command_window, " <komenda> [numer_okna]", "Zarz±dzanie okienkami", "  new\n  kill [numer_okna]\n  next\n  prev\n  switch numer_okna\n  clear\n  refresh\n  list\n" },
-	{ "_add", "?", command_test_add, "", "", "" },
-	{ "_fds", "", command_test_fds, "", "", "" },
-	{ "_msg", "u?", command_test_send, "", "", "" },
-	{ "_ping", "", command_test_ping, "", "", "" },
-	{ "_segv", "", command_test_segv, "", "", "" },
-	{ "_watches", "", command_test_watches, "", "", "" },
+	{ "add", "U??", command_add,
+	  " <numer> <alias> [opcje]", "Dodaje u¿ytkownika do listy kontaktów",
+	  "Opcje identyczne jak dla polecenia %Wlist%n (dotycz±ce wpisu)" },
+	  
+	{ "alias", "??", command_alias,
+	  " [opcje]", "Zarz±dzanie aliasami",
+	  "  -a, --add <alias> <komenda>     dodaje alias\n"
+          "  -A, --append <alias> <komenda>  dodaje komendê do aliasu\n"
+	  "  -d, --del <alias>               usuwa alias\n"
+	  " [-l, --list]                     wy¶wietla listê aliasów" },
+	  
+	{ "away", "?", command_away,
+	  " [powód]", "Zmienia stan na zajêty",
+	  "Je¶li w³±czona jest odpowiednia opcja %Wrandom_reason%n i nie\n"
+          "podano powodu, zostanie wylosowany z pliku %Waway.reasons%n" },
+	  
+	{ "back", "?", command_away,
+	  " [powód]", "Zmienia stan na dostêpny",
+          "Je¶li w³±czona jest odpowiednia opcja %Wrandom_reason%n i nie\n"
+	  "podano powodu, zostanie wylosowany z pliku %Wback.reasons%n" },
+	  
+	{ "change", "?", command_change,
+	  " <opcje>", "Zmienia informacje w katalogu publicznym",
+	  "  -f, --first <imiê>\n"
+          "  -l, --last <nazwisko>\n"
+	  "  -n, --nick <pseudonim>\n"
+	  "  -e, --email <adres>\n"
+	  "  -b, --born <rok urodzenia>\n"
+	  "  -c, --city <miasto>\n"
+	  "  -F, --female                 kobieta\n"
+	  "  -M, --male                   mê¿czyzna\n"
+	  "\n"
+	  "Nale¿y podaæ %Wwszystkie%n opcje." },
+	  
+	{ "chat", "u?", command_msg,
+	  " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ w ramach rozmowy",
+	  "" },
+	  
+	{ "cleartab", "", command_cleartab,
+	  "", "Czy¶ci listê nicków do dope³nienia",
+	  "" },
+	  
+	{ "connect", "", command_connect,
+	  "", "£±czy siê z serwerem",
+	  "" },
+	  
+	{ "dcc", "duf?", command_dcc,
+	  " [opcje]", "Obs³uga bezpo¶rednich po³±czeñ",
+	  "  send <numer/alias> <¶cie¿ka>  wysy³a podany plik\n"
+	  "  get [numer/alias/#id]         akceptuje przysy³any plik\n"
+	  "  voice <numer/alias/#id>       rozpoczna rozmowê g³osow±\n"
+	  "  close [numer/alias/#id]       zamyka po³±czenie\n"
+	  " [show]                         wy¶wietla listê po³±czeñ\n"
+	  "\n"
+	  "Po³±czenia bezpo¶rednie wymagaj± w³±czonej opcji %Wdcc%n.\n"
+	  "Dok³adny opis znajduje siê w pliku %Wdocs/dcc.txt%n" },
+	  
+	{ "del", "u", command_del,
+	  " <numer/alias>", "Usuwa u¿ytkownika z listy kontaktów",
+	  "" },
+	
+	{ "disconnect", "?", command_connect,
+	  " [powód]", "Roz³±cza siê z serwerem",
+	  "Je¶li w³±czona jest opcja %Wauto_reconnect%n, po wywo³aniu\n"
+	  "tej komendy, program nadal bêdzie próbowa³ siê automatycznie\n"
+	  "³±czyæ po okre¶lonym czasie." },
+	  
+	{ "echo", "?", command_echo,
+	  " <tekst>", "Wy¶wietla podany tekst",
+	  "" },
+	  
+	{ "exec", "?", command_exec,
+	  " <polecenie>", "Uruchamia polecenie systemowe",
+	  "Poprzedzenie znakiem %W^%n ukryje informacjê o zakoñczeniu." },
+	  
+	{ "!", "?", command_exec,
+	  " <polecenie>", "Synonim dla %Wexec%n",
+	  "" },
+
+	{ "find", "u", command_find,
+	  " [opcje]", "Przeszukiwanie katalogu publicznego",
+	  "  -u, --uin <numerek>\n"
+	  "  -f, --first <imiê>\n"
+	  "  -l, --last <nazwisko>\n"
+	  "  -n, --nick <pseudonim>\n"
+	  "  -c, --city <miasto>\n"
+	  "  -b, --born <min:max>    zakres roku urodzenia\n"
+	  "  -p, --phone <telefon>\n"
+	  "  -e, --email <e-mail>\n"
+	  "  -a, --active            tylko dostêpni\n"
+	  "  -F, --female            kobiety\n"
+	  "  -M, --male              mê¿czy¼ni\n"
+	  "  --start <n>             wy¶wietla od n-tego wyniku\n"
+	  "\n"
+	  "  Ze wzglêdu na organizacjê katalogu publicznego, niektórych\n"
+	  "  opcji nie mo¿na ze sob± ³±czyæ" },
+	  
+	{ "help", "c", command_help,
+	  " [polecenie]", "Wy¶wietla informacjê o poleceniach",
+	  "" },
+
+#if 0
+        { "history", "u?", command_history,
+	  " <numer/alias> [n]", "Wy¶wietla ostatnie wypowiedzi",
+	  "" },
+#endif
+	  
+	{ "?", "c", command_help,
+	  " [polecenie]", "Synonim dla %Whelp%n",
+	  "" },
+	 
+	{ "ignore", "u", command_ignore,
+	  " [numer/alias]", "Dodaje do listy ignorowanych lub j± wy¶wietla",
+	  "" },
+	  
+	{ "invisible", "?", command_away,
+	  " [powód]", "Zmienia stan na niewidoczny",
+          "Je¶li w³±czona jest odpowiednia opcja %Wrandom_reason%n i nie\n"
+	  "podano powodu, zostanie wylosowany z pliku %Wquit.reasons%n" },
+
+	{ "list", "u?", command_list,
+          " [alias|opcje]", "Zarz±dzanie list± kontaktów",
+	  "\n"
+	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i]\":\n"
+	  "  -a, --active    dostêpne\n"
+	  "  -b, --busy      zajête\n"
+	  "  -i, --inactive  niedostêpne\n"
+	  "\n"
+	  "Zmiana wpisów listy kontaktów \"list <alias> <opcje...>\":\n"
+	  "  -f, --first <imiê>\n"
+	  "  -l, --last <nazwisko>\n"
+	  "  -n, --nick <pseudonim>    pseudonim (nie jest u¿ywany)\n"
+	  "  -d, --display <nazwa>     wy¶wietlana nazwa\n"
+	  "  -p, --phone <telefon>\n"
+	  "  -u, --uin <numerek>\n"
+	  "  -g, --group [+/-]<grupa>  dodaje lub usuwa z grupy\n"
+	  "\n"
+	  "Lista kontaktów na serwerze \"list [-p|-g]\":\n"
+	  "  -p, --put  umieszcza na serwerze\n"
+	  "  -g, --get  pobiera z serwera" },
+	  
+	{ "msg", "u?", command_msg,
+	  " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ",
+	  "" },
+
+        { "on", "?u?", command_on,
+	  " <zdarzenie|...> <numer/alias> <akcja>|clear", "Obs³uga zdarzeñ",
+	  "Szczegó³y dotycz±ce tego polecenia w pliku %Wdocs/on.txt%n" },
+	 
+	{ "passwd", "??", command_passwd,
+	  " <has³o> <e-mail>", "Zmienia has³o i adres e-mail u¿ytkownika",
+	  "" },
+
+	{ "private", "", command_away,
+	  " [on/off]", "W³±cza/wy³±cza tryb ,,tylko dla przyjació³''",
+	  "" },
+	  
+	{ "query", "u", command_query,
+	  " <numer/alias>", "W³±cza rozmowê z dan± osob±",
+	  "" },
+	  
+	{ "quit", "?", command_quit,
+	  " [powód]", "Wychodzi z programu",
+	  "" },
+	  
+	{ "reconnect", "", command_connect,
+	  "", "Roz³±cza i ³±czy ponownie", "" },
+	  
+	{ "register", "??", command_register,
+	  " <email> <has³o>", "Rejestruje nowe konto",
+	  "" },
+	  
+	{ "remind", "", command_remind,
+	  "", "Wysy³a has³o na skrzynkê pocztow±",
+	  "" },
+	  
+	{ "save", "", command_save,
+	  "", "Zapisuje ustawienia programu",
+	  "Aktualny stan zostanie zapisany i zostanie przywrócony przy\n"
+	  "nastêpnym uruchomieniu programu" },
+	  
+	{ "set", "v?", command_set,
+	  " <zmienna> <warto¶æ>", "Wy¶wietla lub zmienia ustawienia",
+	  "U¿ycie ,,set -zmienna'' czy¶ci zawarto¶æ zmiennej." },
+
+	{ "sms", "u?", command_sms,
+	  " <numer/alias> <tre¶æ>", "Wysy³a SMSa do podanej osoby",
+	  "Polecenie wymaga zdefiniowana zmiennej %Wsms_send_app%n" },
+
+	{ "status", "", command_status,
+	  "", "Wy¶wietla aktualny stan",
+	  "" },
+
+	{ "unignore", "i", command_ignore,
+	  " <numer/alias>", "Usuwa z listy ignorowanych osób",
+	  "" },
+	  
+	{ "version", "", command_version,
+	  "", "Wy¶wietla wersje programu",
+	  "" },
+	  
+	{ "window", "??", command_window,
+	  " <komenda> [numer_okna]", "Zarz±dzanie okienkami",
+	  "  new\n"
+	  "  kill [numer_okna]\n"
+	  "  next\n"
+	  "  prev\n"
+	  "  switch <numer_okna>\n"
+	  "  clear\n"
+	  "  refresh\n"
+	  "  list" },
+	  
+	{ "_add", "?", command_test_add, "", "",
+	  "Dodaje do listy dope³niania TABem" },
+	{ "_fds", "", command_test_fds, "", "",
+	  "Wy¶wietla otwarte deskryptory" },
+	{ "_msg", "u?", command_test_send, "", "",
+	  "Udaje, ¿e wysy³a wiadomo¶æ" },
+	{ "_ping", "", command_test_ping, "", "",
+	  "Wysy³a pakiet ping do serwera" },
+	{ "_segv", "", command_test_segv, "", "",
+	  "Wywo³uje naruszenie segmentacji pamiêci" },
+	{ "_watches", "", command_test_watches, "", "",
+	  "Wy¶wietla listê sprawdzanych deskryptorów" },
+
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 
@@ -494,9 +677,11 @@ COMMAND(command_exec)
 
 	if (params[0]) {
 		if (!(pid = fork())) {
-			execl("/bin/sh", "sh", "-c", params[0], NULL);
+			execl("/bin/sh", "sh", "-c", (params[0][0] == '^') ? params[0] + 1 : params[0], NULL);
 			exit(1);
 		}
+		if (params[0][0] == '^')
+			params[0][0] = 2;
 		process_add(pid, params[0]);
 	} else {
 		for (l = children; l; l = l->next) {
@@ -786,7 +971,7 @@ COMMAND(command_help)
 				if (strstr(c->brief_help, "%"))
 				    	blah = format_string(c->brief_help);
 				
-				print("help", c->name, c->params_help, blah ? blah : c->brief_help);
+				print("help", c->name, c->params_help, blah ? blah : c->brief_help, "");
 				free(blah);
 				if (c->long_help && strcmp(c->long_help, "")) {
 					char *foo, *tmp, *plumk, *bar = xstrdup(c->long_help);
@@ -814,7 +999,7 @@ COMMAND(command_help)
 			if (strstr(c->brief_help, "%"))
 			    	blah = format_string(c->brief_help);
 	
-			print("help", c->name, c->params_help, blah ? blah : c->brief_help);
+			print("help", c->name, c->params_help, blah ? blah : c->brief_help, (c->long_help && strcmp(c->long_help, "")) ? "\033[1m *\033[0m" : "");
 			free(blah);
 		}
 
@@ -1918,6 +2103,13 @@ COMMAND(command_on)
         config_changed = 1;
 
         return 0;
+}
+
+COMMAND(command_echo)
+{
+	print("generic", (params && params[0]) ? params[0] : "");
+
+	return 0;
 }
 
 COMMAND(command_window)

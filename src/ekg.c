@@ -328,7 +328,7 @@ void ekg_wait_for_key()
 					}
 
 				if (handlers[i].type == -1) {
-					printf("\n*** FATAL ERROR: Unknown session type. Application may fail.\n*** Mail this to the authors:\n*** ekg-" VERSION "/type=%d/state=%d/id=%d\n", c->type, c->state, c->id);
+//					printf("\n*** FATAL ERROR: Unknown session type. Application may fail.\n*** Mail this to the authors:\n*** ekg-" VERSION "/type=%d/state=%d/id=%d\n", c->type, c->state, c->id);
 					list_remove(&watches, c, 1);
 					break;
 				}
@@ -383,14 +383,15 @@ void sigsegv_handler()
 	fprintf(stderr, "\n\
 *** Naruszenie ochrony pamiêci ***\n\
 \n\
-Próbujê zapisaæ ustawienia do pliku %s/config.%d i listê kontaktów\n\
-do pliku %s/userlist.%d, ale nie obiecujê, ¿e cokolwiek z tego\n\
-wyjdzie.\n\
+Próbujê zapisaæ ustawienia do pliku %s/config.%d i listê\n\
+kontaktów do pliku %s/userlist.%d, ale nie obiecujê,\n\
+¿e cokolwiek z tego wyjdzie.\n\
 \n\
-Je¶li zostanie utworzony plik %s/core, spróbuj uruchomiæ program ,,gdb''\n\
-zgodnie z instrukcjami zawartymi w pliku README. Dziêki temu autorzy\n\
-dowiedz± siê, w którym miejscu wyst±pi³ b³±d i najprawdopodobniej pozwoli\n\
-to unikn±æ tego typu b³êdów w przysz³o¶ci.\n\
+Je¶li zostanie utworzony plik %s/core, spróbuj uruchomiæ\n\
+program ,,gdb'' zgodnie z instrukcjami zawartymi w pliku README.\n\
+Dziêki temu autorzy dowiedz± siê, w którym miejscu wyst±pi³ b³±d\n\
+i najprawdopodobniej pozwoli to unikn±æ tego typu sytuacji w\n\
+przysz³o¶ci.\n\
 \n", config_dir, getpid(), config_dir, getpid(), config_dir);
 
 	config_write_crash();

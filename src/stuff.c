@@ -936,7 +936,7 @@ int alias_add(const char *string, int quiet, int append)
 				if (!quiet)
 					print("aliases_append", string);
 				return 0;
-			}	
+			}
 		}
 	}
 
@@ -1156,9 +1156,10 @@ int event_remove(int flags, uin_t uin)
 int event_check(int event, uin_t uin, const char *data)
 {
 	const char *uin_number = NULL, *uin_display = NULL;
-        char *evt_ptr = NULL;
+        char *action = NULL, **actions, *edata = NULL;
 	struct userlist *u;
         struct list *l;
+	int i;
 
 	uin_number = itoa(uin);
 	if ((u = userlist_find(uin, NULL)))
@@ -1170,33 +1171,47 @@ int event_check(int event, uin_t uin, const char *data)
                 struct event *e = l->data;
 
                 if ((e->flags & event) && (e->uin == uin || e->uin == 1)) {
-			evt_ptr = xstrdup(e->action);
+			action = e->action;
 			break;
                 }
         }
 
-        if (!evt_ptr)
+        if (!action)
                 return 1;
 
-        if (strchr(evt_ptr, ';')) {
-		char **events = array_make(evt_ptr, ";", 0, 0, 0);
-		int i = 0;
-		
-                while (events[i]) {
-			char *tmp = format_string(events[i], uin_number, uin_display, (data) ? data : "");
-			event_run(tmp);
-			free(tmp);
-			i++;
+	if (data) {
+		int size = 1;
+		const char *p;
+		char *q;
+
+		for (p = data; *p; p++) {
+			if (strchr("`!#$&*?|\\\'\"{}[]", *p))
+				size += 2;
+			else
+				size++;
 		}
 		
-		array_free(events);
-        } else {
-		char *tmp = format_string(evt_ptr, uin_number, uin_display, (data) ? data : "");
+		edata = xmalloc(size);
+
+		for (p = data, q = edata; *p; p++, q++) {
+			if (strchr("`!#$&*?|\\\'\"{}[]", *p))
+				*q++ = '\\';
+			*q = *p;
+		}
+		*q = 0;
+	}
+
+	actions = array_make(action, ";", 0, 0, 0);
+
+	for (i = 0; actions && actions[i]; i++) {	
+		char *tmp = format_string(actions[i], uin_number, uin_display, (data) ? data : "", (edata) ? edata : "");
 		event_run(tmp);
 		free(tmp);
 	}
 
-	free(evt_ptr);
+	array_free(actions);
+
+	xfree(edata);
 
         return 0;
 }
@@ -1255,21 +1270,20 @@ int event_run(const char *act)
 	} 
 
 	if (!strncasecmp(acts[0], "exec", 4)) {
-		gg_debug(GG_DEBUG_MISC, "//   *bzzzt*, be back later\n");
-
-#if 0
-		gg_debug(GG_DEBUG_MISC, "//   executing program\n");
-                if (!(pid = fork())) {
-                        execl("/bin/sh", "sh", "-c", acts[1], NULL);
-                        exit(1);
-                }
-                process_add(pid, "\002");
-#endif
+		char *tmp = saprintf("exec %s", action + 5);
+		
+		if (tmp) {
+			gg_debug(GG_DEBUG_MISC, "//   executing program\n");
+			ekg_execute(NULL, tmp);
+			xfree(tmp);
+		} else
+			gg_debug(GG_DEBUG_MISC, "//   not enough memory\n");
+		
 		goto cleanup;
 	} 
 
 	if (!strncasecmp(acts[0], "command", 7)) {
-		gg_debug(GG_DEBUG_MISC, "//   executing program\n");
+		gg_debug(GG_DEBUG_MISC, "//   executing command\n");
 		ekg_execute(NULL, action + 8);
 		goto cleanup;
 	} 

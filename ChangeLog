@@ -5,6 +5,14 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-07-20
+
+- porz±dki w poleceniu help (w)
+- dodanie komendy echo (w)
+- dodanie akcji zdarzeñ ,,exec'' (w)
+- poprawka zdarzeñ z wieloma akcjami (w)
+- dodanie %4 w zdarzeniach, które zawiera eskejpowan± tre¶æ wiadomo¶ci.
+
 // 2002-07-19
 
 - poprawki dokumentacji (tommy/w)
