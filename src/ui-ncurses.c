@@ -1813,7 +1813,7 @@ static void update_statusbar(int commit)
 
 		tm = localtime(&t);
 
-		strftime(tmp, sizeof(tmp), "%H:%M", tm);
+		strftime(tmp, sizeof(tmp), format_find("ncurses_timestamp"), tm);
 		
 		__add_format("time", 1, tmp);
 	}

@@ -59,6 +59,9 @@ warunki mo¿na zagnie¿d¿aæ, tzn. %{?query %{!?query_descr ...}} zostanie
 wy¶wietlone, je¶li prowadzona jest rozmowa, ale rozmówca nie ma stanu
 opisowego.
 
+domy¶lny format czasu (%{time}) mo¿na zmieniæ za pomoc± wpisu
+,,ncurses_statusbar''. szczegó³y w stronie manuala strftime(3).
+
 dziêki temu mo¿na konstruowaæ kosmiczne paski stanu. ale i tak domy¶lny
 powinien wystarczyæ ka¿demu. jest mo¿liwo¶æ rozszerzenia pasku stanu do
 maksymalnie 5-ciu linii. kolejne linie s± opisane formatami ,,statusbar2'',
