@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2004 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *                          Wojciech Bojdo³ <wojboj@htc.net.pl>
@@ -10,6 +10,7 @@
  *                          Piotr Domagalski <szalik@szalik.net>
  *                          Kuba Kowalski <qbq@kofeina.net>
  *                          Piotr Kupisiewicz <deli@rzepaknet.us>
+ *                          Adam Wysocki <gophi@ekg.apcoh.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -6085,7 +6086,7 @@ void command_init()
   	  " [-]<zmienna> [[+/-]warto¶æ]", "wy¶wietla lub zmienia ustawienia",
 	  "\n"
 	  "U¿ycie %Tset -zmienna%n czy¶ci zawarto¶æ zmiennej. Dla zmiennych "
-	  "bêd±cymi mapami bitowymi mo¿na okre¶liæ, czy warto¶æ ma byæ "
+	  "bêd±cych mapami bitowymi mo¿na okre¶liæ, czy warto¶æ ma byæ "
 	  "dodana (poprzedzone plusem), usuniêta (minusem) czy ustawiona "
 	  "(bez prefiksu). Warto¶æ zmiennej mo¿na wzi±æ w cudzys³ów. "
 	  "Poprzedzenie opcji parametrem %T-a%n lub %T--all%n spowoduje "
