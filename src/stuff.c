@@ -1325,7 +1325,7 @@ void changed_dcc(char *var)
 	}
 
 	if (use_dcc && !dcc) {
-		if (!(dcc = gg_create_dcc_socket(config_uin, 0))) {
+		if (!(dcc = gg_dcc_create_socket(config_uin, 0))) {
 			my_printf("dcc_create_error", strerror(errno));
 		} else
 			list_add(&watches, dcc, 0);
@@ -1370,3 +1370,22 @@ void prepare_connect()
 		gg_dcc_ip = dcc_ip;
 }
 
+/*
+ * transfer_id()
+ *
+ * zwraca pierwszy wolny identyfikator transferu dcc.
+ */
+int transfer_id()
+{
+	struct list *l;
+	int id = 1;
+
+	for (l = transfers; l; l = l->next) {
+		struct transfer *t = l->data;
+
+		if (t->id >= id)
+			id = t->id + 1;
+	}
+
+	return id;
+}

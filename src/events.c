@@ -229,6 +229,9 @@ void handle_ack(struct gg_event *e)
 	char *tmp;
 	int queued = (e->event.ack.status == GG_ACK_QUEUED);
 
+	if (!e->event.ack.seq)	/* ignorujemy potwierdzenia ctcp */
+		return;
+
 	if (!display_ack)
 		return;
 
@@ -544,6 +547,48 @@ void handle_pubdir(struct gg_http *h)
 }
 
 /*
+ * find_transfer()
+ *
+ * znajduje strukturê ,,transfer'' dotycz±c± danego po³±czenia.
+ *
+ *  - d - struktura gg_dcc, której szukamy.
+ *
+ * wska¼nik do struktury ,,transfer'' lub NULL, je¶li nie znalaz³.
+ */
+static struct transfer *find_transfer(struct gg_dcc *d)
+{
+	struct list *l;
+
+	for (l = transfers; l; l = l->next) {
+		struct transfer *t = l->data;
+
+		if (t->dcc == d)
+			return t;
+	}
+
+	return NULL;
+}
+
+/*
+ * remove_transfer()
+ *
+ * usuwa z listy transferów ten, który dotyczy podanego po³±czenia dcc.
+ *
+ *  - d - po³±czenie.
+ *
+ * nie zwraca nic.
+ */
+static void remove_transfer(struct gg_dcc *d)
+{
+	struct transfer *t = find_transfer(d);
+
+	if (t) {
+		free(t->filename);
+		list_remove(&transfers, t, 1);
+	}
+}
+
+/*
  * handle_dcc()
  *
  * funkcja zajmuje siê obs³ug± wszystkich zdarzeñ zwi±zanych z DCC.
@@ -555,12 +600,14 @@ void handle_pubdir(struct gg_http *h)
 void handle_dcc(struct gg_dcc *d)
 {
 	struct gg_event *e;
+	struct transfer *t;
 	struct list *l;
 	int tmp;
 
 	if (!(e = gg_dcc_watch_fd(d))) {
 		my_printf("dcc_error", strerror(errno));
 		if (d->type != GG_SESSION_DCC_SOCKET) {
+			remove_transfer(d);
 			list_remove(&watches, d, 0);
 			gg_free_dcc(d);
 		}
@@ -600,20 +647,17 @@ void handle_dcc(struct gg_dcc *d)
 			for (l = transfers; l; l = l->next) {
 				struct transfer *t = l->data;
 
-				/* XXX pozbyæ siê printf()ów */
-
-				printf("transfer: uin=%ld, filename=%s\n", t->uin, t->filename);
-				if (t->uin == d->peer_uin) {
-					printf("that's it!\n");
-					if (gg_dcc_send_file(d, t->filename) == -1) {
-						gg_debug(GG_DEBUG_MISC, "## gg_dcc_send_file() failed (%s)\n", strerror(errno));
-						/* XXX my_printf */
-						list_remove(&transfers, t, 1);
+				if (t->uin == d->peer_uin || !t->dcc) {
+					if (gg_dcc_fill_file_info(d, t->filename) == -1) {
+						gg_debug(GG_DEBUG_MISC, "## gg_dcc_fill_file_info() failed (%s)\n", strerror(errno));
+						my_printf("dcc_open_error", t->filename);
+						remove_transfer(d);
 						list_remove(&watches, d, 0);
 						gg_free_dcc(d);
 						return;
 					}
-					list_remove(&transfers, t, 1);
+					t->dcc = d;
+					t->type = GG_SESSION_DCC_SEND;
 					break;
 				}
 			}
@@ -622,11 +666,15 @@ void handle_dcc(struct gg_dcc *d)
 		case GG_EVENT_DCC_DONE:
 			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_DONE\n");
 
-			/* XXX my_printf() */
+			if (!(t = find_transfer(d))) {
+				gg_free_dcc(d);
+				break;
+			}
 
-			printf("\n*** DCC DONE\n");
+			my_printf((t->dcc->type == GG_SESSION_DCC_SEND) ? "dcc_done_send" : "dcc_done_get", format_user(t->uin), t->filename);
 			
-			list_remove(&watches, d, 0);
+			remove_transfer(d);
+			list_remove(&transfers, t, 0);
 			gg_free_dcc(d);
 
 			break;

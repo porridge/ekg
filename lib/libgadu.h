@@ -138,6 +138,7 @@ struct gg_dcc {
 	int id;			/* identyfikator */
 	int timeout;		/* sugerowany timeout w sekundach */
 
+	int active;		/* czy to my siê ³±czymy? */
 	int port;		/* port, na którym siedzi */
 	uin_t uin;		/* uin klienta */
 	uin_t peer_uin;		/* uin drugiej strony */
@@ -195,11 +196,12 @@ enum {
 	GG_STATE_LISTENING,		/* czeka na po³±czenia */
 	GG_STATE_READING_UIN_1,		/* czeka na uin peera */
 	GG_STATE_READING_UIN_2,		/* czeka na swój uin */
-	GG_STATE_SENDING_ACK,		/* wysy³a potwierdzenie */
+	GG_STATE_SENDING_ACK,		/* wysy³a potwierdzenie dcc */
+	GG_STATE_READING_ACK,		/* czeka na potwierdzenie dcc */
 	GG_STATE_READING_REQUEST,	/* czeka na komendê */
 	GG_STATE_SENDING_FILE_INFO,	/* wysy³a informacje o pliku */
-	GG_STATE_READING_ACK,		/* czeka na potwierdzenie */
-	GG_STATE_SENDING_HEADER,	/* wysy³a nag³ówek pliku */
+	GG_STATE_READING_FILE_ACK,	/* czeka na potwierdzenie pliku */
+	GG_STATE_SENDING_FILE_HEADER,	/* wysy³a nag³ówek pliku */
 	GG_STATE_GETTING_FILE,		/* odbiera plik */
 	GG_STATE_SENDING_FILE,		/* wysy³a plik */
 };
@@ -227,6 +229,7 @@ void gg_free_session(struct gg_session *sess);
 void gg_logoff(struct gg_session *sess);
 int gg_change_status(struct gg_session *sess, int status);
 int gg_send_message(struct gg_session *sess, int msgclass, uin_t recipient, unsigned char *message);
+int gg_send_message_ctcp(struct gg_session *sess, int msgclass, uin_t recipient, unsigned char *message, int message_len);
 int gg_ping(struct gg_session *sess);
 
 
@@ -421,11 +424,12 @@ void gg_free_pubdir(struct gg_http *f);
 int gg_dcc_port;
 char *gg_dcc_ip;
 
-int gg_dcc_send_request(struct gg_session *sess, uin_t uin);
-int gg_dcc_send_file(struct gg_dcc *d, char *filename);
-int gg_send_message_ctcp(struct gg_session *sess, int msgclass, uin_t recipient, unsigned char *message, int message_len); /* XXX lalala */
+int gg_dcc_request(struct gg_session *sess, uin_t uin);
 
-struct gg_dcc *gg_create_dcc_socket(uin_t uin, unsigned int port);
+struct gg_dcc *gg_dcc_send_file(unsigned long ip, unsigned short port, uin_t my_uin, uin_t peer_uin);
+int gg_dcc_fill_file_info(struct gg_dcc *d, char *filename);
+
+struct gg_dcc *gg_dcc_create_socket(uin_t uin, unsigned int port);
 #define gg_free_dcc_socket gg_free_dcc
 struct gg_event *gg_dcc_watch_fd(struct gg_dcc *d);
 
@@ -629,6 +633,9 @@ struct gg_dcc_big_packet {
 #define GG_DCC_CATCH_FILE 0x0002	/* wysy³amy plik */
 
 #define GG_DCC_FILEATTR_READONLY 0x0020
+
+#define GG_DCC_TIMEOUT_SEND 300		/* 5 minut */
+#define GG_DCC_TIMEOUT_FILE_ACK 300	/* 5 minut */
 
 #ifdef __cplusplus
 }

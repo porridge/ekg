@@ -52,6 +52,8 @@ struct transfer {
 	uin_t uin;
 	char *filename;
 	struct gg_dcc *dcc;
+	int type;
+	int id;
 };
 
 struct list *userlist;
@@ -140,5 +142,6 @@ void changed_debug(char *var);
 void changed_dcc(char *var);
 void changed_theme(char *var);
 void prepare_connect();
+int transfer_id();
 
 #endif

@@ -28,6 +28,8 @@
 #include <readline/readline.h>
 #include <errno.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "libgg.h"
@@ -63,7 +65,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_test_add(), command_theme(), command_set(), command_connect(),
 	command_sms(), command_find(), command_modify(), command_cleartab(),
 	command_status(), command_register(), command_test_watches(),
-	command_remind(), command_send();
+	command_remind(), command_dcc();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -73,7 +75,9 @@ int command_add(), command_away(), command_del(), command_alias(),
  * 'U' - rêcznie wpisany uin, nadawca mesgów,
  * 'u' - nazwa lub uin z kontaktów, rêcznie wpisany uin, nadawca mesgów,
  * 'c' - komenda,
- * 'i' - nicki z listy ignorowanych osób.
+ * 'i' - nicki z listy ignorowanych osób,
+ * 'd' - komenda dcc,
+ * 'f' - plik.
  */
 
 struct command commands[] = {
@@ -84,6 +88,7 @@ struct command commands[] = {
 	{ "chat", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ w ramach rozmowy", "" },
 	{ "cleartab", "", command_cleartab, "", "Czy¶ci listê nicków do dope³nienia", "" },
 	{ "connect", "", command_connect, "", "£±czy siê z serwerem", "" },
+	{ "dcc", "duf", command_dcc, " [opcje]", "Obs³uga bezpo¶rednich po³±czeñ", "  send <numer/alias> <¶cie¿ka>\n  get [numer/alias]\n  close [numer/alias/id]\n  show\n" },
 	{ "del", "u", command_del, " <numer/alias>", "Usuwa u¿ytkownika z listy kontaktów", "" },
 	{ "disconnect", "", command_connect, "", "Roz³±cza siê z serwerem", "" },
 	{ "exec", "?", command_exec, " <polecenie>", "Uruchamia polecenie systemowe", "" },
@@ -110,7 +115,6 @@ struct command commands[] = {
 	{ "_msg", "u?", command_test_send, "", "", "" },
 	{ "_add", "?", command_test_add, "", "", "" },
 	{ "_watches", "", command_test_watches, "", "", "" },
-	{ "_send", "u?", command_send, "", "", "" },
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 
@@ -232,6 +236,25 @@ char *ignored_uin_generator(char *text, int state)
 	return NULL;
 }
 
+char *dcc_generator(char *text, int state)
+{
+	char *commands[] = { "close", "get", "send", "show", NULL };
+	static int len, i;
+
+	if (!state) {
+		i = 0;
+		len = strlen(text);
+	}
+
+	while (commands[i]) {
+		if (!strncasecmp(text, commands[i], len))
+			return strdup(commands[i++]);
+		i++;
+	}
+
+	return NULL;
+}
+
 char *empty_generator(char *text, int state)
 {
 	return NULL;
@@ -318,6 +341,12 @@ char **my_completion(char *text, int start, int end)
 						break;
 					case 'v':
 						func = variable_generator;
+						break;
+					case 'd':
+						func = dcc_generator;
+						break;
+					case 'f':
+						func = rl_filename_completion_function;
 						break;
 				}
 			}
@@ -1126,30 +1155,148 @@ COMMAND(command_quit)
 	return -1;
 }
 
-COMMAND(command_send)
+COMMAND(command_dcc)
 {
 	struct transfer t;
 	uin_t uin;
 
-	if (!params[0] || !params[1]) {
-		my_printf("not_enough_params");
+	if (!params[0])
+		params[0] = "show";
+
+	if (!strncasecmp(params[0], "sh", 2)) {		/* show */
+		struct list *l;
+		int pending = 0, active = 0;
+		char buf[16];
+
+		if (params[1] && params[1][0] == 'd') {	/* show debug */
+			for (l = transfers; l; l = l->next) {
+				struct transfer *t = l->data;
+				
+				snprintf(buf, sizeof(buf), "%d", t->id);
+				my_printf("dcc_show_debug", buf, (t->type == GG_SESSION_DCC_SEND) ? "SEND" : "GET", t->filename, format_user(t->uin), (t->dcc) ? "yes" : "no");
+			}
+
+			return 0;
+		}
+
+		for (l = transfers; l; l = l->next) {
+			struct transfer *t = l->data;
+
+			if (!t->dcc || (t->dcc->state != GG_STATE_SENDING_FILE || t->dcc->state != GG_STATE_GETTING_FILE)) {
+				if (!pending) {
+					my_printf("dcc_show_pending_header");
+					pending = 1;
+				}
+				snprintf(buf, sizeof(buf), "%d", t->id);
+				my_printf((t->type == GG_SESSION_DCC_SEND) ? "dcc_show_pending_send" : "dcc_show_pending_get", buf, format_user(t->uin), (t->filename) ? t->filename : "(?)");
+			}
+		}
+
+		for (l = transfers; l; l = l->next) {
+			struct transfer *t = l->data;
+
+			if (t->dcc && (t->dcc->state == GG_STATE_SENDING_FILE || t->dcc->state == GG_STATE_GETTING_FILE)) {
+				if (!active) {
+					my_printf("dcc_show_active_header");
+					active = 1;
+				}
+				snprintf(buf, sizeof(buf), "%d", t->id);
+				my_printf((t->type == GG_SESSION_DCC_SEND) ? "dcc_show_active_send" : "dcc_show_active_get", buf, format_user(t->uin), t->filename);
+			}
+		}
+
+		if (!active && !pending)
+			my_printf("dcc_show_empty");
+		
 		return 0;
 	}
 	
-        if (!(uin = get_uin(params[0])) || !find_user(uin, NULL)) {
-		my_printf("user_not_found", params[0]);
+	if (!strncasecmp(params[0], "se", 2)) {		/* send */
+		struct userlist *u;
+		struct stat st;
+		int fd;
+
+		if (!params[1] || !params[2]) {
+			my_printf("not_enough_params");
+			return 0;
+		}
+		
+		if (!(uin = get_uin(params[1])) || !(u = find_user(uin, NULL))) {
+			my_printf("user_not_found", params[1]);
+			return 0;
+		}
+
+		if (!sess || sess->state != GG_STATE_CONNECTED) {
+			my_printf("not_connected");
+			return 0;
+		}
+
+		if ((fd = open(params[2], O_RDONLY)) == -1 || stat(params[2], &st)) {
+			my_printf("dcc_open_error", params[2], strerror(errno));
+			return 0;
+		} else {
+			close(fd);
+			if (S_ISDIR(st.st_mode)) {
+				my_printf("dcc_open_directory", params[2]);
+				return 0;
+			}
+		}
+
+		t.uin = uin;
+		t.id = transfer_id();
+		t.type = GG_SESSION_DCC_SEND;
+		t.filename = strdup(params[2]);
+		t.dcc = NULL;
+
+		if (u->port < 10) {
+			/* nie mo¿emy siê z nim po³±czyæ, wiêc on spróbuje */
+			gg_dcc_request(sess, uin);
+		} else {
+			struct gg_dcc *d;
+			
+			if (!(d = gg_dcc_send_file(u->ip, u->port, config_uin, uin))) {
+				my_printf("dcc_error", strerror(errno));
+				return 0;
+			}
+
+			if (gg_dcc_fill_file_info(d, params[2]) == -1) {
+				my_printf("dcc_open_error", params[2], strerror(errno));
+				return 0;
+			}
+
+			t.dcc = d;
+		}
+
+		list_add(&transfers, &t, sizeof(t));
+
 		return 0;
 	}
 
-	gg_dcc_send_request(sess, uin);
+	if (!strncasecmp(params[0], "g", 1)) {		/* get */
+		my_printf("dcc_not_supported", params[0]);
+		return 0;
+		
+	        if (!(uin = get_uin(params[1])) || !find_user(uin, NULL)) {
+			my_printf("user_not_found", params[1]);
+			return 0;
+		}
 
-	/* XXX jakie¶ checki */
-	t.uin = uin;
-	t.filename = strdup(params[1]);
-	t.dcc = NULL;
+		if (!sess || sess->state != GG_STATE_CONNECTED) {
+			my_printf("not_connected");
+			return 0;
+		}
 
-	list_add(&transfers, &t, sizeof(t));
 
+	
+	}
+	
+	if (!strncasecmp(params[0], "c", 1)) {		/* close */
+		my_printf("dcc_not_supported", params[0]);
+		return 0;
+	}
+
+	my_printf("dcc_unknown_command", params[0]);
+	
 	return 0;
 }
 
@@ -1231,7 +1378,8 @@ COMMAND(command_test_watches)
 			case GG_STATE_READING_REQUEST: state = "READING_REQUEST"; break;
 			case GG_STATE_SENDING_FILE_INFO: state = "SENDING_FILE_INFO"; break;
 			case GG_STATE_READING_ACK: state = "READING_ACK"; break;
-			case GG_STATE_SENDING_HEADER: state = "SENDING_HEADER"; break;
+			case GG_STATE_READING_FILE_ACK: state = "READING_FILE_ACK"; break;
+			case GG_STATE_SENDING_FILE_HEADER: state = "SENDING_FILE_HEADER"; break;
 			case GG_STATE_GETTING_FILE: state = "SENDING_GETTING_FILE"; break;
 			case GG_STATE_SENDING_FILE: state = "SENDING_SENDING_FILE"; break;
 			default: state = "(unknown)"; break;

@@ -628,7 +628,23 @@ void init_theme()
 
 	add_format("dcc_create_error", "%! Nie mo¿na w³±czyæ DCC: %1\n", 1);
 	add_format("dcc_error_unknown", "%! B³±d krytyczny obs³ugi DCC: %1\n", 1);
-	add_format("dcc_error_handshake", "%! Nie mog± siê dogadaæ\n", 1);
+	add_format("dcc_error_handshake", "%! Nie mo¿na nawi±zaæ po³±cznienia z %1\n", 1);
 	add_format("dcc_timeout", "%! Timeout DCC\n", 1);
+	add_format("dcc_unknown_command", "%! Nieznana opcja: %W%1%n\n", 1);
+	add_format("dcc_not_supported", "%! Opcja %W%1%n nie jest jeszcze obs³ugiwana\n", 1);
+	add_format("dcc_open_error", "%! Nie mo¿na otworzyæ %W%1%n: %2\n", 1);
+	add_format("dcc_open_directory", "%! Nie mo¿na otworzyæ %W%1%n: Jest katalogiem\n", 1);
+	add_format("dcc_show_pending_header", "%> Po³±czenia oczekuj±ce:\n", 1);
+	add_format("dcc_show_pending_send", "%) #%1, %2, wysy³anie %W%3%n\n", 1);
+	add_format("dcc_show_pending_get", "%) #%1, %2, odbiór %W%3%n\n", 1);
+	add_format("dcc_show_active_header", "%> Po³±czenia aktywne:\n", 1);
+	add_format("dcc_show_active_send", "%) #%1, %2, wysy³anie %W%3%n\n", 1);
+	add_format("dcc_show_active_get", "%) #%1, %2, odbiór %W%3%n\n", 1);
+	add_format("dcc_show_empty", "%> Brak bezpo¶rednich po³±czeñ\n", 1);
+	add_format("dcc_show_debug", "%> id=%1, type=%2, filename=%3, uin=%4, dcc=%5\n", 1);
+	
+	add_format("dcc_done_get", "%> Zakoñczono pobieranie pliku %W%2%n od %1\n", 1);
+	add_format("dcc_done_send", "%> Zakoñczono wysy³anie pliku %W%2%n do %1\n", 1);
+	
 };
 
