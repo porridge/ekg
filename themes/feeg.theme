@@ -1,0 +1,26 @@
+# From: From: Piotr Figiel <feeg@psychodelic.org>
+
+# feeg theme
+# dla ekg (by wojtekka), trochê po angielsku, prompty s± zrobione dla
+# konsoli ze znaczkami iso02. zawiera escape-kody (dla rl i czasu)
+# quit w klimacie ADOMA (rogue-like) :> (rogalik do ¶ci±gniêcia z adom.de)
+
+prompt %K÷%w-%K÷%n
+prompt2 %K÷%W=%K÷%n
+error %K×%rx%K×%n
+
+timestamp %n%H%K[5m:[0m%n%M
+
+readline_prompt [30;1m> 
+readline_prompt_away [30;1m[Zzz]> 
+
+known_user %Y%1%n%
+unknown_user %W%1%n
+
+list_avail %> %G  [online]%n %[-30]1 [%K%2%n]\n
+list_busy %> %Y    [busy]%n %[-30]1 [%K%2%n]\n
+list_not_avail %> %K [offline]%n %[-30]1 [%Kn/a%n]\n
+quit \n%G ...\n..%B@%G..%n May thy wisdom be omnipresent!\n %G...%n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n%n
+
+theme_loaded %> %Kfeeg%w.theme\n%> welcome to the machine.\n
+
