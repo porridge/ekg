@@ -85,9 +85,11 @@ int main(int argc, char **argv)
 	struct sockaddr_un addr;
 	struct action_data data;
 	
-	if (argc != 2)
+	if (argc != 2) {
+		printf("program ten nie jest przeznaczony do samodzielnego wykonywania! \n");
 	    	exit(1);
-
+	}
+	
 	if (strlen(argv[1]) >= PATH_MAX)
 	    	exit(2);
 	
