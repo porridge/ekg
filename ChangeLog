@@ -9,6 +9,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - configure pokazuje, które wersje bibliotek i interfejsów zosta³y
   wybrane i które s± domy¶lne (seba/w)
+- zmiana domy¶lnego interfejsu na ncurses. szczegó³y w FAQ, w README,
+  w tek¶cie wyrzucanym przez ./configure (w)
 
 // 2002-10-30
 

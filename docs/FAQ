@@ -4,7 +4,7 @@ Q: ...
 A: Najpierw przeczytaj README, potem TODO.
 
 Q: Sk±d ¶ci±gn±æ?
-A: http://dev.null.pl/ekg/
+A: http://213.146.38.147/ekg/
 
 Q: ./configure wyrzuca b³êdy. Co robiæ?
 A: Najprawdopodobniej nie masz narzêdzi i pakietów potrzebnych do
@@ -12,10 +12,9 @@ A: Najprawdopodobniej nie masz narzêdzi i pakietów potrzebnych do
    C, narzêdzia takie jak make, install, bibliotekê readline i
    odpowiednie pliki nag³ówkowe.
 
-Q: Jak zrobiæ, ¿eby ekg wygl±da³o jak irssi?
-A: Uruchomiæ ,,./configure --enable-ui-ncurses'' potem ,,make clean''
-   i ,,make''. Je¶li masz zainstalowan± bibliotekê ncurses i odpowiednie
-   pliki nag³ówkowe, powinno siê udaæ.
+Q: ekg wygl±da jako¶ inaczej. Co zrobiæ, ¿eby wróciæ do poprzedniego?
+A: Uruchomiæ ,,./configure --disable-ui-ncurses'' potem ,,make clean''
+   i ,,make''.
 
 Q: Jak wys³aæ wiadomo¶æ do kogo¶ ze spacj± w nazwie?
 A: Wpisaæ nazwê w cudzys³owach. Niestety dope³nianie jeszcze nie dzia³a

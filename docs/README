@@ -32,16 +32,17 @@ INSTALACJA
     Proste? Proste. Po pierwszym uruchomieniu ekg powie, jak go
     skonfigurowaæ.
 
-    Program domy¶lnie korzysta z biblioteki readline, wiêc odpowiednie
-    pakiety zawieraj±ce j±, oraz pliki nag³ówkowe, powinny byæ
-    zainstalowane. readline zwykle polega te¿ na innych bibliotekach do
-    obs³ugi terminala, jak np. libtermcap czy ncurses. Je¶li chcesz u¿yæ
-    alternatywnego interfejsu opartego o ncurses, podobnego do klientów
-    ircowych do polecenia configure dodaj ,,--enable-ui-ncurses''. Oczywi¶cie
-    niezbêdny jest te¿ zestaw narzêdzi do kompilacji programów napisanych
-    w jêzyku C -- kompilator, preprocesor, linker, pliki nag³ówkowe,
-    biblioteki systemowe itd. Je¶li skrypt ./configure zg³osi jakie¶
-    b³êdy, skontaktuj siê ze swoim administratorem.
+    Program domy¶lnie korzysta z biblioteki ncurses, wiêc powinny byæ
+    zainstalowane odpowiednie pakiety zawieraj±ce bibliotekê oraz pliki
+    nag³ówkowe. Je¶li chcesz u¿yæ starego interfejsu, do polecenia
+    configure dodaj ,,--disable-ui-ncurses''. Interfejs ten wymaga
+    zainstalowania biblioteki readline wraz z plikami nag³ówkoymi.
+    readline zwykle polega te¿ na innych bibliotekach do obs³ugi
+    terminala, jak np. libtermcap czy ncurses. Oczywi¶cie niezbêdny
+    jest te¿ zestaw narzêdzi do kompilacji programów napisanych w jêzyku
+    C -- kompilator, preprocesor, linker, pliki nag³ówkowe, biblioteki
+    systemowe itd. Je¶li skrypt ./configure zg³osi jakie¶ b³êdy,
+    skontaktuj siê ze swoim administratorem.
 
     ekg powinien dzia³aæ na wiêkszo¶ci systemów un*xowych, jak Linux,
     *BSD, SunOS, IRIX itp. lecz czasami przy dodawaniu nowych funkcji
@@ -59,10 +60,10 @@ U¯YCIE
     ,,chat''. Informacje o ludziach ,,find <numer/nick>''. Szukanie t±
     sam± komend±, ale z ró¿nymi parametrami. ,,help'' Twoim przyjacielem.
     Je¶li dana komenda ma ró¿ne opcje, pomaga ,,help <komenda>''. By
-    wys³aæ kilkulinijkow± wiadomo¶æ w interfejsie readline, zamiast
-    tre¶ci wpisz ,,\'' (backslash). Koñczy siê lini± z sam± kropk±,
-    anuluje Ctrl-D. W interfejscie ncurses u¿ywa siê Ctrl-Enter
-    (szczegó³y poni¿ej, w rodziale ,,KLAWIATURA'').
+    wys³aæ kilkulinijkow± wiadomo¶æ w interfejsie ncurses, wci¶nij
+    Ctrl-Enter. W readline zamiast tre¶ci wpisz ,,\'' (backslash) i
+    zakoñcz lini± z sam± kropk± (szczegó³y poni¿ej, w rodziale
+    ,,KLAWIATURA'').
 
     Je¶li dana komenda przyjmuje ,,--parametr'' mo¿na u¿yæ równie¿
     skrótu ,,-p'', je¶li nie powoduje to niejednoznaczno¶ci. Uwaga!
@@ -91,7 +92,7 @@ KLAWIATURA
 	Up, Down		przegl±danie historii poleceñ
 	Left, Right		poruszanie siê po aktualnej linii
         Ctrl-A, Home		id¼ pocz±tek linii
-        Ctrl-D, Delete		usuñ znak pod kursorem, wyjd¼ z query
+        Ctrl-D, Delete		usuñ znak pod kursorem
         Ctrl-H, Backspace	usuñ znak przed kursorem
         Ctrl-I, Tab		dope³nianie
         Ctrl-L			czyszczenie/od¶wie¿anie ekranu
@@ -112,7 +113,10 @@ KLAWIATURA
     
     Interfejs readline obs³uguje równie¿ inne kombinacje klawiszy. Dok³adna
     lista znajduje siê w stronie manuala ,,readline'' w rozdziale ,,DEFAULT
-    KEY BINDINGS''.
+    KEY BINDINGS''. Dodatkowo:
+
+        Ctrl-D			zamyka rozmowê i anuluje wprowadzanie
+	                        wiadomo¶ci wielolinijkowej
 
     Interfejs ncurses obs³uguje kilka dodatkowych kombinacji:
 

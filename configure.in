@@ -133,36 +133,36 @@ AC_TRY_RUN(
 if test -d src; then
 
   AC_ARG_ENABLE(ui-readline,
-    [  --disable-ui-readline   Disable readline UI])
+    [  --enable-ui-readline    Enable readline UI])
 
-  AC_ARG_ENABLE(force-readline,
-    [  --enable-force-readline Force use of readline])
+  AC_ARG_ENABLE(force-ncurses,
+    [  --disable-force-ncurses Force use of ncurses UI])
 
   AC_ARG_ENABLE(ui-ncurses,
-    [  --enable-ui-ncurses     Enable ncurses UI])
+    [  --disable-ui-ncurses    Disable ncurses UI])
 
-  if test "x$enable_ui_readline" != "xno"; then
-    AC_DEFINE(WITH_UI_READLINE, 1, [define if you want ui_readline])
-    OBJS="$OBJS ui-readline.o"
-    ui_readline_enabled=yes
-    ui_readline_default=yes
-  fi
-
-  if test "x$enable_ui_ncurses" = "xyes"; then
-    AC_DEFINE(WITH_UI_NCURSES, 1, [define if you want ui_ncurses])
+  if test "x$enable_ui_ncurses" != "xno"; then
+    AC_DEFINE(WITH_UI_NCURSES, 1, [define if you want ui-ncurses])
     OBJS="$OBJS ui-ncurses.o"
     ui_ncurses_enabled=yes
-    ui_readline_default=no
     ui_ncurses_default=yes
   fi
-  
-  if test "x$enable_ui_ncurses" = "xyes" -a "x$enable_force_readline" = "xyes"; then 
-    AC_DEFINE(WITH_FORCE_READLINE, 1, [define if you want ui_readline as default])
-    ui_readline_default=yes
+
+  if test "x$enable_ui_readline" = "xyes"; then
+    AC_DEFINE(WITH_UI_READLINE, 1, [define if you want ui-readline])
+    OBJS="$OBJS ui-readline.o"
+    ui_readline_enabled=yes
     ui_ncurses_default=no
+    ui_readline_default=yes
   fi
   
-  if test "x$enable_ui_ncurses" = "xyes"; then 
+  if test "x$enable_ui_readline" = "xyes" -a "x$enable_force_ncurses" = "xyes"; then 
+    AC_DEFINE(WITH_FORCE_NCURSES, 1, [define if you want ui-ncurses as default])
+    ui_ncurses_default=yes
+    ui_readline_default=no
+  fi
+  
+  if test "x$enable_ui_ncurses" != "xno"; then 
     AC_CHECK_NCURSES
 
     if test "x$have_ncurses" = "x"; then
@@ -176,7 +176,7 @@ if test -d src; then
   AC_ARG_WITH(termcap, 
     [  --without-termcap       Used to force ncurses for readline])
 
-  if test "x$enable_ui_readline" != "xno"; then
+  if test "x$enable_ui_readline" = "xyes"; then
     if test "x$with_termcap" = "xno"; then
       TERMCAP_LIB=""
     else
@@ -375,5 +375,11 @@ if test -d src; then
   fi
 fi
 
+echo
+echo "******************************************************************"
+echo "** Uwaga! Zmieniony zosta³ domy¶lny interfejs ekg z readline na **"
+echo "** ncurses. Je¶li z jakiego¶ powodu chcesz u¿ywaæ poprzedniego  **"
+echo "** interfejsu, uruchom ,,./configure --disable-ui-ncurses''     **"
+echo "******************************************************************"
 echo
 

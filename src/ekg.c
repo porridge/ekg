@@ -656,14 +656,14 @@ int main(int argc, char **argv)
 		{ 0, 0, 0, 0 }
 	};
 
-#ifdef WITH_UI_NCURSES
-	ui_init = ui_ncurses_init;
-#else
+#ifdef WITH_UI_READLINE
 	ui_init = ui_readline_init;
+#else
+	ui_init = ui_ncurses_init;
 #endif
 
-#ifdef WITH_FORCE_READLINE
-	ui_init = ui_readline_init;
+#ifdef WITH_FORCE_NCURSES
+	ui_init = ui_ncurses_init;
 #endif 
 
 	srand(time(NULL));
