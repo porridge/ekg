@@ -11,6 +11,7 @@ Depends: ${shlibs:Depends}
 Recommends: 
 Suggests: 
 Conflicts: ekg-ioctld, ekg-dbg
+Replaces: ekg-ioctld, ekg-dbg
 Description: An instant messenger compatible with Gadu Gadu
  Eksperymentalny Klient Gadu-Gadu is an instant messanger
  compatible with Gnu Gadu protocol, very popular in Poland.
@@ -46,6 +47,8 @@ Provides: ekg
 Recommends: 
 Suggests: 
 Conflicts: ekg, ekg-dbg
+Replaces: ekg, ekg-dbg
+Provides: ekg
 Description: An instant messenger compatible with Gadu Gadu
  Eksperymentalny Klient Gadu-Gadu is an instant messanger
  compatible with Gnu Gadu protocol, very popular in Poland.
@@ -61,6 +64,8 @@ Provides: ekg
 Recommends: 
 Suggests: 
 Conflicts: ekg, ekg-ioctld
+Replaces: ekg-ioctld, ekg
+Provides: ekg
 Description: An instant messenger compatible with Gadu Gadu
  Eksperymentalny Klient Gadu-Gadu is an instant messanger
  compatible with Gnu Gadu protocol, very popular in Poland.
@@ -74,6 +79,9 @@ Provides: libgg
 Depends: ${shlibs:Depends}
 Recommends: ekg
 Suggests: ekg-doc
+Conflicts: ekg-dev
+Replaces: ekg-dev
+Provides: ekg-dev
 Description: An instant messenger compatible with Gadu Gadu
  Eksperymentalny Klient Gadu-Gadu is an instant messanger
  compatible with Gnu Gadu protocol, very popular in Poland.
