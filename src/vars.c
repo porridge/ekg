@@ -54,7 +54,7 @@ void variable_init()
 	variable_add("beep_msg", VAR_BOOL, 1, &config_beep_msg, NULL, NULL);
 	variable_add("beep_chat", VAR_BOOL, 1, &config_beep_chat, NULL, NULL);
 	variable_add("beep_notify", VAR_BOOL, 1, &config_beep_notify, NULL, NULL);
-	variable_add("completion_notify", VAR_INT, 1, &config_completion_notify, NULL, variable_map(3, 0, 0, "none", 1, 0, "avail", 2, 0, "all"));
+	variable_add("completion_notify", VAR_MAP, 1, &config_completion_notify, NULL, variable_map(4, 0, 0, "none", 1, 2, "add", 2, 1, "addremove", 4, 0, "busy"));
 	variable_add("ctrld_quits", VAR_BOOL, 1, &config_ctrld_quits, NULL, NULL);
 	variable_add("dcc", VAR_BOOL, 1, &config_dcc, changed_dcc, NULL);
 	variable_add("dcc_ip", VAR_STR, 1, &config_dcc_ip, changed_dcc, NULL);

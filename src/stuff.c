@@ -1978,7 +1978,7 @@ void do_connect()
 	}
 
 	if (!(sess = gg_login(&p))) {
-		print("conn_failed", format_find("conn_failed_memory"));
+		print("conn_failed", format_find((errno == ENOMEM) ? "conn_failed_memory" : "conn_failed_connecting"));
 		do_reconnect();
 	} else
 		list_add(&watches, sess, 0);

@@ -360,149 +360,27 @@ void handle_ack(struct gg_event *e)
 }
 
 /*
- * handle_notify()
+ * handle_common()
  *
- * funkcja obs³uguje listê obecnych.
- *
- *  - e - opis zdarzenia.
- *
- * nie zwraca niczego.
+ * ujednolicona obs³uga zmiany w userli¶cie dla handle_status()
+ * i handle_notify(). utrzymywanie tego samego kodu w dwóch miejscach
+ * jest kompletnie bez sensu.
+ *  
+ *  - uin - numer delikwenta,
+ *  - status - nowy stan,
+ *  - descr - nowy opis,
+ *  - n - dodatki od gg_notify.
  */
-void handle_notify(struct gg_event *e)
-{
-	struct gg_notify_reply *n;
-	struct userlist *u;
-	struct in_addr in;
-	int prev_status;
-
-	if (batch_mode)
-		return;
-
-	n = (e->type == GG_EVENT_NOTIFY) ? e->event.notify : e->event.notify_descr.notify;
-
-	while (n->uin) {
-		if (ignored_check(n->uin) || !(u = userlist_find(n->uin, NULL))) {
-			n++;
-			continue;
-		}
-
-		in.s_addr = n->remote_ip;
-
-		/* je¶li taki sam stan i rizony takie same, to olej */
-		if (u->status == n->status && (e->type == GG_EVENT_NOTIFY || (u->descr && e->type == GG_EVENT_NOTIFY_DESCR && !strcmp(u->descr, e->event.notify_descr.descr)))) {
-			n++;
-			continue;
-		}
-		
-		/* przepisz informacje */
-		prev_status = u->status;
-		u->status = n->status;
-		u->port = n->remote_port;
-		u->ip.s_addr = n->remote_ip;
-
-		if (u->descr) {
-			free(u->descr);
-			u->descr = NULL;
-		}
-
-		if (!GG_S_NA(n->status) && hide_notavail)
-			hide_notavail = 0;
-
-		if (n->status == GG_STATUS_BUSY) {
-			event_check(EVENT_AWAY, u->uin, NULL);
-                        if (config_log_status)
-                                put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away");
-			if (config_display_notify == 1)
-			    	print_window(u->display, 0, "status_busy", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
-		}
-
-		if (n->status == GG_STATUS_BUSY_DESCR) {
-			event_check(EVENT_AWAY, u->uin, NULL);
-			u->descr = (e->event.notify_descr.descr) ? xstrdup(e->event.notify_descr.descr) : xstrdup("");
-			cp_to_iso(u->descr);
-                        if (config_log_status)
-                                put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
-			if (config_display_notify == 1)
-			    	print_window(u->display, 0, "status_busy_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
-		}
-
-		if (n->status == GG_STATUS_AVAIL) {
-			event_check(EVENT_AVAIL, u->uin, NULL);
-		    	if (config_log_status)
-			    	put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail");
-
-			if (config_display_notify == 1 || (config_status == 2 && GG_S_NA(prev_status)))
-			    	print_window(u->display, 0, "status_avail", format_user(u->uin), (u->first_name) ? u->first_name : u->display);
-			
-			if (config_completion_notify)
-				add_send_nick(u->display);
-			if (config_beep && config_beep_notify)
-				ui_beep();
-		}
-
-		if (n->status == GG_STATUS_AVAIL_DESCR) {
-			event_check(EVENT_AVAIL, u->uin, NULL);
-			u->descr = (e->event.notify_descr.descr) ? xstrdup(e->event.notify_descr.descr) : xstrdup("");
-			cp_to_iso(u->descr);
-			
-                        if (config_log_status)
-                                put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
-
-			if (config_display_notify == 1 || (config_status == 2 && GG_S_NA(prev_status)))
-			    	print_window(u->display, 0, "status_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
-			
-			if (config_completion_notify)
-				add_send_nick(u->display);
-
-			if (config_beep && config_beep_notify)
-				ui_beep();
-		}
-		
-		if (n->status == GG_STATUS_NOT_AVAIL) {
-			event_check(EVENT_NOT_AVAIL, u->uin, NULL);
-                        if (config_log_status)
-                                put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail");
-			if (config_display_notify && !hide_notavail)
-			    	print_window(u->display, 0, "status_not_avail", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
-			if (config_completion_notify == 2)
-				remove_send_nick(u->display);
-		}
-
-		if (n->status == GG_STATUS_NOT_AVAIL_DESCR) {
-			event_check(EVENT_NOT_AVAIL, u->uin, NULL);
-			u->descr = (e->event.notify_descr.descr) ? xstrdup(e->event.notify_descr.descr) : xstrdup("");
-			cp_to_iso(u->descr);
-                        if (config_log_status)
-                                put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail", u->descr);
-			if (config_display_notify && !hide_notavail)
-			    	print_window(u->display, 0, "status_not_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
-			if (config_completion_notify == 2)
-				remove_send_nick(u->display);
-		}
-
-		n++;
-	}
-}
-
-/*
- * handle_status()
- *
- * funkcja obs³uguje zmianê stanu ludzi z listy kontaktów.
- *
- *  - e - opis zdarzenia.
- *
- * nie zwraca niczego.
- */
-void handle_status(struct gg_event *e)
+static void handle_common(uin_t uin, int status, const char *descr, struct gg_notify_reply *n)
 {
 	struct userlist *u;
-	struct table {
+	struct status_table {
 		int status;
 		int event;
 		char *log;
 		char *format;
 	};
-	struct table st[] = {
+	struct status_table st[] = {
 		{ GG_STATUS_AVAIL, EVENT_AVAIL, "avail", "status_avail" },
 		{ GG_STATUS_AVAIL_DESCR, EVENT_AVAIL, "avail", "status_avail_descr" },
 		{ GG_STATUS_BUSY, EVENT_AWAY, "busy", "status_busy" },
@@ -511,19 +389,27 @@ void handle_status(struct gg_event *e)
 		{ GG_STATUS_NOT_AVAIL_DESCR, EVENT_NOT_AVAIL, "notavail", "status_not_avail_descr" },
 		{ 0, 0, NULL, NULL },
 	};
-	struct table *s;
+	struct status_table *s;
 	int prev_status;
 
-	/* w trybie wsadowym nie obchodz± nas zmiany stanów */
-	if (batch_mode)
-		return;
-
 	/* je¶li ignorujemy, nie wy¶wietlaj */
-	if (ignored_check(e->event.status.uin))
+	if (ignored_check(uin))
 		return;
 	
 	/* nie pokazujemy nieznajomych */
-	if (!(u = userlist_find(e->event.status.uin, NULL)))
+	if (!(u = userlist_find(uin, NULL)))
+		return;
+
+	/* zapamiêtaj adres i port */
+	if (n) {
+		u->port = n->remote_port;
+		u->ip.s_addr = n->remote_ip;
+	}
+
+	/* je¶li status taki sam i ewentualnie opisy te same, ignoruj */
+	if (!GG_S_D(status) && (u->status == status))
+		return;
+	if (GG_S_D(status) && (u->status == status) && u->descr && descr && !strcmp(u->descr, descr))
 		return;
 
 	/* usuñ poprzedni opis */
@@ -531,22 +417,22 @@ void handle_status(struct gg_event *e)
 	u->descr = NULL;
 
 	/* je¶li stan z opisem, a opisu brak, wpisz pusty tekst */
-	if (GG_S_D(e->event.status.status) && !e->event.status.descr)
+	if (GG_S_D(status) && !descr)
 		u->descr = xstrdup("");
 
 	/* a je¶li jest opis, to go zapamiêtaj */
-	if (e->event.status.descr) {
-		u->descr = xstrdup(e->event.status.descr);
+	if (descr) {
+		u->descr = xstrdup(descr);
 		cp_to_iso(u->descr);
 	}
 
 	/* zapamiêtaj stary stan, ustaw nowy */
 	prev_status = u->status;	
-	u->status = e->event.status.status;
+	u->status = status;
 
 	for (s = st; s->status; s++) {
 		/* je¶li nie ten, sprawdzaj dalej */
-		if (e->event.status.status != s->status)
+		if (status != s->status)
 			continue;
 
 		/* je¶li nie jest opisowy i taki sam, ignoruj */
@@ -554,18 +440,20 @@ void handle_status(struct gg_event *e)
 			break;
 
 		/* eventy */
-	    	event_check(s->event, e->event.status.uin, NULL);
+	    	event_check(s->event, uin, NULL);
 
 		/* zaloguj */
 		if (config_log_status && GG_S_D(s->status))
-			put_log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s\n", e->event.status.uin, u->display, inet_ntoa(u->ip), time(NULL), s->log);
+			put_log(uin, "status,%ld,%s,%s,%ld,%s\n", uin, u->display, inet_ntoa(u->ip), time(NULL), s->log);
 		if (config_log_status && !GG_S_D(s->status))
-		    	put_log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, inet_ntoa(u->ip), time(NULL), s->log, u->descr);
+		    	put_log(uin, "status,%ld,%s,%s,%ld,%s (%s)\n", uin, u->display, inet_ntoa(u->ip), time(NULL), s->log, u->descr);
 
-		/* jak dostêpny, dopiszmy do taba; jak niedostêpny, usuñmy */
-		if (GG_S_A(s->status) && config_completion_notify)
+		/* jak dostêpny lub zajêty, dopiszmy do taba
+		 * jak niedostêpny, usuñmy */
+		if (GG_S_A(s->status) && config_completion_notify) 
 			add_send_nick(u->display);
-		if (GG_S_NA(s->status) && config_completion_notify == 2)
+		if (GG_S_B(s->status) && (config_completion_notify & 4))
+		if (GG_S_NA(s->status) && (config_completion_notify & 2))
 			remove_send_nick(u->display);
 		
 		/* czy mamy wy¶wietlaæ na ekranie? */
@@ -591,7 +479,7 @@ void handle_status(struct gg_event *e)
 		}
 			
 		/* no dobra, poka¿ */
-		print_window(u->display, 0, s->format, format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
+		print_window(u->display, 0, s->format, format_user(uin), (u->first_name) ? u->first_name : u->display, u->descr);
 
 		/* daj znaæ d¿wiêkiem */
 		if (config_beep && config_beep_notify)
@@ -602,13 +490,49 @@ void handle_status(struct gg_event *e)
 }
 
 /*
+ * handle_notify()
+ *
+ * funkcja obs³uguje listê obecnych.
+ *
+ *  - e - opis zdarzenia.
+ */
+void handle_notify(struct gg_event *e)
+{
+	struct gg_notify_reply *n;
+
+	if (batch_mode)
+		return;
+
+	n = (e->type == GG_EVENT_NOTIFY) ? e->event.notify : e->event.notify_descr.notify;
+
+	for (; n->uin; n++) {
+		char *descr = (e->type == GG_EVENT_NOTIFY_DESCR) ? e->event.notify_descr.descr : NULL;
+		
+		handle_common(n->uin, n->status, descr, n);
+	}
+}
+
+/*
+ * handle_status()
+ *
+ * funkcja obs³uguje zmianê stanu ludzi z listy kontaktów.
+ *
+ *  - e - opis zdarzenia.
+ */
+void handle_status(struct gg_event *e)
+{
+	if (batch_mode)
+		return;
+
+	handle_common(e->event.status.uin, e->event.status.status, e->event.status.descr, NULL);
+}
+
+/*
  * handle_failure()
  *
  * funkcja obs³uguje b³êdy przy po³±czeniu.
  *
  *  - e - opis zdarzenia.
- *
- * nie zwraca niczego.
  */
 void handle_failure(struct gg_event *e)
 {
@@ -650,8 +574,6 @@ void handle_failure(struct gg_event *e)
  * funkcja obs³uguje udane po³±czenia.
  *
  *  - e - opis zdarzenia.
- *
- * nie zwraca niczego.
  */
 void handle_success(struct gg_event *e)
 {
