@@ -345,6 +345,8 @@ void ekg_wait_for_key()
 			}
 		}
 
+		if (tv.tv_sec < 0)
+			tv.tv_sec = 0;
 		if (tv.tv_usec < 0)
 			tv.tv_usec = 1;
 
