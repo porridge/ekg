@@ -746,6 +746,7 @@ COMMAND(cmd_exec)
 
 				if (!(uin = get_uin(args[1]))) {
 					printq("user_not_found", args[1]);
+					print("generic", "foo");
 					array_free(args);
 					return -1;
 				}
