@@ -1358,8 +1358,8 @@ int on_off(const char *value)
  *
  * Ustawia stan konferencji na ignorowany lub nie.
  *
- * - name - nazwa konferencji
- * - flag - 1 ignorowac, 0 nie ignorowac
+ * - name - nazwa konferencji,
+ * - flag - 1 ignorowaæ, 0 nie ignorowaæ.
  */
 int conference_set_ignore(const char *name, int flag)
 {
@@ -1388,8 +1388,8 @@ int conference_set_ignore(const char *name, int flag)
  *
  * zmienia nazwê instniej±cej konferencji.
  * 
- *  - oldname - stara nazwa
- *  - newname - nowa nazwa
+ *  - oldname - stara nazwa,
+ *  - newname - nowa nazwa.
  */
 int conference_rename(const char *oldname, const char *newname)
 {
@@ -1428,7 +1428,7 @@ int conference_rename(const char *oldname, const char *newname)
  * dopisuje konferencje do listy konferencji.
  *
  *  - name - nazwa konferencji,
- *  - nicklist - lista nicków, grup, czegokolwiek.
+ *  - nicklist - lista nicków, grup, czegokolwiek,
  *  - quiet - czy wypluwaæ mesgi na stdout.
  *
  * zaalokowan± struct conference lub NULL w przypadku b³êdu.
@@ -1701,7 +1701,7 @@ struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int co
  *
  * dopisuje alias do listy aliasów.
  *
- * - string - linia w formacie 'alias cmd'
+ * - string - linia w formacie 'alias cmd',
  * - quiet - czy wypluwaæ mesgi na stdout.
  */
 int alias_add(const char *string, int quiet, int append)
@@ -1849,7 +1849,7 @@ void alias_free()
  *
  * zamieñ string na odpowiedni± strukturê dla ioctld.
  *
- *  - seq.
+ *  - seq,
  *  - data.
  *
  * 0/-1.
@@ -1933,8 +1933,8 @@ int ioctld_socket(char *path)
  *
  * wysy³a do ioctld polecenie uruchomienia danej akcji.
  *
- * - seq - sekwencja danych
- * - act - rodzaj akcji
+ * - seq - sekwencja danych,
+ * - act - rodzaj akcji.
  *
  * 0/-1.
  */
@@ -1997,7 +1997,7 @@ const char *event_format(int flags)
  *
  * zwraca flagi na podstawie ³añcucha.
  *
- * - events
+ * - events.
  */
 int event_flags(const char *events)
 {
@@ -2025,10 +2025,10 @@ int event_flags(const char *events)
  *
  * Dodaje zdarzenie do listy zdarzeñ.
  *
- * - flags
- * - uin
- * - action
- * - quiet  
+ * - flags,
+ * - uin,
+ * - action,
+ * - quiet.
  */
 int event_add(int flags, uin_t uin, const char *action, int quiet)
 {
@@ -2063,8 +2063,8 @@ int event_add(int flags, uin_t uin, const char *action, int quiet)
  *
  * usuwa zdarzenie z listy zdarzeñ.
  *
- * - flags
- * - uin
+ * - flags,
+ * - uin.
  */
 int event_remove(int flags, uin_t uin)
 {
@@ -2197,8 +2197,8 @@ fail:
  *
  * sprawdza i ewentualnie uruchamia akcjê na podane zdarzenie.
  *
- * - event
- * - uin
+ * - event,
+ * - uin.
  */
 int event_check(int event, uin_t uin, const char *data)
 {
@@ -2271,7 +2271,7 @@ int event_check(int event, uin_t uin, const char *data)
  *
  * sprawdza czy akcja na zdarzenie jest poprawna.
  *
- * - act
+ * - act.
  */
 int event_correct(const char *action)
 {
@@ -2385,7 +2385,7 @@ void event_free()
  *
  * inicjuje potok nazwany do zewnêtrznej kontroli ekg
  *
- * - pipe_file
+ * - pipe_file.
  *
  * zwraca deskryptor otwartego potoku lub warto¶æ b³êdu
  */
@@ -2821,7 +2821,7 @@ int emoticon_remove(char *name)
  * emoticon_read()
  *
  * ³aduje do listy wszystkie makra z pliku ~/.gg/emoticons
- * format tego pliku w dokumentacji
+ * format tego pliku w dokumentacji.
  */
 int emoticon_read()
 {
@@ -2888,7 +2888,7 @@ void emoticon_free()
  * liczy prosty hash z nazwy, wykorzystywany przy przeszukiwaniu list
  * zmiennych, formatów itp.
  *
- *  - name - nazwa,
+ *  - name - nazwa.
  */
 int ekg_hash(const char *name)
 {
@@ -2955,7 +2955,7 @@ struct timer *timer_add(int period, const char *name, const char *command)
  *
  * usuwa timer.
  *
- *  - name - nazwa timera, mo¿e byæ NULL.
+ *  - name - nazwa timera, mo¿e byæ NULL,
  *  - command - komenda timera, mo¿e byæ NULL.
  *
  * 0/-1.
@@ -3062,7 +3062,7 @@ char *log_escape(const char *str)
  *
  * usuwa wiadomo¶ci skojarzone z dan± osob± lub wszystkie (uin==0)
  *
- * - uin - numerek osoby
+ * - uin - numerek osoby.
  *
  */
 void last_del(uin_t uin)
@@ -3105,7 +3105,7 @@ void last_del(uin_t uin)
  *  - uin - nadawca,
  *  - t - czas,
  *  - st - czas nadania,
- *  - msg - tre¶æ wiadomo¶ci,
+ *  - msg - tre¶æ wiadomo¶ci.
  */
 void last_add(unsigned int type, uin_t uin, time_t t, time_t st, const char *msg)
 {

@@ -2019,9 +2019,20 @@ static void binding_add(const char *key, const char *action, int quiet)
 	
 	if (!strncasecmp(key, "ctrl-", 5) && strlen(key) == 6 && isalpha(key[5])) {
 		char ch = toupper(key[5]);
+		list_t l;
 
 		b.key = saprintf("Ctrl-%c", ch);
 		b.action = xstrdup(action);
+
+		for (l = bindings; l; l = l->next) { 
+			struct binding *foo = l->data;
+
+			if (!strcmp(b.key, foo->key)) {
+				print("bind_seq_exist", b.key); 
+				return;
+			}
+		}
+
 		binding_map[ch - 64] = list_add(&bindings, &b, sizeof(b));
 
 		correct = 1;
@@ -2030,9 +2041,20 @@ static void binding_add(const char *key, const char *action, int quiet)
 
 	if (!strncasecmp(key, "alt-", 4) && strlen(key) == 5) {
 		char ch = isalpha(key[4]) ? toupper(key[4]) : key[4];
+		list_t l;
 
 		b.key = saprintf("Alt-%c", ch);
 		b.action = xstrdup(action);
+
+		for (l = bindings; l; l = l->next) {
+			struct binding *foo = l->data;
+	
+			if (!strcmp(b.key, foo->key)) {
+				print("bind_seq_exist", b.key);
+				return;
+			}
+		}
+
 		binding_map_meta[(unsigned char) ch] = list_add(&bindings, &b, sizeof(b));
 		if (isalpha(ch))
 			binding_map_meta[tolower(ch)] = binding_map_meta[(unsigned char) ch];

@@ -73,10 +73,12 @@ int check_mail() {
 			struct passwd *pw = getpwuid(getuid());
 
 			if (!pw) {
-				array_free(folders);
+				if (folders)
+					array_free(folders);
 				return 0;
 			}
 
+			/* oby¶my trafili w dobre miejsce... */
 			inbox = saprintf("%s/%s", "/var/mail/", pw->pw_name);
 		}
 	
@@ -92,7 +94,8 @@ int check_mail() {
 		check_mail_maildir((const char **)folders);
 	}
 
-	array_free(folders);
+	if (folders)
+		array_free(folders);
 
 	return mail_count;
 }
@@ -138,7 +141,11 @@ int check_mail_mbox(const char **folders)
 		return 1;
 	}
 
-	/* XXX nie sprawdzaæ ca³ego pliku, je¶li rozmiar i data zmiany ta sama, co ostanio */
+	/* TODO                                                                 */
+	/* - nie czytaæ ca³ego pliku co chwilê, je¶li siê nie zmieni³,          */
+	/* - o czym¶ zapomnia³em, bo np. mój mutt nie widzi nowej poczty, je¶li */
+	/*   przejedziemy naszym dzieciakiem po skrzynce z now± wiadomo¶ci±,    */
+	/*   co¶ z czasem ostatniego dostêpu do pliku ???                       */
 
 	if (!pid) {	/* born to be wild */
 		char *str_new = NULL, *line = NULL;
@@ -228,6 +235,8 @@ int check_mail_maildir(const char **folders)
 		close(fd[1]);
 		return 1;
 	}
+
+	/* TODO - równie¿, jak przy mbox'ie, nie sprawdzaæ, je¶li nie trzeba */
 
 	if (!pid) {	/* born to be wild */
 		int d_new = 0, new = 0, i = 0;

@@ -3138,8 +3138,12 @@ void command_init()
 	  "  -d, --del <sekwencja>            usuwa podan± sekwencjê\n"
 	  "  -l, --list                       wy¶wietla przypisane sekwencje\n"
 	  "\n"
-	  "Dostêpne sekwencje to: Ctrl-<znak>, Alt-<znak>. Nale¿y pamiêtaæ,\n"
-	  "¿e dla klawisza Alt wielko¶æ znaku ma znaczenie, a dla Ctrl nie.");
+	  "Dostêpne sekwencje to: Ctrl-<znak>, Alt-<znak>."
+#ifndef WITH_UI_NCURSES
+	  " Nale¿y pamiêtaæ, \n"
+	  "¿e dla klawisza Alt wielko¶æ znaku ma znaczenie, a dla Ctrl nie."
+#endif
+	  );
 
 	command_add
 	( "change", "?", cmd_change, 0,

@@ -187,6 +187,7 @@ int config_log_ignored;
 char *config_log_path;
 int config_log_status;
 char *config_log_timestamp;
+int config_mesg_allow;
 char *config_proxy;
 int config_random_reason;
 char *config_password;
@@ -216,7 +217,6 @@ char *config_theme;
 int config_time_deviation;
 char *config_timestamp;
 int config_uin;
-int config_mesg_allow;
 
 char *home_dir;
 char *config_dir;

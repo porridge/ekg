@@ -76,7 +76,7 @@ uninstall-ekg:
 
 #
 
-clean:	clean-libgadu @clean_ekg@ clean-examples
+clean:	clean-libgadu @clean_ekg@ clean-examples clean-compat
 
 clean-libgadu:
 	cd lib && $(MAKE) clean
@@ -87,9 +87,12 @@ clean-ekg:
 clean-examples:
 	cd examples && $(MAKE) clean
 
+clean-compat:
+	cd compat && rm -f *.o *~
+
 #
 
-distclean:	distclean-libgadu @distclean_ekg@ distclean-examples
+distclean:	distclean-libgadu @distclean_ekg@ distclean-examples distclean-compat
 	rm -f *~ config.log config.cache config.status config.h Makefile
 	rm -f config.h.in configure aclocal.m4
 
@@ -102,4 +105,5 @@ distclean-ekg:
 distclean-examples:
 	cd examples && $(MAKE) distclean
 
-
+distclean-compat:
+	cd compat && rm -f *.o *~

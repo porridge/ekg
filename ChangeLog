@@ -11,6 +11,9 @@ zg³osi³ b³±d.
 - ekg potrafi ju¿ sprawdzaæ czy nadesz³a nowa poczta, wiêcej w
   docs/vars.txt w opisie zmiennych check_mail. wymaga jeszcze
   optymalizacji, poprawek ;> (sz)
+- /bind w ui-ncurses nie dodaje sekwencji, je¶li ju¿ istnieje (sz)
+- porz±dek musi byæ - miejscowa kosmetyka kodu/komentarzy (sz)
+- compat te¿ wymaga czyszczenia (sz)
 
 // 2002-12-06
 
