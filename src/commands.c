@@ -642,12 +642,29 @@ COMMAND(command_connect)
 		command_connect("disconnect", NULL);
 		command_connect("connect", NULL);
 	} else if (sess) {
+	    	char *tmp = NULL;
+
+		if (!params[0]) {
+		    	if (config_random_reason & 2) {
+			    	char *path = prepare_path("quit.reasons");
+
+				tmp = get_random_reason(path);
+				if (!tmp && config_quit_reason)
+				    	tmp = strdup(config_quit_reason);
+			}
+			else if (config_quit_reason)
+			    tmp = strdup(config_quit_reason);
+		}
+		else
+		    	tmp = strdup(params[0]);
+
 		connecting = 0;
 		if (sess->state == GG_STATE_CONNECTED)
-			my_printf("disconnected");
+			my_printf((tmp) ? "disconnected" : "disconnected_descr", tmp);
 		else if (sess->state != GG_STATE_IDLE)
 			my_printf("conn_stopped");
-		ekg_logoff(sess, (params) ? params[0] : NULL);
+		ekg_logoff(sess, tmp);
+		free(tmp);
 		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
 		userlist_clear_status();

@@ -545,6 +545,7 @@ void init_theme()
 	add_format("disconn_warning", "%! Serwer roz³±czy³ nas.\n", 1); 
 	add_format("connected", "%> Po³±czono %c(%C%#%c)%n\n", 1);
 	add_format("disconnected", "%> Roz³±czono %c(%C%#%c)%n\n", 1);
+	add_format("disconnected_descr", "%> Roz³±czono %c(%C%#%c): %1%n\n", 1);
 	add_format("theme_loaded", "%> Wczytano opis wygl±du o nazwie %W%1%n\n", 1);
 	add_format("theme_default", "%> Ustawiono domy¶lny opis wygl±du\n", 1);
 	add_format("error_loading_theme", "%! Wyst±pi³ b³±d podczas ³adowania opisu wygl±du: %1\n", 1);
