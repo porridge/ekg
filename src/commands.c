@@ -7,6 +7,7 @@
  *                          Wojciech Bojdo³ <wojboj@htc.net.pl>
  *                          Piotr Wysocki <wysek@linux.bydg.org>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
+ *                          Piotr Domagalski <szalik@szalik.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -361,6 +362,7 @@ COMMAND(cmd_away)
 
 		ui_event("my_status", "back", reason);
 
+		sms_away_destroy();
 	} else {
 		int tmp;
 
@@ -408,7 +410,8 @@ COMMAND(cmd_status)
 {
 	struct userlist *u;
 	struct in_addr i;
-	char *tmp, *priv, *r1, *r2, *status_table[6] = {
+	struct tm *cs;
+	char *tmp, *priv, *r1, *r2, buf[100], *status_table[6] = {
 		"show_status_avail",
 		"show_status_busy",
 		"show_status_invisible",
@@ -428,7 +431,10 @@ COMMAND(cmd_status)
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		char *tmp = format_string(format_find("show_status_not_avail"));
 
+		cs = localtime((const time_t*)&disconnected_since);
+		strftime(buf, sizeof(buf), format_find("show_status_connected_since_timestamp"), (const struct tm*)cs);
 		print("show_status_status", tmp, "");
+		print("show_status_disconnected_since", buf);
 		xfree(tmp);
 
 		return;
@@ -448,8 +454,12 @@ COMMAND(cmd_status)
 	xfree(r2);
 	
 	i.s_addr = sess->server_addr;
+	cs = localtime((const time_t*)&connected_since);
+	strftime(buf, sizeof(buf), format_find("show_status_connected_since_timestamp"), (const struct tm*)cs);
+
 	print("show_status_status", tmp, priv);
 	print("show_status_server", inet_ntoa(i), itoa(sess->port));
+	print("show_status_connected_since", buf);
 
 	xfree(tmp);
 	xfree(priv);

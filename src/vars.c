@@ -86,7 +86,8 @@ void variable_init()
 	variable_add("query_commands", VAR_BOOL, 1, &config_query_commands, NULL, NULL);
 	variable_add("save_password", VAR_BOOL, 1, &config_save_password, NULL, NULL);
 	variable_add("server", VAR_STR, 1, &config_server, NULL, NULL);
-	variable_add("sms_away", VAR_BOOL, 1, &config_sms_away, NULL, NULL);
+	variable_add("sms_away", VAR_MAP, 1, &config_sms_away, NULL, variable_map(3, 0, 0, "none", 1, 2, "all", 2, 1, "separate"));
+	variable_add("sms_away_limit", VAR_INT, 1, &config_sms_away_limit, NULL, NULL);
 	variable_add("sms_max_length", VAR_INT, 1, &config_sms_max_length, NULL, NULL);
 	variable_add("sms_number", VAR_STR, 1, &config_sms_number, NULL, NULL);
 	variable_add("sms_send_app", VAR_STR, 1, &config_sms_app, NULL, NULL);

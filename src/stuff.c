@@ -5,6 +5,7 @@
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@o2.pl>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
+ *                          Piotr Domagalski <szalik@szalik.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -76,6 +77,7 @@ list_t sequences = NULL;
 list_t lasts = NULL;
 list_t lasts_count = NULL;
 list_t conferences = NULL;
+list_t sms_away = NULL;
 
 int away = 0;
 int in_autoexec = 0;
@@ -101,6 +103,7 @@ int config_uin = 0;
 int last_sysmsg = 0;
 char *config_password = NULL;
 int config_sms_away = 0;
+int config_sms_away_limit = 0;
 char *config_sms_number = NULL;
 char *config_sms_app = NULL;
 int config_sms_max_length = 100;
@@ -110,6 +113,8 @@ int config_display_ack = 1;
 int config_completion_notify = 1;
 int private_mode = 0;
 int connecting = 0;
+time_t connected_since = 0;
+time_t disconnected_since = 0;
 int config_display_notify = 1;
 char *config_theme = NULL;
 int config_status = GG_STATUS_AVAIL;
@@ -861,6 +866,109 @@ void do_reconnect()
 {
 	if (config_auto_reconnect && connecting)
 		reconnect_timer = time(NULL);
+}
+
+/*
+ * sms_away_add()
+ *
+ * dodaje osobê do listy delikwentów, od których wiadomo¶æ wys³ano sms'em
+ * podczas naszej nieobecno¶ci. je¶li jest ju¿ na li¶cie, to zwiêksza 
+ * przyporz±dkowany mu licznik.
+ *
+ * - uin
+ */
+void sms_away_add(uin_t uin)
+{
+	struct sms_away_count sac;
+	list_t l;
+
+	/* nic nie robimy, skoro brak limitu */
+	if (config_sms_away_limit == 0)
+		return;
+
+	sac.uin = uin;
+	sac.count = 1;
+
+	/* lista pusta, wiêc dodajemy pierwsz± osobê */
+	if (!sms_away) {
+		list_add(&sms_away, &sac, sizeof(sac));
+		return;
+	}
+
+	/* szukamy delikwenta i zwiekszamy mu licznik ... */
+	for(l = sms_away; l; l = l->next) {
+		struct sms_away_count *s = l->data;
+
+		if (s->uin == uin) {
+			s->count += 1;
+			return;
+		}
+	}
+
+	/* ... lub dodajemy z pocz±tkowym licznikiem, je¶li nie by³ na li¶cie */
+	list_add(&sms_away, &sac, sizeof(sac));
+}
+
+/*
+ * sms_away_destroy()
+ *
+ * pozbywa siê listy sms_away.
+ */
+void sms_away_destroy()
+{
+	if (sms_away) {
+		list_destroy(sms_away, 1);
+		sms_away = NULL;
+	}
+}
+
+/*
+ * sms_away_check()
+ *
+ * sprawdza czy wiadomo¶æ od danej osoby mo¿e zostaæ przekazana
+ * na sms podczas naszej nieobecno¶ci, czy te¿ mo¿e przekroczono
+ * ju¿ limit.
+ *
+ * - uin
+ *
+ * zwraca 1 je¶li tak, 0 je¶li nie.
+ */
+int sms_away_check(uin_t uin)
+{
+	int x = 0;
+	list_t l;
+
+	/* nie ustawiony limit lub pusta lista */
+	if (!config_sms_away_limit || !sms_away)
+		return 1;
+
+	/* limit dotyczy ³±cznej liczby sms'ów */
+	if (config_sms_away == 1) {
+		for(l = sms_away; l; l = l->next) {
+			struct sms_away_count *s = l->data;
+
+			x += s->count;
+		}
+		
+		if (x > config_sms_away_limit)
+			return 0;
+		else
+			return 1;
+	}
+
+	/* limit dotyczy liczby sms'ów od jednej osoby */
+	for (l = sms_away; l; l = l->next) {
+		struct sms_away_count *s = l->data;
+
+		if (s->uin == uin) {
+			if (s->count > config_sms_away_limit)
+				return 0;
+			else 
+				return 1;
+		}
+	}
+
+	return 1;
 }
 
 /*
@@ -2448,6 +2556,8 @@ void ekg_logoff(struct gg_session *sess, const char *reason)
 	gg_logoff(sess);
 
 	update_status();
+
+	disconnected_since = time(NULL);
 }
 
 char *random_line(const char *path)

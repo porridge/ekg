@@ -4,6 +4,7 @@
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Piotr Wysocki <wysek@linux.bydg.org>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
+ *                          Piotr Domagalski <szalik@szalik.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -410,21 +411,23 @@ void handle_msg(struct gg_event *e)
 	if (away && away != 4 && config_sms_away && config_sms_app && config_sms_number) {
 		char *foo, sender[100];
 
-		if (u)
-			snprintf(sender, sizeof(sender), "%s/%u", u->display, u->uin);
-		else
-			snprintf(sender, sizeof(sender), "%u", e->event.msg.sender);
+		sms_away_add(e->event.msg.sender);
 
-		if (strlen(e->event.msg.message) > config_sms_max_length)
-			e->event.msg.message[config_sms_max_length] = 0;
+		if (sms_away_check(e->event.msg.sender)) {
+			if (u)
+				snprintf(sender, sizeof(sender), "%s/%u", u->display, u->uin);
+			else
+				snprintf(sender, sizeof(sender), "%u", e->event.msg.sender);
 
-		foo = format_string(format_find((chat) ? "sms_chat" : "sms_msg"), sender, e->event.msg.message);
+			if (strlen(e->event.msg.message) > config_sms_max_length)
+				e->event.msg.message[config_sms_max_length] = 0;
 
-		/* niech nie wysy³a smsów, je¶li brakuje formatów */
-		if (strcmp(foo, ""))
-			send_sms(config_sms_number, foo, 0);
+			foo = format_string(format_find((chat) ? "sms_chat" : "sms_msg"), sender, e->event.msg.message);
 
-		free(foo);
+			/* niech nie wysy³a smsów, je¶li brakuje formatów */
+	
+			free(foo);
+		}
 	}
 
 	if (e->event.msg.formats_length > 0) {
@@ -721,6 +724,8 @@ void handle_success(struct gg_event *e)
 	hide_notavail = 1;
 
 	update_status();
+
+	connected_since = time(NULL);
 }
 
 /*
@@ -743,6 +748,7 @@ void handle_event(struct gg_session *s)
 		gg_free_session(sess);
 		sess = NULL;
 		ui_event("disconnected");
+		disconnected_since = time(NULL);
 		do_reconnect();
 
 		return;
@@ -1046,6 +1052,7 @@ void handle_disconnect(struct gg_event *e)
 	gg_free_session(sess);
 	sess = NULL;	
 	update_status();
+	disconnected_since = time(NULL);
 	do_reconnect();
 }
 

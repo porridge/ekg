@@ -5,6 +5,7 @@
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@go2.pl>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
+ *                          Piotr Domagalski <szalik@szalik.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -110,6 +111,11 @@ struct last_count {
 	int count;
 };
 
+struct sms_away_count {
+	uin_t uin;
+	int count;
+};
+
 struct conference {
 	char *name;
 	int ignore;
@@ -133,6 +139,7 @@ list_t timers;
 list_t lasts;
 list_t lasts_count;
 list_t conferences;
+list_t sms_away;
 struct gg_session *sess;
 
 int config_dcc;
@@ -155,6 +162,7 @@ int config_uin;
 char *config_password;
 char *config_user;
 int config_sms_away;
+int config_sms_away_limit;
 char *config_sms_number;
 char *config_sms_app;
 int config_sms_max_length;
@@ -204,6 +212,8 @@ time_t last_action;
 int last_sysmsg;
 int private_mode;
 int connecting;
+time_t connected_since;
+time_t disconnected_since;
 int server_index;
 
 int use_proxy;
@@ -303,5 +313,9 @@ void last_add(unsigned int type, uin_t uin, time_t t, const char *msg);
 int last_count_get(uin_t uin);
 void last_count_del(uin_t uin);
 void last_count_add(uin_t uin);
+
+void sms_away_add(uin_t uin);
+void sms_away_destroy();
+int sms_away_check(uin_t uin);
 
 #endif /* __STUFF_H */
