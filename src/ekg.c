@@ -236,12 +236,11 @@ int my_getc(FILE *f)
 			/* auto save */
 			if (config_changed && config_auto_save && time(NULL) - last_save > config_auto_save) {
 				last_save = time(NULL);
-				gg_debug(GG_DEBUG_MISC, "-- autosaving userlist and config after %d seconds.\n",
-						        config_auto_save);
+				gg_debug(GG_DEBUG_MISC, "-- autosaving userlist and config after %d seconds.\n", config_auto_save);
 
 				if (!userlist_write(NULL) && !config_write(NULL)) {
-					my_printf("autosaved");
 					config_changed = 0;
+					my_printf("autosaved");
 				} else
 					my_printf("error_saving");
 			}

@@ -471,8 +471,12 @@ void handle_success(struct gg_event *e)
 	my_printf("connected");
 	userlist_send();
 
-	if (away || private_mode)
-		gg_change_status(sess, config_status);
+	if (away || private_mode) {
+		if (!busy_reason) 
+			gg_change_status(sess, config_status);
+		else
+			gg_change_status_descr(sess, config_status, busy_reason);
+	}
 }
 
 /*
