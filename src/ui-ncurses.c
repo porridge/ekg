@@ -2304,7 +2304,7 @@ static void binding_delete(const char *key, int quiet)
 		struct binding *b = l->data;
 		int i;
 
-		if (!b->key && strcasecmp(key, b->key))
+		if (!b->key || strcasecmp(key, b->key))
 			continue;
 
 		xfree(b->key);
