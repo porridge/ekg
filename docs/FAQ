@@ -12,6 +12,11 @@ A: Najprawdopodobniej nie masz narzêdzi i pakietów potrzebnych do
    C, narzêdzia takie jak make, install, bibliotekê readline i
    odpowiednie pliki nag³ówkowe.
 
+Q: Jak zrobiæ, ¿eby ekg wygl±da³o jak irssi?
+A: Uruchomiæ ,,./configure --enable-ui-ncurses'' potem ,,make clean''
+   i ,,make''. Je¶li masz zainstalowan± bibliotekê ncurses i odpowiednie
+   pliki nag³ówkowe, powinno siê udaæ.
+
 Q: Jak wys³aæ wiadomo¶æ do kogo¶ ze spacj± w nazwie?
 A: Wpisaæ nazwê w cudzys³owach. Niestety dope³nianie jeszcze nie dzia³a
    jak trzeba. ¯eby siê nie mêczyæ, mo¿na zmieniæ w li¶cie kontaktów jego
@@ -29,25 +34,14 @@ A: Odpowiednio ,,list --get'' i ,,list --put''.
 Q: Jak zmieniæ informacje w katalogu publicznym?
 A: U¿yæ polecenia ,,change''.
 
-Q: Jak wys³aæ lub odebraæ plik?
+Q: Jak wys³aæ lub odebraæ plik albo prowadziæ rozmowy g³osowe?
 A: Przeczytaæ szybki kurs z pliku ,,dcc.txt''.
 
-Q: Dlaczego PageUp nie dzia³a?
-A: Bo nie. Je¶li chcesz mieæ mo¿liwo¶æ przewijania, ale za to nieznacznie
-   mniejsz± wygodê (brak dope³niania tabem, brak kilku kombinacji klawiszy,
-   brak query, brak prompta) to mo¿esz po rozpakowaniu wpisaæ ,,./configure
-   --enable-ui-ncurses''. Je¶li siê nie skompiluje, albo nie dzia³a, nie
-   narzekaj. Ta opcja jest jeszcze ca³y czas rozwijana.
-
 Q: Mo¿na otworzyæ osobne okienko do rozmowy?
-A: W ui-readline mo¿na. Tworzymy nowe okno (,,window new''), prze³±czamy siê 
-   na nie (,,window nex'', ,,window switch NR'', lub alt+1-9) i query nick.
+A: Jasne. Tworzymy nowe okno (,,window new''), prze³±czamy siê na nie
+   (,,window next'', ,,window switch NR'', lub Alt+1-9) i ,,query nick''.
    Istnieje te¿ zmienna ,,make_window'', dziêki której ka¿da nowa rozmowa
-   tworzona jest w osobnym okienku (zobacz vars.txt).
-
-Q: Kiedy bêdzie mo¿na?
-A: Gdy kto¶ z nadmiarem wolnego czasu i odpowiedni± ilo¶ci± chêci znajdzie
-   sposób na zrobienie tego.
+   tworzona jest w osobnym okienku (zobacz ,,vars.txt'').
 
 Q: Nie chce siê ³±czyæ, a windziany klient dzia³a! Co jest?
 A: Najwyra¼niej pad³ jeden z serwerów. Wpisz ,,set server 217.17.41.x'',

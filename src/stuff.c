@@ -19,6 +19,12 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+/*
+ * XXX TODO:
+ * - escapowanie w put_log().
+ */
+
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -40,7 +46,9 @@
 #  include <sys/un.h>
 #endif
 #include <ctype.h>
-#include "config.h"
+#ifdef HAVE_ZLIB_H
+#  include <zlib.h>
+#endif
 #include "compat.h"
 #include "libgadu.h"
 #include "stuff.h"
@@ -257,47 +265,133 @@ const char *prepare_path(const char *filename, int do_mkdir)
  * wrzuca do logów informacjê od/do danego numerka. podaje siê go z tego
  * wzglêdu, ¿e gdy `log = 2', informacje lec± do $config_log_path/$uin.
  *
- * - uin,
- * - format...
+ *  - uin - numer delikwenta,
+ *  - format... - akceptuje tylko %s, %d i %ld.
  */
 void put_log(uin_t uin, const char *format, ...)
 {
  	char *lp = config_log_path;
-	char path[PATH_MAX];
+	char path[PATH_MAX], *buf;
+	const char *p;
+	int size = 0;
 	va_list ap;
 	FILE *f;
 
 	if (!config_log)
 		return;
-	
-	if (!lp) {
-		if (config_log == 2)
-			lp = ".";
-		else
-			lp = "gg.log";
+
+	/* oblicz d³ugo¶æ tekstu */
+	va_start(ap, format);
+	for (p = format; *p; p++) {
+		if (*p == '%') {
+			p++;
+			if (!*p)
+				break;
+			
+			if (*p == 'l') {
+				p++;
+				if (!*p)
+					break;
+			}
+			
+			if (*p == 's') {
+				char *tmp = va_arg(ap, char*);
+
+				size += strlen(tmp);
+			}
+			
+			if (*p == 'd') {
+				int tmp = va_arg(ap, int);
+
+				size += strlen(itoa(tmp));
+			}
+		} else
+			size++;
 	}
+	va_end(ap);
+
+	/* zaalokuj bufor */
+	buf = xmalloc(size + 1);
+	*buf = 0;
+
+	/* utwórz tekst z logiem */
+	va_start(ap, format);
+	for (p = format; *p; p++) {
+		if (*p == '%') {
+			p++;
+			if (!*p)
+				break;
+			if (*p == 'l') {
+				p++;
+				if (!*p)
+					break;
+			}
+
+			if (*p == 's') {
+				char *tmp = va_arg(ap, char*);
+
+				strcat(buf, tmp);
+			}
+
+			if (*p == 'd') {
+				int tmp = va_arg(ap, int);
+
+				strcat(buf, itoa(tmp));
+			}
+		} else {
+			buf[strlen(buf) + 1] = 0;
+			buf[strlen(buf)] = *p;
+		}
+	}
+
+	/* teraz skonstruuj ¶cie¿kê logów */
+
+	if (!lp)
+		lp = (config_log & 2) ? "." : "gg.log";
 
 	if (*lp == '~')
 		snprintf(path, sizeof(path), "%s%s", home_dir, lp + 1);
 	else
 		strncpy(path, lp, sizeof(path));
 
-	if (config_log == 2) {
+	if ((config_log & 2)) {
 		if (mkdir(path, 0700) && errno != EEXIST)
-			return;
+			goto cleanup;
 		snprintf(path + strlen(path), sizeof(path) - strlen(path), "/%u", uin);
 	}
 
+#ifdef HAVE_ZLIB
+	/* nawet je¶li chcemy gzipowane logi, a istnieje nieskompresowany log,
+	 * olewamy kompresjê. je¶li loga nieskompresowanego nie ma, dodajemy
+	 * rozszerzenie .gz i balujemy. */
+	if (config_log & 4) {
+		struct stat st;
+		
+		if (stat(path, &st) == -1) {
+			gzFile f;
+
+			snprintf(path + strlen(path), sizeof(path) - strlen(path), ".gz");
+
+			if (!(f = gzopen(path, "a")))
+				goto cleanup;
+
+			gzputs(f, buf);
+			gzclose(f);
+			chmod(path, 0600);
+
+			goto cleanup;
+		}
+	}
+#endif
+
 	if (!(f = fopen(path, "a")))
-		return;
-
-	fchmod(fileno(f), 0600);
-
-	va_start(ap, format);
-	vfprintf(f, format, ap);
-	va_end(ap);
-
+		goto cleanup;
+	fputs(buf, f);
 	fclose(f);
+	chmod(path, 0600);
+
+cleanup:
+	xfree(buf);
 }
 
 /*

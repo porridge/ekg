@@ -1139,30 +1139,74 @@ COMMAND(cmd_set)
 		for (l = variables; l; l = l->next) {
 			struct variable *v = l->data;
 			
-			if ((!arg || !strcasecmp(arg, v->name)) && v->display != 2) {
-				if (v->type == VAR_STR) {
-					char *tmp = *(char**)(v->ptr);
-					
+			if ((!arg || !strcasecmp(arg, v->name)) && (v->display != 2 || strcmp(name, "set"))) {
+				char *string = *(char**)(v->ptr);
+				int value = *(int*)(v->ptr);
+
+				if (!v->display) {
+					print("variable", v->name, "(...)");
+					continue;
+				}
+
+				if (v->type == VAR_STR)
+					print("variable", v->name, (string) ? string : "(none)");
+
+				if (v->type == VAR_BOOL)
+					print("variable", v->name, (value) ? "1 (on)" : "0 (off)");
+				
+				if ((v->type == VAR_INT || v->type == VAR_MAP) && !v->map)
+					print("variable", v->name, itoa(value));
+
+				if (v->type == VAR_INT && v->map) {
+					char *tmp = NULL;
+					int i;
+
+					for (i = 0; v->map[i].label; i++)
+						if (v->map[i].value == value) {
+							tmp = saprintf("%d (%s)", value, v->map[i].label);
+							break;
+						}
+
 					if (!tmp)
-						tmp = "(brak)";
-					if (!v->display)
-						tmp = "(...)";
+						tmp = saprintf("%d", value);
+
 					print("variable", v->name, tmp);
-				} else {
-					print("variable", v->name, (!v->display) ? "(...)" : itoa(*(int*)(v->ptr)));
+
+					xfree(tmp);
+				}
+
+				if (v->type == VAR_MAP && v->map) {
+					string_t s = string_init(itoa(value));
+					int i, first = 1;
+
+					for (i = 0; v->map[i].label; i++) {
+						if ((value & v->map[i].value) || (!value && !v->map[i].value)) {
+							string_append(s, (first) ? " (" : ",");
+							first = 0;
+							string_append(s, v->map[i].label);
+						}
+					}
+
+					if (!first)
+						string_append_c(s, ')');
+
+					print("variable", v->name, s->str);
+
+					string_free(s, 1);
 				}
 			}
 		}
 	} else {
 		theme_cache_reset();
 		switch (variable_set(arg, (unset) ? NULL : params[1], 0)) {
-			case 0:
-				if (!in_autoexec) {
-					print("variable", arg, (unset) ? "(brak)" : params[1]);
-					config_changed = 1;
-					last_save = time(NULL);
-				}
+			case 0: {
+				char *my_params[2] = { params[0], NULL };
+
+				cmd_set("set-show", my_params);
+				config_changed = 1;
+				last_save = time(NULL);
 				break;
+			}
 			case -1:
 				print("variable_not_found", arg);
 				break;
@@ -2553,12 +2597,15 @@ void command_init()
 	( "save", "", cmd_save, 0,
 	  "", "zapisuje ustawienia programu",
 	  "Aktualny stan zostanie zapisany i zostanie przywrócony przy\n"
-	  "nastêpnym uruchomieniu programu");
+	  "nastêpnym uruchomieniu programu.");
 	  
 	command_add
 	( "set", "v?", cmd_set, 0,
-  	  " [-]<zmienna> [warto¶æ]", "wy¶wietla lub zmienia ustawienia",
-	  "U¿ycie %Tset -zmienna%n czy¶ci zawarto¶æ zmiennej.");
+  	  " [-]<zmienna> [[+/-]warto¶æ]", "wy¶wietla lub zmienia ustawienia",
+	  "U¿ycie %Tset -zmienna%n czy¶ci zawarto¶æ zmiennej. Dla zmiennych\n"
+	  "bêd±cymi mapami bitowymi mo¿na okre¶liæ, czy warto¶æ ma byæ\n"
+	  "dodana (poprzedzone plusem), usuniêta (minusem) czy ustawiona\n"
+	  "(bez prefiksu).");
 
 	command_add
 	( "sms", "u?", cmd_sms, 0,
@@ -2605,7 +2652,7 @@ void command_init()
 
 	command_add
 	( "last", "u", cmd_last, 0,
-	  " [numer/alias] ", "wy¶wietla ostatnie mesgi od wszystkich lub od [numer/alias] ",
+	  " [numer/alias]", "wy¶wietla ostatnio otrzymane wiadomo¶ci",
 	  "");
   
 	command_add

@@ -812,7 +812,7 @@ static struct {
 static void complete(int *line_start, int *line_index)
 {
 	int i, blanks = 0, count;
-	char *p, *start = line;
+	char *p, *start = line, *cmd;
 
 	/* nie obs³ugujemy dope³niania w ¶rodku tekstu */
 	if (*line_index != strlen(line))
@@ -871,21 +871,26 @@ static void complete(int *line_start, int *line_index)
 	}
 
 	/* nietypowe dope³nienie nicków przy rozmowach */
-	if (!strcmp(line, "") || ((!strncasecmp(line, "chat ", 5) || !strncasecmp(line, "/chat ", 6)) && blanks == 2 && send_nicks_count > 0) || (!strcasecmp(line, "chat ") || !strcasecmp(line, "/chat"))) {
+	cmd = saprintf("%s%s ", (line[0] == '/') ? "/" : "", (config_tab_command) ? config_tab_command : "chat");
+
+	if (!strcmp(line, "") || (!strncasecmp(line, cmd, strlen(cmd)) && blanks == 2 && send_nicks_count > 0) || !strcasecmp(line, cmd)) {
 		if (send_nicks_count)
-			snprintf(line, sizeof(line), (window_current->target) ? "/chat %s " : "chat %s ", send_nicks[send_nicks_index++]);
+			snprintf(line, sizeof(line), (window_current->target) ? "/%s%s " : "%s%s ", cmd, send_nicks[send_nicks_index++]);
 		else
-			snprintf(line, sizeof(line), (window_current->target) ? "/chat" : "chat ");
+			snprintf(line, sizeof(line), (window_current->target) ? "/%s" : "%s", cmd);
 		*line_start = 0;
 		*line_index = strlen(line);
 		if (send_nicks_index >= send_nicks_count)
 			send_nicks_index = 0;
 
+		xfree(cmd);
 		array_free(completions);
 		completions = NULL;
 
 		return;
 	}
+
+	xfree(cmd);
 
 	/* pocz±tek komendy? */
 	if (!blanks)
@@ -1160,6 +1165,10 @@ static void ui_ncurses_loop()
 				
 			case KEY_F(1):
 				binding_help(0, 0);
+				break;
+
+			case KEY_F(2):
+				binding_quick_list(0, 0);
 				break;
 
 			case KEY_F(12):

@@ -27,3 +27,5 @@
 /* define if you want VOIP support */
 #undef HAVE_VOIP
 
+/* define if you have zlib for compressed logs */
+#undef HAVE_ZLIB

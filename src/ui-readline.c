@@ -1311,7 +1311,7 @@ static int bind_handler_alt(int a, int key)
 /*
  * bind_handler_window()
  *
- * osb³uguje klawisze Alt-1 do Alt-0, zmieniaj±c okna na odpowiednie.
+ * obs³uguje klawisze Alt-1 do Alt-0, zmieniaj±c okna na odpowiednie.
  */
 static int bind_handler_window(int a, int key)
 {

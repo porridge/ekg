@@ -27,6 +27,13 @@ enum {
 	VAR_INT,		/* liczba ca³kowita */
 	VAR_BOOL,		/* 0/1, tak/nie, yes/no, on/off */
 	VAR_FOREIGN,		/* nieznana zmienna */
+	VAR_MAP,		/* bitmapa */
+};
+
+struct value_map {
+	int value;		/* warto¶æ */
+	int conflicts;		/* warto¶ci, z którymi koliduje */
+	char *label;		/* nazwa warto¶ci */
 };
 
 struct variable {
@@ -36,13 +43,15 @@ struct variable {
 	int display;		/* 0 bez warto¶ci, 1 pokazuje, 2 w ogóle */
 	void *ptr;		/* wska¼nik do zmiennej */
 	void (*notify)(const char*);	/* funkcja wywo³ywana przy zmianie */
+	struct value_map *map;	/* mapa warto¶ci i etykiet */
 };
 
 list_t variables;
 
 void variable_init();
 struct variable *variable_find(const char *name);
-int variable_add(const char *name, int type, int display, void *ptr, void (*notify)(const char *name));
+struct value_map *variable_map(int count, ...);
+int variable_add(const char *name, int type, int display, void *ptr, void (*notify)(const char *name), struct value_map *map);
 int variable_set(const char *name, const char *value, int allow_foreign);
 void variable_free();
 

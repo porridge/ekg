@@ -5,6 +5,21 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-09-11
+
+- komenda set akceptuje i wy¶wietla flagi dla niektórych zmiennych. mo¿liwe
+  jest dodawanie flag poprzedzaj±c warto¶æ plusem, lub usuwanie poprzedzaj±c
+  minusem. na przyk³ad ,,set log +gzip'' lub ,,set random_reason -away'' (w)
+- porz±dki w configure.in. nie wykrywamy niepotrzebnych rzeczy -- na przyk³ad
+  je¶li nie znajdzie libgsm, nie sprawdza <linux/soundcard.h>; je¶li nie
+  chcemy ioctld, nie szuka <linux/kd.h> (w)
+- obs³uga logów skompresowanych gzipem: ,,set log +gzip''. je¶li dany log
+  ju¿ istnieje, bêdzie dopisywany w postaci nieskompresowanej -- nale¿y
+  go najpierw skompresowaæ rêcznie za pomoc± komendy gzip (w)
+- uaktualnienia, dodatki i poprawki w dokumentacji (w)
+- usuniêcie configure z cvsu. bêdzie generowany automagicznie przy
+  tworzeniu snapshotów (speedy/w)
+
 // 2002-09-10
 
 - inna filozofia gg_saprintf(). rodzaj maszyny (pre-C99 lub post-C99)

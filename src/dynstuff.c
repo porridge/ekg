@@ -337,7 +337,7 @@ const char *itoa(long int i)
  *  - sep - lista elementów oddzielaj±cych,
  *  - max - maksymalna ilo¶æ elementów tablicy. je¶li równe 0, nie ma
  *          ograniczeñ rozmiaru tablicy.
- *  - trim - czy wiêkszo¶æ ilo¶æ elementów oddzielaj±cych traktowaæ jako
+ *  - trim - czy wiêksz± ilo¶æ elementów oddzielaj±cych traktowaæ jako
  *           jeden (na przyk³ad spacje, tabulacja itp.)
  *  - quotes - czy pola mog± byæ zapisywane w cudzys³owiach lub
  *             apostrofach z escapowanymi znakami.

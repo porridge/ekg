@@ -175,7 +175,11 @@ log
 	wiadomo¶ci. dla 0, nie bêd±. dla 1, bêd± logowane w pliku, który
 	okre¶la zmienna ,,log_path'' lub ,,~/.gg/history'' w przypadku
 	jej braku. dla 2, bêd± logowane w katalogu wskazanym przez zmienn±
-	,,log_path'', a nazwa pliku bêdzie numerem rozmówcy.
+	,,log_path'', a nazwa pliku bêdzie numerem rozmówcy. je¶li mamy
+	wkompilowan± obs³ugê skompresowanych logów, dodanie warto¶ci 4
+	wymusi kompresjê logów. nie bêdzie ona dzia³a³a, je¶li istnieje
+	ju¿ nieskompresowany log. nale¿y go wcze¶niej skompresowaæ
+	poleceniem gzip.
 
 log_ignored 
 	typ: liczba

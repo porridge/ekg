@@ -32,12 +32,14 @@ INSTALACJA
     Proste? Proste. Po pierwszym uruchomieniu ekg powie, jak go
     skonfigurowaæ.
 
-    Program korzysta z biblioteki readline, wiêc odpowiednie pakiety
-    zawieraj±ce j±, oraz pliki nag³ówkowe, powinny byæ zainstalowane.
-    readline zwykle polega te¿ na innych bibliotekach do obs³ugi
-    terminala, jak np. libtermcap czy ncurses. Oczywi¶cie niezbêdny
-    jest te¿ zestaw narzêdzi do kompilacji programów napisanych w
-    jêzyku C -- kompilator, preprocesor, linker, pliki nag³ówkowe,
+    Program domy¶lnie korzysta z biblioteki readline, wiêc odpowiednie
+    pakiety zawieraj±ce j±, oraz pliki nag³ówkowe, powinny byæ
+    zainstalowane. readline zwykle polega te¿ na innych bibliotekach do
+    obs³ugi terminala, jak np. libtermcap czy ncurses. Je¶li chcesz u¿yæ
+    alternatywnego interfejsu opartego o ncurses, podobnego do klientów
+    ircowych do polecenia configure dodaj ,,--enable-ui-ncurses''. Oczywi¶cie
+    niezbêdny jest te¿ zestaw narzêdzi do kompilacji programów napisanych
+    w jêzyku C -- kompilator, preprocesor, linker, pliki nag³ówkowe,
     biblioteki systemowe itd. Je¶li skrypt ./configure zg³osi jakie¶
     b³êdy, skontaktuj siê ze swoim administratorem.
 
@@ -79,13 +81,63 @@ U¯YCIE
     terminal. Je¶li wiêc zamierzasz przekierowaæ wyj¶cie do /dev/null i nie
     masz loga z wiadomo¶ci to licz siê z tym, ¿e mog± one zgin±æ bezpowrotnie.
 
+KLAWIATURA
+
+    Je¶li nie masz do¶wiadczenia w obs³ugiwaniu programów z emacsow±
+    filozofi± obs³ugi klawiatury, oto lista obs³ugiwanych klawiszy:
+
+	Up, Down		przegl±danie historii poleceñ
+	Left, Right		poruszanie siê po aktualnej linii
+        Ctrl-A, Home		id¼ pocz±tek linii
+        Ctrl-D, Delete		usuñ znak pod kursorem, wyjd¼ z query
+        Ctrl-H, Backspace	usuñ znak przed kursorem
+        Ctrl-I, Tab		dope³nianie
+        Ctrl-L			czyszczenie/od¶wie¿anie ekranu
+        Ctrl-M, Enter		zatwierdzenie linii
+        Ctrl-Q			odblokowanie terminala
+        Ctrl-S			zablokowanie terminala
+        Ctrl-U			usuniêcie aktualnej linii
+        Ctrl-W			usuniêcie s³owa przed kursorem
+        Ctrl-Y			wklejenie ostatnio usuniêtego bloku
+        Ctrl-Z			przeniesienie programu w t³o
+	Alt-cyfra		prze³±czenie do podanego okna
+	F1			pomoc
+	F2			krótka lista dostêpnych i zajêtych
+	F12			w³±czenie lub wy³±czenie trybu debugowania
+
+    Lista ta obejmuje klawisze obs³ugiwane przed interfejs readline
+    i ncurses, i nie zawiera kombinacji specyficznych dla tego pierwszego.
+    
+    Interfejs readline obs³uguje równie¿ inne kombinacje klawiszy. Dok³adna
+    lista znajduje siê w stronie manuala ,,readline'' w rozdziale ,,DEFAULT
+    KEY BINDINGS''.
+
+    Interfejs ncurses obs³uguje kilka dodatkowych kombinacji:
+
+	Page Up, Page Down	przewijanie ekranu
+        Alt-N			utwórz nowe okno
+	Alt-K			zamknij aktualne okno
+	Ctrl-Fn			prze³±cza do podanego okna (konsola FreeBSD)
+
+    Dodatkowo, okre¶lonym kombinacjom klawiszy mo¿na przypisaæ ró¿ne
+    komendy za pomoc± polecenia ,,bind''.
+
+GDZIE SZUKAÆ POMOCY
+
     Dobra rada numer jeden: zanim zaczniesz narzekaæ, ¿e czego¶ nie ma,
     przeczytaj plik TODO.
 
-    Dobra rada numer dwa: zanim zaczniesz narzekaæ, ¿e czego¶ nie ma,
-    poszukaj w pliku ChangeLog. Nie ma ¿adnej oficjalnej dokumentacji
-    z list± komend, skrótami klawiszowymi itp. Póki co, powsta³ opis
-    wszystkich zmiennych.
+    Dobra rada numer dwa: plik ULOTKA mówi, co znajduje siê w którym pliku
+    dokumentacji.
+
+    Dobra rada numer trzy: zanim zaczniesz narzekaæ, ¿e czego¶ nie ma,
+    poszukaj w pliku ChangeLog.
+
+    Dobra rada numer cztery: je¶li jeste¶ nowym u¿ytkownikiem, nie pytaj
+    siê, czy co¶ da siê zrobiæ, albo ¿e przyda³oby siê. Program jest
+    rozwijany od ponad roku, wielu ludzi korzysta z niego na co dzieñ,
+    wiêc wiêkszo¶æ ,,bajerów'', o których mo¿esz pomy¶leæ, na pewno jest
+    ju¿ w programie. Przejrzyj listê zmiennych, 
 
 WYSY£ANIE SMSÓW
 
@@ -105,6 +157,11 @@ ZNANE PROBLEMY
 	set meta-flag on
 	set convert-meta off
 	set output-meta on
+
+    Je¶li podczas pisania d³ugich linii przychodz±ce wiadomo¶ci powoduj±
+    ¶mietnik na ekranie, dopisz te¿:
+
+        set horizontal-scroll-mode on
     
 ZG£ASZANIE B£ÊDÓW
 

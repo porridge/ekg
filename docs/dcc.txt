@@ -1,6 +1,7 @@
 // bezpo¶rednie po³±czenia miêdzy klientami (dcc) w ekg
 
-aby umo¿liwiæ przesy³anie plików nale¿y wykonaæ nastêpuj±ce komendy:
+aby umo¿liwiæ przesy³anie plików i rozmowy g³osowe nale¿y wykonaæ
+nastêpuj±ce komendy:
 
 	set dcc 1
 	set dcc_ip <adres_ip>
@@ -12,7 +13,7 @@ w przeciwnym wypadku podajemy adres zewnêtrzny. je¶li mamy tylko jeden
 interfejs sieciowy, problemu nie ma, bo adres jest tylko jeden.
 
 po ponownym po³±czeniu mo¿emy korzystaæ z dobrodziejstw bezpo¶rednich
-po³±czeni. je¶li kto¶ spróbuje co¶ do nas wys³aæ, pojawi siê:
+po³±czeñ. je¶li kto¶ spróbuje co¶ do nas wys³aæ, pojawi siê:
 
 	->- kto¶/123 przesy³a plik zdjecie.jpg o rozmiarze 129117
 	->- Wpisz dcc get #1 by go odebraæ, lub dcc close #1 by anulowaæ
@@ -21,6 +22,8 @@ wystarczy zastosowaæ siê do podanych wskazówek. je¶li chcemy wys³aæ
 komu¶ plik, wpisujemy:
 
 	dcc send <pseudonim/numer> <nazwa_pliku>
+
+szczegó³y dotycz±ce rozmów g³osowych znajduj± siê w pliku ,,voip.txt''.
 
 nale¿y pamiêtaæ, ¿e do przesy³ania plików obie strony musz± mieæ
 dopisane siebie do list kontaktów. je¶li ustawimy niew³a¶ciwy adres,
