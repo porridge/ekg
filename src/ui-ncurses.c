@@ -90,6 +90,7 @@ struct window {
 	char *prompt;		/* sformatowany prompt lub NULL */
 	int prompt_len;		/* d³ugo¶æ prompta lub 0 */
 	int floating;		/* czy p³ywaj±ce? */
+	int pos_x, pos_y;	/* pozycja x,y wzgledem ekranu */
 };
 
 static WINDOW *status = NULL;		/* okno stanu */
@@ -177,6 +178,35 @@ static struct window *window_find(const char *target)
 }
 
 /*
+ * window_floating_update()
+ *
+ * uaktualnia zawartosc okna o id == n
+ * lub wszystkich okienek, gdy n == 0.
+ */
+static void window_floating_update(int n)
+{
+	list_t l;
+
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data, *old;
+
+		if (n && (w->id != n))
+			continue;
+
+		if (w->floating && w->prompt) {
+			werase(w->window);
+			w->y = 0;
+			old = window_current;
+			window_current = w;	/* YYY */
+			command_exec(w->target, w->prompt);
+			window_current = old;
+			/* niech bedzie na tyle male, na ile mozna: */
+			wresize(w->window, w->y + 1, w->window->_maxx + 1);
+		}
+	}
+}
+
+/*
  * window_floating_refresh()
  *
  * od¶wie¿a p³ywaj±ce okienka.
@@ -186,6 +216,8 @@ static void window_floating_refresh()
 {
 	list_t l;
 
+	window_floating_update(0); /* chwilowo, zeby dzialalo */
+
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
 
@@ -194,23 +226,6 @@ static void window_floating_refresh()
 	}
 }
 
-static void window_floating_update()
-{
-	list_t l;
-
-	for (l = windows; l; l = l->next) {
-		struct window *w = l->data, *old;
-
-		if (w->floating && w->prompt) {
-			werase(w->window);
-			w->y = 0;
-			old = window_current;
-			window_current = w;	/* YYY */
-			command_exec(w->target, w->prompt);
-			window_current = old;
-		}
-	}
-}
 
 /*
  * window_refresh()
@@ -229,7 +244,7 @@ static void window_refresh()
 			continue;
 
 		if (window_current->id == w->id)
-			pnoutrefresh(w->window, w->start, 0, 0, 0, output_size - 1, stdscr->_maxx - CONTACTS_SIZE + 1);
+			pnoutrefresh(w->window, w->start, 0, w->pos_y, w->pos_x, output_size - 1, stdscr->_maxx - CONTACTS_SIZE + 1);
 		else
 			pnoutrefresh(w->window, 0, 0, 0, 81, 0, 0);
 	}
@@ -255,11 +270,16 @@ static void window_switch(int id)
 		struct window *w = l->data;
 
 		if (id == w->id) {
-			window_current = w;
+
+			if (!w->floating)
+				window_current = w;
 
 			w->act = 0;
 
 			window_refresh();
+
+			if (w->floating)
+				window_floating_update(id);
 			if (contacts)
 				wnoutrefresh(contacts);
 			wnoutrefresh(status);
@@ -296,6 +316,9 @@ static struct window *window_new(const char *target)
 	struct window w;
 	list_t l;
 	int id = 1, done = 0;
+	int maxx = 10, maxy = 10, z;
+
+	if ((target)&&(*target == '*')) id = 100;	/* XXX */
 
 	while (!done) {
 		done = 1;
@@ -316,10 +339,34 @@ static struct window *window_new(const char *target)
 	w.id = id;
 	w.target = xstrdup(target);
 	if (target) {
-		if (*target == '/') {
+		if (*target == '*') {
+			char *tmp = index(target, '/'), *end = NULL;
+			
 			w.floating = 1;
-			w.prompt = strdup(target);
-			w.prompt_len = strlen(w.prompt);
+			
+			if (!tmp)
+				tmp = w.target + 1;
+				
+			w.prompt = xstrdup(tmp);
+ 			w.prompt_len = strlen(w.prompt);
+
+			tmp = w.target + 1;
+			
+			if ((z = strtoul(tmp, &end, 10)) > 0) {
+				w.pos_x = z;
+				tmp = end;
+				if ((*tmp++ == ',') && ((z = strtoul(tmp, &end, 10)) > 0)) {
+					w.pos_y = z;
+					tmp = end;
+					if ((*tmp++ == ',') && ((z = strtoul(tmp, &end, 10)) > 0)) {
+						maxx = z;
+						tmp = end;
+						if ((*tmp++ == ',') && ((z = strtoul(tmp, &end, 10)) > 0))
+							maxy = z;
+					}
+				}
+			}
+
 		} else {
 			w.prompt = format_string(format_find("ncurses_prompt_query"), target);
 			w.prompt_len = strlen(w.prompt);
@@ -332,9 +379,20 @@ static struct window *window_new(const char *target)
 			w.prompt_len = strlen(w.prompt);
 		}
 	}
-	w.lines = stdscr->_maxy - 1;
-	w.window = (w.floating) ? newwin(15,15,0,20) : newpad(w.lines, stdscr->_maxx + 1);
 
+	/* sprawdzamy wspó³rzêdne */
+	if (w.pos_x > stdscr->_maxx)
+		w.pos_x = 0;
+	if (w.pos_y > stdscr->_maxy)
+		w.pos_y = 0;
+	if (w.pos_x + maxx > stdscr->_maxx)
+		maxx = stdscr->_maxx - w.pos_x - 1;
+	if (w.pos_y + maxy > stdscr->_maxy)
+		maxy = stdscr->_maxy - w.pos_y - 1;
+	
+ 	w.lines = stdscr->_maxy - 1 - w.pos_y;
+	w.window = (w.floating) ? newwin(maxy,maxx,w.pos_y,w.pos_x) : newpad(w.lines, stdscr->_maxx + 1);
+ 
 	return list_add_sorted(&windows, &w, sizeof(w), window_new_compare);
 }
 
@@ -350,7 +408,7 @@ static int print_timestamp(struct window *w)
 	time_t t;
 	int i, x = 0, attr, pair;
 
-	if (!config_timestamp) {
+	if (!config_timestamp || w->floating) {
 		set_cursor(w);
 		return 0;
 	}
@@ -1210,7 +1268,7 @@ void file_generator(const char *text, int len)
 
 void window_generator(const char *text, int len)
 {
-	char *words[] = { "new", "kill", "next", "prev", "switch", "clear", "refresh", "list", NULL };
+	char *words[] = { "new", "kill", "move", "next", "prev", "switch", "clear", "refresh", "list", NULL };
 	int i;
 
 	for (i = 0; words[i]; i++)
@@ -2358,8 +2416,62 @@ static int ui_ncurses_event(const char *event, ...)
 				goto cleanup;
 			}
 			
+			if (!strcasecmp(p1, "move")) {
+				struct window *w = window_current;
+				char *end = NULL, *tmp = NULL;
+				list_t l;
+				int x;
+
+				if (!p2) {
+					print("not_enough_params", "window");
+					goto cleanup;
+				}
+
+				if ((x = strtoul(p2, &end, 10)) <= 0) {
+					/* ?? */
+				}
+					
+				for (w = NULL, l = windows; l; l = l->next) {
+					struct window *ww = l->data;
+
+					if (ww->id == x) {
+						w = ww;
+						break;
+					}
+				}
+
+				if (!end || *end != ',') {
+					/* ?? */
+					goto cleanup;
+				}
+					
+				tmp = end + 1;
+				end = NULL;
+				if ((x = strtoul(tmp, &end, 10)) >= 0)
+					w->pos_x = x;
+				
+				if (!end || *end != ',') {
+					/* ?? */
+					goto cleanup;
+				}
+				
+				tmp = end + 1;
+				end = NULL;
+				
+				if ((x = strtoul(tmp, &end, 10)) >= 0)
+					w->pos_y = x;
+
+				if (w->floating)
+					mvwin(w->window, w->pos_y, w->pos_x);
+				else {
+					/* TODO: czyszczenie screen'a */
+				}
+				 					
+				goto cleanup;
+			}
+			
 			if (!strcasecmp(p1, "refresh")) {
-				window_floating_update();
+				window_floating_update(0);
 				wrefresh(curscr);
 				goto cleanup;
 			}
