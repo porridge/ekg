@@ -471,8 +471,10 @@ void put_log(uin_t uin, const char *format, ...)
 
 	if (*lp == '~')
 		snprintf(path, sizeof(path), "%s%s", home_dir, lp + 1);
-	else
-		strncpy(path, lp, sizeof(path));
+	else {
+		strncpy(path, lp, sizeof(path) - 1);
+		path[sizeof(path) - 1] = '\0';
+	}
 
 	if ((config_log & 2)) {
 		if (mkdir(path, 0700) && errno != EEXIST)
@@ -2285,6 +2287,7 @@ const char *event_format(int flags)
 			if (!first)
 				strncat(buf, ",", sizeof(buf) - 1 - strlen(buf));
 			strncat(buf, event_labels[i].name, sizeof(buf) - 1 - strlen(buf));
+			buf[sizeof(buf) - 1] = '\0';
 			first = 0;
 		}
 	}

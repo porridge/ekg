@@ -3721,6 +3721,7 @@ COMMAND(cmd_last)
 
 				strncat(buf, "/", sizeof(buf) - strlen(buf) - 1);
 				strncat(buf, buf2, sizeof(buf) - strlen(buf) - 1);
+				buf[sizeof(buf) - 1] = '\0';
 			}
 
 			if (config_last & 4 && ll->type == 1)

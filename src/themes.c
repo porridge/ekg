@@ -666,17 +666,17 @@ static FILE *try_open(FILE *prevfd, const char *prefix, const char *filename)
 		return prevfd;
 
 	if (prefix)
-		snprintf(buf, sizeof(buf) - 1, "%s/%s", prefix, filename);
+		snprintf(buf, sizeof(buf), "%s/%s", prefix, filename);
 	else
-		snprintf(buf, sizeof(buf) - 1, "%s", filename);
+		snprintf(buf, sizeof(buf), "%s", filename);
 
 	if ((f = fopen(buf, "r")))
 		return f;
 
 	if (prefix)
-		snprintf(buf, sizeof(buf) - 1, "%s/%s.theme", prefix, filename);
+		snprintf(buf, sizeof(buf), "%s/%s.theme", prefix, filename);
 	else
-		snprintf(buf, sizeof(buf) - 1, "%s.theme", filename);
+		snprintf(buf, sizeof(buf), "%s.theme", filename);
 
 	if ((f = fopen(buf, "r")))
 		return f;

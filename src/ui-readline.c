@@ -645,6 +645,7 @@ static const char *current_prompt()
 		} else
 			tmp = format_string(format_find("readline_prompt_query"), window_current->query_nick, NULL);
 		strncpy(buf, tmp, sizeof(buf) - 1);
+		buf[sizeof(buf) - 1] = '\0';
 		xfree(tmp);
         } else {
 		char *format_win = "readline_prompt_win", *format_nowin = "readline_prompt", *format_win_act = "readline_prompt_win_act";
@@ -668,9 +669,12 @@ static const char *current_prompt()
 			} else
 				tmp = format_string(format_find(format_win), itoa(window_current->id));
 			strncpy(buf, tmp, sizeof(buf) - 1);
+			buf[sizeof(buf) - 1] = '\0';
 			xfree(tmp);
-		} else
+		} else {
 			strncpy(buf, format_find(format_nowin), sizeof(buf) - 1);
+			buf[sizeof(buf) - 1] = '\0';
+		}
         }
 
         if (no_prompt)

@@ -322,7 +322,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 					}
 
 				strncpy(buf, line, len);
-				buf[len] = 0;
+				buf[len] = '\0';
 				next = line + len;
 
 				while (*next == ' ')
