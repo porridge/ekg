@@ -3,6 +3,7 @@
 - szkielet zmian w katalogu publicznym / biblioteka (s)
 - dodany event GG_EVENT_PONG (w)
 - ekg ignoruje SIGPIPE (arekm/w)
+- dodana komenda ,,query'' (drg/w)
 
 // 2001-12-12
 

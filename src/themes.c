@@ -473,6 +473,7 @@ void init_theme()
 	add_format("timestamp", "%H:%M", 1);
 	add_format("readline_prompt", "% ", 1);
 	add_format("readline_prompt_away", "/ ", 1);
+	add_format("readline_prompt_query", "%1> ", 1);
 
 	add_format("known_user", "%W%1%n/%2", 1);
 	add_format("unknown_user", "%W%1%n", 1);
@@ -652,5 +653,8 @@ void init_theme()
 	add_format("dcc_get_getting", "%) Rozpoczêto pobieranie pliku %W%2%n od %1\n", 1);
 	add_format("dcc_get_cant_create", "%! Nie mo¿na utworzyæ pliku %W%1%n\n", 1);
 	
+
+	add_format("query_started", "%) Rozpoczêto rozmowê z %1. Aby zakoñczyæ, wci¶nij Ctrl-D\n", 1);
+	add_format("query_finished", "\n%) Zakoñczono rozmowê z %1\n", 1);
 };
 

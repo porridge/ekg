@@ -81,6 +81,8 @@ int default_status = GG_STATUS_AVAIL;
 char *reg_password = NULL;
 int use_dcc = 0;
 char *dcc_ip = 0;
+char *query_nick = NULL;
+uin_t query_uin = 0;
 
 /*
  * my_puts()
@@ -122,14 +124,22 @@ void my_puts(char *format, ...)
  */
 static char *current_prompt()
 {
+	static char buf[80];	/* g³upio strdup()owaæ wszystko */
 	char *prompt;
 	
-	if (!readline_prompt)
-		readline_prompt = find_format("readline_prompt");
-	if (!readline_prompt_away)
-		readline_prompt_away = find_format("readline_prompt_away");
+	if (query_nick) {
+		if ((prompt = format_string(find_format("readline_prompt_query"), query_nick, NULL))) {
+			strncpy(buf, prompt, sizeof(buf)-1);
+			prompt = buf;
+		}
+	} else {
+		if (!readline_prompt)
+			readline_prompt = find_format("readline_prompt");
+		if (!readline_prompt_away)
+			readline_prompt_away = find_format("readline_prompt_away");
 
-	prompt = (!away) ? readline_prompt : readline_prompt_away;
+		prompt = (!away) ? readline_prompt : readline_prompt_away;
+	}
 
 	if (no_prompt || !prompt)
 		prompt = "";

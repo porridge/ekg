@@ -100,10 +100,12 @@ int proxy_port;
 char *proxy_host;
 char *reg_password;
 char *dcc_ip;
+char *query_nick;
+uin_t query_uin;
+
 
 void my_puts(char *format, ...);
 char *my_readline();
-
 int read_config(char *filename);
 int read_userlist(char *filename);
 int read_sysmsg(char *filename);

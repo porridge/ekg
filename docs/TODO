@@ -6,15 +6,14 @@ biblioteka:
 - komunikacja miêdzy klientami, w tym wysy³anie plików i odbieranie plików,
 - konferencje,
 - przechowywanie userlisty na serwerze,
+- zmiana informacji w katalogu publicznym,
 - uaktualniæ dokumentacjê,
 
 klient:
 - przewijanie ekranu,
-- query,
 - obs³uga nicków ze spacjami,
-- zmiana informacji w katalogu publicznym,
 - proste rozpoznawanie p³ci,
-- dope³nienia,
+- uzupe³niæ dope³nienia,
 
 
 $Id$

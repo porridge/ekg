@@ -435,13 +435,21 @@ u¿ycie: %s [OPCJE]
 	for (;;) {
 		char *line, *tmp = NULL;
 		
-		if (!(line = my_readline()))
-			break;
+		if (!(line = my_readline())) {
+			if (query_uin) {
+				my_printf("query_finished", format_user(query_uin));
+				free(query_nick);
+				query_nick = NULL;
+				query_uin = 0;
+				continue;
+			} else
+				break;
+		}
 
 		if (strcmp(line, ""))
 			add_history(line);
 
-		if ((tmp = is_alias(line))) {
+		if (!query_nick && (tmp = is_alias(line))) {
 			free(line);
 			line = tmp;
 		}

@@ -65,7 +65,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_test_add(), command_theme(), command_set(), command_connect(),
 	command_sms(), command_find(), command_modify(), command_cleartab(),
 	command_status(), command_register(), command_test_watches(),
-	command_remind(), command_dcc();
+	command_remind(), command_dcc(), command_query();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -103,6 +103,7 @@ struct command commands[] = {
 	{ "msg", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ do podanego u¿ytkownika", "" },
 	{ "modify", "u?", command_modify, " <alias> [opcje]", "Zmienia informacje w li¶cie kontaktów", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n  --alias <alias>  // nazwa w li¶cie kontaktów\n  --phone <telefon>\n  --uin <numerek>\n" },
 	{ "private", "", command_away, " [on/off]", "W³±cza/wy³±cza tryb ,,tylko dla przyjació³''", "" },
+	{ "query", "u", command_query, " <numer/alias>", "W³±cza rozmowê z dan± osob±", "" },
 	{ "register", "??", command_register, " <email> <has³o>", "Rejestruje nowy uin", "" },
 	{ "remind", "", command_remind, "", "Wysy³a has³o na skrzynkê pocztow±", "" },
 	{ "save", "", command_save, "", "Zapisuje ustawienia programu", "" },
@@ -1465,6 +1466,33 @@ COMMAND(command_remind)
 	return 0;
 }
 
+COMMAND(command_query)
+{
+	uin_t uin;
+
+	if (query_nick) {
+		free(query_nick);
+		query_nick = NULL;
+		query_uin = 0;
+	}
+
+	if (!params[0]) {
+		my_printf("query_finished");
+		return 0;
+	}
+
+	if (!(uin = get_uin(params[0]))) {
+		my_printf("user_not_found", params[0]);
+		return 0;
+	}
+
+	query_nick = strdup(params[0]);
+	query_uin = uin;
+	my_printf("query_started", format_user(uin));
+
+	return 0;
+}
+
 char *strip_spaces(char *line)
 {
 	char *buf;
@@ -1533,6 +1561,13 @@ int execute_line(char *line)
 	struct command *c;
 	int (*last_abbr)(char *, char **) = NULL;
 	int abbrs = 0;
+
+	if (query_nick && *line != '/') {
+		char *params[] = { query_nick, line, NULL };
+
+		command_msg("chat", params);
+		return 0;
+	}
 	
 	send_nicks_index = 0;
 
