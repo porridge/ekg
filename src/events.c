@@ -576,13 +576,14 @@ void handle_msg(struct gg_event *e)
 	else
 		add_send_nick(itoa(e->event.msg.sender));
 
-	if (!hide)
+	if (!hide) {
 		print_message(e, u, chat, secure);
 
-	if (config_beep && ((chat) ? config_beep_chat : config_beep_msg))
-		ui_beep();
+		if (config_beep && ((chat) ? config_beep_chat : config_beep_msg))
+			ui_beep();
 
-	play_sound((chat) ? config_sound_chat_file : config_sound_msg_file);
+		play_sound((chat) ? config_sound_chat_file : config_sound_msg_file);
+	}
 
 	tmp = log_escape(e->event.msg.message);
 	put_log(e->event.msg.sender, "%s,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), tmp);

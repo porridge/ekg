@@ -54,7 +54,7 @@ list_t formats = NULL;
  */
 const char *format_find(const char *name)
 {
-	char *tmp;
+	const char *tmp;
 	int hash;
 	list_t l;
 

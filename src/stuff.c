@@ -3783,7 +3783,7 @@ void update_status()
 	if (!sess || sess->state != GG_STATE_CONNECTED)
 		u->status = (u->descr) ? GG_STATUS_NOT_AVAIL_DESCR : GG_STATUS_NOT_AVAIL;
 	else
-		u->status = config_status;
+		u->status = GG_S(config_status);
 
 	if (ignored_check(u->uin) & IGNORE_STATUS_DESCR)
 		u->status = ekg_hide_descr_status(u->status);

@@ -131,7 +131,10 @@ int userlist_read()
 		u.first_name = xstrdup(entry[0]);
 		u.last_name = xstrdup(entry[1]);
 		u.nickname = xstrdup(entry[2]);
-		u.display = xstrdup(entry[3]);
+		if (!valid_nick(entry[3]))
+			u.display = saprintf("_%s", entry[3]);
+		else
+			u.display = xstrdup(entry[3]);
 		u.mobile = xstrdup(entry[4]);
 		u.groups = group_init(entry[5]);
 		u.status = GG_STATUS_NOT_AVAIL;
@@ -205,7 +208,10 @@ int userlist_set(const char *contacts, int config)
 		u.first_name = xstrdup(entry[0]);
 		u.last_name = xstrdup(entry[1]);
 		u.nickname = xstrdup(entry[2]);
-		u.display = xstrdup(entry[3]);
+		if (!valid_nick(entry[3]))
+			u.display = saprintf("_%s", entry[3]);
+		else
+			u.display = xstrdup(entry[3]);
 		u.mobile = xstrdup(entry[4]);
 		u.groups = group_init(entry[5]);
 		u.status = GG_STATUS_NOT_AVAIL;
