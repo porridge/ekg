@@ -33,7 +33,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <signal.h>
-#include "ioctl_daemon.h"
+#include "ioctld.h"
 
 char sock_path[PATH_MAX] =  "";
 

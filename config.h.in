@@ -14,9 +14,43 @@
 #undef SCO_FLAVOR
 
 /* readline stuff */
-#undef HAS_READLINE
-#undef HAS_RL_SET_PROMPT
-#undef HAS_RL_COMPLETION
-#undef HAS_RL_GET_SCREEN_SIZE
-#undef HAS_RL_SET_KEY
+#undef HAVE_READLINE
+#undef HAVE_RL_SET_PROMPT
+#undef HAVE_RL_COMPLETION
+#undef HAVE_RL_GET_SCREEN_SIZE
+#undef HAVE_RL_SET_KEY
+
+/* silly types */
+#undef HAVE_INT8_T
+#undef HAVE_U_INT8_T
+#undef HAVE_INT16_T
+#undef HAVE_U_INT16_T
+#undef HAVE_INT32_T
+#undef HAVE_U_INT32_T
+
+/* definitions of silly archs */
+#if !HAVE_INT8_T
+#define HAVE_INT8_T
+typedef char int8_t;
+#endif
+#if !HAVE_U_INT8_T
+#define HAVE_U_INT8_T
+typedef unsigned char int8_t;
+#endif
+#if !HAVE_INT16_T
+#define HAVE_INT16_T
+typedef short int16_t;
+#endif
+#if !HAVE_U_INT16_T
+#define HAVE_U_INT16_T
+typedef unsigned short int16_t;
+#endif
+#if !HAVE_INT32_T
+#define HAVE_INT32_T
+typedef int int32_t;
+#endif
+#if !HAVE_U_INT32_T
+#define HAVE_U_INT32_T
+typedef unsigned int int32_t;
+#endif
 

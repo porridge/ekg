@@ -26,7 +26,6 @@
 #include <errno.h>
 #include <signal.h>
 #include <errno.h>
-#include <curses.h>
 #include "libgadu.h"
 #include "stuff.h"
 #include "events.h"
@@ -147,9 +146,9 @@ void handle_msg(struct gg_event *e)
 		if (config_log_ignored) {
 			cp_to_iso(e->event.msg.message);
 			if (u)
-				snprintf(sender, sizeof(sender), "%s/%lu", u->display, u->uin);
+				snprintf(sender, sizeof(sender), "%s/%u", u->display, u->uin);
 			else
-				snprintf(sender, sizeof(sender), "%lu", e->event.msg.sender);
+				snprintf(sender, sizeof(sender), "%u", e->event.msg.sender);
 			/* XXX eskejpowanie */
 			put_log(e->event.msg.sender, "%sign,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgsend", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, e->event.msg.message);
 		}
@@ -195,9 +194,9 @@ void handle_msg(struct gg_event *e)
 	play_sound((chat) ? config_sound_chat_file : config_sound_msg_file);
 
 	if (u)
-		snprintf(sender, sizeof(sender), "%s/%lu", u->display, u->uin);
+		snprintf(sender, sizeof(sender), "%s/%u", u->display, u->uin);
 	else
-		snprintf(sender, sizeof(sender), "%lu", e->event.msg.sender);
+		snprintf(sender, sizeof(sender), "%u", e->event.msg.sender);
 
 	/* XXX eskejpowanie */
 	put_log(e->event.msg.sender, "%s,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, e->event.msg.message);

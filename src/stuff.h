@@ -27,12 +27,12 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#ifdef IOCTL
+#ifdef WITH_IOCTLD
 #include <sys/un.h>
-#endif
+#endif /* WITH_IOCTLD */
 #include "libgadu.h"
 #include "dynstuff.h"
-#include "ioctl_daemon.h"
+#include "ioctld.h"
 
 /* malutki aliasik, ¿eby nie rzucaæ d³ugimi nazwami wszêdzie */
 #define saprintf gg_alloc_sprintf
@@ -141,9 +141,9 @@ char *reg_password;
 char *query_nick;
 int sock;
 int length;
-#ifdef IOCTL
+#ifdef WITH_IOCTLD
 struct sockaddr_un addr;
-#endif
+#endif /* WITH_IOCTLD */
 char *busy_reason;
 int screen_lines;
 int screen_columns;

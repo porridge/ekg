@@ -359,7 +359,7 @@ to unikn±æ tego typu b³êdów w przysz³o¶ci.\n\
 
 void sigwinch_handler()
 {
-#ifdef HAS_RL_GET_SCREEN_SIZE
+#ifdef HAVE_RL_GET_SCREEN_SIZE
 	rl_get_screen_size(&screen_lines, &screen_columns);
 #endif
 }
@@ -377,11 +377,11 @@ int main(int argc, char **argv)
 {
 	int auto_connect = 1, force_debug = 0, i, new_status = 0 ;
 	char *load_theme = NULL;
-#ifdef IOCTL
-    	char *sock_path = NULL, *ioctl_daemon_path = IOCTL_DAEMON_PATH;
-#	define IOCTL_HELP "  -I, --ioctl-daemon-path [¦CIE¯KA]    ustawia ¶cie¿kê do ioctl_daemon-a\n"
+#ifdef WITH_IOCTLD
+    	char *sock_path = NULL, *ioctl_daemon_path = IOCTLD_PATH;
+#	define IOCTLD_HELP "  -I, --ioctl-daemon-path [¦CIE¯KA]    ustawia ¶cie¿kê do ioctl_daemon-a\n"
 #else
-#	define IOCTL_HELP ""
+#	define IOCTLD_HELP ""
 #endif
 	struct list *l;
 	struct passwd *pw; 
@@ -428,7 +428,7 @@ int main(int argc, char **argv)
 "  -p, --private        po po³±czeniu zmienia stan na ,,tylko dla przyjació³''\n"
 "  -d, --debug          w³±cza wy¶wietlanie dodatkowych informacji\n"
 "  -v, --version        wy¶wietla wersje programu i wychodzi\n"
-IOCTL_HELP
+IOCTLD_HELP
 "\n", argv[0]);
 			return 0;	
 		}
@@ -459,7 +459,7 @@ IOCTL_HELP
 		    	printf("EKG - Eksperymentalny Klient Gadu-Gadu (%s)\n", VERSION);
 			return 0;
 		}
-#ifdef IOCTL
+#ifdef WITH_IOCTLD
                 if (!strcmp(argv[i], "-I") || !strcmp(argv[i], "--ioctl-daemon-path")) {
                         if (argv[i+1]) {
                                 ioctl_daemon_path = argv[i+1];
@@ -482,7 +482,7 @@ IOCTL_HELP
 	read_sysmsg(NULL);
 	in_autoexec = 0;
 
-#ifdef IOCTL
+#ifdef WITH_IOCTLD
         sock_path = prepare_path(".socket");
 
         if (!(ioctl_daemon_pid = fork())) {
@@ -493,7 +493,7 @@ IOCTL_HELP
         init_socket(sock_path);
 
         atexit(kill_ioctl_daemon);
-#endif // IOCTL
+#endif // WITH_IOCTLD
 
 	/* okre¶lanie stanu klienta po w³±czeniu */
 	if (new_status)
@@ -561,7 +561,7 @@ IOCTL_HELP
 	rl_readline_name = "gg";
 	rl_attempted_completion_function = (CPPFunction *) my_completion;
 	rl_completion_entry_function = (void*) empty_generator;
-#ifdef HAS_RL_SET_KEY
+#ifdef HAVE_RL_SET_KEY
 	rl_set_key("\033[[A", binding_help, rl_get_keymap());
 	rl_set_key("\033OP", binding_help, rl_get_keymap());
 	rl_set_key("\033[11~", binding_help, rl_get_keymap());
@@ -572,7 +572,7 @@ IOCTL_HELP
 	rl_set_key("\033[N", binding_quick_list, rl_get_keymap());
 #endif
 	
-#ifdef HAS_RL_GET_SCREEN_SIZE
+#ifdef HAVE_RL_GET_SCREEN_SIZE
 #  ifdef SIGWINCH
 	signal(SIGWINCH, sigwinch_handler);
 #  endif

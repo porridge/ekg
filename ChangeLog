@@ -7,7 +7,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 // 2002-05-17
 
-- poprawka themneów roz³±czania (arim/w)
+- dodany arim.theme (arim/w)
+- poprawka themeów roz³±czania (arim/w)
+- DU¯E zmiany w autoconfie i Makefileach (w)
 
 // 2002-05-16
 

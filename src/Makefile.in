@@ -1,42 +1,39 @@
 # $Id$
 
-INCLUDES = -I.. -I../lib @CURSES_INCLUDEDIR@ @READLINE_INCLUDES@
-LIBS = @LIBS@ @CURSES_LIBS@ @READLINE_LIBS@
-CC = @CC@ 
 prefix = @prefix@
 datadir = @datadir@
 mandir = @mandir@
-NAME = ekg
-IOCTL_DAEMON_NAME = ioctl_daemon
-VERSION = 0.90
-RM = @RM@
+
+CC = @CC@ 
+CFLAGS = @CFLAGS@ -I.. -I../lib -DTHEMES_DIR=\"$(datadir)/ekg/themes\"
+LIBS = @LIBS@
+
 MAKE = @MAKE@
 AR = @AR@
-install = @INSTALL@
+INSTALL = @INSTALL@
 
-CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -DTHEMES_DIR=\"$(datadir)/ekg/themes\" @ioctl_cflags@ @dioctl@
 OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o ekg.o
 LOBJS = ../lib/libgadu.a
 
-all:	ekg @do_ioctl@
+all:	ekg @ioctld@
 
 ekg:	$(OBJS) $(LOBJS)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LOBJS) $(LIBS) 
+	$(CC) $(CFLAGS) -o ekg $(OBJS) $(LOBJS) $(LIBS) 
 
-ioctl_daemon:	ioctl_daemon.c
-	$(CC) ioctl_daemon.c -o $(IOCTL_DAEMON_NAME)
+ioctld:	ioctld.c
+	$(CC) $(CFLAGS) ioctld.c -o ioctld
 
-install: all install_ekg @install_ioctl@
+install: all install_ekg @install_ioctld@
 
 install_ekg:
-	$(install) -m 755 ekg $(prefix)/bin
+	$(INSTALL) -m 755 ekg $(prefix)/bin
 
-install_ioctl:
-	$(install) -m 4755 ioctl_daemon $(prefix)/bin
+install_ioctld:
+	$(INSTALL) -m 4755 ioctld $(prefix)/bin
 
 distclean:	clean
-	$(RM) -f *~ Makefile
+	rm -f *~ Makefile
 
 clean:
-	$(RM) -f *.o ekg ioctl_daemon search core 
+	rm -f *.o ekg ioctld search core 
 

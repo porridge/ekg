@@ -1,20 +1,14 @@
 # $Id$
 
-INCLUDES = -I.. @CURSES_INCLUDEDIR@ @READLINE_INCLUDES@
-LIBS = @LIBS@ @CURSES_LIBS@ @READLINE_LIBS@
 CC = @CC@ 
-prefix = @prefix@
-datadir = @datadir@
-mandir = @mandir@
-NAME = libgadu
-VERSION = 0.90
-RM = @RM@
+CFLAGS = @CFLAGS_LIBGADU@ -I.. -fPIC
+LIBS = @LIBS_LIBGADU@
+
 MAKE = @MAKE@
 AR = @AR@
-install = @INSTALL@
+INSTALL = @INSTALL@
 RANLIB = @RANLIB@
 
-CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -fPIC
 OBJS = common.o libgadu.o search.o pubdir.o http.o dcc.o userlist.o events.o
 
 SHARED = libgadu.so.0.9.0
@@ -31,7 +25,7 @@ clean:
 shared:	$(SHARED)
 
 $(SHARED):	$(OBJS)
-	$(CC) -g -shared -Wl,-soname,libgadu.so -o $(SHARED) $(OBJS) -lc
+	$(CC) -g -shared -Wl,-soname,libgadu.so -o $(SHARED) $(OBJS) $(LIBS) -lc
 
 static: $(STATIC)
 

@@ -393,7 +393,7 @@ char **my_completion(char *text, int start, int end)
 						func = dcc_generator;
 						break;
 					case 'f':
-#ifdef HAS_RL_COMPLETION
+#ifdef HAVE_RL_COMPLETION
 						func = rl_filename_completion_function;
 #endif
 						break;

@@ -11,17 +11,35 @@ AC_PROG_CC
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_PROG_RANLIB
+AC_CHECK_TYPES([int8_t, u_int8_t, int16_t, u_int16_t, int32_t, u_int32_t])
 
-AC_SUBST(DFLAGS)
+AC_SUBST(CFLAGS_LIBGADU)
+AC_SUBST(LIBS_LIBGADU)
+AC_SUBST(ioctld)
+AC_SUBST(install_ioctld)
+AC_SUBST(shared)
+AC_SUBST(install_shared)
+
+# najpierw sprawdzamy te opcje, które s± wspólne dla libgadu i ekg.
 
 AC_ARG_WITH(debug, 
   [  --without-debug  	  Compile without debug [-Wall, -ggdb]])
 
 if test "x$with_debug" = "xno"; then 
-  DFLAGS=""
+  CFLAGS="$CFLAGS"
 else
-  DFLAGS="-Wall -ggdb" 
+  CFLAGS="$CFLAGS -ggdb" 
 fi
+
+AC_CHECK_LIB(nsl, t_accept, LIBS="$LIBS -lnsl")
+AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
+
+# zachowujemy opcje dla libgadu
+
+CFLAGS_LIBGADU="$CFLAGS"
+LIBS_LIBGADU="$LIBS"
+
+# i zaczynamy wykrywaæ ¶mieci dla ekg
 
 AC_ARG_WITH(termcap, 
   [  --without-termcap       Used to force curses/ncurses])
@@ -34,18 +52,17 @@ else
 fi
 
 if test "x$TERMCAP_LIB" = "x"; then 
-   AC_CHECK_CURSES
+  AC_CHECK_CURSES
+  LIBS="$LIBS $CURSES_LIBS"
 fi
 
 AC_CHECK_READLINE
 
 if test "x$READLINE_LIBS" = "x"; then
-    AC_MSG_RESULT([not found])
-    AC_MSG_ERROR([You need both readline and readline-devel packages.])
+  AC_MSG_RESULT([not found])
+  AC_MSG_ERROR([You need both readline and readline-devel packages.])
 fi
 
-SAVE_LIBS="$LIBS"
-SAVE_CFLAGS="$CFLAGS"
 LIBS="$LIBS $READLINE_LIBS"
 CFLAGS="$CFLAGS $READLINE_INCLUDES"
 
@@ -54,7 +71,7 @@ AC_CACHE_CHECK([for rl_set_prompt() in readline], ac_cv_has_rl_set_prompt,
 #include <readline/readline.h>
 ], [rl_set_prompt("");], [ac_cv_has_rl_set_prompt=yes], [ac_cv_has_rl_set_prompt=no])])
 if test x"$ac_cv_has_rl_set_prompt" != xno; then
-    AC_DEFINE(HAS_RL_SET_PROMPT)
+  AC_DEFINE(HAVE_RL_SET_PROMPT)
 fi
 
 AC_CACHE_CHECK([for rl_filename_completion_function() in readline], ac_cv_has_rl_completion,
@@ -62,7 +79,7 @@ AC_CACHE_CHECK([for rl_filename_completion_function() in readline], ac_cv_has_rl
 #include <readline/readline.h>
 ], [char *x = rl_filename_completion_function("", 0);], [ac_cv_has_rl_completion=yes], [ac_cv_has_rl_completion=no])])
 if test x"$ac_cv_has_rl_completion" != xno; then
-    AC_DEFINE(HAS_RL_COMPLETION)
+  AC_DEFINE(HAVE_RL_COMPLETION)
 fi
 
 AC_CACHE_CHECK([for rl_get_screen_size() in readline], ac_cv_has_rl_get_screen_size,
@@ -70,7 +87,7 @@ AC_CACHE_CHECK([for rl_get_screen_size() in readline], ac_cv_has_rl_get_screen_s
 #include <readline/readline.h>
 ], [int x,y; rl_get_screen_size(&y,&x);], [ac_cv_has_rl_get_screen_size=yes], [ac_cv_has_rl_get_screen_size=no])])
 if test x"$ac_cv_has_rl_get_screen_size" != xno; then
-    AC_DEFINE(HAS_RL_GET_SCREEN_SIZE)
+  AC_DEFINE(HAVE_RL_GET_SCREEN_SIZE)
 fi
 
 AC_CACHE_CHECK([for rl_set_key() in readline], ac_cv_has_rl_set_key,
@@ -78,58 +95,36 @@ AC_CACHE_CHECK([for rl_set_key() in readline], ac_cv_has_rl_set_key,
 #include <readline/readline.h>
 ], [rl_set_key("foo",(void*)0,rl_get_keymap());], [ac_cv_has_rl_set_key=yes], [ac_cv_has_rl_set_key=no])])
 if test x"$ac_cv_has_rl_set_key" != xno; then
-    AC_DEFINE(HAS_RL_SET_KEY)
-fi
-
-LIBS="$SAVE_LIBS"
-CFLAGS="$SAVE_CFLAGS"
-
-AC_PATH_PROG(RM, rm, no)
-if test "x$RM" = "xno"; then
-    AC_MSG_ERROR([rm ])
+  AC_DEFINE(HAVE_RL_SET_KEY)
 fi
 
 AC_PATH_PROG(GMAKE, gmake, no)
 if test "x$GMAKE" = "xno"; then
-    AC_PATH_PROG(MAKE, make, no)
-    if test "x$MAKE" = "xno"; then
-	AC_MSG_ERROR([make ])
-    fi
+  AC_PATH_PROG(MAKE, make, no)
+  if test "x$MAKE" = "xno"; then
+    AC_MSG_ERROR([make ])
+  fi
 else
-    MAKE=$GMAKE
+  MAKE=$GMAKE
 fi
-
 
 AC_PATH_PROG(AR, ar, no)
 if test "x$AR" = "xno"; then
-    AC_MSG_ERROR([ar ])
+  AC_MSG_ERROR([ar ])
 fi
 
 AC_C_BIGENDIAN
 
-AC_CHECK_LIB(nsl, t_accept, LIBS="$LIBS -lnsl")
-AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
+AC_ARG_WITH(ioctld, 
+  [  --with-ioctld  	  Compile with ioctld [Linux only]])
 
-AC_SUBST(do_ioctl)
-AC_SUBST(dioctl)
-AC_SUBST(shared)
-AC_SUBST(install_ioctl)
-AC_SUBST(install_shared)
-AC_SUBST(ioctl_cflags)
-
-AC_ARG_WITH(ioctl, 
-  [  --with-ioctl  	  Compile with ioctl deamon [linux only]])
-
-if test "x$with_ioctl" = "xyes"; then 
-  do_ioctl="ioctl_daemon"
-  dioctl=" -DIOCTL "  
-  install_ioctl="install_ioctl"
-  ioctl_cflags="-DIOCTL_DAEMON_PATH=\\\"\$(prefix)/bin/ioctl_daemon\\\""
+if test "x$with_ioctld" = "xyes"; then 
+  CFLAGS="$CFLAGS -DWITH_IOCTLD -DIOCTLD_PATH=\\\"\$(prefix)/bin/ioctld\\\""
+  ioctld="ioctld"
+  install_ioctld="install_ioctld"
 else
-  do_ioctl=""
-  dioctl=""
+  ioctld=""
   install_ioctl=""
-  ioctl_cflags=""
 fi
 
 AC_ARG_WITH(shared, 
@@ -143,21 +138,5 @@ else
   install_shared=""
 fi
 
-
-#if test ! -e  config.h; then 
-#    echo -n "ordering CD from http://dev.null.pl/ekg/CD $ac_c" 1>&6
-#    sleep 1
-#    echo -n ".$ac_c" 1>&6
-#    sleep 1
-#    echo -n ".$ac_c" 1>&6
-#    sleep 1
-#    echo -n ".$ac_c" 1>&6
-#    sleep 1
-#    AC_MSG_RESULT([ just kidding :)])
-#fi
-
 AC_OUTPUT(Makefile lib/Makefile src/Makefile examples/Makefile)
-#    echo "----------------------------------------------------------------"
-#    echo "configure is DONE!"
-#    echo "----------------------------------------------------------------"
 

@@ -349,12 +349,12 @@ dnl 3) Make sure to add @READLINE_INCLUDES@ to your preprocessor flags
 dnl 4) Make sure to add @READLINE_LIBS@ to your linker flags or LIBS
 dnl
 dnl Notes with automake:
-dnl - call AM_CONDITIONAL(HAS_READLINE, test "$has_readline" = true) from
+dnl - call AM_CONDITIONAL(HAVE_READLINE, test "$has_readline" = true) from
 dnl   configure.in
 dnl - your Makefile.am can look something like this
 dnl   -----------------------------------------------
 dnl   INCLUDES= blah blah blah $(READLINE_INCLUDES) 
-dnl   if HAS_READLINE
+dnl   if HAVE_READLINE
 dnl   READLINE_TARGETS=name_of_readline_prog
 dnl   endif
 dnl   bin_PROGRAMS = other_programs $(READLINE_TARGETS)
@@ -368,7 +368,7 @@ dnl
 dnl The following lines should be added to acconfig.h:
 dnl ==================================================
 dnl
-dnl #undef HAS_READLINE
+dnl #undef HAVE_READLINE
 dnl 
 dnl /*=== End new stuff for acconfig.h ===*/
 dnl 
@@ -389,9 +389,9 @@ dnl	CFLAGS=${CFLAGS--O}
 		search_readline=false
 	  elif test "x$withval" != "xyes" ; then
 		READLINE_LIBS="$LIBS -L$withval/lib -lreadline"
-		READLINE_INCLUDES="-I$withval/include -I$withval/include/readline"
+		READLINE_INCLUDES="-I$withval/include -I$withval/include/readline -I$withval/readline"
 		search_readline=false
-		AC_DEFINE(HAS_READLINE)
+		AC_DEFINE(HAVE_READLINE)
 		has_readline=true
 	  else
 	  	search_readline=true
@@ -418,7 +418,7 @@ AC_DEFUN(AC_READLINE, [
  	    READLINE_LIBS="$3"
 	    READLINE_INCLUDES="$4"
 	    search_readline=false
-            AC_DEFINE(HAS_READLINE)
+            AC_DEFINE(HAVE_READLINE)
             has_readline=true
 	fi
     fi

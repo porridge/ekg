@@ -35,7 +35,7 @@ extern "C" {
 /*
  * typ zmiennej okre¶laj±cej numerek danej osoby.
  */
-typedef unsigned long uin_t;
+typedef u_int32_t uin_t;
 
 /*
  * ogólna struktura opisuj±ca ró¿ne sesje. przydatna w klientach.
@@ -121,15 +121,15 @@ struct gg_http {
 #define GG_MAX_PATH 276
 
 struct gg_file_info {
-	unsigned long mode;		/* dwFileAttributes */
-	unsigned long ctime[2];		/* ftCreationTime */
-	unsigned long atime[2];		/* ftLastAccessTime */
-	unsigned long mtime[2];		/* ftLastWriteTime */
-	unsigned long size_hi;		/* nFileSizeHigh */
-	unsigned long size;		/* nFileSizeLow */
-	unsigned long reserved0;	/* dwReserved0 */
-	unsigned long reserved1;	/* dwReserved1 */
-	char filename[GG_MAX_PATH];	/* cFileName */
+	u_int32_t mode;		/* dwFileAttributes */
+	u_int32_t ctime[2];		/* ftCreationTime */
+	u_int32_t atime[2];		/* ftLastAccessTime */
+	u_int32_t mtime[2];		/* ftLastWriteTime */
+	u_int32_t size_hi;		/* nFileSizeHigh */
+	u_int32_t size;		/* nFileSizeLow */
+	u_int32_t reserved0;	/* dwReserved0 */
+	u_int32_t reserved1;	/* dwReserved1 */
+	unsigned char filename[GG_MAX_PATH];	/* cFileName */
 };
 
 /*
@@ -602,8 +602,8 @@ unsigned short fix16(unsigned short x);
 #define GG_DEFAULT_DCC_PORT 1550
 
 struct gg_header {
-	unsigned long type;		/* typ pakietu */
-	unsigned long length;		/* d³ugo¶æ reszty pakietu */
+	u_int32_t type;			/* typ pakietu */
+	u_int32_t length;		/* d³ugo¶æ reszty pakietu */
 }
 #ifdef __GNUC__
 __attribute__ ((packed))
@@ -613,7 +613,7 @@ __attribute__ ((packed))
 #define GG_WELCOME 0x0001
 
 struct gg_welcome {
-	unsigned long key;		/* klucz szyfrowania has³a */
+	u_int32_t key;			/* klucz szyfrowania has³a */
 }
 #ifdef __GNUC__
 __attribute__ ((packed))
@@ -623,12 +623,12 @@ __attribute__ ((packed))
 #define GG_LOGIN 0x000c
 
 struct gg_login {
-	uin_t uin;			/* twój numerek */
-	unsigned long hash;		/* hash has³a */
-	unsigned long status;		/* status na dzieñ dobry */
-	unsigned long version;		/* moja wersja klienta */
-	unsigned long local_ip;		/* mój adres ip */
-	unsigned short local_port;	/* port, na którym s³ucham */
+	u_int32_t uin;			/* twój numerek */
+	u_int32_t hash;			/* hash has³a */
+	u_int32_t status;		/* status na dzieñ dobry */
+	u_int32_t version;		/* moja wersja klienta */
+	u_int32_t local_ip;		/* mój adres ip */
+	u_int32_t local_port;		/* port, na którym s³ucham */
 }
 #ifdef __GNUC__
 __attribute__ ((packed))
@@ -653,7 +653,7 @@ __attribute__ ((packed))
 #define GG_STATUS_FRIENDS_MASK 0x8000		/* tylko dla znajomych (4.6) */
 
 struct gg_new_status {
-	unsigned long status;			/* na jaki zmieniæ? */
+	u_int32_t status;			/* na jaki zmieniæ? */
 }
 #ifdef __GNUC__
 __attribute__ ((packed))
@@ -663,8 +663,8 @@ __attribute__ ((packed))
 #define GG_NOTIFY 0x0010
 	
 struct gg_notify {
-	uin_t uin;		/* numerek danej osoby */
-	char dunno1;		/* == 3 */
+	u_int32_t uin;				/* numerek danej osoby */
+	u_int8_t dunno1;			/* == 3 */
 }
 #ifdef __GNUC__
 __attribute__ ((packed))
@@ -674,12 +674,12 @@ __attribute__ ((packed))
 #define GG_NOTIFY_REPLY 0x000c	/* tak, to samo co GG_LOGIN */
 	
 struct gg_notify_reply {
-	uin_t uin;			/* numerek */
-	unsigned long status;		/* status danej osoby */
-	unsigned long remote_ip;	/* adres ip delikwenta */
-	unsigned short remote_port;	/* port, na którym s³ucha klient */
-	unsigned long version;		/* wersja klienta */
-	unsigned short dunno2;		/* znowu port? */
+	u_int32_t uin;			/* numerek */
+	u_int32_t status;		/* status danej osoby */
+	u_int32_t remote_ip;	/* adres ip delikwenta */
+	u_int16_t remote_port;	/* port, na którym s³ucha klient */
+	u_int32_t version;		/* wersja klienta */
+	u_int16_t dunno2;		/* znowu port? */
 }
 #ifdef __GNUC__
 __attribute__ ((packed))
@@ -690,8 +690,8 @@ __attribute__ ((packed))
 #define GG_REMOVE_NOTIFY 0x000e
 	
 struct gg_add_remove {
-	uin_t uin;		/* numerek */
-	char dunno1;		/* == 3 */
+	u_int32_t uin;			/* numerek */
+	u_int8_t dunno1;		/* == 3 */
 }
 #ifdef __GNUC__
 __attribute__ ((packed))
@@ -701,8 +701,8 @@ __attribute__ ((packed))
 #define GG_STATUS 0x0002
 
 struct gg_status {
-	uin_t uin;			/* numerek */
-	unsigned long status;		/* nowy stan */
+	u_int32_t uin;			/* numerek */
+	u_int32_t status;		/* nowy stan */
 }
 #ifdef __GNUC__
 __attribute__ ((packed))
@@ -721,9 +721,9 @@ __attribute__ ((packed))
 #define GG_MSG_MAXSIZE 2000
 
 struct gg_send_msg {
-	unsigned long recipient;
-	unsigned long seq;
-	unsigned long msgclass;
+	u_int32_t recipient;
+	u_int32_t seq;
+	u_int32_t msgclass;
 }
 #ifdef __GNUC__
 __attribute__ ((packed))
@@ -731,10 +731,17 @@ __attribute__ ((packed))
 ;
 
 struct gg_msg_richtext {
-	unsigned char flag;		
-	unsigned short length;	  
-	unsigned short position;	
-	unsigned char font;
+	u_int8_t flag;		
+	u_int16_t length;	  
+} 
+#ifdef __GNUC__
+ __attribute__ ((packed))
+#endif 
+;
+
+struct gg_msg_richtext_format {
+	u_int16_t position;
+	u_int8_t font;	  
 } 
 #ifdef __GNUC__
  __attribute__ ((packed))
@@ -747,9 +754,9 @@ struct gg_msg_richtext {
 #define GG_FONT_COLOR 0x08
 
 struct gg_msg_richtext_color { 
-	unsigned char red;
-	unsigned char green;
-	unsigned char blue;
+	u_int8_t red;
+	u_int8_t green;
+	u_int8_t blue;
 } 
 #ifdef __GNUC__
  __attribute__ ((packed))
@@ -757,8 +764,8 @@ struct gg_msg_richtext_color {
 ;
 
 struct gg_msg_recipients {
-	unsigned char flag;
-	unsigned int count;
+	u_int8_t flag;
+	u_int32_t count;
 }
 #ifdef __GNUC__
  __attribute__ ((packed))
@@ -772,9 +779,9 @@ struct gg_msg_recipients {
 #define GG_ACK_NOT_DELIVERED 0x0006
 	
 struct gg_send_msg_ack {
-	unsigned long status;
-	unsigned long recipient;
-	unsigned long seq;
+	u_int32_t status;
+	u_int32_t recipient;
+	u_int32_t seq;
 }
 #ifdef __GNUC__
 __attribute__ ((packed))
@@ -784,10 +791,10 @@ __attribute__ ((packed))
 #define GG_RECV_MSG 0x000a
 	
 struct gg_recv_msg {
-	unsigned long sender;
-	unsigned long seq;
-	unsigned long time;
-	unsigned long msgclass;
+	u_int32_t sender;
+	u_int32_t seq;
+	u_int32_t time;
+	u_int32_t msgclass;
 }
 #ifdef __GNUC__
 __attribute__ ((packed))
@@ -805,13 +812,13 @@ __attribute__ ((packed))
  */
 
 struct gg_dcc_small_packet {
-	unsigned long type;		/* rodzaj pakietu */
+	u_int32_t type;		/* rodzaj pakietu */
 };
 
 struct gg_dcc_big_packet {
-	unsigned long type;		/* rodzaj pakietu */
-	unsigned long dunno1;		/* niewiadoma */
-	unsigned long dunno2;		/* niewiadoma */
+	u_int32_t type;		/* rodzaj pakietu */
+	u_int32_t dunno1;		/* niewiadoma */
+	u_int32_t dunno2;		/* niewiadoma */
 };
 
 /*

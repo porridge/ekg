@@ -37,9 +37,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#ifdef IOCTL
+#ifdef WITH_IOCTLD
 #include <sys/un.h>
-#endif
+#endif /* WITH_IOCTLD */
 #include "config.h"
 #include "libgadu.h"
 #include "stuff.h"
@@ -97,9 +97,9 @@ char *config_dcc_ip = NULL;
 char *query_nick = NULL;
 int sock = 0;
 int length = 0;
-#ifdef IOCTL
+#ifdef WITH_IOCTLD
 struct sockaddr_un addr;
-#endif
+#endif /* WITH_IOCTLD */
 char *busy_reason = NULL;
 char *home_dir = NULL;
 int screen_lines = 24;
@@ -205,7 +205,7 @@ char *my_readline()
         char *res, *prompt = current_prompt();
 
         in_readline = 1;
-#ifdef HAS_RL_SET_PROMPT
+#ifdef HAVE_RL_SET_PROMPT
 	rl_set_prompt(prompt);
 #endif
         res = readline(prompt);
@@ -221,7 +221,7 @@ char *my_readline()
  */
 void reset_prompt()
 {
-#ifdef HAS_RL_SET_PROMPT
+#ifdef HAVE_RL_SET_PROMPT
 	rl_set_prompt(current_prompt());
 	rl_redisplay();
 #endif
@@ -287,7 +287,7 @@ void put_log(uin_t uin, char *format, ...)
 	if (config_log == 2) {
 		if (mkdir(path, 0700) && errno != EEXIST)
 			return;
-		snprintf(path + strlen(path), sizeof(path) - strlen(path), "/%lu", uin);
+		snprintf(path + strlen(path), sizeof(path) - strlen(path), "/%u", uin);
 	}
 
 	if (!(f = fopen(path, "a")))
@@ -460,7 +460,7 @@ void config_write_main(FILE *f, int base64)
 	for (l = ignored; l; l = l->next) {
 		struct ignored *i = l->data;
 
-		fprintf(f, "ignore %lu\n", i->uin);
+		fprintf(f, "ignore %u\n", i->uin);
 	}
 
 	for (l = aliases; l; l = l->next) {
@@ -472,7 +472,7 @@ void config_write_main(FILE *f, int base64)
         for (l = events; l; l = l->next) {
                 struct event *e = l->data;
 
-                fprintf(f, "on %s %lu %s\n", format_events(e->flags), e->uin, e->action);
+                fprintf(f, "on %s %u %s\n", format_events(e->flags), e->uin, e->action);
         }
 }
 
@@ -1226,9 +1226,9 @@ int run_event(char *act)
 {
         uin_t uin;
         char *action, *ptr, **acts;
-#ifdef IOCTL
+#ifdef WITH_IOCTLD
 	int res;
-#endif
+#endif /* WITH_IOCTLD */
 
 	gg_debug(GG_DEBUG_MISC, "// run_event(\"%s\");\n", act);
 
@@ -1245,7 +1245,7 @@ int run_event(char *act)
         else 
 	    	acts = array_make(ptr, " ", 1, 0, 0);
 
-#ifdef IOCTL
+#ifdef WITH_IOCTLD
         if (!strncasecmp(acts[0], "blink_leds", 10)) {
 		gg_debug(GG_DEBUG_MISC, "//   blinking leds\n");
 		res = send_event(acts[1], ACT_BLINK_LEDS);
@@ -1261,7 +1261,7 @@ int run_event(char *act)
 		array_free(acts);
 		return res;
 	}
-#endif /* IOCTL */
+#endif /* WITH_IOCTLD */
  	
 	if (!strncasecmp(acts[0], "play", 4)) {
 		gg_debug(GG_DEBUG_MISC, "//   playing sound\n");
@@ -1336,7 +1336,7 @@ fail:
         return 1;
 }
 
-#ifdef IOCTL
+#ifdef WITH_IOCTLD
 /*
  * send_event()
  *
@@ -1369,7 +1369,7 @@ int send_event(char *seq, int act)
 
         return 0;
 }
-#endif
+#endif /* WITH_IOCTLD */
 
 /*
  * correct_event()
@@ -1383,9 +1383,9 @@ int correct_event(char *act)
         char *action, *ev, **events;
 	int a = 0;
 
-#ifdef IOCTL
+#ifdef WITH_IOCTLD
         struct action_data test;
-#endif // IOCTL
+#endif /* WITH_IOCTLD */
 
 	if (!(action = strdup(act)))
 		return 1;
@@ -1407,7 +1407,7 @@ int correct_event(char *act)
                         acts = array_make(ev, " \t", 1, 0, 0);
 		
 
-#ifdef IOCTL
+#ifdef WITH_IOCTLD
                 if (!strncasecmp(acts[0], "blink_leds", 10) || !strncasecmp(acts[0], "beeps_spk", 9)) {
                         if (acts[1] == NULL) {
                                 my_printf("events_act_no_params", acts[0]);
@@ -1446,7 +1446,7 @@ int correct_event(char *act)
                 }
 
                 else 
-#endif // IOCTL		
+#endif /* WITH_IOCTLD */
 
 		if (!strncasecmp(acts[0], "play", 4)) {
 			if (!acts[1]) {
@@ -1591,7 +1591,7 @@ int events_parse_seq(char *seq, struct action_data *data)
         return 0;
 }
 
-#ifdef IOCTL
+#ifdef WITH_IOCTLD
 
 /*
  * init_socket()
@@ -1613,7 +1613,7 @@ int init_socket(char *sock_path)
         return 0;
 }
 
-#endif
+#endif /* WITH_IOCTLD */
 
 static char base64_charset[] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";

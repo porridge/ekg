@@ -333,7 +333,7 @@ void userlist_write_crash()
 			fprintf(f, g->name);
 		}
 		
-		fprintf(f, ";%lu\r\n", u->uin);
+		fprintf(f, ";%u\r\n", u->uin);
 	}	
 
 	fclose(f);
