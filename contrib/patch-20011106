@@ -1,0 +1,328 @@
+Date: Thu, 15 Nov 2001 08:57:25 +0100 (CET)
+From: R. Florek <raf@regionet.regionet.pl>
+To: wojtekka@irc.pl
+Subject: ekg
+
+Czesc
+
+Od niedawna uzywam (z przyjemnoscia) ekg. Brakowalo mi jednak mozliwosci
+"czatowania" z kilkoma odbiorcami na raz wiec pozwolilem sobie to dopisac.
+Przesylam na wszelki wypadke patcha, gdybys uznal to za warte dodania
+(patch jest do wersji 20011106 :( )
+(w protokole te dane ida za trescia wiadomosci - 1 bajt zawsze rowny 1,
+int z liczba extra odbiorcow, no i id'y extra odbiorcow)
+
+
+   Pozdrawiam
+   Rafal Florek
+      
+
+diff -N -u ekg-20011106/Makefile.in after/Makefile.in
+--- ekg-20011106/Makefile.in	Sun Nov  4 22:49:02 2001
++++ after/Makefile.in	Wed Nov 14 20:43:12 2001
+@@ -10,7 +10,7 @@
+ MAKE = @MAKE@
+ 
+ CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES)
+-OBJS = libgg.o libgg_search.o stuff.o commands.o events.o themes.o vars.o dynstuff.o
++OBJS = muser.o libgg_search.o stuff.o commands.o events.o themes.o vars.o dynstuff.o libgg.o
+ 
+ all:	ekg
+ 
+diff -N -u ekg-20011106/commands.c after/commands.c
+--- ekg-20011106/commands.c	Sun Nov  4 16:47:10 2001
++++ after/commands.c	Wed Nov 14 20:43:07 2001
+@@ -880,12 +880,15 @@
+ 	return 0;
+ }
+ 
++u_int uins[100];
++
+ COMMAND(command_msg)
+ {
+ 	struct userlist *u;
+-	char sender[50], *msg = NULL;
+-	uin_t uin;
++	char sender[50], *msg = NULL;	
++	int i;
+ 	int free_msg = 0;
++	struct gg_peers ggp;
+ 
+ 	if (!sess || sess->state != GG_STATE_CONNECTED) {
+ 		my_printf("not_connected");
+@@ -897,15 +900,14 @@
+ 		return 0;
+ 	}
+ 	
+-	if (!(uin = get_uin(params[0]))) {
+-		my_printf("user_not_found", params[0]);
+-		return 0;
+-	}
++	if( !get_uins(&ggp, params[0]) )
++	   return 0;	
++		
+ 
+-        if ((u = find_user(uin, NULL)))
++        if ((u = find_user(ggp.peers_n[0], NULL)))
+                 snprintf(sender, sizeof(sender), "%s/%lu", u->comment, u->uin);
+         else
+-                snprintf(sender, sizeof(sender), "%lu", uin);
++                snprintf(sender, sizeof(sender), "%lu", ggp.peers_n[0]);
+ 
+ 	if (!strcmp(params[1], "\\")) {
+ 		struct string *s;
+@@ -937,13 +939,21 @@
+ 	} else
+ 		msg = params[1];
+ 
+-        put_log(uin, "<< %s %s (%s)\n%s\n", (!strcasecmp(name, "chat")) ?
++        put_log(ggp.peers_n[0], "<< %s %s (%s)\n%s\n", (!strcasecmp(name, "chat")) ?
+                 "Rozmowa do" : "Wiadomo¶æ do", sender, full_timestamp(),
+                 params[1]);
++   iso_to_cp(msg);
+ 
+-	add_send_nick(params[0]);
+-	iso_to_cp(msg);
+-	gg_send_message(sess, (!strcasecmp(name, "msg")) ? GG_CLASS_MSG : GG_CLASS_CHAT, uin, msg);
++   for(i=0; i<ggp.n; ++i)
++   {
++      char* ext_msg;
++      int extm_len;
++   	add_send_nick(ggp.peers_s[i]);
++   	ext_msg= build_ext_msg(&ggp, ggp.peers_n[i], msg, &extm_len);
++   	gg_send_message_ext(sess, (!strcasecmp(name, "msg")) ? GG_CLASS_MSG : GG_CLASS_CHAT,
++   	                    ggp.peers_n[i], ext_msg, extm_len);
++   	free(ext_msg);
++   }
+ 
+ 	if (free_msg)
+ 		free(msg);
+diff -N -u ekg-20011106/commands.h after/commands.h
+--- ekg-20011106/commands.h	Mon Oct 15 03:14:08 2001
++++ after/commands.h	Wed Nov 14 20:43:09 2001
+@@ -29,6 +29,19 @@
+ 	char *long_help;
+ };
+ 
++struct gg_peers
++{
++   int n;
++   char *peers_s[20];
++   unsigned int peers_n[20];
++};
++
++int get_uins(struct gg_peers* ggp, char *params);
++char* build_ext_msg(struct gg_peers* ggp, unsigned int  cui, char *msg, int* ext_len);
++struct gg_session;
++int gg_send_message_ext(struct gg_session *sess, int msgclass, unsigned int  recipient, unsigned char *message, int len);
++
++
+ #define COMMAND(x) int x(char *name, char **params)
+ 
+ int execute_line(char *line);
+diff -N -u ekg-20011106/events.c after/events.c
+--- ekg-20011106/events.c	Tue Oct 23 19:33:07 2001
++++ after/events.c	Wed Nov 14 20:43:07 2001
+@@ -60,6 +60,7 @@
+ 	struct userlist *u = find_user(e->event.msg.sender, NULL);
+ 	int chat = ((e->event.msg.msgclass & 0x0f) == GG_CLASS_CHAT);
+ 	char sender[100];
++	char senders[200];
+ 
+ 	if (is_ignored(e->event.msg.sender))
+ 		return;
+@@ -74,7 +75,17 @@
+ 	}	
+ 
+ 	cp_to_iso(e->event.msg.message);
+-	my_printf((chat) ? "chat_header" : "message_header", format_user(e->event.msg.sender));
++   sprintf(senders, "%s", format_user(e->event.msg.sender));
++   if( e->event.msg.extra_uins )
++   {
++      int i;
++      unsigned int* extra_uins= e->event.msg.extra_uins;
++      unsigned int n= fix32(*extra_uins++);
++      for(i=0; i<n; ++i, ++extra_uins)
++      	sprintf(senders+strlen(senders), ",%s", format_user(fix32(*extra_uins)));
++   }
++
++	my_printf((chat) ? "chat_header" : "message_header", senders);
+ 
+ 	print_message_body(e->event.msg.message, chat);
+ 	my_printf((chat) ? "chat_footer" : "message_footer");
+@@ -87,10 +98,11 @@
+ 	else
+ 		snprintf(sender, sizeof(sender), "%lu", e->event.msg.sender);
+ 
++
+ 	/* wiem, niegramatycznie, ale jako¶ trzeba rozró¿niæ */
+ 
+ 	put_log(e->event.msg.sender, ">> %s %s (%s)\n%s\n", (chat) ?
+-		"Rozmowa od" : "Wiadomo¶æ od", sender, full_timestamp(),
++		"Rozmowa od" : "Wiadomo¶æ od", senders, full_timestamp(),
+ 		e->event.msg.message);
+ 
+ 	if (away && sms_away && sms_send_app && sms_number) {
+diff -N -u ekg-20011106/libgg.c after/libgg.c
+--- ekg-20011106/libgg.c	Sun Nov  4 11:14:33 2001
++++ after/libgg.c	Wed Nov 14 20:43:07 2001
+@@ -80,7 +80,8 @@
+  *
+  * dla maszyn big-endianowych zamienia kolejno¶æ bajtów w ,,long''ach.
+  */
+-static inline unsigned long fix32(unsigned long x)
++//static inline
++unsigned long fix32(unsigned long x)
+ {
+ #ifndef WORDS_BIGENDIAN
+ 	return x;
+@@ -697,6 +698,36 @@
+ 	return fix32(s.seq);
+ }
+ 
++int gg_send_message_ext(struct gg_session *sess, int msgclass, uin_t recipient, unsigned char *message, int len)
++{
++	struct gg_send_msg s;
++
++	if (!sess) {
++		errno = EFAULT;
++		return -1;
++	}
++	
++	if (sess->state != GG_STATE_CONNECTED) {
++		errno = ENOTCONN;
++		return -1;
++	}
++
++	gg_debug(GG_DEBUG_FUNCTION, "** gg_send_message(..., %d, %u, \"...\");\n", msgclass, recipient);
++
++	s.recipient = fix32(recipient);
++	if (!sess->seq)
++		sess->seq = 0x01740000 | (rand() & 0xffff);
++	s.seq = fix32(sess->seq);
++	s.msgclass = fix32(msgclass);
++	sess->seq += (rand() % 0x300) + 0x300;
++	
++	if (gg_send_packet(sess->fd, GG_SEND_MSG, &s, sizeof(s), message, len) == -1)
++		return -1;
++
++	return fix32(s.seq);
++}
++
++
+ /*
+  * gg_ping()
+  *
+@@ -888,11 +919,25 @@
+ 
+ 		gg_debug(GG_DEBUG_MISC, "-- received a message\n");
+ 
+-		if (h->length >= sizeof(*r)) {
++		if (h->length >= sizeof(*r)) 
++		{
++         int mlen;
++         char* msg;
++         char* msgdup;
++
+ 			e->type = GG_EVENT_MSG;
+ 			e->event.msg.msgclass = fix32(r->msgclass);
+ 			e->event.msg.sender = fix32(r->sender);
+-			e->event.msg.message = strdup((char*) r + sizeof(*r));
++
++         msg= ((char*) r + sizeof(*r));
++         mlen= strlen(msg);
++         msgdup= (char*)malloc(h->length);
++         memcpy(msgdup, msg, h->length - sizeof(*r));
++         if( (sizeof(*r)+mlen+1) < h->length )
++            e->event.msg.extra_uins= (unsigned int*)(msgdup+mlen+2);
++         else
++            e->event.msg.extra_uins= 0;
++			e->event.msg.message = msgdup;
+ 		}
+ 	}
+ 
+diff -N -u ekg-20011106/libgg.h after/libgg.h
+--- ekg-20011106/libgg.h	Sat Nov  3 12:13:29 2001
++++ after/libgg.h	Wed Nov 14 20:43:09 2001
+@@ -128,8 +128,9 @@
+         union {
+                 struct {
+                         uin_t sender;
+-			int msgclass;
++               			int msgclass;
+                         unsigned char *message;
++                        unsigned int* extra_uins;
+                 } msg;
+                 struct gg_notify_reply *notify;
+                 struct gg_status status;
+diff -N -u ekg-20011106/muser.c after/muser.c
+--- ekg-20011106/muser.c	Wed Dec 31 19:00:00 1969
++++ after/muser.c	Wed Nov 14 20:43:07 2001
+@@ -0,0 +1,67 @@
++#include <stdio.h>
++#include <string.h>
++#include <stdlib.h>
++#include "commands.h"
++#include "stuff.h"
++#include "themes.h"
++
++unsigned long fix32(unsigned long x);
++
++int get_uins(struct gg_peers* ggp, char* p)
++{
++   int i=0;
++   u_int uin;   
++   u_int is_u= 1;
++   
++   ggp->n= 0;
++
++   while( is_u )
++   {
++      while( p[i] && p[i]!=',' )
++         ++i;
++   
++      if( (is_u= (p[i]!='\0')) )
++         p[i]='\0';
++
++      if( !(uin = get_uin(p)) )
++      {
++   		my_printf("user_not_found", p);		 
++		   return 0;
++	   }
++	
++   	ggp->peers_s[ggp->n]= p;
++   	ggp->peers_n[ggp->n]= uin;
++   	++ggp->n;
++      p+= i+1;
++      i=0;
++   }	
++   return 1;
++}
++
++char* build_ext_msg(struct gg_peers* ggp, u_int cui, char *msg, int* ext_len)
++{
++   int len, len2;
++   char* ext_msg;
++   int i;
++   u_int* uins;
++
++   len= len2= strlen(msg)+1;
++   if( ggp->n > 1 )
++      len2+= 1+4*(ggp->n);
++   ext_msg= (char*)malloc(len2);
++   memcpy(ext_msg, msg, len);
++   uins= (u_int*)(ext_msg+len+1);
++
++   if( ggp->n > 1 )
++   {
++      ext_msg[len]= 1;
++      *uins++= fix32(ggp->n-1);
++      for(i=0; i<ggp->n; ++i)
++         if( ggp->peers_n[i]!= cui )
++            *uins++= fix32(ggp->peers_n[i]);
++   }
++   *ext_len= len2;
++
++   return ext_msg;
++}
++

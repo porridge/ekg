@@ -1,0 +1,142 @@
+Date: Sun, 4 Nov 2001 20:46:25 +0100 (CET)
+From: Piotr Figiel <feeg@psychodelic.org>
+To: wojtekka@irc.pl
+Subject: ekg - patch
+
+Witam,
+ na wstêpie gratuluje ¶wietnej roboty, jak± wykonali¶cie tworz±c libgg.
+Przysy³am ³atkê, dodaj±c± odgrywanie plików d¼wiêkowych po przyj¶ciu
+wiadomo¶ci (ró¿ne d¼wiêki zale¿nie od typu - msg/chat). W przysz³o¶ci
+d¼wiêki mog³yby byæ rozró¿niane zale¿nie od nadawcy wiadomo¶ci.
+ Do tego poprawi³em pewien  b³±d (mo¿e ficzer ?), pozwalaj±cy na
+wymieszanie siê w³a¶ciwo¶ci kilku themów.
+ Nie jestem specem od programowania, wiêc mog± gdzie¶ wyst±piæ b³êdy,
+dlatego proszê sprawdziæ ³atkê przed spaczowaniem :].
+
+Pozdrawiam,
+
+--
+ ( Piotrek "Pheagator" Figiel <feeg psychodelic.org> )
+ ( Nielot# 154315 ) ( *icq no 3670669 ) ( #debian.pl )
+
+ This is the GPL-monkey:                        const char monkey = 0x40;
+      
+
+diff -p -r ekg-20011102/commands.c ekg-20011102-feeg/commands.c
+*** ekg-20011102/commands.c	Fri Nov  2 12:46:04 2001
+--- ekg-20011102-feeg/commands.c	Sun Nov  4 14:18:04 2001
+*************** COMMAND(command_theme)
+*** 968,985 ****
+  		my_printf("not_enough_params");
+  		return 0;
+  	}
+! 	
+  	if (!strcmp(params[0], "-")) {
+- 		init_theme();
+- 		reset_theme_cache();
+  		if (!in_autoexec)
+  			my_printf("theme_default");
+! 	} else {
+! 		if (!read_theme(params[0], 1)) {
+! 			reset_theme_cache();
+! 			if (!in_autoexec)
+  				my_printf("theme_loaded", params[0]);
+! 		} else
+  			my_printf("error_loading_theme", strerror(errno));
+  	}
+  	
+--- 968,988 ----
+  		my_printf("not_enough_params");
+  		return 0;
+  	}
+! 
+! 	init_theme();
+! 	reset_theme_cache();
+! 
+  	if (!strcmp(params[0], "-")) {
+  		if (!in_autoexec)
+  			my_printf("theme_default");
+! 	}
+! 	else {
+! 		if (!read_theme(params[0], 1))
+! 		{
+! 			if (!in_autoexec) 
+  				my_printf("theme_loaded", params[0]);
+! 		}
+! 		else
+  			my_printf("error_loading_theme", strerror(errno));
+  	}
+  	
+diff -p -r ekg-20011102/events.c ekg-20011102-feeg/events.c
+*** ekg-20011102/events.c	Wed Oct 24 01:33:07 2001
+--- ekg-20011102-feeg/events.c	Sun Nov  4 20:31:36 2001
+*************** void handle_msg(struct gg_event *e)
+*** 82,87 ****
+--- 82,103 ----
+  	if (enable_beep && ((chat) ? enable_beep_chat : enable_beep_msg))
+  		my_puts("\007");
+  
++ 	
++ 	if (sound_app && ((chat && sound_chat_file) || sound_msg_file))
++ 	{
++ 		if (!fork())
++ 		{
++ 			int i;
++ 			for (i = 0; i < 255; i++)
++ 				close (i); 
++ 			if (!chat) { // dzia³a na odwrót ;) nie wiem czemu -ph.
++ 				execlp(sound_app,sound_app,sound_chat_file,NULL);
++ 			}
++ 			else 
++ 				execlp(sound_app,sound_app,sound_msg_file,NULL);
++ 			exit(1);
++ 		}
++ 	}
+  	if (u)
+  		snprintf(sender, sizeof(sender), "%s/%lu", u->comment, u->uin);
+  	else
+diff -p -r ekg-20011102/stuff.c ekg-20011102-feeg/stuff.c
+*** ekg-20011102/stuff.c	Fri Nov  2 12:46:04 2001
+--- ekg-20011102-feeg/stuff.c	Sun Nov  4 16:17:08 2001
+*************** int log = 0;
+*** 53,58 ****
+--- 53,61 ----
+  char *log_path = NULL;
+  int display_color = 1;
+  int enable_beep = 1, enable_beep_msg = 1, enable_beep_chat = 1, enable_beep_notify = 1;
++ char *sound_msg_file = NULL;
++ char *sound_chat_file = NULL;
++ char *sound_app = NULL;
+  int config_uin = 0;
+  char *config_password = NULL;
+  int sms_away = 0;
+diff -p -r ekg-20011102/stuff.h ekg-20011102-feeg/stuff.h
+*** ekg-20011102/stuff.h	Fri Nov  2 12:46:05 2001
+--- ekg-20011102-feeg/stuff.h	Sun Nov  4 16:17:41 2001
+*************** int log;
+*** 60,65 ****
+--- 60,68 ----
+  char *log_path;
+  int display_color;
+  int enable_beep, enable_beep_msg, enable_beep_chat, enable_beep_notify;
++ char *sound_msg_file;
++ char *sound_chat_file;
++ char *sound_app;
+  int config_uin;
+  char *config_password;
+  char *config_user;
+diff -p -r ekg-20011102/vars.c ekg-20011102-feeg/vars.c
+*** ekg-20011102/vars.c	Mon Oct 15 09:14:08 2001
+--- ekg-20011102-feeg/vars.c	Sun Nov  4 16:17:54 2001
+*************** struct variable variables[MAX_VARS] = {
+*** 36,41 ****
+--- 36,44 ----
+  	{ "beep_msg", VAR_BOOL, 1, &enable_beep_msg },
+  	{ "beep_chat", VAR_BOOL, 1, &enable_beep_chat },
+  	{ "beep_notify", VAR_BOOL, 1, &enable_beep_notify },
++ 	{ "sound_msg_file", VAR_STR, 1, &sound_msg_file },
++ 	{ "sound_chat_file", VAR_STR, 1, &sound_chat_file },
++ 	{ "sound_app", VAR_STR, 1, &sound_app },
+  	{ "completion_notify", VAR_BOOL, 1, &completion_notify },
+  	{ "display_ack", VAR_BOOL, 1, &display_ack },
+  	{ "display_color", VAR_BOOL, 1, &display_color },
