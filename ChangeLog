@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2004-01-22
+
+- poprawka dzia³ania auto_conference (joshua/sz)
+
 // 2004-01-13
 
 - usuniêcie u¿ytkownika nie usuwa go z listy ignorowanych i blokowanych

@@ -2120,7 +2120,7 @@ COMMAND(cmd_msg)
 	char **nicks = NULL, *nick = NULL, **p = NULL, *add_send = NULL;
 	unsigned char *msg = NULL, *raw_msg = NULL, *format = NULL;
 	uin_t uin;
-	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0, msg_seq, formatlen = 0;
+	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0, msg_seq, formatlen = 0, conference = 0;
 
 	if (!params[0] || !params[1]) {
 		printq("not_enough_params", name);
@@ -2142,6 +2142,7 @@ COMMAND(cmd_msg)
 		list_t l;
 
 		if (c) {
+			conference = 1;
 			xfree(nick);
 			nick = xstrdup(c->name);
 
@@ -2159,6 +2160,8 @@ COMMAND(cmd_msg)
 			xfree(nick);
 			return -1;
 		}
+
+		conference = 1;
 
 		for (l = c->recipients; l; l = l->next)
 			array_add(&nicks, xstrdup(itoa(*((uin_t *) (l->data)))));
@@ -2335,7 +2338,7 @@ COMMAND(cmd_msg)
 
 		secure = 0;
 
-		if (!chat || count == 1) {
+		if (!conference) {
 			unsigned char *__msg = xstrdup(msg);
 #ifdef HAVE_OPENSSL
 			int ret = 0;
@@ -2356,7 +2359,7 @@ COMMAND(cmd_msg)
 		}
 	}
 
-	if (count > 1 && chat) {
+	if (conference) {
 		uin_t *uins = xmalloc(count * sizeof(uin_t));
 		int realcount = 0;
 
