@@ -640,13 +640,16 @@ static void handle_sigsegv()
 	ui_deinit();
 	
 	ioctld_kill();
-	
+
 	fprintf(stderr, "\n"
 "*** Naruszenie ochrony pamiêci ***\n"
 "\n"
 "Spróbujê zapisaæ ustawienia, ale nie obiecujê, ¿e cokolwiek z tego\n"
 "wyjdzie. Trafi± one do plików %s/config.%d\n"
-"oraz %s/userlist.%d\n"
+"oraz %s/userlist.%d.\n"
+"\n"
+"Do pliku %s/debug.%d zapiszê ostatanie komunikaty\n"
+"z okna debugowania.\n"
 "\n"
 "Je¶li zostanie utworzony plik %s/core, spróbuj uruchomiæ\n"
 "polecenie:\n"
@@ -658,7 +661,7 @@ static void handle_sigsegv()
 "i najprawdopodobniej pozwoli to unikn±æ tego typu sytuacji w przysz³o¶ci.\n"
 "Wiêcej szczegó³ów w dokumentacji, w pliku ,,gdb.txt''.\n"
 "\n",
-config_dir, getpid(), config_dir, getpid(), config_dir, argv0, config_dir);
+config_dir, getpid(), config_dir, getpid(), config_dir, getpid(), config_dir, argv0, config_dir);
 
 	config_write_crash();
 	userlist_write_crash();

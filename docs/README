@@ -229,14 +229,15 @@ ZG£ASZANIE B£ÊDÓW
 
     Zaznacz, co to za system, jaka dystrybucja, jaka wersja.
     
-    Je¶li b³±d jest powtarzalny i zwi±zany z sieci±, uruchom ekg z opcj±
-    ,,-d'' i przy¶lij to, co zostanie wy¶wietlone przed samym wyst±pieniem
+    Je¶li b³±d jest powtarzalny i zwi±zany z sieci±, przejd¼ do okna debug
+    i przy¶lij to, co zostaje tam wy¶wietlone przed samym wyst±pieniem
     b³êdu (zwykle ~20 linijek wystarczy).
 
     Je¶li program powoduje naruszenie ochrony pamiêci i powstaje plik
     ,,core'', postêpuj zgodnie z instrukcjami pokazanymi na ekranie --
     uruchom ,,gdb ekg core'', przy¶lij to, co siê pojawi. Potem wydaj
-    polecenie ,,bt'' i jego wynik równie¿ za³±cz do listu.
+    polecenie ,,bt'' i jego wynik równie¿ za³±cz do listu. Je¶li b³±d
+    mo¿e mieæ co¶ wspólnego z sieci±, wy¶lij utworzony plik ,,debug''.
 
     Je¶li program siê zawiesi, nie reaguje na nic i zajmuje 100% czasu
     procesora, w innym oknie terminala wydaj polecenie ,,strace -p <pid>'',
