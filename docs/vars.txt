@@ -125,9 +125,9 @@ check_mail
 	domy¶lna warto¶æ: 0
 
 	okre¶la, czy ekg ma sprawdzaæ, czy nadesz³a nowa poczta i informowaæ
-	o tym na pasku statusu. warto¶æ 1 odpowiada sprawdzaniu skrzynki typu
+	o tym na pasku stanu. warto¶æ 1 odpowiada sprawdzaniu skrzynki typu
 	mbox, a warto¶æ 2 skrzynki typu Maildir. dodadanie warto¶ci 4 oznacza,
-	¿e oprócz informowania na pasku statusu, bêdziemy otrzymywaæ krótk±
+	¿e oprócz informowania na pasku stanu, bêdziemy otrzymywaæ krótk±
 	informacjê o nadej¶ciu poczty w aktualnym oknie. wszystkie dostêpne
 	warto¶ci to: 0, 1, 2, 5, 6.
 
@@ -156,7 +156,7 @@ completion_notify
 	ma byæ dopisywany do listy dope³niania klawiszem Tab. je¶li jest
 	równa 2, jest równie¿ usuwany po przej¶ciu w stan niedostêpny.
 	dodanie warto¶ci 4 spowoduje, ¿e dopisywani bêd± tak¿e ci, którzy
-	pojawi± siê na li¶cie ze statusem ,,zajêty''. wszystkie dostêpne
+	pojawi± siê na li¶cie ze stanem ,,zajêty''. wszystkie dostêpne
 	warto¶ci to: 0, 1, 2, 5, 6.
 
 ctrld_quits
@@ -341,7 +341,7 @@ events_delay
 
 	okre¶la, po ilu sekundach od po³±czenia z serwerem, zaczn± dzia³aæ
 	zdarzenia ,,on'' i d¼wiêki zwi±zane ze zmianami stanu. chodzi o to,
-	aby nie traktowaæ pocz±tkowych informacji o statusie osób po
+	aby nie traktowaæ pocz±tkowych informacji o stanie osób po
 	po³±czeniu jako zmianê ich stanu.
 
 header_size
