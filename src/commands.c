@@ -2514,6 +2514,8 @@ COMMAND(cmd_dcc)
 			}
 		}
 
+		passed = 0;
+
 		for (l = transfers; l; l = l->next) {
 			struct transfer *t = l->data;
 
@@ -2738,10 +2740,10 @@ COMMAND(cmd_dcc)
 	}
 
 	if (!strncasecmp(params[0], "g", 1)) {		/* get */
-		struct transfer *t;
+		struct transfer *t = NULL;
 		char *path;
 		
-		for (t = NULL, l = transfers; l; l = l->next) {
+		for (l = transfers; l; l = l->next) {
 			struct transfer *tt = l->data;
 			struct userlist *u;
 
@@ -2749,11 +2751,14 @@ COMMAND(cmd_dcc)
 				continue;
 			
 			if (!params[1]) {
+				if (tt->dcc->established)
+					continue;
+
 				t = tt;
 				break;
 			}
 
-			if (params[1][0] == '#' && atoi(params[1] + 1) == tt->id) {
+			if (params[1][0] == '#' && strlen(params[1]) > 1 && atoi(params[1] + 1) == tt->id) {
 				t = tt;
 				break;
 			}
