@@ -241,6 +241,7 @@ char *gg_urlencode(char *str);
 #define GG_PUBDIR_PORT 80
 #define GG_DEFAULT_PORT 8074
 #define GG_HTTPS_PORT 443
+#define GG_HTTP_USERAGENT "Mozilla/4.7 [en] (Win98; I)"
 
 struct gg_header {
 	unsigned long type;		/* typ pakietu */
