@@ -54,7 +54,6 @@ ui_loop()
 	powinna wywo³aæ ekg_wait_for_key() przed wywo³aniem funkcji
 	czytaj±cej z klawiatury, by w przerwach móc obs³ugiwaæ po³±czenia
 	sieciowe. gdy u¿ytkownik wyda jak±¶ komendê, powinna wywo³aæ
-	ekg_execute(). je¶li ekg_execute() zwróci 1, funkcja powinna siê
-	zakoñczyæ.
+	command_exec().
 
 $Id$
