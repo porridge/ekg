@@ -3225,8 +3225,7 @@ cleanup:
 COMMAND(cmd_on)
 {
 	if (match_arg(params[0], 'a', "add", 2)) {
-		int flags, res = -1;
-		int uin;
+		int flags, res;
 
 		if (!params[1] || !params[2] || !params[3]) {
 			printq("not_enough_params", name);
@@ -3238,9 +3237,7 @@ COMMAND(cmd_on)
 			return -1;
 		}
 
-		uin = get_uin(params[2]);
-		
-		if (!uin && strcmp(params[2], "*") && params[2][0] != '@') {
+		if (!get_uin(params[2]) && strcmp(params[2], "*") && params[2][0] != '@') {
 			printq("user_not_found", params[2]);
 			return -1;
 		}
