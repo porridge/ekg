@@ -217,6 +217,19 @@ int my_getc(FILE *f)
 				my_printf("auto_away", tmp);
 			}
 
+			/* auto save */
+			if (config_changed && config_auto_save && time(NULL) - last_save > config_auto_save) {
+				last_save = time(NULL);
+				gg_debug(GG_DEBUG_MISC, "-- autosaving userlist and config after %d seconds.\n",
+						        config_auto_save);
+
+				if (!userlist_write(NULL) && !config_write(NULL)) {
+					my_printf("autosaved");
+					config_changed = 0;
+				} else
+					my_printf("error_saving");
+			}
+
 			/* przegl±danie zdech³ych dzieciaków */
 			while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
 				for (l = children; l; l = m) {
@@ -470,6 +483,8 @@ IOCTL_HELP
 		list_add(&watches, sess, 0);
 	}
 
+	if (config_auto_save)
+		last_save = time(NULL);
 
 	for (;;) {
 		char *line, *tmp = NULL;

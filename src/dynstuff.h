@@ -20,6 +20,8 @@
 #ifndef __DYNSTUFF_H
 #define __DYNSTUFF_H
 
+/* listy */
+
 struct list {
 	void *data;
 	struct list *next;
@@ -31,6 +33,8 @@ int list_remove(struct list **list, void *data, int free_data);
 int list_count(struct list *list);
 int list_destroy(struct list *list, int free_data);
 
+/* stringi */
+
 struct string {
 	char *str;
 	int size;
@@ -41,6 +45,13 @@ int string_append(struct string *s, char *str);
 int string_append_n(struct string *s, char *str, int count);
 int string_append_c(struct string *s, char ch);
 char *string_free(struct string *s, int free_string);
+
+/* tablice stringów */
+
+char **array_make(char *string, char *sep, int max, int trim);
+void array_free(char **array);
+
+/* rozszerzenia libców */
 
 char *itoa(long int i);
 

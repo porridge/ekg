@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-02-07
 
 - ju¿ nie dodaje ,,obcych zmiennych'' przy /set (w)
+- auto_save, domy¶lnie wy³±czona (cry/w)
 
 // 2002-02-06
 

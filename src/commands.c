@@ -1085,6 +1085,8 @@ COMMAND(command_msg)
 
 COMMAND(command_save)
 {
+	last_save = time(NULL);
+
 	if (!userlist_write(NULL) && !config_write(NULL)) {
 		my_printf("saved");
 		config_changed = 0;

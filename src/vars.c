@@ -43,6 +43,7 @@ void variable_init()
 
 	variable_add("auto_away", VAR_INT, 1, &config_auto_away, NULL);
 	variable_add("auto_reconnect", VAR_INT, 1, &config_auto_reconnect, NULL);
+	variable_add("auto_save", VAR_INT, 1, &config_auto_save, NULL);
 	variable_add("beep", VAR_BOOL, 1, &config_beep, NULL);
 	variable_add("beep_msg", VAR_BOOL, 1, &config_beep_msg, NULL);
 	variable_add("beep_chat", VAR_BOOL, 1, &config_beep_chat, NULL);

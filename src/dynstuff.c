@@ -335,3 +335,34 @@ char *itoa(long int i)
 
 	return tmp;
 }
+
+/*
+ * array_make()
+ *
+ * tworzy tablicê tekstów z jednego, rozdzielonego podanymi znakami.
+ *
+ * zaalokowan± tablicê z zaalokowanymi ci±gami znaków lub NULL w przypadku
+ * b³êdu.
+ */
+char **array_make(char *string, char *sep, int max, int trim)
+{
+	/* XXX develujê sobie gdzie indziej, ¿eby cvsa nie za¶miecaæ. */
+
+	return NULL;
+}
+
+/*
+ * array_free()
+ *
+ * zwalnia pamieæ zajmowan± przez tablicê.
+ */
+void array_free(char **array)
+{
+	char **tmp;
+
+	for (tmp = array; *tmp; tmp++)
+		free(*tmp);
+
+	free(array);
+}
+

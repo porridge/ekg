@@ -66,6 +66,8 @@ struct gg_session *sess;
 
 int config_dcc;
 int config_auto_away;
+int config_auto_save;
+time_t last_save;
 int config_log;
 char *config_log_path;
 int config_log_ignored;
