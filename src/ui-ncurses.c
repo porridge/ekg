@@ -2723,7 +2723,7 @@ static struct {
 static void complete(int *line_start, int *line_index)
 {
 	char *start, *cmd, **words, *separators;
-	int i, count, word, j, words_count, word_current;
+	int i, count, word, j, words_count, word_current, open_quote;
 	
 	start = xmalloc(strlen(line) + 1);
 	
@@ -2778,11 +2778,13 @@ static void complete(int *line_start, int *line_index)
 	words = NULL;
 
 	/* podziel (uwzglêdniaj±c cudzys³owia)*/
-	for (i = 0; i < strlen(line); i++) {
-		if(line[i] == '"') 
+	for (i = 0, j = 0, open_quote = 0; i < strlen(line); i++) {
+		if(line[i] == '"') {
 			for(j = 0,  i++; i < strlen(line) && line[i] != '"'; i++, j++)
 				start[j] = line[i];
-		else
+			if (i == strlen(line))
+				open_quote = 1;
+		} else
 			for(j = 0; i < strlen(line) && !xisspace(line[i]) && line[i] != ','; j++, i++) 
 				start[j] = line[i];
 		start[j] = '\0';
@@ -2793,7 +2795,7 @@ static void complete(int *line_start, int *line_index)
 	}
 
 	/* je¿eli ostatnie znaki to spacja, albo przecinek to trzeba dodaæ jeszcze pusty wyraz do words */
-	if (strlen(line) > 1 && (line[strlen(line) - 1] == ' ' || line[strlen(line) - 1] == ','))
+	if (strlen(line) > 1 && (line[strlen(line) - 1] == ' ' || line[strlen(line) - 1] == ',') && !open_quote)
 		array_add(&words, xstrdup(""));
 
 /*	 for(i = 0; i < array_count(words); i++)
@@ -3010,22 +3012,25 @@ static void complete(int *line_start, int *line_index)
 		int common = 0;
 		int tmp = 0;
 		int quotes = 0;
+		char *s1 = completions[0];
 
+                if (*s1 =='"')
+                      s1++;
 		/* 
 		 * mo¿e nie za ³adne programowanie, ale skuteczne i w sumie jedyne w 100% spe³niaj±ce	
 	 	 * wymagania dope³niania (uwzglêdnianie cudzyws³owiów itp...)
 		 */
 		for(i=1, j = 0; ; i++, common++) { 
 			for(j=0; j < count; j++) {
-				if(completions[j][0] == '"') 
+		                char *s2;
+
+	                        s2 = completions[j];
+        	                if (*s2 == '"') {
+					s2++;
 					quotes = 1;
-				if(completions[j][0] == '"' && completions[0][0] != '"')
-					tmp = strncasecmp(completions[0], completions[j] + 1, i); 
-				else if(completions[0][0] == '"' && completions[j][0] != '"')
-					tmp = strncasecmp(completions[0] + 1, completions[j], i); 
-				else
-					tmp = strncasecmp(completions[0], completions[j], i); 
-				/* gg_debug(GG_DEBUG_MISC,"strncasecmp(\"%s\", \"%s\", %d) = %d\n", completions[0], completions[j], i, strncasecmp(completions[0], completions[j], i));  */
+				}
+				tmp = strncasecmp(s1, s2, i);
+			/* gg_debug(GG_DEBUG_MISC,"strncasecmp(\"%s\", \"%s\", %d) = %d\n", s1, s2, i, strncasecmp(s1, s2, i));  */
                                 if (tmp)
                                         break;
                         }
