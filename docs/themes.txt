@@ -8,6 +8,7 @@
 | fioletowy     | %m/%p  | %M/%P | %q  |
 | turkusowy     | %c     | %C    | %d  |
 | br±zowy/¿ó³ty | %y     | %Y    | %z  |
+| zielony       | %g     | %G    | %h  |
 | bia³y         | %w     | %W    | %x  |
 | mrugaj±cy     | %i     | -     | -   |
 | t³usty	| %T	 | -	 | -   |

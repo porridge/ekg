@@ -1,10 +1,9 @@
 ===============OPIS CZÊ¦CI HTTP PROTOKO£U GADU-GADU===============
 
-Piotr Mach <pm@gadu-gadu.com> 
+Piotr Mach <pm@gg.wha.la> 
 
 Opis powsta³ na podstawie analizy pakietów i ¼róde³ ekg, opis dla wersji 
-4.9.3 (0x18),  starsze klienty u¿ywaj± innych skryptów o podobnej funkcjonalno¶ci.
-
+4.9.3 (0x18), starsze klienty u¿ywaj± innych skryptów o podobnej funkcjonalno¶ci.
 
 Spis tre¶ci:
 
@@ -12,24 +11,24 @@ Spis tre¶ci:
   1. Szukanie osób w katalogu publicznym
       1.1 Wed³ug imiê, nazwisko, nick, p³eæ, miasto, rok ur.
       1.2 Wed³ug numerka
-  2. Sprawdzanie/zmiana danych w kat publicznym
+  2. Sprawdzanie i zmiana danych w kat publicznym
       2.1 Sprawdzenie
       2.2 Zmiana
-  3. Rejestrowanie konta, usuniêcie i zmiana has³a dla konta
+  3. Rejestrowanie konta, usuniêcie i zmiana has³a
       3.1 Rejestracja
-      3.2 Usuniêcie konta
+      3.2 Usuniêcie
       3.3 Zmiana has³a
   4. Operacje zwi±zane z przechowywaniem listy kontaktów na serwerze
       4.1 Wys³anie
       4.2 Pobranie
       4.3 Usuniêcie
-  5. Wysy³anie has³a na email
+  5. Przypominanie has³a na email
 
 
 0. WSTÊP
 
     Komunikacja z appmsg.gadu-gadu.pl metod± GET HTTP 1.0 zosta³a opisana w protocol.html,
-    pozosta³e pakiety u¿ywaj± POST dla HTTP 1.1 i zosta³y opisane w tym dokumencie.
+    pozosta³e pakiety u¿ywaj± POST dla HTTP 1.0 a w odpowiedzi 1.1 i zosta³y opisane w tym dokumencie.
 
     Wszystkie zapytanie http metod± post maj± postaæ:
 
@@ -49,26 +48,26 @@ Spis tre¶ci:
     Je¶li bêdzie mowa o wysy³aniu danych do serwera to chodzi o ca³y
     powy¿szy pakiet, opisane zostan± tylko: HOST, PATH, DATA
     Pisz±c 'wysy³amy pola: pole1, pole2' mowa o DATA o warto¶ci pole1=aaa&pole2=bbb itp.
-    Pamiêtaj ¿e wypada³oby zastosowaæ urlencode przed wys³aniem.
-    Dla jasno¶ci, pakiet jest wysy³any na hosta o IP
-    odpowiadaj±cemu HOST na port 80.
+    Pamiêtaj o zastosowaniu urlencode i zmianie kodowania na WIN-1250 przed wys³aniem.
+    Dla jasno¶ci, pakiet jest wysy³any na hosta o IP odpowiadaj±cemu HOST na port 80.
 
     Odpowiedzi serwera na powy¿sze zapytania maj± mniej wiêcej postaæ:
 
-        HTTP/1.1 200 OK
-        Server: Microsoft-IIS/5.0
+	HTTP/1.1 200 OK
+	Server: Microsoft-IIS/5.0
 	Date: Mon, 01 Jul 2002 22:30:31 GMT        
-        Connection: Keep-Alive
+	Connection: Keep-Alive
         Content-Length: $LENGTH
         Content-Type: text/html
-        Set-Cookie: ASPSESSIONIDQQGGGLJC=CAEKMBGDJCFBEOKCELEFCNKH; path=/
+        Set-Cookie: $COOKIE
         Cache-control: private
 
         $RESPONSE
 
     lub podobnie :), nag³ówki nie s± dla nas wa¿ne, mo¿na zauwa¿yæ
-    tylko to ¿e czasami ustawia Cookie. Pisz±c dalej ¿e serwer "odpowie warto¶ci±",
-    mowa tylko o RESPONSE
+    tylko to ¿e czasami ustawia COOKIE np 'ASPSESSIONIDQQGGGLJC=CAEKMBGDJCFBEOKCELEFCNKH; path=/' 
+    Pisz±c dalej ¿e serwer "odpowie warto¶ci±", mowa tylko o RESPONSE. 
+    Kodowanie znaków w odpowiedzi to WIN-1250.
 
 
 1. Szukanie osób w katalogu publicznym
@@ -99,18 +98,18 @@ Spis tre¶ci:
         $REKORDY
         NextStart:$UIN
 
-        UIN na koñcu mówi na którym uin'ie zakoñczono szukanie,
+        UIN na koñcu mówi na którym uin'ie zakoñczono szukanie ('0' - pokazano wszystkie),
         mo¿na to wykorzystaæ podaj±c nastêpnym razem t± warto¶æ w polu 'start'
 
         REKORDY to 0-50 kolejnych 8 linijkowych rekordów w formacie
 
-        cyfra statusu  1-niedostepny, 2-zaraz wracam, 3-dostepny
+        cyfra statusu  1-niedostepny, 2-dostepny, 3-zaraz wracam
         uin
         imiê
         nazwisko
         nick
         rok ur
-        cyfra p³eæ     1-kobieta, 2-mezczyzma, 0-nieokreslone
+        cyfra p³eæ     1-kobieta, 2-mê¿czyzma, 0-nieokre¶lono
         miasto
 
         PRZYK£AD jednego rekordu:
@@ -134,13 +133,13 @@ Spis tre¶ci:
         Wysy³amy nastêpuj±ce pola:
         Mode 		o warto¶ci '3'
         UserId		uin
-        start		uin od którego zacz±æ szukanie, puste-brak
+        start		uin od którego zacz±æ szukanie, pusta warto¶æ - brak
 
         PRZYK£AD: Mode=3&UserId=1000&start=
 
         Odpowiedzi± jest taki sam jak dla pkt 1.1 z tym
         ze bêdzie to najwy¿ej jeden 8 linijkowy rekord
-
+	a pole NextStart bedzie mieæ warto¶æ '0'
 
 2. Sprawdzanie/zmiana danych w kat. publicznym
 
@@ -151,7 +150,7 @@ Spis tre¶ci:
 
         Wysy³amy nastêpuj±ce pola
 
-        FmNum		numerek
+        FmNum		uin
         Pass		has³o, plain-text (sic!)
 
         PRZYK£AD:FmNum=1000&Pass=sekret
@@ -178,13 +177,13 @@ Spis tre¶ci:
         LastName       nazwisko - mo¿e byæ puste
         NickName       nick     - mo¿e byæ puste
         BirthYear      rok ur.  - mo¿e byæ puste
-        Gender         p³eæ - warto¶ci jak w pkt 1.1
+        Gender         p³eæ 	- warto¶ci jak w pkt 1.1
         City           miasto   - mo¿e byæ puste
 
         PRZYK£AD: FmNum=1000&Pass=sekret&FirstName=imie&LastName=nazwisko&NickName=nick&BirthYear=1000&Gender=1&City=miasto
 
         Je¶li siê uda³o serwer odpowie:
-        reg_sucess:
+        reg_success:
 
 3. Rejestrowanie konta, usuniêcie i zmiana has³a dla konta
 
@@ -201,7 +200,7 @@ Spis tre¶ci:
 
         PRZYK£AD: pwd=sekret&email=moj@adres.email.pl&code=1104465363
 
-        Je¶li wszystko przebieg³o poprawnie serwer odpowie:
+        Je¶li wszystko przepieg³o poprawnie serwer odpowie:
         reg_success:$UIN
 
         UIN - nowy uin, który w³a¶nie otrzymali¶my
@@ -215,13 +214,13 @@ Spis tre¶ci:
 
         fmnumber     $UIN
         fmpwd        haslo, plain text
-        delete       1
-        fmemail      email podany przy rejestracji konta
-        pwd          nowe przypadkowe has³o ???
+        delete       o warto¶ci '1'
+        fmemail	     email podany przy rejestracji konta
+	pwd          nowe przypadkowe has³o ???
         email        deletedaccount@gadu.gadu.pl
         code         http hash liczony z email+pwd
 
-        PRZYKLAD: fmnumber=1400545&fmpwd=sekret&delete=1&pwd=1400460480&email=deletedaccount@gadu%2Dgadu.pl&code=335674957
+        PRZYKLAD: fmnumber=4617436&fmpwd=haslo&delete=1&fmemail=moj@email.pl&pwd=%2D700963936&email=deletedaccount@gadu%2Dgadu.pl&code=477559883
 
         Je¶li siê uda³o serwer odpowie:
         reg_success:$UIN
@@ -238,13 +237,17 @@ Spis tre¶ci:
         fmnumber      $UIN
         fmpwd         stare haslo, plain text
         pwd           nowe haslo, plain text
-        email         nowy email do przypominania has³a
-        code          http hash liczony z  email+pwd
+        fmemail	      stary email podany przy poprzedniej zmianie has³a lub rejestracji
+	email         nowy email do przypominania has³a
+        code          http hash liczony z email+pwd
 
         je¶li siê uda³o serwer odpowie:
         reg_success:$UIN
-
-4. Operacje zwi±zane z przechowywaniem listy kontaktów na serwerze
+	
+	a je¶li fmemail jest b³êdny odpowie:
+	bademail
+	
+4. Operacje zwi±zane z przechowywaniem listy kont. na serwerze
 
     4.1 Wys³anie list kont.
 
@@ -259,9 +262,10 @@ Spis tre¶ci:
 
         imie;nazwisko;pseudo;wyswietlane;telefon;grupa;uin;adres@email;0;;0;
 
+	ostatnie 3 pola zostaly dodane w wer. 4.9.3 i sa zwiazane z dzwiêkami.
         PRZYKLAD: FmNum=1000&Pass=sekret&Contacts=imie;nazwisko;pseudo;wyswietlane;+48123123123;grupa1;1000;adres@email.pl;0;;0;
 
-        Je¶li siê uda³o serwer odpowie
+        Je¶li siê uda³o serwer odpowie:
         put_success:
 
     4.2 Pobranie listy kont.
@@ -275,7 +279,7 @@ Spis tre¶ci:
 
         PRZYK£AD:  FmNum=1000&Pass=sekret
 
-        Je¶li siê uda³o serwer odpowie
+        Je¶li siê uda³o serwer odpowie:
         get_results:rekord_1
         rekord_2
         rekord_N
@@ -294,20 +298,17 @@ Spis tre¶ci:
 
         PRZYKLAD:   FmNum=1000&Pass=sekret&Delete=1
 
-        Je¶li siê uda³o serwer odpowie
+        Je¶li siê uda³o serwer odpowie:
         put_success:
 
-5. Wysy³anie has³a na email
+5. Przypominanie has³a na email
 
         HOST = retr.gadu-gadu.pl
         PATH = /appsvc/fmsendpwd.asp
 
         Wysy³amy dwa pola:
         userid      uin
-        code        hash_http liczony z uin'a jako string
+        code        hash http liczony z uin'a jako string
 
-        Je¶li siê uda³o serwer odpowie
-
+        Je¶li siê uda³o serwer odpowie:
         pwdsend_success
-
-	

@@ -362,6 +362,13 @@ void handle_msg(struct gg_event *e)
 			strcpy(e->event.msg.message, dec);
 			secure = 1;
 		}
+
+		if (len == -1)
+			gg_debug(GG_DEBUG_MISC, "// private key not found\n");
+		if (len == -2)
+			gg_debug(GG_DEBUG_MISC, "// rsa decryption failed\n");
+		if (len == -3)
+			gg_debug(GG_DEBUG_MISC, "// magic number mismatch\n");
 	}
 #endif
 	
