@@ -832,8 +832,8 @@ char *gg_base64_decode(const char *buf);
 #define GG_HTTPS_PORT 443
 #define GG_HTTP_USERAGENT "Mozilla/4.7 [en] (Win98; I)"
 
-#define GG_DEFAULT_CLIENT_VERSION "5, 0, 5, 107"
-#define GG_DEFAULT_PROTOCOL_VERSION 0x1b
+#define GG_DEFAULT_CLIENT_VERSION "5, 7, 0, 116"
+#define GG_DEFAULT_PROTOCOL_VERSION 0x1c
 #define GG_DEFAULT_TIMEOUT 30
 #define GG_HAS_AUDIO_MASK 0x40000000
 #define GG_LIBGADU_VERSION "CVS"

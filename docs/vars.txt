@@ -521,7 +521,9 @@ server
 	g³ównego serwera. adresy nale¿y oddzielaæ przecinkami, ¶rednikami
 	lub spacjami. po dwukropku mo¿na podaæ port serwera. je¶li adres i
 	port serwera zostan± poprzedzone tekstem ,,tls:'', klient spróbuje
-	wynegocjowaæ bezpieczne po³±czenie TLSv1 z serwerem.
+	wynegocjowaæ bezpieczne po³±czenie TLS z serwerem. je¶li zmiennej
+	przypisze siê warto¶æ ,,tls'', spyta g³ówny serwer o adres serwera
+	obs³uguj±cego po³±czenia TLS i spróbuje siê z nim po³±czyæ.
 
 server_save
 	typ: bool

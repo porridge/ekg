@@ -16,6 +16,9 @@ d - drg, sz - szalik).
 - obs³uga po³±czeñ szyfrowanych TLSv1. nale¿y podaæ adres serwera poprzedzony
   tekstem ,,tls:'' (w)
 - usuniêcie leaka w obs³udze procesów potomnych (scooty/w)
+- korzystanie z hub do po³±czeñ TLS (,,/set server tls'') (w)
+- libgadu: podbicie wersji klienta do 5.7.0b116 i protoko³u do 0x1c (w)
+- uaktualnienie opisu protoko³u w kwestii po³±czeñ TLS (w)
 
 // 2003-05-14
 

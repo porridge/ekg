@@ -1216,6 +1216,13 @@ void ekg_connect()
 	if (config_server) {
 		char *server, *sserver, *tmp, **servers = array_make(config_server, ",; ", 0, 1, 0);
 
+#ifdef __GG_LIBGADU_HAVE_OPENSSL
+		if (!strcasecmp(config_server, "tls")) {
+			p.tls = 1;
+			goto skip_server;
+		}
+#endif
+
 		if (server_index >= array_count(servers))
 			server_index = 0;
 
@@ -1243,6 +1250,7 @@ void ekg_connect()
 
 		array_free(servers);
 	}
+skip_server:
 
 	if (config_proxy_forwarding) {
 		char *fwd = xstrdup(config_proxy_forwarding), *tmp = strchr(fwd, ':');
