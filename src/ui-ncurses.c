@@ -1202,7 +1202,8 @@ crap:
  
 	if (w != window_current && !w->floating) {
 		w->act = 1;
-		update_statusbar(0);
+		if (!command_processing)
+			update_statusbar(0);
 	}
 
 	if (config_speech_app)
