@@ -1175,10 +1175,15 @@ COMMAND(cmd_ignore)
 		
 		if (!ignored_remove(uin)) {
 			print("ignored_deleted", format_user(uin));
+
 			if (sess) {
 				gg_remove_notify(sess, uin);
 				gg_add_notify(sess, uin);
 			}
+
+			if (uin == config_uin)
+				update_status();
+
 			config_changed = 1;
 		} else
 			print("error_not_ignored", format_user(uin));
@@ -1449,7 +1454,7 @@ COMMAND(cmd_list)
 
 		tmp = ekg_status_label(u->status, "list_");
 
-		if (u->uin == config_uin && sess && sess->state == GG_STATE_CONNECTED)
+		if (u->uin == config_uin && sess && sess->state == GG_STATE_CONNECTED && !ignored_check(config_uin))
 			tmp = ekg_status_label(config_status, "list_");
 
 		show = show_all;

@@ -2557,26 +2557,36 @@ void event_free()
 /*
  * init_control_pipe()
  *
- * inicjuje potok nazwany do zewnêtrznej kontroli ekg
+ * inicjuje potok nazwany do zewnêtrznej kontroli ekg.
  *
  * - pipe_file.
  *
- * zwraca deskryptor otwartego potoku lub warto¶æ b³êdu
+ * zwraca deskryptor otwartego potoku lub warto¶æ b³êdu.
  */
 int init_control_pipe(const char *pipe_file)
 {
 	int fd;
+	struct stat st;
+	char *err_str = NULL;
 
 	if (!pipe_file)
 		return 0;
-	if (mkfifo(pipe_file, 0600) < 0 && errno != EEXIST) {
-		fprintf(stderr, "Nie mogê stworzyæ potoku %s: %s. Ignorujê.\n", pipe_file, strerror(errno));
+
+	if (!stat(pipe_file, &st) && !S_ISFIFO(st.st_mode))
+		err_str = saprintf("Plik %s nie jest potokiem. Ignorujê.\n", pipe_file);
+
+	if (mkfifo(pipe_file, 0600) < 0 && errno != EEXIST)
+		err_str = saprintf("Nie mogê stworzyæ potoku %s: %s. Ignorujê.\n", pipe_file, strerror(errno));
+
+	if ((fd = open(pipe_file, O_RDWR | O_NDELAY)) < 0)
+		err_str = saprintf("Nie mogê otworzyæ potoku %s: %s. Ignorujê.\n", pipe_file, strerror(errno));
+
+	if (err_str) {
+		print("generic_error", err_str);
+		xfree(err_str);
 		return -1;
 	}
-	if ((fd = open(pipe_file, O_RDWR | O_NDELAY)) < 0) {
-		fprintf(stderr, "Nie mogê otworzyæ potoku %s: %s. Ignorujê.\n", pipe_file, strerror(errno));
-		return -1;
-	}
+
 	return fd;
 }
 
@@ -3468,6 +3478,9 @@ void update_status()
 	else
 		u->status = config_status;
 
+	if (ignored_check(u->uin))
+		u->status = GG_STATUS_NOT_AVAIL;
+
 	update_status_myip();
 }
 
@@ -3625,8 +3638,10 @@ void change_status(int status, const char *arg, int autom)
 			print(format);
 	}
 
-	ui_event("my_status", (reason) ? format_descr : format, reason);
-	ui_event("my_status_raw", status, reason);
+	if (!ignored_check(config_uin)) {
+		ui_event("my_status", (reason) ? format_descr : format, reason);
+		ui_event("my_status_raw", status, reason);
+	}
 
 	xfree(config_reason);
 	config_reason = reason;

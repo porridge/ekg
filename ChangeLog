@@ -16,6 +16,10 @@ zg³osi³ b³±d.
 - kosmetyka /conference, nazwa przy tworzeniu konferencji jest opcjonalna,
   mo¿na usuwaæ od razu wszystkie konferencje (sz)
 - poprawka mo¿liwego segfaulta przy /timer -d * (sz)
+- mo¿na ignorowaæ samego siebie. wtedy nie jeste¶my pokazywani na li¶cie
+  kontaktów (gozda/sz)
+- nowe pytanie w FAQ (sz)
+- ignorowanie podanego potoku przy uruchomieniu, je¶li to zwyk³y plik (*/sz)
 - poprawka opcji --private przy uruchomieniu (sz)
 - libgadu: poprawione wysy³anie roku urodzenia w gg_change_info() (Chilek/w)
 - /change nie wymaga ju¿ wszystkich parametrów (w)
