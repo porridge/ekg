@@ -30,10 +30,10 @@ AC_DEFUN(AC_CHECK_NCURSES,
 			lib=`echo "$i" | sed 's/.*://'`		# 'g³upi vim
 			path=`echo "$incl" | sed 's/^..//'`	# 'g³upi vim
 
-			cflags="$CFLAGS"
+			cppflags="$CPPFLAGS"
 			ldflags="$LDFLAGS"
 
-			CFLAGS="$CFLAGS $incl"
+			CPPFLAGS="$CPPFLAGS $incl"
 			LDFLAGS="$LDFLAGS $libs"
 
 			have_ncurses_h=""
@@ -76,7 +76,7 @@ AC_DEFUN(AC_CHECK_NCURSES,
 				fi
 			fi
 
-			CFLAGS="$cflags"
+			CPPFLAGS="$cppflags"
 			LDFLAGS="$ldflags"
 		done
 	fi
