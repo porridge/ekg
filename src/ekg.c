@@ -1285,6 +1285,10 @@ void ekg_exit()
 	list_t l;
 	int i;
 
+#ifdef WITH_PYTHON
+	python_finalize();
+#endif
+
 	ekg_logoff(sess, NULL);
 	list_remove(&watches, sess, 0);
 	gg_free_session(sess);
@@ -1395,10 +1399,6 @@ void ekg_exit()
 	xfree(gg_proxy_username);
 	xfree(gg_proxy_password);
 	xfree(config_dir);
-
-#ifdef WITH_PYTHON
-	python_finalize();
-#endif
 
 	/* kapitan schodzi ostatni */
 	if (gg_debug_file) {
