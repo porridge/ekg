@@ -725,8 +725,6 @@ void changed_dcc(const char *var)
  */
 void changed_local_ip(const char *var)
 {
-    int tmp;
-
     if (config_local_ip == NULL)
 	gg_local_ip = htonl(INADDR_ANY);
     else
