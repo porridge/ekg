@@ -6,6 +6,10 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-01-30
+
+- bardziej precyzyjny opis zmiennej ,,auto_back'' (pmb/sz)
+
 // 2003-01-29
 
 - dodanie klawisza Ctrl-K (bies/w)
@@ -18,6 +22,7 @@ zg³osi³ b³±d.
   szczegó³y w ,,/bind -L'' (w)
 - libgadu: dodanie funkcji gg_pubdir50_seq_set() (mmazur/w)
 - libgadu: podbicie wersji API (w)
+- reakcja na zmianê rozmiaru terminala (sz)
 - poprawka Alt-G i zapisywania bindów (sz/w)
 
 // 2003-01-28
