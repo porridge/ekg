@@ -23,6 +23,7 @@ zg³osi³ b³±d.
 - komenda /passwd nie wymaga adresu e-mail (wojtu¶/w)
 - komenda /unregister wymaga podania numeru i has³a, ¿eby zabezpieczyæ siê
   przed przypadkowym usuniêciem konta (w)
+- komenda /change ju¿ dzia³a (w)
 
 // 2003-03-06
 
