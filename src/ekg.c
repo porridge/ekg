@@ -198,6 +198,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 			new = string_init(c->buf->str + index + 1);
 			string_free(c->buf, 1);
 			c->buf = new;
+			xfree(line);
 		}
 	}
 
@@ -1083,6 +1084,8 @@ void ekg_exit()
 	list_destroy(watches, 0);
 
 	xfree(gg_proxy_host);
+	xfree(gg_proxy_username);
+	xfree(gg_proxy_password);
 	xfree(config_dir);
 
 #ifdef WITH_PYTHON

@@ -27,7 +27,7 @@
 #include "stuff.h"
 #include "userlist.h"
 
-static void oom_handler()
+void ekg_oom_handler()
 {
 	fprintf(stderr, "
 *** Brak pamiêci ***
@@ -49,7 +49,7 @@ void *xcalloc(int nmemb, int size)
 	void *tmp = calloc(nmemb, size);
 
 	if (!tmp)
-		oom_handler();
+		ekg_oom_handler();
 
 	return tmp;
 }
@@ -59,7 +59,7 @@ void *xmalloc(int size)
 	void *tmp = malloc(size);
 
 	if (!tmp)
-		oom_handler();
+		ekg_oom_handler();
 	
 	return tmp;
 }
@@ -75,7 +75,7 @@ void *xrealloc(void *ptr, int size)
 	void *tmp = realloc(ptr, size);
 
 	if (!tmp)
-		oom_handler();
+		ekg_oom_handler();
 
 	return tmp;
 }
@@ -88,7 +88,7 @@ char *xstrdup(const char *s)
 		return NULL;
 
 	if (!(tmp = strdup(s)))
-		oom_handler();
+		ekg_oom_handler();
 
 	return tmp;
 }
@@ -106,7 +106,7 @@ char *saprintf(const char *format, ...)
 	va_end(ap);
 
 	if (!res)
-		oom_handler();
+		ekg_oom_handler();
 	
 	return res;
 }

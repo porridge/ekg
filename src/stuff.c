@@ -2230,9 +2230,6 @@ int init_control_pipe(const char *pipe_file)
 	return fd;
 }
 
-static char base64_charset[] =
-	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
 /*
  * base64_encode()
  *
@@ -2240,39 +2237,15 @@ static char base64_charset[] =
  */
 char *base64_encode(const char *buf)
 {
-	char *out, *res;
-	int i = 0, j = 0, k = 0, len = strlen(buf);
-	
-	res = out = xmalloc((len / 3 + 1) * 4 + 2);
-	
-	while (j <= len) {
-		switch (i % 4) {
-			case 0:
-				k = (buf[j] & 252) >> 2;
-				break;
-			case 1:
-				k = ((buf[j] & 3) << 4) | ((buf[j + 1] & 240) >> 4);
-				j++;
-				break;
-			case 2:
-				k = ((buf[j] & 15) << 2) | ((buf[j + 1] & 192) >> 6);
-				j++;
-				break;
-			case 3:
-				k = buf[j++] & 63;
-				break;
-		}
-		*out++ = base64_charset[k];
-		i++;
-	}
+	char *tmp = gg_base64_encode(buf);
 
-	if (i % 4)
-		for (j = 0; j < 4 - (i % 4); j++, out++)
-			*out = '=';
-	
-	*out = 0;
-	
-	return res;
+	if (!buf)
+		return xstrdup("");
+
+	if (!tmp)
+		ekg_oom_handler();
+
+	return tmp;
 }
 
 /*
@@ -2282,48 +2255,16 @@ char *base64_encode(const char *buf)
  */
 char *base64_decode(const char *buf)
 {
-	char *res, *save, *foo, val;
-	const char *end;
-	int index = 0;
-	
-	save = res = xcalloc(1, (strlen(buf) / 4 + 1) * 3 + 2);
+	char *tmp = gg_base64_decode(buf);
 
-	end = buf + strlen(buf);
+	if (!buf)
+		return xstrdup("");
 
-	while (*buf && buf < end) {
-		if (*buf == '\r' || *buf == '\n') {
-			buf++;
-			continue;
-		}
-		if (!(foo = strchr(base64_charset, *buf)))
-			foo = base64_charset;
-		val = (int)foo - (int)base64_charset;
-/*		*buf = 0;	XXX kto mi powie po co to by³o dostaje piwo */
-		buf++;
-		switch (index) {
-			case 0:
-				*res |= val << 2;
-				break;
-			case 1:
-				*res++ |= val >> 4;
-				*res |= val << 4;
-				break;
-			case 2:
-				*res++ |= val >> 2;
-				*res |= val << 6;
-				break;
-			case 3:
-				*res++ |= val;
-				break;
-		}
-		index++;
-		index %= 4;
-	}
-	*res = 0;
-	
-	return save;
+	if (!tmp)
+		ekg_oom_handler();
+
+	return tmp;
 }
-
 	
 /*
  * changed_debug()
@@ -2422,30 +2363,43 @@ void changed_theme(const char *var)
  */
 void changed_proxy(const char *var)
 {
-	char *tmp;
+	char **auth, **userpass = NULL, **hostport = NULL;
 	
-	if (!config_proxy) {
-		gg_proxy_enabled = 0;
-		xfree(gg_proxy_host);
-		gg_proxy_host = NULL;
-		gg_proxy_port = 0;
-		return;
-	}
-
-	gg_proxy_enabled = 1;
+	gg_proxy_port = 0;
 	xfree(gg_proxy_host);
+	gg_proxy_host = NULL;
+	xfree(gg_proxy_username);
+	gg_proxy_username = NULL;
+	xfree(gg_proxy_password);
+	gg_proxy_password = NULL;
 
-	if ((tmp = strchr(config_proxy, ':'))) {
-		int len = (int) tmp - (int) config_proxy;
-		
-		gg_proxy_port = atoi(tmp + 1);
-		gg_proxy_host = xmalloc(len + 1);
-		strncpy(gg_proxy_host, config_proxy, len);
-		gg_proxy_host[len] = 0;
-	} else {
-		gg_proxy_host = xstrdup(config_proxy);
-		gg_proxy_port = 8080;
+	if (!config_proxy)
+		return;
+
+	auth = array_make(config_proxy, "@", 0, 0, 0);
+
+	if (!auth[0] || !strcmp(auth[0], ""))
+		return; 
+	
+	gg_proxy_enabled = 1;
+
+	if (auth[0] && auth[1]) {
+		userpass = array_make(auth[0], ":", 0, 0, 0);
+		hostport = array_make(auth[1], ":", 0, 0, 0);
+	} else
+		hostport = array_make(auth[0], ":", 0, 0, 0);
+	
+	if (userpass && userpass[0] && userpass[1]) {
+		gg_proxy_username = xstrdup(userpass[0]);
+		gg_proxy_password = xstrdup(userpass[1]);
 	}
+
+	gg_proxy_host = xstrdup(hostport[0]);
+	gg_proxy_port = (hostport[1]) ? atoi(hostport[1]) : 8080;
+
+	array_free(hostport);
+	array_free(userpass);
+	array_free(auth);
 }
 
 /*
