@@ -1440,6 +1440,9 @@ void handle_dcc(struct gg_dcc *d)
 				if (*p < 32 || *p == '\\' || *p == '/')
 					*p = '_';
 
+			if (d->file_info.filename[0] == '.')
+				d->file_info.filename[0] = '_';
+
 			t->type = GG_SESSION_DCC_GET;
 			t->filename = xstrdup(d->file_info.filename);
 
