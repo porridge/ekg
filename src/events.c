@@ -1668,18 +1668,18 @@ void handle_search50(struct gg_event *e)
 		switch (GG_S(status)) {
 			case GG_STATUS_AVAIL:
 			case GG_STATUS_AVAIL_DESCR:
-				active = format_string(format_find(__format("_active")));
+				active = format_string(format_find(__format("_active")), nickname);
 				break;
 			case GG_STATUS_BUSY:
 			case GG_STATUS_BUSY_DESCR:
-				active = format_string(format_find(__format("_busy")));
+				active = format_string(format_find(__format("_busy")), nickname);
 				break;
 			case GG_STATUS_INVISIBLE:
 			case GG_STATUS_INVISIBLE_DESCR:
-				active = format_string(format_find(__format("_invisible")));
+				active = format_string(format_find(__format("_invisible")), nickname);
 				break;
 			default:
-				active = format_string(format_find(__format("_inactive")));
+				active = format_string(format_find(__format("_inactive")), nickname);
 		}
 
 		gender = format_string(format_find(__format("_unknown")));
