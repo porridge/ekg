@@ -53,6 +53,7 @@
 #include "emoticons.h"
 #include "events.h"
 #include "libgadu.h"
+#include "log.h"
 #include "mail.h"
 #include "msgqueue.h"
 #ifdef WITH_PYTHON

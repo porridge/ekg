@@ -47,6 +47,7 @@
 #include "dynstuff.h"
 #include "events.h"
 #include "libgadu.h"
+#include "log.h"
 #include "msgqueue.h"
 #ifdef WITH_PYTHON
 #  include "python.h"

@@ -134,14 +134,6 @@ struct timer {
 	char *id;
 };
 
-struct last {
-	int type;		/* 0 - przychodz±ca, 1 - wychodz±ca */
-	uin_t uin;		/* od kogo, lub do kogo przy wysy³anych */
-	time_t time;		/* czas */
-	time_t sent_time;	/* czas wys³ania wiadomo¶ci przychodz±cej */
-	unsigned char *message;	/* wiadomo¶æ */
-};
-
 struct sms_away {
 	uin_t uin;
 	int count;
@@ -185,7 +177,6 @@ list_t transfers;
 list_t events;
 list_t bindings;
 list_t timers;
-list_t lasts;
 list_t conferences;
 list_t sms_away;
 list_t buffers;
@@ -365,18 +356,8 @@ int event_flags(const char *events);
 int event_check(int event, uin_t uin, const char *data);
 void event_free();
 
-void last_add(int type, uin_t uin, time_t t, time_t st, const char *msg);
-void last_del(uin_t uin);
-int last_count(uin_t uin);
-void last_free();
-
-void put_log(uin_t uin, const char *format, ...);
-const char *log_timestamp(time_t t);
-
 int mesg_set(int what);
-
 int msg_encrypt(uin_t uin, unsigned char **msg);
-
 void cp_to_iso(unsigned char *buf);
 void iso_to_cp(unsigned char *buf);
 void iso_to_ascii(unsigned char *buf);
