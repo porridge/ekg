@@ -8,6 +8,7 @@ zg³osi³ b³±d.
 
 // 2003-02-25
 
+- segfault przy /dcc close (sz)
 - poprawka wysy³ania konfiguracji na serwer (zmienne VAR_MAP) (sz)
 - poprawki sim oraz simlite: ¿eby dzia³a³y dobrze na maszynach
   bigendianowych oraz tam, gdzie nie ma /dev/urandom (sz)
