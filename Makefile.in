@@ -26,7 +26,7 @@ libgadu:
 
 install: all 
 	(cd src; $(MAKE) install)
-        @$(install) -d $(prefix)/bin	
+	@$(install) -d $(prefix)/bin	
 	$(install) -m 755 docs/ekl.pl $(prefix)/bin
 	@$(install) -d $(datadir)/ekg/themes/
 	$(install) -m 644 themes/*.theme $(datadir)/ekg/themes
