@@ -620,7 +620,7 @@ int variable_undigest(const char *digest)
 {
 	const char *p = digest;
 
-	if (!digest || strlen(digest) != 2)
+	if (!digest)
 		return -1;
 
 	while (*p) {
