@@ -4,10 +4,12 @@ AC_INIT(lib/libgadu.h)
 AC_PREREQ(2.50)
 AC_CONFIG_HEADER(config.h)
 
+
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_PROG_LN_S
+
 
 AC_PATH_PROG(GMAKE, gmake, no)
 if test "x$GMAKE" = "xno"; then
@@ -179,16 +181,14 @@ if test -d src; then
       LIBS="$LIBS -lgsm"])
   fi
  
-  AC_ARG_WITH(python,
-    [  --with-python           Compile with Python scripts support])
-
-  if test "x$with_python" = "xyes"; then
-    LIBS="$LIBS -lpython2.1"
-    CFLAGS="$CFLAGS -I. -I.. -I/usr/include/python2.1"
-    AC_DEFINE(WITH_PYTHON)
-    python_o="python.o"
+  AC_CHECK_PYTHON
+  
+  if test "x$have_python" = "xtrue"; then
+      python_o="python.o"
+      LIBS="$LIBS $PYTHON_LIBS"
+      CFLAGS="$CFLAGS $PYTHON_INCLUDES"
   fi
-
+      
   AC_CHECK_HEADERS(linux/kd.h, [have_linux_kd_h=yes])
 
   AC_ARG_ENABLE(wap,
