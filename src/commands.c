@@ -2120,7 +2120,7 @@ COMMAND(cmd_msg)
 		
 	        u = userlist_find(uin, NULL);
 
-		put_log(uin, "%s,%ld,%s,%s,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", log_timestamp(time(NULL)), escaped);
+		put_log(uin, "%s,%ld,%s,%s,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u && u->display) ? u->display : "", log_timestamp(time(NULL)), escaped);
 
 		if (config_last & 4)
 			last_add(1, uin, time(NULL), 0, raw_msg);

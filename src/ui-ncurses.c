@@ -2254,7 +2254,8 @@ void unknown_uin_generator(const char *text, int len)
 
 	for (i = 0; i < send_nicks_count; i++) {
 		if (send_nicks[i] && isdigit((int) send_nicks[i][0]) && !strncasecmp(text, send_nicks[i], len))
-			array_add(&completions, xstrdup(send_nicks[i]));
+			if (!array_contains(completions, send_nicks[i], 0))
+				array_add(&completions, xstrdup(send_nicks[i]));
 	}
 }
 
