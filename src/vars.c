@@ -365,7 +365,7 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 		case VAR_MAP:
 		{
 			const char *p = value;
-			int hex;
+			int hex, tmp;
 
 			if (!value)
 				return -2;
@@ -437,7 +437,18 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 				p++;
 			}
 
-			*(int*)(v->ptr) = strtol(value, NULL, 0);
+			tmp = strtol(value, NULL, 0);
+
+			if (v->map && v->type == VAR_MAP) {
+				int i;
+
+				for (i = 0; v->map[i].label; i++) {
+					if ((tmp & v->map[i].value) && (tmp & v->map[i].conflicts))
+						return -2;
+				}
+			}
+
+			*(int*)(v->ptr) = tmp;
 
 			if (v->notify)
 				(v->notify)(v->name);

@@ -10,6 +10,8 @@ zg³osi³ b³±d.
 
 - g³upia ja - poprawka poprawki timestamp'ów (sz)
 - poprawka window next/prev (sz)
+- nie pozwalajmy na podanie konfliktowej warto¶ci zmiennej w postaci
+  liczby (sz)
 - libgadu: dodanie atrybutu ,,printf'' do funkcji gg_saprintf(), dziêki
   czemu kompilator bêdzie sprawdza³ poprawno¶æ jej parametrów (w)
 - libgadu: drobne poprawki parametrów gg_saprintf() (w)
