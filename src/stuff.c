@@ -330,41 +330,6 @@ int alias_remove(const char *name, int quiet)
 }
 
 /*
- * alias_check()
- *
- * sprawdza, czy komenda w line jest aliasem, je¶li tak - zwraca listê
- * komend, inaczej NULL.
- *
- *  - line - linia z komend±.
- */
-list_t alias_check(const char *line)
-{
-	list_t l;
-	int i = 0;
-
-	if (!line)
-		return NULL;
-
-	while (*line == ' ')
-		line++;
-
-	while (line[i] != ' ' && line[i])
-		i++;
-
-	if (!i)
-		return NULL;
-
-	for (l = aliases; l; l = l->next) {
-		struct alias *j = l->data;
-
-		if (strlen(j->name) >= i && !strncmp(line, j->name, i))
-			return j->commands;
-	}
-
-	return NULL;
-}
-
-/*
  * alias_free()
  *
  * usuwa pamiêæ zajêt± przez aliasy.
