@@ -280,8 +280,6 @@ void handle_notify(struct gg_event *e)
 			continue;
 		}
 
-		gg_debug(GG_DEBUG_MISC, "-- handle_notify(), uin=%d, status=%d, descr=%s\n", n->uin, n->status, (e->type == GG_EVENT_NOTIFY_DESCR) ? e->event.notify_descr.descr : "none");
-
 		in.s_addr = n->remote_ip;
 		
 		if (n->status == GG_STATUS_NOT_AVAIL)

@@ -31,7 +31,7 @@
 #include "config.h"
 
 char *prompt_cache = NULL, *prompt2_cache = NULL, *error_cache = NULL, *timestamp_cache = NULL;
-char *readline_prompt = NULL, *readline_prompt_away = NULL;
+char *readline_prompt = NULL, *readline_prompt_away = NULL, *readline_prompt_invisible = NULL;
 
 struct list *formats = NULL;
 
@@ -292,7 +292,7 @@ inline void reset_theme_cache()
 	free(error_cache);
 	
 	prompt_cache = prompt2_cache = error_cache = NULL;
-	readline_prompt = readline_prompt_away = NULL;
+	readline_prompt = readline_prompt_away = readline_prompt_invisible = NULL;
 	timestamp_cache = NULL;
 }
 
@@ -473,6 +473,7 @@ void init_theme()
 	add_format("timestamp", "%H:%M", 1);
 	add_format("readline_prompt", "% ", 1);
 	add_format("readline_prompt_away", "/ ", 1);
+	add_format("readline_prompt_invisible", ". ", 1);
 	add_format("readline_prompt_query", "%1> ", 1);
 
 	add_format("known_user", "%W%1%n/%2", 1);

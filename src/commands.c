@@ -249,8 +249,16 @@ char *variable_generator(char *text, int state)
 		
 		l = l->next;
 		
-		if (v->type != VAR_FOREIGN && !strncasecmp(text, v->name, len))
-			return strdup(v->name);
+		if (v->type == VAR_FOREIGN)
+			continue;
+
+		if (*text == '-') {
+			if (!strncasecmp(text + 1, v->name, len - 1))
+				return gg_alloc_sprintf("-%s", v->name);
+		} else {
+			if (!strncasecmp(text, v->name, len))
+				return strdup(v->name);
+		}
 	}
 
 	return NULL;
@@ -1173,6 +1181,9 @@ COMMAND(command_list)
 					break;
 				case GG_STATUS_NOT_AVAIL_DESCR:
 					status = format_string(find_format("user_info_not_avail_descr"), u->descr);
+					break;
+				case GG_STATUS_INVISIBLE:
+					status = format_string(find_format("user_info_invisble"));
 					break;
 				default:
 					status = format_string(find_format("user_info_unknown"));

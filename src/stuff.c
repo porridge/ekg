@@ -161,8 +161,21 @@ static char *current_prompt()
 			readline_prompt = find_format("readline_prompt");
 		if (!readline_prompt_away)
 			readline_prompt_away = find_format("readline_prompt_away");
+		if (!readline_prompt_invisible)
+			readline_prompt_invisible = find_format("readline_prompt_invisible");
 
-		prompt = (!away) ? readline_prompt : readline_prompt_away;
+		switch (away) {
+			case 1:
+			case 3:
+				prompt = readline_prompt_away;
+				break;
+			case 2:
+			case 5:
+				prompt = readline_prompt_invisible;
+				break;
+			default:
+				prompt = readline_prompt;
+		}
 	}
 
 	if (no_prompt || !prompt)

@@ -27,7 +27,7 @@ struct format {
 
 struct list *formats;
 
-char *readline_prompt, *readline_prompt_away;
+char *readline_prompt, *readline_prompt_away, *readline_prompt_invisible;
 
 void my_printf(char *theme, ...);
 char *find_format(char *name);
