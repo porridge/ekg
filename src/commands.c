@@ -4155,9 +4155,8 @@ void command_init()
 	  "  -b, --bmsg [numer/alias] wysy³a wynik w jednej wiadomo¶ci\n"
 	  "\n"
 	  "Poprzedzenie polecenia znakiem %T^%n ukryje informacjê o zakoñczeniu. "
-	  "W przypadku opcji %T--bmsg%n wynik jest buforowany, dziêki czemu zostanie "
-	  "wys³any w ca³o¶ci w jednej wiadomo¶ci. Je¶li jako alias podamy %T%%%n, "
-	  "wynik bêdzie wys³any do rozmówcy z aktualnego okna.");
+	  "Je¶li jako alias podamy %T%%%n, wynik bêdzie wys³any do rozmówcy z "
+	  "aktualnego okna. ");
 	  
 	command_add
 	( "!", "?", cmd_exec, 0,
@@ -4245,7 +4244,7 @@ void command_init()
 	  "                             mo¿na podaæ wiêcej grup po przecinku\n"
 	  "  -p, --phone <numer>        numer telefonu komórkowego\n"
 	  "  -o, --offline              b±d¼ niedostêpny dla danej osoby\n"
-	  "  -O, --online               b±d¼ dostêpny dla danej osoby\n"
+	  "  -O, --online               b±d¼ widoczny dla danej osoby\n"
 	  "\n"
 	  "Dwie ostatnie opcje dzia³aj± tylko, gdy w³±czony jest tryb ,,tylko "
 	  "dla znajomych''.\n"
