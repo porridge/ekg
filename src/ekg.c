@@ -823,7 +823,7 @@ static int ekg_ui_set(const char *name)
 	else
 		return -1;
 
-	if (strcmp(name, config_interface)) {
+	if (config_interface && strcmp(name, config_interface)) {
 		xfree(config_interface);
 		config_interface = xstrdup(name);
 	}

@@ -12,6 +12,7 @@ zg³osi³ b³±d.
 - poprawka zdarzenia sigusr2 (krzyk/sz)
 - usuniêcie zapomnianych ¶mieci (lordzik/w)
 - poprawka themów wiadomo¶ci (lordzik/w)
+- poprawka segv przy opcji -f (d)
 
 // 2003-02-03
 
