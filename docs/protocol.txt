@@ -9,7 +9,7 @@
                            Marek Kozina <klith@hybrid.art.pl>,
 			   Rafa³ Florek <raf@regionet.regionet.pl>,
 			   Igor Popik <igipop@wsfiz.edu.pl>,
-                           Ajron <ajron@wp.pl>
+                           Rafa³ Cyran <ajron@wp.pl>
 
 --- 0) disclaimer ---------------------------------------------------------
 
@@ -315,7 +315,7 @@ swój wk³ad w poznanie protoko³u mieli:
    konferencje,
  - Igor Popik <igipop@wsfiz.edu.pl>:
    klasy wiadomo¶ci przy odbieraniu zakolejkowanej.
- - Ajron <ajron@wp.pl>:
+ - Rafa³ Cyran <ajron@wp.pl>:
    informacje o remote_port.
 
 ----------------------------------------------------------------------------
