@@ -2178,7 +2178,7 @@ static void ui_ncurses_deinit()
 	xfree(line);
 	xfree(yanked);
 
-	if (getenv("TERM") && !strncmp(getenv("TERM"), "xterm", 5))
+	if (getenv("TERM") && !strncmp(getenv("TERM"), "xterm", 5) && !getenv("EKG_NO_TITLE"))
 		write(1, "\033]2;\007", 5);
 
 	done = 1;
@@ -3915,7 +3915,7 @@ static int ui_ncurses_event(const char *event, ...)
 	if (!event)
 		return 0;
 
-	if (!strcmp(event, "xterm_update") && getenv("TERM") && !strncmp(getenv("TERM"), "xterm", 5)) {
+	if (!strcmp(event, "xterm_update") && getenv("TERM") && !strncmp(getenv("TERM"), "xterm", 5) && !getenv("EKG_NO_TITLE")) {
 		char *tmp = saprintf("\033]2;ekg (%d)\007", config_uin);
 		write(1, tmp, strlen(tmp));
 		xfree(tmp);

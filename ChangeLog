@@ -6,6 +6,8 @@ d - drg, sz - szalik).
 
 // 2003-09-09
 
+- je¶li ustawiona jest zmienna ,,EKG_NO_TITLE'', to nie bêdzie
+  zmiany tytu³u okna xterm'a (sz)
 - dokumentacja dla ekglogs. kosmetyka manuali ekg (porridge/sz)
 - uaktualnienie arim.theme (arim/sz)
 
