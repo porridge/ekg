@@ -144,6 +144,8 @@ int config_last = 0;
 int config_keep_reason = 0;
 int config_enter_scrolls = 0;
 int server_index = 0;
+char *config_audio_device = NULL;
+char *config_speech_app = NULL;
 
 static struct {
 	int event;

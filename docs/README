@@ -160,6 +160,23 @@ WYSY£ANIE SMSÓW
     parametr i wiadomo¶æ za drugi. Ten ze strony http://ceti.pl/~miki/
     spe³nia podane wymagania.
 
+SYNTEZA MOWY
+
+    ekg potrafi korzystaæ z zewnêtrznej aplikacji do syntezy mowy, by
+    odczytywaæ wszystko, co trafia na ekran. Wystarczy ustawiæ zmienn±
+    ,,speech_app'' na nazwê programu czytaj±cego tekst z stdin. Jej
+    ustawienie spowoduje równie¿ zmianê wygl±du programu, by wy¶wietlane
+    komunikaty sta³y siê ³atwiejsze do wymówienia. Przyk³adowe ustawienia,
+    gdy korzystamy z programu ,,powiedz'', to:
+
+	set speech_app powiedz
+	set make_window 0
+	set display_sent 0
+	set display_ack 3
+
+    Wad± aktualnej implementacji jest fakt blokowania ca³ego programu
+    podczas wymawiania tekstu.
+
 ZNANE PROBLEMY
 
     Je¶li nie mo¿esz wpisywaæ polskich liter w interfejsie readline,

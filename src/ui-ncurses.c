@@ -314,8 +314,9 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	struct window *w;
 	const char *p;
 	int x = 0, count = 0;
+	string_t s = NULL;
 	list_t l;
-
+	
 	switch (config_make_window) {
 		case 1:
 			if ((w = window_find(target)))
@@ -359,6 +360,9 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 		update_statusbar();
 	}
 
+	if (config_speech_app)
+		s = string_init(NULL);
+
 	for (p = line; *p; p++) {
 		if (*p == 27) {
 			p++;
@@ -393,11 +397,20 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 				p++;
 			}
 		} else if (*p == 10) {
+			
+			if (config_speech_app)
+				string_append_c(s, *p);
+			
 			if (!*(p + 1))
 				break;
 			w->y++;
 			x = print_timestamp(w);
+			
 		} else {
+			
+			if (config_speech_app)
+				string_append_c(s, *p);
+			
 			if (!x)
 				x += print_timestamp(w);
 			waddch(w->window, (unsigned char) *p);
@@ -429,6 +442,20 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	update_statusbar();
 	wnoutrefresh(input);
 	doupdate();
+
+	if (config_speech_app) {
+		char *tmp = saprintf("%s >2 /dev/null", config_speech_app);
+		FILE *f = popen(tmp, "w");
+
+		xfree(tmp);
+
+		if (f) {
+			fprintf(f, "%s.", s->str);
+			fclose(f);
+		}
+
+		string_free(s, 1);
+	}
 }
 
 /*

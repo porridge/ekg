@@ -45,6 +45,9 @@ void variable_init()
 	variable_add("uin", VAR_INT, 1, &config_uin, changed_uin, NULL);
 	variable_add("password", VAR_STR, 0, &config_password, NULL, NULL);
 
+#ifdef HAVE_VOIP
+	variable_add("audio_device", VAR_STR, 1, &config_audio_device, NULL, NULL);
+#endif
 	variable_add("auto_away", VAR_INT, 1, &config_auto_away, NULL, NULL);
 	variable_add("auto_reconnect", VAR_INT, 1, &config_auto_reconnect, NULL, NULL);
 	variable_add("auto_save", VAR_INT, 1, &config_auto_save, NULL, NULL);
@@ -88,6 +91,7 @@ void variable_init()
 	variable_add("sound_chat_file", VAR_STR, 1, &config_sound_chat_file, NULL, NULL);
 	variable_add("sound_sysmsg_file", VAR_STR, 1, &config_sound_sysmsg_file, NULL, NULL);
 	variable_add("sound_app", VAR_STR, 1, &config_sound_app, NULL, NULL);
+	variable_add("speech_app", VAR_STR, 1, &config_speech_app, NULL, NULL);
 	variable_add("tab_command", VAR_STR, 1, &config_tab_command, NULL, NULL);
 	variable_add("theme", VAR_STR, 1, &config_theme, changed_theme, NULL);
 	variable_add("timestamp", VAR_STR, 1, &config_timestamp, NULL, NULL);

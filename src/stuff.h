@@ -184,6 +184,8 @@ int config_last_size;
 int config_last;
 int config_keep_reason;
 int config_enter_scrolls;
+char *config_audio_device;
+char *config_speech_app;
 
 char *home_dir;
 char *config_dir;

@@ -974,7 +974,7 @@ void ekg_exit()
 
 	ui_deinit();
 
-	if (config_changed) {
+	if (config_changed && !config_speech_app) {
 		char line[80];
 
 		printf("%s", format_find("config_changed"));

@@ -61,6 +61,18 @@ const char *format_find(const char *name)
 
 	hash = ekg_hash(name);
 
+	if (config_speech_app && !strchr(name, ',')) {
+		char *name2 = saprintf("%s,speech", name);
+		const char *tmp;
+		
+		if (strcmp((tmp = format_find(name2)), "")) {
+			xfree(name2);
+			return tmp;
+		}
+		
+		xfree(name2);
+	}
+
 	if (config_theme && (tmp = strchr(config_theme, ',')) && !strchr(name, ',')) {
 		char *name2 = saprintf("%s,%s", name, tmp + 1);
 		const char *tmp;
@@ -668,9 +680,13 @@ void theme_init()
 
 	/* wykorzystywane w innych formatach */
 	format_add("prompt", "%g-%G>%g-%n", 1);
+	format_add("prompt,speech", " ", 1);
 	format_add("prompt2", "%c-%C>%c-%n", 1);
+	format_add("prompt2,speech", " ", 1);
 	format_add("error", "%r-%R>%r-%n", 1);
+	format_add("error,speech", "b³±d!", 1);
 	format_add("timestamp", "%H:%M", 1);
+	format_add("timestamp,speech", " ", 1);
 	
 	/* prompty dla ui-readline */
 	format_add("readline_prompt", "% ", 1);
@@ -690,6 +706,7 @@ void theme_init()
 
 	/* dla funkcji format_user() */
 	format_add("known_user", "%T%1%n/%2", 1);
+	format_add("known_user,speech", "%1", 1);
 	format_add("unknown_user", "%T%1%n", 1);
 	
 	/* czêsto wykorzystywane, ró¿ne, przydatne itd. */
@@ -702,6 +719,7 @@ void theme_init()
 	format_add("not_implemented", "%! Tej funkcji jeszcze nie ma\n", 1);
 	format_add("unknown_command", "%! Nieznane polecenie: %T%1%n\n", 1);
 	format_add("welcome", "%> %TEKG-%1%n (Eksperymentalny Klient Gadu-Gadu)\n%> Program jest rozprowadzany na zasadach licencji GPL w wersji 2\n%> %RPrzed u¿yciem przeczytaj ulotkê (polecenie ,,help'' lub F1)%n\n\n", 1);
+	format_add("welcome,speech", "witamy w e k g", 1);
 	format_add("ekg_version", "%) EKG - Eksperymentalny Klient Gadu-Gadu (%T%1%n)\n%) libgadu-%1 (protokó³ %2, klient %3)\n", 1);
 	format_add("group_empty", "%! Grupa %T%1%n jest pusta\n", 1);
 
@@ -767,22 +785,39 @@ void theme_init()
 	format_add("message_line", "%g|%n %1\n", 1);
 	format_add("message_line_width", "-8", 1);
 	format_add("message_timestamp", "%Y-%m-%d %H:%M", 1);
+
+	format_add("message_header,speech", "wiadomo¶æ od %1: ", 1);
+	format_add("message_conference_header,speech", "wiadomo¶æ od %1 w konferencji %3: ", 1);
+	format_add("message_line,speech", "%1\n", 1);
+	format_add("message_footer,speech", ".", 1);
+
 	format_add("chat_header", "%c.-- %n%1 %c(%C%#%c/%2)%n %c--- -- -%n\n", 1);
 	format_add("chat_conference_header", "%c.-- %c[%T%3%c] -- %n%1 %c(%C%#%c/%2)%n %c--- -- -%n\n", 1);
 	format_add("chat_footer", "%c`----- ---- --- -- -%n\n", 1);
 	format_add("chat_line", "%c|%n %1\n", 1);
 	format_add("chat_line_width", "-8", 1);
 	format_add("chat_timestamp", "%Y-%m-%d %H:%M", 1);
+
+	format_add("chat_header,speech", "wiadomo¶æ od %1: ", 1);
+	format_add("chat_conference_header,speech", "wiadomo¶æ od %1 w konferencji %3: ", 1);
+	format_add("chat_line,speech", "%1\n", 1);
+	format_add("chat_footer,speech", ".", 1);
+
 	format_add("sent_header", "%b.-- %n%1 %c(%C%#%c)%n %b--- -- -%n\n", 1);
 	format_add("sent_conference_header", "%b.-- %b[%T%3%b] -- %n%1 %c(%C%#%c)%n %b--- -- -%n\n", 1);
 	format_add("sent_footer", "%b`----- ---- --- -- -%n\n", 1);
 	format_add("sent_line", "%b|%n %1\n", 1);
 	format_add("sent_line_width", "-8", 1);
 	format_add("sent_timestamp", "%Y-%m-%d %H:%M", 1);
+
 	format_add("sysmsg_header", "%m.-- %TWiadomo¶æ systemowa %c(%C%#%c)%m --- -- -%n\n", 1);
 	format_add("sysmsg_line", "%m|%n %1\n", 1);
 	format_add("sysmsg_line_width", "-8", 1);
 	format_add("sysmsg_footer", "%m`----- ---- --- -- -%n\n", 1);	
+
+	format_add("sysmsg_header,speech", "wiadomo¶æ systemowa:", 1);
+	format_add("sysmsg_line,speech", "%1\n", 1);
+	format_add("sysmsg_footer,speech", ".", 1);
 
 	/* potwierdzenia wiadomo¶ci */
 	format_add("ack_queued", "%> Wiadomo¶æ do %1 zostanie dostarczona pó¼niej\n", 1);
@@ -832,6 +867,7 @@ void theme_init()
 	format_add("variable_not_found", "%! Nieznana zmienna: %1\n", 1);
 	format_add("variable_invalid", "%! Nieprawid³owa warto¶æ zmiennej\n", 1);
 	format_add("no_config", "%! Niekompletna konfiguracja. Wpisz:\n%!   %Tset uin <numerek-gg>%n\n%!   %Tset password <has³o>%n\n%!   %Tsave%n\n%! Nastêpnie wydaj polecenie:\n%!   %Tconnect%n\n%! Je¶li nie masz swojego numerka, wpisz:\n%!   %Tregister <e-mail> <has³o>%n\n\n", 1);
+	format_add("no_config,speech", "niekompletna konfiguracja. wpisz set uin, a potem numer gadu-gadu, potem set pas³ord, a za tym swoje has³o. wpisz sejf, ¿eby zapisaæ ustawienia. wpisz konekt by siê po³±czyæ. je¶li nie masz swojego numeru gadu-gadu, wpisz red¿ister, a potem imejl i has³o.", 1);
 	format_add("error_reading_config", "%! Nie mo¿na odczytaæ pliku konfiguracyjnego: %1\n", 1);
         format_add("config_line_incorrect", "%! Nieprawid³owa linia '%T%1%n', pomijam\n", 1);
 	format_add("autosaved", "%> Automatycznie zapisano ustawienia\n", 1);
@@ -846,7 +882,7 @@ void theme_init()
 	/* kasowanie konta uzytkownika z katalogu publiczengo */
 	format_add("unregister", "%> Konto %T%1%n wykasowane.\n", 1);
 	format_add("unregister_timeout", "%! Przekroczono limit czasu operacji usuwania konta\n", 1);
-	format_add("unregister_bad_uin", "%! Nie poprawny UIN: %T%1%n\n", 1);
+	format_add("unregister_bad_uin", "%! Nie poprawny numer: %T%1%n\n", 1);
 	format_add("unregister_failed", "%! B³±d podczas usuwania konta\n", 1);
 	
 	/* przypomnienie has³a */
@@ -1005,8 +1041,11 @@ void theme_init()
 
 	/* szybka lista kontaktów pod F2 */
 	format_add("quick_list", "%)%1\n", 1);
+	format_add("quick_list,speech", "lista kontaktów: ", 1);
 	format_add("quick_list_avail", " %T%1%n", 1);
+	format_add("quick_list_avail,speech", "%1 jest dostêpny, ", 1);
 	format_add("quick_list_busy", " %w%1%n", 1);
+	format_add("quick_list_busy,speech", "%1 jest zajêty, ", 1);
 	format_add("quick_list_invisible", " %K%1%n", 1);
 
 	/* history, wy³±czone, póki kto¶ nie przepisze sensownie */

@@ -16,6 +16,12 @@ password
 	has³o u¿ytkownika. niezbêdne do po³±czenia z serwerem. automatycznie
 	ustawiane po udanej rejestracji, gdy wcze¶niej by³o puste.
 
+audio_device
+	typ: tekst
+	domy¶lna warto¶æ: /dev/dsp
+
+	urz±dzenie d¼wiêkowe, którego nale¿y u¿ywaæ przy rozmowach g³osowych.
+
 auto_away
 	typ: liczba
 	domy¶lna warto¶æ: 600
@@ -348,6 +354,14 @@ sound_sysmsg_file
 	domy¶lna warto¶æ: brak
 
 	plik d¼wiêkowy odtwarzany po otrzymaniu wiadomo¶ci systemowej.
+
+speech_app
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	aplikacja u¿ywana do odczytywania tekstów wy¶wietlanych na ekranie.
+	jej ustawienie powoduje równie¿ zmianê wygl±du programu na taki,
+	który jest ³atwiejszy do wymówienia.
 
 tab_command
 	typ: tekst

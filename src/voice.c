@@ -54,7 +54,7 @@ int voice_open()
 	if (voice_fd != -1)
 		return -1;
 
-	if ((voice_fd = open("/dev/dsp", O_RDWR)) == -1)
+	if ((voice_fd = open((config_audio_device) ? config_audio_device : "/dev/dsp", O_RDWR)) == -1)
 		goto fail;
 
 	value = 8000;
