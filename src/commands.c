@@ -1636,7 +1636,8 @@ COMMAND(cmd_block)
 COMMAND(cmd_list)
 {
 	list_t l;
-	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, show_descr = 0, show_blocked = 0, show_offline = 0, j;
+	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_group_inverted = 0;
+	int show_inactive = 0, show_invisible = 0, show_descr = 0, show_blocked = 0, show_offline = 0, j;
 	char **argv = NULL, *show_group = NULL, *ip_str;
 	const char *tmp;
 	int params_null = 0;
@@ -1973,13 +1974,27 @@ COMMAND(cmd_list)
 
 			if (match_arg(argv[i], 'm', "member", 2)) {
 				if (j && argv[i+1]) {
-					int off = (argv[i+1][0] == '@' && strlen(argv[i+1]) > 1) ? 1 : 0;
+					int off = 0;
+
+					if (argv[i+1][0] == '!') {
+						show_group_inverted = 1;
+						off++;
+					}
+
+					off = (argv[i+1][off] == '@' && strlen(argv[i+1]) > 1) ? off + 1 : off;
 
 					show_group = xstrdup(argv[i+1] + off);
 				} else
 					if (params[i+1]) {
 						char **tmp = array_make(params[i+1], " \t", 0, 1, 1);
-						int off = (params[i+1][0] == '@' && strlen(params[i+1]) > 1) ? 1 : 0;
+						int off = 0;
+
+						if (params[i+1][0] == '!') {
+							show_group_inverted = 1;
+							off++;
+						}
+
+						off = (params[i+1][off] == '@' && strlen(params[i+1]) > 1) ? off + 1 : off;
 
  						show_group = xstrdup(tmp[0] + off);
 						array_free(tmp);
@@ -2024,7 +2039,7 @@ COMMAND(cmd_list)
 		if (show_descr && !GG_S_D(u->status))
 			show = 0;
 
-		if (show_group && !group_member(u, show_group))
+		if (show_group && (show_group_inverted == group_member(u, show_group)))
 			show = 0;
 
 		if (show_offline && group_member(u, "__offline"))
