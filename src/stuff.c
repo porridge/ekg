@@ -1105,6 +1105,10 @@ int config_read(const char *filename, const char *var)
 		return -1;
 
 	if (stat(filename, &st) || !S_ISREG(st.st_mode)) {
+		if (S_ISDIR(st.st_mode))
+			errno = EISDIR;
+		else
+			errno = EINVAL;
 		fclose(f);
 		return -1;
 	}

@@ -19,8 +19,8 @@ zg³osi³ b³±d.
 - poprawka /add -f (sz)
 - zmiana stanu przy starcie zachowuje siê przy w³±czonym ,,keep_reason'' tak
   samo, jak w kliencie. ze wzglêdu na sposób podawania parametrów, nie mo¿na
-  jednak wyczy¶cic stanu przez ,,-''. je¶li bêdzie to przeszkadza³o, zawsze
-  mo¿na przywrócic stare, ale chyba bardziej k³opotliwe zachowanie ;) (sz)
+  jednak wyczy¶ciæ stanu przez ,,-''. je¶li bêdzie to przeszkadza³o, zawsze
+  mo¿na przywróciæ stare, ale chyba bardziej k³opotliwe zachowanie ;) (sz)
 - zbyt d³uga wysy³ana wiadomo¶æ zostanie przyciêta. niestety, nie dotyczy
   to jeszcze szyfrowanych wiadomo¶ci (w)
 
