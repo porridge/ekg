@@ -1531,7 +1531,7 @@ int event_add(int flags, const char *target, const char *action, int quiet)
 	}
 
 	e.name = xstrdup(itoa(f));
-	e.target = target;
+	e.target = (char *) target;
 	e.flags = flags;
 	e.action = xstrdup(action);
 
@@ -2778,7 +2778,7 @@ void update_status()
 		return;
 
 	if ((u->descr && config_reason && strcmp(u->descr, config_reason)) || (!u->descr && config_reason) || (u->descr && !config_reason))
-		event_check(EVENT_DESCR, config_uin, u->descr);
+		event_check(EVENT_DESCR, config_uin, config_reason);
 
 	xfree(u->descr);
 	u->descr = xstrdup(config_reason);

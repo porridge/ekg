@@ -4,6 +4,12 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2004-11-19
+
+- poprawienie b³êdu przy obs³udze zdarzenia zmiany opisu w³asnego numerka 
+  (acze/g)
+- wyeliminowanie warninga podczas kompilacji stuff.c (g)
+
 // 2004-11-17
 
 - poprawienie kolejno¶ci logowania podczas wykonywania zdarzeñ 
