@@ -11,6 +11,7 @@ zg³osi³ b³±d.
 - poprawka Ctrl-W (w)
 - ucinanie zbyt d³ugich szyfrowanych wiadomo¶ci (sz/w)
 - poprawka segfaultów przy wysy³aniu d³ugich wiadomo¶ci (w)
+- poprawka Ctrl-Spacja (mateusza/w)
 
 // 2003-03-28
 

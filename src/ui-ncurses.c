@@ -3202,6 +3202,9 @@ static void ui_ncurses_loop()
 		if (ch == -2)		/* python ka¿e ignorowaæ */
 			continue;
 
+		if (ch == 0)		/* Ctrl-Space, g³upie to */
+			continue;
+
 		if (ch == 27) {
 			if ((ch = ekg_getch(27)) == -2)
 				continue;
