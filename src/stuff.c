@@ -77,6 +77,7 @@ list_t watches = NULL;
 list_t transfers = NULL;
 list_t events = NULL;
 list_t emoticons = NULL;
+list_t bindings = NULL;
 list_t sequences = NULL;
 list_t timers = NULL;
 list_t lasts = NULL;
@@ -637,10 +638,10 @@ void config_write_main(FILE *f, int base64)
                 fprintf(f, "on %s %u %s\n", event_format(e->flags), e->uin, e->action);
         }
 
-	for (l = sequences; l; l = l->next) {
-		struct sequence *s = l->data;
+	for (l = bindings; l; l = l->next) {
+		struct binding *b = l->data;
 
-		fprintf(f, "bind %s %s\n", s->seq, s->command);
+		fprintf(f, "bind %s %s\n", b->key, b->action);
 	}
 
 }
@@ -3448,4 +3449,23 @@ void change_status(int status, const char *arg, int autom)
 	xfree(tmp);
 
 	update_status();
+}
+
+/*
+ * binding_list()
+ *
+ * wy¶wietla listê przypisanych komend.
+ */
+void binding_list() 
+{
+	list_t l;
+
+	if (!bindings)
+		print("bind_seq_list_empty");
+
+	for (l = bindings; l; l = l->next) {
+		struct binding *b = l->data;
+
+		print("bind_seq_list", b->key, b->action);
+	}
 }

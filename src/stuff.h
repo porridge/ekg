@@ -84,9 +84,9 @@ struct emoticon {
 	char *value;	/* tre¶æ emoticona typu ":-*" */
 };
 
-struct sequence {
-	char *seq;
-	char *command;
+struct binding {
+	char *key;
+	char *action;
 };
 
 struct timer {
@@ -134,7 +134,7 @@ list_t watches;
 list_t transfers;
 list_t events;
 list_t emoticons;
-list_t sequences;
+list_t bindings;
 list_t timers;
 list_t lasts;
 list_t lasts_count;
@@ -340,5 +340,7 @@ int msg_encrypt(uin_t uin, char **msg);
 
 int find_in_uins(int uin_count, uin_t *uins, uin_t uin);
 uin_t str_to_uin(const char *text);
+
+void binding_list();
 
 #endif /* __STUFF_H */

@@ -11,6 +11,7 @@ zg³osi³ b³±d.
 - ujednolicenie nazewnictwa grup. zawsze nale¿y u¿ywaæ zapisu ,,@grupa''.
   jedynie w miejscach, gdzie nie powoduje to dwuznaczno¶ci (list -m grupa,
   list alias -g grupa) dopuszczalne jest w _ostateczno¶ci_ ,,grupa'' (pmb/sz)
+- dodanie /bind w ui-ncurses (w)
 
 // 2002-12-04
 

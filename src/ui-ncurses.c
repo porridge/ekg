@@ -75,6 +75,9 @@ static void ui_ncurses_deinit();
 static void window_switch(int id);
 static void update_statusbar();
 
+static void binding_add(const char *key, const char *action, int quiet);
+static void binding_delete(const char *key, int quiet);
+
 struct window {
 	WINDOW *window;		/* okno okna */
 	char *target;		/* nick query albo inna nazwa albo NULL */
@@ -113,6 +116,8 @@ static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 int config_contacts_size = 8;		/* szeroko¶æ okna kontaktów */
 static int last_contacts_size = 0;	/* poprzedni rozmiar przed zmian± */
 int config_contacts = 0;		/* czy ma byæ okno kontaktów */
+struct binding *binding_map[KEY_MAX + 1];	/* mapa bindowanych klawiszy */
+struct binding *binding_map_meta[KEY_MAX + 1];	/* j.w. z altem */
 
 #define CONTACTS_SIZE ((config_contacts) ? (config_contacts_size + 3): 0)
 
@@ -945,6 +950,9 @@ void ui_ncurses_init()
 
 	t = timer_add(1, "ui-ncurses-time", "refresh_time");
 	t->ui = 1;
+
+	memset(binding_map, 0, sizeof(binding_map));
+	memset(binding_map_meta, 0, sizeof(binding_map_meta));
 }
 
 /*
@@ -1465,7 +1473,15 @@ static void ui_ncurses_loop()
 		int ch;
 
 		ekg_wait_for_key();
-		switch ((ch = wgetch(input))) {
+
+		ch = wgetch(input);
+
+		if (ch != 27 && binding_map[ch] && binding_map[ch]->action) {
+			command_exec(NULL, binding_map[ch]->action);
+			continue;
+		}
+		
+		switch (ch) {
 			case -1:	/* stracony terminal */
 				ekg_exit();
 				break;
@@ -1484,6 +1500,11 @@ static void ui_ncurses_loop()
 			case 27:
 				ch = wgetch(input);
 
+				if (binding_map_meta[ch] && binding_map_meta[ch]->action) {
+					command_exec(NULL, binding_map_meta[ch]->action);
+					break;
+				}
+				
 				/* obs³uga Ctrl-F1 - Ctrl-F12 na FreeBSD */
 				if (ch == '[') {
 					ch = wgetch(input);
@@ -1976,6 +1997,89 @@ static void window_kill(struct window *w)
 	list_remove(&windows, w, 1);
 }
 
+/*
+ * binding_add()
+ *
+ * przypisuje danemu klawiszowi akcjê.
+ */
+static void binding_add(const char *key, const char *action, int quiet)
+{
+	int correct = 0;
+	struct binding b;
+	
+	if (!key || !action)
+		return;
+	
+	if (!strncasecmp(key, "ctrl-", 5) && strlen(key) == 6 && isalpha(key[5])) {
+		char ch = toupper(key[5]);
+
+		b.key = saprintf("Ctrl-%c", ch);
+		b.action = xstrdup(action);
+		binding_map[ch - 64] = list_add(&bindings, &b, sizeof(b));
+
+		correct = 1;
+		config_changed = 1;
+	}
+
+	if (!strncasecmp(key, "alt-", 4) && strlen(key) == 5) {
+		char ch = isalpha(key[4]) ? toupper(key[4]) : key[4];
+
+		b.key = saprintf("Alt-%c", ch);
+		b.action = xstrdup(action);
+		binding_map_meta[(unsigned char) ch] = list_add(&bindings, &b, sizeof(b));
+		if (isalpha(ch))
+			binding_map_meta[tolower(ch)] = binding_map_meta[(unsigned char) ch];
+
+		correct = 1;
+		config_changed = 1;
+	}
+
+	if (!quiet)
+		print((correct) ? "bind_seq_add" : "bind_seq_incorrect", b.key);
+}
+
+/*
+ * binding_delete()
+ *
+ * usuwa akcjê z danego klawisza.
+ */
+static void binding_delete(const char *key, int quiet)
+{
+	list_t l;
+
+	if (!key)
+		return;
+
+	for (l = bindings; l; l = l->next) {
+		struct binding *b = l->data;
+		int i;
+
+		if (!b->key && strcasecmp(key, b->key))
+			continue;
+
+		xfree(b->key);
+		xfree(b->action);
+		
+		for (i = 0; i < KEY_MAX + 1; i++) {
+			if (binding_map[i] == b)
+				binding_map[i] = NULL;
+			if (binding_map_meta[i] == b)
+				binding_map_meta[i] = NULL;
+		}
+
+		list_remove(&bindings, b, 1);
+
+		config_changed = 1;
+
+		if (!quiet)
+			print("bind_seq_remove", key);
+		
+		return;
+	}
+
+	if (!quiet)
+		print("bind_seq_incorrect", key);
+}
 
 /*
  * ui_ncurses_event()
@@ -2061,7 +2165,21 @@ static int ui_ncurses_event(const char *event, ...)
 		char *command = va_arg(ap, char*);
 
 		if (!strcasecmp(command, "bind")) {
-			print("not_implemented");
+			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*), *p3 = va_arg(ap, char*);
+
+			if (match_arg(p1, 'a', "add", 2)) {
+				if (!p2 || !p3)
+					print("not_enough_params", "bind");
+				else
+					binding_add(p2, p3, (!strcasecmp(p1, "--add-quit")) ? 1 : 0);
+			} else if (match_arg(p1, 'd', "delete", 2)) {
+				if (!p2)
+					print("not_enough_params", "bind");
+				else
+					binding_delete(p2, 0);
+			} else
+				binding_list();
+
 			goto cleanup;
 		}
 

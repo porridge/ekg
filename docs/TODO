@@ -17,10 +17,11 @@ klient:
 - dodaæ ,,list --add'', które dopisuje informacje do listy kontaktów,
 - sensowna obs³uga kluczy dla SIM,
 - zmienna beep_*_away (rmrmg)
+- mo¿liwo¶æ bindowania akcji klienta (end-of-line, yank-buffer itp.)
+  nie tylko komend,
 
 klient (ncurses):
 - reakcja na zmianê rozmiaru terminala,
-- dodaæ /bind,
 - konfiguracja listy obecnych (kolorki, co wy¶wietlaæ itd.)
 - mo¿liwo¶æ listy obecnych po lewej (koniu),
 - sensowne zawijanie wy¶wietlanych tekstów,

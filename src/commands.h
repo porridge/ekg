@@ -60,4 +60,6 @@ int binding_help(int a, int b);
 int binding_toggle_debug(int a, int b);
 int binding_toggle_contacts(int a, int b);
 
+int match_arg(const char *arg, char shortopt, const char *longopt, int longoptlen);
+
 #endif /* __COMMANDS_H */

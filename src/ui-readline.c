@@ -111,7 +111,6 @@ static int window_find_query(const char *qnick);
 static char *window_activity();
 
 static int bind_sequence(const char *seq, const char *command, int quiet);
-static int bind_seq_list();
 static int bind_handler_window(int a, int key);
 
 /*
@@ -1001,7 +1000,7 @@ static int ui_readline_event(const char *event, ...)
 					bind_sequence(p2, NULL, 0);
 			
 			} else 
-				bind_seq_list();
+				binding_list();
 
 			result = 1;
 		}
@@ -1382,11 +1381,11 @@ static char *bind_find_command(const char *seq)
 	if (!seq)
 		return NULL;
 	
-	for (l = sequences; l; l = l->next) {
-		struct sequence *s = l->data;
+	for (l = bindings; l; l = l->next) {
+		struct binding *s = l->data;
 
-		if (s->seq && !strcasecmp(s->seq, seq))
-			return s->command;
+		if (s->key && !strcasecmp(s->key, seq))
+			return s->action;
 	}
 
 	return NULL;
@@ -1490,25 +1489,25 @@ static int bind_sequence(const char *seq, const char *command, int quiet)
 	}
 
 	if (command) {
-		struct sequence s;
+		struct binding s;
 		
-		s.seq = nice_seq;
-		s.command = xstrdup(command);
+		s.key = nice_seq;
+		s.action = xstrdup(command);
 
-		list_add(&sequences, &s, sizeof(s));
+		list_add(&bindings, &s, sizeof(s));
 
 		if (!quiet) {
-			print("bind_seq_add", s.seq);
+			print("bind_seq_add", s.key);
 			config_changed = 1;
 		}
 	} else {
 		list_t l;
 
-		for (l = sequences; l; l = l->next) {
-			struct sequence *s = l->data;
+		for (l = bindings; l; l = l->next) {
+			struct binding *s = l->data;
 
-			if (s->seq && !strcasecmp(s->seq, seq)) {
-				list_remove(&sequences, s, 1);
+			if (s->key && !strcasecmp(s->key, seq)) {
+				list_remove(&bindings, s, 1);
 				if (!quiet) {
 					print("bind_seq_remove", seq);
 					config_changed = 1;
@@ -1521,25 +1520,3 @@ static int bind_sequence(const char *seq, const char *command, int quiet)
 	return 1;
 }
 
-/*
- * bind_seq_list()
- *
- * wy¶wietla listê przypisanych komend.
- */
-static int bind_seq_list() 
-{
-	list_t l;
-	int count = 0;
-
-	for (l = sequences; l; l = l->next) {
-		struct sequence *s = l->data;
-
-		print ("bind_seq_list", s->seq, s->command);
-		count++;
-	}
-
-	if (!count)
-		print("bind_seq_list_empty");
-	
-	return 0;
-}
