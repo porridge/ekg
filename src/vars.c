@@ -106,7 +106,8 @@ void variable_init()
 	variable_add("away_reason", "ar", VAR_STR, 1, &config_away_reason, changed_xxx_reason, NULL, NULL);
 	variable_add("back_reason", "br", VAR_STR, 1, &config_back_reason, changed_xxx_reason, NULL, NULL);
 #ifdef WITH_UI_NCURSES
-	variable_add("backlog_size", "bs", VAR_INT, 1, &config_backlog_size, NULL, NULL, NULL);
+	if (ui_init == ui_ncurses_init)
+		variable_add("backlog_size", "bs", VAR_INT, 1, &config_backlog_size, NULL, NULL, NULL);
 #endif
 	variable_add("beep", "be", VAR_BOOL, 1, &config_beep, NULL, NULL, NULL);
 	variable_add("beep_msg", "bm", VAR_BOOL, 1, &config_beep_msg, NULL, NULL, dd_beep);
@@ -119,9 +120,11 @@ void variable_init()
 	variable_add("completion_notify", "cn", VAR_MAP, 1, &config_completion_notify, NULL, variable_map(4, 0, 0, "none", 1, 2, "add", 2, 1, "addremove", 4, 0, "busy"), NULL);
 	variable_add("ctrld_quits", "cq", VAR_BOOL, 1, &config_ctrld_quits, NULL, NULL, NULL);
 #ifdef WITH_UI_NCURSES
-	variable_add("contacts", "co", VAR_INT, 1, &config_contacts, contacts_rebuild, NULL, NULL);
-	variable_add("contacts_descr", "cd", VAR_BOOL, 1, &config_contacts_descr, contacts_rebuild, NULL, NULL);
-	variable_add("contacts_size", "cs", VAR_INT, 1, &config_contacts_size, contacts_rebuild, NULL, dd_contacts);
+	if (ui_init == ui_ncurses_init) {
+		variable_add("contacts", "co", VAR_INT, 1, &config_contacts, contacts_rebuild, NULL, NULL);
+		variable_add("contacts_descr", "cd", VAR_BOOL, 1, &config_contacts_descr, contacts_rebuild, NULL, NULL);
+		variable_add("contacts_size", "cs", VAR_INT, 1, &config_contacts_size, contacts_rebuild, NULL, dd_contacts);
+	}
 #endif
 	variable_add("dcc", "dc", VAR_BOOL, 1, &config_dcc, changed_dcc, NULL, NULL);
 	variable_add("dcc_ip", "di", VAR_STR, 1, &config_dcc_ip, changed_dcc, NULL, dd_dcc);
@@ -135,7 +138,8 @@ void variable_init()
 	variable_add("display_sent", "ds", VAR_BOOL, 1, &config_display_sent, NULL, NULL, NULL);
 	variable_add("display_welcome", "dw", VAR_BOOL, 1, &config_display_welcome, NULL, NULL, NULL);
 #ifdef WITH_UI_NCURSES
-	variable_add("display_transparent", "dt", VAR_BOOL, 1, &config_display_transparent, NULL, NULL, NULL);
+	if (ui_init == ui_ncurses_init)
+		variable_add("display_transparent", "dt", VAR_BOOL, 1, &config_display_transparent, NULL, NULL, NULL);
 #endif
 	variable_add("emoticons", "eM", VAR_BOOL, 1, &config_emoticons, NULL, NULL, NULL);
 #ifdef HAVE_OPENSSL
@@ -143,7 +147,8 @@ void variable_init()
 #endif
 	variable_add("enter_scrolls", "es", VAR_BOOL, 1, &config_enter_scrolls, NULL, NULL, NULL);
 #ifdef WITH_UI_NCURSES
-	variable_add("header_size", "hs", VAR_INT, 1, &config_header_size, header_statusbar_resize, NULL, NULL);
+	if (ui_init == ui_ncurses_init)
+		variable_add("header_size", "hs", VAR_INT, 1, &config_header_size, header_statusbar_resize, NULL, NULL);
 #endif
 	variable_add("keep_reason", "kr", VAR_BOOL, 1, &config_keep_reason, NULL, NULL, NULL);
 	variable_add("last", "la", VAR_MAP, 1, &config_last, NULL, variable_map(4, 0, 0, "none", 1, 2, "all", 2, 1, "separate", 4, 0, "sent"), NULL);
@@ -175,15 +180,18 @@ void variable_init()
 	variable_add("sound_app", "Sa", VAR_STR, 1, &config_sound_app, NULL, NULL, NULL);
 	variable_add("speech_app", "SA", VAR_STR, 1, &config_speech_app, NULL, NULL, NULL);
 #ifdef WITH_UI_NCURSES
-	variable_add("statusbar_size", "sS", VAR_INT, 1, &config_statusbar_size, header_statusbar_resize, NULL, NULL);
+	if (ui_init == ui_ncurses_init)
+		variable_add("statusbar_size", "sS", VAR_INT, 1, &config_statusbar_size, header_statusbar_resize, NULL, NULL);
 #endif
 	variable_add("tab_command", "tc", VAR_STR, 1, &config_tab_command, NULL, NULL, NULL);
 	variable_add("theme", "th", VAR_STR, 1, &config_theme, changed_theme, NULL, NULL);
 	variable_add("time_deviation", "td", VAR_INT, 1, &config_time_deviation, NULL, NULL, NULL);
 	variable_add("timestamp", "ts", VAR_STR, 1, &config_timestamp, NULL, NULL, NULL);
 #ifdef WITH_UI_NCURSES
-	variable_add("windows_save", "ws", VAR_BOOL, 1, &config_windows_save, NULL, NULL, NULL);
-	variable_add("windows_layout", "wl", VAR_STR, 2, &config_windows_layout, NULL, NULL, NULL);
+	if (ui_init == ui_ncurses_init) {
+		variable_add("windows_save", "ws", VAR_BOOL, 1, &config_windows_save, NULL, NULL, NULL);
+		variable_add("windows_layout", "wl", VAR_STR, 2, &config_windows_layout, NULL, NULL, NULL);
+	}
 #endif
 
 	variable_add("status", "st", VAR_INT, 2, &config_status, NULL, NULL, NULL);

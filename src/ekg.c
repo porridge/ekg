@@ -67,7 +67,6 @@
 
 static int ekg_pid = 0;
 static char argv0[PATH_MAX];
-static void (*ui_init)();
 static int ioctld_pid = 0;
 static int mesg_startup;
 
