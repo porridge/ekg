@@ -524,6 +524,22 @@ void ui_readline_init()
  */
 void ui_readline_deinit()
 {
+	if (config_changed) {
+		char *line;
+		const char *prompt = find_format("config_changed");
+
+		if ((line = readline(prompt))) {
+			if (!strcasecmp(line, "tak") || !strcasecmp(line, "yes") || !strcasecmp(line, "t") || !strcasecmp(line, "y")) {
+				if (!userlist_write(NULL) && !config_write(NULL))
+					print("saved");
+				else
+					print("error_saving");
+
+			}
+			free(line);
+		} else
+			printf("\n");
+	}
 
 }
 
@@ -599,22 +615,6 @@ void ui_readline_loop()
 		quit_message_send = 1;
 	}
 
-	if (config_changed) {
-		char *line;
-		const char *prompt = find_format("config_changed");
-
-		if ((line = readline(prompt))) {
-			if (!strcasecmp(line, "tak") || !strcasecmp(line, "yes") || !strcasecmp(line, "t") || !strcasecmp(line, "y")) {
-				if (!userlist_write(NULL) && !config_write(NULL))
-					print("saved");
-				else
-					print("error_saving");
-
-			}
-			free(line);
-		} else
-			printf("\n");
-	}
 }
 
 void ui_readline_new_target(const char *target)
