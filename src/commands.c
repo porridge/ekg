@@ -2936,8 +2936,13 @@ COMMAND(cmd_register)
 
 COMMAND(cmd_reload)
 {
-	if (config_read(NULL, NULL)) {
-		printq("generic_error", "Wyst±pi³ b³±d przy odczycie pliku konfiguracyjnego\n");
+	const char *filename = NULL;
+
+	if (params[0])
+		filename = params[0];
+
+	if (config_read(filename, NULL)) {
+		printq("generic_error", "Wyst±pi³ b³±d przy odczycie pliku konfiguracyjnego");
 		return -1;
 	}
 
@@ -4540,8 +4545,8 @@ void command_init()
 	  "");
 
 	command_add
-	( "reload", "", cmd_reload, 0,
-	  "", "wczytuje na nowo plik konfiguracyjny u¿ytkownika",
+	( "reload", "f", cmd_reload, 0,
+	  " [plik]", "wczytuje ponownie plik konfiguracyjny u¿ytkownika lub podany",
 	  "");
 	  
 	command_add
