@@ -1032,6 +1032,7 @@ COMMAND(cmd_modify)
 							ignored_add(u->uin, level);
 
 						userlist_remove(_u);
+						break;
 					}
 				}
 			}
