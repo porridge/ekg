@@ -99,6 +99,7 @@ int config_beep_notify = 1;
 char *config_sound_msg_file = NULL;
 char *config_sound_chat_file = NULL;
 char *config_sound_sysmsg_file = NULL;
+char *config_sound_notify_file = NULL;
 char *config_sound_app = NULL;
 int config_uin = 0;
 int last_sysmsg = 0;

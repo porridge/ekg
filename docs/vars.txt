@@ -427,6 +427,12 @@ sound_chat_file
 
 	plik d¼wiêkowy odtwarzany w czasie rozmowy.
 
+sound_notify_file
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	plik d¼wiêkowy odtwarzany po zmianie stanu którego¶ ze znajomych.
+
 sound_sysmsg_file
 	typ: tekst
 	domy¶lna warto¶æ: brak

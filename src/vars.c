@@ -103,6 +103,7 @@ void variable_init()
 	variable_add("sound_msg_file", VAR_STR, 1, &config_sound_msg_file, NULL, NULL);
 	variable_add("sound_chat_file", VAR_STR, 1, &config_sound_chat_file, NULL, NULL);
 	variable_add("sound_sysmsg_file", VAR_STR, 1, &config_sound_sysmsg_file, NULL, NULL);
+	variable_add("sound_notify_file", VAR_STR, 1, &config_sound_notify_file, NULL, NULL);
 	variable_add("sound_app", VAR_STR, 1, &config_sound_app, NULL, NULL);
 	variable_add("speech_app", VAR_STR, 1, &config_speech_app, NULL, NULL);
 	variable_add("tab_command", VAR_STR, 1, &config_tab_command, NULL, NULL);

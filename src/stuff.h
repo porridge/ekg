@@ -211,6 +211,7 @@ char *config_sound_app;
 char *config_sound_chat_file;
 char *config_sound_msg_file;
 char *config_sound_sysmsg_file;
+char *config_sound_notify_file;
 char *config_speech_app;
 int config_status;
 char *config_tab_command;

@@ -639,6 +639,10 @@ static void handle_common(uin_t uin, int status, const char *descr, struct gg_no
 		if (config_beep && config_beep_notify)
 			ui_beep();
 
+		/* lub muzyczk± */
+		if (config_sound_notify_file)
+			play_sound(config_sound_notify_file);
+
 		break;
 	}
 }
