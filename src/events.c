@@ -466,13 +466,17 @@ void handle_msg(struct gg_event *e)
 		const char *target = (u) ? u->display : itoa(e->event.msg.sender);
 		FILE *f;
 
-		print_window(target, 0, "public_key_received", format_user(e->event.msg.sender));	
+		print_window(target, 0, "key_public_received", format_user(e->event.msg.sender));	
 
-		mkdir(prepare_path("keys", 1), 0700);
+		if (mkdir(prepare_path("keys", 1), 0700) && errno != EEXIST) {
+			print_window(target, 0, "key_public_write_failed", strerror(errno));
+			return;
+		}
+
 		name = saprintf("%s/%d.pem", prepare_path("keys", 0), e->event.msg.sender);
 
 		if (!(f = fopen(name, "w"))) {
-			print_window(target, 0, "public_key_write_failed");
+			print_window(target, 0, "key_public_write_failed", strerror(errno));
 			xfree(name);
 			return;
 		}
@@ -481,7 +485,7 @@ void handle_msg(struct gg_event *e)
 		fclose(f);
 		xfree(name);
 
-		SIM_KC_Free(SIM_KC_Find(e->event.msg.sender));
+ 		SIM_KC_Free(SIM_KC_Find(e->event.msg.sender));
 
 		return;
 	}

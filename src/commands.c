@@ -33,6 +33,7 @@
 #include <errno.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <dirent.h>
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -2558,95 +2559,165 @@ COMMAND(cmd_version)
 }
 
 #ifdef HAVE_OPENSSL
-COMMAND(cmd_test_keygen)
+COMMAND(cmd_key)
 {
-	printq("generic", "Chwilka, generujê klucze...");
+	if (match_arg(params[0], 'g', "generate", 2)) {
+		char *tmp, *tmp2;
+		struct stat st;
 
-	mkdir(prepare_path("keys", 1), 0700);
+		if (mkdir(prepare_path("keys", 1), 0700) && errno != EEXIST) {
+			printq("key_generating_error", strerror(errno));
+			return -1;
+		}
 
-	if (sim_key_generate(config_uin)) {
-		printq("generic_error", "Nie uda³o siê wygenerowaæ klucza");
-		return -1;
+		tmp = saprintf("%s/%d.pem", prepare_path("keys", 0), config_uin);
+		tmp2 = saprintf("%s/private.pem", prepare_path("keys", 0));
+
+		if (!stat(tmp, &st) && !stat(tmp2, &st)) {
+			printq("key_private_exist");
+			xfree(tmp);
+			xfree(tmp2);
+			return -1;
+		} 
+
+		xfree(tmp);
+		xfree(tmp2);
+
+		printq("key_generating");
+
+		if (sim_key_generate(config_uin)) {
+			printq("key_generating_error", "sim_key_generate()");
+			return -1;
+		}
+
+		printq("key_generating_success");
+
+		return 0;
 	}
 
-	printq("generic", "Wygenerowano i zapisano klucze");
+	if (match_arg(params[0], 's', "send", 2)) {
+		string_t s = string_init(NULL);
+		char *tmp, buf[128];
+		uin_t uin;
+		FILE *f;
+		
+		if (!params[1]) {
+			printq("not_enough_params", name);
+			return -1;
+		}
 
-	return 0;
+		if (!(uin = get_uin(params[1]))) {
+			printq("user_not_found", params[1]);
+			return -1;
+		}
+
+		if (!sess || sess->state != GG_STATE_CONNECTED) {
+			printq("not_connected");
+			return -1;
+		}
+
+		tmp = saprintf("%s/%d.pem", prepare_path("keys", 0), config_uin);
+		f = fopen(tmp, "r");
+		xfree(tmp);
+
+		if (!f) {
+			printq("key_public_not_found", format_user(config_uin));
+			return -1;
+		}
+
+		while (fgets(buf, sizeof(buf), f))
+			string_append(s, buf);
+
+		fclose(f);
+
+		if (gg_send_message(sess, GG_CLASS_MSG, uin, s->str) == -1) {
+			printq("key_send_error");
+			string_free(s, 1);
+			return -1;
+		}
+		
+		printq("key_send_success", format_user(uin));
+		string_free(s, 1);
+
+		return 0;
+	}
+
+ 	if (match_arg(params[0], 'd', "delete", 2)) {
+		char *tmp;
+		uin_t uin;
+
+		if (!params[1]) {
+			printq("not_enough_params", name);
+			return -1;
+		}
+
+		if (!(uin = get_uin(params[1]))) {
+			printq("user_not_found", params[1]);
+			return -1;
+		}
+
+		if (uin == config_uin) {
+			char *tmp = saprintf("%s/private.pem", prepare_path("keys", 0));
+			unlink(tmp);
+			xfree(tmp);
+		}
+
+		tmp = saprintf("%s/%d.pem", prepare_path("keys", 0), uin);
+		
+		if (unlink(tmp)) {
+			printq("key_public_not_found", format_user(uin));
+		} else {
+			printq("key_public_deleted", format_user(uin));
+		}
+		
+		xfree(tmp);
+
+		SIM_KC_Free(SIM_KC_Find(uin));
+
+		return 0;
+	}
+
+	if (!params[0] || match_arg(params[0], 'l', "list", 2)) {
+		DIR *dir;
+		struct dirent *d;
+		int count = 0;
+		const char *path = prepare_path("keys", 0);
+
+		if (!(dir = opendir(path))) {
+			printq("key_public_noexist");
+			return -1;
+		}
+		
+		while ((d = readdir(dir))) {
+			struct stat st;
+			char *name = saprintf("%s/%s", path, d->d_name);
+
+			if (strstr(d->d_name, ".pem") && !stat(name, &st) && S_ISREG(st.st_mode)) {
+				int uin = atoi(d->d_name);
+
+				if (uin) {
+					printq("generic", format_user(uin));
+					count++;
+				}
+			}
+
+			xfree(name);
+		}
+
+		closedir(dir);
+
+		if (!count) {
+			printq("key_public_noexist");
+			return -1;
+		}
+
+		return 0;
+	}
+
+	printq("invalid_params", name);
+
+	return -1;
 }
-
-COMMAND(cmd_test_keysend)
-{
-	string_t s = string_init(NULL);
-	char *tmp, buf[128];
-	uin_t uin;
-	FILE *f;
-	
-	if (!params[0]) {
-		printq("not_enough_params", name);
-		return -1;
-	}
-
-	if (!(uin = get_uin(params[0]))) {
-		printq("user_not_found", params[0]);
-		return -1;
-	}
-
-	if (!sess || sess->state != GG_STATE_CONNECTED) {
-		printq("not_connected");
-		return -1;
-	}
-
-	tmp = saprintf("%s/%d.pem", prepare_path("keys", 0), config_uin);
-	f = fopen(tmp, "r");
-	xfree(tmp);
-
-	if (!f) {
-		printq("public_key_not_found", format_user(config_uin));
-		return -1;
-	}
-
-	while (fgets(buf, sizeof(buf), f))
-		string_append(s, buf);
-
-	fclose(f);
-
-	gg_send_message(sess, GG_CLASS_MSG, uin, s->str);
-
-	string_free(s, 1);
-
-	return 0;
-}
-
-COMMAND(cmd_test_keydel)
-{
-	char *tmp;
-	uin_t uin;
-
-	if (!params[0]) {
-		printq("not_enough_params", name);
-		return -1;
-	}
-
-	if (!(uin = get_uin(params[0]))) {
-		printq("user_not_found", params[0]);
-		return -1;
-	}
-	
-	tmp = saprintf("%s/%d.pem", prepare_path("keys", 0), uin);
-	
-	if (unlink(tmp) == -1) {
-		printq("public_key_not_found", format_user(uin));
-	} else {
-		printq("public_key_deleted", format_user(uin));
-	}
-	
-	xfree(tmp);
-
-	SIM_KC_Free(SIM_KC_Find(uin));
-
-	return 0;
-}
-
 #endif
 
 COMMAND(cmd_test_segv)
@@ -2986,7 +3057,7 @@ COMMAND(cmd_reload)
 		filename = params[0];
 
 	if (config_read(filename, NULL)) {
-		printq("generic_error", "Wyst±pi³ b³±d przy odczycie pliku konfiguracyjnego");
+		printq("error_reading_config", strerror(errno));
 		return -1;
 	}
 
@@ -4460,12 +4531,21 @@ void command_init()
 	  "wzglêdu na ustawienia zmiennych.");
 
 	command_add
+	( "key", "?u", cmd_key, 0,
+	  " [opcje]", "zarz±dza kluczami dla SIM",
+	  "\n"
+	  "  -g, --generate              generuje parê kluczy u¿ytkownika\n"
+	  "  -s, --send <numer/alias>    wysy³a nasz klucz publiczny\n"
+	  "  -d, --delete <numer/alias>  usuwa klucz publiczny\n"
+	  "  [-l, --list]                wy¶wietla posiadane klucze publiczne\n");
+
+	command_add
 	( "last", "uu", cmd_last, 0,
 	  " [opcje]", "wy¶wietla lub czy¶ci ostatnie wiadomo¶ci",
 	  "\n"
-	  "  -s, --stime [numer/alias] wy¶wietla czas wys³ania wiadomo¶ci\n"
-	  "  -c, --clear [numer/alias] czy¶ci podane wiadomo¶ci lub wszystkie\n"
-	  "  [numer/alias]             wy¶wietla ostatnie wiadomo¶ci\n"
+	  "  -s, --stime [numer/alias]  wy¶wietla czas wys³ania wiadomo¶ci\n"
+	  "  -c, --clear [numer/alias]  czy¶ci podane wiadomo¶ci lub wszystkie\n"
+	  "  [numer/alias]              wy¶wietla ostatnie wiadomo¶ci\n"
 	  "\n"
 	  "W przypadku opcji %T--stime%n czas wy¶wietlany jest "
 	  ",,inteligentnie'' zgodnie ze zmienn± %Ttime_deviation.%n");
@@ -4589,8 +4669,8 @@ void command_init()
 	( "queue", "uu", cmd_queue, 0,
 	  " [opcje]", "zarz±dzanie wiadomo¶ciami do wys³ania po po³±czeniu",
 	  "\n"
-	  "  -c, --clear [numer/alias] usuwa podane wiadomo¶ci lub wszystkie\n"
-	  "  [numer/alias]             wy¶wietla kolejkê wiadomo¶ci\n"
+	  "  -c, --clear [numer/alias]  usuwa podane wiadomo¶ci lub wszystkie\n"
+	  "  [numer/alias]              wy¶wietla kolejkê wiadomo¶ci\n"
 	  "\n"
 	  "Mo¿na u¿yæ tylko wtedy, gdy nie jeste¶my po³±czeni. W przypadku "
 	  "konferencji wy¶wietla wszystkich uczestników.");
@@ -4758,17 +4838,6 @@ void command_init()
 	command_add
 	( "_vars", "", cmd_test_vars, 0, "",
 	  "wy¶wietla skrót zmiennych", "");
-#ifdef HAVE_OPENSSL
-	command_add
-	( "_keygen", "", cmd_test_keygen, 0, "",
-	  "generuje parê kluczy", "");
-	command_add
-	( "_keysend", "u", cmd_test_keysend, 0, " <numer/alias>",
-	  "wysy³a klucz publiczny do danej osoby", "");
-	command_add
-	( "_keydel", "u", cmd_test_keydel, 0, " <numer/alias>",
-	  "usuwa klucz publiczny danej osoby", "");
-#endif
 	command_add
 	( "_queue", "uu", cmd_queue, 0, " [opcje]",
 	  "pozwala obserwowaæ kolejkê wiadomo¶ci podczas po³±czenia", "");
