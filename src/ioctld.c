@@ -89,8 +89,12 @@ int blink_leds(int *flag, int *delay)
 #else
 	    	ioctl(fd, KDSETLED, flag[s]);
 #endif 
-		if (delay[s] && delay[s] <= IOCTLD_MAX_DELAY)
-			usleep(delay[s]);
+		if (delay[s]) {
+			if (delay[s] <= IOCTLD_MAX_DELAY)
+				usleep(delay[s]);
+			else
+				usleep(IOCTLD_MAX_DELAY);
+		}
 	}
 
 #ifdef sun
@@ -128,8 +132,12 @@ int beeps_spk(int *tone, int *delay)
 		putchar('\a');
 		fflush(stdout);
 #endif
-		if (delay[s] && delay[s] <= IOCTLD_MAX_DELAY)
-			usleep(delay[s]);
+		if (delay[s]) {
+			if (delay[s] <= IOCTLD_MAX_DELAY)
+				usleep(delay[s]);
+			else
+				usleep(IOCTLD_MAX_DELAY);
+		}
 	}
 
 #ifndef sun
