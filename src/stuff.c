@@ -40,6 +40,7 @@
 
 struct gg_session *sess = NULL;
 struct gg_search *search = NULL;
+struct gg_register *reg = NULL;
 struct list *userlist = NULL;
 struct list *ignored = NULL;
 struct list *children = NULL;
