@@ -5,7 +5,20 @@ to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
 // 2003-09-30
+
 - poprawienie zachowania siê /set dla irssi_set_mode == 1 (weirdo/wysek)
+- libgadu: poprawki zmiennych ze znakiem i bez znaku, które s± potencjalnie
+  niebezpieczne dla u¿ytkownika (gj/w)
+- libgadu: usuniêcie funkcji nieaktualnych ze wzglêdu na zmiany w protokole.
+  przeniesiono je do pliku lib/obsolete.c (w)
+- libgadu: poprawka wysy³ania i pobierania listy kontaktów z serwera (Chilek/w)
+- libgadu: pobieranie tokenu za pomoc± funkcji gg_token(). zwrócon± strukturê
+  obs³ugiwaæ przez gg_token_watch_fd(). po zakoñczeniu w ->body mamy plik
+  graficzny o rozmiarze ->body_size, w ->token->width i ->token->height
+  wymiary obrazka, w ->token->length d³ugo¶æ tokenu i w ->token->tokenid
+  jego identyfikator (w)
+- libgadu: poprawki obs³ugi http, by mo¿na by³o odbieraæ dane binarne (w)
+- poprawki w dokumentacji (w)
 
 // 2003-09-21
 

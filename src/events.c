@@ -1285,6 +1285,42 @@ fail:
 }
 
 /*
+ * handle_token()
+ *
+ * funkcja zajmuj±ca siê zdarzeniami zwi±zanymi z pobieraniem tokenu.
+ *
+ *  - h - delikwent.
+ *
+ * nie zwraca niczego.
+ */
+void handle_token(struct gg_http *h)
+{
+	struct gg_token *t = NULL;
+
+	if (!h)
+		return;
+
+	if (gg_token_watch_fd(h) || h->state == GG_STATE_ERROR) {
+		print("token_failed", http_error_string(h->error));
+		goto fail;
+	}
+	
+	if (h->state != GG_STATE_DONE)
+		return;
+
+	if (!(t = h->data) || !h->body) {
+		print("token_failed", http_error_string(h->error));
+		goto fail;
+	}
+
+	print("token");
+
+fail:
+	list_remove(&watches, h, 0);
+	gg_free_pubdir(h);
+}
+
+/*
  * handle_userlist()
  *
  * funkcja zajmuj±ca siê zdarzeniami userlisty.

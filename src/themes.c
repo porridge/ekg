@@ -1124,6 +1124,11 @@ void theme_init()
 	format_add("change", "%> Informacje w katalogu publicznym zosta³y zmienione\n", 1);
 	format_add("change_failed", "%! B³±d podczas zmiany informacji w katalogu publicznym\n", 1);
 	
+	/* pobieranie tokenu */
+	format_add("token", "%> Token\n", 1);
+	format_add("token_failed", "%! B³±d podczas pobierania tokenu: %1\n", 1);
+	format_add("token_timeout", "%! Przekroczono limit czasu operacji pobierania tokenu\n", 1);
+
 	/* sesemesy */
 	format_add("sms_error", "%! B³±d wysy³ania SMS: %1\n", 1);
 	format_add("sms_unknown", "%! %1 nie ma podanego numeru komórki\n", 1);

@@ -3198,6 +3198,20 @@ COMMAND(cmd_key)
 }
 #endif
 
+COMMAND(cmd_test_token)
+{
+	struct gg_http *h;
+
+	if (!(h = gg_token(1))) {
+		printq("generic_error", "Nie uda³o siê");
+		return -1;
+	}
+
+	list_add(&watches, h, 0);
+
+	return 0;
+}
+
 COMMAND(cmd_test_segv)
 {
 	char *foo = NULL;
@@ -5865,6 +5879,9 @@ void command_init()
 	command_add
 	( "_descr", "?", cmd_away, 0, " <opis>",
 	  "zmienia opis bez zmiany stanu", "");
+	command_add
+	( "_token", "", cmd_test_token, 0, "",
+	  "pobiera z serwera token", "");
 }
 
 /*
