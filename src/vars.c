@@ -29,6 +29,7 @@
 #include "config.h"
 #include "libgadu.h"
 #include "dynstuff.h"
+#include "xmalloc.h"
 
 struct list *variables = NULL;
 
@@ -124,7 +125,7 @@ int variable_add(char *name, int type, int display, void *ptr, void (*notify)(ch
 {
 	struct variable v;
 
-	v.name = strdup(name);
+	v.name = xstrdup(name);
 	v.type = type;
 	v.display = display;
 	v.ptr = ptr;
@@ -149,7 +150,7 @@ int variable_set(char *name, char *value, int allow_foreign)
 	struct variable *v = variable_find(name);
 
 	if (!v && allow_foreign) {
-		variable_add(name, VAR_FOREIGN, 2, strdup(value), NULL);
+		variable_add(name, VAR_FOREIGN, 2, xstrdup(value), NULL);
 		return -1;
 	}
 
@@ -209,7 +210,7 @@ int variable_set(char *name, char *value, int allow_foreign)
 				if (*value == 1)
 					*tmp = base64_decode(value + 1);
 				else
-					*tmp = strdup(value);
+					*tmp = xstrdup(value);
 
 				if (!*tmp)
 					return -3;

@@ -45,6 +45,7 @@
 #include "userlist.h"
 #include "version.h"
 #include "voice.h"
+#include "xmalloc.h"
 
 /*
  * g³upie readline z wersji na wersjê ma inne include'y, grr.
@@ -168,7 +169,7 @@ char *command_generator(char *text, int state)
 		if (state)
 			return NULL;
 		if (send_nicks_count < 1)
-			return strdup((query_nick) ? "/msg" : "msg");
+			return xstrdup((query_nick) ? "/msg" : "msg");
 		send_nicks_index = (send_nicks_count > 1) ? 1 : 0;
 
 		return saprintf((query_nick) ? "/chat %s" : "chat %s", send_nicks[0]);
@@ -181,7 +182,7 @@ char *command_generator(char *text, int state)
 
 	while ((name = commands[index++].name))
 		if (!strncasecmp(text, name, len))
-			return (query_nick) ? saprintf("/%s", name) : strdup(name);
+			return (query_nick) ? saprintf("/%s", name) : xstrdup(name);
 
 	return NULL;
 }
@@ -202,7 +203,7 @@ char *known_uin_generator(char *text, int state)
 		l = l->next;
 
 		if (u->display && !strncasecmp(text, u->display, len))
-			return strdup(u->display);
+			return xstrdup(u->display);
 	}
 
 	return NULL;
@@ -220,7 +221,7 @@ char *unknown_uin_generator(char *text, int state)
 	while (index < send_nicks_count)
 		if (isdigit(send_nicks[index++][0]))
 			if (!strncasecmp(text, send_nicks[index - 1], len))
-				return strdup(send_nicks[index - 1]);
+				return xstrdup(send_nicks[index - 1]);
 
 	return NULL;
 }
@@ -248,7 +249,7 @@ char *variable_generator(char *text, int state)
 				return saprintf("-%s", v->name);
 		} else {
 			if (!strncasecmp(text, v->name, len))
-				return strdup(v->name);
+				return xstrdup(v->name);
 		}
 	}
 
@@ -273,10 +274,10 @@ char *ignored_uin_generator(char *text, int state)
 
 		if (!(u = userlist_find(i->uin, NULL))) {
 			if (!strncasecmp(text, itoa(i->uin), len))
-				return strdup(itoa(i->uin));
+				return xstrdup(itoa(i->uin));
 		} else {
 			if (u->display && !strncasecmp(text, u->display, len))
-				return strdup(u->display);
+				return xstrdup(u->display);
 		}
 	}
 
@@ -295,7 +296,7 @@ char *dcc_generator(char *text, int state)
 
 	while (commands[i]) {
 		if (!strncasecmp(text, commands[i], len))
-			return strdup(commands[i++]);
+			return xstrdup(commands[i++]);
 		i++;
 	}
 
@@ -433,7 +434,7 @@ void add_send_nick(char *nick)
 	if (send_nicks_count != SEND_NICKS_MAX && !dont_add)
 		send_nicks_count++;
 	
-	send_nicks[0] = strdup(nick);	
+	send_nicks[0] = xstrdup(nick);	
 }
 
 COMMAND(command_cleartab)
@@ -494,7 +495,7 @@ COMMAND(command_alias)
 			struct alias *a = l->data;
 			struct list *m;
 			int first = 1, i;
-			char *tmp = calloc(strlen(a->name) + 1, 1);
+			char *tmp = xcalloc(strlen(a->name) + 1, 1);
 			
 			for (i = 0; i < strlen(a->name); i++)
 				strcat(tmp, " ");
@@ -557,10 +558,10 @@ COMMAND(command_away)
 
 				reason = get_random_reason(path);
 				if (!reason && config_away_reason)
-				    	reason = strdup(config_away_reason);
+				    	reason = xstrdup(config_away_reason);
 			}
 			else if (config_away_reason)
-			    	reason = strdup(config_away_reason);
+			    	reason = xstrdup(config_away_reason);
 		}
 		else
 		    	reason = params[0];
@@ -574,10 +575,10 @@ COMMAND(command_away)
 
 				reason = get_random_reason(path);
 				if (!reason && config_quit_reason)
-				    	reason = strdup(config_quit_reason);
+				    	reason = xstrdup(config_quit_reason);
 			}
 			else if (config_quit_reason)
-			    	reason = strdup(config_quit_reason);
+			    	reason = xstrdup(config_quit_reason);
 		}
 		else
 		    	reason = params[0];
@@ -591,10 +592,10 @@ COMMAND(command_away)
 
 				reason = get_random_reason(path);
 				if (!reason && config_back_reason)
-				    	reason = strdup(config_back_reason);
+				    	reason = xstrdup(config_back_reason);
 			}
 			else if (config_back_reason)
-			    	reason = strdup(config_back_reason);
+			    	reason = xstrdup(config_back_reason);
 		}
 		else
 		    	reason = params[0];
@@ -631,7 +632,7 @@ COMMAND(command_away)
 	}
 
 	if (reason)
-		busy_reason = (params[0] ? strdup(params[0]) : reason);
+		busy_reason = (params[0] ? xstrdup(params[0]) : reason);
 
 	return 0;
 }
@@ -705,13 +706,13 @@ COMMAND(command_connect)
 
 				tmp = get_random_reason(path);
 				if (!tmp && config_quit_reason)
-				    	tmp = strdup(config_quit_reason);
+				    	tmp = xstrdup(config_quit_reason);
 			}
 			else if (config_quit_reason)
-			    tmp = strdup(config_quit_reason);
+			    tmp = xstrdup(config_quit_reason);
 		}
 		else
-		    	tmp = strdup(params[0]);
+		    	tmp = xstrdup(params[0]);
 
 		connecting = 0;
 		if (sess->state == GG_STATE_CONNECTED)
@@ -802,7 +803,7 @@ COMMAND(command_find)
 	}
 	
 	if (params[0])
-		query = strdup(params[0]);
+		query = xstrdup(params[0]);
 	
 	memset(&r, 0, sizeof(r));
 
@@ -905,36 +906,33 @@ COMMAND(command_change)
 	if (!(argv = array_make(params[0], " \t", 0, 1, 1)))
 		return 0;
 
-	if (!(r = calloc(1, sizeof(*r)))) {
-		array_free(argv);
-		return 0;
-	}
+	r = xcalloc(1, sizeof(*r));
 	
 	for (i = 0; argv[i]; i++) {
 		
 		if (match_arg(argv[i], 'f', "first", 2) && argv[i + 1]) {
 			free(r->first_name);
-			r->first_name = strdup(argv[++i]);
+			r->first_name = xstrdup(argv[++i]);
 		}
 		
 		if (match_arg(argv[i], 'l', "last", 2) && argv[i + 1]) {
 			free(r->last_name);
-			r->last_name = strdup(argv[++i]);
+			r->last_name = xstrdup(argv[++i]);
 		}
 		
 		if (match_arg(argv[i], 'n', "nickname", 2) && argv[i + 1]) {
 			free(r->nickname);
-			r->nickname = strdup(argv[++i]);
+			r->nickname = xstrdup(argv[++i]);
 		}
 		
 		if (match_arg(argv[i], 'e', "email", 2) && argv[i + 1]) {
 			free(r->email);
-			r->email = strdup(argv[++i]);
+			r->email = xstrdup(argv[++i]);
 		}
 
 		if (match_arg(argv[i], 'c', "city", 2) && argv[i + 1]) {
 			free(r->city);
-			r->city = strdup(argv[++i]);
+			r->city = xstrdup(argv[++i]);
 		}
 		
 		if (match_arg(argv[i], 'b', "born", 2) && argv[i + 1])
@@ -996,28 +994,28 @@ COMMAND(command_modify)
 		
 		if (match_arg(argv[i], 'f', "first", 2) && argv[i + 1]) {
 			free(u->first_name);
-			u->first_name = strdup(argv[++i]);
+			u->first_name = xstrdup(argv[++i]);
 		}
 		
 		if (match_arg(argv[i], 'l', "last", 2) && argv[i + 1]) {
 			free(u->last_name);
-			u->last_name = strdup(argv[++i]);
+			u->last_name = xstrdup(argv[++i]);
 		}
 		
 		if (match_arg(argv[i], 'n', "nickname", 2) && argv[i + 1]) {
 			free(u->nickname);
-			u->nickname = strdup(argv[++i]);
+			u->nickname = xstrdup(argv[++i]);
 		}
 		
 		if (match_arg(argv[i], 'd', "display", 2) && argv[i + 1]) {
 			free(u->display);
-			u->display = strdup(argv[++i]);
+			u->display = xstrdup(argv[++i]);
 			userlist_replace(u);
 		}
 		
 		if (match_arg(argv[i], 'p', "phone", 2) && argv[i + 1]) {
 			free(u->mobile);
-			u->mobile = strdup(argv[++i]);
+			u->mobile = xstrdup(argv[++i]);
 		}
 		
 		if (match_arg(argv[i], 'g', "group", 2) && argv[i + 1]) {
@@ -1062,7 +1060,7 @@ COMMAND(command_help)
 				my_printf("help", c->name, c->params_help, blah ? blah : c->brief_help);
 				free(blah);
 				if (c->long_help && strcmp(c->long_help, "")) {
-					char *foo, *tmp, *plumk, *bar = strdup(c->long_help);
+					char *foo, *tmp, *plumk, *bar = xstrdup(c->long_help);
 
 					if ((foo = bar)) {
 						while ((tmp = gg_get_line(&foo))) {
@@ -1559,13 +1557,13 @@ COMMAND(command_quit)
 
 			tmp = get_random_reason(path);
 			if (!tmp && config_quit_reason)
-			    	tmp = strdup(config_quit_reason);
+			    	tmp = xstrdup(config_quit_reason);
 		}
 		else if (config_quit_reason)
-		    	tmp = strdup(config_quit_reason);
+		    	tmp = xstrdup(config_quit_reason);
 	}
 	else
-	    	tmp = strdup(params[0]);
+	    	tmp = xstrdup(params[0]);
 	
 	if (!quit_message_send) {
 		my_printf((tmp) ? "quit_descr" : "quit", tmp);
@@ -1679,7 +1677,7 @@ COMMAND(command_dcc)
 		t.uin = uin;
 		t.id = transfer_id();
 		t.type = GG_SESSION_DCC_SEND;
-		t.filename = strdup(params[2]);
+		t.filename = xstrdup(params[2]);
 		t.dcc = NULL;
 
 		if (u->port < 10 || (params[3] && !strcmp(params[3], "--reverse"))) {
@@ -1849,7 +1847,7 @@ COMMAND(command_dcc)
 		if (config_dcc_dir) 
 		    	path = saprintf("%s/%s", config_dcc_dir, t->filename);
 		else
-		    	path = strdup(t->filename);
+		    	path = xstrdup(t->filename);
 		
 		/* XXX wiêcej sprawdzania */
 		if ((t->dcc->file_fd = open(path, O_WRONLY | O_CREAT, 0600)) == -1) {
@@ -1942,14 +1940,14 @@ COMMAND(command_test_ping)
 
 COMMAND(command_test_send)
 {
-	struct gg_event *e = malloc(sizeof(struct gg_event));
+	struct gg_event *e = xmalloc(sizeof(struct gg_event));
 
 	if (!params[0] || !params[1])
 		return 0;
 
 	e->type = GG_EVENT_MSG;
 	e->event.msg.sender = get_uin(params[0]);
-	e->event.msg.message = strdup(params[1]);
+	e->event.msg.message = xstrdup(params[1]);
 	e->event.msg.msgclass = GG_CLASS_MSG;
 	
 	handle_msg(e);
@@ -2139,7 +2137,7 @@ COMMAND(command_register)
 
 	list_add(&watches, h, 0);
 
-	reg_password = strdup(params[1]);
+	reg_password = xstrdup(params[1]);
 	
 	return 0;
 }
@@ -2160,7 +2158,7 @@ COMMAND(command_passwd)
 
 	list_add(&watches, h, 0);
 
-	reg_password = strdup(params[0]);
+	reg_password = xstrdup(params[0]);
 	
 	return 0;
 }
@@ -2196,7 +2194,7 @@ COMMAND(command_query)
 	if (!params[0])
 		return 0;
 
-	query_nick = strdup(params[0]);
+	query_nick = xstrdup(params[0]);
 	my_printf("query_started", query_nick);
 
 	return 0;
@@ -2311,7 +2309,7 @@ int execute_line(char *line)
 	
 	send_nicks_index = 0;
 
-	line = strdup(strip_spaces(line));
+	line = xstrdup(strip_spaces(line));
 	
 	if (*line == '/')
 		line++;

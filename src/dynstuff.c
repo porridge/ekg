@@ -24,6 +24,7 @@
 #  include <string.h>
 #endif
 #include "dynstuff.h"
+#include "xmalloc.h"
 
 /*
  * list_add_sorted()
@@ -47,17 +48,13 @@ void *list_add_sorted(struct list **list, void *data, int alloc_size, int (*comp
 		return NULL;
 	}
 
-	if (!(new = malloc(sizeof(struct list))))
-		return NULL;
+	new = xmalloc(sizeof(struct list));
 
 	new->data = data;
 	new->next = NULL;
 
 	if (alloc_size) {
-		if (!(new->data = malloc(alloc_size))) { 
-			free(new);
-			return NULL;
-		}
+		new->data = xmalloc(alloc_size);
 		memcpy(new->data, data, alloc_size);
 	}
 
@@ -202,8 +199,7 @@ int string_append_c(struct string *s, char c)
 	}
 	
 	if (!s->str || strlen(s->str) + 2 > s->size) {
-		if (!(new = realloc(s->str, s->size + 80)))
-			return -1;
+		new = xrealloc(s->str, s->size + 80);
 		if (!s->str)
 			*new = 0;
 		s->size += 80;
@@ -238,8 +234,7 @@ int string_append_n(struct string *s, char *str, int count)
 		count = strlen(str);
 
 	if (!s->str || strlen(s->str) + count + 1 > s->size) {
-		if (!(new = realloc(s->str, s->size + count + 80)))
-			return -1;
+		new = xrealloc(s->str, s->size + count + 80);
 		if (!s->str)
 			*new = 0;
 		s->size += count + 80;
@@ -264,19 +259,16 @@ int string_append(struct string *s, char *str)
  *
  *  - value - je¶li NULL, ci±g jest pusty, inaczej kopiuje tam.
  *
- * zwraca zaalokowan± strukturê `string' lub NULL je¶li pamiêci brak³o.
+ * zwraca zaalokowan± strukturê `string'.
  */
 struct string *string_init(char *value)
 {
-	struct string *tmp = malloc(sizeof(struct string));
-
-	if (!tmp)
-		return NULL;
+	struct string *tmp = xmalloc(sizeof(struct string));
 
 	if (!value)
 		value = "";
 
-	tmp->str = strdup(value);
+	tmp->str = xstrdup(value);
 	tmp->size = strlen(value) + 1;
 
 	return tmp;
@@ -347,7 +339,7 @@ char *itoa(long int i)
 char **array_make(const char *string, const char *sep, int max, int trim, int quotes)
 {
 	const char *p, *q;
-	char **result = NULL, **tmp;
+	char **result = NULL;
 	int items, last = 0;
 
 	for (p = string, items = 0; ; ) {
@@ -376,7 +368,7 @@ char **array_make(const char *string, const char *sep, int max, int trim, int qu
 					break;
 			}
 
-			if ((token = calloc(1, len + 1))) {
+			if ((token = xcalloc(1, len + 1))) {
 				char *r = token;
 			
 				for (q = p + 1; *q; q++, r++) {
@@ -412,19 +404,13 @@ char **array_make(const char *string, const char *sep, int max, int trim, int qu
 			
 		} else {
 			for (q = p, len = 0; *q && (last || !strchr(sep, *q)); q++, len++);
-			if ((token = calloc(1, len + 1))) {
-				strncpy(token, p, len);
-				token[len] = 0;
-			}
+			token = xcalloc(1, len + 1);
+			strncpy(token, p, len);
+			token[len] = 0;
 			p = q;
 		}
 		
-		if (!(tmp = realloc(result, (items + 2) * sizeof(char*)))) {
-			free(token);
-			break;
-		}
-
-		result = tmp;
+		result = xrealloc(result, (items + 2) * sizeof(char*));
 		result[items] = token;
 		result[++items] = NULL;
 
@@ -435,7 +421,7 @@ char **array_make(const char *string, const char *sep, int max, int trim, int qu
 	}
 
 	if (!items)
-		result = calloc(1, sizeof(char*));
+		result = xcalloc(1, sizeof(char*));
 
 	return result;
 }

@@ -48,6 +48,7 @@
 #include "commands.h"
 #include "vars.h"
 #include "userlist.h"
+#include "xmalloc.h"
 
 struct gg_session *sess = NULL;
 struct list *children = NULL;
@@ -237,10 +238,7 @@ char *emoticon_expand(char *s)
 			n++;
 	}
 
-	ms = malloc(n + 1);
-	if (!ms)
-		return NULL;
-	memset(ms, 0, n + 1);
+	ms = xcalloc(1, n + 1);
 
 	for (ss = s; *ss; ss++) {
 		struct emoticon *e = NULL;
@@ -447,7 +445,7 @@ int config_read(char *filename)
                         uin_t uin;
                         char **pms = array_make(foo, " \t", 3, 1, 0);
                         if (pms && pms[0] && pms[1] && pms[2] && (flags = get_flags(pms[0])) && (uin = atoi(pms[1])) && !correct_event(pms[2]))
-                                add_event(get_flags(pms[0]), atoi(pms[1]), strdup(pms[2]), 1);
+                                add_event(get_flags(pms[0]), atoi(pms[1]), xstrdup(pms[2]), 1);
 			array_free(pms);
                 } else
 			variable_set(buf, foo, 1);
@@ -945,7 +943,7 @@ int print_history(uin_t uin, int no)
 				notsure = strtok(NULL, ",");
 			} else
 				strcpy(time2, "");
-			msg = strdup(notsure);
+			msg = xstrdup(notsure);
 			notsure = strtok(NULL, ",");
 			
 			while (notsure != NULL) {
@@ -1006,21 +1004,15 @@ int play_sound(char *sound_path)
  */
 char *read_file(FILE *f)
 {
-	char buf[1024], *new, *res = NULL;
+	char buf[1024], *res = NULL;
 
 	while (fgets(buf, sizeof(buf) - 1, f)) {
+		int first = (res) ? 0 : 1;
 		int new_size = ((res) ? strlen(res) : 0) + strlen(buf) + 1;
 
-		if (!(new = realloc(res, new_size))) {
-			/* je¶li braknie pamiêci, pomijamy resztê linii */
-			if (strchr(buf, '\n'))
-				break;
-			else
-				continue;
-		}
-		if (!res)
-			*new = 0;
-		res = new;
+		res = xrealloc(res, new_size);
+		if (first)
+			*res = 0;
 		strcpy(res + strlen(res), buf);
 		
 		if (strchr(buf, '\n'))
@@ -1047,7 +1039,7 @@ int add_process(int pid, char *name)
 	struct process p;
 
 	p.pid = pid;
-	p.name = strdup(name);
+	p.name = xstrdup(name);
 	list_add(&children, &p, sizeof(p));
 	
 	return 0;
@@ -1136,7 +1128,7 @@ int alias_add(char *string, int quiet, int append)
 		}
 	}
 
-	a.name = strdup(string);
+	a.name = xstrdup(string);
 	a.commands = NULL;
 	list_add(&a.commands, cmd, strlen(cmd) + 1);
 	list_add(&aliases, &a, sizeof(a));
@@ -1313,7 +1305,7 @@ int add_event(int flags, uin_t uin, char *action, int quiet)
 
         e.uin = uin;
         e.flags = flags;
-        e.action = strdup(action);
+        e.action = xstrdup(action);
 
         list_add(&events, &e, sizeof(e));
 
@@ -1382,7 +1374,7 @@ int check_event(int event, uin_t uin, const char *data)
                 struct event *e = l->data;
 
                 if ((e->flags & event) && (e->uin == uin || e->uin == 1)) {
-			evt_ptr = strdup(e->action);
+			evt_ptr = xstrdup(e->action);
 			break;
                 }
         }
@@ -1430,8 +1422,7 @@ int run_event(char *act)
 
 	gg_debug(GG_DEBUG_MISC, "// run_event(\"%s\");\n", act);
 
-	if (!(action = strdup(act)))
-		return 1;
+	action = xstrdup(act);
 	
 	ptr = action;
 	
@@ -1585,8 +1576,7 @@ int correct_event(char *act)
         struct action_data test;
 #endif /* WITH_IOCTLD */
 
-	if (!(action = strdup(act)))
-		return 1;
+	action = xstrdup(act);
 
         if (!strncasecmp(action, "clear",  5)) {
 		free(action);
@@ -1616,7 +1606,7 @@ int correct_event(char *act)
                         }
 
                         if (*acts[1] == '$') {
-			    	char *blah = strdup(acts[1]+1);
+			    	char *blah = xstrdup(acts[1]+1);
 				
                                 if (!strcmp(find_format(blah), "")) {
                                         my_printf("events_seq_not_found", blah);
@@ -1852,10 +1842,7 @@ char *base64_encode(char *buf)
 	char *out, *res;
 	int i = 0, j = 0, k = 0, len = strlen(buf);
 	
-	if (!(res = out = malloc((len / 3 + 1) * 4 + 2))) {
-		gg_debug(GG_DEBUG_MISC, "// base64_encode() not enough memory\n");
-		return NULL;
-	}
+	res = out = xmalloc((len / 3 + 1) * 4 + 2);
 	
 	while (j <= len) {
 		switch (i % 4) {
@@ -1895,10 +1882,7 @@ char *base64_decode(char *buf)
 	char *res, *save, *end, *foo, val;
 	int index = 0;
 	
-	if (!(save = res = calloc(1, (strlen(buf) / 4 + 1) * 3 + 2))) {
-		gg_debug(GG_DEBUG_MISC, "// base64_decode() not enough memory\n");
-		return NULL;
-	}
+	save = res = xcalloc(1, (strlen(buf) / 4 + 1) * 3 + 2);
 
 	end = buf + strlen(buf);
 
@@ -2041,13 +2025,11 @@ void changed_proxy(char *var)
 		int len = (int) tmp - (int) config_proxy;
 		
 		gg_proxy_port = atoi(tmp + 1);
-		gg_proxy_host = malloc(len + 1);
-		if (gg_proxy_host) {
-			strncpy(gg_proxy_host, config_proxy, len);
-			gg_proxy_host[len] = 0;
-		}
+		gg_proxy_host = xmalloc(len + 1);
+		strncpy(gg_proxy_host, config_proxy, len);
+		gg_proxy_host[len] = 0;
 	} else {
-		gg_proxy_host = strdup(config_proxy);
+		gg_proxy_host = xstrdup(config_proxy);
 		gg_proxy_port = 8080;
 	}
 }
@@ -2084,7 +2066,7 @@ void do_connect()
 	p.last_sysmsg = last_sysmsg;
 
 	if (config_server) {
-		char *tmp = strchr(config_server, ':'), *foo = strdup(config_server);
+		char *tmp = strchr(config_server, ':'), *foo = xstrdup(config_server);
 		int len = (int) tmp - (int) config_server;
 			
 		if (foo) {
@@ -2130,21 +2112,6 @@ int transfer_id()
 }
 
 /*
- * strdup_null()
- *
- * dzia³a tak samo jak strdup(), tyle ¿e przy argumencie równym NULL
- * zwraca NULL zamiast segfaultowaæ.
- *
- *  - ptr - bufor do skopiowania.
- *
- * zwraca zaalokowany bufor lub NULL.
- */
-char *strdup_null(char *ptr)
-{
-	return (ptr) ? strdup(ptr) : NULL;
-}
-
-/*
  * ekg_logoff()
  *
  * roz³±cza siê, zmieniaj±c uprzednio stan na niedostêpny z opisem.
@@ -2154,20 +2121,16 @@ char *strdup_null(char *ptr)
  *
  * niczego nie zwraca.
  */
-void ekg_logoff(struct gg_session *sess, char *reason)
+void ekg_logoff(struct gg_session *sess, const char *reason)
 {
-	char *tmp = NULL;
-
 	if (!sess)
 		return;
 
 	if (sess->state != GG_STATE_CONNECTED || sess->status == GG_STATUS_NOT_AVAIL || sess->status == GG_STATUS_NOT_AVAIL_DESCR)
 		return;
 
-	if (reason)
-		tmp = strdup(reason);
-	
-	if (tmp) {
+	if (reason) {
+		char *tmp = xstrdup(reason);
 		iso_to_cp(tmp);
 		gg_change_status_descr(sess, GG_STATUS_NOT_AVAIL_DESCR, tmp);
 		free(tmp);
@@ -2208,7 +2171,7 @@ char *get_random_reason(char *path)
                         fclose(f);
                         if (buf[strlen(buf) - 1] == '\n')
                                 buf[strlen(buf) - 1] = '\0';
-			return strdup(buf);
+			return xstrdup(buf);
                 }
         }
 
@@ -2234,13 +2197,13 @@ int emoticon_add(char *name, char *value)
 
 		if (!strcasecmp(name, g->name)) {
 			free(g->value);
-			g->value = strdup(value);
+			g->value = xstrdup(value);
 			return 0;
 		}
 	}
 
-	e.name = strdup(name);
-	e.value = strdup(value);
+	e.name = xstrdup(name);
+	e.value = xstrdup(value);
 	list_add(&emoticons, &e, sizeof(e));
 
 	return 0;

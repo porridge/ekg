@@ -30,6 +30,7 @@
 #include "dynstuff.h"
 #include "themes.h"
 #include "config.h"
+#include "xmalloc.h"
 
 char *prompt_cache = NULL, *prompt2_cache = NULL, *error_cache = NULL, *timestamp_cache = NULL;
 char *readline_prompt = NULL, *readline_prompt_away = NULL, *readline_prompt_invisible = NULL;
@@ -383,15 +384,15 @@ int add_format(char *name, char *value, int replace)
 		if (!strcasecmp(name, g->name)) {
 			if (replace) {
 				free(g->value);
-				g->value = strdup(value);
+				g->value = xstrdup(value);
 			}
 
 			return 0;
 		}
 	}
 
-	f.name = strdup(name);
-	f.value = strdup(value);
+	f.name = xstrdup(name);
+	f.value = xstrdup(value);
 	list_add(&formats, &f, sizeof(f));
 	
 	return 0;

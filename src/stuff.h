@@ -216,7 +216,7 @@ int init_socket();
 int init_control_pipe(char *path);
 char *get_token(char **ptr, char sep);
 char *strdup_null(char *ptr);
-void ekg_logoff(struct gg_session *sess, char *reason);
+void ekg_logoff(struct gg_session *sess, const char *reason);
 char *get_random_reason(char *path);
 char *emoticon_expand(char *s);
 int emoticon_read();

@@ -32,6 +32,7 @@
 #include "libgadu.h"
 #include "voice.h"
 #include "stuff.h"
+#include "xmalloc.h"
 
 int voice_fd = -1;
 gsm voice_gsm_enc = NULL, voice_gsm_dec = NULL;

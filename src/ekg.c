@@ -45,6 +45,7 @@
 #include "version.h"
 #include "userlist.h"
 #include "vars.h"
+#include "xmalloc.h"
 
 time_t last_action = 0;
 int ioctl_daemon_pid = 0;
@@ -243,10 +244,10 @@ int my_getc(FILE *f)
 
 					reason = get_random_reason(path);
 					if (!reason && config_away_reason)
-					    	reason = strdup(config_away_reason);
+					    	reason = xstrdup(config_away_reason);
 				}
 				else if (config_away_reason)
-				    	reason = strdup(config_away_reason);
+				    	reason = xstrdup(config_away_reason);
 				
 				away = (reason) ? 3 : 1;
 				reset_prompt();
@@ -448,9 +449,7 @@ char *prepare_batch_line(int argc, char *argv[], int n)
 	for (i = n; i < argc; i++)
 		m += strlen(argv[i]) + 1;
 
-	bl = malloc(m);
-	if (!bl)
-		return NULL;
+	bl = xmalloc(m);
 
 	for (i = n; i < argc; i++) {
 		strcat(bl, argv[i]);
@@ -483,7 +482,7 @@ int main(int argc, char **argv)
 			home_dir = pw->pw_dir;
 
 	if (home_dir)
-		home_dir = strdup(home_dir);
+		home_dir = xstrdup(home_dir);
 
 	if (!home_dir) {
 		fprintf(stderr, "Nie mogê znale¼æ katalogu domowego. Popro¶ administratora, ¿eby to naprawi³.\n");

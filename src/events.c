@@ -34,6 +34,7 @@
 #include "themes.h"
 #include "userlist.h"
 #include "voice.h"
+#include "xmalloc.h"
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure();
@@ -85,10 +86,8 @@ void print_message_body(const char *str, int chat)
 	if (!(width = atoi(find_format(line_width))))
 		width = 78;
 	
-	if (!(buf = malloc(width + 1)) || !(mesg = save = strdup(str))) {
-		my_puts("%s", str);		/* emergency ;) */
-		return;
-	}
+	buf = xmalloc(width + 1);
+	mesg = save = xstrdup(str);
 
 	for (i = 0; i < strlen(mesg); i++)	/* XXX ³adniejsze taby */
 		if (mesg[i] == '\t')
@@ -337,8 +336,7 @@ void handle_notify(struct gg_event *e)
 
 		if (n->status == GG_STATUS_BUSY_DESCR) {
 			check_event(EVENT_AWAY, u->uin, NULL);
-			/* XXX sprawdziæ strdup()y */
-			u->descr = (e->event.notify_descr.descr) ? strdup(e->event.notify_descr.descr) : strdup("");
+			u->descr = (e->event.notify_descr.descr) ? xstrdup(e->event.notify_descr.descr) : xstrdup("");
 			cp_to_iso(u->descr);
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
@@ -361,8 +359,7 @@ void handle_notify(struct gg_event *e)
 
 		if (n->status == GG_STATUS_AVAIL_DESCR) {
 			check_event(EVENT_AVAIL, u->uin, NULL);
-			/* XXX sprawdziæ strdup()y */
-			u->descr = (e->event.notify_descr.descr) ? strdup(e->event.notify_descr.descr) : strdup("");
+			u->descr = (e->event.notify_descr.descr) ? xstrdup(e->event.notify_descr.descr) : xstrdup("");
 			cp_to_iso(u->descr);
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
@@ -380,8 +377,7 @@ void handle_notify(struct gg_event *e)
 
 		if (n->status == GG_STATUS_NOT_AVAIL_DESCR) {
 			check_event(EVENT_NOT_AVAIL, u->uin, NULL);
-			/* XXX sprawdziæ strdup()y */
-			u->descr = (e->event.notify_descr.descr) ? strdup(e->event.notify_descr.descr) : strdup("");
+			u->descr = (e->event.notify_descr.descr) ? xstrdup(e->event.notify_descr.descr) : xstrdup("");
 			cp_to_iso(u->descr);
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail", u->descr);
@@ -431,7 +427,7 @@ void handle_status(struct gg_event *e)
 		e->event.status.status = GG_STATUS_AVAIL;
 	
 	if (e->event.status.descr) {
-		u->descr = strdup(e->event.status.descr);
+		u->descr = xstrdup(e->event.status.descr);
 		cp_to_iso(u->descr);
 	}
 
@@ -934,7 +930,7 @@ void handle_dcc(struct gg_dcc *d)
 			}
 			
 			t->type = GG_SESSION_DCC_GET;
-			t->filename = strdup(d->file_info.filename);
+			t->filename = xstrdup(d->file_info.filename);
 
 			for (p = d->file_info.filename; *p; p++)
 				if (*p < 32 || *p == '\\' || *p == '/')

@@ -41,6 +41,7 @@
 #include "commands.h"
 #include "vars.h"
 #include "userlist.h"
+#include "xmalloc.h"
 
 struct list *userlist = NULL;
 struct list *ignored = NULL;
@@ -111,7 +112,7 @@ int userlist_read(char *filename)
 			u.first_name = NULL;
 			u.last_name = NULL;
 			u.nickname = NULL;
-			u.display = strdup(++display);
+			u.display = xstrdup(++display);
 			u.mobile = NULL;
 			u.groups = NULL;
 			u.descr = NULL;
@@ -125,11 +126,11 @@ int userlist_read(char *filename)
 				continue;
 			}
 			
-			u.first_name = strdup_null(entry[0]);
-			u.last_name = strdup_null(entry[1]);
-			u.nickname = strdup_null(entry[2]);
-			u.display = strdup_null(entry[3]);
-			u.mobile = strdup_null(entry[4]);
+			u.first_name = xstrdup(entry[0]);
+			u.last_name = xstrdup(entry[1]);
+			u.nickname = xstrdup(entry[2]);
+			u.display = xstrdup(entry[3]);
+			u.mobile = xstrdup(entry[4]);
 			u.groups = group_init(entry[5]);
 			u.descr = NULL;
 
@@ -183,7 +184,7 @@ int userlist_set(char *contacts)
 			u.first_name = NULL;
 			u.last_name = NULL;
 			u.nickname = NULL;
-			u.display = strdup(++display);
+			u.display = xstrdup(++display);
 			u.mobile = NULL;
 			u.groups = NULL;
 			u.descr = NULL;
@@ -196,11 +197,11 @@ int userlist_set(char *contacts)
 				continue;
 			}
 			
-			u.first_name = strdup_null(entry[0]);
-			u.last_name = strdup_null(entry[1]);
-			u.nickname = strdup_null(entry[2]);
-			u.display = strdup_null(entry[3]);
-			u.mobile = strdup_null(entry[4]);
+			u.first_name = xstrdup(entry[0]);
+			u.last_name = xstrdup(entry[1]);
+			u.nickname = xstrdup(entry[2]);
+			u.display = xstrdup(entry[3]);
+			u.mobile = xstrdup(entry[4]);
 			u.groups = group_init(entry[5]);
 			u.descr = NULL;
 
@@ -384,7 +385,7 @@ int userlist_add(uin_t uin, char *display)
 	u.nickname = NULL;
 	u.mobile = NULL;
 	u.groups = NULL;
-	u.display = strdup(display);
+	u.display = xstrdup(display);
 	u.descr = NULL;
 
 	list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);
@@ -603,7 +604,7 @@ void userlist_send()
 
 	count = list_count(userlist);
 
-        uins = (void*) malloc(count * sizeof(uin_t));
+        uins = xmalloc(count * sizeof(uin_t));
 
 	for (i = 0, l = userlist; l; i++, l = l->next) {
 		struct userlist *u = l->data;
@@ -649,7 +650,7 @@ int group_add(struct userlist *u, char *group)
 {
 	struct group g;
 	
-	g.name = strdup(group);
+	g.name = xstrdup(group);
 
 	list_add_sorted(&u->groups, &g, sizeof(g), group_compare);
 	
@@ -709,9 +710,7 @@ struct list *group_init(char *names)
 	while ((token = get_token(&names, ','))) {
 		struct group g;
 
-		if (!(g.name = strdup(token))) 
-			continue;
-
+		g.name = xstrdup(token);
 		list_add_sorted(&l, &g, sizeof(g), group_compare);
 	}
 	
