@@ -85,69 +85,42 @@ int userlist_read()
 
 	while ((buf = read_file(f))) {
 		struct userlist u;
-		char *display;
+		char **entry;
+		int i;
 		
-		if (buf[0] == '#') {
+		memset(&u, 0, sizeof(u));
+			
+		if (buf[0] == '#' || (buf[0] == '/' && buf[1] == '/')) {
 			xfree(buf);
 			continue;
 		}
 
-		if (!strchr(buf, ';')) {
-			if (!(display = strchr(buf, ' '))) {
-				xfree(buf);
-				continue;
-			}
+		entry = array_make(buf, ";", 7, 0, 0);
 
-			u.uin = strtol(buf, NULL, 0);
-		
-			if (!u.uin) {
-				xfree(buf);
-				continue;
-			}
-
-			u.first_name = NULL;
-			u.last_name = NULL;
-			u.nickname = NULL;
-			u.display = xstrdup(++display);
-			u.mobile = NULL;
-			u.groups = NULL;
-			u.descr = NULL;
-			memset(&u.ip, 0, sizeof(struct in_addr));
-			u.port = 0;
-
-		} else {
-			char **entry = array_make(buf, ";", 7, 0, 0);
-			int i;
-			
-			if (!entry[0] || !entry[1] || !entry[2] || !entry[3] || !entry[4] || !entry[5] || !entry[6] || !(u.uin = strtol(entry[6], NULL, 0))) {
-				array_free(entry);
-				xfree(buf);
-				continue;
-			}
-
-			for (i = 0; i < 6; i++) {
-				if (entry[i] && (!strcmp(entry[i], "(null)") || !strcmp(entry[i], ""))) {
-					xfree(entry[i]);
-					entry[i] = NULL;
-				}
-			}
-			
-			u.first_name = xstrdup(entry[0]);
-			u.last_name = xstrdup(entry[1]);
-			u.nickname = xstrdup(entry[2]);
-			u.display = xstrdup(entry[3]);
-			u.mobile = xstrdup(entry[4]);
-			u.groups = group_init(entry[5]);
-			u.descr = NULL;
-			memset(&u.ip, 0, sizeof(struct in_addr));
-			u.port = 0;
-
+		if (array_count(entry) < 7 || !(u.uin = strtol(entry[6], NULL, 0))) {
 			array_free(entry);
+			xfree(buf);
+			continue;
 		}
 
-		xfree(buf);
-
+		for (i = 0; i < 6; i++) {
+			if (entry[i] && (!strcmp(entry[i], "(null)") || !strcmp(entry[i], ""))) {
+				xfree(entry[i]);
+				entry[i] = NULL;
+			}
+		}
+			
+		u.first_name = xstrdup(entry[0]);
+		u.last_name = xstrdup(entry[1]);
+		u.nickname = xstrdup(entry[2]);
+		u.display = xstrdup(entry[3]);
+		u.mobile = xstrdup(entry[4]);
+		u.groups = group_init(entry[5]);
 		u.status = GG_STATUS_NOT_AVAIL;
+
+		array_free(entry);
+
+		xfree(buf);
 
 		list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);
 	}
@@ -176,11 +149,12 @@ int userlist_set(char *contacts, int config)
 	
 	while ((buf = gg_get_line(&contacts))) {
 		struct userlist u;
-		char *display;
+		char **entry;
 		
-		if (buf[0] == '#') {
+		memset(&u, 0, sizeof(u));
+			
+		if (buf[0] == '#' || (buf[0] == '/' && buf[1] == '/'))
 			continue;
-		}
 
 		if (!strncmp(buf, "__config", 8)) {
 			char **entry;
@@ -199,52 +173,22 @@ int userlist_set(char *contacts, int config)
 			continue;
 		}
 
-		if (!strchr(buf, ';')) {
-			if (!(display = strchr(buf, ' '))) {
-				continue;
-			}
-
-			u.uin = strtol(buf, NULL, 0);
+		entry = array_make(buf, ";", 7, 0, 0);
 		
-			if (!u.uin) {
-				continue;
-			}
-
-			u.first_name = NULL;
-			u.last_name = NULL;
-			u.nickname = NULL;
-			u.display = xstrdup(++display);
-			u.mobile = NULL;
-			u.groups = NULL;
-			u.descr = NULL;
-			memset(&u.ip, 0, sizeof(struct in_addr));
-			u.port = 0;
-
-		} else {
-			char *q, **entry = array_make(buf, ";", 7, 0, 0);
-			
-			if (!entry[0] || !entry[1] || !entry[2] || !entry[3] || !entry[4] || !entry[5] || !entry[6] || !(u.uin = strtol(entry[6], NULL, 0))) {
-				array_free(entry);
-				continue;
-			}
-
-			u.first_name = xstrdup(entry[0]);
-			u.last_name = xstrdup(entry[1]);
-			u.nickname = xstrdup(entry[2]);
-			u.display = xstrdup(entry[3]);
-			for (q = u.display; *q; q++)
-				if (*q == ' ')
-					*q = '_';
-			u.mobile = xstrdup(entry[4]);
-			u.groups = group_init(entry[5]);
-			u.descr = NULL;
-			memset(&u.ip, 0, sizeof(struct in_addr));
-			u.port = 0;
-
+		if (array_count(entry) < 7 || !(u.uin = strtol(entry[6], NULL, 0))) {
 			array_free(entry);
+			continue;
 		}
 
+		u.first_name = xstrdup(entry[0]);
+		u.last_name = xstrdup(entry[1]);
+		u.nickname = xstrdup(entry[2]);
+		u.display = xstrdup(entry[3]);
+		u.mobile = xstrdup(entry[4]);
+		u.groups = group_init(entry[5]);
 		u.status = GG_STATUS_NOT_AVAIL;
+
+		array_free(entry);
 
 		list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);
 	}
