@@ -924,7 +924,7 @@ void do_reconnect()
  * msg_encrypt()
  * 
  * je¶li mo¿na, podmienia wiadomo¶æ na wiadomo¶æ
- * zaszyforwan±.  
+ * zaszyfrowan±.
  */
 int msg_encrypt(uin_t uin, char **msg)
 {
@@ -946,6 +946,8 @@ int msg_encrypt(uin_t uin, char **msg)
 		xfree(enc);
 
 	return len;
+#else
+	return 0;
 #endif
 }
 
@@ -954,7 +956,7 @@ int msg_encrypt(uin_t uin, char **msg)
  *
  * sprawdza, czy w ci±gu uin'ów znajduje siê dany uin.
  *
- * zwraca 1 je¶li znaleziono, 0 je¶li nie.
+ * 1 je¶li znaleziono, 0 je¶li nie.
  */
 int find_in_uins(int uin_count, uin_t *uins, uin_t uin)
 {
