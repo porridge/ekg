@@ -5051,12 +5051,14 @@ int command_remove(const char *name)
  * 'u' - nazwa lub uin z kontaktów, nazwa konferencji, rêcznie wpisany uin, nadawca mesgów,
  * 'c' - komenda,
  * 'i' - nicki z listy ignorowanych osób,
+ * 'b' - nicki z listy blokowanych osób,
+ * 'v' - nazwa zmiennej,
  * 'd' - komenda dcc,
  * 'p' - komenda python,
  * 'w' - komenda window,
- * 'e' - events,
- * 'I' - poziomy ignorowania,
- * 'f' - plik.
+ * 'f' - plik,
+ * 'e' - nazwy zdarzeñ,
+ * 'I' - poziomy ignorowania.
  */
 
 /*

@@ -81,7 +81,10 @@ int rl_get_screen_size(int *lines, int *columns)
 #endif
 
 #ifndef HAVE_RL_FILENAME_COMPLETION_FUNCTION
-void *rl_filename_completion_function = NULL;
+static char *rl_filename_completion_function()
+{
+	return NULL;
+}
 #endif
 
 #ifndef HAVE_RL_SET_PROMPT
@@ -555,6 +558,9 @@ static char **my_completion(char *text, int start, int end)
 						break;
 					case 'w':
 						func = window_generator;
+						break;
+					default:
+						func = empty_generator;
 						break;
 				}
 			}

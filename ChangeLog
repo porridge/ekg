@@ -6,6 +6,11 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-04-08
+
+- poprawka segfaulta w readline przy dope³nianiu nazw plików, gdy
+  brak funkcji ,,rl_filename_completion_function'' (sz)
+
 // 2003-04-07
 
 - libgadu: poprawka pthreadów w libgadu.pc (jajcus/w)
