@@ -93,13 +93,12 @@ void print_message_body(char *str, int chat)
 			mesg[i] = ' ';
 	
 	while ((line = gg_get_line(&mesg))) {
+		char *new_line;
+
 		for (; strlen(line); line = next) {
-			char *new_line;
 			
-			if (config_emoticons && (new_line = emoticon_expand(line))) {
-				free(line);
+			if (config_emoticons && (new_line = emoticon_expand(line)))
 				line = new_line;
-			}
 			
 			if (strlen(line) <= width) {
 				strcpy(buf, line);
@@ -123,6 +122,8 @@ void print_message_body(char *str, int chat)
 
 			my_printf(format, buf);
 		}
+		if (config_emoticons)
+			free(new_line);
 	}
 
 	free(buf);

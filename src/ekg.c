@@ -495,11 +495,10 @@ int main(int argc, char **argv)
 	for (i = 1; i < argc && *argv[i] == '-'; i++) {
 		if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
 			printf(""
-"u¿ycie: %s [OPCJE]\n"
+"u¿ycie: %s [OPCJE] [KOMENDY]\n"
 "  -u, --user [NAZWA]   korzysta z profilu u¿ytkownika o podanej nazwie\n"
 "  -t, --theme [PLIK]   ³aduje opis wygl±du z podanego pliku\n"
 "  -c, --control-pipe [PLIK]	potok nazwany sterowania\n"
-"  -o, --no-pipe        nie tworzy potoku sterowania\n"
 "  -n, --no-auto        nie ³±czy siê automatycznie z serwerem\n"
 "  -a, --away           po po³±czeniu zmienia stan na ,,zajêty''\n"
 "  -b, --back           po po³±czeniu zmienia stan na ,,dostêpny''\n"
