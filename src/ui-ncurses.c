@@ -440,7 +440,7 @@ void window_redraw(struct window *w)
 	int x, y, left = 0, top = 0, height = w->height;
 	
 	werase(w->window);
-	wattrset(w->window, COLOR_PAIR(4));
+	wattrset(w->window, (config_display_color) ? COLOR_PAIR(4) : A_NORMAL);
 
 	if (w->floating) {
 		if ((w->frames & WF_LEFT)) {
@@ -987,7 +987,7 @@ static void update_contacts(int commit)
 	
 	werase(contacts);
 
-	wattrset(contacts, COLOR_PAIR(4));
+	wattrset(contacts, (config_display_color) ? COLOR_PAIR(4) : A_NORMAL);
 
 	for (y = 0; y <= contacts->_maxy; y++)
 		mvwaddch(contacts, y, 0, ACS_VLINE);
@@ -1189,10 +1189,13 @@ static void update_header(int commit)
 int print_statusbar(WINDOW *w, int x, int y, const char *format, void *data_)
 {
 	const char *p = format;
-	int orig_x = x, pair_index = 8;
+	int orig_x = x, bgcolor, fgcolor, bold;
 	struct format_data *data = data_;
 
 	wmove(w, y, x);
+	bgcolor = 1;
+	fgcolor = 7;
+	bold = 0;
 			
 	while (*p && *p != '}' && x <= w->_maxx) {
 		int i, nest;
@@ -1209,10 +1212,10 @@ int print_statusbar(WINDOW *w, int x, int y, const char *format, void *data_)
 			break;
 
 #define __color(x,y,z) \
-		case x: wattrset(w, COLOR_PAIR(pair_index + z)); break; \
-		case y: wattrset(w, COLOR_PAIR(pair_index + z) | A_BOLD); break;
+		case x: fgcolor = z; bold = 0; break; \
+		case y: fgcolor = z; bold = 1; break;
 
-		if (*p != '{' && config_display_color) {
+		if (*p != '{') {
 			switch (*p) {
 				__color('k', 'K', 0);
 				__color('r', 'R', 1);
@@ -1223,16 +1226,24 @@ int print_statusbar(WINDOW *w, int x, int y, const char *format, void *data_)
 				__color('c', 'C', 6);
 				__color('w', 'W', 7);
 				case 'l':
-					pair_index = 0;
+					bgcolor = 1;
 					break;
 				case 'e':
-					pair_index = 8;
+					bgcolor = 0;
 					break;
 				case 'n':
-					wattrset(status, (config_display_color) ? COLOR_PAIR(15) : A_NORMAL);
+					bgcolor = 1;
+					fgcolor = 7;
+					bold = 0;
 					break;
 			}
 			p++;
+
+			if (config_display_color)
+				wattrset(w, COLOR_PAIR(bgcolor * 8 + fgcolor) | ((bold) ? A_BOLD : 0));
+			else
+				wattrset(w, (bgcolor == 1) ? A_REVERSE : A_NORMAL | (bold) ? A_BOLD : 0);
+			
 			continue;
 		}
 #undef __color
@@ -1333,6 +1344,9 @@ static void update_statusbar(int commit)
 	}
 
 	/* inicjalizujemy wszystkie opisowe bzdurki */
+
+	/* XXX mo¿naby zrobiæ sta³± tablicê, bez realokowania. by³oby
+	 * nieco szybciej, bo do¶æ czêsto siê wywo³uje t± funkcjê. */
 
 	memset(&formats, 0, sizeof(formats));
 
