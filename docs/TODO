@@ -9,10 +9,15 @@ biblioteka:
 klient:
 - uzupe³niæ dope³nienia (w tym nicki ze spacjami),
 - wykrywanie niewidocznych jako opcja.
-- wyczyszczenie history.
 - korzystaæ z getopt.
-- kompresja logów.
 - sprawy wymienione w src/ui-ncurses.c
+
+- przej¶æ na ui-ncurses domy¶lnie, a co za tym idzie:
+  + usun±æ timestampy z formatów,
+  + w³±czyæ domy¶lnie ,,set timestamp "%H:%M "'',
+  + w³±czyæ domy¶lnie ,,set display_sent 1'',
+  + w³±czyæ domy¶lnie ,,set make_window 2'',
+  + w³±czyæ domy¶lnie ,,set display_ack 3''.
 
 $Id$
 
