@@ -1293,8 +1293,11 @@ void handle_dcc(struct gg_dcc *d)
 	if (!(ignored_check(d->peer_uin) & IGNORE_EVENTS))
 		event_check(EVENT_DCC, d->peer_uin, NULL);
 
-	if (ignored_check(d->peer_uin) & IGNORE_DCC)
+	if (ignored_check(d->peer_uin) & IGNORE_DCC) {
+		list_remove(&watches, d, 0);
+		gg_free_dcc(d);
 		return;
+	}
 	
 	if (!(e = gg_dcc_watch_fd(d))) {
 		print("dcc_error", strerror(errno));
