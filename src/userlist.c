@@ -587,7 +587,7 @@ uin_t str_to_uin(const char *text)
 	long num;
 
 	if (!text)
-		return (uin_t) 0;
+		return 0;
 
 	errno = 0;
 	num = strtol(text, &tmp, 0);
@@ -912,7 +912,7 @@ int blocked_add(uin_t uin)
 /*
  * userlist_send()
  *
- * wysy³a do serwera userlistê, wywo³uj±c gg_notify()
+ * wysy³a do serwera userlistê, wywo³uj±c gg_notify_ex()
  */
 void userlist_send()
 {

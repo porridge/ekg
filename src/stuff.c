@@ -2262,7 +2262,7 @@ char *random_line(const char *path)
 	if ((f = fopen(path, "r")) == NULL)
 		return NULL;
 	
-	 while ((line = read_file(f))) {
+	while ((line = read_file(f))) {
 		xfree(line);
 		max++;
 	}
@@ -2287,22 +2287,22 @@ char *random_line(const char *path)
 /*
  * read_file()
  *
- * czyta i zwraca linijkê tekstu z pliku alokuj±c przy tym odpowiedni buforek.
+ * czyta i zwraca linijkê tekstu z pliku, alokuj±c przy tym odpowiedni buforek.
  * usuwa znaki koñca linii.
  */
 char *read_file(FILE *f)
 {
 	char buf[1024], *res = NULL;
 
-	while (fgets(buf, sizeof(buf) - 1, f)) {
+	while (fgets(buf, sizeof(buf), f)) {
 		int first = (res) ? 0 : 1;
-		int new_size = ((res) ? strlen(res) : 0) + strlen(buf) + 1;
+		size_t new_size = ((res) ? strlen(res) : 0) + strlen(buf) + 1;
 
 		res = xrealloc(res, new_size);
 		if (first)
 			*res = 0;
 		strcpy(res + strlen(res), buf);
-		
+
 		if (strchr(buf, '\n'))
 			break;
 	}

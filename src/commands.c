@@ -5553,7 +5553,7 @@ void command_init()
 	( "_watches", "", cmd_test_watches, 0, "", 
 	  "wy¶wietla listê sprawdzanych deskryptorów", "");
 	command_add
-	( "_debug", "", cmd_test_debug, 0, "",
+	( "_debug", "?", cmd_test_debug, 0, "",
 	  "wy¶wietla tekst w oknie debug", "");
 	command_add
 	( "_debug_dump", "", cmd_test_debug_dump, 0, "",

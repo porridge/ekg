@@ -130,7 +130,7 @@ int check_mail_update(const char *s, int more)
 
 		play_sound(config_sound_mail_file);
 
-		event_check(EVENT_NEW_MAIL, 1, itoa(mail_count));
+		event_check(EVENT_NEWMAIL, 1, itoa(mail_count));
 	}
 
 	return 0;
@@ -335,7 +335,7 @@ int check_mail_maildir()
 
 		for (l = mail_folders; l; l = l->next) {
 			struct mail_folder *m = l->data;
-			char *tmp = saprintf("%s/%s", m->fname, "new");
+			char *tmp = saprintf("%s/new", m->fname);
 
 			if (!(dir = opendir(tmp))) {
 				xfree(tmp);
@@ -414,19 +414,14 @@ void changed_check_mail(const char *var)
 {
 	if (config_check_mail) {
 		list_t l;
-		struct timer *t;
 
 		/* konieczne, je¶li by³a zmiana typu skrzynek */
 		changed_check_mail_folders("check_mail_folders");
 
-		/* select() musi siê jako¶ wyrobiæ... */
-		if (!config_check_mail_frequency)
-			config_check_mail_frequency = 1;
-
 		for (l = timers; l; l = l->next) {
-			t = l->data;
+			struct timer *t = l->data;
 
-			if (!strcmp(t->name, "check-mail-time")) {
+			if (t->type == TIMER_UI && !strcmp(t->name, "check-mail-time")) {
 				t->period = config_check_mail_frequency;
 				return;
 			}
@@ -441,7 +436,9 @@ void changed_check_mail(const char *var)
 			}
 		}
 
-		t = timer_add(config_check_mail_frequency, 1, TIMER_UI, 0, "check-mail-time", "check_mail");
+		if (config_check_mail_frequency)
+			timer_add(config_check_mail_frequency, 1, TIMER_UI, 0, "check-mail-time", "check_mail");
+
 	} else
 		timer_remove("check-mail-time", 0, NULL);
 }
@@ -490,7 +487,7 @@ void changed_check_mail_folders(const char *var)
 			if (!pw)
 				return;
 
-			inbox = saprintf("%s/%s", "/var/mail", pw->pw_name);
+			inbox = saprintf("/var/mail/%s", pw->pw_name);
 		}
 
 		foo.fhash = ekg_hash(inbox);

@@ -446,7 +446,7 @@ int config_write(const char *filename)
  *  
  *  - vars - tablica z nazwami zmiennych do zapisania.
  * 
- * 0/-1.
+ * 0/-1
  */
 int config_write_partly(char **vars)
 {
