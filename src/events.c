@@ -977,7 +977,7 @@ void handle_dcc(struct gg_dcc *d)
 
 #ifdef HAVE_VOIP
 			voice_open();
-			voice_play(e->event.dcc_voice_data.data, e->event.dcc_voice_data.length);
+			voice_play(e->event.dcc_voice_data.data, e->event.dcc_voice_data.length, 0);
 #endif
 			break;
 			
@@ -1045,11 +1045,14 @@ void handle_voice()
 		}
 	}
 
-	if (!d)
+	/* póki nie mamy po³±czenia, i tak czytamy z /dev/dsp */
+
+	if (!d) {
+		voice_record(buf, sizeof(buf), 1);	/* XXX b³êdy */
 		return;
-
-	voice_record(buf, sizeof(buf));		/* XXX b³êdy */
-
-	gg_dcc_voice_send(d, buf, sizeof(buf));	/* XXX b³êdy */
+	} else {
+		voice_record(buf, sizeof(buf), 0);	/* XXX b³êdy */
+		gg_dcc_voice_send(d, buf, sizeof(buf));	/* XXX b³êdy */
+	}
 #endif /* HAVE_VOIP */
 }

@@ -1667,18 +1667,23 @@ COMMAND(command_dcc)
 		
 		for (t = NULL, l = transfers; l; l = l->next) {
 			struct userlist *u;
+			struct transfer *f = l->data;
 			
-			t = l->data;
+			f = l->data;
 
-			if (!t->dcc || t->type != GG_SESSION_DCC_VOICE)
+			if (!f->dcc || f->type != GG_SESSION_DCC_VOICE || f->dcc->state != GG_STATE_SENDING_VOICE_ACK)
 				continue;
 			
-			if (params[1][0] == '#' && atoi(params[1] + 1) == t->id)
+			if (params[1][0] == '#' && atoi(params[1] + 1) == f->id) {
+				t = f;
 				break;
+			}
 
 			if ((u = userlist_find(t->uin, NULL))) {
-				if (!strcasecmp(params[1], itoa(u->uin)) || !strcasecmp(params[1], u->display))
+				if (!strcasecmp(params[1], itoa(u->uin)) || !strcasecmp(params[1], u->display)) {
+					t = f;
 					break;
+				}
 			}
 		}
 
@@ -1686,6 +1691,28 @@ COMMAND(command_dcc)
 			list_add(&watches, t->dcc, 0);
 			voice_open();
 			return 0;
+		}
+
+		/* sprawd¼, czy ju¿ nie wo³ano o rozmowê g³osow± */
+
+		for (l = transfers; l; l = l->next) {
+			struct transfer *t = l->data;
+
+			printf("transfer, id=%d, type=%d\n", t->id, t->type);
+			if (t->type == GG_SESSION_DCC_VOICE) {
+				my_printf("dcc_voice_running");
+				return 0;
+			}
+		}
+
+		for (l = watches; l; l = l->next) {
+			struct gg_session *s = l->data;
+
+			printf("session, type=%d\n", s->type);
+			if (s->type == GG_SESSION_DCC_VOICE) {
+				my_printf("dcc_voice_running");
+				return 0;
+			}
 		}
 
 		/* je¶li nie by³o, to próbujemy sami zainicjowaæ */
@@ -1807,6 +1834,9 @@ COMMAND(command_dcc)
 			list_remove(&watches, t->dcc, 0);
 			gg_dcc_free(t->dcc);
 		}
+
+		if (t->type == GG_SESSION_DCC_VOICE)
+			voice_close();
 
 		uin = t->uin;
 
@@ -2346,4 +2376,7 @@ int binding_toggle_debug(int a, int b)
 		execute_line("set debug 0");
 	else
 		execute_line("set debug 1");
+
+	return 0;
 }
+

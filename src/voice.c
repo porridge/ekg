@@ -47,6 +47,7 @@ gsm voice_gsm_enc = NULL, voice_gsm_dec = NULL;
 int voice_open()
 {
 	struct gg_session s;
+	gsm_signal tmp;
 	int value;
 	
 	if (voice_fd != -1)
@@ -73,6 +74,9 @@ int voice_open()
 	value = AFMT_S16_LE;
 	
 	if (ioctl(voice_fd, SNDCTL_DSP_SETFMT, &value) == -1)
+		goto fail;
+
+	if (read(voice_fd, &tmp, sizeof(tmp)) != sizeof(tmp))
 		goto fail;
 
 	if (!(voice_gsm_dec = gsm_create()) || !(voice_gsm_enc = gsm_create()))
@@ -145,10 +149,11 @@ void voice_close()
  *
  *  - buf - bufor z danymi,
  *  - length - d³ugo¶æ bufora,
+ *  - null - je¶li 1, dekoduje, ale nie odtwarza,
  *
  * je¶li siê uda³o 0, je¶li nie -1.
  */
-int voice_play(char *buf, int length)
+int voice_play(char *buf, int length, int null)
 {
 	gsm_signal output[160];
 	char *pos = buf;
@@ -156,12 +161,12 @@ int voice_play(char *buf, int length)
 	while (pos <= (buf + length - 55)) {
 		if (gsm_decode(voice_gsm_dec, pos, output))
 			return -1;
-		if (write(voice_fd, output, 320) != 320)
+		if (!null && write(voice_fd, output, 320) != 320)
 			return -1;
 		pos += 33;
 		if (gsm_decode(voice_gsm_dec, pos, output))
 			return -1;
-		if (write(voice_fd, output, 320) != 320)
+		if (!null && write(voice_fd, output, 320) != 320)
 			return -1;
 		pos += 32;
 	}
@@ -176,10 +181,11 @@ int voice_play(char *buf, int length)
  *
  *  - buf - bufor z danymi,
  *  - length - d³ugo¶æ bufora,
+ *  - null - je¶li 1, nie koduje,
  *
  * je¶li siê uda³o 0, je¶li nie -1.
  */
-int voice_record(char *buf, int length)
+int voice_record(char *buf, int length, int null)
 {
 	gsm_signal input[160];
 	char *pos = buf;
@@ -187,11 +193,13 @@ int voice_record(char *buf, int length)
 	while (pos <= (buf + length - 55)) {
 		if (read(voice_fd, input, 320) != 320)
 			return -1;
-		gsm_encode(voice_gsm_enc, input, pos);
+		if (!null)
+			gsm_encode(voice_gsm_enc, input, pos);
 		pos += 32;
 		if (read(voice_fd, input, 320) != 320)
 			return -1;
-		gsm_encode(voice_gsm_enc, input, pos);
+		if (!null)
+			gsm_encode(voice_gsm_enc, input, pos);
 		pos += 33;
 	}
 

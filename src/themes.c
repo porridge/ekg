@@ -748,6 +748,7 @@ void init_theme()
 	add_format("dcc_get_offer", "%) %1 przesy³a plik %W%2%n o rozmiarze %W%3%n\n%) Wpisz %Wdcc get #%4%n by go odebraæ, lub %Wdcc close #%4%n by anulowaæ\n", 1);
 	add_format("dcc_voice_offer", "%) %1 chce rozmawiaæ\n%) Wpisz %Wdcc voice #%2%n by rozpocz±æ rozmowê, lub %Wdcc close #%2%n by anulowaæ\n", 1);
 	add_format("dcc_voice_unsupported", "%) Nie wkompilowano obs³ugi rozmów g³osowych. Przeczytaj %Wdocs/voip.txt%n\n", 1);
+	add_format("dcc_voice_running", "%) Mo¿na prowadziæ tylko jedn± rozmowê g³osow± na raz\n", 1);
 	add_format("dcc_get_not_found", "%! Nie znaleziono po³±czenia %W%1%n\n", 1);
 	add_format("dcc_get_getting", "%) Rozpoczêto pobieranie pliku %W%2%n od %1\n", 1);
 	add_format("dcc_get_cant_create", "%! Nie mo¿na utworzyæ pliku %W%1%n\n", 1);
