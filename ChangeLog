@@ -8,6 +8,10 @@ d - drg, sz - szalik).
 
 - testowa poprawa wydajno¶ci wy¶wietlania - nie od¶wie¿a w obrêbie
   jednej komendy, widaæ to np. przy /help (w/sz)
+- w /last mo¿na po³±czyæ ze sob± wszystkie opcje i zrobiæ np.
+  ,,/last -u szalik -p 17:30-19:00 -n 3'' i dodaæ ,,-c'', aby te
+  wiadomo¶ci usun±æ (sz)
+- podobna kosmetyka j.w. dla /queue (sz)
 
 // 2003-05-29
 

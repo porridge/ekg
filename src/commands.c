@@ -4823,35 +4823,9 @@ COMMAND(cmd_last)
 {
         list_t l;
 	uin_t uin = 0;
-	int last_n = 0, count = 0, i = 0;
+	int last_n = 0, count = 0, i = 0, clear = 0;
 	time_t n, period_start = 0, period_end = 0;
 	struct tm *now;
-
-	if (match_arg(params[0], 'c', "clear", 2)) {
-		if (params[1] && !(uin = get_uin(params[1]))) {
-			printq("user_not_found", params[1]);
-			return -1;
-		}
-
-		if ((uin && !last_count(uin)) || !list_count(lasts)) {
-			if (uin)
-				printq("last_list_empty_nick", format_user(uin));
-			else
-				printq("last_list_empty");
-
-			return -1;
-		}
-
-		if (uin) {
-			last_del(uin);	
-			printq("last_clear_uin", format_user(uin));
-		} else {
-			last_free();
-			printq("last_clear");
-		}
-
-		return 0;
-	}		
 
 	if (params[0]) {
 		char **arr = NULL;
@@ -4868,6 +4842,11 @@ COMMAND(cmd_last)
 
 		/* zobaczmy, co tu mamy ... */
 		for (i = 0; arr[i]; i++) {
+
+			if (match_arg(arr[i], 'c', "clear", 2)) {
+				clear = 1;
+				continue;
+			}
 
 			if (match_arg(arr[i], 'u', "user", 2) && arr[i + 1]) {
 				if (!(uin = get_uin(arr[++i]))) {
@@ -4889,9 +4868,14 @@ COMMAND(cmd_last)
 
 				if ((foo = strchr(tmp, '-'))) {
 					*foo = 0;
+
 					if (foo != tmp)
 						period_start = parsetimestr(tmp);
-					period_end = parsetimestr(++foo);
+
+					foo++;
+
+					if (*foo)
+						period_end = parsetimestr(foo);
 				} else
 					period_start = parsetimestr(tmp);
 			
@@ -4936,10 +4920,12 @@ COMMAND(cmd_last)
 	n = time(NULL);
 	now = localtime(&n);
 
-        for (l = lasts, i = 0; l; l = l->next) {
+        for (l = lasts, i = 0; l; ) {
                 struct last *ll = l->data;
 		struct tm *tm, *st;
 		char buf[100], buf2[100], *time_str = NULL;
+
+		l = l->next;
 
 		if (uin == 0 || uin == ll->uin) {
 
@@ -4955,25 +4941,38 @@ COMMAND(cmd_last)
 			if (last_n && i++ < (count - last_n))
 				continue;
 
-			tm = localtime(&ll->time);
-			strftime(buf, sizeof(buf), format_find("last_list_timestamp"), tm);
+			if (clear) {
+				xfree(ll->message);
+				list_remove(&lasts, ll, 1);
+			} else {
+				tm = localtime(&ll->time);
+				strftime(buf, sizeof(buf), format_find("last_list_timestamp"), tm);
 
-			if (ll->type == 0 && !(ll->sent_time - config_time_deviation <= ll->time && ll->time <= ll->sent_time + config_time_deviation)) {
-				st = localtime(&ll->sent_time);
-				strftime(buf2, sizeof(buf2), format_find((tm->tm_yday == now->tm_yday) ? "last_list_timestamp_today" : "last_list_timestamp"), st);
-				time_str = saprintf("%s/%s", buf, buf2);
-			} else
-				time_str = xstrdup(buf);
+				if (ll->type == 0 && !(ll->sent_time - config_time_deviation <= ll->time && ll->time <= ll->sent_time + config_time_deviation)) {
+					st = localtime(&ll->sent_time);
+					strftime(buf2, sizeof(buf2), format_find((tm->tm_yday == now->tm_yday) ? "last_list_timestamp_today" : "last_list_timestamp"), st);
+					time_str = saprintf("%s/%s", buf, buf2);
+				} else
+					time_str = xstrdup(buf);
 
-			if (ll->type == 1) {
-				if (config_last & 4)
-					printq("last_list_out", time_str, format_user(ll->uin), ll->message);
-			} else
-				printq("last_list_in", time_str, format_user(ll->uin), ll->message);
+				if (ll->type == 1) {
+					if (config_last & 4)
+						printq("last_list_out", time_str, format_user(ll->uin), ll->message);
+				} else
+					printq("last_list_in", time_str, format_user(ll->uin), ll->message);
 
-			xfree(time_str);
+				xfree(time_str);
+			}
 		}
         }
+
+
+	if (clear) {
+		if (count == 1)
+			printq("last_clear_one");
+		else
+			printq("last_clear");
+	}
 
 	return 0;
 }
@@ -4982,79 +4981,104 @@ COMMAND(cmd_queue)
 {
 	list_t l;
 	uin_t uin = 0;
+	int clear = 0, count = 0, i;
 
 	if (strcasecmp(name, "_queue") && sess && sess->state == GG_STATE_CONNECTED) {
 		printq("queue_wrong_use");
 		return -1;
 	}
 
-	if (match_arg(params[0], 'c', "clear", 2)) {
-		if (params[1] && !(uin = get_uin(params[1]))) {
-			printq("user_not_found", params[1]);
+	if (params[0]) {
+		char **arr = NULL;
+
+		array_add(&arr, xstrdup(params[0]));
+
+		if (params[1]) {
+			char **tmp = array_make(params[1], " \t", 0, 1, 1);
+
+			for (i = 0; tmp[i]; i++)
+				array_add(&arr, xstrdup(tmp[i]));
+			array_free(tmp);
+		}
+
+		for (i = 0; arr[i]; i++) {
+
+			if (match_arg(arr[i], 'c', "clear", 2)) {
+				clear = 1;
+				continue;
+			}
+
+			if (match_arg(arr[i], 'u', "user", 2) && arr[i + 1]) {
+				if (!(uin = get_uin(arr[++i]))) {
+					printq("user_not_found", arr[i]);
+					array_free(arr);
+					return -1;
+				}
+
+				continue;	
+			}
+
+			printq("invalid_params", name);
+			array_free(arr);
 			return -1;
 		}
 
-		if ((uin && !msg_queue_count_uin(uin)) || !msg_queue_count()) {
-			if (uin)
-				printq("queue_empty_uin", format_user(uin));
-			else
-				printq("queue_empty");
-
-			return 0;
-		}
-
-		if (uin) {
-			msg_queue_remove_uin(uin);
-			printq("queue_clear_uin", format_user(uin));
-		} else {
-			msg_queue_free();
-			printq("queue_clear");
-		}
-
-		return 0;
-	}		
-
-	if (params[0] && !(uin = get_uin(params[0]))) {
-		printq("user_not_found", params[0]);
-		return -1;
-	}  
-		
-	if ((uin && !msg_queue_count_uin(uin)) || !msg_queue_count()) {
-		if (uin)
-			printq("queue_empty_uin", format_user(uin));
-		else
-			printq("queue_empty");
-
-		return 0;
+		array_free(arr);
 	}
 
-        for (l = msg_queue; l; l = l->next) {
+	if (uin)
+		count = msg_queue_count_uin(uin);
+	else
+		count = msg_queue_count();
+
+	if (!count) {
+		if (uin)
+			printq("queue_empty_uin");
+		else
+			printq("queue_empty");
+	}
+
+        for (l = msg_queue; l; ) {
                 struct msg_queue *m = l->data;
 		struct tm *tm;
 		char *fu = NULL;
 		char buf[100];
 
+		l = l->next;
+
 		if (!uin || find_in_uins(m->uin_count, m->uins, uin)) {
-			tm = localtime(&m->time);
-			strftime(buf, sizeof(buf), format_find("queue_list_timestamp"), tm);
 
-			if (m->uin_count > 1) {
-				string_t s = string_init(format_user(*(m->uins)));
-				int i;
+			if (clear) {
+				msg_queue_remove(m->msg_seq);
+			} else {
+				tm = localtime(&m->time);
+				strftime(buf, sizeof(buf), format_find("queue_list_timestamp"), tm);
 
-				for (i = 1; i < m->uin_count; i++) {
-					string_append(s, ",");
-					string_append(s, format_user(m->uins[i]));
-				}
-				
-				fu = string_free(s, 0);
-			} else
-				fu = xstrdup(format_user(*(m->uins)));
-				
-			printq("queue_list_message", buf, fu, m->msg);
+				if (m->uin_count > 1) {
+					string_t s = string_init(format_user(*(m->uins)));
+					int i;
 
-			xfree(fu);
+					for (i = 1; i < m->uin_count; i++) {
+						string_append(s, ",");
+						string_append(s, format_user(m->uins[i]));
+					}
+					
+					fu = string_free(s, 0);
+				} else
+					fu = xstrdup(format_user(*(m->uins)));
+					
+				printq("queue_list_message", buf, fu, m->msg);
+
+				xfree(fu);
+			}
 		}
+	}
+
+	if (clear) {
+		if (uin)
+			printq("queue_clear_uin");
+		else
+			printq("queue_clear");
 	}
 
 	return 0;
@@ -5440,10 +5464,10 @@ void command_init()
 	( "last", "?u", cmd_last, 0,
 	  " [opcje]", "wy¶wietla lub czy¶ci ostatnie wiadomo¶ci",
 	  "\n"
-	  "  -c, --clear [numer/alias]      czy¶ci podane wiadomo¶ci lub wszystkie\n"
-	  "  -n, --number <n>               wy¶wietla %Tn%n ostatnich wiadomo¶ci\n"
-          "  -p, --period <pocz±tek-koniec> wy¶wietla wiadomo¶ci z podanego okresu\n"
-	  "  -u, --user <numer/alias>       wy¶wietla wiadomo¶ci od u¿ytkownika\n"
+	  "  -c, --clear                    czy¶ci podane wiadomo¶ci lub wszystkie\n"
+	  "  -n, --number <n>               ostatnie %Tn%n wiadomo¶ci\n"
+          "  -p, --period <pocz±tek-koniec> wiadomo¶ci z podanego okresu\n"
+	  "  -u, --user <numer/alias>       wiadomo¶ci od danego u¿ytkownika\n"
 	  "\n"
           "Format zapisu czasu w przypadku opcji ,,%T--period%n'' jest taki sam, jak "
           "dla polecenia %Tat%n. Mo¿na podaæ zarówno pocz±tek, jak i koniec lub tylko "
@@ -5575,11 +5599,11 @@ void command_init()
           "zostanie rozpoczêta nowa konferencja.");
 
 	command_add
-	( "queue", "uu", cmd_queue, 0,
+	( "queue", "?u", cmd_queue, 0,
 	  " [opcje]", "zarz±dzanie wiadomo¶ciami do wys³ania po po³±czeniu",
 	  "\n"
-	  "  -c, --clear [numer/alias]  usuwa podane wiadomo¶ci lub wszystkie\n"
-	  "  [numer/alias]              wy¶wietla kolejkê wiadomo¶ci\n"
+	  "  -c, --clear                usuwa podane wiadomo¶ci lub wszystkie\n"
+          "  -u, --user <numer/alias>   wiadomo¶ci dla danego u¿ytkownika\n"
 	  "\n"
 	  "Mo¿na u¿yæ tylko wtedy, gdy nie jeste¶my po³±czeni. W przypadku "
 	  "konferencji wy¶wietla wszystkich uczestników.");

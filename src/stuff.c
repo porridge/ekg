@@ -3106,7 +3106,7 @@ time_t parsetimestr(const char *p)
 	lt->tm_isdst = -1;
 
 	/* wyci±gamy sekundy, je¶li s± i obcinamy */
-	if ((tmp = strchr(foo, '.')) && !(wrong = (strlen(tmp) != 3))) {
+	if ((tmp = strchr(foo, '.')) && !(wrong = (strlen(tmp) < 2))) {
 		sscanf(tmp + 1, "%2d", &lt->tm_sec);
 		tmp[0] = 0;
 	} else

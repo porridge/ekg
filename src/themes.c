@@ -1374,19 +1374,19 @@ void theme_init()
 	/* last */
 	format_add("last_list_in", "%) %Y <<%n [%1] %2 %3\n", 1);
 	format_add("last_list_out", "%) %G >>%n [%1] %2 %3\n", 1);
-	format_add("last_list_empty", "%! Nie zalogowano ¿adnych wiadomo¶ci\n", 1);
-	format_add("last_list_empty_nick", "%! Nie zalogowano ¿adnych wiadomo¶ci dla %T%1%n\n", 1);
+	format_add("last_list_empty", "%! Nie zalogowano wiadomo¶ci\n", 1);
+	format_add("last_list_empty_nick", "%! Nie zalogowano wiadomo¶ci dla %T%1%n\n", 1);
 	format_add("last_list_timestamp", "%d-%m-%Y %H:%M", 1);
 	format_add("last_list_timestamp_today", "%H:%M", 1);
-	format_add("last_clear_uin", "%) Wiadomo¶ci dla %T%1%n wyczyszczone\n", 1);
-	format_add("last_clear", "%) Wszystkie wiadomo¶ci wyczyszczone\n", 1);
+	format_add("last_clear", "%) Usuniêto wiadomo¶ci\n", 1);
+	format_add("last_clear_one", "%) Usuniêto wiadomo¶æ\n", 1);
 
 	/* queue */
 	format_add("queue_list_timestamp", "%d-%m-%Y %H:%M", 1);
 	format_add("queue_list_message", "%) %G >>%n [%1] %2 %3\n", 1);
-	format_add("queue_clear","%) Kolejka wiadomo¶ci wyczyszczona\n", 1);
-	format_add("queue_clear_uin","%) Kolejka wiadomo¶ci wyczyszczona dla %T%1%n\n", 1);
-	format_add("queue_wrong_use", "%! Komenda dzia³a tylko przy braku po³±czenia z serwerem\n", 1);
+	format_add("queue_clear","%) Usuniêto wiadomo¶ci z kolejki\n", 1);
+	format_add("queue_clear_uin","%) Usuniêto wiadomo¶ci z kolejki dla %T%1%n\n", 1);
+	format_add("queue_wrong_use", "%! Komenda dzia³a tylko w czasie braku po³±czenia z serwerem\n", 1);
 	format_add("queue_empty", "%! Kolejka wiadomo¶ci jest pusta\n", 1);
 	format_add("queue_empty_uin", "%! Brak wiadomo¶ci w kolejce dla %T%1%n\n", 1);
 	format_add("queue_flush", "%> Wys³ano zaleg³e wiadomo¶ci z kolejki\n", 1);
