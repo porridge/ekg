@@ -38,7 +38,6 @@
 #include "voice.h"
 #include "xmalloc.h"
 #include "ui.h"
-#include "db.h"
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure();
