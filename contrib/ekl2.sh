@@ -29,7 +29,7 @@ ggdir="$HOME/.gg"
 while [ $# -gt 0 ]; do
         case $1 in
 		-h) 
-		        echo "UÅ¼yj: $0 [-d format] [-h] [-l] [-m name] [-n] [-s date] [-t] [-v] log_file"
+		        echo "U¿yj: $0 [-d format] [-h] [-l] [-m name] [-n] [-s date] [-t] [-v] log_file"
 			echo -e "\t-d format\tformat wy¶wietlania daty, zobacz date(1)"
 		        echo -e "\t-h\t\tpomoc, któr± teraz widzisz"
 			echo -e "\t-L\t\tlista dostêpnych logów z katalogu $ggdir/history"

@@ -10,9 +10,11 @@ export DH_COMPAT=2
 
 install = /usr/bin/install
 INSDIR = `pwd`/debian/tmp/usr
+ISPOTATO = `apt-cache show debhelper|grep "Version: 2"`
 
 configure: configure-stamp
 configure-stamp:
+	if [ ! -z "$(ISPOTATO)" ]; then touch potato-build;fi
 	dh_testdir
 	./configure --without-debug --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --datadir=\$${prefix}/share
 
@@ -47,7 +49,7 @@ install: build
 	$(install) -d $(INSDIR)/include/
 	$(install) -d $(INSDIR)/lib/menu/
 	$(install) -m 755 src/ekg $(INSDIR)/bin
-	$(install) -m 755 contrib/ekl2.pl $(INSDIR)/bin
+	$(install) -m 755 contrib/ekl2.sh $(INSDIR)/bin/ekl2
 	$(install) -m 444 themes/*.theme $(INSDIR)/share/ekg/themes/
 	$(install) -m 444 lib/libgadu.h $(INSDIR)/include
 	$(install) -m 755 lib/libgadu.so.* $(INSDIR)/lib
@@ -69,12 +71,13 @@ binary-arch: build install
 	dh_installchangelogs -pekg debian/changelog
 	dh_installchangelogs -pekg-dev debian/changelog
 	dh_installchangelogs -pekg-doc debian/changelog
-# if You compile it on potato box comment line below :/
 	sed "s/.TH\ EKG\ n/TH\ EKG\ 1/g"<docs/ekg.man.pl>debian/ekg.1
-	dh_installman -pekg debian/ekg.1
+	sed "s/.TH\ EKL2\ n/TH\ EKL2\ 1/g"<docs/ekl2.man.pl>debian/ekl2.1
+	if [ ! -f potato-build ]; then dh_installman -pekg debian/ekg.1 debian/ekl2.1;fi
+	if [ -f potato-build ]; then dh_installmanpages -pekg debian/ekg.1 debian/ekl2.1;fi
 	dh_strip
 	dh_fixperms
-	dh_compress
+	if [ ! -f potato-build ]; then dh_compress;fi
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol
