@@ -167,7 +167,7 @@ static PyObject *ekg_config_getattr(PyObject *o, char *name)
 		struct variable *v = l->data;
 
 		if (!strcmp(v->name, name)) {
-			if (v->type == VAR_BOOL || v->type == VAR_INT)
+			if (v->type == VAR_BOOL || v->type == VAR_INT || v->type == VAR_MAP)
 				return Py_BuildValue("i", *(int*)(v->ptr));
 			else
 				return Py_BuildValue("s", *(char**)(v->ptr));
@@ -186,7 +186,7 @@ static int ekg_config_setattr(PyObject *o, char *name, PyObject *value)
 		return -1;
 	}
 
-	if (v->type == VAR_INT || v->type == VAR_BOOL) {
+	if (v->type == VAR_INT || v->type == VAR_BOOL || v->type == VAR_MAP) {
 		if (!PyInt_Check(value)) {
 			PyErr_SetString(PyExc_TypeError, "invalid type");
 			return -1;
@@ -312,7 +312,7 @@ int python_unload(const char *name)
 	list_t l;
 
 	if (!name) {
-		print("generic", "Nie podano nazwy skryptu");
+		print("generic_error", "Nie podano nazwy skryptu");
 		return -1;
 	}
 
@@ -336,7 +336,7 @@ int python_unload(const char *name)
 		return 0;
 	}
 	
-	print("generic", "Nie znaleziono skryptu");
+	print("generic_error", "Nie znaleziono skryptu");
 	
 	return -1;
 }
@@ -352,11 +352,11 @@ int python_run(const char *filename)
 {
 	FILE *f = fopen(filename, "r");
 
-	if (f) {
-		PyRun_SimpleFile(f, (char*) filename);
-		fclose(f);
-	} else
+	if (!f)
 		return -1;
+
+	PyRun_SimpleFile(f, (char*) filename);
+	fclose(f);
 
 	return 0;
 }
@@ -398,7 +398,7 @@ int python_load(const char *name)
 	
 	if (strchr(name, '/')) {
 		char *tmp = saprintf("Skrypt nale¿y umie¶ciæ w katalogu \033[1m%s\033[0m", prepare_path("scripts", 0));
-		print("generic", tmp);
+		print("generic_error", tmp);
 		xfree(tmp);
 		return -1;
 	}
@@ -411,7 +411,7 @@ int python_load(const char *name)
 	module = PyImport_ImportModule(name2);
 
 	if (!module) {
-		print("generic", "Nie znaleziono skryptu");
+		print("generic_error", "Nie znaleziono skryptu");
 		PyErr_Print();
 		xfree(name2);
 		return -1;
