@@ -1089,11 +1089,10 @@ void file_generator(const char *text, int len)
 {
 	struct dirent **namelist = NULL;
 	const char *dname, *bname;
-	char *dirc, *basec;
+	char *dirc;
 	int count, i;
 
 	dirc = xstrdup(text);
-	basec = xstrdup(text);
 
 	bname = strrchr(text, '/');
 
@@ -1109,9 +1108,6 @@ void file_generator(const char *text, int len)
 		bname = text + len - 1;
 	}
 
-	if (*bname == '.')
-		bname = "/";
-    
 	count = scandir(dname, &namelist, NULL, alphasort);
 
 	for (i = 0; i < count; i++) {
@@ -1135,7 +1131,6 @@ void file_generator(const char *text, int len)
         }
 
 	xfree(dirc);
-	xfree(basec);
 	xfree(namelist);
 }
 
