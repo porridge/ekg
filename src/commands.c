@@ -170,7 +170,7 @@ COMMAND(cmd_add)
 		print("user_added", params[1]);
 		gg_add_notify(sess, uin);
 		config_changed = 1;
-		ui_event("userlist_changed");
+		ui_event("userlist_changed", itoa(uin), params[1]);
 	} else
 		print("error_adding");
 
@@ -505,6 +505,7 @@ COMMAND(cmd_del)
 	struct userlist *u;
 	uin_t uin;
 	const char *tmp;
+	char *nick;
 
 	if (!params[0]) {
 		print("not_enough_params", name);
@@ -516,15 +517,19 @@ COMMAND(cmd_del)
 		return;
 	}
 
+	nick = xstrdup(u->display);
+	
 	tmp = format_user(uin);
 
 	if (!userlist_remove(u)) {
 		print("user_deleted", tmp);
 		gg_remove_notify(sess, uin);
 		config_changed = 1;
-		ui_event("userlist_changed");
+		ui_event("userlist_changed", nick, itoa(uin));
 	} else
 		print("error_deleting");
+
+	xfree(nick);
 	
 	return;
 }

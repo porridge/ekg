@@ -1023,6 +1023,7 @@ void theme_init()
 
 	/* query */
 	format_add("query_started", "%) Rozpoczêto rozmowê z %T%1%n\n", 1);
+	format_add("query_started_window", "%) Wci¶nij %TAlt-I%n by ignorowaæ, %TAlt-K%n by zamkn±æ okno\n", 1);
 	format_add("query_finished", "%) Zakoñczono rozmowê z %T%1%n\n", 1);
 	format_add("query_exist", "%! Rozmowa z %T%1%n jest ju¿ prowadzona w okienku nr %T%2%n\n", 1);
 

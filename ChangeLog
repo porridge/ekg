@@ -5,10 +5,21 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-10-30
+
+- poprawka wy³±czonego debugowania (Brzezi/w)
+
 // 2002-10-29
 
 - ze wzglêdu na du¿e zainteresowanie u¿ytkowników, dodano zmienn±
   log_timestamp (*/w)
+- poprawka configure.in (porridge/w)
+- Alt-I ignoruje rozmówcê w ui-ncurses (w)
+- dodanie krótkiego tekstu, który informuje, co fajnego mo¿na zrobiæ
+  z okienkiem, gdy kto¶ nas mesgn±³ (w)
+- poprawka timestampu w ui-readline (w)
+- poprawka pagera w ui-readline (Brzezi/w)
+- usuniêciê z listy kontaktów uaktualnia nazwê okna w ui-ncurses (Perry/w)
 
 // 2002-10-28
 

@@ -530,9 +530,7 @@ static void ui_readline_print(const char *target, int separate, const char *xlin
 	
 	/* je¶li nie piszemy do aktualnego, to zapisz do bufora i wyjd¼ */
         if (id && id != window_current->id) {
-		char *tmp = saprintf("%s%s", timestamp, line);
-                window_write(id, tmp);
-		xfree(tmp);
+                window_write(id, line);
 
                 /* XXX trzeba jeszcze waln±æ od¶wie¿enie prompta */
                 goto done;
@@ -542,11 +540,7 @@ static void ui_readline_print(const char *target, int separate, const char *xlin
 	if (pager_lines == -2)
 		goto done;
 
-	{
-		char *tmp = saprintf("%s%s", timestamp, line);
-		window_write(window_current->id, tmp);
-		xfree(tmp);
-	}
+	window_write(window_current->id, line);
 
 	/* ukryj prompt, je¶li jeste¶my w trakcie readline */
         if (in_readline) {
@@ -565,9 +559,11 @@ static void ui_readline_print(const char *target, int separate, const char *xlin
 	printf("%s", line);
 
 	if (pager_lines >= 0) {
+		pager_lines++;
+
 		if (pager_lines >= screen_lines - 2) {
-			char *tmp;
 			const char *prompt = format_find("readline_more");
+			char *tmp;
 			
 			in_readline++;
 		        rl_set_prompt(prompt);
@@ -581,7 +577,7 @@ static void ui_readline_print(const char *target, int separate, const char *xlin
 				printf("\n");
 				pager_lines = -2;
 			}
-			printf("\033[A\033[K");		/* XXX */
+			printf("\033[A\033[K");		/* XXX brzydko */
 		}
 	}
 

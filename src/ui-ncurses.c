@@ -334,6 +334,8 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 					w->prompt = format_string(format_find("ncurses_prompt_query"), target);
 					w->prompt_len = strlen(w->prompt);
 					print("window_id_query_started", itoa(w->id), target);
+					print_window(target, 1, "query_started", target);
+					print_window(target, 1, "query_started_window", target);
 					break;
 				}
 			}
@@ -345,6 +347,8 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 				else {
 					w = window_new(target);
 					print("window_id_query_started", itoa(w->id), target);
+					print_window(target, 1, "query_started", target);
+					print_window(target, 1, "query_started_window", target);
 				}
 			}
 			break;
@@ -1268,6 +1272,12 @@ static void ui_ncurses_loop()
 				if (ch == 'n' || ch == 'N')	/* Alt-N */
 					ui_event("command", "window", "new", NULL);
 
+				if (ch == 'i' || ch == 'I') {	/* Alt-I */
+					char *tmp = saprintf("/ignore %s", window_current->target);
+					command_exec(NULL, tmp);
+					xfree(tmp);
+				}
+
 				if (ch == 13) {		/* Ctrl-Enter */
 					if (input_size == 1)
 						input_size = 5;
@@ -1780,21 +1790,17 @@ static int ui_ncurses_event(const char *event, ...)
 	}
 
 	if (!strcmp(event, "userlist_changed")) {
+		const char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*);
 		list_t l;
 
 		for (l = windows; l; l = l->next) {
 			struct window *w = l->data;
-			struct userlist *u;
-			int uin;
 
-			if (!w->target || !(uin = atoi(w->target)))
-				continue;
-
-			if (!(u = userlist_find(uin, NULL)) || !u->display)
+			if (!w->target || strcasecmp(w->target, p1))
 				continue;
 
 			xfree(w->target);
-			w->target = xstrdup(u->display);
+			w->target = xstrdup(p2);
 
 			xfree(w->prompt);
 			w->prompt = format_string(format_find("ncurses_prompt_query"), w->target);
@@ -1856,6 +1862,7 @@ static int ui_ncurses_event(const char *event, ...)
 				}
 
 				print("query_started", param);
+				print("query_started_window", param);
 				xfree(window_current->target);
 				xfree(window_current->prompt);
 				window_current->target = xstrdup(param);
