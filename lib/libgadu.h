@@ -235,6 +235,7 @@ char *gg_get_line(char **ptr);
 #define GG_PUBDIR_HOST "pubdir.gadu-gadu.pl"
 #define GG_PUBDIR_PORT 80
 #define GG_DEFAULT_PORT 8074
+#define GG_HTTPS_PORT 443
 
 struct gg_header {
 	unsigned long type;		/* typ pakietu */

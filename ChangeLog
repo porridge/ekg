@@ -2,6 +2,9 @@
 
 - popsuta kompilacja na broken solaris ;> [sprawdzone na solarisie 2.7/gcc]
   (speedy)
+- tryb https - juz dostepny ;> ogolnie to milo mnie autor gg zaskoczyl 
+  praktycznie jest juz jeden format. errr w razie b³êdu po³±czenia 
+  appmsg:8074 próbuje siê ³±czyæ z portem :443 tego samego hosta (speedy) 
   
 // 2001-11-02
 

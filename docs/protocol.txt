@@ -64,10 +64,12 @@ co to oznacza? nie mam pojêcia ;) wygl±da na to, ¿e ca³y g*du-g*du jest
 przemy¶lany i w przysz³o¶ci bêdzie mo¿na u¿ywaæ ró¿nych serwerów do ró¿nych
 rzeczy, typu szukanie, obs³uga klientów itd. póki co, ³±czyæ siê trzeba na
 pierwszy adres (tak, ten z portem).
+Je¿eli po³±czenie z portem 8074 nie wyjdzie z jaki¶ specyficznych powodów -
+mo¿na siê ³±czyæ na port 443. 
 
 --- 3) logowanie siê -------------------------------------------------------
 
-po po³±czeniu siê portem 8074 serwera g*du-g*du, dostajemy pakiet typu 0x0001,
+po po³±czeniu siê portem serwera g*du-g*du, dostajemy pakiet typu 0x0001,
 który na potrzeby tego dokumentu nazwiemy:
 
 	#define GG_WELCOME 0x0001
