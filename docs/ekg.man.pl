@@ -1,4 +1,4 @@
-.TH EKG n "11 listopada 2002" 
+.TH EKG 1 "11 listopada 2002" 
 .SH NAZWA
 ekg \- Eksperymentalny Klient Gadu-Gadu
 .SH SK£ADNIA
