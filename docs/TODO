@@ -8,7 +8,7 @@ biblioteka:
 - uaktualniæ dokumentacjê,
 
 klient:
-- przewijanie ekranu, okienka,
+- okienka,
 - uzupe³niæ dope³nienia (w tym nicki ze spacjami),
 - mo¿liwo¶æ zrobienia theme'u a'la irc,
 - osobny program ekgsearch, lub ekg --search,
@@ -16,7 +16,7 @@ klient:
 - escapowanie tre¶ci mesgów.
 - wykrywanie niewidocznych jako opcja.
 - aliasy w query.
-- wyczyszczenie history
+- wyczyszczenie history.
 
 $Id$
 

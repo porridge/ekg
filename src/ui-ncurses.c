@@ -147,7 +147,7 @@ void ui_ncurses_init()
 	wattrset(status, COLOR_PAIR(8) | A_BOLD);
 	mvwaddstr(status, 0, 0, " ekg XP");
 	wattrset(status, COLOR_PAIR(8));
-	waddstr(status, " :: http://dev.null.pl/ekg/ ::                                           ");
+	waddstr(status, " :: http://dev.null.pl/ekg/ :: wlaz³ kotek na p³otek i mruga...          ");
 	
 	wnoutrefresh(output);
 	wnoutrefresh(status);
@@ -192,6 +192,13 @@ static void ui_ncurses_loop()
 				line[0] = 0;
 				break;
 			case 'L' - 64:
+				break;
+			case 9:
+				if (send_nicks_count > 0) {
+					snprintf(line, sizeof(line), "chat %s ", send_nicks[send_nicks_index++]);
+					if (send_nicks_index >= send_nicks_count)
+						send_nicks_count = 0;
+				}
 				break;
 			case KEY_LEFT:
 			case KEY_RIGHT:

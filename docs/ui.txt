@@ -1,8 +1,7 @@
 od 20020627 ekg jest przygotowane do obs³ugi ró¿nych interfejsów u¿ytkowika.
 zrobi³em ca³kiem spor± reorganizacjê kodu, dziêki czemu nie trzeba bêdzie
-psuæ zbyt du¿o, ¿eby dodaæ frontend w ncurses czy jakikolwiek inny. póki co,
-nie ma ¿adnego sposobu na wybór -- trzeba zmieniaæ plik src/ui.h. w ka¿dym
-razie, ekg spodziewa siê kilku funkcji:
+psuæ zbyt du¿o, ¿eby dodaæ frontend w ncurses czy jakikolwiek inny. ekg
+spodziewa siê paru funkcji:
 
 ui_XXX_init()
 	inicjalizacja interfejsu u¿ytkownika. dla ui-readline bêdzie to

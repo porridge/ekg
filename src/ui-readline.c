@@ -443,7 +443,7 @@ static const char *current_prompt()
 		}
 	}
 
-	if (no_prompt || !prompt || batch_mode)
+	if (no_prompt || !prompt)
 		prompt = "";
 
 	return prompt;

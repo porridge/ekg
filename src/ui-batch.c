@@ -22,7 +22,7 @@
 
 static void loop()
 {
-	for (;;)
+	while (batch_line)
 		ekg_wait_for_key();
 }
 
@@ -31,9 +31,14 @@ static void nop()
 
 }
 
+static void print(const char *target, const char *line)
+{
+	printf("%s", line);
+}
+
 void ui_batch_init()
 {
-	ui_print = nop;
+	ui_print = print;
 	ui_loop = loop;
 	ui_beep = nop;
 	ui_new_target = nop;

@@ -21,6 +21,6 @@
 #endif
 
 /* ui */
-#define WITH_UI_READLINE
+#undef WITH_UI_READLINE
 #undef WITH_UI_NCURSES
 

@@ -47,7 +47,7 @@
 #include "ui.h"
 
 time_t last_action = 0;
-int ioctl_daemon_pid = 0;
+int ioctld_pid = 0;
 int ekg_pid = 0;
 
 /*
@@ -368,17 +368,17 @@ void sighup_handler()
 	signal(SIGHUP, sighup_handler);
 }
 
-void kill_ioctl_daemon()
+void kill_ioctld()
 {
-        if (ioctl_daemon_pid > 0 && ekg_pid == getpid())
-                kill(ioctl_daemon_pid, SIGINT);
+        if (ioctld_pid > 0 && ekg_pid == getpid())
+                kill(ioctld_pid, SIGINT);
 }
 
 void sigsegv_handler()
 {
 	signal(SIGSEGV, SIG_DFL);
 	
-	kill_ioctl_daemon();
+	kill_ioctld();
 	
 	fprintf(stderr, "\n\
 *** Naruszenie ochrony pamiêci ***\n\
@@ -433,16 +433,27 @@ char *prepare_batch_line(int argc, char *argv[], int n)
 
 int main(int argc, char **argv)
 {
-	int auto_connect = 1, force_debug = 0, i, new_status = 0 ;
+	int auto_connect = 1, force_debug = 0, i, new_status = 0, ui_set = 0;
 	char *load_theme = NULL;
 	char *pipe_file = NULL;
 #ifdef WITH_IOCTLD
-    	char *sock_path = NULL, *ioctl_daemon_path = IOCTLD_PATH;
+    	char *sock_path = NULL, *ioctld_path = IOCTLD_PATH;
 #endif
 	struct list *l;
 	struct passwd *pw; 
 	struct gg_common si;
-	
+	void (*ui_init)();
+
+#ifdef WITH_UI_NCURSES
+	ui_init = ui_ncurses_init;
+#else
+#  ifdef WITH_UI_READLINE
+	ui_init = ui_readline_init;
+#  else
+	ui_init = ui_stdout_init;
+#  endif
+#endif
+
 	variable_init();
 
 	if (!(home_dir = getenv("HOME")))
@@ -488,6 +499,15 @@ int main(int argc, char **argv)
 #ifdef WITH_IOCTLD
 "  -I, --ioctld-path [¦CIE¯KA]    ustawia ¶cie¿kê do ioctld\n"
 #endif
+"  -f, --frontend [NAZWA]         wybiera jeden z dostêpnych interfejsów\n"
+"                                 (none, batch"
+#ifdef WITH_UI_READLINE
+", readline"
+#endif
+#ifdef WITH_UI_NCURSES
+", ncurses"
+#endif
+")\n"
 "\n", argv[0]);
 			return 0;	
 		}
@@ -531,23 +551,46 @@ int main(int argc, char **argv)
 		}
 #ifdef WITH_IOCTLD
                 if (!strcmp(argv[i], "-I") || !strcmp(argv[i], "--ioctld-path")) {
-                        if (argv[i+1]) {
-                                ioctl_daemon_path = argv[i+1];
+                        if (argv[i + 1]) {
+                                ioctld_path = argv[i + 1];
                                 i++;
                         } else {
-                                fprintf(stderr, "Nie podano ¶cie¿ki do ioctl_daemon-a.\n");
+                                fprintf(stderr, "Nie podano ¶cie¿ki do ioctld.\n");
                                 return 1;
                         }
                 }
 #endif
+		if (!strcmp(argv[i], "-f") || !strcmp(argv[i], "--frontend")) {
+			ui_set = 1;
+			if (!argv[i + 1]) {
+				fprintf(stderr, "Nie podano nazwy interfejsu.\n");
+				return 1;
+			}
+			if (!strcasecmp(argv[i + 1], "none"))
+				ui_init = ui_none_init;
+			else if (!strcasecmp(argv[i + 1], "batch"))
+				ui_init = ui_batch_init;
+#ifdef WITH_UI_READLINE
+			else if (!strcasecmp(argv[i + 1], "readline"))
+				ui_init = ui_readline_init;
+#endif
+#ifdef WITH_UI_NCURSES
+			else if (!strcasecmp(argv[i + 1], "ncurses"))
+				ui_init = ui_ncurses_init;
+#endif
+			else {
+				fprintf(stderr, "Nieznany interfejs %s.\n", argv[i + 1]);
+				return 1;
+			}
+			i++;
+		}
 	}
+
 	if (i < argc && *argv[i] != '-') {
 		batch_line = prepare_batch_line(argc, argv, i);
-		if (!batch_line) {
-			fprintf(stderr, "Nie mogê zaalokowac pamiêci dla polecenia wsadowego");
-			return 1;
-		}
 		batch_mode = 1;
+		if (!ui_set)
+			ui_init = ui_batch_init;
 	}
 	
         ekg_pid = getpid();
@@ -565,14 +608,14 @@ int main(int argc, char **argv)
 	if (!batch_mode) {
 	        sock_path = prepare_path(".socket");
 	
-	        if (!(ioctl_daemon_pid = fork())) {
-			execl(ioctl_daemon_path, "ioctl_daemon", sock_path, NULL);
+	        if (!(ioctld_pid = fork())) {
+			execl(ioctld_path, "ioctld", sock_path, NULL);
 			exit(0);
 		}
 	
 		init_socket(sock_path);
 	
-	        atexit(kill_ioctl_daemon);
+	        atexit(kill_ioctld);
 	}
 #endif /* WITH_IOCTLD */
 
@@ -652,20 +695,10 @@ int main(int argc, char **argv)
 		list_add(&watches, &si, sizeof(si));
 	}
 
-	if (!batch_mode) {
-#ifdef WITH_UI_NCURSES
-		ui_ncurses_init();
-#else
-#  ifdef WITH_UI_READLINE
-		ui_readline_init();
-#  else
-		fprintf(stderr, "Nie wkompilowano ¿adnego intefejsu u¿ytkownika. Mo¿na uruchamiaæ tylko\npolecenia w trybie wsadowym.\n");
-		exit(1);
-#  endif
-#endif
+	ui_init();
+
+	if (!batch_mode)
 		print("welcome", VERSION);
-	} else
-		ui_batch_init();
 	
 	if (!config_uin || !config_password)
 		print("no_config");

@@ -14,6 +14,10 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - doda³em parametry --enable-ui-*. oczywi¶cie nie dzia³aj±. (w)
 - dodanie ui-batch, który nic nie robi dla trybu wsadowego. (w)
 - pocz±tek ui-ncurses. na upartego da siê tego ju¿ u¿ywaæ. (w)
+- porz±dki w configure.in (w)
+- namiastka tab completion w ui-ncurses (w)
+- parametr -f do wyboru ui (w)
+- dodanie ui-none (w)
 
 // 2002-06-25
 

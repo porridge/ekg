@@ -20,7 +20,7 @@ program w danej chwili.
 Nie ³±cz siê automagicznie. Po uruchomieniu nie ³±czy siê automatycznie 
 z serwerami gg. 
 .TP
-.BI \-u "\ " username\ [\-\-user\ username]
+.BI \-u\ username\ [\-\-user\ username]
 Zezwala na uruchomienie ekg z innym \"u¿ytkownikiem\". 
 Standardowo konfiguracja ekg znajduje sie w katalogu ~/.gg (chyba, ¿e
 zdefiniowana jest zmienna ¶rodowiskowa $CONFGI_DIR - wtedy w ~/$CONFIG_DIR/gg/)
@@ -41,3 +41,6 @@ po po³±czeniu zmienia stan na ,,niewidoczny''
 .TP
 .BI \-p\ [\-\-private]
 po po³±czeniu zmienia stan na ,,tylko dla przyjació³''
+.TP
+.BI \-f\ nazwa\ [\-\-frontend\ nazwa]
+wybiera podany interfejs u¿ytkownika

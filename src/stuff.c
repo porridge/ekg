@@ -1413,7 +1413,7 @@ fail:
 /*
  * send_event()
  *
- * wysy³a do ioctl_daemon'a polecenie uruchomienia akcji z ioctl.
+ * wysy³a do ioctld polecenie uruchomienia akcji z ioctl.
  *
  * - seq
  * - act
@@ -1694,7 +1694,7 @@ int init_control_pipe(char *pipe_file)
 /*
  * init_socket()
  *
- * inicjuje gniazdo oraz strukturê addr dla ioctl_daemon'a.
+ * inicjuje gniazdo oraz strukturê addr dla ioctld.
  *
  * - sock_path
 */

@@ -1251,7 +1251,6 @@ COMMAND(command_quit)
 	
 	if (!quit_message_send) {
 		print((tmp) ? "quit_descr" : "quit", tmp);
-		putchar('\n');
 		quit_message_send = 1;
 	}
 

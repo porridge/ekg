@@ -19,7 +19,7 @@ Enables "debug" mode - this is special verbose mode.
 Don't connect automagically. After starting program won't automatically 
 connect to the gg servers. 
 .TP
-.BI \-u "\ " username\ [\-\-user\ username]
+.BI \-u\ username\ [\-\-user\ username]
 Starts ekg with other \"user\". 
 By default config files are stored in ~/.gg (if there is non-empty
 $CONFIG_DIR environment variable, ~/$CONFIG_DIR/gg/ is being used
@@ -40,3 +40,6 @@ after connect goes invisible
 .TP
 .BI \-p\ [\-\-private]
 after connect changes to private
+.TP
+.BI \-f\ name\ [\-\-frontend\ name]
+selects given user interface
