@@ -393,9 +393,13 @@ dnl   fi
     [  --enable-wap            Compile WAP gateway])
 
   if test "x$enable_wap" = "xyes"; then
-    make_ekgwap="make-ekgwap"
-    install_ekgwap="install-ekgwap"
-    AC_DEFINE(WITH_WAP, 1, [define if you want "WAP" support])
+      if test -d ekgwap; then
+        make_ekgwap="make-ekgwap"
+        install_ekgwap="install-ekgwap"
+        AC_DEFINE(WITH_WAP, 1, [define if you want "WAP" support])
+      else
+        AC_MSG_ERROR([You have to download RTG source code from http://www.comm.pl/~serek/ekgwap/])
+      fi
   fi
 
   # sprawdzamy ioctld
