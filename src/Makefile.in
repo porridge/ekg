@@ -27,7 +27,7 @@ ekg:	$(OBJS)
 	$(CC) $(CFLAGS) -o ekg $(OBJS) -L../lib $(LDFLAGS) $(LIBS) @lgadu@
 
 ioctld:	ioctld.c
-	$(CC) $(CFLAGS) ioctld.c -o ioctld
+	$(CC) $(CFLAGS) ioctld.c -o ioctld $(LIBS)
 
 #
 
