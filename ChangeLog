@@ -8,6 +8,8 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 
 - poprawka /list -m (KKKas/w)
 - poprawka /check_conn dla osób spoza grupy spied (zigi/sz)
+- libgadu: poprawka zachowania gg_urlencode() przy pustych tekstach (mslusarz/w)
+- libgadu: optymalizacja gg_chomp() (mslusarz/w)
 
 // 2005-02-17
 
