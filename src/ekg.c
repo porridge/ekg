@@ -1044,6 +1044,7 @@ void ekg_exit()
 	variable_free();
 	event_free();
 	emoticon_free();
+	sms_away_free();
 	command_free();
 	timer_free();
 	binding_free();
