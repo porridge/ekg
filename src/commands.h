@@ -58,5 +58,6 @@ void remove_send_nick(const char *nick);
 int binding_quick_list(int a, int b);
 int binding_help(int a, int b);
 int binding_toggle_debug(int a, int b);
+int binding_toggle_contacts(int a, int b);
 
 #endif /* __COMMANDS_H */

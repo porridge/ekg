@@ -2582,6 +2582,16 @@ int binding_toggle_debug(int a, int b)
 	return 0;
 }
 
+int binding_toggle_contacts(int a, int b)
+{
+	if (config_contacts)
+		command_exec(NULL, "set contacts 0");
+	else
+		command_exec(NULL, "set contacts 1");
+
+	return 0;
+}
+
 COMMAND(cmd_alias_exec)
 {	
 	list_t l, m = NULL;

@@ -748,7 +748,10 @@ static void update_statusbar()
 					break;
 			}
 			
-			if (!strncmp(p, "away ", 5)) {
+			if (!strncmp(p, "debug ", 6)) {
+				matched = (config_debug);
+				p += 5;
+			} else if (!strncmp(p, "away ", 5)) {
 				matched = (away == 1 || away == 3);
 				p += 4;
 			} else if (!strncmp(p, "avail ", 6)) {
@@ -1767,8 +1770,12 @@ static void ui_ncurses_loop()
 			case KEY_F(2):	/* F2 */
 				binding_quick_list(0, 0);
 				break;
-
-			case KEY_F(12):	/* F3 */
+	
+			case KEY_F(3):  /* F3 */
+				binding_toggle_contacts(0, 0);
+				break;
+				
+			case KEY_F(12):	/* F12 */
 				binding_toggle_debug(0, 0);
 				break;
 				
