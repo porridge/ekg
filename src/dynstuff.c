@@ -132,8 +132,8 @@ int list_remove(list_t *list, void *data, int free_data)
 	}
 
 	if (free_data)
-		free(tmp->data);
-	free(tmp);
+		xfree(tmp->data);
+	xfree(tmp);
 
 	return 0;
 }
@@ -169,11 +169,11 @@ int list_destroy(list_t list, int free_data)
 	
 	while (list) {
 		if (free_data)
-			free(list->data);
+			xfree(list->data);
 
 		tmp = list->next;
 
-		free(list);
+		xfree(list);
 
 		list = tmp;
 	}
@@ -356,11 +356,11 @@ char *string_free(string_t s, int free_string)
 		return NULL;
 
 	if (free_string)
-		free(s->str);
+		xfree(s->str);
 	else
 		tmp = s->str;
 
-	free(s);
+	xfree(s);
 
 	return tmp;
 }
@@ -571,8 +571,8 @@ void array_free(char **array)
 		return;
 
 	for (tmp = array; *tmp; tmp++)
-		free(*tmp);
+		xfree(*tmp);
 
-	free(array);
+	xfree(array);
 }
 

@@ -571,7 +571,7 @@ static void ui_readline_print(const char *target, int separate, const char *xlin
 			tmp = readline(prompt);
 			in_readline--;
 			if (tmp) {
-				free(tmp);
+				xfree(tmp);
 				pager_lines = 0;
 			} else {
 				printf("\n");
@@ -809,19 +809,19 @@ static void ui_readline_loop()
 
 			string_append(s, line);
 
-			free(line);
+			xfree(line);
 
 			no_prompt = 1;
 			rl_bind_key(9, rl_insert);
 
 			while ((line = my_readline())) {
 				if (!strcmp(line, ".")) {
-					free(line);
+					xfree(line);
 					break;
 				}
 				string_append(s, line);
 				string_append(s, "\r\n");
-				free(line);
+				xfree(line);
 			}
 
 			rl_bind_key(9, rl_complete);

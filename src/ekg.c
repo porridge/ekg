@@ -321,7 +321,7 @@ void ekg_wait_for_key()
 
 					case GG_SESSION_SEARCH:
 						print("search_timeout");
-						free(h->user_data);
+						xfree(h->user_data);
 						list_remove(&watches, h, 0);
 						gg_free_search(h);
 						break;
@@ -344,7 +344,7 @@ void ekg_wait_for_key()
 
 						print(errmsg);
 						if (h->type == GG_SESSION_REGISTER) {
-							free(reg_password);
+							xfree(reg_password);
 							reg_password = NULL;
 						}
 						list_remove(&watches, h, 0);
@@ -423,7 +423,7 @@ void ekg_wait_for_key()
 
 				ui_event("my_status", "away", reason);
 				ui_event("my_status_raw", GG_STATUS_BUSY, reason);	/* XXX */
-				free(config_reason);
+				xfree(config_reason);
 				config_reason = reason;
 			}
 
@@ -457,7 +457,7 @@ void ekg_wait_for_key()
 						print("process_exit", itoa(p->pid), p->name, itoa(WEXITSTATUS(status)));
 					}
 
-					free(p->name);
+					xfree(p->name);
 					list_remove(&children, p, 1);
 				}
 			}

@@ -470,12 +470,12 @@ int config_read()
 
 	while ((buf = read_file(f))) {
 		if (buf[0] == '#' || buf[0] == ';' || (buf[0] == '/' && buf[1] == '/')) {
-			free(buf);
+			xfree(buf);
 			continue;
 		}
 
 		if (!(foo = strchr(buf, ' '))) {
-			free(buf);
+			xfree(buf);
 			continue;
 		}
 
@@ -510,7 +510,7 @@ int config_read()
                 } else 
 			variable_set(buf, foo, 1);
 
-		free(buf);
+		xfree(buf);
 	}
 	
 	fclose(f);
@@ -537,12 +537,12 @@ int sysmsg_read()
 
 	while ((buf = read_file(f))) {
 		if (buf[0] == '#') {
-			free(buf);
+			xfree(buf);
 			continue;
 		}
 
 		if (!(foo = strchr(buf, ' '))) {
-			free(buf);
+			xfree(buf);
 			continue;
 		}
 
@@ -582,7 +582,7 @@ void config_write_main(FILE *f, int base64)
 					char *tmp = base64_encode(*(char**)(v->ptr));
 					if (config_save_password)
 						fprintf(f, "%s \001%s\n", v->name, tmp);
-					free(tmp);
+					xfree(tmp);
 				} else 	
 					fprintf(f, "%s %s\n", v->name, *(char**)(v->ptr));
 			}
@@ -1866,7 +1866,7 @@ int event_remove(int flags, uin_t uin)
                 if (e && e->uin == uin && e->flags & flags) {
                         if ((e->flags &= ~flags) == 0) {
                                 print("events_del", event_format(flags), (uin == 1) ? "*" : format_user(uin), e->action);
-				free(e->action);
+				xfree(e->action);
                                 list_remove(&events, e, 1);
                                 return 0;
                         } else {
@@ -1970,14 +1970,14 @@ static int event_run(const char *act)
 	gg_debug(GG_DEBUG_MISC, "//   unknown action\n");
 
 cleanup:
-	free(action);
+	xfree(action);
 	array_free(acts);
         return 0;
 
 	goto fail;	/* ¿eby gcc nie wyrzuca³ warningów */
 
 fail:
-	free(action);
+	xfree(action);
 	array_free(acts);
         return 1;
 }
@@ -2043,7 +2043,7 @@ int event_check(int event, uin_t uin, const char *data)
 	for (i = 0; actions && actions[i]; i++) {	
 		char *tmp = format_string(actions[i], uin_number, uin_display, (data) ? data : "", (edata) ? edata : "");
 		event_run(tmp);
-		free(tmp);
+		xfree(tmp);
 	}
 
 	array_free(actions);
@@ -2548,7 +2548,7 @@ void ekg_logoff(struct gg_session *sess, const char *reason)
 		char *tmp = xstrdup(reason);
 		iso_to_cp(tmp);
 		gg_change_status_descr(sess, GG_STATUS_NOT_AVAIL_DESCR, tmp);
-		free(tmp);
+		xfree(tmp);
 	} else
 		gg_change_status(sess, GG_STATUS_NOT_AVAIL);
 
@@ -2610,7 +2610,7 @@ int emoticon_add(char *name, char *value)
 		struct emoticon *g = l->data;
 
 		if (!strcasecmp(name, g->name)) {
-			free(g->value);
+			xfree(g->value);
 			g->value = xstrdup(value);
 			return 0;
 		}
@@ -2638,8 +2638,8 @@ int emoticon_remove(char *name)
 		struct emoticon *f = l->data;
 
 		if (!strcasecmp(f->name, name)) {
-			free(f->value);
-			free(f->name);
+			xfree(f->value);
+			xfree(f->name);
 			list_remove(&emoticons, f, 1);
 
 			return 0;
@@ -2670,7 +2670,7 @@ int emoticon_read()
 	while ((buf = read_file(f))) {
 	
 		if (buf[0] == '#') {
-			free(buf);
+			xfree(buf);
 			continue;
 		}
 
@@ -2681,9 +2681,9 @@ int emoticon_read()
 				emoticon_add(emot[0], emot[1]);
 			else
 				emoticon_remove(emot[0]);
-			free(emot[0]);
-			free(emot[1]);
-			free(emot);
+			xfree(emot[0]);
+			xfree(emot[1]);
+			xfree(emot);
 		}
 
 		xfree(buf);

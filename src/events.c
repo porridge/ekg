@@ -257,7 +257,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 		}
 
 		if (new_line)
-			free(new_line);
+			xfree(new_line);
 	}
 
 	xfree(buf);
@@ -425,8 +425,10 @@ void handle_msg(struct gg_event *e)
 			foo = format_string(format_find((chat) ? "sms_chat" : "sms_msg"), sender, e->event.msg.message);
 
 			/* niech nie wysy³a smsów, je¶li brakuje formatów */
+			if (strcmp(foo, ""))
+				send_sms(config_sms_number, foo, 0);
 	
-			free(foo);
+			xfree(foo);
 		}
 	}
 
@@ -527,7 +529,7 @@ static void handle_common(uin_t uin, int status, const char *descr, struct gg_no
 		return;
 
 	/* usuñ poprzedni opis */
-	free(u->descr);
+	xfree(u->descr);
 	u->descr = NULL;
 
 	/* je¶li stan z opisem, a opisu brak, wpisz pusty tekst */
@@ -717,7 +719,7 @@ void handle_success(struct gg_event *e)
 
 	if (batch_mode && batch_line) {
  		command_exec(NULL, batch_line);
- 		free(batch_line);
+ 		xfree(batch_line);
  		batch_line = NULL;
  	}
 
@@ -848,9 +850,9 @@ void handle_search(struct gg_http *h)
 
 		print((h->id & 1) ? "search_results_multi" : "search_results_single", itoa(s->results[i].uin), (name) ? name : "", s->results[i].nickname, s->results[i].city, (s->results[i].born) ? itoa(s->results[i].born) : "-", gender, active);
 
-		free(name);
-		free(active);
-		free(gender);
+		xfree(name);
+		xfree(active);
+		xfree(gender);
 	}
 
 	r = (void*) h->user_data;
@@ -984,7 +986,7 @@ void handle_pubdir(struct gg_http *h)
 fail:
 	list_remove(&watches, h, 0);
 	if (h->type == GG_SESSION_REGISTER || h->type == GG_SESSION_PASSWD) {
-		free(reg_password);
+		xfree(reg_password);
 		reg_password = NULL;
 	}
 	gg_free_pubdir(h);
@@ -1093,7 +1095,7 @@ static void remove_transfer(struct gg_dcc *d)
 	struct transfer *t = find_transfer(d);
 
 	if (t) {
-		free(t->filename);
+		xfree(t->filename);
 		list_remove(&transfers, t, 1);
 	}
 }

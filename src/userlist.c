@@ -89,20 +89,20 @@ int userlist_read()
 		char *display;
 		
 		if (buf[0] == '#') {
-			free(buf);
+			xfree(buf);
 			continue;
 		}
 
 		if (!strchr(buf, ';')) {
 			if (!(display = strchr(buf, ' '))) {
-				free(buf);
+				xfree(buf);
 				continue;
 			}
 
 			u.uin = strtol(buf, NULL, 0);
 		
 			if (!u.uin) {
-				free(buf);
+				xfree(buf);
 				continue;
 			}
 
@@ -119,7 +119,7 @@ int userlist_read()
 			
 			if (!entry[0] || !entry[1] || !entry[2] || !entry[3] || !entry[4] || !entry[5] || !entry[6] || !(u.uin = strtol(entry[6], NULL, 0))) {
 				array_free(entry);
-				free(buf);
+				xfree(buf);
 				continue;
 			}
 			
@@ -134,7 +134,7 @@ int userlist_read()
 			array_free(entry);
 		}
 
-		free(buf);
+		xfree(buf);
 
 		u.status = GG_STATUS_NOT_AVAIL;
 
@@ -246,8 +246,8 @@ char *userlist_dump()
 		
 		string_append(s, line);
 
-		free(line);
-		free(groups);
+		xfree(line);
+		xfree(groups);
 	}	
 
 	return string_free(s, 0);
@@ -268,19 +268,19 @@ int userlist_write()
 		return -1;
 	
 	if (!(filename = prepare_path("userlist", 1))) {
-		free(contacts);
+		xfree(contacts);
 		return -1;
 	}
 	
 	if (!(f = fopen(filename, "w"))) {
-		free(contacts);
+		xfree(contacts);
 		return -2;
 	}
 	fchmod(fileno(f), 0600);
 	fputs(contacts, f);
 	fclose(f);
 	
-	free(contacts);
+	xfree(contacts);
 
 	return 0;
 }
@@ -425,17 +425,17 @@ int userlist_remove(struct userlist *u)
 	if (!u)
 		return -1;
 	
-	free(u->first_name);
-	free(u->last_name);
-	free(u->nickname);
-	free(u->display);
-	free(u->mobile);
-	free(u->descr);
+	xfree(u->first_name);
+	xfree(u->last_name);
+	xfree(u->nickname);
+	xfree(u->display);
+	xfree(u->mobile);
+	xfree(u->descr);
 
 	for (l = u->groups; l; l = l->next) {
 		struct group *g = l->data;
 
-		free(g->name);
+		xfree(g->name);
 	}
 	list_destroy(u->groups, 1);
 
@@ -535,7 +535,7 @@ const char *format_user(uin_t uin)
 	
 	strncpy(buf, tmp, sizeof(buf) - 1);
 	
-	free(tmp);
+	xfree(tmp);
 
 	return buf;
 }
@@ -699,7 +699,7 @@ int group_remove(struct userlist *u, const char *group)
 			continue;
 
 		if (!strcasecmp(g->name, group)) {
-			free(g->name);
+			xfree(g->name);
 			list_remove(&u->groups, g, 1);
 			
 			return 0;
