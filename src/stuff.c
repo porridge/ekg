@@ -84,6 +84,7 @@ list_t lasts = NULL;
 list_t conferences = NULL;
 list_t sms_away = NULL;
 list_t buffers = NULL;
+list_t searches = NULL;
 
 int in_autoexec = 0;
 int in_auto_away = 0;

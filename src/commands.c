@@ -734,7 +734,7 @@ COMMAND(cmd_find)
 {
 	char **argv = NULL;
 	gg_pubdir50_t req;
-	int i, res = 0;
+	int i, res = 0, all = 0;
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		printq("not_connected");
@@ -813,8 +813,10 @@ COMMAND(cmd_find)
 			gg_pubdir50_add(req, GG_PUBDIR50_BIRTHYEAR, argv[i]);
 		}
 
-		if (match_arg(arg, 'A', "all", 3))
-			printq("generic", "Jeszcze nie jest obs³ugiwane. Bêdzie, nie pytaj o to.");
+		if (match_arg(arg, 'A', "all", 3)) {
+			gg_pubdir50_add(req, GG_PUBDIR50_START, "0");
+			all = 1;
+		}
 	}
 
 search:
@@ -823,7 +825,11 @@ search:
 		res = -1;
 	}
 
-	gg_pubdir50_free(req);
+	if (all)
+		list_add(&searches, req, 0);
+	else
+		gg_pubdir50_free(req);
+
 	array_free(argv);
 
 	return res;
@@ -4539,8 +4545,7 @@ void command_init()
 	  "  -F, --female            kobiety\n"
 	  "  -M, --male              mê¿czy¼ni\n"
 	  "  -s, --start <n>         wy¶wietla od n-tego numeru\n"
-/*	  "  -A, --all               wy¶wietla wszystkich\n" */
-	  );
+	  "  -A, --all               wy¶wietla wszystkich");
 	  
 	command_add
 	( "help", "cv", cmd_help, 0,

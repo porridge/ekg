@@ -1037,7 +1037,7 @@ int main(int argc, char **argv)
 		if (!gg_debug_file)
 			setup_debug();
 
-		gg_debug_level = 255;
+		gg_debug_level = 255 ^ GG_DEBUG_DUMP;
 	} else
 		gg_debug_level = 0;
 #else
@@ -1252,6 +1252,9 @@ void ekg_exit()
 		send_nicks[i] = NULL;
 	}
 	send_nicks_count = 0;
+
+	for (l = searches; l; l = l->next)
+		gg_pubdir50_free(l->data);
 
 	for (l = children; l; l = l->next) {
 		struct process *p = l->data;

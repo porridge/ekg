@@ -17,6 +17,9 @@ zg³osi³ b³±d.
 - przekazywanie liczby nowych maili w zdarzeniu ,,newmail'' (sz)
 - sensowna lista kluczy publicznych (FIG/w)
 - wykrywanie p³ci w wynikach wyszukiwania (FIG/w)
+- libgadu: usuniêcie leaków w gg_pubdir50() (w)
+- libgadu: gg_pubdir50_add() zastêpuje pole, je¶li ju¿ istnieje (w)
+- dodanie /find --all (*/w)
 
 // 2003-02-02
 

@@ -185,6 +185,8 @@ list_t lasts;
 list_t conferences;
 list_t sms_away;
 list_t buffers;
+list_t searches;
+
 struct gg_session *sess;
 
 time_t last_save;
