@@ -3744,7 +3744,7 @@ COMMAND(cmd_at)
 			return -1;
 		}
 
-		if (!strncmp(params[2], "*/", 2) || (strncmp(params[1], "*/", 2) && params[2] && isdigit(params[2][0]))) {
+		if (!strncmp(params[2], "*/", 2) || isdigit(params[2][0])) {
 			a_name = params[1];
 
 			if (!strcmp(a_name, "(null)")) {
@@ -3765,60 +3765,20 @@ COMMAND(cmd_at)
 		} else
 			p = params[1];
 
-		/* podano czêstotliwo¶æ */
-		if (!strncmp(p, "*/", 2)) {
-			p += 2;
-			for (;;) {
-				time_t _period = 0;
-
-				if (isdigit(*p))
-					_period = atoi(p);
-				else {
-					printq("invalid_params", name);
-					return -1;
-				}
-
-				p += strlen(itoa(_period));
-
-				if (strlen(p)) {
-					switch (tolower(*p++)) {
-						case 'd':
-							_period *= 86400;
-							break;
-						case 'h':
-							_period *= 3600;
-							break;
-						case 'm':
-							_period *= 60;
-							break;
-						case 's':
-							break;
-						default:
-							printq("invalid_params", name);
-							return -1;
-					}
-				}
-
-				freq += _period;
-				
-				if (!*p)
-					break;
-			}
-
-			if (a_name)
-				p = params[3];
-			else
-				p = params[2];
-		}
-
 		{
 			struct tm *lt;
 			time_t now = time(NULL);
-			char *tmp, *foo = xstrdup(p);
+			char *tmp, *freq_str = NULL, *foo = xstrdup(p);
 			int wrong = 0;
 
 			lt = localtime(&now);
 			lt->tm_isdst = -1;
+
+			/* czêstotliwo¶æ */
+			if ((tmp = strchr(foo, '/'))) {
+				*tmp = 0;
+				freq_str = ++tmp;
+			}
 
 			/* wyci±gamy sekundy, je¶li s± i obcinamy */
 			if ((tmp = strchr(foo, '.')) && !(wrong = (strlen(tmp) != 3))) {
@@ -3835,7 +3795,7 @@ COMMAND(cmd_at)
 			}
 
 			/* jedziemy ... */
-			if (!wrong)
+			if (!wrong) {
 				switch (strlen(foo)) {
 					int ret;
 
@@ -3872,14 +3832,57 @@ COMMAND(cmd_at)
 					default:
 						wrong = 1;
 				}
-	
-			xfree(foo);
+			}
 
 			/* nie ma b³êdów ? */
 			if (wrong || lt->tm_hour > 23 || lt->tm_min > 59 || lt->tm_sec > 59 || lt->tm_mday > 31 || lt->tm_mon > 12) {
 				printq("invalid_params", name);
+				xfree(foo);
 				return -1;
 			}
+
+			if (freq_str) {
+				for (;;) {
+					time_t _period = 0;
+
+					if (isdigit(*freq_str))
+						_period = atoi(freq_str);
+					else {
+						printq("invalid_params", name);
+						xfree(foo);
+						return -1;
+					}
+
+					freq_str += strlen(itoa(_period));
+
+					if (strlen(freq_str)) {
+						switch (tolower(*freq_str++)) {
+							case 'd':
+								_period *= 86400;
+								break;
+							case 'h':
+								_period *= 3600;
+								break;
+							case 'm':
+								_period *= 60;
+								break;
+							case 's':
+								break;
+							default:
+								printq("invalid_params", name);
+								xfree(foo);
+								return -1;
+						}
+					}
+
+					freq += _period;
+					
+					if (!*freq_str)
+						break;
+				}
+			}
+
+			xfree(foo);
 
 			/* plany na przesz³o¶æ? */
 			if ((period = mktime(lt) - now) <= 0) {
@@ -3893,15 +3896,10 @@ COMMAND(cmd_at)
 			}
 		}
 
-		/* a wiêc gdzie jest komenda ? */
-		if (a_name && freq)
-			a_command = xstrdup(params[4]);
-		else {
-			if (!a_name && !freq)
-				a_command = array_join((char **) params + 2, " " );
-			else
-				a_command = array_join((char **) params + 3, " ");
-		}
+		if (a_name)
+			a_command = xstrdup(params[3]);
+		else
+			a_command = array_join((char **) params + 2, " ");
 
 		if ((t = timer_add(period, ((freq) ? 1 : 0), TIMER_COMMAND, 1, a_name, a_command))) {
 			printq("at_added", t->name);
@@ -4785,10 +4783,10 @@ void command_init()
 	  "wzglêdu na ustawienia zmiennych.");
 
 	command_add
-	( "at", "????c", cmd_at, 0,
+	( "at", "???c", cmd_at, 0,
 	  " [opcje]", "planuje wykonanie komend",
 	  "\n"
-	  "  -a, --add [nazwa] [*/czêst.] <czas> <komenda>  tworzy nowy plan\n"
+	  "  -a, --add [nazwa] <czas>[/czêst.] <komenda>  tworzy nowy plan\n"
 	  "  -d, --del <nazwa>|*                   usuwa plan\n"
 	  " [-l, --list] [nazwa]                   wy¶wietla listê planów\n"
 	  "\n"
