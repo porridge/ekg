@@ -1803,7 +1803,8 @@ COMMAND(cmd_msg)
 			continue;
 
 		if (!(uin = get_uin(*p))) {
-			print("user_not_found", *p);
+			if (valid_nick(*p))
+				print("user_not_found", *p);
 			continue;
 		}
 		

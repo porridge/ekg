@@ -608,18 +608,23 @@ static struct window *window_find(const char *target)
 	list_t l;
 	int status = ((target) ? !strcasecmp(target, "__status") : 0);
 	int current = ((target) ? !strcasecmp(target, "__current") : 0);
+	int debug = ((target) ? !strcasecmp(target, "__debug") : 0);
 
-	/* nie traktujemy nigdy okna debug jako aktualne, piszemy do statusowego */
-	if ((!target || current) && window_current->id)
-		return window_current;
-
-	if (current)
-		status = 1;
+	/* nie traktujemy debug jako aktualne - piszemy do statusowego */
+	if (!target || current) {
+		if (window_current->id)
+			return window_current;
+		else
+			status = 1;
+	}
 
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
 
-		if (status && w->id == 1)
+		if (!w->id && debug)
+			return w;
+
+		if (w->id == 1 && status)
 			return w;
 
 		if (w->target && !strcasecmp(target, w->target))
@@ -874,55 +879,55 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	char *lines, *lines_save, *line2;
 	string_t speech = NULL;
 
-	if (!strcmp(target, "__debug")) {
-		if (!window_find(target))
-			window_new("__debug", -1);
-	}
-
-	switch (config_make_window) {
-		case 1:
-			if ((w = window_find(target)))
-				break;
-
-			if (!separate)
-				w = windows->data;
-
-			for (l = windows; l; l = l->next) {
-				struct window *w = l->data;
-
-				if (separate && !w->target && w->id != 1) {
-					w->target = xstrdup(target);
-					xfree(w->prompt);
-					w->prompt = format_string(format_find("ncurses_prompt_query"), target);
-					w->prompt_len = strlen(w->prompt);
-					print("window_id_query_started", itoa(w->id), target);
-					print_window(target, 1, "query_started", target);
-					print_window(target, 1, "query_started_window", target);
+	if (target && !strcmp(target, "__debug")) {
+		if (!(w = window_find(target)))
+			w = window_new("__debug", -1);
+	} else {
+		switch (config_make_window) {
+			case 1:
+				if ((w = window_find(target)))
 					break;
-				}
-			}
 
-		case 2:
-			if (!(w = window_find(target))) {
 				if (!separate)
-					w = windows->data;
-				else {
-					w = window_new(target, 0);
-					print("window_id_query_started", itoa(w->id), target);
-					print_window(target, 1, "query_started", target);
-					print_window(target, 1, "query_started_window", target);
-				}
-			}
+					w = window_find("__status");
 
-			if (!config_display_crap && target && !strcmp(target, "__current"))
-				w = windows->data;
-			
-			break;
-			
-		default:
-			/* je¶li nie ma okna, rzuæ do statusowego. */
-			if (!(w = window_find(target)))
-				w = windows->data;
+				for (l = windows; l; l = l->next) {
+					struct window *w = l->data;
+
+					if (separate && !w->target && w->id != 1) {
+						w->target = xstrdup(target);
+						xfree(w->prompt);
+						w->prompt = format_string(format_find("ncurses_prompt_query"), target);
+						w->prompt_len = strlen(w->prompt);
+						print("window_id_query_started", itoa(w->id), target);
+						print_window(target, 1, "query_started", target);
+						print_window(target, 1, "query_started_window", target);
+						break;
+					}
+				}
+
+			case 2:
+				if (!(w = window_find(target))) {
+					if (!separate)
+						w = window_find("__status");
+					else {
+						w = window_new(target, 0);
+						print("window_id_query_started", itoa(w->id), target);
+						print_window(target, 1, "query_started", target);
+						print_window(target, 1, "query_started_window", target);
+					}
+				}
+
+				if (!config_display_crap && target && !strcmp(target, "__current"))
+					w = window_find("__status");
+				
+				break;
+				
+			default:
+				/* je¶li nie ma okna, rzuæ do statusowego. */
+				if (!(w = window_find(target)))
+					w = window_find("__status");
+		}
 	}
 
 	if (w != window_current && !w->floating) {
@@ -2740,7 +2745,7 @@ static void window_next()
 	}
 
 	if (!next)
-		next = windows->data;
+		next = window_find("__status");
 
 	window_switch(next->id);
 }
@@ -3153,13 +3158,15 @@ static int ui_ncurses_event(const char *event, ...)
 				for (l = windows; l; l = l->next) {
 					struct window *w = l->data;
 
-					if (w->target) {
-						if (!w->floating)	
-							print("window_list_query", itoa(w->id), w->target);
-						else
-							print("window_list_floating", itoa(w->id), itoa(w->left), itoa(w->top), itoa(w->width), itoa(w->height), w->target);
-					} else
-						print("window_list_nothing", itoa(w->id));
+					if (w->id) {
+						if (w->target) {
+							if (!w->floating)	
+								print("window_list_query", itoa(w->id), w->target);
+							else
+								print("window_list_floating", itoa(w->id), itoa(w->left), itoa(w->top), itoa(w->width), itoa(w->height), w->target);
+						} else
+							print("window_list_nothing", itoa(w->id));
+					}
 				}
 
 				goto cleanup;
