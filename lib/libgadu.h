@@ -199,7 +199,9 @@ enum {
 	GG_STATE_SENDING_ACK,		/* wysy³a potwierdzenie dcc */
 	GG_STATE_READING_ACK,		/* czeka na potwierdzenie dcc */
 	GG_STATE_READING_REQUEST,	/* czeka na komendê */
+	GG_STATE_SENDING_REQUEST,	/* wysy³a komendê */
 	GG_STATE_SENDING_FILE_INFO,	/* wysy³a informacje o pliku */
+	GG_STATE_READING_FILE_INFO,	/* czeka na informacje o pliku */
 	GG_STATE_READING_FILE_ACK,	/* czeka na potwierdzenie pliku */
 	GG_STATE_SENDING_FILE_HEADER,	/* wysy³a nag³ówek pliku */
 	GG_STATE_GETTING_FILE,		/* odbiera plik */

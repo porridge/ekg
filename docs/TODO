@@ -14,6 +14,7 @@ klient:
 - query,
 - obs³uga nicków ze spacjami,
 - zachowywanie wiadomo¶ci systemowej i nie powtarzanie jej.
+- proste rozpoznawanie p³ci.
 
 
 $Id$
