@@ -1308,7 +1308,7 @@ void theme_init()
 	format_add("bind_seq_list_empty", "%! Brak przypisanych akcji\n", 1);
 
 	/* at */
-	format_add("at_list", "%> %1, %2, %3 %K(%4)%n\n", 1);
+	format_add("at_list", "%> %1, %2, %3 %K(%4)%n %5\n", 1);
 	format_add("at_added", "%> Utworzono plan %T%1%n\n", 1);
 	format_add("at_deleted", "%> Usuniêto plan %T%1%n\n", 1);
 	format_add("at_deleted_all", "%> Usuniêto plany u¿ytkownika\n", 1);

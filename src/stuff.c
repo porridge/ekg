@@ -1207,19 +1207,34 @@ int config_read(const char *filename, const char *var)
 
 			if (array_count(pms) == 2) {
 				gg_debug(GG_DEBUG_MISC, "\tbind %s %s\n", pms[0], pms[1]);
-				/* XXX ui_event() nie zwraca wyniku, szkoda */
 				ui_event("command", 1, "bind", "--add", pms[0], pms[1], NULL);
 			}
 
 			array_free(pms);
-		} else if (!strcasecmp(buf, "timer") || !strcasecmp(buf, "at")) {
+		} else if (!strcasecmp(buf, "at")) {
+			char **p = array_make(foo, " \t", 2, 1, 0);
+
+			if (array_count(p) == 2) {
+				char *name = NULL, *tmp;
+
+				gg_debug(GG_DEBUG_MISC, "\tat %s %s\n", p[0], p[1]);
+
+				if (strcmp(p[0], "(null)"))
+					name = p[0];
+
+				tmp = saprintf("at -a %s %s", ((name) ? name : ""), p[1]);
+				ret = command_exec(NULL, tmp, 1);
+				xfree(tmp);
+			}
+
+			array_free(p);
+		} else if (!strcasecmp(buf, "timer")) {
 			char **p = array_make(foo, " \t", 3, 1, 0);
 			char *tmp = NULL, *period_str = NULL, *name = NULL;
 			time_t period;
-			int at = !strcasecmp(buf, "at");
 
 			if (array_count(p) == 3) {
-				gg_debug(GG_DEBUG_MISC, "\t%s %s %s %s\n", ((at) ? "at" : "timer"), p[0], p[1], p[2]);
+				gg_debug(GG_DEBUG_MISC, "\ttimer %s %s %s\n", p[0], p[1], p[2]);
 
 				if (strcmp(p[0], "(null)"))
 					name = p[0];
@@ -1227,21 +1242,13 @@ int config_read(const char *filename, const char *var)
 				if (!strncmp(p[1], "*/", 2)) {
 					period = atoi(p[1] + 2);
 					period_str = saprintf("*/%d", period);
-				} else
-					if (at)	 {
-						struct tm *t;
-
-						period = atoi(p[1]);
-						t = localtime(&period);
-						period_str = xmalloc(100);
-						strftime(period_str, 100, "%Y%m%d%H%M.%S", t);
-					} else {
-						period = atoi(p[1]) - time(NULL);
-						period_str = saprintf("%d", period);
-					}
+				} else {
+					period = atoi(p[1]) - time(NULL);
+					period_str = saprintf("%d", period);
+				}
 		
 				if (period > 0) {
-					tmp = saprintf("%s --add %s %s %s", (at) ? "at" : "timer", (name) ? name : "", period_str, p[2]);
+					tmp = saprintf("timer --add %s %s %s", (name) ? name : "", period_str, p[2]);
 					ret = command_exec(NULL, tmp, 1);
 					xfree(tmp);
 				}
@@ -1254,7 +1261,6 @@ int config_read(const char *filename, const char *var)
 
 			if (ret)
 				gg_debug(GG_DEBUG_MISC, "\tunknown variable %s\n", buf);
-
 		}
 
 		if (!ret)
@@ -1432,17 +1438,28 @@ void config_write_main(FILE *f, int base64)
 		if (t->type != TIMER_COMMAND)
 			continue;
 
-		if (!t->persistent && t->ends.tv_sec - time(NULL) < 5)	/* nie ma sensu zapisywaæ */
+		/* nie ma sensu zapisywaæ */
+		if (!t->persistent && t->ends.tv_sec - time(NULL) < 5)
 			continue;
 
+		/* posortuje, je¶li nie ma nazwy */
 		if (t->name && !isdigit(t->name[0]))
 			name = t->name;
 		else
 			name = "(null)";
 
-		if (t->at)
-			fprintf(f, "at %s %s %s\n", name, itoa(t->ends.tv_sec), t->command);
-		else {
+		if (t->at) {
+			char buf[100];
+			time_t foo = (time_t) t->ends.tv_sec;
+			struct tm *tt = localtime(&foo);
+
+			strftime(buf, sizeof(buf), "%G%m%d%H%M.%S", tt);
+
+			if (t->persistent)
+				fprintf(f, "at %s */%s %s %s\n", name, itoa(t->period), buf, t->command);
+			else
+				fprintf(f, "at %s %s %s\n", name, buf, t->command);
+		} else {
 			char *foo;
 
 			if (t->persistent)
@@ -2382,7 +2399,7 @@ int event_check(int event, uin_t uin, const char *data)
 		*q = 0;
 	}
 
-	actions = array_make(action, ";", 0, 0, 0);
+	actions = array_make(action, ";", 0, 0, 1);
 
 	for (i = 0; actions && actions[i]; i++) {	
 		char *tmp = format_string(actions[i], uin_number, uin_display, ((data) ? data : ""), ((edata) ? edata : ""));

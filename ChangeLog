@@ -10,6 +10,8 @@ zg³osi³ b³±d.
 
 - skrypt autorun/__init__.py nie jest ³adowany (rmrmg/w)
 - poprawka segfaulta przy ,,python unload'' bez parametrów (rmrmg/w)
+- ma³a reorganizacja komend /timer i /at. ta ostatnio potrafi ju¿ 
+  ,,na sta³e'' planowaæ komendy (sz)
 
 // 2003-02-11
 
