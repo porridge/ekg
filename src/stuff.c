@@ -931,7 +931,7 @@ void do_reconnect()
  */
 int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const char *msg, const char *raw_msg)
 {
-	struct queue m;
+	struct msg_queue m;
 
 	if (*uins == config_uin)	/* nie dostaniemy potwierdzenia, je¶li wy¶lemy wiadomo¶æ do siebie */
 		return 1;
@@ -962,7 +962,7 @@ int msg_queue_remove(int msg_seq)
 	list_t l;
 
 	for (l = msg_queue; l; l = l->next) {
-		struct queue *m = l->data;
+		struct msg_queue *m = l->data;
 
 		if (m->msg_seq == msg_seq) {
 			xfree(m->uins);
@@ -994,7 +994,7 @@ int msg_queue_remove_uin(uin_t uin)
 	int x = 0;
 
 	for (l = msg_queue; l; l = l->next) {
-		struct queue *m = l->data;
+		struct msg_queue *m = l->data;
 
 		if (*(m->uins) == uin) {	/* XXX konferencje */
 			xfree(m->uins);
@@ -1019,7 +1019,7 @@ void msg_queue_destroy()
 	list_t l;
 
 	for (l = msg_queue; l; l = l->next) {
-		struct queue *m = l->data;
+		struct msg_queue *m = l->data;
 
 		xfree(m->uins);
 		xfree(m->msg);
@@ -1046,7 +1046,7 @@ int msg_queue_flush()
 		return 2;
 
 	for (; l; l = l->next) {
-		struct queue *m = l->data;
+		struct msg_queue *m = l->data;
 		int new_msg_seq;
 
 		if (m->uin_count == 1)
@@ -1087,7 +1087,7 @@ int msg_queue_count_uin(uin_t uin)
 	int count = 0;
 
 	for (l = msg_queue; l; l = l->next) {
-		struct queue *m = l->data;
+		struct msg_queue *m = l->data;
 
 		if (*(m->uins) == uin)	/* XXX konferencje */
 			count++;

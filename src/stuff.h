@@ -126,7 +126,7 @@ struct gg_exec {
 	string_t buf;	/* bufor na stdout procesu */
 };
 
-struct queue {
+struct msg_queue {
 	int msg_class;
 	int msg_seq;
 	int uin_count;

@@ -2919,7 +2919,7 @@ COMMAND(cmd_queue)
 	}
 
         for (l = msg_queue; l; l = l->next) {
-                struct queue *m = l->data;
+                struct msg_queue *m = l->data;
 		struct tm *tm;
 		char buf[100];
 
