@@ -123,7 +123,7 @@ char *my_readline()
 	prompt = (!away) ? readline_prompt : readline_prompt_away;
 
 	if (no_prompt || !prompt)
-		prompt = NULL;
+		prompt = "";
 
         in_readline = 1;
         res = readline(prompt);
