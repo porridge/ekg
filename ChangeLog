@@ -8,7 +8,11 @@ zg³osi³ b³±d.
 
 // 2003-01-02
 
-- czyszczenie stanow ludzi z listy kontaktow po timeout'cie (pmb/sz)
+- czyszczenie stanów ludzi z listy kontaktów po timeout'cie (pmb/sz)
+- zmienna ,,display_pl_chars'' pozwalaj±ca maskowaæ polskie literki
+  dla tych, którym nie chce siê (nie mog±) skonfigurowaæ terminala (sz)
+- je¶li komu¶ siê nudzi i nadaje ludziom aliasy w postaci liczb, to
+  nie powinien ju¿ mieæ z tym problemów ;> (sz)
 
 // 2002-12-31
 

@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@o2.pl>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
@@ -101,6 +101,7 @@ int config_beep = 1;
 int config_beep_msg = 1;
 int config_beep_chat = 1;
 int config_beep_notify = 1;
+int config_display_pl_chars = 1;
 int config_beep_mail = 1;
 char *config_sound_msg_file = NULL;
 char *config_sound_chat_file = NULL;
@@ -885,6 +886,38 @@ void iso_to_cp(unsigned char *buf)
 }
 
 /*
+ * hide_pl()
+ *
+ * maskuje polsk± literkê w iso.
+ *
+ * - c.
+ */
+unsigned char hide_pl(const unsigned char *c)
+{
+	if (*c == (unsigned char)'±') return 'a';
+	if (*c == (unsigned char)'ê') return 'e';
+	if (*c == (unsigned char)'æ') return 'c';
+	if (*c == (unsigned char)'³') return 'l';
+	if (*c == (unsigned char)'ñ') return 'n';
+	if (*c == (unsigned char)'ó') return 'o';
+	if (*c == (unsigned char)'¶') return 's';
+	if (*c == (unsigned char)'¿') return 'z';
+	if (*c == (unsigned char)'¼') return 'z';
+
+	if (*c == (unsigned char)'¡') return 'A';
+	if (*c == (unsigned char)'Ê') return 'E';
+	if (*c == (unsigned char)'Æ') return 'C';
+	if (*c == (unsigned char)'£') return 'L';
+	if (*c == (unsigned char)'Ñ') return 'N';
+	if (*c == (unsigned char)'Ó') return 'O';
+	if (*c == (unsigned char)'¦') return 'S';
+	if (*c == (unsigned char)'¯') return 'Z';
+	if (*c == (unsigned char)'¬') return 'Z';
+
+	return *c;
+}
+
+/*
  * strip_spaces()
  *
  * pozbywa siê spacji na pocz±tku i koñcu ³añcucha.
@@ -1530,18 +1563,21 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 	for (p = nicks, i = 0; *p; p++) {
 		uin_t uin;
+		struct userlist *u;
 
 		if (!strcmp(*p, ""))
 		        continue;
 
-		if (!(uin = get_uin(*p))) {
+		uin = get_uin(*p);
+
+		if (!(u = userlist_find(uin, *p))) {
 			if (!quiet)
 			        print("user_not_found", *p);
 			continue;
 		}
 
 
-		list_add(&(c.recipients), &uin, sizeof(uin));
+		list_add(&(c.recipients), &(u->uin), sizeof(u->uin));
 		i++;
 	}
 
@@ -1622,9 +1658,9 @@ int conference_remove(const char *name)
 /*
  * conference_create()
  *
- * Tworzy nowa konferencje z wygenerowana nazwa.
+ * tworzy nowa konferencje z wygenerowana nazwa.
  *
- * - nicksstr - lista nikow tak jak dla polecenia conference.
+ * - nicks - lista nikow tak, jak dla polecenia conference.
  */
 struct conference *conference_create(const char *nicks)
 {
@@ -1794,7 +1830,7 @@ int alias_remove(const char *name)
 /*
  * alias_check()
  *
- * sprawdza czy komenda w foo jest aliasem, je¶li tak - zwraca listê
+ * sprawdza czy komenda w line jest aliasem, je¶li tak - zwraca listê
  * komend, innaczej NULL.
  *
  *  - line - linia z komend±.

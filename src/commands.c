@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *                          Wojciech Bojdo³ <wojboj@htc.net.pl>
@@ -728,7 +728,9 @@ COMMAND(cmd_modify)
 		return;
 	}
 
-	if (!(uin = get_uin(params[0])) || !(u = userlist_find(uin, NULL))) {
+	uin = get_uin(params[0]);
+
+	if (!(u = userlist_find(uin, params[0]))) {
 		print("user_not_found", params[0]);
 		return;
 	}
@@ -782,7 +784,7 @@ COMMAND(cmd_modify)
 							group_remove(u, tmp[x] + 1 + off);
 							modified = 1;
 						} else {
-							print("group_member_not_yet", format_user(uin), tmp[x] + 1);
+							print("group_member_not_yet", format_user(u->uin), tmp[x] + 1);
 							if (!modified)
 								modified = -1;
 						}
@@ -794,7 +796,7 @@ COMMAND(cmd_modify)
 							group_add(u, tmp[x] + 1 + off);
 							modified = 1;
 						} else {
-							print("group_member_already", format_user(uin), tmp[x] + 1);
+							print("group_member_already", format_user(u->uin), tmp[x] + 1);
 							if (!modified)
 								modified = -1;
 						}
@@ -806,7 +808,7 @@ COMMAND(cmd_modify)
 							group_add(u, tmp[x] + off);
 							modified = 1;
 						} else {
-							print("group_member_already", format_user(uin), tmp[x]);
+							print("group_member_already", format_user(u->uin), tmp[x]);
 							if (!modified)
 								modified = -1;
 						}
@@ -935,6 +937,7 @@ COMMAND(cmd_ignore)
 {
 	uin_t uin;
 	char *tmp;
+	struct userlist *u = NULL;
 
 	if (*name == 'i' || *name == 'I') {
 		if (!params[0]) {
@@ -965,13 +968,15 @@ COMMAND(cmd_ignore)
 			xfree(tmp);
 			return;
 		}
-		
-		if (!(uin = get_uin(params[0]))) {
+
+		uin = get_uin(params[0]);	
+
+		if (!(u = userlist_find(uin, params[0]))) {
 			print("user_not_found", params[0]);
 			return;
 		}
 		
-		if (!ignored_add(uin, IGNORE_ALL)) {
+		if (!ignored_add(u->uin, IGNORE_ALL)) {
 			print("ignored_added", params[0]);
 			config_changed = 1;
 		} else
@@ -990,16 +995,18 @@ COMMAND(cmd_ignore)
 			return;
 		}
 		
-		if (!(uin = get_uin(params[0]))) {
+		uin = get_uin(params[0]);
+
+		if (!(u = userlist_find(uin, params[0]))) {
 			print("user_not_found", params[0]);
 			return;
 		}
 		
-		if (!ignored_remove(uin)) {
-			print("ignored_deleted", format_user(uin));
+		if (!ignored_remove(u->uin)) {
+			print("ignored_deleted", format_user(u->uin));
 			config_changed = 1;
 		} else
-			print("error_not_ignored", format_user(uin));
+			print("error_not_ignored", format_user(u->uin));
 	
 	}
 }
@@ -1007,6 +1014,7 @@ COMMAND(cmd_ignore)
 COMMAND(cmd_block)
 {
 	uin_t uin;
+	struct userlist *u = NULL;
 
 	if (*name == 'b' || *name == 'B') {
 		if (!params[0]) {
@@ -1030,12 +1038,14 @@ COMMAND(cmd_block)
 			return;
 		}
 
-		if (!(uin = get_uin(params[0]))) {
+		uin = get_uin(params[0]);
+
+		if (!(u = userlist_find(uin, params[0]))) {
 			print("user_not_found", params[0]);
 			return;
 		}
 		
-		blocked_add(uin);
+		blocked_add(u->uin);
 		print("blocked_added", params[0]);
 		config_changed = 1;
 	} else {
@@ -1044,16 +1054,18 @@ COMMAND(cmd_block)
 			return;
 		}
 
-		if (!(uin = get_uin(params[0]))) {
+		uin = get_uin(params[0]);
+
+		if (!(u = userlist_find(uin, params[0]))) {
 			print("user_not_found", params[0]);
 			return;
 		}
 		
-		if (!blocked_remove(uin)) {
-			print("blocked_deleted", format_user(uin));
+		if (!blocked_remove(u->uin)) {
+			print("blocked_deleted", format_user(u->uin));
 			config_changed = 1;
 		} else
-			print("error_not_blocked", format_user(uin));
+			print("error_not_blocked", format_user(u->uin));
 	
 	}
 }
@@ -1096,7 +1108,9 @@ COMMAND(cmd_list)
 			return;
 		}
 
-		if (!(uin = get_uin(params[0])) || !(u = userlist_find(uin, NULL))) {
+		uin = get_uin(params[0]);
+
+		if (!(u = userlist_find(uin, params[0]))) {
 			print("user_not_found", params[0]);
 			return;
 		}
@@ -1761,13 +1775,16 @@ COMMAND(cmd_sms)
 {
 	struct userlist *u;
 	const char *number = NULL;
+	uin_t uin;
 
 	if (!params[1]) {
 		print("not_enough_params", name);
 		return;
 	}
 
-	if ((u = userlist_find(0, params[0]))) {
+	uin = get_uin(params[0]);
+
+	if ((u = userlist_find(uin, params[0]))) {
 		if (!u->mobile || !strcmp(u->mobile, "")) {
 			print("sms_unknown", format_user(u->uin));
 			return;
@@ -1913,8 +1930,10 @@ COMMAND(cmd_dcc)
 			print("not_enough_params", name);
 			return;
 		}
-		
-		if (!(uin = get_uin(params[1])) || !(u = userlist_find(uin, NULL))) {
+
+		uin = get_uin(params[1]);	
+
+		if (!(u = userlist_find(uin, params[1]))) {
 			print("user_not_found", params[1]);
 			return;
 		}
@@ -2031,7 +2050,9 @@ COMMAND(cmd_dcc)
 #endif
 		/* je¶li nie by³o, to próbujemy sami zainicjowaæ */
 
-		if (!(uin = get_uin(params[1])) || !(u = userlist_find(uin, NULL))) {
+		uin = get_uin(params[1]);
+
+		if (!(u = userlist_find(uin, params[1]))) {
 			print("user_not_found", params[1]);
 			return;
 		}

@@ -253,6 +253,13 @@ display_notify
 	1 powoduje wy¶wietlanie wszystkich zmian, warto¶æ 2 wy¶wietla
 	tylko zmiany z niedostêpnego na dostêpny i na odwrót.
 
+display_pl_chars
+	typ: liczba
+	domy¶lna warto¶æ: 1
+
+	je¶li w³±czone, wy¶wietlne s± polskie literki na terminalu. w przeciwnym
+	wypadku, zamieniane s± na odpowiadaj±ce im literki ASCII.
+
 display_sent
 	typ: bool
 	domy¶lna warto¶æ: 0

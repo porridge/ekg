@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@go2.pl>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
@@ -178,6 +178,7 @@ int config_display_color;
 char *config_display_color_map;
 int config_display_crap;
 int config_display_notify;
+int config_display_pl_chars;
 int config_display_sent;
 int config_display_welcome;
 char *config_email;
@@ -290,6 +291,7 @@ int sysmsg_write();
 
 void cp_to_iso(unsigned char *buf);
 void iso_to_cp(unsigned char *buf);
+unsigned char hide_pl(const unsigned char *c);
 char *strip_spaces(char *line);
 
 int alias_add(const char *string, int quiet, int append);

@@ -340,7 +340,7 @@ char *va_format_string(const char *format, va_list ap)
 			}
 
 			if (*p >= '1' && *p <= '9') {
-				char *str = (char*) args[*p - '1'];
+				char *str = (char *) args[*p - '1'];
 				int i, len;
 
 				if (!str)
@@ -360,7 +360,14 @@ char *va_format_string(const char *format, va_list ap)
 					for (i = 0; i < fill_length; i++)
 						string_append_c(buf, fill_char);
 
-				string_append_n(buf, str, len);
+				if (config_display_pl_chars)
+					string_append_n(buf, str, len);
+				else {
+					int i;
+
+					for (i = 0; i < len; i++)
+						string_append_c(buf, hide_pl(&str[i]));
+				}
 
 				if (fill_after) 
 					for (i = 0; i < fill_length; i++)
@@ -368,7 +375,10 @@ char *va_format_string(const char *format, va_list ap)
 
 			}
 		} else
-			string_append_c(buf, *p);
+			if (config_display_pl_chars)
+				string_append_c(buf, *p);
+			else
+				string_append_c(buf, hide_pl(p));
 
 		p++;
 	}
