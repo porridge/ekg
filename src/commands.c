@@ -794,6 +794,12 @@ COMMAND(cmd_change)
 	if (!r->city)
 		r->city = xstrdup("");
 
+	iso_to_cp(r->first_name);
+	iso_to_cp(r->last_name);
+	iso_to_cp(r->nickname);
+	iso_to_cp(r->email);
+	iso_to_cp(r->city);
+
 	if ((h = gg_change_info(config_uin, config_password, r, 1)))
 		list_add(&watches, h, 0);
 
@@ -1417,9 +1423,9 @@ COMMAND(cmd_list)
 		}
 
 		if (match_arg(params[0], 'c', "clear", 2))
-			h->user_data = (char *) 2;
+			h->user_data = (char *) 2;	/* --clear */
 		else
-			h->user_data = (char *) 3;
+			h->user_data = (char *) 3;	/* --clear-config */
 		
 		xfree(contacts);
 		

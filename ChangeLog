@@ -18,6 +18,7 @@ zg³osi³ b³±d.
 - kosmetyka (sz)
 - poprawki zwi±zane z strncpy() i strncat() (sz)
 - poprawka kodowania argumentów /find (zuko_wski/w)
+- j.w. dla /change (sz)
 - nowe formaty /list (w)
 
 // 2003-01-22
