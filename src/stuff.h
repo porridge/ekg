@@ -431,6 +431,7 @@ void update_status();
 void update_status_myip();
 void change_status(int status, const char *arg, int autom);
 const char *ekg_status_label(int status, const char *prefix);
+int ekg_hide_descr_status(int status);
 
 /* funkcje poza stuff.c */
 void ekg_wait_for_key();

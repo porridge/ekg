@@ -1275,19 +1275,23 @@ COMMAND(cmd_ignore)
 	uin_t uin = 0;
 
 	if (*name == 'i' || *name == 'I') {
+		const char *user;
+		int flags;
+
 		if (!params[0]) {
 			list_t l;
 			int i = 0;
 
 			for (l = userlist; l; l = l->next) {
 				struct userlist *u = l->data;
+				int level;
 
-				if (!ignored_check(u->uin))
+				if (!(level = ignored_check(u->uin)))
 					continue;
 
 				i = 1;
 
-				printq("ignored_list", format_user(u->uin));
+				printq("ignored_list", format_user(u->uin), ignore_format(level));
 			}
 
 			if (!i)
@@ -1305,19 +1309,36 @@ COMMAND(cmd_ignore)
 			return res;
 		}
 
-		if (!(uin = get_uin(params[0]))) {
-			printq("user_not_found", params[0]);
+		if (params[1]) {
+			user = params[1];
+			flags = ignore_flags(params[0]);
+
+			if (!flags) {
+				printq("invalid_params", name);
+				return -1;
+			}
+
+		} else {
+			user = params[0];
+			flags = IGNORE_ALL;
+		}
+
+		if (!(uin = get_uin(user))) {
+			printq("user_not_found", user);
 			return -1;
 		}
-		
-		if (!ignored_add(uin, IGNORE_ALL)) {
-			printq("ignored_added", params[0]);
-			userlist_clear_status(uin);
+
+		if (!ignored_add(uin, flags)) {
+			printq("ignored_added", format_user(uin));
 			config_changed = 1;
+		} else {
+			printq("ignored_exist", format_user(uin));
+			return -1;
 		}
 
 	} else {
 		int unignore_all = ((params[0] && !strcmp(params[0], "*")) ? 1 : 0);
+		int level;
 
 		if (!params[0]) {
 			printq("not_enough_params", name);
@@ -1350,10 +1371,7 @@ COMMAND(cmd_ignore)
 				if (!ignored_remove(u->uin))
 					x = 1;
 
-				if (sess) {
-					gg_remove_notify(sess, uin);
-					gg_add_notify(sess, uin);
-				}
+				level = ignored_check(u->uin);
 
 				if (uin == config_uin)
 					update_status();
@@ -1369,14 +1387,11 @@ COMMAND(cmd_ignore)
 			
 			return 0;
 		}
+
+		level = ignored_check(uin);
 		
 		if (!ignored_remove(uin)) {
 			printq("ignored_deleted", format_user(uin));
-
-			if (sess) {
-				gg_remove_notify(sess, uin);
-				gg_add_notify(sess, uin);
-			}
 
 			if (uin == config_uin)
 				update_status();
@@ -1424,7 +1439,7 @@ COMMAND(cmd_block)
 		}
 		
 		blocked_add(uin);
-		printq("blocked_added", params[0]);
+		printq("blocked_added", format_user(uin));
 		config_changed = 1;
 	} else {
 		int unblock_all = ((params[0] && !strcmp(params[0], "*")) ? 1 : 0);
@@ -3347,7 +3362,7 @@ COMMAND(cmd_on)
 		}
 
 		if (!(flags = event_flags(params[1]))) {
-			printq("events_incorrect");
+			printq("invalid_params", name);
 			return -1;
 		}
 
@@ -4705,11 +4720,18 @@ void command_init()
 	  "");
 	 
 	command_add
-	( "ignore", "u", cmd_ignore, 0,
-	  " [numer/alias]", "dodaje do listy ignorowanych",
+	( "ignore", "uu", cmd_ignore, 0,
+	  " [poziom] [numer/alias]", "dodaje do listy ignorowanych",
 	  "\n"
-	  "W przysz³o¶ci bêdzie mo¿liwe wybranie zdarzeñ zwi±zanych z dan± "
-	  "osob±, takich jak wiadomo¶ci, zmiana stanu, zmiana opisu itp.");
+	  "Dostêpne poziomy ignorowania:\n"
+	  "  - status - ca³kowicie ignoruje stan\n"
+	  "  - descr - ignoruje tylko opisy\n"
+	  "  - msg - ignoruje wiadomo¶ci\n"
+	  "  - dcc - ignoruje po³±czenia DCC\n"
+	  "  - events - ignoruje zdarzenia zwi±zane z u¿ytkownikiem\n"
+	  "  - * - wszystkie poziomy\n"
+	  "\n"
+	  "Poziomy mo¿na ³±czyæ ze sob± za pomoc± przecinka lub ,,|''.");
 	  
 	command_add
 	( "invisible", "?", cmd_away, 0,

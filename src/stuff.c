@@ -192,7 +192,7 @@ char *last_search_last_name = NULL;
 char *last_search_nickname = NULL;
 uin_t last_search_uin = 0;
 
-struct event_label event_labels[] = {
+struct event_label event_labels[EVENT_LABELS_MAX] = {
 	{ EVENT_MSG, "msg" },
 	{ EVENT_CHAT, "chat" },
 	{ EVENT_AVAIL, "avail" },
@@ -1177,7 +1177,7 @@ int config_read(const char *filename, const char *var)
                         int flags;
                         char **pms = array_make(foo, " \t", 3, 1, 0);
 
-                        if (pms && pms[0] && pms[1] && pms[2] && (flags = event_flags(pms[0]))) {
+                        if (array_count(pms) == 3 && (flags = event_flags(pms[0]))) {
 				gg_debug(GG_DEBUG_MISC, "\ton %s %s %s\n", pms[0], pms[1], pms[2]);
                                 ret = event_add(flags, pms[1], pms[2], 1);
 			}
@@ -1186,7 +1186,7 @@ int config_read(const char *filename, const char *var)
 		} else if (!strcasecmp(buf, "bind")) {
 			char **pms = array_make(foo, " \t", 2, 1, 0);
 
-			if (pms && pms[0] && pms[1]) {
+			if (array_count(pms) == 2) {
 				gg_debug(GG_DEBUG_MISC, "\tbind %s %s\n", pms[0], pms[1]);
 				/* XXX ui_event() nie zwraca wyniku, szkoda */
 				ui_event("command", 1, "bind", "--add", pms[0], pms[1], NULL);
@@ -1199,7 +1199,7 @@ int config_read(const char *filename, const char *var)
 			time_t period;
 			int at = !strcasecmp(buf, "at");
 
-			if (p && p[0] && p[1] && p[2]) {
+			if (array_count(p) == 3) {
 				gg_debug(GG_DEBUG_MISC, "\t%s %s %s %s\n", ((at) ? "at" : "timer"), p[0], p[1], p[2]);
 
 				if (strcmp(p[0], "(null)"))
@@ -2263,14 +2263,17 @@ int event_flags(const char *events)
 	int i, j, flags = 0;
 	char **a;
 
-	if (!(a = array_make(events, "|,:", 0, 1, 0)))
-		return 0;
+	if (!events)
+		return flags;
+
+	a = array_make(events, "|,:", 0, 1, 0);
 
 	for (j = 0; a[j]; j++) {
 		if (!strcmp(a[j], "*")) {
 			flags = EVENT_ALL;
 			break;
 		}
+
 		for (i = 0; event_labels[i].name; i++)
 			if (!strcasecmp(a[j], event_labels[i].name))
 				flags |= event_labels[i].event;
@@ -4063,6 +4066,34 @@ const char *ekg_status_label(int status, const char *prefix)
 	snprintf(buf, sizeof(buf), "%s%s", (prefix) ? prefix : "", label);
 
 	return buf;
+}
+
+/*
+ * ekg_hide_descr_status()
+ *
+ * je¶li dany status jest opisowy, zwraca
+ * taki sam status bez opisu.
+ */
+int ekg_hide_descr_status(int status)
+{
+	int ret = status;
+
+	switch (status) {
+		case GG_STATUS_AVAIL_DESCR:
+			ret = GG_STATUS_AVAIL;
+			break;
+		case GG_STATUS_BUSY_DESCR:
+			ret = GG_STATUS_BUSY;
+			break;
+		case GG_STATUS_INVISIBLE_DESCR:
+			ret = GG_STATUS_INVISIBLE;
+			break;
+		case GG_STATUS_NOT_AVAIL_DESCR:
+			ret = GG_STATUS_NOT_AVAIL;
+			break;
+	}
+
+	return ret;
 }
 
 struct color_map default_color_map[26] = {

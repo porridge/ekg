@@ -49,7 +49,7 @@ struct group {
 	char *name;
 };
 
-enum ignored_level_t {
+enum ignore_t {
 	IGNORE_STATUS = 1,
 	IGNORE_STATUS_DESCR = 2,
 	IGNORE_MSG = 4,
@@ -57,6 +57,14 @@ enum ignored_level_t {
 	IGNORE_EVENTS = 16,
 	
 	IGNORE_ALL = 255
+};
+
+#define	IGNORE_LABELS_MAX 6
+struct ignore_label ignore_labels[IGNORE_LABELS_MAX];
+
+struct ignore_label {
+	int level;
+	char *name;
 };
 
 list_t userlist;
@@ -82,6 +90,9 @@ char userlist_type(struct userlist *u);
 int ignored_add(uin_t uin, int level);
 int ignored_remove(uin_t uin);
 int ignored_check(uin_t uin);
+
+int ignore_flags(const char *str);
+const char *ignore_format(int level);
 
 int blocked_add(uin_t uin);
 int blocked_remove(uin_t uin);

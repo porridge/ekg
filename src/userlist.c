@@ -45,6 +45,15 @@
 
 list_t userlist = NULL;
 
+struct ignore_label ignore_labels[IGNORE_LABELS_MAX] = {
+	{ IGNORE_STATUS, "status" },
+	{ IGNORE_STATUS_DESCR, "descr" },
+	{ IGNORE_MSG, "msg" },
+	{ IGNORE_DCC, "dcc" },
+	{ IGNORE_EVENTS, "events" },
+	{ 0, NULL }
+};
+
 /*
  * userlist_compare()
  *
@@ -104,7 +113,7 @@ int userlist_read()
 		}
 
 		for (i = 0; i < 6; i++) {
-			if (entry[i] && (!strcmp(entry[i], "(null)") || !strcmp(entry[i], ""))) {
+			if (!strcmp(entry[i], "(null)") || !strcmp(entry[i], "")) {
 				xfree(entry[i]);
 				entry[i] = NULL;
 			}
@@ -143,6 +152,9 @@ int userlist_set(const char *contacts, int config)
 {
 	string_t vars = NULL;
 	char *buf, *cont, *contsave;
+
+	if (!contacts)
+		return -1;
 
 	userlist_clear();
 
@@ -231,12 +243,9 @@ int userlist_set(const char *contacts, int config)
  */
 char *userlist_dump()
 {
-	string_t s;
+	string_t s = string_init(NULL);
 	list_t l;
 
-	if (!(s = string_init(NULL)))
-		return NULL;
-	
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
 		char *groups, *line;
@@ -597,11 +606,12 @@ int ignored_remove(uin_t uin)
 {
 	struct userlist *u = userlist_find(uin, NULL);
 	list_t l;
+	int level;
 
 	if (!u)
 		return -1;
 
-	if (!ignored_check(uin))
+	if (!(level = ignored_check(uin)))
 		return -1;
 
 	for (l = u->groups; l; ) {
@@ -609,7 +619,7 @@ int ignored_remove(uin_t uin)
 
 		l = l->next;
 
-		if (!g || !g->name || strncasecmp(g->name, "__ignored", 9))
+		if (strncasecmp(g->name, "__ignored", 9))
 			continue;
 
 		xfree(g->name);
@@ -618,6 +628,11 @@ int ignored_remove(uin_t uin)
 
 	if (!u->display && !u->groups)
 		userlist_remove(u);
+
+	if (sess && (level & IGNORE_STATUS || level & IGNORE_STATUS_DESCR)) {
+		gg_remove_notify_ex(sess, u->uin, userlist_type(u));
+		gg_add_notify_ex(sess, u->uin, userlist_type(u));
+	}
 
 	return 0;
 }
@@ -644,6 +659,12 @@ int ignored_add(uin_t uin, int level)
 	tmp = saprintf("__ignored_%d", level);
 	group_add(u, tmp);
 	xfree(tmp);
+
+	if (level & IGNORE_STATUS)
+		u->status = GG_STATUS_NOT_AVAIL;
+
+	if (level & IGNORE_STATUS_DESCR)
+		u->status = ekg_hide_descr_status(u->status);
 	
 	return 0;
 }
@@ -666,9 +687,6 @@ int ignored_check(uin_t uin)
 	for (l = u->groups; l; l = l->next) {
 		struct group *g = l->data;
 
-		if (!g->name)
-			continue;
-
 		if (!strcasecmp(g->name, "__ignored"))
 			return IGNORE_ALL;
 
@@ -677,6 +695,67 @@ int ignored_check(uin_t uin)
 	}
 
 	return 0;
+}
+
+/*
+ * ignore_flags()
+ *
+ * zamienia ³añcuch znaków na odpowiedni
+ * poziom ignorowania w postaci liczby.
+ */
+int ignore_flags(const char *str)
+{
+	int x, y, ret = 0;
+	char **arr;
+
+	if (!str)
+		return ret;
+
+	arr = array_make(str, "|,:", 0, 1, 0);
+
+	for (x = 0; arr[x]; x++) {
+		if (!strcmp(arr[x], "*")) {
+			ret = IGNORE_ALL;
+			break;
+		}
+
+		for (y = 0; ignore_labels[y].name; y++)
+			if (!strcasecmp(arr[x], ignore_labels[y].name))
+				ret |= ignore_labels[y].level;
+	}
+
+	array_free(arr);
+
+	return ret;
+}
+
+/*
+ * ignore_format()
+ *
+ * zwraca statyczny ³añcuch znaków reprezentuj±cy
+ * dany poziom ignorowania.
+ */
+const char *ignore_format(int level)
+{
+	static char buf[200];
+	int i, comma = 0;
+
+	buf[0] = 0;
+
+	if (level == IGNORE_ALL)
+		return "*";
+
+	for (i = 0; ignore_labels[i].name; i++) {
+		if (level & ignore_labels[i].level) {
+			strncat(buf, ignore_labels[i].name, sizeof(buf) - 1 - strlen(buf));
+			buf[sizeof(buf) - 1] = 0;
+
+			if (comma++)
+				strncat(buf, ",", sizeof(buf) - 1 - strlen(buf));
+		}
+	}
+
+	return buf;
 }
 
 /*
@@ -704,7 +783,7 @@ int blocked_remove(uin_t uin)
 
 		l = l->next;
 
-		if (!g || !g->name || strcasecmp(g->name, "__blocked"))
+		if (strcasecmp(g->name, "__blocked"))
 			continue;
 
 		xfree(g->name);
@@ -807,6 +886,9 @@ int group_add(struct userlist *u, const char *group)
 	struct group g;
 	list_t l;
 
+	if (!u || !group)
+		return -1;
+
 	for (l = u->groups; l; l = l->next) {
 		struct group *g = l->data;
 
@@ -840,9 +922,6 @@ int group_remove(struct userlist *u, const char *group)
 	
 	for (l = u->groups; l; l = l->next) {
 		struct group *g = l->data;
-
-		if (!g || !g->name)
-			continue;
 
 		if (!strcasecmp(g->name, group)) {
 			xfree(g->name);
@@ -925,19 +1004,13 @@ list_t group_init(const char *names)
  */
 char *group_to_string(list_t groups, int meta, int sep)
 {
-	string_t foo;
+	string_t foo = string_init(NULL);
 	list_t l;
 	int comma = 0;
-
-	if (!(foo = string_init(NULL)))
-		return NULL;
 
 	for (l = groups; l; l = l->next) {
 		struct group *g = l->data;
 
-		if (!g || !g->name)
-			continue;
-		
 		if (!meta && !strncmp(g->name, "__", 2)) {
 			comma = 0;
 			continue;

@@ -912,7 +912,8 @@ void theme_init()
 	format_add("ignored_added", "%> Dodano %T%1%n do listy ignorowanych\n", 1);
 	format_add("ignored_deleted", "%> Usuniêto %1 z listy ignorowanych\n", 1);
 	format_add("ignored_deleted_all", "%> Usuniêto wszystkich z listy ignorowanych\n", 1);
-	format_add("ignored_list", "%> %1\n", 1);
+	format_add("ignored_exist", "%! %1 jest ju¿ ignorowany\n", 1);
+	format_add("ignored_list", "%> %1, %2\n", 1);
 	format_add("ignored_list_empty", "%! Lista ignorowanych u¿ytkowników jest pusta\n", 1);
 	format_add("error_not_ignored", "%! %1 nie jest na li¶cie ignorowanych\n", 1);
 	format_add("blocked_added", "%> Dodano %T%1%n do listy blokowanych\n", 1);
@@ -1230,7 +1231,6 @@ void theme_init()
         format_add("events_list_empty", "%! Brak zdarzeñ\n", 1);
         format_add("events_list", "%> %4, on %1 %2 %3\n", 1);
 	format_add("events_list_inactive", "%> %4, on %1 %2 %3 %K(nieaktywne)%n\n", 1);
-        format_add("events_incorrect", "%! Nieprawid³owo zdefiniowane zdarzenie\n", 1);
         format_add("events_add", "%> Dodano zdarzenie %T%1%n\n", 1);
         format_add("events_del", "%> Usuniêto zdarzenie %T%1%n\n", 1);
         format_add("events_del_all", "%> Usuniêto wszystkie zdarzenia\n", 1);
