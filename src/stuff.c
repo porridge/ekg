@@ -1582,6 +1582,7 @@ int ioctld_parse_seq(const char *seq, struct action_data *data)
 int ioctld_socket(char *path)
 {
 	struct sockaddr_un sun;
+	int i, retry = 5, usecs = 50000;
 
 	if (ioctld_sock != -1)
 		close(ioctld_sock);
@@ -1592,10 +1593,13 @@ int ioctld_socket(char *path)
 	sun.sun_family = AF_UNIX;
 	strcpy(sun.sun_path, path);
 
-	if (connect(ioctld_sock, (struct sockaddr*) &sun, sizeof(sun)) == -1)
-		return -1;
+	for (i = 0; i <= retry; i++) {
+		if (connect(ioctld_sock, (struct sockaddr*) &sun, sizeof(sun)) != -1)
+		return 0;
+		usleep(usecs);
+	}
 
-        return 0;
+        return -1;
 }
 
 /*
