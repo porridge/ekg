@@ -76,6 +76,7 @@
 COMMAND(cmd_ignore);
 COMMAND(cmd_msg);
 COMMAND(cmd_modify);
+COMMAND(cmd_check_conn);
 
 char *send_nicks[SEND_NICKS_MAX] = { NULL };
 int send_nicks_count = 0, send_nicks_index = 0;
@@ -5571,6 +5572,31 @@ int check_conn(uin_t uin)
 	return gg_image_request(sess, uin, 1, GG_CRC32_INVISIBLE);
 }
 
+static int check_conn_all_wrapper(const char *group, int quiet)
+{
+	list_t l;
+	int any = 0;
+	int ret = 0;
+
+	for (l = userlist; l; l = l->next) {
+		struct userlist *u = l->data;
+
+		if (group_member(u, group + 1)) {
+			const char *params[] = { itoa(u->uin), NULL };
+
+			any = 1;
+
+			if (cmd_check_conn("check_conn", params, NULL, quiet))
+				ret = 1;
+		}
+	}
+
+	if (!any)
+		printq("group_empty", group);
+
+	return ret;
+}
+
 COMMAND(cmd_check_conn)
 {
 	uin_t uin;
@@ -5580,6 +5606,10 @@ COMMAND(cmd_check_conn)
 	if (!params[0] && !target) {
 		printq("not_enough_params", name);
 		return -1;
+	}
+
+	if (params[0] && params[0][0] == '@') {
+		return check_conn_all_wrapper(params[0], quiet);
 	}
 
 	if (params[0]) {
@@ -5877,7 +5907,7 @@ void command_init()
 	
 	command_add
 	( "check_conn", "u?", cmd_check_conn, 0,
-	  " [opcje] [numer/alias]", "sprawdza, czy podany u¿ytkownik jest po³±czony z serwerem",
+	  " [opcje] [numer/alias/@grupa]", "sprawdza, czy podany u¿ytkownik jest po³±czony z serwerem",
 	  "\n"
 	  "  -u, --update  sprawdza, czy osoby oznaczone jako niewidoczne s± nadal po³±czone\n"
 	  "  -s, --scan    sprawdza, czy osoby nale¿±ce do grupy %Tspied%n i maj±ce stan\n"
@@ -5895,8 +5925,7 @@ void command_init()
 	  "¶ledzony na bie¿±co, jednak ze wzglêdu na ró¿ne zachowanie oryginalnego klienta, nale¿y co "
 	  "pewien czas dokonywaæ rêcznego sprawdzania czy nasza wiedza o stanie niewidocznym danej osoby "
 	  "jest wci±¿ aktualna. Nale¿y wiêc dodaæ timer, który np. co 60 sekund wywo³a polecnie "
-	  "%Tcheck_conn -u%n. Mo¿na te¿ okresowo "
-	  "wykonywaæ polecenie %Tcheck_conn -s%n, aby poprawiæ skuteczno¶æ wykrywania niewidocznych.\n"
+	  "%Tcheck_conn -u%n oraz polecenie %Tcheck_conn -s%n.\n"
 	  "\n"
 	  "Opcja "
 	  "%T-s%n zak³ada, ¿e serwer prawid³owo zakolejkuje wiadomo¶æ dla u¿ytkownika niedostêpnego i nie wysy³a "
