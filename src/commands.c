@@ -539,6 +539,7 @@ COMMAND(cmd_exec)
 
 		if (match_arg(params[0], 'm', "msg", 2) || (buf = match_arg(params[0], 'b', "bmsg", 2))) {
 			int uin;
+			struct userlist *u;
 
 			if (!params[1] || !params[2]) {
 				print("not_enough_params", name);
@@ -550,7 +551,11 @@ COMMAND(cmd_exec)
 				return;
 			}
 
-			tg = xstrdup(itoa(uin));
+			if ((u = userlist_find(uin, NULL)))
+				tg = xstrdup(u->display);
+			else
+				tg = xstrdup(itoa(uin));
+
 			msg = (buf) ? 2 : 1;
 			p = array_join((char **) params + 2, " ");
 		} else
