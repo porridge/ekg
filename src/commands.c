@@ -416,7 +416,7 @@ COMMAND(cmd_away)
 			return -1;
 	}
 
-	if (!strcasecmp(name, "_status"))
+	if (!strcasecmp(name, "_descr"))
 		change_status(config_status, params[0], q);
 
 	if (!strcasecmp(name, "away"))
@@ -5568,7 +5568,7 @@ void command_init()
 	( "_ctcp", "u", cmd_test_ctcp, 0, " <numer/alias>",
 	  "wysy³a ¿±danie bezpo¶redniego po³±czenia", "");
 	command_add
-	( "_status", "?", cmd_away, 0, " <opis>",
+	( "_descr", "?", cmd_away, 0, " <opis>",
 	  "zmienia opis bez zmiany stanu", "");
 }
 
