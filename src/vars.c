@@ -446,8 +446,6 @@ int variable_set(const char *name, const char *value, int allow_foreign)
  * variable_free()
  *
  * zwalnia pamiêæ u¿ywan± przez zmienne.
- *
- * nie zwraca niczego.
  */
 void variable_free()
 {
