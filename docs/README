@@ -7,10 +7,10 @@
 
 LICENCJA
 
-    Program jest udostêpniony na zasadach licencji GPL, której tre¶æ
+    Program jest udostêpniony na zasadach licencji GPL v2, której tre¶æ
     za³±czono w pliku src/COPYING. Bibliotekê libgadu obs³uguj±ca
-    warstwê sieciow± udostêpniono na zasadach licencji LGPL, której
-    tre¶æ znajduje siê w pliku lib/COPYING.
+    warstwê sieciow± udostêpniono na zasadach licencji LGPL v2.1,
+    której tre¶æ znajduje siê w pliku lib/COPYING.
     
     Program i biblioteka zosta³y napisane na podstawie informacji
     uzyskanych przez badanie pakietów wysy³anych miêdzy klientem
