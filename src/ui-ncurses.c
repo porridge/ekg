@@ -2850,6 +2850,8 @@ static void binding_backward_delete_char(const char *arg)
 
 		lines_index--;
 		lines_adjust();
+
+		return;
 	}
 
 	if (strlen(line) > 0 && line_index > 0) {
