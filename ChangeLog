@@ -8,6 +8,7 @@ d - drg, sz - szalik).
 
 - libgadu: gg_session->port jest prawid³owo wype³niane (w)
 - poprawka server_save dla po³±czeñ TLS (perry/w)
+- informacja o szyfrowanym po³±czeniu w /status (scooty/w)
 
 // 2003-05-15
 

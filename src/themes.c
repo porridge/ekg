@@ -1216,6 +1216,7 @@ void theme_init()
 	format_add("show_status_uin_nick", "%) Numer: %T%1%n (%T%2%n)\n", 1);
 	format_add("show_status_status", "%) Aktualny stan: %T%1%2%n\n", 1);
 	format_add("show_status_server", "%) Aktualny serwer: %T%1%n:%T%2%n\n", 1);
+	format_add("show_status_server_tls", "%) Aktualny serwer: %T%1%n:%T%2%n (po³±czenie szyfrowane)\n", 1);
 	format_add("show_status_avail", "%Ydostêpny%n", 1);
 	format_add("show_status_avail_descr", "%Ydostêpny%n (%T%1%n%2)", 1);
 	format_add("show_status_busy", "%Gzajêty%n", 1);

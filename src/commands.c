@@ -533,7 +533,12 @@ COMMAND(cmd_status)
 
 	printq("show_status_status", tmp, priv);
 	printq("show_status_ekg_started_since", buf1);
-	printq("show_status_server", inet_ntoa(i), itoa(sess->port));
+#ifdef __GG_LIBGADU_HAVE_OPENSSL
+	if (sess->ssl)
+		printq("show_status_server_tls", inet_ntoa(i), itoa(sess->port));
+	else
+#endif	
+		printq("show_status_server", inet_ntoa(i), itoa(sess->port));
 	printq("show_status_connected_since", buf);
 
 	xfree(tmp);
