@@ -124,7 +124,8 @@ void variable_init()
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
 		variable_add("contacts", "co", VAR_INT, 1, &config_contacts, NULL, NULL, NULL);
-		variable_add("contacts_options", "cO", VAR_STR, 1, &config_contacts_options, NULL, NULL, NULL);
+		variable_add("contacts_groups", "cg", VAR_STR, 1, &config_contacts_groups, NULL, NULL, dd_contacts);
+		variable_add("contacts_options", "cO", VAR_STR, 1, &config_contacts_options, NULL, NULL, dd_contacts);
 		variable_add("contacts_size", "cs", VAR_INT, 1, &config_contacts_size, NULL, NULL, dd_contacts);
 	}
 #endif
@@ -308,8 +309,10 @@ int variable_add(const char *name, const char *short_name, int type, int display
 		for (l = variables; l; l = l->next) {
 			struct variable *v = l->data;
 
-			if (!strcmp(v->short_name, short_name))
-				fprintf(stderr, "Error! Variable short name conflict:\n- short name: \"%s\"\n- existing variable: \"%s\"\n- conflicting variable: \"%s\"\n", short_name, v->name, name);
+			if (!strcmp(v->short_name, short_name)) {
+				fprintf(stderr, "Error! Variable short name conflict:\n- short name: \"%s\"\n- existing variable: \"%s\"\n- conflicting variable: \"%s\"\n\nPress any key to continue...", short_name, v->name, name);
+				getchar();
+			}
 		}
 	}
 

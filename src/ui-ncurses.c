@@ -82,8 +82,6 @@ static void ui_ncurses_deinit();
 
 static void window_switch(int id);
 static void update_statusbar(int commit);
-struct window;
-static int contacts_update(struct window *w);
 
 static void binding_add(const char *key, const char *action, int internal, int quiet);
 static void binding_delete(const char *key, int quiet);
@@ -186,6 +184,7 @@ int config_display_transparent = 1;	/* czy chcemy przezroczyste t³o? */
 int config_contacts_size = 9;		/* szeroko¶æ okna kontaktów */
 int config_contacts = 0;		/* czy ma byæ okno kontaktów */
 char *config_contacts_options = NULL;	/* opcje listy kontaktów */
+char *config_contacts_groups = NULL;	/* grupy listy kontaktów */
 
 static int contacts_margin = 1;
 static int contacts_edge = WF_RIGHT;
@@ -193,6 +192,7 @@ static int contacts_frame = WF_LEFT;
 static int contacts_descr = 0;
 static int contacts_wrap = 0;
 static int contacts_order[5] = { 0, 1, 2, 3, -1 };
+static int contacts_group_index = 0;
 
 struct binding *binding_map[KEY_MAX + 1];	/* mapa bindowanych klawiszy */
 struct binding *binding_map_meta[KEY_MAX + 1];	/* j.w. z altem */
@@ -202,6 +202,8 @@ static int window_backlog_split(struct window *w, int full, int removed);
 static void window_redraw(struct window *w);
 static void window_clear(struct window *w, int full);
 static void window_refresh();
+
+static int contacts_update(struct window *w);
 
 #ifndef COLOR_DEFAULT
 #  define COLOR_DEFAULT (-1)
@@ -1191,15 +1193,15 @@ static int contacts_update(struct window *w)
 {
 	struct {
 		int status1, status2;
-		char *format, *format_descr, *format_descr_full;
+		char *format, *format_descr, *format_descr_full, *format_header, *format_footer;
 	} table[5] = {
-		{ GG_STATUS_AVAIL, GG_STATUS_AVAIL_DESCR, "contacts_avail", "contacts_avail_descr", "contacts_avail_descr_full" },
-		{ GG_STATUS_BUSY, GG_STATUS_BUSY_DESCR, "contacts_busy", "contacts_busy_descr", "contacts_busy_descr_full" },
-		{ GG_STATUS_INVISIBLE, GG_STATUS_INVISIBLE_DESCR, "contacts_invisible", "contacts_invisible_descr", "contacts_invisible_descr_full" },
-		{ GG_STATUS_BLOCKED, -1, "contacts_blocking", "contacts_blocking", "contacts_blocking" },
-		{ GG_STATUS_NOT_AVAIL, GG_STATUS_NOT_AVAIL_DESCR, "contacts_not_avail", "contacts_not_avail_descr", "contacts_not_avail_descr_full" }
+		{ GG_STATUS_AVAIL, GG_STATUS_AVAIL_DESCR, "contacts_avail", "contacts_avail_descr", "contacts_avail_descr_full", "contacts_avail_header", "contacts_avail_footer" },
+		{ GG_STATUS_BUSY, GG_STATUS_BUSY_DESCR, "contacts_busy", "contacts_busy_descr", "contacts_busy_descr_full", "contacts_busy_header", "contacts_busy_footer" },
+		{ GG_STATUS_INVISIBLE, GG_STATUS_INVISIBLE_DESCR, "contacts_invisible", "contacts_invisible_descr", "contacts_invisible_descr_full", "contacts_invisible_header", "contacts_invisible_footer" },
+		{ GG_STATUS_NOT_AVAIL, GG_STATUS_NOT_AVAIL_DESCR, "contacts_not_avail", "contacts_not_avail_descr", "contacts_not_avail_descr_full", "contacts_not_avail_header", "contacts_not_avail_footer" },
+		{ GG_STATUS_BLOCKED, -1, "contacts_blocking", "contacts_blocking", "contacts_blocking", "contacts_blocking_header", "contacts_blocking_footer" },
 	};
-	const char *header, *footer;
+	const char *header = NULL, *footer = NULL, *group = NULL;
 	int j;
 		
 	if (!w) {
@@ -1220,18 +1222,37 @@ static int contacts_update(struct window *w)
 	
 	window_clear(w, 1);
 
-	header = format_find("contacts_header");
-	footer = format_find("contacts_footer");
+	if (config_contacts_groups) {
+		char **groups = array_make(config_contacts_groups, ",", 0, 0, 0);
+		if (contacts_group_index > array_count(groups))
+			contacts_group_index = 0;
+
+		if (contacts_group_index > 0) {
+			group = groups[contacts_group_index - 1];
+			header = format_find("contacts_header_group");
+			footer = format_find("contacts_footer_group");
+		}
+	}
+
+	if (!header || !footer) {
+		header = format_find("contacts_header");
+		footer = format_find("contacts_footer");
+	}
 	
 	if (strcmp(header, "")) 
-		window_backlog_add(w, reformat_string(format_string(header)));
+		window_backlog_add(w, reformat_string(format_string(header, group)));
 
 	for (j = 0; j < 5; j++) {
+		const char *header, *footer;
+		int i = contacts_order[j], count;
 		list_t l;
-		int i = contacts_order[j];
 
 		if (i < 0 || i > 4)
 			continue;
+
+		header = format_find(table[i].format_header);
+		footer = format_find(table[i].format_footer);
+		count = 0;
 
 		for (l = userlist; l; l = l->next) {
 			struct userlist *u = l->data;
@@ -1240,6 +1261,12 @@ static int contacts_update(struct window *w)
 
 			if ((u->status != table[i].status1 && u->status != table[i].status2) || !u->display)
 				continue;
+
+			if (group && !group_member(u, group))
+				continue;
+
+			if (!count && strcmp(header, ""))
+				window_backlog_add(w, reformat_string(format_string(header)));
 
 			if (GG_S_D(u->status) && contacts_descr)
 				format = table[i].format_descr_full;
@@ -1251,11 +1278,16 @@ static int contacts_update(struct window *w)
 			line = format_string(format_find(format), u->display, u->descr);
 			window_backlog_add(w, reformat_string(line));
 			xfree(line);
+
+			count++;
 		}
+
+		if (count && strcmp(footer, ""))
+			window_backlog_add(w, reformat_string(format_string(footer)));
 	}
 
 	if (strcmp(footer, "")) 
-		window_backlog_add(w, reformat_string(format_string(footer)));
+		window_backlog_add(w, reformat_string(format_string(footer, group)));
 
 	w->redraw = 1;
 
@@ -2999,6 +3031,13 @@ static void binding_toggle_contacts_wrapper(const char *arg)
 	binding_toggle_contacts(0, 0);
 }
 
+static void binding_next_contacts_group(const char *arg)
+{
+	contacts_group_index++;
+	contacts_update(NULL);
+	window_commit();
+}
+
 /*
  * ui_ncurses_loop()
  *
@@ -3298,6 +3337,7 @@ static void binding_parse(struct binding *b, const char *action)
 	__action("complete", binding_complete);
 	__action("quick-list", binding_quick_list_wrapper);
 	__action("toggle-contacts", binding_toggle_contacts_wrapper);
+	__action("next-contacts-group", binding_next_contacts_group);
 	__action("ignore-query", binding_ignore_query);
 
 #undef __action
@@ -4150,5 +4190,6 @@ static void binding_default()
 	binding_add("F1", "/help", 1, 1);
 	binding_add("F2", "quick-list", 1, 1);
 	binding_add("F3", "toggle-contacts", 1, 1);
+	binding_add("F4", "next-contacts-group", 1, 1);
 	binding_add("F12", "/window switch 0", 1, 1);
 }
