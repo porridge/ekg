@@ -8,6 +8,10 @@ LICENCJA
     Program jest udostêpniony na zasadach licencji GPL v2, której tre¶æ
     za³±czono w pliku src/COPYING. Niektóre pliki mog± byæ objête inn±
     licencj± zgodn± z GPL v2. Fakt ten jest odnotowany na pocz±tku pliku.
+
+    Wyj±tkiem od licencji GPL v2 jest mo¿liwo¶æ kompilacji, konsolidacji
+    i u¿ywania programu z bibliotek± OpenSSL autorstwa Projektu OpenSSL
+    (The OpenSSL Project) dostêpn± pod adresem http://www.openssl.org/
     
     Bibliotekê libgadu obs³uguj±ca warstwê sieciow± udostêpniono na
     zasadach licencji LGPL v2.1, której tre¶æ znajduje siê w pliku

@@ -229,8 +229,6 @@ enum gg_session_t {
 	GG_SESSION_USER7	/* j.w. */
 };
 
-#define gg_session_enum gg_session_t
-
 /*
  * enum gg_state_t
  *
@@ -283,17 +281,6 @@ enum gg_state_t {
 	GG_STATE_READING_TYPE		/* czeka na typ po³±czenia */
 };
 
-#define gg_state_enum gg_state_t
-
-/*
- * dla zachowania kompatybilno¶ci wstecz. w wersji 1.0 bêdzie usuniête. oby.
- */
-#define GG_STATE_CONNECTING_HTTP GG_STATE_CONNECTING
-#define GG_STATE_WRITING_HTTP GG_STATE_READING_DATA
-#define GG_STATE_WAITING_FOR_KEY GG_STATE_READING_KEY
-#define GG_STATE_SENDING_KEY GG_STATE_READING_REPLY
-#define GG_STATE_FINISHED GG_STATE_DONE
-
 /*
  * enum gg_check_t
  *
@@ -305,8 +292,6 @@ enum gg_check_t {
 	GG_CHECK_WRITE = 1,		/* sprawdzamy mo¿liwo¶æ zapisu */
 	GG_CHECK_READ = 2		/* sprawdzamy mo¿liwo¶æ odczytu */
 };
-
-#define gg_check_enum gg_check_t	/* dla kompatybilno¶ci */
 
 /*
  * struct gg_login_params
