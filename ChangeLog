@@ -7,6 +7,7 @@ d - drg, sz - szalik, del - deletek).
 // 2004-07-14
 
 - libgadu: poprawki obs³ugi proxy (the_leech/w)
+- libgadu: poprawka z³ego zachowania po roz³±czeniu klienta (patryk/w)
 
 // 2004-07-06
 
