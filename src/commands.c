@@ -1922,7 +1922,7 @@ COMMAND(command_on)
 
 COMMAND(command_window)
 {
-	ui_window(params);
+	ui_event("command", "window", (params) ? params[0] : NULL, (params && params[0]) ? params[1] : NULL);
 
 	return 0;
 }

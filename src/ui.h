@@ -27,7 +27,6 @@ void (*ui_print)(const char *target, const char *line);
 void (*ui_beep)(void);
 int (*ui_event)(const char *event, ...);
 void (*ui_deinit)(void);
-void (*ui_window)(char **params);
 
 extern void ui_none_init();
 extern void ui_batch_init();

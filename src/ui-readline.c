@@ -44,7 +44,6 @@ static void ui_readline_print(const char *target, const char *line);
 static void ui_readline_beep();
 static int ui_readline_event(const char *event, ...);
 static void ui_readline_deinit();
-static void ui_readline_window(char **params);
 
 static int in_readline = 0, no_prompt = 0, pager_lines = -1, screen_lines = 24, screen_columns = 80, curr_window = 1, windows_count = 0;
 struct list *windows = NULL;
@@ -61,15 +60,15 @@ static int windows_sort();
 static int window_query_id(const char *qnick);
 
 /* a jak ju¿ przy okienkach jeste¶my... */
-int window_01() { window_switch(1); return(0); }
-int window_02() { window_switch(2); return(0); }
-int window_03() { window_switch(3); return(0); }
-int window_04() { window_switch(4); return(0); }
-int window_05() { window_switch(5); return(0); }
-int window_06() { window_switch(6); return(0); }
-int window_07() { window_switch(7); return(0); }
-int window_08() { window_switch(8); return(0); }
-int window_09() { window_switch(9); return(0); }
+static int window_01() { window_switch(1); return(0); }
+static int window_02() { window_switch(2); return(0); }
+static int window_03() { window_switch(3); return(0); }
+static int window_04() { window_switch(4); return(0); }
+static int window_05() { window_switch(5); return(0); }
+static int window_06() { window_switch(6); return(0); }
+static int window_07() { window_switch(7); return(0); }
+static int window_08() { window_switch(8); return(0); }
+static int window_09() { window_switch(9); return(0); }
 
 static void sigcont_handler()
 {
@@ -101,7 +100,7 @@ static void sigwinch_handler()
  *
  * pobiera znak z klawiatury obs³uguj±c w miêdzyczasie sieæ.
  */
-int my_getc(FILE *f)
+static int my_getc(FILE *f)
 {
 	ekg_wait_for_key();
 	return rl_getc(f);
@@ -377,7 +376,7 @@ static char **my_completion(char *text, int start, int end)
  * wy¶wietla dany tekst na ekranie, uwa¿aj±c na trwaj±ce w danych chwili
  * readline().
  */
-void ui_readline_print(const char *target, const char *line)
+static void ui_readline_print(const char *target, const char *line)
 {
         int old_end = rl_end, i, win_id;
 	char *old_prompt = rl_prompt;
@@ -443,7 +442,7 @@ void ui_readline_print(const char *target, const char *line)
         }
 }
 
-void ui_readline_beep()
+static void ui_readline_beep()
 {
 	printf("\a");
 	fflush(stdout);
@@ -533,7 +532,6 @@ void ui_readline_init()
 	ui_beep = ui_readline_beep;
 	ui_event = ui_readline_event;
 	ui_deinit = ui_readline_deinit;
-	ui_window = ui_readline_window;
 		
 	rl_initialize();
 	rl_getc_function = my_getc;
@@ -583,7 +581,7 @@ void ui_readline_init()
  *
  * zamyka to, co zwi±zane z interfejsem.
  */
-void ui_readline_deinit()
+static void ui_readline_deinit()
 {
 	if (config_changed) {
 		char *line;
@@ -610,7 +608,7 @@ void ui_readline_deinit()
  * g³ówna pêtla programu. wczytuje dane z klawiatury w miêdzyczasie
  * obs³uguj±c sieæ i takie tam.
  */
-void ui_readline_loop()
+static void ui_readline_loop()
 {
 	for (;;) {
 		char *line = my_readline();
@@ -678,7 +676,7 @@ void ui_readline_loop()
 
 }
 
-int ui_readline_event(const char *event, ...)
+static int ui_readline_event(const char *event, ...)
 {
 	va_list ap;
 	int result = 0;
@@ -707,9 +705,47 @@ int ui_readline_event(const char *event, ...)
 			result = 1;
 		}
 
-		if (!strcasecmp(command, "window"))
-			/* tutaj kiedy¶ bêdzie obs³uga tego polecenia */
-			result = 0;
+		if (!strcasecmp(command, "window")) {
+			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*);
+
+			if (!p1) {
+		                print("window_not_enough_params");
+				result = 1;
+				goto cleanup;
+		        }
+
+		        if (!strcasecmp(p1, "new")) {
+		                if (!window_add())
+		                        print("window_add");
+ 
+			} else if (!strcasecmp(p1, "next")) {
+		                window_switch(curr_window + 1);
+
+			} else if (!strcasecmp(p1, "prev")) {
+		                window_switch(curr_window - 1);
+				
+		        } else if (!strcasecmp(p1, "kill")) {
+		                int id = (p2) ? atoi(p2) : curr_window;
+
+				window_del(id);
+				
+		        } else if (!strcasecmp(p1, "switch")) {
+		                if (!p2)
+		                        print("window_not_enough_params");
+		                else
+		                	window_switch(atoi(p2));
+
+			} else if (!strcasecmp(p1, "refresh")) {
+		                window_refresh();
+
+			} else if (!strcasecmp(p1, "clear")) {
+		                window_clear();
+
+			} else
+				print("window_invalid");
+
+			result = 1;
+		}
 	}
 
 cleanup:
@@ -718,7 +754,7 @@ cleanup:
 	return result;
 }
 
-int window_add()
+static int window_add()
 {
         int j;
         struct window w;
@@ -740,7 +776,7 @@ int window_add()
         return 0;
 }
 
-int window_del(int id)
+static int window_del(int id)
 {
         struct list *l;
 
@@ -769,7 +805,7 @@ int window_del(int id)
         return 1;
 }
 
-int window_switch(int id)
+static int window_switch(int id)
 {
         struct list *l, *tmp = windows;
 
@@ -795,7 +831,7 @@ int window_switch(int id)
         return 1;
 }
 
-int window_refresh()
+static int window_refresh()
 {
         int j = 0;
 
@@ -814,7 +850,7 @@ int window_refresh()
         return 0;
 }
 
-int window_write(int id, const char *line)
+static int window_write(int id, const char *line)
 {
         int j = 1;
         struct list *l;
@@ -848,7 +884,7 @@ int window_write(int id, const char *line)
         return 0;
 }
 
-int window_clear()
+static int window_clear()
 {
         int j;
 
@@ -858,7 +894,7 @@ int window_clear()
         return 0;
 }
 
-int windows_sort()
+static int windows_sort()
 {
         struct list *l;
         int id = 1;
@@ -872,7 +908,7 @@ int windows_sort()
         return 0;
 }
 
-int window_query_id(const char *qnick)
+static int window_query_id(const char *qnick)
 {
         struct list *l;
 
@@ -892,55 +928,3 @@ int window_query_id(const char *qnick)
         return -2;
 }
 
-void ui_readline_window(char **params)
-{
-        if (!params || !*params) {
-                print("window_not_enough_params");
-                return;
-        }
-
-        if (!strcmp(*params, "new")) {
-                if (!window_add()) {
-                        print("window_add");
-                        return;
-                }
-        }
-
-        if (!strcmp(*params, "next")) {
-                window_switch(curr_window + 1);
-                return;
-        }
-
-        if (!strcmp(*params, "prev")) {
-                window_switch(curr_window - 1);
-                return;
-        }
-
-        if (!strcmp(*params, "kill")) {
-                int id = (*(params+1)) ? atoi(*(params+1)) : curr_window;
-
-                window_del(id);
-                return;
-        }
-
-        if (!strcmp(*params, "switch")) {
-                if (!*(params+1)) {
-                        print("window_not_enough_params");
-                        return;
-                }
-                window_switch(atoi(*(params+1)));
-                return;
-        }
-
-        if (!strcmp(*params, "refresh")) {
-                window_refresh();
-                return;
-        }
-
-        if (!strcmp(*params, "clear")) {
-                window_clear();
-                return;
-        }
-
-        print("window_invalid");
-}

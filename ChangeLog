@@ -15,6 +15,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   dla dziwnych systemów (s/w)
 - dodanie makra GG_PACKED, które przydaje siê przy definicji struktur (w)
 - dodane okienka do ui-readline (d)
+- ma³y cleanup (w)
 
 // 2002-07-03
 
