@@ -1,31 +1,46 @@
-/* config.h.in.  Generated automatically from configure.in by autoheader.  */
-
 /* Define if your processor stores words with the most significant
    byte first (like Motorola and SPARC, unlike Intel and VAX).  */
 #undef WORDS_BIGENDIAN
 
-/* macros/curses checks */
+/* curses checks */
 #undef HAS_CURSES
-#undef USE_SUNOS_CURSES
-#undef USE_BSD_CURSES
-#undef USE_SYSV_CURSES
 #undef USE_NCURSES
-#undef NO_COLOR_CURSES
-#undef SCO_FLAVOR
 
-/* readline stuff */
+/* readline checks */
 #undef HAVE_READLINE
 #undef HAVE_RL_SET_PROMPT
-#undef HAVE_RL_COMPLETION
+#undef HAVE_RL_FILENAME_COMPLETION_FUNCTION
 #undef HAVE_RL_GET_SCREEN_SIZE
 #undef HAVE_RL_SET_KEY
 
 /* voice stuff */
 #undef HAVE_LINUX_SOUNDCARD_H
 #undef HAVE_GSM_H
-
 #if defined(HAVE_LINUX_SOUNDCARD_H) && defined(HAVE_GSM_H)
 #define HAVE_VOIP
+#endif
+
+/* define types */
+#undef HAVE_SYS_TYPES_H
+#undef HAVE_STDLIB_H
+#undef HAVE_INTTYPES_H
+#undef HAVE_STDINT_H
+#undef HAVE_UNISTD_H
+
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+#ifdef HAVE_INTTYPES_H
+#include <inttypes.h>
+#endif
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
 #endif
 
 /* silly types */

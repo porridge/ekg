@@ -150,6 +150,7 @@ struct gg_dcc {
 	struct gg_file_info file_info;
 				/* informacje o pliku */
 	int established;	/* po³±czenie ustanowione */
+	char *voice_buf;	/* bufor na pakiet po³±czenia g³osowego */
 };
 
 /*

@@ -2,9 +2,6 @@ dnl $Id$
 
 AC_INIT(lib/libgadu.h)
 
-PACKAGE=ekg
-VERSION=0.9
-
 AC_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
@@ -95,42 +92,12 @@ if test -d src; then
   LIBS="$LIBS $READLINE_LIBS"
   CFLAGS="$CFLAGS $READLINE_INCLUDES"
 
-  AC_CACHE_CHECK([for rl_set_prompt() in readline], ac_cv_has_rl_set_prompt,
-  [AC_TRY_LINK([#include <stdio.h>
-#include <readline/readline.h>
-], [rl_set_prompt("");], [ac_cv_has_rl_set_prompt=yes], [ac_cv_has_rl_set_prompt=no])])
-    if test x"$ac_cv_has_rl_set_prompt" != xno; then
-    AC_DEFINE(HAVE_RL_SET_PROMPT)
-  fi
-
-  AC_CACHE_CHECK([for rl_filename_completion_function() in readline], ac_cv_has_rl_completion,
-  [AC_TRY_LINK([#include <stdio.h>
-#include <readline/readline.h>
-], [char *x = rl_filename_completion_function("", 0);], [ac_cv_has_rl_completion=yes], [ac_cv_has_rl_completion=no])])
-  if test x"$ac_cv_has_rl_completion" != xno; then
-    AC_DEFINE(HAVE_RL_COMPLETION)
-  fi
-
-  AC_CACHE_CHECK([for rl_get_screen_size() in readline], ac_cv_has_rl_get_screen_size,
-  [AC_TRY_LINK([#include <stdio.h>
-#include <readline/readline.h>
-], [int x,y; rl_get_screen_size(&y,&x);], [ac_cv_has_rl_get_screen_size=yes], [ac_cv_has_rl_get_screen_size=no])])
-  if test x"$ac_cv_has_rl_get_screen_size" != xno; then
-    AC_DEFINE(HAVE_RL_GET_SCREEN_SIZE)
-  fi
-
-  AC_CACHE_CHECK([for rl_set_key() in readline], ac_cv_has_rl_set_key,
-  [AC_TRY_LINK([#include <stdio.h>
-#include <readline/readline.h>
-], [rl_set_key("foo",(void*)0,rl_get_keymap());], [ac_cv_has_rl_set_key=yes], [ac_cv_has_rl_set_key=no])])
-  if test x"$ac_cv_has_rl_set_key" != xno; then
-    AC_DEFINE(HAVE_RL_SET_KEY)
-  fi
+  AC_CHECK_FUNCS([rl_set_prompt rl_filename_completion_function rl_get_screen_size rl_set_key])
 
   AC_CHECK_LIB(gsm, gsm_decode, [
-    AC_CHECK_HEADERS([linux/soundcard.h gsm.h])
+    AC_CHECK_HEADERS([gsm.h linux/soundcard.h])
     LIBS="$LIBS -lgsm"])
-
+ 
   AC_ARG_WITH(ioctld,
     [  --with-ioctld           Compile with ioctld (Linux only)])
 
