@@ -185,7 +185,6 @@ int check_mail_mbox()
 		int f_new = 0, new = 0, in_header = 0, i = 0;
 		FILE *f;
 		struct stat st;
-		struct timeval foo[1];
 
 		close(fd[0]);
 
@@ -220,10 +219,15 @@ int check_mail_mbox()
 			fclose(f);
 
 #ifdef HAVE_UTIMES
-			/* przecie¿ my nic nie ruszali¶my ;> */			
-			foo[0].tv_sec = st.st_atime;
-			foo[1].tv_sec = st.st_mtime;
-			utimes(m->fname, (const struct timeval *) &foo);
+			{
+				struct timeval foo[1];
+
+				foo[0].tv_sec = st.st_atime;
+				foo[1].tv_sec = st.st_mtime;
+
+				/* przecie¿ my nic nie ruszali¶my ;> */			
+				utimes(m->fname, (const struct timeval *) &foo);
+			}
 #endif
 
 			if (i == to_check)
@@ -382,7 +386,7 @@ void changed_check_mail(const char *var)
 		/* konieczne, je¶li by³a zmiana typu skrzynek */
 		changed_check_mail_folders("check_mail_folders");
 
-		for (l = timers; l; l=l->next ) {
+		for (l = timers; l; l = l->next) {
 			t = l->data;
 
 			if (!strcmp(t->name, "check-mail-time")) {
