@@ -399,8 +399,6 @@ struct gg_pubdir50_s {
 
 typedef struct gg_pubdir50_s *gg_pubdir50_t;
 
-typedef struct gg_pubdir50_s *gg_search50_t;	/* XXX legacy */
-
 /*
  * struktura opisuj±ca rodzaj zdarzenia. wychodzi z gg_watch_fd() lub
  * z gg_dcc_watch_fd()
@@ -446,8 +444,6 @@ struct gg_event {
 			int length;
 		} dcc_voice_data;
 
-		gg_search50_t search50;		/* XXX legacy */
-		
 		gg_pubdir50_t pubdir50;
         } event;
 };
@@ -577,36 +573,6 @@ void gg_pubdir50_free(gg_pubdir50_t res);
 #define GG_PUBDIR50_FAMILYCITY "familycity"
 
 int gg_pubdir50_handle_reply(struct gg_event *e, const char *packet, int length);
-
-/*
- * poni¿sze zostaj± dla kompatybilno¶ci ABI z aplikacjami, które u¿ywaj±
- * proponowanego interfejsu. za jaki¶ czas zniknie.
- */
-uint32_t gg_search50(struct gg_session *sess, gg_search50_t req);
-gg_search50_t gg_search50_new();
-int gg_search50_add(gg_search50_t req, const char *field, const char *value);
-const char *gg_search50_get(gg_search50_t res, int num, const char *field);
-int gg_search50_count(gg_search50_t res);
-uin_t gg_search50_next(gg_search50_t res);
-uint32_t gg_search50_seq(gg_search50_t res);
-void gg_search50_free(gg_search50_t res);
-
-#define GG_SEARCH50_UIN "FmNumber"
-#define GG_SEARCH50_STATUS "FmStatus"
-#define GG_SEARCH50_FIRSTNAME "firstname"
-#define GG_SEARCH50_LASTNAME "lastname"
-#define GG_SEARCH50_NICKNAME "nickname"
-#define GG_SEARCH50_BIRTHYEAR "birthyear"
-#define GG_SEARCH50_CITY "city"
-#define GG_SEARCH50_GENDER "gender"
-#define GG_SEARCH50_GENDER_FEMALE "1"
-#define GG_SEARCH50_GENDER_MALE "2"
-#define GG_SEARCH50_ACTIVE "ActiveOnly"
-#define GG_SEARCH50_ACTIVE_TRUE "1"
-#define GG_SEARCH50_ACTIVE_FALSE "0"
-#define GG_SEARCH50_START "fmstart"
-#define GG_SEARCH50_FAMILYNAME "familyname"
-#define GG_SEARCH50_FAMILYCITY "familycity"
 
 /*
  * operacje na katalogu publicznym.

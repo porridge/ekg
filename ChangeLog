@@ -11,6 +11,9 @@ zg³osi³ b³±d.
 - bardziej precyzyjny opis zmiennej ,,auto_back'' (pmb/sz)
 - poprawka kombinacji Ctrl-<kursor> na terminalach BSD (sz/w)
 - ignorowanie SIGQUIT, przez co Ctrl-4 i Ctrl-\ nie bêd± wychodziæ (sz/w)
+- libgadu: usuniêcie kodu gg_search50() (w)
+- libgadu: usuniêcie kodu gg_search() i zast±pienie go funkcjami
+  zwracaj±cymi b³±d (w)
 
 // 2003-01-29
 

@@ -4152,14 +4152,17 @@ void command_init()
 	( "bind", "???", cmd_bind, 0,
 	  " [opcje]", "przypisywanie akcji klawiszom",
 	  "\n"
-	  "  -a, --add <sekwencja> <komenda>  przypisuje now± sekwencjê\n"
-	  "  -d, --del <sekwencja>            usuwa podan± sekwencjê\n"
-	  " [-l, --list]                      wy¶wietla przypisane sekwencje\n"
-	  "  -L, --list-default               j.w. plus domy¶lne sekwencje\n"
+	  "  -a, --add <sekwencja> <akcja>  przypisuje now± sekwencjê\n"
+	  "  -d, --del <sekwencja>          usuwa podan± sekwencjê\n"
+	  " [-l, --list]                    wy¶wietla przypisane sekwencje\n"
+	  "  -L, --list-default             j.w. plus domy¶lne sekwencje\n"
 	  "\n"
 	  "Dostêpne sekwencje to: Ctrl-<znak>, Alt-<znak>, F<liczba>, Enter, "
 	  "Backspace, Delete, Insert, Home, End, Left, Right, Up, Down, "
-	  "PageUp, PageDown.");
+	  "PageUp, PageDown.\n"
+	  "\n"
+	  "Dostêpne akcje to: backward-word, forward-word, kill-word, toggle-input, cancel-input, backward-delete-char, beginning-of-line, end-of-line, delete-char, backward-page, forward-page, kill-line, yank, accept-line, line-discard, quoted-insert, word-rubout, backward-char, forward-char, previous-history, next-history, complete, quick-list, toggle-contacts, ignore-query. "
+	  "Ka¿da inna akcja bêdzie traktowana jako komenda do wykonania.");
 
 	command_add
 	( "change", "?", cmd_change, 0,
