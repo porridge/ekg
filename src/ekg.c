@@ -1057,8 +1057,10 @@ int main(int argc, char **argv)
 	ui_screen_height = getenv("LINES") ? atoi(getenv("LINES")) : 24;
 
 #ifdef WITH_UI_NCURSES
-	if (ui_init == ui_ncurses_init)
+	if (ui_init == ui_ncurses_init) {
 		config_read(NULL, "display_transparent");
+		config_read(NULL, "contacts");
+	}
 #endif
 
 	ui_init();

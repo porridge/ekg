@@ -1225,10 +1225,11 @@ void contacts_rebuild()
 	last_contacts_size = config_contacts_size;
 	last_header_size = config_header_size;
 	
-	if (contacts)
-		delwin(contacts);
-	
-	contacts = newwin(OUTPUT_SIZE, config_contacts_size + 2, config_header_size, stdscr->_maxx - config_contacts_size - 1);
+	if (contacts) {
+		wresize(contacts, OUTPUT_SIZE, config_contacts_size + 2);
+		mvwin(contacts, config_header_size, stdscr->_maxx - config_contacts_size - 1);
+	} else
+		contacts = newwin(OUTPUT_SIZE, config_contacts_size + 2, config_header_size, stdscr->_maxx - config_contacts_size - 1);
 
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
@@ -1241,7 +1242,7 @@ void contacts_rebuild()
 		window_backlog_split(w, 1, 0);
 	}
 
-	window_commit();
+	update_contacts(1);
 }
 
 /*

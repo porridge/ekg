@@ -27,6 +27,7 @@ zg³osi³ b³±d.
 - libgadu: gg_pubdir50_add() zastêpuje pole, je¶li ju¿ istnieje (w)
 - dodanie /find --all (*/w)
 - dodanie /find --stop (FIG/w)
+- drobna optymalizacja wy¶wietlania listy kontaktów (w)
 
 // 2003-02-02
 
