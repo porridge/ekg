@@ -12,6 +12,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - mo¿liwo¶æ zmiany nazwy konferencji (DJ/w)
 - poprawka b³êdu przy log_status 1 (speedy/w)
 - naprawienie zmiennej timestamp w ncurses (czach/w)
+- ,,W pogoni za kursorem'' (DJ,czach/w)
 
 // 2002-09-12
 

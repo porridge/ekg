@@ -182,7 +182,6 @@ static void window_refresh()
 	mvwin(status, stdscr->_maxy - input_size, 0);
 	wresize(input, input_size, input->_maxx + 1);
 	mvwin(input, stdscr->_maxy - input_size + 1, 0);
-	wmove(input, 0, 0);
 }
 
 /*
