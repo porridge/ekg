@@ -23,7 +23,7 @@ klient:
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,
   + dodaæ /bind,
-  + doprowadziæ listê kontaktów po prawej do stanu u¿ywalno¶ci.
+  + konfiguracja listy obecnych (kolorki, co wy¶wietlaæ itd.)
   + sensowne zawijanie wy¶wietlanych tekstów.
 
 - przej¶æ na ui-ncurses domy¶lnie, a co za tym idzie:

@@ -502,19 +502,66 @@ static void update_contacts()
 
 	wattrset(contacts, COLOR_PAIR(0));
 	
-	for (l = userlist, y = 0; l; l = l->next) {
+	for (l = userlist, y = 0; l && y <= contacts->_maxy; l = l->next) {
 		struct userlist *u = l->data;
 		int x;
 
 		if (!GG_S_A(u->status))
 			continue;
+
+		wattrset(contacts, COLOR_PAIR(3) | A_BOLD);
 		
 		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
 			mvwaddch(contacts, y, x + 2, u->display[x]);
+
+		if (GG_S_D(u->status)) {
+			wattrset(contacts, COLOR_PAIR(16) | A_BOLD);
+			mvwaddch(contacts, y, 1, 'i');
+		}
+		
+		y++;
+	}
+
+	for (l = userlist; l && y <= contacts->_maxy; l = l->next) {
+		struct userlist *u = l->data;
+		int x;
+
+		if (!GG_S_B(u->status))
+			continue;
+		
+		wattrset(contacts, COLOR_PAIR(2));
+
+		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
+			mvwaddch(contacts, y, x + 2, u->display[x]);
+
+		if (GG_S_D(u->status)) {
+			wattrset(contacts, COLOR_PAIR(16) | A_BOLD);
+			mvwaddch(contacts, y, 1, 'i');
+		}
 	
 		y++;
 	}
+
+	for (l = userlist; l && y <= contacts->_maxy; l = l->next) {
+		struct userlist *u = l->data;
+		int x;
+
+		if (!GG_S_I(u->status))
+			continue;
+		
+		wattrset(contacts, COLOR_PAIR(0));
+
+		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
+			mvwaddch(contacts, y, x + 2, u->display[x]);
+
+		if (GG_S_D(u->status)) {
+			wattrset(contacts, COLOR_PAIR(16) | A_BOLD);
+			mvwaddch(contacts, y, 1, 'i');
+		}
 	
+		y++;
+	}
+
 	wnoutrefresh(contacts);
 }
 
@@ -525,6 +572,10 @@ static void update_contacts()
  */
 void contacts_rebuild()
 {
+	/* nie jeste¶my w ncurses */
+	if (!windows)
+		return;
+	
 	ui_screen_width = stdscr->_maxx + 1 - CONTACTS_SIZE;
 
 	if (!config_contacts) {
