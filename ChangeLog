@@ -12,6 +12,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawki konferencji, wy¶wietlanie jej nazwy (DJ/w)
 - wyrzucenie -I/usr/include z flag kompilatora (malekith/w)
 - poprawka kodu o niezdefiniowanym dzia³aniu (malekith/w)
+- porz±dki z ui_event() (malekith/w)
+- porz±dki w configure.in i Makefile.in (w)
+- proste dope³nianie plików w ui-ncurses (DJ/w)
 
 // 2002-10-02
 

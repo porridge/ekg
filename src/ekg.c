@@ -234,7 +234,7 @@ void ekg_wait_for_key()
 				else
 #endif
 				if (t->ui)
-					ui_event(t->command);
+					ui_event(t->command, NULL);
 				else
 					command_exec(NULL, t->command);
 

@@ -1248,7 +1248,7 @@ static void ui_ncurses_loop()
 					ui_event("command", "window", "kill", NULL);
 
 				if (ch == 'n' || ch == 'N')	/* Alt-N */
-					ui_event("command", "window", "new");
+					ui_event("command", "window", "new", NULL);
 
 				if (ch == 13) {		/* Ctrl-Enter */
 					if (input_size == 1)
@@ -1430,7 +1430,7 @@ static void ui_ncurses_loop()
 			}
 
 			case 'L' - 64:	/* Ctrl-L */
-				ui_event("command", "window", "refresh");
+				ui_event("command", "window", "refresh", NULL);
 				break;
 				
 			case 9:		/* Tab */

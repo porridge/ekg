@@ -17,7 +17,7 @@ AR = @AR@
 INSTALL = @INSTALL@
 STRIP = @STRIP@
 
-OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o voice.o ekg.o xmalloc.o @ui_readline_o@ @ui_ncurses_o@ ui-batch.o ui-none.o @libgadu_a@ @python_o@ @getopt_o@
+OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o voice.o ekg.o xmalloc.o @OBJS@ ui-batch.o ui-none.o
 
 #
 

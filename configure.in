@@ -44,7 +44,6 @@ AC_SUBST(install_ioctld, "")
 AC_SUBST(shared, "")
 AC_SUBST(install_shared, "")
 
-AC_SUBST(libgadu_a, "")
 AC_SUBST(lgadu, "")
 
 AC_SUBST(static, "static")
@@ -59,9 +58,7 @@ AC_SUBST(uninstall_ekg, "")
 AC_SUBST(make_ekgwap, "")
 AC_SUBST(install_ekgwap, "")
 
-AC_SUBST(ui_readline_o, "")
-AC_SUBST(ui_ncurses_o, "")
-AC_SUBST(python_o, "")
+AC_SUBST(OBJS, "")
 
 # najpierw sprawdzamy te opcje, które s± wspólne dla libgadu i ekg.
 
@@ -139,7 +136,7 @@ if test -d src; then
 
   if test "x$enable_ui_readline" != "xno"; then
     AC_DEFINE(WITH_UI_READLINE, 1, [define if you want ui_readline])
-    ui_readline_o="ui-readline.o"
+    OBJS="$OBJS ui-readline.o"
   fi
 
   if test -f .enable-ui-ncurses; then
@@ -148,7 +145,7 @@ if test -d src; then
   
   if test "x$enable_ui_ncurses" = "xyes"; then
     AC_DEFINE(WITH_UI_NCURSES, 1, [define if you want ui_ncurses])
-    ui_ncurses_o="ui-ncurses.o"
+    OBJS="$OBJS ui-ncurses.o"
   fi
   
   if test "x$enable_ui_ncurses" = "xyes" -a "x$enable_force_readline" = "xyes"; then 
@@ -216,7 +213,7 @@ if test -d src; then
   AC_CHECK_PYTHON
   
   if test "x$have_python" = "xtrue"; then
-    python_o="python.o"
+    OBJS="$OBJS python.o"
     LDFLAGS="$PYTHON_LIBS $LDFLAGS"
     CFLAGS="$CFLAGS $PYTHON_INCLUDES"
   fi
@@ -275,16 +272,15 @@ dnl   fi
 
   # sprawdzamy, czy system ma getopt_long
 
-  AC_SUBST(getopt_o)
-  AC_CHECK_FUNC(getopt_long, , [getopt_o="../compat/getopt.o ../compat/getopt1.o"; CFLAGS="-I../compat $CFLAGS"])
+  AC_CHECK_FUNC(getopt_long, , [OBJS="$OBJS ../compat/getopt.o ../compat/getopt1.o"; CFLAGS="-I../compat $CFLAGS"])
   
   # ustawiamy opcje
 
-  libgadu_a="../lib/libgadu.a"
-  lgadu=""
   if test "x$enable_static" = "xno" -o "x$enable_dynamic" = "xyes"; then 
-    libgadu_a=""
     lgadu="-lgadu"
+  else
+    OBJS="$OBJS ../lib/libgadu.a"
+    lgadu=""
   fi
   ekg="ekg"
   install_ekg="install-ekg"

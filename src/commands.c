@@ -2089,9 +2089,9 @@ COMMAND(cmd_query)
 	if (params[0] && (params[0][0] == '@' || strchr(params[0], ','))) {
 		struct conference *c = conference_create(params[0]);
 
-		ui_event("command", "query", c->name);
+		ui_event("command", "query", c->name, NULL);
 	} else
-		ui_event("command", "query", params[0]);
+		ui_event("command", "query", params[0], NULL);
 }
 
 COMMAND(cmd_on)
@@ -2156,12 +2156,12 @@ COMMAND(cmd_echo)
 
 COMMAND(cmd_window)
 {
-	ui_event("command", "window", (params) ? params[0] : NULL, (params && params[0]) ? params[1] : NULL);
+	ui_event("command", "window", (params) ? params[0] : NULL, (params && params[0]) ? params[1] : NULL, NULL);
 }
 
 COMMAND(cmd_bind)
 {
-	ui_event("command", "bind", (params) ? params[0] : NULL, (params && params[0]) ? params[1] : NULL, (params && params[1]) ? params[2] : NULL); 
+	ui_event("command", "bind", (params) ? params[0] : NULL, (params && params[0]) ? params[1] : NULL, (params && params[1]) ? params[2] : NULL, NULL); 
 }
 
 char *strip_spaces(char *line)
