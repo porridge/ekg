@@ -130,10 +130,13 @@ ZG£ASZANIE B£ÊDÓW
 LISTA DYSKUSYJNA
 
     Istnieje lista dyskusyjna dla u¿ytkowników EKG o adresie 
-    ekg-users@list.ziew.org. Aby siê zapisaæ, nale¿y na adres
-    sympa@list.ziew.org wys³aæ wiadomo¶æ o tre¶ci:
-
-	subscribe ekg-users
+    ekg-users@list.ziew.org. Aby siê zapisaæ nale¿y wej¶æ na 
+    strone o adresie:
+	    
+	http://list.ziew.org/mailman/listinfo/ekg-users
+	
+    oraz postêpowac wed³ug instrukcji tam zawartych.
+    
 
 PODZIÊKOWANIA
 
