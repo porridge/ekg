@@ -76,7 +76,7 @@ struct userlist *userlist_find(uin_t uin, const char *display);
 char *userlist_dump();
 void userlist_clear();
 #define userlist_free userlist_clear
-int userlist_set(char *contacts, int config);
+int userlist_set(const char *contacts, int config);
 char userlist_type(struct userlist *u);
 
 int ignored_add(uin_t uin, int level);

@@ -569,6 +569,34 @@ char *array_join(char **array, const char *sep)
 }
 
 /*
+ * array_contains()
+ *
+ * stwierdza, czy tablica zawiera podany element.
+ *
+ *  - array - tablica
+ *  - string - szukany ci±g znaków
+ *  - casesensitive - czy mamy zwracaæ uwagê na wielko¶æ znaków?
+ *
+ * 0/1
+ */
+int array_contains(char **array, const char *string, int casesensitive)
+{
+	int i;
+
+	if (!array || !string)
+		return 0;
+
+	for (i = 0; array[i]; i++) {
+		if (casesensitive && !strcmp(array[i], string))
+			return 1;
+		if (!casesensitive && !strcasecmp(array[i], string))
+			return 1;
+	}
+
+	return 0;
+}
+	
+/*
  * array_free()
  *
  * zwalnia pamieæ zajmowan± przez tablicê.

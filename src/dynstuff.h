@@ -60,6 +60,7 @@ char **array_make(const char *string, const char *sep, int max, int trim, int qu
 char *array_join(char **array, const char *sep);
 void array_add(char ***array, char *string);
 int array_count(char **array);
+int array_contains(char **array, const char *string, int casesensivit);
 void array_free(char **array);
 
 /* rozszerzenia libców */

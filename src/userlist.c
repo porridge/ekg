@@ -136,20 +136,22 @@ int userlist_read()
  * userlist_set()
  *
  * ustawia listê kontaktów na podan±.
+ *
+ * 0/-1
  */
-int userlist_set(char *contacts, int config)
+int userlist_set(const char *contacts, int config)
 {
 	string_t vars = NULL;
-	char *buf;
+	char *buf, *cont, *contsave;
 
 	userlist_clear();
 
 	if (config)
 		vars = string_init(NULL);
 	
-	/* XXX argh! zmieniæ na nie ruszaj±ce ,,contacts'' */
+	contsave = cont = xstrdup(contacts);
 	
-	while ((buf = gg_get_line(&contacts))) {
+	while ((buf = gg_get_line(&cont))) {
 		struct userlist u;
 		char **entry;
 		
@@ -195,10 +197,15 @@ int userlist_set(char *contacts, int config)
 		list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);
 	}
 
+	xfree(contsave);
+
 	if (config) {
 		char *tmp = string_free(vars, 0);
+		
 		gg_debug(GG_DEBUG_MISC, "// received ekg variables digest: %s\n", tmp);
-		variable_undigest(tmp);	/* XXX kod b³êdu */
+
+		if (variable_undigest(tmp))
+			return -1;
 
 		if (sess && sess->state == GG_STATE_CONNECTED) {
 			if (config_reason) {

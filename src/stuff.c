@@ -2813,7 +2813,7 @@ int msg_encrypt(uin_t uin, unsigned char **msg)
 	int len;
 		
 	if (config_encryption == 1) {
-		unsigned char *enc = xmalloc(4096);	/* XXX idiotyzm */
+		unsigned char *enc = xmalloc(4096);	/* sad but true */
 		memset(enc, 0, 4096);
 		
 		len = SIM_Message_Encrypt(*msg, enc, strlen(*msg), uin);

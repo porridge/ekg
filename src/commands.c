@@ -392,8 +392,6 @@ COMMAND(cmd_away)
 		sms_away_free();
 	}
 
-	/* XXX mo¿e by tak do osobnej funkcji? */
-
 	if (!strcasecmp(name, "private")) {
 		int tmp;
 
@@ -1871,14 +1869,13 @@ COMMAND(cmd_msg)
 		char **tmp = array_make(nick, ",", 0, 0, 0);
 		int i;
 
-		/* XXX nie s± wykrywane duplikaty */
-		
 		for (i = 0; tmp[i]; i++) {
 			int count = 0;
 			list_t l;
 
 			if (tmp[i][0] != '@') {
-				array_add(&nicks, xstrdup(tmp[i]));
+				if (!array_contains(nicks, tmp[i], 0))
+					array_add(&nicks, xstrdup(tmp[i]));
 				continue;
 			}
 
@@ -1890,7 +1887,8 @@ COMMAND(cmd_msg)
 					struct group *g = m->data;
 
 					if (!strcasecmp(g->name, tmp[i] + 1)) {
-						array_add(&nicks, xstrdup(u->display));
+						if (!array_contains(nicks, u->display, 0))
+							array_add(&nicks, xstrdup(u->display));
 						count++;
 					}
 				}

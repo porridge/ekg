@@ -436,7 +436,6 @@ void handle_msg(struct gg_event *e)
 			char *tmp;
 			cp_to_iso(e->event.msg.message);
 			tmp = log_escape(e->event.msg.message);
-			/* XXX eskejpowanie */
 			put_log(e->event.msg.sender, "%sign,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), tmp);
 			xfree(tmp);
 		}
@@ -1104,7 +1103,7 @@ void handle_pubdir(struct gg_http *h)
 
 	if (h->type == GG_SESSION_REGISTER) {
 		if (!s->uin) {
-			print(bad, "Serwer odrzuci³ ¿±danie");	/* XXX themy */
+			print("register_failed", "");
 			goto fail;
 		}
 		
@@ -1123,7 +1122,7 @@ void handle_pubdir(struct gg_http *h)
 
 	if (h->type == GG_SESSION_UNREGISTER) {
 		if (!s->uin) {
-			print(bad, "Serwer odrzuci³ ¿±danie");	/* XXX themy */
+			print("unregister_failed", "");
 			goto fail;
 		}
 
