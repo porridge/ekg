@@ -116,7 +116,7 @@ char *va_format_string(const char *format, va_list ap)
 			
 			argc = *p - '0';
 		} else {
-			if (*p >= '1' && *p <= '9')
+			if (*p >= '1' && *p <= '9' && (*p - '0') > argc)
 				argc = *p - '0';
 		}
 	}
