@@ -144,7 +144,8 @@ AC_DEFUN(AC_CHECK_READLINE,[
 	     /usr/local/include:-L/usr/local/lib \
              /usr/freeware/include:-L/usr/freeware/lib32 \
 	     /usr/pkg/include:-L/usr/pkg/lib \
-	     /sw/include:-L/sw/lib ; do
+	     /sw/include:-L/sw/lib \
+	     /net/caladium/usr/people/piotr.nba/temp/pkg/include:-L/net/caladium/usr/people/piotr.nba/temp/pkg/lib; do
     
       incl=`echo "$i" | sed 's/:.*//'`
       lib=`echo "$i" | sed 's/.*://'`
