@@ -43,4 +43,6 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 
 void remove_transfer(struct gg_dcc *d);
 
+void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_t ip, uint16_t port, int version, int image_size);
+
 #endif /* __EVENTS_H */

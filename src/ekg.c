@@ -546,19 +546,13 @@ void ekg_wait_for_key()
 			
 					if (u && group_member(u, "spied"))
 						if (GG_S_I(u->status)) {
-
-							u->last_seen = time(NULL);
-							xfree(u->last_descr);
-							u->last_descr = xstrdup(u->descr);
-
-							if (GG_S_D(u->status))
-								u->status = GG_STATUS_NOT_AVAIL_DESCR;
-							else
-								u->status = GG_STATUS_NOT_AVAIL;
+							int status = (GG_S_D(u->status)) ? GG_STATUS_NOT_AVAIL_DESCR : GG_STATUS_NOT_AVAIL;
+							iso_to_cp(u->descr);
+							handle_common(u->uin, status, u->descr, time(NULL), u->ip.s_addr, u->port, u->protocol, u->image_size);
 						}
 
 					list_remove(&spiedlist, s, 1);
-				}	
+				}
 			}
 		}
 

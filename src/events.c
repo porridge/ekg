@@ -747,12 +747,11 @@ void handle_ack(struct gg_event *e)
  *  - version - nowa wersja,
  *  - image_size - nowy rozmiar obrazka.
  */
-static void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_t ip, uint16_t port, int version, int image_size)
+void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_t ip, uint16_t port, int version, int image_size)
 {
 	struct userlist *u;
 	static struct userlist ucache[20];
 	static time_t seencache[20];
-	static char first_time = 1;
 	struct status_table {
 		int status;
 		int event;
@@ -778,12 +777,6 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 #ifdef WITH_PYTHON
 	list_t l;
 #endif
-
-	if (first_time) {
-		first_time = 0;
-		memset(ucache, 0, sizeof(ucache));
-		memset(seencache, 0, sizeof(seencache));
-	}
 
 	/* nie pokazujemy nieznajomych, chyba ze display_notify & 4 */
 	if (!(u = userlist_find(uin, NULL))) {
@@ -869,7 +862,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 	}
 #endif
 
-#define __USER_QUITING ((GG_S_NA(status) || GG_S_I(status)) && !(GG_S_NA(u->status) || GG_S_I(u->status)))
+#define __USER_QUITING (GG_S_NA(status) && !GG_S_NA(u->status))
 
 	if (GG_S_BL(status) && !GG_S_BL(u->status)) {
 		u->status = status;	/* poza list± stanów */
@@ -887,39 +880,11 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 	}
 
 	/* je¶li kto¶ odchodzi albo dostajemy powiadomienie, ¿e go nie ma (i go nie by³o)... */
-	if (__USER_QUITING || GG_S_NA(status)) {
+	if (GG_S_NA(status)) {
 
-		/* ... i je¶li go podgl±damy, to sprawd¼my czy siê nie ukrywa */
-		if (group_member(u, "spied")) {
-			int onlist;
-			list_t l;
-
-			onlist = 0;
-			for (l = spiedlist; l; l = l->next) {
-				struct spied *s = l->data;
-
-				if (s->uin == u->uin) {
-					onlist = 1;
-					break;
-				}
-			}
-
-			if (!onlist) {
-				char *tmp;
-				struct spied s;
-
-				s.uin = u->uin;
-				/* je¶li po 10 sek. nie uzyskamy odpowiedzi, tzn. ¿e jednak kto¶ jest naprawdê niedostêpny */	
-				s.timeout = 10;
-				list_add(&spiedlist, &s, sizeof(s));
-
-				tmp = saprintf("/check_conn %d", u->uin);
-				command_exec(NULL, tmp, 1);
-				xfree(tmp);
-
-				gg_debug(GG_DEBUG_MISC, "// ekg: spying: %d\n", u->uin);
-			}
-		}
+		/* ... i je¶li go podgl±damy, to sprawd¼my, czy siê nie ukrywa */
+		if (!GG_S_I(u->status) && group_member(u, "spied"))
+			check_conn(u->uin);
 	}
 
 	if (ip)
@@ -1285,16 +1250,14 @@ void handle_success(struct gg_event *e)
 	last_conn_event = time(NULL);
 
 	addr.s_addr = sess->server_addr;
+
 	event_check(EVENT_CONNECTED, 0, inet_ntoa(addr));
 
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
 
-		if (group_member(u, "spied")) {
-			char *tmp = saprintf("/check_conn %d", u->uin);
-			command_exec(NULL, tmp, 1);
-			xfree(tmp);
-		}
+		if (group_member(u, "spied"))
+			check_conn(u->uin);
 	}
 }
 
@@ -2318,12 +2281,9 @@ void handle_image_reply(struct gg_event *e)
 		}
 
 		if (GG_S_NA(u->status)) {
-			if (GG_S_D(u->status))
-				u->status = GG_STATUS_INVISIBLE_DESCR;
-			else
-				u->status = GG_STATUS_INVISIBLE;
-
-			event_check(EVENT_INVISIBLE, u->uin, u->descr);
+			int status = (GG_S_D(u->status)) ? GG_STATUS_INVISIBLE_DESCR : GG_STATUS_INVISIBLE;
+			iso_to_cp(u->descr);
+			handle_common(u->uin, status, u->descr, time(NULL), u->ip.s_addr, u->port, u->protocol, u->image_size);
 		}
 
 	} else if (e->event.image_request.crc32 == GG_CRC32_INVISIBLE) {

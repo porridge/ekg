@@ -476,6 +476,7 @@ int ekg_hide_descr_status(int status);
 /* funkcje poza stuff.c */
 void ekg_wait_for_key();
 void ekg_exit();
+int check_conn(uin_t uin);
 
 #ifdef WITH_ASPELL
 void spellcheck_init(void);
