@@ -1261,7 +1261,7 @@ void handle_userlist(struct gg_http *h)
 	if (h->callback(h) || h->state == GG_STATE_ERROR) {
 		print(format_error, strerror(errno));
 		list_remove(&watches, h, 0);
-		xfree(h->user_data);
+		h->destroy(h);
 		return;
 	}
 	
