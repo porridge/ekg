@@ -149,10 +149,13 @@ int my_getc(FILE *f)
 				struct gg_session *s = l->data;
 				struct gg_common *c = l->data;
 				struct gg_http *h = l->data;
+				char *errmsg;
 
 				if (!FD_ISSET(c->fd, &rd) && !FD_ISSET(c->fd, &wd))
 					continue;
 
+				errmsg = NULL;
+				
 				switch (c->type) {
 					case GG_SESSION_USER0:
 						return rl_getc(stdin);
@@ -162,15 +165,7 @@ int my_getc(FILE *f)
 						break;
 
 					case GG_SESSION_SEARCH:
-						if (gg_search_watch_fd(h) == -1) {
-							my_printf("search_failed", strerror(errno));
-							free(h->user_data);
-							list_remove(&watches, h, 0);
-							gg_free_search(h);
-							break;
-						}
-						if (h->state == GG_STATE_ERROR) {
-							gg_debug(GG_DEBUG_MISC, "++ gg_search()... error\n");
+						if (gg_search_watch_fd(h) || h->state == GG_STATE_ERROR) {
 							my_printf("search_failed", strerror(errno));
 							free(h->user_data);
 							list_remove(&watches, h, 0);
@@ -188,24 +183,37 @@ int my_getc(FILE *f)
 						break;
 
 					case GG_SESSION_REGISTER:
-						if (gg_register_watch_fd(h)) {
-							my_printf("register_failed", strerror(errno));
+						if (!errmsg)
+							errmsg = "register_failed";
+					case GG_SESSION_PASSWD:
+						if (!errmsg)
+							errmsg = "passwd_failed";
+					case GG_SESSION_REMIND:
+						if (!errmsg)
+							errmsg = "remind_failed";
+					case GG_SESSION_CHANGE:
+						if (!errmsg)
+							errmsg = "change_failed";
+
+						if (gg_pubdir_watch_fd(h) || s->state == GG_STATE_ERROR) {
+							my_printf(errmsg, strerror(errno));
 							list_remove(&watches, h, 0);
-							gg_free_register(h);
-							free(reg_password);
+							gg_free_pubdir(h);
+							if (h->type == GG_SESSION_REGISTER) {
+								free(reg_password);
+								reg_password = NULL;
+							}
 							break;
 						}
-						if (s->state == GG_STATE_ERROR) {
-							my_printf("register_failed", strerror(errno));
-							list_remove(&watches, h, 0);
-							gg_free_register(h);
-							free(reg_password);
-							break;
-						}
+						
 						if (s->state == GG_STATE_DONE) {	
-							handle_register(h);
+							handle_pubdir(h);
 							list_remove(&watches, h, 0);
-							gg_free_register(h);
+							gg_free_pubdir(h);
+							if (h->type == GG_SESSION_REGISTER) {
+								free(reg_password);
+								reg_password = NULL;
+							}
 							break;
 						}
 					}

@@ -62,7 +62,8 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_save(), command_msg(), command_quit(), command_test_send(),
 	command_test_add(), command_theme(), command_set(), command_connect(),
 	command_sms(), command_find(), command_modify(), command_cleartab(),
-	command_status(), command_register(), command_test_watches();
+	command_status(), command_register(), command_test_watches(),
+	command_remind();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -98,6 +99,7 @@ struct command commands[] = {
 	{ "modify", "u?", command_modify, " <alias> [opcje]", "Zmienia informacje w li¶cie kontaktów", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n  --alias <alias>  // nazwa w li¶cie kontaktów\n  --phone <telefon>\n  --uin <numerek>\n" },
 	{ "private", "", command_away, " [on/off]", "W³±cza/wy³±cza tryb ,,tylko dla przyjació³''", "" },
 	{ "register", "??", command_register, " <email> <has³o>", "Rejestruje nowy uin", "" },
+	{ "remind", "", command_remind, "", "Wysy³a has³o na skrzynkê pocztow±", "" },
 	{ "save", "", command_save, "", "Zapisuje ustawienia programu", "" },
 	{ "set", "v?", command_set, " <zmienna> <warto¶æ>", "Wy¶wietla lub zmienia ustawienia", "" },
 	{ "sms", "u?", command_sms, " <numer/alias> <tre¶æ>", "Wysy³a SMSa do podanej osoby", "" },
@@ -1222,6 +1224,25 @@ COMMAND(command_register)
 	list_add(&watches, h, 0);
 
 	reg_password = strdup(params[1]);
+	
+	return 0;
+}
+
+COMMAND(command_remind)
+{
+	struct gg_http *h;
+	
+	if (!params[0] || !params[1]) {
+		my_printf("not_enough_params");
+		return 0;
+	}
+
+	if (!(h = gg_remind_passwd(config_uin, 1))) {
+		my_printf("remind_failed", strerror(errno));
+		return 0;
+	}
+
+	list_add(&watches, h, 0);
 	
 	return 0;
 }

@@ -341,20 +341,47 @@ void handle_search(struct gg_http *h)
 	}
 }
 
-void handle_register(struct gg_http *h)
+void handle_pubdir(struct gg_http *h)
 {
 	struct gg_pubdir *s = NULL;
-	char uin[16];
+	char uin[16], *good = "", *bad = "";
 
-	if (!h || !(s = h->data) || !s->success || !s->uin)
-		my_printf("register_error");
-	
-	if (!config_uin && !config_password && reg_password) {
-		config_uin = s->uin;
-		config_password = reg_password;
+	if (!h)
+		return;
+
+	switch (h->type) {
+		case GG_SESSION_REGISTER:
+			good = "register";
+			bad = "register_failed";
+			break;
+		case GG_SESSION_PASSWD:
+			good = "passwd";
+			bad = "passwd_failed";
+			break;
+		case GG_SESSION_REMIND:
+			good = "remind";
+			bad = "remind_failed";
+			break;
+	}
+
+	if (!(s = h->data) || !s->success) {
+		my_printf(bad);
+		return;
+	}
+
+	if (h->type == GG_SESSION_REGISTER) {
+		if (!s->uin) {
+			my_printf(bad);
+			return;
+		}
+		
+		if (!config_uin && !config_password && reg_password) {
+			config_uin = s->uin;
+			config_password = reg_password;
+		}
 	}
 	
 	snprintf(uin, sizeof(uin), "%lu", s->uin);
-	my_printf ("register", uin);
+	my_printf(good, uin);
 };
 
