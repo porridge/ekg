@@ -71,7 +71,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 	int width, next_width, i, j, mem_width = 0;
 	char *mesg, *buf, *line, *next, *format = NULL, *format_first = "", *next_format = NULL, *head = NULL, *foot = NULL, *save;
 	char *line_width = NULL, timestr[100];
-	const char *target = (chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender));
+	char *target = xstrdup((chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender)));
 	struct tm *tm;
 	
 	switch (chat) {
@@ -205,11 +205,13 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 			free(new_line);
 	}
 
-	free(buf);
-	free(save);
+	xfree(buf);
+	xfree(save);
 
 	if (!strcmp(format_find(format_first), ""))
 		print_window(target, 1, foot);
+
+	xfree(target);
 }
 
 /*
