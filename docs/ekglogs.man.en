@@ -1,0 +1,72 @@
+.TH EKGLOGS 1 "7 September 2003"
+.SH NAME
+ekglogs \- a logs lister for EKG
+.SH SYNTAX
+.B ekglogs [
+.BI options
+.B ]
+<
+.B ~/.gg/history
+
+.SH DESCRIPTION
+.B ekglogs
+reads ekg logs on standard input and prints them out nicely formatted on
+standard output.
+	
+.SH OPTIONS
+.TP
+.BI \-t
+don't display time at all
+.TP
+.BI \-d
+don't display day changes
+.TP
+.BI \-x
+always print nicknames
+.TP
+.BI \-v
+never display nicknames
+(by default: print nicknames unless either `u' or `n' was specified)
+.TP
+.BI \-r
+display incoming messages' receipt time
+.TP
+.BI \-R
+like \fB\-r\fR and align outgoing messages
+.TP
+.BI \-s
+display seconds
+.TP
+.BI \-S
+display receipt time seconds
+.TP
+.BI \-C
+display a colon between hours and minutes
+.TP
+.BI \-b
+do not display malformed lines (they start with !!!)
+.TP
+.BI \-a
+do not display status changes
+.TP
+.BI \-c
+use colourful display
+.TP
+.BI \-h
+display help message
+.TP
+.BI \-u\ UIN
+display only messages from/to \fIUIN\fR
+.TP
+.BI \-n\ NICK
+display only messages from/to \fINICK\fR
+.PP
+Options don't need to be preceded with `-', and may be concatenated.
+.PP
+Option `u' or `n' should be specified as last one. You should not specify both
+`u' and `n'.
+
+.SH AUTHOR
+Robert Goliasz <rgoliasz@poczta.onet.pl>
+.SH "SEE ALSO"
+.BR ekg (1)
