@@ -1246,6 +1246,9 @@ COMMAND(cmd_list)
 		struct in_addr in;
 		int show;
 
+		if (!u->display)
+			continue;
+
 		tmp = "list_unknown";
 		switch (u->status) {
 			case GG_STATUS_AVAIL:
