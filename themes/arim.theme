@@ -170,11 +170,14 @@ userlist_get_error %! %RB³±d podczas pobierania listy kontaktów!%n\n
 userlist_get_ok %) %WListê kontaktów wczytano z serwera.%n\n
 userlist_put_error %! %RB³±d podczas wysy³ania listy kontaktów!%n\n
 userlist_put_ok %) %WListê kontaktów zachowano na serwerze.%n\n
-variable %> %K%[_25]1%W%2%n\n
+variable %> %K%[_25]1%w%2%n\n
 variable_invalid %! %Wset:%n %r[%1]%n <- z³a warto¶æ.\n
 variable_not_found %! %RNieznana zmienna%n%W:%n %K[%n%W%1%n%K]%n\n
 statusbar  %c|%w%{time}%c|%w %c(%w%{?!nick uin}%{nick}%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) (%wwin%c/%w%{window}%{?query %c:%W}%{query}%c)%w%{?activity  %c(%wact%c/%w}%{activity}%{?activity %c)%w}%{?mail  %c(%wmail%c/%w}%{mail}%{?mail %c)}%{?more  %c(%Gwiêcej%c)}%{?debug  %c(%Cdebug%c)}
-ncurses_prompt > 
+ncurses_prompt_none >
+ncurses_prompt >
+ncurses_prompt_query %1> 
+header  %c..:: %w%{window}%c %{?query :: %c%{?query_away %w}%{?query_avail %W}%{?query_invisible %K}%{?query_notavail %k}%{query}%{?query_descr %c/%w%{query_descr}}%c %{?query_ip :: %wip%c/%w%{query_ip}%c}}%{?!query :: %c%wekg%c/%w%{version}%c :: %w%{url}%c}%c ::..%n
 
 # Variant specific formats
 chat_footer %W+------------%n\n
