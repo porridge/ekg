@@ -135,6 +135,11 @@ struct window {
 	int overflow;		/* ilo¶æ nadmiarowych linii w okienku */
 };
 
+struct format_data {
+	char *name;			/* %{nazwa} */
+	char *text;			/* tre¶æ */
+};
+
 static WINDOW *status = NULL;		/* okno stanu */
 static WINDOW *header = NULL;		/* okno nag³ówka */
 static WINDOW *input = NULL;		/* okno wpisywania tekstu */
@@ -409,8 +414,11 @@ void window_resize()
 			}
 		}
 
-		w->height += delta;
+		w->height = OUTPUT_SIZE;
 		wresize(w->window, w->height, w->width);
+
+		w->top = config_header_size;
+		mvwin(w->window, w->top, w->left);
 
 		w->redraw = 1;
 	}
@@ -767,6 +775,7 @@ static struct window *window_new(const char *target, int new_id)
 	memset(&w, 0, sizeof(w));
 
 	w.id = id;
+	w.top = config_header_size;
 
 	if (target) {
 		if (*target == '*') {
@@ -1071,6 +1080,7 @@ static void update_contacts(int commit)
  */
 void contacts_rebuild()
 {
+	static int last_header_size = -1;
 	list_t l;
 
 	/* nie jeste¶my w ncurses */
@@ -1103,15 +1113,16 @@ void contacts_rebuild()
 		return;
 	}
 
-	if (config_contacts_size == last_contacts_size)
+	if (config_contacts_size == last_contacts_size && config_header_size == last_header_size)
 		return;
 		
 	last_contacts_size = config_contacts_size;
+	last_header_size = config_header_size;
 	
 	if (contacts)
 		delwin(contacts);
 	
-	contacts = newwin(OUTPUT_SIZE, config_contacts_size + 2, 0, stdscr->_maxx - config_contacts_size - 1);
+	contacts = newwin(OUTPUT_SIZE, config_contacts_size + 2, config_header_size, stdscr->_maxx - config_contacts_size - 1);
 
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
@@ -1160,6 +1171,133 @@ static void update_header(int commit)
 }
 		
 /*
+ * print_statusbar()
+ *
+ * wy¶wietla pasek stanu zgodnie z podany formatem i danymi.
+ *
+ *  - w - okno ncurses, do którego piszemy
+ *  - x, y - wspó³rzêdne, od których zaczynamy
+ *  - format - co mamy wy¶wietliæ
+ *  - data - dane do podstawienia w formatach
+ *
+ * zwraca ilo¶æ dopisanych znaków.
+ */
+int print_statusbar(WINDOW *w, int x, int y, const char *format, struct format_data *data)
+{
+	const char *p = format;
+	int orig_x = x;
+
+	wmove(w, y, x);
+			
+	while (*p && *p != '}' && x <= w->_maxx) {
+		int i, nest;
+
+		if (*p != '%') {
+			waddch(w, (unsigned char) *p);
+			p++;
+			x++;
+			continue;
+		}
+
+		p++;
+		if (!*p)
+			break;
+
+#define __color(x,y,z) \
+		case x: wattrset(w, COLOR_PAIR(8 + z)); break; \
+		case y: wattrset(w, COLOR_PAIR(8 + z) | A_BOLD); break;
+
+		if (*p != '{' && config_display_color) {
+			switch (*p) {
+				__color('k', 'K', 0);
+				__color('r', 'R', 1);
+				__color('g', 'G', 2);
+				__color('y', 'Y', 3);
+				__color('b', 'B', 4);
+				__color('m', 'M', 5);
+				__color('c', 'C', 6);
+				__color('w', 'W', 7);
+				case 'n':
+					wattrset(status, (config_display_color) ? COLOR_PAIR(15) : A_NORMAL);
+					break;
+			}
+			p++;
+			continue;
+		}
+#undef __color
+		if (*p != '{' && !config_display_color)
+			continue;
+
+		p++;
+		if (!*p)
+			break;
+
+		for (i = 0; data[i].name; i++) {
+			int len;
+
+			if (!data[i].text)
+				continue;
+
+			len = strlen(data[i].name);
+
+			if (!strncmp(p, data[i].name, len) && p[len] == '}') {
+				waddstr(w, data[i].text);
+				p += len;
+				x += strlen(data[i].text);
+				goto next;
+			}
+		}
+
+		if (*p == '?') {
+			int neg = 0;
+
+			p++;
+			if (!*p)
+				break;
+
+			if (*p == '!') {
+				neg = 1;
+				p++;
+			}
+
+			for (i = 0; data[i].name; i++) {
+				int len, matched = (int) data[i].text;
+
+				if (neg)
+					matched = !matched;
+
+				len = strlen(data[i].name);
+
+				if (!strncmp(p, data[i].name, len) && p[len] == ' ') {
+					p += len + 1;
+
+					if (matched)
+						x += print_statusbar(w, x, y, p, data);
+					goto next;
+				}
+			}
+
+			goto next;
+		}
+
+next:
+		/* uciekamy z naszego poziomu zagnie¿d¿enia */
+
+		nest = 1;
+
+		while (*p && nest) {
+			if (*p == '}')
+				nest--;
+			if (*p == '{')
+				nest++;
+			p++;
+		}
+	}
+
+	return x - orig_x;
+}
+
+/*
  * update_statusbar()
  *
  * uaktualnia pasek stanu i wy¶wietla go ponownie.
@@ -1168,20 +1306,129 @@ static void update_header(int commit)
  */
 static void update_statusbar(int commit)
 {
-	int y;
+	struct userlist *u = userlist_find(config_uin, NULL);
+	struct userlist *q = userlist_find(0, window_current->target);
+	struct format_data *formats = NULL;
+	int formats_count = 0, i, y;
 
-	if (config_display_color)
+	if (config_display_color) {
 		wattrset(status, COLOR_PAIR(15));
-	else
+		if (header)
+			wattrset(header, COLOR_PAIR(15));
+	} else {
 		wattrset(status, A_REVERSE);
+		if (header)
+			wattrset(header, A_REVERSE);
+	}
+
+	/* inicjalizujemy wszystkie opisowe bzdurki */
+
+	memset(&formats, 0, sizeof(formats));
+
+#define __add_format(x, y, z) \
+	{ \
+		formats = xrealloc(formats, (formats_count + 2) * sizeof(struct format_data)); \
+		formats[formats_count].name = x; \
+		formats[formats_count].text = (y) ? xstrdup(z) : NULL; \
+		formats_count++; \
+		formats[formats_count].name = NULL; \
+		formats[formats_count].text = NULL; \
+	} 
+
+	{
+		time_t t = time(NULL);
+		struct tm *tm;
+		char tmp[16];
+
+		tm = localtime(&t);
+
+		strftime(tmp, sizeof(tmp), "%H:%M", tm);
+		
+		__add_format("time", 1, tmp);
+	}
+
+	__add_format("window", 1, itoa(window_current->id));
+	__add_format("uin", config_uin, itoa(config_uin));
+	__add_format("nick", (u && u->display), u->display);
+	__add_format("query", 1, window_current->target);
+	__add_format("descr", 1, config_reason);
+	__add_format("mail", (config_check_mail && mail_count), itoa(mail_count));
+	{
+		string_t s = string_init("");
+		int first = 1, act = 0;
+		list_t l;
+
+		for (l = windows; l; l = l->next) {
+			struct window *w = l->data;
+
+			if (!w->act) 
+				continue;
+
+			if (!first)
+				string_append_c(s, ',');
+			
+			string_append(s, itoa(w->id));
+			first = 0;
+			act = 1;
+		}
+		
+		__add_format("activity", (act), s->str);
+
+		string_free(s, 1);
+	}
+	
+	__add_format("debug", (config_debug), "");
+	__add_format("away", GG_S_B(config_status), "");
+	__add_format("busy", GG_S_B(config_status), "");
+	__add_format("avail", GG_S_A(config_status), "");
+	__add_format("invisible", GG_S_I(config_status), "");
+	__add_format("notavail", (!sess || sess->state != GG_STATE_CONNECTED), "");
+	__add_format("more", (window_current->more), "");
+
+	__add_format("query_descr", (q), q->descr);
+	__add_format("query_away", (q && GG_S_B(q->status)), "");
+	__add_format("query_busy", (q && GG_S_B(q->status)), "");
+	__add_format("query_avail", (q && GG_S_A(q->status)), "");
+	__add_format("query_invisible", (q && GG_S_I(q->status)), "");
+	__add_format("query_notavail", (q && GG_S_NA(q->status)), "");
+
+	__add_format("url", 1, "http://dev.null.pl/ekg/");
+	__add_format("version", 1, VERSION);
+
+#undef __add_format
+	
+	for (y = 0; y < config_header_size; y++) {
+		const char *p;
+		int x;
+
+		wmove(header, y, 0);
+
+		for (x = 0; x <= header->_maxx; x++)
+			waddch(header, ' ');
+		
+		wmove(header, y, 0);
+
+		if (!y) {
+			p = format_find("header1");
+
+			if (!strcmp(p, ""))
+				p = format_find("header");
+		} else {
+			char *tmp = saprintf("header%d", y + 1);
+			p = format_find(tmp);
+			xfree(tmp);
+		}
+
+		print_statusbar(header, 0, y, p, formats);
+	}
 
 	for (y = 0; y < config_statusbar_size; y++) {
 		const char *p;
-		int i, nested = 0;
+		int x;
 
 		wmove(status, y, 0);
 
-		for (i = 0; i <= status->_maxx; i++)
+		for (x = 0; x <= status->_maxx; x++)
 			waddch(status, ' ');
 		
 		wmove(status, y, 0);
@@ -1196,203 +1443,15 @@ static void update_statusbar(int commit)
 			p = format_find(tmp);
 			xfree(tmp);
 		}
-		
-		for (; *p; p++) {
-			if (*p == '}' && nested) {
-				nested--;
-				continue;
-			}
 
-			if (*p != '%') {
-				waddch(status, (unsigned char) *p);
-				continue;
-			}
-		
-			p++;
+		print_statusbar(status, 0, y, p, formats);
+	}
 
-			if (!*p)
-				break;
+	for (i = 0; formats[i].name; i++)
+		xfree(formats[i].text);
 
-#define __color(x,y,z) \
-		case x: wattrset(status, COLOR_PAIR(8+z)); break; \
-		case y: wattrset(status, COLOR_PAIR(8+z) | A_BOLD); break;
-
-			if (*p != '{' && config_display_color) {
-				switch (*p) {
-					__color('k', 'K', 0);
-					__color('r', 'R', 1);
-					__color('g', 'G', 2);
-					__color('y', 'Y', 3);
-					__color('b', 'B', 4);
-					__color('m', 'M', 5);
-					__color('c', 'C', 6);
-					__color('w', 'W', 7);
-					case 'n':
-						wattrset(status, (config_display_color) ? COLOR_PAIR(15) : A_NORMAL);
-						break;
-				}
-				continue;
-			}
-#undef __color
-			if (*p != '{' && !config_display_color)
-				continue;
-
-			p++;
-			if (!*p)
-				break;
-
-			if (!strncmp(p, "time}", 5)) {
-				struct tm *tm;
-				time_t t = time(NULL);
-				char tmp[16];
-
-				tm = localtime(&t);
-
-				strftime(tmp, sizeof(tmp), "%H:%M", tm);
-				waddstr(status, tmp);
-				p += 4;
-			} else if (!strncmp(p, "time ", 5)) {	/* XXX naprawiæ */
-				struct tm *tm;
-				time_t t = time(NULL);
-				char tmp[100], *fmt;
-				const char *q;
-
-				tm = localtime(&t);
-
-				p += 5;
-
-				for (q = p; *q && *q != '}'; q++);
-
-				fmt = xmalloc(q - p + 1);
-				strncpy(fmt, p, q - p);
-				fmt[q - p] = 0;
-
-				strftime(tmp, sizeof(tmp), fmt, tm);
-
-				xfree(fmt);
-				p = q - 1;
-			} else if (!strncmp(p, "window}", 7)) {
-				waddstr(status, itoa(window_current->id));
-				p += 6;
-			} else if (!strncmp(p, "uin}", 4)) {
-				waddstr(status, itoa(config_uin));
-				p += 3;
-			} else if (!strncmp(p, "nick}", 5)) {
-				struct userlist *u = userlist_find(config_uin, NULL);
-				if (u && u->display)
-					waddstr(status, u->display);
-				p += 4;
-			} else if (!strncmp(p, "query}", 6)) {
-				if (window_current->target)
-					waddstr(status, window_current->target);
-				p += 5;
-			} else if (!strncmp(p, "descr}", 6)) {
-				if (config_reason)
-					waddstr(status, config_reason);
-				p += 5;
-			} else if (!strncmp(p, "mail}", 5)) {
-				if (config_check_mail && mail_count)
-					waddstr(status, itoa(mail_count));
-				p += 4;
-			} else if (!strncmp(p, "activity}", 9)) {
-				string_t s = string_init("");
-				int first = 1;
-				list_t l;
-
-				for (l = windows; l; l = l->next) {
-					struct window *w = l->data;
-
-					if (w->act) {
-						if (!first) 
-							string_append_c(s, ',');
-						string_append(s, itoa(w->id));
-						first = 0;
-					}
-				}
-				
-				waddstr(status, s->str);
-
-				string_free(s, 1);
-
-				p += 8;
-			} else if (*p == '?') {
-				int matched = 0, neg = 0;
-
-				p++;
-				if (!*p)
-					break;
-
-				if (*p == '!') {
-					neg = 1;
-					p++;
-					if (!*p)
-						break;
-				}
-				
-				if (!strncmp(p, "debug ", 6)) {
-					matched = (config_debug);
-					p += 5;
-				} else if (!strncmp(p, "mail ", 5)) {
-					matched = (config_check_mail && mail_count);
-					p += 4;
-				} else if (!strncmp(p, "descr ", 6)) {
-					matched = (config_reason != NULL);
-					p += 5;
-				} else if (!strncmp(p, "away ", 5)) {
-					matched = GG_S_B(config_status);
-					p += 4;
-				} else if (!strncmp(p, "avail ", 6)) {
-					matched = GG_S_A(config_status);
-					p += 5;
-				} else if (!strncmp(p, "invisible ", 10)) {
-					matched = GG_S_I(config_status);
-					p += 9;
-				} else if (!strncmp(p, "notavail ", 9)) {
-					matched = (!sess || sess->state != GG_STATE_CONNECTED);
-					p += 8;
-				} else if (!strncmp(p, "query ", 6)) {
-					matched = (window_current->target != NULL);
-					p += 5;
-				} else if (!strncmp(p, "activity ", 9)) {
-					list_t l;
-
-					for (l = windows; l; l = l->next) {
-						struct window *w = l->data;
-
-						if (w->act)
-							matched = 1;
-					}
-
-					p += 8;
-				} else if (!strncmp(p, "more ", 5)) {
-					matched = (window_current->more);
-					p += 4;
-				} else if (!strncmp(p, "nick ", 5)) {
-					struct userlist *u = userlist_find(config_uin, NULL);
-					
-					matched = (u && u->display);
-					p += 4;
-				}
-
-				if (neg)
-					matched = !matched;
-
-				if (!matched) {
-					while (*p && *p != '}')
-						p++;
-					if (!*p)
-						break;
-				} else 
-					nested++;
-			} else {
-				while (*p && *p != '}')
-					p++;
-				if (!*p)
-					break;
-			}
-		}
-	}	
-
+	xfree(formats);
+	
 	if (commit)
 		window_commit();
 }
@@ -3208,8 +3267,6 @@ cleanup:
  */
 void header_statusbar_resize()
 {
-	list_t l;
-
 	if (config_header_size < 0)
 		config_header_size = 0;
 
@@ -3223,12 +3280,6 @@ void header_statusbar_resize()
 		config_statusbar_size = 5;
 
 	window_resize();
-
-	for (l = windows; l; l = l->next) {
-		struct window *w = l->data;
-
-		mvwin(w->window, config_header_size, 0);
-	}
 
 	if (config_header_size) {
 		if (!header)
@@ -3249,5 +3300,5 @@ void header_statusbar_resize()
 
 	update_statusbar(0);
 
-	window_commit();
+	contacts_rebuild();	/* commitnie */
 }

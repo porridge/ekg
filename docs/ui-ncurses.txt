@@ -15,10 +15,10 @@ zalecane ustawienia:
 pasek stanu zawiera zegar, informacje o w³asnym numerku (kolor okre¶la
 stan: czarny -- niedostêpny, bia³y -- dostêpny, szary -- zajêty, ciemnoszary
 -- niewidoczny), numer aktualnego okna, informacje o aktywno¶ci w innych
-oknach.
+oknach, nowej poczcie itd.
 
 dodano nowy format ,,statusbar''. podobnie jak i reszta obs³uguje kolory,
-ale nie ma dope³niania, mrugania itp. za to s± konstrukcje warunkowe oraz
+ale nie ma dope³niania, mrugania itp. s± za to konstrukcje warunkowe oraz
 rozszerzone informacje:
 
 	%{time}		aktualny czas formatu %H:%M
@@ -28,6 +28,10 @@ rozszerzone informacje:
 	%{activity}	lista okien, w których siê co¶ pojawi³o
 	%{nick}		w³asny pseudonim
 	%{descr}	opis stanu
+	%{mail}		ilo¶æ nowej poczty lub pusty je¶li nie ma
+	%{query_descr}	opis stanu rozmówcy
+	%{version}	wersja ekg
+	%{url}		adres to strony ekg
 
 konstrukcje warunkowe pozwalaj± dodawaæ do pasku stanu teksty (ale ju¿
 nie rozszerzone informacje lub kolejne warunki) tylko gdy spe³niony
@@ -36,19 +40,33 @@ zostanie okre¶lony warunek. konstrukcje te wygl±daj± nastêpuj±co:
 	%{?warunek tekst}	tekst wy¶wietlony przy spe³nionym warunku
 	%{?!warunek tekst}	tekst wy¶wietlony przy niespe³nionym warunku
 
-a dostêpne warunki to:
+warunkiem mo¿e byæ dostêpno¶æ którego¶ z wy¿ej wymienionych tekstów.
+je¶li na przyk³ad w aktualnym oknie jest prowadzona rozmowa, warunek
+%{?query ...} bêdzie spe³niony. je¶li nie skonfigurowali¶my w³asnego
+numeru, spe³niony bêdzie warunek %{?!uin ...}. ponadto wystêpuj± równie¿:
 
 	%{?away ...}		stan zajêty
 	%{?avail ...}		stan dostêpny
 	%{?notavail ...}	stan niedostêpny (niepo³±czony)
 	%{?invisible ...}	stan niewidoczny
-	%{?descr ...}		stan z opisem
-	%{?query ...}		w aktualnym oknie jest rozmowa
-	%{?activity ...}	w innych oknach co¶ siê dzieje
 	%{?more ...}		dopisano co¶ do okna, gdy jest przewiniête
-	%{?nick ...}		znamy swojego nicka
+	%{?query_away ...}	rozmówca zajêty
+	%{?query_avail ...}	rozmówca dostêpny
+	%{?query_notavail ...}	rozmówca niedostêpny
+	%{?query_invisible ...}	rozmówca niewidoczny
+
+warunki mo¿na zanie¿d¿aæ, tzn. %{?query %{!?query_descr ...}} zostanie
+wy¶wietlone je¶li prowadzona jest rozmowa, ale rozmówca nie ma stanu
+opisowego.
 
 dziêki temu mo¿na konstruowaæ kosmiczne paski stanu. ale i tak domy¶lny
-powinien wystarczyæ ka¿demu.
+powinien wystarczyæ ka¿demu. jest mo¿liwo¶æ rozszerzenia pasku stanu do
+maksymalnie 5-ciu linii. kolejne linie s± opisane formatami ,,statusbar2'',
+,,statusbar3'' itd. je¶li wystêpuje format ,,statusbar1'', ma on
+pierwszeñstwo przed ,,statusbar''.
+
+mo¿liwe jest te¿ w³±czenie nag³ówka okna, tj. paska wy¶wietlanego u góry
+ekranu, nad oknami. jest on opisany formatami ,,header'', ,,header1'',
+,,header2'' itd., analogicznie do paska stanu. dostêne formaty s± identyczne.
 
 $Id$
