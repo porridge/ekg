@@ -165,7 +165,7 @@ void variable_init()
 	if (ui_init == ui_ncurses_init)
 		variable_add("header_size", "hs", VAR_INT, 1, &config_header_size, header_statusbar_resize, NULL, NULL);
 #endif
-	variable_add("keep_reason", "kr", VAR_BOOL, 1, &config_keep_reason, NULL, NULL, NULL);
+	variable_add("keep_reason", "kr", VAR_INT, 1, &config_keep_reason, NULL, NULL, NULL);
 	variable_add("last", "la", VAR_MAP, 1, &config_last, NULL, variable_map(4, 0, 0, "none", 1, 2, "all", 2, 1, "separate", 4, 0, "sent"), NULL);
 	variable_add("last_size", "ls", VAR_INT, 1, &config_last_size, NULL, NULL, NULL);
 	variable_add("log", "lo", VAR_MAP, 1, &config_log, NULL, variable_map(4, 0, 0, "none", 1, 2, "file", 2, 1, "dir", 4, 0, "gzip"), NULL);

@@ -1292,7 +1292,8 @@ void ekg_exit()
 		array_add(&vars, xstrdup("last_sysmsg"));
 
 	if (config_keep_reason) {
-		array_add(&vars, xstrdup("status"));
+		if (config_keep_reason != 2)
+			array_add(&vars, xstrdup("status"));
 		array_add(&vars, xstrdup("reason"));
 	}
 

@@ -11,6 +11,7 @@ zg³osi³ b³±d.
 - uruchomienie interatywnej aplikacji nie blokuje ekg (ubanus/w)
 - /play dzia³a jak /exec sound_app, dziêki czemu zadzia³a modprobe
   w przypadku braku odpowiednich modu³ów (ubanus/w)
+- keep_reason == 2 nie zapisuje stanu (Tohver/w)
 
 // 2003-03-29
 
