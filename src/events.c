@@ -331,8 +331,13 @@ void handle_status(struct gg_event *e)
 		} else if (e->event.status.status == GG_STATUS_BUSY_DESCR)
 		{
 		    	check_event(EVENT_AWAY, e->event.status.uin);
-			u->descr = strdup(e->event.status.descr);
-			my_printf("status_busy_descr", format_user(e->event.status.uin), u->descr);
+			if (u->descr) {
+				u->descr = strdup(e->event.status.descr);
+				my_printf("status_busy_descr", format_user(e->event.status.uin), u->descr);
+			} else {
+				e->event.status.status = GG_STATUS_BUSY;
+				my_printf("status_busy", format_user(e->event.status.uin), u->descr);
+			}
 		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL && u->status != GG_STATUS_NOT_AVAIL)
 		{
 		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin);
