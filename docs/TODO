@@ -16,6 +16,7 @@ klient:
 - osobny program ekgsearch, lub ekg --search,
 - dodaæ --more-- tam, gdzie siê da i ujednoliciæ.
 - wielolinijkowe komendy do historii.
+- lastlog, awaylog.
 
 
 $Id$

@@ -32,7 +32,7 @@
 #include "dynstuff.h"
 #include "ioctl_daemon.h"
 
-enum { EVENT_MSG = 1, EVENT_CHAT = 2, EVENT_AVAIL = 4, EVENT_NOT_AVAIL = 8, EVENT_AWAY = 16, EVENT_DCC = 32, EVENT_INVISIBLE = 64 };
+enum { EVENT_MSG = 1, EVENT_CHAT = 2, EVENT_AVAIL = 4, EVENT_NOT_AVAIL = 8, EVENT_AWAY = 16, EVENT_DCC = 32, EVENT_INVISIBLE = 64, EVENT_EXEC = 128 };
 
 struct process {
 	int pid;

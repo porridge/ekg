@@ -110,6 +110,7 @@ struct command commands[] = {
 	{ "passwd", "??", command_passwd, " <has³o> <e-mail>", "Zmienia has³o i adres e-mail u¿ytkownika", "" },
 	{ "private", "", command_away, " [on/off]", "W³±cza/wy³±cza tryb ,,tylko dla przyjació³''", "" },
 	{ "query", "u", command_query, " <numer/alias>", "W³±cza rozmowê z dan± osob±", "" },
+	{ "quit", "?", command_quit, " [powód]", "Wychodzi z programu", "" },
 	{ "reconnect", "", command_connect, "", "Roz³±cza i ³±czy ponownie", "" },
 	{ "register", "??", command_register, " <email> <has³o>", "Rejestruje nowy uin", "" },
 	{ "remind", "", command_remind, "", "Wysy³a has³o na skrzynkê pocztow±", "" },
@@ -117,14 +118,13 @@ struct command commands[] = {
 	{ "set", "v?", command_set, " <zmienna> <warto¶æ>", "Wy¶wietla lub zmienia ustawienia", "" },
 	{ "sms", "u?", command_sms, " <numer/alias> <tre¶æ>", "Wysy³a SMSa do podanej osoby", "" },
 	{ "status", "", command_status, "", "Wy¶wietla aktualny stan", "" },
-	{ "quit", "?", command_quit, " [powód]", "Wychodzi z programu", "" },
 	{ "unignore", "i", command_ignore, " <numer/alias>", "Usuwa z listy ignorowanych osób", "" },
-	{ "_msg", "u?", command_test_send, "", "", "" },
 	{ "_add", "?", command_test_add, "", "", "" },
-	{ "_watches", "", command_test_watches, "", "", "" },
-	{ "_ping", "", command_test_ping, "", "", "" },
 	{ "_fds", "", command_test_fds, "", "", "" },
+	{ "_msg", "u?", command_test_send, "", "", "" },
+	{ "_ping", "", command_test_ping, "", "", "" },
 	{ "_segv", "", command_test_segv, "", "", "" },
+	{ "_watches", "", command_test_watches, "", "", "" },
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 

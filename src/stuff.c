@@ -314,7 +314,7 @@ int config_read(char *filename)
 		return -1;
 
 	while ((buf = read_file(f))) {
-		if (buf[0] == '#' || buf[0] == ';' || (buf[0] == '/' || buf[1] == '/')) {
+		if (buf[0] == '#' || buf[0] == ';' || (buf[0] == '/' && buf[1] == '/')) {
 			free(buf);
 			continue;
 		}
@@ -1017,7 +1017,9 @@ char *format_events(int flags)
 		strcat(buff, *buff ? "|away" : "away");
         if (flags & EVENT_DCC)
 		strcat(buff, *buff ? "|dcc" : "dcc");
-        if (strlen(buff) > 33)
+        if (flags & EVENT_EXEC)
+		strcat(buff, *buff ? "|exec" : "exec");
+        if (strlen(buff) > 37)
 		strcpy(buff, "*");
 
         return buff;
@@ -1047,6 +1049,8 @@ int get_flags(char *events)
         if (strstr(events, "away") || strstr(events, "AWAY"))
 		flags |= EVENT_AWAY;
         if (strstr(events, "dcc") || strstr(events, "DCC"))
+		flags |= EVENT_DCC;
+        if (strstr(events, "exec") || strstr(events, "EXEC"))
 		flags |= EVENT_DCC;
 	if (strstr(events, "invisible") || strstr(events, "INVISIBLE"))
 	    	flags |= EVENT_INVISIBLE;
@@ -1137,8 +1141,15 @@ int del_event(int flags, uin_t uin)
  */
 int check_event(int event, uin_t uin)
 {
-        char *evt_ptr = NULL;
+        char *evt_ptr = NULL, *uin_number = NULL, *uin_display = NULL;
+	struct userlist *u;
         struct list *l;
+
+	uin_number = itoa(uin);
+	if ((u = userlist_find(uin, NULL)))
+		uin_display = u->display;
+	else
+		uin_display = uin_number;
 
         for (l = events; l; l = l->next) {
                 struct event *e = l->data;
@@ -1157,13 +1168,18 @@ int check_event(int event, uin_t uin)
 		int i = 0;
 		
                 while (events[i]) {
-			run_event(events[i]);
+			char *tmp = format_string(events[i], uin_number, uin_display);
+			run_event(tmp);
+			free(tmp);
 			i++;
 		}
 		
 		array_free(events);
-        } else
-		run_event(evt_ptr);
+        } else {
+		char *tmp = format_string(evt_ptr, uin_number, uin_display);
+		run_event(tmp);
+		free(tmp);
+	}
 
 	free(evt_ptr);
 
@@ -1221,6 +1237,24 @@ int run_event(char *act)
 	if (!strncasecmp(acts[0], "play", 4)) {
 		gg_debug(GG_DEBUG_MISC, "//   playing sound\n");
 		play_sound(acts[1]);
+		free(action);
+		array_free(acts);
+		return 0;
+	} 
+
+	if (!strncasecmp(acts[0], "exec", 4)) {
+		int pid;
+
+		gg_debug(GG_DEBUG_MISC, "//   *bzzzt*, be back later\n");		
+
+#if 0
+		gg_debug(GG_DEBUG_MISC, "//   executing program\n");
+                if (!(pid = fork())) {
+                        execl("/bin/sh", "sh", "-c", acts[1], NULL);
+                        exit(1);
+                }
+                add_process(pid, "\002");
+#endif
 		free(action);
 		array_free(acts);
 		return 0;
@@ -1397,6 +1431,15 @@ int correct_event(char *act)
 				return 1; 
 			}
 		} 
+		else if (!strncasecmp(acts[0], "exec", 4)) {
+			if (!acts[1]) {
+				my_printf("events_act_no_params", acts[0]);
+				free(action);
+				array_free(acts);
+				array_free(events);
+				return 1; 
+			}
+		} 
 		else if (!strncasecmp(acts[0], "chat", 4) || !strncasecmp(acts[0], "msg", 3)) {
                         if (!acts[1]) {
                                 my_printf("events_act_no_params", acts[0]);
@@ -1418,6 +1461,11 @@ int correct_event(char *act)
 			    	i++;
 			acts[1][i] = '\0';
 
+#if 0
+
+// wywalone z tego wzglêdu, ¿e usera mo¿na dopisaæ dopiero po zdefiniowaniu
+// zdarzenia i mo¿e to byæ te¿ %1 lub %2.
+
                         if (!get_uin(acts[1])) {
                                 my_printf("user_not_found", acts[1]);
 				free(action);
@@ -1425,6 +1473,7 @@ int correct_event(char *act)
 				array_free(events);
                                 return 1;
                         }
+#endif
 
 			array_free(acts);
                         continue;
