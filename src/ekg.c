@@ -61,6 +61,9 @@
 #  include "sim.h"
 #  include "simlite.h"
 #endif
+#ifndef HAVE_STRLCPY
+#   include "../compat/strlcpy.h"
+#endif
 
 #ifndef PATH_MAX
 #  define PATH_MAX _POSIX_PATH_MAX
@@ -877,8 +880,7 @@ int main(int argc, char **argv)
 
 	srand(time(NULL));
 
-	strncpy(argv0, argv[0], sizeof(argv0) - 1);
-	argv0[sizeof(argv0) - 1] = 0;
+	strlcpy(argv0, argv[0], sizeof(argv0));
 
 	command_init();
 
@@ -1187,8 +1189,7 @@ int main(int argc, char **argv)
 
 #ifdef HAVE_OPENSSL
 	SIM_KC_Init();
-	strncpy(SIM_Key_Path, prepare_path("keys/", 0), sizeof(SIM_Key_Path) - 1);
-	SIM_Key_Path[sizeof(SIM_Key_Path) - 1] = 0;
+	strlcpy(SIM_Key_Path, prepare_path("keys/", 0), sizeof(SIM_Key_Path));
 	sim_key_path = xstrdup(prepare_path("keys/", 0));
 #endif
 

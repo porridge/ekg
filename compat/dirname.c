@@ -16,7 +16,9 @@
  */
 
 #include <stdio.h>
-#include <string.h>
+#ifndef _AIX
+#  include <string.h>
+#endif
 #include <limits.h>
 #include <errno.h>
 

@@ -5,7 +5,9 @@
 
 #include <stdlib.h>
 #include <dirent.h>
-#include <string.h>
+#ifndef _AIX
+#  include <string.h>
+#endif
 #include <errno.h>
 
 int alphasort(const struct dirent **a, const struct dirent **b)

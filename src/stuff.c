@@ -66,6 +66,12 @@
 #include "userlist.h"
 #include "vars.h"
 #include "xmalloc.h"
+#ifndef HAVE_STRLCPY
+#  include "../compat/strlcpy.h"
+#endif
+#ifndef HAVE_STRLCAT
+#  include "../compat/strlcat.h"
+#endif
 
 #ifndef PATH_MAX
 #  define PATH_MAX _POSIX_PATH_MAX
@@ -2215,9 +2221,8 @@ const char *event_format(int flags)
 	for (i = 0; event_labels[i].name; i++) {
 		if ((flags & event_labels[i].event)) {
 			if (!first)
-				strncat(buf, ",", sizeof(buf) - 1 - strlen(buf));
-			strncat(buf, event_labels[i].name, sizeof(buf) - 1 - strlen(buf));
-			buf[sizeof(buf) - 1] = 0;
+				strlcat(buf, ",", sizeof(buf));
+			strlcat(buf, event_labels[i].name, sizeof(buf));
 			first = 0;
 		}
 	}
@@ -2633,8 +2638,7 @@ void put_log(uin_t uin, const char *format, ...)
 	if (*lp == '~')
 		snprintf(path, sizeof(path), "%s%s", home_dir, lp + 1);
 	else {
-		strncpy(path, lp, sizeof(path) - 1);
-		path[sizeof(path) - 1] = 0;
+		strlcpy(path, lp, sizeof(path));
 	}
 
 	if ((config_log & 2)) {
@@ -3426,7 +3430,7 @@ int ioctld_socket(char *path)
 		return -1;
 
 	sockun.sun_family = AF_UNIX;
-	strcpy(sockun.sun_path, path);
+	strlcpy(sockun.sun_path, path, sizeof(sockun.sun_path));
 
 	for (i = 5; i; i--) {
 		if (connect(ioctld_sock, (struct sockaddr*) &sockun, sizeof(sockun)) != -1)

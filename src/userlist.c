@@ -1,8 +1,9 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
+ *                          Piotr Domagalski <szalik@szalik.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -42,6 +43,12 @@
 #include "userlist.h"
 #include "vars.h"
 #include "xmalloc.h"
+#ifndef HAVE_STRLCPY
+#  include "../compat/strlcpy.h"
+#endif
+#ifndef HAVE_STRLCAT
+#  include "../compat/strlcat.h"
+#endif
 
 list_t userlist = NULL;
 
@@ -490,6 +497,8 @@ int userlist_remove(struct userlist *u)
  */
 int userlist_replace(struct userlist *u)
 {
+	if (!u)
+		return -1;
 	if (list_remove(&userlist, u, 0))
 		return -1;
 	if (!list_add_sorted(&userlist, u, 0, userlist_compare))
@@ -587,8 +596,7 @@ const char *format_user(uin_t uin)
 	else
 		tmp = format_string(format_find("known_user"), u->display, itoa(uin));
 	
-	strncpy(buf, tmp, sizeof(buf) - 1);
-	buf[sizeof(buf) - 1] = 0;
+	strlcpy(buf, tmp, sizeof(buf));
 	
 	xfree(tmp);
 
@@ -747,13 +755,10 @@ const char *ignore_format(int level)
 
 	for (i = 0; ignore_labels[i].name; i++) {
 		if (level & ignore_labels[i].level) {
-			if (comma++) {
-				strncat(buf, ",", sizeof(buf) - 1 - strlen(buf));
-				buf[sizeof(buf) - 1] = 0;
-			}
+			if (comma++)
+				strlcat(buf, ",", sizeof(buf));
 
-			strncat(buf, ignore_labels[i].name, sizeof(buf) - 1 - strlen(buf));
-			buf[sizeof(buf) - 1] = 0;
+			strlcat(buf, ignore_labels[i].name, sizeof(buf));
 		}
 	}
 

@@ -34,6 +34,9 @@
 #include "ui.h"
 #include "vars.h"
 #include "xmalloc.h"
+#ifndef HAVE_STRLCPY
+#  include "../compat/strlcpy.h"
+#endif
 
 list_t variables = NULL;
 
@@ -322,7 +325,7 @@ int variable_add(const char *name, const char *short_name, int type, int display
 	v.name_hash = ekg_hash(name);
 	v.type = type;
 	if (short_name)
-		strncpy(v.short_name, short_name, sizeof(v.short_name) - 1);
+		strlcpy(v.short_name, short_name, sizeof(v.short_name));
 	v.display = display;
 	v.ptr = ptr;
 	v.notify = notify;

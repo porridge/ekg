@@ -40,8 +40,11 @@
 #include "vars.h"
 #include "ui.h"
 #include "mail.h"
+#ifndef HAVE_STRLCPY
+#  include "../compat/strlcpy.h"
+#endif
 
-/* podstawny ewentualnie brakuj±ce funkcje i definicje readline */
+/* podstawmy ewentualnie brakuj±ce funkcje i definicje readline */
 
 extern void rl_extend_line_buffer(int len);
 extern char **completion_matches();
@@ -644,8 +647,7 @@ static const char *current_prompt()
 				tmp = format_string(format_find("readline_prompt_query_win"), window_current->query_nick, itoa(window_current->id));
 		} else
 			tmp = format_string(format_find("readline_prompt_query"), window_current->query_nick, NULL);
-		strncpy(buf, tmp, sizeof(buf) - 1);
-		buf[sizeof(buf) - 1] = 0;
+		strlcpy(buf, tmp, sizeof(buf));
 		xfree(tmp);
         } else {
 		char *format_win = "readline_prompt_win", *format_nowin = "readline_prompt", *format_win_act = "readline_prompt_win_act";
@@ -668,13 +670,10 @@ static const char *current_prompt()
 				xfree(act);
 			} else
 				tmp = format_string(format_find(format_win), itoa(window_current->id));
-			strncpy(buf, tmp, sizeof(buf) - 1);
-			buf[sizeof(buf) - 1] = 0;
+			strlcpy(buf, tmp, sizeof(buf));
 			xfree(tmp);
-		} else {
-			strncpy(buf, format_find(format_nowin), sizeof(buf) - 1);
-			buf[sizeof(buf) - 1] = 0;
-		}
+		} else
+			strlcpy(buf, format_find(format_nowin), sizeof(buf));
         }
 
         if (no_prompt)

@@ -51,6 +51,9 @@
 #ifdef WITH_PYTHON
 #  include "python.h"
 #endif
+#ifndef HAVE_STRLCPY
+#  include "../compat/strlcpy.h"
+#endif
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure(), handle_search50();
@@ -327,8 +330,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 						break;
 					}
 
-				strncpy(buf, line, len);
-				buf[len] = '\0';
+				strlcpy(buf, line, sizeof(buf));
 				next = line + len;
 
 				while (*next == ' ')
