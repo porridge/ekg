@@ -33,7 +33,7 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
                       je¿eli po kombinacji wyst±pi znak '/' - po nim podany
                       musi byæ odstêp czasu do kolejnej kombinacji.
                       kombinacje tworzy siê dodaj±c do siebie bity:
-                      1 - NumLock,  2 - ScrollLocl, 4 - CapsLock i tak np.
+                      1 - NumLock,  2 - ScrollLock, 4 - CapsLock i tak np.
                       pod¶wietlenie NumLock i CapsLock to 1+4 czyli 5.
 		beeps_spk [sekwencja] - odgrywa sekwencjê na sprzêtowym 
                       g³o¶niczku. tony s± oddzielane przecinkami, odstêpy czasu,
@@ -55,8 +55,11 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 		zmiany przez kogo¶ opisu, %3 zawiera nowy opis stanu.
 		%4 jest tym samym co %3, lecz wszystkie niebezpieczne znaki,
 		które mog³yby zostaæ zinterpretowane przez shella zostaj±
-		poprzedzone backslashem. dlatego chc±c wkleiæ tre¶æ wiadomo¶ci
-		lub opis do akcji ,,exec'' nale¿y u¿yæ %4.
+		poprzedzone backslashem. u¿ywanie tre¶ci wiadomo¶ci do
+		akcji ,,exec'' jest NIEBEZPIECZNE. je¶li naprawdê musisz to
+		zrobiæ, u¿yj "%4" (w cudzys³owiach!) pamiêtaj tylko, ¿e
+		¿aden program nie jest idealny, wiêc który¶ znak specjalnie
+		interpertowany przez shella móg³ zostaæ przypadkowo pominiêty.
 
 akcje blink_leds oraz beeps_spk musz± mieæ dostêp do /dev/console, wiêc
 uruchamiany jest specjalny daemon (ioctld) z prawami roota. po wyj¶ciu 
@@ -71,5 +74,6 @@ przyk³ady:
 	on * * blink_leds $blah.led
 	on msg|chat * msg %1 nie ma mnie. zostaw wiadomo¶æ.
 	on sigusr1 * command disconnect
+	on chat jarek echo "/msg szpieg %4" > ~/.gg/innyuser/pipe
 
 $Id$

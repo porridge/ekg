@@ -2400,7 +2400,7 @@ int event_check(int event, uin_t uin, const char *data)
 		char *q;
 
 		for (p = data; *p; p++) {
-			if (strchr("`!#$&*?|\\\'\"{}[]<>", *p))
+			if (strchr("`!#$&*?|\\\'\"{}[]<>\n\r", *p))
 				size += 2;
 			else
 				size++;
@@ -2411,6 +2411,16 @@ int event_check(int event, uin_t uin, const char *data)
 		for (p = data, q = edata; *p; p++, q++) {
 			if (strchr("`!#$&*?|\\\'\"{}[]<>", *p))
 				*q++ = '\\';
+			if (*p == '\n') {
+				*q++ = '\\';
+				*q = 'n';
+				continue;
+			}
+			if (*p == '\r') {
+				*q++ = '\\';
+				*q = 'r';
+				continue;
+			}
 			*q = *p;
 		}
 
