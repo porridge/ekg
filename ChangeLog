@@ -10,7 +10,8 @@ zg³osi³ b³±d.
 
 - dalsze kosmetyczne poprawki reakcji na zmianê rozmiaru terminala
   w readline i ncurses (sz)
-- ignorowanie klawiszy Ctrl-C, Ctrl-Y itp. w ncurses (sz)
+- deaktywacja systemowego znaczenia klawiszy Ctrl-C, Ctrl-Y itp.
+  w ncurses (sz)
 
 // 2003-04-03
 
