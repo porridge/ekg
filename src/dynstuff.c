@@ -287,6 +287,8 @@ void string_insert_n(string_t s, int index, const char *str, int count)
 
 	memmove(s->str + index + count, s->str + index, s->len + 1 - index);
 	memmove(s->str + index, str, count);
+
+	s->len += count;
 }
 
 void string_insert(string_t s, int index, const char *str)

@@ -16,6 +16,8 @@ zg³osi³ b³±d.
 - parametr /exec % zamieniony na $, ¿eby unikn±æ ew. konfliktów z
   formatami (sz)
 - nie dodawajmy do listy dope³nieñ przy b³êdnym nicku w chat/msg (sz)
+- taby w stderr, tyczy siê to wiêc m.in. wyników /exec (sz)
+- poprawka niedzia³aj±cego string_insert_n() (sz)
 - poprawka kombinacji Ctrl-<kursor> na terminalach BSD (sz/w)
 - ignorowanie SIGQUIT, przez co Ctrl-4 i Ctrl-\ nie bêd± wychodziæ (sz/w)
 - libgadu: usuniêcie kodu gg_search50() (w)

@@ -13,8 +13,7 @@ lista rzeczy, które wypada³oby zrobiæ _przed_ wydaniem wersji 1.0:
   - mo¿liwo¶æ podania portu forwardingu (fidor)
   - poprawiæ getopt(), ¿eby rozumia³ ,,--back "powód"'',
   - uzupe³niæ dope³nienia (w tym nicki ze spacjami, lista nicków (joshua)),
-  - sensowna obs³uga kluczy dla SIM,
-  - taby w stderr,
+  - sensowna obs³uga kluczy dla SIM.
 
 pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
 

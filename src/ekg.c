@@ -200,10 +200,16 @@ static void get_line_from_pipe(struct gg_exec *c)
 		return;
 
 	if ((ret = read(c->fd, buf, sizeof(buf) - 1)) != 0 && ret != -1) {
-		char *tmp;
+		char *tmp, *tab;
 
 		buf[ret] = 0;
 		string_append(c->buf, buf);
+
+		/* Tab --> 4 x space */
+		while ((tab = strchr(c->buf->str, 9))) {
+			*tab = ' ';
+			string_insert_n(c->buf, (tab - c->buf->str), "   ", 3);
+		}
 
 		while ((tmp = strchr(c->buf->str, '\n'))) {
 			int index = tmp - c->buf->str;
