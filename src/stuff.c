@@ -180,6 +180,7 @@ char *config_profile = NULL;
 int config_header_size = 0;
 int config_statusbar_size = 1;
 char *config_proxy_forwarding = NULL;
+int config_password_cp1250 = 0;
 
 struct event_label event_labels[] = {
 	{ EVENT_MSG, "msg" },
@@ -1623,7 +1624,8 @@ void do_connect()
 		xfree(fwd);
 	}
 
-	iso_to_cp(p.password);
+	if (!config_password_cp1250)
+		iso_to_cp(p.password);
 	if (p.status_descr)
 		iso_to_cp(p.status_descr);
 
@@ -1633,7 +1635,8 @@ void do_connect()
 	} else
 		list_add(&watches, sess, 0);
 
-	cp_to_iso(p.password);
+	if (!config_password_cp1250)
+		cp_to_iso(p.password);
 	if (p.status_descr)
 		cp_to_iso(p.status_descr);
 }

@@ -2864,6 +2864,8 @@ COMMAND(cmd_register)
 	list_t l;
 
 	if (name[0] == 'r') {
+		char *passwd;
+
 		if (registered_today) {
 			printq("registered_today");
 			return -1;
@@ -2882,15 +2884,19 @@ COMMAND(cmd_register)
 				return -1;
 			}
 		}
+
+		passwd = xstrdup(params[1]);
+		iso_to_cp(passwd);
 	
-		if (!(h = gg_register(params[0], params[1], 1))) {
+		if (!(h = gg_register(params[0], passwd, 1))) {
+			xfree(passwd);
 			printq("register_failed", strerror(errno));
 			return -1;
 		}
 
 		list_add(&watches, h, 0);
 
-		reg_password = xstrdup(params[1]);
+		reg_password = passwd;
 		reg_email = xstrdup(params[0]);
 	} else {
 		uin_t uin = 0;
@@ -2923,20 +2929,29 @@ COMMAND(cmd_register)
 COMMAND(cmd_passwd)
 {
 	struct gg_http *h;
+	char *oldpasswd, *newpasswd;
 	
 	if (!params[0] || (!params[1] && !config_email)) {
 		printq("not_enough_params", name);
 		return -1;
 	}
 
-	if (!(h = gg_change_passwd2(config_uin, (config_password) ? config_password : "", params[0], (config_email) ? config_email : "", (params[1]) ? params[1] : config_email, 1))) {
+	oldpasswd = xstrdup(config_password);
+	if (oldpasswd && !config_password_cp1250)
+		iso_to_cp(oldpasswd);
+	newpasswd = xstrdup(params[0]);
+	iso_to_cp(newpasswd);
+
+	if (!(h = gg_change_passwd2(config_uin, (oldpasswd) ? oldpasswd : "", newpasswd, (config_email) ? config_email : "", (params[1]) ? params[1] : config_email, 1))) {
+		xfree(newpasswd);
+		xfree(oldpasswd);
 		printq("passwd_failed", strerror(errno));
 		return -1;
 	}
 
 	list_add(&watches, h, 0);
 
-	reg_password = xstrdup(params[0]);
+	reg_password = newpasswd;
 	reg_email = xstrdup((params[1]) ? params[1] : config_email);
 
 	return 0;

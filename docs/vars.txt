@@ -648,6 +648,12 @@ interface
 	przez podanie parametru -f w wywo³aniu programu, a zapisywana
 	dopiero za pomoc± komendy ,,save''.
 
+password_cp1250
+	typ: bool, zmienna wewnêtrzna, ukryta
+
+	przy w³±czonej opcji nie bêdzie przeprowadzana konwersja has³a
+	ze standardu ISO-8859-2 na CP1250.
+
 protocol
 	typ: liczba, zmienna wewnêtrzna, ukryta
 

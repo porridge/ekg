@@ -237,6 +237,7 @@ char *config_log_timestamp;
 int config_make_window;
 int config_mesg_allow;
 char *config_password;
+int config_password_cp1250;
 int config_protocol;
 char *config_proxy;
 char *config_proxy_forwarding;

@@ -15,6 +15,8 @@ zg³osi³ b³±d.
   i mieæ dzia³aj±ce dcc. przyznajê, ¿e nazwa nie jest najlepsza. (fidor/w)
 - libgadu: brakuj±cy include w search.c (sCoOtY/w)
 - konwersja has³a na CP1250 podczas ³±czenia (Mati/w)
+- dodanie zmiennej ,,password_cp1250'', któr± nale¿y w³±czyæ, je¶li serwer
+  odrzuca has³o z polskimi literami (w)
 
 // 2002-01-31
 
