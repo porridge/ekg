@@ -2231,7 +2231,7 @@ int ioctld_parse_seq(const char *seq, struct action_data *data)
         if (!data || !seq)
                 return -1;
 
-	memset(data, 0, sizeof(struct action_data));
+	memset(data, -1, sizeof(struct action_data));
 
 	entries = array_make(seq, ",", 0, 0, 1);
 

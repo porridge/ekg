@@ -60,10 +60,9 @@ char sock_path[PATH_MAX] = "";
 
 int blink_leds(int *flag, int *delay) 
 {
-    	int s, fd;
-#ifdef sun 
-	int restore_data;
+    	int s, fd, restore_data;
 
+#ifdef sun 
 	if ((fd = open("/dev/kbd", O_RDONLY)) == -1)
 		return -1;
 
@@ -71,9 +70,11 @@ int blink_leds(int *flag, int *delay)
 #else
 	if ((fd = open("/dev/console", O_WRONLY)) == -1)
 		fd = STDOUT_FILENO;
+
+	ioctl(fd, KDGETLED, &restore_data);
 #endif
 
-	for (s = 0; flag[s] >= 0 && s <= IOCTLD_MAX_ITEMS; s++) {
+	for (s = 0; flag[s] >= 0 && s < IOCTLD_MAX_ITEMS; s++) {
 #ifdef sun
 		int leds = 0;
 		/* tak.. na sunach jest to troszkê inaczej */
@@ -95,7 +96,7 @@ int blink_leds(int *flag, int *delay)
 #ifdef sun
 	ioctl(fd, KIOCSLED, &restore_data);
 #else
-	ioctl(fd, KDSETLED, 8);
+	ioctl(fd, KDSETLED, restore_data);
 #endif
 	
 	if (fd != STDOUT_FILENO)
@@ -114,7 +115,7 @@ int beeps_spk(int *tone, int *delay)
 		fd = STDOUT_FILENO;
 #endif
 		
-	for (s = 0; tone[s] >= 0 && s <= IOCTLD_MAX_ITEMS; s++) {
+	for (s = 0; tone[s] >= 0 && s < IOCTLD_MAX_ITEMS; s++) {
 
 #ifdef __FreeBSD__
 		ioctl(fd, KIOCSOUND, 0);

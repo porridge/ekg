@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-05-28
+
+- psuj±cy zabawê b³±d off-by-one w ioctld. przywracanie pocz±tkowego
+  stanu diod LED. niestety, nie mam jak sprawdziæ na Linuksie (sz)
+
 // 2003-05-21
 
 - poprawka /disconnect przy auto_reconnect != 0 (scooty/w)
