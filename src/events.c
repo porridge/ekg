@@ -344,7 +344,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 						break;
 					}
 
-				strlcpy(buf, line, len);
+				strlcpy(buf, line, len + 1);
 				buf[len] = 0;
 				next = line + len;
 
