@@ -1725,24 +1725,6 @@ COMMAND(cmd_list)
 		
 		if (u->ip.s_addr)
 			printq("user_info_ip", ip_str);
-		if ((u->protocol & GG_HAS_AUDIO_MASK))
-			printq("user_info_voip");
-
-		if ((u->protocol & 0x00ffffff)) {
-			int v = u->protocol & 0x00ffffff;
-			const char *ver = NULL;
-
-			if (v < 0x0b)
-				ver = "<= 4.0.x";
-			if (v >= 0x0b && v < 0x11)
-				ver = "4.5.x";
-			if (v == 0x10)
-				ver = "4.6.x";
-
-			if (ver)
-				printq("user_info_version", ver);
-		}
-
 		if (u->mobile && strcmp(u->mobile, ""))
 			printq("user_info_mobile", u->mobile);
 		if (strcmp(groups, ""))

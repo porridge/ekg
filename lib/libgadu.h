@@ -379,10 +379,7 @@ enum gg_event_t {
 
 	GG_EVENT_PUBDIR50_SEARCH_REPLY,	/* odpowiedz wyszukiwania */
 	GG_EVENT_PUBDIR50_READ,		/* odczytano w³asne dane z katalogu */
-	GG_EVENT_PUBDIR50_WRITE,		/* wpisano w³asne dane do katalogu */
-
-	GG_EVENT_STATUS60,		/* kto¶ zmieni³ stan w GG 6.0 */
-	GG_EVENT_NOTIFY60		/* kto¶ siê pojawi³ w GG 6.0 */
+	GG_EVENT_PUBDIR50_WRITE		/* wpisano w³asne dane do katalogu */
 };
 
 #define GG_EVENT_SEARCH50_REPLY GG_EVENT_PUBDIR50_SEARCH_REPLY
@@ -496,28 +493,6 @@ struct gg_event {
 			uint32_t status;	/* nowy stan */
 			char *descr;		/* opis stanu */
 		} status;
-
-                struct {			/* @status60 zmiana stanu -- GG_EVENT_STATUS60 */
-			uin_t uin;		/* numer */
-			int status;	/* nowy stan */
-			uint32_t remote_ip;	/* adres ip */
-			uint16_t remote_port;	/* port */
-			int version;	/* wersja klienta */
-			int image_size;	/* maksymalny rozmiar grafiki */
-			char *descr;		/* opis stanu */
-			int time;		/* czas powrotu */
-		} status60;
-
-		struct {			/* @notify60 informacja o li¶cie kontaktów -- GG_EVENT_NOTIFY60 */
-			uin_t uin;		/* numer */
-			int status;	/* stan */
-			uint32_t remote_ip;	/* adres ip */
-			uint16_t remote_port;	/* port */
-			int version;	/* wersja klienta */
-			int image_size;	/* maksymalny rozmiar grafiki */
-			char *descr;		/* opis stanu */
-			int time;		/* czas powrotu */
-		} *notify60;
 		
 		struct {			/* @ack potwierdzenie wiadomo¶ci -- GG_EVENT_ACK */
 			uin_t recipient;	/* numer odbiorcy */
@@ -857,8 +832,8 @@ char *gg_base64_decode(const char *buf);
 #define GG_HTTPS_PORT 443
 #define GG_HTTP_USERAGENT "Mozilla/4.7 [en] (Win98; I)"
 
-#define GG_DEFAULT_CLIENT_VERSION "6, 0, 0, 132"
-#define GG_DEFAULT_PROTOCOL_VERSION 0x20
+#define GG_DEFAULT_CLIENT_VERSION "5, 7, 0, 116"
+#define GG_DEFAULT_PROTOCOL_VERSION 0x1c
 #define GG_DEFAULT_TIMEOUT 30
 #define GG_HAS_AUDIO_MASK 0x40000000
 #define GG_LIBGADU_VERSION "CVS"
@@ -879,7 +854,7 @@ struct gg_welcome {
 #define GG_LOGIN 0x000c
 
 struct gg_login {
-	uint32_t uin;			/* mój numerek */
+	uint32_t uin;			/* twój numerek */
 	uint32_t hash;			/* hash has³a */
 	uint32_t status;		/* status na dzieñ dobry */
 	uint32_t version;		/* moja wersja klienta */
@@ -890,7 +865,7 @@ struct gg_login {
 #define GG_LOGIN_EXT 0x0013
 
 struct gg_login_ext {
-	uint32_t uin;			/* mój numerek */
+	uint32_t uin;			/* twój numerek */
 	uint32_t hash;			/* hash has³a */
 	uint32_t status;		/* status na dzieñ dobry */
 	uint32_t version;		/* moja wersja klienta */
@@ -898,22 +873,6 @@ struct gg_login_ext {
 	uint16_t local_port;		/* port, na którym s³ucham */
 	uint32_t external_ip;		/* zewnêtrzny adres ip */
 	uint16_t external_port;		/* zewnêtrzny port */
-} GG_PACKED;
-
-#define GG_LOGIN60 0x0015
-
-struct gg_login60 {
-	uint32_t uin;			/* mój numerek */
-	uint32_t hash;			/* hash has³a */
-	uint32_t status;		/* status na dzieñ dobry */
-	uint32_t version;		/* moja wersja klienta */
-	uint8_t dunno1;			/* 0x00 */
-	uint32_t local_ip;		/* mój adres ip */
-	uint16_t local_port;		/* port, na którym s³ucham */
-	uint32_t external_ip;		/* zewnêtrzny adres ip */
-	uint16_t external_port;		/* zewnêtrzny port */
-	uint8_t image_size;		/* maksymalny rozmiar grafiki */
-	uint8_t dunno2;			/* 0xbe */
 } GG_PACKED;
 
 #define GG_LOGIN_OK 0x0003
@@ -1010,36 +969,12 @@ struct gg_notify_reply {
 	uint16_t dunno2;		/* znowu port? */
 } GG_PACKED;
 
-#define GG_NOTIFY_REPLY60 0x0011
-	
-struct gg_notify_reply60 {
-	uint32_t uin;			/* numerek plus flagi w MSB */
-	uint8_t status;			/* status danej osoby */
-	uint32_t remote_ip;		/* adres ip delikwenta */
-	uint16_t remote_port;		/* port, na którym s³ucha klient */
-	uint8_t version;		/* wersja klienta */
-	uint8_t image_size;		/* maksymalny rozmiar grafiki */
-	uint8_t dunno1;			/* 0x00 */
-} GG_PACKED;
-
-#define GG_STATUS60 0x000f
-	
-struct gg_status60 {
-	uint32_t uin;			/* numerek plus flagi w MSB */
-	uint8_t status;			/* status danej osoby */
-	uint32_t remote_ip;		/* adres ip delikwenta */
-	uint16_t remote_port;		/* port, na którym s³ucha klient */
-	uint8_t version;		/* wersja klienta */
-	uint8_t image_size;		/* maksymalny rozmiar grafiki */
-	uint8_t dunno1;			/* 0x00 */
-} GG_PACKED;
-
 #define GG_ADD_NOTIFY 0x000d
 #define GG_REMOVE_NOTIFY 0x000e
 	
 struct gg_add_remove {
 	uint32_t uin;			/* numerek */
-	uint8_t dunno1;			/* bitmapa */
+	uint8_t dunno1;			/* == 3 */
 } GG_PACKED;
 
 #define GG_STATUS 0x0002

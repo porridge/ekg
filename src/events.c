@@ -57,7 +57,7 @@
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure(), handle_search50(),
-	handle_change50(), handle_status60(), handle_notify60();
+	handle_change50();
 
 static int hide_notavail = 0;	/* czy ma ukrywaæ niedostêpnych -- tylko zaraz po po³±czeniu */
 
@@ -71,8 +71,6 @@ static struct handler handlers[] = {
 	{ GG_EVENT_ACK, handle_ack },
 	{ GG_EVENT_STATUS, handle_status },
 	{ GG_EVENT_NOTIFY, handle_notify },
-	{ GG_EVENT_STATUS60, handle_status60 },
-	{ GG_EVENT_NOTIFY60, handle_notify60 },
 	{ GG_EVENT_NOTIFY_DESCR, handle_notify },
 	{ GG_EVENT_CONN_SUCCESS, handle_success },
 	{ GG_EVENT_CONN_FAILED, handle_failure },
@@ -701,19 +699,15 @@ void handle_ack(struct gg_event *e)
  * handle_common()
  *
  * ujednolicona obs³uga zmiany w userli¶cie dla handle_status()
- * i handle_notify(). utrzymywanie tego samego kodu w kilku miejscach
+ * i handle_notify(). utrzymywanie tego samego kodu w dwóch miejscach
  * jest kompletnie bez sensu.
  *  
  *  - uin - numer delikwenta,
  *  - status - nowy stan,
- *  - idescr - nowy opis,
- *  - itime - nowy czas powrotu,
- *  - ip - nowy adres IP,
- *  - port - nowy port,
- *  - version - nowa wersja,
- *  - image_size - nowy rozmiar obrazka.
+ *  - descr - nowy opis,
+ *  - n - dodatki od gg_notify.
  */
-static void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_t ip, uint16_t port, int version, int image_size)
+static void handle_common(uin_t uin, int status, const char *idescr, struct gg_notify_reply *n)
 {
 	struct userlist *u;
 	struct status_table {
@@ -798,19 +792,15 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 		descr = xstrdup(idescr);
 	
 	/* zapamiêtaj adres, port i protokó³ */
-	if (__USER_QUITING) {
-		u->last_ip.s_addr = u->ip.s_addr;
-		u->last_port = u->port;
+	if (n) {
+		if (__USER_QUITING) {
+			u->last_ip.s_addr = u->ip.s_addr;
+			u->last_port = u->port;
+		}
+		u->port = n->remote_port;
+		u->ip.s_addr = n->remote_ip;
+		u->protocol = n->version;
 	}
-
-	if (ip)
-		u->ip.s_addr = ip;
-	if (port)
-		u->port = port;
-	if (version)
-		u->protocol = version;
-	if (image_size)
-		u->image_size = image_size;
 
 	/* je¶li status taki sam i ewentualnie opisy te same, ignoruj */
 	if (!GG_S_D(status) && (u->status == status)) {
@@ -973,26 +963,8 @@ void handle_notify(struct gg_event *e)
 	for (; n->uin; n++) {
 		char *descr = (e->type == GG_EVENT_NOTIFY_DESCR) ? e->event.notify_descr.descr : NULL;
 		
-		handle_common(n->uin, n->status, descr, 0, n->remote_ip, n->remote_port, n->version, 0);
+		handle_common(n->uin, n->status, descr, n);
 	}
-}
-
-/*
- * handle_notify60()
- *
- * funkcja obs³uguje listê obecnych w wersji 6.0.
- *
- *  - e - opis zdarzenia.
- */
-void handle_notify60(struct gg_event *e)
-{
-	int i;
-	
-	if (batch_mode)
-		return;
-
-	for (i = 0; e->event.notify60[i].uin; i++)
-		handle_common(e->event.notify60[i].uin, e->event.notify60[i].status, e->event.notify60[i].descr, e->event.notify60[i].time, e->event.notify60[i].remote_ip, e->event.notify60[i].remote_port, e->event.notify60[i].version, e->event.notify60[i].image_size);
 }
 
 /*
@@ -1007,22 +979,7 @@ void handle_status(struct gg_event *e)
 	if (batch_mode)
 		return;
 
-	handle_common(e->event.status.uin, e->event.status.status, e->event.status.descr, 0, 0, 0, 0, 0);
-}
-
-/*
- * handle_status60()
- *
- * funkcja obs³uguje zmianê stanu ludzi z listy kontaktów w wersji 6.0.
- *
- *  - e - opis zdarzenia.
- */
-void handle_status60(struct gg_event *e)
-{
-	if (batch_mode)
-		return;
-
-	handle_common(e->event.status60.uin, e->event.status60.status, e->event.status60.descr, e->event.status60.time, e->event.status60.remote_ip, e->event.status60.remote_port, e->event.status60.version, e->event.status60.image_size);
+	handle_common(e->event.status.uin, e->event.status.status, e->event.status.descr, NULL);
 }
 
 /*
