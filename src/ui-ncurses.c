@@ -2868,6 +2868,10 @@ static void complete(int *line_start, int *line_index)
 		if(i >= strlen(line))
 			word_current = words_count + 1;
 		i--;
+              	/* hmm, jeste¶my ju¿ na wyrazie wskazywany przez kursor ? */
+                if(i >= *line_index)
+                        break;
+
 	}
 
 	/* trzeba pododawaæ trochê do liczników w spefycicznych (patrz warunki) sytuacjach */
@@ -2880,10 +2884,11 @@ static void complete(int *line_start, int *line_index)
 		
 /*	gg_debug(GG_DEBUG_MISC, "word = %d\n", word);
 	gg_debug(GG_DEBUG_MISC, "start = \"%s\"\n", start);   
-	gg_debug(GG_DEBUG_MISC, "words_count = %d\n", words_count);	 
+	gg_debug(GG_DEBUG_MISC, "words_count = %d\n", words_count);	
+	gg_debug(GG_DEBUG_MISC, "word_current = %d\n", word_current); */
 	
-	 for(i = 0; i < strlen(separators); i++)
-		gg_debug(GG_DEBUG_MISC, "separators[i = %d] = \"%c\"\n", i, separators[i]);   */
+/*	 for(i = 0; i < strlen(separators); i++)
+		gg_debug(GG_DEBUG_MISC, "separators[i = %d] = \"%c\"\n", i, separators[i]);  */ 
 	
 	cmd = saprintf("/%s ", (config_tab_command) ? config_tab_command : "chat");
 	
@@ -2940,11 +2945,8 @@ static void complete(int *line_start, int *line_index)
 		}
 		
 		if (params && abbrs == 1) {
-			if(strchr(params, 'u') && word_current != strlen(strchr(params, 'u'))) 
-				goto problem;
-					
 			for (i = 0; generators[i].ch; i++) {
-				if (generators[i].ch == params[word - 1] || strchr(params, 'u')) {
+				if (generators[i].ch == params[word_current - 2]) {
 					int j;
 
 					generators[i].generate(words[word], strlen(words[word]));
@@ -2977,7 +2979,6 @@ static void complete(int *line_start, int *line_index)
 
 		}
 	}
-problem:
 	
 	count = array_count(completions);
 
