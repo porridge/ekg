@@ -42,6 +42,7 @@
 #define TOGGLE_BIT(x) (1 << (x - 1))
 
 #define GG_CRC32_INVISIBLE 99
+#define SPYING_RESPONSE_TIMEOUT 15
 
 enum event_t {
 	EVENT_MSG = TOGGLE_BIT(1),

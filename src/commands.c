@@ -5542,7 +5542,7 @@ int check_conn(uin_t uin)
 		}
 
 		s.uin = uin;
-		s.timeout = 15;
+		s.timeout = SPYING_RESPONSE_TIMEOUT;
 		list_add(&spiedlist, &s, sizeof(s));
 
 		gg_debug(GG_DEBUG_MISC, "// ekg: spying %d\n", s.uin);

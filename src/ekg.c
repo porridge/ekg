@@ -558,7 +558,7 @@ void ekg_wait_for_key()
 					/* wymu¶ pokazanie zmiany na niedostêpny */
 					if (GG_S_NA(u->status)) {
 
-						if (config_events_delay && (time(NULL) - (last_conn_event + 15)) < config_events_delay) {
+						if (config_events_delay && (time(NULL) - (last_conn_event + SPYING_RESPONSE_TIMEOUT)) < config_events_delay) {
 							s->timeout = -1;
 							continue;
 						}
