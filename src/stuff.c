@@ -1530,15 +1530,16 @@ void changed_dcc(char *var)
  */
 void changed_theme(char *var)
 {
-    init_theme();
-    reset_theme_cache();
-    if(config_theme) {
-	if(!read_theme(config_theme, 1)) {
-	    reset_theme_cache();
-    	    my_printf("theme_loaded", config_theme);
-	} else
-	    my_printf("error_loading_theme", strerror(errno));
-    }
+	if (!config_theme) {
+		init_theme();
+		reset_theme_cache();
+	} else {
+		if (!read_theme(config_theme, 1)) {
+			reset_theme_cache();
+			my_printf("theme_loaded", config_theme);
+		} else
+			my_printf("error_loading_theme", strerror(errno));
+	}
 }
 
 /*

@@ -8,6 +8,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-02-15
 
 - quickfix zapisywania theme'ów (jsm/w)
+- sensowne themey. zniknê³o polecenie ,,theme''. zmienia siê zmienn±
+  ,,theme'' (w)
 
 // 2002-02-14
 
