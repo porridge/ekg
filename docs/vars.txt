@@ -32,6 +32,13 @@ auto_reconnect
 	w przypadku nieudanego po³±czenia, okre¶la po ilu sekundach program
 	ma ponowiæ próbê. je¶li równa 0, nie próbuje wiêcej.
 
+auto_save
+	typ liczba:
+	domy¶lna warto¶æ: 0
+
+	po jakim czasie automatycznie zapisaæ ustawienia, w sekundach.
+	je¶li 0, nie zapisuje automatycznie.
+	
 beep
 	typ: bool
 	domy¶lna warto¶æ: 1
