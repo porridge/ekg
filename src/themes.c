@@ -1193,6 +1193,7 @@ void theme_init()
 	format_add("windows_max", "%! Wyczerpano limit ilo¶ci okien\n", 1);
 	format_add("window_list_query", "%) %1: rozmowa z %T%2%n\n", 1);
 	format_add("window_list_nothing", "%) %1: brak rozmowy\n", 1);
+	format_add("window_list_floating", "%) %1: p³ywaj±ce %4x%5 w %2,%3 %T%6%n\n", 1);
 	format_add("window_invalid", "%! Nieprawid³owy parametr\n", 1);
 	format_add("window_id_query_started", "%) Rozmowa z %T%2%n rozpoczêta w oknie %W%1%n\n", 1);
 	format_add("window_kill_status", "%! Nie mo¿na zamkn±æ okna statusowego\n", 1);

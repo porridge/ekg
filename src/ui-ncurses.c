@@ -495,7 +495,7 @@ static void window_floating_update(int n)
 		if (n && (w->id != n))
 			continue;
 
-		if (!w->floating || !w->prompt)
+		if (!w->floating)
 			continue;
 
 		if (w->last_update == time(NULL))
@@ -506,7 +506,7 @@ static void window_floating_update(int n)
 		window_clear(w, 1);
 		tmp = window_current;
 		window_current = w;
-		command_exec(w->target, w->prompt);
+		command_exec(w->target, w->target);
 		window_current = tmp;
 
 		window_redraw(w);
@@ -563,11 +563,10 @@ static void window_switch(int id)
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
 
-		if (id != w->id)
+		if (id != w->id || w->floating)
 			continue;
 
-		if (!w->floating)
-			window_current = w;
+		window_current = w;
 
 		w->act = 0;
 		
@@ -617,6 +616,9 @@ static struct window *window_new(const char *target, int new_id)
 	list_t l;
 	int id = 1, done = 0;
 
+	if (target && *target == '*')
+		id = 100;
+
 	while (!done) {
 		done = 1;
 
@@ -637,24 +639,20 @@ static struct window *window_new(const char *target, int new_id)
 	memset(&w, 0, sizeof(w));
 
 	w.id = id;
-	w.target = xstrdup(target);
 
 	if (target) {
 		if (*target == '*') {
-			char *tmp = index(target, '/');
+			const char *tmp = index(target, '/');
 			char **argv;
 			
 			w.floating = 1;
 			
 			if (!tmp)
-				tmp = w.target + 1;
+				tmp = target + 1;
 				
-			w.prompt = xstrdup(tmp);
- 			w.prompt_len = strlen(w.prompt);
+			w.target = xstrdup(tmp);
 
-			tmp = w.target + 1;
-
-			argv = array_make(w.target + 1, ",", 5, 0, 0);
+			argv = array_make(target + 1, ",", 5, 0, 0);
 
 			if (argv[0])
 				w.left = atoi(argv[0]);
@@ -669,6 +667,7 @@ static struct window *window_new(const char *target, int new_id)
 
 			array_free(argv);
 		} else {
+			w.target = xstrdup(target);
 			w.prompt = format_string(format_find("ncurses_prompt_query"), target);
 			w.prompt_len = strlen(w.prompt);
 		}
@@ -715,7 +714,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	struct window *w;
 	fstring_t fs;
 	list_t l;
-	int count = 0, bottom = 0;
+	int count = 0, bottom = 0, prev_count;
 	char *lines, *lines_save, *line2;
 	string_t speech = NULL;
 
@@ -765,7 +764,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 				w = windows->data;
 	}
 
-	if (w != window_current) {
+	if (w != window_current && !w->floating) {
 		w->act = 1;
 		update_statusbar();
 	}
@@ -775,7 +774,9 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	
 	if (w->start == w->lines_count - w->height)
 		bottom = 1;
-
+	
+	prev_count = w->lines_count;
+	
 	/* XXX wyrzuciæ dzielenie na linie z ekg */
 	lines = lines_save = xstrdup(line);
 	while ((line2 = gg_get_line(&lines))) {
@@ -791,6 +792,14 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 
 	if (bottom)
 		w->start = w->lines_count - w->height;
+	else {
+		if (w->backlog_size == config_backlog_size) {
+			w->start -= count - (w->lines_count - prev_count);
+
+			if (w->start < 0)
+				w->start = 0;
+		}
+	}
 	
 	if (w->start - w->lines_count > w->height)
 		w->more = 1;
@@ -2826,9 +2835,12 @@ static int ui_ncurses_event(const char *event, ...)
 				for (l = windows; l; l = l->next) {
 					struct window *w = l->data;
 
-					if (w->target)
-						print("window_list_query", itoa(w->id), w->target);
-					else
+					if (w->target) {
+						if (!w->floating)	
+							print("window_list_query", itoa(w->id), w->target);
+						else
+							print("window_list_floating", itoa(w->id), itoa(w->left), itoa(w->top), itoa(w->width), itoa(w->height), w->target);
+					} else
 						print("window_list_nothing", itoa(w->id));
 				}
 
