@@ -53,6 +53,7 @@ struct userlist {
 	char *last_descr;	/* j.w. ostatni opis */
 	struct in_addr last_ip; /* j.w. ostatni adres ip */
 	unsigned short last_port; /* j.w. ostatni port */
+	int image_size;		/* maksymalny rozmiar obrazków */
 };
 
 struct group {

@@ -8,6 +8,8 @@ d - drg, sz - szalik).
 
 - usuniêcie nieaktualnych informacji, nowe rodzaje pakietów w GG 6.0,
   indeks pakietów (*/w)
+- libgadu: pocz±tek obs³ugi protoko³u GG 6.0. nowe zdarzenia GG_STATUS60
+  i GG_NOTIFY_REPLY60 (w)
 
 // 2003-05-26
 
