@@ -850,9 +850,9 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 
 	if (!ignore_status) {
 		u->status = status;
-		ui_event("status", u->uin, u->display, status, (ignore_status_descr) ? u->descr : descr);
 		xfree(u->descr);
 		u->descr = descr;
+		ui_event("status", u->uin, u->display, status, (ignore_status_descr) ? NULL : u->descr);
 	 } else
 		xfree(descr);
 }
