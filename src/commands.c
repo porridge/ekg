@@ -483,7 +483,7 @@ COMMAND(cmd_exec)
 			tmp = saprintf("\002%s", params[0] + 1);
 		else
 			tmp = xstrdup(params[0]);
-		process_add(pid, params[0]);
+		process_add(pid, tmp);
 		xfree(tmp);
 	} else {
 		for (l = children; l; l = l->next) {

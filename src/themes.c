@@ -50,8 +50,8 @@ list_t formats = NULL;
  */
 const char *format_find(const char *name)
 {
-	char *tmp, *name2 = NULL;
-	int hash, hash2 = 0;
+	char *tmp;
+	int hash;
 	list_t l;
 
 	if (!name)
@@ -59,26 +59,24 @@ const char *format_find(const char *name)
 
 	hash = ekg_hash(name);
 
-	if (config_theme && (tmp = strchr(config_theme, ','))) {
-		name2 = saprintf("%s,%s", name, tmp + 1);
-		hash2 = ekg_hash(name2);
+	if (config_theme && (tmp = strchr(config_theme, ',')) && !strchr(name, ',')) {
+		char *name2 = saprintf("%s,%s", name, tmp + 1);
+		const char *tmp;
+		
+		if (strcmp((tmp = format_find(name2)), "")) {
+			xfree(name2);
+			return tmp;
+		}
+		
+		xfree(name2);
 	}
 	
 	for (l = formats; l; l = l->next) {
 		struct format *f = l->data;
 
-		if (name2 && hash2 == f->name_hash && !strcasecmp(f->name, name2)) {
-			xfree(name2);
+		if (hash == f->name_hash && !strcasecmp(f->name, name))
 			return f->value;
-		}
-
-		if (hash == f->name_hash && !strcasecmp(f->name, name)) {
-			xfree(name2);
-			return f->value;
-		}
 	}
-	
-	xfree(name2);
 	
 	return "";
 }
