@@ -9,7 +9,6 @@ lista rzeczy, które wypada³oby zrobiæ _przed_ wydaniem wersji 1.0:
   - uaktualniæ dokumentacjê: opis API, protoko³u,
 
 * klient:
-  - reakcja na zmianê rozmiaru terminala,
   - obs³uga kolorowego tekstu.
   - mo¿liwo¶æ podania portu forwardingu (fidor)
   - upro¶ciæ ,,on'', akcje dostêpne (jako komendy?) tak¿e dla timer/at,
@@ -28,8 +27,6 @@ pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
   - dodaæ ,,list --add'', które dopisuje informacje do listy kontaktów,
   - zapisywanie konfiguracji do innego pliku,
   - zmienna beep_*_away (rmrmg)
-  - mo¿liwo¶æ bindowania akcji klienta (end-of-line, yank-buffer itp.)
-    nie tylko komend,
   - zmieniæ domy¶lne ustawienia na: display_sent 1, make_window 2,
     display_ack 3,
   - konfiguracja listy obecnych (kolorki, co wy¶wietlaæ itd.)

@@ -390,7 +390,7 @@ char *base64_decode(const char *buf)
  *
  * wy¶wietla listê przypisanych komend.
  */
-void binding_list(int quiet) 
+void binding_list(int quiet, int all) 
 {
 	list_t l;
 
@@ -400,7 +400,8 @@ void binding_list(int quiet)
 	for (l = bindings; l; l = l->next) {
 		struct binding *b = l->data;
 
-		printq("bind_seq_list", b->key, b->action);
+		if (!b->internal || (all && b->internal))
+			printq("bind_seq_list", b->key, b->action);
 	}
 }
 
@@ -421,6 +422,9 @@ void binding_free()
 
 		xfree(b->key);
 		xfree(b->action);
+		xfree(b->arg);
+		xfree(b->default_action);
+		xfree(b->default_arg);
 	}
 
 	list_destroy(bindings, 1);

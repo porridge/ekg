@@ -80,8 +80,9 @@ static void ui_ncurses_deinit();
 static void window_switch(int id);
 static void update_statusbar(int commit);
 
-static void binding_add(const char *key, const char *action, int quiet);
+static void binding_add(const char *key, const char *action, int internal, int quiet);
 static void binding_delete(const char *key, int quiet);
+static void binding_default();
 
 struct screen_line {
 	int len;		/* d³ugo¶æ linii */
@@ -1523,15 +1524,13 @@ static void update_statusbar(int commit)
  */
 static void winch_handler()
 {
-	beep();
+	endwin();
+	refresh();
 
+	window_resize();
 	window_refresh();
-	if (contacts)
-		wnoutrefresh(contacts);
-	wnoutrefresh(status);
-	wnoutrefresh(input);
-	doupdate();
-	wrefresh(curscr);
+	contacts_rebuild();
+	window_commit();
 }
 
 /*
@@ -1615,6 +1614,8 @@ void ui_ncurses_init()
 	memset(binding_map_meta, 0, sizeof(binding_map_meta));
 
 	contacts_rebuild();
+
+	binding_default();
 }
 
 /*
@@ -2298,7 +2299,7 @@ void print_char(WINDOW *w, int y, int x, unsigned char ch)
  *
  *  - meta - przedrostek klawisza.
  *
- * zwraca kod klawisza lub -1, je¶li nale¿y go pomin±æ.
+ * zwraca kod klawisza lub -2, je¶li nale¿y go pomin±æ.
  */
 int ekg_getch(int meta)
 {
@@ -2319,10 +2320,397 @@ int ekg_getch(int meta)
 	PYTHON_HANDLE_FOOTER()
 
 	if (python_handle_result == 0 || python_handle_result == 2)
-		ch = -1;
+		ch = -2;
 #endif
 
 	return ch;
+}
+
+static void binding_backward_word(const char *arg)
+{
+	while (line_index > 0 && line[line_index - 1] == ' ')
+		line_index--;
+	while (line_index > 0 && line[line_index - 1] != ' ')
+		line_index--;
+}
+
+static void binding_forward_word(const char *arg)
+{
+	while (line_index < strlen(line) && line[line_index] == ' ')
+		line_index++;
+	while (line_index < strlen(line) && line[line_index] != ' ')
+		line_index++;
+}
+
+static void binding_kill_word(const char *arg)
+{
+	char *p = line + line_index;
+	int eaten = 0;
+
+	while (*p && *p == ' ') {
+		p++;
+		eaten++;
+	}
+
+	while (*p && *p != ' ') {
+		p++;
+		eaten++;
+	}
+
+	memmove(line + line_index, line + line_index + eaten, strlen(line) - line_index - eaten + 1);
+}
+
+static void binding_toggle_input(const char *arg)
+{
+	if (input_size == 1) {
+		input_size = 5;
+		update_input();
+	} else {
+		string_t s = string_init("");
+		char *tmp;
+		int i;
+	
+		for (i = 0; lines[i]; i++) {
+			if (!strcmp(lines[i], "") && !lines[i + 1])
+				break;
+
+			string_append(s, lines[i]);
+			string_append(s, "\r\n");
+		}
+
+		line = string_free(s, 0);
+		tmp = xstrdup(line);
+		history[0] = line;
+
+		input_size = 1;
+		update_input();
+
+		command_exec(window_current->target, tmp);
+		xfree(tmp);
+	}
+}
+
+static void binding_cancel_input(const char *arg)
+{
+	input_size = 1;
+	update_input();
+}
+
+static void binding_backward_delete_char(const char *arg)
+{
+	if (lines && line_index == 0 && lines_index > 0 && strlen(lines[lines_index]) + strlen(lines[lines_index - 1]) < LINE_MAXLEN) {
+		int i;
+
+		line_index = strlen(lines[lines_index - 1]);
+		strcat(lines[lines_index - 1], lines[lines_index]);
+		
+		xfree(lines[lines_index]);
+
+		for (i = lines_index; i < array_count(lines); i++)
+			lines[i] = lines[i + 1];
+
+		lines = xrealloc(lines, (array_count(lines) + 1) * sizeof(char*));
+
+		lines_index--;
+		lines_adjust();
+	}
+
+	if (strlen(line) > 0 && line_index > 0) {
+		memmove(line + line_index - 1, line + line_index, LINE_MAXLEN - line_index);
+		line[LINE_MAXLEN - 1] = 0;
+		line_index--;
+	}
+}
+
+static void binding_kill_line(const char *arg)
+{
+	line[line_index] = 0;
+}
+
+static void binding_yank(const char *arg)
+{
+	if (yanked && strlen(yanked) + strlen(line) + 1 < LINE_MAXLEN) {
+		memmove(line + line_index + strlen(yanked), line + line_index, LINE_MAXLEN - line_index - strlen(yanked));
+		memcpy(line + line_index, yanked, strlen(yanked));
+		line_index += strlen(yanked);
+	}
+}
+
+static void binding_delete_char(const char *arg)
+{
+	if (line_index == strlen(line) && lines_index < array_count(lines) - 1 && strlen(line) + strlen(lines[lines_index + 1]) < LINE_MAXLEN) {
+		int i;
+
+		strcat(line, lines[lines_index + 1]);
+
+		xfree(lines[lines_index + 1]);
+
+		for (i = lines_index + 1; i < array_count(lines); i++)
+			lines[i] = lines[i + 1];
+
+		lines = xrealloc(lines, (array_count(lines) + 1) * sizeof(char*));
+
+		lines_adjust();
+	
+		return;
+	}
+				
+	if (line_index < strlen(line)) {
+		memmove(line + line_index, line + line_index + 1, LINE_MAXLEN - line_index - 1);
+		line[LINE_MAXLEN - 1] = 0;
+	}
+}
+				
+static void binding_accept_line(const char *arg)
+{
+	if (lines) {
+		int i;
+
+		lines = xrealloc(lines, (array_count(lines) + 2) * sizeof(char*));
+
+		for (i = array_count(lines); i > lines_index; i--)
+			lines[i + 1] = lines[i];
+
+		lines[lines_index + 1] = xmalloc(LINE_MAXLEN);
+		strcpy(lines[lines_index + 1], line + line_index);
+		line[line_index] = 0;
+		
+		line_index = 0;
+		lines_index++;
+
+		lines_adjust();
+	
+		return;
+	}
+				
+	command_exec(window_current->target, line);
+
+	if (strcmp(line, "")) {
+		if (history[0] != line)
+			xfree(history[0]);
+		history[0] = xstrdup(line);
+		xfree(history[HISTORY_MAX - 1]);
+		memmove(&history[1], &history[0], sizeof(history) - sizeof(history[0]));
+	} else {
+		if (config_enter_scrolls)
+			print("none", "");
+	}
+
+	history[0] = line;
+	history_index = 0;
+	line[0] = 0;
+	line_adjust();
+}
+
+static void binding_line_discard(const char *arg)
+{
+	xfree(yanked);
+	yanked = strdup(line);
+	line[0] = 0;
+	line_adjust();
+
+	if (lines && lines_index < array_count(lines) - 1) {
+		int i;
+
+		xfree(lines[lines_index]);
+
+		for (i = lines_index; i < array_count(lines); i++)
+			lines[i] = lines[i + 1];
+
+		lines = xrealloc(lines, (array_count(lines) + 1) * sizeof(char*));
+
+		lines_adjust();
+	}
+}
+
+static void binding_quoted_insert(const char *arg)
+{
+	int ch;
+
+	ekg_wait_for_key();
+
+	ch = ekg_getch('V' - 64);	/* XXX */
+
+	if (ch == -1)
+		return;
+
+	if (strlen(line) >= LINE_MAXLEN - 1)
+		return;
+
+	memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
+
+	line[line_index++] = ch;
+}
+
+static void binding_word_rubout(const char *arg)
+{
+	char *p;
+	int eaten = 0;
+
+	p = line + line_index;
+	while (isspace(*(p-1)) && p > line) {
+		p--;
+		eaten++;
+	}
+	if (p > line) {
+		while (!isspace(*(p-1)) && p > line) {
+			p--;
+			eaten++;
+		}
+	}
+	memmove(p, line + line_index, strlen(line) - line_index + 1);
+	line_index -= eaten;
+}
+
+static void binding_complete(const char *arg)
+{
+	if (!lines)
+		complete(&line_start, &line_index);
+	else {
+		int i, count = 8 - (line_index % 8);
+
+		if (strlen(line) + count >= LINE_MAXLEN - 1)
+			return;
+
+		memmove(line + line_index + count, line + line_index, LINE_MAXLEN - line_index - count);
+
+		for (i = line_index; i < line_index + count; i++)
+			line[i] = ' ';
+
+		line_index += count;
+	}
+}
+
+static void binding_backward_char(const char *arg)
+{
+	if (lines) {
+		if (line_index > 0)
+			line_index--;
+		else {
+			if (lines_index > 0)
+				lines_index--;
+			lines_adjust();
+		}
+
+		return;
+	}
+
+	if (line_index > 0)
+		line_index--;
+}
+
+static void binding_forward_char(const char *arg)
+{
+	if (lines) {
+		if (line_index < strlen(line))
+			line_index++;
+		else {
+			if (lines_index < array_count(lines) - 1)
+				lines_index++;
+			lines_adjust();
+		}
+
+		return;
+	}
+
+	if (line_index < strlen(line))
+		line_index++;
+}
+
+static void binding_end_of_line(const char *arg)
+{
+	line_adjust();
+}
+
+static void binding_beginning_of_line(const char *arg)
+{
+	line_index = 0;
+	line_start = 0;
+}
+
+static void binding_previous_history(const char *arg)
+{
+	if (lines) {
+		if (lines_index - lines_start == 0)
+			if (lines_start)
+				lines_start--;
+
+		if (lines_index)
+			lines_index--;
+
+		lines_adjust();
+
+		return;
+	}
+				
+	if (history[history_index + 1]) {
+		if (history_index == 0)
+			history[0] = xstrdup(line);
+		history_index++;
+		strcpy(line, history[history_index]);
+		line_adjust();
+	}
+}
+
+static void binding_next_history(const char *arg)
+{
+	if (lines) {
+		if (lines_index - line_start == 4)
+			if (lines_index < array_count(lines) - 1)
+				lines_start++;
+
+		if (lines_index < array_count(lines) - 1)
+			lines_index++;
+
+		lines_adjust();
+
+		return;
+	}
+
+	if (history_index > 0) {
+		history_index--;
+		strcpy(line, history[history_index]);
+		line_adjust();
+		if (history_index == 0) {
+			xfree(history[0]);
+			history[0] = line;
+		}
+	}
+}
+
+static void binding_backward_page(const char *arg)
+{
+	window_current->start -= window_current->height;
+	if (window_current->start < 0)
+		window_current->start = 0;
+	window_redraw(window_current);
+}
+
+static void binding_forward_page(const char *arg)
+{
+	window_current->start += window_current->height;
+
+	if (window_current->start > window_current->lines_count - window_current->height + window_current->overflow)
+		window_current->start = window_current->lines_count - window_current->height + window_current->overflow;
+
+	if (window_current->start < 0)
+		window_current->start = 0;
+
+	if (window_current->start == window_current->lines_count - window_current->height + window_current->overflow) {
+		window_current->more = 0;
+		update_statusbar(0);
+	}
+	window_redraw(window_current);
+}
+
+static void binding_quick_list_wrapper(const char *arg)
+{
+	binding_quick_list(0, 0);
+}
+
+static void binding_toggle_contacts_wrapper(const char *arg)
+{
+	binding_toggle_contacts(0, 0);
 }
 
 /*
@@ -2338,40 +2726,35 @@ static void ui_ncurses_loop()
 	history[0] = line;
 
 	for (;;) {
+		struct binding *b = NULL;
 		int ch;
 		
 		ekg_wait_for_key();
 		ch = ekg_getch(0);
 
-
-		if (ch == -1)
-			continue;
-
-		if (ch != 27 && binding_map[ch] && binding_map[ch]->action) {
-			command_exec(NULL, binding_map[ch]->action);
+		if (ch == -1) {		/* stracony terminal */
+			ekg_exit();
 			continue;
 		}
-		
-		switch (ch) {
-			case -1:	/* stracony terminal */
-				ekg_exit();
-				break;
 
-			case KEY_RESIZE:  /* zmiana rozmiaru terminala */
-				winch_handler();
-				break;
+		if (ch == -2)		/* python ka¿e ignorowaæ */
+			continue;
 
-			case 27:
-				ch = ekg_getch(27);
+		if (ch == 27) {
+			if ((ch = ekg_getch(27)) == -2)
+				continue;
 
-				if (ch == -1)
-					continue;
+			b = binding_map_meta[ch];
 
-				if (binding_map_meta[ch] && binding_map_meta[ch]->action) {
-					command_exec(NULL, binding_map_meta[ch]->action);
-					break;
-				}
-				
+			if (ch == 27)
+				b = binding_map[27];
+
+			if (b && b->action) {
+				if (b->function)
+					b->function(b->arg);
+				else
+					command_exec(NULL, b->action);
+			} else {
 				/* obs³uga Ctrl-F1 - Ctrl-F12 na FreeBSD */
 				if (ch == '[') {
 					ch = wgetch(input);
@@ -2380,458 +2763,25 @@ static void ui_ncurses_loop()
 					break;
 				}
 				
-				if (ch >= '1' && ch <= '9')	/* Alt-cyfra */
-					window_switch(ch - '1' + 1);
-				else if (ch == '0')
-					window_switch(10);
-				else if (ch == 'q')
-					window_switch(11);
-				else if (ch == 'w')
-					window_switch(12);
-				else if (ch == 'e')
-					window_switch(13);
-				else if (ch == 'r')
-					window_switch(14);
-				else if (ch == 't')
-					window_switch(15);
-				else if (ch == 'y')
-					window_switch(16);
-				else if (ch == 'u')
-					window_switch(17);
-				else if (ch == 'i')
-					window_switch(18);
-				else if (ch == 'o')
-					window_switch(19);
-				else if (ch == 'p')
-					window_switch(20);
-
-				if (ch == '`')			/* Alt-` */
-					window_switch(0);
-
-				if (ch == 'k' || ch == 'K')	/* Alt-K */
-					ui_event("command", 0, "window", "kill", NULL);
-
-				if (ch == 'n' || ch == 'N')	/* Alt-N */
-					ui_event("command", 0, "window", "new", NULL);
-
 				if (ch == 'g' || ch == 'G') {	/* Alt-G */
 					char *tmp = saprintf("/ignore %s", window_current->target);
 					command_exec(NULL, tmp);
 					xfree(tmp);
 				}
-
-				if (ch == 'b' || ch == 'B') {	/* Alt-B */
-					while (line_index > 0 && line[line_index - 1] == ' ')
-						line_index--;
-					while (line_index > 0 && line[line_index - 1] != ' ')
-						line_index--;
-				}
-
-				if (ch == 'f' || ch == 'F') {	/* Alt-F */
-					while (line_index < strlen(line) && line[line_index] == ' ')
-						line_index++;
-					while (line_index < strlen(line) && line[line_index] != ' ')
-						line_index++;
-				}
-
-				if (ch == 'd' || ch == 'D') {	/* Alt-D */
-					char *p = line + line_index;
-					int eaten = 0;
-
-					while (*p && *p == ' ') {
-						p++;
-						eaten++;
-					}
-
-					while (*p && *p != ' ') {
-						p++;
-						eaten++;
-					}
-
-					memmove(line + line_index, line + line_index + eaten, strlen(line) - line_index - eaten + 1);
-				}
-
-				if (ch == 13) {		/* Ctrl-Enter */
-					if (input_size == 1) {
-						input_size = 5;
-						update_input();
-					} else {
-						string_t s = string_init("");
-						char *tmp;
-						int i;
-						
-						for (i = 0; lines[i]; i++) {
-							if (!strcmp(lines[i], "") && !lines[i + 1])
-								break;
-
-							string_append(s, lines[i]);
-							string_append(s, "\r\n");
-						}
-
-						line = string_free(s, 0);
-						tmp = xstrdup(line);
-						history[0] = line;
-
-						input_size = 1;
-						update_input();
-
-						command_exec(window_current->target, tmp);
-						xfree(tmp);
-					}
-				}
-
-				if (ch == 27 && input_size == 5) {  /* Esc */
-					input_size = 1;
-
-					update_input();
-				}
-
-				break;
-			
-			case 'N' - 64:	/* Ctrl-N */
-				ui_event("command", 0,"window", "next", NULL);
-				break;
-
-			case 'P' - 64:	/* Ctrl-P */
-				ui_event("command", 0, "window", "prev", NULL);
-				break;
-				
-			case KEY_BACKSPACE:
-			case 8:
-			case 127:
-				if (lines && line_index == 0 && lines_index > 0 && strlen(lines[lines_index]) + strlen(lines[lines_index - 1]) < LINE_MAXLEN) {
-					int i;
-
-					line_index = strlen(lines[lines_index - 1]);
-					strcat(lines[lines_index - 1], lines[lines_index]);
-					
-					xfree(lines[lines_index]);
-
-					for (i = lines_index; i < array_count(lines); i++)
-						lines[i] = lines[i + 1];
-
-					lines = xrealloc(lines, (array_count(lines) + 1) * sizeof(char*));
-
-					lines_index--;
-					lines_adjust();
-
-					break;
-				}
-
-				if (strlen(line) > 0 && line_index > 0) {
-					memmove(line + line_index - 1, line + line_index, LINE_MAXLEN - line_index);
-					line[LINE_MAXLEN - 1] = 0;
-					line_index--;
-				}
-				break;
-
-			case 'K' - 64:	/* Ctrl-K */
-				line[line_index] = 0;
-				break;
-
-			case 'Y' - 64:	/* Ctrl-Y */
-				if (yanked && strlen(yanked) + strlen(line) + 1 < LINE_MAXLEN) {
-					memmove(line + line_index + strlen(yanked), line + line_index, LINE_MAXLEN - line_index - strlen(yanked));
-					memcpy(line + line_index, yanked, strlen(yanked));
-					line_index += strlen(yanked);
-				}
-				break;
-
-			case KEY_DC:	/* Ctrl-D, Delete */
-			case 'D' - 64:
-				if (line_index == strlen(line) && lines_index < array_count(lines) - 1 && strlen(line) + strlen(lines[lines_index + 1]) < LINE_MAXLEN) {
-					int i;
-
-					strcat(line, lines[lines_index + 1]);
-
-					xfree(lines[lines_index + 1]);
-
-					for (i = lines_index + 1; i < array_count(lines); i++)
-						lines[i] = lines[i + 1];
-
-					lines = xrealloc(lines, (array_count(lines) + 1) * sizeof(char*));
-
-					lines_adjust();
-					
-					break;
-				}
-				
-				if (line_index < strlen(line)) {
-					memmove(line + line_index, line + line_index + 1, LINE_MAXLEN - line_index - 1);
-					line[LINE_MAXLEN - 1] = 0;
-				}
-				break;	
-				
-			case KEY_ENTER:	/* Enter */
-			case 13:
-				if (lines) {
-					int i;
-
-					lines = xrealloc(lines, (array_count(lines) + 2) * sizeof(char*));
-
-					for (i = array_count(lines); i > lines_index; i--)
-						lines[i + 1] = lines[i];
-
-					lines[lines_index + 1] = xmalloc(LINE_MAXLEN);
-					strcpy(lines[lines_index + 1], line + line_index);
-					line[line_index] = 0;
-					
-					line_index = 0;
-					lines_index++;
-
-					lines_adjust();
-					
-					break;
-				}
-				
-				command_exec(window_current->target, line);
-
-				if (strcmp(line, "")) {
-					if (history[0] != line)
-						xfree(history[0]);
-					history[0] = xstrdup(line);
-					xfree(history[HISTORY_MAX - 1]);
-					memmove(&history[1], &history[0], sizeof(history) - sizeof(history[0]));
-				} else {
-					if (config_enter_scrolls)
-						print("none", "");
-				}
-
-				history[0] = line;
-				history_index = 0;
-				line[0] = 0;
-				line_adjust();
-				break;	
-
-			case 'U' - 64:	/* Ctrl-U */
-				xfree(yanked);
-				yanked = strdup(line);
-				line[0] = 0;
-				line_adjust();
-
-				if (lines && lines_index < array_count(lines) - 1) {
-					int i;
-
-					xfree(lines[lines_index]);
-
-					for (i = lines_index; i < array_count(lines); i++)
-						lines[i] = lines[i + 1];
-
-					lines = xrealloc(lines, (array_count(lines) + 1) * sizeof(char*));
-
-					lines_adjust();
-				}
-
-				break;
-
-			case 'V' - 64:	/* Ctrl-V */
-			{
-				ekg_wait_for_key();
-
-				ch = ekg_getch('V' - 64);
-
-				if (ch == -1)
-					continue;
-
+			}
+		} else {
+			if ((b = binding_map[ch]) && b->action) {
+				if (b->function)
+					b->function(b->arg);
+				else
+					command_exec(NULL, b->action);
+			} else if (ch < 255) {
 				if (strlen(line) >= LINE_MAXLEN - 1)
 					break;
 				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
 
 				line[line_index++] = ch;
-
-				break;
 			}
-
-			case 'W' - 64:	/* Ctrl-W */
-			{
-				char *p;
-				int eaten = 0;
-
-				p = line + line_index;
-				while (isspace(*(p-1)) && p > line) {
-					p--;
-					eaten++;
-				}
-				if (p > line) {
-					while (!isspace(*(p-1)) && p > line) {
-						p--;
-						eaten++;
-					}
-				}
-				memmove(p, line + line_index, strlen(line) - line_index + 1);
-				line_index -= eaten;
-
-				break;
-			}
-
-			case 'L' - 64:	/* Ctrl-L */
-				ui_event("command", 0, "window", "refresh", NULL);
-				break;
-				
-			case 9:		/* Tab */
-				if (!lines)
-					complete(&line_start, &line_index);
-				else {
-					int i, count = 8 - (line_index % 8);
-
-					if (strlen(line) + count >= LINE_MAXLEN - 1)
-						break;
-
-					memmove(line + line_index + count, line + line_index, LINE_MAXLEN - line_index - count);
-
-					for (i = line_index; i < line_index + count; i++)
-						line[i] = ' ';
-
-					line_index += count;
-				}
-
-				break;
-				
-			case KEY_LEFT:	/* <-- */
-				if (lines) {
-					if (line_index > 0)
-						line_index--;
-					else {
-						if (lines_index > 0)
-							lines_index--;
-						lines_adjust();
-					}
-
-					break;
-				}
-
-				if (line_index > 0)
-					line_index--;
-				break;
-				
-			case KEY_RIGHT:	/* --> */
-				if (lines) {
-					if (line_index < strlen(line))
-						line_index++;
-					else {
-						if (lines_index < array_count(lines) - 1)
-							lines_index++;
-						lines_adjust();
-					}
-
-					break;
-				}
-
-				if (line_index < strlen(line))
-					line_index++;
-				break;
-				
-			case 'E' - 64:	/* Ctrl-E, End */
-			case KEY_END:
-			case KEY_SELECT:
-				line_adjust();
-				break;
-				
-			case 'A' - 64:	/* Ctrl-A, Home */
-			case KEY_HOME:
-			case KEY_FIND:
-				line_index = 0;
-				line_start = 0;
-				break;
-				
-			case KEY_UP:	/* /\ */
-				if (lines) {
-					if (lines_index - lines_start == 0)
-						if (lines_start)
-							lines_start--;
-
-					if (lines_index)
-						lines_index--;
-
-					lines_adjust();
-
-					break;
-				}
-				
-				if (history[history_index + 1]) {
-					if (history_index == 0)
-						history[0] = xstrdup(line);
-					history_index++;
-					strcpy(line, history[history_index]);
-					line_adjust();
-				}
-				break;
-				
-			case KEY_DOWN:	/* \/ */
-				if (lines) {
-					if (lines_index - line_start == 4)
-						if (lines_index < array_count(lines) - 1)
-							lines_start++;
-
-					if (lines_index < array_count(lines) - 1)
-						lines_index++;
-
-					lines_adjust();
-
-					break;
-				}
-
-				if (history_index > 0) {
-					history_index--;
-					strcpy(line, history[history_index]);
-					line_adjust();
-					if (history_index == 0) {
-						xfree(history[0]);
-						history[0] = line;
-					}
-				}
-				break;
-				
-			case KEY_PPAGE:	/* Page Up */
-			case 'F' - 64:	/* Ctrl-F */
-				window_current->start -= window_current->height;
-				if (window_current->start < 0)
-					window_current->start = 0;
-				window_redraw(window_current);
-
-				break;
-
-			case KEY_NPAGE:	/* Page Down */
-			case 'G' - 64:	/* Ctrl-G */
-				window_current->start += window_current->height;
-
-				if (window_current->start > window_current->lines_count - window_current->height + window_current->overflow)
-					window_current->start = window_current->lines_count - window_current->height + window_current->overflow;
-
-				if (window_current->start < 0)
-					window_current->start = 0;
-
-				if (window_current->start == window_current->lines_count - window_current->height + window_current->overflow) {
-					window_current->more = 0;
-					update_statusbar(0);
-				}
-				window_redraw(window_current);
-
-				break;
-				
-			case KEY_F(1):	/* F1 */
-				binding_help(0, 0);
-				break;
-
-			case KEY_F(2):	/* F2 */
-				binding_quick_list(0, 0);
-				break;
-	
-			case KEY_F(3):  /* F3 */
-				binding_toggle_contacts(0, 0);
-				break;
-				
-			case KEY_F(12):	/* F12 */
-				window_switch(0);
-				break;
-				
-			default:
-				/* XXX kod jest zdublowany przy Ctrl-V */
-				if (strlen(line) >= LINE_MAXLEN - 1)
-					break;
-				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
-
-				line[line_index++] = ch;
 		}
 
 		/* je¶li siê co¶ zmieni³o, wygeneruj dope³nienia na nowo */
@@ -2885,6 +2835,7 @@ static void ui_ncurses_loop()
 			wattrset(input, COLOR_PAIR(7));
 			wmove(input, 0, line_index - line_start + window_current->prompt_len);
 		}
+		
 		window_commit();
 	}
 }
@@ -2996,69 +2947,227 @@ cleanup:
 }
 
 /*
+ * binding_parse()
+ *
+ * analizuje dan± akcjê i wype³nia pola struct binding odpowiedzialne
+ * za dzia³anie.
+ *
+ *  - b - wska¼nik wype³nianej skruktury,
+ *  - action - akcja,
+ */
+static void binding_parse(struct binding *b, const char *action)
+{
+	char **args;
+
+	if (!b || !action)
+		return;
+
+	b->action = xstrdup(action);
+
+	args = array_make(action, " \t", 1, 1, 1);
+
+	if (!args[0]) {
+		array_free(args);
+		return;
+	}
+	
+#define __action(x,y) \
+	if (!strcmp(args[0], x)) { \
+		b->function = y; \
+		b->arg = xstrdup(args[1]); \
+	} 
+
+	__action("backward-word", binding_backward_word);
+	__action("forward-word", binding_forward_word);
+	__action("kill-word", binding_kill_word);
+	__action("toggle-input", binding_toggle_input);
+	__action("cancel-input", binding_cancel_input);
+	__action("backward-delete-char", binding_backward_delete_char);
+	__action("beginning-of-line", binding_beginning_of_line);
+	__action("end-of-line", binding_end_of_line);
+	__action("delete-char", binding_delete_char);
+	__action("backward-page", binding_backward_page);
+	__action("forward-page", binding_forward_page);
+	__action("kill-line", binding_kill_line);
+	__action("yank", binding_yank);
+	__action("accept-line", binding_accept_line);
+	__action("line-discard", binding_line_discard);
+	__action("quoted-insert", binding_quoted_insert);
+	__action("word-rubout", binding_word_rubout);
+	__action("backward-char", binding_backward_char);
+	__action("forward-char", binding_forward_char);
+	__action("previous-history", binding_previous_history);
+	__action("next-history", binding_next_history);
+	__action("complete", binding_complete);
+	__action("quick-list", binding_quick_list_wrapper);
+	__action("toggle-contacts", binding_toggle_contacts_wrapper);
+
+#undef __action
+}
+
+/*
+ * binding_key()
+ *
+ * analizuje nazwê klawisza i wpisuje akcjê do odpowiedniej mapy.
+ *
+ * 0/-1.
+ */
+int binding_key(struct binding *b, const char *key, int add)
+{
+	if (!strncasecmp(key, "Alt-", 4)) {
+		unsigned char ch;
+
+		if (!strcasecmp(key + 4, "Enter")) {
+			b->key = xstrdup("Alt-Enter");
+			if (add)
+				binding_map_meta[13] = list_add(&bindings, b, sizeof(struct binding));
+			return 0;
+		}
+
+		if (strlen(key) != 5)
+			return -1;
+	
+		ch = toupper(key[4]);
+
+		b->key = saprintf("Alt-%c", ch);
+
+		if (add) {
+			binding_map_meta[ch] = list_add(&bindings, b, sizeof(struct binding));
+			if (isalpha(ch))
+				binding_map_meta[tolower(ch)] = binding_map_meta[ch];
+		}
+
+		return 0;
+	}
+
+	if (!strncasecmp(key, "Ctrl-", 5)) {
+		unsigned char ch;
+		
+		if (strlen(key) != 6)
+			return -1;
+
+		ch = toupper(key[5]);
+		b->key = saprintf("Ctrl-%c", ch);
+
+		if (add)
+			binding_map[ch - 64] = list_add(&bindings, b, sizeof(struct binding));
+		
+		return 0;
+	}
+
+	if (toupper(key[0]) == 'F' && atoi(key + 1)) {
+		int f = atoi(key + 1);
+
+		if (f < 1 || f > 24)
+			return -1;
+
+		b->key = saprintf("F%d", f);
+		
+		if (add)
+			binding_map[KEY_F(f)] = list_add(&bindings, b, sizeof(struct binding));
+		
+		return 0;
+	}
+
+#define __key(x, y, z) \
+	if (!strcasecmp(key, x)) { \
+		b->key = xstrdup(x); \
+		if (add) { \
+			binding_map[y] = list_add(&bindings, b, sizeof(struct binding)); \
+			if (z) \
+				binding_map[z] = binding_map[y]; \
+		} \
+		return 0; \
+	}
+
+	__key("Enter", 13, 0);
+	__key("Escape", 27, 0);
+	__key("Home", KEY_HOME, KEY_FIND);
+	__key("End", KEY_END, KEY_SELECT);
+	__key("Delete", KEY_DC, 0);
+	__key("Backspace", KEY_BACKSPACE, 127);
+	__key("Tab", 9, 0);
+	__key("Left", KEY_LEFT, 0);
+	__key("Right", KEY_RIGHT, 0);
+	__key("Up", KEY_UP, 0);
+	__key("Down", KEY_DOWN, 0);
+	__key("PageUp", KEY_PPAGE, 0);
+	__key("PageDown", KEY_NPAGE, 0);
+
+#undef __key
+
+	return -1;
+}
+
+/*
  * binding_add()
  *
  * przypisuje danemu klawiszowi akcjê.
+ *
+ *  - key - opis klawisza,
+ *  - action - akcja,
+ *  - internal - czy to wewnêtrzna akcja interfejsu?
+ *  - quiet - czy byæ cicho i nie wy¶wietlaæ niczego?
  */
-static void binding_add(const char *key, const char *action, int quiet)
+static void binding_add(const char *key, const char *action, int internal, int quiet)
 {
 	int correct = 0;
-	struct binding b;
+	struct binding b, *c = NULL;
+	list_t l;
 	
 	if (!key || !action)
 		return;
 	
-	if (!strncasecmp(key, "ctrl-", 5) && strlen(key) == 6 && isalpha(key[5])) {
-		char ch = toupper(key[5]);
-		list_t l;
+	memset(&b, 0, sizeof(b));
 
-		b.key = saprintf("Ctrl-%c", ch);
-		b.action = xstrdup(action);
-
-		for (l = bindings; l; l = l->next) { 
-			struct binding *foo = l->data;
-
-			if (!strcmp(b.key, foo->key)) {
-				printq("bind_seq_exist", b.key); 
-				xfree(b.key);
-				xfree(b.action);
-				return;
-			}
-		}
-
-		binding_map[ch - 64] = list_add(&bindings, &b, sizeof(b));
-
-		correct = 1;
-	}
-
-	if (!strncasecmp(key, "alt-", 4) && strlen(key) == 5) {
-		char ch = isalpha(key[4]) ? toupper(key[4]) : key[4];
-		list_t l;
-
-		b.key = saprintf("Alt-%c", ch);
-		b.action = xstrdup(action);
-
-		for (l = bindings; l; l = l->next) {
-			struct binding *foo = l->data;
+	b.internal = internal;
 	
-			if (!strcmp(b.key, foo->key)) {
-				printq("bind_seq_exist", b.key);
-				xfree(b.key);
-				xfree(b.action);
-				return;
+	for (l = bindings; l; l = l->next) {
+		struct binding *d = l->data;
+
+		if (!strcasecmp(key, d->key)) {
+			if (d->internal) {
+				c = d;
+				break;
 			}
+			printq("bind_seq_exist", d->key);
+			return;
 		}
-
-		binding_map_meta[(unsigned char) ch] = list_add(&bindings, &b, sizeof(b));
-		if (isalpha(ch))
-			binding_map_meta[tolower(ch)] = binding_map_meta[(unsigned char) ch];
-
-		correct = 1;
 	}
 
-	printq((correct) ? "bind_seq_add" : "bind_seq_incorrect", b.key);
-	if (!in_autoexec && correct)
-		config_changed = 1;
+	binding_parse(&b, action);
+
+	if (internal) {
+		b.default_action = xstrdup(b.action);
+		b.default_function = b.function;
+		b.default_arg = xstrdup(b.arg);
+	}
+
+	if (binding_key(&b, key, (c) ? 0 : 1)) {
+		printq("bind_seq_incorrect", key);
+		xfree(b.action);
+		xfree(b.arg);
+		xfree(b.default_action);
+		xfree(b.default_arg);
+		xfree(b.key);
+	} else {
+		printq("bind_seq_add", b.key);
+
+		if (c) {
+			xfree(c->action);
+			c->action = b.action;
+			xfree(c->arg);
+			c->arg = b.arg;
+			c->function = b.function;
+			xfree(b.default_action);
+			xfree(b.default_arg);
+			xfree(b.key);
+			c->internal = 0;
+		}
+
+		if (!in_autoexec && correct && !internal)
+			config_changed = 1;
+	}
 }
 
 /*
@@ -3080,17 +3189,30 @@ static void binding_delete(const char *key, int quiet)
 		if (!b->key || strcasecmp(key, b->key))
 			continue;
 
-		xfree(b->key);
-		xfree(b->action);
-		
-		for (i = 0; i < KEY_MAX + 1; i++) {
-			if (binding_map[i] == b)
-				binding_map[i] = NULL;
-			if (binding_map_meta[i] == b)
-				binding_map_meta[i] = NULL;
+		if (b->internal) {
+			printq("bind_seq_incorrect", key);
+			return;
 		}
 
-		list_remove(&bindings, b, 1);
+		xfree(b->action);
+		xfree(b->arg);
+		
+		if (b->default_action) {
+			b->action = xstrdup(b->default_action);
+			b->arg = xstrdup(b->default_arg);
+			b->function = b->default_function;
+			b->internal = 1;
+		} else {
+			xfree(b->key);
+			for (i = 0; i < KEY_MAX + 1; i++) {
+				if (binding_map[i] == b)
+					binding_map[i] = NULL;
+				if (binding_map_meta[i] == b)
+					binding_map_meta[i] = NULL;
+			}
+
+			list_remove(&bindings, b, 1);
+		}
 
 		config_changed = 1;
 
@@ -3229,14 +3351,16 @@ static int ui_ncurses_event(const char *event, ...)
 				if (!p2 || !p3) {
 					printq("not_enough_params", "bind");
 				} else
-					binding_add(p2, p3, quiet);
+					binding_add(p2, p3, 0, quiet);
 			} else if (match_arg(p1, 'd', "delete", 2)) {
 				if (!p2) {
 					printq("not_enough_params", "bind");
 				} else
 					binding_delete(p2, quiet);
+			} else if (match_arg(p1, 'L', "list-default", 5)) {
+				binding_list(quiet, 1);
 			} else
-				binding_list(quiet);
+				binding_list(quiet, 0);
 
 			goto cleanup;
 		}
@@ -3605,4 +3729,72 @@ void header_statusbar_resize()
 	update_statusbar(0);
 
 	contacts_rebuild();	/* commitnie */
+}
+
+/*
+ * binding_default()
+ *
+ * ustawia lub przywraca domy¶lne ustawienia przypisanych klawiszy.
+ */
+static void binding_default()
+{
+	binding_add("Alt-`", "/window switch 0", 1, 1);
+	binding_add("Alt-1", "/window switch 1", 1, 1);
+	binding_add("Alt-2", "/window switch 2", 1, 1);
+	binding_add("Alt-3", "/window switch 3", 1, 1);
+	binding_add("Alt-4", "/window switch 4", 1, 1);
+	binding_add("Alt-5", "/window switch 5", 1, 1);
+	binding_add("Alt-6", "/window switch 6", 1, 1);
+	binding_add("Alt-7", "/window switch 7", 1, 1);
+	binding_add("Alt-8", "/window switch 8", 1, 1);
+	binding_add("Alt-9", "/window switch 0", 1, 1);
+	binding_add("Alt-0", "/window switch 10", 1, 1);
+	binding_add("Alt-Q", "/window switch 11", 1, 1);
+	binding_add("Alt-W", "/window switch 12", 1, 1);
+	binding_add("Alt-E", "/window switch 13", 1, 1);
+	binding_add("Alt-R", "/window switch 14", 1, 1);
+	binding_add("Alt-T", "/window switch 15", 1, 1);
+	binding_add("Alt-Y", "/window switch 16", 1, 1);
+	binding_add("Alt-U", "/window switch 17", 1, 1);
+	binding_add("Alt-I", "/window switch 18", 1, 1);
+	binding_add("Alt-O", "/window switch 19", 1, 1);
+	binding_add("Alt-P", "/window switch 20", 1, 1);
+	binding_add("Alt-K", "/window kill", 1, 1);
+	binding_add("Alt-N", "/window new", 1, 1);
+	binding_add("Alt-G", "/window ignore %{target}", 1, 1);
+	binding_add("Alt-B", "backward-word", 1, 1);
+	binding_add("Alt-F", "forward-word", 1, 1);
+	binding_add("Alt-D", "kill-word", 1, 1);
+	binding_add("Alt-Enter", "toggle-input", 1, 1);
+	binding_add("Escape", "cancel-input", 1, 1);
+	binding_add("Ctrl-N", "/window next", 1, 1);
+	binding_add("Ctrl-P", "/window prev", 1, 1);
+	binding_add("Backspace", "backward-delete-char", 1, 1);
+	binding_add("Ctrl-H", "backward-delete-char", 1, 1);
+	binding_add("Ctrl-A", "beginning-of-line", 1, 1);
+	binding_add("Home", "beginning-of-line", 1, 1);
+	binding_add("Ctrl-D", "delete-char", 1, 1);
+	binding_add("Delete", "delete-char", 1, 1);
+	binding_add("Ctrl-E", "end-of-line", 1, 1);
+	binding_add("Ctrl-K", "kill-line", 1, 1);
+	binding_add("Ctrl-Y", "yank", 1, 1);
+	binding_add("Enter", "accept-line", 1, 1);
+	binding_add("Ctrl-M", "accept-line", 1, 1);
+	binding_add("Ctrl-U", "line-discard", 1, 1);
+	binding_add("Ctrl-V", "quoted-insert", 1, 1);
+	binding_add("Ctrl-W", "word-rubout", 1, 1);
+	binding_add("Ctrl-L", "/window refresh", 1, 1);
+	binding_add("Tab", "complete", 1, 1);
+	binding_add("Right", "forward-char", 1, 1);
+	binding_add("Left", "backward-char", 1, 1);
+	binding_add("Up", "previous-history", 1, 1);
+	binding_add("Down", "next-history", 1, 1);
+	binding_add("PageUp", "backward-page", 1, 1);
+	binding_add("Ctrl-F", "backward-page", 1, 1);
+	binding_add("PageDown", "forward-page", 1, 1);
+	binding_add("Ctrl-G", "forward-page", 1, 1);
+	binding_add("F1", "/help", 1, 1);
+	binding_add("F2", "quick-list", 1, 1);
+	binding_add("F3", "toggle-contacts", 1, 1);
+	binding_add("F12", "/window switch 0", 1, 1);
 }

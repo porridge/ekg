@@ -100,7 +100,15 @@ struct emoticon {
 
 struct binding {
 	char *key;
-	char *action;
+
+	char *action;			/* akcja */
+	int internal;			/* czy domy¶lna kombinacja? */
+	void (*function)(const char *arg);	/* funkcja obs³uguj±ca */
+	char *arg;			/* argument funkcji */
+
+	char *default_action;		/* domy¶lna akcja */
+	void (*default_function)(const char *arg);	/* domy¶lna funkcja */
+	char *default_arg;		/* domy¶lny argument */
 };
 
 enum timer_type {
@@ -294,7 +302,7 @@ void alias_free();
 char *base64_encode(const char *buf);
 char *base64_decode(const char *buf);
 
-void binding_list(int quiet);
+void binding_list(int quiet, int all);
 void binding_free();
 
 int buffer_add(int type, const char *target, const char *line, int max_lines);

@@ -4160,8 +4160,11 @@ void command_init()
 	  "  -a, --add <sekwencja> <komenda>  przypisuje now± sekwencjê\n"
 	  "  -d, --del <sekwencja>            usuwa podan± sekwencjê\n"
 	  " [-l, --list]                      wy¶wietla przypisane sekwencje\n"
+	  "  -L, --list-default               j.w. plus domy¶lne sekwencje\n"
 	  "\n"
-	  "Dostêpne sekwencje to: Ctrl-<znak>, Alt-<znak>.");
+	  "Dostêpne sekwencje to: Ctrl-<znak>, Alt-<znak>, F<liczba>, Enter, "
+	  "Backspace, Delete, Insert, Home, End, Left, Right, Up, Down, "
+	  "PageUp, PageDown.");
 
 	command_add
 	( "change", "?", cmd_change, 0,
