@@ -49,3 +49,6 @@ przyk³ady:
 	on * disconnect kupa msg dupa nic z tego; blink_leds 7
 	on chat * blink_leds 4, 1, 2
 	on * * blink_leds $blah.led
+
+
+// $Id$

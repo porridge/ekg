@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 # ekg cat log - wy¶wietla logi ekg w nieco bardziej czytelnej formie.
 # (c) 2001 Pawe³ Maziarz <drg@go2.pl>
+# $Id$
 
 if (!$ARGV[0]) {
     print "U¿ycie: $0 plik_z_logiem\n";
