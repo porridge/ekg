@@ -407,7 +407,7 @@ void ekg_wait_for_key()
 
 		/* timeout autoawaya */
 		if (config_auto_away && GG_S_A(config_status) && time(NULL) - last_action > config_auto_away && sess->state == GG_STATE_CONNECTED)
-			change_status(GG_STATUS_BUSY, NULL, config_auto_away);
+			change_status(GG_STATUS_BUSY | (GG_S_F(config_status) ? GG_STATUS_FRIENDS_MASK : 0), NULL, config_auto_away);
 
 		/* auto save */
 		if (config_auto_save && config_changed && time(NULL) - last_save > config_auto_save) {
