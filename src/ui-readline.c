@@ -789,6 +789,7 @@ static int ui_readline_event(const char *event, ...)
 				xfree(window_current->query_nick);
 				window_current->query_nick = xstrdup(param);
 			} else {
+				printf("\n");	/* XXX brzydkie */
 				print("query_finished", window_current->query_nick);
 				xfree(window_current->query_nick);
 				window_current->query_nick = NULL;
