@@ -35,7 +35,7 @@ while [ $# -gt 0 ]; do
 		        echo -e "\t-h\t\tpomoc, któr± teraz widzisz"
 			echo -e "\t-L\t\tlista dostêpnych logów z katalogu $ggdir/history"
 			echo -e "\t-l\t\tlista sesji w wybranym logu"
-		        echo -e "\t-m name\t\tdomoy¶lnie \$USER"
+		        echo -e "\t-m name\t\tdomy¶lnie \$USER"
 		        echo -e "\t-n\t\tbez kolorów"
 			echo -e "\t-s date\t\tstart date; czas, odk±d zacz±æ drukownie historii"
 		        echo -e "\t-t\t\tzachowaj odstêpy czasowe miêdzy wypowiedziami (symulacja rozmowy)"

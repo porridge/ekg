@@ -17,6 +17,14 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+/*
+ * roadmap:
+ * - dope³nianie tabem,
+ * - okienka,
+ * - konfigurowalny statusbar,
+ * - mo¿liwo¶æ w³±czenia listy kontaktów po prawej,
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

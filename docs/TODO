@@ -12,6 +12,8 @@ klient:
 - lastlog, awaylog.
 - wykrywanie niewidocznych jako opcja.
 - wyczyszczenie history.
+- korzystaæ z getopt.
+- zapamiêtywaæ reasony.
 
 display_notify
         typ: bool

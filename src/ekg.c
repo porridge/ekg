@@ -49,6 +49,7 @@
 time_t last_action = 0;
 int ioctld_pid = 0;
 int ekg_pid = 0;
+char argv0[PATH_MAX];
 
 /*
  * struktura zawieraj±ca adresy funkcji obs³uguj±cych ró¿ne sesje
@@ -328,7 +329,6 @@ void ekg_wait_for_key()
 					}
 
 				if (handlers[i].type == -1) {
-//					printf("\n*** FATAL ERROR: Unknown session type. Application may fail.\n*** Mail this to the authors:\n*** ekg-" VERSION "/type=%d/state=%d/id=%d\n", c->type, c->state, c->id);
 					list_remove(&watches, c, 1);
 					break;
 				}
@@ -383,16 +383,21 @@ void sigsegv_handler()
 	fprintf(stderr, "\n\
 *** Naruszenie ochrony pamiêci ***\n\
 \n\
-Próbujê zapisaæ ustawienia do pliku %s/config.%d i listê\n\
-kontaktów do pliku %s/userlist.%d, ale nie obiecujê,\n\
-¿e cokolwiek z tego wyjdzie.\n\
+Spróbujê zapisaæ ustawienia, ale nie obiecujê, ¿e cokolwiek z tego\n\
+wyjdzie. Trafi± one do plików %s/config.%d\n\
+oraz %s/userlist.%d\n\
 \n\
 Je¶li zostanie utworzony plik %s/core, spróbuj uruchomiæ\n\
-program ,,gdb'' zgodnie z instrukcjami zawartymi w pliku README.\n\
-Dziêki temu autorzy dowiedz± siê, w którym miejscu wyst±pi³ b³±d\n\
-i najprawdopodobniej pozwoli to unikn±æ tego typu sytuacji w\n\
-przysz³o¶ci.\n\
-\n", config_dir, getpid(), config_dir, getpid(), config_dir);
+polecenie:\n\
+\n\
+    gdb %s %s/core\n\
+\n\
+zanotowaæ kilka ostatnich linii, a nastêpnie zanotowaæ wynik polecenia\n\
+,,bt''. Dziêki temu autorzy dowiedz± siê, w którym miejscu wyst±pi³ b³±d\n\
+i najprawdopodobniej pozwoli to unikn±æ tego typu sytuacji w przysz³o¶ci.\n\
+Wiêcej szczegó³ów w dokumentacji, w pliku ,,gdb.txt''.\n\
+\n",
+config_dir, getpid(), config_dir, getpid(), config_dir, argv0, config_dir);
 
 	config_write_crash();
 	userlist_write_crash();
@@ -456,6 +461,9 @@ int main(int argc, char **argv)
 #endif
 
 	srand(time(NULL));
+
+	strncpy(argv0, argv[0], sizeof(argv0) - 1);
+	argv0[sizeof(argv0) - 1] = 0;
 
 	variable_init();
 

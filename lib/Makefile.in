@@ -48,6 +48,7 @@ shared:	$(SHARED)
 
 $(SHARED): $(OBJS)
 	$(CC) -g -shared -Wl,-soname=libgadu.so.$(VERSION_MAJOR) -o $(SHARED) $(OBJS) $(LIBS) -lc
+	ln -s $(SHARED) libgadu.so
 
 #
 

@@ -5,6 +5,14 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-07-27
+
+- mo¿liwo¶æ nieuruchamiania ./configure przez ./autogen.sh (porridge/w)
+- AC_PREREQ (porridge/w)
+- ekg mo¿e byæ linkowane dynamicznie z libgadu (porridge/w)
+- many dla ekgsearch (porridge/w)
+- literówki (porridge/w)
+
 // 2002-07-25
 
 - je¶li wykryje <linux/kd.h>, robi --with-ioctld (w)
@@ -16,6 +24,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-07-23
 
 - dodanie obs³ugi znaków ¡±¦¶¬¼ w ekgsearch (wysek)
+- poprawka komunikatu przy segfaultach (w)
 
 // 2002-07-22
 

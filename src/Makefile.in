@@ -14,14 +14,14 @@ MAKE = @MAKE@
 AR = @AR@
 INSTALL = @INSTALL@
 
-OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o voice.o ekg.o xmalloc.o @ui_readline_o@ @ui_ncurses_o@ ui-batch.o ui-none.o ../lib/libgadu.a
+OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o voice.o ekg.o xmalloc.o @ui_readline_o@ @ui_ncurses_o@ ui-batch.o ui-none.o @libgadu_a@
 
 #
 
 all:	ekg @ioctld@
 
 ekg:	$(OBJS)
-	$(CC) $(CFLAGS) -o ekg $(OBJS) $(LIBS)
+	$(CC) $(CFLAGS) -o ekg $(OBJS) -L../lib $(LIBS) @lgadu@
 
 ioctld:	ioctld.c
 	$(CC) $(CFLAGS) ioctld.c -o ioctld

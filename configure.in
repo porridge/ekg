@@ -1,7 +1,7 @@
 dnl $Id$
 
 AC_INIT(lib/libgadu.h)
-
+AC_PREREQ(2.50)
 AC_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
@@ -34,6 +34,9 @@ AC_SUBST(install_ioctld, "")
 
 AC_SUBST(shared, "")
 AC_SUBST(install_shared, "")
+
+AC_SUBST(libgadu_a, "")
+AC_SUBST(lgadu, "")
 
 AC_SUBST(static, "static")
 AC_SUBST(install_static, "install-static")
@@ -69,8 +72,8 @@ AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
 
 # zachowujemy opcje dla libgadu
 
-CFLAGS_LIBGADU="$CFLAGS"
-LIBS_LIBGADU="$LIBS"
+CFLAGS_LIBGADU="$CFLAGS_LIBGADU $CFLAGS"
+LIBS_LIBGADU="$LIBS_LIBGADU $LIBS"
 
 # i zaczynamy wykrywaæ ¶mieci dla ekg
 
@@ -154,10 +157,19 @@ if test -d src; then
 
   AC_ARG_WITH(shared,
     [  --with-shared           Compile shared version of libgadu])
+  
+  AC_ARG_ENABLE(dynamic,
+    [  --enable-dynamic        Link ekg dynamically with libgadu])
 
+  libgadu_a="../lib/libgadu.a"
+  lgadu=""
   if test "x$with_shared" = "xyes"; then 
     shared="shared"
     install_shared="install-shared"
+    if test "x$enable_dynamic" = "xyes"; then
+      libgadu_a=""
+      lgadu="-lgadu"
+    fi
   fi
   ekg="ekg"
   install_ekg="install-ekg"

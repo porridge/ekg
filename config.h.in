@@ -3,8 +3,7 @@
 #undef WORDS_BIGENDIAN
 
 /* curses checks */
-#undef HAS_CURSES
-#undef USE_NCURSES
+#undef HAVE_CURSES
 
 /* readline checks */
 #undef HAVE_READLINE
