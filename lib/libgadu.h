@@ -701,7 +701,8 @@ struct gg_dcc_big_packet {
 
 #define GG_DCC_FILEATTR_READONLY 0x0020
 
-#define GG_DCC_TIMEOUT_SEND 300		/* 5 minut */
+#define GG_DCC_TIMEOUT_SEND 1800	/* 30 minut */
+#define GG_DCC_TIMEOUT_GET 1800		/* 30 minut */
 #define GG_DCC_TIMEOUT_FILE_ACK 300	/* 5 minut */
 
 #ifdef __cplusplus

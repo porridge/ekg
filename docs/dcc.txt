@@ -1,0 +1,22 @@
+// bezpo¶rednie po³±czenia miêdzy klientami (dcc) w ekg
+
+obs³uga dcc nie jest jeszcze kompletna. brakuje wielu rzeczy. w chwili
+obecnej mo¿na odbieraæ pliki. by w³±czyæ dcc nale¿y wpisaæ:
+
+	set dcc 1
+	set dcc_ip <adres_ip>
+	disconnect
+	connect
+
+od tej chwili mo¿emy odbieraæ wysy³ane do nas pliki. je¶li kto¶ spróbuje
+co¶ do nas wys³aæ, pojawi siê:
+
+	->- ktos/123 przesy³a plik zdjecie.jpg o rozmiarze 129117
+	->- Wpisz dcc get #1 by go odebraæ, lub dcc close #1 by anulowaæ
+
+dalszych instrukcji chyba nie trzeba podawaæ. inne opcje dcc bêd±
+dostêpne w ci±gu kilku najbli¿szych dni. proszê _nie_przesy³aæ_
+informacji, ¿e nie dzia³a nie istniej± opcja, ani nie pytaæ siê,
+kiedy bêdzie dzia³aæ.
+
+// $Id$

@@ -1,20 +1,27 @@
-/*
- * przyk³ad prostego programu ³±cz±cego siê z serwerem i wysy³aj±cego
- * jedn± wiadomo¶æ.
- */
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "libgg.h"
 
 int main(int argc, char **argv)
 {
-	if (argc < 3) {
-		fprintf(stderr, "u¿ycie: %s <email> <has³o>\n", argv[0]);
+	char buf[100];
+	int i;
+
+	if (argc < 2 || argc > 10) {
+		fprintf(stderr, "u¿ycie: %s <kolejne> [wyrazy] [do] [hasha]\n", argv[0]);
 		return 1;
 	}
 
-	printf("%u\n", gg_http_hash(argv[1], argv[2]));
+	strcpy(buf, "");
+	
+	for (i = 1; i < argc; i++)
+		strcat(buf, "s");
+
+	printf("%s\n", buf);
+	printf("%u\n", gg_http_hash("ss", "wojtekka@irc.pl", "dupa123"));
+	
+	printf("%u\n", gg_http_hash(buf, argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7], argv[8], argv[9], argv[10]));
 
 	return 0;
 }

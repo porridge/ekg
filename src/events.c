@@ -525,6 +525,11 @@ void handle_pubdir(struct gg_http *h)
 		return;
 	}
 
+	if (h->type == GG_SESSION_PASSWD) {
+		config_password = reg_password;
+		reg_password = NULL;
+	}
+
 	if (h->type == GG_SESSION_REGISTER) {
 		if (!s->uin) {
 			my_printf(bad);
@@ -534,6 +539,7 @@ void handle_pubdir(struct gg_http *h)
 		if (!config_uin && !config_password && reg_password) {
 			config_uin = s->uin;
 			config_password = reg_password;
+			reg_password = NULL;
 		}
 	}
 	
@@ -541,7 +547,7 @@ void handle_pubdir(struct gg_http *h)
 	my_printf(good, uin);
 
 	list_remove(&watches, h, 0);
-	if (h->type == GG_SESSION_REGISTER) {
+	if (h->type == GG_SESSION_REGISTER || h->type == GG_SESSION_PASSWD) {
 		free(reg_password);
 		reg_password = NULL;
 	}

@@ -1,3 +1,19 @@
+Teksty w nawiasach na koñcu linii mówi± o tym, kto dokona³ poprawki.
+Je¶li jest postaci ,,nick'', powinno byæ jasne. Postaæ ,,nick/x''
+oznacza, ¿e pomys³odawc± jest ,,nick'', a zrobi³ to kto¶, czyjego
+pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm). 
+,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'', ,,i/nick''
+oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
+
+// 2001-12-16
+ 
+- zmiana has³a komend± ,,passwd'' (w)
+- fix gg_change_passwd(), ¿eby dzia³a³o (w)
+- ,,dcc get'' dzia³a (w)
+- poprawka README i ChangeLoga, ¿eby da³y siê ³atwo zHTMLizowaæ (w)
+- nowa strona http://dev.null.pl/ekg/ (w)
+- poprawki wysy³ania plików. niestety nie by³o okazji sprawdziæ (w).
+
 // 2001-12-14
 
 - szkielet zmian w katalogu publicznym / biblioteka (s)
@@ -116,8 +132,8 @@
 
 // 2001-11-15
 
-- poprawki dokumentacji (shasta/wojtekka).
-- dodane dzwiêki przy wiadomo¶ciach -- zmienne ,,sound_...'' (feeg/wojtekka).
+- poprawki dokumentacji (shasta/w).
+- dodane dzwiêki przy wiadomo¶ciach -- zmienne ,,sound_...'' (feeg/w).
 - ,,display_ack'': 0 - nie pokazuje nic, 1 - pokazuje wszystkie, 2 - tylko
   dostarczone, 3 - tylko zakolejkowane. (i/klith).
 - klith.theme.
@@ -128,7 +144,7 @@
 - poprawiona dokumentacja [ja chce wpisywac polskie krzaki i nie wiem jak] 
   (wojtekka)
 - logowanie wielolinijkowych wiadomosci (wojtekka)
-- poprawiony segfault na bsd w pewnych warunkach (smarkacz/wojtekka)
+- poprawiony segfault na bsd w pewnych warunkach (smarkacz/w)
 
 // 2001-11-04 
 
@@ -147,7 +163,7 @@
 // 2001-11-02
 
 - w razie b³êdu po³±czenia z appmsg:80, próbuje siê ³±czyæ po :8074 z
-  tym samym hostem (wojtekka).
+  tym samym hostem (w).
 - dopisa³em urla do README, bo mam ju¿ do¶æ pytañ, sk±d to ¶ci±gn±æ (w).
 - wywalone z IDEAS to, co ju¿ zrobione (w).
 - po ,,disconnect'' nie powinien próbowaæ siê ³±czyæ (w).

@@ -8,67 +8,68 @@
 
 LICENCJA
 
-    program jest udostêpniony na zasadach licencji GPL, której tre¶æ
-    za³±czono w pliku COPYING. program i biblioteka obs³uguj±ca
+    Program jest udostêpniony na zasadach licencji GPL, której tre¶æ
+    za³±czono w pliku COPYING. Program i biblioteka obs³uguj±ca
     protokó³ Gadu-gadu zosta³y napisane na podstawie informacji
     uzyskanych przez badanie pakietów wysy³anych miêdzy klientem
-    a serwerem. autorzy nie disasemblowali, ani nie dekompilowali
-    oryginalnego klienta. projekt powsta³ przy u¿yciu darmowych
+    a serwerem. Autorzy nie disasemblowali, ani nie dekompilowali
+    oryginalnego klienta. Projekt powsta³ przy u¿yciu darmowych
     i wolnodostêpnych narzêdzi.
 
     Gadu-gadu jest zastrze¿onym znakiem towarowym sms-express sp. z o.o.
 
 INSTALACJA
 
-    skompilowaæ i odpaliæ. proste? proste. po pierwszym uruchomieni
+    Skompilowaæ i odpaliæ. Proste? Proste. Po pierwszym uruchomieni
     ekg powie, jak go skonfigurowaæ.
 
     ekg powinien dzia³aæ na wiêkszo¶ci systemów un*xowych, jak Linux,
-    *BSD, SunOS, IRIX itp. je¶li uda Ci siê skompilowaæ go na jakim¶
+    *BSD, SunOS, IRIX itp. Je¶li uda Ci siê skompilowaæ go na jakim¶
     egzotycznym systemie lub rzadko spotykanej architekturze, daj znaæ.
 
-    program korzysta z biblioteki readline, wiêc odpowiednie pakiety
+    Program korzysta z biblioteki readline, wiêc odpowiednie pakiety
     zawieraj±ce j±, oraz pliki nag³ówkowe, powinny byæ zainstalowane.
     readline zwykle polega te¿ na innych bibliotekach do obs³ugi
-    terminala, jak np. libtermcap czy ncurses. oczywi¶cie niezbêdny
+    terminala, jak np. libtermcap czy ncurses. Oczywi¶cie niezbêdny
     jest te¿ zestaw narzêdzi do kompilacji programów napisanych w
     jêzyki C -- kompilator, preprocesor, linker, pliki nag³ówkowe,
     biblioteki systemowe itd.
 
 U¯YCIE
 
-    jest na tyle intuicyjne, ¿e nie powinno sprawiæ problemów (wszyscy
+    Jest na tyle intuicyjne, ¿e nie powinno sprawiæ problemów (wszyscy
     betatesterzy poradzili sobie bez jakiejkolwiek dokumentacji).
-    interfejs jest podobny do ircii. dope³nianie tabem jest dostêpne w
-    wiêkszo¶ci komend. komendy mo¿na wywo³ywaæ skrótami, o ile s± one
-    jednoznaczne. wysy³anie wiadomo¶ci komend± ,,msg'', rozmowa komend±
-    ,,chat''. informacje o ludzikach ,,find <numer/nick>''. szukanie t±
+    Interfejs jest podobny do ircii. Dope³nianie tabem jest dostêpne w
+    wiêkszo¶ci komend. Komendy mo¿na wywo³ywaæ skrótami, o ile s± one
+    jednoznaczne. Wysy³anie wiadomo¶ci komend± ,,msg'', rozmowa komend±
+    ,,chat''. Informacje o ludziach ,,find <numer/nick>''. Szukanie t±
     sam± komend±, ale z ró¿nymi parametrami. ,,help'' Twoim przyjacielem.
-    je¶li dana komenda ma ró¿ne opcje, pomaga ,,help <komenda>''. by
+    je¶li dana komenda ma ró¿ne opcje, pomaga ,,help <komenda>''. By
     wys³aæ kilkulinijkow± wiadomo¶æ, zamiast tre¶ci wpisz ,,\''
-    (backslash). koñczy siê lini± z sam± kropk±. nie mo¿na przesy³aæ
-    plików, ani nawi±zywaæ bezpo¶rednich po³±czeñ.
+    (backslash). Koñczy siê lini± z sam± kropk±, anuluje Ctrl-D. Nie
+    mo¿na przesy³aæ plików, ani nawi±zywaæ bezpo¶rednich po³±czeñ.
 
-    dobra rada numer jeden: zanim zaczniesz narzekaæ, ¿e czego¶ nie ma,
+    Dobra rada numer jeden: zanim zaczniesz narzekaæ, ¿e czego¶ nie ma,
     przeczytaj plik TODO.
 
-    dobra rada numer dwa: zanim zaczniesz narzekaæ, ¿e czego¶ nie ma,
-    poszukaj w pliku ChangeLog. nie ma ¿adnej oficjalnej dokumentacji
-    z list± komend, zmiennych, skrótami klawiszowymi itp.
+    Dobra rada numer dwa: zanim zaczniesz narzekaæ, ¿e czego¶ nie ma,
+    poszukaj w pliku ChangeLog. Nie ma ¿adnej oficjalnej dokumentacji
+    z list± komend, skrótami klawiszowymi itp. Póki co, powsta³ opis
+    wszystkich zmiennych.
 
 WYSY£ANIE SMSÓW
 
-    ekg korzysta z zewnêtrznego programu do wysy³ania smsów. nie ma
+    ekg korzysta z zewnêtrznego programu do wysy³ania smsów. Nie ma
     najmniejszego sensu dublowania tej funkcji, skoro i tak wiêkszo¶æ
     ma ju¿ zainstalowane odpowiednie skrypty/programy/cokolwiek.
-    wystarczy podaæ ¶cie¿kê do takiego programu w zmiennej
-    ,,sms_send_app''. powinien przyjmowaæ numer telefonu za pierwszy
-    parametr i wiadomo¶æ za drugi. ten ze strony http://ceti.pl/~miki/
+    Rystarczy podaæ ¶cie¿kê do takiego programu w zmiennej
+    ,,sms_send_app''. Powinien przyjmowaæ numer telefonu za pierwszy
+    parametr i wiadomo¶æ za drugi. Ten ze strony http://ceti.pl/~miki/
     spe³nia podane wymagania.
 
 PROBLEMY
 
-    je¶li nie mo¿esz wpisywaæ polskich liter, dopisz do pliku /etc/inputrc
+    Je¶li nie mo¿esz wpisywaæ polskich liter, dopisz do pliku /etc/inputrc
     lub ~/.inputrc nastêpuj±ce linie:
 
 	set meta-flag on
@@ -77,65 +78,66 @@ PROBLEMY
     
 BUGREPORTY
 
-    proszê, nie przysy³ajcie informacji, ¿e mo¿naby dodaæ co¶, co jest
-    ju¿ wymienione w TODO. nie przysy³ajcie informacji, ¿e jest jaki¶
-    b³±d, je¶li poprawka jest wymieniona w TODO. nie przysy³ajcie
-    informacji o warningach podczas kompilacji. dopiero je¶li nie chce
-    siê w ogóle skompilowaæ, dajcie znaæ. zaznacznie, co to za system,
-    jaka dystrybucja, jaka wersja. je¶li b³±d jest powtarzalny i zwi±zany
+    Proszê, nie przysy³ajcie informacji, ¿e mo¿naby dodaæ co¶, co jest
+    ju¿ wymienione w TODO. Nie przysy³ajcie informacji, ¿e jest jaki¶
+    b³±d, je¶li poprawka jest wymieniona w TODO. Nie przysy³ajcie
+    informacji o warningach podczas kompilacji -- dopiero je¶li nie chce
+    siê w ogóle skompilowaæ, dajcie znaæ. Zaznacznie, co to za system,
+    jaka dystrybucja, jaka wersja. Je¶li b³±d jest powtarzalny i zwi±zany
     z sieci±, prosi³bym o to, co wyrzuca ekg uruchomione z opcj± ,,-d''.
-    je¶li segfaultuje i zrzuca core, prosi³bym o podes³anie tego, co
+    Je¶li segfaultuje i zrzuca core, prosi³bym o podes³anie tego, co
     poka¿e ,,gdb ekg core'', a nastêpnie ,,bt''.
 
 ¬RÓD£A
 
-    czê¶æ jest ³adnie udokumentowana, czê¶æ nie. komentarze czasami s±
-    bardzo g³upie, ale je¶li siê do trzeciej rano siedzi nad g³upim
-    segfaultem, ciê¿ko siê pohamowaæ. ca³y program objêty jest licencj±
-    GPL, wiêc pamiêtaj o tym, korzystaj±c z tych ¼róde³. je¶li napiszesz
+    Czê¶æ jest ³adnie udokumentowana, czê¶æ nie. Komentarze czasami s±
+    bardzo g³upie, ale je¶li siê do trzeciej rano siedzi nad dziwnym
+    segfaultem, ciê¿ko siê pohamowaæ. Ca³y program objêty jest licencj±
+    GPL, wiêc pamiêtaj o tym, korzystaj±c z jego ¼róde³. Je¶li napiszesz
     jakiegokolwiek klienta, frontend czy co¶ takiego, by³bym wdziêczny
-    za informacje o nim. chêtnie umieszczê odno¶niki do innych tego typu
+    za informacje o nim. Chêtnie umieszczê odno¶niki do innych tego typu
     projektów na stronie.
 
-    snapshoty kodu s± dostêpne pod adresem http://dev.null.pl/ekg/
-    je¶li nie wyst±pi ¿adne trzêsienie ziemi, brak pr±du ani barykady na
+    Snapshoty kodu s± dostêpne pod adresem http://dev.null.pl/ekg/.
+    Je¶li nie wyst±pi ¿adne trzêsienie ziemi, brak pr±du ani barykady na
     drogach, powinny byæ robione co 24 godziny, wieczorem.
 
 LISTA DYSKUSYJNA
 
-    istnieje lista dyskusyjna dla u¿ytkowników EKG o adresie 
-    ekg-users@list.ziew.org. aby siê zapisaæ, nale¿y na adres
+    Istnieje lista dyskusyjna dla u¿ytkowników EKG o adresie 
+    ekg-users@list.ziew.org. Aby siê zapisaæ, nale¿y na adres
     sympa@list.ziew.org wys³aæ wiadomo¶æ o tre¶ci:
 
-    	subscribe ekg-users
+	subscribe ekg-users
 
 PODZIÊKOWANIA
 
-    wymienieni ludzie mieli mniejszy lub wiêkszy wp³yw na rozwój biblioteki
-    i klienta. niektórzy pomagali analizowaæ protokó³, niektóry testowali
-    na ró¿nych systemach, inni podsy³ali patche i bugreporty. je¶li kogo¶
-    pomin±³em, przepraszam, niech da znaæ. w ka¿dym razie wielkie dziêki
+    Wymienieni ludzie mieli mniejszy lub wiêkszy wp³yw na rozwój biblioteki
+    i klienta. Niektórzy pomagali analizowaæ protokó³, niektóry testowali
+    na ró¿nych systemach, inni podsy³ali patche i bugreporty. Je¶li kogo¶
+    pomin±³em, przepraszam, niech da znaæ. W ka¿dym razie wielkie dziêki
     nale¿± siê poni¿szym osobom:
 
-    Robert J. Wo¼ny (speedy@atman.pl)
-    Darek Jackowski (ascent@linux.pl)
-    Arkadiusz Mi¶kiewicz (misiek@pld.org.pl)
-    Tomasz Jarzynka (tomee@cpi.pl)
-    Leszek Urbañski (tygrys@moo.pl)
-    Kuba Jermak (kooba@irc.pl)
-    Tomasz Torcz (zdzichu@irc.pl)
-    Adam Kruszewski (phantom@linux.bydg.org)
-    Piotr Wysocki (wysek@tower.braxis.co.uk)
-    Marcin Chojnowski (martii@obgyn.edu.pl)
-    Jaros³aw Kamper (jack@jack.eu.org)
-    Pawe³ Kot (pkot@linuxnews.pl)
-    Piotr Stolc (socrtp@sedez.iq.pl)
-    Artur Pietruk (arturp@plukwa.net)
-    Adam Ludwikowski (adam.ludwikowski@wp.pl)
-    Pawe³ Maziarz (drg@go2.pl)
-    Piotr Figiel (feeg@psychodelic.org)
-    Rafa³ Florek (raf@regionet.regionet.pl)
-    Krzysztof Sk³adzieñ (coxoc@coxoc.org)
+	Robert J. Wo¼ny (speedy@atman.pl)
+	Darek Jackowski (ascent@linux.pl)
+	Arkadiusz Mi¶kiewicz (misiek@pld.org.pl)
+	Tomasz Jarzynka (tomee@cpi.pl)
+	Leszek Urbañski (tygrys@moo.pl)
+	Asia Kaniewska (kj_asia@wp.pl)
+	Kuba Jermak (kooba@irc.pl)
+	Tomasz Torcz (zdzichu@irc.pl)
+	Adam Kruszewski (phantom@linux.bydg.org)
+	Piotr Wysocki (wysek@tower.braxis.co.uk)
+	Marcin Chojnowski (martii@obgyn.edu.pl)
+	Jaros³aw Kamper (jack@jack.eu.org)
+	Pawe³ Kot (pkot@linuxnews.pl)
+	Piotr Stolc (socrtp@sedez.iq.pl)
+	Artur Pietruk (arturp@plukwa.net)
+	Adam Ludwikowski (adam.ludwikowski@wp.pl)
+	Pawe³ Maziarz (drg@go2.pl)
+	Piotr Figiel (feeg@psychodelic.org)
+	Rafa³ Florek (raf@regionet.regionet.pl)
+	Krzysztof Sk³adzieñ (coxoc@coxoc.org)
 
 
 $Id$
