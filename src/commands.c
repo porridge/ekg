@@ -5117,7 +5117,7 @@ void command_init()
 	  "\n"
 	  "Je¶li który¶ z parametrów nie zostanie podany, jego warto¶æ "
 	  "zostanie wyczyszczona w katalogu publicznym. Podanie parametru "
-	   ",,%T-%n'' wyczy¶ci %Twszystkie%n pola.");
+	  ",,%T-%n'' wyczy¶ci %Twszystkie%n pola.");
 	  
 	command_add
 	( "chat", "u?", cmd_msg, 0,
@@ -5181,8 +5181,8 @@ void command_init()
 	( "exec", "?", cmd_exec, 0,
 	  " [opcje] <polecenie>", "uruchamia polecenie systemowe",
 	  "\n"
-	  "  -m, --msg  [numer/alias] wysy³a wynik do danej osoby\n"
-	  "  -b, --bmsg [numer/alias] wysy³a wynik w jednej wiadomo¶ci\n"
+	  "  -m, --msg  [numer/alias]  wysy³a wynik do danej osoby\n"
+	  "  -b, --bmsg [numer/alias]  wysy³a wynik w jednej wiadomo¶ci\n"
 	  "\n"
 	  "Poprzedzenie polecenia znakiem ,,%T^%n'' ukryje informacjê o "
 	  "zakoñczeniu. Zapisanie opcji wielkimi literami (np. %T-B%n) "
