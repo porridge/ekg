@@ -26,7 +26,10 @@ A: Patrz pierwsza odpowied¼.
 Q: Jak pobraæ listê u¿ytkowników z serwera lub j± tam umie¶ciæ?
 A: Odpowiednio ,,list --get'' i ,,list --put''.
 
-Q: Jak wys³aæ plik, zmieniæ informacje w katalogu publicznym?
+Q: Jak zmieniæ informacje w katalogu publicznym?
+A: U¿yæ polecenia ,,change''.
+
+Q: Jak wys³aæ lub odebraæ plik?
 A: Póki co, nie da siê. Trzeba u¿yæ oryginalnego klienta (dzia³a pod wine,
    vmware i pod Windows).
 

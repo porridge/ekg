@@ -67,7 +67,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_sms(), command_find(), command_modify(), command_cleartab(),
 	command_status(), command_register(), command_test_watches(),
 	command_remind(), command_dcc(), command_query(), command_passwd(),
-	command_test_ping(), command_on();
+	command_test_ping(), command_on(), command_change();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -87,6 +87,7 @@ struct command commands[] = {
 	{ "alias", "??", command_alias, " [opcje]", "Zarz±dzanie aliasami", "  --add <alias> <komenda>\n  --del <alias>\n  [--list]\n" },
 	{ "away", "", command_away, "", "Zmienia stan na zajêty", "" },
 	{ "back", "", command_away, "", "Zmienia stan na dostêpny", "" },
+	{ "change", "?", command_change, " <opcje>", "Zmienia informacje w katalogu publicznym", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>\n  --email <adres>\n  --born <rok urodzenia>\n  --city <miasto>\n  --female  \n  --male" },
 	{ "chat", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ w ramach rozmowy", "" },
 	{ "cleartab", "", command_cleartab, "", "Czy¶ci listê nicków do dope³nienia", "" },
 	{ "connect", "", command_connect, "", "£±czy siê z serwerem", "" },
@@ -765,6 +766,83 @@ COMMAND(command_find)
 
 	list_add(&watches, h, 0);
 	
+	array_free(argv);
+
+	return 0;
+}
+
+COMMAND(command_change)
+{
+	struct gg_change_info_request *r;
+	struct gg_http *h;
+	char **argv = NULL;
+	int i;
+
+	if (!params[0]) {
+		my_printf("not_enough_params");
+		return 0;
+	}
+
+	if (!(argv = array_make(params[0], " \t", 0, 1, 1)))
+		return 0;
+
+	if (!(r = calloc(1, sizeof(*r)))) {
+		array_free(argv);
+		return 0;
+	}
+	
+	for (i = 0; argv[i]; i++) {
+		char *arg = argv[i];
+		
+		if (*arg == '-' && *(arg + 1) == '-')
+			arg++;
+		
+		if (!strncmp(arg, "-f", 2) && strncmp(arg, "-fe", 3) && argv[i + 1]) {
+			free(r->first_name);
+			r->first_name = strdup(argv[++i]);
+		}
+		
+		if (!strncmp(arg, "-l", 2) && argv[i + 1]) {
+			free(r->last_name);
+			r->last_name = strdup(argv[++i]);
+		}
+		
+		if (!strncmp(arg, "-n", 2) && argv[i + 1]) {
+			free(r->nickname);
+			r->nickname = strdup(argv[++i]);
+		}
+		
+		if (!strncmp(arg, "-e", 2) && argv[i + 1]) {
+			free(r->email);
+			r->email = strdup(argv[++i]);
+		}
+
+		if (!strncmp(arg, "-c", 2) && argv[i + 1]) {
+			free(r->city);
+			r->city = strdup(argv[++i]);
+		}
+		
+		if (!strncmp(arg, "-b", 2) && argv[i + 1])
+			r->born = atoi(argv[++i]);
+		
+		if (!strncmp(arg, "-fe", 3))
+			r->gender = GG_GENDER_FEMALE;
+
+		if (!strncmp(arg, "-m", 2))
+			r->gender = GG_GENDER_MALE;
+	}
+
+	if (!r->first_name || !r->last_name || !r->nickname || !r->email || !r->city || !r->born) {
+		gg_change_info_request_free(r);
+		my_printf("change_not_enough_params");
+		array_free(argv);
+		return 0;
+	}
+
+	if ((h = gg_change_info(config_uin, config_password, r, 1)))
+		list_add(&watches, h, 0);
+
+	gg_change_info_request_free(r);
 	array_free(argv);
 
 	return 0;
