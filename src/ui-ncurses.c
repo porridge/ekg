@@ -1291,6 +1291,14 @@ static void ui_ncurses_loop()
 				}
 
 				break;
+			
+			case 'N' - 64:	/* Ctrl-N */
+				ui_event("command", "window", "next", NULL);
+				break;
+
+			case 'P' - 64:	/* Ctrl-P */
+				ui_event("command", "window", "prev", NULL);
+				break;
 				
 			case KEY_BACKSPACE:
 			case 8:
@@ -1546,6 +1554,7 @@ static void ui_ncurses_loop()
 				break;
 				
 			case KEY_PPAGE:	/* Page Up */
+			case 'F' - 64:	/* Ctrl-F */
 				window_current->start -= output_size;
 				if (window_current->start < 0)
 					window_current->start = 0;
@@ -1553,6 +1562,7 @@ static void ui_ncurses_loop()
 				break;
 
 			case KEY_NPAGE:	/* Page Down */
+			case 'G' - 64:	/* Ctrl-G */
 				window_current->start += output_size;
 				if (window_current->start > window_current->lines - output_size)
 					window_current->start = window_current->lines - output_size;
