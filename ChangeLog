@@ -4,6 +4,7 @@
   kolei, tylko na _wszystkie_ i potem po kolei sprawdza, czy przypadkiem
   nie jest na li¶cie. powinno zlikwidowaæ dziwne przypadki tworzenia
   zombie i zajmowania ca³ych dostêpnych zasobów (p/wojtekka)
+- fix commands.c dla BSD (p/wojtekka)
 
 // 2001-10-24
 

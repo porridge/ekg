@@ -26,6 +26,8 @@
 #include <ctype.h>
 #include <readline/readline.h>
 #include <errno.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 #include "libgg.h"
 #include "stuff.h"
