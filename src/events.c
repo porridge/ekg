@@ -107,8 +107,18 @@ void handle_msg(struct gg_event *e)
 	struct tm *tm;
 	char czas[100];
 
-	if (is_ignored(e->event.msg.sender))
+	
+	if (is_ignored(e->event.msg.sender)) {
+		cp_to_iso(e->event.msg.message);
+		if (u)
+			snprintf(sender, sizeof(sender), "%s/%lu", u->comment, u->uin);
+		else
+			snprintf(sender, sizeof(sender), "%lu", e->event.msg.sender);
+		put_log(e->event.msg.sender, ">> ignorowana %s %s (%s)\n%s\n", (chat) ?
+		"Rozmowa od" : "Wiadomo¶æ od", sender, full_timestamp(),
+		e->event.msg.message);
 		return;
+	};
 	
 	if (u)
 		add_send_nick(u->comment);
