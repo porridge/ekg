@@ -434,7 +434,7 @@ static char **my_completion(char *text, int start, int end)
 static void ui_readline_print(const char *target, const char *line)
 {
         int old_end = rl_end, i, id = 0;
-	char *old_prompt = rl_prompt;
+	char *old_prompt = "";
 	
 	/* znajd¼ odpowiednie okienko i ewentualnie je utwórz */
 	if (target)
@@ -458,8 +458,9 @@ static void ui_readline_print(const char *target, const char *line)
 
 	/* ukryj prompt, je¶li jeste¶my w trakcie readline */
         if (in_readline) {
+		old_prompt = xstrdup(rl_prompt);
                 rl_end = 0;
-                rl_prompt = "";
+		rl_set_prompt("");
                 rl_redisplay();
                 printf("\r");
                 for (i = 0; i < strlen(old_prompt); i++)
@@ -480,11 +481,11 @@ static void ui_readline_print(const char *target, const char *line)
 			char *tmp;
 			const char *prompt = format_find("readline_more");
 			
-			in_readline = 1;
+			in_readline++;
 		        rl_set_prompt(prompt);
 			pager_lines = -1;
 			tmp = readline(prompt);
-			in_readline = 0;
+			in_readline--;
 			if (tmp) {
 				free(tmp);
 				pager_lines = 0;
@@ -499,7 +500,8 @@ static void ui_readline_print(const char *target, const char *line)
 	/* je¶li jeste¶my w readline, poka¿ z powrotem prompt */
         if (in_readline) {
                 rl_end = old_end;
-                rl_prompt = old_prompt;
+		rl_set_prompt(old_prompt);
+		xfree(old_prompt);
 		rl_forced_update_display();
         }
 }

@@ -17,6 +17,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - jest ju¿ dope³nianie tabem w ui-ncurses. niniejszym og³aszam ten interfejs
   u¿ywalnym. jak zwykle, prosimy zapi±æ pasy, spodziewamy siê nieznacznych
   turbulencji (w)
+- poprawka ui-readline, by unikn±æ potencjalnego segfaulta (adwol/w)
 
 // 2002-08-15
 

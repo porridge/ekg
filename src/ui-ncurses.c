@@ -53,7 +53,7 @@ static WINDOW *status = NULL, *input = NULL, *output = NULL;
 static char *history[HISTORY_MAX];
 static int history_index = 0;
 static int lines = 0, y = 0, start = 0;
-static char line[1000] = "";
+static char line[1000] = "", *yanked = NULL;
 static char **completions = NULL;	/* lista dope³nieñ */
 
 #define output_size (stdscr->_maxy - 1)
@@ -199,6 +199,8 @@ static void ui_ncurses_deinit()
 	delwin(input);
 	delwin(status);
 	endwin();
+
+	xfree(yanked);
 }
 
 #define adjust() \
@@ -522,6 +524,13 @@ static void ui_ncurses_loop()
 					line_index--;
 				}
 				break;
+			case 'Y' - 64:
+				if (yanked && strlen(yanked) + strlen(line) + 1 < sizeof(line)) {
+					memmove(line + line_index + strlen(yanked), line + line_index, sizeof(line) - line_index - strlen(yanked));
+					memcpy(line + line_index, yanked, strlen(yanked));
+					line_index += strlen(yanked);
+				}
+				break;
 			case KEY_DC:
 			case 'D' - 64:
 				if (line_index < strlen(line)) {
@@ -544,6 +553,8 @@ static void ui_ncurses_loop()
 				adjust();
 				break;	
 			case 'U' - 64:
+				xfree(yanked);
+				yanked = strdup(line);
 				line[0] = 0;
 				adjust();
 				break;
