@@ -5594,11 +5594,12 @@ void command_init()
 	( "python", "p?", cmd_python, 0,
 	  " [komenda] [opcje]", "obs³uga skryptów",
 	  "\n"
-	  "  load <skrypt>    ³aduje skrypt\n"
-	  "  unload <skrypt>  usuwa skrypt z pamiêci\n"
-	  "  run <plik>       uruchamia skrypt\n"
 	  "  exec <komenda>   uruchamia komendê\n"
-	  " [list]            wy¶wietla listê za³adowanych skryptów");
+	  " [list]            wy¶wietla listê za³adowanych skryptów\n"
+	  "  load <skrypt>    ³aduje skrypt\n"
+	  "  restart          restartuje interpreter\n"
+	  "  run <plik>       uruchamia skrypt\n"
+	  "  unload <skrypt>  usuwa skrypt z pamiêci\n");
 #endif
 
 	command_add
