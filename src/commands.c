@@ -635,6 +635,7 @@ COMMAND(command_status)
 		my_printf("show_status", na, "");
 	} else {
 		char *foo[6];
+		struct in_addr i;
 
 		foo[0] = av;
 		foo[1] = bs;
@@ -643,7 +644,8 @@ COMMAND(command_status)
 		foo[4] = ad;
 		foo[5] = id;
 
-		my_printf("show_status", foo[away], (private_mode) ? pr : np);
+		i.s_addr = sess->server_addr;
+		my_printf("show_status", foo[away], (private_mode) ? pr : np, inet_ntoa(i));
 	}
 
 	free(av);

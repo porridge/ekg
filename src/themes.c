@@ -704,7 +704,7 @@ void init_theme()
 	add_format("private_mode_off", "%> Wy³±czono tryb ,,tylko dla przyjació³''\n", 1);
 	add_format("private_mode_invalid", "%! Nieprawid³owa warto¶æ\n", 1);
 	
-	add_format("show_status", "%) Aktualny stan: %1%2\n", 1);
+	add_format("show_status", "%) Aktualny stan: %1%2\n%) Aktualny serwer: %3\n", 1);
 	add_format("show_status_avail", "%Ydostêpny%n", 1);
 	add_format("show_status_avail_descr", "%Ydostêpny%n (%1)", 1);
 	add_format("show_status_busy", "%Gzajêty%n", 1);
