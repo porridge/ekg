@@ -11,6 +11,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   dziêki temu configure zajmuje ~100kB mniej (w)
 - dodanie $(DESTDIR) do Makefile (jajcus/w)
 - instalacja libgadu.h, polskich manów, ekgsearch (w)
+- przepisanie readline.m4 od zera. teraz siê zacznie narzekanie na mnie
+  na ekg-users (w)
 
 // 2002-07-11
 
