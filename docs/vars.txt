@@ -154,6 +154,8 @@ completion_notify
 	okre¶la, czy po pojawieniu siê którego¶ ze znajomych jego nick
 	ma byæ dopisywany do listy dope³niania klawiszem Tab. je¶li jest
 	równa 2, jest równie¿ usuwany po przej¶ciu w stan niedostêpny.
+	dodanie warto¶ci 4 spowoduje, ¿e dopisywani bêd± tak¿e ci, którzy
+	pojawi± siê na li¶cie ze statusem ,,zajêty''.
 
 ctrld_quits
 	typ: bool

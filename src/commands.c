@@ -683,9 +683,6 @@ COMMAND(cmd_find)
 		return -1;
 	}
 
-	for (i = 0; argv[i]; i++)
-		iso_to_cp(argv[i]);
-
 	if (argv[0] && !argv[1] && argv[0][0] == '#') { /* konferencja */
 		char *tmp = saprintf("conference --find %s", argv[0]);
 		int res = command_exec(NULL, tmp);
@@ -693,6 +690,10 @@ COMMAND(cmd_find)
 		array_free(argv);
 		return res;
 	}
+
+	for (i = 0; argv[i]; i++)
+		iso_to_cp(argv[i]);
+
 
 	if (!(req = gg_pubdir50_new(GG_PUBDIR50_SEARCH)))
 		return -1;
@@ -1147,7 +1148,7 @@ COMMAND(cmd_ignore)
 		if (params[0][0] == '#') {
 			int res;
 			
-			tmp = saprintf("%cconference --ignore %s", ((quiet) ? '^' : ' '), params[0]);
+			tmp = saprintf("%sconference --ignore %s", ((quiet) ? "^" : ""), params[0]);
 			res = command_exec(NULL, tmp);
 			xfree(tmp);
 			return res;
@@ -1175,7 +1176,7 @@ COMMAND(cmd_ignore)
 		if (params[0][0] == '#') {
 			int res;
 			
-			tmp = saprintf("%cconference --unignore %s", ((quiet) ? '^' : ' '), params[0]);
+			tmp = saprintf("%sconference --unignore %s", ((quiet) ? "^" : ""), params[0]);
 			res = command_exec(NULL, tmp);
 			xfree(tmp);
 			return res;
@@ -3247,7 +3248,7 @@ COMMAND(cmd_alias_exec)
 	}
 	
 	for (; m; ) {
-		char *tmp = saprintf("%s%s%s%s", (*(char*)(m->data) == '/') ? "" : "/", (char*) m->data, (params[0]) ? " " : "", (params[0]) ? params[0] : "");
+		char *tmp = saprintf("%s%s%s%s%s", ((*((char *) m->data) == '/') ? "" : "/"), ((quiet) ? "^" : ""), (char *) m->data, ((params[0]) ? " " : ""), ((params[0]) ? params[0] : ""));
 		m = m->next;
 		command_exec(target, tmp);
 		xfree(tmp);

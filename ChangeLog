@@ -6,6 +6,11 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-01-27
+
+- wyciszenie aliasu spowoduje wyciszenie komend w nim zawartych (sz)
+- brakuj±cy opis warto¶ci 4 zmiennej ,,completion_notify'' (sz)
+
 // 2003-01-26
 
 - list alias -o/-O dzia³aj± wy³±cznie w trybie ,,tylko dla znajomych''.
