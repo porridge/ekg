@@ -5,6 +5,11 @@
 - przy readline 4.x bêdzie ³adnie zmieniaæ prompta przy awayu (w)
 - ,,ekg --help'' i okolice (w)
 - dodany include do libgg.h, poprawka INADDR_NONE (w)
+- stan o kliencie jest przechowywany w zmiennej ,,default_status'', a nie
+  jak dotychczas, w ,,away'' i ,,private''. stan mo¿na te¿ podaæ przy
+  uruchamianiu.
+- mo¿liwo¶æ zmiany gg_session->initial_status w libgg zaraz po wywo³aniu
+  gg_login(). trochê nie³adne, ale ciê¿ko to zrobiæ inaczej ;/
 - popsucie 10 innych rzeczy (w)
 
 // 2001-11-19 
