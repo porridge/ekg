@@ -13,6 +13,13 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   zarz±dzaæ komend± ,,timer'' (w)
 - dalsze psucie pythona. dodanie przyk³adowego skryptu. dodanie komendy
   _py, która wykona kod w pythonie (w)
+- usuniêcie copyrightów z docs/README i z bannera, ¿eby wymienieni ludzie
+  nie byli traktowani jako jedyni autorzy (w)
+- sensowne opisanie instalacji w docs/README (w)
+- komenda quit jest ju¿ traktowana jako zwyk³a komenda, przez co nie
+  powinno byæ problemów z aliasami i timerami. niestety spowoduje to
+  leaki pamiêci przy wychodzeniu, ale tym zajmê siê kiedy indziej (w)
+- reorganizacja skryptów pythona. nie dzia³aj±. (w)
 
 // 2002-08-19
 

@@ -740,10 +740,7 @@ static void ui_readline_loop()
 		
 		pager_lines = 0;
 		
-		if (command_exec(window_current->query_nick, line)) {
-			xfree(line);
-			break;
-		}
+		command_exec(window_current->query_nick, line);
 
 		pager_lines = -1;
 

@@ -20,8 +20,8 @@
 #ifndef __COMMANDS_H
 #define __COMMANDS_H
 
-typedef int command_func_t(const char *name, char **params);
-#define COMMAND(x) int x(const char *name, char **params)
+typedef void command_func_t(const char *name, char **params);
+#define COMMAND(x) void x(const char *name, char **params)
 
 struct command {
 	char *name;
@@ -39,7 +39,7 @@ int command_add(const char *name, const char *params, command_func_t function, i
 int command_remove(const char *name);
 void command_init();
 void command_free();
-int command_exec(char *target, char *line);
+void command_exec(char *target, char *line);
 
 COMMAND(cmd_alias_exec);
 

@@ -1,9 +1,7 @@
 
-                    Eksperymentalny Klient Gadu-Gadu
+                     Eksperymentalny Klient Gadu-Gadu
 
-        (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>,
-  	                        Robert J. Wo¼ny <speedy@ziew.org>,
-				Adam Osuchowski <adwol@polsl.gliwice.pl>
+          (C) Copyright 2001-2002 Autorzy (pe³na lista poni¿ej)
 
 LICENCJA
 
@@ -22,14 +20,17 @@ LICENCJA
 
 INSTALACJA
 
-    Skompilowaæ i odpaliæ. Proste? Proste. Po pierwszym uruchomieniu
-    ekg powie, jak go skonfigurowaæ.
+    Rozpakowaæ poleceniem ,,tar zxvf ekg-XXXXYYZZ.tar.gz'' (gdzie
+    XXXXYYZZ to wersja snapshotu), wej¶æ do utworzonego katalogu.
+    Je¶li mamy uprawnienia administratora na danej maszynie, wywo³ujemy
+    ,,./configure'', potem ,,make'' i z prawami roota ,,make install''.
+    Je¶li chcemy zainstalowaæ program w katalogu domowym, do polecenia
+    configure dodajemy parametr ,,--prefix=$HOME/ekg''. Po zainstalowaniu
+    w ten sposób, program gotowy do uruchomienia bêdzie znajdowa³ siê
+    w katalogu ekg/bin w katalogu domowym.
 
-    ekg powinien dzia³aæ na wiêkszo¶ci systemów un*xowych, jak Linux,
-    *BSD, SunOS, IRIX itp. lecz czasami przy dodawaniu nowych funkcji
-    nie sposób sprawdziæ ich zachowania na wszystkich popularnych
-    systemach. W takim wypadku przydatne s± informacje o b³êdach z
-    dok³adnym wskazaniem systemu i architektury.
+    Proste? Proste. Po pierwszym uruchomieniu ekg powie, jak go
+    skonfigurowaæ.
 
     Program korzysta z biblioteki readline, wiêc odpowiednie pakiety
     zawieraj±ce j±, oraz pliki nag³ówkowe, powinny byæ zainstalowane.
@@ -37,7 +38,14 @@ INSTALACJA
     terminala, jak np. libtermcap czy ncurses. Oczywi¶cie niezbêdny
     jest te¿ zestaw narzêdzi do kompilacji programów napisanych w
     jêzyku C -- kompilator, preprocesor, linker, pliki nag³ówkowe,
-    biblioteki systemowe itd.
+    biblioteki systemowe itd. Je¶li skrypt ./configure zg³osi jakie¶
+    b³êdy, skontaktuj siê ze swoim administratorem.
+
+    ekg powinien dzia³aæ na wiêkszo¶ci systemów un*xowych, jak Linux,
+    *BSD, SunOS, IRIX itp. lecz czasami przy dodawaniu nowych funkcji
+    nie sposób sprawdziæ ich zachowania na wszystkich popularnych
+    systemach. W takim wypadku przydatne s± informacje o b³êdach z
+    dok³adnym wskazaniem systemu i architektury.
 
 U¯YCIE
 
@@ -137,15 +145,15 @@ LISTA DYSKUSYJNA
 	
     oraz postêpowac wed³ug instrukcji tam zawartych.
     
-
-PODZIÊKOWANIA
+AUTORZY
 
     Wymienieni ludzie mieli mniejszy lub wiêkszy wp³yw na rozwój biblioteki
-    i klienta. Niektórzy pomagali analizowaæ protokó³, niektóry testowali
-    na ró¿nych systemach, inni podsy³ali patche i bugreporty. Je¶li kogo¶
-    pomin±³em, przepraszam, niech da znaæ. W ka¿dym razie wielkie dziêki
-    nale¿± siê poni¿szym osobom:
+    i klienta. Niektórzy pisali kod, pomagali analizowaæ protokó³, testowali
+    na ró¿nych systemach, inni podsy³ali patche i bugreporty. Je¶li kto¶
+    zosta³ pominiêty, niech da znaæ. W ka¿dym razie za to, jak wygl±da ekg
+    odpowiedzialni s±:
 
+	Wojtek Kaniewski (wojtekka@irc.pl)
 	Robert J. Wo¼ny (speedy@ziew.org)
 	Darek Jackowski (ascent@linux.pl)
 	Arkadiusz Mi¶kiewicz (misiek@pld.org.pl)

@@ -540,8 +540,7 @@ static void ui_ncurses_loop()
 				break;	
 			case KEY_ENTER:
 			case 13:
-				if (command_exec(NULL, line))
-					return;
+				command_exec(NULL, line);
 				if (history[0] != line)
 					xfree(history[0]);
 				history[0] = xstrdup(line);

@@ -189,6 +189,7 @@ int transfer_id();
 void ekg_logoff(struct gg_session *sess, const char *reason);
 void ekg_wait_for_key();
 int ekg_hash(const char *name);
+void ekg_exit();
 
 int process_add(int pid, const char *name);
 int process_remove(int pid);
@@ -234,5 +235,6 @@ void emoticon_free();
 
 struct timer *timer_add(int period, const char *name, const char *command);
 int timer_remove(const char *name, const char *command);
+void timer_free();
 
 #endif /* __STUFF_H */

@@ -137,8 +137,6 @@ COMMAND(cmd_cleartab)
 	}
 	send_nicks_count = 0;
 	send_nicks_index = 0;
-
-	return 0;
 }
 
 COMMAND(cmd_add)
@@ -147,17 +145,17 @@ COMMAND(cmd_add)
 
 	if (!params[0] || !params[1]) {
 		print("not_enough_params");
-		return 0;
+		return;
 	}
 
 	if (userlist_find(atoi(params[0]), params[1])) {
 		print("user_exists", params[1]);
-		return 0;
+		return;
 	}
 
 	if (!(uin = atoi(params[0]))) {
 		print("invalid_uin");
-		return 0;
+		return;
 	}
 
 	if (!userlist_add(uin, params[1])) {
@@ -171,8 +169,6 @@ COMMAND(cmd_add)
 		params++;
 		cmd_modify("add", params);
 	}
-
-	return 0;
 }
 
 COMMAND(cmd_alias)
@@ -203,32 +199,31 @@ COMMAND(cmd_alias)
 		if (!count)
 			print("aliases_list_empty");
 
-		return 0;
+		return;
 	}
 
 	if (match_arg(params[0], 'a', "add", 2)) {
 		if (!alias_add(params[1], 0, 0))
 			config_changed = 1;
 
-		return 0;
+		return;
 	}
 
 	if (match_arg(params[0], 'A', "append", 2)) {
 		if (!alias_add(params[1], 0, 1))
 			config_changed = 1;
 
-		return 0;
+		return;
 	}
 
 	if (match_arg(params[0], 'd', "del", 2)) {
 		if (!alias_remove(params[1]))
 			config_changed = 1;
 
-		return 0;
+		return;
 	}
 
 	print("aliases_invalid");
-	return 0;
 }
 
 COMMAND(cmd_away)
@@ -292,12 +287,12 @@ COMMAND(cmd_away)
 
 		if (!params[0]) {
 			print((private_mode) ? "private_mode_is_on" : "private_mode_is_off");
-			return 0;
+			return;
 		}
 		
 		if ((tmp = on_off(params[0])) == -1) {
 			print("private_mode_invalid");
-			return 0;
+			return;
 		}
 
 		private_mode = tmp;
@@ -322,7 +317,7 @@ COMMAND(cmd_away)
 	if (reason)
 		config_reason = reason;
 
-	return 0;
+	return;
 }
 
 COMMAND(cmd_status)
@@ -365,8 +360,6 @@ COMMAND(cmd_status)
 	free(id);
 	free(pr);
 	free(np);
-
-	return 0;
 }
 
 COMMAND(cmd_connect)
@@ -374,7 +367,7 @@ COMMAND(cmd_connect)
 	if (!strcasecmp(name, "connect")) {
 		if (sess) {
 			print((sess->state == GG_STATE_CONNECTED) ? "already_connected" : "during_connect");
-			return 0;
+			return;
 		}
                 if (config_uin && config_password) {
 			print("connecting");
@@ -414,8 +407,6 @@ COMMAND(cmd_connect)
 		reconnect_timer = 0;
 		ui_event("disconnected");
 	}
-
-	return 0;
 }
 
 COMMAND(cmd_del)
@@ -426,12 +417,12 @@ COMMAND(cmd_del)
 
 	if (!params[0]) {
 		print("not_enough_params");
-		return 0;
+		return;
 	}
 
 	if (!(uin = get_uin(params[0])) || !(u = userlist_find(uin, NULL))) {
 		print("user_not_found", params[0]);
-		return 0;
+		return;
 	}
 
 	tmp = format_user(uin);
@@ -443,7 +434,7 @@ COMMAND(cmd_del)
 	} else
 		print("error_deleting");
 
-	return 0;
+	return;
 }
 
 COMMAND(cmd_exec)
@@ -468,8 +459,6 @@ COMMAND(cmd_exec)
 		if (!children)
 			print("no_processes");
 	}
-
-	return 0;
 }
 
 COMMAND(cmd_find)
@@ -501,7 +490,7 @@ COMMAND(cmd_find)
 		r.uin = (query_nick) ? ((strchr(query_nick, ',')) ? config_uin : get_uin(query_nick)) : config_uin;
 		id = id * 2;
 		*/
-		return 0;
+		return;
 
 	} else {
 		if (argv[0] && !argv[1] && argv[0][0] != '-') {
@@ -510,7 +499,7 @@ COMMAND(cmd_find)
 				print("user_not_found", params[0]);
 				free(query);
 				array_free(argv);
-				return 0;
+				return;
 			}
 		} else {
 			id = id * 2 + 1;	/* multiple search */
@@ -570,7 +559,7 @@ COMMAND(cmd_find)
 		print("search_failed", strerror(errno));
 		free(query);
 		array_free(argv);
-		return 0;
+		return;
 	}
 
 	h->id = id;
@@ -580,7 +569,7 @@ COMMAND(cmd_find)
 	
 	array_free(argv);
 
-	return 0;
+	return;
 }
 
 COMMAND(cmd_change)
@@ -592,7 +581,7 @@ COMMAND(cmd_change)
 
 	if (!params[0]) {
 		print("not_enough_params");
-		return 0;
+		return;
 	}
 
 	argv = array_make(params[0], " \t", 0, 1, 1);
@@ -640,7 +629,7 @@ COMMAND(cmd_change)
 		gg_change_info_request_free(r);
 		print("change_not_enough_params");
 		array_free(argv);
-		return 0;
+		return;
 	}
 
 	if ((h = gg_change_info(config_uin, config_password, r, 1)))
@@ -648,8 +637,6 @@ COMMAND(cmd_change)
 
 	gg_change_info_request_free(r);
 	array_free(argv);
-
-	return 0;
 }
 
 COMMAND(cmd_modify)
@@ -661,12 +648,12 @@ COMMAND(cmd_modify)
 
 	if (!params[0]) {
 		print("not_enough_params");
-		return 0;
+		return;
 	}
 
 	if (!(uin = get_uin(params[0])) || !(u = userlist_find(uin, NULL))) {
 		print("user_not_found", params[0]);
-		return 0;
+		return;
 	}
 
 	if (!params[1]) {
@@ -676,7 +663,7 @@ COMMAND(cmd_modify)
 		
 		free(groups);
 
-		return 0;
+		return;
 	} else 
 		argv = array_make(params[1], " \t", 0, 1, 1);
 
@@ -731,8 +718,6 @@ COMMAND(cmd_modify)
 	config_changed = 1;
 
 	array_free(argv);
-
-	return 0;
 }
 
 COMMAND(cmd_help)
@@ -766,7 +751,7 @@ COMMAND(cmd_help)
 					}
 				}
 
-				return 0;
+				return;
 			}
 		}
 	}
@@ -788,8 +773,6 @@ COMMAND(cmd_help)
 	print("help_footer");
 
 	binding_help(0, 0);
-
-	return 0;
 }
 
 COMMAND(cmd_ignore)
@@ -809,12 +792,12 @@ COMMAND(cmd_ignore)
 			if (!ignored) 
 				print("ignored_list_empty");
 
-			return 0;
+			return;
 		}
 		
 		if (!(uin = get_uin(params[0]))) {
 			print("user_not_found", params[0]);
-			return 0;
+			return;
 		}
 		
 		if (!ignored_add(uin)) {
@@ -826,12 +809,12 @@ COMMAND(cmd_ignore)
 	} else {
 		if (!params[0]) {
 			print("not_enough_params");
-			return 0;
+			return;
 		}
 		
 		if (!(uin = get_uin(params[0]))) {
 			print("user_not_found", params[0]);
-			return 0;
+			return;
 		}
 		
 		if (!ignored_remove(uin)) {
@@ -841,8 +824,6 @@ COMMAND(cmd_ignore)
 			print("error_not_ignored", format_user(uin));
 	
 	}
-	
-	return 0;
 }
 
 COMMAND(cmd_list)
@@ -857,13 +838,13 @@ COMMAND(cmd_list)
 		
 		if (!(uin = get_uin(params[0])) || !(u = userlist_find(uin, NULL))) {
 			print("user_not_found", params[0]);
-			return 0;
+			return;
 		}
 
 		/* list <alias> [opcje] */
 		if (params[1]) {
 			cmd_modify("modify", params);
-			return 0;
+			return;
 		}
 
 		{
@@ -901,7 +882,7 @@ COMMAND(cmd_list)
 			free(status);
 		}
 
-		return 0;
+		return;
 	}
 
 	/* list --get */
@@ -910,12 +891,12 @@ COMMAND(cmd_list)
 		
 		if (!(h = gg_userlist_get(config_uin, config_password, 1))) {
 			print("userlist_get_error", strerror(errno));
-			return 0;
+			return;
 		}
 		
 		list_add(&watches, h, 0);
 		
-		return 0;
+		return;
 	}
 
 	/* list --put */
@@ -925,19 +906,19 @@ COMMAND(cmd_list)
 		
 		if (!contacts) {
 			print("userlist_put_error", strerror(ENOMEM));
-			return 0;
+			return;
 		}
 		
 		if (!(h = gg_userlist_put(config_uin, config_password, contacts, 1))) {
 			print("userlist_put_error", strerror(errno));
-			return 0;
+			return;
 		}
 		
 		free(contacts);
 		
 		list_add(&watches, h, 0);
 
-		return 0;
+		return;
 	}
 
 	/* list --active | --busy | --inactive | --invisible */
@@ -1010,8 +991,6 @@ COMMAND(cmd_list)
 
 	if (!count && show_all)
 		print("list_empty");
-
-	return 0;
 }
 
 COMMAND(cmd_msg)
@@ -1023,12 +1002,12 @@ COMMAND(cmd_msg)
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		print("not_connected");
-		return 0;
+		return;
 	}
 
 	if (!params[0] || !params[1] || !(nicks = array_make(params[0], ",", 0, 0, 0))) {
 		print("not_enough_params");
-		return 0;
+		return;
 	}
 
 	count = array_count(nicks);
@@ -1069,8 +1048,6 @@ COMMAND(cmd_msg)
 	unidle();
 
 	array_free(nicks);
-
-	return 0;
 }
 
 COMMAND(cmd_save)
@@ -1082,33 +1059,6 @@ COMMAND(cmd_save)
 		config_changed = 0;
 	} else
 		print("error_saving");
-
-	return 0;
-}
-
-COMMAND(cmd_theme)
-{
-	if (!params[0]) {
-		print("not_enough_params");
-		return 0;
-	}
-	
-	if (!strcmp(params[0], "-")) {
-		theme_init();
-		if (!in_autoexec)
-			print("theme_default");
-		variable_set("theme", NULL, 0);
-	} else {
-		if (!theme_read(params[0], 1)) {
-			theme_cache_reset();
-			if (!in_autoexec)
-				print("theme_loaded", params[0]);
-			variable_set("theme", params[0], 0);
-		} else
-			print("error_loading_theme", strerror(errno));
-	}
-	
-	return 0;
 }
 
 COMMAND(cmd_set)
@@ -1158,8 +1108,6 @@ COMMAND(cmd_set)
 				break;
 		}
 	}
-
-	return 0;
 }
 
 COMMAND(cmd_sms)
@@ -1169,13 +1117,13 @@ COMMAND(cmd_sms)
 
 	if (!params[1]) {
 		print("not_enough_params");
-		return 0;
+		return;
 	}
 
 	if ((u = userlist_find(0, params[0]))) {
 		if (!u->mobile || !strcmp(u->mobile, "")) {
 			print("sms_unknown", format_user(u->uin));
-			return 0;
+			return;
 		}
 		number = u->mobile;
 	} else
@@ -1183,8 +1131,6 @@ COMMAND(cmd_sms)
 
 	if (send_sms(number, params[1], 1) == -1)
 		print("sms_error", strerror(errno));
-
-	return 0;
 }
 
 COMMAND(cmd_history)
@@ -1194,7 +1140,7 @@ COMMAND(cmd_history)
 	
 	if (!params[0]) {
 		print("not_enough_params");
-		return 0;
+		return;
 	}
 	
 	if (params[1]) { /* sa oba parametry */
@@ -1205,13 +1151,11 @@ COMMAND(cmd_history)
 	
 	if (!uin) {
 		print("history_error", "Brak wybranego u¿ytkownika na li¶cie kontaktów");
-		return 0;
+		return;
 	}
 
 	if (print_history(uin, n) == -1)
 		print("history_error", strerror(errno));
-
-	return 0;
 }
 
 COMMAND(cmd_quit)
@@ -1241,7 +1185,7 @@ COMMAND(cmd_quit)
 
 	ui_event("disconnected");
 
-	return -1;
+	ekg_exit();
 }
 
 COMMAND(cmd_dcc)
@@ -1260,7 +1204,7 @@ COMMAND(cmd_dcc)
 				print("dcc_show_debug", itoa(t->id), (t->type == GG_SESSION_DCC_SEND) ? "SEND" : "GET", t->filename, format_user(t->uin), (t->dcc) ? "yes" : "no");
 			}
 
-			return 0;
+			return;
 		}
 
 		for (l = transfers; l; l = l->next) {
@@ -1308,7 +1252,7 @@ COMMAND(cmd_dcc)
 		if (!active && !pending)
 			print("dcc_show_empty");
 		
-		return 0;
+		return;
 	}
 	
 	if (!strncasecmp(params[0], "se", 2)) {		/* send */
@@ -1318,27 +1262,27 @@ COMMAND(cmd_dcc)
 
 		if (!params[1] || !params[2]) {
 			print("not_enough_params");
-			return 0;
+			return;
 		}
 		
 		if (!(uin = get_uin(params[1])) || !(u = userlist_find(uin, NULL))) {
 			print("user_not_found", params[1]);
-			return 0;
+			return;
 		}
 
 		if (!sess || sess->state != GG_STATE_CONNECTED) {
 			print("not_connected");
-			return 0;
+			return;
 		}
 
 		if ((fd = open(params[2], O_RDONLY)) == -1 || stat(params[2], &st)) {
 			print("dcc_open_error", params[2], strerror(errno));
-			return 0;
+			return;
 		} else {
 			close(fd);
 			if (S_ISDIR(st.st_mode)) {
 				print("dcc_open_directory", params[2]);
-				return 0;
+				return;
 			}
 		}
 
@@ -1356,13 +1300,13 @@ COMMAND(cmd_dcc)
 			
 			if (!(d = gg_dcc_send_file(u->ip.s_addr, u->port, config_uin, uin))) {
 				print("dcc_error", strerror(errno));
-				return 0;
+				return;
 			}
 
 			if (gg_dcc_fill_file_info(d, params[2]) == -1) {
 				print("dcc_open_error", params[2], strerror(errno));
 				gg_free_dcc(d);
-				return 0;
+				return;
 			}
 
 			list_add(&watches, d, 0);
@@ -1372,7 +1316,7 @@ COMMAND(cmd_dcc)
 
 		list_add(&transfers, &t, sizeof(t));
 
-		return 0;
+		return;
 	}
 
 	if (params[0][0] == 'v') {			/* voice */
@@ -1382,7 +1326,7 @@ COMMAND(cmd_dcc)
 
 		if (!params[1]) {
 			print("not_enough_params");
-			return 0;
+			return;
 		}
 		
 		/* sprawdzamy najpierw przychodz±ce po³±czenia */
@@ -1413,7 +1357,7 @@ COMMAND(cmd_dcc)
 		if (t) {
 			list_add(&watches, t->dcc, 0);
 			voice_open();
-			return 0;
+			return;
 		}
 
 		/* sprawd¼, czy ju¿ nie wo³ano o rozmowê g³osow± */
@@ -1441,12 +1385,12 @@ COMMAND(cmd_dcc)
 
 		if (!(uin = get_uin(params[1])) || !(u = userlist_find(uin, NULL))) {
 			print("user_not_found", params[1]);
-			return 0;
+			return;
 		}
 
 		if (!sess || sess->state != GG_STATE_CONNECTED) {
 			print("not_connected");
-			return 0;
+			return;
 		}
 
 		memset(&tt, 0, sizeof(tt));
@@ -1462,7 +1406,7 @@ COMMAND(cmd_dcc)
 			
 			if (!(d = gg_dcc_voice_chat(u->ip.s_addr, u->port, config_uin, uin))) {
 				print("dcc_error", strerror(errno));
-				return 0;
+				return;
 			}
 
 			list_add(&watches, d, 0);
@@ -1475,7 +1419,7 @@ COMMAND(cmd_dcc)
 #else
 		print("dcc_voice_unsupported");
 #endif
-		return 0;
+		return;
 	}
 
 	if (!strncasecmp(params[0], "g", 1)) {		/* get */
@@ -1509,7 +1453,7 @@ COMMAND(cmd_dcc)
 
 		if (!l || !t || !t->dcc) {
 			print("dcc_get_not_found", (params[1]) ? params[1] : "");
-			return 0;
+			return;
 		}
 
 		if (config_dcc_dir) 
@@ -1524,7 +1468,7 @@ COMMAND(cmd_dcc)
 			list_remove(&transfers, t, 1);
 			free(path);
 			
-			return 0;
+			return;
 		}
 		
 		free(path);
@@ -1533,7 +1477,7 @@ COMMAND(cmd_dcc)
 		
 		list_add(&watches, t->dcc, 0);
 
-		return 0;
+		return;
 	}
 	
 	if (!strncasecmp(params[0], "c", 1)) {		/* close */
@@ -1542,7 +1486,7 @@ COMMAND(cmd_dcc)
 
 		if (!params[1]) {
 			print("not_enough_params");
-			return 0;
+			return;
 		}
 		
 		for (t = NULL, l = transfers; l; l = l->next) {
@@ -1554,7 +1498,7 @@ COMMAND(cmd_dcc)
 
 		if (!t) {
 			print("dcc_close_notfound");
-			return 0;
+			return;
 		}
 
 		if (t->dcc) {
@@ -1576,12 +1520,10 @@ COMMAND(cmd_dcc)
 
 		print("dcc_close", format_user(uin));
 		
-		return 0;
+		return;
 	}
 
 	print("dcc_unknown_command", params[0]);
-	
-	return 0;
 }
 
 COMMAND(cmd_version) 
@@ -1590,23 +1532,19 @@ COMMAND(cmd_version)
 
 	snprintf(buf, sizeof(buf), "0x%.2x", GG_DEFAULT_PROTOCOL_VERSION);
     	print("ekg_version", VERSION, buf, GG_DEFAULT_CLIENT_VERSION);
-
-	return 0;
 }
 
 COMMAND(cmd_test_segv)
 {
 	char *foo = NULL;
 
-	return (*foo = 'A');
+	*foo = 'A';
 }
 
 COMMAND(cmd_test_ping)
 {
 	if (sess)
 		gg_ping(sess);
-
-	return 0;
 }
 
 COMMAND(cmd_test_send)
@@ -1614,7 +1552,7 @@ COMMAND(cmd_test_send)
 	struct gg_event *e = xmalloc(sizeof(struct gg_event));
 
 	if (!params[0] || !params[1])
-		return 0;
+		return;
 
 	memset(e, 0, sizeof(*e));
 	e->type = GG_EVENT_MSG;
@@ -1623,16 +1561,12 @@ COMMAND(cmd_test_send)
 	e->event.msg.msgclass = GG_CLASS_MSG;
 	
 	handle_msg(e);
-
-	return 0;
 }
 
 COMMAND(cmd_test_add)
 {
 	if (params[0])
 		add_send_nick(params[0]);
-
-	return 0;
 }
 
 COMMAND(cmd_test_watches)
@@ -1710,8 +1644,6 @@ COMMAND(cmd_test_watches)
 		snprintf(buf, sizeof(buf), "%d: type=%s, fd=%d, state=%s, check=%s, id=%d, timeout=%d", no, type, s->fd, state, check, s->id, s->timeout);
 		print("generic", buf);
 	}
-
-	return 0;
 }
 
 COMMAND(cmd_test_fds)
@@ -1775,7 +1707,6 @@ COMMAND(cmd_test_fds)
 		print("generic", buf);
 	}
 #endif
-	return 0;
 }
 
 COMMAND(cmd_register)
@@ -1785,12 +1716,12 @@ COMMAND(cmd_register)
 
 	if (registered_today) {
 		print("registered_today");
-		return 0;
+		return;
 	}
 	
 	if (!params[0] || !params[1]) {
 		print("not_enough_params");
-		return 0;
+		return;
 	}
 
 	for (l = watches; l; l = l->next) {
@@ -1798,20 +1729,18 @@ COMMAND(cmd_register)
 
 		if (s->type == GG_SESSION_REGISTER) {
 			print("register_pending");
-			return 0;
+			return;
 		}
 	}
 	
 	if (!(h = gg_register(params[0], params[1], 1))) {
 		print("register_failed", strerror(errno));
-		return 0;
+		return;
 	}
 
 	list_add(&watches, h, 0);
 
 	reg_password = xstrdup(params[1]);
-	
-	return 0;
 }
 
 COMMAND(cmd_passwd)
@@ -1820,19 +1749,17 @@ COMMAND(cmd_passwd)
 	
 	if (!params[0] || !params[1]) {
 		print("not_enough_params");
-		return 0;
+		return;
 	}
 
 	if (!(h = gg_change_passwd(config_uin, config_password, params[0], params[1], 1))) {
 		print("passwd_failed", strerror(errno));
-		return 0;
+		return;
 	}
 
 	list_add(&watches, h, 0);
 
 	reg_password = xstrdup(params[0]);
-	
-	return 0;
 }
 
 COMMAND(cmd_remind)
@@ -1841,19 +1768,15 @@ COMMAND(cmd_remind)
 	
 	if (!(h = gg_remind_passwd(config_uin, 1))) {
 		print("remind_failed", strerror(errno));
-		return 0;
+		return;
 	}
 
 	list_add(&watches, h, 0);
-	
-	return 0;
 }
 
 COMMAND(cmd_query)
 {
 	ui_event("command", "query", params[0]);
-
-	return 0;
 }
 
 COMMAND(cmd_on)
@@ -1875,17 +1798,17 @@ COMMAND(cmd_on)
                 if (!count)
                         print("events_list_empty");
 
-                return 0;
+                return;
         }
 
         if (!params[1] || !params[2]) {
                 print("not_enough_params");
-                return 0;
+                return;
         }
 
         if (!(flags = event_flags(params[0]))) {
                 print("events_incorrect");
-                return 0;
+                return;
         }
 
         if (*params[1] == '*')
@@ -1895,43 +1818,35 @@ COMMAND(cmd_on)
 
         if (!uin) {
                 print("invalid_uin");
-                return 0;
+                return;
         }
 
         if (!strncasecmp(params[2], "clear", 5)) {
                 event_remove(flags, uin);
                 config_changed = 1;
-                return 0;
+                return;
         }
 
         if (event_correct(params[2]))
-                return 0;
+                return;
 
 	event_add(flags, uin, params[2], 0);
         config_changed = 1;
-
-        return 0;
 }
 
 COMMAND(cmd_echo)
 {
 	print("generic", (params && params[0]) ? params[0] : "");
-
-	return 0;
 }
 
 COMMAND(cmd_window)
 {
 	ui_event("command", "window", (params) ? params[0] : NULL, (params && params[0]) ? params[1] : NULL);
-
-	return 0;
 }
 
 COMMAND(cmd_bind)
 {
 	ui_event("command", "bind", (params) ? params[0] : NULL, (params && params[0]) ? params[1] : NULL, (params && params[1]) ? params[2] : NULL); 
-
-	return 0;
 }
 
 char *strip_spaces(char *line)
@@ -1956,7 +1871,7 @@ char *strip_spaces(char *line)
  *
  * zmienia zawarto¶æ bufora line.
  */
-int command_exec(char *target, char *line)
+void command_exec(char *target, char *line)
 {
 	char *cmd = NULL, *tmp, *p = NULL, short_cmd[2] = ".", *last_name = NULL, *last_params = NULL, *line_save = NULL;
 	command_func_t *last_abbr = NULL;
@@ -1965,14 +1880,14 @@ int command_exec(char *target, char *line)
 	list_t l;
 
 	if (!line)
-		return 0;
+		return;
 
 	if (!strcmp(line, "")) {
 		if (batch_mode && !batch_line) {
 			quit_message_send = 1;
-			return 1;
+			ekg_exit();
 		}
-		return 0;
+		return;
 	}
 
 	if (target && *line != '/') {
@@ -1998,7 +1913,7 @@ int command_exec(char *target, char *line)
 			if (strcmp(line, ""))
 				cmd_msg("chat", params);
 
-			return 0;
+			return;
 		}
 	}
 	
@@ -2051,23 +1966,21 @@ int command_exec(char *target, char *line)
 
 	if (last_abbr && abbrs == 1) {
 		char **par;
-		int res = 0, len = strlen(last_params);
+		int len = strlen(last_params);
 
 		par = array_make(p, " \t", len, 1, 1);
-		res = (last_abbr)(last_name, par);
+		(last_abbr)(last_name, par);
 		array_free(par);
 
 		xfree(line_save);
 
-		return res;
+		return;
 	}
 
 	if (strcmp(cmd, ""))
 		print("unknown_command", cmd);
 
 	xfree(line_save);
-	
-	return 0;
 }
 
 /*
@@ -2146,7 +2059,6 @@ int binding_toggle_debug(int a, int b)
 COMMAND(cmd_alias_exec)
 {	
 	list_t l, m = NULL;
-	int res = 0;
 
 	for (l = aliases; l; l = l->next) {
 		struct alias *a = l->data;
@@ -2157,13 +2069,11 @@ COMMAND(cmd_alias_exec)
 		}
 	}
 	
-	for (; m && !res; m = m->next) {
+	for (; m; m = m->next) {
 		char *tmp = saprintf("/%s%s%s", (char*) m->data, (params[0]) ? " " : "", (params[0]) ? params[0] : "");
-		res = command_exec(NULL, tmp);
+		command_exec(NULL, tmp);
 		free(tmp);
 	}
-
-	return res;
 }
 
 COMMAND(cmd_timer)
@@ -2173,20 +2083,20 @@ COMMAND(cmd_timer)
 	if (match_arg(params[0], 'a', "add", 2)) {
 		if (!params[1] || !params[2]) {
 			print("not_enough_params");
-			return 0;
+			return;
 		}
 		timer_add(atoi(params[1]), NULL, params[2]);
 
-		return 0;
+		return;
 	}
 
 	if (match_arg(params[0], 'd', "del", 2)) {
 		if (!params[1]) {
 			print("not_enough_params");
-			return 0;
+			return;
 		}
 		timer_remove(params[1], NULL);
-		return 0;
+		return;
 	}
 
 	for (l = timers; l; l = l->next) {
@@ -2194,8 +2104,6 @@ COMMAND(cmd_timer)
 
 		print("timer_list", t->name, itoa(t->period - (time(NULL) - t->started)), t->command);
 	}
-
-	return 0;
 }
 
 #ifdef WITH_PYTHON
@@ -2205,8 +2113,6 @@ COMMAND(cmd_test_load)
 		print("not_enough_params");
 	else
 		python_load(params[0]);
-
-	return 0;
 }
 
 COMMAND(cmd_test_python)
@@ -2215,8 +2121,6 @@ COMMAND(cmd_test_python)
 		print("not_enough_params");
 	else
 		python_exec(params[0]);
-
-	return 0;
 }
 #endif
 

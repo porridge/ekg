@@ -10,6 +10,14 @@
 #include "version.h"
 #include "vars.h"
 
+struct module {
+	char *name;
+	PyObject *module;
+	PyObject *deinit;
+};
+
+list_t modules = NULL;
+
 static PyObject* ekg_connect(PyObject *self, PyObject *args)
 {
 	do_connect();
@@ -152,12 +160,31 @@ int python_finalize()
 
 int python_load(const char *filename)
 {
-	FILE *fp = fopen(filename, "r");
+	PyObject *mod, *init;
+	struct module m;
 
-	if (fp) {
-		PyRun_SimpleFile(fp, (char*) filename);
-		fclose(fp);
+	if (!(mod = PyImport_ImportModule((char*) filename))) {
+		printf("module not found\n");
+		return -1;
 	}
+	
+	if ((init = PyObject_GetAttrString(mod, "init"))) {
+		PyObject *args = Py_BuildValue("()"), *result;
+
+		result = PyEval_CallObject(init, args);
+
+		Py_XDECREF(result);
+		Py_XDECREF(args);
+		Py_XDECREF(init);
+	}
+
+	memset(&m, 0, sizeof(m));
+
+	m.name = xstrdup(filename);
+	m.module = mod;
+	m.deinit = PyObject_GetAttrString(mod, "deinit");
+
+	list_add(&modules, &m, sizeof(m));
 
 	return 0;
 }

@@ -53,6 +53,7 @@ time_t last_action = 0;
 int ioctld_pid = 0;
 int ekg_pid = 0;
 char argv0[PATH_MAX];
+char *pipe_file = NULL;
 
 /*
  * usuwanie sesji GG_SESSION_USERx.
@@ -102,14 +103,13 @@ static struct {
  *
  * - c - struktura steruj±ca przechowuj±ca m.in. deskryptor potoku.
  */
-int get_char_from_pipe(struct gg_common *c)
+void get_char_from_pipe(struct gg_common *c)
 {
 	static char buf[PIPE_MSG_MAX_BUF_LEN + 1];
 	char ch;
-	int ret = 0;
   
 	if (!c)
-  		return 0;
+  		return;
 
 	if (read(c->fd, &ch, 1) > 0) {
 		if (ch != '\n' && ch != '\r') {
@@ -117,11 +117,10 @@ int get_char_from_pipe(struct gg_common *c)
 				buf[strlen(buf)] = ch;
 		}
 		if (ch == '\n' || (strlen(buf) >= PIPE_MSG_MAX_BUF_LEN)) {
-			ret = command_exec(NULL, buf);
+			command_exec(NULL, buf);
 			memset(buf, 0, PIPE_MSG_MAX_BUF_LEN + 1);
 		}
 	}
-	return ret;
 }
 
 /*
@@ -362,10 +361,7 @@ void ekg_wait_for_key()
 					return;
 
 				if (c->type == GG_SESSION_USER1) {
-					if (get_char_from_pipe(c)) {
-						immediately_quit = 1;
-						return;
-					}
+					get_char_from_pipe(c);
 					break;
 				}
 
@@ -495,11 +491,9 @@ int main(int argc, char **argv)
 {
 	int auto_connect = 1, force_debug = 0, i, new_status = 0, ui_set = 0;
 	char *load_theme = NULL;
-	char *pipe_file = NULL;
 #ifdef WITH_IOCTLD
 	const char *sock_path = NULL, *ioctld_path = IOCTLD_PATH;
 #endif
-	list_t l;
 	struct passwd *pw; 
 	struct gg_common si;
 	void (*ui_init)();
@@ -793,6 +787,15 @@ int main(int argc, char **argv)
 	
 	ui_loop();
 
+	ekg_exit();
+
+	return 0;
+}
+
+void ekg_exit()
+{
+	list_t l;
+
 	ekg_logoff(sess, NULL);
 	list_remove(&watches, sess, 0);
 	gg_free_session(sess);
@@ -842,6 +845,6 @@ int main(int argc, char **argv)
 	python_finalize();
 #endif
 
-	return 0;
+	exit(0);
 }
 
