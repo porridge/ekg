@@ -117,7 +117,7 @@ void ekg_wait_for_key()
 {
 	static time_t last_ping = 0;
 	struct timeval tv;
-	struct list *l, *m;
+	list_t l, m;
 	fd_set rd, wd;
 	int ret, maxfd, pid, status;
 
@@ -445,7 +445,7 @@ int main(int argc, char **argv)
 #ifdef WITH_IOCTLD
 	const char *sock_path = NULL, *ioctld_path = IOCTLD_PATH;
 #endif
-	struct list *l;
+	list_t l;
 	struct passwd *pw; 
 	struct gg_common si;
 	void (*ui_init)();
@@ -608,7 +608,7 @@ int main(int argc, char **argv)
 
 	ui_init();
 
-	init_theme();
+	theme_init();
 
 	in_autoexec = 1;
         userlist_read();
@@ -677,12 +677,12 @@ int main(int argc, char **argv)
 		gg_debug_level = 255;
 	
 	if (load_theme)
-		read_theme(load_theme, 1);
+		theme_read(load_theme, 1);
 	else
 		if (config_theme)
-			read_theme(config_theme, 1);
+			theme_read(config_theme, 1);
 	
-	reset_theme_cache();
+	theme_cache_reset();
 		
 	time(&last_action);
 

@@ -451,7 +451,7 @@ static void ui_readline_print(const char *target, const char *line)
 
 		if (pager_lines >= screen_lines - 2) {
 			char *tmp;
-			const char *prompt = find_format("readline_more");
+			const char *prompt = format_find("readline_more");
 			
 			in_readline = 1;
 #ifdef HAVE_RL_SET_PROMPT
@@ -501,7 +501,7 @@ static const char *current_prompt()
                 sprintf(w, "%d", curr_window);
 
         if (win->query_nick) {
-                if ((prompt = (*w) ? format_string(find_format("readline_prompt_query_win"), win->query_nick, w) : format_string(find_format("readline_prompt_query"), win->query_nick, NULL))) {
+                if ((prompt = (*w) ? format_string(format_find("readline_prompt_query_win"), win->query_nick, w) : format_string(format_find("readline_prompt_query"), win->query_nick, NULL))) {
                         strncpy(buf, prompt, sizeof(buf)-1);
                         prompt = buf;
                 }
@@ -509,14 +509,14 @@ static const char *current_prompt()
                 switch (away) {
                         case 1:
                         case 3:
-                                prompt = (*w) ? format_string(find_format("readline_prompt_away_win"), w) : find_format("readline_prompt_away");
+                                prompt = (*w) ? format_string(format_find("readline_prompt_away_win"), w) : format_find("readline_prompt_away");
                                 break;
                         case 2:
                         case 5:
-                                prompt = (*w) ? format_string(find_format("readline_prompt_invisible_win"), w) : find_format("readline_prompt_invisible");
+                                prompt = (*w) ? format_string(format_find("readline_prompt_invisible_win"), w) : format_find("readline_prompt_invisible");
                                 break;
                         default:
-                                prompt = (*w) ? format_string(find_format("readline_prompt_win"), w, NULL) : find_format("readline_prompt");
+                                prompt = (*w) ? format_string(format_find("readline_prompt_win"), w, NULL) : format_find("readline_prompt");
                 }
         }
 
@@ -621,7 +621,7 @@ static void ui_readline_deinit()
 {
 	if (config_changed) {
 		char *line;
-		const char *prompt = find_format("config_changed");
+		const char *prompt = format_find("config_changed");
 
 		if ((line = readline(prompt))) {
 			if (!strcasecmp(line, "tak") || !strcasecmp(line, "yes") || !strcasecmp(line, "t") || !strcasecmp(line, "y")) {

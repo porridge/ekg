@@ -100,6 +100,12 @@ struct command commands[] = {
           "Je¶li w³±czona jest odpowiednia opcja %Wrandom_reason%n i nie\n"
 	  "podano powodu, zostanie wylosowany z pliku %Wback.reasons%n" },
 	  
+	{ "bind", "???", command_bind,
+	  " <opcja> [sekwencja] [komenda]", "Bindowanie klawiszy",
+	  " -a, --add <sekwencja> <komenda>  binduje now± sekwencjê\n"
+	  " -d, --del <sekwencja>            usuwa podan± sekwencjê\n"
+	  " -l, --list                       wy¶wietla zabindowane sekwencje" },
+
 	{ "change", "?", command_change,
 	  " <opcje>", "Zmienia informacje w katalogu publicznym",
 	  "  -f, --first <imiê>\n"
@@ -290,13 +296,7 @@ struct command commands[] = {
 	  "  clear\n"
 	  "  refresh\n"
 	  "  list" },
-
-	{ "bind", "???", command_bind,
-	  " <opcja> [sekwencja] [komenda]", "Bindowanie klawiszy",
-	  " -a, --add <sekwencja> <komenda>	binduje now± sekwencjê\n"
-	  " -d, --del <sekwencja>		usuwa podan± sekwencjê\n"
-	  " -l, --list				wy¶wietla zabindowane sekwencje"},
-	  
+  
 	{ "_add", "?", command_test_add, "", "",
 	  "Dodaje do listy dope³niania TABem" },
 	{ "_fds", "", command_test_fds, "", "",
@@ -408,12 +408,12 @@ COMMAND(command_add)
 COMMAND(command_alias)
 {
 	if (!params[0] || match_arg(params[0], 'l', "list", 2)) {
-		struct list *l;
+		list_t l;
 		int count = 0;
 
 		for (l = aliases; l; l = l->next) {
 			struct alias *a = l->data;
-			struct list *m;
+			list_t m;
 			int first = 1, i;
 			char *tmp = xcalloc(strlen(a->name) + 1, 1);
 			
@@ -559,15 +559,15 @@ COMMAND(command_status)
 {
 	char *av, *ad, *bs, *bd, *na, *in, *id, *pr, *np;
 
-	av = format_string(find_format("show_status_avail"));
-	ad = format_string(find_format("show_status_avail_descr"), busy_reason);
-	bs = format_string(find_format("show_status_busy"));
-	bd = format_string(find_format("show_status_busy_descr"), busy_reason);
-	in = format_string(find_format("show_status_invisible"));
-	id = format_string(find_format("show_status_invisible_descr"), busy_reason);
-	na = format_string(find_format("show_status_not_avail"));
-	pr = format_string(find_format("show_status_private_on"));
-	np = format_string(find_format("show_status_private_off"));
+	av = format_string(format_find("show_status_avail"));
+	ad = format_string(format_find("show_status_avail_descr"), busy_reason);
+	bs = format_string(format_find("show_status_busy"));
+	bd = format_string(format_find("show_status_busy_descr"), busy_reason);
+	in = format_string(format_find("show_status_invisible"));
+	id = format_string(format_find("show_status_invisible_descr"), busy_reason);
+	na = format_string(format_find("show_status_not_avail"));
+	pr = format_string(format_find("show_status_private_on"));
+	np = format_string(format_find("show_status_private_off"));
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		print("show_status", na, "");
@@ -678,7 +678,7 @@ COMMAND(command_del)
 
 COMMAND(command_exec)
 {
-	struct list *l;
+	list_t l;
 	int pid;
 
 	if (params[0]) {
@@ -706,7 +706,7 @@ COMMAND(command_find)
 {
 	struct gg_search_request r;
 	struct gg_http *h;
-	struct list *l;
+	list_t l;
 	char **argv = NULL, *query = NULL;
 	int i, id = 1;
 
@@ -1009,6 +1009,8 @@ COMMAND(command_help)
 			free(blah);
 		}
 
+	print("help_footer");
+
 	return 0;
 }
 
@@ -1018,7 +1020,7 @@ COMMAND(command_ignore)
 
 	if (*name == 'i' || *name == 'I') {
 		if (!params[0]) {
-			struct list *l;
+			list_t l;
 
 			for (l = ignored; l; l = l->next) {
 				struct ignored *i = l->data;
@@ -1067,7 +1069,7 @@ COMMAND(command_ignore)
 
 COMMAND(command_list)
 {
-	struct list *l;
+	list_t l;
 	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, j;
 	char *tmp, **argv = NULL;
 
@@ -1091,28 +1093,28 @@ COMMAND(command_list)
 			
 			switch (u->status) {
 				case GG_STATUS_AVAIL:
-					status = format_string(find_format("user_info_avail"), u->display);
+					status = format_string(format_find("user_info_avail"), u->display);
 					break;
 				case GG_STATUS_AVAIL_DESCR:
-					status = format_string(find_format("user_info_avail_descr"), u->display, u->descr);
+					status = format_string(format_find("user_info_avail_descr"), u->display, u->descr);
 					break;
 				case GG_STATUS_BUSY:
-					status = format_string(find_format("user_info_busy"), u->display);
+					status = format_string(format_find("user_info_busy"), u->display);
 					break;
 				case GG_STATUS_BUSY_DESCR:
-					status = format_string(find_format("user_info_busy_descr"), u->display, u->descr);
+					status = format_string(format_find("user_info_busy_descr"), u->display, u->descr);
 					break;
 				case GG_STATUS_NOT_AVAIL:
-					status = format_string(find_format("user_info_not_avail"), u->display);
+					status = format_string(format_find("user_info_not_avail"), u->display);
 					break;
 				case GG_STATUS_NOT_AVAIL_DESCR:
-					status = format_string(find_format("user_info_not_avail_descr"), u->display, u->descr);
+					status = format_string(format_find("user_info_not_avail_descr"), u->display, u->descr);
 					break;
 				case GG_STATUS_INVISIBLE:
-					status = format_string(find_format("user_info_invisble"), u->display);
+					status = format_string(format_find("user_info_invisble"), u->display);
 					break;
 				default:
-					status = format_string(find_format("user_info_unknown"), u->display);
+					status = format_string(format_find("user_info_unknown"), u->display);
 			}
 		
 			print("user_info", u->first_name, u->last_name, u->nickname, u->display, u->mobile, groups, itoa(u->uin), status);
@@ -1297,14 +1299,13 @@ COMMAND(command_theme)
 	}
 	
 	if (!strcmp(params[0], "-")) {
-		init_theme();
-		reset_theme_cache();
+		theme_init();
 		if (!in_autoexec)
 			print("theme_default");
 		variable_set("theme", NULL, 0);
 	} else {
-		if (!read_theme(params[0], 1)) {
-			reset_theme_cache();
+		if (!theme_read(params[0], 1)) {
+			theme_cache_reset();
 			if (!in_autoexec)
 				print("theme_loaded", params[0]);
 			variable_set("theme", params[0], 0);
@@ -1317,7 +1318,7 @@ COMMAND(command_theme)
 
 COMMAND(command_set)
 {
-	struct list *l;
+	list_t l;
 	int unset = 0;
 	char *arg;
 
@@ -1345,7 +1346,7 @@ COMMAND(command_set)
 			}
 		}
 	} else {
-		reset_theme_cache();
+		theme_cache_reset();
 		switch (variable_set(arg, (unset) ? NULL : params[1], 0)) {
 			case 0:
 				if (!in_autoexec) {
@@ -1449,7 +1450,7 @@ COMMAND(command_quit)
 COMMAND(command_dcc)
 {
 	struct transfer t;
-	struct list *l;
+	list_t l;
 	uin_t uin;
 
 	if (!params[0] || !strncasecmp(params[0], "sh", 2)) {	/* show */
@@ -1835,7 +1836,7 @@ COMMAND(command_test_add)
 
 COMMAND(command_test_watches)
 {
-	struct list *l;
+	list_t l;
 	char buf[200], *type, *state, *check;
 	int no = 0;
 
@@ -1979,7 +1980,7 @@ COMMAND(command_test_fds)
 COMMAND(command_register)
 {
 	struct gg_http *h;
-	struct list *l;
+	list_t l;
 
 	if (registered_today) {
 		print("registered_today");
@@ -2060,7 +2061,7 @@ COMMAND(command_on)
         uin_t uin;
 
         if (!params[0] || !strncasecmp(params[0], "-l", 2)) {
-                struct list *l;
+                list_t l;
                 int count = 0;
 
                 for (l = events; l; l = l->next) {
@@ -2257,15 +2258,15 @@ int binding_quick_list(int a, int b)
 		switch (u->status) {
 			case GG_STATUS_AVAIL:
 			case GG_STATUS_AVAIL_DESCR:
-				format = find_format("quick_list_avail");
+				format = format_find("quick_list_avail");
 				break;
 			case GG_STATUS_BUSY:
 			case GG_STATUS_BUSY_DESCR:
-				format = find_format("quick_list_busy");
+				format = format_find("quick_list_busy");
 				break;
 			case GG_STATUS_INVISIBLE:
 			case GG_STATUS_INVISIBLE_DESCR:
-				format = find_format("quick_list_invisible");
+				format = format_find("quick_list_invisible");
 				break;
 		}
 
@@ -2323,7 +2324,7 @@ int binding_toggle_debug(int a, int b)
  */
 int ekg_execute(char *target, char *line)
 {
-	struct list *l;
+	list_t l;
 
 	if (!line)
 		return 0;

@@ -37,7 +37,7 @@
 #include "ioctld.h"
 
 /* malutki aliasik, ¿eby nie rzucaæ d³ugimi nazwami wszêdzie */
-#define saprintf gg_alloc_sprintf
+#define saprintf gg_saprintf
 
 enum event_t {
 	EVENT_MSG = 1,
@@ -61,7 +61,7 @@ struct process {
 
 struct alias {
 	char *name;
-	struct list *commands;		/* commands->data to (char*) */
+	list_t commands;		/* commands->data to (char*) */
 };
 
 struct transfer {
@@ -88,13 +88,13 @@ struct sequence {
 	char *command;
 };
 
-struct list *children;
-struct list *aliases;
-struct list *watches;
-struct list *transfers;
-struct list *events;
-struct list *emoticons;
-struct list *sequences;
+list_t children;
+list_t aliases;
+list_t watches;
+list_t transfers;
+list_t events;
+list_t emoticons;
+list_t sequences;
 struct gg_session *sess;
 
 int config_dcc;
@@ -184,6 +184,7 @@ void do_connect();
 int transfer_id();
 void ekg_logoff(struct gg_session *sess, const char *reason);
 void ekg_wait_for_key();
+int ekg_hash(const char *name);
 
 int process_add(int pid, const char *name);
 int process_remove(int pid);
@@ -203,7 +204,7 @@ void iso_to_cp(unsigned char *buf);
 
 int alias_add(const char *string, int quiet, int append);
 int alias_remove(const char *name);
-struct list *alias_check(const char *foo);
+list_t alias_check(const char *foo);
 
 char *base64_encode(const char *buf);
 char *base64_decode(const char *buf);

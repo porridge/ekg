@@ -24,7 +24,9 @@ LN_S = @LN_S@
 OBJS = common.o libgadu.o search.o pubdir.o http.o dcc.o userlist.o events.o
 LOBJS = common.lo libgadu.lo search.lo pubdir.lo http.lo dcc.lo userlist.lo events.lo
 
-SHARED = libgadu.so.$(VERSION_MAJOR).$(VERSION_MINOR)
+SHAREDMM = libgadu.so
+SHAREDM = $(SHAREDMM).$(VERSION_MAJOR)
+SHARED = $(SHAREDM).$(VERSION_MINOR)
 STATIC = libgadu.a
 
 all:	@static@ @shared@
@@ -54,7 +56,8 @@ shared:	$(SHARED)
 
 $(SHARED): $(LOBJS)
 	$(CC) -g -shared -Wl,-soname=libgadu.so.$(VERSION_MAJOR) -o $(SHARED) $(LOBJS) $(LIBS) -lc
-	$(LN_S) $(SHARED) libgadu.so
+	$(LN_S) -f $(SHARED) $(SHAREDM)
+	$(LN_S) -f $(SHARED) $(SHAREDMM)
 
 #
 
@@ -67,7 +70,8 @@ install-common:
 
 install-shared:	install-common @strip_libgadu_so@
 	$(INSTALL) -m 755 $(SHARED) $(DESTDIR)$(libdir)
-	ldconfig || true
+	cd $(DESTDIR)$(libdir) && $(LN_S) -f $(SHARED) $(SHAREDM)
+	cd $(DESTDIR)$(libdir) && $(LN_S) -f $(SHARED) $(SHAREDMM)
 
 install-static:	install-common
 	$(INSTALL) -m 755 $(STATIC) $(DESTDIR)$(libdir)

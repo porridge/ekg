@@ -21,6 +21,12 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   przez co w najgorszym wypadku bêdzie kompilowana dwa razy (porridge/w)
 - konwersja cp->iso userlisty z serwera (a.latanski/w),
 - zamiana spacji na podkre¶lenia w userli¶cie z serwera (a.latanski/w),
+- ,,display_notify 2'', szczegó³y w docs/vars.txt (w),
+- dodanie prostych hashy themeów i zmiennych, ¿eby ltrace nie za¶mieca³o
+  konsoli przez 5 minut przy starcie programu. przy okazji ekg bêdzie
+  startowa³o oko³o 20us szybciej (w),
+- s/struct list */list_t /, s/struct string */string_t / (w)
+- drobne porz±dki w kodzie ekg (w)
 
 // 2002-07-25
 

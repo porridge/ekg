@@ -35,7 +35,7 @@ struct userlist {
 	char *nickname;		/* pseudonim */
 	char *display;		/* wy¶wietlania nazwa */
 	char *mobile;		/* komórka */
-	struct list *groups;	/* grupy, do których nale¿y */
+	list_t groups;		/* grupy, do których nale¿y */
 	uin_t uin;		/* numer */
 	int status;		/* aktualny stan */
 	char *descr;		/* opis/powód stanu */
@@ -52,8 +52,8 @@ struct group {
 	char *name;
 };
 
-struct list *userlist;
-struct list *ignored;
+list_t userlist;
+list_t ignored;
 
 int userlist_read();
 int userlist_write();
@@ -74,8 +74,8 @@ int ignored_check(uin_t uin);
 
 int group_add(struct userlist *u, const char *group);
 int group_remove(struct userlist *u, const char *group);
-char *group_to_string(struct list *l);
-struct list *group_init(const char *groups);
+char *group_to_string(list_t l);
+list_t group_init(const char *groups);
 
 const char *format_user(uin_t uin);
 uin_t get_uin(const char *text);

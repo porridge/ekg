@@ -116,7 +116,7 @@ fail:
  */
 void voice_close()
 {
-	struct list *l;
+	list_t l;
 
 	for (l = watches; l; l = l->next) {
 		struct gg_session *s = l->data;

@@ -94,11 +94,11 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 	}	
 
 	tm = localtime(&e->event.msg.time);
-	strftime(timestr, sizeof(timestr), find_format("timestamp"), tm);
+	strftime(timestr, sizeof(timestr), format_find("timestamp"), tm);
 
 	print_window(target, head, format_user(e->event.msg.sender), timestr);
 
-	if (!(width = atoi(find_format(line_width))))
+	if (!(width = atoi(format_find(line_width))))
 		width = 78;
 	
 	buf = xmalloc(width + 1);
@@ -236,7 +236,7 @@ void handle_msg(struct gg_event *e)
 		if (strlen(e->event.msg.message) > config_sms_max_length)
 			e->event.msg.message[config_sms_max_length] = 0;
 
-		foo = format_string(find_format((chat) ? "sms_chat" : "sms_msg"), sender, e->event.msg.message);
+		foo = format_string(format_find((chat) ? "sms_chat" : "sms_msg"), sender, e->event.msg.message);
 
 		/* niech nie wysy³a smsów, je¶li brakuje formatów */
 		if (strcmp(foo, ""))
@@ -299,6 +299,7 @@ void handle_notify(struct gg_event *e)
 	struct gg_notify_reply *n;
 	struct userlist *u;
 	struct in_addr in;
+	int prev_status;
 
 	if (batch_mode)
 		return;
@@ -320,6 +321,7 @@ void handle_notify(struct gg_event *e)
 		}
 		
 		/* przepisz informacje */
+		prev_status = u->status;
 		u->status = n->status;
 		u->port = n->remote_port;
 		u->ip.s_addr = n->remote_ip;
@@ -333,7 +335,7 @@ void handle_notify(struct gg_event *e)
 			event_check(EVENT_AWAY, u->uin, NULL);
                         if (config_log_status)
                                 log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away");
-			if (config_display_notify)
+			if (config_display_notify == 1)
 			    	print("status_busy", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
 		}
 
@@ -343,7 +345,7 @@ void handle_notify(struct gg_event *e)
 			cp_to_iso(u->descr);
                         if (config_log_status)
                                 log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
-			if (config_display_notify)
+			if (config_display_notify == 1)
 			    	print("status_busy_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		}
 
@@ -351,7 +353,7 @@ void handle_notify(struct gg_event *e)
 			event_check(EVENT_AVAIL, u->uin, NULL);
 		    	if (config_log_status)
 			    	log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail");
-			if (config_display_notify)
+			if (config_display_notify == 1 || (config_status == 2 && (prev_status == GG_STATUS_NOT_AVAIL || prev_status == GG_STATUS_NOT_AVAIL_DESCR)))
 			    	print("status_avail", format_user(u->uin), (u->first_name) ? u->first_name : u->display);
 			
 			if (config_completion_notify)
@@ -366,7 +368,7 @@ void handle_notify(struct gg_event *e)
 			cp_to_iso(u->descr);
                         if (config_log_status)
                                 log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
-			if (config_display_notify)
+			if (config_display_notify == 1 || (config_status == 2 && (prev_status == GG_STATUS_NOT_AVAIL || prev_status == GG_STATUS_NOT_AVAIL_DESCR)))
 			    	print("status_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
 			if (config_completion_notify)
 				add_send_nick(u->display);
@@ -443,7 +445,8 @@ void handle_status(struct gg_event *e)
 		    	event_check(EVENT_AVAIL, e->event.status.uin, NULL);
 			if (config_completion_notify)
 				add_send_nick(u->display);
-			print("status_avail", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
+			if (config_display_notify != 2 || (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)) 
+				print("status_avail", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
 			if (config_beep && config_beep_notify)
 				ui_beep();
 		} else if (e->event.status.status == GG_STATUS_AVAIL_DESCR) {
@@ -452,7 +455,8 @@ void handle_status(struct gg_event *e)
 		    	event_check(EVENT_AVAIL, e->event.status.uin, NULL);
 			if (config_completion_notify)
 				add_send_nick(u->display);
-			print("status_avail_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
+			if (config_display_notify != 2 || (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)) 
+				print("status_avail_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
 			if (config_beep && config_beep_notify)
 				ui_beep();
 		} else if (e->event.status.status == GG_STATUS_BUSY && u->status != GG_STATUS_BUSY) 
@@ -460,13 +464,15 @@ void handle_status(struct gg_event *e)
                         if (config_log_status)
 			    	log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "away");
 		    	event_check(EVENT_AWAY, e->event.status.uin, NULL);
-			print("status_busy", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
+			if (config_display_notify != 2)
+				print("status_busy", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
 		} else if (e->event.status.status == GG_STATUS_BUSY_DESCR)
 		{
                         if (config_log_status)
                                 log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
 		    	event_check(EVENT_AWAY, e->event.status.uin, NULL);
-			print("status_busy_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
+			if (config_display_notify != 2)
+				print("status_busy_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL)
 		{
                         if (config_log_status)
@@ -610,21 +616,21 @@ void handle_search(struct gg_http *h)
 		name = saprintf("%s %s", s->results[i].first_name, s->results[i].last_name);
 
 		if (!(h->id & 1)) {
-			active_format = find_format((s->results[i].active) ? "search_results_single_active" : "search_results_single_inactive");
+			active_format = format_find((s->results[i].active) ? "search_results_single_active" : "search_results_single_inactive");
 			if (s->results[i].gender == GG_GENDER_FEMALE)
-				gender_format = find_format("search_results_single_female");
+				gender_format = format_find("search_results_single_female");
 			else if (s->results[i].gender == GG_GENDER_MALE)
-				gender_format = find_format("search_results_single_male");
+				gender_format = format_find("search_results_single_male");
 			else
-				gender_format = find_format("search_results_single_male");
+				gender_format = format_find("search_results_single_male");
 		} else {
-			active_format = find_format((s->results[i].active) ? "search_results_multi_active" : "search_results_multi_inactive");
+			active_format = format_find((s->results[i].active) ? "search_results_multi_active" : "search_results_multi_inactive");
 			if (s->results[i].gender == GG_GENDER_FEMALE)
-				gender_format = find_format("search_results_multi_female");
+				gender_format = format_find("search_results_multi_female");
 			else if (s->results[i].gender == GG_GENDER_MALE)
-				gender_format = find_format("search_results_multi_male");
+				gender_format = format_find("search_results_multi_male");
 			else
-				gender_format = find_format("search_results_multi_unknown");
+				gender_format = format_find("search_results_multi_unknown");
 		}
 
 		active = format_string(active_format, s->results[i].nickname);
@@ -797,7 +803,7 @@ void handle_disconnect(struct gg_event *e)
  */
 static struct transfer *find_transfer(struct gg_dcc *d)
 {
-	struct list *l;
+	list_t l;
 
 	for (l = transfers; l; l = l->next) {
 		struct transfer *t = l->data;
@@ -841,7 +847,7 @@ void handle_dcc(struct gg_dcc *d)
 {
 	struct gg_event *e;
 	struct transfer *t, tt;
-	struct list *l;
+	list_t l;
 	char *p;
 
 	event_check(EVENT_DCC, d->peer_uin, NULL);
@@ -1046,7 +1052,7 @@ void handle_dcc(struct gg_dcc *d)
 void handle_voice()
 {
 #ifdef HAVE_VOIP
-	struct list *l;
+	list_t l;
 	struct gg_dcc *d = NULL;
 	char buf[GG_DCC_VOICE_FRAME_LENGTH];
 	

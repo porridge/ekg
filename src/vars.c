@@ -31,7 +31,7 @@
 #include "dynstuff.h"
 #include "xmalloc.h"
 
-struct list *variables = NULL;
+list_t variables = NULL;
 
 /*
  * variable_init()
@@ -94,15 +94,18 @@ void variable_init()
  */
 struct variable *variable_find(const char *name)
 {
-	struct list *l;
+	list_t l;
+	int hash;
 
 	if (!name)
 		return NULL;
 
+	hash = ekg_hash(name);
+
 	for (l = variables; l; l = l->next) {
 		struct variable *v = l->data;
 
-		if (v->name && !strcasecmp(v->name, name))
+		if (v->name && v->name_hash == hash && !strcasecmp(v->name, name))
 			return v;
 	}
 
@@ -127,6 +130,7 @@ int variable_add(const char *name, int type, int display, void *ptr, void (*noti
 	struct variable v;
 
 	v.name = xstrdup(name);
+	v.name_hash = ekg_hash(name);
 	v.type = type;
 	v.display = display;
 	v.ptr = ptr;

@@ -43,8 +43,8 @@
 #include "userlist.h"
 #include "xmalloc.h"
 
-struct list *userlist = NULL;
-struct list *ignored = NULL;
+list_t userlist = NULL;
+list_t ignored = NULL;
 
 /*
  * userlist_compare()
@@ -225,8 +225,8 @@ int userlist_set(char *contacts)
  */
 char *userlist_dump()
 {
-	struct list *l;
-	struct string *s;
+	string_t s;
+	list_t l;
 
 	if (!(s = string_init(NULL)))
 		return NULL;
@@ -293,7 +293,7 @@ int userlist_write()
  */
 void userlist_write_crash()
 {
-	struct list *l;
+	list_t l;
 	char name[32];
 	FILE *f;
 
@@ -305,7 +305,7 @@ void userlist_write_crash()
 		
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
-		struct list *m;
+		list_t m;
 		
 		fprintf(f, "%s;%s;%s;%s;%s;", 
 			(u->first_name) ? u->first_name : u->display,
@@ -335,14 +335,14 @@ void userlist_write_crash()
  */
 void userlist_clear_status()
 {
-        struct list *l;
+        list_t l;
 
         for (l = userlist; l; l = l->next) {
                 struct userlist *u = l->data;
 
                 u->status = GG_STATUS_NOT_AVAIL;
-        };
-};
+        }
+}
 
 /*
  * userlist_clear()
@@ -391,7 +391,7 @@ int userlist_add(uin_t uin, const char *display)
  */
 int userlist_remove(struct userlist *u)
 {
-	struct list *l;
+	list_t l;
 
 	if (!u)
 		return -1;
@@ -448,7 +448,7 @@ int userlist_replace(struct userlist *u)
  */
 struct userlist *userlist_find(uin_t uin, const char *display)
 {
-	struct list *l;
+	list_t l;
 
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
@@ -500,9 +500,9 @@ const char *format_user(uin_t uin)
 	static char buf[100], *tmp;
 	
 	if (!u)
-		tmp = format_string(find_format("unknown_user"), itoa(uin));
+		tmp = format_string(format_find("unknown_user"), itoa(uin));
 	else
-		tmp = format_string(find_format("known_user"), u->display, itoa(uin));
+		tmp = format_string(format_find("known_user"), u->display, itoa(uin));
 	
 	strncpy(buf, tmp, sizeof(buf) - 1);
 	
@@ -520,7 +520,7 @@ const char *format_user(uin_t uin)
  */
 int ignored_remove(uin_t uin)
 {
-	struct list *l;
+	list_t l;
 
 	for (l = ignored; l; l = l->next) {
 		struct ignored *i = l->data;
@@ -543,7 +543,7 @@ int ignored_remove(uin_t uin)
  */
 int ignored_add(uin_t uin)
 {
-	struct list *l;
+	list_t l;
 	struct ignored i;
 
 	for (l = ignored; l; l = l->next) {
@@ -568,7 +568,7 @@ int ignored_add(uin_t uin)
  */
 int ignored_check(uin_t uin)
 {
-	struct list *l;
+	list_t l;
 
 	for (l = ignored; l; l = l->next) {
 		struct ignored *i = l->data;
@@ -587,7 +587,7 @@ int ignored_check(uin_t uin)
  */
 void userlist_send()
 {
-        struct list *l;
+        list_t l;
         uin_t *uins;
         int i, count;
 
@@ -658,7 +658,7 @@ int group_add(struct userlist *u, const char *group)
  */
 int group_remove(struct userlist *u, const char *group)
 {
-	struct list *l;
+	list_t l;
 
 	if (!u || !group)
 		return -1;
@@ -690,9 +690,9 @@ int group_remove(struct userlist *u, const char *group)
  *
  * zwraca listê `struct group' je¶li siê uda³o, inaczej NULL.
  */
-struct list *group_init(const char *names)
+list_t group_init(const char *names)
 {
-	struct list *l = NULL;
+	list_t l = NULL;
 	char **groups = array_make(names, ",", 0, 1, 0);
 	int i;
 
@@ -717,10 +717,10 @@ struct list *group_init(const char *names)
  *
  * zwraca zaalokowany ci±g znaków lub NULL w przypadku b³êdu.
  */
-char *group_to_string(struct list *groups)
+char *group_to_string(list_t groups)
 {
-	struct string *foo;
-	struct list *l;
+	string_t foo;
+	list_t l;
 
 	if (!(foo = string_init(NULL)))
 		return NULL;

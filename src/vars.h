@@ -20,6 +20,8 @@
 #ifndef __VARS_H
 #define __VARS_H
 
+#include "dynstuff.h"
+
 enum {
 	VAR_STR,		/* ci±g znaków */
 	VAR_INT,		/* liczba ca³kowita */
@@ -29,13 +31,14 @@ enum {
 
 struct variable {
 	char *name;		/* nazwa zmiennej */
+	int name_hash;		/* hash nazwy zmiennej */
 	int type;		/* rodzaj */
 	int display;		/* 0 bez warto¶ci, 1 pokazuje, 2 w ogóle */
 	void *ptr;		/* wska¼nik do zmiennej */
 	void (*notify)(const char*);	/* funkcja wywo³ywana przy zmianie */
 };
 
-struct list *variables;
+list_t variables;
 
 void variable_init();
 struct variable *variable_find(const char *name);

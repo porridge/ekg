@@ -53,13 +53,13 @@
 #include "ui.h"
 
 struct gg_session *sess = NULL;
-struct list *children = NULL;
-struct list *aliases = NULL;
-struct list *watches = NULL;
-struct list *transfers = NULL;
-struct list *events = NULL;
-struct list *emoticons = NULL;
-struct list *sequences = NULL;
+list_t children = NULL;
+list_t aliases = NULL;
+list_t watches = NULL;
+list_t transfers = NULL;
+list_t events = NULL;
+list_t emoticons = NULL;
+list_t sequences = NULL;
 
 int away = 0;
 int in_autoexec = 0;
@@ -150,7 +150,7 @@ static struct {
  */
 char *emoticon_expand(const char *s)
 {
-	struct list *l = NULL;
+	list_t l = NULL;
 	const char *ss;
 	char *ms;
 	size_t n = 0;
@@ -413,7 +413,7 @@ int sysmsg_read()
  */
 void config_write_main(FILE *f, int base64)
 {
-	struct list *l;
+	list_t l;
 
 	for (l = variables; l; l = l->next) {
 		struct variable *v = l->data;
@@ -441,7 +441,7 @@ void config_write_main(FILE *f, int base64)
 
 	for (l = aliases; l; l = l->next) {
 		struct alias *a = l->data;
-		struct list *m;
+		list_t m;
 
 		for (m = a->commands; m; m = m->next)
 			fprintf(f, "alias %s %s\n", a->name, (char*) m->data);
@@ -878,7 +878,7 @@ int process_add(int pid, const char *name)
  */
 int process_remove(int pid)
 {
-	struct list *l;
+	list_t l;
 
 	for (l = children; l; l = l->next) {
 		struct process *p = l->data;
@@ -924,7 +924,7 @@ int on_off(const char *value)
 int alias_add(const char *string, int quiet, int append)
 {
 	char *cmd;
-	struct list *l;
+	list_t l;
 	struct alias a;
 
 	if (!string || !(cmd = strchr(string, ' '))) {
@@ -972,7 +972,7 @@ int alias_add(const char *string, int quiet, int append)
  */
 int alias_remove(const char *name)
 {
-	struct list *l;
+	list_t l;
 
 	if (!name) {
 		print("not_enough_params");
@@ -1003,9 +1003,9 @@ int alias_remove(const char *name)
  *
  *  - line - linia z komend±.
  */
-struct list *alias_check(const char *line)
+list_t alias_check(const char *line)
 {
-	struct list *l;
+	list_t l;
 	int i = 0;
 
 	while (*line == ' ')
@@ -1097,7 +1097,7 @@ int event_flags(const char *events)
 int event_add(int flags, uin_t uin, const char *action, int quiet)
 {
         int f;
-        struct list *l;
+        list_t l;
         struct event e;
 
         for (l = events; l; l = l->next) {
@@ -1132,7 +1132,7 @@ int event_add(int flags, uin_t uin, const char *action, int quiet)
  */
 int event_remove(int flags, uin_t uin)
 {
-        struct list *l;
+        list_t l;
 
         for (l = events; l; l = l->next) {
                 struct event *e = l->data;
@@ -1170,7 +1170,7 @@ int event_check(int event, uin_t uin, const char *data)
 	const char *uin_number = NULL, *uin_display = NULL;
         char *action = NULL, **actions, *edata = NULL;
 	struct userlist *u;
-        struct list *l;
+        list_t l;
 	int i;
 
 	uin_number = itoa(uin);
@@ -1363,7 +1363,7 @@ int event_send(const char *seq, int act)
 
 	if (*seq == '$') {
 		seq++;
-		s = find_format(seq);
+		s = format_find(seq);
 		if (!strcmp(s, "")) {
 			print("events_seq_not_found", seq);
 			return 1;
@@ -1420,7 +1420,7 @@ int event_correct(const char *action)
 			}
 
                         if (*acts[1] == '$') {
-                                if (!strcmp(find_format(acts[1] + 1), "")) {
+                                if (!strcmp(format_find(acts[1] + 1), "")) {
                                         print("events_seq_not_found", acts[1] + 1);
 					goto fail;
 				}
@@ -1701,7 +1701,7 @@ void changed_debug(const char *var)
 void changed_dcc(const char *var)
 {
 	struct gg_dcc *dcc = NULL;
-	struct list *l;
+	list_t l;
 	
 	if (!config_uin)
 		return;
@@ -1751,11 +1751,10 @@ void changed_dcc(const char *var)
 void changed_theme(const char *var)
 {
 	if (!config_theme) {
-		init_theme();
-		reset_theme_cache();
+		theme_init();
 	} else {
-		if (!read_theme(config_theme, 1)) {
-			reset_theme_cache();
+		if (!theme_read(config_theme, 1)) {
+			theme_cache_reset();
 			if (!in_autoexec)
 				print("theme_loaded", config_theme);
 		} else
@@ -1804,7 +1803,7 @@ void changed_proxy(const char *var)
  */
 void do_connect()
 {
-	struct list *l;
+	list_t l;
 	struct gg_login_params p;
 
 	for (l = watches; l; l = l->next) {
@@ -1861,7 +1860,7 @@ void do_connect()
  */
 int transfer_id()
 {
-	struct list *l;
+	list_t l;
 	int id = 1;
 
 	for (l = transfers; l; l = l->next) {
@@ -1948,7 +1947,7 @@ char *random_line(const char *path)
 int emoticon_add(char *name, char *value)
 {
 	struct emoticon e;
-	struct list *l;
+	list_t l;
 
 	for (l = emoticons; l; l = l->next) {
 		struct emoticon *g = l->data;
@@ -1976,7 +1975,7 @@ int emoticon_add(char *name, char *value)
  */
 int emoticon_remove(char *name)
 {
-	struct list *l;
+	list_t l;
 
 	for (l = emoticons; l; l = l->next) {
 		struct emoticon *f = l->data;
@@ -2036,3 +2035,22 @@ int emoticon_read()
 	return 0;
 }
 
+/*
+ * ekg_hash()
+ *
+ * liczy prosty hash z nazwy, wykorzystywany przy przeszukiwaniu list
+ * zmiennych, formatów itp.
+ *
+ *  - name - nazwa,
+ */
+int ekg_hash(const char *name)
+{
+	int hash = 0;
+
+	for (; *name; name++) {
+		hash ^= *name;
+		hash <<= 1;
+	}
+
+	return hash;
+}
