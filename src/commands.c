@@ -168,16 +168,16 @@ COMMAND(cmd_add)
 
 	if (params[0] && match_arg(params[0], 'f', "find", 2)) {
 		int nonick = 0;
-		char *nickname = NULL;
+		char *nickname, *tmp;
 
 		if (!last_search_uin || !last_search_nickname) {
 			printq("search_no_last");
 			return -1;
 		}
 
-		last_search_nickname = strip_spaces(last_search_nickname);
+		tmp = strip_spaces(last_search_nickname);
 
-		if ((nonick = !strcmp(last_search_nickname, "")) && !params[1]) {
+		if ((nonick = !strcmp(tmp, "")) && !params[1]) {
 			printq("search_no_last_nickname");
 			return -1;
 		}
@@ -185,7 +185,7 @@ COMMAND(cmd_add)
 		if (nonick)
 			nickname = (char *) params[1];
 		else
-			nickname = last_search_nickname;	
+			nickname = tmp;
 		
 		params_free = 1;
 
@@ -2736,8 +2736,9 @@ COMMAND(cmd_key)
 		while ((d = readdir(dir))) {
 			struct stat st;
 			char *name = saprintf("%s/%s", path, d->d_name);
+			const char *tmp;
 
-			if (strstr(d->d_name, ".pem") && !stat(name, &st) && S_ISREG(st.st_mode)) {
+			if ((tmp = strstr(d->d_name, ".pem")) && !tmp[4] && !stat(name, &st) && S_ISREG(st.st_mode)) {
 				int uin = atoi(d->d_name);
 
 				if (uin) {
