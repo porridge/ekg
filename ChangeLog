@@ -6,6 +6,7 @@ d - drg, sz - szalik).
 
 // 2003-05-28
 
+- libgadu: poprawka w±tkowego resolvera przy po³±czeniach http (sz)
 - psuj±cy zabawê b³±d off-by-one w ioctld. przywracanie pocz±tkowego
   stanu diod LED. niestety, nie mam jak sprawdziæ na Linuksie (sz)
 
