@@ -51,8 +51,9 @@ enum event_t {
 	EVENT_DELIVERED = 2048,
 	EVENT_QUEUED = 4096,
 	EVENT_NEW_MAIL = 8192,
+	EVENT_QUERY = 16384,
 
-	EVENT_ALL = 16383,	/* uaktualniaæ za ka¿d± zmian± */
+	EVENT_ALL = 32767,	/* uaktualniaæ za ka¿d± zmian± */
 
 	INACTIVE_EVENT = 32768	/* nieaktywne zdarzenie */
 };

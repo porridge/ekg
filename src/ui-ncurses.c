@@ -903,6 +903,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 						print("window_id_query_started", itoa(w->id), target);
 						print_window(target, 1, "query_started", target);
 						print_window(target, 1, "query_started_window", target);
+						event_check(EVENT_QUERY, get_uin(target), target);
 						break;
 					}
 				}
@@ -916,6 +917,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 						print("window_id_query_started", itoa(w->id), target);
 						print_window(target, 1, "query_started", target);
 						print_window(target, 1, "query_started_window", target);
+						event_check(EVENT_QUERY, get_uin(target), target);
 					}
 				}
 

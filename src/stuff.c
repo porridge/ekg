@@ -195,6 +195,7 @@ static struct {
 	{ EVENT_DELIVERED, "delivered" },
 	{ EVENT_QUEUED, "queued" },
 	{ EVENT_NEW_MAIL, "new_mail" },
+	{ EVENT_QUERY, "query" },
 	{ INACTIVE_EVENT, NULL },
 	{ 0, NULL },
 };
@@ -2183,7 +2184,7 @@ int ioctld_send(const char *seq, int act)
  */
 const char *event_format(int flags)
 {
-        static char buf[100];
+        static char buf[200];
 	int i, first = 1;
 
 	buf[0] = 0;
