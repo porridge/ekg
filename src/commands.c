@@ -2069,8 +2069,9 @@ COMMAND(cmd_alias_exec)
 		}
 	}
 	
-	for (; m; m = m->next) {
+	for (; m; ) {
 		char *tmp = saprintf("/%s%s%s", (char*) m->data, (params[0]) ? " " : "", (params[0]) ? params[0] : "");
+		m = m->next;
 		command_exec(NULL, tmp);
 		free(tmp);
 	}

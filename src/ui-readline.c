@@ -845,29 +845,20 @@ static int ui_readline_event(const char *event, ...)
 		if (!strcasecmp(command, "bind")) {
 			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*), *p3 = va_arg(ap, char*);
 			
-			if (!p1) {
-				print("not_enough_params");
-				result = 1;
-				goto cleanup;
-			}
-
-			if (!strcasecmp(p1, "-a") || !strcasecmp(p1, "--add") ||!strcasecmp(p1, "--add-quiet")) {
-				if (!p2 || !p3) 
+			if (p1 && (!strcasecmp(p1, "-a") || !strcasecmp(p1, "--add") ||!strcasecmp(p1, "--add-quiet"))) {
+				if (!p2 || !p3)
 					print("bind_not_enough_params");
 				else
 					bind_sequence(p2, p3, (!strcasecmp(p1, "--add-quiet")) ? 1 : 0);
 			
-			} else if (!strcasecmp(p1, "-d") || !strcasecmp(p1, "--del")) {
+			} else if (p1 && (!strcasecmp(p1, "-d") || !strcasecmp(p1, "--del"))) {
 				if (!p2)
 					print("bind_not_enough_params");
 				else
 					bind_sequence(p2, NULL, 0);
 			
-			} else if (!strcasecmp(p1, "-l") || !strcasecmp(p1, "--list")) {
+			} else 
 				bind_seq_list();
-			
-			} else
-				print ("bind_invalid");
 
 			result = 1;
 		}
