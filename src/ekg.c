@@ -53,7 +53,7 @@
 #include "ui.h"
 #include "python.h"
 #ifdef HAVE_OPENSSL
-#include "sim.h"
+#  include "sim.h"
 #endif
 
 #ifndef PATH_MAX

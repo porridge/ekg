@@ -52,7 +52,7 @@
 #include "ui.h"
 #include "python.h"
 #ifdef HAVE_OPENSSL
-#include "sim.h"
+#  include "sim.h"
 #endif
 
 COMMAND(cmd_modify);
@@ -1300,24 +1300,8 @@ COMMAND(cmd_msg)
 	count = array_count(nicks);
 
 #ifdef HAVE_OPENSSL
-	if (config_encryption == 1 && array_count(nicks) == 1 && (uin = get_uin(nicks[0]))) {
-		char *enc = xmalloc(4096);	/* XXX idiotyzm */
-		int len;
-		
-		memset(enc, 0, 4096);
-		
-		len = SIM_Message_Encrypt(msg, enc, strlen(msg), uin);
-		
-		gg_debug(GG_DEBUG_MISC, "// encrypted length: %d\n", len);
-
-		if (len > 0) {
-			xfree(msg);
-			msg = enc;
+	if (config_encryption == 1 && array_count(nicks) == 1 && (uin = get_uin(nicks[0])) && (msg_encrypt(uin, &msg) > 0))
 			secure = 1;
-		}
-
-		gg_debug(GG_DEBUG_MISC, "// encrypted message: %s\n", enc);
-	}
 #endif
 
 	for (p = nicks; *p; p++) {
@@ -1338,7 +1322,7 @@ COMMAND(cmd_msg)
 
 		if (!chat || count == 1) {
 			msg_seq = gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
-			msg_queue_add((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, msg_seq, 1, &uin, msg, (secure) ? raw_msg : NULL);
+			msg_queue_add((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, msg_seq, 1, &uin, raw_msg, secure);
 
 			valid++;
 		}
@@ -1355,7 +1339,7 @@ COMMAND(cmd_msg)
 				uins[realcount++] = uin;
 	
 		msg_seq = gg_send_message_confer(sess, GG_CLASS_CHAT, realcount, uins, msg);
-		msg_queue_add((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, msg_seq, count, uins, msg, (secure) ? raw_msg : NULL);
+		msg_queue_add((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, msg_seq, count, uins, raw_msg, 0);
 
 		valid++;
 
@@ -2947,12 +2931,8 @@ COMMAND(cmd_queue)
 			tm = localtime(&m->time);
 			strftime(buf, sizeof(buf), format_find("queue_list_timestamp"), tm);
 
-			if (m->raw_msg)
-				tmp = xstrdup(m->raw_msg);
-			else {
-				tmp = xstrdup(m->msg);
-				cp_to_iso(tmp);
-			}
+			tmp = xstrdup(m->msg);
+			cp_to_iso(tmp);
 
 			if (m->uin_count > 1) {
 				string_t s = string_init(format_user(*(m->uins)));

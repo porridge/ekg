@@ -133,7 +133,7 @@ struct msg_queue {
 	int uin_count;
 	uin_t *uins;
 	char *msg;
-	char *raw_msg;
+	int secure;
 	time_t time;
 };
 
@@ -343,13 +343,15 @@ void contacts_rebuild();
 int mesg_set(int what);
 void mesg_changed();
 
-int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const char *msg, const char *raw_msg);
+int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const char *msg, int secure);
 int msg_queue_remove(int msg_seq);
 int msg_queue_remove_uin(uin_t uin);
 void msg_queue_destroy();
 int msg_queue_flush();
 int msg_queue_count();
 int msg_queue_count_uin(uin_t uin);
+
+int msg_encrypt(uin_t uin, char **msg);
 
 int find_in_uins(int uin_count, uin_t *uins, uin_t uin);
 

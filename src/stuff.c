@@ -48,6 +48,9 @@
 #  include <sys/un.h>
 #endif
 #include <ctype.h>
+#ifdef HAVE_OPENSSL
+#  include "sim.h"
+#endif
 #ifdef HAVE_ZLIB_H
 #  include <zlib.h>
 #endif
@@ -918,6 +921,35 @@ void do_reconnect()
 }
 
 /*
+ * msg_encrypt()
+ * 
+ * je¶li mo¿na, podmienia wiadomo¶æ na wiadomo¶æ
+ * zaszyforwan±.  
+ */
+int msg_encrypt(uin_t uin, char **msg)
+{
+#ifdef HAVE_OPENSSL
+	char *enc = xmalloc(4096);	/* XXX idiotyzm */
+	int len;
+		
+	memset(enc, 0, 4096);
+		
+	len = SIM_Message_Encrypt(*msg, enc, strlen(*msg), uin);
+		
+	gg_debug(GG_DEBUG_MISC, "// encrypted length: %d\n", len);
+
+	if (len > 0) {
+		xfree(*msg);
+		*msg = enc;
+		gg_debug(GG_DEBUG_MISC, "// encrypted message: %s\n", enc);
+	} else
+		xfree(enc);
+
+	return len;
+#endif
+}
+
+/*
  * find_in_uins()
  *
  * sprawdza, czy w ci±gu uin'ów znajduje siê dany uin.
@@ -945,11 +977,11 @@ int find_in_uins(int uin_count, uin_t *uins, uin_t uin)
  * uin_count - ilo¶c adresatów,
  * uins - adresaci wiadomo¶ci,
  * msg - wiadomo¶æ,
- * raw_msg - wiadomo¶æ niezaszyfrowana, mo¿e byæ NULL.
+ * secure - czy ma byæ zaszyfrowana.
  *
  * 0 je¶li siê uda³o, 1 je¶li b³±d.
  */
-int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const char *msg, const char *raw_msg)
+int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const char *msg, int secure)
 {
 	struct msg_queue m;
 
@@ -962,7 +994,7 @@ int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const 
 	m.uins = xmalloc(uin_count * sizeof(uin_t));
 	memmove(m.uins, uins, uin_count * sizeof(uin_t));
 	m.msg = xstrdup(msg);
-	m.raw_msg = xstrdup(raw_msg);
+	m.secure = secure;
 	m.time = time(NULL);
 
 	return (list_add(&msg_queue, &m, sizeof(m)) != NULL) ? 0 : 1;
@@ -987,7 +1019,6 @@ int msg_queue_remove(int msg_seq)
 		if (m->msg_seq == msg_seq) {
 			xfree(m->uins);
 			xfree(m->msg);
-			xfree(m->raw_msg);
 
 			list_remove(&msg_queue, m, 1);
 
@@ -1019,7 +1050,6 @@ int msg_queue_remove_uin(uin_t uin)
 		if (find_in_uins(m->uin_count, m->uins, uin)) {
 			xfree(m->uins);
 			xfree(m->msg);
-			xfree(m->raw_msg);
 
 			list_remove(&msg_queue, m, 1);
 			x = 1;
@@ -1043,7 +1073,6 @@ void msg_queue_destroy()
 
 		xfree(m->uins);
 		xfree(m->msg);
-		xfree(m->raw_msg);
 	}
 
 	list_destroy(msg_queue, 1);
@@ -1067,15 +1096,22 @@ int msg_queue_flush()
 
 	for (; l; l = l->next) {
 		struct msg_queue *m = l->data;
-		int new_msg_seq;
+		int new_seq;
+		char *tmp = xstrdup(m->msg);
 
-		if (m->uin_count == 1)
-			new_msg_seq = gg_send_message(sess, m->msg_class, *(m->uins), m->msg);
-		else
-			new_msg_seq = gg_send_message_confer(sess, m->msg_class, m->uin_count, m->uins, m->msg);
+		iso_to_cp(tmp);
 
-		if (new_msg_seq != -1)
-			m->msg_seq = new_msg_seq;
+		if (m->uin_count == 1) {
+			if (m->secure)
+				msg_encrypt(*(m->uins), &tmp);
+			new_seq = gg_send_message(sess, m->msg_class, *(m->uins), tmp);
+		} else
+			new_seq = gg_send_message_confer(sess, m->msg_class, m->uin_count, m->uins, tmp);
+
+		xfree(tmp);
+
+		if (new_seq != -1)
+			m->msg_seq = new_seq;
 		else
 			return 1;
 	}
@@ -1099,7 +1135,7 @@ int msg_queue_count()
  * zwraca liczbê wiadomo¶ci w kolejce dla danego
  * u¿ytkownika.
  *
- * - uin
+ * - uin.
  */
 int msg_queue_count_uin(uin_t uin)
 {

@@ -42,7 +42,7 @@
 #include "xmalloc.h"
 #include "ui.h"
 #ifdef HAVE_OPENSSL
-#include "sim.h"
+#  include "sim.h"
 #endif
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
