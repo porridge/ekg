@@ -1770,7 +1770,7 @@ void ekg_logoff(struct gg_session *sess, char *reason)
 char *get_random_reason(char *path)
 {
         int max = 0, embryo, item, fd, tmp = 0;
-        char buf[256], *ret;
+        char buf[256];
         FILE *f;
 
         if ((f = fopen(path, "r")) == NULL)
@@ -1788,9 +1788,9 @@ char *get_random_reason(char *path)
         else
                 embryo=(int)time(NULL);
 
-        srandom(embryo);
+        srand(embryo);
 
-        item = (random()%max) + 1;
+        item = (rand()%max) + 1;
 
         while (fgets(buf, sizeof(buf) - 1, f)) {
                 tmp++;
@@ -1798,9 +1798,7 @@ char *get_random_reason(char *path)
                         fclose(f);
                         if (buf[strlen(buf) - 1] == '\n')
                                 buf[strlen(buf) - 1] = '\0';
-                        ret = (char*)malloc(strlen(buf));
-                        strcpy(ret, buf);
-                        return ret;
+			return strdup(buf);
                 }
         }
 

@@ -13,9 +13,9 @@ klient:
 - uzupe³niæ dope³nienia (w tym nicki ze spacjami),
 - mo¿liwo¶æ zrobienia theme'u a'la irc,
 - kilka komend w aliasach,
-- parametry --check i/lub --get do sprawdzania czy jest nowa wersja,
 - osobny program ekgsearch, lub ekg --search,
 - dodaæ --more-- tam, gdzie siê da i ujednoliciæ.
+- wielolinijkowe komendy do historii.
 
 
 $Id$

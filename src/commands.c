@@ -1457,14 +1457,17 @@ COMMAND(command_quit)
 		    	tmp = strdup(config_quit_reason);
 	}
 	else
-	    	tmp = params[0];
+	    	tmp = strdup(params[0]);
 	
 	my_printf((tmp) ? "quit_descr" : "quit", tmp);
 
 	ekg_logoff(sess, tmp);
+	free(tmp);
+	
 	list_remove(&watches, sess, 0);
 	gg_free_session(sess);
 	sess = NULL;
+	
 	return -1;
 }
 

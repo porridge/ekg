@@ -46,9 +46,6 @@ function get_list {
  check_wget
  echo -n "¦ci±gam listê wersji EKG. Poczekaj chwilê. "
   wget -q -P $TMP $EKGWWW/download.php
- # to mozna zamienic na odczytywanie pliku ktory bylby automatycznie po
- # twojej stronie generowany, a w ktorym bylby tylko numer najnowszej 
- # werjsji
  LASTES="`grep ekg-20 $TMP/download.php | cut -d\  -f6 | \
   	   cut -d\\" -f2 | tail -1 | sed -e s/.tar.gz//`"
   rm -f $TMP/download.php*
@@ -59,8 +56,6 @@ function get_list {
 function check_new {
  get_list
  NEW=0
- # ten warunek jest wystraczalny, bo nie ma mozliwosci zeby pojawilas sie
- # jakas starsza wersja
   if [ "$LASTES" != "$LASTEKG" ]; then \
     echo -n "Jest nowsza wersja $LASTES. "
     NEW=1
