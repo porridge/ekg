@@ -1986,10 +1986,8 @@ COMMAND(cmd_msg)
 			return -1;
 		}
 
-		for (l = c->recipients; l; l = l->next) {
+		for (l = c->recipients; l; l = l->next)
 			array_add(&nicks, xstrdup(itoa(*((uin_t *) (l->data)))));
-			print("generic", itoa(*((uin_t *) (l->data))));
-		}
 		
 		add_send = xstrdup(c->name);
 	} else {
@@ -2187,12 +2185,6 @@ COMMAND(cmd_msg)
 			if ((uin = get_uin(*p)))
 				uins[realcount++] = uin;
 
-		{
-			int i;
-			for (i = 0; i < realcount; i++)
-				print("generic2", itoa(uins[i]));
-		}
-		
 		if (sess)
 			msg_seq = gg_send_message_confer_richtext(sess, GG_CLASS_CHAT, realcount, uins, msg, format, formatlen);
 		else
