@@ -175,6 +175,7 @@ int config_display_crap = 1;
 char *config_display_color_map = NULL;
 int config_windows_save = 0;
 char *config_windows_layout = NULL;
+char *config_profile = NULL;
 
 static struct {
 	int event;
@@ -278,21 +279,21 @@ const char *prepare_path(const char *filename, int do_mkdir)
 	if (do_mkdir) {
 		if (mkdir(config_dir, 0700) && errno != EEXIST)
 			return NULL;
-		if (config_user && *config_user) {
-			snprintf(path, sizeof(path), "%s/%s", config_dir, config_user);
+		if (config_profile) {
+			snprintf(path, sizeof(path), "%s/%s", config_dir, config_profile);
 			if (mkdir(path, 0700) && errno != EEXIST)
 				return NULL;
 		}
 	}
 	
 	if (!filename || !*filename) {
-		if (config_user && *config_user)
-			snprintf(path, sizeof(path), "%s/%s", config_dir, config_user);
+		if (config_profile)
+			snprintf(path, sizeof(path), "%s/%s", config_dir, config_profile);
 		else
 			snprintf(path, sizeof(path), "%s", config_dir);
 	} else {
-		if (config_user && *config_user)
-			snprintf(path, sizeof(path), "%s/%s/%s", config_dir, config_user, filename);
+		if (config_profile)
+			snprintf(path, sizeof(path), "%s/%s/%s", config_dir, config_profile, filename);
 		else
 			snprintf(path, sizeof(path), "%s/%s", config_dir, filename);
 	}

@@ -33,7 +33,7 @@ struct handler {
 void handle_event(struct gg_session *s);
 void handle_dcc(struct gg_dcc *s);
 void handle_msg(struct gg_event *e);
-void handle_voice();
+void handle_voice(struct gg_common *c);
 
 void handle_search(struct gg_http *s);
 void handle_pubdir(struct gg_http *s);

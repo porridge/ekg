@@ -1582,9 +1582,11 @@ void handle_dcc(struct gg_dcc *d)
  *
  * obs³uga danych przychodz±cych z urz±dzenia wej¶ciowego.
  *
+ *  - c - struktura opisuj±ca urz±dzenie wej¶ciowe.
+ *
  * brak.
  */
-void handle_voice()
+void handle_voice(struct gg_common *c)
 {
 #ifdef HAVE_VOIP
 	list_t l;

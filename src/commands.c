@@ -312,8 +312,8 @@ COMMAND(cmd_status)
 	int mqc;
 	char *tmp, *priv, *r1, *r2, buf[100];
 
-	if (config_user && strcmp(config_user, ""))
-		print("show_status_profile", config_user);
+	if (config_profile)
+		print("show_status_profile", config_profile);
 
 	if ((u = userlist_find(config_uin, NULL)) && u->display)
 		print("show_status_uin_nick", itoa(config_uin), u->display);

@@ -15,6 +15,7 @@ zg³osi³ b³±d.
 - libgadu: podbicie wersji API (w)
 - uporz±dkowanie kodu timerów, timeoutów itp. (w)
 - wyrzucenie zmiennych away i private_mode, bo tylko komplikowa³y sprawy (w)
+- ró¿ne porz±dki w kodzie (w)
 
 // 2002-01-08
 

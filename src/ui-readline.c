@@ -649,13 +649,13 @@ static const char *current_prompt()
         } else {
 		char *format_win = "readline_prompt_win", *format_nowin = "readline_prompt", *format_win_act = "readline_prompt_win_act";
 			
-		if (away == 1 || away == 3) {
+		if (GG_S_B(config_status)) {
 			format_win = "readline_prompt_away_win";
 			format_nowin = "readline_prompt_away";
 			format_win_act = "readline_prompt_away_win_act";
 		}
 
-		if (away == 2 || away == 5) {
+		if (GG_S_I(config_status)) {
 			format_win = "readline_prompt_invisible_win";
 			format_nowin = "readline_prompt_invisible";
 			format_win_act = "readline_prompt_invisible_win_act";

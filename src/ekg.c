@@ -73,8 +73,13 @@ static int mesg_startup;
 time_t last_action = 0;
 char *pipe_file = NULL;
 
+static void get_line_from_pipe(struct gg_exec *c);
+static void get_char_from_pipe(struct gg_common *c);
+
+extern FILE *gg_debug_file;
+
 /*
- * usuwanie sesji GG_SESSION_USERx.
+ * usuwanie sesji GG_SESSION_USERx. wystarczy zwolniæ.
  */
 static void reaper_user(void *foo)
 {
@@ -82,7 +87,7 @@ static void reaper_user(void *foo)
 }
 
 /*
- * usuwanie sesji GG_SESSION_USER3.
+ * usuwanie sesji GG_SESSION_USER3. trzeba wcze¶niej zwolniæ pola sesji.
  */
 static void reaper_user3(struct gg_exec *e)
 {
@@ -104,10 +109,6 @@ static void reaper_search(struct gg_http *s)
 	gg_search_free(s);
 }
 
-static void get_line_from_pipe(struct gg_exec *c);
-
-#define VV void(*)(void*)
-
 /*
  * struktura zawieraj±ca adresy funkcji obs³uguj±cych ró¿ne sesje
  * i zwalniaj±cych pamiêæ po nich.
@@ -117,29 +118,33 @@ static struct {
 	void (*handler)(void*);
 	void (*reaper)(void*);
 } handlers[] = {
-	{ GG_SESSION_GG, (VV) handle_event, (VV) gg_free_session },
-	{ GG_SESSION_DCC, (VV) handle_dcc, (VV) gg_dcc_free },
-	{ GG_SESSION_DCC_SOCKET, (VV) handle_dcc, (VV) gg_dcc_free },
-	{ GG_SESSION_DCC_SEND, (VV) handle_dcc, (VV) gg_dcc_free },
-	{ GG_SESSION_DCC_GET, (VV) handle_dcc, (VV) gg_dcc_free },
-	{ GG_SESSION_DCC_VOICE, (VV) handle_dcc, (VV) gg_dcc_free },
-	{ GG_SESSION_SEARCH, (VV) handle_search, (VV) reaper_search },
-	{ GG_SESSION_REGISTER, (VV) handle_pubdir, (VV) gg_register_free },
-	{ GG_SESSION_UNREGISTER, (VV) handle_pubdir, (VV) gg_pubdir_free },
-	{ GG_SESSION_PASSWD, (VV) handle_pubdir, (VV) gg_change_passwd_free },
-	{ GG_SESSION_REMIND, (VV) handle_pubdir, (VV) gg_remind_passwd_free },
-	{ GG_SESSION_CHANGE, (VV) handle_pubdir, (VV) gg_change_pubdir_free },
-	{ GG_SESSION_USERLIST_GET, (VV) handle_userlist, (VV) gg_userlist_get_free },
-	{ GG_SESSION_USERLIST_PUT, (VV) handle_userlist, (VV) gg_userlist_put_free },
-	{ GG_SESSION_USER0, NULL, (VV) reaper_user },
-	{ GG_SESSION_USER1, NULL, (VV) reaper_user },
-	{ GG_SESSION_USER2, (VV) handle_voice, (VV) reaper_user },
-	{ GG_SESSION_USER3, (VV) get_line_from_pipe, (VV) reaper_user3 },
-	{ GG_SESSION_USER4, (VV) get_line_from_pipe, (VV) reaper_user3 },
+
+#define EKG_HANDLER(x, y, z) { x, (void(*)(void*)) y, (void(*)(void*)) z },
+
+	EKG_HANDLER(GG_SESSION_GG, handle_event, gg_free_session)
+	EKG_HANDLER(GG_SESSION_DCC, handle_dcc, gg_dcc_free)
+	EKG_HANDLER(GG_SESSION_DCC_SOCKET, handle_dcc, gg_dcc_free)
+	EKG_HANDLER(GG_SESSION_DCC_SEND, handle_dcc, gg_dcc_free)
+	EKG_HANDLER(GG_SESSION_DCC_GET, handle_dcc, gg_dcc_free)
+	EKG_HANDLER(GG_SESSION_DCC_VOICE, handle_dcc, gg_dcc_free)
+	EKG_HANDLER(GG_SESSION_SEARCH, handle_search, reaper_search)
+	EKG_HANDLER(GG_SESSION_REGISTER, handle_pubdir, gg_register_free)
+	EKG_HANDLER(GG_SESSION_UNREGISTER, handle_pubdir, gg_pubdir_free)
+	EKG_HANDLER(GG_SESSION_PASSWD, handle_pubdir, gg_change_passwd_free)
+	EKG_HANDLER(GG_SESSION_REMIND, handle_pubdir, gg_remind_passwd_free)
+	EKG_HANDLER(GG_SESSION_CHANGE, handle_pubdir, gg_change_pubdir_free)
+	EKG_HANDLER(GG_SESSION_USERLIST_GET, handle_userlist, gg_userlist_get_free)
+	EKG_HANDLER(GG_SESSION_USERLIST_PUT, handle_userlist, gg_userlist_put_free)
+	EKG_HANDLER(GG_SESSION_USER0, NULL, reaper_user)
+	EKG_HANDLER(GG_SESSION_USER1, get_char_from_pipe, reaper_user)
+	EKG_HANDLER(GG_SESSION_USER2, handle_voice, reaper_user)
+	EKG_HANDLER(GG_SESSION_USER3, get_line_from_pipe, reaper_user3)
+	EKG_HANDLER(GG_SESSION_USER4, get_line_from_pipe, reaper_user3)
+
+#undef EKG_HANDLER
+
 	{ -1, NULL, NULL }, 
 };
-
-#define PIPE_MSG_MAX_BUF_LEN 1024
 
 /*
  * get_char_from_pipe()
@@ -151,7 +156,7 @@ static struct {
  */
 static void get_char_from_pipe(struct gg_common *c)
 {
-	static char buf[PIPE_MSG_MAX_BUF_LEN + 1];
+	static char buf[1024];
 	char ch;
   
 	if (!c)
@@ -159,12 +164,12 @@ static void get_char_from_pipe(struct gg_common *c)
 
 	if (read(c->fd, &ch, 1) > 0) {
 		if (ch != '\n' && ch != '\r') {
-			if (strlen(buf) < PIPE_MSG_MAX_BUF_LEN)
+			if (strlen(buf) < sizeof(buf) - 1)
 				buf[strlen(buf)] = ch;
 		}
-		if (ch == '\n' || (strlen(buf) >= PIPE_MSG_MAX_BUF_LEN)) {
+		if (ch == '\n' || (strlen(buf) >= sizeof(buf) - 1)) {
 			command_exec(NULL, buf);
-			memset(buf, 0, PIPE_MSG_MAX_BUF_LEN + 1);
+			memset(buf, 0, sizeof(buf));
 		}
 	}
 }
@@ -236,7 +241,8 @@ static void get_line_from_pipe(struct gg_exec *c)
  * ekg_wait_for_key()
  *
  * funkcja wywo³ywana przez interfejsy u¿ytkownika do przetwarzania danych
- * z sieci, gdy czeka siê na reakcjê u¿ytkownika.
+ * z sieci, gdy czeka siê na reakcjê u¿ytkownika. obs³uguje timery,
+ * timeouty i wszystko, co ma siê dziaæ w tle.
  */
 void ekg_wait_for_key()
 {
@@ -319,9 +325,8 @@ void ekg_wait_for_key()
 
 				case GG_SESSION_SEARCH:
 					print("search_timeout");
-					xfree(h->user_data);
 					list_remove(&watches, h, 0);
-					gg_free_search(h);
+					reaper_search(h);
 					break;
 
 				case GG_SESSION_REGISTER:
@@ -447,6 +452,7 @@ void ekg_wait_for_key()
 #endif
 
 		/* zerknij na wszystkie niezbêdne deskryptory */
+		
 		FD_ZERO(&rd);
 		FD_ZERO(&wd);
 
@@ -465,6 +471,7 @@ void ekg_wait_for_key()
 		}
 
 		/* domy¶lny timeout to 1s */
+		
 		tv.tv_sec = 1;
 		tv.tv_usec = 0;
 
@@ -503,84 +510,84 @@ void ekg_wait_for_key()
 		}
 
 		/* na wszelki wypadek sprawd¼ warto¶ci */
-
+		
 		if (tv.tv_sec < 0)
 			tv.tv_sec = 0;
 
 		if (tv.tv_usec < 0)
 			tv.tv_usec = 0;
 
+		/* sprawd¼, co siê dzieje */
+
 		ret = select(maxfd + 1, &rd, &wd, NULL, &tv);
 	
+		/* je¶li wyst±pi³ b³±d, daj znaæ */
+
 		if (ret == -1) {
 			if (errno != EINTR)
 				perror("select()");
 			continue;
 		}
 
+		/* nic siê nie sta³o? je¶li to tryb wsadowy i zrobili¶my,
+		 * co mieli¶my zrobiæ, wyjd¼. */
+		
 		if (!ret) {
 			if (batch_mode && !batch_line)
 				break;
-		} else {
-			for (l = watches; l; l = l->next) {
-				struct gg_common *c = l->data;
-				int i;
 
-				if (!c || (!FD_ISSET(c->fd, &rd) && !FD_ISSET(c->fd, &wd)))
-					continue;
+			continue;
+		}
 
-				if (c->type == GG_SESSION_USER0) {
-					if (config_auto_back == 2 && GG_S_B(config_status))
-						change_status(GG_STATUS_AVAIL, NULL, 1);
+		/* przejrzyj desktyptory */
+		for (l = watches; l; l = l->next) {
+			struct gg_common *c = l->data;
+			int i;
 
-					if (config_auto_back == 2)
-						unidle();
+			if (!c || (!FD_ISSET(c->fd, &rd) && !FD_ISSET(c->fd, &wd)))
+				continue;
 
-					return;
-				}
+			if (c->type == GG_SESSION_USER0) {
+				if (config_auto_back == 2 && GG_S_B(config_status))
+					change_status(GG_STATUS_AVAIL, NULL, 1);
 
-				if (c->type == GG_SESSION_USER1) {
-					get_char_from_pipe(c);
+				if (config_auto_back == 2)
+					unidle();
+
+				return;
+			}
+
+			for (i = 0; handlers[i].type != -1; i++)
+				if (c->type == handlers[i].type && handlers[i].handler) {
+					(handlers[i].handler)(c);
 					break;
 				}
 
-				if (c->type == GG_SESSION_USER2) {
-					handle_voice();
-					break;
-				}
-
-				for (i = 0; handlers[i].type != -1; i++)
-					if (c->type == handlers[i].type && handlers[i].handler) {
-						(handlers[i].handler)(c);
-						break;
-					}
-
-				if (handlers[i].type == -1) {
-					list_remove(&watches, c, 1);
-					break;
-				}
-				
+			if (handlers[i].type == -1) {
+				list_remove(&watches, c, 1);
 				break;
 			}
+			
+			break;
 		}
 	}
 	
 	return;
 }
 
-static void sigusr1_handler()
+static void handle_sigusr1()
 {
 	event_check(EVENT_SIGUSR1, 1, "SIGUSR1");
-	signal(SIGUSR1, sigusr1_handler);
+	signal(SIGUSR1, handle_sigusr1);
 }
 
-static void sigusr2_handler()
+static void handle_sigusr2()
 {
 	event_check(EVENT_SIGUSR2, 1, "SIGUSR2");
-	signal(SIGUSR1, sigusr2_handler);
+	signal(SIGUSR1, handle_sigusr2);
 }
 
-static void sighup_handler()
+static void handle_sighup()
 {
 	if (sess && sess->state != GG_STATE_IDLE) {
 		print("disconected");
@@ -591,16 +598,21 @@ static void sighup_handler()
 		sess = NULL;
 	}
 	
-	signal(SIGHUP, sighup_handler);
+	signal(SIGHUP, handle_sighup);
 }
 
-static void kill_ioctld()
+/*
+ * ioctld_kill()
+ *
+ * zajmuje siê usuniêciem ioctld z pamiêci.
+ */
+static void ioctld_kill()
 {
         if (ioctld_pid > 0 && ekg_pid == getpid())
                 kill(ioctld_pid, SIGINT);
 }
 
-static void sigsegv_handler()
+static void handle_sigsegv()
 {
 	signal(SIGSEGV, SIG_DFL);
 
@@ -608,25 +620,25 @@ static void sigsegv_handler()
 
 	ui_deinit();
 	
-	kill_ioctld();
+	ioctld_kill();
 	
-	fprintf(stderr, "\n\
-*** Naruszenie ochrony pamiêci ***\n\
-\n\
-Spróbujê zapisaæ ustawienia, ale nie obiecujê, ¿e cokolwiek z tego\n\
-wyjdzie. Trafi± one do plików %s/config.%d\n\
-oraz %s/userlist.%d\n\
-\n\
-Je¶li zostanie utworzony plik %s/core, spróbuj uruchomiæ\n\
-polecenie:\n\
-\n\
-    gdb %s %s/core\n\
-\n\
-zanotowaæ kilka ostatnich linii, a nastêpnie zanotowaæ wynik polecenia\n\
-,,bt''. Dziêki temu autorzy dowiedz± siê, w którym miejscu wyst±pi³ b³±d\n\
-i najprawdopodobniej pozwoli to unikn±æ tego typu sytuacji w przysz³o¶ci.\n\
-Wiêcej szczegó³ów w dokumentacji, w pliku ,,gdb.txt''.\n\
-\n",
+	fprintf(stderr, "\n"
+"*** Naruszenie ochrony pamiêci ***\n"
+"\n"
+"Spróbujê zapisaæ ustawienia, ale nie obiecujê, ¿e cokolwiek z tego\n"
+"wyjdzie. Trafi± one do plików %s/config.%d\n"
+"oraz %s/userlist.%d\n"
+"\n"
+"Je¶li zostanie utworzony plik %s/core, spróbuj uruchomiæ\n"
+"polecenie:\n"
+"\n"
+"    gdb %s %s/core\n"
+"\n"
+"zanotowaæ kilka ostatnich linii, a nastêpnie zanotowaæ wynik polecenia\n"
+",,bt''. Dziêki temu autorzy dowiedz± siê, w którym miejscu wyst±pi³ b³±d\n"
+"i najprawdopodobniej pozwoli to unikn±æ tego typu sytuacji w przysz³o¶ci.\n"
+"Wiêcej szczegó³ów w dokumentacji, w pliku ,,gdb.txt''.\n"
+"\n",
 config_dir, getpid(), config_dir, getpid(), config_dir, argv0, config_dir);
 
 	config_write_crash();
@@ -649,26 +661,29 @@ config_dir, getpid(), config_dir, getpid(), config_dir, argv0, config_dir);
  */
 static char *prepare_batch_line(int argc, char *argv[], int n)
 {
+	size_t len = 0;
+	char *buf;
 	int i;
-	size_t m = 0;
-	char *bl;
 
 	for (i = n; i < argc; i++)
-		m += strlen(argv[i]) + 1;
+		len += strlen(argv[i]) + 1;
 
-	bl = xmalloc(m);
+	buf = xmalloc(len);
 
 	for (i = n; i < argc; i++) {
-		strcat(bl, argv[i]);
+		strcat(buf, argv[i]);
 		if (i < argc - 1)
-			strcat(bl, " ");
+			strcat(buf, " ");
 	}
 
-	return bl;
+	return buf;
 }
 
-extern FILE *gg_debug_file;
-
+/*
+ * setup_debug()
+ *
+ * ustawia wszystko, co niezbêdne do debugowania.
+ */
 static void setup_debug()
 {
 	struct gg_exec se;
@@ -702,6 +717,8 @@ static void setup_debug()
  * ekg_ui_set()
  *
  * w³±cza interfejs o podanej nazwie.
+ *
+ * 0/-1
  */
 static int ekg_ui_set(const char *name)
 {
@@ -726,11 +743,6 @@ static int ekg_ui_set(const char *name)
 		return -1;
 
 	return 0;
-}
-
-void ui_dummy_print(const char *target, int separate, const char *line)
-{
-
 }
 
 int main(int argc, char **argv)
@@ -800,14 +812,12 @@ int main(int argc, char **argv)
 	else
 		config_dir = saprintf("%s/.gg", home_dir);
 
-	signal(SIGSEGV, sigsegv_handler);
-	signal(SIGHUP, sighup_handler);
-	signal(SIGUSR1, sigusr1_handler);
-	signal(SIGUSR2, sigusr2_handler);
+	signal(SIGSEGV, handle_sigsegv);
+	signal(SIGHUP, handle_sighup);
+	signal(SIGUSR1, handle_sigusr1);
+	signal(SIGUSR2, handle_sigusr2);
 	signal(SIGALRM, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
-
-	config_user = "";
 
 	while ((c = getopt_long(argc, argv, "b::a::i::pdnc:f:hI:ot:u:vN", ekg_options, NULL)) != -1) {
 		switch (c) {
@@ -868,7 +878,7 @@ int main(int argc, char **argv)
 				return 0;
 				break;
 			case 'u':
-				config_user = optarg;
+				config_profile = optarg;
 				break;
 			case 'c':
 				pipe_file = optarg;
@@ -963,7 +973,7 @@ int main(int argc, char **argv)
 	
 		ioctld_socket(sock_path);
 	
-		atexit(kill_ioctld);
+		atexit(ioctld_kill);
 	}
 #endif /* WITH_IOCTLD */
 
@@ -987,6 +997,7 @@ int main(int argc, char **argv)
 		config_debug = 1;
 	}
 	
+	/* je¶li ma byæ theme, niech bêdzie theme */
 	if (load_theme)
 		theme_read(load_theme, 1);
 	else
@@ -1029,12 +1040,8 @@ int main(int argc, char **argv)
 
 	ui_event("config_changed");
 
-	if (!config_log_path) {
-		if (config_user != "")
-			config_log_path = saprintf("%s/%s/history", config_dir, config_user);
-		else
-			config_log_path = saprintf("%s/history", config_dir);
-	}
+	if (!config_log_path) 
+		config_log_path = xstrdup(prepare_path("history", 0));
 
 #ifdef HAVE_OPENSSL
 	SIM_KC_Init();
@@ -1063,6 +1070,12 @@ int main(int argc, char **argv)
 	return 0;
 }
 
+/*
+ * ekg_exit()
+ *
+ * wychodzi z klienta sprz±taj±c przy okazji wszystkie sesje, zwalniaj±c
+ * pamiêæ i czyszcz±c pokój.
+ */
 void ekg_exit()
 {
 	char **vars = NULL;

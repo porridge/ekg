@@ -30,6 +30,7 @@
 void ekg_oom_handler()
 {
 	fprintf(stderr,
+"\n"
 "*** Brak pamiêci ***\n"
 "\n"
 "Próbujê zapisaæ ustawienia do pliku %s/config.%d i listê kontaktów\n"
@@ -59,6 +60,9 @@ void *xmalloc(int size)
 
 	if (!tmp)
 		ekg_oom_handler();
+
+	/* na wszelki wypadek wyczy¶æ bufor */
+	memset(tmp, 0, size);
 	
 	return tmp;
 }

@@ -21,6 +21,7 @@
 #define __XMALLOC_H
 
 #define xnew(t) (xcalloc(1, sizeof(t)))
+#define xnew_t(t) (xcalloc(1, sizeof(*t)))
 
 void ekg_oom_handler();
 

@@ -153,7 +153,7 @@ list_t sms_away;
 struct gg_session *sess;
 
 time_t last_save;
-char *config_user;
+char *config_profile;
 int config_changed;
 
 char *config_audio_device;
