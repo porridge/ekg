@@ -188,8 +188,9 @@ dnl <ekg>
   # na SunOSach nie ma scandir()
   AC_CHECK_FUNCS(scandir, , [OBJS="$OBJS ../compat/scandir.o"])
 
-  # utimes do sprawdzania poczty
+  # utimes/utime do sprawdzania poczty
   AC_CHECK_FUNCS(utimes)
+  AC_CHECK_FUNCS(utime)
 
   # sprawdzamy, czy system ma getopt_long
   AC_CHECK_FUNC(getopt_long, , [OBJS="$OBJS ../compat/getopt.o ../compat/getopt1.o"; CFLAGS="-I../compat $CFLAGS"])

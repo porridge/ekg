@@ -24,6 +24,11 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#ifndef HAVE_UTIMES
+#   ifdef HAVE_UTIME
+#      include <utime.h>
+#   endif
+#endif
 #include <sys/time.h>
 #include <pwd.h>
 #include <dirent.h>
@@ -225,8 +230,16 @@ int check_mail_mbox()
 				foo[0].tv_sec = st.st_atime;
 				foo[1].tv_sec = st.st_mtime;
 
-				/* przecie¿ my nic nie ruszali¶my ;> */			
-				utimes(m->fname, (const struct timeval *) &foo);
+				utimes(m->fname, foo);
+			}
+#elif defined (HAVE_UTIME)
+			{
+				struct utimbuf foo;
+
+				foo.actime = st.st_atime;
+				foo.modtime = st.st_mtime;
+
+				utime(m->fname, &foo);
 			}
 #endif
 
