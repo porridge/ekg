@@ -296,8 +296,9 @@ int main(int argc, char **argv)
 	int auto_connect = 1, force_debug = 0, i, new_status = 0 ;
 	char *home = getenv("HOME"), *load_theme = NULL, *ioctl_daemon_path = IOCTL_DAEMON_PATH;
 #ifdef IOCTL
-    	char *sock_path = NULL, 
+    	char *sock_path = NULL;
 #endif // IOCTL
+
 	struct passwd *pw; 
 	struct gg_common si;
 	
