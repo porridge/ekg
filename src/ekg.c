@@ -140,7 +140,6 @@ static struct {
 	EKG_HANDLER(GG_SESSION_UNREGISTER, handle_pubdir, gg_pubdir_free)
 	EKG_HANDLER(GG_SESSION_PASSWD, handle_pubdir, gg_change_passwd_free)
 	EKG_HANDLER(GG_SESSION_REMIND, handle_pubdir, gg_remind_passwd_free)
-	EKG_HANDLER(GG_SESSION_CHANGE, handle_pubdir, gg_change_pubdir_free)
 	EKG_HANDLER(GG_SESSION_USERLIST_GET, handle_userlist, gg_userlist_get_free)
 	EKG_HANDLER(GG_SESSION_USERLIST_PUT, handle_userlist, gg_userlist_put_free)
 	EKG_HANDLER(GG_SESSION_USER0, NULL, reaper_user)		/* stdin */
@@ -434,12 +433,6 @@ void ekg_wait_for_key()
 					gg_free_pubdir(h);
 					break;
 
-				case GG_SESSION_CHANGE:
-					print("change_timeout");
-					list_remove(&watches, h, 0);
-					gg_free_pubdir(h);
-					break;
-					
 				case GG_SESSION_DCC:
 				case GG_SESSION_DCC_GET:
 				case GG_SESSION_DCC_SEND:

@@ -39,6 +39,7 @@ struct command {
 };
 
 list_t commands;
+int change_quiet;
 
 int command_add(const char *name, const char *params, command_func_t function, int alias, const char *params_help, const char *brief_help, const char *long_help);
 int command_remove(const char *name);

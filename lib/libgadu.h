@@ -613,10 +613,15 @@ void gg_pubdir_free(struct gg_http *f);
 
 /* rejestracja nowego numerka */
 struct gg_http *gg_register(const char *email, const char *password, int async);
-struct gg_http *gg_unregister(uin_t uin, const char *password, const char *email, int async);
+struct gg_http *gg_register2(const char *email, const char *password, const char *qa, int async);
 #define gg_register_watch_fd gg_pubdir_watch_fd
 #define gg_register_free gg_pubdir_free
 #define gg_free_register gg_pubdir_free
+
+struct gg_http *gg_unregister(uin_t uin, const char *password, const char *email, int async);
+struct gg_http *gg_unregister2(uin_t uin, const char *password, const char *qa, int async);
+#define gg_unregister_watch_fd gg_pubdir_watch_fd
+#define gg_unregister_free gg_pubdir_free
 
 /* przypomnienie has³a e-mailem */
 struct gg_http *gg_remind_passwd(uin_t uin, int async);
@@ -627,6 +632,7 @@ struct gg_http *gg_remind_passwd(uin_t uin, int async);
 /* zmiana has³a */
 struct gg_http *gg_change_passwd(uin_t uin, const char *passwd, const char *newpasswd, const char *newemail, int async);
 struct gg_http *gg_change_passwd2(uin_t uin, const char *passwd, const char *newpasswd, const char *email, const char *newemail, int async);
+struct gg_http *gg_change_passwd3(uin_t uin, const char *passwd, const char *newpasswd, const char *qa, int async);
 #define gg_change_passwd_free gg_pubdir_free
 #define gg_free_change_passwd gg_pubdir_free
 
@@ -798,8 +804,8 @@ char *gg_base64_decode(const char *buf);
 #define GG_HTTPS_PORT 443
 #define GG_HTTP_USERAGENT "Mozilla/4.7 [en] (Win98; I)"
 
-#define GG_DEFAULT_CLIENT_VERSION "4.9.3.62"
-#define GG_DEFAULT_PROTOCOL_VERSION 0x18
+#define GG_DEFAULT_CLIENT_VERSION "5, 0, 5, 107"
+#define GG_DEFAULT_PROTOCOL_VERSION 0x1b
 #define GG_DEFAULT_TIMEOUT 30
 #define GG_HAS_AUDIO_MASK 0x40000000
 #define GG_LIBGADU_VERSION "CVS"

@@ -75,6 +75,7 @@ COMMAND(cmd_modify);
 char *send_nicks[SEND_NICKS_MAX] = { NULL };
 int send_nicks_count = 0, send_nicks_index = 0;
 int quit_command = 0;
+int change_quiet = 0;
 
 list_t commands = NULL;
 
@@ -958,99 +959,91 @@ search:
 
 COMMAND(cmd_change)
 {
-	struct gg_change_info_request *r;
-	struct gg_http *h;
-	char **argv = NULL;
 	int i, match = 0;
+	gg_pubdir50_t req;
+
+	if (!sess || sess->state != GG_STATE_CONNECTED) {
+		printq("not_connected");
+		return -1;
+	}
 
 	if (!params[0]) {
 		printq("not_enough_params", name);
 		return -1;
 	}
 
-	argv = array_make(params[0], " \t", 0, 1, 1);
+	if (!(req = gg_pubdir50_new(GG_PUBDIR50_WRITE)))
+		return -1;
 
-	r = xcalloc(1, sizeof(*r));
-	
-	for (i = 0; argv[i]; i++) {
+	if (strcmp(params[0], "-")) {
+		char **argv = array_make(params[0], " \t", 0, 1, 1);
 		
-		if (match_arg(argv[i], 'f', "first", 2) && argv[i + 1]) {
-			xfree(r->first_name);
-			r->first_name = xstrdup(argv[++i]);
-			match = 1;
-		}
+		for (i = 0; argv[i]; i++)
+			iso_to_cp(argv[i]);
+
+		for (i = 0; argv[i]; i++) {
+			if (match_arg(argv[i], 'f', "first", 2) && argv[i + 1]) {
+				gg_pubdir50_add(req, GG_PUBDIR50_FIRSTNAME, argv[++i]);
+				match = 1;
+			}
+
+			if (match_arg(argv[i], 'N', "familyname", 7) && argv[i + 1]) {
+				gg_pubdir50_add(req, GG_PUBDIR50_FAMILYNAME, argv[++i]);
+				match = 1;
+			}
 		
-		if (match_arg(argv[i], 'l', "last", 2) && argv[i + 1]) {
-			xfree(r->last_name);
-			r->last_name = xstrdup(argv[++i]);
-			match = 1;
-		}
+			if (match_arg(argv[i], 'l', "last", 2) && argv[i + 1]) {
+				gg_pubdir50_add(req, GG_PUBDIR50_LASTNAME, argv[++i]);
+				match = 1;
+			}
 		
-		if (match_arg(argv[i], 'n', "nickname", 2) && argv[i + 1]) {
-			xfree(r->nickname);
-			r->nickname = xstrdup(argv[++i]);
-			match = 1;
-		}
-		
-		if (match_arg(argv[i], 'e', "email", 2) && argv[i + 1]) {
-			xfree(r->email);
-			r->email = xstrdup(argv[++i]);
-			match = 1;
+			if (match_arg(argv[i], 'n', "nickname", 2) && argv[i + 1]) {
+				gg_pubdir50_add(req, GG_PUBDIR50_NICKNAME, argv[++i]);
+				match = 1;
+			}
+			
+			if (match_arg(argv[i], 'c', "city", 2) && argv[i + 1]) {
+				gg_pubdir50_add(req, GG_PUBDIR50_CITY, argv[++i]);
+				match = 1;
+			}
+			
+			if (match_arg(argv[i], 'C', "familycity", 7) && argv[i + 1]) {
+				gg_pubdir50_add(req, GG_PUBDIR50_FAMILYCITY, argv[++i]);
+				match = 1;
+			}
+			
+			if (match_arg(argv[i], 'b', "born", 2) && argv[i + 1]) {
+				gg_pubdir50_add(req, GG_PUBDIR50_BIRTHYEAR, argv[++i]);
+				match = 1;
+			}
+			
+			if (match_arg(argv[i], 'F', "female", 2)) {
+				gg_pubdir50_add(req, GG_PUBDIR50_GENDER, GG_PUBDIR50_GENDER_FEMALE);
+				match = 1;
+			}
+
+			if (match_arg(argv[i], 'M', "male", 2)) {
+				gg_pubdir50_add(req, GG_PUBDIR50_GENDER, GG_PUBDIR50_GENDER_MALE);
+				match = 1;
+			}
 		}
 
-		if (match_arg(argv[i], 'c', "city", 2) && argv[i + 1]) {
-			xfree(r->city);
-			r->city = xstrdup(argv[++i]);
-			match = 1;
-		}
-		
-		if (match_arg(argv[i], 'b', "born", 2) && argv[i + 1]) {
-			r->born = atoi(argv[++i]);
-			match = 1;
-		}
-		
-		if (match_arg(argv[i], 'F', "female", 2)) {
-			r->gender = GG_GENDER_FEMALE;
-			match = 1;
+		if (!match) {
+			printq("invalid_params", name);
+			return -1;
 		}
 
-		if (match_arg(argv[i], 'M', "male", 2)) {
-			r->gender = GG_GENDER_MALE;
-			match = 1;
-		}
+		array_free(argv);
 	}
 
-	if (!match && strcmp(params[0], "-")) {
-		printq("invalid_params", name);
+	if (!gg_pubdir50(sess, req)) {
+		printq("change_failed", "");
+		gg_pubdir50_free(req);
 		return -1;
 	}
 
-	if (!r->first_name)
-		r->first_name = xstrdup("");
-
-	if (!r->last_name)
-		r->last_name = xstrdup("");
-
-	if (!r->nickname)
-		r->nickname = xstrdup("");
-
-	if (!r->email)
-		r->email = xstrdup("");
-
-	if (!r->city)
-		r->city = xstrdup("");
-
-	iso_to_cp(r->first_name);
-	iso_to_cp(r->last_name);
-	iso_to_cp(r->nickname);
-	iso_to_cp(r->email);
-	iso_to_cp(r->city);
-
-	if ((h = gg_change_info(config_uin, config_password, r, 1)))
-		list_add(&watches, h, 0);
-
-	gg_change_info_request_free(r);
-	array_free(argv);
+	gg_pubdir50_free(req);
+	change_quiet = quiet;
 
 	return 0;
 }
@@ -3115,7 +3108,6 @@ COMMAND(cmd_test_watches)
 			case GG_SESSION_REGISTER: type = "REGISTER"; break;
 			case GG_SESSION_UNREGISTER: type = "UNREGISTER"; break;
 			case GG_SESSION_REMIND: type = "REMIND"; break;
-			case GG_SESSION_CHANGE: type = "CHANGE"; break;
 			case GG_SESSION_PASSWD: type = "PASSWD"; break;
 			case GG_SESSION_DCC: type = "DCC"; break;
 			case GG_SESSION_DCC_SOCKET: type = "DCC_SOCKET"; break;
@@ -3318,7 +3310,7 @@ COMMAND(cmd_register)
 		passwd = xstrdup(params[1]);
 		iso_to_cp(passwd);
 	
-		if (!(h = gg_register(params[0], passwd, 1))) {
+		if (!(h = gg_register2(params[0], passwd, "", 1))) {
 			xfree(passwd);
 			printq("register_failed", strerror(errno));
 			return -1;
@@ -3330,22 +3322,20 @@ COMMAND(cmd_register)
 		reg_email = xstrdup(params[0]);
 	} else {
 		uin_t uin = 0;
-		const char *pwd = NULL;
 		
-		if (!params[0] || (!params[1] && !config_password) || (!params[2] && !config_uin)) {
+		if (!params[0] || !params[1]) {
 			printq("not_enough_params", name);
 			return -1;
 		} 
 		
-		pwd = (params[1] ? params[1] : config_password);
-		uin = ((params[1] && params[2]) ? get_uin(params[2]) : config_uin);
+		uin = get_uin(params[0]);
 
 		if (uin <= 0) {
 			printq("unregister_bad_uin", uin);
 			return -1;
 		}
 
-		if (!(h = gg_unregister(uin, pwd, params[0], 1))) {
+		if (!(h = gg_unregister2(uin, params[1], "", 1))) {
 			printq("unregister_failed", strerror(errno));
 			return -1;
 		}
@@ -3381,7 +3371,7 @@ COMMAND(cmd_passwd)
 	struct gg_http *h;
 	char *oldpasswd, *newpasswd;
 	
-	if (!params[0] || (!params[1] && !config_email)) {
+	if (!params[0]) {
 		printq("not_enough_params", name);
 		return -1;
 	}
@@ -3392,7 +3382,7 @@ COMMAND(cmd_passwd)
 	newpasswd = xstrdup(params[0]);
 	iso_to_cp(newpasswd);
 
-	if (!(h = gg_change_passwd2(config_uin, (oldpasswd) ? oldpasswd : "", newpasswd, (config_email) ? config_email : "", (params[1]) ? params[1] : config_email, 1))) {
+	if (!(h = gg_change_passwd3(config_uin, (oldpasswd) ? oldpasswd : "", newpasswd, "", 1))) {
 		xfree(newpasswd);
 		xfree(oldpasswd);
 		printq("passwd_failed", strerror(errno));
@@ -3402,7 +3392,6 @@ COMMAND(cmd_passwd)
 	list_add(&watches, h, 0);
 
 	reg_password = newpasswd;
-	reg_email = xstrdup((params[1]) ? params[1] : config_email);
 
 	return 0;
 }
@@ -5105,9 +5094,10 @@ void command_init()
 	  "  -f, --first <imiê>\n"
           "  -l, --last <nazwisko>\n"
 	  "  -n, --nick <pseudonim>\n"
-	  "  -e, --email <adres>\n"
 	  "  -b, --born <rok urodzenia>\n"
 	  "  -c, --city <miasto>\n"
+	  "  -N, --familyname <nazwisko>  nazwisko panieñskie\n"
+	  "  -C, --familycity <miasto>    miasto rodzinne\n"
 	  "  -F, --female                 kobieta\n"
 	  "  -M, --male                   mê¿czyzna\n"
 	  "\n"
@@ -5355,11 +5345,9 @@ void command_init()
 	 
 	command_add
 	( "passwd", "??", cmd_passwd, 0,
-	  " <has³o> [e-mail]", "zmienia has³o i adres e-mail u¿ytkownika",
+	  " <has³o>", "zmienia has³o u¿ytkownika",
 	  "\n"
-	  "Do zmiany has³a niezbêdne jest ustawienie prawid³owego (podanego "
-	  "podczas rejestracji lub pó¼niej zmienionego) adresu e-mail w "
-	  "zmiennej %Temail%n. Bez tego zmiana has³a siê nie powiedzie.");
+	  "Zmiana has³a nie wymaga ju¿ ustawienia zmiennej %Temail%n.");
 
 	command_add
 	( "play", "f", cmd_play, 0,
@@ -5461,8 +5449,10 @@ void command_init()
 
 	command_add
 	( "unregister", "???", cmd_register, 0,
-	  " <email> [<has³o> [<uin/nick>]]", "usuwa konto z serwera",
-	  "");
+	  " <uin/alias> <has³o>", "usuwa konto z serwera",
+	  "Podanie numeru i has³a jest niezbêdne ze wzglêdów bezpieczeñstwa. "
+	  "Nikt nie chcia³by chyba usun±æ konta przypadkowo, bez ¿adnego "
+	  "potwierdzenia.");
 
 	command_add
 	( "conference", "??u", cmd_conference, 0,

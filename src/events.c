@@ -55,7 +55,8 @@
 #include "xmalloc.h"
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
-	handle_success(), handle_failure(), handle_search50();
+	handle_success(), handle_failure(), handle_search50(),
+	handle_change50();
 
 static int hide_notavail = 0;	/* czy ma ukrywaæ niedostêpnych -- tylko zaraz po po³±czeniu */
 
@@ -69,6 +70,7 @@ static struct handler handlers[] = {
 	{ GG_EVENT_CONN_FAILED, handle_failure },
 	{ GG_EVENT_DISCONNECT, handle_disconnect },
 	{ GG_EVENT_PUBDIR50_SEARCH_REPLY, handle_search50 },
+	{ GG_EVENT_PUBDIR50_WRITE, handle_change50 },
 	{ 0, NULL }
 };
 
@@ -1110,10 +1112,6 @@ void handle_pubdir(struct gg_http *h)
 			good = "remind";
 			bad = "remind_failed";
 			break;
-		case GG_SESSION_CHANGE:
-			good = "change";
-			bad = "change_failed";
-			break;
 	}
 
 	if (gg_pubdir_watch_fd(h) || h->state == GG_STATE_ERROR) {
@@ -1701,4 +1699,17 @@ void handle_search50(struct gg_event *e)
 
 		break;
 	}
+}
+
+/*
+ * handle_change50()
+ *
+ * zajmuje siê obs³ug± zmiany danych w katalogu publicznym.
+ *
+ *  - e - opis zdarzenia
+ */
+void handle_change50(struct gg_event *e)
+{
+	if (!change_quiet)
+		print("change");
 }
