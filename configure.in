@@ -91,14 +91,17 @@ AC_CHECK_LIB(nsl, t_accept, LIBS="$LIBS -lnsl")
 AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
 
 AC_SUBST(do_ioctl)
+AC_SUBST(dioctl)
 
 AC_ARG_WITH(ioctl, 
   [  --without-ioctl  	  Compile without ioctl deamon [linux specific]])
 
 if test "x$with_ioctl" = "xno"; then 
   do_ioctl=""
+  dioctl=""
 else
-  do_ioctl="ioctl_daemon" 
+  do_ioctl="ioctl_daemon"
+  dioctl=" -DIOCTL "  
 fi
 
 

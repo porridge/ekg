@@ -1524,13 +1524,17 @@ int run_event(char *act)
         else
                 cmd = action;
 
+#ifdef IOCTL
         if (!strncasecmp(cmd, "blink_leds", 4))
                 return send_event(strdup(arg), ACT_BLINK_LEDS);
 
         else if(!strncasecmp(cmd, "beeps_spk", 4))
                 return send_event(strdup(arg), ACT_BEEPS_SPK);
 
-        else if(!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
+        else 
+#endif	//IOCTL
+ 	
+	if(!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
                 struct userlist *u;
                 char sender[50];
 

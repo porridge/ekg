@@ -14,8 +14,9 @@ MAKE = @MAKE@
 AR = @AR@
 install = @INSTALL@
 do_ioctl = @do_ioctl@
+DIOCTL = @dioctl@
 
-CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -DTHEMES_DIR=\"$(datadir)/ekg/themes\" -DIOCTL_DAEMON_PATH=\"$(prefix)/bin/ioctl_daemon\"
+CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -DTHEMES_DIR=\"$(datadir)/ekg/themes\" -DIOCTL_DAEMON_PATH=\"$(prefix)/bin/ioctl_daemon\" $(DIOCTL)
 OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o
 LOBJS = ../lib/libgadu.a
 

@@ -312,7 +312,9 @@ int main(int argc, char **argv)
 "  -i, --invisible      po po³±czeniu zmienia stan na ,,niewidoczny''\n"
 "  -p, --private        po po³±czeniu zmienia stan na ,,tylko dla przyjació³''\n"
 "  -d, --debug          w³±cza wy¶wietlanie dodatkowych informacji\n"
+#ifdef IOCTL
 "  -I, --ioctl-daemon-path [¦CIE¯KA]    ustawia ¶cie¿kê do ioctl_daemon-a\n"
+#endif // IOCTL
 "\n", argv[0]);
 			return 0;	
 		}
@@ -356,6 +358,7 @@ int main(int argc, char **argv)
 	read_config(NULL);
 	read_sysmsg(NULL);
 
+#ifdef IOCTL
         sock_path = prepare_path(".socket");
 
         if(!(ioctl_daemon_pid = fork()))
@@ -364,6 +367,7 @@ int main(int argc, char **argv)
         init_socket(sock_path);
 
         atexit(kill_ioctl_daemon);
+#endif // IOCTL
 
 	/* okre¶lanie stanu klienta po w³±czeniu */
 	if (new_status)

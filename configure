@@ -2975,6 +2975,7 @@ fi
 
 
 
+
 # Check whether --with-ioctl or --without-ioctl was given.
 if test "${with_ioctl+set}" = set; then
   withval="$with_ioctl"
@@ -2984,8 +2985,10 @@ fi
 
 if test "x$with_ioctl" = "xno"; then 
   do_ioctl=""
+  dioctl=""
 else
-  do_ioctl="ioctl_daemon" 
+  do_ioctl="ioctl_daemon"
+  dioctl=" -DIOCTL "  
 fi
 
 
@@ -3150,6 +3153,7 @@ s%@GMAKE@%$GMAKE%g
 s%@MAKE@%$MAKE%g
 s%@AR@%$AR%g
 s%@do_ioctl@%$do_ioctl%g
+s%@dioctl@%$dioctl%g
 
 CEOF
 EOF
