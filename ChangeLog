@@ -11,6 +11,9 @@ zg³osi³ b³±d.
 - pozbycie siê kosmicznych warningów (sz)
 - bardziej zrozumia³e zachowanie przy make_window = 1 (sz)
 - poprawka segfault'a przy /list -G (sz)
+- /list <user> poka¿e te¿, ¿e kto¶ jest za firewall'em lub nie ma nas
+  w kontaktach. trochê zbêdne, bo mo¿na ten fakt stwierdziæ i bez
+  tego... (spaceman/sz)
 
 // 2003-02-23
 
@@ -311,7 +314,7 @@ zg³osi³ b³±d.
 - drobna reorganizacja kolorów w ui-ncurses (w)
 - zmienna ,,display_color = 2'' wy¶wietla kolory wszêdzie oprócz pasku
   stanu i nag³ówka okna (Charvel/w)
-- nowy rodzaj okna ,,w->doodle = 1'' przeznaczony dla skryptów pythonowy.
+- nowy rodzaj okna ,,w->doodle = 1'' przeznaczony dla skryptów pythonowych.
   mog± rysowaæ po nim co tylko chc±, gdzie tylko chc± i jak tylko chc±.
   wszystko dziêki funkcjom ekg.window_printat() i ekg.window_commit().
   nie ma przewijania, nie ma bajerów. po dodaniu kilku mi³ych funkcji do

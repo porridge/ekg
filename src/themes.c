@@ -870,8 +870,8 @@ void theme_init()
 
 	/* add, del */
 	format_add("user_added", "%> Dopisano %T%1%n do listy kontaktów\n", 1);
-	format_add("user_deleted", "%> Usuniêto %T%1%n z listy kontaktów\n", 1);
-	format_add("user_cleared_list", "%> Wyczyszczono listê kontaktów\n", 1);
+	format_add("user_deleted", "%) Usuniêto %T%1%n z listy kontaktów\n", 1);
+	format_add("user_cleared_list", "%) Wyczyszczono listê kontaktów\n", 1);
 	format_add("user_exists", "%! %T%1%n ju¿ istnieje w li¶cie kontaktów\n", 1);
 	format_add("user_exists_other", "%! %T%1%n ju¿ istnieje w li¶cie kontaktów jako %2\n", 1);
 
@@ -903,15 +903,15 @@ void theme_init()
 
 	/* ignore, unignore, block, unblock */
 	format_add("ignored_added", "%> Dodano %T%1%n do listy ignorowanych\n", 1);
-	format_add("ignored_deleted", "%> Usuniêto %1 z listy ignorowanych\n", 1);
-	format_add("ignored_deleted_all", "%> Usuniêto wszystkich z listy ignorowanych\n", 1);
+	format_add("ignored_deleted", "%) Usuniêto %1 z listy ignorowanych\n", 1);
+	format_add("ignored_deleted_all", "%) Usuniêto wszystkich z listy ignorowanych\n", 1);
 	format_add("ignored_exist", "%! %1 jest ju¿ ignorowany\n", 1);
 	format_add("ignored_list", "%> %1 %2\n", 1);
 	format_add("ignored_list_empty", "%! Lista ignorowanych u¿ytkowników jest pusta\n", 1);
 	format_add("error_not_ignored", "%! %1 nie jest na li¶cie ignorowanych\n", 1);
 	format_add("blocked_added", "%> Dodano %T%1%n do listy blokowanych\n", 1);
-	format_add("blocked_deleted", "%> Usuniêto %1 z listy blokowanych\n", 1);
-	format_add("blocked_deleted_all", "%> Usuniêto wszystkich z listy blokowanych\n", 1);
+	format_add("blocked_deleted", "%) Usuniêto %1 z listy blokowanych\n", 1);
+	format_add("blocked_deleted_all", "%) Usuniêto wszystkich z listy blokowanych\n", 1);
 	format_add("blocked_list", "%> %1\n", 1);
 	format_add("blocked_list_empty", "%! Lista blokowanych u¿ytkowników jest pusta\n", 1);
 	format_add("error_not_blocked", "%! %1 nie jest na li¶cie blokowanych\n", 1);
@@ -1153,6 +1153,8 @@ void theme_init()
 	format_add("user_info_status", "%K| %nStan: %T%1%n\n", 1);
 	format_add("user_info_block", "%K| %nBlokowan%@1\n", 1);
 	format_add("user_info_offline", "%K| %nNie widzi stanu\n", 1);
+	format_add("user_info_not_in_contacts", "%K| %nNie ma nas w swoich kontaktach\n", 1);
+	format_add("user_info_firewalled", "%K| %nZnajduje siê za firewall/NAT\n", 1);
 	format_add("user_info_ip", "%K| %nAdres: %T%1%n\n", 1);
 	format_add("user_info_mobile", "%K| %nTelefon: %T%1%n\n", 1);
 	format_add("user_info_groups", "%K| %nGrupy: %T%1%n\n", 1);
@@ -1265,15 +1267,15 @@ void theme_init()
 	format_add("events_seq_incorrect", "%! Nieprawid³owa sekwencja\n", 1);
 
 	/* lista kontaktów z serwera */
-	format_add("userlist_put_ok", "%) Listê kontaktów zachowano na serwerze\n", 1);
+	format_add("userlist_put_ok", "%> Listê kontaktów zachowano na serwerze\n", 1);
 	format_add("userlist_put_error", "%! B³±d podczas wysy³ania listy kontaktów\n", 1);
-	format_add("userlist_get_ok", "%) Listê kontaktów wczytano z serwera\n", 1);
+	format_add("userlist_get_ok", "%> Listê kontaktów wczytano z serwera\n", 1);
 	format_add("userlist_get_error", "%! B³±d podczas pobierania listy kontaktów\n", 1);
 	format_add("userlist_clear_ok", "%) Usuniêto listê kontaktów z serwera\n", 1);
 	format_add("userlist_clear_error", "%! B³±d podczas usuwania listy kontaktów\n", 1);
-	format_add("userlist_config_put_ok", "%) Listê kontaktów i konfiguracjê zachowano na serwerze\n", 1);
+	format_add("userlist_config_put_ok", "%> Listê kontaktów i konfiguracjê zachowano na serwerze\n", 1);
 	format_add("userlist_config_put_error", "%! B³±d podczas wysy³ania listy kontaktów i konfiguracji\n", 1);
-	format_add("userlist_config_get_ok", "%) Listê kontaktów i konfiguracjê wczytano z serwera\n", 1);
+	format_add("userlist_config_get_ok", "%> Listê kontaktów i konfiguracjê wczytano z serwera\n", 1);
 	format_add("userlist_config_get_error", "%! B³±d podczas pobierania listy kontaktów i konfiguracji\n", 1);
 	format_add("userlist_config_clear_ok", "%) Usuniêto listê kontaktów i konfiguracjê z serwera\n", 1);
 	format_add("userlist_config_clear_error", "%! B³±d podczas usuwania listy kontaktów i konfiguracji\n", 1);

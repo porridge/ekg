@@ -1617,6 +1617,10 @@ COMMAND(cmd_list)
 			printq("user_info_block", (u->first_name) ? u->first_name : u->display);
 		if (group_member(u, "__offline"))
 			printq("user_info_offline", (u->first_name) ? u->first_name : u->display);
+		if (u->port == 2)
+			printq("user_info_not_in_contacts");
+		if (u->port == 1)
+			printq("user_info_firewalled");
 		
 		if (u->ip.s_addr)
 			printq("user_info_ip", ip_str);
