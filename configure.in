@@ -36,11 +36,16 @@ if test "x$TERMCAP_LIB" = "x"; then
 fi
 
 AC_CHECK_READLINE
-dnl AC_MSG_CHECKING(rl_set_prompt)
-dnl #AC_TRY_LINK([#include <readline/readline.h>
-dnl #], [rl_set_prompt("");], AC_DEFINE(HAS_RL_SET_PROMPT)
-dnl AC_MSG_RESULT(found),
-dnl AC_MSG_RESULT(not found))
+
+AC_MSG_CHECKING(rl_set_prompt)
+XXX_LIBS="$LIBS"
+LIBS="$LIBS $READLINE_LIBS"
+AC_TRY_LINK([#include <stdio.h>
+#include <readline/readline.h>
+], [rl_set_prompt();], AC_DEFINE(HAS_RL_SET_PROMPT)
+AC_MSG_RESULT(found),
+AC_MSG_RESULT(not found))
+LIBS="$XXX_LIBS"
 
 AC_PATH_PROG(RM, rm, no)
 if test "x$RM" = "xno"; then

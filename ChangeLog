@@ -1,3 +1,7 @@
+// 2001-11-21
+
+- poprawka configure.in, wykrywanie rl_set_prompt() (w)
+
 // 2001-11-20
 
 - mocno poprawiona obs³uga ustawieñ pocz±tkowych (w)
