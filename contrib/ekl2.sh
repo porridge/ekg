@@ -15,7 +15,7 @@ if [ $# -lt 1 ]; then
 	exit
 fi
 
-color="true"	# defaultowo kolory sa wlczone, by to zmienic usun ta linie, lub uzyj -n
+color="true"	# defaultowo kolory s± w³±czone, by to zmienic usun ta linie, lub uzyj -n
 ggsender="$USER" # domyslny naglowek dla wychodzacych odpowiedzi (czyli twoich)
 ggftimeformat="%D %T" # domyslny format wyswietlania daty, zgodny z date(1)
 ggtimenow=`date +%s` # aktualny czas w sekundach. wartosc potrzebna tylko w jednym miejscu, 
@@ -34,7 +34,7 @@ while [ $# -gt 0 ]; do
 		        echo -e "\t-h\t\tpomoc, któr± teraz widzisz"
 			echo -e "\t-L\t\tlista dostêpnych logów z katalogu $ggdir/history"
 			echo -e "\t-l\t\tlista sesji w wybranym logu"
-		        echo -e "\t-m name\t\domy¶lnie \$USER"
+		        echo -e "\t-m name\t\dmoy¶lnie \$USER"
 		        echo -e "\t-n\t\tbez kolorów"
 			echo -e "\t-s date\t\tstart date; time from were to start printing dialog, see date(1) --date"
 		        echo -e "\t-t\t\tkeep timestamps interval"
@@ -111,8 +111,8 @@ for i in `cat "$gglog"`; do
 		sleep "$ggwaittime";
 	fi
 
-	ggftime=`date --date "$(expr $ggtime - $ggtimenow)sec" +"$ggftimeformat"` # UWAGA! linijka 90 taka sama!
+	ggftime=`date --date "$(expr "$ggtime" - "$ggtimenow")sec" +"$ggftimeformat"` # UWAGA! linijka 90 taka sama!
 	ggmsg=`echo "$i" | sed 's/.*,[0123456789]*,//'`
 	echo -e "${ggway}${gguid} [${ggftime}]: ${color:+\x1B[0;38m}\c"
 	printf "%s\n" "${ggmsg}"
-done
+done 2>/dev/null

@@ -2,6 +2,10 @@ ekg (CVS-1) unstable; urgency=low
   * added changelog entry for automatic snapshot building.
  -- Adam Kruszewski <phantom@debian.org.pl>  Thu, 09 May 2002 14:41:04 +0000
 
+ekg (20020525-1) unstable; urgency=low
+  * added emoticons.sample and emoticons.txt to ekg and ekg-doc packages.
+ -- Adam Kruszewski <phantom@debian.org.pl>  Thu, 26 May 2002 13:16:12 +0000
+
 ekg (20020523-1) unstable; urgency=low
   * added nasty hack for automagic building of packages on potato boxes.
   * exchanged ekl2.pl for ekl2.sh and added man page for it.

@@ -2,3 +2,5 @@ docs/README
 ChangeLog
 debian/README.Debian
 debian/copyright
+docs/emoticons.txt
+docs/emoticons.sample
