@@ -1688,6 +1688,7 @@ void ui_ncurses_init()
 
 #undef __init_bg
 
+	contacts_rebuild();
 	window_commit();
 
 	signal(SIGINT, SIG_IGN);
@@ -1701,8 +1702,6 @@ void ui_ncurses_init()
 
 	memset(binding_map, 0, sizeof(binding_map));
 	memset(binding_map_meta, 0, sizeof(binding_map_meta));
-
-	contacts_rebuild();
 
 	binding_default();
 }
@@ -2319,6 +2318,8 @@ static void complete(int *line_start, int *line_index)
 			*line_index = strlen(line);
 		}
 	}
+
+	array_free(words);
 
 	return;
 }
