@@ -51,6 +51,7 @@ struct variable {
 list_t variables;
 
 void variable_init();
+void variable_set_default();
 struct variable *variable_find(const char *name);
 struct value_map *variable_map(int count, ...);
 int variable_add(const char *name, const char *short_name, int type, int display, void *ptr, void (*notify)(const char *name), struct value_map *map, int (*dyndisplay)(const char *name));

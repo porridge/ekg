@@ -6,9 +6,11 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
-// 2002-02-02
+// 2003-02-02
 
 - komenda ,,key'' do obs³ugi kluczy SIM (sz)
+- poprawka zachowania po ,,reload'' (m.in. duplikaty aliasów) (sz)
+- kolejna poprawka tabów podczas czytania z potoku (sz)
 - wy¶wietlanie fingerprintu kluczy (w)
 - poprawka analizy parametrów klienta. rozumie ju¿ --away "powód",
   -a "powód" i -a"powód" (w)
@@ -16,7 +18,7 @@ zg³osi³ b³±d.
 - poprawka dope³niania (FIG/w)
 - ,,add --find'' doda do listy kontaktów ostatnio znalezion± osobê (w)
 
-// 2002-02-01
+// 2003-02-01
 
 - poprawka Alt-9 (krzyk/w)
 - uaktualnienie leon.theme (leon/w)
@@ -53,7 +55,7 @@ zg³osi³ b³±d.
   nale¿y koñczyæ. klawisz Ctrl-R jest tymczasowy, dopóki nie znajdê
   sposobu na obs³u¿enie Ctrl-C w ncurses (w)
 
-// 2002-01-31
+// 2003-01-31
 
 - drobna reorganizacja kolorów w ui-ncurses (w)
 - zmienna ,,display_color = 2'' wy¶wietla kolory wszêdzie oprócz pasku

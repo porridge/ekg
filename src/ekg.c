@@ -197,10 +197,18 @@ static void get_line_from_pipe(struct gg_exec *c)
 
 		while ((tab = strchr(c->buf->str, '\t'))) {
 			int count;
+			char *last_n = tab;
 			
 			*tab = ' ';
 
-			count = 8 - ((int) (tab - c->buf->str)) % 8;
+			while (*last_n) {
+				if (*last_n == '\n')
+					break;
+				else
+					last_n--;
+			}
+
+			count = 8 - ((int) (tab - last_n)) % 8;
 
 			if (count > 1)
 				string_insert_n(c->buf, (tab - c->buf->str), "        ", count - 1);
@@ -998,6 +1006,8 @@ int main(int argc, char **argv)
 		}
 	}
 
+	in_autoexec = 1;
+
 	if (optind < argc) {
 		batch_line = prepare_batch_line(argc, argv, optind);
 		batch_mode = 1;
@@ -1007,6 +1017,7 @@ int main(int argc, char **argv)
 	}
 
 	variable_init();
+
 	config_profile = new_profile;
 
 	if (!ui_set) {
@@ -1050,13 +1061,10 @@ int main(int argc, char **argv)
 		config_read(NULL, "display_transparent");
 #endif
 
-	in_autoexec = 1;
-
 	ui_init();
 	ui_event("theme_init");
 
-	config_timestamp = xstrdup("%H:%M ");
-	config_display_color_map = xstrdup("nTgGbBrR");
+	variable_set_default();
 
 	if (!no_global_config)
 		config_read(SYSCONFDIR "/ekg.conf", NULL);
@@ -1156,7 +1164,7 @@ int main(int argc, char **argv)
 #ifdef HAVE_OPENSSL
 	SIM_KC_Init();
 	strncpy(SIM_Key_Path, prepare_path("keys/", 0), sizeof(SIM_Key_Path) - 1);
-	SIM_Key_Path[sizeof(SIM_Key_Path) - 1] = '\0';
+	SIM_Key_Path[sizeof(SIM_Key_Path) - 1] = 0;
 	sim_key_path = xstrdup(prepare_path("keys/", 0));
 #endif
 

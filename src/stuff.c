@@ -550,6 +550,11 @@ void buffer_free()
 	buffers = NULL;
 }
 
+/*
+ * changed_backlog_size()
+ *
+ * wywo³ywane po zmianie warto¶ci zmiennej ,,backlog_size''.
+ */
 void changed_backlog_size(const char *var)
 {
 #ifdef WITH_UI_NCURSES
@@ -1086,6 +1091,24 @@ int config_read(const char *filename, const char *var)
 	
 	if (!(f = fopen(filename, "r")))
 		return -1;
+
+	if (!in_autoexec && !var) {
+		list_t l;
+
+		for (l = userlist; l; l = l->next) {
+			struct userlist *u = l->data;
+
+			if (ignored_check(u->uin))
+				ignored_remove(u->uin);
+		}
+
+		alias_free();
+		timer_free();
+		event_free();
+		variable_free();
+		variable_init();
+		variable_set_default();
+	}
 
 	while ((buf = read_file(f))) {
 		if (buf[0] == '#' || buf[0] == ';' || (buf[0] == '/' && buf[1] == '/')) {

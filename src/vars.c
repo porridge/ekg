@@ -207,6 +207,17 @@ void variable_init()
 }
 
 /*
+ * variable_set_default()
+ *
+ * ustawia pewne standardowe warto¶ci zmiennych.
+ */
+void variable_set_default()
+{
+	config_timestamp = xstrdup("%H:%M ");
+	config_display_color_map = xstrdup("nTgGbBrR");
+}
+
+/*
  * variable_find()
  *
  * znajduje strukturê `variable' opisuj±c± zmienn± o podanej nazwie.

@@ -167,16 +167,31 @@ COMMAND(cmd_add)
 	}
 
 	if (params[0] && match_arg(params[0], 'f', "find", 2)) {
+		int nonick = 0;
+		char *nickname = NULL;
+
 		if (!last_search_uin || !last_search_nickname) {
 			printq("search_no_last");
 			return -1;
 		}
 
+		last_search_nickname = strip_spaces(last_search_nickname);
+
+		if ((nonick = !strcmp(last_search_nickname, "")) && !params[1]) {
+			printq("search_no_last_nickname");
+			return -1;
+		}
+
+		if (nonick)
+			nickname = (char *) params[1];
+		else
+			nickname = last_search_nickname;	
+		
 		params_free = 1;
 
 		params = xmalloc(4 * sizeof(char*));
 		params[0] = itoa(last_search_uin);
-		params[1] = last_search_nickname;
+		params[1] = nickname;
 		params[2] = saprintf("-f \"%s\" -l \"%s\"", (last_search_first_name) ? last_search_first_name : "", (last_search_last_name) ? last_search_last_name : "");
 		params[3] = NULL;
 	}
@@ -4333,8 +4348,9 @@ void command_init()
 	( "add", "U??", cmd_add, 0,
 	  " [numer] [alias] [opcje]", "dodaje u¿ytkownika do listy kontaktów",
 	  "\n"
-	  "  -f, --find  Dodanie do listy kontaktów u¿ytkownika ostatnio\n"
-	  "              znalezionego w katalogu publicznym.\n"
+	  "  -f, --find [alias]  Dodanie do listy kontaktów u¿ytkownika ostatnio\n"
+	  "                      znalezionego w katalogu publicznym. Nale¿y podaæ\n"
+	  "                      alias, je¶li nie znaleziono pseudonimu.\n"
 	  "\n"
 	  "Pozosta³e opcje identyczne jak dla polecenia %Tlist%n (dotycz±ce "
 	  "wpisu). W oknie rozmowy z kim¶ spoza naszej listy kontaktów jako "
