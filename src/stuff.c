@@ -95,7 +95,6 @@ char *reg_password = NULL;
 int config_dcc = 0;
 char *config_dcc_ip = NULL;
 char *query_nick = NULL;
-uin_t query_uin = 0;
 int sock = 0;
 int length = 0;
 #ifdef IOCTL

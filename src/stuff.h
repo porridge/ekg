@@ -139,7 +139,6 @@ int proxy_port;
 char *proxy_host;
 char *reg_password;
 char *query_nick;
-uin_t query_uin;
 int sock;
 int length;
 #ifdef IOCTL

@@ -606,11 +606,10 @@ IOCTL_HELP
 		char *line, *tmp = NULL;
 		
 		if (!(line = my_readline())) {
-			if (query_uin) {
-				my_printf("query_finished", format_user(query_uin));
+			if (query_nick) {
+				my_printf("query_finished", query_nick);
 				free(query_nick);
 				query_nick = NULL;
-				query_uin = 0;
 				continue;
 			} else
 				break;

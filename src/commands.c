@@ -4,6 +4,7 @@
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@infomex.pl>
+ *                          Wojciech Bojdol <wojboj@htc.net.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -782,7 +783,7 @@ COMMAND(command_find)
 	memset(&r, 0, sizeof(r));
 
 	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
-		r.uin = (query_nick) ? query_uin : config_uin;
+		r.uin = (query_nick) ? ((strchr(query_nick, ',')) ? config_uin : get_uin(query_nick)) : config_uin;
 		id = id * 2;
 
 	} else {
@@ -1298,7 +1299,7 @@ COMMAND(command_list)
 COMMAND(command_msg)
 {
 	struct userlist *u;
-	char *msg = NULL;
+	char *msg = NULL, **nicks, **p;
 	uin_t uin;
 	int free_msg = 0, chat = (!strcasecmp(name, "chat"));
 
@@ -1307,13 +1308,8 @@ COMMAND(command_msg)
 		return 0;
 	}
 
-	if (!params[0] || !params[1]) {
+	if (!params[0] || !params[1] || !(nicks = array_make(params[0], ",", 0, 0, 0))) {
 		my_printf("not_enough_params");
-		return 0;
-	}
-	
-	if (!(uin = get_uin(params[0]))) {
-		my_printf("user_not_found", params[0]);
 		return 0;
 	}
 
@@ -1321,8 +1317,10 @@ COMMAND(command_msg)
 		struct string *s;
 		char *line;
 
-		if (!(s = string_init(NULL)))
+		if (!(s = string_init(NULL))) {
+			array_free(nicks);
 			return 0;
+		}
 
 		rl_bind_key('\t', rl_insert);		/* XXX */
 		
@@ -1345,6 +1343,7 @@ COMMAND(command_msg)
 		if (!line) {
 			printf("\n");
 			string_free(s, 1);
+			array_free(nicks);
 			return 0;
 		}
 		msg = string_free(s, 0);
@@ -1352,14 +1351,24 @@ COMMAND(command_msg)
 	} else
 		msg = params[1];
 
-        u = userlist_find(uin, NULL);
+	iso_to_cp(msg);
 
-	put_log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), msg);
+	for (p = nicks; *p; p++) {
+		if (!(uin = get_uin(*p))) {
+			my_printf("user_not_found", *p);
+			continue;
+		}
+		
+	        if (!(u = userlist_find(uin, NULL)))
+			continue;
+
+		put_log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), msg);
+
+		gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
+	}
 
 	if (!query_nick || strcasecmp(query_nick, params[0]))
 		add_send_nick(params[0]);
-	iso_to_cp(msg);
-	gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
 
 	if (free_msg)
 		free(msg);
@@ -1940,30 +1949,23 @@ COMMAND(command_remind)
 
 COMMAND(command_query)
 {
-	uin_t uin;
+	if (!params[0]) {
+		if (!query_nick)
+			return 0;
 
-	if (!params[0] && !query_nick)
-		return 0;
-
+		my_printf("query_finished", query_nick);
+	}
+		
 	if (query_nick) {
 		free(query_nick);
 		query_nick = NULL;
 	}
 
-	if (!params[0]) {
-		my_printf("query_finished", format_user(query_uin));
-		query_uin = 0;
+	if (!params[0])
 		return 0;
-	}
-
-	if (!(uin = get_uin(params[0]))) {
-		my_printf("user_not_found", params[0]);
-		return 0;
-	}
 
 	query_nick = strdup(params[0]);
-	query_uin = uin;
-	my_printf("query_started", format_user(uin));
+	my_printf("query_started", query_nick);
 
 	return 0;
 }
