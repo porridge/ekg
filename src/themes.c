@@ -166,6 +166,8 @@ char *va_format_string(char *format, va_list ap)
 					string_append(buf, "\033[1;37m");
 				if (*p == 'x')
 					string_append(buf, "\033[47m");
+				if (*p == 'i')
+					string_append(buf, "\033[5m");
 				if (*p == 'n')
 					string_append(buf, "\033[0m");
 			}
