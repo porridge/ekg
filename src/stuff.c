@@ -1452,7 +1452,7 @@ const char *event_format(int flags)
 /*
  * event_format_target()
  *
- * zajmuje siê sformatowaniem uina/aliasu w ³ancuchu
+ * zajmuje siê sformatowaniem uina/aliasu w ³añcuchu
  * znaków ze zdarzenia. nie zwalniaæ.
  */
 const char *event_format_target(const char *target)
@@ -1593,7 +1593,7 @@ int event_check(int event, uin_t uin, const char *data)
 	for (i = 0; actions && actions[i]; i++) {	
 		char *tmp = format_string(actions[i], uin_number, uin_display, ((data) ? data : ""), ((edata) ? edata : ""));
 
-		gg_debug(GG_DEBUG_MISC, "// event_check() event: %d doing: %s\n", event, tmp);
+		gg_debug(GG_DEBUG_MISC, "// event_check() uin: %s event: \"%s\" doing: \"%s\"\n", uin_number, event_format(event), tmp);
 		command_exec(NULL, tmp, 0);
 		xfree(tmp);
 	}
