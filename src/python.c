@@ -42,14 +42,14 @@
 
 int python_handle_result = -1;
 
-static PyObject* ekg_connect(PyObject *self, PyObject *args)
+static PyObject* ekg_cmd_connect(PyObject *self, PyObject *args)
 {
 	ekg_connect();
 
 	return Py_BuildValue("");
 }
 
-static PyObject* ekg_disconnect(PyObject *self, PyObject *args)
+static PyObject* ekg_cmd_disconnect(PyObject *self, PyObject *args)
 {
 	char *reason = NULL, *tmp;
 
@@ -64,7 +64,7 @@ static PyObject* ekg_disconnect(PyObject *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
-static PyObject* ekg_printf(PyObject *self, PyObject *pyargs)
+static PyObject* ekg_cmd_printf(PyObject *self, PyObject *pyargs)
 {
 	char *format = "generic", *args[9];
 	int i;
@@ -80,7 +80,7 @@ static PyObject* ekg_printf(PyObject *self, PyObject *pyargs)
 	return Py_BuildValue("");
 }
 
-static PyObject* ekg_command(PyObject *self, PyObject *args)
+static PyObject* ekg_cmd_command(PyObject *self, PyObject *args)
 {
 	char *command = NULL;
 
@@ -92,7 +92,7 @@ static PyObject* ekg_command(PyObject *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
-static PyObject* ekg_print_header(PyObject *self, PyObject *args)
+static PyObject* ekg_cmd_print_header(PyObject *self, PyObject *args)
 {
 	char *text = NULL;
 	int x, y;
@@ -107,7 +107,7 @@ static PyObject* ekg_print_header(PyObject *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
-static PyObject* ekg_print_statusbar(PyObject *self, PyObject *args)
+static PyObject* ekg_cmd_print_statusbar(PyObject *self, PyObject *args)
 {
 	char *text = NULL;
 	int x, y;
@@ -122,7 +122,7 @@ static PyObject* ekg_print_statusbar(PyObject *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
-static PyObject* ekg_window_printat(PyObject *self, PyObject *args)
+static PyObject* ekg_cmd_window_printat(PyObject *self, PyObject *args)
 {
 	char *target = NULL, *text = NULL;
 	int id, x, y;
@@ -140,7 +140,7 @@ static PyObject* ekg_window_printat(PyObject *self, PyObject *args)
 	return NULL;
 }
 
-static PyObject* ekg_window_commit(PyObject *self, PyObject *args)
+static PyObject* ekg_cmd_window_commit(PyObject *self, PyObject *args)
 {
 	ui_event("commit");
 
@@ -148,14 +148,14 @@ static PyObject* ekg_window_commit(PyObject *self, PyObject *args)
 }
 
 static PyMethodDef ekg_methods[] = {
-	{ "connect", ekg_connect, METH_VARARGS, "" },
-	{ "disconnect", ekg_disconnect, METH_VARARGS, "" },
-	{ "printf", ekg_printf, METH_VARARGS, "" },
-	{ "command", ekg_command, METH_VARARGS, "" },
-	{ "print_header", ekg_print_header, METH_VARARGS, "" },
-	{ "print_statusbar", ekg_print_statusbar, METH_VARARGS, "" },
-	{ "window_printat", ekg_window_printat, METH_VARARGS, "" },
-	{ "window_commit", ekg_window_commit, METH_VARARGS, "" },
+	{ "connect", ekg_cmd_connect, METH_VARARGS, "" },
+	{ "disconnect", ekg_cmd_disconnect, METH_VARARGS, "" },
+	{ "printf", ekg_cmd_printf, METH_VARARGS, "" },
+	{ "command", ekg_cmd_command, METH_VARARGS, "" },
+	{ "print_header", ekg_cmd_print_header, METH_VARARGS, "" },
+	{ "print_statusbar", ekg_cmd_print_statusbar, METH_VARARGS, "" },
+	{ "window_printat", ekg_cmd_window_printat, METH_VARARGS, "" },
+	{ "window_commit", ekg_cmd_window_commit, METH_VARARGS, "" },
 	{ NULL, NULL, 0, NULL }
 };
 
