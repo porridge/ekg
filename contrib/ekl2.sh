@@ -9,8 +9,9 @@
 # v1.3 (28.05.2002) obsluga trybow logowania 1 i 2, paprawka dotyczaca ip
 #       obsluga wiadomosci wielolinijkowych
 # 1.4 (11.2002) kompletnie od nowa napisany skrypt, z kilkoma bajerkami
+# 1.41 (30.06.2003) poprawa wy¶wietlania daty, dziêki Goblinowi
 
-_ver=1.4
+_ver=1.41
 
 if [ $# -eq 0 ]; then
 	echo "co chcesz ze mn± zrobiæ? (u¿yj '$0 -h')";
@@ -27,11 +28,11 @@ Cy=$'\x1B[0;36m'; # yellow
 # logs dir
 dir="$HOME/.gg/history";
 # log file fields regexps
-fmr="\([a-z]*recv\)";	# message sent/received. chat/msg ignored
-fms="\([a-z]*send\)";	# message sent/received. chat/msg ignored
-fuin="\([0-9]*\)"; # uin number
-fnick="\([^,]*\)"; # uin number
-fdate="\([0-9]\{10\}\)"; # uin number
+fmr="\([a-z]*recv\)";	# message received 
+fms="\([a-z]*send\)";	# message sent 
+fuin="\([0-9]*\)"; # uin number field
+fnick="\([^,]*\)"; # uin number field
+fdate="\([0-9]\{10\}\)"; # date field 
 msg="\"\?\(.*[^\"]\)\"\?"; # message
 
 _getnick () {
@@ -200,14 +201,14 @@ case $1 in
 			if [ "`expr $date - $lastdate`" -gt "$sessint" ]; then
 				let disccount++;
 				if [ ! -z "$sessnum" -a "$sessnum" -eq "$disccount" ]||[ -z "$sessnum" ]; then
-					echo -e "$disccount.\tRozmowa z `date --date "01/01/1970 ${date}sec" "${dateformat}"`. Zaczêta przez $nick.";
+					echo -e "$disccount.\tRozmowa z `date --date "01/01/1970 1:0:${date}sec" "${dateformat}"`. Zaczêta przez $nick.";
 				fi
 				[ "$sessnum" = "$disccount" ] &&  sessprint=1 || sessprint=0
 			fi 2>/dev/null
 			lastdate="$date";
 		fi
 		if [ "$sessprint" -eq 1 ]; then
-	     		echo "${clr}.--`date --date "01/01/1970 ${date}sec" "${dateformat}"`- ${nick} ---- - -   - ";
+	     		echo "${clr}.--`date --date "01/01/1970 1:0:${date}sec" "${dateformat}"`- ${nick} ---- - -   - ";
 			echo "|${Cn} $msg";
 			echo "${clr}'--------${Cn}";
 		fi
