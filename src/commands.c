@@ -1470,18 +1470,17 @@ COMMAND(command_query)
 {
 	uin_t uin;
 
-	if (!params[0] || !params[1]) {
-		my_printf("not_enough_params");
+	if (!params[0] && !query_nick)
 		return 0;
-	}
+
 	if (query_nick) {
 		free(query_nick);
 		query_nick = NULL;
-		query_uin = 0;
 	}
 
 	if (!params[0]) {
-		my_printf("query_finished");
+		my_printf("query_finished", format_user(query_uin));
+		query_uin = 0;
 		return 0;
 	}
 
