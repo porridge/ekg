@@ -737,7 +737,7 @@ static void ui_readline_loop()
 			}
 		}
 
-		if (strlen(line) > 1 && line[strlen(line) - 1] == '\\' && line[strlen(line) - 2] == ' ') {
+		if (strlen(line) > 0 && line[strlen(line) - 1] == '\\') {
 			string_t s = string_init(NULL);
 
 			line[strlen(line) - 1] = 0;

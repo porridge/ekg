@@ -5,6 +5,10 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-10-16
+
+- poprawienie wielolinijkowych wiadomo¶ci w ui-readline (d)
+
 // 2002-10-15
 
 - dodanie syntezy mowy, szczegó³y w README. uprzedzaj±c pytania, dzia³a
