@@ -812,6 +812,17 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 		if (GG_S_NA(s->status) && (config_completion_notify & 2))
 			remove_send_nick(u->display);
 		
+		if (hide)
+			break;
+
+		/* daj znaæ d¿wiêkiem */
+		if (config_beep && config_beep_notify)
+			ui_beep();
+
+		/* i muzyczk± */
+		if (config_sound_notify_file && strcmp(config_sound_notify_file, ""))
+			play_sound(config_sound_notify_file);
+
 		/* czy mamy wy¶wietlaæ na ekranie? */
 		if (!config_display_notify || config_contacts == 2)
 			break;
@@ -835,15 +846,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 		}
 			
 		/* no dobra, poka¿ */
-		if (!hide)
-			print_window(u->display, 0, s->format, format_user(uin), (u->first_name) ? u->first_name : u->display, descr);
-
-		/* daj znaæ d¿wiêkiem */
-		if (config_beep && config_beep_notify)
-			ui_beep();
-
-		/* i muzyczk± */
-		play_sound(config_sound_notify_file);
+		print_window(u->display, 0, s->format, format_user(uin), (u->first_name) ? u->first_name : u->display, descr);
 
 		break;
 	}

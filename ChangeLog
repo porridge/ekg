@@ -9,6 +9,9 @@ zg³osi³ b³±d.
 // 2003-02-06
 
 - s/strcmp/strcasecmp/ w kodzie query dla ui-readline (teardrop/d)
+- taby w docs/vars.txt (sz)
+- ustawienie ,,contacts'' na warto¶æ 2 nie oznacza wcale, ¿e 
+  ,,beep_notify'' czy te¿ ,,sound_notify_file'' ma przestaæ dzia³aæ (sz)
 	
 // 2003-02-05
 

@@ -321,9 +321,9 @@ events_delay
 	domy¶lna warto¶æ: 3
 
 	okre¶la, po ilu sekundach od po³±czenia z serwerem, zaczn± dzia³aæ
-	zdarzenia zwi±zane ze zmianami stanu. chodzi o to, aby nie traktowaæ
-	pierwszych informacji o statusie osób po po³±czeniu jako zmianê ich
-	stanu.
+	zdarzenia ,,on'' zwi±zane ze zmianami stanu. chodzi o to, aby nie
+	traktowaæ pocz±tkowych informacji o statusie osób po po³±czeniu jako
+	zmianê ich stanu.
 
 header_size
 	typ: liczba
@@ -371,18 +371,18 @@ log
 	ju¿ nieskompresowany log. nale¿y go wcze¶niej skompresowaæ
 	poleceniem gzip. wszystkie dostêpne warto¶ci to: 0, 1, 2, 5, 6.
 
-log_ignored 
+log_ignored
 	typ: liczba
-	domy¶lna warto¶æ: 0 
-	    
+	domy¶lna warto¶æ: 0
+
 	okre¶la czy logujemy ignorowane wiadomo¶ci.
 
 log_status
-        typ: bool
-        domy¶lna warto¶æ: 0
+	typ: bool
+	domy¶lna warto¶æ: 0
 
-        okre¶la czy bêd± logowane zmiany stanu ludzi z listy (zmienna
-        ,,log'' musi byæ ró¿na od 0)
+	okre¶la czy bêd± logowane zmiany stanu ludzi z listy (zmienna
+	,,log'' musi byæ ró¿na od 0)
 	
 log_path
 	typ: tekst
