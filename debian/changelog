@@ -2,6 +2,12 @@ ekg (CVS-1) unstable; urgency=low
   * added changelog entry for automatic snapshot building.
  -- Adam Kruszewski <phantom@debian.org.pl>  Thu, 09 May 2002 14:41:04 +0000
 
+ekg (20020708-1) unstable; urgency=low
+  * deleted ugly workaround with dh_compress when building on potato
+    (my previous potato box, was too much ,,strange'' and dh_compress
+     always failed :-/)
+ -- Adam Kruszewski <phantom@debian.org.pl>  Mon,  8 Jul 2002 23:38:12 +0000
+
 ekg (20020621-1) unstable; urgency=low
   * added voip.txt to ekg-doc package.
  -- Adam Kruszewski <phantom@debian.org.pl>  Sat, 22 Jun 2002 22:21:34 +0000

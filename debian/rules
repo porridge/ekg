@@ -77,7 +77,7 @@ binary-arch: build install
 	if [ -f potato-build ]; then dh_installmanpages -pekg debian/ekg.1 debian/ekl2.1;fi
 	dh_strip
 	dh_fixperms
-	if [ ! -f potato-build ]; then dh_compress;fi
+	dh_compress
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol
