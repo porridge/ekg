@@ -569,8 +569,8 @@ COMMAND(command_connect)
 	                        do_reconnect();
 	                } else {
 				sess->initial_status = config_status;
+				list_add(&watches, sess, 0);
 			}
-			list_add(&watches, sess, 0);
 		} else
 			my_printf("no_config");
 	} else if (!strcasecmp(name, "reconnect")) {

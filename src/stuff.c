@@ -1061,7 +1061,7 @@ int del_event(int flags, uin_t uin)
         for (l = events; l; l = l->next) {
                 struct event *e = l->data;
 
-                if (e->uin == uin && e->flags & flags) {
+                if (e && e->uin == uin && e->flags & flags) {
                         if ((e->flags &= ~flags) == 0) {
                                 my_printf("events_del", format_events(flags), (uin == 1) ? "*" : format_user(uin), e->action);
 				free(e->action);

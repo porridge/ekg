@@ -12,6 +12,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   wyniku ma byæ pokazywane. dodanie parametru ,,start'' do funkcji
   gg_search_request_mode_*() (meecash/w)
 - dodanie parametru ,,--start'' do komendy ,,find'' (w)
+- poprawka g³upiego b³êdu z watches (kfazi/w)
 
 // 2002-03-04
 

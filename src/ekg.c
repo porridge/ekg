@@ -187,8 +187,8 @@ int my_getc(FILE *f)
 					do_reconnect();
 				} else {
 					sess->initial_status = config_status;
+					list_add(&watches, sess, 0);
 				}
-				list_add(&watches, sess, 0);
 			}
 
 			/* timeout pinga */
@@ -476,8 +476,8 @@ IOCTL_HELP
 			do_reconnect();
 		} else {
 			sess->initial_status = config_status;
+			list_add(&watches, sess, 0);
 		}
-		list_add(&watches, sess, 0);
 	}
 
 	if (config_auto_save)
