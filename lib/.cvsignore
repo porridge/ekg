@@ -1,4 +1,6 @@
 Makefile
 libgadu.so*
 so_locations
+libgadu.pc
+libgadu-config.h
 *.lo
