@@ -2,6 +2,7 @@
 
 /*
  *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
+ *			Robert J. Wo¼ny <speedy@ziew.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -41,6 +42,9 @@ struct variable variables[MAX_VARS] = {
 	{ "display_color", VAR_BOOL, 1, &display_color },
 	{ "log", VAR_INT, 1, &log },
 	{ "log_path", VAR_STR, 1, &log_path },
+
+	{ "debug", VAR_BOOL, 1, &display_debug },
+	
 	{ "sms_away", VAR_BOOL, 1, &sms_away },
 	{ "sms_max_length", VAR_INT, 1, &sms_max_length },
 	{ "sms_number", VAR_STR, 1, &sms_number },

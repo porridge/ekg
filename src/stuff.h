@@ -2,6 +2,7 @@
 
 /*
  *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
+ *			Robert J. Wo¼ny <speedy@ziew.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -59,7 +60,7 @@ int auto_away;
 int log;
 char *log_path;
 int display_color;
-int enable_beep, enable_beep_msg, enable_beep_chat, enable_beep_notify;
+int enable_beep, enable_beep_msg, enable_beep_chat, enable_beep_notify, display_debug;
 int config_uin;
 char *config_password;
 char *config_user;

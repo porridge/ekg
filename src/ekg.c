@@ -76,6 +76,12 @@ int my_getc(FILE *f)
 		tv.tv_sec = 1;
 		tv.tv_usec = 0;
 		
+		if (display_debug) {
+		    gg_debug_level = 255;
+		} else 
+		    gg_debug_level = 0;
+		
+		    
 		ret = select(maxfd + 1, &rd, &wd, NULL, &tv);
 	
 		if (!ret) {
@@ -227,7 +233,10 @@ int main(int argc, char **argv)
 
 	if (!config_uin || !config_password)
 		my_printf("no_config");
-	
+
+	if (display_debug)
+		gg_debug_level = 255;
+		
 	read_userlist(NULL);
 
 	if (config_uin && config_password && auto_connect) {
