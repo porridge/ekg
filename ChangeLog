@@ -8,6 +8,10 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-11-18
 
 - poprawka reakcji F3 (kostoo/w)
+- libgadu: poprawka wysy³ania du¿ych zapytañ http (Chilek/w)
+- libgadu: nieznaczna zmiana ABI -- dodano GG_STATE_SENDING_QUERY, ale
+  z tego wzglêdu, ¿e jest to sta³a wewnêtrzna biblioteki, nie podbijam
+  ABI biblioteki (w)
 
 // 2002-11-17
 

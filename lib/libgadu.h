@@ -218,6 +218,7 @@ enum gg_state_enum {
 	GG_STATE_CONNECTED,             /* po³±czy³ siê */
 
         /* gg_http */
+	GG_STATE_SENDING_QUERY,		/* wysy³a zapytanie http */
 	GG_STATE_READING_HEADER,	/* czeka na nag³ówek http */
 	GG_STATE_PARSING,               /* przetwarza dane */
 	GG_STATE_DONE,                  /* skoñczy³ */

@@ -77,6 +77,8 @@ dnl sparc libs...
 AC_CHECK_LIB(nsl, t_accept, LIBS="$LIBS -lnsl")
 AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
 
+AC_CHECK_FUNCS([gethostbyname_r])
+
 # zachowujemy opcje dla libgadu
 
 CFLAGS_LIBGADU="$CFLAGS_LIBGADU $CFLAGS"
