@@ -80,11 +80,11 @@ list_t modules;
 
 int python_initialize();
 int python_finalize();
-int python_load(const char *name);
-int python_unload(const char *name);
+int python_load(const char *name, int quiet);
+int python_unload(const char *name, int quiet);
 int python_exec(const char *command);
-int python_run(const char *filename);
-int python_list();
+int python_run(const char *filename, int quiet);
+int python_list(int quiet);
 int python_function(const char *function, const char *arg);
 void python_autorun();
 

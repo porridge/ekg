@@ -4552,35 +4552,20 @@ COMMAND(cmd_timer)
 #ifdef WITH_PYTHON
 COMMAND(cmd_python)
 {
-	if (!params[0]) {
-		python_list();
-		return 0;
-	}
+	if (!params[0] || !strncasecmp(params[0], "li", 2))
+		return python_list(quiet);
 
-	if (!strncasecmp(params[0], "lo", 2)) {
-		python_load(params[1]);
-		return 0;
-	}
+	if (!strncasecmp(params[0], "lo", 2))
+		return python_load(params[1], quiet);
 
-	if (!strncasecmp(params[0], "u", 1)) {
-		python_unload(params[1]);
-		return 0;
-	}
+	if (!strncasecmp(params[0], "u", 1))
+		return python_unload(params[1], quiet);
 
-	if (!strncasecmp(params[0], "r", 1)) {
-		python_run(params[1]);
-		return 0;
-	}
+	if (!strncasecmp(params[0], "r", 1))
+		return python_run(params[1], quiet);
 
-	if (!strncasecmp(params[0], "e", 1)) {
-		python_exec(params[1]);
-		return 0;
-	}
-
-	if (!strncasecmp(params[0], "li", 2)) {
-		python_list();
-		return 0;
-	}
+	if (!strncasecmp(params[0], "e", 1))
+		return python_exec(params[1]);
 
 	printq("invalid_params", name);
 

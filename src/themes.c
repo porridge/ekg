@@ -1079,7 +1079,7 @@ void theme_init()
 	format_add("not_connected", "%! Brak po³±czenia z serwerem. Wpisz %Tconnect%n\n", 1);
 	format_add("not_connected_msg_queued", "%! Brak po³±czenia z serwerem. Wiadomo¶æ bêdzie wys³ana po po³±czeniu.%n\n", 1);
 
-	/* obs³uga themeów */
+	/* obs³uga motywów */
 	format_add("theme_loaded", "%> Wczytano motyw %T%1%n\n", 1);
 	format_add("theme_default", "%> Ustawiono domy¶lny motyw\n", 1);
 	format_add("error_loading_theme", "%! B³±d podczas ³adowania motywu: %1\n", 1);
@@ -1119,7 +1119,6 @@ void theme_init()
 	format_add("passwd_timeout", "%! Przekroczono limit czasu operacji zmiany has³a\n", 1);
 	
 	/* zmiana informacji w katalogu publicznym */
-	format_add("change_not_enough_params", "%! Nie podano wszystkich wymaganych parametrów\n", 1);
 	format_add("change", "%> Informacje w katalogu publicznym zosta³y zmienione\n", 1);
 	format_add("change_failed", "%! B³±d podczas zmiany informacji w katalogu publicznym\n", 1);
 	
@@ -1394,6 +1393,7 @@ void theme_init()
 	format_add("http_failed_writing", "Serwer zerwa³ po³±czenie", 1);
 	format_add("http_failed_memory", "Brak pamiêci", 1);
 
+#ifdef HAVE_OPENSSL
 	/* szyfrowanie */
 	format_add("key_generating", "%> Czekaj, generujê klucze...\n", 1);
 	format_add("key_generating_success", "%> Wygenerowano i zapisano klucze\n", 1);
@@ -1408,4 +1408,15 @@ void theme_init()
 	format_add("key_send_error", "%! B³±d podczas wysy³ania klucza publicznego\n", 1);
 	format_add("key_list", "%> %1 (%3)\n%) %2\n", 1);
 	format_add("key_list_timestamp", "%Y-%m-%d %H:%M", 1);
+#endif
+
+#ifdef WITH_PYTHON
+	/* python */
+	format_add("python_list", "%> %1\n", 1);
+	format_add("python_list_empty", "%! Brak za³adowanych skryptów\n", 1);
+	format_add("python_removed", "%) Skrypt zosta³ usuniêty\n", 1);
+	format_add("python_need_name", "%! Nie podano nazwy skryptu\n", 1);
+	format_add("python_not_found", "%! Nie znaleziono skryptu %T%1%n\n", 1);
+	format_add("python_wrong_location", "%! Skrypt nale¿y umie¶ciæ w katalogu %T%1%n\n", 1);
+#endif
 }

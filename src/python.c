@@ -128,12 +128,12 @@ static PyObject* ekg_cmd_window_printat(PyObject *self, PyObject *args)
 	int id, x, y;
 
 	if (PyArg_ParseTuple(args, "siis", &target, &x, &y, &text)) {
-		ui_event("printat", target, 0, x, y, text);
+		ui_event("printat", target, 0, x, y, text, NULL);
 		return Py_BuildValue("");
 	}
 
 	if (PyArg_ParseTuple(args, "iiis", &id, &x, &y, &text)) {
-		ui_event("printat", NULL, id, x, y, text);
+		ui_event("printat", NULL, id, x, y, text, NULL);
 		return Py_BuildValue("");
 	}
 
@@ -142,7 +142,7 @@ static PyObject* ekg_cmd_window_printat(PyObject *self, PyObject *args)
 
 static PyObject* ekg_cmd_window_commit(PyObject *self, PyObject *args)
 {
-	ui_event("commit");
+	ui_event("commit", NULL);
 
 	return Py_BuildValue("");
 }
@@ -303,16 +303,17 @@ int python_finalize()
  *
  * usuwa z pamiêci podany skrypt.
  *
- *  - name - nazwa skryptu
+ *  - name - nazwa skryptu,
+ *  - quiet.
  *
  * 0/-1
  */
-int python_unload(const char *name)
+int python_unload(const char *name, int quiet)
 {
 	list_t l;
 
 	if (!name) {
-		print("generic_error", "Nie podano nazwy skryptu");
+		printq("python_need_name");
 		return -1;
 	}
 
@@ -331,12 +332,12 @@ int python_unload(const char *name)
 
 		list_remove(&modules, m, 1);
 
-		print("generic", "Skrypt zosta³ usuniêty");
+		printq("python_removed");
 
 		return 0;
 	}
 	
-	print("generic_error", "Nie znaleziono skryptu");
+	printq("python_not_found", name);
 	
 	return -1;
 }
@@ -348,12 +349,14 @@ int python_unload(const char *name)
  *
  * 0/-1
  */
-int python_run(const char *filename)
+int python_run(const char *filename, int quiet)
 {
 	FILE *f = fopen(filename, "r");
 
-	if (!f)
+	if (!f) {
+		printq("python_not_found", filename);
 		return -1;
+	}
 
 	PyRun_SimpleFile(f, (char*) filename);
 	fclose(f);
@@ -383,23 +386,24 @@ PyObject *python_get_func(PyObject *module, const char *name)
  *
  * ³aduje skrypt pythona o podanej nazwie z ~/.gg/scripts
  *
- *  - name - nazwa skryptu
+ *  - name - nazwa skryptu,
+ *  - quiet.
  *
  * 0/-1
  */
-int python_load(const char *name)
+int python_load(const char *name, int quiet)
 {
 	PyObject *module, *init;
 	struct module m;
 	char *name2;
 
-	if (!name)
+	if (!name) {
+		printq("python_need_name");
 		return -1;
+	}
 	
 	if (strchr(name, '/')) {
-		char *tmp = saprintf("Skrypt nale¿y umie¶ciæ w katalogu \033[1m%s\033[0m", prepare_path("scripts", 0));
-		print("generic_error", tmp);
-		xfree(tmp);
+		printq("python_wrong_location", prepare_path("scripts", 0));
 		return -1;
 	}
 
@@ -411,7 +415,7 @@ int python_load(const char *name)
 	module = PyImport_ImportModule(name2);
 
 	if (!module) {
-		print("generic_error", "Nie znaleziono skryptu");
+		printq("python_not_found", name2);
 		PyErr_Print();
 		xfree(name2);
 		return -1;
@@ -463,7 +467,7 @@ int python_load(const char *name)
  *
  * wykonuje polecenie pythona.
  * 
- *  - command - polecenie
+ *  - command - polecenie.
  * 
  * 0/-1
  */
@@ -489,14 +493,17 @@ int python_exec(const char *command)
  *
  * 0/-1
  */
-int python_list()
+int python_list(int quiet)
 {
 	list_t l;
+
+	if (!modules)
+		printq("python_list_empty");
 
 	for (l = modules; l; l = l->next) {
 		struct module *m = l->data;
 
-		print("generic", m->name);
+		printq("python_list", m->name);
 	}
 
 	return 0;
@@ -550,7 +557,7 @@ void python_autorun()
 		tmp = saprintf("autorun.%s", d->d_name);
 		tmp[strlen(tmp) - 3] = 0;
 
-		python_load(tmp);
+		python_load(tmp, 0);
 
 		xfree(tmp);
 	}
