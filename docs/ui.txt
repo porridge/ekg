@@ -1,6 +1,6 @@
 od 20020627 ekg jest przygotowane do obs³ugi ró¿nych interfejsów u¿ytkownika.
 przeprowadzono ca³kiem spor± reorganizacjê kodu, dziêki czemu nie trzeba
-bêdzie psuæ zbyt du¿o, ¿eby dodaæ frontend w ncurses czy jakikolwiek inny.
+bêdzie psuæ zbyt du¿o, ¿eby dodaæ jakikolwiek inny frontend.
 
 je¶li kto¶ chce napisaæ w³asny interfejs (chocia¿by w gtk+, chocia¿ nie
 wiadomo po co, skoro jest GNU Gadu -- http://gadu.gnu.pl/), musi napisaæ
