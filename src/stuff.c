@@ -663,6 +663,8 @@ void config_write_crash()
 	snprintf(name, sizeof(name), "config.%d", getpid());
 	if (!(f = fopen(name, "w")))
 		return;
+
+	chmod(name, 0400);
 	
 	config_write_main(f, 0);
 	

@@ -464,7 +464,7 @@ sms_max_length
 	domy¶lna warto¶æ: 100
 
 	maksymalna d³ugo¶æ przekazywanych wiadomo¶ci. powy¿ej tego limitu
-	wiadomo¶æ zostanie uciêta.
+	wiadomo¶æ zostanie uciêta. je¶li równa 0, nie ma limitu.
 
 sms_number
 	typ: tekst

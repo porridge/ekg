@@ -363,6 +363,8 @@ void userlist_write_crash()
 	snprintf(name, sizeof(name), "userlist.%d", getpid());
 	if (!(f = fopen(name, "w")))
 		return;
+
+	chmod(name, 0400);
 		
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;

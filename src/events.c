@@ -566,7 +566,7 @@ void handle_msg(struct gg_event *e)
 			else
 				snprintf(sender, sizeof(sender), "%u", e->event.msg.sender);
 
-			if (strlen(e->event.msg.message) > config_sms_max_length)
+			if (config_sms_max_length && strlen(e->event.msg.message) > config_sms_max_length)
 				e->event.msg.message[config_sms_max_length] = 0;
 
 			foo = format_string(format_find((chat) ? "sms_chat" : "sms_msg"), sender, e->event.msg.message);

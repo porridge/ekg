@@ -24,6 +24,7 @@ zg³osi³ b³±d.
   konfiguracji na serwerze (w)
 - dodanie mo¿liwo¶ci zapisu konfiguracji ekg na serwerze (opcje
   --put-config i --get-config komendy /list) (w)
+- zmienna sms_max_length przy warto¶ci 0 usuwa limit (rmrmg/w)
 
 // 2002-12-24
 
