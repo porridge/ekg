@@ -35,7 +35,7 @@ AC_DEFUN(AC_CHECK_READLINE,[
         AC_DEFINE(HAVE_READLINE)
         have_readline=true
         break
-      elif test -f $incl/readline.h ; then
+      elif test -f $incl/readline.h -a "x$incl" != "x/usr/include"; then
         AC_MSG_RESULT($incl/readline.h)
         READLINE_LIBS="$lib -lreadline"
         READLINE_INCLUDES="-I$incl"
