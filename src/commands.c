@@ -1516,6 +1516,8 @@ COMMAND(command_quit)
 		quit_message_send = 1;
 	}
 
+	ekg_logoff(sess, tmp);
+
 	return -1;
 }
 
@@ -1605,7 +1607,7 @@ COMMAND(command_dcc)
 		t.filename = strdup(params[2]);
 		t.dcc = NULL;
 
-		if (u->port < 10 || params[3] && !strcmp(params[3], "--reverse")) {
+		if (u->port < 10 || (params[3] && !strcmp(params[3], "--reverse"))) {
 			/* nie mo¿emy siê z nim po³±czyæ, wiêc on spróbuje */
 			gg_dcc_request(sess, uin);
 		} else {
