@@ -1,8 +1,10 @@
-10:52 < e-Undis> hm... to mi sie nie podoba:
-10:52 < e-Undis> gcc  -Wall -O3 -ggdb -g -O2
-10:59 <@arekm> btw /me mia³ problemy z jakim¶ progem
-               kompilowanym z -ggdb .. bez tego posz³o
-10:59 <@arekm> gcc siê sypa³
+22:14 <Undzio6> otoz jak wcisne tab, to wybiera on osobe ktora ostatnio zrobila
+                jakies zdarzenie - np pojawila sie na liscie.
+22:14 <Undzio6> lepsze byloby chyba gdyby wpierw wybieral osoby do ktorych cos
+                odpisuje
+22:15 <Undzio6> teraz jak z kims sobie gadam to gdy ktos inny zmieni swoj status
+                i ja tego nie zauwaze to wiadomosc leci do tego kogos
+
 
 ~OutSideR~ <outsider@langusta.starnet.pl>
 
