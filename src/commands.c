@@ -506,7 +506,8 @@ COMMAND(cmd_status)
 	int mqc, now_days;
 	char *tmp, *priv, *r1, *r2, buf[100], buf1[100];
 
-	printq("show_status_header");
+	if(strcmp(format_find("show_status_header"), ""))
+		printq("show_status_header");
 
 	if (config_profile)
 		printq("show_status_profile", config_profile);
