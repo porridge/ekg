@@ -1588,6 +1588,12 @@ COMMAND(cmd_quit)
 
 	ekg_logoff(sess, tmp);
 
+	if (tmp) {
+		xfree(config_reason);
+		config_reason = tmp;
+		tmp = NULL;
+	}
+		
 	xfree(tmp);
 
 	ui_event("disconnected");

@@ -764,8 +764,11 @@ void handle_success(struct gg_event *e)
 	if (away || private_mode) {
 		if (!config_reason || !GG_S_D(config_status)) 
 			gg_change_status(sess, config_status);
-		else
+		else {
+			iso_to_cp(config_reason);
 			gg_change_status_descr(sess, config_status, config_reason);
+			cp_to_iso(config_reason);
+		}
 	}
 
 	if (!msg_queue_flush())
