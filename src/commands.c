@@ -2234,7 +2234,10 @@ void command_init()
 	  "  -a, --add <alias> <komenda>     dodaje alias\n"
           "  -A, --append <alias> <komenda>  dodaje komendê do aliasu\n"
 	  "  -d, --del <alias>               usuwa alias\n"
-	  " [-l, --list]                     wy¶wietla listê aliasów");
+	  " [-l, --list]                     wy¶wietla listê aliasów\n"
+	  "\n"
+	  "Uwaga! Usuniêcie aliasu przez samego siebie spowoduje naruszenie\n"
+	  "ochrony pamiêci.");
 	  
 	command_add
 	( "away", "?", cmd_away, 0,
