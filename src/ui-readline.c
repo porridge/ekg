@@ -410,6 +410,7 @@ void ui_readline_print(const char *target, const char *line)
 void ui_readline_beep()
 {
 	printf("\a");
+	fflush(stdout);
 }
 
 /*

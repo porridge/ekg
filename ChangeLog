@@ -10,6 +10,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - update arim.theme (arim/w)
 - update opisu protoko³u: GG_CLASS_ACK (acc/w)
 - update opisu protoko³u: GG_LOGIN_EXT (pm,ajron/w)
+- poprawka beepania w ui-readline (ghunt/w)
 
 // 2002-07-03
 
