@@ -603,7 +603,7 @@ static void remove_transfer(struct gg_dcc *d)
 void handle_dcc(struct gg_dcc *d)
 {
 	struct gg_event *e;
-	struct transfer *t;
+	struct transfer *t, tt;
 	struct list *l;
 	char buf1[16], buf2[16];
 	int tmp;
@@ -668,13 +668,20 @@ void handle_dcc(struct gg_dcc *d)
 			break;
 			
 		case GG_EVENT_DCC_NEED_FILE_ACK:
-			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_NEED_FILE_INFO\n");
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_NEED_FILE_ACK\n");
 			/* ¿eby nie sprawdza³o, póki luser nie odpowie */
 			list_remove(&watches, d, 0);
 
 			if (!(t = find_transfer(d))) {
-				gg_free_dcc(d);
-				break;
+				tt.uin = d->peer_uin;
+				tt.type = GG_SESSION_DCC_GET;
+				tt.filename = NULL;
+				tt.dcc = d;
+				tt.id = transfer_id();
+				if (!(t = list_add(&transfers, &tt, sizeof(tt)))) {
+					gg_free_dcc(d);
+					break;
+				}
 			}
 			
 			snprintf(buf1, sizeof(buf1), "%d", t->id);

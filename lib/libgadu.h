@@ -283,7 +283,7 @@ enum {
 	GG_ERROR_DCC_HANDSHAKE,		/* b³±d negocjacji */
 	GG_ERROR_DCC_FILE,		/* b³±d odczytu/zapisu pliku */
 	GG_ERROR_DCC_EOF,		/* plik siê skoñczy³? */
-	GG_ERROR_DCC_SENDING,		/* b³±d wysy³ania */
+	GG_ERROR_DCC_NET,		/* b³±d wysy³ania/odbierania */
 };
 
 /*

@@ -1160,13 +1160,13 @@ COMMAND(command_quit)
 COMMAND(command_dcc)
 {
 	struct transfer t;
+	struct list *l;
 	uin_t uin;
 
 	if (!params[0])
 		params[0] = "show";
 
 	if (!strncasecmp(params[0], "sh", 2)) {		/* show */
-		struct list *l;
 		int pending = 0, active = 0;
 		char buf[16];
 
@@ -1278,21 +1278,31 @@ COMMAND(command_dcc)
 	}
 
 	if (!strncasecmp(params[0], "g", 1)) {		/* get */
-		my_printf("dcc_not_supported", params[0]);
-		return 0;
+		struct transfer *t;
 		
-	        if (!(uin = get_uin(params[1])) || !find_user(uin, NULL)) {
-			my_printf("user_not_found", params[1]);
-			return 0;
+		for (t = NULL, l = transfers; l; l = l->next) {
+			t = l->data;
+
+			if (!t->dcc || t->type != GG_SESSION_DCC_GET || !t->filename)
+				continue;
+			
+			if (!params[1])
+				break;
+
+			if (params[1][0] == '#' && atoi(params[1] + 1) == t->id)
+				break;
+
+			/* XXX po nicku */
 		}
 
-		if (!sess || sess->state != GG_STATE_CONNECTED) {
-			my_printf("not_connected");
+		if (!l || !t || !t->dcc) {
+			my_printf("dcc_get_not_found", (params[1]) ? params[1] : "");
 			return 0;
 		}
-
-
-	
+		
+		my_printf("dcc_get_getting", format_user(t->uin), t->filename);	/* XXX wiêcej informacji */
+		
+		list_add(&watches, t->dcc, 0);
 	}
 	
 	if (!strncasecmp(params[0], "c", 1)) {		/* close */
