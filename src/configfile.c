@@ -442,7 +442,8 @@ int config_write(const char *filename)
 		return -1;
 	}
 
-	rename(tmp, filename);
+	if (rename(tmp, filename) == -1)
+		return -1;
 	
 	return 0;
 }
@@ -551,7 +552,8 @@ pass:
 		return -1;
 	}
 	
-	rename(newfn, filename);
+	if (rename(newfn, filename) == -1)
+		return -1;
 
 	xfree(newfn);
 

@@ -366,7 +366,8 @@ int userlist_write()
 	
 	xfree(contacts);
 
-	rename(tmp, filename);
+	if (rename(tmp, filename) == -1)
+		return -2;
 
 	return 0;
 }
