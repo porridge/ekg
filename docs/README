@@ -19,11 +19,11 @@ LICENCJA
     
     Program i biblioteka zosta³y napisane na podstawie informacji
     uzyskanych przez badanie pakietów wysy³anych miêdzy klientem
-    a serwerem oraz od osób trzecich. Autorzy nie disasemblowali,
+    a serwerem oraz od osób trzecich. Autorzy nie disasemblowali
     ani nie dekompilowali oryginalnego klienta. Projekt powsta³ przy
     u¿yciu darmowych i wolnodostêpnych narzêdzi.
 
-    Gadu-Gadu jest zastrze¿onym znakiem towarowym sms-express sp. z o.o.
+    Gadu-Gadu jest zastrze¿onym znakiem towarowym sms-express Sp. z o.o.
 
 INSTALACJA
 
@@ -78,11 +78,11 @@ U¯YCIE
 
     Program mo¿na skonfigurowaæ pod wieloma wzglêdami, a wszystkie mo¿liwe
     ustawienia, które zmienia siê poleceniem ,,set'', s± opisane w pliku
-    vars.txt. Pomoc dotycz±c± poszczególnych ustawieñ mo¿na uzyskaæ tak¿e za
-    pomoc± polecenia ,,help set <zmienna>''.
+    vars.txt. Pomoc dotycz±c± poszczególnych ustawieñ mo¿na uzyskaæ tak¿e
+    poprzez polecenie ,,help set <zmienna>''.
 
-    Je¶li dana komenda przyjmuje ,,--parametr'' mo¿na u¿yæ równie¿
-    skrótu ,,-p'', je¶li nie powoduje to niejednoznaczno¶ci. Uwaga!
+    Je¶li dana komenda przyjmuje ,,--parametr'', mo¿na u¿yæ równie¿
+    skrótu ,,-p'', gdy nie powoduje to niejednoznaczno¶ci. Uwaga!
     Brana pod uwagê jest zwykle pierwsza litera, wiêc je¶li wpiszesz
     ,,list --gone'', ekg potraktuje to jako ,,list --get''.
 
@@ -94,11 +94,11 @@ U¯YCIE
 
     Je¶li w linii poleceñ shella podasz po nazwie programu i parametrach
     zaczynaj±cych siê od my¶lnika co¶ jeszcze, to zostanie to zinterpretowane
-    jako komenda wsadowa. ekg wykona tylko t± komendê, i od razu wyjdzie.
-    Je¶li na serwerze czekaj± na Ciebie jakie¶ wiadomo¶ci to serwer je
+    jako komenda wsadowa. ekg wykona tylko tê komendê i od razu wyjdzie.
+    Je¶li na serwerze czekaj± na Ciebie jakie¶ wiadomo¶ci, to serwer je
     przy¶le zaraz po po³±czeniu i w trybie wsadowym ekg wypisze je na
     terminal. Je¶li wiêc zamierzasz przekierowaæ wyj¶cie do /dev/null i nie
-    masz loga z wiadomo¶ci to licz siê z tym, ¿e mog± one zgin±æ bezpowrotnie.
+    masz loga z wiadomo¶ci, to licz siê z tym, ¿e mog± one zgin±æ bezpowrotnie.
 
 KLAWIATURA
 
@@ -158,7 +158,7 @@ KLAWIATURA
 	F4			kolejna grupa w li¶cie kontaktów
 
     Po wej¶ciu do trybu wielolinijkowego poruszamy siê za pomoc± kursorów
-    i zatwierdzamy ponownym wci¶niêciem Ctrl-Enter. By anulowaæ wciskamy
+    i zatwierdzamy ponownym wci¶niêciem Ctrl-Enter. By anulowaæ, wciskamy
     Esc i czekamy chwilê. Je¶li kombinacja ta nie jest obs³ugiwana przez
     terminal, mo¿na u¿ywaæ Alt-Enter lub wcisn±æ Esc i zaraz po nim Enter.
 
@@ -192,7 +192,7 @@ PLIK KONFIGURACYJNY
     Dziêki temu administrator mo¿e wymusiæ pewne opcje na klientach
     u¿ytkowników, jak na przyk³ad ,,server'' czy ,,proxy''. Globalne
     pliki konfiguracyjne mo¿na ignorowaæ przez uruchomienie klienta
-    z opcja ,,-N''.
+    z opcj± ,,-N''.
 
 GDZIE SZUKAÆ POMOCY
 
@@ -301,7 +301,7 @@ ZG£ASZANIE B£ÊDÓW
 
 ¬RÓD£A
 
-    Snapshoty kodu s± dostêpne pod adresem http://dev.null.pl/ekg/.
+    Snapshoty kodu s± dostêpne pod adresem http://dev.null.pl/ekg/
     Je¶li nie wyst±pi ¿adne trzêsienie ziemi, brak pr±du ani barykady na
     drogach, powinny byæ robione co 24 godziny, wieczorem.
 
@@ -314,7 +314,7 @@ ZG£ASZANIE B£ÊDÓW
 
 LISTA DYSKUSYJNA
 
-    Istnieje lista dyskusyjna dla u¿ytkowników EKG o adresie 
+    Istnieje lista dyskusyjna dla u¿ytkowników ekg o adresie 
     ekg-users@list.ziew.org. Aby siê zapisaæ, nale¿y wej¶æ na 
     stronê o adresie:
 	    
