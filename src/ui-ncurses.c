@@ -1811,6 +1811,8 @@ static void ui_ncurses_deinit()
 	delwin(input);
 	delwin(status);
 	delwin(contacts);
+	if (header)
+		delwin(header);
 	endwin();
 
 	for (i = 0; i < HISTORY_MAX; i++)
@@ -2215,8 +2217,8 @@ static void complete(int *line_start, int *line_index)
 	if (word == -1)
 		word = 0;
 	
-	fprintf(stderr, "word = %d\n", word);
-	fprintf(stderr, "start = \"%s\"\n", start);
+/*	gg_debug(GG_DEBUG_MISC, "word = %d\n", word);
+	gg_debug(GG_DEBUG_MISC, "start = \"%s\"\n", start); */
 	
 	/* nietypowe dope³nienie nicków przy rozmowach */
 	cmd = saprintf("/%s ", (config_tab_command) ? config_tab_command : "chat");

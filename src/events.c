@@ -1623,19 +1623,16 @@ void handle_search50(struct gg_event *e)
 		gg_pubdir50_t req = l->data;
 		uin_t next;
 
-		fprintf(stderr, "req->seq = %d, res->seq = %d\n", gg_pubdir50_seq(req), gg_pubdir50_seq(res));
 		if (gg_pubdir50_seq(req) != gg_pubdir50_seq(res))
 			continue;
 
 		/* nie ma dalszych? to dziêkujemy */
 		if (!(next = gg_pubdir50_next(res)) || !sess) {
-			fprintf(stderr, "no next\n");
 			list_remove(&searches, req, 0);
 			gg_pubdir50_free(req);
 			break;
 		}
 
-		fprintf(stderr, "next = %d\n", next);
 		gg_pubdir50_add(req, GG_PUBDIR50_START, itoa(next));
 		gg_pubdir50(sess, req);
 

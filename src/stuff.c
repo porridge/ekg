@@ -4032,13 +4032,13 @@ char color_map(unsigned char r, unsigned char g, unsigned char b)
 	char ch = 0;
 	int i;
 
-	fprintf(stderr, "color=%.2x%.2x%.2x\n", r, g, b);
+/*	gg_debug(GG_DEBUG_MISC, "color=%.2x%.2x%.2x\n", r, g, b); */
 
 #define __sq(x) ((x)*(x))
 	for (i = 0; i < 26; i++) {
 		unsigned long dist = __sq(r - map[i].r) + __sq(g - map[i].g) + __sq(b - map[i].b);
 
-		fprintf(stderr, "%d(%c)=%.2x%.2x%.2x, dist=%ld\n", i, map[i].color, map[i].r, map[i].g, map[i].b, dist);
+/*		gg_debug(GG_DEBUG_MISC, "%d(%c)=%.2x%.2x%.2x, dist=%ld\n", i, map[i].color, map[i].r, map[i].g, map[i].b, dist); */
 
 		if (dist < mindist) {
 			ch = map[i].color;
@@ -4047,7 +4047,7 @@ char color_map(unsigned char r, unsigned char g, unsigned char b)
 	}
 #undef __sq
 
-	fprintf(stderr, "mindist=%ld, color=%c\n", mindist, ch);
+/*	gg_debug(GG_DEBUG_MISC, "mindist=%ld, color=%c\n", mindist, ch); */
 
 	return ch;	
 }
