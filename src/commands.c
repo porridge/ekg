@@ -35,6 +35,7 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sys/ioctl.h>
 #include "config.h"
 #include "libgadu.h"
 #include "stuff.h"
@@ -547,6 +548,8 @@ COMMAND(cmd_exec)
 		s.id = pid;
 		s.timeout = 60;
 		s.buf = string_init(NULL);
+
+		fcntl(s.fd, F_SETFL, O_NONBLOCK);
 
 		list_add(&watches, &s, sizeof(s));
 		close(fd[1]);
@@ -1798,6 +1801,12 @@ COMMAND(cmd_version)
     	print("ekg_version", VERSION, buf, GG_DEFAULT_CLIENT_VERSION);
 }
 
+COMMAND(cmd_test_debug)
+{
+	if (params[0])
+		gg_debug(GG_DEBUG_MISC, "%s\n", params[0]);
+}
+
 COMMAND(cmd_test_segv)
 {
 	char *foo = NULL;
@@ -1837,7 +1846,7 @@ COMMAND(cmd_test_watches)
 {
 	list_t l;
 	char buf[200], *type, *state, *check;
-	int no = 0;
+	int no = 0, queue = -1;
 
 	for (l = watches; l; l = l->next, no++) {
 		struct gg_common *s = l->data;
@@ -1905,8 +1914,12 @@ COMMAND(cmd_test_watches)
 			case GG_STATE_SENDING_FILE: state = "SENDING_SENDING_FILE"; break;
 			default: state = "(unknown)"; break;
 		}
+
+#ifdef FIONREAD
+		ioctl(s->fd, FIONREAD, &queue);
+#endif
 		
-		snprintf(buf, sizeof(buf), "%d: type=%s, fd=%d, state=%s, check=%s, id=%d, timeout=%d", no, type, s->fd, state, check, s->id, s->timeout);
+		snprintf(buf, sizeof(buf), "%d: type=%s, fd=%d, state=%s, check=%s, id=%d, timeout=%d, queue=%d", no, type, s->fd, state, check, s->id, s->timeout, queue);
 		print("generic", buf);
 	}
 }
@@ -3010,6 +3023,9 @@ void command_init()
 	command_add
 	( "_watches", "", cmd_test_watches, 0, "", 
 	  "wy¶wietla listê sprawdzanych deskryptorów", "");
+	command_add
+	( "_debug", "", cmd_test_debug, 0, "",
+	  "wy¶wietla tekst", "");
 #ifdef WITH_PYTHON
 	command_add
 	( "_load", "?", cmd_test_python, 0, "", 

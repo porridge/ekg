@@ -37,6 +37,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
+#include <fcntl.h>
 #include <libgadu.h>
 #include "config.h"
 #include "libgadu.h"
@@ -581,6 +582,8 @@ static void setup_debug()
 	se.id = 0;
 	se.timeout = -1;
 	se.buf = string_init(NULL);
+
+	fcntl(se.fd, F_SETFL, O_NONBLOCK);
 	
 	gg_debug_file = fdopen(fd[1], "w");
 
@@ -697,7 +700,7 @@ int main(int argc, char **argv)
 				pipe_file = argv[i + 1];
 				i++;
 			} else {
-				fprintf(stderr, "Nie podano nazwy potoku kontrolnego");
+				fprintf(stderr, "Nie podano nazwy potoku kontrolneg\n");
 				return 1;
 			}
 		}
@@ -824,14 +827,12 @@ int main(int argc, char **argv)
 		private_mode = 1;
 	
 	/* czy w³±czyæ debugowanie? */	
-	if (gg_debug_level)
-		config_debug = 1;
-
-	if (force_debug)
-		gg_debug_level = 255;
+	setup_debug();
 	
-	if (config_debug)
+	if (force_debug || gg_debug_level || config_debug) {
 		gg_debug_level = 255;
+		config_debug = 1;
+	}
 	
 	if (load_theme)
 		theme_read(load_theme, 1);
@@ -866,8 +867,6 @@ int main(int argc, char **argv)
 		si.timeout = -1;
 		list_add(&watches, &si, sizeof(si));
 	}
-
-	setup_debug();
 
 	if (!batch_mode)
 		print("welcome", VERSION);
