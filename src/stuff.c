@@ -544,7 +544,7 @@ int buffer_count(int type)
  * buffer_pop()
  *
  * zwraca zaalokowany ³añcuch z pocz±tku kolejki buforów
- * danego typy i usuwa ten element z kolejki. zwraca
+ * danego typu i usuwa ten element z kolejki. zwraca
  * NULL, gdy kolejka jest pusta.
  */
 char *buffer_pop(int type)

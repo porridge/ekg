@@ -4410,6 +4410,8 @@ static void binding_default()
 	binding_add("F2", "quick-list", 1, 1);
 	binding_add("F3", "toggle-contacts", 1, 1);
 	binding_add("F4", "next-contacts-group", 1, 1);
+#ifndef GG_DEBUG_DISABLE
 	binding_add("F12", "/window switch 0", 1, 1);
+#endif
 	binding_add("F11", "ui-ncurses-debug-toggle", 1, 1);
 }

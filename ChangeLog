@@ -14,6 +14,7 @@ zg³osi³ b³±d.
   uruchamiaæ ekg z bibliotek± OpenSSL (porridge/w)
 - drobne poprawki readline. niech wygl±da jako tako w 1.0, mimo ¿e
   ju¿ nie supportowane: operator $, window active/last, msg * (sz)
+- sekwencje z Alt'em w readline zawsze odnosz± siê do ma³ych liter (sz)
 
 // 2003-03-27
 

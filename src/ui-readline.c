@@ -1573,6 +1573,9 @@ static int bind_sequence(const char *seq, const char *command, int quiet)
 			rl_bind_key(key, bind_handler_ctrl);
 			nice_seq = xstrdup(seq);
 			nice_seq[0] = xtoupper(nice_seq[0]);
+			nice_seq[1] = xtolower(nice_seq[1]);
+			nice_seq[2] = xtolower(nice_seq[2]);
+			nice_seq[3] = xtolower(nice_seq[3]);
 			nice_seq[5] = xtoupper(nice_seq[5]);
 		} else
 			rl_unbind_key(key);
@@ -1580,12 +1583,14 @@ static int bind_sequence(const char *seq, const char *command, int quiet)
 	} else if (!strncasecmp(seq, "Alt-", 4) && strlen(seq) == 5) {
 
 		if (command) {
-			rl_bind_key_in_map(seq[4], bind_handler_alt, emacs_meta_keymap);
+			rl_bind_key_in_map(xtolower(seq[4]), bind_handler_alt, emacs_meta_keymap);
 			nice_seq = xstrdup(seq);
 			nice_seq[0] = xtoupper(nice_seq[0]);
+			nice_seq[1] = xtolower(nice_seq[1]);
+			nice_seq[2] = xtolower(nice_seq[2]);
 			nice_seq[4] = xtoupper(nice_seq[4]);
 		} else
-			rl_unbind_key_in_map(seq[4], emacs_meta_keymap);
+			rl_unbind_key_in_map(xtolower(seq[4]), emacs_meta_keymap);
 		
 	} else {
 		printq("bind_seq_incorrect", seq);
