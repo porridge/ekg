@@ -44,7 +44,7 @@
  * zwraca zaalokowany bufor, który wypada³oby kiedy¶ zwolniæ albo NULL
  * w przypadku b³êdu.
  */
-static char *gg_urlencode(char *str)
+char *gg_urlencode(char *str)
 {
 	char *p, *q, *buf, hex[] = "0123456789abcdef";
 	int size = 0;
