@@ -1158,6 +1158,8 @@ void theme_init()
 	format_add("user_info_nickname", "%K| %nPseudonim: %T%1%n\n", 1);
 	format_add("user_info_name", "%K| %nImiê i nazwisko: %T%1 %2%n\n", 1);
 	format_add("user_info_status", "%K| %nStan: %T%1%n\n", 1);
+	format_add("user_info_block", "%K| %nBlokowan%@1\n", 1);
+	format_add("user_info_offline", "%K| %nNie widzi stanu\n", 1);
 	format_add("user_info_ip", "%K| %nAdres: %T%1%n\n", 1);
 	format_add("user_info_mobile", "%K| %nTelefon: %T%1%n\n", 1);
 	format_add("user_info_groups", "%K| %nGrupy: %T%1%n\n", 1);

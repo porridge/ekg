@@ -1496,18 +1496,27 @@ COMMAND(cmd_list)
 
 	if (params[0] && *params[0] != '-') {
 		char *status, *groups;
+		const char *group = params[0];
 		struct userlist *u;
+		int invert = 0;
+		
+		/* list !@grupa */
+		if (group[0] == '!' && group[1] == '@') {
+			group++;
+			invert = 1;
+		}
 
 		/* list @grupa */
-		if (params[0][0] == '@' && strlen(params[0]) > 1) {
+		if (group[0] == '@' && strlen(group) > 1) {
 			string_t members = string_init(NULL);
+			char *__group;
 			int count = 0;
 
 			for (l = userlist; l; l = l->next) {
 				u = l->data;
 
-				if (u->groups) {
-					if (group_member(u, params[0]+1)) {
+				if (u->groups || invert) {
+					if ((!invert && group_member(u, group + 1)) || (invert && !group_member(u, group + 1))) {
 						if (count++)
 							string_append(members, ", ");
 						string_append(members, u->display);
@@ -1515,11 +1524,13 @@ COMMAND(cmd_list)
 				}
 			}
 			
+			__group = saprintf("%s%s", (invert) ? "!" : "", group + 1);
 			if (count) {
-				printq("group_members", params[0], members->str);
+				printq("group_members", __group, members->str);
 			} else {
-				printq("group_empty", params[0]);
+				printq("group_empty", __group);
 			}
+			xfree(__group);
 
 			string_free(members, 1);
 
@@ -1553,6 +1564,12 @@ COMMAND(cmd_list)
 			printq("user_info_name", u->last_name, "");
 
 		printq("user_info_status", status);
+
+		if (group_member(u, "__blocked"))
+			printq("user_info_block", (u->first_name) ? u->first_name : u->display);
+		if (group_member(u, "__offline"))
+			printq("user_info_offline", (u->first_name) ? u->first_name : u->display);
+		
 		if (u->ip.s_addr)
 			printq("user_info_ip", ip_str);
 		if (u->mobile && strcmp(u->mobile, ""))
@@ -4766,15 +4783,16 @@ void command_init()
           " [alias|@grupa|opcje]", "zarz±dzanie list± kontaktów",
 	  "\n"
 	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i|-B|-d|-m|-o]\":\n"
-	  "  -a, --active          dostêpne\n"
-	  "  -b, --busy            zajête\n"
-	  "  -i, --inactive        niedostêpne\n"
-	  "  -B, --blocked         blokuj±ce nas\n"
-	  "  -d, --description     osoby z opisem\n"
-	  "  -m, --member <@grupa> osoby nale¿±ce do danej grupy\n"
-	  "  -o, --offline         osoby dla których jeste¶my niedostêpni\n"
+	  "  -a, --active           dostêpne\n"
+	  "  -b, --busy             zajête\n"
+	  "  -i, --inactive         niedostêpne\n"
+	  "  -B, --blocked          blokuj±ce nas\n"
+	  "  -d, --description      osoby z opisem\n"
+	  "  -m, --member <@grupa>  osoby nale¿±ce do danej grupy\n"
+	  "  -o, --offline          osoby dla których jeste¶my niedostêpni\n"
 	  "\n"
-	  "Wy¶wietlanie cz³onków grupy: \"list @grupa\"\n"
+	  "Wy¶wietlanie cz³onków grupy: \"list @grupa\". Wy¶wietlanie osób "
+	  "spoza grupy: \"list !@grupa\".\n"
 	  "\n"
 	  "Zmiana wpisów listy kontaktów \"list <alias> <opcje...>\":\n"
 	  "  -f, --first <imiê>\n"

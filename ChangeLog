@@ -23,6 +23,8 @@ zg³osi³ b³±d.
 - obs³uga grup w li¶cie kontaktów. ustawiane zmienn± ,,contacts_groups''
   i prze³±czane klawiszem F4 (jojo/w)
 - libgadu: bufor z opisem stanu z gg_login_params jest strdup()owany (pirat/w)
+- informowanie o blokowaniu lub ukrywaniu siê przed kim¶ w /list (cukier/w)
+- mo¿liwo¶æ negacji w ,,/list @grupa'' (cukier/w)
 
 // 2003-02-07
 
