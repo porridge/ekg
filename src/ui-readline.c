@@ -1519,6 +1519,7 @@ static int bind_sequence(const char *seq, const char *command, int quiet)
 		
 		s.key = nice_seq;
 		s.action = xstrdup(command);
+		s.internal = 0;
 		s.arg = s.default_action = s.default_arg = NULL;
 
 		list_add(&bindings, &s, sizeof(s));
