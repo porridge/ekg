@@ -888,6 +888,7 @@ void theme_init()
 	format_add("list_not_avail_descr", "%> %1 %r(niedostêpn%@2: %n%5%r)%n\n", 1);
 	format_add("list_invisible", "%> %1 %c(niewidoczn%@2)%n %b%3:%4%n\n", 1);
 	format_add("list_invisible_descr", "%> %1 %c(niewidoczn%@2: %n%5%c)%n %b%3:%4%n\n", 1);
+	format_add("list_blocked", "%> %1 %m(blokuj±c%@2)%n\n", 1);
 	format_add("list_unknown", "%> %1\n", 1);
 	format_add("modify_done", "%> Zmieniono wpis w li¶cie kontaktów\n", 1);
 
@@ -1075,6 +1076,7 @@ void theme_init()
 	format_add("user_info_not_avail_descr", "%rniedostêpn%@1%n (%2)", 1);
 	format_add("user_info_invisible", "%cniewidoczn%@1%n", 1);
 	format_add("user_info_invisible_descr", "%cniewidoczn%@1%n (%2)", 1);
+	format_add("user_info_blocked", "%mblokuj±c%@1%n", 1);
 
 	format_add("group_members", "%) Grupa %T%1%n: %2\n", 1);
 	format_add("group_member_already", "%! %1 nale¿y ju¿ do grupy %T%2%n\n", 1);

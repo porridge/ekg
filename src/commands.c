@@ -1043,6 +1043,9 @@ COMMAND(cmd_list)
 			case GG_STATUS_INVISIBLE_DESCR:
 				status = format_string(format_find("user_info_invisible_descr"), (u->first_name) ? u->first_name : u->display, u->descr);
 				break;
+			case GG_STATUS_BLOCKED:
+				status = format_string(format_find("user_info_blocked"), (u->first_name) ? u->first_name : u->display);
+				break;
 			default:
 				status = format_string(format_find("user_info_unknown"), (u->first_name) ? u->first_name : u->display);
 		}
@@ -1167,6 +1170,9 @@ COMMAND(cmd_list)
 				break;
 			case GG_STATUS_INVISIBLE:
 				tmp = "list_invisible";
+				break;
+			case GG_STATUS_BLOCKED:
+				tmp = "list_blocked";
 				break;
 		}
 
