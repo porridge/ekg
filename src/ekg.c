@@ -545,7 +545,8 @@ void ekg_wait_for_key()
 				if (s->timeout == 0) {
 					struct userlist *u = userlist_find(s->uin, NULL);
 					char *tmp = NULL;
-					time_t tmp_seen = 0;
+					time_t tmp_seen;
+					int correct_seen = 0;
 
 					if (!u) {
 						list_remove(&spiedlist, s, 1);
@@ -564,6 +565,7 @@ void ekg_wait_for_key()
 						u->ip = u->last_ip;
 						u->port = u->last_port;
 						tmp_seen = u->last_seen;
+						correct_seen = 1;
 					}
 			
 					if (GG_S_I(u->status)) {
@@ -576,7 +578,7 @@ void ekg_wait_for_key()
 							u->last_descr = tmp;
 						}
 
-						if (tmp_seen)
+						if (correct_seen)
 							u->last_seen = tmp_seen;
 					}
 
