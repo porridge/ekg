@@ -40,8 +40,8 @@ A: Gdy kto¶ z nadmiarem wolnego czasu i odpowiedni± ilo¶ci± chêci znajdzie
    sposób na zrobienie tego.
 
 Q: Nie chce siê ³±czyæ, a windziany klient dzia³a! Co jest?
-A: Najwyra¼niej pad³ jeden z serwerów. Wpisz ,,set server 217.17.41.84''
-   i spróbuj po³±czyæ siê jeszcze raz.
+A: Najwyra¼niej pad³ jeden z serwerów. Wpisz ,,set server 217.17.41.x'',
+   gdzie x to warto¶æ od 82 do 85 i spróbuj po³±czyæ siê jeszcze raz.
 
 Q: Jak usun±æ zmienn±?
 A: ,,set -zmienna''
