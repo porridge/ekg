@@ -3330,7 +3330,7 @@ COMMAND(cmd_test_hexmsg)
 	}
 
 	for (i = 0; params[1][i]; i++) {
-		if (isxdigit(params[1][i]))
+		if (xisxdigit(params[1][i]))
 			size++;
 	}
 
@@ -3342,7 +3342,7 @@ COMMAND(cmd_test_hexmsg)
 	for (i = 0, j = 0; params[1][i]; i++) {
 		char ch = tolower(params[1][i]), *hex = "0123456789abcdef";
 
-		if (!isxdigit(ch))
+		if (!xisxdigit(ch))
 			continue;
 
 		buf[j / 2] |= (int)(strchr(hex, ch) - hex);
