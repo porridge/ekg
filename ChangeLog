@@ -27,6 +27,11 @@ zg³osi³ b³±d.
 - zbyt d³uga wysy³ana wiadomo¶æ zostanie przyciêta. niestety, nie dotyczy
   to jeszcze szyfrowanych wiadomo¶ci (w)
 - drobne poprawki kodu (w)
+- usuniêcie zmiennej ,,contacts_descr'' (w)
+- kompletna reorganizacja listy kontaków. jest nowa, kolorowa, bardziej
+  konfigurowalna, themowalna i nie szczypie w oczy. dodanie zmiennej
+  ,,contacts_options'', warto zajrzeæ do jej opisu (koniu i wiele innych
+  osób, które dzieli³y siê pomys³ami/w)
 
 // 2003-02-06
 

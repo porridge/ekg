@@ -43,8 +43,8 @@ auto_back
 
 	warto¶æ okre¶laj±ca, czy stan ma byæ automatycznie zmieniany na
 	dostêpny, je¶li obecny stan ,,zajêty'' zosta³ ustawiony automatycznie.
-	je¶li równa 1, stan jest zmieniany na dostêpny przy wys³aniu jakiejkolwiek
-	wiadomo¶ci. je¶li równa 2, przy wci¶niêciu klawisza.
+	je¶li równa 1, stan jest zmieniany na dostêpny przy wys³aniu
+	jakiejkolwiek wiadomo¶ci. je¶li równa 2, przy wci¶niêciu klawisza.
 	
 auto_reconnect
 	typ: liczba
@@ -176,11 +176,23 @@ contacts
 	s± wy¶wietlane, ignoruj±c warto¶æ zmiennej ,,display_notify''.
 	dzia³a tylko w interfejsie ncurses.
 
-contacts_descr
-	typ: bool
-	domy¶lna warto¶æ: 0
+contacts_options
+	typ: tekst
+	domy¶lna warto¶æ: brak
 
-	okre¶la, czy w li¶cie kontaktów maj± byæ wy¶wietlane opisy stanu.
+	opcje listy kontaktów oddzielone przecinkiem lub spacj±. domy¶lne
+	ustawienia to ,,right, frame, margin=1, nowrap, nodescr, order=0123''.
+	mo¿liwe stany to: 0 - dostêpni, 1 - zajêci, 2 - niewidoczni, 3 -
+	blokuj±cy, 4 - niedostêpni). mo¿na pomin±æ niektóre stany -- nie
+	bêd± po prostu wy¶wietlane na li¶cie.
+	
+	lista dostêpnych opcji:
+	- left, right, top, bottom - po³o¿enie listy kontaktów na ekranie,
+	- frame, noframe - lista oddzielona ramk± od g³ówne okna lub nie,
+	- margin=n, nomargin - margines miêdzy list± a g³ównym oknem lub brak,
+	- wrap, nowrap - tre¶æ listy bêdzie zawijana lub ucinana,
+	- descr, nodescr - opisy stanu bêd± lub nie bêd± wy¶wietlane,
+	- order=n - kolejno¶æ wy¶wietlanych stanów.
 	
 contacts_size
 	typ: liczba

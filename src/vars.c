@@ -124,7 +124,7 @@ void variable_init()
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
 		variable_add("contacts", "co", VAR_INT, 1, &config_contacts, NULL, NULL, NULL);
-		variable_add("contacts_descr", "cd", VAR_BOOL, 1, &config_contacts_descr, NULL, NULL, NULL);
+		variable_add("contacts_options", "cO", VAR_STR, 1, &config_contacts_options, NULL, NULL, NULL);
 		variable_add("contacts_size", "cs", VAR_INT, 1, &config_contacts_size, NULL, NULL, dd_contacts);
 	}
 #endif

@@ -82,7 +82,8 @@ static void ui_ncurses_deinit();
 
 static void window_switch(int id);
 static void update_statusbar(int commit);
-static void contacts_update(int commit);
+struct window;
+static int contacts_update(struct window *w);
 
 static void binding_add(const char *key, const char *action, int internal, int quiet);
 static void binding_delete(const char *key, int quiet);
@@ -118,7 +119,9 @@ struct window {
 	int floating;		/* czy p³ywaj±ce? */
 	int doodle;		/* czy do gryzmolenia? */
 	int frames;		/* informacje o ramkach */
+	int edge;		/* okienko brzegowe */
 	int last_update;	/* czas ostatniego uaktualnienia */
+	int nowrap;		/* nie zawijamy linii */
 	
 	char *target;		/* nick query albo inna nazwa albo NULL */
 	
@@ -132,6 +135,9 @@ struct window {
 	int left, top;		/* pozycja (x, y) wzglêdem pocz±tku ekranu */
 	int width, height;	/* wymiary okna */
 
+	int margin_left, margin_right, margin_top, margin_bottom;
+				/* marginesy */
+
 	fstring_t *backlog;	/* bufor z liniami */
 	int backlog_size;	/* rozmiar backloga */
 
@@ -139,9 +145,13 @@ struct window {
 
 	int start;		/* od której linii zaczyna siê wy¶wietlanie */
 	int lines_count;	/* ilo¶æ linii ekranowych w backlogu */
-	struct screen_line *lines;	/* linie ekranowe */
+	struct screen_line *lines;	
+				/* linie ekranowe */
 
 	int overflow;		/* ilo¶æ nadmiarowych linii w okienku */
+
+	int (*handle_redraw)(struct window *w);
+				/* obs³uga przerysowania zawarto¶ci okna */
 };
 
 struct format_data {
@@ -172,10 +182,18 @@ static struct window *window_current;	/* wska¼nik na aktualne okno */
 static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 
 int config_backlog_size = 1000;		/* maksymalny rozmiar backloga */
-int config_contacts_size = 8;		/* szeroko¶æ okna kontaktów */
-int config_contacts = 0;		/* czy ma byæ okno kontaktów */
-int config_contacts_descr = 0;		/* i czy maj± byæ wy¶wietlane opisy */
 int config_display_transparent = 1;	/* czy chcemy przezroczyste t³o? */
+int config_contacts_size = 9;		/* szeroko¶æ okna kontaktów */
+int config_contacts = 0;		/* czy ma byæ okno kontaktów */
+char *config_contacts_options = NULL;	/* opcje listy kontaktów */
+
+static int contacts_margin = 1;
+static int contacts_edge = WF_RIGHT;
+static int contacts_frame = WF_LEFT;
+static int contacts_descr = 0;
+static int contacts_wrap = 0;
+static int contacts_order[5] = { 0, 1, 2, 3, -1 };
+
 struct binding *binding_map[KEY_MAX + 1];	/* mapa bindowanych klawiszy */
 struct binding *binding_map_meta[KEY_MAX + 1];	/* j.w. z altem */
 
@@ -196,17 +214,14 @@ static void window_refresh();
  */
 int contacts_size()
 {
-	if (!contacts || !config_contacts)
+	if (!config_contacts)
 		return 0;
 
 	if (config_contacts_size + 2 > (stdscr->_maxx + 1) / 2)
 		return 0;
 
-	return config_contacts_size + 2;
+	return config_contacts_size + (contacts_frame) ? 1 : 0;
 }
-
-/* rozmiar okna wy¶wietlaj±cego tekst */
-#define OUTPUT_SIZE (stdscr->_maxy + 1 - input_size - config_statusbar_size - config_header_size)
 
 /*
  * ui_debug()
@@ -214,8 +229,8 @@ int contacts_size()
  * wy¶wietla szybko sformatowany tekst w aktualnym oknie. do debugowania.
  */
 #define ui_debug(x...) { \
-	char *ui_debug_tmp = saprintf(x); \
-	ui_ncurses_print(NULL, 0, ui_debug_tmp); \
+	char *ui_debug_tmp = saprintf("UI " x); \
+	ui_ncurses_print("__debug", 0, ui_debug_tmp); \
 	xfree(ui_debug_tmp); \
 }
 
@@ -257,9 +272,6 @@ void window_commit()
 {
 	window_refresh();
 
-	if (contacts && contacts_size() > 0)
-		wnoutrefresh(contacts);
-	
 	if (header)
 		wnoutrefresh(header);
 
@@ -401,11 +413,11 @@ int window_backlog_split(struct window *w, int full, int removed)
 				l->ts_len = strlen(l->ts);
 			}
 
-			width = w->width - l->ts_len - l->prompt_len;
+			width = w->width - l->ts_len - l->prompt_len - w->margin_left - w->margin_right;
 			if ((w->frames & WF_LEFT))
-				width -= 2;
+				width -= 1;
 			if ((w->frames & WF_RIGHT))
-				width -= 2;
+				width -= 1;
 
 			if (l->len < width)
 				break;
@@ -415,12 +427,26 @@ int window_backlog_split(struct window *w, int full, int removed)
 				if (str[j] == ' ')
 					word = j + 1;
 
-				if (j == width - 1) {
-					l->len = (word) ? word : (width - 1);
+				if (j == width) {
+					l->len = (word) ? word : width;
+					if (str[j] == ' ') {
+						l->len--;
+						str++;
+						attr++;
+					}
 					break;
 				}
 			}
 
+			if (w->nowrap) {
+				while (*str) {
+					str++;
+					attr++;
+				}
+
+				break;
+			}
+		
 			str += l->len;
 			attr += l->len;
 
@@ -436,7 +462,7 @@ int window_backlog_split(struct window *w, int full, int removed)
 	}
 
 	if (full) {
-		if (window_current->id == w->id) 
+		if (window_current && window_current->id == w->id) 
 			window_redraw(w);
 		else
 			w->redraw = 1;
@@ -453,19 +479,70 @@ int window_backlog_split(struct window *w, int full, int removed)
  */
 void window_resize()
 {
+	int left, right, top, bottom, width, height;
 	list_t l;
 
-	if (contacts) {
-		wresize(contacts, OUTPUT_SIZE, contacts_size());
-		mvwin(contacts, config_header_size, stdscr->_maxx - config_contacts_size - 1);
-		contacts_update(0);
+	left = 0;
+	right = stdscr->_maxx + 1;
+	top = config_header_size;
+	bottom = stdscr->_maxy + 1 - input_size - config_statusbar_size;
+	width = right - left;
+	height = bottom - top;
+
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data;
+
+		if (!w->edge)
+			continue;
+
+		if ((w->edge & WF_LEFT)) {
+			w->left = left;
+			w->top = top;
+			w->height = height;
+			width -= w->width;
+			left += w->width;
+		}
+
+		if ((w->edge & WF_RIGHT)) {
+			w->left = right - w->width;
+			w->top = top;
+			w->height = height;
+			width -= w->width;
+			right -= w->width;
+		}
+
+		if ((w->edge & WF_TOP)) {
+			w->left = left;
+			w->top = top;
+			w->width = width;
+			height -= w->height;
+			top += w->height;
+		}
+
+		if ((w->edge & WF_BOTTOM)) {
+			w->left = left;
+			w->top = bottom - w->height;
+			w->width = width;
+			height -= w->height;
+			bottom -= w->height;
+		}
+
+		wresize(w->window, w->height, w->width);
+		mvwin(w->window, w->top, w->left);
+
+//		ui_debug("edge window id=%d resized to (%d,%d,%d,%d)\n", w->id, w->left, w->top, w->width, w->height);
+		
+		w->redraw = 1;
 	}
 
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
-		int delta, width;
+		int delta;
 
-		delta = OUTPUT_SIZE - w->height;
+		if (w->floating)
+			continue;
+
+		delta = height - w->height;
 
 		if (w->lines_count - w->start == w->height) {
 			w->start -= delta;
@@ -479,17 +556,12 @@ void window_resize()
 			}
 		}
 
-		w->height = OUTPUT_SIZE;
+		w->height = height;
 
 		if (w->height < 1)
 			w->height = 1;
 
-		width = stdscr->_maxx + 1 - contacts_size();
-
-		if (width < 10)
-			width = 10;
-
-		if (w->width != width) {
+		if (w->width != width && !w->doodle) {
 			w->width = width;
 			window_backlog_split(w, 1, 0);
 		}
@@ -498,8 +570,8 @@ void window_resize()
 		
 		wresize(w->window, w->height, w->width);
 
-		w->top = config_header_size;
-		w->left = 0;
+		w->top = top;
+		w->left = left;
 
 		if (w->left < 0)
 			w->left = 0;
@@ -513,8 +585,13 @@ void window_resize()
 
 		mvwin(w->window, w->top, w->left);
 
+//		ui_debug("normal window id=%d resized to (%d,%d,%d,%d)\n", w->id, w->left, w->top, w->width, w->height);
+
 		w->redraw = 1;
 	}
+
+	ui_screen_width = width;
+	ui_screen_height = height;
 }
 
 /*
@@ -526,27 +603,35 @@ void window_resize()
  */
 void window_redraw(struct window *w)
 {
-	int x, y, left = 0, top = 0, height = w->height;
+	int x, y, left = w->margin_left, top = w->margin_top, height = w->height - w->margin_top - w->margin_bottom;
 	
 	if (w->doodle) {
 		w->redraw = 0;
 		return;
 	}
 
+	if (w->handle_redraw) {
+		/* handler mo¿e sam narysowaæ wszystko, wtedy zwraca -1.
+		 * mo¿e te¿ tylko uaktualniæ zawarto¶æ okna, wtedy zwraca
+		 * 0 i rysowaniem zajmuje siê ta funkcja. */
+		if (w->handle_redraw(w) == -1)
+			return;
+	}
+	
 	werase(w->window);
 	wattrset(w->window, color_pair(COLOR_BLUE, 0, COLOR_BLACK));
 
 	if (w->floating) {
 		if ((w->frames & WF_LEFT)) {
-			left += 2;
+			left++;
 
 			for (y = 0; y < w->height; y++)
-				mvwaddch(w->window, y, 0, ACS_VLINE);
+				mvwaddch(w->window, y, w->margin_left, ACS_VLINE);
 		}
 
 		if ((w->frames & WF_RIGHT)) {
 			for (y = 0; y < w->height; y++)
-				mvwaddch(w->window, y, w->width - 1, ACS_VLINE);
+				mvwaddch(w->window, y, w->width - 1 - w->margin_right, ACS_VLINE);
 		}
 			
 		if ((w->frames & WF_TOP)) {
@@ -554,14 +639,14 @@ void window_redraw(struct window *w)
 			height--;
 
 			for (x = 0; x < w->width; x++)
-				mvwaddch(w->window, 0, x, ACS_HLINE);
+				mvwaddch(w->window, w->margin_top, x, ACS_HLINE);
 		}
 
 		if ((w->frames & WF_BOTTOM)) {
 			height--;
 
 			for (x = 0; x < w->width; x++)
-				mvwaddch(w->window, w->height - 1, x, ACS_HLINE);
+				mvwaddch(w->window, w->height - 1 - w->margin_bottom, x, ACS_HLINE);
 		}
 
 		if ((w->frames & WF_LEFT) && (w->frames & WF_TOP))
@@ -683,7 +768,7 @@ static struct window *window_find(const char *target)
 
 	/* nie traktujemy debug jako aktualne - piszemy do statusowego */
 	if (!target || current) {
-		if (window_current->id)
+		if (window_current && window_current->id)
 			return window_current;
 		else
 			status = 1;
@@ -724,6 +809,10 @@ static void window_floating_update(int n)
 		if (!w->floating)
 			continue;
 
+		/* je¶li ma w³asn± obs³ugê od¶wie¿ania, nie ruszamy */
+		if (w->handle_redraw)
+			continue;
+		
 		if (w->last_update == time(NULL))
 			continue;
 
@@ -760,19 +849,22 @@ static void window_refresh()
 		wnoutrefresh(w->window);
 	}
 
-	window_floating_update(0);	/* XXX chwilowo, ¿eby dzia³a³o */
-	
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
 
 		if (!w->floating)
 			continue;
 
+		if (w->handle_redraw)
+			window_redraw(w);
+		else
+			window_floating_update(w->id);
+
 		touchwin(w->window);
 		wnoutrefresh(w->window);
 	}
 	
-	mvwin(status, config_header_size + OUTPUT_SIZE, 0);
+	mvwin(status, stdscr->_maxy + 1 - input_size - config_statusbar_size, 0);
 	wresize(input, input_size, input->_maxx + 1);
 	mvwin(input, stdscr->_maxy - input_size + 1, 0);
 }
@@ -834,9 +926,9 @@ static int window_new_compare(void *data1, void *data2)
  */
 static struct window *window_new(const char *target, int new_id)
 {
-	struct window w;
-	list_t l;
+	struct window w, *result = NULL;
 	int id = 1, done = 0;
+	list_t l;
 
 	if (target && *target == '*')
 		id = 100;
@@ -865,13 +957,49 @@ static struct window *window_new(const char *target, int new_id)
 	memset(&w, 0, sizeof(w));
 
 	w.id = id;
-	w.top = config_header_size;
+
+	/* domy¶lne rozmiary zostan± dostosowane przez window_resize() */
+	w.top = 0;
+	w.left = 0;
+	w.width = 1;
+	w.height = 1;
 
 	if (target) {
+		if (!strcmp(target, "__contacts")) {
+			int size = config_contacts_size + contacts_margin + ((contacts_frame) ? 1 : 0);
+			switch (contacts_edge) {
+				case WF_LEFT:
+					w.width = size;
+					w.margin_right = contacts_margin;
+					break;
+				case WF_RIGHT:
+					w.width = size;
+					w.margin_left = contacts_margin;
+					break;
+				case WF_TOP:
+					w.height = size;
+					w.margin_bottom = contacts_margin;
+					break;
+				case WF_BOTTOM:
+					w.height = size;
+					w.margin_top = contacts_margin;
+					break;
+			}
+
+			w.floating = 1;
+			w.edge = contacts_edge;
+			w.frames = contacts_frame;
+			w.handle_redraw = contacts_update;
+			w.target = xstrdup(target);
+			w.nowrap = !contacts_wrap;
+		}
+
 		if (*target == '+') {
 			w.doodle = 1;
 			w.target = xstrdup(target + 1);
-		} else if (*target == '*') {
+		}
+		
+		if (*target == '*') {
 			const char *tmp = index(target, '/');
 			char **argv;
 			
@@ -896,12 +1024,16 @@ static struct window *window_new(const char *target, int new_id)
 				w.frames = atoi(argv[4]);
 
 			array_free(argv);
-		} else {
+		}
+		
+		if (!w.target) {
 			w.target = xstrdup(target);
 			w.prompt = format_string(format_find("ncurses_prompt_query"), target);
 			w.prompt_len = strlen(w.prompt);
 		}
-	} else {
+	}
+	
+	if (!target) {
 		const char *f = format_find("ncurses_prompt_none");
 
 		if (strcmp(f, "")) {
@@ -910,60 +1042,12 @@ static struct window *window_new(const char *target, int new_id)
 		}
 	}
 
-	/* sprawdzamy wspó³rzêdne */
-	if (w.left > stdscr->_maxx)
-		w.left = 0;
-	if (w.top > stdscr->_maxy)
-		w.top = config_header_size;
-	if (!w.height)
-		w.height = OUTPUT_SIZE;
- 	if (!w.width)
-		w.width = stdscr->_maxx + 1 - contacts_size();
-	if (w.left + w.width > stdscr->_maxx + 1)
-		w.width = stdscr->_maxx + 1 - w.left;
-	if (w.top + w.height > stdscr->_maxy + 1)
-		w.height = stdscr->_maxy + 1 - w.top;
-
-#if 0
-	if (windows)
-		ui_debug("(new %d,%d,%d,%d,%d,%d)\n", w.floating, w.frames, w.left, w.top, w.width, w.height);
-#endif
-
  	w.window = newwin(w.height, w.width, w.top, w.left);
+	result = list_add_sorted(&windows, &w, sizeof(w), window_new_compare);
 
-#if 0
-	if (w.doodle) {
-		int i;
+	window_resize();
 
-		w.lines = xmalloc(w.height * sizeof(struct screen_line));
-		w.lines_count = w.height;
-
-		for (i = 0; i < w.height; i++) {
-			int j;
-
-			w.lines[i].len = w.width;
-			w.lines[i].str = xmalloc(w.width + 1);
-			w.lines[i].attr = xmalloc(w.width + 1);
-
-			for (j = 0; j < w.width; j++) {
-				w.lines[i].str[j] = 'X';
-				w.lines[i].attr[j] = 128;
-			}
-
-			w.lines[i].str[j] = 0;
-			w.lines[i].attr[j] = 0;
-		}
-
-		w.lines[2].str[10] = 'd';
-		w.lines[2].str[11] = 'o';
-		w.lines[2].str[12] = 'o';
-		w.lines[2].str[13] = 'd';
-		w.lines[2].str[14] = 'l';
-		w.lines[2].str[15] = 'e';
- 	}
-#endif
-
-	return list_add_sorted(&windows, &w, sizeof(w), window_new_compare);
+	return result;
 }
 
 /*
@@ -1029,13 +1113,14 @@ crap:
 				w = window_find("__status");
 	}
 
+	/* albo zaczynamy, albo koñczymy i nie ma okienka ¿adnego */
+	if (!w) 
+		return;
+ 
 	if (w != window_current && !w->floating) {
 		w->act = 1;
 		update_statusbar(0);
 	}
-
-//	if (w->doodle);
-//		return;
 
 	if (config_speech_app)
 		speech = string_init(NULL);
@@ -1100,108 +1185,81 @@ crap:
 /*
  * contacts_update()
  *
- * uaktualnia listê kontaktów po prawej.
- *
- *  - commit - czy rzuciæ od razu na ekran?
+ * uaktualnia okno listy kontaktów.
  */
-static void contacts_update(int commit)
+static int contacts_update(struct window *w)
 {
-	int y = 0;
-	list_t l;
+	struct {
+		int status1, status2;
+		char *format, *format_descr, *format_descr_full;
+	} table[5] = {
+		{ GG_STATUS_AVAIL, GG_STATUS_AVAIL_DESCR, "contacts_avail", "contacts_avail_descr", "contacts_avail_descr_full" },
+		{ GG_STATUS_BUSY, GG_STATUS_BUSY_DESCR, "contacts_busy", "contacts_busy_descr", "contacts_busy_descr_full" },
+		{ GG_STATUS_INVISIBLE, GG_STATUS_INVISIBLE_DESCR, "contacts_invisible", "contacts_invisible_descr", "contacts_invisible_descr_full" },
+		{ GG_STATUS_BLOCKED, -1, "contacts_blocking", "contacts_blocking", "contacts_blocking" },
+		{ GG_STATUS_NOT_AVAIL, GG_STATUS_NOT_AVAIL_DESCR, "contacts_not_avail", "contacts_not_avail_descr", "contacts_not_avail_descr_full" }
+	};
+	const char *header, *footer;
+	int j;
 		
-	if (!contacts)
-		return;
+	if (!w) {
+		list_t l;
+
+		for (l = windows; l; l = l->next) {
+			struct window *v = l->data;
+			
+			if (v->target && !strcmp(v->target, "__contacts")) {
+				w = v;
+				break;
+			}
+		}
+
+		if (!w)
+			return -1;
+	}
 	
-	werase(contacts);
+	window_clear(w, 1);
 
-	wattrset(contacts, color_pair(COLOR_BLUE, 0, COLOR_BLACK));
-
-	for (y = 0; y <= contacts->_maxy; y++)
-		mvwaddch(contacts, y, 0, ACS_VLINE);
-
-	wattrset(contacts, color_pair(COLOR_WHITE, 0, COLOR_BLACK));
+	header = format_find("contacts_header");
+	footer = format_find("contacts_footer");
 	
-	for (l = userlist, y = 0; l && y <= contacts->_maxy; l = l->next) {
-		struct userlist *u = l->data;
-		int x, z;
+	if (strcmp(header, "")) 
+		window_backlog_add(w, reformat_string(format_string(header)));
 
-		if (!GG_S_A(u->status))
+	for (j = 0; j < 5; j++) {
+		list_t l;
+		int i = contacts_order[j];
+
+		if (i < 0 || i > 4)
 			continue;
 
-		wattrset(contacts, color_pair(COLOR_YELLOW, 1, COLOR_BLACK));
-		
-		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
-			mvwaddch(contacts, y, x + 2, (unsigned char) u->display[x]);
+		for (l = userlist; l; l = l->next) {
+			struct userlist *u = l->data;
+			const char *format;
+			char *line;
 
-		wattrset(contacts, color_pair(COLOR_WHITE, 0, COLOR_BLACK));
+			if ((u->status != table[i].status1 && u->status != table[i].status2) || !u->display)
+				continue;
 
-		if (config_contacts_descr && u->descr)
-			for (z = 0, x++; *(u->descr + z) && x < config_contacts_size; x++, z++)
-				mvwaddch(contacts, y, x + 2, (unsigned char) u->descr[z]);
+			if (GG_S_D(u->status) && contacts_descr)
+				format = table[i].format_descr_full;
+			else if (GG_S_D(u->status) && !contacts_descr)
+				format = table[i].format_descr;
+			else
+				format = table[i].format;
 
-		if (GG_S_D(u->status)) {
-			wattrset(contacts, color_pair(COLOR_BLACK, 1, COLOR_BLACK));
-			mvwaddch(contacts, y, 1, 'i');
+			line = format_string(format_find(format), u->display, u->descr);
+			window_backlog_add(w, reformat_string(line));
+			xfree(line);
 		}
-		
-		y++;
 	}
 
-	for (l = userlist; l && y <= contacts->_maxy; l = l->next) {
-		struct userlist *u = l->data;
-		int x, z;
+	if (strcmp(footer, "")) 
+		window_backlog_add(w, reformat_string(format_string(footer)));
 
-		if (!GG_S_B(u->status))
-			continue;
-		
-		wattrset(contacts, color_pair(COLOR_GREEN, 0, COLOR_BLACK));
+	w->redraw = 1;
 
-		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
-			mvwaddch(contacts, y, x + 2, (unsigned char) u->display[x]);
-
-		wattrset(contacts, color_pair(COLOR_WHITE, 0, COLOR_BLACK));
-
-		if (config_contacts_descr && u->descr)
-			for (z = 0, x++; *(u->descr + z) && x < config_contacts_size; x++, z++)
-				mvwaddch(contacts, y, x + 2, (unsigned char) u->descr[z]);
-
-
-		if (GG_S_D(u->status)) {
-			wattrset(contacts, color_pair(COLOR_BLACK, 1, COLOR_BLACK));
-			mvwaddch(contacts, y, 1, 'i');
-		}
-	
-		y++;
-	}
-
-	for (l = userlist; l && y <= contacts->_maxy; l = l->next) {
-		struct userlist *u = l->data;
-		int x, z;
-
-		if (!GG_S_I(u->status))
-			continue;
-		
-		wattrset(contacts, color_pair(COLOR_WHITE, 0, COLOR_BLACK));
-
-		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
-			mvwaddch(contacts, y, x + 2, (unsigned char) u->display[x]);
-
-		wattrset(contacts, color_pair(COLOR_WHITE, 0, COLOR_BLACK));
-
-		if (config_contacts_descr && u->descr)
-			for (z = 0, x++; *(u->descr + z) && x < config_contacts_size; x++, z++)
-				mvwaddch(contacts, y, x + 2, (unsigned char) u->descr[z]);
-
-		if (GG_S_D(u->status)) {
-			wattrset(contacts, color_pair(COLOR_BLACK, 1, COLOR_BLACK));
-			mvwaddch(contacts, y, 1, 'i');
-		}
-	
-		y++;
-	}
-
-	if (commit)
-		window_commit();
+	return 0;
 }
 
 /*
@@ -1211,17 +1269,122 @@ static void contacts_update(int commit)
  */
 void contacts_changed()
 {
-	if (config_contacts && !contacts)
-		contacts = newwin(OUTPUT_SIZE, config_contacts_size + 2, config_header_size, stdscr->_maxx - config_contacts_size - 1);
+	struct window *w = NULL;
+	list_t l;
+
+	contacts_margin = 1;
+	contacts_edge = WF_RIGHT;
+	contacts_frame = WF_LEFT;
+	contacts_order[0] = 0;
+	contacts_order[1] = 1;
+	contacts_order[2] = 2;
+	contacts_order[3] = 3;
+	contacts_order[4] = -1;
+	contacts_wrap = 0;
+	contacts_descr = 0;
+
+	if (config_contacts_options) {
+		char **args = array_make(config_contacts_options, " \t,", 0, 1, 1);
+		int i;
+
+		for (i = 0; args[i]; i++) {
+			if (!strcasecmp(args[i], "left")) {
+				contacts_edge = WF_LEFT;
+				if (contacts_frame)
+					contacts_frame = WF_RIGHT;
+			}
+
+			if (!strcasecmp(args[i], "right")) {
+				contacts_edge = WF_RIGHT;
+				if (contacts_frame)
+					contacts_frame = WF_LEFT;
+			}
+
+			if (!strcasecmp(args[i], "top")) {
+				contacts_edge = WF_TOP;
+				if (contacts_frame)
+					contacts_frame = WF_BOTTOM;
+			}
+
+			if (!strcasecmp(args[i], "bottom")) {
+				contacts_edge = WF_BOTTOM;
+				if (contacts_frame)
+					contacts_frame = WF_TOP;
+			}
+
+			if (!strcasecmp(args[i], "noframe"))
+				contacts_frame = 0;
+
+			if (!strcasecmp(args[i], "frame")) {
+				switch (contacts_edge) {
+					case WF_TOP:
+						contacts_frame = WF_BOTTOM;
+						break;
+					case WF_BOTTOM:
+						contacts_frame = WF_TOP;
+						break;
+					case WF_LEFT:
+						contacts_frame = WF_RIGHT;
+						break;
+					case WF_RIGHT:
+						contacts_frame = WF_LEFT;
+						break;
+				}
+			}
+
+			if (!strncasecmp(args[i], "margin=", 7))
+				contacts_margin = atoi(args[i] + 7);
+
+			if (!strcasecmp(args[i], "nomargin"))
+				contacts_margin = 0;
+
+			if (!strcasecmp(args[i], "wrap"))
+				contacts_wrap = 1;
+
+			if (!strcasecmp(args[i], "nowrap"))
+				contacts_wrap = 0;
+
+			if (!strcasecmp(args[i], "descr"))
+				contacts_descr = 1;
+
+			if (!strcasecmp(args[i], "nodescr"))
+				contacts_descr = 0;
+
+			if (!strncasecmp(args[i], "order=", 6)) {
+				int j;
+				
+				contacts_order[0] = -1;
+				contacts_order[1] = -1;
+				contacts_order[2] = -1;
+				contacts_order[3] = -1;
+				contacts_order[4] = -1;
+				
+				for (j = 0; args[i][j + 6] && j < 5; j++)
+					contacts_order[j] = args[i][j + 6] - '0';	
+			}
+		}
+
+		array_free(args);
+	}
 	
-	if (!config_contacts && contacts) {
-		delwin(contacts);
-		contacts = NULL;
+	for (l = windows; l; l = l->next) {
+		struct window *v = l->data;
+
+		if (v->target && !strcmp(v->target, "__contacts")) {
+			w = v;
+			break;
+		}
 	}
 
-	ui_screen_width = stdscr->_maxx - contacts_size();
+	if (w) {
+		window_kill(w, 1);
+		w = NULL;
+	}
 
-	window_resize();
+	if (config_contacts && !w)
+		window_new("__contacts", 1000);
+	
+	contacts_update(NULL);
 	window_commit();
 }
 
@@ -1588,9 +1751,6 @@ static void winch_handler()
 
 	endwin();
 	refresh();
-
-        ui_screen_width = stdscr->_maxx - contacts_size() + 1;
-        ui_screen_height = stdscr->_maxy + 1;
 
 	window_resize();
 	window_commit();
@@ -3079,6 +3239,8 @@ cleanup:
 	xfree(w->prompt);
 	delwin(w->window);
 	list_remove(&windows, w, 1);
+
+	window_resize();
 }
 
 /*
@@ -3769,7 +3931,7 @@ static int ui_ncurses_event(const char *event, ...)
 					w->left = stdscr->_maxx + 1 - w->width;
 				
 				if (w->top + w->height > stdscr->_maxy + 1)
-					w->top = OUTPUT_SIZE - w->height;
+					w->top = stdscr->_maxy + 1 - w->height;
 				
 				if (w->floating)
 					mvwin(w->window, w->top, w->left);
@@ -3870,7 +4032,7 @@ static int ui_ncurses_event(const char *event, ...)
 cleanup:
 	va_end(ap);
 
-	contacts_update(0);
+	contacts_update(NULL);
 	update_statusbar(1);
 	
 	return 0;
@@ -3915,7 +4077,7 @@ void header_statusbar_resize()
 	window_resize();
 
 	wresize(status, config_statusbar_size, stdscr->_maxx + 1);
-	mvwin(status, config_header_size + OUTPUT_SIZE, 0);
+	mvwin(status, stdscr->_maxy + 1 - input_size - config_statusbar_size, 0);
 
 	update_statusbar(0);
 

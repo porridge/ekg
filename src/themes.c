@@ -939,6 +939,21 @@ void theme_init()
 	format_add("modify_online", "%> %1 bêdzie widzieæ nasz stan\n", 1);
 	format_add("modify_done", "%> Zmieniono wpis w li¶cie kontaktów\n", 1);
 
+	/* lista kontaktów z boku ekranu */
+	format_add("contacts_avail", " %Y%1%n", 1);
+	format_add("contacts_avail_descr", "%Ki%Y%1%n", 1);
+	format_add("contacts_avail_descr_full", "%Ki%Y%1%n %2", 1);
+	format_add("contacts_busy", " %G%1%n", 1);
+	format_add("contacts_busy_descr", "%Ki%G%1%n", 1);
+	format_add("contacts_busy_descr_full", "%Ki%G%1%n %2", 1);
+	format_add("contacts_not_avail", " %r%1%n", 1);
+	format_add("contacts_not_avail_descr", "%Ki%r%1%n", 1);
+	format_add("contacts_not_avail_descr_full", "%Ki%r%1%n %2", 1);
+	format_add("contacts_invisible", " %c%1%n", 1);
+	format_add("contacts_invisible_descr", "%Ki%c%1%n", 1);
+	format_add("contacts_invisible_descr_full", "%Ki%c%1%n %2", 1);
+	format_add("contacts_blocking", " %m%1%n", 1);
+		
 	/* ¿egnamy siê, zapisujemy konfiguracjê */
 	format_add("quit", "%> Papa\n", 1);
 	format_add("quit_descr", "%> Papa: %T%1%n%2\n", 1);
