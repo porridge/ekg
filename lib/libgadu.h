@@ -320,13 +320,6 @@ enum {
 	GG_ERROR_DCC_NET,		/* b³±d wysy³ania/odbierania */
 };
 
-struct gg_msg_format {
-	int position;
-	int length;
-	unsigned char font;
-	unsigned char color[3];
-};
-
 /*
  * struktura opisuj±ca rodzaj zdarzenia. wychodzi z gg_watch_fd() lub
  * z gg_dcc_watch_fd()
@@ -629,7 +622,7 @@ struct gg_login {
 	u_int32_t status;		/* status na dzieñ dobry */
 	u_int32_t version;		/* moja wersja klienta */
 	u_int32_t local_ip;		/* mój adres ip */
-	u_int32_t local_port;		/* port, na którym s³ucham */
+	u_int16_t local_port;		/* port, na którym s³ucham */
 }
 #ifdef __GNUC__
 __attribute__ ((packed))
