@@ -2193,6 +2193,25 @@ int timer_remove(const char *name, const char *command)
 }
 
 /*
+ * timer_free()
+ *
+ * zwalnia pamiêæ po timerach.
+ */
+void timer_free()
+{
+	list_t l;
+
+	for (l = timers; l; l = l->next) {
+		struct timer *t = l->data;
+		
+		xfree(t->name);
+		xfree(t->command);
+	}
+
+	list_destroy(timers, 1);
+}
+
+/*
  * log_escape()
  *
  * je¶li trzeba, eskejpuje tekst do logów.

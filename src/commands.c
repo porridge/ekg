@@ -101,7 +101,7 @@ void add_send_nick(const char *nick)
 	if (send_nicks_count != SEND_NICKS_MAX && !dont_add)
 		send_nicks_count++;
 	
-	send_nicks[0] = xstrdup(nick);	
+	send_nicks[0] = xstrdup(nick);
 }
 
 /*

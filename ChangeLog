@@ -16,6 +16,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawne zapisywanie polskich znaków mesgów wychodz±cych w last (d)
 - s/get_last_count/last_count_get/ (d)
 - brakuj±ce sent_line_first (dawjar/w)
+- usuniêcie kilku drobnych leaków (w)
+- ekg pyta siê o zapisanie konfiguracji, nie ui (Arim/w)
 	
 // 2002-09-06
 

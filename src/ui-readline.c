@@ -659,35 +659,10 @@ void ui_readline_init()
  */
 static void ui_readline_deinit()
 {
-	int i;
-
 	if (ekg_segv_handler)
 		return;
 
-	if (config_changed) {
-		char *line;
-		const char *prompt = format_find("config_changed");
-
-		if ((line = readline(prompt))) {
-			if (!strcasecmp(line, "tak") || !strcasecmp(line, "yes") || !strcasecmp(line, "t") || !strcasecmp(line, "y")) {
-				if (!userlist_write(NULL) && !config_write(NULL))
-					print("saved");
-				else
-					print("error_saving");
-
-			}
-			free(line);
-		} else
-			printf("\n");
-	}
-
 	window_free();
-
-	for (i = 0; i < SEND_NICKS_MAX; i++) {
-		xfree(send_nicks[i]);
-		send_nicks[i] = NULL;
-	}
-	send_nicks_count = 0;
 }
 
 /*

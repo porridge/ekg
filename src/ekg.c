@@ -801,6 +801,7 @@ int main(int argc, char **argv)
 void ekg_exit()
 {
 	list_t l;
+	int i;
 
 	ekg_logoff(sess, NULL);
 	list_remove(&watches, sess, 0);
@@ -808,6 +809,28 @@ void ekg_exit()
 	sess = NULL;
 
 	ui_deinit();
+
+	if (config_changed) {
+		char line[80];
+
+		printf("%s", format_find("config_changed"));
+		fflush(stdout);
+		if (fgets(line, sizeof(line), stdin)) {
+			if (line[strlen(line) - 1] == '\n')
+				line[strlen(line) - 1] = 0;
+			if (!strcasecmp(line, "tak") || !strcasecmp(line, "yes") || !strcasecmp(line, "t") || !strcasecmp(line, "y")) {
+				if (userlist_write(NULL) || config_write(NULL))
+					printf("Wyst±pi³ b³±d podczas zapisu.\n");
+			}
+		} else
+			printf("\n");
+	}
+
+	for (i = 0; i < SEND_NICKS_MAX; i++) {
+		xfree(send_nicks[i]);
+		send_nicks[i] = NULL;
+	}
+	send_nicks_count = 0;
 
 	for (l = children; l; l = l->next) {
 		struct process *p = l->data;
@@ -827,6 +850,7 @@ void ekg_exit()
 	event_free();
 	emoticon_free();
 	command_free();
+	timer_free();
 
 	xfree(home_dir);
 

@@ -648,7 +648,11 @@ void ui_ncurses_init()
  */
 static void ui_ncurses_deinit()
 {
+	static int done = 0;
 	list_t l;
+
+	if (done)
+		return;
 
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
@@ -668,6 +672,8 @@ static void ui_ncurses_deinit()
 	endwin();
 
 	xfree(yanked);
+
+	done = 1;
 }
 
 /*
