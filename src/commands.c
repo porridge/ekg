@@ -2178,9 +2178,11 @@ COMMAND(cmd_dcc)
 		struct transfer *t;
 		char *path;
 		
-		for (t = NULL, l = transfers; l; l = l->next) {
+		for (t = NULL, l = transfers; l; ) {
 			struct transfer *tt = l->data;
 			struct userlist *u;
+
+			l = l->next;
 			
 			if (!tt->dcc || tt->type != GG_SESSION_DCC_GET || !tt->filename)
 				continue;
@@ -2753,7 +2755,7 @@ COMMAND(cmd_on)
         }
 
 	if (event_correct(params[2], 0))
-	return;
+		return;
 
 	event_add(flags, uin, params[2], 0);
 	config_changed = 1;

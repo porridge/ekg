@@ -121,8 +121,10 @@ int msg_queue_remove_uin(uin_t uin)
 	list_t l;
 	int x = 0;
 
-	for (l = msg_queue; l; l = l->next) {
+	for (l = msg_queue; l; ) {
 		struct msg_queue *m = l->data;
+
+		l = l->next;
 
 		if (find_in_uins(m->uin_count, m->uins, uin)) {
 			xfree(m->uins);

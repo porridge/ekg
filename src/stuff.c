@@ -1731,7 +1731,6 @@ int conference_remove(const char *name)
 			list_destroy(c->recipients, 1);
 			list_remove(&conferences, c, 1);
 			remove_send_nick(name);
-
 			return 0;
 		}
 	}
@@ -2980,7 +2979,6 @@ int emoticon_remove(char *name)
 			xfree(f->value);
 			xfree(f->name);
 			list_remove(&emoticons, f, 1);
-
 			return 0;
 		}
 	}
@@ -3148,8 +3146,10 @@ int timer_remove(const char *name, int at, const char *command)
 	list_t l;
 	int removed = 0;
 
-	for (l = timers; l; l = l->next) {
+	for (l = timers; l; ) {
 		struct timer *t = l->data;
+
+		l = l->next;
 
 		if ((at == t->at) && ((name && !strcmp(name, t->name)) || (command && !strcmp(command, t->command)))) {
 			xfree(t->name);
@@ -3319,8 +3319,10 @@ void last_del(uin_t uin)
 {
 	list_t l;
 
-	for (l = lasts; l; l = l->next) {
+	for (l = lasts; l; ) {
 		struct last *ll = l->data;
+
+		l = l->next;
 
 		if (uin == ll->uin) {
 			xfree(ll->message);
