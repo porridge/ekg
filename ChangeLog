@@ -12,6 +12,8 @@ zg³osi³ b³±d.
   kompatybilno¶ci ze nieaktualnymi wersjami API (w)
 - drobna poprawka do licencji pozwalaj±ca kompilowaæ, konsolidowaæ i
   uruchamiaæ ekg z bibliotek± OpenSSL (porridge/w)
+- drobne poprawki readline. niech wygl±da jako tako w 1.0, mimo ¿e
+  ju¿ nie supportowane: operator $, window active/last, msg * (sz)
 
 // 2003-03-27
 

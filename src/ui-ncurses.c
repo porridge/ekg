@@ -4040,14 +4040,14 @@ static int ui_ncurses_event(const char *event, ...)
 				for (l = windows; l; l = l->next) {
 					struct window *w = l->data;
 
-					if (!quiet && w->id) {
+					if (w->id) {
 						if (w->target) {
 							if (!w->floating)	
-								print("window_list_query", itoa(w->id), w->target);
+								printq("window_list_query", itoa(w->id), w->target);
 							else
-								print("window_list_floating", itoa(w->id), itoa(w->left), itoa(w->top), itoa(w->width), itoa(w->height), w->target);
+								printq("window_list_floating", itoa(w->id), itoa(w->left), itoa(w->top), itoa(w->width), itoa(w->height), w->target);
 						} else
-							print("window_list_nothing", itoa(w->id));
+							printq("window_list_nothing", itoa(w->id));
 					}
 				}
 

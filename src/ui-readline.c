@@ -90,6 +90,8 @@ struct window {
 	char *line[MAX_LINES_PER_SCREEN];
 };
 
+static int window_last_id = -1;
+
 /* deklaracje funkcji interfejsu */
 static void ui_readline_loop();
 static void ui_readline_print(const char *target, int separate, const char *line);
@@ -360,7 +362,7 @@ static char *dcc_generator(char *text, int state)
 
 static char *window_generator(char *text, int state)
 {
-	char *commands[] = { "new", "kill", "next", "prev", "switch", "clear", "refresh", "list", NULL };
+	char *commands[] = { "new", "kill", "next", "prev", "switch", "clear", "refresh", "list", "last", "active", NULL };
 	static int len, i;
 
 	if (!state) {
@@ -945,6 +947,33 @@ static int ui_readline_event(const char *event, ...)
 		int quiet = va_arg(ap, int);
 		char *command = va_arg(ap, char*);
 
+		if (!strcasecmp(command, "query-current")) {
+			int *param = va_arg(ap, uin_t*);
+
+			if (window_current->query_nick)
+				*param = get_uin(window_current->query_nick);
+			else
+				*param = 0;
+
+			goto cleanup;
+		}
+
+		if (!strcasecmp(command, "query-nicks")) {
+			char ***param = va_arg(ap, char***);
+			list_t l;
+
+			for (l = windows; l; l = l->next) {
+				struct window *w = l->data;
+
+				if (!w->query_nick)
+					continue;
+				else
+					array_add(param, xstrdup(w->query_nick));
+			}
+
+			goto cleanup;
+		}
+
 		if (!strcasecmp(command, "query")) {
 			char *param = va_arg(ap, char*);	
 			
@@ -978,10 +1007,14 @@ static int ui_readline_event(const char *event, ...)
 			
 			if (window_current->query_nick) {
 				struct userlist *u = userlist_find(0, window_current->query_nick);
+				struct conference *c = conference_find(window_current->query_nick);
 				int uin;
 
 				if (u && u->uin)
 					tmp = saprintf("find %d", u->uin);
+
+				if (c && c->name)
+					tmp = saprintf("/conference --find %s", c->name);
 
 				if (!u && (uin = atoi(window_current->query_nick)))
 					tmp = saprintf("find %d", uin);
@@ -1000,13 +1033,23 @@ static int ui_readline_event(const char *event, ...)
 		if (!strcasecmp(command, "window")) {
 			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*);
 
-			if (!p1) {
-		                printq("not_enough_params", "window");
-				result = 1;
-				goto cleanup;
-		        }
+			if (!p1 || !strcasecmp(p1, "list")) {
+				if (!quiet)
+					window_list();
+			} else if (!strcasecmp(p1, "last")) {
+				if (window_last_id != -1)
+					window_switch(window_last_id, 0);
+			} else if (!strcasecmp(p1, "active")) {
+				list_t l;
 
-		        if (!strcasecmp(p1, "new")) {
+				for (l = windows; l; l = l->next) {
+					struct window *w = l->data;
+
+					if (w->act)
+						window_switch(w->id, 0);
+				}
+
+		        } else if (!strcasecmp(p1, "new")) {
 		                window_add();
  
 			} else if (!strcasecmp(p1, "next")) {
@@ -1033,10 +1076,6 @@ static int ui_readline_event(const char *event, ...)
 		                window_clear();
 				window_refresh();
 
-			} else if (!strcasecmp(p1, "list")) {
-				if (!quiet)
-					window_list();
-				
 			} else
 				printq("invalid_params", "window");
 
@@ -1197,6 +1236,9 @@ static int window_switch(int id, int quiet)
 		printq("window_noexist");
 		return -1;
 	}
+
+	if (id != window_current->id)
+		window_last_id = window_current->id;
 
 	window_current = w;
 	w->act = 0;
