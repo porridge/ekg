@@ -269,12 +269,19 @@ int msg_queue_write()
 		for (i = 0; i < m->uin_count; i++)
 			fprintf(f, "%d\n", m->uins[i]);
 
-		fprintf(f, "%d\n%ld\n%s", m->secure, (long) m->time, m->msg);
+		fprintf(f, "%d\n%ld\n%d\n", m->secure, (long) m->time, m->formatlen);
+
+		if (m->formatlen) {
+			for (i = 0; i < m->formatlen; i++)
+				fprintf(f, "%c", m->format[i]);
+
+			fprintf(f, "\n");
+		}
+
+		fprintf(f, "%s", m->msg);
 
 		fclose(f);
-
 		chmod(fn, 0600);
-
 		xfree(fn);
 	}
 
@@ -336,6 +343,7 @@ int msg_queue_read()
 
 		fscanf(f, "%d\n", &m.secure);
 		fscanf(f, "%ld\n", (long *) &m.time);
+		fscanf(f, "%d\n", &m.formatlen);
 
 		/* dziwny plik? */
 		if (!m.time || !m.msg_seq || !m.msg_class) {
@@ -343,6 +351,15 @@ int msg_queue_read()
 			xfree(fn);
 			xfree(m.uins);
 			continue;
+		}
+
+		if (m.formatlen) {
+			m.format = xcalloc(m.formatlen, sizeof(unsigned char));
+
+			for (i =0; i < m.formatlen; i++)
+				fscanf(f, "%c", &m.format[i]);
+
+			fscanf(f, "%*c");
 		}
 
 		msg = string_init(NULL);
