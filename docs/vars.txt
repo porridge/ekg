@@ -176,6 +176,12 @@ display_sent
 	zwróciæ uwagê, ¿e przy make_window = 2, wys³anie wiadomo¶ci utworzy
 	automatycznie okienko rozmowy.
 
+display_welcome
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	mówi, czy ekg ma wy¶wietliæ tekst powitalny.
+
 emoticons
 	typ: bool
 	domy¶lna warto¶æ: 1

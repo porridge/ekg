@@ -965,7 +965,7 @@ int main(int argc, char **argv)
 		list_add(&watches, &si, sizeof(si));
 	}
 
-	if (!batch_mode)
+	if (!batch_mode && config_display_welcome)
 		print("welcome", VERSION);
 
 	if (!config_uin || !config_password)

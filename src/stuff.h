@@ -177,6 +177,7 @@ int config_display_ack;
 int config_display_color;
 int config_display_notify;
 int config_display_sent;
+int config_display_welcome;
 char *config_email;
 int config_emoticons;
 int config_encryption;

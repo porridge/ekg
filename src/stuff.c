@@ -162,6 +162,7 @@ int config_server_save = 0;
 char *config_email = NULL;
 int config_time_deviation = 300;
 int config_mesg_allow = 2;
+int config_display_welcome = 1;
 
 static struct {
 	int event;

@@ -70,6 +70,7 @@ void variable_init()
 	variable_add("display_ack", VAR_INT, 1, &config_display_ack, NULL, variable_map(4, 0, 0, "none", 1, 0, "all", 2, 0, "delivered", 3, 0, "queued"));
 	variable_add("display_color", VAR_BOOL, 1, &config_display_color, NULL, NULL);
 	variable_add("display_notify", VAR_INT, 1, &config_display_notify, NULL, variable_map(3, 0, 0, "none", 1, 0, "all", 2, 0, "significant"));
+	variable_add("display_welcome", VAR_BOOL, 1, &config_display_welcome, NULL, NULL);
 	variable_add("display_sent", VAR_BOOL, 1, &config_display_sent, NULL, NULL);
 	variable_add("emoticons", VAR_BOOL, 1, &config_emoticons, NULL, NULL);
 #ifdef HAVE_OPENSSL
