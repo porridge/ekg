@@ -1250,7 +1250,7 @@ fail:
  */
 void handle_userlist(struct gg_http *h)
 {
-	char *format_ok, *format_error;
+	const char *format_ok, *format_error;
 	
 	if (!h)
 		return;
@@ -1259,8 +1259,13 @@ void handle_userlist(struct gg_http *h)
 		format_ok = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_get_ok" : "userlist_put_ok";
 		format_error = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_get_error" : "userlist_put_error";
 	} else {
-		format_ok = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_config_get_ok" : "userlist_config_put_ok";
-		format_error = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_config_get_error" : "userlist_config_put_error";
+		if (h->user_data == (char *) 1) {
+			format_ok = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_config_get_ok" : "userlist_config_put_ok";
+			format_error = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_config_get_error" : "userlist_config_put_error";
+		} else {
+			format_ok = (h->user_data == (char *) 2) ? "userlist_clear_ok" : "userlist_config_clear_ok";
+			format_error = (h->user_data == (char *) 2) ? "userlist_clear_error" : "userlist_config_clear_error";
+		}
 	}
 
 	if (h->callback(h) || h->state == GG_STATE_ERROR) {

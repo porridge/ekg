@@ -1471,19 +1471,23 @@ COMMAND(cmd_list)
 			xfree(contacts);
 			
 			contacts = string_free(s, 0);
-		}
+		} else
+			contacts = xstrdup("");
 			
 		if (!contacts) {
-			print("userlist_put_error", strerror(ENOMEM));
+			print("userlist_clear_error", strerror(ENOMEM));
 			return;
 		}
 		
 		if (!(h = gg_userlist_put(config_uin, config_password, contacts, 1))) {
-			print("userlist_put_error", strerror(errno));
+			print("userlist_clear_error", strerror(errno));
 			return;
 		}
 
-		h->user_data = (char*) 1;
+		if (match_arg(params[0], 'c', "clear", 2))
+			h->user_data = (char *) 2;
+		else
+			h->user_data = (char *) 3;
 		
 		xfree(contacts);
 		
@@ -1544,7 +1548,8 @@ COMMAND(cmd_list)
 			return;
 		}
 
-		h->user_data = (char*) 1;
+		if (match_arg(params[0], 'P', "put-config", 5))
+			h->user_data = (char*) 1;
 		
 		xfree(contacts);
 		
@@ -4119,7 +4124,7 @@ void command_init()
 	  "  -o, --offline              b±d¼ niedostêpny dla danej osoby\n"
 	  "  -O, --online               b±d¼ dostêpny dla danej osoby\n"
 	  "\n"
-	  "Lista kontaktów na serwerze \"list [-p|-g|-P|-G]\":\n"
+	  "Lista kontaktów na serwerze \"list [-p|-g|-c|-P|-G|-C]\":\n"
 	  "  -p, --put         umieszcza na serwerze\n"
 	  "  -P, --put-config  umieszcza na serwerze razem z konfiguracj±\n"
 	  "  -g, --get         pobiera z serwera\n"
