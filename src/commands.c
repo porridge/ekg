@@ -1193,8 +1193,46 @@ COMMAND(cmd_msg)
 
 		for (l = c->recipients; l; l = l->next)
 			array_add(&nicks, xstrdup(itoa(*((uin_t *) (l->data)))));
-	} else 
-		nicks = array_make(nick, ",", 0, 0, 0);
+	} else {
+		char **tmp = array_make(nick, ",", 0, 0, 0);
+		int i;
+
+		/* XXX nie s± wykrywane duplikaty */
+		
+		for (i = 0; tmp[i]; i++) {
+			int count = 0;
+			list_t l;
+
+			if (tmp[i][0] != '@') {
+				array_add(&nicks, xstrdup(tmp[i]));
+				continue;
+			}
+
+			for (l = userlist; l; l = l->next) {
+				struct userlist *u = l->data;			
+				list_t m;
+
+				for (m = u->groups; m; m = m->next) {
+					struct group *g = m->data;
+
+					if (!strcasecmp(g->name, tmp[i] + 1)) {
+						array_add(&nicks, xstrdup(u->display));
+						count++;
+					}
+				}
+			}
+
+			if (!count)
+				print("group_empty", tmp[i] + 1);
+		}
+
+		array_free(tmp);
+	}
+
+	if (!nicks) {
+		xfree(nick);
+		return;
+	}
 
 	msg = xstrdup(params[1]);
 	escaped = log_escape(msg);
