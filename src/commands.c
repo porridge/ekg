@@ -183,7 +183,7 @@ COMMAND(cmd_add)
 	struct userlist *u;
 	uin_t uin;
 
-	if (params[0] && !params[1]) {
+	if (params[0] && !match_arg(params[0], 'f', "find", 2) && !params[1]) {
 		ui_event("command", quiet, "add", params[0], NULL);
 		return 0;
 	}
@@ -204,11 +204,11 @@ COMMAND(cmd_add)
 			return -1;
 		}
 
-		if (nonick)
+		if (nonick || params[1])
 			nickname = (char *) params[1];
 		else
 			nickname = tmp;
-		
+
 		params_free = 1;
 
 		params = xmalloc(4 * sizeof(char*));

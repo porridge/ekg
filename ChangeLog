@@ -16,6 +16,7 @@ zg³osi³ b³±d.
 - dodana zmienna ,,reason_limit'' (jojo/w)
 - poprawki ,,reload plik'', gdy kto¶ u¿ywa zarówno readline jak i ncurses (sz)
 - kosmetyka /change (sz)
+- poprawka /add -f (sz)
 
 // 2003-02-06
 
