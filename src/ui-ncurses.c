@@ -2797,7 +2797,10 @@ static void complete(int *line_start, int *line_index)
 		gg_debug(GG_DEBUG_MISC, "words[i = %d] = \"%s\"\n", i, words[i]);     */
 
 	/* inicjujemy pamiêc dla separators */
-	separators = xmalloc(array_count(words));
+	if (words != NULL)
+		separators = xmalloc(array_count(words));
+	else
+		separators = NULL;
 		
 	/* sprawd¼, gdzie jeste¶my (uwzgêdniaj±c cudzys³owia) i dodaj separatory*/
 	for (word = 0, i = 0; i < strlen(line); i++, word++) {
@@ -2839,7 +2842,8 @@ static void complete(int *line_start, int *line_index)
 		i--;
 	}
 
-	separators[j] = '\0'; // koniec ciagu 	
+	if (separators)
+		separators[j] = '\0'; // koniec ciagu 	
 	
 	/* aktualny wyraz bez uwzgledniania przecinkow */
 	for (i = 0, words_count = 0, word_current = 0; i < strlen(line); i++, words_count++) {
