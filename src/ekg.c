@@ -629,7 +629,7 @@ void ekg_wait_for_key()
 
 			if (c->type == GG_SESSION_USER0) {
 				if (config_auto_back == 2 && GG_S_B(config_status) && in_auto_away) {
-					change_status(GG_STATUS_AVAIL, NULL, 1);
+					change_status(GG_STATUS_AVAIL, (config_auto_away_keep_descr) ? config_status : NULL, 1);
 					in_auto_away = 0;
 				}
 
