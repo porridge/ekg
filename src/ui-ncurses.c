@@ -123,6 +123,8 @@ struct window {
 	int start;		/* od której linii zaczyna siê wy¶wietlanie */
 	int lines_count;	/* ilo¶æ linii ekranowych w backlogu */
 	struct screen_line *lines;	/* linie ekranowe */
+
+	int overflow;		/* ilo¶æ nadmiarowych linii w okienku */
 };
 
 static WINDOW *status = NULL;		/* okno stanu */
@@ -422,6 +424,7 @@ static void window_clear(struct window *w, int full)
 	if (!full) {
 		w->start = w->lines_count;
 		w->redraw = 1;
+		w->overflow = w->height;
 		return;
 	}
 
@@ -791,6 +794,11 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 		count += window_backlog_add(w, fs);
 	}
 	xfree(lines_save);
+
+	w->overflow -= count;
+
+	if (w->overflow < 0)
+		w->overflow = 0;
 
 	if (bottom)
 		w->start = w->lines_count - w->height;
@@ -1216,7 +1224,7 @@ static void update_statusbar()
 				break;
 		}
 	}
-	
+
 	wnoutrefresh(status);
 	if (config_contacts)
 		wnoutrefresh(contacts);
@@ -2311,13 +2319,13 @@ static void ui_ncurses_loop()
 			case 'G' - 64:	/* Ctrl-G */
 				window_current->start += window_current->height;
 
-				if (window_current->start > window_current->lines_count - window_current->height)
-					window_current->start = window_current->lines_count - window_current->height;
+				if (window_current->start > window_current->lines_count - window_current->height + window_current->overflow)
+					window_current->start = window_current->lines_count - window_current->height + window_current->overflow;
 
 				if (window_current->start < 0)
 					window_current->start = 0;
 
-				if (window_current->start == window_current->lines_count - window_current->height) {
+				if (window_current->start == window_current->lines_count - window_current->height + window_current->overflow) {
 					window_current->more = 0;
 					update_statusbar();
 				}
