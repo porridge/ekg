@@ -5523,6 +5523,9 @@ int check_conn(uin_t uin)
 {
 	struct userlist *u;
 
+	if (!sess || sess->state != GG_STATE_CONNECTED)
+		return -1;
+
 	if ((u = userlist_find(uin, NULL)) && group_member(u, "spied")) {
 		list_t l;
 		struct spied s;
@@ -5554,11 +5557,6 @@ COMMAND(cmd_check_conn)
 		return -1;
 	}
 
-	if (!sess || sess->state != GG_STATE_CONNECTED) {
-		printq("not_connected");
-		return -1;
-	}
-
 	if (params[0]) {
 		if (match_arg(params[0], 'u', "update", 2)) {
 			list_t l;
@@ -5585,6 +5583,11 @@ COMMAND(cmd_check_conn)
 
 			return 0;
 		}
+	}
+
+	if (!sess || sess->state != GG_STATE_CONNECTED) {
+		printq("not_connected");
+		return -1;
 	}
 
 	par = params[0] ? params[0] : target;
@@ -5808,7 +5811,7 @@ void command_init()
 	  "Backspace, Delete, Insert, Home, End, Left, Right, Up, Down, "
 	  "PageUp, PageDown.\n"
 	  "\n"
-	  "Dostêpne akcje to: backward-word, forward-word, kill-word, toggle-input, cancel-input, backward-delete-char, beginning-of-line, end-of-line, delete-char, backward-page, forward-page, kill-line, yank, accept-line, line-discard, quoted-insert, word-rubout, backward-char, forward-char, previous-history, next-history, complete, quick-list, toggle-contacts, next-contacts-group, ignore-query. "
+	  "Dostêpne akcje to: backward-word, forward-word, kill-word, toggle-input, cancel-input, backward-delete-char, beginning-of-line, end-of-line, delete-char, backward-page, forward-page, kill-line, yank, accept-line, line-discard, quoted-insert, word-rubout, backward-char, forward-char, previous-history, next-history, complete, quick-list, toggle-contacts, next-contacts-group, ignore-query, contacts-scroll-up, contacts-scroll-down. "
 	  "Ka¿da inna akcja bêdzie traktowana jako komenda do wykonania.");
 
 	command_add

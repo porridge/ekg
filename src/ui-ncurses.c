@@ -220,6 +220,8 @@ static int contacts_wrap = 0;
 static int contacts_order[5] = { 0, 1, 2, 3, -1 };
 static int contacts_framecolor = 4;
 static int contacts_group_index = 0;
+static int contacts_count = 0;
+static int contacts_offset = 0;
 
 struct binding *binding_map[KEY_MAX + 1];	/* mapa bindowanych klawiszy */
 struct binding *binding_map_meta[KEY_MAX + 1];	/* j.w. z altem */
@@ -1376,6 +1378,7 @@ static int contacts_update(struct window *w)
 	const char *header = NULL, *footer = NULL;
 	char *group = NULL;
 	int j;
+	int offset = contacts_offset;
 		
 	if (!w) {
 		list_t l;
@@ -1423,6 +1426,7 @@ static int contacts_update(struct window *w)
 		xfree(tmp);
 	}
 
+	contacts_count = 0;
 	for (j = 0; j < 5; j++) {
 		const char *header, *footer;
 		int i = contacts_order[j], count;
@@ -1450,6 +1454,13 @@ static int contacts_update(struct window *w)
 				char *tmp = format_string(header);
 				window_backlog_add(w, reformat_string(tmp));
 				xfree(tmp);
+			}
+
+			contacts_count++;
+
+			if (offset) {
+				offset--;
+				continue;
 			}
 
 			if (GG_S_D(u->status) && contacts_descr)
@@ -1515,6 +1526,7 @@ void contacts_changed()
 	contacts_order[4] = -1;
 	contacts_wrap = 0;
 	contacts_descr = 0;
+	contacts_offset = 0;
 
 	if (config_contacts_options) {
 		char **args = array_make(config_contacts_options, " \t,", 0, 1, 1);
@@ -3677,6 +3689,24 @@ static void binding_next_contacts_group(const char *arg)
 	window_commit();
 }
 
+static void binding_contacts_scrolldown(const char *arg)
+{
+	if (contacts_offset < contacts_count) {
+		contacts_offset++;
+		contacts_update(NULL);
+		window_commit();
+	}
+}
+
+static void binding_contacts_scrollup(const char *arg)
+{
+	if (contacts_offset) {
+		contacts_offset--;
+		contacts_update(NULL);
+		window_commit();
+	}
+}
+
 static void binding_ui_ncurses_debug_toggle(const char *arg)
 {
 	if (++ui_ncurses_debug > 2)
@@ -4182,6 +4212,8 @@ static void binding_parse(struct binding *b, const char *action)
 	__action("next-contacts-group", binding_next_contacts_group);
 	__action("ignore-query", binding_ignore_query);
 	__action("ui-ncurses-debug-toggle", binding_ui_ncurses_debug_toggle);
+	__action("contacts-scroll-up", binding_contacts_scrollup);
+	__action("contacts-scroll-down", binding_contacts_scrolldown);
 
 #undef __action
 
@@ -5105,4 +5137,6 @@ static void binding_default()
 	binding_add("F12", "/window switch 0", 1, 1);
 #endif
 	binding_add("F11", "ui-ncurses-debug-toggle", 1, 1);
+	binding_add("Alt-Z", "contacts-scroll-up", 1, 1);
+	binding_add("Alt-X", "contacts-scroll-down", 1, 1);
 }
