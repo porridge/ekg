@@ -170,6 +170,7 @@ int config_time_deviation = 300;
 int config_mesg_allow = 2;
 int config_display_welcome = 1;
 int config_auto_back = 0;
+int config_display_crap = 1;
 
 static struct {
 	int event;

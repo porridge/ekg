@@ -422,6 +422,10 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 					print_window(target, 1, "query_started_window", target);
 				}
 			}
+
+			if (!config_display_crap && !strcmp(target, "__current"))
+				w = windows->data;
+			
 			break;
 			
 		default:
@@ -2226,8 +2230,8 @@ static int ui_ncurses_event(const char *event, ...)
 					window_switch(w->id);
 				}
 
-				print("query_started", param);
-				print("query_started_window", param);
+				print_window(param, 0, "query_started", param);
+				print_window(param, 0, "query_started_window", param);
 				xfree(window_current->target);
 				xfree(window_current->prompt);
 				window_current->target = xstrdup(param);

@@ -167,6 +167,7 @@ char *config_dcc_dir;
 int config_debug;
 int config_display_ack;
 int config_display_color;
+int config_display_crap;
 int config_display_notify;
 int config_display_sent;
 int config_display_welcome;

@@ -169,6 +169,14 @@ display_color
 
 	warto¶æ 0 wy³±cza wy¶wietlanie kolorów, warto¶æ 1 w³±cza.
 
+display_crap
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	mówi, czy w oknie rozmowy maj± byæ wy¶wietlane komunikaty niezwi±zane
+	z rozmowc±. je¶li jest równe 0, w oknie rozmowy s± wy¶wietlane tylko
+	wiadomo¶ci i informacje o zmianie stanu rozmówcy.
+
 display_notify
 	typ: liczba
 	domy¶lna warto¶æ: 1
