@@ -6,10 +6,9 @@ biblioteka:
 - komunikacja miêdzy klientami, w tym wysy³anie plików,
 - wysy³anie has³a na maila,
 - konferencje,
-- znalezienie algorytmu na liczenie hashy http, przez bêdzie mo¿liwe:
-  - zak³adanie kont,
-  - zmiana informacji w katalogu publicznym,
-  - zmiana has³a.
+- zak³adanie kont,
+- zmiana informacji w katalogu publicznym,
+- zmiana has³a.
 - wysy³anie userlisty na server 
 - timeouty, chocia¿ zastawiam siê, czy nie lepiej zrzuciæ ich na klienta.
 
