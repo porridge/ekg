@@ -629,7 +629,7 @@ int variable_undigest(const char *digest)
  */
 void variable_help(const char *name)
 {
-	FILE *f = fopen(DATA_DIR "/vars.txt", "r");
+	FILE *f = fopen(DATADIR "/vars.txt", "r");
 	char *line, *type = NULL, *def = NULL, *tmp;
 	string_t s = string_init(NULL);
 	int found = 0;

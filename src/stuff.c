@@ -464,18 +464,16 @@ cleanup:
 /*
  * config_read()
  *
- * czyta z pliku ~/.gg/config lub podanego konfiguracjê i listê ignorowanych
- * u¿yszkodników.
+ * czyta z pliku ~/.gg/config lub podanego konfiguracjê.
  *
- *  - filename.
+ *  - filename,
  */
-int config_read()
+int config_read(const char *filename)
 {
-	const char *filename;
 	char *buf, *foo;
 	FILE *f;
 
-	if (!(filename = prepare_path("config", 0)))
+	if (!filename && !(filename = prepare_path("config", 0)))
 		return -1;
 	
 	if (!(f = fopen(filename, "r")))
@@ -2965,15 +2963,19 @@ int ekg_hash(const char *name)
  * dodaje timera.
  *
  *  - period - za jaki czas w sekundach ma byæ uruchomiony,
+ *  - persistent - czy sta³y timer,
+ *  - type - rodzaj timera,
  *  - name - nazwa timera w celach identyfikacji. je¶li jest równa NULL,
  *           zostanie przyznany pierwszy numerek z brzegu.
  *  - command - komenda wywo³ywana po up³yniêciu czasu.
  *
  * zwraca zaalokowan± struct timer.
  */
-struct timer *timer_add(int period, const char *name, const char *command)
+struct timer *timer_add(int period, int persistent, int type, const char *name, const char *command)
 {
 	struct timer t;
+	struct timeval tv;
+	struct timezone tz;
 
 	if (!name) {
 		int i;
@@ -2999,10 +3001,14 @@ struct timer *timer_add(int period, const char *name, const char *command)
 	}
 
 	memset(&t, 0, sizeof(t));
-	t.started = time(NULL);
+	gettimeofday(&tv, &tz);
+	tv.tv_sec += period;
+	memcpy(&t.ends, &tv, sizeof(tv));
 	t.period = period;
 	t.name = xstrdup(name);
 	t.command = xstrdup(command);
+	t.type = type;
+	t.persistent = persistent;
 
 	return list_add(&timers, &t, sizeof(t));
 }

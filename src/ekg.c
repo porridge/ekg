@@ -252,25 +252,42 @@ void ekg_wait_for_key()
 		/* przejrzyj timery */
 		for (l = timers; l; ) {
 			struct timer *t = l->data;
+			struct timeval tv;
+			struct timezone tz;
 
 			l = l->next;
 
-			if (time(NULL) - t->started > t->period) {
+			gettimeofday(&tv, &tz);
+
+			if (tv.tv_sec >= t->ends.tv_sec && tv.tv_usec >= t->ends.tv_usec) {
+				switch (t->type) {
+					case TIMER_SCRIPT:
 #ifdef WITH_PYTHON
-				if (t->script)
-					python_function(t->command, t->id);
-				else
+						python_function(t->command, t->id);
 #endif
-				if (t->ui)
-					ui_event(t->command, NULL);
-				else
-					command_exec(NULL, t->command);
+						break;
+					case TIMER_UI:
+						ui_event(t->command, NULL);
+						break;
 
-				xfree(t->name);
-				xfree(t->command);
-				xfree(t->id);
+					default:
+						command_exec(NULL, t->command);
+				}
 
-				list_remove(&timers, t, 1);
+				if (!t->persistent) {
+					xfree(t->name);
+					xfree(t->command);
+					xfree(t->id);
+
+					list_remove(&timers, t, 1);
+				} else {
+					struct timeval tv;
+					struct timezone tz;
+
+					gettimeofday(&tv, &tz);
+					tv.tv_sec += t->period;
+					memcpy(&t->ends, &tv, sizeof(tv));
+				}
 			}
 		}
 
@@ -305,9 +322,32 @@ void ekg_wait_for_key()
 				FD_SET(w->fd, &wd);
 		}
 
+		/* domy¶lny timeout to 1s */
 		tv.tv_sec = 1;
 		tv.tv_usec = 0;
+
+		/* ale je¶li który¶ timer ma wyst±piæ wcze¶niej ni¿ za sekundê
+		 * to skróæmy odpowiednio czas oczekiwania */
 		
+		for (l = timers; l; l = l->next) {
+			struct timer *t = l->data;
+			struct timeval tv2;
+			struct timezone tz;
+			int usec = 0;
+
+			gettimeofday(&tv2, &tz);
+
+			usec = (t->ends.tv_sec - tv2.tv_sec) * 1000000 + t->ends.tv_usec - tv2.tv_usec;
+
+			if (usec < 1000000 && (tv.tv_sec == 1 || tv.tv_usec > usec)) {
+				tv.tv_sec = 0;
+				tv.tv_usec = usec;
+			}
+		}
+
+		if (tv.tv_usec < 0)
+			tv.tv_usec = 1;
+
 		ret = select(maxfd + 1, &rd, &wd, NULL, &tv);
 	
 		if (ret == -1) {
@@ -655,7 +695,7 @@ void ui_dummy_print(const char *target, int separate, const char *line)
 int main(int argc, char **argv)
 {
 	int auto_connect = 1, force_debug = 0, new_status = 0, ui_set = 0;
-	int c = 0, set_private = 0;
+	int c = 0, set_private = 0, no_global_config = 0;
 	char *load_theme = NULL, *new_reason = NULL;
 #ifdef WITH_IOCTLD
 	const char *sock_path = NULL, *ioctld_path = IOCTLD_PATH;
@@ -677,6 +717,7 @@ int main(int argc, char **argv)
 		{ "theme", required_argument, 0, 't' },
 		{ "user", required_argument, 0, 'u' },
 		{ "version", no_argument, 0, 'v' },
+		{ "no-global-config", no_argument, 0, 'N' },
 		{ 0, 0, 0, 0 }
 	};
 
@@ -727,7 +768,7 @@ int main(int argc, char **argv)
 
 	config_user = "";
 
-	while ((c = getopt_long(argc, argv, "b::a::i::pdnc:f:hI:ot:u:v", ekg_options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "b::a::i::pdnc:f:hI:ot:u:vN", ekg_options, NULL)) != -1) {
 		switch (c) {
 			case 'b':
 				new_status = (optarg) ? GG_STATUS_AVAIL_DESCR : GG_STATUS_AVAIL;
@@ -753,9 +794,13 @@ int main(int argc, char **argv)
 			case 'n':
 				auto_connect = 0;
 				break;
+			case 'N':
+				no_global_config = 1;
+				break;
 			case 'h':
 				printf(""
 "u¿ycie: %s [OPCJE] [KOMENDY]\n"
+"  -N, --no-global-config     ignoruje globalny plik konfiguracyjny\n"
 "  -u, --user=NAZWA           korzysta z profilu u¿ytkownika o podanej nazwie\n"
 "  -t, --theme=PLIK           ³aduje opis wygl±du z podanego pliku\n"
 "  -c, --control-pipe=PLIK    potok nazwany sterowania\n"
@@ -849,7 +894,12 @@ int main(int argc, char **argv)
 	config_display_color_map = xstrdup("nTgGbBrR");
 
 	in_autoexec = 1;
-	config_read();
+
+	config_read(NULL);
+
+	if (!no_global_config)
+		config_read(SYSCONFDIR "/ekg.conf");
+	
         userlist_read();
 	update_status();
 	sysmsg_read();

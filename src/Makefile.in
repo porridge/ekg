@@ -6,9 +6,10 @@ mandir = @mandir@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
 libexecdir = @libexecdir@
+sysconfdir = @sysconfdir@
 
 CC = @CC@ 
-CFLAGS = -I.. -I../lib @CFLAGS@ -Wall -DDATA_DIR=\"${datadir}/ekg\"
+CFLAGS = -I.. -I../lib @CFLAGS@ -Wall -DDATADIR=\"${datadir}/ekg\" -DSYSCONFDIR=\"${sysconfdir}\"
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 
@@ -30,7 +31,9 @@ ekg:	$(OBJS)
 ioctld:	ioctld.c
 	$(CC) $(CFLAGS) ioctld.c -o ioctld $(LIBS)
 
-dep:
+dep:	.depend
+
+.depend:	$(SRCS)
 	$(CC) -MM $(CFLAGS) $(SRCS) 1> .depend
 
 #

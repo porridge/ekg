@@ -25,6 +25,12 @@ zg³osi³ b³±d.
 - dokoñczenie kilku zapomnianych rzeczy w /list (sz/w)
 - eksperymentalne wprowadzenie ,,make dep''. mam nadziejê, ¿e na egzotycznych
   systemach nie bêdzie sprawiaæ problemów (w)
+- reorganizacja timerów, dziêki czemu maj± teraz odpowiedni± dok³adno¶æ,
+  a nie +/- 1s. jest mo¿liwe zrobienie sta³ych timerów (w)
+- czytanie globalnego pliku konfiguracyjnego /etc/ekg.conf,
+  /usr/local/etc/ekg.conf itp. po konfiguracji u¿ytkownika, ¿eby móc
+  na przyk³ad wymusiæ jakie¶ konkretne serwery (w)
+- dodanie opcji -N (w)
 
 // 2003-01-03
 

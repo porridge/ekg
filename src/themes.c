@@ -723,7 +723,7 @@ int theme_read(const char *filename, int replace)
 		if (!strchr(filename, '/')) {
 			f = try_open(f, prepare_path("", 0), fn);
 			f = try_open(f, prepare_path("themes", 0), fn);
-			f = try_open(f, DATA_DIR "/themes", fn);
+			f = try_open(f, DATADIR "/themes", fn);
 		}
 
 		xfree(fn);

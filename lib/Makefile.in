@@ -62,7 +62,9 @@ $(SHARED): $(LOBJS)
 
 #
 
-dep:
+dep:	.depend
+
+.depend:	$(SRCS)
 	$(CC) -MM $(CFLAGS) $(SRCS) 1> .depend
 
 #

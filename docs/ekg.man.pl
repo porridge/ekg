@@ -11,7 +11,7 @@ ekg \- Eksperymentalny Klient Gadu-Gadu
 
 .SH OPIS
 .B ekg
-Jest to eksperymentalny klient Gadu-Gadu.
+jest eksperymentalnym klient Gadu-Gadu.
 
 .SH OPCJE
 .TP
@@ -19,9 +19,9 @@ Jest to eksperymentalny klient Gadu-Gadu.
 Wy¶wietla listê mo¿liwych opcji.
 .TP
 .BI \-u\ username\ [\-\-user\ username]
-Pozwala na uruchomienie ekg z innym ,,u¿ytkownikiem''
-Standardowo konfiguracja ekg znajduje sie w katalogu ~/.gg (chyba, ¿e
-zdefiniowana jest zmienna ¶rodowiskowa $CONFGI_DIR - wtedy w ~/$CONFIG_DIR/gg/).
+Pozwala na uruchomienie ekg z innym ,,profilem u¿ytkownika''.
+Standardowo konfiguracja ekg znajduje sie w katalogu ~/.gg/ (chyba, ¿e
+zdefiniowana jest zmienna ¶rodowiskowa $CONFIG_DIR - wtedy w ~/$CONFIG_DIR/gg/).
 Ta opcja pozwala na stworzenie struktury podkatalogów z oddzielnymi
 konfiguracjami.
 .TP
@@ -34,6 +34,10 @@ Tworzy nazwany potok (ang. named pipe) umo¿liwiaj±cy sterowanie klientem.
 .BI \-n\ [\-\-no-auto]
 Nie ³±cz siê automagicznie. Po uruchomieniu nie ³±czy siê automatycznie 
 z serwerami gg. 
+.TP
+.BI \-N\ [\-\-no-global-config]
+Nie czytaj globalnego pliku konfiguracyjnego (np. /etc/ekg.conf) po
+wczytaniu pliku konfiguracyjnego u¿ytkownika.
 .TP
 .BI \-a\ [\-\-away[=opis]]
 Po po³±czeniu zmienia stan na ,,zajêty''.

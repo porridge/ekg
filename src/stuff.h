@@ -28,6 +28,7 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "config.h"
@@ -90,14 +91,20 @@ struct binding {
 	char *action;
 };
 
+enum timer_type {
+	TIMER_SCRIPT,
+	TIMER_UI,
+	TIMER_COMMAND
+};
+
 struct timer {
-	int started;	/* kiedy ustawiono timer */
-	int period;	/* ile sekund ma trwaæ czekanie */
-	int script;	/* czy obs³ugiwany przez skrypt */
-	int ui;		/* czy obs³ugiwany przez ui */
-	char *name;	/* nazwa timera */
-	char *command;	/* komenda do wywo³ania */
-	char *id;	/* identyfikator timera */
+	struct timeval ends;	/* kiedy siê koñczy? */
+	int period;		/* ile sekund ma trwaæ czekanie */
+	int persistent;		/* czy ma byæ na zawsze? */
+	int type;		/* rodzaj timera */
+	char *name;		/* nazwa timera */
+	char *command;		/* komenda do wywo³ania */
+	char *id;		/* identyfikator timera */
 };
 
 struct last {
@@ -331,7 +338,7 @@ int emoticon_read();
 char *emoticon_expand(const char *s);
 void emoticon_free();
 
-struct timer *timer_add(int period, const char *name, const char *command);
+struct timer *timer_add(int period, int persistent, int type, const char *name, const char *command);
 int timer_remove(const char *name, const char *command);
 void timer_free();
 

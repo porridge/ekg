@@ -1342,8 +1342,7 @@ void ui_ncurses_init()
 	
 	memset(history, 0, sizeof(history));
 
-	t = timer_add(1, "ui-ncurses-time", "refresh_time");
-	t->ui = 1;
+	t = timer_add(1, 0, TIMER_UI, "ui-ncurses-time", "refresh_time");
 
 	memset(binding_map, 0, sizeof(binding_map));
 	memset(binding_map_meta, 0, sizeof(binding_map_meta));
@@ -2688,15 +2687,12 @@ static int ui_ncurses_event(const char *event, ...)
 	}
 #endif
 
-	if (!strcmp(event, "refresh_time")) {
-		struct timer *t = timer_add(1, "ui-ncurses-time", "refresh_time");
-		t->ui = 1;
-	}
+	if (!strcmp(event, "refresh_time"))
+		timer_add(1, 0, TIMER_UI, "ui-ncurses-time", "refresh_time");
 
         if (!strcasecmp(event, "check_mail")) {
-		struct timer *t = timer_add(config_check_mail_frequency, "check-mail-time", "check_mail");
+		timer_add(config_check_mail_frequency, 0, TIMER_UI, "check-mail-time", "check_mail");
 
-		t->ui = 1;
 		check_mail();
 	}
 

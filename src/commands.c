@@ -3032,7 +3032,7 @@ COMMAND(cmd_timer)
 			print("not_enough_params", name);
 			return;
 		}
-		timer_add(atoi(params[1]), NULL, params[2]);
+		timer_add(atoi(params[1]), 0, TIMER_COMMAND, NULL, params[2]);
 
 		return;
 	}
@@ -3048,8 +3048,20 @@ COMMAND(cmd_timer)
 
 	for (l = timers; l; l = l->next) {
 		struct timer *t = l->data;
+		struct timeval tv;
+		struct timezone tz;
+		char *tmp;
 
-		print("timer_list", t->name, itoa(t->period - (time(NULL) - t->started)), t->command);
+		gettimeofday(&tv, &tz);
+	
+		if (t->ends.tv_usec < tv.tv_usec)
+			tmp = saprintf("%d.%.3d", t->ends.tv_sec - tv.tv_sec - 1, (t->ends.tv_usec - tv.tv_usec + 1000000) / 1000);
+		else
+			tmp = saprintf("%d.%.3d", t->ends.tv_sec - tv.tv_sec, (t->ends.tv_usec - tv.tv_usec) / 1000);
+
+		print("timer_list", t->name, tmp, t->command);
+
+		xfree(tmp);
 	}
 }
 
@@ -3802,8 +3814,7 @@ void command_init()
 	  " [-l, --list]                 wy¶wietla listê timerów\n"
 	  "\n"
 	  "Czas podaje siê w sekundach. Timer po jednorazowym uruchomieniu "
-	  "jest usuwany. Odmierzanie czasu nie jest idealne i ma dok³adno¶æ "
-	  "+/- 1 sekundy.");
+	  "jest usuwany.");
 
 	command_add
 	( "unignore", "i", cmd_ignore, 0,
