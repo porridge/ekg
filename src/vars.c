@@ -50,7 +50,7 @@ struct variable variables[MAX_VARS] = {
 	{ "sms_number", VAR_STR, 1, &sms_number },
 	{ "sms_send_app", VAR_STR, 1, &sms_send_app },
 
-	{ "away", VAR_BOOL, 2, &away },
+	{ "away", VAR_INT, 2, &away },
 	{ "bold_font", VAR_STR, 2, &bold_font },
 	{ "private", VAR_BOOL, 2, &private_mode },
 
