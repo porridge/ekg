@@ -762,18 +762,22 @@ IOCTLD_HELP
 
 		if (!query_nick && (l = alias_check(line))) {
 			char *p = line;
+			int quit = 0;
 
 			while (*p != ' ' && *p)
 				p++;
 			
-			/* XXX aliasy nie mog± wywo³ywaæ quit */
-
-			for (; l; l = l->next) {
+			for (; l && !quit; l = l->next) {
 				char *tmp = saprintf("%s%s", (char*) l->data, p);
 				if (tmp)
-					execute_line(tmp);
+					if (execute_line(tmp)) 
+						quit = 1;
 				
 				free(tmp);
+			}
+			if (quit) {
+				free(line);
+				break;
 			}
 		} else {
 			if (execute_line(line)) {
