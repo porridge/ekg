@@ -2224,11 +2224,12 @@ COMMAND(cmd_msg)
 		if (config_last & 4)
 			last_add(1, uin, time(NULL), 0, raw_msg);
 
+		secure = 0;
+
 		if (!chat || count == 1) {
 			unsigned char *__msg = xstrdup(msg);
-			int ret = 0;
-			secure = 0;
 #ifdef HAVE_OPENSSL
+			int ret = 0;
 			if (config_encryption && (ret = msg_encrypt(uin, &__msg)) > 0)
 				secure = 1;
 
