@@ -13,6 +13,8 @@ zg³osi³ b³±d.
 - dodana zmienna ,,proxy_forwarding'', która pozwala podaæ adres i port
   przekierowania na serwerze po¶rednicz±cym (proxy, router, nat, cokolwiek)
   i mieæ dzia³aj±ce dcc. przyznajê, ¿e nazwa nie jest najlepsza. (fidor/w)
+- libgadu: brakuj±cy include w search.c (sCoOtY/w)
+- konwersja has³a na CP1250 podczas ³±czenia (Mati/w)
 
 // 2002-01-31
 

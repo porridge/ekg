@@ -20,6 +20,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#ifndef _AIX
+#  include <string.h>
+#endif
 #include "libgadu.h"
 
 /*

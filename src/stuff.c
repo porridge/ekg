@@ -1623,11 +1623,19 @@ void do_connect()
 		xfree(fwd);
 	}
 
+	iso_to_cp(p.password);
+	if (p.status_descr)
+		iso_to_cp(p.status_descr);
+
 	if (!(sess = gg_login(&p))) {
 		print("conn_failed", format_find((errno == ENOMEM) ? "conn_failed_memory" : "conn_failed_connecting"));
 		do_reconnect();
 	} else
 		list_add(&watches, sess, 0);
+
+	cp_to_iso(p.password);
+	if (p.status_descr)
+		cp_to_iso(p.status_descr);
 }
 
 /*
