@@ -2420,6 +2420,20 @@ static void ui_ncurses_loop()
 					xfree(tmp);
 				}
 
+				if (ch == 'b' || ch == 'B') {	/* Alt-B */
+					while (line_index > 0 && line[line_index - 1] == ' ')
+						line_index--;
+					while (line_index > 0 && line[line_index - 1] != ' ')
+						line_index--;
+				}
+
+				if (ch == 'f' || ch == 'F') {	/* Alt-F */
+					while (line_index < strlen(line) && line[line_index] == ' ')
+						line_index++;
+					while (line_index < strlen(line) && line[line_index] != ' ')
+						line_index++;
+				}
+
 				if (ch == 13) {		/* Ctrl-Enter */
 					if (input_size == 1) {
 						input_size = 5;
