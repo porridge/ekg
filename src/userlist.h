@@ -46,6 +46,7 @@ struct userlist {
 	struct in_addr ip;	/* adres ip */
 	unsigned short port;	/* port */
 	int protocol;		/* wersja protoko³u */
+	char *foreign;		/* dla kompatybilno¶ci */
 };
 
 struct group {

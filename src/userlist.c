@@ -118,7 +118,7 @@ int userlist_read()
 			continue;
 		}
 
-		entry = array_make(buf, ";", 7, 0, 0);
+		entry = array_make(buf, ";", 8, 0, 0);
 
 		if ((count = array_count(entry)) < 7 || !(u.uin = atoi(entry[6]))) {
 			array_free(entry);
@@ -143,6 +143,10 @@ int userlist_read()
 		u.mobile = xstrdup(entry[4]);
 		u.groups = group_init(entry[5]);
 		u.status = GG_STATUS_NOT_AVAIL;
+		if (entry[7])
+			u.foreign = saprintf(";%s", entry[7]);
+		else
+			u.foreign = xstrdup("");
 
 		for (i = 0; i < count; i++)
 			xfree(entry[i]);
@@ -206,7 +210,7 @@ int userlist_set(const char *contacts, int config)
 			continue;
 		}
 
-		entry = array_make(buf, ";", 7, 0, 0);
+		entry = array_make(buf, ";", 8, 0, 0);
 		
 		if (array_count(entry) < 7 || !(u.uin = atoi(entry[6]))) {
 			array_free(entry);
@@ -230,6 +234,10 @@ int userlist_set(const char *contacts, int config)
 		u.mobile = xstrdup(entry[4]);
 		u.groups = group_init(entry[5]);
 		u.status = GG_STATUS_NOT_AVAIL;
+		if (entry[7])
+			u.foreign = saprintf(";%s", entry[7]);
+		else
+			u.foreign = xstrdup("");
 
 		array_free(entry);
 
@@ -278,17 +286,18 @@ char *userlist_dump()
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
 		char *groups, *line;
-		
+
 		groups = group_to_string(u->groups, 1, 0);
 		
-		line = saprintf("%s;%s;%s;%s;%s;%s;%d\r\n",
+		line = saprintf("%s;%s;%s;%s;%s;%s;%d%s\r\n",
 			(u->first_name) ? u->first_name : "",
 			(u->last_name) ? u->last_name : "",
 			(u->nickname) ? u->nickname : ((u->display) ? u->display: ""),
 			(u->display) ? u->display : "",
 			(u->mobile) ? u->mobile : "",
 			groups,
-			u->uin);
+			u->uin,
+			u->foreign);
 		
 		string_append(s, line);
 
@@ -404,7 +413,7 @@ void userlist_write_crash()
 			fprintf(f, "%s", g->name);
 		}
 		
-		fprintf(f, ";%u\r\n", u->uin);
+		fprintf(f, ";%u%s\r\n", u->uin, u->foreign);
 	}	
 
 	fclose(f);
@@ -487,6 +496,7 @@ int userlist_remove(struct userlist *u)
 	xfree(u->display);
 	xfree(u->mobile);
 	xfree(u->descr);
+	xfree(u->foreign);
 
 	for (l = u->groups; l; l = l->next) {
 		struct group *g = l->data;

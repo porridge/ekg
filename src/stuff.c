@@ -1622,7 +1622,7 @@ void event_free()
  *
  *  - what - MESG_ON, MESG_OFF lub MESG_CHECK
  * 
- * -1 je¶li b³ad, lub aktualny stan MESG_ON/MESG_OFF
+ * -1 je¶li b³ad, lub aktualny stan: MESG_ON/MESG_OFF
 */
 int mesg_set(int what)
 {
@@ -1671,7 +1671,7 @@ int msg_encrypt(uin_t uin, unsigned char **msg)
 			return 1;
 		}
 
-		gg_debug(GG_DEBUG_MISC, "// ekg: simlite encryption error: %s\n", sim_strerror(sim_errno));
+		gg_debug(GG_DEBUG_MISC, "// ekg: simlite encryption failed: %s\n", sim_strerror(sim_errno));
 		return 0;
 	}
 #endif
