@@ -94,10 +94,16 @@ struct timer {
 	char *command;	/* komenda do wywo³ania */
 };
 
-struct history {
-	uin_t uin;		/* w³a¶ciciel */
+struct last {
+	unsigned int type;	/* 0 - przychodz±ca, 1 - wychodz±ca */
+	uin_t uin;		/* od kogo, lub do kogo przy wysy³anych */
 	time_t time;		/* czas */
 	unsigned char *message;	/* wiadomo¶æ */
+};
+
+struct last_count {
+	uin_t uin;
+	int count;
 };
 
 list_t children;
@@ -109,6 +115,7 @@ list_t emoticons;
 list_t sequences;
 list_t timers;
 list_t lasts;
+list_t lasts_count;
 struct gg_session *sess;
 
 int config_dcc;
@@ -162,7 +169,8 @@ int config_save_password;
 char *config_timestamp;
 int config_display_sent;
 int config_sort_windows;
-int config_last_count;
+int config_last_size;
+int config_last;
 
 char *home_dir;
 char *config_dir;
@@ -186,7 +194,6 @@ char *batch_line;
 int immediately_quit;
 int ekg_segv_handler;
 int ioctld_sock;
-int last_count;
 
 void unidle();
 const char *timestamp(const char *format);
@@ -252,6 +259,9 @@ void emoticon_free();
 struct timer *timer_add(int period, const char *name, const char *command);
 int timer_remove(const char *name, const char *command);
 void timer_free();
-int last_add(uin_t uin, time_t t, const char *msg);
+int last_add(unsigned int type, uin_t uin, time_t t, const char *msg);
+int get_last_count(uin_t uin);
+int last_count_del(uin_t uin);
+int last_count_add(uin_t uin);
 
 #endif /* __STUFF_H */

@@ -61,6 +61,7 @@ list_t events = NULL;
 list_t emoticons = NULL;
 list_t sequences = NULL;
 list_t lasts = NULL;
+list_t lasts_count = NULL;
 
 int away = 0;
 int in_autoexec = 0;
@@ -128,8 +129,8 @@ int config_save_password = 1;
 char *config_timestamp = NULL;
 int config_display_sent = 0;
 int config_sort_windows = 0;
-int config_last_count = 10;
-int last_count = 0;
+int config_last_size = 10;
+int config_last = 0;
 
 static struct {
 	int event;
@@ -2247,45 +2248,120 @@ char *log_escape(const char *str)
 	return res;
 }
 
-int last_add(uin_t uin, time_t t, const char *msg)
+int last_add(unsigned int type, uin_t uin, time_t t, const char *msg)
 {
-	struct history h;
 	list_t l;
+	struct last ll;
+	int last_count = 0;
 
+	/* nic nie zapisujemy, je¿eli user sam nie wie czego chce. */
+	if (config_last_size <= 0)
+		return 0;
+	
+	if (config_last & 2) 
+		last_count = get_last_count(uin);
+	else
+		last_count = list_count(lasts);
+				
 	/* usuwamy ostatni± wiadomo¶æ, w razie potrzeby... */
-	if (last_count >= config_last_count) {
+	if (last_count >= config_last_size) {
 		time_t tmp_time = 0;
 		
 		/* najpierw j± znajdziemy... */
 		for (l = lasts; l; l = l->next) {
-			struct history *ll = l->data;
+			struct last *lll = l->data;
+
+			if (config_last & 2 && lll->uin != uin)
+				continue;
 
 			if (!tmp_time)
-				tmp_time = ll->time;
-
-			if (ll->time < tmp_time)
-				tmp_time = ll->time;
+				tmp_time = lll->time;
+			
+			if (lll->time <= tmp_time)
+				tmp_time = lll->time;
 		}
 		
 		/* ...by teraz usun±æ */
 		for (l = lasts; l; l = l->next) {
-			struct history *ll = l->data;
+			struct last *lll = l->data;
 
-			if (ll->time == tmp_time) {
-				xfree(ll->message);
-				list_remove(&lasts, ll, 1);
+			if (lll->time == tmp_time && lll->uin == uin) {
+				xfree(lll->message);
+				list_remove(&lasts, lll, 1);
+				last_count_del(uin);
 				break;
 			}
 		}
 
 	}
 
-	h.uin = uin;
-	h.time = t;
-	h.message = xstrdup(msg);
+	ll.type = type;
+	ll.uin = uin;
+	ll.time = t;
+	ll.message = xstrdup(msg);
 	
-	list_add(&lasts, &h, sizeof(h));
-	last_count++;
+	list_add(&lasts, &ll, sizeof(ll));
+	last_count_add(uin);
 
 	return 0;
+}
+
+int last_count_add(uin_t uin) {
+	list_t l;
+	int add = 0;
+
+	for (l = lasts_count; l; l = l->next) {
+		struct last_count *lc = l->data;
+
+		if (lc->uin == uin) {
+			lc->count++;
+			add++;
+		}
+	}
+
+	if (!add) {
+		struct last_count lc;
+
+		lc.uin = uin;
+		lc.count = 1;
+
+		list_add(&lasts_count, &lc, sizeof(lc));
+	}
+
+	return 0;
+}
+
+int last_count_del(uin_t uin) 
+{
+	list_t l;
+
+	for (l = lasts_count; l; l = l->next) {
+		struct last_count *lc = l->data;
+
+		if (lc->uin == uin) { 
+			lc->count--;
+			
+			if (lc->count <= 0)
+				list_remove(&lasts_count, lc, 1);
+		}
+	}
+
+	return 0;
+}
+
+int get_last_count(uin_t uin) 
+{
+	int last_count = 0;
+	list_t l;
+
+	for (l = lasts_count; l; l = l->next) {
+		struct last_count *lc = l->data;
+		
+		if (lc->uin == uin) {
+			last_count = lc->count;
+			break;
+		}
+	}
+
+	return last_count;
 }

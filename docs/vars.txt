@@ -150,7 +150,18 @@ display_sent
 	zwróciæ uwagê, ¿e przy make_window = 2, wys³anie wiadomo¶ci utworzy
 	automatycznie okienko rozmowy.
 
-last_count
+last
+	typ: liczba
+	domy¶lna warto¶æ: 0
+
+	wskazuje czy zapisywaæ ostatnie wiadomo¶ci do podrêcznego bufora
+	(last_size musi byc wiêksze od 0). dla 1, bêdzie zapisywaæ tylko
+	last_size wszystkich wiadomo¶ci przychodz±cych, dla 2, last_size
+	wiadomo¶ci od ka¿dego usera. dostêpna jest jeszcze logiczna
+	warto¶æ 4, która pozwala logowaæ wiadomo¶ci wys³ane. dostêpne s±
+	w takim razie warto¶ci 0, 1, 2, 5 i 6.
+	
+last_size
 	typ: liczba
 	domy¶lna warto¶æ: 0
 

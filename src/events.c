@@ -103,8 +103,9 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 			break;
 	}	
 
-	if (config_last_count > 0 && chat >= 0 && chat <= 2)
-		last_add(e->event.msg.sender, e->event.msg.time, e->event.msg.message);
+	/* je¿eli chcemy, dodajemy do bufora ,,last'' wiadomo¶æ... */
+	if (config_last & 1 && (chat >= 0 && chat <= 2))
+		       last_add(0, e->event.msg.sender, e->event.msg.time, e->event.msg.message);
 	
 	tm = localtime(&e->event.msg.time);
 	strftime(timestr, sizeof(timestr), format_find("timestamp"), tm);

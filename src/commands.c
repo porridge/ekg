@@ -1063,6 +1063,9 @@ COMMAND(cmd_msg)
 
 		put_log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), escaped);
 
+		if (config_last & 4)
+			last_add(1, uin, time(NULL), escaped);
+
 		if (!chat || count == 1)
 			gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
 	}
@@ -2191,29 +2194,31 @@ COMMAND(cmd_test_python)
 COMMAND(cmd_last)
 {
         list_t l;
-	uin_t uin = -1;
-	int count = 0;
+	uin_t uin = 0;
+	int count = 0, last_count;
 
-	if (params[0]) 
-		if (!(uin = get_uin(params[0]))) {
-			print("user_not_found", params[0]);
-			return;
-		}
-	
-	if (last_count == 0) {
+	if (params[0] && (!(uin = get_uin(params[0])))) {
+		print("user_not_found", params[0]);
+		return;
+	}  
+		
+	if (!(last_count = (uin > 0) ? get_last_count(uin) : list_count(lasts))) {
 		print("last_list_empty");
 		return;
 	}
 
         for (l = lasts; l; l = l->next) {
-                struct history *h = l->data;
+                struct last *ll = l->data;
 		struct tm *tm;
 		char buf[100];
 
-		if (uin == -1 || (uin != 0 && uin == h->uin)) {
-			tm = localtime(&h->time);
+		if (uin == 0 || uin == ll->uin) {
+			tm = localtime(&ll->time);
 			strftime(buf, sizeof(buf), "%m-%d-%Y %H:%M", tm);
-			print("last_list", buf, format_user(h->uin), h->message);
+			if (config_last & 4 && ll->type == 1)
+				print("last_list_out", buf, format_user(ll->uin), ll->message);
+			else
+				print("last_list_in", buf, format_user(ll->uin), ll->message);
 			count++;
 		}
         }
