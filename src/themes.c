@@ -768,15 +768,15 @@ int theme_read(const char *filename, int replace)
 	theme_init();
 	ui_event("theme_init");
 
-        while ((buf = read_file(f))) {
-                char *value, *p;
+	while ((buf = read_file(f))) {
+		char *value, *p;
 
-                if (buf[0] == '#') {
+		if (buf[0] == '#') {
 			xfree(buf);
-                        continue;
+			continue;
 		}
 
-                if (!(value = strchr(buf, ' '))) {
+		if (!(value = strchr(buf, ' '))) {
 			xfree(buf);
 			continue;
 		}
@@ -802,6 +802,8 @@ int theme_read(const char *filename, int replace)
         }
 
         fclose(f);
+
+	theme_cache_reset();
 
         return 0;
 }
