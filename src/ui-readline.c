@@ -469,30 +469,29 @@ static char **my_completion(char *text, int start, int end)
  */
 static void ui_readline_print(const char *target, int separate, const char *line)
 {
-        int old_end = rl_end, id = 0, in_esc_code;
+        int old_end = rl_end, id = 0;
 	char *old_prompt = NULL; 
 	const char *p;
 	string_t s = NULL;
 	
-	if (config_speech_app)
+	if (config_speech_app) {
+		int in_esc_code = 0;
+		
 		s = string_init(NULL);
 
-	in_esc_code = 0;
-	for (p = line; *p; p++) {
-		if (*p == '\n')
-			pager_lines++;
+		for (p = line; *p; p++) {
+			if (*p == 27) 
+				in_esc_code = 1;
 
-		if (*p == 27) 
-			in_esc_code = 1;
-
-		/* zak³adamy, ¿e 'm' koñczy eskejpow± sekwencje */
-		if (in_esc_code && *p == 'm') {
-			in_esc_code = 0;
-			continue;
-		}
+			/* zak³adamy, ¿e 'm' koñczy eskejpow± sekwencje */
+			if (in_esc_code && *p == 'm') {
+				in_esc_code = 0;
+				continue;
+			}
 			
-		if (config_speech_app && !in_esc_code) 
-			string_append_c(s, *p);
+			if (!in_esc_code) 
+				string_append_c(s, *p);
+		}
 	}
 
 	/* znajd¼ odpowiednie okienko i ewentualnie je utwórz */
@@ -882,6 +881,30 @@ static int ui_readline_event(const char *event, ...)
 			}
 
 			result = 1;
+		}
+
+		if (!strcasecmp(command, "find")) {
+			char *tmp = NULL;
+			
+			if (window_current->query_nick) {
+				struct userlist *u = userlist_find(0, window_current->query_nick);
+				int uin;
+
+				if (u && u->uin)
+					tmp = saprintf("find %d", u->uin);
+
+				if (!u && (uin = atoi(window_current->query_nick)))
+					tmp = saprintf("find %d", uin);
+			}
+
+			if (!tmp)
+				tmp = saprintf("find %d", config_uin);
+
+			command_exec(NULL, tmp);
+
+			xfree(tmp);
+
+			goto cleanup;
 		}
 
 		if (!strcasecmp(command, "window")) {
