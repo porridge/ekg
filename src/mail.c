@@ -122,7 +122,9 @@ int check_mail_update(int update)
 	mail_count = update;
 
 	if (mail_count && mail_count > last_mail_count) {
-		print((mail_count == 1) ? "new_mail_one" : "new_mail_more", itoa(mail_count));
+		if (config_check_mail & 4)
+			print((mail_count == 1) ? "new_mail_one" : "new_mail_more", itoa(mail_count));
+
 		if (config_beep && config_beep_mail)
 			ui_beep();
 	}

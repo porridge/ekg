@@ -117,7 +117,9 @@ check_mail
 
 	okre¶la, czy ekg ma sprawdzaæ, czy nadesz³a nowa poczta i informowaæ
 	o tym na pasku statusu. warto¶æ 1 odpowiada sprawdzaniu skrzynki typu
-	mbox, a warto¶æ 2 skrzynki typu Maildir.
+	mbox, a warto¶æ 2 skrzynki typu Maildir. dodadanie warto¶ci 4 oznacza,
+	¿e oprócz informowania na pasku statusu, bêdziemy otrzymywaæ krótk±
+	informacjê o nadej¶ciu poczty w aktualnym oknie.
 
 check_mail_frequency
 	typ: liczba
