@@ -7,6 +7,8 @@ biblioteka:
 - komunikacja miêdzy klientami, bezpo¶rednie rozmowy,
 - uaktualniæ dokumentacjê,
 - uaktualniæ zmianê has³a,
+- wysy³anie ¿±dania http mo¿e przekroczyæ rozmiar bufora gniazda. trzeba
+  to select()owaæ (Chilek/w)
 
 klient:
 - "mesg n"/"mesg y" - brak komunikatow/write/wall (mateusza)
