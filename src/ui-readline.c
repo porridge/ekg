@@ -786,15 +786,15 @@ static int window_del(int id)
         }
 
         for (l = windows; l; l = l->next) {
-                struct window *win = l->data;
+                struct window *w = l->data;
 
-                if (win->id == id) {
+                if (w->id == id) {
                         print("window_del");
-                        list_remove(&windows, win, 1);
+                        list_remove(&windows, w, 1);
                         windows_sort();
                         windows_count--;
                         if (curr_window == id)
-                                window_switch((id > 1) ? id-1 : 1);
+                                window_switch((id > 1 || curr_window > windows_count) ? id-1 : 1);
                         return 0;
 
                 }
@@ -808,9 +808,6 @@ static int window_del(int id)
 static int window_switch(int id)
 {
         struct list *l, *tmp = windows;
-
-        if (id == curr_window)
-                return 0;
 
         for (l = windows; l; l = l->next) {
                 struct window *w = l->data;
@@ -907,8 +904,8 @@ static int windows_sort()
 
                 w->id = id++;
         }
-
-        return 0;
+        
+	return 0;
 }
 
 static int window_query_id(const char *qnick)
