@@ -318,7 +318,7 @@ dnl   fi
   # sprawdzamy ioctld
 
   AC_ARG_ENABLE(ioctld,
-    [  --enable-ioctld         Compile ioctld (Linux only)])
+    [  --enable-ioctld         Compile ioctld])
 
   if test "x$enable_ioctld" = "xyes"; then 
     AC_CHECK_HEADERS(linux/kd.h, [have_ioctld_includes=yes], [

@@ -14,6 +14,7 @@ zg³osi³ b³±d.
 - obs³uga zdarzenia ,,blink_leds'' w ,,on'' dla solarisa (d)
 - ma³a poprawka konfliktu nazw dla solarisa (d)
 - dodana ¿a³osna namiastka ,,beeps_spk'' dla solarisa (d)
+- --enable-ioctld ju¿ nie jest tylko Linux only (d)
 
 // 2002-12-03
 
