@@ -3657,11 +3657,24 @@ COMMAND(cmd_remind)
 {
 	struct gg_http *h;
 	
-	if (!(h = gg_remind_passwd(config_uin, 1))) {
+	if (!last_tokenid) {
+		printq("token_missing");
+		return -1;
+	}
+
+	if (!params[0]) {
+		printq("not_enough_params", name);
+		return -1;
+	}
+
+	if (!(h = gg_remind_passwd2(config_uin, last_tokenid, params[0], 1))) {
 		printq("remind_failed", strerror(errno));
 		return -1;
 	}
 
+	xfree(last_tokenid);
+	last_tokenid = NULL;
+	
 	list_add(&watches, h, 0); 
 
 	return 0;
@@ -5738,9 +5751,10 @@ void command_init()
 	  "");
 	  
 	command_add
-	( "remind", "", cmd_remind, 0,
-	  "", "wysy³a has³o na skrzynkê pocztow±",
-	  "");
+	( "remind", "?", cmd_remind, 0,
+	  " <token>", "wysy³a has³o na skrzynkê pocztow±",
+	  "\n"
+	  "Przed operacj± nale¿y pobraæ token komend± %Ttoken%n.");
 
 	command_add
 	( "save", "?", cmd_save, 0,

@@ -7,6 +7,10 @@ d - drg, sz - szalik).
 // 2003-10-05
 
 - libgadu: poprawka wysy³ania listy kontaktów na serwer (Chilek/w)
+- libgadu: dostosowanie wysy³ania has³a do GG 6.0 now± funkcj±
+  gg_remind_passwd2() (Chilek/w)
+- libgadu: poprawka zmiany has³a (w)
+- libgadu: inteligentne potwierdzenie eksportu listy kontaktów (Chilek/w)
 
 // 2003-10-04
 
