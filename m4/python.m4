@@ -60,4 +60,3 @@ AC_DEFUN(AC_CHECK_PYTHON,[
 		fi
 	fi
 ])
-
