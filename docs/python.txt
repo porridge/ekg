@@ -82,7 +82,10 @@ oto lista wywo³ywanych funkcji:
 - handle_keypress(meta, key)
 
   gdy zostaje wci¶niêty klawisz o kodzie key. je¶li wcze¶niejszym kodem
-  by³ 27, meta jest równe 27.
+  by³ 27, meta jest równe 27. zwracane warto¶ci pochodz± z funkcji getch()
+  biblioteki ncurses, wiêc dla wiêkszo¶ci klawiszy funkcyjnych s± zwracane
+  odpowiednie kody. ich listê mo¿na znale¼æ w plikach nag³ówkowych ncurses
+  w sta³ych z przedrostkiem KEY_
 
 - handle_redraw_header()
 
