@@ -753,11 +753,14 @@ IOCTLD_HELP
 
 		if (strcmp(line, ""))
 			add_history(line);
-		else if (batch_mode && !batch_line) {
-			quit_message_send = 1;
-			break;
+		else {
+			if (batch_mode && !batch_line) {
+				quit_message_send = 1;
+				break;
+			}
+			free(line);
+			continue;
 		}
-
 		my_printf_lines = 0;
 
 		if (!query_nick && (l = alias_check(line))) {
