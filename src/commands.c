@@ -1146,12 +1146,13 @@ COMMAND(cmd_block)
 COMMAND(cmd_list)
 {
 	list_t l;
-	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, show_descr = 0, show_blocked = 0, show_offline = 0, j, p;
+	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, show_descr = 0, show_blocked = 0, show_offline = 0, j;
 	char *tmp, **argv = NULL, *show_group = NULL;
 
 	if (params[0] && *params[0] != '-') {
 		char *status, *groups;
 		struct userlist *u;
+		struct in_addr in;
 
 		/* list @grupa */
 		if (params[0][0] == '@' && strlen(params[0]) > 1) {
@@ -1222,10 +1223,15 @@ COMMAND(cmd_list)
 			default:
 				status = format_string(format_find("user_info_unknown"), (u->first_name) ? u->first_name : u->display);
 		}
-		
-		groups = group_to_string(u->groups, 0);
 
-		print("user_info", u->first_name, u->last_name, (u->nickname) ? u->nickname : u->display, u->display, u->mobile, groups, itoa(u->uin), status);
+		groups = group_to_string(u->groups, 0);
+		
+		if (GG_S_A(u->status) || GG_S_B(u->status))
+			in.s_addr = u->ip.s_addr;
+		else
+			in.s_addr = inet_addr("0.0.0.0");
+
+		print("user_info", (u->nickname) ? u->nickname : u->display, itoa(u->uin), status, inet_ntoa(in), u->first_name, u->last_name, u->display, u->mobile, groups);
 		
 		xfree(groups);
 		xfree(status);
@@ -1406,41 +1412,16 @@ COMMAND(cmd_list)
 		}
 
 		in.s_addr = u->ip.s_addr;
-		p = u->port;
 
-		if (u->uin == config_uin) {
-			if (config_dcc && config_dcc_ip) {
-
-				if (strcmp(config_dcc_ip, "auto"))
-					in.s_addr = inet_addr(config_dcc_ip);
-				else {
-					struct sockaddr_in foo;
-					int bar = sizeof(foo);
-
-					if (!sess || getsockname(sess->fd, (struct sockaddr *) &foo, &bar))
-						goto fail;
-
-					in.s_addr = foo.sin_addr.s_addr; 
-				}
-
-				p = 1550;
-
-			} else {
-fail:
-				in.s_addr = inet_addr("0.0.0.0");
-				p = 0;
+		if (u->uin == config_uin && sess && sess->state == GG_STATE_CONNECTED)
+			switch (config_status) {
+				case GG_STATUS_INVISIBLE:
+					tmp = "list_invisible";
+					break;
+				case GG_STATUS_INVISIBLE_DESCR:
+					tmp = "list_invisible_descr";
+					break;
 			}
-				
-			if (sess && sess->state == GG_STATE_CONNECTED)
-				switch (config_status) {
-					case GG_STATUS_INVISIBLE:
-						tmp = "list_invisible";
-						break;
-					case GG_STATUS_INVISIBLE_DESCR:
-						tmp = "list_invisible_descr";
-						break;
-				}
-		}
 
 		show = show_all;
 
@@ -1469,7 +1450,7 @@ fail:
 			show = 1;
 
 		if (show) {
-			print(tmp, format_user(u->uin), (u->first_name) ? u->first_name : u->display, inet_ntoa(in), itoa(p), u->descr);
+			print(tmp, format_user(u->uin), (u->first_name) ? u->first_name : u->display, inet_ntoa(in), itoa(u->port), u->descr);
 			count++;
 		}
 	}

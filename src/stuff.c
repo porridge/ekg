@@ -2585,6 +2585,8 @@ void changed_dcc(const char *var)
 		if (u)
 			u->ip.s_addr = gg_dcc_ip;
 	}
+
+	update_status_myip();
 }
 	
 /*
@@ -3408,6 +3410,42 @@ void update_status()
 		u->status = (u->descr) ? GG_STATUS_NOT_AVAIL_DESCR : GG_STATUS_NOT_AVAIL;
 	else
 		u->status = st[away];
+
+	update_status_myip();
+}
+
+/*
+ * update_status_myip()
+ *
+ * zajmuje siê wpisaniem w³asnego adresu IP i portu na li¶cie.
+ */
+void update_status_myip()
+{
+	struct userlist *u = userlist_find(config_uin, NULL);
+
+	if (!u)
+		return;
+	
+	if (config_dcc && config_dcc_ip) {
+		if (strcmp(config_dcc_ip, "auto"))
+			u->ip.s_addr = inet_addr(config_dcc_ip);
+		else {
+			struct sockaddr_in foo;
+			int bar = sizeof(foo);
+
+			if (!sess || getsockname(sess->fd, (struct sockaddr *) &foo, &bar))
+				goto fail;
+
+			u->ip.s_addr = foo.sin_addr.s_addr; 
+		}
+
+		u->port = 1550;
+
+	} else {
+fail:
+		u->ip.s_addr = inet_addr("0.0.0.0");
+		u->port = 0;
+	}
 }
 
 /*

@@ -280,6 +280,7 @@ char *log_escape(const char *str);
 char *xstrmid(const char *str, int start, int length);
 const char *http_error_string(int h);
 void update_status();
+void update_status_myip();
 void change_status(int status, const char *arg, int autom);
 
 int process_add(int pid, const char *name);

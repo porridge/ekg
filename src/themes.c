@@ -1097,7 +1097,7 @@ void theme_init()
 	format_add("exec_error", "%! B³±d uruchamiania procesu: %1\n", 1);
 
 	/* szczegó³owe informacje o u¿ytkowniku */
-	format_add("user_info", "%) Pseudonim: %T%3%n\n%) Numer: %T%7%n\n%) Stan: %8\n%) Imiê i nazwisko: %T%1 %2%n\n%) Alias: %T%4%n\n%) Numer telefonu: %T%5%n\n%) Grupy: %T%6%n\n", 1);
+	format_add("user_info", "%) Pseudonim: %T%1%n\n%) Numer: %T%2%n\n%) Stan: %3\n%) Adres IP: %b%4%n\n%) Imiê i nazwisko: %T%5 %6%n\n%) Alias: %T%7%n\n%) Numer telefonu: %T%8%n\n%) Grupy: %T%9%n\n", 1);
 	format_add("user_info_avail", "%Ydostêpn%@1%n", 1);
 	format_add("user_info_avail_descr", "%Ydostêpn%@1%n (%2)", 1);
 	format_add("user_info_busy", "%Gzajêt%@1%n", 1);
