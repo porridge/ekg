@@ -256,7 +256,7 @@ display_pl_chars
 	typ: bool
 	domy¶lna warto¶æ: 1
 
-	je¶li w³±czone, wy¶wietlne s± polskie literki na terminalu.
+	je¶li w³±czone, wy¶wietlane s± polskie literki na terminalu.
 	w przeciwnym wypadku, zamieniane s± na odpowiadaj±ce im literki
 	ASCII.
 
