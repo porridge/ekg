@@ -2191,6 +2191,7 @@ void changed_debug(const char *var)
  */
 void changed_dcc(const char *var)
 {
+	struct userlist *u = userlist_find(config_uin, NULL);
 	struct gg_dcc *dcc = NULL;
 	list_t l;
 	
@@ -2217,6 +2218,9 @@ void changed_dcc(const char *var)
 				list_add(&watches, dcc, 0);
 			}
 		}
+
+		if (u && dcc)
+			u->port = dcc->port;
 	}
 
 	if (!strcmp(var, "dcc_ip")) {
@@ -2228,9 +2232,11 @@ void changed_dcc(const char *var)
 				config_dcc_ip = NULL;
 				gg_dcc_ip = 0;
 			}
-		}
-		else
+		} else
 			gg_dcc_ip = 0;
+
+		if (u)
+			u->ip.s_addr = gg_dcc_ip;
 	}
 }
 	

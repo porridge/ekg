@@ -400,15 +400,11 @@ int userlist_add(uin_t uin, const char *display)
 {
 	struct userlist u;
 
+	memset(&u, 0, sizeof(u));
+
 	u.uin = uin;
 	u.status = GG_STATUS_NOT_AVAIL;
-	u.first_name = NULL;
-	u.last_name = NULL;
-	u.nickname = NULL;
-	u.mobile = NULL;
-	u.groups = NULL;
 	u.display = xstrdup(display);
-	u.descr = NULL;
 
 	list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);
 	
