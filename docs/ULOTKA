@@ -3,6 +3,7 @@
           "Czytanie dokumentacji mo¿e powodowaæ raka i choroby serca"
                  minister do spraw informatyzacji i Windows [1]
 
+
 czyli krótki przewodnik po dokumentacji:
 
 README		opis programu. g³ówny plik dokumentacji.
@@ -22,18 +23,16 @@ ChangeLog	lista zmian w kolejnych wersjach. czêsto zawiera informacje
 
 vars.txt	opis zmiennych u¿ywanych przez program.
 
-on.txt		opis sk³adni polecenia /on.
-
-emoticons.txt	opis pliku z list± emotikonów.
+files.txt	opis formatów plików: listy kontaktów, konfiguracji,
+		historii, emotikonów.
 
 themes.txt	opis dotycz±cy zmiany wygl±du klienta. przydatny dla tych,
 		którzy lubi± bawiæ siê w kolorki.
 
-protocol.html, dcc-protocol.txt, http.txt
-		opis protoko³u u¿ywanego przez klienty Gadu-Gadu przy
+protocol.html	opis protoko³u u¿ywanego przez klienty Gadu-Gadu przy
 		po³±czeniach z serwerem, protoko³u bezpo¶rednich
-		po³±czeñ miêdzy klientami oraz us³ug HTTP. niestety nie
-		s± kompletne.
+		po³±czeñ miêdzy klientami oraz us³ug HTTP. niestety s±
+		niekompletne, ze wzglêdu na ci±g³e zmiany w protokole.
 
 api.txt		krótki opis api biblioteki libgadu. powinien wystarczyæ
 		na pocz±tek. reszty niestety trzeba szukaæ w ¼ród³ach
@@ -50,8 +49,6 @@ przenosny-kod.txt
 		ró¿nymi uniksami.
 
 gdb.txt		szybki kurs obs³ugi gdb.
-
-historia.txt	opis formatu pliku, do którego zapisywana jest historia.
 
 ui.txt		wskazówki dla developerów chc±cych dodaæ nowe ui.
 

@@ -1,4 +1,4 @@
-parê wymagañ dla developerów:
+parê wymagañ i wskazówek dla developerów:
 
 1) gdy co¶ poprawiasz/dodajesz, zachowuj styl reszty kodu. wciêcia rób
    znakami tabulacji, a nie spacjami. stawiaj spacje po przecinkach i

@@ -10,7 +10,9 @@ nastêpuj±ce komendy:
 je¶li jeste¶my za maskarad± lub chcemy przesy³aæ pliki do ludzi z tej
 samej sieci lokalnej, podajemy adres komputera widoczny od strony sieci.
 w przeciwnym wypadku podajemy adres zewnêtrzny. je¶li mamy tylko jeden
-interfejs sieciowy, problemu nie ma, bo adres jest tylko jeden.
+interfejs sieciowy, problemu nie ma, bo adres jest tylko jeden. zamiast
+adresu mo¿na wpisaæ tekst ,,auto''. w takim wypadku ekg ustawi adres,
+z którego wychodzi po³±czenie do serwera.
 
 po ponownym po³±czeniu mo¿emy korzystaæ z dobrodziejstw bezpo¶rednich
 po³±czeñ. je¶li kto¶ spróbuje co¶ do nas wys³aæ, pojawi siê:
@@ -60,7 +62,6 @@ Gadu-Gadu i windowsowy klient sam siê z nami po³±czy. ekg nie jest a¿
 tak restrykcyjne, ale mo¿e siê to zmieniæ. najprawdopodobniej parametry
 komendy dcc równie¿ ulegn± zmianom w przysz³o¶ci. póki co, kod jest
 w fazie rozwoju.
-
 
 // api kodu dcc
 
