@@ -1237,8 +1237,6 @@ static void contacts_update(int commit)
  */
 void contacts_changed()
 {
-	ui_screen_width = stdscr->_maxx - contacts_size();
-
 	if (config_contacts && !contacts)
 		contacts = newwin(OUTPUT_SIZE, config_contacts_size + 2, config_header_size, stdscr->_maxx - config_contacts_size - 1);
 	
@@ -1246,6 +1244,8 @@ void contacts_changed()
 		delwin(contacts);
 		contacts = NULL;
 	}
+
+	ui_screen_width = stdscr->_maxx - contacts_size();
 
 	window_resize();
 	window_commit();
