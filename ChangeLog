@@ -11,6 +11,7 @@ zg³osi³ b³±d.
 - wykoñczenie wyciszania niektórych komend (sz)
 - naprawienie /bind nie wczytuj±cego konfiguracji z pliku (pmb/sz)
 - mo¿na wysy³aæ wynik exec do rozmówcy z aktualnego okna (pmb/sz)
+- klawisze Alt-Q do Alt-P prze³±czaj± do okienk 11..20 (gozda/w)
 
 // 2003-01-23
 

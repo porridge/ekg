@@ -2309,6 +2309,26 @@ static void ui_ncurses_loop()
 					window_switch(ch - '1' + 1);
 				else if (ch == '0')
 					window_switch(10);
+				else if (ch == 'q')
+					window_switch(11);
+				else if (ch == 'w')
+					window_switch(12);
+				else if (ch == 'e')
+					window_switch(13);
+				else if (ch == 'r')
+					window_switch(14);
+				else if (ch == 't')
+					window_switch(15);
+				else if (ch == 'y')
+					window_switch(16);
+				else if (ch == 'u')
+					window_switch(17);
+				else if (ch == 'i')
+					window_switch(18);
+				else if (ch == 'o')
+					window_switch(19);
+				else if (ch == 'p')
+					window_switch(20);
 
 				if (ch == '`')			/* Alt-` */
 					window_switch(0);
