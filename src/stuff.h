@@ -241,6 +241,7 @@ int config_enter_scrolls;
 int config_events_delay;
 char *config_interface;
 int config_header_size;
+int config_irssi_set_mode;
 int config_keep_reason;
 int config_last;
 int config_last_size;

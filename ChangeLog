@@ -5,10 +5,12 @@ to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
 // 2003-09-21
+
 - nowa zmienna irssi_set_mode, je¶li ustawiona na 1, to zmienia zachowanie
   /set z jednym argumentem. domy¶lnie wy³±czone. wiêcej w docs/vars.txt (wysek)
 
 // 2003-09-14
+
 - libgadu: poprawka segfaulta (Chilek/wysek)
 
 // 2003-09-12
