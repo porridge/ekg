@@ -1464,12 +1464,9 @@ void handle_dcc(struct gg_dcc *d)
 				tt.filename = NULL;
 				tt.dcc = d;
 				tt.id = transfer_id();
-				if (!(t = list_add(&transfers, &tt, sizeof(tt)))) {
-					gg_free_dcc(d);
-					break;
-				}
+				t = list_add(&transfers, &tt, sizeof(tt));
 			}
-			
+
 			t->type = GG_SESSION_DCC_GET;
 			t->filename = xstrdup(d->file_info.filename);
 

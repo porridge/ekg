@@ -2029,7 +2029,7 @@ COMMAND(cmd_dcc)
 			for (l = transfers; l; l = l->next) {
 				struct transfer *t = l->data;
 				
-				print("dcc_show_debug", itoa(t->id), (t->type == GG_SESSION_DCC_SEND) ? "SEND" : "GET", t->filename, format_user(t->uin), (t->dcc) ? "yes" : "no");
+				print("dcc_show_debug", itoa(t->id), (t->type == GG_SESSION_DCC_SEND) ? "SEND" : "GET", t->filename, format_user(t->uin), (t->dcc) ? "yes" : "no", (t->dcc) ? itoa(t->dcc->offset) : "0", (t->dcc) ? itoa(t->dcc->file_info.size) : "0", (t->dcc) ? itoa(100*t->dcc->offset/t->dcc->file_info.size) : "0");
 			}
 
 			return;
@@ -2257,12 +2257,10 @@ COMMAND(cmd_dcc)
 		struct transfer *t;
 		char *path;
 		
-		for (t = NULL, l = transfers; l; ) {
+		for (t = NULL, l = transfers; l; l = l->next) {
 			struct transfer *tt = l->data;
 			struct userlist *u;
 
-			l = l->next;
-			
 			if (!tt->dcc || tt->type != GG_SESSION_DCC_GET || !tt->filename)
 				continue;
 			
