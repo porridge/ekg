@@ -1468,6 +1468,7 @@ COMMAND(cmd_list)
 				string_append(s, "\r\n");
 			}
 
+			xfree(vars);
 			xfree(contacts);
 			
 			contacts = string_free(s, 0);
@@ -1533,6 +1534,7 @@ COMMAND(cmd_list)
 				string_append(s, "\r\n");
 			}
 
+			xfree(vars);
 			xfree(contacts);
 			
 			contacts = string_free(s, 0);
