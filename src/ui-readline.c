@@ -586,6 +586,9 @@ static void ui_readline_print(const char *target, int separate, const char *xlin
 	const char *p, *line = NULL;
 	string_t s = NULL;
 
+	if (target && !strcmp(target, "__debug"))
+		return;
+
 	if (config_timestamp) {
 		string_t s = string_init(NULL);
 		const char *p = xline;

@@ -10,6 +10,7 @@ zg³osi³ b³±d.
 
 - poprawka warninga przy kompilacji bez ncurses (Lordzik/w)
 - poprawka komunikatu b³êdu przy b³êdzie ³adowania themu (gozda/w)
+- poprawka debugowania w readline (Lordzik/w)
 
 // 2003-04-15
 

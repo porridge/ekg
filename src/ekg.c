@@ -811,7 +811,6 @@ static char *prepare_batch_line(int argc, char *argv[], int n)
 	return buf;
 }
 
-#ifdef WITH_UI_NCURSES
 /*
  * debug_handler()
  *
@@ -851,7 +850,6 @@ static void debug_handler(int level, const char *format, va_list ap)
 		print_window("__debug", 0, "debug", tmp);
 	xfree(tmp);
 }
-#endif
 
 /*
  * ekg_ui_set()
@@ -1100,6 +1098,15 @@ int main(int argc, char **argv)
 
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
+		if (!gg_debug_file)
+			gg_debug_handler = debug_handler;
+
+		gg_debug_level = 255;
+	}
+#endif
+
+#ifdef WITH_UI_READLINE
+	if (ui_init == ui_readline_init) {
 		if (!gg_debug_file)
 			gg_debug_handler = debug_handler;
 
