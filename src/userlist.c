@@ -307,8 +307,7 @@ void userlist_write_crash()
 	char name[32];
 	FILE *f;
 
-	chdir(home_dir);
-	chdir(".gg");
+	chdir(config_dir);
 	
 	snprintf(name, sizeof(name), "userlist.%d", getpid());
 	if (!(f = fopen(name, "w")))

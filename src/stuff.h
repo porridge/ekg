@@ -131,6 +131,7 @@ int config_protocol;
 int config_emoticons;
 
 char *home_dir;
+char *config_dir;
 int in_readline;
 int away;
 int in_autoexec;

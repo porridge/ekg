@@ -315,14 +315,14 @@ char *prepare_path(char *filename)
 	
 	if (!filename || !*filename) {
 		if (config_user && *config_user)
-			snprintf(path, sizeof(path), "%s/.gg/%s", home_dir, config_user);
+			snprintf(path, sizeof(path), "%s/%s", config_dir, config_user);
 		else
-			snprintf(path, sizeof(path), "%s/.gg", home_dir);
+			snprintf(path, sizeof(path), "%s", config_dir);
 	} else {
 		if (config_user && *config_user)
-			snprintf(path, sizeof(path), "%s/.gg/%s/%s", home_dir, config_user, filename);
+			snprintf(path, sizeof(path), "%s/%s/%s", config_dir, config_user, filename);
 		else
-			snprintf(path, sizeof(path), "%s/.gg/%s", home_dir, filename);
+			snprintf(path, sizeof(path), "%s/%s", config_dir, filename);
 	}
 	
 	return path;
@@ -562,8 +562,7 @@ void config_write_crash()
 	char name[32];
 	FILE *f;
 
-	chdir(home_dir);
-	chdir(".gg");
+	chdir(config_dir);
 
 	snprintf(name, sizeof(name), "config.%d", getpid());
 	if (!(f = fopen(name, "w")))

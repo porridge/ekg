@@ -385,15 +385,15 @@ void sigsegv_handler()
 	fprintf(stderr, "\n\
 *** Naruszenie ochrony pamiêci ***\n\
 \n\
-Próbujê zapisaæ ustawienia do pliku ~/.gg/config.%d i listê kontaktów\n\
-do pliku ~/.gg/userlist.%d, ale nie obiecujê, ¿e cokolwiek z tego\n\
+Próbujê zapisaæ ustawienia do pliku %s/config.%d i listê kontaktów\n\
+do pliku %s/userlist.%d, ale nie obiecujê, ¿e cokolwiek z tego\n\
 wyjdzie.\n\
 \n\
-Je¶li zostanie utworzony plik ~/.gg/core, spróbuj uruchomiæ program ,,gdb''\n\
+Je¶li zostanie utworzony plik %s/core, spróbuj uruchomiæ program ,,gdb''\n\
 zgodnie z instrukcjami zawartymi w pliku README. Dziêki temu autorzy\n\
 dowiedz± siê, w którym miejscu wyst±pi³ b³±d i najprawdopodobniej pozwoli\n\
 to unikn±æ tego typu b³êdów w przysz³o¶ci.\n\
-\n", getpid(), getpid());
+\n", config_dir, getpid(), config_dir, getpid(), config_dir);
 
 	config_write_crash();
 	userlist_write_crash();
@@ -479,6 +479,11 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Nie mogê znale¼æ katalogu domowego. Popro¶ administratora, ¿eby to naprawi³.\n");
 		return 1;
 	}
+
+	if (getenv("CONFIG_DIR"))
+	    config_dir = saprintf("%s/%s/gg", home_dir, getenv("CONFIG_DIR"));
+	else
+	    config_dir = saprintf("%s/.gg", home_dir);
 
 	signal(SIGSEGV, sigsegv_handler);
 	signal(SIGCONT, sigcont_handler);
@@ -705,9 +710,9 @@ IOCTLD_HELP
 
 	if (!config_log_path) {
 		if (config_user != "")
-			config_log_path = saprintf("%s/.gg/%s/history", home_dir, config_user);
+			config_log_path = saprintf("%s/%s/history", config_dir, config_user);
 		else
-			config_log_path = saprintf("%s/.gg/history", home_dir);
+			config_log_path = saprintf("%s/history", config_dir);
 	}
 	
 	changed_dcc("dcc");
