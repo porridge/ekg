@@ -74,6 +74,15 @@ int my_getc(FILE *f)
 				FD_SET(search->fd, &wd);
 		}
 
+		if (reg && reg->state != GG_STATE_IDLE) {
+			if (reg->fd > maxfd)
+				maxfd = reg->fd;
+			if ((reg->check & GG_CHECK_READ))
+				FD_SET(reg->fd, &rd);
+			if ((reg->check & GG_CHECK_WRITE))
+				FD_SET(reg->fd, &wd);
+		}
+
 		tv.tv_sec = 1;
 		tv.tv_usec = 0;
 		
@@ -172,6 +181,25 @@ int my_getc(FILE *f)
 					}
 				}
 			}
+
+			if (reg && (FD_ISSET(reg->fd, &rd) || FD_ISSET(reg->fd, &wd))) {
+				if (gg_register_watch_fd(reg) == -1) {
+					my_printf("register_failed", strerror(errno));
+					gg_free_register(reg);
+					reg = NULL;
+				} else {
+					if (reg->state == GG_STATE_IDLE) {
+						my_printf("register_failed", strerror(errno));
+						gg_free_register(reg);
+						reg = NULL;
+					}
+					if (reg->state == GG_STATE_FINISHED) {	
+						handle_register(reg);
+						gg_free_register(reg);
+						reg = NULL;
+					}
+				}
+			}			
 		}
 	}
 	

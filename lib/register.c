@@ -32,15 +32,13 @@
 /*
  * gg_register()
  *
- * próbuje zarejestrowaæ u¿ytkownika. W TEJ CHWILI NIE DZIA£A, ze wzglêdu na
- * brak funkcji licz±cej hashe. jak ju¿ algorytm zostanie rozszyfrowanych,
- * zacznie dzia³aæ.
+ * próbuje zarejestrowaæ u¿ytkownika. W TEJ CHWILI JU¯ DZIA£A, 
  *
- *  - r - informacja o tym, czego szukamy,
+ *  - email, password - informacja rejestracyjne,
  *  - async - ma byæ asynchronicznie?
  *
  * zwraca zaalokowan± strukturê `gg_register', któr± po¼niej nale¿y zwolniæ
- * funkcj± gg_free_search(), albo NULL je¶li wyst±pi³ b³±d.
+ * funkcj± gg_free_register(), albo NULL je¶li wyst±pi³ b³±d.
  */
 struct gg_register *gg_register(char *email, char *password, int async)
 {
@@ -97,7 +95,8 @@ struct gg_register *gg_register(char *email, char *password, int async)
 
 	r->done = 0;
 	r->uin = 0;
-
+	r->password = password;
+	
 	if (!(r->http = gg_http_connect(GG_REGISTER_HOST, GG_REGISTER_PORT, async, query))) {
 		gg_debug(GG_DEBUG_MISC, "=> register, gg_http_connect() failed mysteriously\n");
 		free(query);

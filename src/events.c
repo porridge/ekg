@@ -330,3 +330,17 @@ void handle_search(struct gg_search *s)
 	}
 }
 
+void handle_register(struct gg_register *s)
+{
+	char uin[16];
+
+	if (!s->done)
+		my_printf("register_not_found");
+	
+	config_uin = s->uin;
+	config_password = s->password;
+	
+	snprintf(uin, sizeof(uin), "%lu", s->uin);
+	my_printf ("register", uin);
+};
+

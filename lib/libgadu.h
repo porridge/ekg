@@ -214,7 +214,8 @@ struct gg_register {
 	
 	/* otrzymany numerek, 0 je¶li siê nie powiod³o */
 	uin_t uin;
-
+	char *password;
+	
 	/* po³±czenie */
 	struct gg_http *http;
 	int fd, state, error, check;

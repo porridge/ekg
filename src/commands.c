@@ -62,7 +62,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_save(), command_msg(), command_quit(), command_test_send(),
 	command_test_add(), command_theme(), command_set(), command_connect(),
 	command_sms(), command_find(), command_modify(), command_cleartab(),
-	command_status();
+	command_status(), command_register();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -104,6 +104,7 @@ struct command commands[] = {
 	{ "theme", "f", command_theme, " <plik>", "£aduje opis wygl±du z podanego pliku", "" },
 	{ "quit", "", command_quit, "", "Wychodzi z programu", "" },
 	{ "unignore", "i", command_ignore, " <numer/alias>", "Usuwa z listy ignorowanych osób", "" },
+	{ "register", "??", command_register, " <email> <has³o>", "Rejestruje nowy uin", "" },
 	{ "_send", "u?", command_test_send, "", "", "" },
 	{ "_add", "?", command_test_add, "", "", "" },
 	{ NULL, NULL, NULL, NULL, NULL }
@@ -1103,6 +1104,22 @@ COMMAND(command_test_add)
 	if (params[0])
 		add_send_nick(params[0]);
 
+	return 0;
+}
+
+COMMAND(command_register)
+{
+
+	if (!params[0] || !params[1]) {
+		my_printf("not_enough_params");
+		return 0;
+	}
+	
+	if (!(reg = gg_register(params[0], params[1], 1))) {
+		my_printf("register_failed", strerror(errno));
+		return 0;
+	}
+	
 	return 0;
 }
 

@@ -537,7 +537,8 @@ void init_theme()
 	add_format("variable_invalid", "%! Nieprawid³owa warto¶æ zmiennej\n", 1);
 	add_format("not_implemented", "%! Tej funkcji jeszcze nie ma\n", 1);
 	add_format("no_config", "%! Niekompletna konfiguracja. Wpisz:\n%!   %Wset uin <numerek-gg>%n\n%!   %Wset password <has³o>%n\n%!   %Wsave%n\n%! Nastêpnie wydaj polecenie:\n%!   %Wconnect%n\n\n", 1);
-
+	add_format("register", "%! Rejestracja poprawna: Wygrany uin: %1\n", 1);
+	
 	add_format("sms_msg", "EKG: msg %1 %# >> %2", 1);
 	add_format("sms_chat", "EKG: chat %1 %# >> %2", 1);
 	add_format("sms_error", "%! B³±d wysy³ania SMS\n", 1);
