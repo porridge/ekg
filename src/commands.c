@@ -1780,26 +1780,30 @@ COMMAND(cmd_list)
 
 	/* list --get */
 	if (params[0] && (match_arg(params[0], 'g', "get", 2) || match_arg(params[0], 'G', "get-config", 5))) {
-		struct gg_http *h;
-		
-		if (!(h = gg_userlist_get(config_uin, config_password, 1))) {
+		if (!sess || sess->state != GG_STATE_CONNECTED) {
+			printq("not_connected");
+			return -1;
+		}
+	
+		if (gg_userlist_request(sess, GG_USERLIST_GET, NULL) == -1) {
 			printq("userlist_get_error", strerror(errno));
 			return -1;
 		}
 
-		if (match_arg(params[0], 'G', "get-config", 5))
-			h->user_data = (char*) 1;
-		
-		list_add(&watches, h, 0);
+		userlist_get_config = (match_arg(params[0], 'G', "get-config", 5));
 		
 		return 0;
 	}
 
 	/* list --clear */
 	if (params[0] && (match_arg(params[0], 'c', "clear", 2) || match_arg(params[0], 'C', "clear-config", 8))) {
-		struct gg_http *h;
 		char *contacts = NULL;
 		
+		if (!sess || sess->state != GG_STATE_CONNECTED) {
+			printq("not_connected");
+			return -1;
+		}
+
 		if (match_arg(params[0], 'c', "clear", 2)) {
 			string_t s = string_init(contacts);
 			char *vars = variable_digest();
@@ -1839,28 +1843,29 @@ COMMAND(cmd_list)
 		} else
 			contacts = xstrdup("");
 			
-		if (!(h = gg_userlist_put(config_uin, config_password, contacts, 1))) {
+		if (gg_userlist_request(sess, GG_USERLIST_PUT, NULL) == -1) {
 			printq("userlist_clear_error", strerror(errno));
 			xfree(contacts);
 			return -1;
 		}
 
-		if (match_arg(params[0], 'c', "clear", 2))
-			h->user_data = (char *) 2;	/* --clear */
-		else
-			h->user_data = (char *) 3;	/* --clear-config */
+		userlist_put_config = (match_arg(params[0], 'c', "clear", 2)) ? 2 : 3;
 		
 		xfree(contacts);
-		
-		list_add(&watches, h, 0);
 
 		return 0;
 	}
 	
 	/* list --put */
 	if (params[0] && (match_arg(params[0], 'p', "put", 2) || match_arg(params[0], 'P', "put-config", 5))) {
-		struct gg_http *h;
-		char *contacts = userlist_dump();
+		char *contacts;
+
+		if (!sess || sess->state != GG_STATE_CONNECTED) {
+			printq("not_connected");
+			return -1;
+		}
+
+		contacts = userlist_dump();
 
 		iso_to_cp(contacts);
 
@@ -1902,19 +1907,16 @@ COMMAND(cmd_list)
 			contacts = string_free(s, 0);
 		}
 		
-		if (!(h = gg_userlist_put(config_uin, config_password, contacts, 1))) {
+		if (gg_userlist_request(sess, GG_USERLIST_PUT, contacts) == -1) {
 			printq("userlist_put_error", strerror(errno));
 			xfree(contacts);
 			return -1;
 		}
 
-		if (match_arg(params[0], 'P', "put-config", 5))
-			h->user_data = (char*) 1;
+		userlist_put_config = (match_arg(params[0], 'P', "put-config", 5));
 		
 		xfree(contacts);
 		
-		list_add(&watches, h, 0);
-
 		return -1;
 	}
 

@@ -57,7 +57,8 @@
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure(), handle_search50(),
-	handle_change50(), handle_status60(), handle_notify60();
+	handle_change50(), handle_status60(), handle_notify60(),
+	handle_userlist();
 
 static int hide_notavail = 0;	/* czy ma ukrywaæ niedostêpnych -- tylko zaraz po po³±czeniu */
 
@@ -79,6 +80,7 @@ static struct handler handlers[] = {
 	{ GG_EVENT_DISCONNECT, handle_disconnect },
 	{ GG_EVENT_PUBDIR50_SEARCH_REPLY, handle_search50 },
 	{ GG_EVENT_PUBDIR50_WRITE, handle_change50 },
+	{ GG_EVENT_USERLIST, handle_userlist },
 	{ 0, NULL }
 };
 
@@ -1291,65 +1293,64 @@ fail:
  *
  * nie zwraca niczego.
  */
-void handle_userlist(struct gg_http *h)
+void handle_userlist(struct gg_event *e)
 {
-	const char *format_ok, *format_error;
-	
-	if (!h)
-		return;
-	
-	if (!h->user_data) {
-		format_ok = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_get_ok" : "userlist_put_ok";
-		format_error = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_get_error" : "userlist_put_error";
-	} else {
-		if (h->user_data == (char *) 1) {
-			format_ok = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_config_get_ok" : "userlist_config_put_ok";
-			format_error = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_config_get_error" : "userlist_config_put_error";
-		} else {
-			format_ok = (h->user_data == (char *) 2) ? "userlist_clear_ok" : "userlist_config_clear_ok";
-			format_error = (h->user_data == (char *) 2) ? "userlist_clear_error" : "userlist_config_clear_error";
-		}
-	}
+	switch (e->event.userlist.type) {
+		case GG_USERLIST_GET_REPLY:
+		{
+			if (!userlist_get_config)
+				print("userlist_get_ok");
+			else
+				print("userlist_config_get_ok");
+			
+			if (e->event.userlist.reply) {
+				list_t l;
 
-	if (h->callback(h) || h->state == GG_STATE_ERROR) {
-		print(format_error, strerror(errno));
-		list_remove(&watches, h, 0);
-		h->destroy(h);
-		return;
-	}
-	
-	if (h->state != GG_STATE_DONE)
-		return;
+				for (l = userlist; l; l = l->next) {
+					struct userlist *u = l->data;
+					if (sess)
+						gg_remove_notify_ex(sess, u->uin, userlist_type(u));
+				}
 
-	print((h->data) ? format_ok : format_error);
-		
-	if (h->type == GG_SESSION_USERLIST_GET && h->data) {
-		list_t l;
+				cp_to_iso(e->event.userlist.reply);
+				userlist_set(e->event.userlist.reply, userlist_get_config);
+				userlist_send();
+				update_status();
+				update_status_myip();
 
-		for (l = userlist; l; l = l->next) {
-			struct userlist *u = l->data;
-			if (sess)
-				gg_remove_notify_ex(sess, u->uin, userlist_type(u));
+				for (l = userlist; l; l = l->next) {
+					struct userlist *u = l->data;
+
+					if (u->display)
+						ui_event("userlist_changed", itoa(u->uin), u->display, NULL);
+				}
+
+				config_changed = 1;
+			}
+
+			break;
 		}
 
-		cp_to_iso(h->data);
-		userlist_set(h->data, (h->user_data) ? 1 : 0);
-		userlist_send();
-		update_status();
-		update_status_myip();
+		case GG_USERLIST_PUT_REPLY:
+		{
+			switch (userlist_put_config) {
+				case 0:
+					print("userlist_put_ok");
+					break;
+				case 1:
+					print("userlist_config_put_ok");
+					break;
+				case 2:
+					print("userlist_clear_ok");
+					break;
+				case 3:
+					print("userlist_config_clear_ok");
+					break;
+			}
 
-		for (l = userlist; l; l = l->next) {
-			struct userlist *u = l->data;
-
-			if (u->display)
-				ui_event("userlist_changed", itoa(u->uin), u->display, NULL);
+			break;
 		}
-
-		config_changed = 1;
 	}
-
-	list_remove(&watches, h, 0);
-	h->destroy(h);
 }
 
 /*

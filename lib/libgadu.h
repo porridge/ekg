@@ -124,6 +124,8 @@ struct gg_session {
 	void *ssl;		/* zachowujemy ABI */
 	void *ssl_ctx;
 #endif
+
+	int image_size;		/* maksymalny rozmiar obrazków */
 };
 
 /*
@@ -331,8 +333,9 @@ struct gg_login_params {
 	uint32_t external_addr;		/* adres widziany na zewnatrz */
 	uint16_t external_port;		/* port widziany na zewnatrz */
 	int tls;			/* czy ³±czymy po TLS? */
+	int image_size;			/* maksymalny rozmiar obrazka */
 
-	char dummy[8 * sizeof(int)];	/* miejsce na kolejnych 8 zmiennych,
+	char dummy[7 * sizeof(int)];	/* miejsce na kolejnych 8 zmiennych,
 					 * ¿eby z dodaniem parametru nie 
 					 * zmienia³ siê rozmiar struktury */
 };

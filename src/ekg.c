@@ -138,8 +138,6 @@ static struct {
 	EKG_HANDLER(GG_SESSION_UNREGISTER, handle_pubdir, gg_pubdir_free)
 	EKG_HANDLER(GG_SESSION_PASSWD, handle_pubdir, gg_change_passwd_free)
 	EKG_HANDLER(GG_SESSION_REMIND, handle_pubdir, gg_remind_passwd_free)
-	EKG_HANDLER(GG_SESSION_USERLIST_GET, handle_userlist, gg_userlist_get_free)
-	EKG_HANDLER(GG_SESSION_USERLIST_PUT, handle_userlist, gg_userlist_put_free)
 	EKG_HANDLER(GG_SESSION_USER0, NULL, reaper_user)		/* stdin */
 	EKG_HANDLER(GG_SESSION_USER1, get_char_from_pipe, reaper_user)	/* control pipe */
 	EKG_HANDLER(GG_SESSION_USER2, handle_voice, reaper_user)	/* voice */
