@@ -51,7 +51,7 @@
 #endif
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
-	handle_success(), handle_failure();
+	handle_success(), handle_failure(), handle_search50();
 
 static int hide_notavail = 0;	/* czy ma ukrywaæ niedostêpnych -- tylko zaraz po po³±czeniu */
 
@@ -64,6 +64,7 @@ static struct handler handlers[] = {
 	{ GG_EVENT_CONN_SUCCESS, handle_success },
 	{ GG_EVENT_CONN_FAILED, handle_failure },
 	{ GG_EVENT_DISCONNECT, handle_disconnect },
+	{ GG_EVENT_SEARCH50_REPLY, handle_search50 },
 	{ 0, NULL }
 };
 
@@ -1608,3 +1609,83 @@ void handle_voice(struct gg_common *c)
 	}
 #endif /* HAVE_VOIP */
 }
+
+/*
+ * handle_search50()
+ *
+ * zajmuje siê obs³ug± wyniku przeszukiwania katalogu publicznego.
+ *
+ *  - e - opis zdarzenia
+ */
+void handle_search50(struct gg_event *e)
+{
+	gg_search50_t res = e->event.search50;
+	int i, count;
+
+	if ((count = gg_search50_count(res)) < 1) {
+		print("search_not_found");
+		return;
+	}
+
+	for (i = 0; i < count; i++) {
+		const char *__fmnumber = gg_search50_get(res, i, "fmnumber");
+		const char *uin = (__fmnumber) ? __fmnumber : "?";
+
+		const char *__firstname = gg_search50_get(res, i, "firstname");
+		char *firstname = xstrdup((__firstname) ? __firstname : "");
+
+		const char *__lastname = gg_search50_get(res, i, "lastname");
+		char *lastname = xstrdup((__lastname) ? __lastname : "");
+		
+		const char *__nickname = gg_search50_get(res, i, "nickname");
+		char *nickname = xstrdup((__nickname) ? __nickname : "");
+
+		const char *__fmstatus = gg_search50_get(res, i, "fmstatus");
+		int status = (__fmstatus) ? atoi(__fmstatus) : GG_STATUS_NOT_AVAIL;
+
+		const char *__birthyear = gg_search50_get(res, i, "birthyear");
+		const char *birthyear = (__birthyear && strcmp(__birthyear, "0")) ? __birthyear : "-";
+
+		const char *__city = gg_search50_get(res, i, "city");
+		char *city = xstrdup((__city) ? __city : "");
+
+		char *name, *active, *gender;
+
+		cp_to_iso(firstname);
+		cp_to_iso(lastname);
+		cp_to_iso(nickname);
+		cp_to_iso(city);
+
+		name = saprintf("%s %s", firstname, lastname);
+
+#define __format(x) ((count == 1) ? "search_results_single" x : "search_results_multi" x)
+
+		switch (status) {
+			case GG_STATUS_AVAIL:
+				active = format_string(format_find(__format("_active")), nickname);
+				break;
+
+			case GG_STATUS_BUSY:
+				active = format_string(format_find(__format("_busy")), nickname);
+				break;
+			default:
+				active = format_string(format_find(__format("_inactive")), nickname);
+		}
+
+		gender = format_string(format_find(__format("_unknown")));
+		
+		print(__format(""), uin, name, nickname, city, birthyear, gender, active);
+
+#undef __format
+
+		xfree(name);
+		xfree(active);
+		xfree(gender);
+
+		xfree(firstname);
+		xfree(lastname);
+		xfree(nickname);
+		xfree(city);
+	}
+}
+

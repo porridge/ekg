@@ -14,10 +14,13 @@ zg³osi³ b³±d.
 - ,,*'' w nazwie timera i at usuwa wszystkie (ale nie timery UI) (sz)
 - dok³adniejsze sprawdzanie argumentów w kilku funkcjach (mati/w)
 - poprawka dope³niania zmiennych przy w³±czonej li¶cie kontaktów (*/w)
-- libgadu: eksperymentalny kod wyszukiwania zgodny z GG 5.0. wysy³a
-  ju¿ poprawne zapytania, ale nie obs³uguje odpowiedzi. API mo¿e siê
+- libgadu: eksperymentalny kod wyszukiwania zgodny z GG 5.0. API mo¿e siê
   zmieniæ. na pewno siê zmieni. trzeba uzgodniæ z ekip± Kadu (w)
 - /find wysy³a zapytania zgodne z GG 5.0 (w)
+- wyszukiwanie dzia³a (w)
+- lekka poprawka themów wyszukiwania, ze wzglêdu na brak informacji o p³ci
+  w wynikach (w)
+- poprawka zale¿no¶ci w Makefile'ach (FIG/w)
 
 // 2003-01-10
 

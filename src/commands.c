@@ -668,6 +668,11 @@ COMMAND(cmd_find)
 	gg_search50_t req;
 	int i;
 
+	if (!sess || sess->state != GG_STATE_CONNECTED) {
+		print("not_connected");
+		return;
+	}
+		
 	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
 		ui_event("command", "find", NULL);
 		return;
@@ -681,7 +686,8 @@ COMMAND(cmd_find)
 		return;
 	}
 
-	req = gg_search50_new();
+	if (!(req = gg_search50_new()))
+		return;
 	
 	if (argv[0] && !argv[1] && argv[0][0] != '-') {
 		uin_t uin = get_uin(params[0]);
@@ -701,31 +707,31 @@ COMMAND(cmd_find)
 		char *arg = argv[i];
 				
 		if (match_arg(arg, 'f', "first", 2) && argv[i + 1])
-			gg_search50_add(req, "firstname", argv[++i]);
+			gg_search50_add(req, GG_SEARCH50_FIRSTNAME, argv[++i]);
 
 		if (match_arg(arg, 'l', "last", 2) && argv[i + 1])
-			gg_search50_add(req, "lastname", argv[++i]);
+			gg_search50_add(req, GG_SEARCH50_LASTNAME, argv[++i]);
 
 		if (match_arg(arg, 'n', "nickname", 2) && argv[i + 1])
-			gg_search50_add(req, "nickname", argv[++i]);
+			gg_search50_add(req, GG_SEARCH50_NICKNAME, argv[++i]);
 		
 		if (match_arg(arg, 'c', "city", 2) && argv[i + 1])
-			gg_search50_add(req, "city", argv[++i]);
+			gg_search50_add(req, GG_SEARCH50_CITY, argv[++i]);
 
 		if (match_arg(arg, 'u', "uin", 2) && argv[i + 1])
-			gg_search50_add(req, "fmnumber", argv[++i]);
+			gg_search50_add(req, GG_SEARCH50_UIN, argv[++i]);
 		
 		if (match_arg(arg, 's', "start", 2) && argv[i + 1])
-			gg_search50_add(req, "fmstart", argv[++i]);
+			gg_search50_add(req, GG_SEARCH50_START, argv[++i]);
 		
 		if (match_arg(arg, 'F', "female", 2))
-			gg_search50_add(req, "gender", "1");
+			gg_search50_add(req, GG_SEARCH50_GENDER, GG_SEARCH50_GENDER_FEMALE);
 
 		if (match_arg(arg, 'M', "male", 2))
-			gg_search50_add(req, "gender", "2");
+			gg_search50_add(req, GG_SEARCH50_GENDER, GG_SEARCH50_GENDER_MALE);
 
 		if (match_arg(arg, 'a', "active", 2))
-			gg_search50_add(req, "ActiveOnly", "1");
+			gg_search50_add(req, GG_SEARCH50_ACTIVE, GG_SEARCH50_ACTIVE_TRUE);
 
 		if (match_arg(arg, 'b', "born", 2) && argv[i + 1]) {
 			char *foo = strchr(argv[++i], ':');
@@ -733,7 +739,7 @@ COMMAND(cmd_find)
 			if (foo)
 				*foo = ' ';
 
-			gg_search50_add(req, "birthyear", argv[i]);
+			gg_search50_add(req, GG_SEARCH50_BIRTHYEAR, argv[i]);
 		}
 
 		if (match_arg(arg, 'A', "all", 3))
@@ -741,7 +747,7 @@ COMMAND(cmd_find)
 	}
 
 search:
-	if (gg_search50(sess, req))
+	if (!gg_search50(sess, req))
 		print("search_failed", http_error_string(0));
 
 	gg_search50_free(req);

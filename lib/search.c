@@ -34,7 +34,8 @@
  * rozpoczyna szukanie u¿ytkowników. informacje o tym, czego dok³adnie szukamy
  * s± zawarte w struct gg_search_request. ze wzglêdu na specyfikê ich
  * przeszukiwarki, niektórych pól nie mo¿na mieszaæ. s± oznaczone w libgadu.h
- * jako osobne tryby
+ * jako osobne tryby. ZE WZGLÊDU NA ZMIANY W PROTOKOLE, WYSZUKIWANIE T¡ METOD¡
+ * NIE ZWRÓCI ¯ADNYCH WYNIKÓW. NALE¯Y U¯YWAÆ FUNKCJI gg_search50()
  *
  *  - r - informacja o tym, czego szukamy
  *  - async - po³±czenie asynchroniczne

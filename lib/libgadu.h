@@ -333,7 +333,9 @@ enum gg_event_t {
 	GG_EVENT_DCC_NEED_FILE_INFO,	/* nale¿y wype³niæ file_info */
 	GG_EVENT_DCC_NEED_FILE_ACK,	/* czeka na potwierdzenie pliku */
 	GG_EVENT_DCC_NEED_VOICE_ACK,	/* czeka na potwierdzenie rozmowy */
-	GG_EVENT_DCC_VOICE_DATA 	/* ramka danych rozmowy g³osowej */
+	GG_EVENT_DCC_VOICE_DATA, 	/* ramka danych rozmowy g³osowej */
+
+	GG_EVENT_SEARCH50_REPLY		/* odpowiedz wyszukiwania GG 5.0 */
 };
 
 /*
@@ -372,6 +374,25 @@ enum gg_error_t {
 	GG_ERROR_DCC_NET,		/* b³±d wysy³ania/odbierania */
 	GG_ERROR_DCC_REFUSED 		/* po³±czenie odrzucone przez usera */
 };
+
+/*
+ * struktury dotycz±ce wyszukiwania w GG 5.0. NIE NALE¯Y SIÊ DO NICH
+ * ODWO£YWAÆ BEZPO¦REDNIO! do dostêpu do nich s³u¿± funkcje gg_search50_*()
+ */
+struct gg_search50_entry {
+	int num;
+	char *field;
+	char *value;
+};
+
+struct gg_search50_s {
+	int count;
+	int next;
+	struct gg_search50_entry *entries;
+	int entries_count;
+};
+
+typedef struct gg_search50_s *gg_search50_t;
 
 /*
  * struktura opisuj±ca rodzaj zdarzenia. wychodzi z gg_watch_fd() lub
@@ -417,6 +438,8 @@ struct gg_event {
 			uint8_t *data;
 			int length;
 		} dcc_voice_data;
+
+		gg_search50_t search50;
         } event;
 };
 
@@ -516,21 +539,6 @@ void gg_search_request_free(struct gg_search_request *r);
  *
  * NIE NALE¯Y SIÊ ODWO£YWAÆ DO PÓL gg_search50_t BEZPO¦REDNIO!
  */
-struct gg_search50_entry {
-	int num;
-	char *field;
-	char *value;
-};
-
-struct gg_search50_s {
-	int count;
-	int next;
-	struct gg_search50_entry *entries;
-	int entries_count;
-};
-
-typedef struct gg_search50_s *gg_search50_t;
-
 int gg_search50(struct gg_session *sess, gg_search50_t req);
 gg_search50_t gg_search50_new();
 int gg_search50_add(gg_search50_t req, const char *field, const char *value);
@@ -538,6 +546,23 @@ const char *gg_search50_get(gg_search50_t res, int num, const char *field);
 int gg_search50_count(gg_search50_t res);
 uin_t gg_search50_next(gg_search50_t res);
 void gg_search50_free(gg_search50_t res);
+
+#define GG_SEARCH50_UIN "FmNumber"
+#define GG_SEARCH50_STATUS "FmStatus"
+#define GG_SEARCH50_FIRSTNAME "firstname"
+#define GG_SEARCH50_LASTNAME "lastname"
+#define GG_SEARCH50_NICKNAME "nickname"
+#define GG_SEARCH50_BIRTHYEAR "birthyear"
+#define GG_SEARCH50_CITY "city"
+#define GG_SEARCH50_GENDER "gender"
+#define GG_SEARCH50_GENDER_FEMALE "1"
+#define GG_SEARCH50_GENDER_MALE "2"
+#define GG_SEARCH50_ACTIVE "ActiveOnly"
+#define GG_SEARCH50_ACTIVE_TRUE "1"
+#define GG_SEARCH50_ACTIVE_FALSE "0"
+#define GG_SEARCH50_START "fmstart"
+
+int gg_search50_handle_reply(struct gg_event *e, const char *packet, int length);
 
 /*
  * operacje na katalogu publicznym.
@@ -769,14 +794,14 @@ struct gg_login_ext {
 #define GG_SEARCH50_REQUEST 0x0014
 
 struct gg_search50_request {
-	uint32_t dunno1;		/* ??? */
+	uint32_t dunno1;		/* 0xXXXXXX03 */
 	uint8_t dunno2;			/* '>' */
 } GG_PACKED;
 
 #define GG_SEARCH50_REPLY 0x000e
 
 struct gg_search50_reply {
-	uint32_t dunno1;		/* ??? */
+	uint32_t dunno1;		/* 0xXXXXXX05 */
 	uint8_t dunno2;			/* '>' */
 } GG_PACKED;
 

@@ -44,6 +44,7 @@ AC_SUBST(shared, "")
 AC_SUBST(install_shared, "")
 
 AC_SUBST(lgadu, "")
+AC_SUBST(libgadu_a, "")
 
 AC_SUBST(static, "static")
 AC_SUBST(install_static, "install-static")
@@ -384,7 +385,7 @@ dnl   fi
     lib_static_default=no
     lgadu="-lgadu"
   else
-    lgadu="../lib/libgadu.a"
+    libgadu_a="../lib/libgadu.a"
     lib_shared_default=no
     lib_static_default=yes
   fi

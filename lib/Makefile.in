@@ -30,7 +30,7 @@ SHAREDM = $(SHAREDMM).$(VERSION_MAJOR)
 SHARED = $(SHAREDM).$(VERSION_MINOR)
 STATIC = libgadu.a
 
-all:	dep @static@ @shared@
+all:	@static@ @shared@
 
 #
 
@@ -42,7 +42,7 @@ distclean:	clean
 
 #
 
-static: $(STATIC)
+static: dep $(STATIC)
 
 $(STATIC): $(OBJS)
 	$(AR) r $(STATIC) $(OBJS) 
@@ -53,7 +53,7 @@ $(STATIC): $(OBJS)
 %.lo:	%.c
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) -fPIC $< -o $@
 
-shared:	$(SHARED)
+shared:	dep $(SHARED)
 
 $(SHARED): $(LOBJS)
 	$(CC) -shared -Wl,-soname=libgadu.so.$(VERSION_MAJOR) -o $(SHARED) $(LOBJS) $(LIBS) -lc

@@ -25,8 +25,8 @@ SRCS = $(OBJS:.o=.c)
 
 all:	dep ekg @ioctld@
 
-ekg:	$(OBJS)
-	$(CC) $(CFLAGS) -o ekg $(OBJS) -L../lib $(LDFLAGS) $(LIBS) @lgadu@
+ekg:	$(OBJS) @libgadu_a@
+	$(CC) $(CFLAGS) -o ekg $(OBJS) -L../lib $(LDFLAGS) $(LIBS) @lgadu@ @libgadu_a@
 
 ioctld:	ioctld.c
 	$(CC) $(CFLAGS) ioctld.c -o ioctld $(LIBS)

@@ -36,6 +36,8 @@ gg_search50_t gg_search50_new()
 {
 	gg_search50_t res = malloc(sizeof(struct gg_search50_s));
 
+	gg_debug(GG_DEBUG_FUNCTION, "** gg_search50_new();\n");
+
 	if (!res) {
 		gg_debug(GG_DEBUG_MISC, "// gg_search50_new() out of memory\n");
 		return NULL;
@@ -62,6 +64,8 @@ int gg_search50_add_n(gg_search50_t req, int num, const char *field, const char 
 {
 	struct gg_search50_entry *tmp = NULL, *entry;
 	char *dupfield, *dupvalue;
+
+	gg_debug(GG_DEBUG_FUNCTION, "** gg_search50_add_n(%p, %d, \"%s\", \"%s\");\n", req, num, field, value);
 
 	if (!(dupfield = strdup(field))) {
 		gg_debug(GG_DEBUG_MISC, "// gg_search50_add_n() out of memory\n");
@@ -139,7 +143,7 @@ void gg_search50_free(gg_search50_t s)
  *  - sess - sesja,
  *  - req - zapytanie.
  *
- * 0/-1
+ * numer sekwencyjny wyszukiwania lub 0 w przypadku b³êdu.
  */
 int gg_search50(struct gg_session *sess, gg_search50_t req)
 {
@@ -150,13 +154,15 @@ int gg_search50(struct gg_session *sess, gg_search50_t req)
 	gg_debug(GG_DEBUG_FUNCTION, "** gg_search50(%p, %p);\n", sess, req);
 	
 	if (!sess || !req) {
+		gg_debug(GG_DEBUG_MISC, "// gg_search50() invalid arguments\n");
 		errno = EFAULT;
-		return -1;
+		return 0;
 	}
 
 	if (sess->state != GG_STATE_CONNECTED) {
+		gg_debug(GG_DEBUG_MISC, "// gg_search50() not connected\n");
 		errno = ENOTCONN;
-		return -1;
+		return 0;
 	}
 
 	for (i = 0; i < req->entries_count; i++) {
@@ -168,10 +174,14 @@ int gg_search50(struct gg_session *sess, gg_search50_t req)
 		size += strlen(req->entries[i].value) + 1;
 	}
 
-	buf = malloc(size);
+	if (!(buf = malloc(size))) {
+		gg_debug(GG_DEBUG_MISC, "// gg_search50() out of memory (%d bytes)\n", size);
+		return 0;
+	}
 
 	r = (struct gg_search50_request*) buf;
-	r->dunno1 = 0x1f000003;
+	res = (random() & 0xffffff00) | 0x00000003;
+	r->dunno1 = gg_fix32(res);
 	r->dunno2 = '>';
 
 	for (i = 0, p = buf + 5; i < req->entries_count; i++) {
@@ -185,11 +195,176 @@ int gg_search50(struct gg_session *sess, gg_search50_t req)
 		p += strlen(p) + 1;
 	}
 
-	res = gg_send_packet(sess->fd, GG_SEARCH50_REQUEST, buf, size, NULL, 0);
+	if (gg_send_packet(sess->fd, GG_SEARCH50_REQUEST, buf, size, NULL, 0) == -1)
+		res = 0;
 
 	free(buf);
 
 	return res;
+}
+
+/*
+ * gg_search50_handle_reply()  // funkcja wewnêtrzna
+ *
+ * analizuje przychodz±cy pakiet odpowiedzi i zapisuje wynik wyszukiwania
+ * w struct gg_event.
+ *
+ *  - e - opis zdarzenia,
+ *  - packet - zawarto¶æ pakietu odpowiedzi,
+ *  - length - d³ugo¶æ pakietu odpowiedzi.
+ *
+ * 0/-1
+ */
+int gg_search50_handle_reply(struct gg_event *e, const char *packet, int length)
+{
+	const char *end = packet + length, *p;
+	gg_search50_t res;
+	int num = 0;
+	
+	gg_debug(GG_DEBUG_FUNCTION, "** gg_search50_handle_reply(%p, %p, %d);\n", e, packet, length);
+
+	if (!e || !packet) {
+		gg_debug(GG_DEBUG_MISC, "// gg_search50_handle_reply() invalid arguments\n");
+		errno = EINVAL;
+		return -1;
+	}
+
+	if (length < 5) {
+		gg_debug(GG_DEBUG_MISC, "// gg_search50_handle_reply() packet too short\n");
+		errno = EINVAL;
+		return -1;
+	}
+
+	if (!(res = gg_search50_new())) {
+		gg_debug(GG_DEBUG_MISC, "// gg_search50_handle_reply() unable to allocate reply\n");
+		return -1;
+	}
+
+	e->event.search50 = res;
+
+	/* pomiñ pocz±tek odpowiedzi */
+	p = packet + 5;
+
+	while (p < end) {
+		const char *field, *value;
+
+		field = p;
+
+		/* sprawd¼, czy nie mamy podzia³u na kolejne pole */
+		if (!*field) {
+			num++;
+			field++;
+		}
+
+		value = NULL;
+		
+		for (p = field; p < end; p++) {
+			/* je¶li mamy koniec tekstu... */
+			if (!*p) {
+				/* ...i jeszcze nie mieli¶my warto¶ci pola to
+				 * wiemy, ¿e po tym zerze jest warto¶æ... */
+				if (!value)
+					value = p + 1;
+				else
+					/* ...w przeciwym wypadku koniec
+					 * warto¶ci i mo¿emy wychodziæ
+					 * grzecznie z pêtli */
+					break;
+			}
+		}
+		
+		/* sprawd¼my, czy pole nie wychodzi poza pakiet, ¿eby nie
+		 * mieæ segfaultów, je¶li serwer przestanie zakañczaæ pakietów
+		 * przez \0 */
+
+		if (p == end) {
+			gg_debug(GG_DEBUG_MISC, "// gg_search50_handle_reply() premature end of packet\n");
+			goto failure;
+		}
+
+		p++;
+
+		/* je¶li dostali¶my namier na nastêpne wyniki, to znaczy ¿e
+		 * mamy koniec wyników i nie jest to kolejna osoba. */
+		if (!strcasecmp(field, "nextstart")) {
+			res->next = atoi(value);
+			num--;
+		} else {
+			if (gg_search50_add_n(res, num, field, value) == -1)
+				goto failure;
+		}
+	}	
+
+	res->count = num + 1;
+	
+	return 0;
+
+failure:
+	gg_search50_free(res);
+	return -1;
+}
+
+/*
+ * gg_search50_get()
+ *
+ * pobiera informacjê z rezultatu wyszukiwania.
+ *
+ *  - res - rezultat wyszukiwania,
+ *  - num - numer odpowiedzi,
+ *  - field - nazwa pola (wielko¶æ liter nie ma znaczenia).
+ *
+ * warto¶æ pola lub NULL, je¶li nie znaleziono.
+ */
+const char *gg_search50_get(gg_search50_t res, int num, const char *field)
+{
+	char *value = NULL;
+	int i;
+
+	gg_debug(GG_DEBUG_FUNCTION, "** gg_search50_field(%p, %d, \"%s\");\n", res, num, field);
+
+	if (!res || num < 0 || !field) {
+		gg_debug(GG_DEBUG_MISC, "// gg_search50_field() invalid arguments\n");
+		errno = EINVAL;
+		return NULL;
+	}
+
+	for (i = 0; i < res->entries_count; i++) {
+		if (res->entries[i].num == num && !strcasecmp(res->entries[i].field, field)) {
+			value = res->entries[i].value;
+			break;
+		}
+	}
+
+	return value;
+}
+
+/*
+ * gg_search50_count()
+ *
+ * zwraca ilo¶æ znalezionych osób.
+ *
+ *  - res - wynik szukania.
+ *
+ * ilo¶æ lub -1 w przypadku b³êdu.
+ */
+int gg_search50_count(gg_search50_t res)
+{
+	return (!res) ? -1 : res->count;
+}
+
+/*
+ * gg_search50_next()
+ *
+ * zwraca numer, od którego nale¿y rozpocz±æ kolejne wyszukiwanie, je¶li
+ * zale¿y nam na kolejnych wynikach.
+ *
+ *  - res - wynik szukania.
+ *
+ * numer lub -1 w przypadku b³êdu.
+ */
+uin_t gg_search50_next(gg_search50_t res)
+{
+	return (!res) ? -1 : res->next;
 }
 
 /*
