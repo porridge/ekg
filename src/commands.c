@@ -5002,7 +5002,7 @@ void command_init()
 	  "Poprzedzenie polecenia znakiem ,,%T^%n'' ukryje informacjê o "
 	  "zakoñczeniu. Je¶li jako alias podamy ,,%T$%n'', wynik bêdzie "
 	  "wys³any do rozmówcy z aktualnego okna. Zapisanie opcji wielkimi "
-	  "literami (np. %T-B%n) spowoduje umieszczenia polecenia w pierwszej "
+	  "literami (np. %T-B%n) spowoduje umieszczenie polecenia w pierwszej "
 	  "linii wysy³anego wyniku. Ze wzglêdu na budowê klienta, numery i "
 	  "aliasy %Tnie bêd±%n dope³niane Tabem.");
 	  
