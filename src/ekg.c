@@ -460,7 +460,7 @@ void ekg_wait_for_key()
 		}
 
 		/* timeout autoawaya */
-		if (config_auto_away && GG_S_A(config_status) && time(NULL) - last_action > config_auto_away && sess->state == GG_STATE_CONNECTED) {
+		if (config_auto_away && GG_S_A(config_status) && time(NULL) - last_action > config_auto_away && sess && sess->state == GG_STATE_CONNECTED) {
 			change_status(GG_STATUS_BUSY, NULL, config_auto_away);
 			in_auto_away = 1;
 		}
