@@ -996,7 +996,7 @@ COMMAND(cmd_list)
 COMMAND(cmd_msg)
 {
 	struct userlist *u;
-	char **nicks, **p, *msg;
+	char **nicks, **p, *msg, *escaped;
 	uin_t uin;
 	int count, chat = (!strcasecmp(name, "chat"));
 
@@ -1039,6 +1039,7 @@ COMMAND(cmd_msg)
 	count = array_count(nicks);
 	msg = xstrdup(params[1]);
 	iso_to_cp(msg);
+	escaped = log_escape(msg);
 
 	for (p = nicks; *p; p++) {
 		if (!strcmp(*p, ""))
@@ -1051,11 +1052,13 @@ COMMAND(cmd_msg)
 		
 	        u = userlist_find(uin, NULL);
 
-		put_log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), params[1]);
+		put_log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), escaped);
 
 		if (!chat || count == 1)
 			gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
 	}
+
+	xfree(escaped);
 
 	if (count > 1 && chat) {
 		uin_t *uins = xmalloc(count * sizeof(uin_t));

@@ -214,15 +214,19 @@ void handle_msg(struct gg_event *e)
 {
 	struct userlist *u = userlist_find(e->event.msg.sender, NULL);
 	int chat = ((e->event.msg.msgclass & 0x0f) == GG_CLASS_CHAT);
+	char *tmp;
 	
 	if (!e->event.msg.message)
 		return;
 	
 	if (ignored_check(e->event.msg.sender)) {
 		if (config_log_ignored) {
+			char *tmp;
 			cp_to_iso(e->event.msg.message);
+			tmp = log_escape(e->event.msg.message);
 			/* XXX eskejpowanie */
-			put_log(e->event.msg.sender, "%sign,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgsend", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, e->event.msg.message);
+			put_log(e->event.msg.sender, "%sign,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgsend", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, tmp);
+			xfree(tmp);
 		}
 		return;
 	};
@@ -275,8 +279,9 @@ void handle_msg(struct gg_event *e)
 
 	play_sound((chat) ? config_sound_chat_file : config_sound_msg_file);
 
-	/* XXX eskejpowanie */
-	put_log(e->event.msg.sender, "%s,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, e->event.msg.message);
+	tmp = log_escape(e->event.msg.message);
+	put_log(e->event.msg.sender, "%s,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, tmp);
+	xfree(tmp);
 
 	if (away && config_sms_away && config_sms_app && config_sms_number) {
 		char *foo, sender[100];

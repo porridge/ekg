@@ -191,6 +191,7 @@ void ekg_logoff(struct gg_session *sess, const char *reason);
 void ekg_wait_for_key();
 int ekg_hash(const char *name);
 void ekg_exit();
+char *log_escape(const char *str);
 
 int process_add(int pid, const char *name);
 int process_remove(int pid);
