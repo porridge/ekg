@@ -553,11 +553,10 @@ pass:
  */
 void config_write_crash()
 {
-	char name[32], path[PATH_MAX];
+	char name[32];
 	FILE *f;
 
-	snprintf(path, sizeof(path), "%s", config_dir);
-	chdir(path);
+	chdir(config_dir);
 
 	snprintf(name, sizeof(name), "config.%d", (int) getpid());
 	if (!(f = fopen(name, "w")))
@@ -579,11 +578,9 @@ void debug_write_crash()
 {
 	char name[32];
 	FILE *f;
-	char path[PATH_MAX];
 	list_t l;
 
-	snprintf(path, sizeof(path), "%s", config_dir);
-	chdir(path);
+	chdir(config_dir);
 
 	snprintf(name, sizeof(name), "debug.%d", (int) getpid());
 	if (!(f = fopen(name, "w")))
