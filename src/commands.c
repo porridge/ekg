@@ -1207,7 +1207,7 @@ COMMAND(cmd_list)
 COMMAND(cmd_msg)
 {
 	struct userlist *u;
-	char **nicks = NULL, **p, *msg = NULL, *escaped, *nick;
+	char **nicks = NULL, **p, *msg = NULL, *escaped, *nick, *last;
 	uin_t uin;
 	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0;
 
@@ -1286,6 +1286,7 @@ COMMAND(cmd_msg)
 	}
 
 	msg = xstrdup(params[1]);
+	last = xstrdup(params[1]);
 	escaped = log_escape(msg);
 	iso_to_cp(msg);
 	count = array_count(nicks);
@@ -1304,7 +1305,7 @@ COMMAND(cmd_msg)
 		put_log(uin, "%s,%ld,%s,%s,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", log_timestamp(time(NULL)), escaped);
 
 		if (config_last & 4)
-			last_add(1, uin, time(NULL), msg);
+			last_add(1, uin, time(NULL), last);
 
 		if (!chat || count == 1) {
 			gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
@@ -1313,6 +1314,7 @@ COMMAND(cmd_msg)
 	}
 
 	xfree(escaped);
+	xfree(last);
 
 #ifdef HAVE_OPENSSL
 	if (config_encryption == 1 && array_count(nicks) == 1 && (uin = get_uin(nicks[0]))) {
