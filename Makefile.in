@@ -39,8 +39,10 @@ install-ekg-themes:
 install-ekg-man:
 	$(INSTALL) -d $(DESTDIR)$(mandir)/man1
 	$(INSTALL) -m 644 docs/ekg.man.en $(DESTDIR)$(mandir)/man1/ekg.1
+	$(INSTALL) -m 644 docs/ekgsearch.man.en $(DESTDIR)$(mandir)/man1/ekgsearch.1
 	$(INSTALL) -d $(DESTDIR)$(mandir)/pl/man1
 	$(INSTALL) -m 644 docs/ekg.man.pl $(DESTDIR)$(mandir)/pl/man1/ekg.1
+	$(INSTALL) -m 644 docs/ekgsearch.man.pl $(DESTDIR)$(mandir)/pl/man1/ekgsearch.1
 
 install-ekgsearch:
 	$(INSTALL) -d $(DESTDIR)$(bindir)

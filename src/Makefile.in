@@ -36,7 +36,7 @@ install-ekg:
 
 install-ioctld:
 	$(INSTALL) -d $(DESTDIR)$(bindir)
-	$(INSTALL) -m 4755 ioctld $(DESTDIR)$(bindir)
+	$(INSTALL) -m 755 ioctld $(DESTDIR)$(bindir)
 
 #
 

@@ -12,6 +12,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - ekg mo¿e byæ linkowane dynamicznie z libgadu (porridge/w)
 - many dla ekgsearch (porridge/w)
 - literówki (porridge/w)
+- ioctld nie jest instalowany z suidem (w)
+- instalacja manów ekgsearch (w)
 
 // 2002-07-25
 
