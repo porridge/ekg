@@ -2550,8 +2550,12 @@ void window_generator(const char *text, int len)
 
 void reason_generator(const char *text, int len)
 {
-	if (config_reason && !strncasecmp(text, config_reason, len))
-		array_add(&completions, xstrdup(config_reason));
+	if (config_reason && !strncasecmp(text, config_reason, len)) {
+		char *reason;
+		/* brzydkie rozwi±zanie, ¿eby nie ruszaæ opisu przy dope³nianiu */
+		reason = saprintf("\001%s", config_reason);
+		array_add(&completions, reason);
+	}
 }
 
 static struct {
@@ -2739,6 +2743,12 @@ static void complete(int *line_start, int *line_index)
 						string_t s;
 						const char *p;
 
+						/* opisu nie cytujemy */
+						if (completions[j][0] == '\001') {
+							memmove(completions[j], completions[j] + 1, strlen(completions[j]) + 1);
+							continue;
+						}
+
 						if (!strchr(completions[j], '"') && !strchr(completions[j], '\\') && !strchr(completions[j], ' '))
 							continue;
 						
@@ -2767,6 +2777,9 @@ static void complete(int *line_start, int *line_index)
 	count = array_count(completions);
 
 	if (count == 1) {
+		char *tmp;
+		while ((tmp = strchr(completions[0], '\001')))
+			*tmp = ' ';
 		snprintf(start, LINE_MAXLEN - (start - line), "%s ", completions[0]);
 		*line_index = strlen(line);
 		array_free(completions);

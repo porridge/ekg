@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-11-27
+
+- dope³nianie opisów bez cytowania (*/sz)
+
 // 2003-11-22
 
 - dodany kod b³êdu GG_FAILURE_NEED_EMAIL przy zdarzeniu GG_EVENT_CONN_FAILED (chilek)
