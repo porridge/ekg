@@ -392,8 +392,8 @@ enum gg_event_t {
 	GG_EVENT_STATUS,		/* kto¶ zmieni³ stan */
 	GG_EVENT_ACK,			/* potwierdzenie wys³ania wiadomo¶ci */
 	GG_EVENT_PONG,			/* pakiet pong */
-	GG_EVENT_CONN_FAILED,		/* po³±czenie siê powiod³o */
-	GG_EVENT_CONN_SUCCESS,		/* po³±czenie siê nie uda³o */
+	GG_EVENT_CONN_FAILED,		/* po³±czenie siê nie uda³o */
+	GG_EVENT_CONN_SUCCESS,		/* po³±czenie siê powiod³o */
 	GG_EVENT_DISCONNECT,		/* serwer zrywa po³±czenie */
 
 	GG_EVENT_DCC_NEW,		/* nowe po³±czenie miêdzy klientami */
