@@ -1242,11 +1242,13 @@ COMMAND(command_theme)
 		reset_theme_cache();
 		if (!in_autoexec)
 			my_printf("theme_default");
+		variable_set("theme", NULL, 0);
 	} else {
 		if (!read_theme(params[0], 1)) {
 			reset_theme_cache();
 			if (!in_autoexec)
 				my_printf("theme_loaded", params[0]);
+			variable_set("theme", params[0], 0);
 		} else
 			my_printf("error_loading_theme", strerror(errno));
 	}
@@ -1521,6 +1523,7 @@ COMMAND(command_test_send)
 	e->type = GG_EVENT_MSG;
 	e->event.msg.sender = get_uin(params[0]);
 	e->event.msg.message = strdup(params[1]);
+	e->event.msg.msgclass = GG_CLASS_MSG;
 	
 	handle_msg(e);
 
