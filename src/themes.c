@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "dynstuff.h"
 #include "stuff.h"
@@ -693,6 +694,7 @@ int format_remove(const char *name)
 static FILE *try_open(FILE *prevfd, const char *prefix, const char *filename)
 {
 	char buf[PATH_MAX];
+	int save_errno;
 	FILE *f;
 
 	if (prevfd)
@@ -711,8 +713,13 @@ static FILE *try_open(FILE *prevfd, const char *prefix, const char *filename)
 	else
 		snprintf(buf, sizeof(buf), "%s.theme", filename);
 
+	save_errno = errno;
+	
 	if ((f = fopen(buf, "r")))
 		return f;
+
+	if (errno == ENOENT)
+		errno = save_errno;
 
 	return NULL;
 }
@@ -742,6 +749,7 @@ int theme_read(const char *filename, int replace)
 		if ((tmp = strchr(fn, ',')))
 			*tmp = 0;
 		
+		errno = ENOENT;
 		f = try_open(NULL, NULL, fn);
 
 		if (!strchr(filename, '/')) {
