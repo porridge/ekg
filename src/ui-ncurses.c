@@ -1786,11 +1786,17 @@ void dcc_generator(const char *text, int len)
 
 void command_generator(const char *text, int len)
 {
-	char *slash = "";
+	char *slash = "", *dash = "";
 	list_t l;
 
 	if (*text == '/') {
 		slash = "/";
+		text++;
+		len--;
+	}
+
+	if (*text == '^') {
+		dash = "^";
 		text++;
 		len--;
 	}
@@ -1802,7 +1808,7 @@ void command_generator(const char *text, int len)
 		struct command *c = l->data;
 
 		if (!strncasecmp(text, c->name, len))
-			array_add(&completions, saprintf("%s%s", slash, c->name));
+			array_add(&completions, saprintf("%s%s%s", slash, dash, c->name));
 	}
 }
 
@@ -2308,10 +2314,10 @@ static void ui_ncurses_loop()
 					window_switch(0);
 
 				if (ch == 'k' || ch == 'K')	/* Alt-K */
-					ui_event("command", "window", "kill", NULL);
+					ui_event("command", 0, "window", "kill", NULL);
 
 				if (ch == 'n' || ch == 'N')	/* Alt-N */
-					ui_event("command", "window", "new", NULL);
+					ui_event("command", 0, "window", "new", NULL);
 
 				if (ch == 'i' || ch == 'I') {	/* Alt-I */
 					char *tmp = saprintf("/ignore %s", window_current->target);
@@ -2357,11 +2363,11 @@ static void ui_ncurses_loop()
 				break;
 			
 			case 'N' - 64:	/* Ctrl-N */
-				ui_event("command", "window", "next", NULL);
+				ui_event("command", 0,"window", "next", NULL);
 				break;
 
 			case 'P' - 64:	/* Ctrl-P */
-				ui_event("command", "window", "prev", NULL);
+				ui_event("command", 0, "window", "prev", NULL);
 				break;
 				
 			case KEY_BACKSPACE:
@@ -2511,7 +2517,7 @@ static void ui_ncurses_loop()
 			}
 
 			case 'L' - 64:	/* Ctrl-L */
-				ui_event("command", "window", "refresh", NULL);
+				ui_event("command", 0, "window", "refresh", NULL);
 				break;
 				
 			case 9:		/* Tab */
@@ -3068,20 +3074,23 @@ static int ui_ncurses_event(const char *event, ...)
 	}
 
 	if (!strcmp(event, "command")) {
+		int quiet = va_arg(ap, int);
 		char *command = va_arg(ap, char*);
 
 		if (!strcasecmp(command, "bind")) {
 			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*), *p3 = va_arg(ap, char*);
 
 			if (match_arg(p1, 'a', "add", 2) || match_arg(p1, 'a', "add-quiet", 5)) {
-				if (!p2 || !p3)
-					print("not_enough_params", "bind");
-				else
+				if (!p2 || !p3) {
+					if (!quiet)
+						print("not_enough_params", "bind");
+				} else
 					binding_add(p2, p3, (!strcasecmp(p1, "--add-quiet")) ? 1 : 0);
 			} else if (match_arg(p1, 'd', "delete", 2)) {
-				if (!p2)
-					print("not_enough_params", "bind");
-				else
+				if (!p2) {
+					if (!quiet)
+						print("not_enough_params", "bind");
+				} else
 					binding_delete(p2, 0);
 			} else
 				binding_list();
@@ -3132,8 +3141,11 @@ static int ui_ncurses_event(const char *event, ...)
 					window_switch(w->id);
 				}
 
-				print_window(param, 0, "query_started", param);
-				print_window(param, 0, "query_started_window", param);
+				if (!quiet) {
+					print_window(param, 0, "query_started", param);
+					print_window(param, 0, "query_started_window", param);
+				}
+
 				xfree(window_current->target);
 				xfree(window_current->prompt);
 				window_current->target = xstrdup(param);
@@ -3142,7 +3154,9 @@ static int ui_ncurses_event(const char *event, ...)
 			} else {
 				const char *f = format_find("ncurses_prompt_none");
 
-				print("query_finished", window_current->target);
+				if (!quiet)
+					print("query_finished", window_current->target);
+
 				xfree(window_current->target);
 				xfree(window_current->prompt);
 				window_current->target = NULL;
@@ -3167,7 +3181,7 @@ static int ui_ncurses_event(const char *event, ...)
 				for (l = windows; l; l = l->next) {
 					struct window *w = l->data;
 
-					if (w->id) {
+					if (!quiet && w->id) {
 						if (w->target) {
 							if (!w->floating)	
 								print("window_list_query", itoa(w->id), w->target);
@@ -3190,7 +3204,8 @@ static int ui_ncurses_event(const char *event, ...)
 
 			if (!strcasecmp(p1, "switch")) {
 				if (!p2) {
-					print("not_enough_params", "window");
+					if (!quiet)
+						print("not_enough_params", "window");
 					goto cleanup;
 				}
 				window_switch(atoi(p2));
@@ -3213,7 +3228,8 @@ static int ui_ncurses_event(const char *event, ...)
 					}
 
 					if (!w) {
-						print("window_noexist");
+						if (!quiet)
+							print("window_noexist");
 						goto cleanup;
 					}
 				}
@@ -3239,14 +3255,16 @@ static int ui_ncurses_event(const char *event, ...)
 				list_t l;
 
 				if (!p2) {
-					print("not_enough_params", "window");
+					if (!quiet)
+						print("not_enough_params", "window");
 					goto cleanup;
 				}
 
 				argv = array_make(p2, " ,", 3, 0, 0);
 
 				if (array_count(argv) < 3) {
-					print("not_enough_params", "window");
+					if (!quiet)
+						print("not_enough_params", "window");
 					array_free(argv);
 					goto cleanup;
 				}
@@ -3261,7 +3279,8 @@ static int ui_ncurses_event(const char *event, ...)
 				}
 
 				if (!w) {
-					print("window_noexist");
+					if (!quiet)
+						print("window_noexist");
 					array_free(argv);
 					goto cleanup;
 				}
@@ -3312,14 +3331,16 @@ static int ui_ncurses_event(const char *event, ...)
 				list_t l;
 
 				if (!p2) {
-					print("not_enough_params", "window");
+					if (!quiet)
+						print("not_enough_params", "window");
 					goto cleanup;
 				}
 
 				argv = array_make(p2, " ,", 3, 0, 0);
 
 				if (array_count(argv) < 3) {
-					print("not_enough_params", "window");
+					if (!quiet)
+						print("not_enough_params", "window");
 					array_free(argv);
 					goto cleanup;
 				}
@@ -3334,7 +3355,8 @@ static int ui_ncurses_event(const char *event, ...)
 				}
 
 				if (!w) {
-					print("window_noexist");
+					if (!quiet)
+						print("window_noexist");
 					array_free(argv);
 					goto cleanup;
 				}
@@ -3388,7 +3410,8 @@ static int ui_ncurses_event(const char *event, ...)
 				goto cleanup;
 			}
 			
-			print("invalid_params", "window");
+			if (!quiet)
+				print("invalid_params", "window");
 		}
 	}
 

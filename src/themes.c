@@ -881,7 +881,7 @@ void theme_init()
 	format_add("help", "%> %T%1%n%2 - %3%4\n", 1);
 	format_add("help_more", "%) %|%1\n", 1);
 	format_add("help_alias", "%) %T%1%n jest aliasem i nie posiada opisu\n", 1);
-	format_add("help_footer", "\n%> Gwiazdka (%T*%n) oznacza, ¿e mo¿na uzyskaæ wiêcej szczegó³ów\n\n", 1);
+	format_add("help_footer", "\n%> Gwiazdka (%T*%n) oznacza, ¿e mo¿na uzyskaæ wiêcej szczegó³ów\n%> Poprzedzenie komendy znakiem %T^%n powoduje ukrycie jej wyniku\n\n", 1);
 	format_add("help_quick", "%> %|Przed u¿yciem przeczytaj ulotkê. Plik %Tdocs/ULOTKA%n zawiera krótki przewodnik po za³±czonej dokumentacji. Je¶li go nie masz, mo¿esz ¶ci±gn±æ pakiet ze strony %Thttp://dev.null.pl/ekg/%n\n", 1);
 	format_add("help_set_file_not_found", "%! Nie znaleziono opisu zmiennych (nieprawid³owa instalacja)\n", 1);
 	format_add("help_set_var_not_found", "%! Nie znaleziono opisu zmiennej %T%1%n\n", 1);
@@ -1097,7 +1097,7 @@ void theme_init()
 	format_add("exec_error", "%! B³±d uruchamiania procesu: %1\n", 1);
 
 	/* szczegó³owe informacje o u¿ytkowniku */
-	format_add("user_info", "%) Pseudonim: %T%1%n\n%) Numer: %T%2%n\n%) Stan: %3\n%) Adres IP: %T%4%n\n%) Imiê i nazwisko: %T%5 %6%n\n%) Alias: %T%7%n\n%) Numer telefonu: %T%8%n\n%) Grupy: %T%9%n\n", 1);
+	format_add("user_info", "%) Pseudonim: %T%1%n\n%) Numer: %T%2%n\n%) Stan: %3\n%) Adres IP: %T%4%n\n%) Imiê i nazwisko: %T%5 %6%n\n%) Alias: %T%7%n\n%) Numer telefonu: %T%8%n\n%) Grupy: %T%9%n\n", 1);	/* XXX do usuniêcia */
 			
 	format_add("user_info_header", "%K.--%n %T%1%n/%2 %K--- -- -%n\n", 1);
 	format_add("user_info_nickname", "%K| %nPseudonim: %T%1%n\n", 1);

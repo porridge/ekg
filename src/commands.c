@@ -67,6 +67,8 @@ int quit_command = 0;
 
 list_t commands = NULL;
 
+#define printq(x...) { if (!quiet) { print(x); } }
+
 int match_arg(const char *arg, char shortopt, const char *longopt, int longoptlen)
 {
 	if (!arg || *arg != '-')
@@ -150,6 +152,8 @@ COMMAND(cmd_cleartab)
 
 	send_nicks_count = 0;
 	send_nicks_index = 0;
+
+	return 0;
 }
 
 COMMAND(cmd_add)
@@ -158,27 +162,28 @@ COMMAND(cmd_add)
 	struct userlist *u;
 
 	if (!params[0] || !params[1]) {
-		print("not_enough_params", name);
-		return;
+		printq("not_enough_params", name);
+		return -1;
 	}
 
 	if (!(uin = str_to_uin(params[0]))) {
-		print("invalid_uin");
-		return;
+		printq("invalid_uin");
+		return -1;
 	}
 
 	if (!valid_nick(params[1])) {
-		print("invalid_nick");
-		return;
+		printq("invalid_nick");
+		return -1;
 	}
 
 	if ((u = userlist_find(uin, params[1])) && u->display) {
-		if (!strcasecmp(params[1], u->display) && u->uin == uin)
-			print("user_exists", params[1]);
-		else
-			print("user_exists_other", params[1], format_user(u->uin));
+		if (!strcasecmp(params[1], u->display) && u->uin == uin) {
+			printq("user_exists", params[1]);
+		} else {
+			printq("user_exists_other", params[1], format_user(u->uin));
+		}
 
-		return;
+		return -1;
 	}
 
 	/* kto¶ by³ tylko ignorowany/blokowany, nadajmy mu nazwê */
@@ -186,51 +191,57 @@ COMMAND(cmd_add)
 		u->display = xstrdup(params[1]);	
 
 	if (u || userlist_add(uin, params[1])) {
-		print("user_added", params[1]);
+		printq("user_added", params[1]);
 		gg_add_notify_ex(sess, uin, userlist_type(u));
 		config_changed = 1;
 		ui_event("userlist_changed", itoa(uin), params[1]);
 	} else
-		print("error_adding");
+		printq("error_adding");
 
 	if (params[2]) {
 		params++;
-		cmd_modify("add", params, NULL);
+		cmd_modify("add", params, NULL, quiet);
 	}
+
+	return 0;
 }
 
 COMMAND(cmd_alias)
 {
 	if (match_arg(params[0], 'a', "add", 2)) {
 		if (!params[1] || !strchr(params[1], ' ')) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 
-		if (!alias_add(params[1], 0, 0))
+		if (!alias_add(params[1], 0, 0)) {
 			config_changed = 1;
+			return 0;
+		}
 
-		return;
+		return -1;
 	}
 
 	if (match_arg(params[0], 'A', "append", 2)) {
 		if (!params[1] || !strchr(params[1], ' ')) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 
-		if (!alias_add(params[1], 0, 1))
+		if (!alias_add(params[1], 0, 1)) {
 			config_changed = 1;
+			return 0;
+		}
 
-		return;
+		return -1;
 	}
 
 	if (match_arg(params[0], 'd', "del", 2)) {
 		int ret;
 
 		if (!params[1]) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 
 		if (!strcmp(params[1], "*"))
@@ -238,10 +249,12 @@ COMMAND(cmd_alias)
 		else
 			ret = alias_remove(params[1], 0);
 
-		if (!ret)
+		if (!ret) {
 			config_changed = 1;
+			return 0;
+		}
 
-		return;
+		return -1;
 	}
 	
 	if (!params[0] || match_arg(params[0], 'l', "list", 2) || params[0][0] != '-') {
@@ -262,7 +275,7 @@ COMMAND(cmd_alias)
 				strcat(tmp, " ");
 
 			for (m = a->commands; m; m = m->next) {
-				print((first) ? "aliases_list" : "aliases_list_next", a->name, (char*) m->data, tmp);
+				printq((first) ? "aliases_list" : "aliases_list_next", a->name, (char*) m->data, tmp);
 				first = 0;
 				count++;
 			}
@@ -271,22 +284,25 @@ COMMAND(cmd_alias)
 		}
 
 		if (!count) {
-			if (aname)
-				print("aliases_noexist", aname);
-			else
-				print("aliases_list_empty");
+			if (aname) {
+				printq("aliases_noexist", aname);
+				return -1;
+			} else
+				printq("aliases_list_empty");
 		}
 
-		return;
+		return 0;
 	}
 
-	print("invalid_params", name);
+	printq("invalid_params", name);
+
+	return -1;
 }
 
 COMMAND(cmd_away)
 {
 	if (params[0] && strlen(params[0]) > GG_STATUS_DESCR_MAXSIZE)
-		print("descr_too_long", itoa(strlen(params[0]) - GG_STATUS_DESCR_MAXSIZE));
+		printq("descr_too_long", itoa(strlen(params[0]) - GG_STATUS_DESCR_MAXSIZE));
 
 	if (!strcasecmp(name, "away"))
 		change_status(GG_STATUS_BUSY, params[0], 0);
@@ -305,21 +321,21 @@ COMMAND(cmd_away)
 		int tmp;
 
 		if (!params[0]) {
-			print(GG_S_F(config_status) ? "private_mode_is_on" : "private_mode_is_off");
-			return;
+			printq(GG_S_F(config_status) ? "private_mode_is_on" : "private_mode_is_off");
+			return 0;
 		}
 		
 		if ((tmp = on_off(params[0])) == -1) {
-			print("private_mode_invalid");
-			return;
+			printq("private_mode_invalid");
+			return -1;
 		}
 
 		if (tmp == GG_S_F(config_status)) {
-			print(GG_S_F(config_status) ? "private_mode_is_on" : "private_mode_is_off");
-			return;
+			printq(GG_S_F(config_status) ? "private_mode_is_on" : "private_mode_is_off");
+			return 0;
 		}
 
-		print((tmp) ? "private_mode_on" : "private_mode_off");
+		printq((tmp) ? "private_mode_on" : "private_mode_off");
 		ui_event("my_status", "private", (tmp) ? "on" : "off");
 
 		config_status = GG_S(config_status);
@@ -338,6 +354,8 @@ COMMAND(cmd_away)
 	}
 
 	unidle();
+
+	return 0;
 }
 
 COMMAND(cmd_status)
@@ -348,13 +366,15 @@ COMMAND(cmd_status)
 	int mqc;
 	char *tmp, *priv, *r1, *r2, buf[100];
 
-	if (config_profile)
-		print("show_status_profile", config_profile);
+	if (config_profile) {
+		printq("show_status_profile", config_profile);
+	}
 
-	if ((u = userlist_find(config_uin, NULL)) && u->display)
-		print("show_status_uin_nick", itoa(config_uin), u->display);
-	else
-		print("show_status_uin", itoa(config_uin));
+	if ((u = userlist_find(config_uin, NULL)) && u->display) {
+		printq("show_status_uin_nick", itoa(config_uin), u->display);
+	} else {
+		printq("show_status_uin", itoa(config_uin));
+	}
 	
 	lce = localtime((const time_t *) &last_conn_event);
 	strftime(buf, sizeof(buf), format_find((last_conn_event / 86400 == time(NULL) / 86400) ? "show_status_last_conn_event_today" : "show_status_last_conn_event"), (const struct tm*) lce);
@@ -362,16 +382,16 @@ COMMAND(cmd_status)
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		char *tmp = format_string(format_find("show_status_not_avail"));
 
-		print("show_status_status", tmp, "");
+		printq("show_status_status", tmp, "");
 
 		if (last_conn_event)
-			print("show_status_disconnected_since", buf);
+			printq("show_status_disconnected_since", buf);
 		if ((mqc = msg_queue_count()))
-			print("show_status_msg_queue", itoa(mqc)); 
+			printq("show_status_msg_queue", itoa(mqc)); 
 
 		xfree(tmp);
 
-		return;
+		return 0;
 	}
 
 	if (GG_S_F(config_status))
@@ -389,20 +409,22 @@ COMMAND(cmd_status)
 	
 	i.s_addr = sess->server_addr;
 
-	print("show_status_status", tmp, priv);
-	print("show_status_server", inet_ntoa(i), itoa(sess->port));
-	print("show_status_connected_since", buf);
+	printq("show_status_status", tmp, priv);
+	printq("show_status_server", inet_ntoa(i), itoa(sess->port));
+	printq("show_status_connected_since", buf);
 
 	xfree(tmp);
 	xfree(priv);
+
+	return 0;
 }
 
 COMMAND(cmd_connect)
 {
 	if (!strcasecmp(name, "connect")) {
 		if (sess) {
-			print((sess->state == GG_STATE_CONNECTED) ? "already_connected" : "during_connect");
-			return;
+			printq((sess->state == GG_STATE_CONNECTED) ? "already_connected" : "during_connect");
+			return -1;
 		}
 
 		if (params && params[0] && params[1]) {
@@ -414,14 +436,16 @@ COMMAND(cmd_connect)
 			variable_set("password", params[0], 0);
 			
                 if (config_uin && config_password) {
-			print("connecting");
+			printq("connecting");
 			connecting = 1;
 			do_connect();
-		} else
-			print("no_config");
+		} else {
+			printq("no_config");
+			return -1;
+		}
 	} else if (!strcasecmp(name, "reconnect")) {
-		cmd_connect("disconnect", NULL, NULL);
-		cmd_connect("connect", NULL, NULL);
+		cmd_connect("disconnect", NULL, NULL, quiet);
+		cmd_connect("connect", NULL, NULL, quiet);
 	} else if (sess) {
 	    	char *tmp = NULL;
 
@@ -448,14 +472,14 @@ COMMAND(cmd_connect)
 
 				r1 = xstrmid(tmp, 0, GG_STATUS_DESCR_MAXSIZE);
 				r2 = xstrmid(tmp, GG_STATUS_DESCR_MAXSIZE, -1);
-				print("disconnected_descr", r1, r2);
+				printq("disconnected_descr", r1, r2);
 				xfree(r1);
 				xfree(r2);
 			} else
-				print("disconnected");
+				printq("disconnected");
 			
 		} else if (sess->state != GG_STATE_IDLE)
-			print("conn_stopped");
+			printq("conn_stopped");
 
 		ekg_logoff(sess, tmp);
 		xfree(tmp);
@@ -466,6 +490,8 @@ COMMAND(cmd_connect)
 		reconnect_timer = 0;
 		ui_event("disconnected");
 	}
+
+	return 0;
 }
 
 COMMAND(cmd_del)
@@ -477,13 +503,13 @@ COMMAND(cmd_del)
 	int del_all = ((params[0] && !strcmp(params[0], "*")) ? 1 : 0);
 
 	if (!params[0]) {
-		print("not_enough_params", name);
-		return;
+		printq("not_enough_params", name);
+		return -1;
 	}
 
 	if (!del_all && !(u = userlist_find((uin = get_uin(params[0])), NULL))) {
-		print("user_not_found", params[0]);
-		return;
+		printq("user_not_found", params[0]);
+		return -1;
 	}
 
 	if (del_all) {
@@ -499,26 +525,29 @@ COMMAND(cmd_del)
 			userlist_remove(u);
 		}
 
-		print("user_cleared_list");
+		printq("user_cleared_list");
 		config_changed = 1;
-		return;
+		return 0;
 	}
 
 	nick = xstrdup(u->display);
 	tmp = format_user(u->uin);
 
 	if (!userlist_remove(u)) {
-		print("user_deleted", tmp);
+		printq("user_deleted", tmp);
 		if (sess)
 			gg_remove_notify(sess, uin);
 		config_changed = 1;
 		ui_event("userlist_changed", nick, itoa(uin));
-	} else
-		print("error_deleting");
+	} else {
+		printq("error_deleting");
+		xfree(nick);
+		return -1;
+	}
 
 	xfree(nick);
 	
-	return;
+	return 0;
 }
 
 COMMAND(cmd_exec)
@@ -533,8 +562,8 @@ COMMAND(cmd_exec)
 		char *p = NULL, *tg = NULL;
 
 		if (pipe(fd)) {
-			print("exec_error", strerror(errno));
-			return;
+			printq("exec_error", strerror(errno));
+			return -1;
 		}
 
 		if (match_arg(params[0], 'm', "msg", 2) || (buf = match_arg(params[0], 'b', "bmsg", 2))) {
@@ -542,13 +571,13 @@ COMMAND(cmd_exec)
 			struct userlist *u;
 
 			if (!params[1] || !params[2]) {
-				print("not_enough_params", name);
-				return;
+				printq("not_enough_params", name);
+				return -1;
 			}
 
 			if (!(uin = get_uin(params[1]))) {
-				print("user_not_found", params[1]);
-				return;
+				printq("user_not_found", params[1]);
+				return -1;
 			}
 
 			if ((u = userlist_find(uin, NULL)))
@@ -573,10 +602,10 @@ COMMAND(cmd_exec)
 		}
 
 		if (pid < 0) {
-			print("exec_error", strerror(errno));
+			printq("exec_error", strerror(errno));
 			xfree(p);
 			xfree(tg);
-			return;
+			return -1;
 		}
 	
 		s.fd = fd[0];
@@ -620,29 +649,33 @@ COMMAND(cmd_exec)
 					tmp = xstrdup(p->name);
 			}
 
-			print("process", itoa(p->pid), tmp);
+			printq("process", itoa(p->pid), tmp);
 			xfree(tmp);
 		}
 
-		if (!children)
-			print("no_processes");
+		if (!children) {
+			printq("no_processes");
+			return -1;
+		}
 	}
+
+	return 0;
 }
 
 COMMAND(cmd_find)
 {
 	char **argv = NULL;
 	gg_pubdir50_t req;
-	int i;
+	int i, res = 0;
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
-		print("not_connected");
-		return;
+		printq("not_connected");
+		return -1;
 	}
 		
 	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
-		ui_event("command", "find", NULL);
-		return;
+		ui_event("command", quiet, "find", NULL);
+		return -1;
 	}
 
 	for (i = 0; argv[i]; i++)
@@ -650,22 +683,22 @@ COMMAND(cmd_find)
 
 	if (argv[0] && !argv[1] && argv[0][0] == '#') { /* konferencja */
 		char *tmp = saprintf("conference --find %s", argv[0]);
-		command_exec(NULL, tmp);
+		int res = command_exec(NULL, tmp);
 		xfree(tmp);
 		array_free(argv);
-		return;
+		return res;
 	}
 
 	if (!(req = gg_pubdir50_new(GG_PUBDIR50_SEARCH)))
-		return;
+		return -1;
 	
 	if (argv[0] && !argv[1] && argv[0][0] != '-') {
 		uin_t uin = get_uin(params[0]);
 
 		if (!uin) {
-			print("user_not_found", params[0]);
+			printq("user_not_found", params[0]);
 			array_free(argv);
-			return;
+			return -1;
 		}
 
 		gg_pubdir50_add(req, GG_PUBDIR50_UIN, itoa(uin));
@@ -713,17 +746,19 @@ COMMAND(cmd_find)
 		}
 
 		if (match_arg(arg, 'A', "all", 3))
-			print("generic", "Jeszcze nie jest obs³ugiwane");
+			printq("generic", "Jeszcze nie jest obs³ugiwane. Bêdzie, nie pytaj o to.");
 	}
 
 search:
-	if (!gg_pubdir50(sess, req))
-		print("search_failed", http_error_string(0));
+	if (!gg_pubdir50(sess, req)) {
+		printq("search_failed", http_error_string(0));
+		res = -1;
+	}
 
 	gg_pubdir50_free(req);
 	array_free(argv);
 
-	return;
+	return res;
 }
 
 COMMAND(cmd_change)
@@ -734,8 +769,8 @@ COMMAND(cmd_change)
 	int i;
 
 	if (!params[0]) {
-		print("not_enough_params", name);
-		return;
+		printq("not_enough_params", name);
+		return -1;
 	}
 
 	argv = array_make(params[0], " \t", 0, 1, 1);
@@ -805,23 +840,24 @@ COMMAND(cmd_change)
 
 	gg_change_info_request_free(r);
 	array_free(argv);
+
+	return 0;
 }
 
 COMMAND(cmd_modify)
 {
 	struct userlist *u;
 	char **argv = NULL;
-	int i;
-	int modified = 0;
+	int i, res = 0, modified = 0;
 
 	if (!params[0]) {
-		print("not_enough_params", name);
-		return;
+		printq("not_enough_params", name);
+		return -1;
 	}
 
 	if (!(u = userlist_find(get_uin(params[0]), NULL))) {
-		print("user_not_found", params[0]);
-		return;
+		printq("user_not_found", params[0]);
+		return -1;
 	}
 
 	argv = array_make(params[1], " \t", 0, 1, 1);
@@ -861,9 +897,9 @@ COMMAND(cmd_modify)
 				struct userlist *u = l->data;
 
 				if (u->display && !strcasecmp(u->display, argv[i])) {
-					print("user_exists", u->display);
+					printq("user_exists", u->display);
 					array_free(argv);
-					return;
+					return -1;
 				}
 			}
 			
@@ -887,7 +923,7 @@ COMMAND(cmd_modify)
 							group_remove(u, tmp[x] + 1 + off);
 							modified = 1;
 						} else {
-							print("group_member_not_yet", format_user(u->uin), tmp[x] + 1);
+							printq("group_member_not_yet", format_user(u->uin), tmp[x] + 1);
 							if (!modified)
 								modified = -1;
 						}
@@ -899,7 +935,7 @@ COMMAND(cmd_modify)
 							group_add(u, tmp[x] + 1 + off);
 							modified = 1;
 						} else {
-							print("group_member_already", format_user(u->uin), tmp[x] + 1);
+							printq("group_member_already", format_user(u->uin), tmp[x] + 1);
 							if (!modified)
 								modified = -1;
 						}
@@ -911,7 +947,7 @@ COMMAND(cmd_modify)
 							group_add(u, tmp[x] + off);
 							modified = 1;
 						} else {
-							print("group_member_already", format_user(u->uin), tmp[x]);
+							printq("group_member_already", format_user(u->uin), tmp[x]);
 							if (!modified)
 								modified = -1;
 						}
@@ -925,9 +961,9 @@ COMMAND(cmd_modify)
 			list_t l;
 
 			if (!new_uin) {
-				print("invalid_uin");
+				printq("invalid_uin");
 				array_free(argv);
-				return;
+				return -1;
 			}
 
 			for (l = userlist; l; l = l->next) {
@@ -935,9 +971,9 @@ COMMAND(cmd_modify)
 				
 				if (new_uin == _u->uin) {
 					if (_u->display) {
-						print("user_exists_other", argv[i], format_user(_u->uin));
+						printq("user_exists_other", argv[i], format_user(_u->uin));
 						array_free(argv);
-						return;
+						return -1;
 					} else {
 						/* zmieniamy komu¶ uin, a taki uin jest ju¿ blokowany/ignorowany
 					 	   ale nie jest widoczny na naszej li¶cie */
@@ -972,7 +1008,7 @@ COMMAND(cmd_modify)
 		if (match_arg(argv[i], 'o', "offline", 2)) {
 			gg_remove_notify_ex(sess, u->uin, userlist_type(u));
 			group_add(u, "__offline");
-			print("modify_offline", format_user(u->uin));
+			printq("modify_offline", format_user(u->uin));
 			modified = 2;
 			gg_add_notify_ex(sess, u->uin, userlist_type(u));
 		}
@@ -980,7 +1016,7 @@ COMMAND(cmd_modify)
 		if (match_arg(argv[i], 'O', "online", 2)) {
 			gg_remove_notify_ex(sess, u->uin, userlist_type(u));
 			group_remove(u, "__offline");
-			print("modify_online", format_user(u->uin));
+			printq("modify_online", format_user(u->uin));
 			modified = 2;
 			gg_add_notify_ex(sess, u->uin, userlist_type(u));
 		}
@@ -990,10 +1026,11 @@ COMMAND(cmd_modify)
 	if (strcasecmp(name, "add")) {
 		switch (modified) {
 			case 0:
-				print("not_enough_params", name);
+				printq("not_enough_params", name);
+				res = -1;
 				break;
 			case 1:
-				print("modify_done", params[0]);
+				printq("modify_done", params[0]);
 			case 2:
 				config_changed = 1;
 				break;
@@ -1002,6 +1039,8 @@ COMMAND(cmd_modify)
 		config_changed = 1;
 
 	array_free(argv);
+
+	return res;
 }
 
 COMMAND(cmd_help)
@@ -1012,43 +1051,40 @@ COMMAND(cmd_help)
 		const char *p = (params[0][0] == '/' && strlen(params[0]) > 1) ? params[0] + 1 : params[0];
 
 		if (!strcasecmp(p, "set") && params[1]) {
-			variable_help(params[1]);
-			return;
+			if (!quiet)
+				variable_help(params[1]);
+			return 0;
 		}
 			
 		for (l = commands; l; l = l->next) {
 			struct command *c = l->data;
 			
 			if (!strcasecmp(c->name, p) && c->alias) {
-				print("help_alias", p);
-				return;
+				printq("help_alias", p);
+				return -1;
 			}
 
 			if (!strcasecmp(c->name, p) && !c->alias) {
-			    	char *blah = NULL;
+			    	char *tmp = NULL;
 
 				if (strstr(c->brief_help, "%"))
-				    	blah = format_string(c->brief_help);
+				    	tmp = format_string(c->brief_help);
 				
-				print("help", c->name, c->params_help, blah ? blah : c->brief_help, "");
-				xfree(blah);
+				printq("help", c->name, c->params_help, tmp ? tmp : c->brief_help, "");
+				xfree(tmp);
 
 				if (c->long_help && strcmp(c->long_help, "")) {
-					char *foo, *tmp, *plumk, *bar = xstrdup(c->long_help);
+					char *foo, *tmp, *bar = format_string(c->long_help);
 
-					if ((foo = bar)) {
-						while ((tmp = gg_get_line(&foo))) {
-							plumk = format_string(tmp);
-							if (plumk) {
-								print("help_more", plumk);
-								xfree(plumk);
-							}
-						}
-						xfree(bar);
-					}
+					foo = bar;
+
+					while ((tmp = gg_get_line(&foo)))
+						print("help_more", tmp);
+
+					xfree(bar);
 				}
 
-				return;
+				return 0;
 			}
 		}
 	}
@@ -1062,13 +1098,15 @@ COMMAND(cmd_help)
 			if (strstr(c->brief_help, "%"))
 			    	blah = format_string(c->brief_help);
 	
-			print("help", c->name, c->params_help, blah ? blah : c->brief_help, (c->long_help && strcmp(c->long_help, "")) ? "\033[1m *\033[0m" : "");
+			printq("help", c->name, c->params_help, blah ? blah : c->brief_help, (c->long_help && strcmp(c->long_help, "")) ? "\033[1m *\033[0m" : "");
 			xfree(blah);
 		}
 	}
 
-	print("help_footer");
-	print("help_quick");
+	printq("help_footer");
+	printq("help_quick");
+
+	return 0;
 }
 
 COMMAND(cmd_ignore)
@@ -1090,31 +1128,35 @@ COMMAND(cmd_ignore)
 
 				i = 1;
 
-				print("ignored_list", format_user(u->uin));
+				printq("ignored_list", format_user(u->uin));
 			}
 
-			if (!i) 
-				print("ignored_list_empty");
+			if (!i) {
+				printq("ignored_list_empty");
+				return -1;
+			}
 
-			return;
+			return 0;
 		}
 
 		if (params[0][0] == '#') {
+			int res;
+			
 			tmp = saprintf("conference --ignore %s", params[0]);
-			command_exec(NULL, tmp);
+			res = command_exec(NULL, tmp);
 			xfree(tmp);
-			return;
+			return res;
 		}
 
 		if (!(uin = get_uin(params[0]))) {
-			print("user_not_found", params[0]);
-			return;
+			printq("user_not_found", params[0]);
+			return -1;
 		}
 		
 		if (!ignored_add(uin, IGNORE_ALL)) {
 			struct userlist *u = userlist_find(uin, NULL);
 
-			print("ignored_added", params[0]);
+			printq("ignored_added", params[0]);
 
 			if (u && sess) {
 				gg_remove_notify(sess, uin);
@@ -1123,26 +1165,28 @@ COMMAND(cmd_ignore)
 
 			config_changed = 1;
 		} else
-			print("error_adding_ignored");
+			printq("error_adding_ignored");
 
 	} else {
 		int unignore_all = ((params[0] && !strcmp(params[0], "*")) ? 1 : 0);
 
 		if (!params[0]) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 
 		if (params[0][0] == '#') {
+			int res;
+			
 			tmp = saprintf("conference --unignore %s", params[0]);
-			command_exec(NULL, tmp);
+			res = command_exec(NULL, tmp);
 			xfree(tmp);
-			return;
+			return res;
 		}
 		
 		if (!unignore_all && !(uin = get_uin(params[0]))) {
-			print("user_not_found", params[0]);
-			return;
+			printq("user_not_found", params[0]);
+			return -1;
 		}
 
 		if (unignore_all) {
@@ -1167,16 +1211,18 @@ COMMAND(cmd_ignore)
 			}
 
 			if (x) {
-				print("ignored_deleted_all");
+				printq("ignored_deleted_all");
 				config_changed = 1;
-			} else
-				print("ignored_list_empty");
+			} else {
+				printq("ignored_list_empty");
+				return -1;
+			}
 			
-			return;
+			return 0;
 		}
 		
 		if (!ignored_remove(uin)) {
-			print("ignored_deleted", format_user(uin));
+			printq("ignored_deleted", format_user(uin));
 
 			if (sess) {
 				gg_remove_notify(sess, uin);
@@ -1187,10 +1233,14 @@ COMMAND(cmd_ignore)
 				update_status();
 
 			config_changed = 1;
-		} else
-			print("error_not_ignored", format_user(uin));
+		} else {
+			printq("error_not_ignored", format_user(uin));
+			return -1;
+		}
 	
 	}
+
+	return 0;
 }
 
 COMMAND(cmd_block)
@@ -1210,34 +1260,34 @@ COMMAND(cmd_block)
 
 				i = 1;
 
-				print("blocked_list", format_user(u->uin));
+				printq("blocked_list", format_user(u->uin));
 			}
 
 			if (!i) 
-				print("blocked_list_empty");
+				printq("blocked_list_empty");
 
-			return;
+			return 0;
 		}
 
 		if (!(uin = get_uin(params[0]))) {
-			print("user_not_found", params[0]);
-			return;
+			printq("user_not_found", params[0]);
+			return -1;
 		}
 		
 		blocked_add(uin);
-		print("blocked_added", params[0]);
+		printq("blocked_added", params[0]);
 		config_changed = 1;
 	} else {
 		int unblock_all = ((params[0] && !strcmp(params[0], "*")) ? 1 : 0);
 
 		if (!params[0]) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 
 		if (!unblock_all && !(uin = get_uin(params[0]))) {
-			print("user_not_found", params[0]);
-			return;
+			printq("user_not_found", params[0]);
+			return -1;
 		}
 
 		if (unblock_all) {
@@ -1254,21 +1304,25 @@ COMMAND(cmd_block)
 			}
 
 			if (x) {
-				print("blocked_deleted_all");
+				printq("blocked_deleted_all");
 				config_changed = 1;
 			} else
-				print("blocked_list_empty");
+				printq("blocked_list_empty");
 
-			return;			
+			return 0;
 		}
 		
 		if (!blocked_remove(uin)) {
-			print("blocked_deleted", format_user(uin));
+			printq("blocked_deleted", format_user(uin));
 			config_changed = 1;
-		} else
-			print("error_not_blocked", format_user(uin));
+		} else {
+			printq("error_not_blocked", format_user(uin));
+			return -1;
+		}
 	
 	}
+
+	return 0;
 }
 
 COMMAND(cmd_list)
@@ -1299,26 +1353,25 @@ COMMAND(cmd_list)
 				}
 			}
 			
-			if (count)
-				print("group_members", params[0], members->str);
-			else
-				print("group_empty", params[0]);
+			if (count) {
+				printq("group_members", params[0], members->str);
+			} else {
+				printq("group_empty", params[0]);
+			}
 
 			string_free(members, 1);
 
-			return;
+			return 0;
 		}
 
 		if (!(u = userlist_find(get_uin(params[0]), NULL)) || (u && !u->display)) {
-			print("user_not_found", params[0]);
-			return;
+			printq("user_not_found", params[0]);
+			return -1;
 		}
 
 		/* list <alias> [opcje] */
-		if (params[1]) {
-			cmd_modify("list", params, NULL);
-			return;
-		}
+		if (params[1])
+			return cmd_modify("list", params, NULL, quiet);
 
 		status = format_string(format_find(ekg_status_label(u->status, "user_info_")), (u->first_name) ? u->first_name : u->display, u->descr);
 
@@ -1326,29 +1379,29 @@ COMMAND(cmd_list)
 
 		ip_str = saprintf("%s:%s", inet_ntoa(u->ip), itoa(u->port));
 
-		print("user_info_header", u->display, itoa(u->uin));
+		printq("user_info_header", u->display, itoa(u->uin));
 		if (u->nickname && strcmp(u->nickname, u->display)) 
-			print("user_info_nickname", u->nickname);
+			printq("user_info_nickname", u->nickname);
 		if (u->first_name || u->last_name)
-			print("user_info_name", u->first_name, u->last_name);
-		print("user_info_status", status);
+			printq("user_info_name", u->first_name, u->last_name);
+		printq("user_info_status", status);
 		if (u->ip.s_addr)
-			print("user_info_ip", ip_str);
+			printq("user_info_ip", ip_str);
 		if (u->mobile)
-			print("user_info_mobile", u->mobile);
+			printq("user_info_mobile", u->mobile);
 		if (strcmp(groups, ""))
-			print("user_info_groups", groups);
-		print("user_info_footer", u->display, itoa(u->uin));
+			printq("user_info_groups", groups);
+		printq("user_info_footer", u->display, itoa(u->uin));
 		
 #if 0
-		print("user_info", (u->nickname) ? u->nickname : u->display, itoa(u->uin), status, ip_str, u->first_name, u->last_name, u->display, u->mobile, groups);
+		printq("user_info", (u->nickname) ? u->nickname : u->display, itoa(u->uin), status, ip_str, u->first_name, u->last_name, u->display, u->mobile, groups);
 #endif
 		
 		xfree(ip_str);
 		xfree(groups);
 		xfree(status);
 
-		return;
+		return 0;
 	}
 
 	/* list --get */
@@ -1356,8 +1409,8 @@ COMMAND(cmd_list)
 		struct gg_http *h;
 		
 		if (!(h = gg_userlist_get(config_uin, config_password, 1))) {
-			print("userlist_get_error", strerror(errno));
-			return;
+			printq("userlist_get_error", strerror(errno));
+			return -1;
 		}
 
 		if (match_arg(params[0], 'G', "get-config", 5))
@@ -1365,7 +1418,7 @@ COMMAND(cmd_list)
 		
 		list_add(&watches, h, 0);
 		
-		return;
+		return 0;
 	}
 
 	/* list --clear */
@@ -1413,13 +1466,13 @@ COMMAND(cmd_list)
 			contacts = xstrdup("");
 			
 		if (!contacts) {
-			print("userlist_clear_error", strerror(ENOMEM));
-			return;
+			printq("userlist_clear_error", strerror(ENOMEM));
+			return -1;
 		}
 		
 		if (!(h = gg_userlist_put(config_uin, config_password, contacts, 1))) {
-			print("userlist_clear_error", strerror(errno));
-			return;
+			printq("userlist_clear_error", strerror(errno));
+			return -1;
 		}
 
 		if (match_arg(params[0], 'c', "clear", 2))
@@ -1431,7 +1484,7 @@ COMMAND(cmd_list)
 		
 		list_add(&watches, h, 0);
 
-		return;
+		return 0;
 	}
 	
 	/* list --put */
@@ -1478,13 +1531,13 @@ COMMAND(cmd_list)
 		}
 		
 		if (!contacts) {
-			print("userlist_put_error", strerror(ENOMEM));
-			return;
+			printq("userlist_put_error", strerror(ENOMEM));
+			return -1;
 		}
 		
 		if (!(h = gg_userlist_put(config_uin, config_password, contacts, 1))) {
-			print("userlist_put_error", strerror(errno));
-			return;
+			printq("userlist_put_error", strerror(errno));
+			return -1;
 		}
 
 		if (match_arg(params[0], 'P', "put-config", 5))
@@ -1494,7 +1547,7 @@ COMMAND(cmd_list)
 		
 		list_add(&watches, h, 0);
 
-		return;
+		return -1;
 	}
 
 	/* list --active | --busy | --inactive | --invisible | --description | --member | --blocked | --offline */
@@ -1594,13 +1647,15 @@ COMMAND(cmd_list)
 			show = 1;
 
 		if (show) {
-			print(tmp, format_user(u->uin), (u->first_name) ? u->first_name : u->display, inet_ntoa(u->ip), itoa(u->port), u->descr);
+			printq(tmp, format_user(u->uin), (u->first_name) ? u->first_name : u->display, inet_ntoa(u->ip), itoa(u->port), u->descr);
 			count++;
 		}
 	}
 
 	if (!count && !(show_descr || show_group) && show_all)
-		print("list_empty");
+		printq("list_empty");
+
+	return 0;
 }
 
 COMMAND(cmd_msg)
@@ -1612,8 +1667,8 @@ COMMAND(cmd_msg)
 	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0, msg_seq, formatlen = 0;
 
 	if (!params[0] || !params[1]) {
-		print("not_enough_params", name);
-		return;
+		printq("not_enough_params", name);
+		return -1;
 	}
 
 	if (config_auto_back == 1 && GG_S_B(config_status))
@@ -1638,9 +1693,9 @@ COMMAND(cmd_msg)
 		list_t l;
 
 		if (!c) {
-			print("conferences_noexist", nick);
+			printq("conferences_noexist", nick);
 			xfree(nick);
-			return;
+			return -1;
 		}
 
 		for (l = c->recipients; l; l = l->next)
@@ -1675,7 +1730,7 @@ COMMAND(cmd_msg)
 			}
 
 			if (!count)
-				print("group_empty", tmp[i] + 1);
+				printq("group_empty", tmp[i] + 1);
 		}
 
 		array_free(tmp);
@@ -1683,7 +1738,7 @@ COMMAND(cmd_msg)
 
 	if (!nicks) {
 		xfree(nick);
-		return;
+		return 0;
 	}
 
 	msg = xstrdup(params[1]);
@@ -1748,7 +1803,7 @@ COMMAND(cmd_msg)
 
 		if (!(uin = get_uin(*p))) {
 			if (valid_nick(*p))
-				print("user_not_found", *p);
+				printq("user_not_found", *p);
 			continue;
 		}
 		
@@ -1793,7 +1848,7 @@ COMMAND(cmd_msg)
 	add_send_nick(nick);
 
 	if (valid && (!sess || sess->state != GG_STATE_CONNECTED))
-		print("not_connected_msg_queued");
+		printq("not_connected_msg_queued");
 
 	if (valid && config_display_sent) {
 		struct gg_event e;
@@ -1824,6 +1879,8 @@ COMMAND(cmd_msg)
 	array_free(nicks);
 
 	unidle();
+
+	return 0;
 }
 
 COMMAND(cmd_save)
@@ -1831,16 +1888,20 @@ COMMAND(cmd_save)
 	last_save = time(NULL);
 
 	if (!userlist_write(NULL) && !config_write(NULL)) {
-		print("saved");
+		printq("saved");
 		config_changed = 0;
-	} else
-		print("error_saving");
+	} else {
+		printq("error_saving");
+		return -1;
+	}
+
+	return 0;
 }
 
 COMMAND(cmd_set)
 {
 	const char *arg = NULL, *val = NULL;
-	int unset = 0, show_all = 0;
+	int unset = 0, show_all = 0, res = 0;
 	char *value = NULL;
 	list_t l;
 
@@ -1882,7 +1943,7 @@ COMMAND(cmd_set)
 					continue;
 
 				if (!v->display) {
-					print("variable", v->name, "(...)");
+					printq("variable", v->name, "(...)");
 					displayed = 1;
 					continue;
 				}
@@ -1890,17 +1951,17 @@ COMMAND(cmd_set)
 				if (v->type == VAR_STR) {
 					char *tmp = (string) ? saprintf("\"%s\"", string) : "(none)";
 
-					print("variable", v->name, tmp);
+					printq("variable", v->name, tmp);
 					
 					if (string)
 						xfree(tmp);
 				}
 
 				if (v->type == VAR_BOOL)
-					print("variable", v->name, (value) ? "1 (on)" : "0 (off)");
+					printq("variable", v->name, (value) ? "1 (on)" : "0 (off)");
 				
 				if ((v->type == VAR_INT || v->type == VAR_MAP) && !v->map)
-					print("variable", v->name, itoa(value));
+					printq("variable", v->name, itoa(value));
 
 				if (v->type == VAR_INT && v->map) {
 					char *tmp = NULL;
@@ -1915,7 +1976,7 @@ COMMAND(cmd_set)
 					if (!tmp)
 						tmp = saprintf("%d", value);
 
-					print("variable", v->name, tmp);
+					printq("variable", v->name, tmp);
 
 					xfree(tmp);
 				}
@@ -1935,7 +1996,7 @@ COMMAND(cmd_set)
 					if (!first)
 						string_append_c(s, ')');
 
-					print("variable", v->name, s->str);
+					printq("variable", v->name, s->str);
 
 					string_free(s, 1);
 				}
@@ -1944,8 +2005,10 @@ COMMAND(cmd_set)
 			}
 		}
 
-		if (!displayed && params[0])
-			print("variable_not_found", params[0]);
+		if (!displayed && params[0]) {
+			printq("variable_not_found", params[0]);
+			return -1;
+		}
 	} else {
 		theme_cache_reset();
 		switch (variable_set(arg, (unset) ? NULL : value, 0)) {
@@ -1953,21 +2016,25 @@ COMMAND(cmd_set)
 			{
 				const char *my_params[2] = { (!unset) ? params[0] : params[0] + 1, NULL };
 
-				cmd_set("set-show", my_params, NULL);
+				cmd_set("set-show", my_params, NULL, quiet);
 				config_changed = 1;
 				last_save = time(NULL);
 				break;
 			}
 			case -1:
-				print("variable_not_found", arg);
+				printq("variable_not_found", arg);
+				res = -1;
 				break;
 			case -2:
-				print("variable_invalid", arg);
+				printq("variable_invalid", arg);
+				res = -1;
 				break;
 		}
 	}
 
 	xfree(value);
+
+	return res;
 }
 
 COMMAND(cmd_sms)
@@ -1976,21 +2043,25 @@ COMMAND(cmd_sms)
 	const char *number = NULL;
 
 	if (!params[0] || !params[1] || !config_sms_app) {
-		print("not_enough_params", name);
-		return;
+		printq("not_enough_params", name);
+		return -1;
 	}
 
 	if ((u = userlist_find(get_uin(params[0]), NULL))) {
 		if (!u->mobile || !strcmp(u->mobile, "")) {
-			print("sms_unknown", format_user(u->uin));
-			return;
+			printq("sms_unknown", format_user(u->uin));
+			return -1;
 		}
 		number = u->mobile;
 	} else
 		number = params[0];
 
-	if (send_sms(number, params[1], 1) == -1)
-		print("sms_error", strerror(errno));
+	if (send_sms(number, params[1], 1) == -1) {
+		printq("sms_error", strerror(errno));
+		return -1;
+	}
+
+	return 0;
 }
 
 COMMAND(cmd_quit)
@@ -2023,12 +2094,12 @@ COMMAND(cmd_quit)
 			r1 = xstrmid(tmp, 0, GG_STATUS_DESCR_MAXSIZE);
 			r2 = xstrmid(tmp, GG_STATUS_DESCR_MAXSIZE, -1);
 
-			print("quit_descr", r1, r2);
+			printq("quit_descr", r1, r2);
 
 			xfree(r1);
 			xfree(r2);
 		} else
-			print("quit");
+			printq("quit");
 
 		quit_message_send = 1;
 	}
@@ -2046,6 +2117,8 @@ COMMAND(cmd_quit)
 	/* nie wychodzimy tutaj, ¿eby command_exec() mia³o szansê zwolniæ
 	 * u¿ywan± przez siebie pamiêæ. */
 	quit_command = 1;
+
+	return 0;
 }
 
 COMMAND(cmd_dcc)
@@ -2061,10 +2134,10 @@ COMMAND(cmd_dcc)
 			for (l = transfers; l; l = l->next) {
 				struct transfer *t = l->data;
 				
-				print("dcc_show_debug", itoa(t->id), (t->type == GG_SESSION_DCC_SEND) ? "SEND" : "GET", t->filename, format_user(t->uin), (t->dcc) ? "yes" : "no", (t->dcc) ? itoa(t->dcc->offset) : "0", (t->dcc) ? itoa(t->dcc->file_info.size) : "0", (t->dcc) ? itoa(100*t->dcc->offset/t->dcc->file_info.size) : "0");
+				printq("dcc_show_debug", itoa(t->id), (t->type == GG_SESSION_DCC_SEND) ? "SEND" : "GET", t->filename, format_user(t->uin), (t->dcc) ? "yes" : "no", (t->dcc) ? itoa(t->dcc->offset) : "0", (t->dcc) ? itoa(t->dcc->file_info.size) : "0", (t->dcc) ? itoa(100*t->dcc->offset/t->dcc->file_info.size) : "0");
 			}
 
-			return;
+			return 0;
 		}
 
 		for (l = transfers; l; l = l->next) {
@@ -2072,18 +2145,18 @@ COMMAND(cmd_dcc)
 
 			if (!t->dcc || !t->dcc->established) {
 				if (!pending) {
-					print("dcc_show_pending_header");
+					printq("dcc_show_pending_header");
 					pending = 1;
 				}
 				switch (t->type) {
 					case GG_SESSION_DCC_SEND:
-						print("dcc_show_pending_send", itoa(t->id), format_user(t->uin), t->filename);
+						printq("dcc_show_pending_send", itoa(t->id), format_user(t->uin), t->filename);
 						break;
 					case GG_SESSION_DCC_GET:
-						print("dcc_show_pending_get", itoa(t->id), format_user(t->uin), t->filename);
+						printq("dcc_show_pending_get", itoa(t->id), format_user(t->uin), t->filename);
 						break;
 					case GG_SESSION_DCC_VOICE:
-						print("dcc_show_pending_voice", itoa(t->id), format_user(t->uin));
+						printq("dcc_show_pending_voice", itoa(t->id), format_user(t->uin));
 				}
 			}
 		}
@@ -2093,26 +2166,26 @@ COMMAND(cmd_dcc)
 
 			if (t->dcc && t->dcc->established) {
 				if (!active) {
-					print("dcc_show_active_header");
+					printq("dcc_show_active_header");
 					active = 1;
 				}
 				switch (t->type) {
 					case GG_SESSION_DCC_SEND:
-						print("dcc_show_active_send", itoa(t->id), format_user(t->uin), t->filename);
+						printq("dcc_show_active_send", itoa(t->id), format_user(t->uin), t->filename);
 						break;
 					case GG_SESSION_DCC_GET:
-						print("dcc_show_active_get", itoa(t->id), format_user(t->uin), t->filename);
+						printq("dcc_show_active_get", itoa(t->id), format_user(t->uin), t->filename);
 						break;
 					case GG_SESSION_DCC_VOICE:
-						print("dcc_show_active_voice", itoa(t->id), format_user(t->uin));
+						printq("dcc_show_active_voice", itoa(t->id), format_user(t->uin));
 				}
 			}
 		}
 
 		if (!active && !pending)
-			print("dcc_show_empty");
+			printq("dcc_show_empty");
 		
-		return;
+		return 0;
 	}
 	
 	if (!strncasecmp(params[0], "se", 2)) {		/* send */
@@ -2121,30 +2194,30 @@ COMMAND(cmd_dcc)
 		int fd;
 
 		if (!params[1] || !params[2]) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 
 		uin = get_uin(params[1]);	
 
 		if (!(u = userlist_find(uin, params[1]))) {
-			print("user_not_found", params[1]);
-			return;
+			printq("user_not_found", params[1]);
+			return -1;
 		}
 
 		if (!sess || sess->state != GG_STATE_CONNECTED) {
-			print("not_connected");
-			return;
+			printq("not_connected");
+			return -1;
 		}
 
 		if ((fd = open(params[2], O_RDONLY)) == -1 || stat(params[2], &st)) {
-			print("dcc_open_error", params[2], strerror(errno));
-			return;
+			printq("dcc_open_error", params[2], strerror(errno));
+			return -1;
 		} else {
 			close(fd);
 			if (S_ISDIR(st.st_mode)) {
-				print("dcc_open_directory", params[2]);
-				return;
+				printq("dcc_open_directory", params[2]);
+				return -1;
 			}
 		}
 
@@ -2161,14 +2234,14 @@ COMMAND(cmd_dcc)
 			struct gg_dcc *d;
 			
 			if (!(d = gg_dcc_send_file(u->ip.s_addr, u->port, config_uin, uin))) {
-				print("dcc_error", strerror(errno));
-				return;
+				printq("dcc_error", strerror(errno));
+				return -1;
 			}
 
 			if (gg_dcc_fill_file_info(d, params[2]) == -1) {
-				print("dcc_open_error", params[2], strerror(errno));
+				printq("dcc_open_error", params[2], strerror(errno));
 				gg_free_dcc(d);
-				return;
+				return -1;
 			}
 
 			list_add(&watches, d, 0);
@@ -2178,7 +2251,7 @@ COMMAND(cmd_dcc)
 
 		list_add(&transfers, &t, sizeof(t));
 
-		return;
+		return 0;
 	}
 
 	if (params[0][0] == 'v') {			/* voice */
@@ -2187,8 +2260,8 @@ COMMAND(cmd_dcc)
 		struct transfer *t, tt;
 
 		if (!params[1]) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 		
 		/* sprawdzamy najpierw przychodz±ce po³±czenia */
@@ -2218,7 +2291,7 @@ COMMAND(cmd_dcc)
 		if (t) {
 			list_add(&watches, t->dcc, 0);
 			voice_open();
-			return;
+			return 0;
 		}
 
 		/* sprawd¼, czy ju¿ nie wo³ano o rozmowê g³osow± */
@@ -2228,7 +2301,7 @@ COMMAND(cmd_dcc)
 			struct transfer *t = l->data;
 
 			if (t->type == GG_SESSION_DCC_VOICE) {
-				print("dcc_voice_running");
+				printq("dcc_voice_running");
 				return 0;
 			}
 		}
@@ -2237,7 +2310,7 @@ COMMAND(cmd_dcc)
 			struct gg_session *s = l->data;
 
 			if (s->type == GG_SESSION_DCC_VOICE) {
-				print("dcc_voice_running");
+				printq("dcc_voice_running");
 				return 0;
 			}
 		}
@@ -2247,13 +2320,13 @@ COMMAND(cmd_dcc)
 		uin = get_uin(params[1]);
 
 		if (!(u = userlist_find(uin, params[1]))) {
-			print("user_not_found", params[1]);
-			return;
+			printq("user_not_found", params[1]);
+			return -1;
 		}
 
 		if (!sess || sess->state != GG_STATE_CONNECTED) {
-			print("not_connected");
-			return;
+			printq("not_connected");
+			return -1;
 		}
 
 		memset(&tt, 0, sizeof(tt));
@@ -2268,8 +2341,8 @@ COMMAND(cmd_dcc)
 			struct gg_dcc *d;
 			
 			if (!(d = gg_dcc_voice_chat(u->ip.s_addr, u->port, config_uin, uin))) {
-				print("dcc_error", strerror(errno));
-				return;
+				printq("dcc_error", strerror(errno));
+				return -1;
 			}
 
 			list_add(&watches, d, 0);
@@ -2280,9 +2353,9 @@ COMMAND(cmd_dcc)
 		list_add(&transfers, &tt, sizeof(tt));
 		voice_open();
 #else
-		print("dcc_voice_unsupported");
+		printq("dcc_voice_unsupported");
 #endif
-		return;
+		return -1;
 	}
 
 	if (!strncasecmp(params[0], "g", 1)) {		/* get */
@@ -2315,8 +2388,8 @@ COMMAND(cmd_dcc)
 		}
 
 		if (!l || !t || !t->dcc) {
-			print("dcc_get_not_found", (params[1]) ? params[1] : "");
-			return;
+			printq("dcc_get_not_found", (params[1]) ? params[1] : "");
+			return -1;
 		}
 
 		if (config_dcc_dir) 
@@ -2326,21 +2399,21 @@ COMMAND(cmd_dcc)
 		
 		/* XXX wiêcej sprawdzania */
 		if ((t->dcc->file_fd = open(path, O_WRONLY | O_CREAT, 0600)) == -1) {
-			print("dcc_get_cant_create", path);
+			printq("dcc_get_cant_create", path);
 			gg_free_dcc(t->dcc);
 			list_remove(&transfers, t, 1);
 			xfree(path);
 			
-			return;
+			return -1;
 		}
 		
 		xfree(path);
 		
-		print("dcc_get_getting", format_user(t->uin), t->filename);
+		printq("dcc_get_getting", format_user(t->uin), t->filename);
 		
 		list_add(&watches, t->dcc, 0);
 
-		return;
+		return 0;
 	}
 	
 	if (!strncasecmp(params[0], "c", 1)) {		/* close */
@@ -2348,8 +2421,8 @@ COMMAND(cmd_dcc)
 		uin_t uin;
 
 		if (!params[1]) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 		
 		for (t = NULL, l = transfers; l; l = l->next) {
@@ -2360,8 +2433,8 @@ COMMAND(cmd_dcc)
 		}
 
 		if (!t) {
-			print("dcc_close_notfound");
-			return;
+			printq("dcc_close_notfound");
+			return -1;
 		}
 
 		if (t->dcc) {
@@ -2381,12 +2454,14 @@ COMMAND(cmd_dcc)
 
 		list_remove(&transfers, t, 1);
 
-		print("dcc_close", format_user(uin));
+		printq("dcc_close", format_user(uin));
 		
-		return;
+		return 0;
 	}
 
-	print("dcc_unknown_command", params[0]);
+	printq("dcc_unknown_command", params[0]);
+
+	return -1;
 }
 
 COMMAND(cmd_version) 
@@ -2394,22 +2469,26 @@ COMMAND(cmd_version)
 	char buf[10];
 
 	snprintf(buf, sizeof(buf), "0x%.2x", GG_DEFAULT_PROTOCOL_VERSION);
-    	print("ekg_version", VERSION, buf, GG_DEFAULT_CLIENT_VERSION);
+    	printq("ekg_version", VERSION, buf, GG_DEFAULT_CLIENT_VERSION);
+
+	return 0;
 }
 
 #ifdef HAVE_OPENSSL
 COMMAND(cmd_test_keygen)
 {
-	print("generic", "Chwilka, generujê klucze...");
+	printq("generic", "Chwilka, generujê klucze...");
 
 	mkdir(prepare_path("keys", 1), 0700);
 
 	if (sim_key_generate(config_uin)) {
-		print("generic", "Nie uda³o siê wygenerowaæ klucza");
-		return;
+		printq("generic", "Nie uda³o siê wygenerowaæ klucza");
+		return -1;
 	}
 
-	print("generic", "Wygenerowano i zapisano klucze");
+	printq("generic", "Wygenerowano i zapisano klucze");
+
+	return 0;
 }
 
 COMMAND(cmd_test_keysend)
@@ -2420,18 +2499,18 @@ COMMAND(cmd_test_keysend)
 	FILE *f;
 	
 	if (!params[0]) {
-		print("not_enough_params", name);
-		return;
+		printq("not_enough_params", name);
+		return -1;
 	}
 
 	if (!(uin = get_uin(params[0]))) {
-		print("user_not_found", params[0]);
-		return;
+		printq("user_not_found", params[0]);
+		return -1;
 	}
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
-		print("not_connected");
-		return;
+		printq("not_connected");
+		return -1;
 	}
 
 	tmp = saprintf("%s/%d.pem", prepare_path("keys", 0), config_uin);
@@ -2439,8 +2518,8 @@ COMMAND(cmd_test_keysend)
 	xfree(tmp);
 
 	if (!f) {
-		print("public_key_not_found", format_user(config_uin));
-		return;
+		printq("public_key_not_found", format_user(config_uin));
+		return -1;
 	}
 
 	while (fgets(buf, sizeof(buf), f))
@@ -2451,6 +2530,8 @@ COMMAND(cmd_test_keysend)
 	gg_send_message(sess, GG_CLASS_MSG, uin, s->str);
 
 	string_free(s, 1);
+
+	return 0;
 }
 
 COMMAND(cmd_test_keydel)
@@ -2459,23 +2540,28 @@ COMMAND(cmd_test_keydel)
 	uin_t uin;
 
 	if (!params[0]) {
-		print("not_enough_params", name);
-		return;
+		printq("not_enough_params", name);
+		return -1;
 	}
 
 	if (!(uin = get_uin(params[0]))) {
-		print("user_not_found", params[0]);
-		return;
+		printq("user_not_found", params[0]);
+		return -1;
 	}
 	
 	tmp = saprintf("%s/%d.pem", prepare_path("keys", 0), uin);
-	if (unlink(tmp) == -1)
-		print("public_key_not_found", format_user(uin));
-	else
-		print("public_key_deleted", format_user(uin));
+	
+	if (unlink(tmp) == -1) {
+		printq("public_key_not_found", format_user(uin));
+	} else {
+		printq("public_key_deleted", format_user(uin));
+	}
+	
 	xfree(tmp);
 
 	SIM_KC_Free(SIM_KC_Find(uin));
+
+	return 0;
 }
 
 #endif
@@ -2484,6 +2570,8 @@ COMMAND(cmd_test_debug)
 {
 	if (params[0])
 		gg_debug(GG_DEBUG_MISC, "%s\n", params[0]);
+
+	return 0;
 }
 
 COMMAND(cmd_test_segv)
@@ -2491,12 +2579,16 @@ COMMAND(cmd_test_segv)
 	char *foo = NULL;
 
 	*foo = 'A';
+
+	return 0;
 }
 
 COMMAND(cmd_test_ping)
 {
 	if (sess)
 		gg_ping(sess);
+
+	return 0;
 }
 
 COMMAND(cmd_test_send)
@@ -2504,7 +2596,7 @@ COMMAND(cmd_test_send)
 	struct gg_event *e = xmalloc(sizeof(struct gg_event));
 
 	if (!params[0] || !params[1])
-		return;
+		return -1;
 
 	memset(e, 0, sizeof(*e));
 	e->type = GG_EVENT_MSG;
@@ -2515,12 +2607,16 @@ COMMAND(cmd_test_send)
 	
 	handle_msg(e);
 	event_free(e);
+
+	return 0;
 }
 
 COMMAND(cmd_test_add)
 {
 	if (params[0])
 		add_send_nick(params[0]);
+
+	return 0;
 }
 
 COMMAND(cmd_test_debug_dump)
@@ -2528,8 +2624,10 @@ COMMAND(cmd_test_debug_dump)
 	char *tmp = saprintf("Zrzuci³em debug do pliku debug.%d", getpid());
 
 	debug_write_crash();
-	print("generic", tmp);
+	printq("generic", tmp);
 	xfree(tmp);
+
+	return 0;
 }
 
 COMMAND(cmd_test_watches)
@@ -2610,8 +2708,10 @@ COMMAND(cmd_test_watches)
 #endif
 		
 		snprintf(buf, sizeof(buf), "%d: type=%s, fd=%d, state=%s, check=%s, id=%d, timeout=%d, queue=%d", no, type, s->fd, state, check, s->id, s->timeout, queue);
-		print("generic", buf);
+		printq("generic", buf);
 	}
+
+	return 0;
 }
 
 COMMAND(cmd_test_fds)
@@ -2672,9 +2772,10 @@ COMMAND(cmd_test_fds)
 		if (S_ISLNK(st.st_mode))
 			strcat(buf, "symlink");
 
-		print("generic", buf);
+		printq("generic", buf);
 	}
 #endif
+	return 0;
 }
 
 COMMAND(cmd_register)
@@ -2684,27 +2785,27 @@ COMMAND(cmd_register)
 
 	if (name[0] == 'r') {
 		if (registered_today) {
-			print("registered_today");
-			return;
+			printq("registered_today");
+			return -1;
 		}
 	
 		if (!params[0] || !params[1]) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 	
 		for (l = watches; l; l = l->next) {
 			struct gg_common *s = l->data;
 
 			if (s->type == GG_SESSION_REGISTER) {
-				print("register_pending");
-				return;
+				printq("register_pending");
+				return -1;
 			}
 		}
 	
 		if (!(h = gg_register(params[0], params[1], 1))) {
-			print("register_failed", strerror(errno));
-			return;
+			printq("register_failed", strerror(errno));
+			return -1;
 		}
 
 		list_add(&watches, h, 0);
@@ -2716,25 +2817,27 @@ COMMAND(cmd_register)
 		const char *pwd = NULL;
 		
 		if (!params[0] || (!params[1] && !config_password) || (!params[2] && !config_uin)) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		} 
 		
 		pwd = (params[1] ? params[1] : config_password);
 		uin = ((params[1] && params[2]) ? get_uin(params[2]) : config_uin);
 
 		if (uin <= 0) {
-			print("unregister_bad_uin", uin);
-			return;
+			printq("unregister_bad_uin", uin);
+			return -1;
 		}
 
 		if (!(h = gg_unregister(uin, pwd, params[0], 1))) {
-			print("unregister_failed", strerror(errno));
-			return;
+			printq("unregister_failed", strerror(errno));
+			return -1;
 		}
 
 		list_add(&watches, h, 0);
 	}
+
+	return 0;
 }
 
 COMMAND(cmd_passwd)
@@ -2742,19 +2845,21 @@ COMMAND(cmd_passwd)
 	struct gg_http *h;
 	
 	if (!params[0] || (!params[1] && !config_email)) {
-		print("not_enough_params", name);
-		return;
+		printq("not_enough_params", name);
+		return -1;
 	}
 
 	if (!(h = gg_change_passwd2(config_uin, (config_password) ? config_password : "", params[0], (config_email) ? config_email : "", (params[1]) ? params[1] : config_email, 1))) {
-		print("passwd_failed", strerror(errno));
-		return;
+		printq("passwd_failed", strerror(errno));
+		return -1;
 	}
 
 	list_add(&watches, h, 0);
 
 	reg_password = xstrdup(params[0]);
 	reg_email = xstrdup((params[1]) ? params[1] : config_email);
+
+	return 0;
 }
 
 COMMAND(cmd_remind)
@@ -2762,17 +2867,19 @@ COMMAND(cmd_remind)
 	struct gg_http *h;
 	
 	if (!(h = gg_remind_passwd(config_uin, 1))) {
-		print("remind_failed", strerror(errno));
-		return;
+		printq("remind_failed", strerror(errno));
+		return -1;
 	}
 
 	list_add(&watches, h, 0); 
+
+	return 0;
 }
 
 COMMAND(cmd_query)
 {
 	char **p = xmalloc(sizeof(params));
-	int i;
+	int i, res = 0;
 
 	for (i = 0; params[i]; i++)
 		p[i] = xstrdup(params[i]);
@@ -2785,7 +2892,7 @@ COMMAND(cmd_query)
 		if (!c)
 			goto cleanup;
 
-		ui_event("command", "query", c->name, NULL);
+		ui_event("command", quiet, "query", c->name, NULL);
 
 		xfree(p[0]);
 		p[0] = xstrdup(c->name);
@@ -2795,11 +2902,11 @@ COMMAND(cmd_query)
 			struct conference *c = conference_find(params[0]);
 
 			if (!c) {
-				print("conferences_noexist", params[0]);
+				printq("conferences_noexist", params[0]);
 				goto cleanup;
 			}
 		
-			ui_event("command", "query", c->name, NULL);
+			ui_event("command", quiet, "query", c->name, NULL);
 
 			xfree(p[0]);
 			p[0] = xstrdup(c->name);
@@ -2807,21 +2914,24 @@ COMMAND(cmd_query)
 		} else {
 
 			if (params[0] && !get_uin(params[0])) {
-				print("user_not_found", params[0]);
+				printq("user_not_found", params[0]);
+				res = -1;
 				goto cleanup;
 			} else
-				ui_event("command", "query", params[0], NULL);
+				ui_event("command", quiet, "query", params[0], NULL);
 		}
 	}
 		
 	if (params[0] && params[1])
-		cmd_msg("chat", (const char **) p, NULL);
+		cmd_msg("chat", (const char **) p, NULL, quiet);
 
 cleanup:
 	for (i = 0; p[i]; i++)
 		xfree(p[i]);
 
 	xfree(p);
+
+	return res;
 }
 
 COMMAND(cmd_on)
@@ -2836,24 +2946,24 @@ COMMAND(cmd_on)
 		for (l = events; l; l = l->next) {
 			struct event *ev = l->data;
 
-			print((ev->flags & INACTIVE_EVENT) ? "events_list_inactive" : "events_list", event_format(abs(ev->flags)), (ev->uin == 1) ? "*" : format_user(ev->uin), ev->action);
+			printq((ev->flags & INACTIVE_EVENT) ? "events_list_inactive" : "events_list", event_format(abs(ev->flags)), (ev->uin == 1) ? "*" : format_user(ev->uin), ev->action);
 			count++;
 		}
 
 		if (!count)
-			print("events_list_empty");
+			printq("events_list_empty");
 
-		return;
+		return 0;
 	}
 
 	if (!params[1] || !params[2]) {
-		print("not_enough_params", name);
-		return;
+		printq("not_enough_params", name);
+		return -1;
 	}
 
 	if (!(flags = event_flags(params[0]))) {
-		print("events_incorrect");
-		return;
+		printq("events_incorrect");
+		return -1;
 	}
 
 	if (*params[1] == '*')
@@ -2862,56 +2972,66 @@ COMMAND(cmd_on)
 		uin = get_uin(params[1]);
 
 	if (!uin) {
-		print("invalid_uin");
-		return;
+		printq("invalid_uin");
+		return -1;
 	}
 
         if (!strncasecmp(params[2], "clear", 5)) {
 		event_remove(flags, uin, 0);
 		config_changed = 1;
-		return;
+		return 0;
         }
 
 	if (event_correct(params[2], 0))
-		return;
+		return -1;
 
 	event_add(flags, uin, params[2], 0);
 	config_changed = 1;
+
+	return 0;
 }
 
 COMMAND(cmd_echo)
 {
-	print("generic", (params && params[0]) ? params[0] : "");
+	printq("generic", (params && params[0]) ? params[0] : "");
+
+	return 0;
 }
 
 COMMAND(cmd_window)
 {
-	ui_event("command", "window", (params) ? params[0] : NULL, (params && params[0]) ? params[1] : NULL, NULL);
+	ui_event("command", quiet, "window", (params) ? params[0] : NULL, (params && params[0]) ? params[1] : NULL, NULL);
+	
+	return 0;
 }
 
 COMMAND(cmd_bind)
 {
-	ui_event("command", "bind", (params) ? params[0] : NULL, (params && params[0]) ? params[1] : NULL, (params && params[1]) ? params[2] : NULL, NULL); 
+	ui_event("command", quiet, "bind", (params) ? params[0] : NULL, (params && params[0]) ? params[1] : NULL, (params && params[1]) ? params[2] : NULL, NULL); 
+
+	return 0;
 }
 
 COMMAND(cmd_test_vars)
 {
 	char *tmp = variable_digest();
-	print("generic", tmp);
+	printq("generic", tmp);
 	xfree(tmp);
+
+	return 0;
 }
 
 /*
  * command_exec()
  * 
- * wykonuje polecenie zawarte w linii tekstu.
+ * wykonuje polecenie zawarte w linii tekstu. 
  *
  *  - target - w którym oknie nast±pi³o (NULL je¶li to nie query)
  *  - xline - linia tekstu.
  *
- * zmienia zawarto¶æ bufora line.
+ * 0/-1.
  */
-void command_exec(const char *target, const char *xline)
+int command_exec(const char *target, const char *xline)
 {
 	char *cmd = NULL, *tmp, *p = NULL, short_cmd[2] = ".", *last_name = NULL, *last_params = NULL, *line_save = NULL, *line = NULL;
 	command_func_t *last_abbr = NULL;
@@ -2919,15 +3039,17 @@ void command_exec(const char *target, const char *xline)
 	int correct_command = 0;
 	list_t l;
 
+	int quiet = 0;	/* XXX póki nie stanie siê argumentem funkcji */
+
 	if (!xline)
-		return;
+		return 0;
 
 	if (!strcmp(xline, "")) {
 		if (batch_mode && !batch_line) {
 			quit_message_send = 1;
 			ekg_exit();
 		}
-		return;
+		return 0;
 	}
 
 	if (target && *xline != '/') {
@@ -2951,9 +3073,9 @@ void command_exec(const char *target, const char *xline)
 			const char *params[] = { target, xline, NULL };
 
 			if (strcmp(xline, ""))
-				cmd_msg("chat", params, NULL);
+				cmd_msg("chat", params, NULL, quiet);
 
-			return;
+			return 0;
 		}
 	}
 	
@@ -2964,6 +3086,11 @@ void command_exec(const char *target, const char *xline)
 	
 	if (*line == '/')
 		line++;
+
+	if (*line == '^') {
+		quiet = 1;
+		line++;
+	}
 
 	for (l = commands; l; l = l->next) {
 		struct command *c = l->data;
@@ -3007,10 +3134,10 @@ void command_exec(const char *target, const char *xline)
 
 	if (last_abbr && abbrs == 1) {
 		char **par;
-		int len = strlen(last_params);
+		int res, len = strlen(last_params);
 
 		par = array_make(p, " \t", len, 1, 1);
-		(last_abbr)(last_name, (const char**) par, target);
+		res = (last_abbr)(last_name, (const char**) par, target, quiet);
 		array_free(par);
 
 		xfree(line_save);
@@ -3018,13 +3145,15 @@ void command_exec(const char *target, const char *xline)
 		if (quit_command)
 			ekg_exit();
 
-		return;
+		return res;
 	}
 
 	if (strcmp(cmd, ""))
-		print("unknown_command", cmd);
+		printq("unknown_command", cmd);
 
 	xfree(line_save);
+
+	return -1;
 }
 
 /*
@@ -3123,24 +3252,29 @@ COMMAND(cmd_alias_exec)
 		command_exec(NULL, tmp);
 		xfree(tmp);
 	}
+
+	return 0;
 }
 
 COMMAND(cmd_timer)
 {
-	list_t l;
-	int quiet = 0, count = 0;
+	int addquiet = 0, count = 0, res = 0;
 	int at = !strcasecmp(name, "at");
+	list_t l;
 
-	if (match_arg(params[0], 'a', "add", 2) || (quiet = match_arg(params[0], 'a', "add-quiet", 5))) {
+	if (match_arg(params[0], 'a', "add", 2) || (addquiet = match_arg(params[0], 'a', "add-quiet", 5))) {
 		const char *p = params[1];
 		char *t_command = NULL, *t_name = NULL;
 		time_t period = 0;
 		struct timer *t;
 		int persistent = 0;
 
-		if ((!params[1] || !params[2]) && !quiet) {
-			print("not_enough_params", name);
-			return;
+		if (addquiet)
+			quiet = 1;
+
+		if ((!params[1] || !params[2])) {
+			printq("not_enough_params", name);
+			return -1;
 		}
 
 		/* podano nazwê timera/at, a wiêc czas jest nastêpnym parametrem */
@@ -3151,7 +3285,8 @@ COMMAND(cmd_timer)
 				t = l->data;
 
 				if (t->name && !strcasecmp(t->name, t_name)) {
-					print((at) ? "at_exist" : "timer_exist", t_name);
+					printq((at) ? "at_exist" : "timer_exist", t_name);
+					res = -1;
 					goto cleanup;
 				}
 			}
@@ -3214,15 +3349,15 @@ COMMAND(cmd_timer)
 
 			/* nie ma b³êdów ? */
 			if (wrong || lt->tm_hour > 23 || lt->tm_min > 59 || lt->tm_sec > 61 || lt->tm_mday > 31 || lt->tm_mon > 12) {
-				if (!quiet)
-					print("invalid_params", name);
+				printq("invalid_params", name);
+				res = -1;
 				goto cleanup;
 			}
 
 			/* plany na przesz³o¶æ? */
 			if ((period = mktime(lt) - now) <= 0) {
-				if (!quiet)
-					print("at_back_to_past");
+				printq("at_back_to_past");
+				res = -1;
 				goto cleanup;
 			}
 
@@ -3239,8 +3374,8 @@ COMMAND(cmd_timer)
 				if (isdigit(*p))
 					_period = atoi(p);
 				else {
-					if (!quiet)
-						print("invalid_params", name);
+					printq("invalid_params", name);
+					res = -1;
 					goto cleanup;
 				}
 
@@ -3260,8 +3395,7 @@ COMMAND(cmd_timer)
 						case 's':
 							break;
 						default:
-							if (!quiet)
-								print("invalid_params", name);
+							printq("invalid_params", name);
 							goto cleanup;
 					}
 				}
@@ -3274,9 +3408,7 @@ COMMAND(cmd_timer)
 		}
 
 		if ((t = timer_add(period, persistent, TIMER_COMMAND, at, t_name, t_command))) {
-			if (!quiet)
-				print((at) ? "at_added" : "timer_added", t->name);
-
+			printq((at) ? "at_added" : "timer_added", t->name);
 			config_changed = 1;
 		}
 
@@ -3284,7 +3416,7 @@ cleanup:
 		xfree(t_name);
 		xfree(t_command);
 
-		return;
+		return res;
 	}
 
 	if (match_arg(params[0], 'd', "del", 2)) {
@@ -3292,8 +3424,8 @@ cleanup:
 		int del_all = 0;
 
 		if (!params[1]) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 
 		if (!strcmp(params[1], "*")) {
@@ -3314,19 +3446,23 @@ cleanup:
 			ret = timer_remove(params[1], at, NULL);
 		
 		if (!ret) {
-			if (del_all)
-				print((at) ? "at_deleted_all" : "timer_deleted_all");
-			else
-				print((at) ? "at_deleted" : "timer_deleted", params[1]);
-
+			if (del_all) {
+				printq((at) ? "at_deleted_all" : "timer_deleted_all");
+			} else {
+				printq((at) ? "at_deleted" : "timer_deleted", params[1]);
+			}
+			
 			config_changed = 1;
-		} else
-			if (del_all)
-				print((at) ? "at_empty" : "timer_empty");
-			else
-				print((at) ? "at_noexist" : "timer_noexist", params[1]);
+		} else {
+			if (del_all) {
+				printq((at) ? "at_empty" : "timer_empty");
+			} else {
+				printq((at) ? "at_noexist" : "timer_noexist", params[1]);
+				res = -1;
+			}
+		}
 
-		return;
+		return res;
 	}
 
 	if (!params[0] || match_arg(params[0], 'l', "list", 2) || params[0][0] != '-') {
@@ -3406,26 +3542,31 @@ cleanup:
 					type_str = "unknown";
 			}
 			
-			if (at)
-				print("at_list", t->name, tmp, t->command, type_str);
-			else
-				print("timer_list", t->name, tmp, t->command, type_str, (t->persistent) ? "*" : "");
+			if (at) {
+				printq("at_list", t->name, tmp, t->command, type_str);
+			} else {
+				printq("timer_list", t->name, tmp, t->command, type_str, (t->persistent) ? "*" : "");
+			}
 
 			xfree(tmp);
 
 		}
 
 		if (!count) {
-			if (tname)
-				print((at) ? "at_noexist" : "timer_noexist", tname);
-			else
-				print((at) ? "at_empty" : "timer_empty");
+			if (tname) {
+				printq((at) ? "at_noexist" : "timer_noexist", tname);
+				res = -1;
+			} else {
+				printq((at) ? "at_empty" : "timer_empty");
+			}
 		}
 
-		return;
+		return res;
 	}
 
-	print("invalid_params", name);
+	printq("invalid_params", name);
+
+	return -1;
 }
 
 #ifdef WITH_PYTHON
@@ -3434,35 +3575,37 @@ COMMAND(cmd_python)
 {
 	if (!params[0]) {
 		python_list();
-		return;
+		return 0;
 	}
 
 	if (!strncasecmp(params[0], "lo", 2)) {
 		python_load(params[1]);
-		return;
+		return 0;
 	}
 
 	if (!strncasecmp(params[0], "u", 1)) {
 		python_unload(params[1]);
-		return;
+		return 0;
 	}
 
 	if (!strncasecmp(params[0], "r", 1)) {
 		python_run(params[1]);
-		return;
+		return 0;
 	}
 
 	if (!strncasecmp(params[0], "e", 1)) {
 		python_exec(params[1]);
-		return;
+		return 0;
 	}
 
 	if (!strncasecmp(params[0], "li", 2)) {
 		python_list();
-		return;
+		return 0;
 	}
 
-	print("invalid_params", name);
+	printq("invalid_params", name);
+
+	return -1;
 }
 
 #endif
@@ -3508,19 +3651,21 @@ COMMAND(cmd_conference)
 		}
 
 		if (!count) {
-			if (params[0] && params[0][0] == '#')
-				print("conferences_noexist", params[0]);
-			else
-				print("conferences_list_empty");
+			if (params[0] && params[0][0] == '#') {
+				printq("conferences_noexist", params[0]);
+				return -1;
+			} else {
+				printq("conferences_list_empty");
+			}
 		}
 
-		return;
+		return 0;
 	}
 
 	if (match_arg(params[0], 'a', "add", 2)) {
 		if (!params[1]) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 
 		if (params[2])
@@ -3528,13 +3673,13 @@ COMMAND(cmd_conference)
 		else
 			conference_create(params[1]);
 
-		return;
+		return 0;
 	}
 
 	if (match_arg(params[0], 'd', "del", 2)) {
 		if (!params[1]) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 
 		if (!strcmp(params[1], "*"))
@@ -3542,40 +3687,40 @@ COMMAND(cmd_conference)
 		else
 			conference_remove(params[1]);
 
-		return;
+		return 0;
 	}
 
 	if (match_arg(params[0], 'r', "rename", 2)) {
 		if (!params[1] || !params[2]) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 		
 		conference_rename(params[1], params[2]);
 
-		return;
+		return 0;
 	}
 	
 	if (match_arg(params[0], 'i', "ignore", 2)) {
 		if (!params[1]) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 
 		conference_set_ignore(params[1], 1);
 
-		return;
+		return 0;
 	}
 
 	if (match_arg(params[0], 'u', "unignore", 2)) {
 		if (!params[1]) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 
 		conference_set_ignore(params[1], 0);
 
-		return;
+		return 0;
 	}
 
 	if (match_arg(params[0], 'f', "find", 2)) {
@@ -3584,8 +3729,8 @@ COMMAND(cmd_conference)
 		list_t l;
 
 		if (!params[1]) {
-			print("not_enough_params", name);
-			return;
+			printq("not_enough_params", name);
+			return -1;
 		}
 
 		c = conference_find(params[1]);
@@ -3596,14 +3741,18 @@ COMMAND(cmd_conference)
 				command_exec(NULL, tmp);
 				xfree(tmp);
 			}
-		} else
-			print("conferences_noexist", params[1]);
+		} else {
+			printq("conferences_noexist", params[1]);
+			return -1;
+		}
 
 
-		return;
+		return 0;
 	}
 
-	print("invalid_params", name);
+	printq("invalid_params", name);
+
+	return -1;
 }
 
 COMMAND(cmd_last)
@@ -3614,42 +3763,50 @@ COMMAND(cmd_last)
 
 	if (match_arg(params[0], 'c', "clear", 2)) {
 		if (params[1] && !(uin = get_uin(params[1]))) {
-			print("user_not_found", params[1]);
-			return;
+			printq("user_not_found", params[1]);
+			return -1;
 		}
 
 		if ((uin && !last_count(uin)) || !list_count(lasts)) {
-			(uin) ? print("last_list_empty_nick", format_user(uin)) : print("last_list_empty");
-			return;
+			if (uin) {
+				printq("last_list_empty_nick", format_user(uin));
+			} else {
+				printq("last_list_empty");
+			}
+			return 0;
 		}
 
 		if (uin) {
 			last_del(uin);	
-			print("last_clear_uin", format_user(uin));
+			printq("last_clear_uin", format_user(uin));
 		} else {
 			last_free();
-			print("last_clear");
+			printq("last_clear");
 		}
 
-		return;
+		return 0;
 	}		
 
 	if (match_arg(params[0], 's', "stime", 2)) {
 		show_sent = 1;
 
 		if (params[1] && !(uin = get_uin(params[1]))) {
-			print("user_not_found", params[1]);
-			return;
+			printq("user_not_found", params[1]);
+			return -1;
 		}
 	} else
 		if (params[0] && !(uin = get_uin(params[0]))) {
-			print("user_not_found", params[0]);
-			return;
+			printq("user_not_found", params[0]);
+			return -1;
 		}
 		
 	if (!((uin > 0) ? last_count(uin) : list_count(lasts))) {
-		(uin) ? print("last_list_empty_nick", format_user(uin)) : print("last_list_empty");
-		return;
+		if (uin) {
+			printq("last_list_empty_nick", format_user(uin));
+		} else {
+			printq("last_list_empty");
+		}
+		return 0;
 	}
 
         for (l = lasts; l; l = l->next) {
@@ -3668,14 +3825,17 @@ COMMAND(cmd_last)
 			} else
 				time_str = xstrdup(buf);
 
-			if (config_last & 4 && ll->type == 1)
-				print("last_list_out", time_str, format_user(ll->uin), ll->message);
-			else
-				print("last_list_in", time_str, format_user(ll->uin), ll->message);
+			if (config_last & 4 && ll->type == 1) {
+				printq("last_list_out", time_str, format_user(ll->uin), ll->message);
+			} else {
+				printq("last_list_in", time_str, format_user(ll->uin), ll->message);
+			}
 
 			xfree(time_str);
 		}
         }
+
+	return 0;
 }
 
 COMMAND(cmd_queue)
@@ -3684,40 +3844,48 @@ COMMAND(cmd_queue)
 	uin_t uin = 0;
 
 	if (strcasecmp(name, "_queue") && sess && sess->state == GG_STATE_CONNECTED) {
-		print("queue_wrong_use");
-		return;
+		printq("queue_wrong_use");
+		return -1;
 	}
 
 	if (match_arg(params[0], 'c', "clear", 2)) {
 		if (params[1] && !(uin = get_uin(params[1]))) {
-			print("user_not_found", params[1]);
-			return;
+			printq("user_not_found", params[1]);
+			return -1;
 		}
 
 		if ((uin && !msg_queue_count_uin(uin)) || !msg_queue_count()) {
-			(uin) ? print("queue_empty_uin", format_user(uin)) : print("queue_empty");
-			return;
+			if (uin) {
+				printq("queue_empty_uin", format_user(uin));
+			} else {
+				printq("queue_empty");
+			}
+			return 0;
 		}
 
 		if (uin) {
 			msg_queue_remove_uin(uin);
-			print("queue_clear_uin", format_user(uin));
+			printq("queue_clear_uin", format_user(uin));
 		} else {
 			msg_queue_free();
-			print("queue_clear");
+			printq("queue_clear");
 		}
 
-		return;
+		return 0;
 	}		
 
 	if (params[0] && !(uin = get_uin(params[0]))) {
-		print("user_not_found", params[0]);
-		return;
+		printq("user_not_found", params[0]);
+		return -1;
 	}  
 		
 	if ((uin && !msg_queue_count_uin(uin)) || !msg_queue_count()) {
-		(uin) ? print("queue_empty_uin", format_user(uin)) : print("queue_empty");
-		return;
+		if (uin) {
+			printq("queue_empty_uin", format_user(uin));
+		} else {
+			printq("queue_empty");
+		}
+		return 0;
 	}
 
         for (l = msg_queue; l; l = l->next) {
@@ -3743,11 +3911,13 @@ COMMAND(cmd_queue)
 			} else
 				fu = xstrdup(format_user(*(m->uins)));
 				
-			print("queue_list_message", buf, fu, m->msg);
+			printq("queue_list_message", buf, fu, m->msg);
 
 			xfree(fu);
 		}
 	}
+
+	return 0;
 }
 
 /*
@@ -4208,7 +4378,7 @@ void command_init()
 	  "  -d, --del <numer/nazwa>|*           zatrzymuje timer lub wszystkie\n"
 	  " [-l, --list, <nazwa>]                wy¶wietla listê timerów\n"
 	  "\n"
-	  "Czas podaje siê w sekundach. Mo¿na te¿ u¿yæ przyrostków d, h, m, s, "
+	  "Czas podaje siê w sekundach. Mo¿na te¿ u¿yæ przyrostków %Td%n, %Th%n, %Tm%n, %Ts%n, "
 	  "oznaczaj±cych dni, godziny, minuty, sekundy, np. 5h20m. Timer po "
 	  "jednorazowym uruchomieniu jest usuwany, chyba ¿e czas poprzedzimy "
 	  "wyra¿eniem ,,*/''. Wtedy timer bêdzie uruchamiany w zadanych odstêpach "

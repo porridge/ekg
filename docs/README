@@ -36,13 +36,14 @@ INSTALACJA
     zainstalowane odpowiednie pakiety zawieraj±ce bibliotekê oraz pliki
     nag³ówkowe. Je¶li chcesz u¿yæ starego interfejsu, do polecenia
     configure dodaj ,,--disable-ui-ncurses''. Interfejs ten wymaga
-    zainstalowania biblioteki readline wraz z plikami nag³ówkoymi.
+    zainstalowania biblioteki readline wraz z plikami nag³ówkowymi.
     readline zwykle polega te¿ na innych bibliotekach do obs³ugi
-    terminala, jak np. libtermcap czy ncurses. Oczywi¶cie niezbêdny
-    jest te¿ zestaw narzêdzi do kompilacji programów napisanych w jêzyku
-    C -- kompilator, preprocesor, linker, pliki nag³ówkowe, biblioteki
-    systemowe itd. Je¶li skrypt ./configure zg³osi jakie¶ b³êdy,
-    skontaktuj siê ze swoim administratorem.
+    terminala, jak np. libtermcap czy ncurses. Instalacja obu interfejsów
+    naraz nie jest wskazana. Oczywi¶cie niezbêdny jest te¿ zestaw narzêdzi
+    do kompilacji programów napisanych w jêzyku C -- kompilator,
+    preprocesor, linker, pliki nag³ówkowe, biblioteki systemowe itd.
+    Je¶li skrypt ./configure zg³osi jakie¶ b³êdy, skontaktuj siê ze swoim
+    administratorem.
 
     ekg powinien dzia³aæ na wiêkszo¶ci systemów uniksowych, jak Linux,
     *BSD, SunOS, IRIX itp. lecz czasami przy dodawaniu nowych funkcji

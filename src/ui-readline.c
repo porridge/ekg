@@ -905,6 +905,7 @@ static int ui_readline_event(const char *event, ...)
 	}
 
 	if (!strcasecmp(event, "command")) {
+		int quiet = va_arg(ap, int);
 		char *command = va_arg(ap, char*);
 
 		if (!strcasecmp(command, "query")) {
