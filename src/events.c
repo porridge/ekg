@@ -784,7 +784,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 				event_check(EVENT_DESCR, uin, descr);
 
 			if (!__SAME_GG_S(prev_status, status)) {
-				if (!(ignored_check(uin) & IGNORE_STATUS) && GG_S_NA(prev_status) && GG_S_A(s->status))
+				if (!ignore_status && GG_S_NA(prev_status) && GG_S_A(s->status))
 					event_check(EVENT_ONLINE, uin, descr);
 				else
 					event_check(s->event, uin, descr);
@@ -801,7 +801,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 
 #undef __SAME_GG_S
 
-		if (ignore_status)
+		if (ignore_status || ignore_notify)
 			break;
 
 		/* zaloguj */
@@ -820,7 +820,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 			remove_send_nick(u->display);
 
 		/* wy¶wietlaæ na ekranie ? */
-		if (!config_display_notify || ignore_notify || hide)
+		if (!config_display_notify || hide)
 			break;
 
 		if (config_display_notify == 2) {

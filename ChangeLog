@@ -6,6 +6,12 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-04-06
+
+- kosmetyka ekl2.sh (porridge/sz)
+- ,,/ignore <user> notify'' spowoduje te¿, ¿e u¿ytkownik, przy zmianie
+  stanu, nie zostanie dopisany do listy dope³niania Tabem (kbns/sz)
+
 // 2003-04-05
 
 - dalsze kosmetyczne poprawki reakcji na zmianê rozmiaru terminala

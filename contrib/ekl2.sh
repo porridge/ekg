@@ -62,12 +62,12 @@ while [ $# -gt 0 ]; do
 		;;
 		-l | --sessions )
 			sess="yes";
-			if [ "${2:0:1}" == "+" ]; then
-                                sessnum="${2:1}";
+			if [ "x${2#?}" = "x${2#+}" ]; then
+                                sessnum="${2#+}";
                                 shift;
                         fi
-			if [ "${2:0:1}" == "+" ]; then
-				sessint="${2:1}";
+			if [ "x${2#?}" = "x${2#+}" ]; then
+				sessint="${2#+}";
 				shift;
 			else
 				sessint="60";
@@ -130,7 +130,7 @@ if [ ! -d "$dir" ]; then
 	if [ -f "$dir" -a "`basename $dir`" != "history" ]; then
 		fle="$dir"; # if someone will set exact file
 	else
-		if [ -f "$dir" -a "`basename $dir`" == "history" ]; then # occurs, when log variable is set to 1
+		if [ -f "$dir" -a "`basename $dir`" = "history" ]; then # occurs, when log variable is set to 1
 			printonlynick="$fle";
 			fle="$dir/history";
 		else
@@ -157,11 +157,11 @@ fi
 exit;
 }
 
-if [ "${list}" == "yes" ]; then
+if [ "${list}" = "yes" ]; then
 	_userslist;
 fi
 
-if [ "${list}" == "hidden_yes" ]; then
+if [ "${list}" = "hidden_yes" ]; then
 	if [ -d "$dir" ]; then
 		fle="$dir/`_userslist | grep "$fle" | cut -f 1`";
 	else
@@ -195,14 +195,14 @@ case $1 in
 		flds="date nick clr msg";
 	fi
 	while read $flds; do
-		if [ "$sess" == "yes" ]; then
+		if [ "$sess" = "yes" ]; then
 			[ -z "$lastdate" ] && lastdate="$date";
 			if [ "`expr $date - $lastdate`" -gt "$sessint" ]; then
 				let disccount++;
 				if [ ! -z "$sessnum" -a "$sessnum" -eq "$disccount" ]||[ -z "$sessnum" ]; then
 					echo -e "$disccount.\tRozmowa z `date --date "01/01/1970 ${date}sec" "${dateformat}"`. Zaczêta przez $nick.";
 				fi
-				[ "$sessnum" == "$disccount" ] &&  sessprint=1 || sessprint=0
+				[ "$sessnum" = "$disccount" ] &&  sessprint=1 || sessprint=0
 			fi 2>/dev/null
 			lastdate="$date";
 		fi
