@@ -8,6 +8,8 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 
 - dodanie zmiennej beep_title, obs³uguj±cej informowanie o sygnale d¼wiêkowym
   w pasku tytu³owym na terminalu xterm (qbq/w)
+- libgadu: sprawdzanie poprawno¶ci parametrów funkcji
+  gg_send_message_richtext() i gg_send_message_confer_richtext() (mslusarz/w)
 
 // 2005-01-10
 
