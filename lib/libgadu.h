@@ -305,6 +305,7 @@ struct gg_add_remove {
 	
 #define GG_SEND_MSG 0x000b
 
+#define GG_CLASS_QUEUED 0x0001
 #define GG_CLASS_MSG 0x0004
 #define GG_CLASS_CHAT 0x0008
 
