@@ -114,7 +114,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 				/* XXX mapowanie kolorów */
 			}
 
-			if ((p[i + 2] & 7))
+			if ((p[i + 2] & 7) || !p[i + 2])
 				formatmap[pos] = attrmap[p[i + 2] & 7];
 
 			i += (p[i + 2] & GG_FONT_COLOR) ? 6 : 3;

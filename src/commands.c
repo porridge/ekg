@@ -1545,7 +1545,7 @@ COMMAND(cmd_msg)
 
 		if (format && formatlen) {
 			format[1] = (formatlen - 3) & 255;
-			format[2] = ((formatlen - 3) << 8) & 255;
+			format[2] = ((formatlen - 3) >> 8) & 255;
 		}
 	}
 
@@ -3597,7 +3597,7 @@ void command_init()
 	( "list", "u?", cmd_list, 0,
           " [alias|@grupa|opcje]", "zarz±dzanie list± kontaktów",
 	  "\n"
-	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i|-d|-m]\":\n"
+	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i|-d|-m|-o]\":\n"
 	  "  -a, --active          dostêpne\n"
 	  "  -b, --busy            zajête\n"
 	  "  -i, --inactive        niedostêpne\n"
@@ -3619,7 +3619,7 @@ void command_init()
 	  "  -o, --offline              b±d¼ niedostêpny dla danej osoby\n"
 	  "  -O, --online               b±d¼ dostêpny dla danej osoby\n"
 	  "\n"
-	  "Lista kontaktów na serwerze \"list [-p|-g]\":\n"
+	  "Lista kontaktów na serwerze \"list [-p|-g|-P|-G]\":\n"
 	  "  -p, --put         umieszcza na serwerze\n"
 	  "  -P, --put-config  umieszcza na serwerze razem z konfiguracj±\n"
 	  "  -g, --get         pobiera z serwera\n"
