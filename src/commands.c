@@ -644,7 +644,7 @@ COMMAND(command_connect)
 	} else if (sess) {
 	    	char *tmp = NULL;
 
-		if (!params[0]) {
+		if (!params || !params[0]) {
 		    	if (config_random_reason & 2) {
 			    	char *path = prepare_path("quit.reasons");
 
