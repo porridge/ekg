@@ -101,6 +101,8 @@ char *config_quit_reason;
 char *config_away_reason;
 int config_random_reason;
 int config_query_commands;
+char *config_proxy;
+char *config_server;
 
 char *home_dir;
 int in_readline;
@@ -160,7 +162,8 @@ void reset_prompt();
 void changed_debug(char *var);
 void changed_dcc(char *var);
 void changed_theme(char *var);
-void prepare_connect();
+void changed_proxy(char *var);
+void do_connect();
 int transfer_id();
 int add_event(int flags, uin_t uin, char *action, int quiet);
 int del_event(int flags, uin_t uin);

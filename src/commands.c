@@ -630,14 +630,7 @@ COMMAND(command_connect)
                 if (config_uin && config_password) {
 			my_printf("connecting");
 			connecting = 1;
-			prepare_connect();
-			if (!(sess = gg_login(config_uin, config_password, 1))) {
-	                        my_printf("conn_failed", strerror(errno));
-	                        do_reconnect();
-	                } else {
-				sess->initial_status = config_status;
-				list_add(&watches, sess, 0);
-			}
+			do_connect();
 		} else
 			my_printf("no_config");
 	} else if (!strcasecmp(name, "reconnect")) {

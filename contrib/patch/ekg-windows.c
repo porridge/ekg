@@ -3,7 +3,7 @@
 .---------------------------------------------------------------------------.
 | ekg - wirtualne okienka 0.9.29   by nils <nils@kki.net.pl>   ekg: 251880  |
 `---------------------------------------------------------------------------'
-     Lines: 669, Size: 19903, Release date: Mon Feb 18 17:03:53 CET 2002
+     Lines: 670, Size: 19918, Release date: Mon Feb 18 17:03:53 CET 2002
 
 
 Compilation:
@@ -274,6 +274,7 @@ while (*fmt)
                 sprintf(buf,"%c", c);
                 break;
           }	
+       *++fmt;
 			 }
 	  strcat(buforek,buf);
 	}

@@ -188,14 +188,7 @@ int my_getc(FILE *f)
 				reconnect_timer = 0;
 				my_printf("connecting");
 				connecting = 1;
-				prepare_connect();
-				if (!(sess = gg_login(config_uin, config_password, 1))) {
-					my_printf("conn_failed", strerror(errno));
-					do_reconnect();
-				} else {
-					sess->initial_status = config_status;
-					list_add(&watches, sess, 0);
-				}
+				do_connect();
 			}
 
 			/* timeout pinga */
@@ -555,16 +548,9 @@ IOCTL_HELP
 	changed_dcc("dcc");
 
 	if (config_uin && config_password && auto_connect) {
-		prepare_connect();
 		my_printf("connecting");
 		connecting = 1;
-		if (!(sess = gg_login(config_uin, config_password, 1))) {
-			my_printf("conn_failed", strerror(errno));
-			do_reconnect();
-		} else {
-			sess->initial_status = config_status;
-			list_add(&watches, sess, 0);
-		}
+		do_connect();
 	}
 
 	if (config_auto_save)

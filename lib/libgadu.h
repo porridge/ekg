@@ -71,9 +71,14 @@ struct gg_session {
 
 	struct gg_event *event;	/* zdarzenie po ->callback() */
 
-	unsigned int server_ip;	/* adres serwera */
-	unsigned int client_ip;	/* adres klienta */
-	int client_port;	/* port, na którym klient s³ucha */
+	unsigned long proxy_addr;	/* adres proxy, keszowany */
+	int proxy_port;			/* port proxy */
+
+	unsigned long hub_addr;		/* adres huba po resolvniêciu */
+	unsigned long server_addr;	/* adres serwera, od huba */
+
+	unsigned long client_addr;	/* adres klienta */
+	int client_port;		/* port, na którym klient s³ucha */
 
 	uin_t uin;		/* numerek klienta */
 	char *password;		/* i jego has³o. zwalniane automagicznie */
@@ -185,7 +190,8 @@ enum gg_state_enum {
 	GG_STATE_ERROR,			/* wyst±pi³ b³±d. kod w x->error */
 
         /* gg_session */
-	GG_STATE_CONNECTING_GG,         /* wywo³a³ connect() */
+	GG_STATE_CONNECTING_HUB,	/* wywo³a³ connect() na huba */
+	GG_STATE_CONNECTING_GG,         /* wywo³a³ connect() na serwer */
 	GG_STATE_READING_KEY,           /* czeka na klucz */
 	GG_STATE_READING_REPLY,         /* czeka na odpowied¼ */
 	GG_STATE_CONNECTED,             /* po³±czy³ siê */
@@ -232,7 +238,24 @@ enum gg_check_enum {
 	GG_CHECK_READ = 2,		/* sprawdzamy mo¿liwo¶æ odczytu */
 };
 
-struct gg_session *gg_login(uin_t uin, const char *password, int async);
+/*
+ * parametry gg_login(). przenios³em do struktury, ¿eby unikn±æ cyrków
+ * z ci±g³ymi zmianami api, gdy chcemy co¶ dodatkowego powiedzieæ tej
+ * funkcji.
+ */
+struct gg_login_params {
+	uin_t uin;			/* numerek */
+	char *password;			/* has³o */
+	int async;			/* asynchroniczne sockety? */
+	int status;			/* pocz±tkowy status klienta */
+	char *status_descr;		/* opis statusu XXX */
+	unsigned long server_addr;	/* adres serwera gg */
+	unsigned short server_port;	/* port serwera gg */
+	unsigned long client_addr;	/* adres dcc klienta */
+	unsigned short client_port;	/* port dcc klienta */
+};
+
+struct gg_session *gg_login(const struct gg_login_params *p);
 void gg_free_session(struct gg_session *sess);
 void gg_logoff(struct gg_session *sess);
 int gg_change_status(struct gg_session *sess, int status);
@@ -527,12 +550,11 @@ extern int gg_debug_level;
 void gg_debug(int level, const char *format, ...);
 
 /*
- * Pare ma³ych zmiennych do obs³ugi "http proxy"
+ * konfiguracja http proxy.
  */
- 
-extern int gg_http_use_proxy;
-extern char *gg_http_proxy_host;
-extern int gg_http_proxy_port;
+extern int gg_proxy_enabled;
+extern char *gg_proxy_host;
+extern int gg_proxy_port;
 
 /*
  * -------------------------------------------------------------------------
@@ -570,7 +592,7 @@ unsigned short fix16(unsigned short x);
 #define GG_HTTPS_PORT 443
 #define GG_HTTP_USERAGENT "Mozilla/4.7 [en] (Win98; I)"
 
-#define GG_CLIENT_VERSION 0x15
+#define GG_CLIENT_VERSION 0x16
 #define GG_DEFAULT_TIMEOUT 30
 
 #define GG_DEFAULT_DCC_PORT 1550
@@ -615,14 +637,16 @@ __attribute__ ((packed))
 
 #define GG_NEW_STATUS 0x0002
 
-#define GG_STATUS_NOT_AVAIL 0x0001	/* roz³±czony */
-#define GG_STATUS_AVAIL 0x0002		/* dostêpny */
-#define GG_STATUS_BUSY 0x0003		/* zajêty */
-#define GG_STATUS_BUSY_DESCR 0x0004	/* zajêty z opisem (4.8) */
-#define GG_STATUS_INVISIBLE 0x0014	/* niewidoczny (4.6) */
+#define GG_STATUS_NOT_AVAIL 0x0001		/* niedostêpny */
 #define GG_STATUS_NOT_AVAIL_DESCR 0x0015	/* niedostêpny z opisem (4.8) */
+#define GG_STATUS_AVAIL 0x0002			/* dostêpny */
+#define GG_STATUS_AVAIL_DESCR 0x0004		/* dostêpny z opisem (4.9) */
+#define GG_STATUS_BUSY 0x0003			/* zajêty */
+#define GG_STATUS_BUSY_DESCR 0x0004		/* zajêty z opisem (4.8) */
+#define GG_STATUS_INVISIBLE 0x0014		/* niewidoczny (4.6) */
+#define GG_STATUS_INVISIBLE_DESCR 0x0016	/* niewidoczny z opisem (4.9) */
 
-#define GG_STATUS_FRIENDS_MASK 0x8000	/* tylko dla znajomych (4.6) */
+#define GG_STATUS_FRIENDS_MASK 0x8000		/* tylko dla znajomych (4.6) */
 
 struct gg_new_status {
 	unsigned long status;			/* na jaki zmieniæ? */

@@ -149,21 +149,12 @@ log_path
 
 	¶cie¿ka, gdzie bêd± zachowywane wysy³ane i otrzymane wiadomo¶ci.
 
-proxy_port
-	typ: liczba
-	domy¶lna warto¶æ: 0
-
-	port serwera proxy, który jest u¿ywany do po³±czeñ http (szukanie,
-	zmiana danych w katalogu publicznym itp.), gdy w³±czono opcjê
-	,,use_proxy''.
-
-proxy_host
+proxy
 	typ: tekst
 	domy¶lna warto¶æ: brak
 
-	adres serwera proxy, który jest u¿ywany do po³±czeñ http (szukanie,
-	zmiana danych w katalogu publicznym itp.), gdy w³±czono opcjê
-	,,use_proxy''.
+	adres i port serwera proxy, oddzielone przecinkiem. je¶li nie podano
+	portu, domy¶lnie jest przyjmowany 8080.
 
 query_commands
 	typ: bool
@@ -188,6 +179,14 @@ random_reason
 	zajêty, dla 2 niedostêpny, dla 3 i ten i ten. je¿eli z jakich¶
 	przyczyn nie powiedzie siê odczyt, opis bêdzie pobierany ze zmiennych
 	,,away_reason'' lub ,,quit_reason'', o ile nie s± puste.
+
+server
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	adres IP serwera, z którym klient powinien siê po³±czyæ, pomijaj±c
+	w³a¶ciw± procedurê ³±czenia siê. przydane podczas awarii g³ównego
+	serwera.
 
 sms_away
 	typ: bool
@@ -252,14 +251,6 @@ theme
 	domy¶lna warto¶æ: brak
 
 	zawiera nazwê pliku okre¶laj±cego wygl±d klienta (ang. theme)
-	{ "theme", VAR_STR, 1, &default_theme, changed_theme },
-
-use_proxy
-	typ: liczba
-	domy¶lna warto¶æ: 0
-
-	okre¶la, czy do po³±czeñ http ma byæ u¿ywany serwer proxy
-	zdefiniowany wcze¶niej w zmiennych ,,proxy_host'' i ,,proxy_port''.
 
 
 default_status

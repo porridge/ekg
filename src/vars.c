@@ -58,12 +58,11 @@ void variable_init()
 	variable_add("log_ignored", VAR_INT, 1, &config_log_ignored, NULL);
 	variable_add("log_status", VAR_BOOL, 1, &config_log_status, NULL);
 	variable_add("log_path", VAR_STR, 1, &config_log_path, NULL);
-	variable_add("use_proxy", VAR_INT, 1, &gg_http_use_proxy, NULL);
-	variable_add("proxy_port", VAR_INT, 1, &gg_http_proxy_port, NULL);
-	variable_add("proxy_host", VAR_STR, 1, &gg_http_proxy_host, NULL);
+	variable_add("proxy", VAR_STR, 1, &config_proxy, changed_proxy);
 	variable_add("random_reason", VAR_INT, 1, &config_random_reason, NULL);
 	variable_add("quit_reason", VAR_STR, 1, &config_quit_reason, NULL);
 	variable_add("query_commands", VAR_BOOL, 1, &config_query_commands, NULL);
+	variable_add("server", VAR_STR, 1, &config_server, NULL);
 	variable_add("sms_away", VAR_BOOL, 1, &config_sms_away, NULL);
 	variable_add("sms_max_length", VAR_INT, 1, &config_sms_max_length, NULL);
 	variable_add("sms_number", VAR_STR, 1, &config_sms_number, NULL);

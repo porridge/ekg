@@ -103,6 +103,8 @@ char *config_quit_reason = NULL;
 char *config_away_reason = NULL;
 int config_random_reason = 0;
 int config_query_commands = 0;
+char *config_proxy = NULL;
+char *config_server = NULL;
 
 /*
  * my_puts()
@@ -1738,13 +1740,50 @@ void changed_theme(char *var)
 }
 
 /*
- * prepare_connect()
+ * changed_proxy()
  *
- * przygotowuje wszystko pod po³±czenie gg_login.
+ * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,proxy''.
  */
-void prepare_connect()
+void changed_proxy(char *var)
+{
+	char *tmp;
+	
+	if (!config_proxy) {
+		gg_proxy_enabled = 0;
+		free(gg_proxy_host);
+		gg_proxy_host = NULL;
+		gg_proxy_port = 0;
+		return;
+	}
+
+	gg_proxy_enabled = 1;
+	free(gg_proxy_host);
+	
+	if ((tmp = strchr(config_proxy, ':'))) {
+		int len = (int) tmp - (int) config_proxy;
+		
+		gg_proxy_port = atoi(tmp + 1);
+		gg_proxy_host = malloc(len + 1);
+		if (gg_proxy_host) {
+			strncpy(gg_proxy_host, config_proxy, len);
+			gg_proxy_host[len - 1] = 0;
+		}
+	} else {
+		free(gg_proxy_host);
+		gg_proxy_host = strdup(config_proxy);
+		gg_proxy_port = 8080;
+	}
+}
+
+/*
+ * do_connect()
+ *
+ * przygotowuje wszystko pod po³±czenie gg_login i ³±czy siê.
+ */
+void do_connect()
 {
 	struct list *l;
+	struct gg_login_params p;
 
 	for (l = watches; l; l = l->next) {
 		struct gg_dcc *d = l->data;
@@ -1754,6 +1793,38 @@ void prepare_connect()
 			
 		}
 	}
+
+	memset(&p, 0, sizeof(p));
+
+	p.uin = config_uin;
+	p.password = config_password;
+	p.status = config_status;
+	p.async = 1;
+
+	if (config_server) {
+		char *tmp = strchr(config_server, ':'), *foo = strdup(config_server);
+		int len = (int) tmp - (int) config_server;
+			
+		if (foo) {
+			if (tmp) {
+				p.server_port = atoi(tmp + 1);
+				foo[len] = 0;
+				p.server_addr = inet_addr(foo);
+				gg_debug(GG_DEBUG_MISC, "-- server_addr=%s, server_port=%d\n", foo, p.server_port);
+			} else {
+				p.server_port = GG_DEFAULT_PORT;
+				p.server_addr = inet_addr(config_server);
+				gg_debug(GG_DEBUG_MISC, "-- server_addr=%s, server_port=%d\n", config_server, p.server_port);
+			}
+			free(foo);
+		}
+	}
+
+	if (!(sess = gg_login(&p))) {
+		my_printf("conn_failed", strerror(errno));
+		do_reconnect();
+	} else
+		list_add(&watches, sess, 0);
 }
 
 /*

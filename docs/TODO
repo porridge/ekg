@@ -17,6 +17,7 @@ klient:
 - dodaæ --more-- tam, gdzie siê da i ujednoliciæ.
 - wielolinijkowe komendy do historii.
 - lastlog, awaylog.
+- tryb nieinteraktywny przez jakie¶ --exec albo co¶ takiego.
 
 
 $Id$
