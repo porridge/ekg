@@ -6,7 +6,6 @@ rozwi±zanie.
 
 * biblioteka:
   - komunikacja miêdzy klientami, bezpo¶rednie rozmowy,
-  - czas powrotu w stanach opisowych,
   - sniffn±æ rejestracjê konta, zmieni³a siê (Carol)
 
 * klient:
