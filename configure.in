@@ -366,6 +366,7 @@ if test "x$enable_ui_ncurses" != "xno"; then
 
 	LDFLAGS="$LDFLAGS $CURSES_LIBS"
 	CFLAGS="$CFLAGS $CURSES_INCLUDES"
+	echo "CURSES_INCLUDES=$CURSES_INCLUDES"
 fi
 
 AC_ARG_WITH(termcap, 

@@ -37,11 +37,15 @@ struct module {
 	PyObject *handle_redraw_statusbar;
 	PyObject *handle_keypress;
 	PyObject *handle_command_line;
+	PyObject *handle_msg_own;
+	PyObject *handle_status_own;
 };
 
 #define PYTHON_HANDLE_HEADER(event, args...) \
 { \
 	list_t __py_l; \
+	\
+	python_handle_result = -1;\
 	\
 	for (__py_l = modules; __py_l; __py_l = __py_l->next) { \
 		struct module *__py_m = __py_l->data; \

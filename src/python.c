@@ -330,9 +330,11 @@ int python_unload(const char *name, int quiet)
 		}
 
 		Py_XDECREF(m->handle_msg);
+		Py_XDECREF(m->handle_msg_own);
 		Py_XDECREF(m->handle_connect);
 		Py_XDECREF(m->handle_disconnect);
 		Py_XDECREF(m->handle_status);
+		Py_XDECREF(m->handle_status_own);
 		Py_XDECREF(m->handle_redraw_header);
 		Py_XDECREF(m->handle_redraw_statusbar);
 		Py_XDECREF(m->handle_keypress);
@@ -454,9 +456,11 @@ int python_load(const char *name, int quiet)
 	m.module = module;
 	m.deinit = python_get_func(module, "deinit");
 	m.handle_msg = python_get_func(module, "handle_msg");
+	m.handle_msg_own = python_get_func(module, "handle_msg_own");
 	m.handle_connect = python_get_func(module, "handle_connect");
 	m.handle_disconnect = python_get_func(module, "handle_disconnect");
 	m.handle_status = python_get_func(module, "handle_status");
+	m.handle_status_own = python_get_func(module, "handle_status_own");
 	m.handle_redraw_header = python_get_func(module, "handle_redraw_header");
 	m.handle_redraw_statusbar = python_get_func(module, "handle_redraw_statusbar");
 	m.handle_keypress = python_get_func(module, "handle_keypress");

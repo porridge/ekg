@@ -72,12 +72,22 @@ oto lista wywo³ywanych funkcji:
   krotkê/entkê/cokolwiek (ang. tuple) o takich samych argumentach jak funkcja,
   dane zostan± zmienione.
 
+- handle_msg_own(rcpts, text)
+
+  gdy u¿ytkownik wysy³a wiadomo¶æ. rcpts jest _tekstow±_ reprezentacj±
+  odbiorcy, dok³adnie tak± jak poda³ u¿ytkownik (pierwszy argument /msg,
+  /chat, /query itd). je¶li zwróci 0, wiadomo¶æ nie zostanie wys³ana.
+
 - handle_status(uin, name, status, descr)
 
   gdy kto¶ zmienia stan. nazwy parametrów powinny byæ zrozumia³e. je¶li
   zwróci 0, zmiana stanu zostanie zignorowana. je¶li zwróci 2, zmiana stanu
   nie bêdzie ignorowana, ale nie zostanie wy¶wietlona. je¶li zwróci krotkê
   o takich samych argumentach jak funkcja, dane zostan± zmienione.
+
+- handle_status_own(status, descr)
+
+  gdy klient zmienia stan. je¶li zwróci 0, stan nie zostanie zmieniony.
 
 - handle_keypress(meta, key)
 

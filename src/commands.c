@@ -2135,7 +2135,35 @@ COMMAND(cmd_msg)
 	if (config_auto_back == 1 && GG_S_B(config_status) && in_auto_away)
 		change_status(GG_STATUS_AVAIL, NULL, 1);
 
+	if (strlen(params[1]) > 1989)
+		printq("message_too_long");
+	
+	msg = xstrmid(params[1], 0, 1989);
+
 	nick = xstrdup(params[0]);
+
+#ifdef WITH_PYTHON
+	PYTHON_HANDLE_HEADER(msg_own, "(ss)", nick, msg)
+	{
+		char *a, *b;
+
+		PYTHON_HANDLE_RESULT("ss", &a, &b)
+		{
+			xfree(nick);
+			nick = xstrdup(a);
+			xfree(msg);
+			msg = xstrdup(b);
+		}
+	}
+
+	PYTHON_HANDLE_FOOTER()
+
+	if (!python_handle_result) {
+		xfree(nick);
+		xfree(msg);
+		return -1;
+	}
+#endif
 
 	if ((*nick == '@' || strchr(nick, ',')) && chat && config_auto_conference) {
 		struct conference *c = conference_create(nick);
@@ -2158,6 +2186,7 @@ COMMAND(cmd_msg)
 		if (!c) {
 			printq("conferences_noexist", nick);
 			xfree(nick);
+			xfree(msg);
 			return -1;
 		}
 
@@ -2205,13 +2234,9 @@ COMMAND(cmd_msg)
 
 	if (!nicks) {
 		xfree(nick);
+		xfree(msg);
 		return 0;
 	}
-
-	if (strlen(params[1]) > 1989)
-		printq("message_too_long");
-	
-	msg = xstrmid(params[1], 0, 1989);
 
 	/* analizê tekstu zrobimy w osobnym bloku dla porz±dku */
 	{

@@ -69,6 +69,9 @@
 #include "userlist.h"
 #include "vars.h"
 #include "xmalloc.h"
+#ifdef WITH_PYTHON
+#  include "python.h"
+#endif
 
 #ifndef PATH_MAX
 #  define PATH_MAX _POSIX_PATH_MAX
@@ -2752,14 +2755,15 @@ fail:
  *  - reason - opis stanu, mo¿e byæ NULL.
  *  - autom - czy zmiana jest automatyczna?
  */
-void change_status(int status, const char *arg, int autom)
+void change_status(int status, const char *xarg, int autom)
 {
 	const char *filename, *config_x_reason, *format, *format_descr, *auto_format = NULL, *auto_format_descr = NULL;
 	int random_mask, status_descr;
-	char *reason = NULL, *tmp = NULL;
+	char *reason = NULL, *tmp = NULL, *arg;
 	int private_mask = (GG_S_F(config_status) ? GG_STATUS_FRIENDS_MASK : 0);
 
 	status = GG_S(status);
+	arg = xstrdup(xarg);
 
 	switch (status) {
 		case GG_STATUS_BUSY:
@@ -2805,6 +2809,26 @@ void change_status(int status, const char *arg, int autom)
 		default:
 			return;
 	}
+
+#ifdef WITH_PYTHON
+	PYTHON_HANDLE_HEADER(status_own, "(is)", status, arg)
+	{
+		char *a;
+
+		PYTHON_HANDLE_RESULT("is", &status, &a)
+		{
+			xfree(arg);
+			arg = xstrdup(a);
+		}
+	}
+
+	PYTHON_HANDLE_FOOTER()
+
+	if (!python_handle_result) {
+		xfree(arg);
+		return;
+	}
+#endif
 
 	if (!(config_auto_away % 60))
 		tmp = saprintf("%dm", config_auto_away / 60);
@@ -2884,6 +2908,7 @@ void change_status(int status, const char *arg, int autom)
 	}
 	
 	xfree(tmp);
+	xfree(arg);
 
 	update_status();
 }
