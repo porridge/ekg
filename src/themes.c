@@ -367,14 +367,7 @@ char *va_format_string(const char *format, va_list ap)
 					for (i = 0; i < fill_length; i++)
 						string_append_c(buf, fill_char);
 
-				if (config_display_pl_chars)
-					string_append_n(buf, str, len);
-				else {
-					int i;
-
-					for (i = 0; i < len; i++)
-						string_append_c(buf, hide_pl(&str[i]));
-				}
+				string_append_n(buf, str, len);
 
 				if (fill_after) 
 					for (i = 0; i < fill_length; i++)
@@ -382,16 +375,16 @@ char *va_format_string(const char *format, va_list ap)
 
 			}
 		} else
-			if (config_display_pl_chars)
-				string_append_c(buf, *p);
-			else
-				string_append_c(buf, hide_pl(p));
+			string_append_c(buf, *p);
 
 		p++;
 	}
 
 	if (!dont_resolve && no_prompt_cache)
 		theme_cache_reset();
+
+	if (!config_display_pl_chars)
+		iso_to_ascii(buf->str);
 
 	return string_free(buf, 0);
 }

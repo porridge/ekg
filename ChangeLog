@@ -17,6 +17,7 @@ zg³osi³ b³±d.
   usuniêciu z listy osoby, któr± blokujemy (sz)
 - ekg ostrzega o mo¿liwo¶ci filtrowania wiadomo¶ci przez serwer (joshua/w)
 - informacja dla nowych u¿ytkowników o konieczno¶ci podania adresu e-mail (w)
+- zmienna ,,display_pl_chars'' dzia³a te¿ w nag³ówku i pasku stanu (sz/w)
 
 // 2003-02-09
 

@@ -2917,38 +2917,40 @@ void iso_to_cp(unsigned char *buf)
 }
 
 /*
- * hide_pl()
+ * iso_to_ascii()
  *
- * maskuje polsk± literkê w iso.
+ * usuwa polskie litery z tekstu.
  *
  *  - c.
  */
-unsigned char hide_pl(const unsigned char *c)
+void iso_to_ascii(unsigned char *buf)
 {
-	if (!c)
-		return 0;
+	if (!buf)
+		return;
 
-	if (*c == (unsigned char)'±') return 'a';
-	if (*c == (unsigned char)'ê') return 'e';
-	if (*c == (unsigned char)'æ') return 'c';
-	if (*c == (unsigned char)'³') return 'l';
-	if (*c == (unsigned char)'ñ') return 'n';
-	if (*c == (unsigned char)'ó') return 'o';
-	if (*c == (unsigned char)'¶') return 's';
-	if (*c == (unsigned char)'¿') return 'z';
-	if (*c == (unsigned char)'¼') return 'z';
+	while (*buf) {
+		if (*buf == (unsigned char)'±') *buf = 'a';
+		if (*buf == (unsigned char)'ê') *buf = 'e';
+		if (*buf == (unsigned char)'æ') *buf = 'c';
+		if (*buf == (unsigned char)'³') *buf = 'l';
+		if (*buf == (unsigned char)'ñ') *buf = 'n';
+		if (*buf == (unsigned char)'ó') *buf = 'o';
+		if (*buf == (unsigned char)'¶') *buf = 's';
+		if (*buf == (unsigned char)'¿') *buf = 'z';
+		if (*buf == (unsigned char)'¼') *buf = 'z';
 
-	if (*c == (unsigned char)'¡') return 'A';
-	if (*c == (unsigned char)'Ê') return 'E';
-	if (*c == (unsigned char)'Æ') return 'C';
-	if (*c == (unsigned char)'£') return 'L';
-	if (*c == (unsigned char)'Ñ') return 'N';
-	if (*c == (unsigned char)'Ó') return 'O';
-	if (*c == (unsigned char)'¦') return 'S';
-	if (*c == (unsigned char)'¯') return 'Z';
-	if (*c == (unsigned char)'¬') return 'Z';
+		if (*buf == (unsigned char)'¡') *buf = 'A';
+		if (*buf == (unsigned char)'Ê') *buf = 'E';
+		if (*buf == (unsigned char)'Æ') *buf = 'C';
+		if (*buf == (unsigned char)'£') *buf = 'L';
+		if (*buf == (unsigned char)'Ñ') *buf = 'N';
+		if (*buf == (unsigned char)'Ó') *buf = 'O';
+		if (*buf == (unsigned char)'¦') *buf = 'S';
+		if (*buf == (unsigned char)'¯') *buf = 'Z';
+		if (*buf == (unsigned char)'¬') *buf = 'Z';
 
-	return *c;
+		buf++;
+	}
 }
 
 /*

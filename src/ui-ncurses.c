@@ -1512,12 +1512,20 @@ static void update_header(int commit)
  *
  * zwraca ilo¶æ dopisanych znaków.
  */
-int window_printat(WINDOW *w, int x, int y, const char *format, void *data_, int fgcolor, int bold, int bgcolor, int status)
+int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, int fgcolor, int bold, int bgcolor, int status)
 {
 	int orig_x = x;
 	int backup_display_color = config_display_color;
-	const char *p = format;
+	char *format = (char*) format_;
+	const char *p;
 	struct format_data *data = data_;
+
+	if (!config_display_pl_chars) {
+		format = xstrdup(format);
+		iso_to_ascii(format);
+	}
+
+	p = format;
 
 	if (status && config_display_color == 2)
 		config_display_color = 0;
@@ -1604,9 +1612,20 @@ int window_printat(WINDOW *w, int x, int y, const char *format, void *data_, int
 			len = strlen(data[i].name);
 
 			if (!strncmp(p, data[i].name, len) && p[len] == '}') {
-				waddstr(w, data[i].text);
+				char *text = data[i].text;
+
+				if (!config_display_pl_chars) {
+					text = xstrdup(text);
+					iso_to_ascii(text);
+				}
+
+				waddstr(w, text);
 				p += len;
 				x += strlen(data[i].text);
+				
+				if (!config_display_pl_chars)
+					xfree(text);
+				
 				goto next;
 			}
 		}
@@ -1658,6 +1677,9 @@ next:
 	}
 
 	config_display_color = backup_display_color;
+
+	if (!config_display_pl_chars)
+		xfree(format);
 
 	return x - orig_x;
 }

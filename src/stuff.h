@@ -391,7 +391,7 @@ int msg_encrypt(uin_t uin, unsigned char **msg);
 
 void cp_to_iso(unsigned char *buf);
 void iso_to_cp(unsigned char *buf);
-unsigned char hide_pl(const unsigned char *c);
+void iso_to_ascii(unsigned char *buf);
 char *strip_spaces(char *line);
 
 int find_in_uins(int uin_count, uin_t *uins, uin_t uin);
