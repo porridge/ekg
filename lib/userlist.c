@@ -105,7 +105,7 @@ struct gg_http *gg_userlist_get(uin_t uin, const char *passwd, int async)
  * gg_userlist_get_watch_fd()
  *
  * przy asynchronicznym ¶ci±ganiu userlisty nale¿y wywo³aæ t± funkcjê
- * po zauwa¿eniu zmianan na gg_http->fd.
+ * po zauwa¿eniu zmian na gg_http->fd.
  *
  *  - h - struktura zwrócona przez gg_userlist_get()
  *
@@ -249,7 +249,7 @@ struct gg_http *gg_userlist_put(uin_t uin, const char *passwd, const char *conta
  * gg_userlist_put_watch_fd()
  *
  * przy asynchronicznym wysy³aniu userlisty nale¿y wywo³aæ t± funkcjê
- * po zauwa¿eniu zmianan na gg_http->fd.
+ * po zauwa¿eniu zmian na gg_http->fd.
  *
  *  - h - to co¶, co zwróci³a gg_userlist_put()
  *

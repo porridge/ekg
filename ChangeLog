@@ -19,6 +19,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   ¿eby niczego nie zwalnia³y, bo mo¿e byæ jeszcze gorzej (w)
 - s/windows_sort/window_sort/ w ui-readline (w)
 - poprawienie potencjalnego b³êdu w ui-readline (w)
+- literówki w komentarzach (w)
+- docs/api z prostym skryptem generuj±cym dokumentacjê (w)
 
 // 2002-08-05
 
