@@ -131,11 +131,11 @@ static struct {
 	EKG_HANDLER(GG_SESSION_CHANGE, handle_pubdir, gg_change_pubdir_free)
 	EKG_HANDLER(GG_SESSION_USERLIST_GET, handle_userlist, gg_userlist_get_free)
 	EKG_HANDLER(GG_SESSION_USERLIST_PUT, handle_userlist, gg_userlist_put_free)
-	EKG_HANDLER(GG_SESSION_USER0, NULL, reaper_user)
-	EKG_HANDLER(GG_SESSION_USER1, get_char_from_pipe, reaper_user)
-	EKG_HANDLER(GG_SESSION_USER2, handle_voice, reaper_user)
-	EKG_HANDLER(GG_SESSION_USER3, get_line_from_pipe, reaper_user3)
-	EKG_HANDLER(GG_SESSION_USER4, get_line_from_pipe, reaper_user3)
+	EKG_HANDLER(GG_SESSION_USER0, NULL, reaper_user)		/* stdin */
+	EKG_HANDLER(GG_SESSION_USER1, get_char_from_pipe, reaper_user)	/* control pipe */
+	EKG_HANDLER(GG_SESSION_USER2, handle_voice, reaper_user)	/* voice */
+	EKG_HANDLER(GG_SESSION_USER3, get_line_from_pipe, reaper_user3)	/* exec, debug, stderr */
+	EKG_HANDLER(GG_SESSION_USER4, get_line_from_pipe, reaper_user3)	/* mail */
 
 #undef EKG_HANDLER
 
@@ -786,12 +786,7 @@ static void setup_debug()
 	fcntl(fd[0], F_SETFL, O_NONBLOCK);
 	fcntl(fd[1], F_SETFL, O_NONBLOCK);
 	
-	old_stderr = fcntl(2, F_DUPFD, 0);
-
-	dup2(fd[1], 2);
-	
-	gg_debug_file = stderr;
-
+	gg_debug_file = fdopen(fd[1], "w");
 	setbuf(gg_debug_file, NULL);		/* XXX leak */
 
 	list_add(&watches, &se, sizeof(se));
@@ -1197,6 +1192,30 @@ int main(int argc, char **argv)
 		si.id = 0;
 		si.timeout = -1;
 		list_add(&watches, &si, sizeof(si));
+	}
+
+	/* stderr */
+	if (!batch_mode) {
+		struct gg_exec se;
+		int fd[2];
+		
+		if (!pipe(fd)) {
+			memset(&se, 0, sizeof(se));
+			se.fd = fd[0];
+			se.check = GG_CHECK_READ;
+			se.state = GG_STATE_READING_DATA;
+			se.type = GG_SESSION_USER3;
+			se.id = 2;
+			se.timeout = -1;
+			se.buf = string_init(NULL);
+			list_add(&watches, &se, sizeof(se));
+
+			fcntl(fd[0], F_SETFL, O_NONBLOCK);
+			fcntl(fd[1], F_SETFL, O_NONBLOCK);
+
+			old_stderr = fcntl(2, F_DUPFD, 0);
+			dup2(fd[1], 2);
+		}
 	}
 
 	/* dodajemy otwarty potok sterujacy do ogl±danych deskryptorów */

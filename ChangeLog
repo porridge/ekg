@@ -13,6 +13,7 @@ zg³osi³ b³±d.
   poprzez ,,contacts'' równe 2 (sz)
 - poziom ignorowania ,,notify'' (sz)
 - mniej ra¿±cy w oczy theme dla nazwy grupy w li¶cie kontaktów (sz)
+- ,,stderr'' wêdruje do aktualnego okna (w/sz)
 - zabezpieczenie przed zalewem po³±czeñ dcc (segfault/w)
 
 // 2003-02-13
