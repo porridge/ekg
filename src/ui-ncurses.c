@@ -1812,6 +1812,16 @@ void command_generator(const char *text, int len)
 	}
 }
 
+void unknown_uin_generator(const char *text, int len)
+{
+	int i;
+
+	for (i = 0; i < send_nicks_count; i++) {
+		if (isdigit(send_nicks[i][0]) && !strncasecmp(text, send_nicks[i], len))
+			array_add(&completions, xstrdup(send_nicks[i]));
+	}
+}
+
 /*
  * XXX nie obs³uguje eskejpowania znaków, dope³nia tylko pierwszy wyraz.
  */
@@ -1842,16 +1852,8 @@ void known_uin_generator(const char *text, int len)
 		if (!strncasecmp(text, c->name, len))
 			array_add(&completions, xstrdup(c->name));
 	}
-}
 
-void unknown_uin_generator(const char *text, int len)
-{
-	int i;
-
-	for (i = 0; i < send_nicks_count; i++) {
-		if (isdigit(send_nicks[i][0]) && !strncasecmp(text, send_nicks[i], len))
-			array_add(&completions, xstrdup(send_nicks[i]));
-	}
+	unknown_uin_generator(text, len);
 }
 
 void variable_generator(const char *text, int len)
@@ -1892,6 +1894,27 @@ void ignored_uin_generator(const char *text, int len)
 				array_add(&completions, xstrdup(u->display));
 		}
 	}
+}
+
+void blocked_uin_generator(const char *text, int len)
+{
+	list_t l;
+
+	for (l = userlist; l; l = l->next) {
+		struct userlist *u = l->data;
+
+		if (!group_member(u, "__blocked"))
+			continue;
+
+		if (!u->display) {
+			if (!strncasecmp(text, itoa(u->uin), len))
+				array_add(&completions, xstrdup(itoa(u->uin)));
+		} else {
+			if (u->display && !strncasecmp(text, u->display, len))
+				array_add(&completions, xstrdup(u->display));
+		}
+	}
+
 }
 
 void empty_generator(const char *text, int len)
@@ -1967,6 +1990,7 @@ static struct {
 	{ 'c', command_generator },
 	{ 's', empty_generator },
 	{ 'i', ignored_uin_generator },
+	{ 'b', blocked_uin_generator },
 	{ 'v', variable_generator },
 	{ 'd', dcc_generator },
 	{ 'f', file_generator },

@@ -901,7 +901,7 @@ void theme_init()
 	format_add("blocked_deleted_all", "%> Usuniêto wszystkich z listy blokowanych\n", 1);
 	format_add("blocked_list", "%> %1\n", 1);
 	format_add("blocked_list_empty", "%! Lista blokowanych u¿ytkowników jest pusta\n", 1);
-	format_add("error_not_blocked", "%! %1 nie jest na li¶cie blokowany\n", 1);
+	format_add("error_not_blocked", "%! %1 nie jest na li¶cie blokowanych\n", 1);
 
 	/* lista kontaktów */
 	format_add("list_empty", "%! Lista kontaktów jest pusta\n", 1);

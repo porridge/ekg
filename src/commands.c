@@ -1167,8 +1167,7 @@ COMMAND(cmd_ignore)
 			}
 
 			config_changed = 1;
-		} else
-			printq("error_adding_ignored");
+		}
 
 	} else {
 		int unignore_all = ((params[0] && !strcmp(params[0], "*")) ? 1 : 0);
