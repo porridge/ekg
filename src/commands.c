@@ -155,7 +155,6 @@ COMMAND(cmd_add)
 {
 	uin_t uin;
 	struct userlist *u;
-	int fallthrough = 0;
 
 	if (!params[0] || !params[1]) {
 		print("not_enough_params", name);
@@ -182,12 +181,10 @@ COMMAND(cmd_add)
 	}
 
 	/* kto¶ by³ tylko ignorowany/blokowany, nadajmy mu nazwê */
-	if (u) {
+	if (u)
 		u->display = xstrdup(params[1]);	
-		fallthrough = 1;
-	}
 
-	if (fallthrough || userlist_add(uin, params[1])) {
+	if (u || userlist_add(uin, params[1])) {
 		print("user_added", params[1]);
 		gg_add_notify(sess, uin);
 		config_changed = 1;
@@ -865,7 +862,7 @@ COMMAND(cmd_modify)
 				
 				if (new_uin == _u->uin) {
 					if (_u->display) {
-						print("user_exists_other", argv[i], format_user(u->uin));
+						print("user_exists_other", argv[i], format_user(_u->uin));
 						array_free(argv);
 						return;
 					} else {
@@ -3026,11 +3023,60 @@ COMMAND(cmd_timer)
 	list_t l;
 
 	if (match_arg(params[0], 'a', "add", 2)) {
+		const char *p = params[1];
+		time_t t = 0;
+		int persistent = 0;
+
 		if (!params[1] || !params[2]) {
 			print("not_enough_params", name);
 			return;
 		}
-		timer_add(atoi(params[1]), 0, TIMER_COMMAND, NULL, params[2]);
+
+		if (!strncmp(p, "*/", 2)) {
+			p += 2;
+			persistent = 1;
+		}
+
+		for (;;) {
+			time_t tmp_t = 0;
+			int get_out = 0;
+
+			if (isdigit(*p))
+				tmp_t = atoi(p);
+			else {
+				print("invalid_params", name);
+				return;
+			}
+
+			p += strlen(itoa(tmp_t));
+
+			if (strlen(p)) {
+				switch (*p++) {
+					case 'd':
+						tmp_t *= 86400;
+						break;
+					case 'h':
+						tmp_t *= 3600;
+						break;
+					case 'm':
+						tmp_t *= 60;
+						break;
+					case 's':
+						break;
+					default:
+						print("invalid_params", name);
+						return;
+				}
+			} else
+				get_out = 1;
+
+			t += tmp_t;
+			
+			if (get_out || *p == '\0')
+				break;
+		}
+
+		timer_add(t, persistent, TIMER_COMMAND, NULL, params[2]);
 
 		return;
 	}
@@ -3807,12 +3853,15 @@ void command_init()
 	( "timer", "???", cmd_timer, 0,
 	  " [opcje]", "zarz±dzanie timerami",
 	  "\n"
-	  "  -a, --add <czas> <komenda>  tworzy nowy timer\n"
-	  "  -d, --del <numer>           zatrzymuje timer\n"
-	  " [-l, --list]                 wy¶wietla listê timerów\n"
+	  "  -a, --add [*/]<czas> <komenda>  tworzy nowy timer\n"
+	  "  -d, --del <numer>               zatrzymuje timer\n"
+	  " [-l, --list]                     wy¶wietla listê timerów\n"
 	  "\n"
-	  "Czas podaje siê w sekundach. Timer po jednorazowym uruchomieniu "
-	  "jest usuwany.");
+	  "Czas podaje siê w sekundach. Mo¿na te¿ u¿yæ przyrostków d, h, m, s, "
+	  "oznaczaj±cych dni, godziny, minuty, sekundy, np. 5h20m. Timer po "
+	  "jednorazowym uruchomieniu jest usuwany, chyba ¿e czas poprzedzimy "
+	  "wyra¿eniem ,,*/''. Wtedy timer bêdzie uruchamiany w zadanych odstêpach "
+	  "czasu.");
 
 	command_add
 	( "unignore", "i", cmd_ignore, 0,

@@ -2994,7 +2994,7 @@ int ekg_hash(const char *name)
  *
  * zwraca zaalokowan± struct timer.
  */
-struct timer *timer_add(int period, int persistent, int type, const char *name, const char *command)
+struct timer *timer_add(time_t period, int persistent, int type, const char *name, const char *command)
 {
 	struct timer t;
 	struct timeval tv;

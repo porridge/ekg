@@ -339,7 +339,7 @@ int emoticon_read();
 char *emoticon_expand(const char *s);
 void emoticon_free();
 
-struct timer *timer_add(int period, int persistent, int type, const char *name, const char *command);
+struct timer *timer_add(time_t period, int persistent, int type, const char *name, const char *command);
 int timer_remove(const char *name, const char *command);
 void timer_free();
 
