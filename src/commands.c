@@ -3767,7 +3767,8 @@ COMMAND(cmd_timer)
 
 		if ((t = timer_add(period, persistent, TIMER_COMMAND, at, t_name, t_command))) {
 			printq((at) ? "at_added" : "timer_added", t->name);
-			config_changed = 1;
+			if (!in_autoexec)
+				config_changed = 1;
 		}
 
 cleanup:
@@ -4885,8 +4886,7 @@ void command_init()
 	  "oznaczaj±cych dni, godziny, minuty, sekundy, np. 5h20m. Timer po "
 	  "jednorazowym uruchomieniu jest usuwany, chyba ¿e czas poprzedzimy "
 	  "wyra¿eniem ,,*/''. Wtedy timer bêdzie uruchamiany w zadanych odstêpach "
-	  "czasu, a na li¶cie bêdzie oznaczony gwiazdk±. Nazwa nie mo¿e siê "
-	  "zaczynaæ cyfr±.");
+	  "czasu, a na li¶cie bêdzie oznaczony gwiazdk±.");
 
 	command_add
 	( "unignore", "i", cmd_ignore, 0,
