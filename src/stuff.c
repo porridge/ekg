@@ -2215,25 +2215,27 @@ int event_add(int flags, uin_t uin, const char *action, int quiet)
  */
 int event_remove(int flags, uin_t uin)
 {
-        list_t l;
+	list_t l;
 	int removed = 0;
 
-        for (l = events; l; l = l->next) {
-                struct event *e = l->data;
+	for (l = events; l; ) {
+		struct event *e = l->data;
 		int event_flags;
+
+		l = l->next;
 
 		event_flags = e->flags & ~INACTIVE_EVENT;
 
-                if (e && e->uin == uin && e->flags & flags) {
-                        if ((event_flags &= ~flags) == 0) {
-                                print("events_del", event_format(flags), (uin == 1) ? "*" : format_user(uin), e->action);
+		if (e && e->uin == uin && e->flags & flags) {
+			if ((event_flags &= ~flags) == 0) {
+				print("events_del", event_format(flags), (uin == 1) ? "*" : format_user(uin), e->action);
 				xfree(e->action);
-                                list_remove(&events, e, 1);
+				list_remove(&events, e, 1);
 				removed = 1;
-                        } else {
-                                print("events_del_flags", event_format(flags));
+			} else {
+				print("events_del_flags", event_format(flags));
 				e->flags = event_flags;
-                                return 0;
+				return 0;
                         }
                 }
         }

@@ -1182,14 +1182,14 @@ void theme_init()
 
 	/* zdarzenia */
         format_add("events_list_empty", "%! Brak zdarzeñ\n", 1);
-        format_add("events_list", "%> on %G%1 %T%2 %B%3%n\n", 1);
-	format_add("events_list_inactive", "%> on %G%1 %T%2 %B%3 %g(nieaktywne)%n\n", 1);
+        format_add("events_list", "%> on %1 %2 %3\n", 1);
+	format_add("events_list_inactive", "%> on %1 %2 %3 %K(nieaktywne)%n\n", 1);
         format_add("events_incorrect", "%! Nieprawid³owo zdefiniowane zdarzenie\n", 1);
         format_add("events_add", "%> Dodano zdarzenie\n", 1);
         format_add("events_del", "%> Usuniêto zdarzenie\n", 1);
         format_add("events_exist", "%! Zdarzenie %T%1%n istnieje dla %2\n", 1);
-        format_add("events_add_flags", "%> Flagi %G%1%n dodane\n", 1);
-        format_add("events_del_flags", "%> Flagi %G%1%n usuniête\n", 1);
+        format_add("events_add_flags", "%> Flagi %T%1%n dodane\n", 1);
+        format_add("events_del_flags", "%> Flagi %T%1%n usuniête\n", 1);
         format_add("events_del_noexist", "%! Zdarzenie %T%1%n nie istnieje dla u¿ytkownika %2\n", 1);
         format_add("events_seq_not_found", "%! Sekwencja %T%1%n nie znaleziona\n", 1);
 	format_add("events_act_wrong", "%! Nieprawid³owa akcja\n", 1);

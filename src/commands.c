@@ -2706,57 +2706,57 @@ cleanup:
 
 COMMAND(cmd_on)
 {
-        int flags;
-        uin_t uin;
+	int flags;
+	uin_t uin;
 
-        if (!params[0] || !strncasecmp(params[0], "-l", 2)) {
-                list_t l;
+	if (!params[0] || !strncasecmp(params[0], "-l", 2)) {
+		list_t l;
                 int count = 0;
 
-                for (l = events; l; l = l->next) {
-                        struct event *ev = l->data;
+		for (l = events; l; l = l->next) {
+			struct event *ev = l->data;
 
-                        print((ev->flags & INACTIVE_EVENT) ? "events_list_inactive" :"events_list", event_format(abs(ev->flags)), (ev->uin == 1) ? "*" : format_user(ev->uin), ev->action);
-                        count++;
-                }
+			print((ev->flags & INACTIVE_EVENT) ? "events_list_inactive" : "events_list", event_format(abs(ev->flags)), (ev->uin == 1) ? "*" : format_user(ev->uin), ev->action);
+			count++;
+		}
 
-                if (!count)
-                        print("events_list_empty");
+		if (!count)
+			print("events_list_empty");
 
-                return;
-        }
+		return;
+	}
 
-        if (!params[1] || !params[2]) {
-                print("not_enough_params", name);
-                return;
-        }
+	if (!params[1] || !params[2]) {
+		print("not_enough_params", name);
+		return;
+	}
 
-        if (!(flags = event_flags(params[0]))) {
-                print("events_incorrect");
-                return;
-        }
+	if (!(flags = event_flags(params[0]))) {
+		print("events_incorrect");
+		return;
+	}
 
-        if (*params[1] == '*')
-                uin = 1;
-        else
-                uin = get_uin(params[1]);
+	if (*params[1] == '*')
+		uin = 1;
+	else
+		uin = get_uin(params[1]);
 
-        if (!uin) {
-                print("invalid_uin");
-                return;
-        }
+	if (!uin) {
+		print("invalid_uin");
+		return;
+	}
 
         if (!strncasecmp(params[2], "clear", 5)) {
-                event_remove(flags, uin);
-                config_changed = 1;
-                return;
+		event_remove(flags, uin);
+		config_changed = 1;
+		return;
         }
 
-        if (event_correct(params[2], 0))
-                return;
+	if (event_correct(params[2], 0))
+	return;
 
 	event_add(flags, uin, params[2], 0);
-        config_changed = 1;
+	config_changed = 1;
 }
 
 COMMAND(cmd_echo)
@@ -3962,7 +3962,7 @@ void command_init()
 	  
 	command_add
 	( "query", "u?", cmd_query, 0,
-	  " <numer/alias/@grupa> [wiadomo¶æ]", "w³±cza rozmowê z dan± osob±",
+	  " <numer/alias/@grupa> [wiadomo¶æ]", "w³±cza rozmowê",
 	  "\n"
 	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub "
 	  "pseudonimy przecinkiem (ale bez odstêpów). W takim wypadku "
@@ -3970,7 +3970,7 @@ void command_init()
 
 	command_add
 	( "queue", "uu", cmd_queue, 0,
-	  " [opcje]", "wy¶wietla lub czy¶ci wiadomo¶ci do wys³ania po po³±czeniu",
+	  " [opcje]", "zarz±dzanie wiadomo¶ciami do wys³ania po po³±czeniu",
 	  "\n"
 	  " [numer/alias]             wy¶wietla kolejkê wiadomo¶ci\n"
 	  " -c, --clear [numer/alias] usuwa wiadomo¶ci dla numer/alias lub wszystkie\n"
