@@ -10,6 +10,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawki libgadu pod k±tem kompilacji pod win32 (hao/w)
 - malutki porz±dek w ui-readline (w)
 - poprawka segfaulta w ui-readline przy usuwaniu okienek (goblin/w)
+- ignorowanie autom4te.cache z autoconfa 2.53 (w)
 
 // 2002-08-05
 

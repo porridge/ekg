@@ -6,3 +6,4 @@ config.cache
 .DS_Store
 unoff
 stdint.h
+autom4te.cache
