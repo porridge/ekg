@@ -1414,8 +1414,11 @@ static int contacts_update(struct window *w)
 		footer = format_find("contacts_footer");
 	}
 	
-	if (strcmp(header, "")) 
-		window_backlog_add(w, reformat_string(format_string(header, group)));
+	if (strcmp(header, "")) {
+		char *tmp = format_string(header, group);
+		window_backlog_add(w, reformat_string(tmp));
+		xfree(tmp);
+	}
 
 	for (j = 0; j < 5; j++) {
 		const char *header, *footer;
@@ -1440,8 +1443,11 @@ static int contacts_update(struct window *w)
 			if (group && !group_member(u, group))
 				continue;
 
-			if (!count && strcmp(header, ""))
-				window_backlog_add(w, reformat_string(format_string(header)));
+			if (!count && strcmp(header, "")) {
+				char *tmp = format_string(header);
+				window_backlog_add(w, reformat_string(tmp));
+				xfree(tmp);
+			}
 
 			if (GG_S_D(u->status) && contacts_descr)
 				format = table[i].format_descr_full;
@@ -1457,12 +1463,18 @@ static int contacts_update(struct window *w)
 			count++;
 		}
 
-		if (count && strcmp(footer, ""))
-			window_backlog_add(w, reformat_string(format_string(footer)));
+		if (count && strcmp(footer, "")) {
+			char *tmp = format_string(footer);
+			window_backlog_add(w, reformat_string(tmp));
+			xfree(tmp);
+		}
 	}
 
-	if (strcmp(footer, "")) 
-		window_backlog_add(w, reformat_string(format_string(footer, group)));
+	if (strcmp(footer, "")) {
+		char *tmp = format_string(footer, group);
+		window_backlog_add(w, reformat_string(tmp));
+		xfree(tmp);
+	}
 
 	xfree(group);
 
