@@ -2364,7 +2364,7 @@ static void ui_ncurses_loop()
 				if (ch == 'n' || ch == 'N')	/* Alt-N */
 					ui_event("command", 0, "window", "new", NULL);
 
-				if (ch == 'i' || ch == 'I') {	/* Alt-I */
+				if (ch == 'g' || ch == 'G') {	/* Alt-G */
 					char *tmp = saprintf("/ignore %s", window_current->target);
 					command_exec(NULL, tmp);
 					xfree(tmp);

@@ -128,7 +128,8 @@ KLAWIATURA
 	Ctrl-F, Ctrl-G		j.w.
         Alt-N			utwórz nowe okno
 	Alt-K			zamknij aktualne okno
-	Alt-I			ignoruj aktualnego rozmówcê
+	Alt-G			ignoruj aktualnego rozmówcê
+	Alt-Q do Alt-P		prze³±cza do okna 11 do 20
 	Ctrl-Fn			prze³±cza do podanego okna (konsola FreeBSD)
 	Ctrl-Enter		przej¶cie do trybu wielolinijkowego
 	Ctrl-P			poprzednie okno
