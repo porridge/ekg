@@ -109,7 +109,7 @@ static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 
 int config_ctxwin_size = 10;		/* szerokosc okna kontaktow */
 static int last_ctxwin_size = 10;	/* poprzedni rozmiar przed zmiana */
-int config_ctxwin_enabled = 1;		/* czy ma byc okno kontaktow */
+int config_ctxwin_enabled = 0;		/* czy ma byc okno kontaktow */
 
 /* rozmiar okna wy¶wietlaj±cego tekst */
 #define output_size (stdscr->_maxy - input_size)
