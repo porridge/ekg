@@ -10,6 +10,7 @@ rozwi±zanie.
 
 * klient:
   - informcja o opisie w /find (scooty/w)
+  - zawijanie linijek w wielolinijkowym (?)
   - dope³nianie w ¶rodku linii (sz)
   - wykrywanie niewidocznych jako opcja (wielu)
   - czas powrotu w stanach opisowych (?)
