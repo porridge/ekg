@@ -88,10 +88,13 @@ LIBS_LIBGADU="$LIBS_LIBGADU $LIBS"
 
 AC_ARG_ENABLE(shared,
   [  --enable-shared         Compile shared version of libgadu])
+
+lib_shared_enabled=no
   
 if test "x$enable_shared" = "xyes"; then
   shared="shared"
   install_shared="install-shared"
+  lib_shared_enabled=yes
 fi
 
 AC_ARG_ENABLE(static,
@@ -99,9 +102,12 @@ AC_ARG_ENABLE(static,
 
 Optional ekg Features:])
 
+lib_static_enabled=yes
+
 if test "x$enable_static" = "xno"; then
   static=""
   install_static=""
+  lib_static_enabled=no
 fi
 
 if test "x$enable_static" = "xno" -a "x$enable_shared" != "xyes"; then
@@ -138,19 +144,22 @@ if test -d src; then
   if test "x$enable_ui_readline" != "xno"; then
     AC_DEFINE(WITH_UI_READLINE, 1, [define if you want ui_readline])
     OBJS="$OBJS ui-readline.o"
+    ui_readline_enabled=yes
+    ui_readline_default=yes
   fi
 
-  if test -f .enable-ui-ncurses; then
-    enable_ui_ncurses=yes
-  fi
-  
   if test "x$enable_ui_ncurses" = "xyes"; then
     AC_DEFINE(WITH_UI_NCURSES, 1, [define if you want ui_ncurses])
     OBJS="$OBJS ui-ncurses.o"
+    ui_ncurses_enabled=yes
+    ui_readline_default=no
+    ui_ncurses_default=yes
   fi
   
   if test "x$enable_ui_ncurses" = "xyes" -a "x$enable_force_readline" = "xyes"; then 
     AC_DEFINE(WITH_FORCE_READLINE, 1, [define if you want ui_readline as default])
+    ui_readline_default=yes
+    ui_ncurses_default=no
   fi
   
   if test "x$enable_ui_ncurses" = "xyes"; then 
@@ -297,10 +306,14 @@ dnl   fi
   # ustawiamy opcje
 
   if test "x$enable_static" = "xno" -o "x$enable_dynamic" = "xyes"; then 
+    lib_shared_default=yes
+    lib_static_default=no
     lgadu="-lgadu"
   else
     OBJS="$OBJS ../lib/libgadu.a"
     lgadu=""
+    lib_shared_default=no
+    lib_static_default=yes
   fi
   ekg="ekg"
   install_ekg="install-ekg"
@@ -316,4 +329,51 @@ fi
 
 AC_OUTPUT
 
+echo
+echo "configured options:"
+
+if test "x$lib_static_enabled" = "xyes"; then
+  if test "x$lib_static_default" = "xyes"; then
+    echo " - static libgadu: enabled (default)"
+  else
+    echo " - static libgadu: enabled"
+  fi
+else
+  echo " - static libgadu: disabled"
+fi
+
+if test "x$lib_shared_enabled" = "xyes"; then
+  if test "x$lib_shared_default" = "xyes"; then
+    echo " - shared libgadu: enabled (default)"
+  else
+    echo " - shared libgadu: enabled"
+  fi
+else
+  echo " - shared libgadu: disabled"
+fi
+
+if test -d src; then
+  
+  if test "x$ui_readline_enabled" = "xyes"; then
+    if test "x$ui_readline_default" = "xyes"; then
+      echo " - ui-readline: enabled (default)"
+    else
+      echo " - ui-readline: enabled"
+    fi
+  else
+    echo " - ui-readline: disabled"
+  fi
+
+  if test "x$ui_ncurses_enabled" = "xyes"; then
+    if test "x$ui_ncurses_default" = "xyes"; then
+      echo " - ui-ncurses: enabled (default)"
+    else
+      echo " - ui-ncurses: enabled"
+    fi
+  else
+    echo " - ui-ncurses: disabled"
+  fi
+fi
+
+echo
 
