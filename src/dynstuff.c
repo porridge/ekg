@@ -279,6 +279,27 @@ string_t string_init(const char *value)
 }
 
 /*
+ * string_clear()
+ *
+ * czy¶ci zawarto¶æ struktury `string'.
+ *
+ *  - str - ci±g znaków,
+ */
+void string_clear(string_t s)
+{
+	if (!s)
+		return;
+
+	if (s->size > 160) {
+		s->str = xrealloc(s->str, 80);
+		s->size = 80;
+	}
+
+	s->str[0] = 0;
+	s->len = 0;
+}
+
+/*
  * string_free()
  *
  * zwalnia pamiêæ po strukturze string i mo¿e te¿ zwolniæ pamiêæ po samym

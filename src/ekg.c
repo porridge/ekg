@@ -157,12 +157,13 @@ void get_char_from_pipe(struct gg_common *c)
  */
 void get_line_from_pipe(struct gg_exec *c)
 {
-	char ch, buf[1024];
+	char ch;
+	int ret;
   
 	if (!c)
   		return;
 
-	if (read(c->fd, &ch, 1) > 0) {
+	while ((ret = read(c->fd, &ch, 1)) > 0) {
 		if (ch != '\n' && ch != '\r')
 			string_append_c(c->buf, ch);
 		if (ch == '\n') {
@@ -170,14 +171,17 @@ void get_line_from_pipe(struct gg_exec *c)
 				print("exec", c->buf->str, itoa(c->id));
 			else
 				print_window("debug", 0, "debug", c->buf->str);
-			string_free(c->buf, 1);
-			c->buf = string_init(NULL);
+			string_clear(c->buf);
 		}
-	} else {
-		if (c->buf->len)
-			print("exec", c->buf->str, itoa(c->id));
-		else
-			print_window("debug", 0, "debug", c->buf->str);
+	}
+
+	if ((ret == -1 && errno != EAGAIN) || ret == 0) {
+		if (c->buf->len) {
+			if (c->id)
+				print("exec", c->buf->str, itoa(c->id));
+			else
+				print_window("debug", 0, "debug", c->buf->str);
+		}
 		string_free(c->buf, 1);
 		list_remove(&watches, c, 1);
 	}

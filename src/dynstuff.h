@@ -49,6 +49,7 @@ string_t string_init(const char *str);
 int string_append(string_t s, const char *str);
 int string_append_n(string_t s, const char *str, int count);
 int string_append_c(string_t s, char ch);
+void string_clear(string_t s);
 char *string_free(string_t s, int free_string);
 
 /* tablice stringów */
