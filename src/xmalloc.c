@@ -110,4 +110,3 @@ char *saprintf(const char *format, ...)
 	
 	return res;
 }
-

@@ -1201,7 +1201,7 @@ int send_sms(const char *recipient, const char *message, int show_result)
 			dup2(fd[1], 1);
 			close(fd[1]);
 		}	
-		execlp(config_sms_app, config_sms_app, recipient, message, NULL);
+		execlp(config_sms_app, config_sms_app, recipient, message, (void *) NULL);
 		exit(1);
 	}
 
@@ -1254,7 +1254,7 @@ int play_sound(const char *sound_path)
 		for (i = 0; i < 255; i++)
 			close(i);
 			
-		execlp(config_sound_app, config_sound_app, sound_path, NULL);
+		execlp(config_sound_app, config_sound_app, sound_path, (void *) NULL);
 		exit(1);
 	}
 

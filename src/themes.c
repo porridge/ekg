@@ -1256,4 +1256,4 @@ void theme_init()
 	format_add("public_key_write_failed", "%! Nie uda³o siê zapisaæ klucza publicznego: %1\n", 1);
 	format_add("public_key_not_found", "%! Nie znaleziono klucza publicznego %1\n", 1);
 	format_add("public_key_deleted", "%! Klucz publiczny %1 zosta³ usuniêty\n", 1);
-};
+}

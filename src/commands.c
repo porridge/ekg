@@ -131,7 +131,6 @@ void remove_send_nick(const char *nick)
 				send_nicks[j - 1] = send_nicks[j];
 
 			send_nicks_count--;
-
 			send_nicks[send_nicks_count] = NULL;
 
 			break;
@@ -147,6 +146,7 @@ COMMAND(cmd_cleartab)
 		xfree(send_nicks[i]);
 		send_nicks[i] = NULL;
 	}
+
 	send_nicks_count = 0;
 	send_nicks_index = 0;
 }
@@ -200,7 +200,6 @@ COMMAND(cmd_alias)
 				strcat(tmp, " ");
 
 			for (m = a->commands; m; m = m->next) {
-
 				print((first) ? "aliases_list" : "aliases_list_next", a->name, (char*) m->data, tmp);
 				first = 0;
 				count++;
@@ -281,6 +280,7 @@ COMMAND(cmd_away)
 
 		if (sess && sess->state == GG_STATE_CONNECTED) {
 			gg_debug(GG_DEBUG_MISC, "-- config_status = 0x%.2x\n", config_status);
+
 			if (config_reason) {
 				iso_to_cp(config_reason);
 				gg_change_status_descr(sess, config_status, config_reason);
@@ -314,17 +314,19 @@ COMMAND(cmd_status)
 	else
 		print("show_status_uin", itoa(config_uin));
 	
-	lce = localtime((const time_t*)&last_conn_event);
-	strftime(buf, sizeof(buf), format_find((last_conn_event / 86400 == time(NULL) / 86400) ? "show_status_last_conn_event_today" : "show_status_last_conn_event"), (const struct tm*)lce);
+	lce = localtime((const time_t*) &last_conn_event);
+	strftime(buf, sizeof(buf), format_find((last_conn_event / 86400 == time(NULL) / 86400) ? "show_status_last_conn_event_today" : "show_status_last_conn_event"), (const struct tm*) lce);
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		char *tmp = format_string(format_find("show_status_not_avail"));
 
 		print("show_status_status", tmp, "");
+
 		if (last_conn_event)
 			print("show_status_disconnected_since", buf);
 		if ((mqc = msg_queue_count()))
 			print("show_status_msg_queue", itoa(mqc)); 
+
 		xfree(tmp);
 
 		return;
@@ -386,9 +388,8 @@ COMMAND(cmd_connect)
 				tmp = random_line(prepare_path("quit.reasons", 0));
 				if (!tmp && config_quit_reason)
 					tmp = xstrdup(config_quit_reason);
-			}
-			else if (config_quit_reason)
-			    tmp = xstrdup(config_quit_reason);
+			} else if (config_quit_reason)
+				tmp = xstrdup(config_quit_reason);
 		} else
 		    	tmp = xstrdup(params[0]);
 
@@ -406,13 +407,14 @@ COMMAND(cmd_connect)
 				r1 = xstrmid(tmp, 0, GG_STATUS_DESCR_MAXSIZE);
 				r2 = xstrmid(tmp, GG_STATUS_DESCR_MAXSIZE, -1);
 				print("disconnected_descr", r1, r2);
-				xfree(r2);
 				xfree(r1);
+				xfree(r2);
 			} else
 				print("disconnected");
 			
 		} else if (sess->state != GG_STATE_IDLE)
 			print("conn_stopped");
+
 		ekg_logoff(sess, tmp);
 		xfree(tmp);
 		list_remove(&watches, sess, 0);
@@ -480,7 +482,7 @@ COMMAND(cmd_exec)
 				dup2(fd[1], 1);
 				close(fd[1]);
 			}	
-			execl("/bin/sh", "sh", "-c", (params[0][0] == '^') ? params[0] + 1 : params[0], NULL);
+			execl("/bin/sh", "sh", "-c", (params[0][0] == '^') ? params[0] + 1 : params[0], (void *) NULL);
 			exit(1);
 		}
 
@@ -507,6 +509,7 @@ COMMAND(cmd_exec)
 			tmp = saprintf("\002%s", params[0] + 1);
 		else
 			tmp = xstrdup(params[0]);
+
 		process_add(pid, tmp);
 		xfree(tmp);
 	} else {
@@ -515,6 +518,7 @@ COMMAND(cmd_exec)
 
 			print("process", itoa(p->pid), p->name);
 		}
+
 		if (!children)
 			print("no_processes");
 	}
@@ -539,14 +543,11 @@ COMMAND(cmd_find)
 			id = h->id / 2 + 1;
 	}
 	
-	r = xmalloc(sizeof(*r));
-	memset(r, 0, sizeof(*r));
+	r = xcalloc(1, sizeof(*r));
 
 	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
-		ui_event("command", "find", NULL);
-		r->uin = config_uin;
-		id = id * 2;
 		xfree(r);
+		ui_event("command", "find", NULL);
 		return;
 
 	} else {
@@ -554,14 +555,15 @@ COMMAND(cmd_find)
 			char *tmp = saprintf("conference --find %s", argv[0]);
 			command_exec(NULL, tmp);
 			xfree(tmp);
+			xfree(r);
 			array_free(argv);
 			return;
 		} else if (argv[0] && !argv[1] && argv[0][0] != '-') {
 			id = id * 2;	/* single search */
 			if (!(r->uin = get_uin(params[0]))) {
 				print("user_not_found", params[0]);
-				array_free(argv);
 				xfree(r);
+				array_free(argv);
 				return;
 			}
 		} else {
@@ -582,6 +584,7 @@ COMMAND(cmd_find)
 				if (match_arg(arg, 'u', "uin", 2) && argv[i + 1])
 					if (!(r->uin = str_to_uin(argv[++i]))) {
 						print("invalid_uin");
+						gg_search_request_free(r);
 						array_free(argv);
 						return;
 					}
@@ -692,8 +695,8 @@ COMMAND(cmd_change)
 	}
 
 	if (!r->first_name || !r->last_name || !r->nickname || !r->email || !r->city || !r->born) {
-		gg_change_info_request_free(r);
 		print("change_not_enough_params");
+		gg_change_info_request_free(r);
 		array_free(argv);
 		return;
 	}
@@ -844,6 +847,7 @@ COMMAND(cmd_help)
 	
 	if (params[0]) {
 		const char *p = (params[0][0] == '/' && strlen(params[0]) > 1) ? params[0] + 1 : params[0];
+
 		for (l = commands; l; l = l->next) {
 			struct command *c = l->data;
 			
@@ -860,6 +864,7 @@ COMMAND(cmd_help)
 				
 				print("help", c->name, c->params_help, blah ? blah : c->brief_help, "");
 				xfree(blah);
+
 				if (c->long_help && strcmp(c->long_help, "")) {
 					char *foo, *tmp, *plumk, *bar = xstrdup(c->long_help);
 
@@ -895,7 +900,6 @@ COMMAND(cmd_help)
 	}
 
 	print("help_footer");
-
 	print("help_quick");
 }
 
@@ -1633,8 +1637,6 @@ COMMAND(cmd_quit)
 		tmp = NULL;
 	}
 		
-	xfree(tmp);
-
 	ui_event("disconnected");
 
 	/* nie wychodzimy tutaj, ¿eby command_exec() mia³o szansê zwolniæ

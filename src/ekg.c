@@ -864,7 +864,7 @@ int main(int argc, char **argv)
 		sock_path = prepare_path(".socket", 1);
 	
 		if (!(ioctld_pid = fork())) {
-			execl(ioctld_path, "ioctld", sock_path, NULL);
+			execl(ioctld_path, "ioctld", sock_path, (void *) NULL);
 			exit(0);
 		}
 	

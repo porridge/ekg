@@ -739,7 +739,7 @@ int group_member(struct userlist *u, const char *group)
  * inicjuje listê grup u¿ytkownika na podstawie danego ci±gu znaków,
  * w którym kolejne nazwy grup s± rozdzielone przecinkiem.
  * 
- *  - named - nazwy grup.
+ *  - names - nazwy grup.
  *
  * zwraca listê `struct group' je¶li siê uda³o, inaczej NULL.
  */
@@ -766,7 +766,7 @@ list_t group_init(const char *names)
  *
  * zmienia listê grup na ci±g znaków rodzielony przecinkami.
  *
- *  - l - lista grup.
+ *  - groups - lista grup.
  *
  * zwraca zaalokowany ci±g znaków lub NULL w przypadku b³êdu.
  */
@@ -792,4 +792,3 @@ char *group_to_string(list_t groups)
 
 	return string_free(foo, 0);
 }
-

@@ -130,8 +130,8 @@ void variable_init()
 	variable_add("display_color_map", VAR_STR, 1, &config_display_color_map, NULL, NULL, dd_color);
 	variable_add("display_crap", VAR_BOOL, 1, &config_display_crap, NULL, NULL, NULL);
 	variable_add("display_notify", VAR_INT, 1, &config_display_notify, NULL, variable_map(3, 0, 0, "none", 1, 0, "all", 2, 0, "significant"), NULL);
-	variable_add("display_welcome", VAR_BOOL, 1, &config_display_welcome, NULL, NULL, NULL);
 	variable_add("display_sent", VAR_BOOL, 1, &config_display_sent, NULL, NULL, NULL);
+	variable_add("display_welcome", VAR_BOOL, 1, &config_display_welcome, NULL, NULL, NULL);
 	variable_add("emoticons", VAR_BOOL, 1, &config_emoticons, NULL, NULL, NULL);
 #ifdef HAVE_OPENSSL
 	variable_add("encryption", VAR_INT, 1, &config_encryption, NULL, variable_map(2, 0, 0, "none", 1, 0, "sim"), NULL);
