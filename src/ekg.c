@@ -297,7 +297,10 @@ int main(int argc, char **argv)
 	char *home = getenv("HOME"), *load_theme = NULL, *ioctl_daemon_path = IOCTL_DAEMON_PATH;
 #ifdef IOCTL
     	char *sock_path = NULL;
-#endif // IOCTL
+#	define IOCTL_HELP "  -I, --ioctl-daemon-path [¦CIE¯KA]    ustawia ¶cie¿kê do ioctl_daemon-a\n"
+#else
+#	define IOCTL_HELP ""
+#endif
 
 	struct passwd *pw; 
 	struct gg_common si;
@@ -316,9 +319,7 @@ int main(int argc, char **argv)
 "  -i, --invisible      po po³±czeniu zmienia stan na ,,niewidoczny''\n"
 "  -p, --private        po po³±czeniu zmienia stan na ,,tylko dla przyjació³''\n"
 "  -d, --debug          w³±cza wy¶wietlanie dodatkowych informacji\n"
-#ifdef IOCTL
-"  -I, --ioctl-daemon-path [¦CIE¯KA]    ustawia ¶cie¿kê do ioctl_daemon-a\n"
-#endif // IOCTL
+IOCTL_HELP
 "\n", argv[0]);
 			return 0;	
 		}
@@ -365,8 +366,10 @@ int main(int argc, char **argv)
 #ifdef IOCTL
         sock_path = prepare_path(".socket");
 
-        if(!(ioctl_daemon_pid = fork()))
-            execl(ioctl_daemon_path, "ioctl_daemon", sock_path, NULL);
+        if(!(ioctl_daemon_pid = fork())) {
+		execl(ioctl_daemon_path, "ioctl_daemon", sock_path, NULL);
+		exit(0);
+	}
 
         init_socket(sock_path);
 

@@ -8,6 +8,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-02-06
 
 - kosmetyka, dodanie obslugi akcji "play" (s)
+- poprawka --ioctl-... w helpie, bo siê nie kompilowa³o na gcc 3.0 (w)
+- dodane exit(0) za execl() ioctl-daemona, bo przy jego braku program
+  szed³ dalej i dzia³a³y dwie sesje ekg (w)
 
 // 2002-02-03
 
