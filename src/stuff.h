@@ -153,7 +153,6 @@ char *config_tab_command;
 int config_ctrld_quits;
 int config_save_password;
 char *config_timestamp;
-int config_status_window;
 
 char *home_dir;
 char *config_dir;

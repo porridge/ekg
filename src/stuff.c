@@ -125,7 +125,6 @@ int ioctld_sock = -1;
 int config_ctrld_quits = 1;
 int config_save_password = 1;
 char *config_timestamp = NULL;
-int config_status_window = 1;
 
 static struct {
 	int event;

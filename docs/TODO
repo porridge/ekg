@@ -12,6 +12,7 @@ klient:
 - wykrywanie niewidocznych jako opcja.
 - wyczyszczenie history.
 - korzystaæ z getopt.
+- wy¶wietlanie wysy³anych wiadomo¶ci.
 
 $Id$
 
