@@ -35,6 +35,14 @@
 
 list_t variables = NULL;
 
+/*
+ * dd_*()
+ *
+ * funkcje informuj±ce, czy dana grupa zmiennych ma zostaæ wy¶wietlona.
+ * równie dobrze mo¿na by³o przekazaæ wska¼nik do zmiennej, która musi
+ * byæ ró¿na od zera, ale dziêki funkcjom nie trzeba bêdzie mieszaæ w 
+ * przysz³o¶ci.
+ */
 static int dd_beep(const char *name)
 {
 	return (config_beep);
