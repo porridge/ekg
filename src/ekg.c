@@ -823,7 +823,7 @@ int main(int argc, char **argv)
 	srand(time(NULL));
 
 	strncpy(argv0, argv[0], sizeof(argv0) - 1);
-	argv0[sizeof(argv0) - 1] = '\0';
+	argv0[sizeof(argv0) - 1] = 0;
 
 	command_init();
 
