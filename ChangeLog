@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-04-25
 
 - sekwencje F1 i F2 dla putty (jmk/w)
+- poprawka dla nie-gnu-kompilatorów (speedy/w)
 
 // 2002-04-24
 
