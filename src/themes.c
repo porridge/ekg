@@ -1094,14 +1094,14 @@ void theme_init()
         format_add("config_line_incorrect", "%! Nieprawid³owa linia '%T%1%n', pomijam\n", 1);
 	format_add("autosaved", "%> Automatycznie zapisano ustawienia\n", 1);
 	
-	/* rejestracja nowego numera */
+	/* rejestracja nowego numeru */
 	format_add("register", "%> Rejestracja poprawna. Wygrany numerek: %T%1%n\n", 1);
 	format_add("register_failed", "%! B³±d podczas rejestracji: %1\n", 1);
 	format_add("register_pending", "%! Rejestracja w toku\n", 1);
 	format_add("register_timeout", "%! Przekroczono limit czasu operacji rejestrowania\n", 1);
 	format_add("registered_today", "%! Ju¿ zarejestrowano jeden numer. Nie nadu¿ywaj\n", 1);
 
-	/* kasowanie konta uzytkownika z katalogu publiczengo */
+	/* kasowanie konta u¿ytkownika z katalogu publiczengo */
 	format_add("unregister", "%> Konto %T%1%n wykasowano\n", 1);
 	format_add("unregister_timeout", "%! Przekroczono limit czasu operacji usuwania konta\n", 1);
 	format_add("unregister_bad_uin", "%! Niepoprawny numer: %T%1%n\n", 1);
@@ -1232,7 +1232,7 @@ void theme_init()
 	format_add("aliases_exist", "%! Alias %T%1%n ju¿ istnieje\n", 1);
 	format_add("aliases_noexist", "%! Alias %T%1%n nie istnieje\n", 1);
 	format_add("aliases_command", "%! %T%1%n jest wbudowan± komend±\n", 1);
-	format_add("aliases_not_enough_params", "%! Alias %T%1%n wymaga wiêkszej ilo¶æi parametrów\n", 1);
+	format_add("aliases_not_enough_params", "%! Alias %T%1%n wymaga wiêkszej ilo¶ci parametrów\n", 1);
 
 	/* po³±czenia bezpo¶rednie */
 	format_add("dcc_attack", "%! %|Program otrzyma³ zbyt wiele ¿±dañ bezpo¶rednich po³±czeñ, ostatnie od %1\n", 1);
