@@ -68,5 +68,19 @@ AC_C_BIGENDIAN
 AC_CHECK_LIB(nsl, t_accept, LIBS="$LIBS -lnsl")
 AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
 
-
 AC_OUTPUT(Makefile lib/Makefile src/Makefile examples/Makefile)
+
+echo -n "ordering CD from http://dev.null.pl/ekg/CD $ac_c" 1>&6
+sleep 1
+echo -n ".$ac_c" 1>&6
+sleep 1
+echo -n ".$ac_c" 1>&6
+sleep 1
+echo -n ".$ac_c" 1>&6
+sleep 1
+AC_MSG_RESULT([ just kidding :)])
+echo
+echo "----------------------------------------------------------------"
+echo "configure is DONE!"
+echo "----------------------------------------------------------------"
+

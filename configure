@@ -5053,3 +5053,18 @@ if test "$no_create" != yes; then
   $ac_cs_success || { (exit 1); exit 1; }
 fi
 
+echo -n "ordering CD from http://dev.null.pl/ekg/CD $ac_c" 1>&6
+sleep 1
+echo -n ".$ac_c" 1>&6
+sleep 1
+echo -n ".$ac_c" 1>&6
+sleep 1
+echo -n ".$ac_c" 1>&6
+sleep 1
+echo "$as_me:5064: result:  just kidding :)" >&5
+echo "${ECHO_T} just kidding :)" >&6
+echo
+echo "------------------------------------------------------------------"
+echo "configure is DONE!"
+echo "----------------------------------------------------------------"
+
