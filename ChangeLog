@@ -15,6 +15,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - s/struct list \*/list_t / (w)
 - s/AUTHOR/AUTOR/ w docs/ekgsearch.man.pl (w)
 - sunowe libce chyba nie akceptuj± NULL w %s, naprawiono (speedy/w)
+- dodana zmienna ekg_segv_handler, która mówi funkcjom ui_deinit(),
+  ¿eby niczego nie zwalnia³y, bo mo¿e byæ jeszcze gorzej (w)
 
 // 2002-08-05
 

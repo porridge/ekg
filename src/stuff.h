@@ -168,6 +168,7 @@ int pipe_fd;
 int batch_mode;
 char *batch_line;
 int immediately_quit;
+int ekg_segv_handler;
 
 void unidle();
 const char *timestamp(const char *format);

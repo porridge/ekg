@@ -645,6 +645,9 @@ static void ui_readline_deinit()
 {
 	int i;
 
+	if (ekg_segv_handler)
+		return;
+
 	if (config_changed) {
 		char *line;
 		const char *prompt = format_find("config_changed");
@@ -1060,13 +1063,11 @@ static void window_list()
 
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
-		char id[4];
 
-		snprintf(id, 4, "%d", w->id);
 		if (w->query_nick)
-			print("window_list_query", id, w->query_nick);
+			print("window_list_query", itoa(w->id), w->query_nick);
 		else
-			print("window_list_nothing", id);
+			print("window_list_nothing", itoa(w->id));
 	}
 }		
 

@@ -392,6 +392,8 @@ void sigsegv_handler()
 {
 	signal(SIGSEGV, SIG_DFL);
 
+	ekg_segv_handler = 1;
+
 	ui_deinit();
 	
 	kill_ioctld();
