@@ -482,7 +482,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 				}
 			}
 
-			if (!config_display_crap && !strcmp(target, "__current"))
+			if (!config_display_crap && target && !strcmp(target, "__current"))
 				w = windows->data;
 			
 			break;
