@@ -3216,9 +3216,8 @@ static void ui_ncurses_loop()
 				header_statusbar_resize();
 				changed_backlog_size("backlog_size");
 			}
-
-			continue;
 #endif
+			continue;
 		}
 
 		ch = ekg_getch(0);
