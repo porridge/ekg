@@ -874,11 +874,11 @@ static void complete(int *line_start, int *line_index)
 	}
 
 	/* nietypowe dope³nienie nicków przy rozmowach */
-	if (!strcmp(line, "") || (!strncasecmp(line, "chat ", 5) && blanks < 3 && send_nicks_count > 0)) {
+	if (!strcmp(line, "") || ((!strncasecmp(line, "chat ", 5) || !strncasecmp(line, "/chat ", 6))  && blanks < 3 && send_nicks_count > 0)) {
 		if (send_nicks_count)
-			snprintf(line, sizeof(line), "chat %s ", send_nicks[send_nicks_index++]);
+			snprintf(line, sizeof(line), (window_current->target) ? "/chat %s " : "chat %s ", send_nicks[send_nicks_index++]);
 		else
-			snprintf(line, sizeof(line), "chat ");
+			snprintf(line, sizeof(line), (window_current->target) ? "/chat" : "chat ");
 		*line_start = 0;
 		*line_index = strlen(line);
 		if (send_nicks_index >= send_nicks_count)
@@ -1359,9 +1359,7 @@ static int ui_ncurses_event(const char *event, ...)
 			}
 			
 			if (!strcasecmp(p1, "refresh")) {
-				clearok(curscr, TRUE);
 				wrefresh(curscr);
-				clearok(curscr, FALSE);
 				goto cleanup;
 			}
 
