@@ -5,25 +5,32 @@ to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek).
 
 // 2004-04-17
+
 - poprawione tabcompletion (b³êdy z cudzys³owiami) (MS/del)
 
 // 2004-04-06
+
 - poprawka tabcompletion dla nazw plików (Brzezi/del)
 - poprawka problemu z 'query odbiorca wiadomosc' (Sydney/del)
 
 // 2004-04-05
+
 - poprawka b³êdu z ustawianiem opisu i stanu przy ³±czeniu (nik/del)
 
 // 2004-04-04 
+
 - poprawka wycieku pamiêci przy /set contacts_size 0 (mirek/del)
 
 // 2004-03-28
+
 - poprawka dotycz±ca tabcompletion (del)
 
 // 2004-03-23
+
 - usuniêty b³±d z dope³nieniem np /dcc g[TAB] (Wojciech S/del)
 
 // 2004-03-21
+
 - usuniêty b³±d przy query maj±cym utworzyæ konferencjê, np:
  /query "Imiê Nazwisko",nick wy¶le komunikat zamiast tworzyæ konferncjê (del)
 - parê poprawek dotycz±cych wew. funkcji (del) 
