@@ -173,7 +173,7 @@ COMMAND(cmd_add)
 	}
 
 	if ((u = userlist_find(uin, params[1])) && u->display) {
-		if (!strcmp(params[1], u->display) && u->uin == uin)
+		if (!strcasecmp(params[1], u->display) && u->uin == uin)
 			print("user_exists", params[1]);
 		else
 			print("user_exists_other", params[1], format_user(u->uin));
@@ -876,7 +876,7 @@ COMMAND(cmd_modify)
 			for (l = userlist; l; l = l->next) {
 				struct userlist *u = l->data;
 
-				if (u->display && !strcmp(u->display, argv[i])) {
+				if (u->display && !strcasecmp(u->display, argv[i])) {
 					print("user_exists", u->display);
 					array_free(argv);
 					return;
@@ -3537,7 +3537,7 @@ COMMAND(cmd_queue)
 	list_t l;
 	uin_t uin = 0;
 
-	if (strcmp(name, "_queue") && sess && sess->state == GG_STATE_CONNECTED) {
+	if (strcasecmp(name, "_queue") && sess && sess->state == GG_STATE_CONNECTED) {
 		print("queue_wrong_use");
 		return;
 	}
