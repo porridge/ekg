@@ -576,6 +576,7 @@ COMMAND(cmd_connect)
 			config_reason = NULL;
 			xfree(tmp);
 			tmp = NULL;
+			config_status = ekg_hide_descr_status(config_status);
 		}
 
 		connecting = 0;
@@ -2385,6 +2386,7 @@ COMMAND(cmd_quit)
 		config_reason = NULL;
 		xfree(tmp);
 		tmp = NULL;
+		config_status = ekg_hide_descr_status(config_status);
 	}
 	
 	if (!quit_message_send) {
