@@ -1213,7 +1213,7 @@ void theme_init()
 	format_add("aliases_command", "%! %T%1%n jest wbudowan± komend±\n", 1);
 
 	/* po³±czenia bezpo¶rednie */
-	format_add("dcc_attack", "%! %|Program otrzyma³ zbyt ¿±dañ bezpo¶rednich po³±czeñ, ostatnie od %1. Dodano t± osobê do listy ignorowanych.\n", 1);
+	format_add("dcc_attack", "%! %|Program otrzyma³ zbyt wiele ¿±dañ bezpo¶rednich po³±czeñ, ostatnie od %1. Dodano tê osobê do listy ignorowanych.\n", 1);
 	format_add("dcc_create_error", "%! Nie mo¿na w³±czyæ po³±czeñ bezpo¶rednich: %1\n", 1);
 	format_add("dcc_error_network", "%! B³±d transmisji z %1\n", 1);
 	format_add("dcc_error_refused", "%! Po³±czenie z %1 zosta³o odrzucone\n", 1);
