@@ -691,7 +691,7 @@ COMMAND(command_connect)
 
 		connecting = 0;
 		if (sess->state == GG_STATE_CONNECTED)
-			my_printf((tmp) ? "disconnected" : "disconnected_descr", tmp);
+			my_printf((tmp) ? "disconnected_descr" : "disconnected", tmp);
 		else if (sess->state != GG_STATE_IDLE)
 			my_printf("conn_stopped");
 		ekg_logoff(sess, tmp);
