@@ -725,7 +725,7 @@ void handle_success(struct gg_event *e)
 
 	update_status();
 
-	connected_since = time(NULL);
+	last_conn_event = time(NULL);
 }
 
 /*
@@ -748,7 +748,7 @@ void handle_event(struct gg_session *s)
 		gg_free_session(sess);
 		sess = NULL;
 		ui_event("disconnected");
-		disconnected_since = time(NULL);
+		last_conn_event = time(NULL);
 		do_reconnect();
 
 		return;
@@ -1052,7 +1052,7 @@ void handle_disconnect(struct gg_event *e)
 	gg_free_session(sess);
 	sess = NULL;	
 	update_status();
-	disconnected_since = time(NULL);
+	last_conn_event = time(NULL);
 	do_reconnect();
 }
 

@@ -410,7 +410,7 @@ COMMAND(cmd_status)
 {
 	struct userlist *u;
 	struct in_addr i;
-	struct tm *cs;
+	struct tm *lce;
 	char *tmp, *priv, *r1, *r2, buf[100], *status_table[6] = {
 		"show_status_avail",
 		"show_status_busy",
@@ -428,13 +428,15 @@ COMMAND(cmd_status)
 	else
 		print("show_status_uin", itoa(config_uin));
 	
+	lce = localtime((const time_t*)&last_conn_event);
+	strftime(buf, sizeof(buf), format_find("show_status_last_conn_event"), (const struct tm*)lce);
+
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		char *tmp = format_string(format_find("show_status_not_avail"));
 
-		cs = localtime((const time_t*)&disconnected_since);
-		strftime(buf, sizeof(buf), format_find("show_status_connected_since_timestamp"), (const struct tm*)cs);
 		print("show_status_status", tmp, "");
-		print("show_status_disconnected_since", buf);
+		if (last_conn_event)
+			print("show_status_disconnected_since", buf);
 		xfree(tmp);
 
 		return;
@@ -454,8 +456,6 @@ COMMAND(cmd_status)
 	xfree(r2);
 	
 	i.s_addr = sess->server_addr;
-	cs = localtime((const time_t*)&connected_since);
-	strftime(buf, sizeof(buf), format_find("show_status_connected_since_timestamp"), (const struct tm*)cs);
 
 	print("show_status_status", tmp, priv);
 	print("show_status_server", inet_ntoa(i), itoa(sess->port));

@@ -113,8 +113,7 @@ int config_display_ack = 1;
 int config_completion_notify = 1;
 int private_mode = 0;
 int connecting = 0;
-time_t connected_since = 0;
-time_t disconnected_since = 0;
+time_t last_conn_event = 0;
 int config_display_notify = 1;
 char *config_theme = NULL;
 int config_status = GG_STATUS_AVAIL;
@@ -2557,7 +2556,7 @@ void ekg_logoff(struct gg_session *sess, const char *reason)
 
 	update_status();
 
-	disconnected_since = time(NULL);
+	last_conn_event = time(NULL);
 }
 
 char *random_line(const char *path)

@@ -212,8 +212,7 @@ time_t last_action;
 int last_sysmsg;
 int private_mode;
 int connecting;
-time_t connected_since;
-time_t disconnected_since;
+time_t last_conn_event;
 int server_index;
 
 int use_proxy;
