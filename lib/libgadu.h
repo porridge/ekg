@@ -390,8 +390,6 @@ struct gg_search_result {
 #define GG_GENDER_FEMALE 1	/* kobieta */
 #define GG_GENDER_MALE 2	/* mê¿czyzna */
 
-#define gg_modify gg_search_result
-
 struct gg_http *gg_search(struct gg_search_request *r, int async);
 int gg_search_watch_fd(struct gg_http *f);
 void gg_free_search(struct gg_http *f);
@@ -410,7 +408,15 @@ struct gg_pubdir {
 	uin_t uin;		/* otrzymany numerek. 0 je¶li b³±d */
 };
 
-#define gg_modify gg_search_result
+struct gg_modify {
+	char *first_name;	/* imiê */
+	char *last_name;	/* nazwisko */
+	char *nickname;		/* pseudonim */
+	char *email;		/* email */
+	int born;		/* rok urodzenia */
+	int gender;		/* p³eæ */
+	char *city;		/* miasto */
+};
 
 struct gg_http *gg_register(char *email, char *password, int async);
 #define gg_register_watch_fd gg_pubdir_watch_fd
