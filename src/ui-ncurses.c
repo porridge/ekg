@@ -86,7 +86,9 @@ struct window {
 
 static WINDOW *status = NULL;		/* okno stanu */
 static WINDOW *input = NULL;		/* okno wpisywania tekstu */
-static WINDOW *ctx = NULL;		/* okno kontaktow */
+static struct window ctx = { NULL, 
+	"__ctx", 0,  0, 0, 0, 0, 0, 
+	NULL, 0 } ;			/* okno kontaktow */
 
 #define HISTORY_MAX 1000		/* maksymalna ilo¶æ wpisów historii */
 static char *history[HISTORY_MAX];	/* zapamiêtane linie */
@@ -106,6 +108,8 @@ static struct window *window_current;	/* wska¼nik na aktualne okno */
 static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 
 int config_ctxwin_size = 10;		/* szerokosc okna kontaktow */
+static int last_ctxwin_size = 10;	/* poprzedni rozmiar przed zmiana */
+int config_ctxwin_enabled = 1;		/* czy ma byc okno kontaktow */
 
 /* rozmiar okna wy¶wietlaj±cego tekst */
 #define output_size (stdscr->_maxy - input_size)
@@ -151,6 +155,9 @@ static struct window *window_find(const char *target)
 
 	if (!strcasecmp(target, "__status"))
 		return windows->data;
+		
+	if (!strcasecmp(target, "__ctx"))
+		return &ctx;
 	
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
@@ -176,7 +183,7 @@ static void window_refresh()
 		struct window *w = l->data;
 
 		if (window_current->id == w->id)
-			pnoutrefresh(w->window, w->start, 0, 0, 0, output_size - 1, stdscr->_maxx - config_ctxwin_size + 1);
+			pnoutrefresh(w->window, w->start, 0, 0, 0, output_size - 1, stdscr->_maxx - ((config_ctxwin_enabled) ? config_ctxwin_size : 0) + 1);
 		else
 			pnoutrefresh(w->window, 0, 0, 0, 81, 0, 0);
 	}
@@ -205,7 +212,7 @@ static void window_switch(int id)
 
 			window_refresh();
 			wnoutrefresh(status);
-			wnoutrefresh(ctx);
+			if (config_ctxwin_enabled) wnoutrefresh(ctx.window);
 			wnoutrefresh(input);
 			doupdate();
 			update_statusbar();
@@ -270,7 +277,7 @@ static struct window *window_new(const char *target)
 		}
 	}
 	w.lines = stdscr->_maxy - 1;
-	w.window = newpad(w.lines, stdscr->_maxx - config_ctxwin_size + 1);
+	w.window = newpad(w.lines, stdscr->_maxx - ((config_ctxwin_enabled) ? config_ctxwin_size : 0) + 1);
 
 	return list_add_sorted(&windows, &w, sizeof(w), window_new_compare);
 }
@@ -360,7 +367,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 				}
 			}
 			break;
-
+			
 		default:
 			/* je¶li nie ma okna, rzuæ do statusowego. */
 			if (!(w = window_find(target)))
@@ -416,19 +423,21 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 			if (!*(p + 1))
 				break;
 			w->y++;
-			x = print_timestamp(w);
+			
+			if (strcasecmp(target,"__ctx"))
+				x = print_timestamp(w);
 			
 		} else {
 			
 			if (config_speech_app)
 				string_append_c(s, *p);
 			
-			if (!x)
+			if ((!x)&&(strcasecmp(target,"__ctx")))
 				x += print_timestamp(w);
 			waddch(w->window, (unsigned char) *p);
 			count++;
 			x++;
-			if (x == stdscr->_maxx - config_ctxwin_size + 1) {
+			if (x == stdscr->_maxx - ((config_ctxwin_enabled) ? config_ctxwin_size : 0) + 1) {
 				if (*(p + 1) == 10)
 					p++;
 				else
@@ -440,7 +449,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 		}
 	}
 
-	if (!count) {
+	if ((!count)&&(strcasecmp(target,"__ctx"))) {
 		print_timestamp(w);
 		set_cursor(w);
 	}
@@ -482,10 +491,11 @@ static void update_ctxlist()
 	int count = 0, show_all = 0, show_busy = 1, 
 		show_active = 1, show_inactive = 0, 
 		show_invisible = 1;
-	char *tmp;
-	wmove(ctx, 0, 1);
-	werase(ctx);
-	waddstr(ctx, "Obecni:");
+	//char *tmp;
+		
+	if (!ctx.window) return;
+	wmove(ctx.window, 0, 1);
+	waddstr(ctx.window, "Obecni:");
 
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
@@ -494,18 +504,34 @@ static void update_ctxlist()
 		in.s_addr = u->ip.s_addr;
 
 		if (show_all || (show_busy && (u->status == GG_STATUS_BUSY || u->status == GG_STATUS_BUSY_DESCR)) || (show_active && (u->status == GG_STATUS_AVAIL || u->status == GG_STATUS_AVAIL_DESCR)) || (show_inactive && (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)) || (show_invisible && (u->status == GG_STATUS_INVISIBLE))) {
-			wmove(ctx,count+1,1);
-			tmp=strdup(u->display); tmp[config_ctxwin_size]='\0'; waddstr(ctx, tmp); free(tmp);
-			// waddstr(ctx, u->descr);
+			wmove(ctx.window,count+1,1);
+	//		tmp=strdup(u->display); tmp[config_ctxwin_size]='\0'; waddstr(ctx, tmp); free(tmp);
+			ui_ncurses_print("__ctx", 2, u->display);
 			count++;
 		}
 	}
-	wnoutrefresh(ctx);
+	wnoutrefresh(ctx.window);
 	
 }
 
 
+/*
+ * ctxwin_rebuild() - wywolywane przy zmianach wartosci enable/size
+ *
+ */
+void ctxwin_rebuild()
+{
+if (config_ctxwin_size!=last_ctxwin_size) {
+	if (ctx.window) delwin(ctx.window);
+	ctx.window = newwin(stdscr->_maxy-2, config_ctxwin_size, 0, stdscr->_maxx - config_ctxwin_size + 1);
+	}
+if ((config_ctxwin_enabled)&&(config_ctxwin_size)) {
+	if (!ctx.window) 
+		ctx.window = newwin(stdscr->_maxy-2, config_ctxwin_size, 0, stdscr->_maxx - config_ctxwin_size + 1);
+	}
 
+if ((!config_ctxwin_enabled)&&(ctx.window)) delwin(ctx.window);
+}
 
 /*
  * update_statusbar()
@@ -707,7 +733,7 @@ static void update_statusbar()
 	}
 	
 	wnoutrefresh(status);
-	wnoutrefresh(ctx);
+	if (config_ctxwin_enabled) wnoutrefresh(ctx.window);
 	wnoutrefresh(input);
 	doupdate();
 }
@@ -748,7 +774,6 @@ void ui_ncurses_init()
 	window_current = window_new(NULL);
 	status = newwin(1, stdscr->_maxx + 1, stdscr->_maxy - 1, 0);
 	input = newwin(1, stdscr->_maxx + 1, stdscr->_maxy, 0);
-	ctx = newwin(stdscr->_maxy-2, config_ctxwin_size, 0, stdscr->_maxx - config_ctxwin_size + 1);
 	keypad(input, TRUE);
 
 	start_color();
@@ -771,7 +796,7 @@ void ui_ncurses_init()
 	init_pair(15, COLOR_WHITE, COLOR_BLUE);
 
 	wnoutrefresh(status);
-	wnoutrefresh(ctx);
+	if (config_ctxwin_enabled) wnoutrefresh(ctx.window);
 	wnoutrefresh(input);
 	doupdate();
 
@@ -812,7 +837,7 @@ static void ui_ncurses_deinit()
 	doupdate();
 	delwin(input);
 	delwin(status);
-	delwin(ctx);
+	delwin(ctx.window);
 	endwin();
 
 	for (i = 0; i < HISTORY_MAX; i++)
@@ -1280,7 +1305,7 @@ static void update_input()
 
 	window_refresh();
 	wnoutrefresh(status);
-	wnoutrefresh(ctx);
+	if (config_ctxwin_enabled) wnoutrefresh(ctx.window);
 	wnoutrefresh(input);
 	doupdate();
 }
@@ -1308,7 +1333,7 @@ static void ui_ncurses_loop()
 				beep();
 				window_refresh();
 				wnoutrefresh(status);
-				update_ctxlist();
+				if (config_ctxwin_enabled) update_ctxlist();
 				wnoutrefresh(input);
 				doupdate();
 				wrefresh(curscr);
@@ -1725,7 +1750,7 @@ static void ui_ncurses_loop()
 			wmove(input, 0, line_index - line_start + window_current->prompt_len);
 		}
 		wnoutrefresh(status);
-		wnoutrefresh(ctx);
+		if (config_ctxwin_enabled) wnoutrefresh(ctx.window);
 		wnoutrefresh(input);
 		doupdate();
 	}
@@ -2048,7 +2073,7 @@ static int ui_ncurses_event(const char *event, ...)
 cleanup:
 	va_end(ap);
 
-	update_ctxlist();
+	if (config_ctxwin_enabled) update_ctxlist();
 	update_statusbar();
 	
 	return 0;

@@ -170,6 +170,7 @@ int config_last;
 int config_last_size;
 int config_log;
 int config_ctxwin_size;
+int config_ctxwin_enabled;
 int config_log_ignored;
 char *config_log_path;
 int config_log_status;
@@ -315,5 +316,8 @@ void last_count_add(uin_t uin);
 void sms_away_add(uin_t uin);
 void sms_away_destroy();
 int sms_away_check(uin_t uin);
+
+void ctxwin_rebuild();
+
 
 #endif /* __STUFF_H */
