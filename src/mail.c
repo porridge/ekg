@@ -110,8 +110,10 @@ int check_mail_update(const char *s, int more)
 	if (new_count == mail_count)
 		return 0;
 
-	last_mail_count = mail_count;
-	mail_count = new_count;
+	if (!more) {
+		last_mail_count = mail_count;
+		mail_count = new_count;
+	}
 
 	if (!more && mail_count && mail_count > last_mail_count) {
 		if (config_check_mail & 4) {
