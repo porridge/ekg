@@ -652,7 +652,7 @@ void changed_dcc(const char *var)
 }
 
 /*
- * changed_mesg()
+ * changed_mesg_allow()
  *
  * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,mesg_allow''.
  */

@@ -16,15 +16,15 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <sys/types.h>
+
 #include <errno.h>
 #include <dirent.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 static struct dirent foo;
-#define __DIRENT_SIZE(d)	\
-	(sizeof(foo) - sizeof(foo.d_name) + strlen((d)->d_name) + 1)
+#define __DIRENT_SIZE(d) (sizeof(foo) - sizeof(foo.d_name) + strlen((d)->d_name) + 1)
 
 int alphasort(const void *__a, const void *__b)
 {

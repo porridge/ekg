@@ -1,3 +1,4 @@
+#include <sys/types.h>
 #include <dirent.h>
 
 int alphasort(const void*, const void*);
