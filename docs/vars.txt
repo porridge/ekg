@@ -296,6 +296,13 @@ enter_scrolls
 	je¶li w³±czone, wci¶niêcie klawisza Enter w pustej linii spowoduje
 	przesuniêcie ekranu o jedn± liniê.
 
+header_size
+	typ: liczba
+	domy¶lna warto¶æ: 0
+
+	okre¶la rozmiar nag³ówka okna wy¶wietlanego na górze ekranu.
+	maksymalna ilo¶æ linii to 5.
+
 keep_reason
 	typ: bool
 	domy¶lna warto¶æ: 0
@@ -537,6 +544,12 @@ speech_app
 	aplikacja u¿ywana do odczytywania tekstów wy¶wietlanych na ekranie.
 	jej ustawienie powoduje równie¿ zmianê wygl±du programu na taki,
 	który jest ³atwiejszy do wymówienia.
+
+statusbar_size
+	typ: liczba
+	domy¶lna warto¶æ: 1
+
+	okre¶la rozmiar paska stanu w liniach w zakresie od 1 do 5.
 
 tab_command
 	typ: tekst

@@ -46,6 +46,7 @@ extern void ui_readline_init();
 #ifdef WITH_UI_NCURSES
 int config_backlog_size;
 extern void ui_ncurses_init();
+extern void header_statusbar_resize();
 #endif
 
 #endif /* __UI_H */

@@ -139,6 +139,9 @@ void variable_init()
 	variable_add("encryption", "en", VAR_INT, 1, &config_encryption, NULL, variable_map(2, 0, 0, "none", 1, 0, "sim"), NULL);
 #endif
 	variable_add("enter_scrolls", "es", VAR_BOOL, 1, &config_enter_scrolls, NULL, NULL, NULL);
+#ifdef WITH_UI_NCURSES
+	variable_add("header_size", "hs", VAR_INT, 1, &config_header_size, header_statusbar_resize, NULL, NULL);
+#endif
 	variable_add("keep_reason", "kr", VAR_BOOL, 1, &config_keep_reason, NULL, NULL, NULL);
 	variable_add("last", "la", VAR_MAP, 1, &config_last, NULL, variable_map(4, 0, 0, "none", 1, 2, "all", 2, 1, "separate", 4, 0, "sent"), NULL);
 	variable_add("last_size", "ls", VAR_INT, 1, &config_last_size, NULL, NULL, NULL);
@@ -168,6 +171,9 @@ void variable_init()
 	variable_add("sound_notify_file", "Sn", VAR_STR, 1, &config_sound_notify_file, NULL, NULL, dd_sound);
 	variable_add("sound_app", "Sa", VAR_STR, 1, &config_sound_app, NULL, NULL, NULL);
 	variable_add("speech_app", "SA", VAR_STR, 1, &config_speech_app, NULL, NULL, NULL);
+#ifdef WITH_UI_NCURSES
+	variable_add("statusbar_size", "sS", VAR_INT, 1, &config_statusbar_size, header_statusbar_resize, NULL, NULL);
+#endif
 	variable_add("tab_command", "tc", VAR_STR, 1, &config_tab_command, NULL, NULL, NULL);
 	variable_add("theme", "th", VAR_STR, 1, &config_theme, changed_theme, NULL, NULL);
 	variable_add("time_deviation", "td", VAR_INT, 1, &config_time_deviation, NULL, NULL, NULL);

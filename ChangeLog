@@ -24,6 +24,10 @@ zg³osi³ b³±d.
   backlogu (w)
 - /list na siebie pokazuje prawid³owy port (FIG/w)
 - poprawki configure.in (FIG/w)
+- mo¿liwo¶æ rozszerzania pasku statusu zmienn± ,,statusbar_size''.
+  kolejne linie s± opisane formatami ,,statusbar2'', ,,statusbar3'' itd. (w)
+- mo¿liwo¶æ stworzenia nag³ówka okna zmienn± ,,header_size''. póki co,
+  nie ma mo¿liwo¶ci wy¶wietlania w nim czegokolwiek (w)
 
 // 2002-01-08
 

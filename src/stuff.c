@@ -176,6 +176,8 @@ char *config_display_color_map = NULL;
 int config_windows_save = 0;
 char *config_windows_layout = NULL;
 char *config_profile = NULL;
+int config_header_size = 0;
+int config_statusbar_size = 1;
 
 static struct {
 	int event;
