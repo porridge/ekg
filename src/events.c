@@ -401,7 +401,7 @@ void handle_msg(struct gg_event *e)
 			xfree(tmp);
 		}
 		return;
-	};
+	}
 
 	if ((e->event.msg.msgclass & GG_CLASS_CTCP)) {
 		gg_debug(GG_DEBUG_MISC, "// ekg: received ctcp\n");
@@ -433,11 +433,13 @@ void handle_msg(struct gg_event *e)
 
 		if (!(f = fopen(name, "w"))) {
 			print_window(target, 0, "public_key_write_failed");
+			xfree(name);
 			return;
 		}
 		
 		fprintf(f, "%s", e->event.msg.message);
 		fclose(f);
+		xfree(name);
 
 		SIM_KC_Free(SIM_KC_Find(e->event.msg.sender));
 
@@ -457,6 +459,8 @@ void handle_msg(struct gg_event *e)
 			strcpy(e->event.msg.message, dec);
 			secure = 1;
 		}
+
+		xfree(dec);
 
 		if (len == -1)
 			gg_debug(GG_DEBUG_MISC, "// ekg: private key not found\n");
