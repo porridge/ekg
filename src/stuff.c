@@ -1369,7 +1369,9 @@ char *decode_base64(char *buf)
 				*res++ |= val;
 				break;
 		}
-		index = ++index % 4;
+		/* gcc 3.x */
+		index++;
+		index = index % 4;
 	}
 	*res = 0;
 	return res;

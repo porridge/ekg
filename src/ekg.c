@@ -297,18 +297,17 @@ int main(int argc, char **argv)
 
 	for (i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
-			printf("\
-u¿ycie: %s [OPCJE]
-  -u, --user [NAZWA]   korzysta z profilu u¿ytkownika o podanej nazwie
-  -t, --theme [PLIK]   ³aduje opis wygl±du z podanego pliku
-  -n, --no-auto        nie ³±czy siê automatycznie z serwerem
-  -a, --away           po po³±czeniu zmienia stan na ,,zajêty''
-  -b, --back           po po³±czeniu zmienia stan na ,,dostêpny''
-  -i, --invisible      po po³±czeniu zmienia stan na ,,niewidoczny''
-  -p, --private        po po³±czeniu zmienia stan na ,,tylko dla przyjació³''
-  -d, --debug          w³±cza wy¶wietlanie dodatkowych informacji
-
-", argv[0]);
+			printf(""
+"u¿ycie: %s [OPCJE]\n"
+"  -u, --user [NAZWA]   korzysta z profilu u¿ytkownika o podanej nazwie\n"
+"  -t, --theme [PLIK]   ³aduje opis wygl±du z podanego pliku\n"
+"  -n, --no-auto        nie ³±czy siê automatycznie z serwerem\n"
+"  -a, --away           po po³±czeniu zmienia stan na ,,zajêty''\n"
+"  -b, --back           po po³±czeniu zmienia stan na ,,dostêpny''\n"
+"  -i, --invisible      po po³±czeniu zmienia stan na ,,niewidoczny''\n"
+"  -p, --private        po po³±czeniu zmienia stan na ,,tylko dla przyjació³''\n"
+"  -d, --debug          w³±cza wy¶wietlanie dodatkowych informacji\n"
+"\n", argv[0]);
 			return 0;	
 		}
 		if (!strcmp(argv[i], "-b") || !strcmp(argv[i], "--back"))
