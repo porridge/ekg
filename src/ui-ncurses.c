@@ -1680,6 +1680,12 @@ static void ui_ncurses_deinit()
 				struct window *w = l->data;
 
 				if (w->id == i) {
+					if (w->floating) {
+						char *tmp = saprintf("*%d,%d,%d,%d,%d,", w->left, w->top, w->width, w->height, w->frames);
+						string_append(s, tmp);
+						xfree(tmp);
+					}
+				
 					target = w->target;
 					break;
 				}
