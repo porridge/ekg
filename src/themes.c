@@ -1023,6 +1023,7 @@ void theme_init()
 	/* potwierdzenia wiadomo¶ci */
 	format_add("ack_queued", "%> Wiadomo¶æ do %1 zostanie dostarczona pó¼niej\n", 1);
 	format_add("ack_delivered", "%> Wiadomo¶æ do %1 zosta³a dostarczona\n", 1);
+	format_add("ack_filtered", "%! %|Wiadomo¶æ do %1 najprawdopodobniej nie zosta³a dostarczona, poniewa¿ dana osoba jest niedostêpna, a serwer twierdzi, ¿e dorêczy³ wiadomo¶æ. Sytuacja taka ma miejsce, gdy wiadomo¶æ zosta³a odrzucona przez filtry serwera (np. zawiera adres strony WWW)\n", 1);
 	format_add("message_too_long", "%! Wiadomo¶æ jest zbyt d³uga i zosta³a skrócona\n", 1);
 
 	/* ludzie zmieniaj± stan */

@@ -620,7 +620,7 @@ void handle_msg(struct gg_event *e)
 void handle_ack(struct gg_event *e)
 {
 	struct userlist *u = userlist_find(e->event.ack.recipient, NULL);
-	int queued = (e->event.ack.status == GG_ACK_QUEUED);
+	int queued = (e->event.ack.status == GG_ACK_QUEUED), filtered = 0;
 	const char *tmp, *target = (u) ? u->display : itoa(e->event.ack.recipient);
 
 	if (!e->event.ack.seq)	/* ignorujemy potwierdzenia ctcp */
@@ -634,14 +634,21 @@ void handle_ack(struct gg_event *e)
 	if (!config_display_ack)
 		return;
 
+	if (u && !queued && GG_S_NA(u->status)) {
+		filtered = 1;
+		print_window(target, 0, "ack_filtered", format_user(e->event.ack.recipient));
+	}
+
 	if (config_display_ack == 2 && queued)
 		return;
 
 	if (config_display_ack == 3 && !queued)
 		return;
 
-	tmp = queued ? "ack_queued" : "ack_delivered";
-	print_window(target, 0, tmp, format_user(e->event.ack.recipient));
+	if (!filtered) {
+		tmp = queued ? "ack_queued" : "ack_delivered";
+		print_window(target, 0, tmp, format_user(e->event.ack.recipient));
+	}
 }
 
 /*

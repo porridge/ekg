@@ -15,6 +15,7 @@ zg³osi³ b³±d.
   kilka minut po pó³nocy) z powodu ma³ej precyzji, dochodzi³o do pomy³ek (sz)
 - s/gg_remove_notify/gg_remove_notify_ex, ¿eby nie zostawiaæ ¶mieæi np. po
   usuniêciu z listy osoby, któr± blokujemy (sz)
+- ekg ostrzega o mo¿liwo¶ci filtrowania wiadomo¶ci przez serwer (joshua/w)
 
 // 2003-02-09
 
