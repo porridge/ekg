@@ -259,6 +259,7 @@ int config_events_delay;
 char *config_interface;
 int config_header_size;
 int config_ignore_unknown_sender;
+int config_ignore_empty_msg;
 int config_irssi_set_mode;
 int config_keep_reason;
 int config_last;

@@ -514,7 +514,7 @@ void handle_msg(struct gg_event *e)
 		 * ignorujemy puste wiadomosci z jednym obrazkiem - ktos nas pewnie 
 		 * szpieguje (a my i tak nie obslugujemy wyswietlania obrazkow)
 		 */
-		if (imageno && strlen(e->event.msg.message) == 0)
+		if (config_ignore_empty_msg && imageno && strlen(e->event.msg.message) == 0)
 			return;
 	}
 

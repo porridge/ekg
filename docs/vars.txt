@@ -461,6 +461,14 @@ ignore_unknown_sender
 	okre¶la, czy bêd± ignorowane wiadomo¶ci od osób, których nie mamy
 	na swojej li¶cie kontaktów.
 
+ignore_empty_msg
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	okre¶la, czy bêd± ignorowane puste wiadomo¶ci, zawieraj±ce jedynie
+	obrazek, co mo¿e mieæ miejsce, jesli kto¶ sprawdza, czy jeste¶my
+	niewidoczni.
+
 ioctld_enable
 	typ: liczba
 	domy¶lna warto¶æ: 1

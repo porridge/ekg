@@ -194,6 +194,7 @@ char *config_interface = NULL;
 int config_reason_limit = 0;
 char *config_dcc_limit = NULL;
 int config_ignore_unknown_sender = 0;
+int config_ignore_empty_msg = 0;
 #ifdef WITH_WAP
 int config_wap_enabled = 2;
 #endif

@@ -6,6 +6,7 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 
 // 2005-01-30
 
+- dodanie zmiennej ,,ignore_empty_msg'' (porridge/sz)
 - pomijanie ,,\r\n'' w ostatniej linii np. wielolinijkowego statusu (kosma/sz)
 - dodanie funkcji check_conn pomagaj±cej sprawdzaæ czy kto¶ jest 
   niewidoczny (*/del)
