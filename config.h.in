@@ -28,29 +28,29 @@
 #undef HAVE_INT32_T
 #undef HAVE_U_INT32_T
 
-/* definitions of silly archs */
+/* definitions for silly archs */
 #ifndef HAVE_INT8_T
-#define HAVE_INT8_T
+#define HAVE_INT8_T 1
 typedef char int8_t;
 #endif
 #ifndef HAVE_U_INT8_T
-#define HAVE_U_INT8_T
-typedef unsigned char int8_t;
+#define HAVE_U_INT8_T 1
+typedef unsigned char u_int8_t;
 #endif
 #ifndef HAVE_INT16_T
-#define HAVE_INT16_T
+#define HAVE_INT16_T 1
 typedef short int16_t;
 #endif
 #ifndef HAVE_U_INT16_T
-#define HAVE_U_INT16_T
-typedef unsigned short int16_t;
+#define HAVE_U_INT16_T 1
+typedef unsigned short u_int16_t;
 #endif
 #ifndef HAVE_INT32_T
-#define HAVE_INT32_T
+#define HAVE_INT32_T 1
 typedef int int32_t;
 #endif
 #ifndef HAVE_U_INT32_T
-#define HAVE_U_INT32_T
-typedef unsigned int int32_t;
+#define HAVE_U_INT32_T 1
+typedef unsigned int u_int32_t;
 #endif
 
