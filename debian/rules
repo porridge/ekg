@@ -71,8 +71,8 @@ binary-arch: build install
 	dh_installchangelogs -pekg debian/changelog
 	dh_installchangelogs -pekg-dev debian/changelog
 	dh_installchangelogs -pekg-doc debian/changelog
-	sed "s/.TH\ EKG\ n/TH\ EKG\ 1/g"<docs/ekg.man.pl>debian/ekg.1
-	sed "s/.TH\ EKL2\ n/TH\ EKL2\ 1/g"<docs/ekl2.man.pl>debian/ekl2.1
+	sed "s/\.TH\ EKG\ n/\.TH\ EKG\ 1/g"<docs/ekg.man.pl>debian/ekg.1
+	sed "s/\.TH\ EKL2\ n/\.TH\ EKL2\ 1/g"<docs/ekl2.man.pl>debian/ekl2.1
 	if [ ! -f potato-build ]; then dh_installman -pekg debian/ekg.1 debian/ekl2.1;fi
 	if [ -f potato-build ]; then dh_installmanpages -pekg debian/ekg.1 debian/ekl2.1;fi
 	dh_strip
