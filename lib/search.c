@@ -256,7 +256,7 @@ int gg_search_watch_fd(struct gg_http *h)
 			return 0;
 		}
 
-		s->results[s->count].active = (atoi(line[0]) == 2);
+		s->results[s->count].active = atoi(line[0]);
 		s->results[s->count].uin = (strtol(line[1], NULL, 0));
 		s->results[s->count].first_name = strdup(line[2]);
 		s->results[s->count].last_name = strdup(line[3]);

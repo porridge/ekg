@@ -59,8 +59,10 @@ U¯YCIE
     ,,chat''. Informacje o ludziach ,,find <numer/nick>''. Szukanie t±
     sam± komend±, ale z ró¿nymi parametrami. ,,help'' Twoim przyjacielem.
     Je¶li dana komenda ma ró¿ne opcje, pomaga ,,help <komenda>''. By
-    wys³aæ kilkulinijkow± wiadomo¶æ, zamiast tre¶ci wpisz ,,\''
-    (backslash). Koñczy siê lini± z sam± kropk±, anuluje Ctrl-D. 
+    wys³aæ kilkulinijkow± wiadomo¶æ w interfejsie readline, zamiast
+    tre¶ci wpisz ,,\'' (backslash). Koñczy siê lini± z sam± kropk±,
+    anuluje Ctrl-D. W interfejscie ncurses u¿ywa siê Ctrl-Enter
+    (szczegó³y poni¿ej, w rodziale ,,KLAWIATURA'').
 
     Je¶li dana komenda przyjmuje ,,--parametr'' mo¿na u¿yæ równie¿
     skrótu ,,-p'', je¶li nie powoduje to niejednoznaczno¶ci. Uwaga!
@@ -118,6 +120,12 @@ KLAWIATURA
         Alt-N			utwórz nowe okno
 	Alt-K			zamknij aktualne okno
 	Ctrl-Fn			prze³±cza do podanego okna (konsola FreeBSD)
+	Ctrl-Enter		przej¶cie do trybu wielolinijkowego
+
+    Po wej¶ciu do trybu wielolinijkowego poruszamy siê za pomoc± kursorów
+    i zatwierdzamy ponownym wci¶niêciem Ctrl-Enter. By anulowaæ wciskamy
+    Esc i czemy chwilê. Je¶li kombinacja ta nie jest obs³ugiwana przez
+    terminal, mo¿na u¿ywaæ Alt-Enter lub wcisn±æ Esc i zaraz po nim Enter.
 
     Dodatkowo, okre¶lonym kombinacjom klawiszy mo¿na przypisaæ ró¿ne
     komendy za pomoc± polecenia ,,bind''.

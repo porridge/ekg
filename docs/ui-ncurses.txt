@@ -8,11 +8,8 @@ aby wkompilowaæ ten interfejs, nale¿y wykonaæ:
 
 interfejs ten ró¿ni siê nieco od readline z okienkami. g³ówn± ró¿nic± jest
 fakt, ¿e pierwsze okienko istnieje _zawsze_ i jest oknem stanu. do niego
-lec± informacje o pojawianiu siê i znikaniu ludzi. do kolejnych okien
-przechodzi siê klawiszem Alt-<numer> lub Esc, potem cyfra, lub klawiszami
-Ctrl-F1 do Ctrl-F12 na konsoli FreeBSD. mo¿na te¿ przej¶æ komend± ,,window
-switch <numer>''. okna zamyka siê klawiszem Alt-k lub Esc, k, albo komend±
-,,window kill [numer]''.
+lec± informacje o pojawianiu siê i znikaniu ludzi. szczegó³y dotycz±ce
+obs³ugi klawiatury znajduj± siê w pliku README.
 
 zalecane ustawienia:
 
@@ -20,7 +17,7 @@ zalecane ustawienia:
 	set display_sent 1
 	set make_window 2
 
-NIE MO¯NA JESZCZE BINDOWAÆ KLAWISZY ANI WYSY£AÆ WIELOLINIJKOWYCH WIADOMO¦CI!
+NIE MO¯NA JESZCZE BINDOWAÆ KLAWISZY!
 
 pasek stanu zawiera zegar, informacje o w³asnym numerku (kolor okre¶la
 stan: czarny -- niedostêpny, bia³y -- dostêpny, szary -- zajêty, ciemnoszary

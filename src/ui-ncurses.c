@@ -83,16 +83,28 @@ struct window {
 	int prompt_len;		/* d³ugo¶æ prompta lub 0 */
 };
 
-static WINDOW *status = NULL, *input = NULL;
-#define HISTORY_MAX 1000
-static char *history[HISTORY_MAX];
-static int history_index = 0;
-static char line[1000] = "", *yanked = NULL;
-static char **completions = NULL;	/* lista dope³nieñ */
-static list_t windows = NULL;
-static struct window *window_current;
+static WINDOW *status = NULL;		/* okno stanu */
+static WINDOW *input = NULL;		/* okno wpisywania tekstu */
 
-#define output_size (stdscr->_maxy - 1)
+#define HISTORY_MAX 1000		/* maksymalna ilo¶æ wpisów historii */
+static char *history[HISTORY_MAX];	/* zapamiêtane linie */
+static int history_index = 0;		/* offset w historii */
+
+#define LINE_MAXLEN 1000		/* rozmiar linii */
+static char *line = NULL;		/* wska¼nik aktualnej linii */
+static char *yanked = NULL;		/* bufor z ostatnio wyciêtym tekstem */
+static char **lines = NULL;		/* linie wpisywania wielolinijkowego */
+static int line_start = 0;		/* od którego znaku wy¶wietlamy? */
+static int line_index = 0;		/* na którym znaku jest kursor? */
+static int lines_start = 0;		/* od której linii wy¶wietlamy? */
+static int lines_index = 0;		/* w której linii jeste¶my? */
+static char **completions = NULL;	/* lista dope³nieñ */
+static list_t windows = NULL;		/* lista okien */
+static struct window *window_current;	/* wska¼nik na aktualne okno */
+static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
+
+/* rozmiar okna wy¶wietlaj±cego tekst */
+#define output_size (stdscr->_maxy - input_size)
 
 /*
  * ui_debug()
@@ -688,17 +700,38 @@ static void ui_ncurses_deinit()
 }
 
 /*
- * adjust()
+ * line_adjust()
  *
- * ustawia kursor w odpowiednim miejscu ekranu po zmianie tekstu.
+ * ustawia kursor w odpowiednim miejscu ekranu po zmianie tekstu w poziomie.
  */
-#define adjust() \
-{ \
-	line_index = strlen(line); \
-	if (strlen(line) < input->_maxx - 9 - window_current->prompt_len) \
-		line_start = 0; \
-	else \
-		line_start = strlen(line) - strlen(line) % (input->_maxx - 9 - window_current->prompt_len); \
+static void line_adjust()
+{
+	int prompt_len = (lines) ? 0 : window_current->prompt_len;
+
+	line_index = strlen(line);
+	if (strlen(line) < input->_maxx - 9 - prompt_len)
+		line_start = 0;
+	else
+		line_start = strlen(line) - strlen(line) % (input->_maxx - 9 - prompt_len);
+}
+
+/*
+ * lines_adjust()
+ *
+ * poprawia kursor po przesuwaniu go w pionie.
+ */
+static void lines_adjust()
+{
+	if (lines_index < lines_start)
+		lines_start = lines_index;
+
+	if (lines_index - 4 > lines_start)
+		lines_start = lines_index - 4;
+
+	line = lines[lines_index];
+
+	if (line_index > strlen(line))
+		line_index = strlen(line);
 }
 
 void dcc_generator(const char *text, int len)
@@ -897,9 +930,9 @@ static void complete(int *line_start, int *line_index)
 
 	if (!strcmp(line, "") || (!strncasecmp(line, cmd, strlen(cmd)) && blanks == 2 && send_nicks_count > 0) || !strcasecmp(line, cmd)) {
 		if (send_nicks_count)
-			snprintf(line, sizeof(line), (window_current->target) ? "/%s%s " : "%s%s ", cmd, send_nicks[send_nicks_index++]);
+			snprintf(line, LINE_MAXLEN, (window_current->target) ? "/%s%s " : "%s%s ", cmd, send_nicks[send_nicks_index++]);
 		else
-			snprintf(line, sizeof(line), (window_current->target) ? "/%s" : "%s", cmd);
+			snprintf(line, LINE_MAXLEN, (window_current->target) ? "/%s" : "%s", cmd);
 		*line_start = 0;
 		*line_index = strlen(line);
 		if (send_nicks_index >= send_nicks_count)
@@ -965,7 +998,7 @@ static void complete(int *line_start, int *line_index)
 	count = array_count(completions);
 
 	if (count == 1) {
-		snprintf(start, sizeof(line) - (start - line), "%s ", completions[0]);
+		snprintf(start, LINE_MAXLEN - (start - line), "%s ", completions[0]);
 		*line_index = strlen(line);
 		array_free(completions);
 		completions = NULL;
@@ -994,7 +1027,7 @@ static void complete(int *line_start, int *line_index)
 				break;
 		}
 
-		if (common > strlen(start) && start - line + common < sizeof(line)) {
+		if (common > strlen(start) && start - line + common < LINE_MAXLEN) {
 			snprintf(start, common + 1, "%s", completions[0]);
 			*line_index = strlen(line);
 		}
@@ -1004,13 +1037,72 @@ static void complete(int *line_start, int *line_index)
 }
 
 /*
+ * update_input()
+ *
+ * uaktualnia zmianê rozmiaru pola wpisywania tekstu -- przesuwa okienka
+ * itd. je¶li zmieniono na pojedyncze, czy¶ci dane wej¶ciowe.
+ */
+static void update_input()
+{
+	list_t l;
+
+	if (input_size == 1) {
+		int i;
+		
+		for (i = 0; lines[i]; i++)
+			xfree(lines[i]);
+		xfree(lines);
+		lines = NULL;
+
+		line = xmalloc(LINE_MAXLEN);
+		strcpy(line, "");
+
+		line_start = 0;
+		line_index = 0; 
+		lines_start = 0;
+		lines_index = 0;
+	} else {
+		lines = xmalloc(2 * sizeof(char*));
+		lines[0] = xmalloc(LINE_MAXLEN);
+		lines[1] = NULL;
+		strcpy(lines[0], line);
+		xfree(line);
+		line = lines[0];
+		lines_start = 0;
+		lines_index = 0;
+	}
+	
+	/* przesuñ/ods³oñ okienka */
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data;
+
+		if (input_size == 5 && w->lines - w->start == output_size + 4)
+			w->start += 4;
+
+		if (input_size == 1 && w->lines - w->start == output_size - 4)
+			w->start -= 4;
+	}
+
+	mvwin(status, stdscr->_maxy - input_size, 0);
+	wresize(input, input_size, input->_maxx + 1);
+	mvwin(input, stdscr->_maxy - input_size + 1, 0);
+	wmove(input, 0, 0);
+	
+	window_refresh();
+	wnoutrefresh(status);
+	wnoutrefresh(input);
+	doupdate();
+}
+	
+/*
  * ui_ncurses_loop()
  *
  * g³ówna pêtla interfejsu.
  */
 static void ui_ncurses_loop()
 {
-	int line_start = 0, line_index = 0;
+	line = xmalloc(LINE_MAXLEN);
+	strcpy(line, "");
 
 	history[0] = line;
 
@@ -1030,49 +1122,138 @@ static void ui_ncurses_loop()
 					break;
 				}
 				
-				if (ch >= '1' && ch <= '9')
+				if (ch >= '1' && ch <= '9')	/* Alt-cyfra */
 					window_switch(ch - '1' + 1);
 				else if (ch == '0')
 					window_switch(10);
 
-				if (ch == 'k')
+				if (ch == 'k' || ch == 'K')	/* Alt-K */
 					ui_event("command", "window", "kill", NULL);
 
-				if (ch == 'n')
+				if (ch == 'n' || ch == 'N')	/* Alt-N */
 					ui_event("command", "window", "new");
+
+				if (ch == 13) {		/* Ctrl-Enter */
+					if (input_size == 1)
+						input_size = 5;
+					else {
+						string_t s = string_init("");
+						int i;
+						
+						for (i = 0; lines[i]; i++) {
+							if (!strcmp(lines[i], "") && !lines[i + 1])
+								break;
+
+							string_append(s, lines[i]);
+							string_append(s, "\r\n");
+						}
+
+						command_exec(window_current->target, s->str);
+
+						string_free(s, 1);
+
+						input_size = 1;
+					}
+					
+					update_input();
+				}
+
+				if (ch == 27 && input_size == 5) {  /* Esc */
+					input_size = 1;
+
+					update_input();
+				}
 
 				break;
 				
 			case KEY_BACKSPACE:
 			case 8:
 			case 127:
+				if (lines && line_index == 0 && lines_index > 0 && strlen(lines[lines_index]) + strlen(lines[lines_index - 1]) < LINE_MAXLEN) {
+					int i;
+
+					line_index = strlen(lines[lines_index - 1]);
+					strcat(lines[lines_index - 1], lines[lines_index]);
+					
+					xfree(lines[lines_index]);
+
+					for (i = lines_index; i < array_count(lines); i++)
+						lines[i] = lines[i + 1];
+
+					lines = xrealloc(lines, (array_count(lines) + 1) * sizeof(char*));
+
+					lines_index--;
+					lines_adjust();
+
+					break;
+				}
+
 				if (strlen(line) > 0 && line_index > 0) {
-					memmove(line + line_index - 1, line + line_index, sizeof(line) - line_index);
-					line[sizeof(line) - 1] = 0;
+					memmove(line + line_index - 1, line + line_index, LINE_MAXLEN - line_index);
+					line[LINE_MAXLEN - 1] = 0;
 					line_index--;
 				}
 				break;
 
 			case 'Y' - 64:
-				if (yanked && strlen(yanked) + strlen(line) + 1 < sizeof(line)) {
-					memmove(line + line_index + strlen(yanked), line + line_index, sizeof(line) - line_index - strlen(yanked));
+				if (yanked && strlen(yanked) + strlen(line) + 1 < LINE_MAXLEN) {
+					memmove(line + line_index + strlen(yanked), line + line_index, LINE_MAXLEN - line_index - strlen(yanked));
 					memcpy(line + line_index, yanked, strlen(yanked));
 					line_index += strlen(yanked);
 				}
 				break;
 
-			case KEY_DC:
+			case KEY_DC:	/* Ctrl-D, Delete */
 			case 'D' - 64:
+				if (line_index == strlen(line) && lines_index < array_count(lines) - 1 && strlen(line) + strlen(lines[lines_index + 1]) < LINE_MAXLEN) {
+					int i;
+
+					strcat(line, lines[lines_index + 1]);
+
+					xfree(lines[lines_index + 1]);
+
+					for (i = lines_index + 1; i < array_count(lines); i++)
+						lines[i] = lines[i + 1];
+
+					lines = xrealloc(lines, (array_count(lines) + 1) * sizeof(char*));
+
+					lines_adjust();
+					
+					break;
+				}
+				
 				if (line_index < strlen(line)) {
-					memmove(line + line_index, line + line_index + 1, sizeof(line) - line_index - 1);
-					line[sizeof(line) - 1] = 0;
+					memmove(line + line_index, line + line_index + 1, LINE_MAXLEN - line_index - 1);
+					line[LINE_MAXLEN - 1] = 0;
 				}
 				break;	
 				
-			case KEY_ENTER:
+			case KEY_ENTER:	/* Enter */
 			case 13:
 			{
-				char *tmp = xstrdup(line);
+				char *tmp;
+
+				if (lines) {
+					int i;
+
+					lines = xrealloc(lines, (array_count(lines) + 2) * sizeof(char*));
+
+					for (i = array_count(lines); i > lines_index; i--)
+						lines[i + 1] = lines[i];
+
+					lines[lines_index + 1] = xmalloc(LINE_MAXLEN);
+					strcpy(lines[lines_index + 1], line + line_index);
+					line[line_index] = 0;
+					
+					line_index = 0;
+					lines_index++;
+
+					lines_adjust();
+					
+					break;
+				}
+				
+				tmp = xstrdup(line);
 				
 				command_exec(window_current->target, tmp);
 				xfree(tmp);
@@ -1084,18 +1265,32 @@ static void ui_ncurses_loop()
 				history[0] = line;
 				history_index = 0;
 				line[0] = 0;
-				adjust();
+				line_adjust();
 				break;	
 			}
 
-			case 'U' - 64:
+			case 'U' - 64:	/* Ctrl-U */
 				xfree(yanked);
 				yanked = strdup(line);
 				line[0] = 0;
-				adjust();
+				line_adjust();
+
+				if (lines && lines_index < array_count(lines) - 1) {
+					int i;
+
+					xfree(lines[lines_index]);
+
+					for (i = lines_index; i < array_count(lines); i++)
+						lines[i] = lines[i + 1];
+
+					lines = xrealloc(lines, (array_count(lines) + 1) * sizeof(char*));
+
+					lines_adjust();
+				}
+
 				break;
 
-			case 'W' - 64:
+			case 'W' - 64:	/* Ctrl-W */
 			{
 				char *p;
 				int eaten = 0;
@@ -1117,53 +1312,106 @@ static void ui_ncurses_loop()
 				break;
 			}
 
-			case 'L' - 64:
+			case 'L' - 64:	/* Ctrl-L */
 				ui_event("command", "window", "refresh");
 				break;
 				
-			case 9:
-				complete(&line_start, &line_index);
+			case 9:		/* Tab */
+				if (!lines)
+					complete(&line_start, &line_index);
+
+				/* XXX tab w wielolinijkowym */
 
 				break;
 				
-			case KEY_LEFT:
+			case KEY_LEFT:	/* <-- */
+				if (lines) {
+					if (line_index > 0)
+						line_index--;
+					else {
+						if (lines_index > 0)
+							lines_index--;
+						lines_adjust();
+					}
+
+					break;
+				}
+
 				if (line_index > 0)
 					line_index--;
 				break;
 				
-			case KEY_RIGHT:
+			case KEY_RIGHT:	/* --> */
+				if (lines) {
+					if (line_index < strlen(line))
+						line_index++;
+					else {
+						if (lines_index < array_count(lines) - 1)
+							lines_index++;
+						lines_adjust();
+					}
+
+					break;
+				}
+
 				if (line_index < strlen(line))
 					line_index++;
 				break;
 				
-			case 'E' - 64:
+			case 'E' - 64:	/* Ctrl-E, End */
 			case KEY_END:
 			case KEY_SELECT:
-				adjust();
+				line_adjust();
 				break;
 				
-			case 'A' - 64:
+			case 'A' - 64:	/* Ctrl-A, Home */
 			case KEY_HOME:
 			case KEY_FIND:
 				line_index = 0;
 				line_start = 0;
 				break;
 				
-			case KEY_UP:
+			case KEY_UP:	/* /\ */
+				if (lines) {
+					if (lines_index - lines_start == 0)
+						if (lines_start)
+							lines_start--;
+
+					if (lines_index)
+						lines_index--;
+
+					lines_adjust();
+
+					break;
+				}
+				
 				if (history[history_index + 1]) {
 					if (history_index == 0)
 						history[0] = xstrdup(line);
 					history_index++;
 					strcpy(line, history[history_index]);
-					adjust();
+					line_adjust();
 				}
 				break;
 				
-			case KEY_DOWN:
+			case KEY_DOWN:	/* \/ */
+				if (lines) {
+					if (lines_index - line_start == 4)
+						if (lines_index < array_count(lines) - 1)
+							lines_start++;
+
+					if (lines_index < array_count(lines) - 1)
+						lines_index++;
+
+					lines_adjust();
+
+					break;
+				}
+
 				if (history_index > 0) {
 					history_index--;
 					strcpy(line, history[history_index]);
-					adjust();
+					line_adjust();
 					if (history_index == 0) {
 						xfree(history[0]);
 						history[0] = line;
@@ -1171,38 +1419,38 @@ static void ui_ncurses_loop()
 				}
 				break;
 				
-			case KEY_PPAGE:
+			case KEY_PPAGE:	/* Page Up */
 				window_current->start -= output_size;
 				if (window_current->start < 0)
 					window_current->start = 0;
 
 				break;
 
-			case KEY_NPAGE:
+			case KEY_NPAGE:	/* Page Down */
 				window_current->start += output_size;
 				if (window_current->start > window_current->lines - output_size)
 					window_current->start = window_current->lines - output_size;
 
 				break;
 				
-			case KEY_F(1):
+			case KEY_F(1):	/* F1 */
 				binding_help(0, 0);
 				break;
 
-			case KEY_F(2):
+			case KEY_F(2):	/* F2 */
 				binding_quick_list(0, 0);
 				break;
 
-			case KEY_F(12):
+			case KEY_F(12):	/* F3 */
 				binding_toggle_debug(0, 0);
 				break;
 				
 			default:
 				if (ch < 32)
 					break;
-				if (strlen(line) >= sizeof(line) - 1)
+				if (strlen(line) >= LINE_MAXLEN - 1)
 					break;
-				memmove(line + line_index + 1, line + line_index, sizeof(line) - line_index - 1);
+				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
 
 				line[line_index++] = ch;
 		}
@@ -1223,18 +1471,35 @@ static void ui_ncurses_loop()
 		window_refresh();
 		werase(input);
 		wattrset(input, COLOR_PAIR(7));
-		if (window_current->prompt) {
-			mvwaddstr(input, 0, 0, window_current->prompt);
-			mvwaddstr(input, 0, window_current->prompt_len, line + line_start);
-		} else
-			mvwaddstr(input, 0, 0, line + line_start);
-		wattrset(input, COLOR_PAIR(16) | A_BOLD);
-		if (line_start > 0)
-			mvwaddch(input, 0, window_current->prompt_len, '<');
-		if (strlen(line) - line_start > input->_maxx + 1 - window_current->prompt_len)
-			mvwaddch(input, 0, input->_maxx, '>');
-		wattrset(input, COLOR_PAIR(7));
-		wmove(input, 0, line_index - line_start + window_current->prompt_len);
+
+		if (lines) {
+			int i;
+			
+			for (i = 0; i < 5; i++) {
+				unsigned char *p;
+				int j;
+
+				if (!lines[lines_start + i])
+					break;
+				for (j = 0, p = lines[lines_start + i] + line_start; *p && j < input->_maxx + 1; p++, j++)
+					mvwaddch(input, i, j, *p);
+			}
+
+			wmove(input, lines_index - lines_start, line_index - line_start);
+		} else {
+			if (window_current->prompt) {
+				mvwaddstr(input, 0, 0, window_current->prompt);
+				mvwaddstr(input, 0, window_current->prompt_len, line + line_start);
+			} else
+				mvwaddstr(input, 0, 0, line + line_start);
+			wattrset(input, COLOR_PAIR(16) | A_BOLD);
+			if (line_start > 0)
+				mvwaddch(input, 0, window_current->prompt_len, '<');
+			if (strlen(line) - line_start > input->_maxx + 1 - window_current->prompt_len)
+				mvwaddch(input, 0, input->_maxx, '>');
+			wattrset(input, COLOR_PAIR(7));
+			wmove(input, 0, line_index - line_start + window_current->prompt_len);
+		}
 		wnoutrefresh(status);
 		wnoutrefresh(input);
 		doupdate();

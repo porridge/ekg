@@ -12,6 +12,14 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - ,,window clear'' dzia³a w ui-ncurses. wzorowane na irssi, gdzie
   zawarto¶æ okna nie jest kompletnie czyszczona, tylko przewijana
   poza obszar ekranu (w)
+- zmiana zachowania gg_search(). active w wyniku bêdzie zawiera³o
+  stan danej osoby. z tego wzglêdu bêdzie wy¶wietla³o te¿ zajêtych
+  jako dostêpnych w aplikacjach. podbicie API, mimo ¿e powinno byæ
+  ABI. tyle, ¿e z powodu takiej bzdury nie warto psuæ zale¿no¶ci (w)
+- wielolinijkowe wiadomo¶ci w ui-ncurses, wywo³ywane Ctrl-Enter,
+  Alt-Enter lub Esc-Enter. wysy³ane t± sam± kombinacj±, anulowane
+  samym Esc. teoretycznie mo¿e powodowaæ segfaulty, ale sprawdzi³em
+  valgrindem i niczego niebezpiecznego nie znalaz³. (w)
 
 // 2002-09-11
 

@@ -453,6 +453,7 @@ static void handle_common(uin_t uin, int status, const char *descr, struct gg_no
 		if (GG_S_A(s->status) && config_completion_notify) 
 			add_send_nick(u->display);
 		if (GG_S_B(s->status) && (config_completion_notify & 4))
+			add_send_nick(u->display);
 		if (GG_S_NA(s->status) && (config_completion_notify & 2))
 			remove_send_nick(u->display);
 		
@@ -675,7 +676,18 @@ void handle_search(struct gg_http *h)
 		name = saprintf("%s %s", s->results[i].first_name, s->results[i].last_name);
 
 		if (!(h->id & 1)) {
-			active_format = format_find((s->results[i].active) ? "search_results_single_active" : "search_results_single_inactive");
+			switch (s->results[i].active) {
+				case GG_STATUS_AVAIL:
+					active_format = format_find("search_results_single_active");
+					break;
+
+				case GG_STATUS_BUSY:
+					active_format = format_find("search_results_single_busy");
+					break;
+				default:
+					active_format = format_find("search_results_single_inactive");
+			}
+
 			if (s->results[i].gender == GG_GENDER_FEMALE)
 				gender_format = format_find("search_results_single_female");
 			else if (s->results[i].gender == GG_GENDER_MALE)
@@ -683,7 +695,18 @@ void handle_search(struct gg_http *h)
 			else
 				gender_format = format_find("search_results_single_male");
 		} else {
-			active_format = format_find((s->results[i].active) ? "search_results_multi_active" : "search_results_multi_inactive");
+			switch (s->results[i].active) {
+				case GG_STATUS_AVAIL:
+					active_format = format_find("search_results_multi_active");
+					break;
+
+				case GG_STATUS_BUSY:
+					active_format = format_find("search_results_multi_busy");
+					break;
+				default:
+					active_format = format_find("search_results_multi_inactive");
+			}
+
 			if (s->results[i].gender == GG_GENDER_FEMALE)
 				gender_format = format_find("search_results_multi_female");
 			else if (s->results[i].gender == GG_GENDER_MALE)
