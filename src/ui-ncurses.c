@@ -2220,7 +2220,7 @@ static void complete(int *line_start, int *line_index)
 	/* nietypowe dope³nienie nicków przy rozmowach */
 	cmd = saprintf("/%s ", (config_tab_command) ? config_tab_command : "chat");
 
-	if (!strcmp(line, "") || (!strncasecmp(line, cmd, strlen(cmd)) && array_count(words) == 2 && send_nicks_count > 0) || (!strcasecmp(line, cmd) && send_nicks_count > 0)) {
+	if (!strcmp(line, "") || (!strncasecmp(line, cmd, strlen(cmd)) && word == 2 && send_nicks_count > 0) || (!strcasecmp(line, cmd) && send_nicks_count > 0)) {
 		if (send_nicks_index >= send_nicks_count)
 			send_nicks_index = 0;
 
