@@ -6,6 +6,8 @@ d - drg, sz - szalik, del - deletek).
 
 // 2004-03-03
 
+- poprawka zwi±zana z b³êdnym interpretowaniem komand np:
+  po wpisaniu /qui wykonywana by³a komenda /quit (del)
 - poprawka TAB completition (pare b³êdów, cleanup, komentarze) (del)
 - poprawka formatu ,,ncurses_timestamp'' (kfahoo/w)
 

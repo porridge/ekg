@@ -4248,10 +4248,10 @@ int command_exec(const char *target, const char *xline, int quiet)
 			last_abbr = c->function;
 			last_name = c->name;
 			last_params = (c->alias) ? "?" : c->params;
-			abbrs = 1;		
+			abbrs = 1;	
 			break;
 		}
-		if (!strncasecmp(c->name, cmd, strlen(cmd))) {
+		if (!strncasecmp(c->name, cmd, strlen(cmd) + 1)) {
 			abbrs++;
 			last_abbr = c->function;
 			last_name = c->name;
