@@ -2485,7 +2485,7 @@ COMMAND(cmd_test_keygen)
 	mkdir(prepare_path("keys", 1), 0700);
 
 	if (sim_key_generate(config_uin)) {
-		printq("generic", "Nie uda³o siê wygenerowaæ klucza");
+		printq("generic_error", "Nie uda³o siê wygenerowaæ klucza");
 		return -1;
 	}
 

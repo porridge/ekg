@@ -734,7 +734,13 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 
 	/* a je¶li jest opis, to go zapamiêtaj */
 	if (descr) {
+		char *tmp = NULL;
 		u->descr = xstrdup(descr);
+
+		/* niektóre klienty pozwalaj± na '\n' - psuje nam to wy¶wietlanie */
+		if ((tmp = strchr(u->descr, '\n')))
+			*tmp = ' ';
+
 		cp_to_iso(u->descr);
 	}
 
