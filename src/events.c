@@ -1331,14 +1331,12 @@ void handle_token(struct gg_http *h)
 		goto fail;
 	}
 
-	if (write(fd, h->body, h->body_size) != h->body_size) {
+	if ((write(fd, h->body, h->body_size) != h->body_size) || (close(fd) != 0)) {
 		print("token_failed", strerror(errno));
 		close(fd);
 		unlink(file);
 		goto fail;
 	}
-
-	close(fd);
 
 #ifdef HAVE_LIBJPEG
 	if (config_display_token) {
