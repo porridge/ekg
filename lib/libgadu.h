@@ -206,7 +206,7 @@ void gg_search_cancel(struct gg_search *f);
  * siê ustawiaæ odpowiednich leveli, wiêc wiêkszo¶æ sz³a do _MISC.
  */
 
-int gg_debug_level;
+extern int gg_debug_level;
 
 #define GG_DEBUG_NET 1
 #define GG_DEBUG_TRAFFIC 2
