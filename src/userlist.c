@@ -126,7 +126,7 @@ int userlist_read()
 			}
 
 			for (i = 0; i < 6; i++) {
-				if (entry[i] && !strcmp(entry[i], "(null)")) {
+				if (entry[i] && (!strcmp(entry[i], "(null)") || !strcmp(entry[i], ""))) {
 					xfree(entry[i]);
 					entry[i] = NULL;
 				}
@@ -291,11 +291,13 @@ char *userlist_dump()
 		groups = group_to_string(u->groups, 1);
 		
 		line = saprintf("%s;%s;%s;%s;%s;%s;%lu\r\n",
-			(u->first_name) ?
-			u->first_name : u->display, (u->last_name) ?
-			u->last_name : "", (u->nickname) ? u->nickname :
-			u->display, u->display, (u->mobile) ? u->mobile :
-			"", groups, u->uin);
+			(u->first_name) ? u->first_name : "",
+			(u->last_name) ? u->last_name : "",
+			(u->nickname) ? u->nickname : ((u->display) ? u->display: ""),
+			(u->display) ? u->display : "",
+			(u->mobile) ? u->mobile : "",
+			groups,
+			u->uin);
 		
 		string_append(s, line);
 
