@@ -67,6 +67,7 @@ struct gg_session {
 	int port;       	/* port, z którym siê ³±czymy */
 	int seq;        	/* numer sekwencyjny ostatniej wiadomo¶ci */
 	int last_pong;  	/* czas otrzymania ostatniego ping/pong */
+	int last_event;		/* czas otrzymania ostatniego pakietu */
 
 	unsigned int server_ip;	/* adres serwera */
 	unsigned int client_ip;	/* adres klienta */

@@ -9,6 +9,8 @@ oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
 - gg_send_packet() o zmiennej ilo¶ci parametrów (a)
 - informowanie o wiadomo¶ciach konferencyjnych przez API libgg (a)
+- poprawki w gg_watch_fd_connected() (w)
+- dodanie gg_session->last_event (a/w)
 
 // 2001-12-16
  
