@@ -3071,6 +3071,7 @@ void change_status(int status, const char *arg, int autom)
 	if (arg && !strcmp(arg, "-")) {
 		xfree(reason);
 		reason = NULL;
+		status = ekg_hide_descr_status(status);
 	}
 
 	if (reason)
