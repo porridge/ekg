@@ -275,10 +275,11 @@ char *va_format_string(const char *format, va_list ap)
 				string_append(buf, prompt2_cache);
 			if (*p == '!')
 				string_append(buf, error_cache);
+			if (*p == '|')
+				string_append(buf, "\033[00m");	/* g³upie, wiem */
 			if (*p == '#')
 				string_append(buf, timestamp(timestamp_cache));
-			if (config_display_color && isalpha(*p) && 
-			    automaton_color_escapes) {
+			if (config_display_color && isalpha(*p) && automaton_color_escapes) {
 				string_append_c(buf, '\033');
 				string_append_c(buf, *p);
 			} else if (config_display_color) {
@@ -422,6 +423,7 @@ fstring_t reformat_string(const char *str)
 
 	res->str = xmalloc(len + 1);
 	res->attr = xmalloc(len + 1);
+	res->prompt_len = 0;
 
 	for (i = 0, j = 0; str[i]; i++) {
 		if (str[i] == 27) {
@@ -441,8 +443,13 @@ fstring_t reformat_string(const char *str)
 				}
 
 				if (str[i] == ';' || isalpha(str[i])) {
-					if (tmp == 0)
+					if (tmp == 0) {
 						attr = 128;
+
+						/* prompt jako \033[00m */
+						if (str[i - 1] == '0' && str[i - 2] == '0')
+							res->prompt_len = j;
+					}
 
 					if (tmp == 1)
 						attr |= 64;
@@ -716,7 +723,7 @@ int theme_read(const char *filename, int replace)
 		if (!strchr(filename, '/')) {
 			f = try_open(f, prepare_path("", 0), fn);
 			f = try_open(f, prepare_path("themes", 0), fn);
-			f = try_open(f, THEMES_DIR, fn);
+			f = try_open(f, DATA_DIR "/themes", fn);
 		}
 
 		xfree(fn);
@@ -877,10 +884,15 @@ void theme_init()
 	
 	/* pomoc */
 	format_add("help", "%> %1%2 - %3%4\n", 1);
-	format_add("help_more", "%) %1\n", 1);
+	format_add("help_more", "%) %|%1\n", 1);
 	format_add("help_alias", "%) %T%1%n jest aliasem i nie posiada opisu\n", 1);
-	format_add("help_footer", " \n%> Gwiazdka (%T*%n) oznacza, ¿e mo¿na uzyskaæ wiêcej szczegó³ów\n\n", 1);
-	format_add("help_quick", "%> Przed u¿yciem przeczytaj ulotkê. Plik %Tdocs/ULOTKA%n zawiera krótki\n%> przewodnik po za³±czonej dokumentacji. Je¶li go nie masz, mo¿esz\n%> ¶ci±gn±æ pakiet ze strony %Thttp://dev.null.pl/ekg/%n\n", 1);
+	format_add("help_footer", "\n%> Gwiazdka (%T*%n) oznacza, ¿e mo¿na uzyskaæ wiêcej szczegó³ów\n\n", 1);
+	format_add("help_quick", "%> %|Przed u¿yciem przeczytaj ulotkê. Plik %Tdocs/ULOTKA%n zawiera krótki przewodnik po za³±czonej dokumentacji. Je¶li go nie masz, mo¿esz ¶ci±gn±æ pakiet ze strony %Thttp://dev.null.pl/ekg/%n\n", 1);
+	format_add("help_set_file_not_found", "%! Nie znaleziono opisu zmiennych (nieprawid³owa instalacja)\n", 1);
+	format_add("help_set_var_not_found", "%! Nie znaleziono opisu zmiennej %T%1%n\n", 1);
+	format_add("help_set_header", "%> %T%1%n (%2, domy¶lna warto¶æ: %3)\n%>\n", 1);
+	format_add("help_set_body", "%> %|%1\n", 1);
+	format_add("help_set_footer", "", 1);
 
 	/* ignore, unignore, block, unblock */
 	format_add("ignored_added", "%> Dodano %T%1%n do listy ignorowanych\n", 1);

@@ -18,6 +18,7 @@ klient:
 - zmienna beep_*_away (rmrmg)
 - mo¿liwo¶æ bindowania akcji klienta (end-of-line, yank-buffer itp.)
   nie tylko komend,
+- taby w stderr,
 
 klient (ncurses):
 - reakcja na zmianê rozmiaru terminala,

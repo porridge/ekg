@@ -82,8 +82,14 @@ static void binding_delete(const char *key, int quiet);
 
 struct screen_line {
 	int len;
+	
 	char *str;
 	char *attr;
+	
+	char *prompt_str;
+	char *prompt_attr;
+	int prompt_len;
+	
 	char *ts;
 	int ts_len;
 };
@@ -244,11 +250,11 @@ int window_backlog_split(struct window *w, int full)
 	for (i = w->backlog_size - 1; i >= 0; i--) {
 		struct screen_line *l;
 		char *str, *attr;
-		time_t ts;
 		int j;
+		time_t ts;
 
-		str = w->backlog[i]->str;
-		attr = w->backlog[i]->attr;
+		str = w->backlog[i]->str + w->backlog[i]->prompt_len;
+		attr = w->backlog[i]->attr + w->backlog[i]->prompt_len;
 		ts = w->backlog[i]->ts;
 
 		for (;;) {
@@ -267,6 +273,10 @@ int window_backlog_split(struct window *w, int full)
 			l->ts = NULL;
 			l->ts_len = 0;
 
+			l->prompt_len = w->backlog[i]->prompt_len;
+			l->prompt_str = w->backlog[i]->str;
+			l->prompt_attr = w->backlog[i]->attr;
+
 			if (!w->floating && config_timestamp) {
 				struct tm *tm = localtime(&ts);
 				char buf[100];
@@ -275,7 +285,7 @@ int window_backlog_split(struct window *w, int full)
 				l->ts_len = strlen(l->ts);
 			}
 
-			width = w->width - l->ts_len;
+			width = w->width - l->ts_len - l->prompt_len;
 			if ((w->frames & WF_LEFT))
 				width -= 2;
 			if ((w->frames & WF_RIGHT))
@@ -382,6 +392,36 @@ void window_redraw(struct window *w)
 		for (x = 0; l->ts && x < l->ts_len; x++)
 			mvwaddch(w->window, top + y, left + x, (unsigned char) l->ts[x]);
 
+		/* XXX po³±czyæ wy¶wietlanie prompta i linii w jeden kod */
+
+		for (x = 0; x < l->prompt_len; x++) {
+			int attr = A_NORMAL;
+			unsigned char ch = l->prompt_str[x];
+
+			if ((l->prompt_attr[x] & 64))
+				attr |= A_BOLD;
+
+			if (!(l->prompt_attr[x] & 128)) {
+				int tmp = l->prompt_attr[x] & 7;
+
+				attr |= COLOR_PAIR((tmp) ? tmp : 16);
+			}
+
+			if (ch < 32) {
+				ch += 64;
+				attr |= A_REVERSE;
+			}
+
+			if (ch > 127 && ch < 160) {
+				ch = '?';
+				attr |= A_REVERSE;
+			}
+
+			wattrset(w->window, attr);
+
+			mvwaddch(w->window, top + y, left + x + l->ts_len, ch);
+		}
+
 		for (x = 0; x < l->len; x++) {
 			int attr = A_NORMAL;
 			unsigned char ch = l->str[x];
@@ -407,7 +447,7 @@ void window_redraw(struct window *w)
 
 			wattrset(w->window, attr);
 
-			mvwaddch(w->window, top + y, left + x + l->ts_len, ch);
+			mvwaddch(w->window, top + y, left + x + l->ts_len + l->prompt_len, ch);
 		}
 	}
 

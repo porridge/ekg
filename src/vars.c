@@ -33,6 +33,7 @@
 #include "dynstuff.h"
 #include "xmalloc.h"
 #include "ui.h"
+#include "themes.h"
 
 list_t variables = NULL;
 
@@ -617,3 +618,90 @@ int variable_undigest(const char *digest)
 
 	return 0;
 }
+
+/*
+ * variable_help()
+ *
+ * wy¶wietla pomoc dotycz±c± danej zmiennej na podstawie pliku
+ * ${datadir}/ekg/vars.txt.
+ *
+ * - name - nazwa zmiennej
+ */
+void variable_help(const char *name)
+{
+	FILE *f = fopen(DATA_DIR "/vars.txt", "r");
+	char *line, *type = NULL, *def = NULL, *tmp;
+	string_t s = string_init(NULL);
+	int found = 0;
+
+	if (!f) {
+		print("help_set_file_not_found");
+		return;
+	}
+
+	while ((line = read_file(f))) {
+		if (!strcasecmp(line, name)) {
+			found = 1;
+			xfree(line);
+			break;
+		}
+
+		xfree(line);
+	}
+
+	if (!found) {
+		fclose(f);
+		print("help_set_var_not_found", name);
+		return;
+	}
+
+	line = read_file(f);
+	
+	if ((tmp = strstr(line, ": ")))
+		type = xstrdup(tmp + 2);
+	else
+		type = xstrdup("?");
+	
+	xfree(line);
+	
+	line = read_file(f);
+	if ((tmp = strstr(line, ": ")))
+		def = xstrdup(tmp + 2);
+	else
+		def = xstrdup("?");
+	xfree(line);
+
+	print("help_set_header", name, type, def);
+
+	xfree(type);
+	xfree(def);
+
+	xfree(read_file(f));	/* pomijamy liniê */
+
+	while ((line = read_file(f))) {
+		if (line[0] != '\t') {
+			xfree(line);
+			break;
+		}
+
+		if (!strncmp(line, "\t- ", 3) && strcmp(s->str, "")) {
+			print("help_set_body", s->str);
+			string_clear(s);
+		}
+		
+		string_append(s, line + 1);
+
+		if (line[strlen(line) - 1] != ' ')
+			string_append_c(s, ' ');
+
+		xfree(line);
+	}
+
+	if (strcmp(s->str, ""))
+		print("help_set_body", s->str);
+
+	string_free(s, 1);
+	
+	print("help_set_footer", name);
+}
+

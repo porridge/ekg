@@ -51,6 +51,33 @@ parametr z samym pseudonimem.
 %)  prompt2 (domy¶lnie turkusowy)
 %#  timestamp (domy¶lnie GG:MM)
 
+%|  koniec promptu. je¶li ten format wystêpuje, to przy przenoszeniu do
+    nastêpnej linii, tekst przed tym formatem zostanie wy¶wietlony podownie.
+
+    na przyk³ad dla:
+
+        %> D³uga linia, która zostanie podzielona na kilka linii
+
+    na ma³ym terminalu zostanie podzielone na:
+
+	.-------------------------.
+        | ::: D³uga linia, która  |
+        | zostanie podzielona na  |
+        | kilka linii             |
+	`-------------------------'
+
+    a po dodaniu %|, tzn:
+
+        %> %|D³uga linia, która zostanie podzielona na kilka linii
+
+    zostanie wy¶wietlone jako:
+
+        .-------------------------.
+        | ::: D³uga linia, która  |
+	| ::: zostanie podzielona |
+	| ::: na kilka linii      |
+	`-------------------------'
+
 * * *
 
 dwa specjalne formaty ,,known_user'' i ,,unknown_user'' okre¶laj±, jak

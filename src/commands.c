@@ -894,6 +894,11 @@ COMMAND(cmd_help)
 	if (params[0]) {
 		const char *p = (params[0][0] == '/' && strlen(params[0]) > 1) ? params[0] + 1 : params[0];
 
+		if (!strcasecmp(p, "set") && params[1]) {
+			variable_help(params[1]);
+			return;
+		}
+			
 		for (l = commands; l; l = l->next) {
 			struct command *c = l->data;
 			
@@ -1247,6 +1252,8 @@ COMMAND(cmd_list)
 			print("userlist_put_error", strerror(errno));
 			return;
 		}
+
+		h->user_data = (char*) 1;
 		
 		xfree(contacts);
 		
@@ -3419,11 +3426,13 @@ void command_init()
 	command_add
 	( "add", "U??", cmd_add, 0,
 	  " <numer> <alias> [opcje]", "dodaje u¿ytkownika do listy kontaktów",
+	  "\n"
 	  "Opcje identyczne jak dla polecenia %Tlist%n (dotycz±ce wpisu)");
 	  
 	command_add
 	( "alias", "??", cmd_alias, 0,
 	  " [opcje]", "Zarz±dzanie aliasami",
+	  "\n"
 	  "  -a, --add <alias> <komenda>     dodaje alias\n"
           "  -A, --append <alias> <komenda>  dodaje komendê do aliasu\n"
 	  "  -d, --del <alias>               usuwa alias\n"
@@ -3432,17 +3441,19 @@ void command_init()
 	command_add
 	( "away", "?", cmd_away, 0,
 	  " [powód/-]", "zmienia stan na zajêty",
-	  "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie\n"
-          "podano powodu, zostanie wylosowany z pliku %Taway.reasons%n.\n"
- 	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez\n"
+	  "\n"
+	  "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie "
+          "podano powodu, zostanie wylosowany z pliku %Taway.reasons%n. "
+ 	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez "
 	  "wzglêdu na ustawienia zmiennych.");
  
 	command_add
 	( "back", "?", cmd_away, 0,
 	  " [powód/-]", "zmienia stan na dostêpny",
-          "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie\n"
-	  "podano powodu, zostanie wylosowany z pliku %Tback.reasons%n.\n"
-	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez\n"
+	  "\n"
+          "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie "
+	  "podano powodu, zostanie wylosowany z pliku %Tback.reasons%n. "
+	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez "
 	  "wzglêdu na ustawienia zmiennych.");
 	  
 	command_add
@@ -3453,20 +3464,17 @@ void command_init()
 	command_add
 	( "bind", "???", cmd_bind, 0,
 	  " <opcja> [sekwencja] [komenda]", "przypisywanie akcji klawiszom",
+	  "\n"
 	  "  -a, --add <sekwencja> <komenda>  przypisuje now± sekwencjê\n"
 	  "  -d, --del <sekwencja>            usuwa podan± sekwencjê\n"
 	  "  -l, --list                       wy¶wietla przypisane sekwencje\n"
 	  "\n"
-	  "Dostêpne sekwencje to: Ctrl-<znak>, Alt-<znak>."
-#ifndef WITH_UI_NCURSES
-	  " Nale¿y pamiêtaæ, \n"
-	  "¿e dla klawisza Alt wielko¶æ znaku ma znaczenie, a dla Ctrl nie."
-#endif
-	  );
+	  "Dostêpne sekwencje to: Ctrl-<znak>, Alt-<znak>.");
 
 	command_add
 	( "change", "?", cmd_change, 0,
 	  " <opcje>", "zmienia informacje w katalogu publicznym",
+	  "\n"
 	  "  -f, --first <imiê>\n"
           "  -l, --last <nazwisko>\n"
 	  "  -n, --nick <pseudonim>\n"
@@ -3476,13 +3484,14 @@ void command_init()
 	  "  -F, --female                 kobieta\n"
 	  "  -M, --male                   mê¿czyzna\n"
 	  "\n"
-	  "Nale¿y podaæ %Twszystkie%n opcje.");
+	  "Nale¿y podaæ %Twszystkie%n opcje, z wyj±tkiem -F lub -M.");
 	  
 	command_add
 	( "chat", "u?", cmd_msg, 0,
 	  " <numer/alias/@grupa> <wiadomo¶æ>", "wysy³a wiadomo¶æ w rozmowie",
-	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub\n"
-	  "pseudonimy przecinkiem (ale bez odstêpów). W takim wypadku\n"
+	  "\n"
+	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub "
+	  "pseudonimy przecinkiem (ale bez odstêpów). W takim wypadku "
 	  "zostanie rozpoczêta rozmowa grupowa.");
 	  
 	command_add
@@ -3493,22 +3502,24 @@ void command_init()
 	command_add
 	( "connect", "??", cmd_connect, 0,
 	  " [[numer] has³o]", "³±czy siê z serwerem",
-	  "Je¶li podano jeden parametr, jest on traktowany jako has³o,\n"
-	  "a je¶li podano dwa, s± to kolejno numer i has³o. Dane te s±\n"
-	  "ustawiane w konfiguracji i zostan± utrwalone po wydaniu komendy\n"
+	  "\n"
+	  "Je¶li podano jeden parametr, jest on traktowany jako has³o, "
+	  "a je¶li podano dwa, s± to kolejno numer i has³o. Dane te s± "
+	  "ustawiane w konfiguracji i zostan± utrwalone po wydaniu komendy "
 	  "%Tsave%n.");
 	  
 	command_add
 	( "dcc", "duf?", cmd_dcc, 0,
 	  " [opcje]", "obs³uga bezpo¶rednich po³±czeñ",
+	  "\n"
 	  "  send <numer/alias> <¶cie¿ka>  wysy³a podany plik\n"
 	  "  get [numer/alias/#id]         akceptuje przysy³any plik\n"
 	  "  voice <numer/alias/#id>       rozpoczna rozmowê g³osow±\n"
 	  "  close [numer/alias/#id]       zamyka po³±czenie\n"
 	  " [show]                         wy¶wietla listê po³±czeñ\n"
 	  "\n"
-	  "Po³±czenia bezpo¶rednie wymagaj± w³±czonej opcji %Tdcc%n.\n"
-	  "dok³adny opis znajduje siê w pliku %Tdocs/dcc.txt%n");
+	  "Po³±czenia bezpo¶rednie wymagaj± w³±czonej opcji %Tdcc%n. "
+	  "Dok³adny opis znajduje siê w pliku %Tdocs/dcc.txt%n");
 	  
 	command_add
 	( "del", "u", cmd_del, 0,
@@ -3518,10 +3529,11 @@ void command_init()
 	command_add
 	( "disconnect", "?", cmd_connect, 0,
 	  " [powód/-]", "roz³±cza siê z serwerem",
+	  "\n"
 	  "Parametry identyczne jak dla komendy %Tquit%n.\n"
 	  "\n"
-	  "Je¶li w³±czona jest opcja %Tauto_reconnect%n, po wywo³aniu\n"
-	  "tej komendy, program nadal bêdzie próbowa³ siê automatycznie\n"
+	  "Je¶li w³±czona jest opcja %Tauto_reconnect%n, po wywo³aniu "
+	  "tej komendy, program nadal bêdzie próbowa³ siê automatycznie "
 	  "³±czyæ po okre¶lonym czasie.");
 	  
 	command_add
@@ -3532,6 +3544,7 @@ void command_init()
 	command_add
 	( "exec", "?", cmd_exec, 0,
 	  " <polecenie>", "uruchamia polecenie systemowe",
+	  "\n"
 	  "Poprzedzenie znakiem %T^%n ukryje informacjê o zakoñczeniu.");
 	  
 	command_add
@@ -3542,6 +3555,7 @@ void command_init()
 	command_add
 	( "find", "u", cmd_find, 0,
 	  " [opcje]", "przeszukiwanie katalogu publicznego",
+	  "\n"
 	  "  -u, --uin <numerek>\n"
 	  "  -f, --first <imiê>\n"
 	  "  -l, --last <nazwisko>\n"
@@ -3555,41 +3569,45 @@ void command_init()
 	  "  --start <n>             wy¶wietla od n-tego wyniku\n"
 	  "  -A, --all               wy¶wietla wszystkich\n"
 	  "\n"
-	  "  Ze wzglêdu na organizacjê katalogu publicznego, niektórych\n"
-	  "  opcji nie mo¿na ze sob± ³±czyæ");
+	  "Ze wzglêdu na organizacjê katalogu publicznego, niektórych "
+	  "opcji nie mo¿na ze sob± ³±czyæ");
 	  
 	command_add
-	( "help", "c", cmd_help, 0,
-	  " [polecenie]", "wy¶wietla informacjê o poleceniach",
-	  "");
+	( "help", "cv", cmd_help, 0,
+	  " [polecenie] [zmienna]", "wy¶wietla informacjê o poleceniach",
+	  "\n"
+	  "Mo¿liwe jest wy¶wietlenie informacji o zmiennych, je¶li jako "
+	  "polecenie poda siê %Tset%n");
 	  
 	command_add
-	( "?", "c", cmd_help, 0,
-	  " [polecenie]", "synonim dla %Thelp%n",
+	( "?", "cv", cmd_help, 0,
+	  " [polecenie] [zmienna]", "synonim dla %Thelp%n",
 	  "");
 	 
 	command_add
 	( "ignore", "u", cmd_ignore, 0,
 	  " [opcje] [numer/alias]", "dodaje do listy ignorowanych",
 	  "\n"
-	  "W przysz³o¶ci bêdzie mo¿liwe wybranie zdarzeñ zwi±zanych z dan±\n"
+	  "W przysz³o¶ci bêdzie mo¿liwe wybranie zdarzeñ zwi±zanych z dan± "
 	  "osob±, takich jak wiadomo¶ci, zmiana stanu, zmiana opisu itp.");
 	  
 	command_add
 	( "invisible", "?", cmd_away, 0,
 	  " [powód/-]", "zmienia stan na niewidoczny",
-          "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie\n"
-	  "podano powodu, zostanie wylosowany z pliku %Tquit.reasons%n.\n"
-	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez\n"
+	  "\n"
+          "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie "
+	  "podano powodu, zostanie wylosowany z pliku %Tquit.reasons%n. "
+	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez "
 	  "wzglêdu na ustawienia zmiennych.");
 
 	command_add
 	( "last", "uu", cmd_last, 0,
 	  " [opcje]", "wy¶wietla lub czy¶ci ostatnie wiadomo¶ci",
+	  "\n"
 	  " [numer/alias]             wy¶wietla ostatnie wiadomo¶ci\n"
 	  " -s, --stime [numer/alias] wy¶wietla czas wys³ania wiadomo¶ci przychodz±cych\n"
 	  " -c, --clear [numer/alias] czy¶ci wiadomo¶ci od/do numer/alias lub wszystkie\n"
-	  "W przypadku opcji %T-s%n lub %T--stime%n czas wy¶wietlany jest ,,inteligentnie''\n"
+	  "W przypadku opcji %T-s%n lub %T--stime%n czas wy¶wietlany jest ,,inteligentnie''"
 	  "zgodnie ze zmienn± %Ttime_deviation.%n"
 	  );
 
@@ -3628,7 +3646,8 @@ void command_init()
 	command_add
 	( "msg", "u?", cmd_msg, 0,
 	  " <numer/alias/@grupa> <wiadomo¶æ>", "wysy³a wiadomo¶æ",
-	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub\n"
+	  "\n"
+	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub "
 	  "pseudonimy przecinkiem (ale bez odstêpów).");
 
 	command_add
@@ -3649,25 +3668,27 @@ void command_init()
 	command_add
 	( "query", "u?", cmd_query, 0,
 	  " <numer/alias/@grupa> [wiadomo¶æ]", "w³±cza rozmowê z dan± osob±",
-	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub\n"
-	  "pseudonimy przecinkiem (ale bez odstêpów). W takim wypadku\n"
+	  "\n"
+	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub "
+	  "pseudonimy przecinkiem (ale bez odstêpów). W takim wypadku "
           "zostanie rozpoczêta rozmowa grupowa.");
 
 	command_add
 	( "queue", "uu", cmd_queue, 0,
 	  " [opcje]", "wy¶wietla lub czy¶ci wiadomo¶ci do wys³ania po po³±czeniu",
+	  "\n"
 	  " [numer/alias]             wy¶wietla kolejkê wiadomo¶ci\n"
 	  " -c, --clear [numer/alias] usuwa wiadomo¶ci dla numer/alias lub wszystkie\n"
-	  "Mo¿na u¿yæ tylko wtedy, gdy nie jeste¶my po³±czeni. W przypadku\n"
-	  "konferencji wy¶wietla wszystkich uczestników.\n"
-	  );
+	  "Mo¿na u¿yæ tylko wtedy, gdy nie jeste¶my po³±czeni. W przypadku "
+	  "konferencji wy¶wietla wszystkich uczestników.");
 	  
 	command_add
 	( "quit", "?", cmd_quit, 0,
 	  " [powód/-]", "wychodzi z programu",
-          "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie\n"
-	  "podano powodu, zostanie wylosowany z pliku %Tquit.reasons%n.\n"
-	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez\n"
+	  "\n"
+          "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie "
+	  "podano powodu, zostanie wylosowany z pliku %Tquit.reasons%n. "
+	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez "
 	  "wzglêdu na ustawienia zmiennych.");
 	  
 	command_add
@@ -3688,22 +3709,25 @@ void command_init()
 	command_add
 	( "save", "", cmd_save, 0,
 	  "", "zapisuje ustawienia programu",
-	  "Aktualny stan zostanie zapisany i zostanie przywrócony przy\n"
+	  "\n"
+	  "Aktualny stan zostanie zapisany i zostanie przywrócony przy "
 	  "nastêpnym uruchomieniu programu.");
 	  
 	command_add
 	( "set", "v?", cmd_set, 0,
   	  " [-]<zmienna> [[+/-]warto¶æ]", "wy¶wietla lub zmienia ustawienia",
-	  "U¿ycie %Tset -zmienna%n czy¶ci zawarto¶æ zmiennej. Dla zmiennych\n"
-	  "bêd±cymi mapami bitowymi mo¿na okre¶liæ, czy warto¶æ ma byæ\n"
-	  "dodana (poprzedzone plusem), usuniêta (minusem) czy ustawiona\n"
-	  "(bez prefiksu). Warto¶æ zmiennej mo¿na wzi±æ w cudzys³ów.\n"
-	  "Poprzedzenie opcji parametrem %T-a%n lub %T--all%n spowoduje\n"
-	  "wy¶wietlenie wszystkich, nawet aktualnie nieaktywnych zmiennych.\n");
+	  "\n"
+	  "U¿ycie %Tset -zmienna%n czy¶ci zawarto¶æ zmiennej. Dla zmiennych "
+	  "bêd±cymi mapami bitowymi mo¿na okre¶liæ, czy warto¶æ ma byæ "
+	  "dodana (poprzedzone plusem), usuniêta (minusem) czy ustawiona "
+	  "(bez prefiksu). Warto¶æ zmiennej mo¿na wzi±æ w cudzys³ów. "
+	  "Poprzedzenie opcji parametrem %T-a%n lub %T--all%n spowoduje "
+	  "wy¶wietlenie wszystkich, nawet aktualnie nieaktywnych zmiennych.");
 
 	command_add
 	( "sms", "u?", cmd_sms, 0,
 	  " <numer/alias> <tre¶æ>", "wysy³a smsa do podanej osoby",
+	  "\n"
 	  "Polecenie wymaga zdefiniowana zmiennej %Tsms_send_app%n");
 
 	command_add
@@ -3719,27 +3743,29 @@ void command_init()
 	command_add
 	( "conference", "???", cmd_conference, 0,
 	  " [opcje]", "zarz±dzanie konferencjami",
-	  "  -a, --add <#nazwa> <numer/alias/@grupa> tworzy now± konferencjê\n"
-	  "  -d, --del <#nazwa>                  usuwa konferencjê\n"
-	  "  -i, --ignore <#nazwa>               oznacza konferencjê jako ingorowan±\n"
-	  "  -u, --unignore <#nazwa>             oznacza konferencjê jako nieingorowan±\n"
-	  "  -r, --rename <#old> <#new>          zmienia nazwê konferencji\n"
-	  "  -f, --find <#nazwa>                 wyszukuje uczestnikow w katalogu\n"
-	  " [-l, --list, <#nazwa>  ]             wy¶wietla listê konferencji\n"
 	  "\n"
-	  "Dodaje nazwê konferencji i definiuje, kto bierze w niej udzia³.\n"
-	  "Kolejne numery, pseudonimy lub grupy mog± byc odzielone\n"
+	  "  -a, --add <#nazwa> <numer/alias/@grupa>  tworzy now± konferencjê\n"
+	  "  -d, --del <#nazwa>          usuwa konferencjê\n"
+	  "  -i, --ignore <#nazwa>       oznacza konferencjê jako ingorowan±\n"
+	  "  -u, --unignore <#nazwa>     oznacza konferencjê jako nieingorowan±\n"
+	  "  -r, --rename <#old> <#new>  zmienia nazwê konferencji\n"
+	  "  -f, --find <#nazwa>         wyszukuje uczestnikow w katalogu\n"
+	  " [-l, --list, <#nazwa>]       wy¶wietla listê konferencji\n"
+	  "\n"
+	  "Dodaje nazwê konferencji i definiuje, kto bierze w niej udzia³. "
+	  "Kolejne numery, pseudonimy lub grupy mog± byc odzielone "
 	  "przecinkiem lub spacj±.");
 
 	command_add
 	( "timer", "???", cmd_timer, 0,
 	  " [opcje]", "zarz±dzanie timerami",
+	  "\n"
 	  "  -a, --add <czas> <komenda>  tworzy nowy timer\n"
 	  "  -d, --del <numer>           zatrzymuje timer\n"
 	  " [-l, --list]                 wy¶wietla listê timerów\n"
 	  "\n"
-	  "Czas podaje siê w sekundach. Timer po jednorazowym uruchomieniu\n"
-	  "jest usuwany. Odmierzanie czasu nie jest idealne i ma dok³adno¶æ\n"
+	  "Czas podaje siê w sekundach. Timer po jednorazowym uruchomieniu "
+	  "jest usuwany. Odmierzanie czasu nie jest idealne i ma dok³adno¶æ "
 	  "+/- 1 sekundy.");
 
 	command_add
@@ -3760,19 +3786,29 @@ void command_init()
 	command_add
 	( "window", "w?", cmd_window, 0,
 	  " <komenda> [numer_okna]", "zarz±dzanie okienkami",
-	  "  new\n"
-	  "  kill [numer_okna]\n"
-	  "  next\n"
-	  "  prev\n"
-	  "  switch <numer_okna>\n"
-	  "  clear\n"
-	  "  refresh\n"
-	  "  list");
+	  "\n"
+	  "  new [*opcje]          tworzy nowe okno\n"
+	  "  kill [numer_okna]    zamyka aktualne lub podane okno\n"
+	  "  next                 prze³±cza do nastêpnego okna\n"
+	  "  prev                 prze³±cza do poprzedniego okna\n"
+	  "  switch <numer_okna>  prze³±cza do podanego okna\n"
+	  "  clear                czy¶ci aktualne okno\n"
+	  "  refresh              od¶wie¿a aktualne okno\n"
+	  "  list                 wy¶wietla listê okien\n"
+	  "\n"
+	  "Argumenty dla %Tnew%n to %T*x,y,w,h[,f],/komenda%n, gdzie %Tx%n i "
+	  "%Ty%n to "
+	  "pozycja okna na ekranie, %Tw%n i %Th%n to odpowiednio szeroko¶æ "
+	  "i wysoko¶æ okna w znakach, a %Tf%n jest map± bitow± okre¶laj±c± "
+	  "z której strony wystêpuj± ramki (1 - lewo, 2 - prawo, 4 - góra, "
+          "8 - dó³), a komenda okre¶la, jakie komendy wynik ma byæ "
+	  "wy¶wietlany regularnie w oknie.");
 
 #ifdef WITH_PYTHON
 	command_add
 	( "python", "p?", cmd_python, 0,
 	  " <komenda> [opcje]", "obs³uga skryptów",
+	  "\n"
 	  "  load <skrypt>    ³aduje skrypt\n"
 	  "  unload <skrypt>  usuwa skrypt z pamiêci\n"
 	  "  run <plik>       uruchamia skrypt\n"

@@ -1250,8 +1250,13 @@ void handle_userlist(struct gg_http *h)
 	if (!h)
 		return;
 	
-	format_ok = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_get_ok" : "userlist_put_ok";
-	format_error = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_get_error" : "userlist_put_error";
+	if (!h->user_data) {
+		format_ok = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_get_ok" : "userlist_put_ok";
+		format_error = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_get_error" : "userlist_put_error";
+	} else {
+		format_ok = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_config_get_ok" : "userlist_config_put_ok";
+		format_error = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_config_get_error" : "userlist_config_put_error";
+	}
 
 	if (h->callback(h) || h->state == GG_STATE_ERROR) {
 		print(format_error, strerror(errno));

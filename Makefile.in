@@ -40,12 +40,13 @@ install:	all install-libgadu @install_ekg@ @install_ekgwap@
 install-libgadu:
 	cd lib && $(MAKE) install
 
-install-ekg:	install-ekg-themes install-ekg-man install-ekgsearch
+install-ekg:	install-ekg-data install-ekg-man install-ekgsearch
 	cd src && $(MAKE) install
 
-install-ekg-themes:
+install-ekg-data:
 	$(INSTALL) -d $(DESTDIR)$(datadir)/ekg/themes
 	$(INSTALL) -m 644 themes/*.theme $(DESTDIR)$(datadir)/ekg/themes
+	$(INSTALL) -m 644 docs/vars.txt $(DESTDIR)$(datadir)/ekg
 
 install-ekg-man:
 	$(INSTALL) -d $(DESTDIR)$(mandir)/man1

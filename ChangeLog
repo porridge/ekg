@@ -11,6 +11,13 @@ zg³osi³ b³±d.
 - g³upia ja, zepsu³em ,,del'' (sz)
 - ³adne od¶wie¿anie listy kontaktów po ,,list --get'' (sz)
 - poprawka wy¶wietlania formatowanych wiadomo¶ci (sz/w)
+- dodanie formatu %|, szczegó³y w docs/themes.txt (w)
+- dodanie ,,/help set <zmienna>'' (w)
+- instalowanie vars.txt do ${prefix}/share/ekg/ (w)
+- poprawki helpa /list (FIG/w)
+- informowanie o zapisie lub odczycie konfiguracji z serwera (FIG/w)
+- poprawki helpów, ¿eby u¿ywa³y %| i wygl±da³y ³adnie po zmianie
+  rozmiaru okna (w)
 
 // 2003-01-03
 

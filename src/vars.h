@@ -57,6 +57,7 @@ int variable_add(const char *name, const char *short_name, int type, int display
 int variable_set(const char *name, const char *value, int allow_foreign);
 char *variable_digest();
 int variable_undigest(const char *digest);
+void variable_help(const char *name);
 void variable_free();
 
 #endif /* __VARS_H */
