@@ -699,6 +699,7 @@ struct gg_login_ext {
 #define GG_STATUS_BUSY_DESCR 0x0005		/* zajêty z opisem (4.8) */
 #define GG_STATUS_INVISIBLE 0x0014		/* niewidoczny (4.6) */
 #define GG_STATUS_INVISIBLE_DESCR 0x0016	/* niewidoczny z opisem (4.9) */
+#define GG_STATUS_BLOCKED 0x0006		/* zablokowany */
 
 #define GG_STATUS_FRIENDS_MASK 0x8000		/* tylko dla znajomych (4.6) */
 
