@@ -5525,29 +5525,21 @@ int check_conn(uin_t uin)
 
 	if ((u = userlist_find(uin, NULL)) && group_member(u, "spied")) {
 		list_t l;
-		int onlist;
+		struct spied s;
 
-		onlist = 0;
 		for (l = spiedlist; l; l = l->next) {
 			struct spied *s = l->data;
 
-			if (u->uin == s->uin) {
-				onlist = 1;
-				break;
-			}
+			if (u->uin == s->uin)
+				return -1;
 		}
 
-		if (!onlist) {
-			struct spied s;
+		s.uin = u->uin;
+		s.timeout = 10;
+		list_add(&spiedlist, &s, sizeof(s));
 
-			s.uin = u->uin;
-			s.timeout = 10;
-			list_add(&spiedlist, &s, sizeof(s));
-
-			gg_debug(GG_DEBUG_MISC, "// ekg: spying %d\n", s.uin);
-		}
-	} else
-		return -1;
+		gg_debug(GG_DEBUG_MISC, "// ekg: spying %d\n", s.uin);
+	}
 
 	return gg_image_request(sess, uin, 1, GG_CRC32_INVISIBLE);
 }
