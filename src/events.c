@@ -54,11 +54,25 @@ void print_message_body(char *str, int chat)
 {
 	int width, i, j;
 	char *mesg, *buf, *line, *next, *format, *save;
+	char *line_width; 
+	
+	switch (chat) {
+		case 0:
+		    format = "message_line";
+		    line_width = "message_line_width";
+		    break;		
+		case 1:
+		    format = "chat_line"; 
+		    line_width = "chat_line_width";
+		    break;
+		case 2:
+		    format = "sysmsg_line"; 
+		    line_width = "sysmsg_line_width";
+		    break;
+	}	
 
-	if (!(width = atoi(find_format((chat) ? "chat_line_width" : "message_line_width"))))
+	if (!(width = atoi(find_format(line_width))))
 		width = 78;
-
-	format = (chat) ? "chat_line" : "message_line";
 	
 	if (!(buf = malloc(width + 1)) || !(mesg = save = strdup(str))) {
 		my_puts(str);			/* emergency ;) */
@@ -125,7 +139,7 @@ void handle_msg(struct gg_event *e)
 	if (e->event.msg.sender == 0) {
 		my_printf("sysmsg_header");
 		cp_to_iso(e->event.msg.message);
-		print_message_body(e->event.msg.message, 0);
+		print_message_body(e->event.msg.message, 2);
 		my_printf("sysmsg_footer");
 
 		if (enable_beep)

@@ -514,8 +514,10 @@ void init_theme()
 	add_format("chat_footer", "%c`----- ---- --- -- -%n\n", 1);
 	add_format("chat_line", "%c|%n %1\n", 1);
 	add_format("chat_line_width", "75", 1);
-	add_format("sysmsg_header", "%g.-- wiadomo¶æ systemowa %g--- -- -\n", 1);
-	add_format("sysmsg_footer", "%g`----- ---- --- -- -%n\n", 1);	
+	add_format("sysmsg_header", "%m.-- wiadomo¶æ systemowa %m--- -- -\n", 1);
+	add_format("sysmsg_line", "%m|%n %1\n", 1);
+	add_format("sysmsg_line_width", "75", 1);
+	add_format("sysmsg_footer", "%m`----- ---- --- -- -%n\n", 1);	
 	add_format("ack_queued", "%> Wiadomo¶æ do %1 zostanie dostarczona pó¼niej %c(%C%#%c)%n\n", 1);
 	add_format("ack_delivered", "%> Wiadomo¶æ do %1 zosta³a dostarczona %c(%C%#%c)%n\n", 1);
 	add_format("status_avail", "%> %1 jest dostêpny %c(%C%#%c)%n\n", 1);
