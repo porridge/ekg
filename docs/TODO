@@ -8,8 +8,11 @@ biblioteka:
 - uaktualniæ dokumentacjê,
 
 klient:
+- poradziæ sobie z duplikatami wiadomo¶ci z powodu kolejkowania,
+- sprawdzanie parametrów dotycz±cych konferencji (¿eby ,,/chat , test''
+  nie tworzy³o nowej konferencji)
 - uzupe³niæ dope³nienia (w tym nicki ze spacjami, lista nicków (joshua)),
-- wykrywanie niewidocznych jako opcja.
+- wykrywanie niewidocznych jako opcja,
 - zapisywanie konfiguracji do innego pliku,
 - poprawiæ mo¿liwo¶æ ustawienia powodu przy wywo³ywaniu ekg (jojo),
 - poprawiæ getopt(), ¿eby rozumia³ ,,--back "powód"'',

@@ -77,6 +77,7 @@ list_t transfers = NULL;
 list_t events = NULL;
 list_t emoticons = NULL;
 list_t sequences = NULL;
+list_t timers = NULL;
 list_t lasts = NULL;
 list_t lasts_count = NULL;
 list_t conferences = NULL;
@@ -1056,11 +1057,11 @@ void sms_away_add(uin_t uin)
 }
 
 /*
- * sms_away_destroy()
+ * sms_away_free()
  *
  * pozbywa siê listy sms_away.
  */
-void sms_away_destroy()
+void sms_away_free()
 {
 	if (sms_away) {
 		list_destroy(sms_away, 1);
@@ -1777,6 +1778,7 @@ void alias_free()
 	}
 
 	list_destroy(aliases, 1);
+	aliases = NULL;
 }
 
 #ifdef WITH_IOCTLD
@@ -2314,6 +2316,7 @@ void event_free()
 	}
 
 	list_destroy(events, 1);
+	events = NULL;
 }
 
 /*
@@ -2815,6 +2818,7 @@ void emoticon_free()
 	}
 
 	list_destroy(emoticons, 1);
+	emoticons = NULL;
 }
 
 /*
@@ -2933,6 +2937,7 @@ void timer_free()
 	}
 
 	list_destroy(timers, 1);
+	timers = NULL;
 }
 
 /*

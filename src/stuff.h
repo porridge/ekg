@@ -325,7 +325,7 @@ void last_count_del(uin_t uin);
 void last_count_add(uin_t uin);
 
 void sms_away_add(uin_t uin);
-void sms_away_destroy();
+void sms_away_free();
 int sms_away_check(uin_t uin);
 
 void contacts_rebuild();

@@ -363,7 +363,7 @@ COMMAND(cmd_away)
 
 		ui_event("my_status", "back", reason);
 
-		sms_away_destroy();
+		sms_away_free();
 	} else {
 		int tmp;
 
@@ -2334,7 +2334,7 @@ COMMAND(cmd_remind)
 static int count_params(const char **params) {
 	int count = 0;
 
-	while (*(params++))
+	while (*params++)
 		count++;
 
 	return count;
@@ -2342,16 +2342,12 @@ static int count_params(const char **params) {
 
 COMMAND(cmd_query)
 {
-	/* XXX bardzo brzydkie, ale musimy mieæ mo¿liwo¶æ zmiany params */
-	const char **tmp = params;
-	char **p = (char **) xmalloc(count_params(params) * sizeof(char *));
-	int i = 0;
+	/* XXX potrzebujemy kopii params, aby móc modyfikowaæ parametry */
+	char **p = xmalloc(count_params(params) * sizeof(char *));
+	int i;
 
-	while (*tmp) {
-		p[i] = (char *)params[i];
-		i++;
-		tmp++;
-	}
+	for (i = 0; params[i]; i++)
+		p[i] = xstrdup(params[i]);
 
 	if (params[0] && (params[0][0] == '@' || strchr(params[0], ','))) {
 		struct conference *c = conference_create(params[0]);
@@ -2392,6 +2388,9 @@ COMMAND(cmd_query)
 		cmd_msg("chat", (const char **)p);
 
 cleanup:
+	for (i = 0; params[i]; i++)
+		xfree(p[i]);
+
 	xfree(p);
 }
 
@@ -3404,7 +3403,7 @@ void command_init()
 	command_add
 	( "conference", "???", cmd_conference, 0,
 	  " [opcje]", "zarz±dzanie konferencjami",
-	  "  -a, --add <#nazwa> <nick/uin/@grupa> tworzy now± konferencjê\n"
+	  "  -a, --add <#nazwa> <numer/alias/@grupa> tworzy now± konferencjê\n"
 	  "  -d, --del <#nazwa>                  usuwa konferencjê\n"
 	  "  -i, --ignore <#nazwa>               oznacza konferencjê jako ingorowan±\n"
 	  "  -u, --unignore <#nazwa>             oznacza konferencjê jako nieingorowan±\n"
