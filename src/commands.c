@@ -5228,7 +5228,7 @@ void command_init()
 	  "\n"
 	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub "
 	  "pseudonimy przecinkiem (ale bez odstêpów). W takim wypadku "
-	  "zostanie rozpoczêta rozmowa grupowa. Je¶li zamiast odbiorcy "
+	  "zostanie rozpoczêta nowa konferencja. Je¶li zamiast odbiorcy "
 	  "podany zostanie znak ,,%T*%n'', to wiadomo¶æ bêdzie wys³ana do "
 	  "wszystkich aktualnych rozmówców.");
 	  
@@ -5498,7 +5498,7 @@ void command_init()
 	  "\n"
 	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub "
 	  "pseudonimy przecinkiem (ale bez odstêpów). W takim wypadku "
-          "zostanie rozpoczêta rozmowa grupowa.");
+          "zostanie rozpoczêta nowa konferencja.");
 
 	command_add
 	( "queue", "uu", cmd_queue, 0,
