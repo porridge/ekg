@@ -2226,10 +2226,14 @@ COMMAND(cmd_msg)
 
 		if (!chat || count == 1) {
 			unsigned char *__msg = xstrdup(msg);
+			int ret = 0;
 			secure = 0;
 #ifdef HAVE_OPENSSL
-			if (config_encryption && msg_encrypt(uin, &__msg) > 0)
+			if (config_encryption && (ret = msg_encrypt(uin, &__msg)) > 0)
 				secure = 1;
+
+			if (ret == 2)
+				printq("message_too_long");
 #endif
 			if (sess)
 				msg_seq = gg_send_message_richtext(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, __msg, format, formatlen);

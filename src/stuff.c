@@ -1761,14 +1761,18 @@ int msg_encrypt(uin_t uin, unsigned char **msg)
 		unsigned char *res = sim_message_encrypt(*msg, uin);
 
 		if (res) {
+			int ret = 1;
+
 			xfree(*msg);
 			*msg = res;
 			
-			if (strlen(*msg) > 1989)	/* XXX informowaæ o tym u¿ytkownika */
+			if (strlen(*msg) > 1989) {
 				(*msg)[1989] = 0;
+				ret = 2;
+			}
 			
 			gg_debug(GG_DEBUG_MISC, "// ekg: simlite encrypted: %s\n", res);
-			return 1;
+			return ret;
 		}
 
 		gg_debug(GG_DEBUG_MISC, "// ekg: simlite encryption failed: %s\n", sim_strerror(sim_errno));
