@@ -83,6 +83,7 @@ char *va_format_string(const char *format, va_list ap)
 	const char *p, *args[9];
 	int i, argc = 0;
 
+	/* liczymy ilo¶æ argumentów */
 	for (p = format; *p; p++) {
 		if (*p != '%')
 			continue;
@@ -98,7 +99,9 @@ char *va_format_string(const char *format, va_list ap)
 			if (!*p)
 				break;
 
-			argc = *p - '0';
+			if ((*p - '0') > argc)
+				argc = *p - '0';
+			
 		} else if (*p == '(' || *p == '[') {
 			if (*p == '(') {
 				while (*p && *p != ')')
@@ -114,7 +117,8 @@ char *va_format_string(const char *format, va_list ap)
 			if (!*p)
 				break;
 			
-			argc = *p - '0';
+			if ((*p - '0') > argc)
+				argc = *p - '0';
 		} else {
 			if (*p >= '1' && *p <= '9' && (*p - '0') > argc)
 				argc = *p - '0';
