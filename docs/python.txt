@@ -76,7 +76,7 @@ oto lista wywo³ywanych funkcji:
   gdy kto¶ zmienia stan. nazwy parametrów powinny byæ zrozumia³e. je¶li
   zwróci 0, zmiana stanu zostanie zignorowana. je¶li zwróci 2, zmiana stanu
   nie bêdzie ignorowana, ale nie zostanie wy¶wietlona. je¶li zwróci krotkê
-  o takich samych argument
+  o takich samych argument jak funkcja, dane zostan± zmienione.
 
 pó¼niej zostan± dodane funkcje dotycz±ce wszystkich zdarzeñ zwi±zanych
 z sesj± gg, plus obs³uga interfejsu u¿ytkownika (informacja o wci¶niêtych
