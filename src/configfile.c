@@ -552,8 +552,10 @@ pass:
 		return -1;
 	}
 	
-	if (rename(newfn, filename) == -1)
+	if (rename(newfn, filename) == -1) {
+		xfree(newfn);
 		return -1;
+	}
 
 	xfree(newfn);
 
