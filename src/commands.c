@@ -109,7 +109,7 @@ struct command commands[] = {
 	{ "?", "c", command_help, " [polecenie]", "Synonim dla %Whelp%n", "" },
 	{ "ignore", "u", command_ignore, " [numer/alias]", "Dodaje do listy ignorowanych lub j± wy¶wietla", "" },
 	{ "invisible", "?", command_away, "", "Zmienia stan na niewidoczny", "" },
-	{ "list", "u?", command_list, " [alias|opcje]", "Zarz±dzanie list± kontaktów", "\nWy¶wietlanie osób o podanym stanie \"list [-a|-b|-i]\":\n  -a, --active\n  -b, --busy\n  -i, --inactive\n  -w, --wait\n\nZmiana wpisów listy kontaktów \"list <alias> <opcje...>\":\n  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>  // tylko informacja\n  -d, --display <nazwa>  // wy¶wietlana nazwa\n  -p, --phone <telefon>\n  -u, --uin <numerek>\n  -g, --group [+/-]<grupa>\n\nLista kontaktów na serwerze \"list [-p|-g]\":\n  -p, --put\n  -g, --get" },
+	{ "list", "u?", command_list, " [alias|opcje]", "Zarz±dzanie list± kontaktów", "\nWy¶wietlanie osób o podanym stanie \"list [-a|-b|-i]\":\n  -a, --active\n  -b, --busy\n  -i, --inactive\n\nZmiana wpisów listy kontaktów \"list <alias> <opcje...>\":\n  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>  // tylko informacja\n  -d, --display <nazwa>  // wy¶wietlana nazwa\n  -p, --phone <telefon>\n  -u, --uin <numerek>\n  -g, --group [+/-]<grupa>\n\nLista kontaktów na serwerze \"list [-p|-g]\":\n  -p, --put\n  -g, --get" },
 	{ "msg", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ do podanego u¿ytkownika", "" },
         { "on", "?u?", command_on, " <zdarzenie|...> <numer/alias> <akcja>|clear", "Dodaje lub usuwa zdarzenie", "" },
 	{ "passwd", "??", command_passwd, " <has³o> <e-mail>", "Zmienia has³o i adres e-mail u¿ytkownika", "" },
@@ -1150,7 +1150,7 @@ COMMAND(command_ignore)
 COMMAND(command_list)
 {
 	struct list *l;
-	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, j, page_wait = 0;
+	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, j;
 	char *tmp, **argv = NULL;
 
 	if (params[0] && *params[0] != '-') {
@@ -1242,16 +1242,12 @@ COMMAND(command_list)
 		return 0;
 	}
 
-	/* list --active | --busy | --inactive | --invisible [--wait] */
+	/* list --active | --busy | --inactive | --invisible */
 	for (j = 0; params[j]; j++) {
       		if ((argv = array_make(params[j], " \t", 0, 1, 1))) {
 			int i;
 
 	 		for (i = 0; argv[i]; i++) {
-				
-				if (match_arg(argv[i], 'w', "wait", 2))
-					page_wait = 1;
-				
 				if (match_arg(argv[i], 'a', "active", 2)) {
 					show_all = 0;
 					show_active = 1;
