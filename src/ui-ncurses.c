@@ -2434,6 +2434,23 @@ static void ui_ncurses_loop()
 						line_index++;
 				}
 
+				if (ch == 'd' || ch == 'D') {	/* Alt-D */
+					char *p = line + line_index;
+					int eaten = 0;
+
+					while (*p && *p == ' ') {
+						p++;
+						eaten++;
+					}
+
+					while (*p && *p != ' ') {
+						p++;
+						eaten++;
+					}
+
+					memmove(line + line_index, line + line_index + eaten, strlen(line) - line_index - eaten + 1);
+				}
+
 				if (ch == 13) {		/* Ctrl-Enter */
 					if (input_size == 1) {
 						input_size = 5;
