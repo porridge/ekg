@@ -5784,6 +5784,7 @@ void command_init()
 	command_add
 	( "check_conn", "u?", cmd_check_conn, 0,
 	  " <numer/alias>", "sprawdza czy podany u¿ytkownik jest po³±czony z serwerem",
+	  "\n"
 	  "EKSPERYMENTALNE! Sprawdza, czy podana osoba jest po³±czona. Klient tej osoby "
 	  "musi obs³ugiwaæ obrazki. Dzia³a w przypadku GG 6.0 dla Windows. Je¶li kto¶ "
 	  "u¿ywa innego klienta, to mo¿e mu siê pojawiæ pusta wiadomo¶æ (np. TLEN, ekg2). "
