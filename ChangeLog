@@ -4,12 +4,12 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
-// 2003-05-27
+// 2003-08-27
 
 - usuniêcie nieaktualnych informacji, nowe rodzaje pakietów w GG 6.0,
   indeks pakietów (*/w)
 
-// 2003-05-26
+// 2003-08-26
 
 - uaktualnienie ekg_logs (Goblin/w)
 - libgadu: poprawka zwalniania zasobów gg_session przy w±tkowanym
