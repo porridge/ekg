@@ -133,12 +133,6 @@ int check_mail_mbox()
 	if (!cont || pipe(fd))
 		return 1;
 
-	/* XXX */
-	for (l = mail_folders; l; l = l->next) {
-		struct mail_folder *m = l->data;
-		m->check = 1;
-	}
-
  	if ((pid = fork()) < 0) {
 		close(fd[0]);
 		close(fd[1]);
