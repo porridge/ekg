@@ -12,6 +12,7 @@ zg³osi³ b³±d.
 - poprawka segfaulta przy ,,python unload'' bez parametrów (rmrmg/w)
 - ma³a reorganizacja komend /timer i /at. ta ostatnia potrafi ju¿ 
   ,,na sta³e'' planowaæ komendy (sz)
+- krzyk.theme (krzyk/sz)
 
 // 2003-02-11
 
