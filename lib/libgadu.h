@@ -538,7 +538,7 @@ struct gg_event {
 			int version;	/* wersja klienta */
 			int image_size;	/* maksymalny rozmiar grafiki w KiB */
 			char *descr;		/* opis stanu */
-			int time;		/* czas powrotu */
+			time_t time;		/* czas powrotu */
 		} status60;
 
 		struct {			/* @notify60 informacja o li¶cie kontaktów -- GG_EVENT_NOTIFY60 */
@@ -549,7 +549,7 @@ struct gg_event {
 			int version;	/* wersja klienta */
 			int image_size;	/* maksymalny rozmiar grafiki w KiB */
 			char *descr;		/* opis stanu */
-			int time;		/* czas powrotu */
+			time_t time;		/* czas powrotu */
 		} *notify60;
 		
 		struct {			/* @ack potwierdzenie wiadomo¶ci -- GG_EVENT_ACK */
