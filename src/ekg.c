@@ -642,10 +642,8 @@ static void handle_sigsegv()
 	
 	ioctld_kill();
 
-	if (old_stderr) {
-		close(2);
+	if (old_stderr)
 		dup2(old_stderr, 2);
-	}
 
 	fprintf(stderr, "\n"
 "*** Naruszenie ochrony pamiêci ***\n"
