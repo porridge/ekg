@@ -593,6 +593,9 @@ static void handle_common(uin_t uin, int status, const char *descr, struct gg_no
 			break;
 
 		/* eventy */
+		if (GG_S_D(s->status) && prev_status == s->status) /* tylko zmiana opisu */
+			event_check(EVENT_DESCR, uin, NULL);
+
 	    	event_check(s->event, uin, NULL);
 
 		/* zaloguj */

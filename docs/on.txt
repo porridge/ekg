@@ -8,6 +8,7 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 		away  -            -//-               'zajêty';
 		invisible -        -//-               'niewidoczny';
 		disconnect -       -//-	              'niedostêpny';
+		descr - zmiana przez kogo¶ swojego opisu;
 		dcc - otrzymanie od kogo¶ dcc;
 		sigusr1, sigusr2 - otrzymanie podanego sygna³u;
 		delivered, queued - wiadomo¶æ dostarczona lub zakolejkowana;

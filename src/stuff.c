@@ -176,6 +176,7 @@ static struct {
 	{ EVENT_AWAY, "away" },
 	{ EVENT_DCC, "dcc" },
 	{ EVENT_INVISIBLE, "invisible" },
+	{ EVENT_DESCR, "descr" },
 	{ EVENT_EXEC, "exec" },
 	{ EVENT_SIGUSR1, "sigusr1" },
 	{ EVENT_SIGUSR2, "sigusr2" },

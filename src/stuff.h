@@ -43,13 +43,14 @@ enum event_t {
 	EVENT_AWAY = 16,
 	EVENT_DCC = 32,
 	EVENT_INVISIBLE = 64,
-	EVENT_EXEC = 128,
-	EVENT_SIGUSR1 = 256,
-	EVENT_SIGUSR2 = 512,
-	EVENT_DELIVERED = 1024,
-	EVENT_QUEUED = 2048,
+	EVENT_DESCR = 128,
+	EVENT_EXEC = 256,
+	EVENT_SIGUSR1 = 512,
+	EVENT_SIGUSR2 = 1024,
+	EVENT_DELIVERED = 2048,
+	EVENT_QUEUED = 4096,
 
-	EVENT_ALL = 4095,	/* uaktualniaæ za ka¿d± zmian± */
+	EVENT_ALL = 8191,	/* uaktualniaæ za ka¿d± zmian± */
 
 	INACTIVE_EVENT = 8192, /* nieaktywne zdarzenie */
 };
