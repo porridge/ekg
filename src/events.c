@@ -825,7 +825,8 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 
 	if (!descr) 
 		descr = xstrdup(idescr);
-	
+
+
 	/* zapamiêtaj adres, port i protokó³ */
 	if (__USER_QUITING) {
 		u->last_ip.s_addr = u->ip.s_addr;
@@ -855,9 +856,14 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 		unsigned char *tmp;
 
 		for (tmp = descr; *tmp; tmp++) {
-			if (*tmp == 13 || *tmp == 10 || *tmp == 9)
+			/* usuwamy \r, interesuje nas tylko \n w opisie */
+			if (*tmp == 13)
+				memmove(tmp, tmp + 1, strlen(tmp));
+			/* tabulacja na spacje */
+			if (*tmp == 9)
 				*tmp = ' ';
-			if (*tmp < 32)
+			/* resztê poza \n zamieniamy na ? */
+			if (*tmp < 32 && *tmp != 10)
 				*tmp = '?';
 		}
 
@@ -968,9 +974,19 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 #endif
 			
 		/* no dobra, poka¿ */
-		if (u->display)
-			print_window(u->display, 0, s->format, format_user(uin), (u->first_name) ? u->first_name : u->display, descr);
+		if (u->display) {
+			char *tmp = xstrdup(descr), *p;
 
+			for (p = tmp; p && *p; p++) {
+				if (*p == 13 || *p == 10)
+					*p = '|';
+			}
+
+			print_window(u->display, 0, s->format, format_user(uin), (u->first_name) ? u->first_name : u->display, tmp);
+
+			xfree(tmp);
+		}
+	
 		break;
 	}
 
