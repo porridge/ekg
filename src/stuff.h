@@ -182,7 +182,7 @@ int del_process(int pid);
 int on_off(char *value);
 int alias_add(char *string, int quiet, int append);
 int alias_remove(char *name);
-struct list *alias_check(char *foo);
+struct list *alias_check(const char *foo);
 int play_sound(char *sound_path);
 
 char *base64_encode(char *buf);

@@ -142,7 +142,7 @@ int match_arg(char *arg, char shortopt, char *longopt, int longoptlen)
 	return (*arg == shortopt);
 }
 
-void add_send_nick(char *nick)
+void add_send_nick(const char *nick)
 {
 	int i, count = send_nicks_count, dont_add = 0;
 
@@ -1935,54 +1935,18 @@ char *strip_spaces(char *line)
 	return buf;
 }
 
-/*
- * ekg_execute()
- * 
- * wykonuje polecenie zawarte w linii tekstu.
- *
- *  - target - w którym oknie nast±pi³o (NULL je¶li to nie query)
- *  - line - linia tekstu.
- *
- * zmienia zawarto¶æ bufora line.
- */
-int ekg_execute(char *target, char *line)
+int old_execute(char *target, char *line)
 {
 	char *cmd = NULL, *tmp, *p = NULL, short_cmd[2] = ".", *last_name = NULL, *last_params = NULL;
 	struct command *c;
 	int (*last_abbr)(char *, char **) = NULL;
 	int abbrs = 0;
 	int correct_command = 0;
-	struct list *l;
 
-	if (!line)
-		return 0;
+	tmp = saprintf(">> old_execute(\"%s\", \"%s\");\n", target, line);
+	ui_print("__current", tmp);
+	xfree(tmp);
 
-	if (!strcmp(line, "")) {
-		if (batch_mode && !batch_line) {
-			quit_message_send = 1;
-			return 1;
-		}
-		return 0;
-	}
-
-	if (!target && (l = alias_check(line))) {
-		char *p = line;
-		int quit = 0;
-
-		while (*p != ' ' && *p)
-			p++;
-			
-		for (; l && !quit; l = l->next) {
-			char *tmp = saprintf("%s%s", (char*) l->data, p);
-			if (tmp) {
-				free(line);
-				line = tmp;
-			}
-		}
-	}
-
-	/* tu siê zaczyna by³e execute_line() */
-	
 	if (target && *line != '/') {
 	
 		/* wykrywanie przypadkowo wpisanych poleceñ */
@@ -2143,3 +2107,47 @@ int binding_toggle_debug(int a, int b)
 	return 0;
 }
 
+/*
+ * ekg_execute()
+ * 
+ * wykonuje polecenie zawarte w linii tekstu.
+ *
+ *  - target - w którym oknie nast±pi³o (NULL je¶li to nie query)
+ *  - line - linia tekstu.
+ *
+ * zmienia zawarto¶æ bufora line.
+ */
+int ekg_execute(char *target, char *line)
+{
+	struct list *l;
+
+	if (!line)
+		return 0;
+
+	if (!strcmp(line, "")) {
+		if (batch_mode && !batch_line) {
+			quit_message_send = 1;
+			return 1;
+		}
+		return 0;
+	}
+	
+	if ((!target && (l = alias_check(line))) || (*line == '/' && (l = alias_check(line + 1)))) {
+		char *p = line;
+		int res = 0;
+
+		while (*p != ' ' && *p)
+			p++;
+			
+		for (; l && !res; l = l->next) {
+			char *tmp = saprintf("%s%s", (char*) l->data, p);
+			res = old_execute(target, tmp);
+			free(tmp);
+		}
+
+		return res;
+	}
+
+	return old_execute(target, line);
+}
+	

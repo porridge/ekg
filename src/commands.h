@@ -42,7 +42,7 @@ extern struct command commands[];
 
 int ekg_execute(char *target, char *line);
 
-void add_send_nick(char *nick);
+void add_send_nick(const char *nick);
 
 int binding_quick_list(int a, int b);
 int binding_help(int a, int b);

@@ -377,6 +377,8 @@ void kill_ioctld()
 void sigsegv_handler()
 {
 	signal(SIGSEGV, SIG_DFL);
+
+	ui_deinit();
 	
 	kill_ioctld();
 	
