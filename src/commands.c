@@ -1712,8 +1712,7 @@ COMMAND(cmd_dcc)
 				break;
 			}
 
-			/* XXX segfaultuje. dlaczego? */
-			if ((u = userlist_find(t->uin, NULL))) {
+			if (t && (u = userlist_find(t->uin, NULL))) {
 				if (!strcasecmp(params[1], itoa(u->uin)) || !strcasecmp(params[1], u->display)) {
 					t = f;
 					break;
