@@ -2348,7 +2348,7 @@ COMMAND(cmd_query)
 			ui_event("command", "query", params[0], NULL);
 	}
 		
-	if (params[1])
+	if (params[0] && params[1])
 		cmd_msg("chat", params);
 }
 
