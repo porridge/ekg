@@ -4742,7 +4742,8 @@ COMMAND(cmd_last)
         list_t l;
 	uin_t uin = 0;
 	int show_sent = 0, last_n = 0, count = 0, i = 0;
-	const char *nick = params[0];
+	char **arr = NULL;
+	const char *nick = NULL;
 	time_t n;
 	struct tm *now;
 
@@ -4753,11 +4754,11 @@ COMMAND(cmd_last)
 		}
 
 		if ((uin && !last_count(uin)) || !list_count(lasts)) {
-			if (uin) {
+			if (uin)
 				printq("last_list_empty_nick", format_user(uin));
-			} else {
+			else
 				printq("last_list_empty");
-			}
+
 			return -1;
 		}
 
@@ -4772,32 +4773,42 @@ COMMAND(cmd_last)
 		return 0;
 	}		
 
-	if (match_arg(params[0], 's', "stime", 2)) {
-		show_sent = 1;
-		nick = params[1];
-	}
+	if (params[0]) {
+		show_sent = match_arg(params[0], 's', "stime", 2);
 
-	if (match_arg(params[0], 'n', "number", 2)) {
-		const char *tmp;
-		nick = params[1];
+		if (!show_sent)
+			nick = params[0];
 
-		if ((tmp = params[1])) {
-			last_n = atoi(params[1]);
-			nick = NULL;
+		if (params[1]) {
+			arr = array_make(params[1], " \t", 0, 1, 0);
 
-			while (*tmp)
-				if (*tmp == ' ') {
-					nick = ++tmp;
-					break;
-				} else
-					tmp++;
+			nick = arr[0];
+			
+			if (match_arg(params[0], 'n', "number", 2)) {
+				last_n = strtol(arr[0], NULL, 0);
+				nick = arr[1];
+				
+				if (arr[1] && (show_sent = match_arg(arr[1], 's', "stime", 2)))
+					nick = arr[2];
+			}
+
+			if (arr[1] && show_sent && match_arg(arr[0], 'n', "number", 2)) {
+				last_n = atoi(arr[1]);
+				nick = arr[2];
+			}
+
 		}
 	}
 
 	if (nick && !(uin = get_uin(nick))) {
 		printq("user_not_found", nick);
+		if (arr)
+			array_free(arr);
 		return -1;
 	}
+
+	if (arr)
+		array_free(arr);
 		
 	if (!((uin > 0) ? (count = last_count(uin)) : (count = list_count(lasts)))) {
 		if (uin) {
