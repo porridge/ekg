@@ -3039,8 +3039,6 @@ COMMAND(cmd_on)
 		return 0;
 	}
 
-	/* XXX mo¿e jeszcze jaki¶ parametr --modify ? */
-
 	printq("invalid_params", name);
 
 	return -1;
