@@ -78,6 +78,7 @@ int ignored_check(uin_t uin);
 
 int group_add(struct userlist *u, const char *group);
 int group_remove(struct userlist *u, const char *group);
+int group_member(struct userlist *u, const char *group);
 char *group_to_string(list_t l);
 list_t group_init(const char *groups);
 

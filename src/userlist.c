@@ -710,6 +710,30 @@ int group_remove(struct userlist *u, const char *group)
 }
 
 /*
+ * group_member()
+ *
+ * sprawdza czy u¿ytkownik jest cz³onkiem danej grupy.
+ *
+ * zwraca 1 je¶li tak, 0 je¶li nie.
+ */
+int group_member(struct userlist *u, const char *group)
+{
+	list_t l;
+
+	if (!u || !group)
+		return 0;
+
+	for (l = u->groups; l; l = l->next) {
+		struct group *g = l->data;
+
+		if (!strcasecmp(g->name, group))
+			return 1;
+	}
+
+	return 0;
+}
+
+/*
  * group_init()
  *
  * inicjuje listê grup u¿ytkownika na podstawie danego ci±gu znaków,

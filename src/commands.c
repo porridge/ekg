@@ -924,15 +924,16 @@ COMMAND(cmd_list)
 {
 	list_t l;
 	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, show_descr = 0, j, p;
-	char *tmp, **argv = NULL;
+	char *tmp, **argv = NULL, *show_group = NULL;
 
 	if (params[0] && *params[0] != '-') {
 		char *status, *groups;
 		struct userlist *u;
 		uin_t uin;
 
+		/* list @grupa */
 		if (params[0][0] == '@' && strlen(params[0]) > 1) {
-			string_t members = string_init("");
+			string_t members = string_init(NULL);
 			int count = 0;
 
 			for (l = userlist; l; l = l->next) {
@@ -1047,7 +1048,7 @@ COMMAND(cmd_list)
 		return;
 	}
 
-	/* list --active | --busy | --inactive | --invisible | --description */
+	/* list --active | --busy | --inactive | --invisible | --description | --member */
 	for (j = 0; params[j]; j++) {
 		int i;
 
@@ -1072,6 +1073,17 @@ COMMAND(cmd_list)
 			if (match_arg(argv[i], 'I', "invisible", 2)) {
 				show_all = 0;
 				show_invisible = 1;
+			}
+
+			if (match_arg(argv[i], 'm', "member", 2)) {
+				if (j && argv[i+1])
+					show_group = xstrdup(argv[i+1]);
+				else
+					if (params[i+1]) {
+						char **tmp = array_make(params[i+1], " \t", 0, 1, 1);
+ 						show_group = xstrdup(tmp[0]);
+						array_free(tmp);
+					}
 			}
 
 			if (match_arg(argv[i], 'd', "description", 2))
@@ -1129,13 +1141,13 @@ COMMAND(cmd_list)
 				}
 		}
 
-		if ((show_all || (show_busy && GG_S_B(u->status)) || (show_active && GG_S_A(u->status)) || (show_inactive && GG_S_NA(u->status)) || (show_invisible && GG_S_I(u->status))) && !(show_descr && !GG_S_D(u->status))) {
+		if ((show_all || (show_busy && GG_S_B(u->status)) || (show_active && GG_S_A(u->status)) || (show_inactive && GG_S_NA(u->status)) || (show_invisible && GG_S_I(u->status))) && !(show_descr && !GG_S_D(u->status)) && !(show_group && !group_member(u, show_group))) {
 			print(tmp, format_user(u->uin), (u->first_name) ? u->first_name : u->display, inet_ntoa(in), itoa(p), u->descr);
 			count++;
 		}
 	}
 
-	if (!count && show_all)
+	if (!count && !(show_descr || show_group) && show_all)
 		print("list_empty");
 }
 
@@ -3223,11 +3235,12 @@ void command_init()
 	( "list", "u?", cmd_list, 0,
           " [alias|@grupa|opcje]", "zarz±dzanie list± kontaktów",
 	  "\n"
-	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i|-d]\":\n"
+	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i|-d|-m]\":\n"
 	  "  -a, --active       dostêpne\n"
 	  "  -b, --busy         zajête\n"
 	  "  -i, --inactive     niedostêpne\n"
 	  "  -d, --description  osoby z opisem\n"
+	  "  -m, --member <grupa> osoby nale¿±ce do danej grupy\n"
 	  "\n"
 	  "Wy¶wietlanie cz³onków grupy: \"list @grupa\"\n"
 	  "\n"

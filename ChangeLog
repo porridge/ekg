@@ -6,6 +6,10 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2002-12-03
+
+- /list --member <grupa> wy¶wietla tylko cz³onków grupy (sz)
+
 // 2002-12-02
 
 - uaktualnienie contrib/link.pl (theKnight/w)
