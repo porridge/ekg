@@ -88,9 +88,12 @@ int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const 
 	m.msg = xstrdup(msg);
 	m.secure = secure;
 	m.time = time(NULL);
-	m.format = xmalloc(formatlen * sizeof(unsigned char));
-	memmove(m.format, format, formatlen * sizeof(unsigned char));
 	m.formatlen = formatlen;
+	if (formatlen > 0) {
+		m.format = xmalloc(formatlen * sizeof(unsigned char));
+		memmove(m.format, format, formatlen * sizeof(unsigned char));
+	} else
+		m.format = NULL;
 
 	return (list_add(&msg_queue, &m, sizeof(m)) ? 0 : -1);
 }

@@ -2980,15 +2980,20 @@ static void complete(int *line_start, int *line_index)
 			    		strcat(line, completions[0]);
 				*line_index = strlen(line) + 1;
 			} else {
-				if(strchr(words[i], ' '))
-					strcat(line, saprintf("\"%s\"", words[i]));
-				else
+				if(strchr(words[i], ' ')) {
+					char *buf =  saprintf("\"%s\"", words[i]);
+					strcat(line, buf);
+					xfree(buf);
+				} else
 					strcat(line, words[i]);
 			}
 			if((i == array_count(words) - 1 && line[strlen(line) - 1] != ' ' ))
 				strcat(line, " ");
-			else if (line[strlen(line) - 1] != ' ') 
-                                strcat(line, saprintf("%c", separators[i]));
+			else if (line[strlen(line) - 1] != ' ') {
+				size_t slen = strlen(line);
+				line[slen] = separators[i];
+				line[slen + 1] = '\0';
+			}
 		}
 		array_free(completions);
 		completions = NULL;
@@ -3049,14 +3054,19 @@ static void complete(int *line_start, int *line_index)
 					strncat(line, completions[0], common);
 					*line_index = strlen(line);
 				} else {
-					if(strrchr(words[i], ' '))
-						strcat(line, saprintf("\"%s\"", words[i]));
-					else
+					if(strrchr(words[i], ' ')) {
+						char *buf;
+						buf = saprintf("\"%s\"", words[i]);
+						strcat(line, buf);
+						xfree(buf);
+					} else
 						strcat(line, words[i]);
 				}
 				
-				if(separators[i]) {
-					strcat(line, saprintf("%c", separators[i]));
+				if (separators[i]) {
+					size_t slen = strlen(line);
+					line[slen] = separators[i];
+					line[slen + 1] = '\0';
 				}
 			}
 		}

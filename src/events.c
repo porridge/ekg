@@ -1517,9 +1517,11 @@ void handle_token(struct gg_http *h)
 	print("token_unsupported");
 #endif	/* HAVE_MKSTEMP */
 
-	xfree(file);
 
 fail:
+#ifdef HAVE_MKSTEMP
+	xfree(file);
+#endif
 	list_remove(&watches, h, 0);
 	gg_token_free(h);
 }
