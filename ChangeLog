@@ -16,6 +16,9 @@ zg³osi³ b³±d.
 - poprawka obs³ugi zmiany rozmiaru terminala (perry/w)
 - je¶li terminal jest zbyt ma³y, lista kontaktów jest ukrywana (w)
 - /status pokazuje uptime klienta (FIG/w)
+- poprawka stylu w docs/protocol.html (w)
+- poprawka tymczasowej zmiany poziomu debugowania (w)
+- dodana komenda /_ctcp (w)
 	
 // 2003-02-05
 

@@ -3397,6 +3397,16 @@ COMMAND(cmd_test_vars)
 	return 0;
 }
 
+COMMAND(cmd_test_ctcp)
+{
+	if (!sess || !params[0])
+		return -1;
+
+	gg_dcc_request(sess, get_uin(params[0]));
+
+	return 0;
+}
+
 /*
  * command_exec()
  * 
@@ -4986,6 +4996,9 @@ void command_init()
 	command_add
 	( "_queue", "uu", cmd_queue, 0, " [opcje]",
 	  "pozwala obserwowaæ kolejkê wiadomo¶ci podczas po³±czenia", "");
+	command_add
+	( "_ctcp", "u", cmd_test_ctcp, 0, " <numer/alias>",
+	  "wysy³a ¿±danie bezpo¶redniego po³±czenia", "");
 }
 
 /*

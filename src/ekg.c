@@ -1039,7 +1039,7 @@ int main(int argc, char **argv)
 		if (!gg_debug_file)
 			setup_debug();
 
-		gg_debug_level = 255 ^ GG_DEBUG_DUMP;
+		gg_debug_level = 255;
 	} else
 		gg_debug_level = 0;
 #else
