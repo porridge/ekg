@@ -1275,7 +1275,6 @@ COMMAND(cmd_ignore)
 	uin_t uin = 0;
 
 	if (*name == 'i' || *name == 'I') {
-		const char *user;
 		int flags;
 
 		if (!params[0]) {
@@ -1310,21 +1309,18 @@ COMMAND(cmd_ignore)
 		}
 
 		if (params[1]) {
-			user = params[1];
-			flags = ignore_flags(params[0]);
+			flags = ignore_flags(params[1]);
 
 			if (!flags) {
 				printq("invalid_params", name);
 				return -1;
 			}
 
-		} else {
-			user = params[0];
+		} else
 			flags = IGNORE_ALL;
-		}
 
-		if (!(uin = get_uin(user))) {
-			printq("user_not_found", user);
+		if (!(uin = get_uin(params[0]))) {
+			printq("user_not_found", params[0]);
 			return -1;
 		}
 
@@ -4484,6 +4480,7 @@ int command_remove(const char *name)
  * 'p' - komenda python,
  * 'w' - komenda window,
  * 'e' - events,
+ * 'I' - poziomy ignorowania,
  * 'f' - plik.
  */
 
@@ -4720,8 +4717,8 @@ void command_init()
 	  "");
 	 
 	command_add
-	( "ignore", "uu", cmd_ignore, 0,
-	  " [poziom] [numer/alias]", "dodaje do listy ignorowanych",
+	( "ignore", "uI", cmd_ignore, 0,
+	  " [numer/alias] [poziom]", "dodaje do listy ignorowanych",
 	  "\n"
 	  "Dostêpne poziomy ignorowania:\n"
 	  "  - status - ca³kowicie ignoruje stan\n"
