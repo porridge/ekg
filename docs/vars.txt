@@ -200,7 +200,7 @@ random_reason
         ~/.gg/away.reasons dla away i ~/.gg/back.reasons dla back). dla 0 nie 
         jest losowany, dla 1 losowany jest opis dotycz±cy stanu	zajêty, dla 2 
         niedostêpny, dla 4 dostêpny, dla 8 niewidoczny. warto¶ci te mo¿na ze 
-        sob± ³±czyæ, np. 11 bêdzie dotyczyæ stanów niedostêpny, zajêty oraz
+        sob± dodawaæ, np. 11 bêdzie dotyczyæ stanów niedostêpny, zajêty oraz
         niewidoczny. je¿eli z jakich¶ przyczyn nie powiedzie siê odczyt,
         opis bêdzie pobierany ze zmiennych ,,away_reason'' lub ,,quit_reason'',
         o ile nie s± puste.
