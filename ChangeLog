@@ -10,6 +10,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - klawisz F3 toggluje listê kontaktów (w)
 - tryb debugowania jest odnotowywany na pasku stanu (w)
 - usuniêcie leaka przy debugowaniu (w)
+- poprawka zapisywania szyfrowanych wiadomo¶ci do /last (szalik/w)
 
 // 2002-11-16
 
