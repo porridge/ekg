@@ -14,6 +14,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   siê dostosowywa³ do zmian rozmiaru terminala (w)
 - mniejsze poprawki ui-ncurses (w)
 - dodanie ,,window next'' i ,,window prev'' (w)
+- obs³uga Ctrl-L w ui-ncurses (Kooba/w)
 
 // 2002-09-04
 

@@ -1004,12 +1004,10 @@ static void ui_ncurses_loop()
 					window_switch(10);
 
 				if (ch == 'k')
-					window_kill(window_current);
+					ui_event("command", "window", "kill", NULL);
 
-				if (ch == 'n') {
-					struct window *w = window_new(NULL);
-					window_switch(w->id);
-				}
+				if (ch == 'n')
+					ui_event("command", "window", "new", NULL);
 
 				break;
 				
@@ -1088,6 +1086,7 @@ static void ui_ncurses_loop()
 			}
 
 			case 'L' - 64:
+				ui_event("command", "window", "refresh");
 				break;
 				
 			case 9:
@@ -1359,7 +1358,14 @@ static int ui_ncurses_event(const char *event, ...)
 				goto cleanup;
 			}
 			
-			if (!strcasecmp(p1, "clear") || !strcasecmp(p1, "refresh")) {
+			if (!strcasecmp(p1, "refresh")) {
+				clearok(curscr, TRUE);
+				wrefresh(curscr);
+				clearok(curscr, FALSE);
+				goto cleanup;
+			}
+
+			if (!strcasecmp(p1, "clear")) {
 				print("not_implemented");
 				goto cleanup;
 			}
