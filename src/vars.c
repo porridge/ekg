@@ -42,7 +42,7 @@ list_t variables = NULL;
  */
 void variable_init()
 {
-	variable_add("uin", VAR_INT, 1, &config_uin, NULL, NULL);
+	variable_add("uin", VAR_INT, 1, &config_uin, changed_uin, NULL);
 	variable_add("password", VAR_STR, 0, &config_password, NULL, NULL);
 
 	variable_add("auto_away", VAR_INT, 1, &config_auto_away, NULL, NULL);
@@ -64,6 +64,7 @@ void variable_init()
 	variable_add("display_notify", VAR_INT, 1, &config_display_notify, NULL, variable_map(3, 0, 0, "none", 1, 0, "all", 2, 0, "significant"));
 	variable_add("display_sent", VAR_BOOL, 1, &config_display_sent, NULL, NULL);
 	variable_add("emoticons", VAR_BOOL, 1, &config_emoticons, NULL, NULL);
+	variable_add("keep_reason", VAR_BOOL, 1, &config_keep_reason, NULL, NULL);
 	variable_add("last", VAR_MAP, 1, &config_last, NULL, variable_map(4, 0, 0, "none", 1, 2, "all", 2, 1, "separate", 4, 0, "sent"));
 	variable_add("last_size", VAR_INT, 1, &config_last_size, NULL, NULL);
 	variable_add("log", VAR_MAP, 1, &config_log, NULL, variable_map(4, 0, 0, "none", 1, 2, "file", 2, 1, "dir", 4, 0, "gzip"));

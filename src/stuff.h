@@ -179,6 +179,7 @@ int config_display_sent;
 int config_sort_windows;
 int config_last_size;
 int config_last;
+int config_keep_reason;
 
 char *home_dir;
 char *config_dir;
@@ -259,6 +260,7 @@ void changed_debug(const char *var);
 void changed_dcc(const char *var);
 void changed_theme(const char *var);
 void changed_proxy(const char *var);
+void changed_uin(const char *var);
 
 int event_add(int flags, uin_t uin, const char *action, int quiet);
 int event_remove(int flags, uin_t uin);

@@ -141,6 +141,7 @@ int config_display_sent = 0;
 int config_sort_windows = 0;
 int config_last_size = 10;
 int config_last = 0;
+int config_keep_reason = 0;
 
 static struct {
 	int event;
@@ -2258,6 +2259,16 @@ void changed_proxy(const char *var)
 		gg_proxy_host = xstrdup(config_proxy);
 		gg_proxy_port = 8080;
 	}
+}
+
+/*
+ * changed_uin()
+ *
+ * funkcja wywo³ywana przy zmianie zmiennej uin.
+ */
+void changed_uin(const char *var)
+{
+	ui_event("xterm_update");
 }
 
 /*

@@ -11,6 +11,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - zmiany stanu zawsze wrzuca do pierwszego okna (theKnight/w)
 - wska¼nik (more) w ui-ncurses (sdas/w)
 - ³adowanie themu zeruje poprzedni (Arim/w)
+- pocz±tek obs³ugi xtermowych tytu³ów (jojo/w)
+- dodana zmienna keep_reason (jojo/w)
 
 // 2002-09-18
 

@@ -301,9 +301,11 @@ void ekg_wait_for_key()
 					reason = random_line(prepare_path("away.reasons", 0));
 					if (!reason && config_away_reason)
 					    	reason = xstrdup(config_away_reason);
-				}
-				else if (config_away_reason)
+				} else if (config_away_reason)
 				    	reason = xstrdup(config_away_reason);
+
+				if (!reason && config_keep_reason && config_reason)
+					reason = xstrdup(config_reason);
 				
 				away = (reason) ? 3 : 1;
 
@@ -687,6 +689,8 @@ int main(int argc, char **argv)
 	emoticon_read();
 	in_autoexec = 0;
 
+	ui_event("xterm_update");
+	
 #ifdef WITH_IOCTLD
 	if (!batch_mode) {
 		sock_path = prepare_path(".socket", 1);

@@ -235,8 +235,10 @@ COMMAND(cmd_away)
 	
 	unidle();
 
-	free(config_reason);
-	config_reason = NULL;
+	if (!config_keep_reason && !params[0]) {
+		xfree(config_reason);
+		config_reason = NULL;
+	}
 	
 	if (!strcasecmp(name, "away")) {
 	    	if (!params[0]) {
@@ -246,9 +248,11 @@ COMMAND(cmd_away)
 				    	reason = xstrdup(config_away_reason);
 			} else if (config_away_reason)
 			    	reason = xstrdup(config_away_reason);
-		}
-		else
+		} else
 		    	reason = xstrdup(params[0]);
+
+		if (config_keep_reason && !reason)
+			reason = config_reason;
 		
 		away = (reason) ? 3 : 1;
 		print((reason) ? "away_descr" : "away", reason);
@@ -265,6 +269,9 @@ COMMAND(cmd_away)
 		else
 		    	reason = xstrdup(params[0]);
 		
+		if (config_keep_reason && !reason)
+			reason = config_reason;
+		
 		away = (reason) ? 5 : 2;
 		print((reason) ? "invisible_descr" : "invisible", reason);
 		ui_event("my_status", "invisible", reason);
@@ -280,6 +287,9 @@ COMMAND(cmd_away)
 		}
 		else
 		    	reason = xstrdup(params[0]);
+
+		if (config_keep_reason && !reason)
+			reason = config_reason;
 		
 		away = (reason) ? 4 : 0;
 		print((reason) ? "back_descr" : "back", reason);
@@ -1315,9 +1325,11 @@ COMMAND(cmd_quit)
 		}
 		else if (config_quit_reason)
 		    	tmp = xstrdup(config_quit_reason);
-	}
-	else
+	} else
 	    	tmp = xstrdup(params[0]);
+
+	if (config_keep_reason && !tmp && config_reason)
+		tmp = xstrdup(config_reason);
 	
 	if (!quit_message_send) {
 		print((tmp) ? "quit_descr" : "quit", tmp);

@@ -1638,6 +1638,14 @@ static int ui_ncurses_event(const char *event, ...)
 	if (!strcmp(event, "theme_init"))
 		ui_ncurses_theme_init(); 
 
+#if 0
+	if (!strcmp(event, "xterm_update") && getenv("TERM") && !strncmp(getenv("TERM"), "xterm", 5)) {
+		char *tmp = saprintf("\033]0;EKG (%d)\007", config_uin);
+		tputs(tmp, 1, putchar);
+		xfree(tmp);
+	}
+#endif
+
 	if (!strcmp(event, "refresh_time")) {
 		struct timer *t = timer_add(1, "ui-ncurses-time", "refresh_time");
 		t->ui = 1;

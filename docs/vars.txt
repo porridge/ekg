@@ -150,6 +150,13 @@ display_sent
 	zwróciæ uwagê, ¿e przy make_window = 2, wys³anie wiadomo¶ci utworzy
 	automatycznie okienko rozmowy.
 
+keep_reason
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	je¶li w³±czona, komendy ,,away'', ,,back'', ,,invisible'' i ,,quit''
+	bez podanego powodu przejm± aktualny opis.
+	
 last
 	typ: liczba
 	domy¶lna warto¶æ: 0
