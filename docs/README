@@ -117,10 +117,13 @@ KLAWIATURA
     Interfejs ncurses obs³uguje kilka dodatkowych kombinacji:
 
 	Page Up, Page Down	przewijanie ekranu
+	Ctrl-F, Ctrl-G		j.w.
         Alt-N			utwórz nowe okno
 	Alt-K			zamknij aktualne okno
 	Ctrl-Fn			prze³±cza do podanego okna (konsola FreeBSD)
 	Ctrl-Enter		przej¶cie do trybu wielolinijkowego
+	Ctrl-P			poprzednie okno
+        Ctrl-N			kolejne okno
 
     Po wej¶ciu do trybu wielolinijkowego poruszamy siê za pomoc± kursorów
     i zatwierdzamy ponownym wci¶niêciem Ctrl-Enter. By anulowaæ wciskamy

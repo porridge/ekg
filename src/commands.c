@@ -472,9 +472,19 @@ COMMAND(cmd_connect)
 		    	tmp = xstrdup(params[0]);
 
 		connecting = 0;
-		if (sess->state == GG_STATE_CONNECTED)
-			print((tmp) ? "disconnected_descr" : "disconnected", tmp);
-		else if (sess->state != GG_STATE_IDLE)
+		if (sess->state == GG_STATE_CONNECTED) {
+			if (tmp) {
+				char *r1, *r2;
+
+				r1 = xstrmid(tmp, 0, GG_STATUS_DESCR_MAXSIZE);
+				r2 = xstrmid(tmp, GG_STATUS_DESCR_MAXSIZE, -1);
+				print("disconnected_descr", r1, r2);
+				xfree(r2);
+				xfree(r1);
+			} else
+				print("disconnected");
+			
+		} else if (sess->state != GG_STATE_IDLE)
 			print("conn_stopped");
 		ekg_logoff(sess, tmp);
 		free(tmp);
