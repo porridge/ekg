@@ -782,9 +782,6 @@ static void ui_readline_postinit()
  */
 static void ui_readline_deinit()
 {
-	if (ekg_segv_handler)
-		return;
-
 	window_free();
 }
 
