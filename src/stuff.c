@@ -3246,7 +3246,7 @@ char *read_file(FILE *f)
  *
  * 0/-1
  */
-int send_sms(const char *recipient, const char *message, int show_result)
+int send_sms(const char *recipient, const char *message, int quiet)
 {
 	int pid, fd[2] = { 0, 0 };
 	struct gg_exec s;
@@ -3297,7 +3297,7 @@ int send_sms(const char *recipient, const char *message, int show_result)
 	list_add(&watches, &s, sizeof(s));
 	close(fd[1]);
 	
-	tmp = saprintf((show_result) ? "\001%s" : "\002%s", recipient);
+	tmp = saprintf((quiet) ? "\002%s" : "\001%s", recipient);
 	process_add(pid, tmp);
 	xfree(tmp);
 

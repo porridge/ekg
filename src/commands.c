@@ -2322,7 +2322,7 @@ COMMAND(cmd_sms)
 	} else
 		number = params[0];
 
-	if (send_sms(number, params[1], 1) == -1) {
+	if (send_sms(number, params[1], quiet) == -1) {
 		printq("sms_error", strerror(errno));
 		return -1;
 	}

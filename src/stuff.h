@@ -406,7 +406,7 @@ const char *prepare_path(const char *filename, int do_mkdir);
 char *random_line(const char *path);
 char *read_file(FILE *f);
 
-int send_sms(const char *recipient, const char *message, int show_result);
+int send_sms(const char *recipient, const char *message, int quiet);
 void sms_away_add(uin_t uin);
 int sms_away_check(uin_t uin);
 void sms_away_free();
