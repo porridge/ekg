@@ -19,6 +19,7 @@ d - drg, sz - szalik).
   jego identyfikator (w)
 - libgadu: poprawki obs³ugi http, by mo¿na by³o odbieraæ dane binarne (w)
 - poprawki w dokumentacji (w)
+- poprawka flag kompilacji pythona (ksmigrod/w)
 
 // 2003-09-21
 
