@@ -163,20 +163,22 @@ void handle_status(struct gg_event *e)
 
 	if (is_ignored(e->event.status.uin))
 		return;
+	
+	if (!(u = find_user(e->event.status.uin, NULL)))
+		return;
 
-	if ((u = find_user(e->event.status.uin, NULL)))
-		u->status = e->event.status.status;
-
-	if (e->event.status.status == GG_STATUS_AVAIL) {
+	if (e->event.status.status == GG_STATUS_AVAIL && u->status != GG_STATUS_AVAIL) {
 		if (u && completion_notify)
 			add_send_nick(u->comment);
 		my_printf("status_avail", format_user(e->event.status.uin));
 		if (enable_beep && enable_beep_notify)
 			my_puts("\007");
-	} else if (e->event.status.status == GG_STATUS_BUSY)
+	} else if (e->event.status.status == GG_STATUS_BUSY && u->status != GG_STATUS_BUSY)
 		my_printf("status_busy", format_user(e->event.status.uin));
-	else if (e->event.status.status == GG_STATUS_NOT_AVAIL)
+	else if (e->event.status.status == GG_STATUS_NOT_AVAIL && u->status != GG_STATUS_NOT_AVAIL)
 		my_printf("status_not_avail", format_user(e->event.status.uin));
+	
+	u->status = e->event.status.status;
 }
 
 void handle_failure(struct gg_event *e)
