@@ -309,7 +309,7 @@ char **my_completion(char *text, int start, int end)
 	CPFunction *func = empty_generator;
 
 	if (start) {
-		if (!strncasecmp(rl_line_buffer, "chat ", 5)) {
+		if (!strncasecmp(rl_line_buffer, "chat ", 5) || !strncasecmp(rl_line_buffer, "/chat ", 6)) {
 			word = 0;
 			for (i = 0; i < strlen(rl_line_buffer); i++) {
 				if (isspace(rl_line_buffer[i]))
@@ -343,16 +343,17 @@ char **my_completion(char *text, int start, int end)
 
 		for (c = commands; c->name; c++) {
 			int len = strlen(c->name);
+			char *cmd = (*rl_line_buffer == '/') ? rl_line_buffer + 1 : rl_line_buffer;
 
-			if (!strncasecmp(rl_line_buffer, c->name, len) && isspace(rl_line_buffer[len])) {
+			if (!strncasecmp(cmd, c->name, len) && isspace(cmd[len])) {
 				params = c->params;
 				abbrs = 1;
 				break;
 			}
 			
-			for (len = 0; rl_line_buffer[len] && rl_line_buffer[len] != ' '; len++);
+			for (len = 0; cmd[len] && cmd[len] != ' '; len++);
 
-			if (!strncasecmp(rl_line_buffer, c->name, len)) {
+			if (!strncasecmp(cmd, c->name, len)) {
 				params = c->params;
 				abbrs++;
 			} else

@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-03-13
 
 - fix Makefile.in, install -d $(prefiX)/bin (gawrysz/w)
+- poprawka dope³niania w query (gawrysz/w)
 
 // 2002-03-12
 
