@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-07-11
 
 - poprawka aliasów w query (theKnight/w)
+- poprawka Makefile dla --with-shared (Charvel/w)
 
 // 2002-07-10
 
