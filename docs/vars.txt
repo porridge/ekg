@@ -48,6 +48,14 @@ auto_back
 	je¶li równa 1, stan jest zmieniany na dostêpny przy wys³aniu
 	jakiejkolwiek wiadomo¶ci. je¶li równa 2, przy wci¶niêciu klawisza.
 
+auto_conference
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	okre¶la, czy w momencie wysy³ania wiadomo¶ci za pomoc± /chat lub
+	/query do wielu u¿ytkowników ma byæ automatycznie utworzona
+	konferencja.
+
 auto_find
 	typ: bool
 	domy¶lna warto¶æ: 0

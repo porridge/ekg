@@ -2137,7 +2137,7 @@ COMMAND(cmd_msg)
 
 	nick = xstrdup(params[0]);
 
-	if ((*nick == '@' || strchr(nick, ',')) && chat) {
+	if ((*nick == '@' || strchr(nick, ',')) && chat && config_auto_conference) {
 		struct conference *c = conference_create(nick);
 		list_t l;
 
@@ -3899,7 +3899,7 @@ COMMAND(cmd_query)
 
 	p[i] = NULL;
 
-	if (params[0] && (params[0][0] == '@' || strchr(params[0], ','))) {
+	if (params[0] && (params[0][0] == '@' || strchr(params[0], ',')) && config_auto_conference) {
 		struct conference *c = conference_create(params[0]);
 		
 		if (!c) {
@@ -3929,12 +3929,30 @@ COMMAND(cmd_query)
 
 		} else {
 
-			if (params[0] && !get_uin(params[0])) {
-				printq("user_not_found", params[0]);
-				res = -1;
-				goto cleanup;
-			} else
-				ui_event("command", quiet, "query", params[0], NULL);
+			if (params[0]) {
+				if (!strchr(params[0], ',') && !get_uin(params[0])) {
+					printq("user_not_found", params[0]);
+					res = -1;
+					goto cleanup;
+				}
+
+				if (strchr(params[0], ',')) {
+					char **tmp = array_make(params[0], ",", 0, 0, 0);
+					int i;
+
+					for (i = 0; tmp[i]; i++)
+						if (!get_uin(tmp[i])) {
+							printq("user_not_found", tmp[i]);
+							res = -1;
+							array_free(tmp);
+							goto cleanup;
+						}
+
+					array_free(tmp);
+				}
+			}
+
+			ui_event("command", quiet, "query", params[0], NULL);
 		}
 	}
 		

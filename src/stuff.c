@@ -96,6 +96,7 @@ int reconnect_timer = 0;
 int config_auto_away = 600;
 int config_auto_save = 0;
 int config_auto_find = 0;
+int config_auto_conference = 1;
 time_t last_save = 0;
 int config_display_color = 1;
 int config_beep = 1;
