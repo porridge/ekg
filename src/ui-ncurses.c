@@ -3227,6 +3227,8 @@ static void ui_ncurses_loop()
 					b = binding_map[KEY_HOME];
 				else if (tmp == 'F')
 					b = binding_map[KEY_END];
+				else if (tmp == 'M')
+					continue;
 				else
 					ungetch(tmp);
 			}

@@ -14,6 +14,7 @@ zg³osi³ b³±d.
 - poprawka Ctrl-Spacja (mateusza/w)
 - zamiana ,,dcc send --reverse'' na ,,dcc rsend'' i ,,dcc voice --reverse''
   na ,,dcc rvoice'' (FIG/w)
+- poprawka Shift-Enter w xtermopobnych (*/w)
 
 // 2003-03-28
 

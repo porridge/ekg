@@ -27,8 +27,8 @@ LICENCJA
 
 INSTALACJA
 
-    Rozpakowaæ poleceniem ,,tar zxvf ekg-XXXXYYZZ.tar.gz'' (gdzie
-    XXXXYYZZ to wersja snapshotu), wej¶æ do utworzonego katalogu.
+    Rozpakowaæ poleceniem ,,tar zxvf ekg-XXX.tar.gz'' (gdzie XXX to wersja
+    programu lub data wykonania snapshotu), wej¶æ do utworzonego katalogu.
     Je¶li mamy uprawnienia administratora na danej maszynie, wywo³ujemy
     ,,./configure'', potem ,,make'' i z prawami roota ,,make install''.
     Je¶li chcemy zainstalowaæ program w katalogu domowym, do polecenia
@@ -67,13 +67,13 @@ U¯YCIE
     betatesterzy poradzili sobie bez jakiejkolwiek dokumentacji).
     Interfejs jest wzorowany na irssi. Dope³nianie tabem jest dostêpne w
     wiêkszo¶ci komend. Komendy mo¿na wywo³ywaæ skrótami, o ile s± one
-    jednoznaczne. Wysy³anie wiadomo¶ci komend± ,,msg'', rozmowa komend±
-    ,,chat''. Informacje o ludziach ,,find <numer/nick>''. Szukanie t±
-    sam± komend±, ale z ró¿nymi parametrami. ,,help'' Twoim przyjacielem.
-    Je¶li dana komenda ma ró¿ne opcje, pomaga ,,help <komenda>''. By
-    wys³aæ kilkulinijkow± wiadomo¶æ w interfejsie ncurses, wci¶nij
-    Ctrl-Enter. W readline zamiast tre¶ci wpisz ,,\'' (backslash) i
-    zakoñcz lini± z sam± kropk± (szczegó³y poni¿ej, w rodziale
+    jednoznaczne. Wysy³anie wiadomo¶ci komend± ,,msg'', otwarcie okna 
+    rozmowy komend± ,,query''. Informacje o rozmówcach ,,find'' w oknie
+    rozmowy. Szukanie t± sam± komend±, ale z ró¿nymi parametrami. ,,help''
+    Twoim przyjacielem. Je¶li dana komenda ma ró¿ne opcje, pomaga
+    ,,help <komenda>''. By wys³aæ kilkulinijkow± wiadomo¶æ w interfejsie
+    ncurses, wci¶nij Ctrl-Enter. W readline zamiast tre¶ci wpisz ,,\''
+    (backslash) i zakoñcz lini± z sam± kropk± (szczegó³y poni¿ej, w rodziale
     ,,KLAWIATURA'').
 
     Je¶li dana komenda przyjmuje ,,--parametr'' mo¿na u¿yæ równie¿
@@ -90,7 +90,7 @@ U¯YCIE
     Je¶li w linii poleceñ shella podasz po nazwie programu i parametrach
     zaczynaj±cych siê od my¶lnika co¶ jeszcze, to zostanie to zinterpretowane
     jako komenda wsadowa. ekg wykona tylko t± komendê, i od razu wyjdzie.
-    Je¶li na serwerze GG czekaj± na Ciebie jakie¶ wiadomo¶ci to serwer je
+    Je¶li na serwerze czekaj± na Ciebie jakie¶ wiadomo¶ci to serwer je
     przy¶le zaraz po po³±czeniu i w trybie wsadowym ekg wypisze je na
     terminal. Je¶li wiêc zamierzasz przekierowaæ wyj¶cie do /dev/null i nie
     masz loga z wiadomo¶ci to licz siê z tym, ¿e mog± one zgin±æ bezpowrotnie.
