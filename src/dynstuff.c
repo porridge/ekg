@@ -182,6 +182,28 @@ int list_destroy(list_t list, int free_data)
 }
 
 /*
+ * string_realloc()
+ *
+ * upewnia siê, ¿e w stringu bêdzie wystarczaj±co du¿o miejsca.
+ *
+ *  - n - wymagana ilo¶æ znaków (bez koñcowego '\0').
+ */
+static void string_realloc(string_t s, int count)
+{
+	char *tmp;
+	
+	if (s->str && count + 1 <= s->size)
+		return;
+	
+	tmp = xrealloc(s->str, count + 81);
+	if (!s->str)
+		*tmp = 0;
+	tmp[count + 80] = 0;
+	s->size = count + 81;
+	s->str = tmp;
+}
+	
+/*
  * string_append_c()
  *
  * dodaje do danego ci±gu jeden znak, alokuj±c przy tym odpowiedni± ilo¶æ
@@ -192,20 +214,12 @@ int list_destroy(list_t list, int free_data)
  */
 int string_append_c(string_t s, char c)
 {
-	char *new;
-
 	if (!s) {
 		errno = EFAULT;
 		return -1;
 	}
 	
-	if (!s->str || s->len + 2 > s->size) {
-		new = xrealloc(s->str, s->size + 80);
-		if (!s->str)
-			*new = 0;
-		s->size += 80;
-		s->str = new;
-	}
+	string_realloc(s, s->len + 1);
 
 	s->str[s->len + 1] = 0;
 	s->str[s->len++] = c;
@@ -224,9 +238,7 @@ int string_append_c(string_t s, char c)
  */
 int string_append_n(string_t s, const char *str, int count)
 {
-	char *new;
-
-	if (!s) {
+	if (!s || !str) {
 		errno = EFAULT;
 		return -1;
 	}
@@ -234,13 +246,7 @@ int string_append_n(string_t s, const char *str, int count)
 	if (count == -1)
 		count = strlen(str);
 
-	if (!s->str || s->len + count + 1 > s->size) {
-		new = xrealloc(s->str, s->size + count + 80);
-		if (!s->str)
-			*new = 0;
-		s->size += count + 80;
-		s->str = new;
-	}
+	string_realloc(s, s->len + count);
 
 	s->str[s->len + count] = 0;
 	strncpy(s->str + s->len, str, count);
@@ -253,6 +259,38 @@ int string_append_n(string_t s, const char *str, int count)
 int string_append(string_t s, const char *str)
 {
 	return string_append_n(s, str, -1);
+}
+
+/*
+ * string_insert_n()
+ *
+ * wstawia tekst w podane miejsce bufora.
+ *  
+ *  - s - ci±g znaków,
+ *  - index - miejsce, gdzie mamy wpisac (liczone od 0),
+ *  - str - tekst do dopisania,
+ *  - count - ilo¶æ znaków do dopisania (-1 znaczy, ¿e wszystkie).
+ */
+void string_insert_n(string_t s, int index, const char *str, int count)
+{
+	if (!s || !str)
+		return;
+
+	if (count == -1)
+		count = strlen(str);
+
+	if (index > s->len)
+		index = s->len;
+	
+	string_realloc(s, s->len + count);
+
+	memmove(s->str + index + count, s->str + index, s->len + 1 - index);
+	memmove(s->str + index, str, count);
+}
+
+void string_insert(string_t s, int index, const char *str)
+{
+	string_insert_n(s, index, str, -1);
 }
 
 /*

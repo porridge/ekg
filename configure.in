@@ -216,11 +216,20 @@ if test -d src; then
   if test "x$with_libgsm" != "xno"; then
     AC_CHECK_LIB(gsm, gsm_decode, [ 
       AC_CHECK_HEADERS(gsm.h, [
+        have_gsm_h=yes
+      ], [
+        AC_CHECK_HEADERS(gsm/gsm.h, [
+	  have_gsm_h=yes
+	  CFLAGS="$CFLAGS -I/usr/include/gsm"
+	])
+      ])
+      if test "x$have_gsm_h" = "xyes"; then
         AC_CHECK_HEADERS(linux/soundcard.h, [
           AC_DEFINE(HAVE_VOIP, 1, [define if you want VOIP support])
 	  LDFLAGS="-lgsm $LDFLAGS"
+	  OBJS="$OBJS voice.o"
 	])
-      ])
+      fi
     ])
   fi
 

@@ -17,10 +17,6 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "config.h"
-
-#ifdef HAVE_VOIP
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -206,15 +202,6 @@ int voice_record(const char *buf, int length, int null)
 
 	return 0;
 }
-
-#else /* HAVE_VOIP */
-
-int voice_open() { return -1; }
-int voice_close() { return -1; }
-int voice_play(const char *buf, int length, int null) { return -1; }
-int voice_record(const char *buf, int length, int null) { return -1; }
-
-#endif /* HAVE_VOIP */
 
 /*
  * Local variables:
