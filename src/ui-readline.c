@@ -60,15 +60,15 @@ static int windows_sort();
 static int window_query_id(const char *qnick);
 
 /* a jak ju¿ przy okienkach jeste¶my... */
-static int window_01() { window_switch(1); return(0); }
-static int window_02() { window_switch(2); return(0); }
-static int window_03() { window_switch(3); return(0); }
-static int window_04() { window_switch(4); return(0); }
-static int window_05() { window_switch(5); return(0); }
-static int window_06() { window_switch(6); return(0); }
-static int window_07() { window_switch(7); return(0); }
-static int window_08() { window_switch(8); return(0); }
-static int window_09() { window_switch(9); return(0); }
+static void window_01() { if (curr_window == 1) return; window_switch(1); }
+static void window_02() { if (curr_window == 2) return; window_switch(2); }
+static void window_03() { if (curr_window == 3) return; window_switch(3); }
+static void window_04() { if (curr_window == 4) return; window_switch(4); } 
+static void window_05() { if (curr_window == 5) return; window_switch(5); }
+static void window_06() { if (curr_window == 6) return; window_switch(6); }
+static void window_07() { if (curr_window == 7) return; window_switch(7); }
+static void window_08() { if (curr_window == 8) return; window_switch(8); }
+static void window_09() { if (curr_window == 9) return; window_switch(9); }
 
 static void sigcont_handler()
 {
