@@ -169,7 +169,7 @@ void handle_msg(struct gg_event *e)
 		if (config_dcc && u) {
 			struct gg_dcc *d;
 
-                        if (!(d = gg_dcc_send_file(u->ip.s_addr, u->port, config_uin, e->event.msg.sender))) {
+                        if (!(d = gg_dcc_get_file(u->ip.s_addr, u->port, config_uin, e->event.msg.sender))) {
 				my_printf("dcc_error", strerror(errno));
 				return;
 			}
