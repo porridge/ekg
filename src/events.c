@@ -1692,6 +1692,7 @@ void handle_search50(struct gg_event *e)
 	gg_pubdir50_t res = e->event.pubdir50;
 	int i, count, all = 0;
 	list_t l;
+	uin_t last_uin = 0;
 
 	if ((count = gg_pubdir50_count(res)) < 1) {
 		print("search_not_found");
@@ -1792,6 +1793,8 @@ void handle_search50(struct gg_event *e)
 		xfree(lastname);
 		xfree(nickname);
 		xfree(city);
+
+		last_uin = atoi(uin);
 	}
 
 	/* je¶li mieli¶my ,,/find --all'', szukamy dalej */
@@ -1803,7 +1806,7 @@ void handle_search50(struct gg_event *e)
 			continue;
 
 		/* nie ma dalszych? to dziêkujemy */
-		if (!(next = gg_pubdir50_next(res)) || !sess) {
+		if (!(next = gg_pubdir50_next(res)) || !sess || next < last_uin) {
 			list_remove(&searches, req, 0);
 			gg_pubdir50_free(req);
 			break;
