@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek).
 
+// 2004-07-14
+
+- libgadu: poprawki obs³ugi proxy (the_leech/w)
+
 // 2004-07-06
 
 - poprawka dzia³ania /queue -u user -c (struthio/sz)
