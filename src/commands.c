@@ -3330,7 +3330,7 @@ COMMAND(cmd_test_hexmsg)
 	}
 
 	for (i = 0; params[1][i]; i++) {
-		if (isxdigit(params[1][i]))
+		if (xisxdigit(params[1][i]))
 			size++;
 	}
 
@@ -3342,7 +3342,7 @@ COMMAND(cmd_test_hexmsg)
 	for (i = 0, j = 0; params[1][i]; i++) {
 		char ch = tolower(params[1][i]), *hex = "0123456789abcdef";
 
-		if (!isxdigit(ch))
+		if (!xisxdigit(ch))
 			continue;
 
 		buf[j / 2] |= (int)(strchr(hex, ch) - hex);
@@ -3925,12 +3925,6 @@ COMMAND(cmd_query)
 	char **p = xcalloc(3, sizeof(char*));
 	int i, res = 0;
 
-	/* sprawdzamy czy wszystko jest wpisane okey */
-	if (!params[0] || (params[0][0] == '@' && !params[0][1])) {
-		printq("invalid_params", name);
-		return -1;
-	}
-
 	for (i = 0; params[i]; i++)
 		p[i] = xstrdup(params[i]);
 
@@ -4009,7 +4003,7 @@ COMMAND(cmd_query)
 				array_free(tmp);
 			}
 
-			ui_event("command", quiet, "query", strip_chars(params[0], '\"'), NULL);
+			ui_event("command", quiet, "query", (params[0]) ? strip_chars(params[0], '\"') : NULL, NULL);
 		}
 	}
 
