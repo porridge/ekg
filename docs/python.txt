@@ -13,7 +13,6 @@ niewiele jeszcze dzia³a. w zasadzie to prawie nic. przyk³adowy skrypt:
    ekg.config.password = "test123"
    ekg.connect()
 
-
-który ³adujemy komend± ,,_load test.py''. nic wiêcej.
+który ³adujemy komend± ,,_run test.py''. nic wiêcej.
 
 $Id$

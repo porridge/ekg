@@ -158,6 +158,19 @@ int python_finalize()
 	return 0;
 }
 
+int python_run(const char *filename)
+{
+	FILE *f = fopen(filename, "r");
+
+	if (f) {
+		PyRun_SimpleFile(f, (char*) filename);
+		fclose(f);
+	} else
+		return -1;
+
+	return 0;
+}
+
 int python_load(const char *filename)
 {
 	PyObject *mod, *init;

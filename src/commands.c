@@ -2107,21 +2107,24 @@ COMMAND(cmd_timer)
 }
 
 #ifdef WITH_PYTHON
-COMMAND(cmd_test_load)
-{
-	if (!params[0])
-		print("not_enough_params");
-	else
-		python_load(params[0]);
-}
 
 COMMAND(cmd_test_python)
 {
-	if (!params[0])
+	if (!params[0]) {
 		print("not_enough_params");
-	else
+		return;
+	}
+
+	if (!strcmp(name, "_load"))
+		python_load(params[0]);
+
+	if (!strcmp(name, "_run"))
+		python_run(params[0]);
+
+	if (!strcmp(name, "_py"))
 		python_exec(params[0]);
 }
+
 #endif
 
 /*
@@ -2512,8 +2515,11 @@ void command_init()
 	  "Wy¶wietla listê sprawdzanych deskryptorów");
 #ifdef WITH_PYTHON
 	command_add
-	( "_load", "?", cmd_test_load, 0, "", "",
+	( "_load", "?", cmd_test_python, 0, "", "",
 	  "£aduje skrypt");
+	command_add
+	( "_run", "?", cmd_test_python, 0, "", "",
+	  "Uruchamia skrypt");
 	command_add
 	( "_py", "?", cmd_test_python, 0, "", "",
 	  "Wykonuje polecenie Pythona");
