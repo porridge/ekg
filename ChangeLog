@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - dodane zdarzenia ,,sigusr1'' i ,,sigusr2'' odpowiadaj±ce sygna³om (joshua/w)
 - dodana akcja ,,command'', która wywo³uje podan± komendê (w)
 - wysy³anie wiadomo¶ci do wielu odbiorców (wojboj/w)
+- poprawka rejestracji (scooty/w)
 
 // 2002-05-15
 

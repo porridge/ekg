@@ -644,8 +644,9 @@ void handle_pubdir(struct gg_http *h)
 			config_uin = s->uin;
 			config_password = reg_password;
 			reg_password = NULL;
-			registered_today = 1;
 		}
+
+		registered_today = 1;
 	}
 	
 	my_printf(good, itoa(s->uin));
