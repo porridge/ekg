@@ -6,3 +6,6 @@ message_line_width 78
 chat_line_first %3 %C<%n%2%C>%n %1\n
 chat_line         %1\n
 chat_line_width 78
+sent_line_first %3 %C<%n%2%C>%n %1\n
+sent_line       %1\n
+sent_line_width 78
