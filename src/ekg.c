@@ -60,16 +60,18 @@
 #  define PATH_MAX _POSIX_PATH_MAX
 #endif
 
+static int ekg_pid = 0;
+static char argv0[PATH_MAX];
+static void (*ui_init)();
+static int ioctld_pid = 0;
+
 time_t last_action = 0;
-int ioctld_pid = 0;
-int ekg_pid = 0;
-char argv0[PATH_MAX];
 char *pipe_file = NULL;
 
 /*
  * usuwanie sesji GG_SESSION_USERx.
  */
-void reaper_user(void *foo)
+static void reaper_user(void *foo)
 {
 	xfree(foo);
 }
@@ -77,7 +79,7 @@ void reaper_user(void *foo)
 /*
  * usuwanie sesji GG_SESSION_USER3.
  */
-void reaper_user3(struct gg_exec *e)
+static void reaper_user3(struct gg_exec *e)
 {
 	if (e->buf)
 		string_free(e->buf, 1);
@@ -88,11 +90,13 @@ void reaper_user3(struct gg_exec *e)
 /*
  * usuwanie sesji wyszukiwania.
  */
-void reaper_search(struct gg_http *s)
+static void reaper_search(struct gg_http *s)
 {
 	gg_search_request_free((struct gg_search_request*) s->user_data);
 	gg_search_free(s);
 }
+
+static void get_line_from_pipe(struct gg_exec *c);
 
 #define VV void(*)(void*)
 
@@ -136,7 +140,7 @@ static struct {
  *
  * - c - struktura steruj±ca przechowuj±ca m.in. deskryptor potoku.
  */
-void get_char_from_pipe(struct gg_common *c)
+static void get_char_from_pipe(struct gg_common *c)
 {
 	static char buf[PIPE_MSG_MAX_BUF_LEN + 1];
 	char ch;
@@ -164,7 +168,7 @@ void get_char_from_pipe(struct gg_common *c)
  *
  * - c - struktura steruj±ca przechowuj±ca m.in. deskryptor potoku.
  */
-void get_line_from_pipe(struct gg_exec *c)
+static void get_line_from_pipe(struct gg_exec *c)
 {
 	char buf[1024];
 	int ret;
@@ -500,19 +504,19 @@ void ekg_wait_for_key()
 	return;
 }
 
-void sigusr1_handler()
+static void sigusr1_handler()
 {
 	event_check(EVENT_SIGUSR1, 1, "SIGUSR1");
 	signal(SIGUSR1, sigusr1_handler);
 }
 
-void sigusr2_handler()
+static void sigusr2_handler()
 {
 	event_check(EVENT_SIGUSR2, 1, "SIGUSR2");
 	signal(SIGUSR1, sigusr2_handler);
 }
 
-void sighup_handler()
+static void sighup_handler()
 {
 	if (sess && sess->state != GG_STATE_IDLE) {
 		print("disconected");
@@ -525,13 +529,13 @@ void sighup_handler()
 	signal(SIGHUP, sighup_handler);
 }
 
-void kill_ioctld()
+static void kill_ioctld()
 {
         if (ioctld_pid > 0 && ekg_pid == getpid())
                 kill(ioctld_pid, SIGINT);
 }
 
-void sigsegv_handler()
+static void sigsegv_handler()
 {
 	signal(SIGSEGV, SIG_DFL);
 
@@ -578,7 +582,7 @@ config_dir, getpid(), config_dir, getpid(), config_dir, argv0, config_dir);
  *
  * zwraca stworzon± linie w zaalokowanym buforze lub NULL przy b³êdzie.
  */
-char *prepare_batch_line(int argc, char *argv[], int n)
+static char *prepare_batch_line(int argc, char *argv[], int n)
 {
 	int i;
 	size_t m = 0;
@@ -626,7 +630,37 @@ static void setup_debug()
 
 	list_add(&watches, &se, sizeof(se));
 }
-	
+
+/*
+ * ekg_ui_set()
+ *
+ * w³±cza interfejs o podanej nazwie.
+ */
+static int ekg_ui_set(const char *name)
+{
+	if (!name)
+		return 0;
+
+	if (!strcasecmp(optarg, "none"))
+		ui_init = ui_none_init;
+	else if (!strcasecmp(optarg, "batch"))
+		ui_init = ui_batch_init;
+	else if (!strcasecmp(optarg, "automaton"))
+		ui_init = ui_automaton_init;
+#ifdef WITH_UI_READLINE
+	else if (!strcasecmp(optarg, "readline"))
+		ui_init = ui_readline_init;
+#endif
+#ifdef WITH_UI_NCURSES
+	else if (!strcasecmp(optarg, "ncurses"))
+		ui_init = ui_ncurses_init;
+#endif
+	else
+		return -1;
+
+	return 0;
+}
+
 int main(int argc, char **argv)
 {
 	int auto_connect = 1, force_debug = 0, new_status = 0, ui_set = 0;
@@ -637,7 +671,6 @@ int main(int argc, char **argv)
 #endif
 	struct passwd *pw; 
 	struct gg_common si;
-	void (*ui_init)();
 	struct option ekg_options[] = {
 		{ "back", optional_argument, 0, 'b' },
 		{ "away", optional_argument, 0, 'a' },
@@ -665,6 +698,9 @@ int main(int argc, char **argv)
 #ifdef WITH_FORCE_NCURSES
 	ui_init = ui_ncurses_init;
 #endif 
+
+	ekg_ui_set(getenv("EKG_UI"));
+	ekg_ui_set(getenv("EKG_FRONTEND"));
 
 	srand(time(NULL));
 
@@ -703,17 +739,17 @@ int main(int argc, char **argv)
 	while ((c = getopt_long(argc, argv, "b::a::i::pdnc:f:hI:ot:u:v", ekg_options, NULL)) != -1) {
 		switch (c) {
 			case 'b':
-				new_status = GG_STATUS_AVAIL;
+				new_status = (optarg) ? GG_STATUS_AVAIL_DESCR : GG_STATUS_AVAIL;
 				xfree(new_reason);
 				new_reason = xstrdup(optarg);
 			        break;
 			case 'a':
-				new_status = GG_STATUS_BUSY;
+				new_status = (optarg) ? GG_STATUS_BUSY_DESCR : GG_STATUS_BUSY;
 				xfree(new_reason);
 				new_reason = xstrdup(optarg);
 			        break;
 			case 'i':
-				new_status = GG_STATUS_INVISIBLE;
+				new_status = (optarg) ? GG_STATUS_INVISIBLE_DESCR : GG_STATUS_INVISIBLE;
 				xfree(new_reason);
 				new_reason = xstrdup(optarg);
 			        break;
@@ -777,24 +813,11 @@ int main(int argc, char **argv)
 			case 'f':
 				ui_set = 1;
 
-				if (!strcasecmp(optarg, "nonde"))
-					ui_init = ui_none_init;
-				else if (!strcasecmp(optarg, "batch"))
-					ui_init = ui_batch_init;
-				else if (!strcasecmp(optarg, "automaton"))
-					ui_init = ui_automaton_init;
-#ifdef WITH_UI_READLINE
-				else if (!strcasecmp(optarg, "readline"))
-					ui_init = ui_readline_init;
-#endif
-#ifdef WITH_UI_NCURSES
-				else if (!strcasecmp(optarg, "ncurses"))
-					ui_init = ui_ncurses_init;
-#endif
-				else {
+				if (ekg_ui_set(optarg)) {
 					fprintf(stderr, "Nieznany interfejs %s.\n", optarg);
 					return 1;
 				}
+
 				break;
 			case '?':
 				/* obs³ugiwane przez getopt */
@@ -954,7 +977,6 @@ int main(int argc, char **argv)
 #ifdef HAVE_OPENSSL
 	SIM_KC_Init();
 	strncpy(SIM_Key_Path, prepare_path("keys/", 0), sizeof(SIM_Key_Path));
-	strcpy(SIM_Not_Encrypted, "\001sim-unencrypted\001");
 #endif
 
 	changed_dcc("dcc");
@@ -1052,6 +1074,8 @@ void ekg_exit()
 #ifdef WITH_PYTHON
 	python_finalize();
 #endif
+
+	SIM_KC_Finish();
 
 	exit(0);
 }

@@ -494,7 +494,7 @@ COMMAND(cmd_connect)
 		} else
 		    	tmp = xstrdup(params[0]);
 
-		if (params[0] && !strcmp(params[0], "-")) {
+		if (params && params[0] && !strcmp(params[0], "-")) {
 			xfree(tmp);
 			tmp = NULL;
 		}

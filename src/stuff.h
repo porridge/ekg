@@ -300,6 +300,4 @@ int last_count_get(uin_t uin);
 void last_count_del(uin_t uin);
 void last_count_add(uin_t uin);
 
-void get_line_from_pipe(struct gg_exec *);
-
 #endif /* __STUFF_H */

@@ -69,6 +69,20 @@ static PyObject* ekg_printf(PyObject *self, PyObject *pyargs)
 	return Py_BuildValue("");
 }
 
+#if 0
+static PyObject* ekg_print(PyObject *self, PyObject *pyargs)
+{
+	char *arg;
+
+	if (!PyArg_ParseTuple(pyargs, "s:print", &arg))
+		return NULL;
+
+	print("generic", arg);
+
+	return Py_BuildValue("");
+}
+#endif
+
 static PyObject* ekg_command(PyObject *self, PyObject *args)
 {
 	char *command = NULL;
@@ -154,6 +168,8 @@ int python_initialize()
 {
 	PyObject *ekg, *ekg_config;
 
+	setenv("PYTHONPATH", ".", 1);
+
 	Py_Initialize();
 
 	if (!(ekg = Py_InitModule("ekg", ekg_methods)))
@@ -232,11 +248,11 @@ int python_load(const char *filename)
 		name = xstrdup(filename);
 	}
 	
-	if (strlen(name) > 3 && !strcmp(name + strlen(name) - 3, ".py"))
-		name[strlen(name) - 3] = 0;
+//	if (strlen(name) > 3 && !strcmp(name + strlen(name) - 3, ".py"))
+//		name[strlen(name) - 3] = 0;
 
-	printf("PYTHONPATH=%s\n", getenv("PYTHONPATH"));
-	printf("oname=%s\n", name);
+	gg_debug(GG_DEBUG_MISC, "PYTHONPATH=%s\n", getenv("PYTHONPATH"));
+	gg_debug(GG_DEBUG_MISC, "name=%s\n", name);
 	chdir(getenv("PYTHONPATH"));
 	
 	if (!(module = PyImport_ImportModule(name))) {
