@@ -1002,6 +1002,12 @@ void handle_dcc(struct gg_dcc *d)
 				case GG_ERROR_DCC_HANDSHAKE:
 					my_printf("dcc_error_handshake", format_user(d->peer_uin));
 					break;
+				case GG_ERROR_DCC_NET:
+					my_printf("dcc_error_network", format_user(d->peer_uin));
+					break;
+				case GG_ERROR_DCC_REFUSED:
+					my_printf("dcc_error_refused", format_user(d->peer_uin));
+					break;
 				default:
 					my_printf("dcc_error_unknown", "");
 			}

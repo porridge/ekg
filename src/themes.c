@@ -724,8 +724,10 @@ void init_theme()
 	add_format("aliases_noexist", "%! Alias %W%1%n nie istnieje\n", 1);
 
 	add_format("dcc_create_error", "%! Nie mo¿na w³±czyæ DCC: %1\n", 1);
-	add_format("dcc_error_unknown", "%! B³±d krytyczny obs³ugi DCC: %1\n", 1);
-	add_format("dcc_error_handshake", "%! Nie mo¿na nawi±zaæ po³±cznienia z %1\n", 1);
+	add_format("dcc_error_network", "%! B³±d transmisji z %1\n", 1);
+	add_format("dcc_error_refused", "%! Po³±czenie %1 zosta³o anulowane\n", 1);
+	add_format("dcc_error_unknown", "%! Nieznany b³±d po³±czenia bezpo¶redniego\n", 1);
+	add_format("dcc_error_handshake", "%! Nie mo¿na nawi±zaæ po³±czenia z %1\n", 1);
 	add_format("dcc_timeout", "%! Timeout DCC\n", 1);
 	add_format("dcc_unknown_command", "%! Nieznana opcja: %W%1%n\n", 1);
 	add_format("dcc_not_supported", "%! Opcja %W%1%n nie jest jeszcze obs³ugiwana\n", 1);

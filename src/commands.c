@@ -1800,22 +1800,27 @@ COMMAND(command_dcc)
 		char *path;
 		
 		for (t = NULL, l = transfers; l; l = l->next) {
+			struct transfer *tt = l->data;
 			struct userlist *u;
 			
-			t = l->data;
-
-			if (!t->dcc || t->type != GG_SESSION_DCC_GET || !t->filename)
+			if (!tt->dcc || tt->type != GG_SESSION_DCC_GET || !tt->filename)
 				continue;
 			
-			if (!params[1])
+			if (!params[1]) {
+				t = tt;
 				break;
+			}
 
-			if (params[1][0] == '#' && atoi(params[1] + 1) == t->id)
+			if (params[1][0] == '#' && atoi(params[1] + 1) == tt->id) {
+				t = tt;
 				break;
+			}
 
 			if ((u = userlist_find(t->uin, NULL))) {
-				if (!strcasecmp(params[1], itoa(u->uin)) || !strcasecmp(params[1], u->display))
+				if (!strcasecmp(params[1], itoa(u->uin)) || !strcasecmp(params[1], u->display)) {
+					t = tt;
 					break;
+				}
 			}
 		}
 

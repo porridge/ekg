@@ -84,7 +84,9 @@ struct gg_session {
 	int recv_done;		/* ile ju¿ wczytano do bufora */
         int recv_left;		/* i ile jeszcze trzeba wczytaæ */
 
-	int version;		/* wersja klienta */
+	int protocol_version;	/* wersja u¿ywanego protoko³u */
+	char *client_version;	/* wersja u¿ywanego klienta */
+	int last_sysmsg;	/* ostatnia wiadomo¶æ systemowa */
 };
 
 /*
@@ -260,7 +262,10 @@ struct gg_login_params {
 	unsigned short server_port;	/* port serwera gg */
 	unsigned long client_addr;	/* adres dcc klienta */
 	unsigned short client_port;	/* port dcc klienta */
-	int client_version;		/* wersja klienta */
+	int protocol_version;		/* wersja protoko³u */
+	char *client_version;		/* wersja klienta */
+	int has_audio;			/* czy ma d¼wiêk? */
+	int last_sysmsg;		/* ostatnia wiadomo¶æ systemowa */
 };
 
 struct gg_session *gg_login(const struct gg_login_params *p);
@@ -484,7 +489,6 @@ struct gg_http *gg_remind_passwd(uin_t uin, int async);
 
 /* zmiana has³a */
 struct gg_http *gg_change_passwd(uin_t uin, const char *passwd, const char *newpasswd, const char *newemail, int async);
-#define gg_change_passwd_watch_fd gg_pubdir_watch_fd
 #define gg_change_passwd_free gg_pubdir_free
 #define gg_free_change_passwd gg_pundir_free
 
@@ -609,8 +613,10 @@ unsigned short fix16(unsigned short x);
 #define GG_HTTPS_PORT 443
 #define GG_HTTP_USERAGENT "Mozilla/4.7 [en] (Win98; I)"
 
-#define GG_DEFAULT_CLIENT_VERSION 0x18
+#define GG_DEFAULT_CLIENT_VERSION "4.9.3.62"
+#define GG_DEFAULT_PROTOCOL_VERSION 0x18
 #define GG_DEFAULT_TIMEOUT 30
+#define GG_HAS_AUDIO_MASK 0x40000000
 
 #define GG_DEFAULT_DCC_PORT 1550
 
