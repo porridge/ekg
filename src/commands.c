@@ -1470,6 +1470,10 @@ COMMAND(command_query)
 {
 	uin_t uin;
 
+	if (!params[0] || !params[1]) {
+		my_printf("not_enough_params");
+		return 0;
+	}
 	if (query_nick) {
 		free(query_nick);
 		query_nick = NULL;
