@@ -1,0 +1,324 @@
+// 2001-10-14
+
+- dodana komenda ,,alias'' (p/drg).
+- dodany docs/ekl.pl (p/drg).
+- mo¿na zmieniaæ prompta w themes ustawieniami ,,readline_prompt''
+  i ,,readline_prompt_away'' (i/drg).
+- fix command_alias (p/drg).
+- time.h w libgg.c (p/drg).
+
+// 2001-10-09
+
+- dodane pole ,,last_pong'' w strukturze ,,gg_session'' zwieraj±ce czas
+  otrzymania ostatniego pakietu GG_PONG (i/tomee).
+- dodana komenda ,,private'' w³±czaj±ca lub wy³±czaj±ca tryb tylko dla
+  znajomych z GG 4.6 (p/pkot,vinil).
+- dodana komenda ,,status'' wy¶wietlaj±ca aktualny stan (i/Sydney Green).
+- stan klienta jest zapisywany komend± ,,save'', wiêc mo¿e wej¶æ na sieæ
+  w trybie tylko dla przyjació³ lub zajêty itd, itd.
+- wiêcej debugów w libgg_search.c (i/tomee).
+- poprawki w docs/protocol.txt (i/wzik).
+
+// 2001-10-08
+
+- dopisana zmienna ,,bold_font'' ¿eby nie psu³o konfigów GNU Gadu (p/thrull).
+
+// 2001-10-05
+
+- zmienna display_ack (i/outsider).
+- informacje o nickach w changelogu bêd± poprzedzane literk± 'i' w przypadku
+  propozycji lub pomys³u, 'b' w przypadku bugreportu lub 'p' w przypadku
+  gotowego patcha lub ¼róde³ek.
+- zmienna completion_notify (i/rekin).
+- dorzucony jamzed.theme (p/jamzed).
+- automatyczne dopisywanie rozszerzenia przy ³adowaniu theme'ów (i/nie
+  pamiêtam, kto to proponowa³ -- niech siê zg³osi ;))
+
+// 2001-10-02
+
+- chmody zapisywanych plików (p/ascent).
+- poprawka komunikatu przy EINPROGRESS w gg_connect(). 
+- fixy dla AIXa (p/arturp).
+
+// 2001-10-01
+
+- poprawki na alphê.
+- /cleartab (i/szok).
+- poprawki debugowania dla MacOS X (p/vinil).
+- fix segfaultu przy otrzymaniu notify usera spoza listy (b/ascent).
+- wykrywanie czy $cc obs³uguje -pipe (p/ascent).
+- pyta o zapisanie konfiguracji przy wychodzeniu (p/pkot).
+- wywalenie #ifdefów GG_DEBUG, niech sobie bêdzie na sta³e. w koñcu to
+  wersja rozwojowa. i siê powinno kompilowaæ na MacOS X (p/vinil,wojtekka).
+- wywalenie <termcap.h> z testowania termcapa. dziêki temu od rêki
+  kompiluje siê na IRIXie (vinil wiedzia³, nie powiedzia³, a to by³o tak...)
+- cleanup w list_remove() (p/pkot).
+- poprawka wykrywania -pipe (p/vinil).
+- info o kompilacji na MacOS-ie w README (i/vinil).
+
+// 2001-09-30
+
+- numerek snapshotu w themes.c (b/jack).
+- update docs/protocol.txt (p/wzik).
+- configure wykrywa readline z pakietów netbsd (b/socrtp).
+- poprawka bigendianów (p/vinil,wojtekka).
+
+// 2001-09-29
+
+- case insensitive tab completion (i/pkot).
+- poprawka gg_urlencode(), bo segfaultowa³o z polskimi localami.
+- ,,make shared'' do³±cza libgg_search.o (p/tomee).
+
+// 2001-09-28
+
+- poprawka command_del() -- sensowniejsze komunikaty (b/ascent).
+- poprawka command_add() -- nie mo¿na dodaæ dwóch userów o tych samych
+  ksywach (b/ascent).
+- poprawka zapisu ustawieñ. tworzy ~/.gg (b/madmax).
+- ,,configure --help'' nie idzie dalej (b/madmax).
+
+// 2001-09-27
+
+- poprawka s/ENOTSUP/EINVAL/ bo OpenBSD nie ma tego (b/phantom).
+- poprawka add_user() (pkot).
+- dodana komenda ,,modify''.
+- zmiana licencji na GPLv2, przygotowania do pierwszego publicznego
+  snapshotu.
+
+// 2001-09-26
+
+- poprawka p³ci przy formularzu szukania ludków (b/arekm).
+
+// 2001-09-25
+
+- rewrite obs³ugi listy kontaktów, ignorowanych i theme'ów. nie maj± ju¿
+  sztywno ustalonych limitów. dosz³a lista dzieciaków.
+- obs³uga dzieciaków na waitpid(), dziêki czemu wiadomo który i jak siê
+  zakoñczy³.
+- przy wysy³aniu smsów, zamykane s± wszystkie deskryptory, przez co nie
+  bêdzie ¶mieciæ na ekranie.
+
+// 2001-09-24
+
+- poprawka wait(). na wolniejszym sprzêcie select() potrafi³ siê wieszaæ,
+  je¶li przyszed³ SIGCHLD.
+- nie robi autoawaya, gdy user jest niewidoczny (miskoala).
+- nie loguje je¶li nie ma logowaæ (zdzichu).
+
+// 2001-09-23
+
+- poprawki parsera komend.
+- klient potrafi szukaæ userów. szczegó³y w ,,help find''. jako parametr
+  mo¿na podaæ nicka z ksi±¿ki lub sam numerek, pomijaj±c fiku¶ne opcje tej
+  komendy. i tak, wiem, czasami nie wiadomo dlaczego wywala b³êdy.
+- ekg odpalone z parametrem '-n' albo '--no-auto' nie ³±czy siê od razu
+  z serwerem. do tego '-d' dorobi³o siê d³ugiej nazwy '--debug'.
+- poprawka gg_urlencode() ¿eby nie korzysta³o isalnum(), bo locale mog³yby
+  popsuæ (arekm).
+
+- configure wykrywa endiany i nie bawi siê w setki #ifdef'ów (kod vinila)
+- wywalona obs³uga wyj±tków przy select(), bo powodowa³a tylko dziwne
+  problemy z nieistniej±cymi b³êdami.
+- dodane i poprawione mnóstwo wpisów gg_debug().
+- dodane opisy funkcji w stuff.c, themes.c i vars.c.
+- poprawione cp_to_iso().
+- poprawki poprawek parsera komend (bugreport jack'a).
+- poprawki Makefile.in.
+- poprawka loga poprawki poprawek -- dopisanie apostrofa (jack zg³osi³).
+- zmienne ,,beep_msg'', ,,beep_chat'', ,,beep_notify'' (jack).
+
+- wielolinijkowe mesgi. wystarczy zamiast tre¶ci wiadomo¶ci wpisaæ ,,\'',
+  wklepaæ wiadomo¶æ i zakoñczyæ lini± zawieraj±c± sam± kropkê. ¿eby anulowaæ
+  wystarczy ^D. i tak, niestety jak w trakcie pisania co¶ przyjdzie, to
+  potnie wiadomo¶æ. póki co.
+
+- fix polskich znaczków.
+
+- poprawne dope³nianie parametrów przy skróconych komendach (wysek).
+
+// 2001-09-22
+
+- poprawiony b³±d w configure po checkinie.
+- interfejs szukania luserów. póki co, klient jeszcze z niego nie korzysta
+  ale jest do³±czony prosty programik w `docs/search.c'. niestety mo¿e siê
+  wywalaæ na egzotycznych systemach z popsutym vsnprintf()... :/
+
+- niewielkie zmiany w api. gg_login() zwraca zaalokowan± strukturê
+  `gg_session' albo NULL, któr± zwalnia siê przez gg_free_session().
+  zmieniona nazwa funkcji gg_watch_event() na gg_watch_fd().
+- za to w libgg_search.c duuu¿e zmiany w api. do³±czony plik
+  examples/search.c powinien rozja¶niæ nieco. poza tym, dopisa³em jakie¶tam
+  komentarze przy funkcjach. haha.
+
+- read_file() czyta z pliku liniê i dynamicznie alokuje. dziêki temu
+  maksymalny rozmiar linii w konfiguracji, autoexecu i themes jest zale¿ny
+  wy³±cznie od dostêpnej pamiêci.
+
+- dope³nianie do lewej, do prawej, spacjami, kropkami, podkre¶leniami i takie
+  tam inne bzdururki. szczegó³y w docs/themes.txt
+
+// 2001-09-20
+
+- nowy format `prompt2', ¿eby ³adnie i kolorowo odró¿niaæ wiadomo¶ci od
+  innych tekstów wywalanych na ekran.
+- zmieni³ siê format userlisty, ¿eby by³ zgodny z eksportem/importem
+  windzianego klienta. i tak, linie koñcz± siê `\r\n'. pó¼niej dopiszê
+  jakie¶ zarz±dzanie tym.
+
+// 2001-09-19
+
+- wygl±da na to, ¿e mój magiczny configure siê wywala³ tam, gdzie shellem
+  nie jest bash tylko na przyk³ad tcsh. poprawi³em, dzia³a niektórym ;)
+- poprawiona kolejno¶æ include'ów i ma³y fix w themes.c, dziêki czemu
+  nie rzuca warningami na OpenBSD.
+- poprawione wykrywanie readline >= 4.x (dziêki wyskowi i zdzichowi).
+- sms_away, powiadamienie na komórkê o przychodz±cych wiadomo¶ciach,
+  jako¶ tak... podziêkowaæ wyskowi, bo podes³a³ patcha.
+
+// 2001-09-18
+
+- configure, haha!
+- powinno pój¶æ nawet na Irixie dziêki configure i patchom vinila.
+
+// 2001-09-17
+
+- ³adniejsze formatowanie w skrypcie ggsearch.
+- dane mog± przychodziæ w kilku pakietach i nie bêdzie EAGAIN. jedynie
+  nag³ówek musi byæ w ca³o¶ci. w normalnych warunkach nie przyjdzie nigdy
+  w kawa³kach, wiêc je¶li klient siê wywali, co co¶ bardzo dziwnego siê
+  dzieje z sieci± ;)
+- poprawka /away (MisKoala).
+- wywalenie kolorków z prompta. przynajmniej dobrze zawija.
+
+// 2001-09-16
+
+- poprawki w formatowaniu unignore.
+- dope³nianie nazw zmiennych i ignorowanych.
+- jakie¶tam poprawki w README.
+
+// 2001-09-15
+
+- czytanie listy ignorowanych z ~/.gg/config.
+- zapis konfiguracji (zmiennych i ignorowanych).
+- bugfix parsowania skróconych komend.
+
+// 2001-09-14
+
+- poprawka segfaultu w przypadku roz³±czenia przez serwer (zg³osi³ martii).
+
+// 2001-09-13
+
+- Makefile vs. PLDowe ncurses (bugreport jacka),
+
+// 2001-09-12
+
+- parê bugfixów z reconnectem,
+- dodane komendy 'connect' i 'disconnect',
+- uin i has³o przeniesione do zmiennych.
+
+// 2001-09-11
+
+- dodane '-lcurses', ¿eby siê kompilowa³o pod dziwnymi systemami ;)
+- dodany tryb niewidoczny (patch vinila).
+- poprawiona reakcja na zerwanie po³±czenia.
+- zmienna 'auto_reconnect' w sekundach.
+- resolver nie zostawia ju¿ zombie.
+- update w docs/protocol.txt z nowymi ficzerami GG 4.6 (info od vinila).
+
+// 2001-09-09
+
+- zmienne, ale jeszcze nie zapisuje ustawieñ.
+- logowanie (patch phantoma),
+  log=1 loguje do pliku $log_path, log=2 do $log_path/$uin
+- mo¿na wy³±czyæ kolorki (zmienna display_color)
+- mo¿na wy³±czyæ beepanie (zmienna beep)
+
+// 2001-09-08
+
+- blokuj±ce sockety.
+- uaktualnienie opisu protoko³u.
+
+// 2001-09-07
+
+- dodane extern "C" i s/class/msgclass/, ¿eby siê tomeemu kompilowa³o w C++.
+- do nick completion dodawane s± nicki osób, które w³a¶nie siê pojawi³y.
+- theme'y obs³uguj± kolorowe t³a. szczegó³y w themes.c
+
+// 2001-09-06
+
+- poprawione braki w obs³udze b³êdów.
+- pocz±tek przywracania blokuj±cej obs³ugi socketów.
+- pocz±tki dokumentacji dla programistów - uzupe³nione braki w komentarzach
+  libgg.c i osobny plik API.
+
+// 2001-09-05
+
+- poprawione klasy mesgów. nie wiem dlaczgo, ale teraz dochodz± potwierdzenia.
+- zmiana nazwy binarki z gg na ekg.
+- usuniêcie wszystkich tekstów ,,G*du-g*du'' z pakietu, poniewa¿ to
+  znak towarowy zastrze¿ony. whatever ;)
+
+// 2001-09-02
+
+- biblioteka jest nieblokuj±ca. no dobra, czê¶æ rzeczy jak czytanie
+  http mo¿e siê wywaliæ, je¶li nie dostanie od razu wszystkich danych,
+  ale teoretycznie nie powinno siê to przytrafiæ. nawet na moim magicznym
+  ³±czu 28800 nigdy nie by³o problemu. kiedy¶ poprawiê. trzeba tylko
+  jeszcze poprawiæ komendy, ¿eby reagowa³y odpowiednio, je¶li klient siê
+  nie po³±czy³ jeszcze.
+- reconnect na ka¿dym etapie. nie wa¿ne, czy to zaraz po uruchomieniu czy
+  w trakcie dzia³ania. w tej chwili czas, po którym siê ³±czy jeszcze raz
+  jest ustawiony na 5 sekund.
+- poprawione endiany, ¿eby dzia³a³y i na solku.
+- do Makefile'a dopisana opcja ,,shared'' buduj±ca bibliotekê dzielon±
+  (przepis od tomee'go).
+
+- komendy wymagaj±ce po³±czenia bêd± krzyczeæ, je¶li go nie ma.
+- automatyczne stawianie awaya po ponownym po³±czeniu.
+- autoaway dzia³a tylko podczas po³±czenia.
+
+// 2001-09-01
+
+- usuniêcie strsep (vinil co¶tam mówi³).
+
+// 2001-08-30
+
+- powinno kompilowaæ siê na bsd bez poprawek (vinil poda³ ifdefy).
+
+// 2001-08-29
+
+d³ugo mnie w domu nie widzieli, wiêc nie by³o dziennych snapshotów. jako¶
+tak. whatever. i je¶li kto¶ ma jakie¶ uwagi, niech najpierw zajrzy do TODO
+i BUGS.
+
+- niby obs³uguje EINTR przy read(), ale czasami jeszcze mówi, ¿e roz³±czono
+  z powodem ,,Interrupted System Call''.
+- podzia³ ,,send'' na ,,msg'' i ,,chat'' (Wiadomo¶æ i Rozmowa odpowiednio).
+  i nie, nie ma ¿adnych osobnych okienek.
+- poprawiony b³±d przy kompilacji, konfikt z <readline.h>
+- beepa przy wiadomo¶ciach. póki co nie ma mo¿liwo¶ci wy³±czenia innej ni¿
+  zmianê w theme'ach.
+
+// 2001-08-25
+
+- themes. domy¶lnie szuka w '~/.gg/default.theme'.
+- '~/.gg/autoexec' zawiera listê komend do wykonania po starcie, na przyk³ad
+  za³adowanie jakiego¶tam theme'u.
+- dwa przyk³adowe g³upie theme'y w docs/, które mo¿na wrzuciæ do ~/.gg
+- poprawiony warning z rl_extend_line_buffer (zg³osi³ wysek),
+
+// 2001-08-23
+
+- ignorowanie '/' na pocz±tku komendy,
+- 'make checkin',
+- timestamp przy otrzymanym mesgu,
+- reconnect 5 razy,
+- pokazuje powód b³êdu (connection refused itd),
+- poprawione unknown_uin_completion,
+- testowe komendy _add i _send,
+- t³o mesgów,
+- tab completion dzia³a jak trzeba,
+- eleet niebieskie t³o mesgów (wiem, dalekie od idea³u).
+
+
+$Id$

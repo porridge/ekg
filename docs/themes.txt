@@ -1,0 +1,47 @@
+
+.---------------,--------,-------,-----.
+| kolor         | zwyk³y | jasny | t³o |
+,---------------+--------+-------+-----'
+| czarny/szary  | %k     | %K    | %l  |
+| niebieski     | %b     | %B    | %e  |
+| czerwony      | %r     | %R    | %s  |
+| fioletowy     | %m/%p  | %M/%P | %q  |
+| turkusowy     | %c     | %C    | %d  |
+| br±zowy/¿ó³ty | %y     | %Y    | %z  |
+| bia³y         | %w     | %W    | %x  |
+,---------------'--------'-------'-----|
+| bez koloru    | %n                   |
+`---------------'----------------------'
+
+* * *
+
+przy %1-%9 mo¿na kazaæ dope³niaæ do konkretnej szeroko¶ci. przydaje siê
+do wszelkiego rodzaju tabelek.
+
+  %[10]1   dope³nia spacjami z prawej pierwszy parametr do 10 pól 
+  %[-10]1  j.w. tylko ¿e do lewej
+  %[.5]1   dope³nia zerami
+  %[,9]2   dope³nia kropkami
+  %[_4]1   dope³nia znakami podkre¶lenia
+  %(10)1   je¶li rozmiar parametru przekroczy 10 znaków nie obcina
+
+UWAGA! kolorkowe sekwencje ansi traktuje jak znaki, wiêc nie powinno
+siê ich u¿ywaæ przy dope³nianiu parametrów.
+
+* * *
+
+%>  prompt (domy¶lnie zó³to-zielony)
+%!  error (domy¶lnie czerwony)
+%)  prompt2 (domy¶lnie turkusowy)
+%#  timestamp (domy¶lnie GG:MM)
+
+* * *
+
+dwa specjalne formaty ,,known_user'' i ,,unknown_user'' okre¶laj±, jak
+bêd± pokazywani userzy z listy i spoza listy kontaktów. pierwszy za
+parametry przyjmuje %1 opis, %2 numerek, a drugi %1 numerek.
+
+* * *
+
+$Id$
+

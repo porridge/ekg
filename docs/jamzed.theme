@@ -1,0 +1,22 @@
+known_user %W%1%Y/%W%2
+auto_away %> %c[%W Automatyczna zmiana stanu po %Y%1%W na%c ]%R:%c[%Y ZAJÊTY %c]%R:%c(%C%#%c)%n\n
+list_avail %> %1 %c[%G Aktywny%c ]%n\n
+list_busy %> %1 %c[%Y Zajêty%c ]%n\n
+list_not_avail %> %1 %c[%r Nieaktywny%c ]%n\n
+status_avail %> %c[%1%c]%R:%c[%W Zmieni³%B[%Wa%B]%W tryb na %c]%R:%c[%G AKTYWNY %c]%R:%c(%C%#%c)%n\n
+status_busy %> %c[%1%c]%R:%c[%W Zmieni³%B[%Wa%B]%W tryb na%c ]%R:%c[%Y ZAJÊTY %c]%R:%c(%C%#%c)%n\n
+status_not_avail %> %c[%1%c]%R:%c[%W Zmieni³%B[%Wa%B]%W tryb na%c ]%R:%c[%r NIEAKTYWNY %c]%R:%c(%C%#%c)%n\n 
+away %> %c[%W Zmiana stanu na %c]%R:%c[ %RZAJÊTY %c]%R:%c(%C%#%c)%n\n
+back %> %c[%W Zmiana stanu na %c]%R:%c[ %GAKTYWNY %c]%R:%c(%C%#%c)%n\n
+invisible %> %c[%W Zmiana stanu na%c ]%R:%c[ %WNIEWIDOCZNY %c]%R:%c(%C%#%c)%n\n
+message_header \n%c[%1%c]%R:%c(%C%#%c)%Y\n
+message_footer %n\n
+chat_header \n%c[%1%c]%R:%c(%C%#%c)%Y\n
+chat_footer %n\n
+ack_queued %> %c[%1%c]%R:%c[%W Wiadomo¶æ otrzyma pó¼niej %c]%R:%c(%C%#%c)%n\n
+ack_delivered %> %c[%1%c]%R:%c[%W Wiadomo¶æ otrzyma³%B[%Wa%B] %c]%R:%c(%C%#%c)%n\n
+prompt %M%P-%Y=%M%P>%n
+prompt2 %Y-%B=%Y-%R>%n
+error %R<%W=%R-%n
+theme_loaded \n%R<%Y[jamzed]%G@%Y[EKG theme%G|%Y03/10/01%G|%Y]%R> %G<%Y[%RPatryk Ku¼micz%Y]%G> %R<%Y[jamzed%G@%Yirc.pl]%R>%n\n
+saved %c[ %WUstawienia zosta³y zapisane %c]%n\n

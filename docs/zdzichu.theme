@@ -1,0 +1,10 @@
+list_avail %> %1 %G(otwarty na wszelakie propozycje)%n\n
+list_busy %> %1 %Y(zarywa)%n\n
+list_not_avail %> %1 %r(¿onaty/zamê¿na)%n\n
+status_avail %> %1 jest otwarty/a na wszelakie propozycje %c(%C%#%c)%n\n
+status_busy %> %1 w³a¶nie zarywa %c(%C%#%c)%n\n
+status_not_avail %> %1 jest ¿onaty albo zamê¿na %c(%C%#%c)%n\n
+
+timestamp %H:%M:%S
+theme_loaded Wczytano superowy themik %W%1%n\n
+saved %> Zachowano dla potomno¶ci\n

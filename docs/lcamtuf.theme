@@ -1,0 +1,3 @@
+prompt %B[%R+%B]%n
+error %B[%R!%B]%n
+

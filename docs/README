@@ -1,0 +1,102 @@
+
+                    Eksperymentalny Klient Gadu-gadu
+          (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
+
+                Motto: ,,Bunkrów nie ma, ale te¿ jest...''
+
+LICENCJA
+
+    program jest udostêpniony na zasadach licencji GPL, która jest
+    do³±czona w pliku COPYING. program i biblioteka obs³uguj±ca
+    protokó³ Gadu-gadu zosta³y napisane na podstawie informacji
+    uzyskanych z badañ pakietów miêdzy klientem a serwerem. ¿aden
+    klient Gadu-gadu nie by³ disasemblowany, ani dekompilowany. ca³y
+    projekt powsta³ przy u¿yciu darmowych i wolnodostêpnych narzêdzi.
+
+    Gadu-gadu jest zastrze¿onym znakiem towarowym sms-express sp. z o.o.
+
+INSTALACJA
+
+    skompilowaæ i odpaliæ. proste? proste. po pierwszym uruchomieni
+    ekg powie, jak go skonfigurowaæ. niestety jeszcze nie mo¿na zak³adaæ
+    kont gg. trzeba u¿yæ windzianego klienta. ka¿dy list w tej sprawie
+    bêdzie IGNOROWANY. po co czytaæ listy od ludzi, którym nie chce siê
+    nawet czytaæ do³±czonej dokumentacji.
+
+    ekg powinien dzia³aæ na wiêkszo¶ci popularnych dystrybucji Linuksa
+    (testowano na RedHacie, Slackware i PLD), OpenBSD i FreeBSD. uda³o
+    siê nawet go skompilowaæ z drobnymi poprawkami cygwinem, ale nie za
+    bardzo chcia³ chodziæ ;) na MacOS-ie wypada³oby uruchomiæ
+    ,,./configure --cc=cc'', ¿eby bez problemu siê skompilowa³o.
+
+U¯YCIE
+
+    jest na tyle intuicyjne, ¿e nie powinno sprawiæ problemów (wszyscy
+    betatesterzy poradzili sobie bez jakiejkolwiek dokumentacji).
+    interfejs jest podobny do ircii. dope³nianie tabem jest dostêpne
+    w wiêkszo¶ci komend. wysy³anie wiadomo¶ci komend± ,,msg'', rozmowa
+    komend± ,,chat''. informacje o ludzikach ,,find <numer/nick>''.
+    szukanie t± sam± komend±, ale z ró¿nymi parametrami. ,,help'' Twoim
+    przyjacielem. by wys³aæ kilkulinijkow± wiadomo¶æ, zamiast tre¶ci
+    wpisz ,,\'' (backslash). koñczy siê lini± z sam± kropk±.
+
+WYSY£ANIE SMSÓW
+
+    ekg korzysta z zewnêtrznego programu do wysy³ania smsów. nie ma
+    najmniejszego sensu dublowania tej funkcji, skoro i tak wiêkszo¶æ
+    ma ju¿ zainstalowane odpowiednie skrypty/programy/cokolwiek.
+    wystarczy podaæ ¶cie¿kê do takiego programu w zmiennej
+    ,,sms_send_app''. powinien przyjmowaæ numer telefonu za pierwszy
+    parametr i wiadomo¶æ za drugi. ten ze strony http://ceti.pl/~miki/
+    spe³nia podane wymagania.
+    
+BUGREPORTY
+
+    proszê, nie przysy³ajcie informacji, ¿e mo¿naby dodaæ co¶, co jest
+    ju¿ wymienione w TODO. nie przysy³ajcie informacji, ¿e jest jaki¶
+    b³±d, je¶li poprawka jest wymieniona w TODO. nie przysy³ajcie
+    informacji o warningach podczas kompilacji. dopiero je¶li nie chce
+    siê w ogóle skompilowaæ, dajcie znaæ. zaznacznie, co to za system,
+    jaka dystrybucja, jaka wersja. je¶li b³±d jest powtarzalny i zwi±zany
+    z sieci±, prosi³bym o to, co wyrzuca ekg uruchomione z opcj± ,,-d''.
+    je¶li segfaultuje i zrzuca core, prosi³bym o podes³anie tego, co
+    poka¿e ,,gdb ekg core'', a nastêpnie ,,bt''.
+
+¬RÓD£A
+
+    czê¶æ jest ³adnie udokumentowana, czê¶æ nie. komentarze czasami s±
+    bardzo g³upie, ale je¶li siê do trzeciej rano siedzi nad g³upim
+    segfaultem, ciê¿ko siê pohamowaæ. ca³y program objêty jest licencj±
+    GPL, wiêc pamiêtaj o tym, korzystaj±c z tych ¼róde³. je¶li napiszesz
+    jakiegokolwiek klienta, frontend czy co¶ takiego, by³bym wdziêczny
+    za informacje o nim. chêtnie umieszczê odno¶niki do innych tego typu
+    projektów na stronie.
+
+PODZIÊKOWANIA
+
+    wymienieni ludzie mieli mniejszy lub wiêkszy wp³yw na rozwój biblioteki
+    i klienta. niektórzy pomagali analizowaæ protokó³, niektóry testowali
+    na ró¿nych systemach, inni podsy³ali patche i bugreporty. je¶li kogo¶
+    pomin±³em, przepraszam, niech da znaæ. w ka¿dym razie wielkie dziêki
+    nale¿± siê poni¿szym osobom:
+
+    Robert J. Wo¼ny (speedy@atman.pl)
+    Darek Jackowski (ascent@linux.pl)
+    Leszek Urbañski (tygrys@moo.pl)
+    Kuba Jermak (kooba@irc.pl)
+    Tomasz Torcz (zdzichu@irc.pl)
+    Tomasz Jarzynka (tomee@cpi.pl)
+    Adam Kruszewski (phantom@linux.bydg.org)
+    Piotr Wysocki (wysek@tower.braxis.co.uk)
+    Marcin Chojnowski (martii@obgyn.edu.pl)
+    Jaros³aw Kamper (jack@jack.eu.org)
+    Arkadiusz Mi¶kiewicz (misiek@pld.org.pl)
+    Pawe³ Kot (pkot@linuxnews.pl)
+    Piotr Stolc (socrtp@sedez.iq.pl)
+    Artur Pietruk (arturp@plukwa.net)
+    Adam Ludwikowski (adam.ludwikowski@wp.pl)
+    Pawe³ Maziarz (drg@go2.pl)
+
+
+$Id$
+

@@ -1,0 +1,19 @@
+
+biblioteka:
++ ctcp
+! zak³adanie kont
+- proxy, https // vinil
+- tryb tylko dla przyjació³ // vinil
+- wysy³anie has³a na maila // vaxior
+- fixowanie w gg_notify_reply // vinil
+
+klient:
+- sensowne wy¶wietlanie mesgów (t³o, wordwrap itp)
+- historia / przewijanie ekranu // jack
++ query // jack
+- zmiana ~/.gg // vinil
++ cofanie ekranu
+
+
+$Id$
+
