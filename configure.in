@@ -1,7 +1,7 @@
 dnl $Id$
 
 AC_INIT(lib/libgadu.h)
-AC_PREREQ(2.53)
+AC_PREREQ(2.50)
 AC_CONFIG_HEADER(config.h)
 
 

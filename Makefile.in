@@ -29,7 +29,7 @@ examples:
 
 #
 
-configure:	configure.in m4/* acconfig.h
+configure:	configure.in m4/*
 	./autogen.sh
 
 #
