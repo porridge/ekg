@@ -12,6 +12,13 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - ekg -v zwraca wersjê ekg i libgadu ze szczegó³ami (niepamiêtamkto/w)
 - podbicie wersji api (w)
 - poprawki voip (Chilek/w)
+- MILI PAÑSTWO, PROSZÊ PRZYGOTOWAÆ SZAMPANA! pierwszy snapshot, który
+  znalaz³em na dysku to 20010825 ----  wynika z tego, ¿e min±³ rok od pierwszej
+  zachowanej, nieoficjalnej wersji ekg. je¶li kto¶ chce siê po¶miaæ,
+  zapraszam do http://dev.null.pl/ekg/stare/ekg-2001082501.tar.gz a jako
+  ciekawostkê za³±czam wykres rozmiaru tarballa w czasie (jest pod adresem
+  http://dev.null.pl/ekg/tarball.png). dziêkujê za uwagê i przepraszam za
+  za¶miecanie changeloga. (w)
 
 // 2002-08-23
 
