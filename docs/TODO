@@ -1,47 +1,46 @@
-rzeczy, których nie ma, ale s± na li¶cie ,,do zrobienia'' lub pozostaj±
-pobo¿nymi ¿yczeniami, ale nie chce mi siê odpowiadaæ kolejny raz, ¿e mo¿e
-kiedy¶ bêdzie. listy/mesgi/posty z listami, ¿eby dodaæ co¶ z poni¿szej listy,
-albo zwi±zanego z tym bêd± albo ignorowane, albo zacznê byæ niemi³y. --w
+nie zawracaj ludziom g³owy i nie pisz, ¿e chcia³by¶ co¶ zaproponowaæ, je¶li
+zosta³o wymienione na poni¿szych listach. listy lub wiadomo¶ci, ¿eby co¶
+nich dostaæ bêd± albo ignorowane, albo odpowied¼ mo¿e byæ wulgarna. im dana
+sprawa jest wy¿ej na li¶cie, tym wa¿niejsze jest jej rozwi±zanie.
 
-biblioteka:
-- komunikacja miêdzy klientami, bezpo¶rednie rozmowy,
-- uaktualniæ dokumentacjê,
+lista rzeczy, które wypada³oby zrobiæ _przed_ wydaniem wersji 1.0:
 
-klient:
-- upro¶ciæ ,,on'', akcje dostêpne (jako komendy?) tak¿e dla timer/at,
-- uzupe³niæ dope³nienia (w tym nicki ze spacjami, lista nicków (joshua)),
-- wykrywanie niewidocznych jako opcja,
-- zapisywanie konfiguracji do innego pliku,
-- poprawiæ mo¿liwo¶æ ustawienia powodu przy wywo³ywaniu ekg (jojo),
-- poprawiæ getopt(), ¿eby rozumia³ ,,--back "powód"'',
-- dodaæ ,,list --add'', które dopisuje informacje do listy kontaktów,
-- sensowna obs³uga kluczy dla SIM,
-- zmienna beep_*_away (rmrmg)
-- mo¿liwo¶æ bindowania akcji klienta (end-of-line, yank-buffer itp.)
-  nie tylko komend,
-- taby w stderr,
-- mo¿liwo¶æ podania portu forwardingu (fidor)
-- obs³uga kolorowego tekstu.
+* biblioteka:
+  - uaktualniæ dokumentacjê: opis API, protoko³u,
 
-klient (ncurses):
-- reakcja na zmianê rozmiaru terminala,
-- konfiguracja listy obecnych (kolorki, co wy¶wietlaæ itd.)
-- mo¿liwo¶æ listy obecnych po lewej (koniu),
-- osobna historia dla ka¿dego okna (koniu),
+* klient:
+  - reakcja na zmianê rozmiaru terminala,
+  - obs³uga kolorowego tekstu.
+  - mo¿liwo¶æ podania portu forwardingu (fidor)
+  - upro¶ciæ ,,on'', akcje dostêpne (jako komendy?) tak¿e dla timer/at,
+  - poprawiæ getopt(), ¿eby rozumia³ ,,--back "powód"'',
+  - uzupe³niæ dope³nienia (w tym nicki ze spacjami, lista nicków (joshua)),
+  - sensowna obs³uga kluczy dla SIM,
+  - taby w stderr,
 
-- naprawienie nieszczêsnego /exec. doda³em ju¿ pole target do gg_exec,
-  ale nie widzê jakiego¶ g³upiego b³êdu najwyrazniej.
-- mo¿liwo¶æ zrobienia okienek brzegowych, tzn. takich jak np. teraz lista
-  kontaktów, które zmniejsza³yby rozmiar g³ównego okna.
-- mo¿liwo¶æ definiowania kolorów p³ywaj±cych okien: t³o, ramka.
-- zamiana listy kontaktów na zwyk³e p³ywajace okno (jak ju¿ bêd±
-  zaimplementowane brzegowe)
-- ,,wje¿d¿anie'' i automatyczne chowanie listy kontaków, co¶ na wzór pasku
-  zadañ w windowsach (;
+pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
 
-- przej¶æ na ui-ncurses domy¶lnie, a co za tym idzie:
-  + w³±czyæ domy¶lnie ,,set display_sent 1'',
-  + w³±czyæ domy¶lnie ,,set make_window 2'',
-  + w³±czyæ domy¶lnie ,,set display_ack 3'',
+* biblioteka:
+  - komunikacja miêdzy klientami, bezpo¶rednie rozmowy,
+
+* klient:
+  - wykrywanie niewidocznych jako opcja,
+  - dodaæ ,,list --add'', które dopisuje informacje do listy kontaktów,
+  - zapisywanie konfiguracji do innego pliku,
+  - zmienna beep_*_away (rmrmg)
+  - mo¿liwo¶æ bindowania akcji klienta (end-of-line, yank-buffer itp.)
+    nie tylko komend,
+  - zmieniæ domy¶lne ustawienia na: display_sent 1, make_window 2,
+    display_ack 3,
+  - konfiguracja listy obecnych (kolorki, co wy¶wietlaæ itd.)
+  - mo¿liwo¶æ listy obecnych po lewej (koniu),
+  - osobna historia dla ka¿dego okna (koniu),
+  - mo¿liwo¶æ zrobienia okienek brzegowych, tzn. takich jak np. teraz lista
+    kontaktów, które zmniejsza³yby rozmiar g³ównego okna.
+  - mo¿liwo¶æ definiowania kolorów p³ywaj±cych okien: t³o, ramka.
+  - zamiana listy kontaktów na zwyk³e p³ywajace okno (jak ju¿ bêd±
+    zaimplementowane brzegowe)
+  - ,,wje¿d¿anie'' i automatyczne chowanie listy kontaków, co¶ na wzór pasku
+    zadañ w windowsach (;
 
 $Id$
