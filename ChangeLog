@@ -137,8 +137,8 @@ zg³osi³ b³±d.
 
 // 2002-11-11
 
-- 1. Limitowanie wysy?anych sms'ów przy w??czonym sms_away (szalik/s)
-- 2. 'status' wy?wietla od kiedy jeste?my po??czeni, lub roz??czeni. (szalik/s)
+- limitowanie wysy³anych sms'ów przy w³±czonym sms_away (szalik/s)
+- /status wy¶wietla od kiedy jeste¶my po³±czeni lub roz³±czeni (szalik/s)
 - dodany leon.theme (leon/s)
 
 // 2002-11-09 
