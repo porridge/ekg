@@ -136,6 +136,7 @@ enum {
 /*
  * dla zachowania kompatybilno¶ci wstecz. w wersji 1.0 bêdzie usuniête. oby.
  */
+#define GG_STATE_CONNECTING_HTTP GG_STATE_CONNECTING
 #define GG_STATE_WRITING_HTTP GG_STATE_READING_DATA
 #define GG_STATE_WAITING_FOR_KEY GG_STATE_READING_KEY
 #define GG_STATE_SENDING_KEY GG_STATE_READING_REPLY
