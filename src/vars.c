@@ -151,7 +151,7 @@ void variable_init()
 #endif
 	variable_add("emoticons", "eM", VAR_BOOL, 1, &config_emoticons, NULL, NULL, NULL);
 #ifdef HAVE_OPENSSL
-	variable_add("encryption", "en", VAR_INT, 1, &config_encryption, NULL, variable_map(3, 0, 0, "none", 1, 2, "sim", 2, 1, "simlite"), NULL);
+	variable_add("encryption", "en", VAR_BOOL, 1, &config_encryption, NULL, NULL, NULL);
 #endif
 	variable_add("enter_scrolls", "es", VAR_BOOL, 1, &config_enter_scrolls, NULL, NULL, NULL);
 	variable_add("events_delay", "ev", VAR_INT, 1, &config_events_delay, NULL, NULL, NULL);

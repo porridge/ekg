@@ -318,7 +318,7 @@ emoticons
 	szczegó³ów w pliku docs/files.txt w sekcji 5-tej.
 
 encryption
-	typ: liczba
+	typ: bool
 	domy¶lna warto¶æ: 0
 
 	w³±cza szyfrowanie wiadomo¶ci. je¶li w systemie jest zainstalowana
