@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - usuniêcie ,,ordering cd'' -- b³êdy na starszych solarisach (M.Przadlo/w)
 - update readme w zakresie wysy³ania bugreportów (w)
 - poprawka segfaultu przy b³êdach w pubdir (robson/w)
+- prawid³owy host w gg_change_info() (robson/w)
 
 // 2002-04-12
 
