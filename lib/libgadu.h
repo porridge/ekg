@@ -796,15 +796,15 @@ struct gg_login_ext {
 #define GG_SEARCH50_REQUEST 0x0014
 
 struct gg_search50_request {
-	uint32_t dunno1;		/* 0xXXXXXX03 */
-	uint8_t dunno2;			/* '>' */
+	uint8_t type;			/* 0x03 */
+	uint32_t seq;			/* czas wys³ania zapytania */
 } GG_PACKED;
 
 #define GG_SEARCH50_REPLY 0x000e
 
 struct gg_search50_reply {
-	uint32_t dunno1;		/* 0xXXXXXX05 */
-	uint8_t dunno2;			/* '>' */
+	uint8_t type;			/* 0x05 */
+	uint32_t seq;			/* czas wys³ania zapytania */
 } GG_PACKED;
 
 #define GG_NEW_STATUS 0x0002

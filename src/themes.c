@@ -1173,6 +1173,7 @@ void theme_init()
 	format_add("dcc_get_getting", "%) Rozpoczêto pobieranie pliku %T%2%n od %1\n", 1);
 	format_add("dcc_get_cant_create", "%! Nie mo¿na utworzyæ pliku %T%1%n\n", 1);
 	format_add("dcc_invalid_ip", "%! Nieprawid³owy adres IP\n", 1);
+	format_add("dcc_user_not_avail", "%! %1 musi byæ aktywn%@1, by móc wys³aæ plik\n", 1);
 
 	/* query */
 	format_add("query_started", "%) Rozpoczêto rozmowê z %T%1%n\n", 1);

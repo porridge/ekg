@@ -29,6 +29,8 @@
 #include "libgadu.h"
 #include "dynstuff.h"
 
+#define EKG_GENDER(u) (((u)->first_name) ? (u)->first_name : (u)->display)
+
 struct userlist {
 	char *first_name;	/* imiê */
 	char *last_name;	/* nazwisko */
