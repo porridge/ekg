@@ -1803,7 +1803,7 @@ COMMAND(cmd_list)
 			printq("user_info_mobile", u->mobile);
 		if (strcmp(groups, ""))
 			printq("user_info_groups", groups);
-		if (GG_S_I(u->status) || GG_S_NA(u->status)) {
+		if (GG_S_NA(u->status)) {
 			char buf[100];
 			struct tm *last_seen_time;
 			if (u->last_seen) {
@@ -3920,7 +3920,7 @@ COMMAND(cmd_remind)
 		return -1;
 	}
 
-	if (!(h = gg_remind_passwd2(config_uin, last_tokenid, params[0], 1))) {
+	if (!(h = gg_remind_passwd3(config_uin, config_email, last_tokenid, params[0], 1))) {
 		printq("remind_failed", strerror(errno));
 		return -1;
 	}
@@ -6096,7 +6096,8 @@ void command_init()
 	  " <has³o> <token>", "zmienia has³o u¿ytkownika",
 	  "\n"
 	  "Przed zmian± has³a nale¿y pobraæ token komend± %Ttoken%n. Niezbêdne "
-	  "jest ustawienie zmiennej %Temail%n.");
+	  "jest ustawienie zmiennej %Temail%n. Adres e-mail zapisany na serwerze " 
+	  "zostanie uaktualniony zgodnie z warto¶ci± tej zmiennej.");
 
 	command_add
 	( "play", "f", cmd_play, 0,

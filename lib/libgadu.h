@@ -744,6 +744,7 @@ struct gg_http *gg_unregister3(uin_t uin, const char *password, const char *toke
 /* przypomnienie has³a e-mailem */
 struct gg_http *gg_remind_passwd(uin_t uin, int async);
 struct gg_http *gg_remind_passwd2(uin_t uin, const char *tokenid, const char *tokenval, int async);
+struct gg_http *gg_remind_passwd3(uin_t uin, const char *email, const char *tokenid, const char *tokenval, int async);
 #define gg_remind_passwd_watch_fd gg_pubdir_watch_fd
 #define gg_remind_passwd_free gg_pubdir_free
 #define gg_free_remind_passwd gg_pubdir_free

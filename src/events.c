@@ -322,7 +322,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 	}
 
 	buf = xmalloc(mem_width);
-	mesg = save = xstrdup(e->event.msg.message);
+	mesg = save = (strlen(e->event.msg.message) > 0) ? xstrdup(e->event.msg.message) : xstrdup(" ");
 
 	for (i = 0; i < strlen(mesg); i++)	/* XXX ³adniejsze taby */
 		if (mesg[i] == '\t')
@@ -510,10 +510,7 @@ void handle_msg(struct gg_event *e)
 				i += 3;
 		}
 
-		/*
-		 * ignorujemy puste wiadomosci z jednym obrazkiem - ktos nas pewnie 
-		 * szpieguje (a my i tak nie obslugujemy wyswietlania obrazkow)
-		 */
+		/* ignorujemy wiadomo¶ci bez tre¶ci zawieraj±ce jedynie obrazek(ki) */
 		if (config_ignore_empty_msg && imageno && strlen(e->event.msg.message) == 0)
 			return;
 	}

@@ -546,6 +546,11 @@ void ekg_wait_for_key()
 			
 					if (u && group_member(u, "spied"))
 						if (GG_S_I(u->status)) {
+
+							u->last_seen = time(NULL);
+							xfree(u->last_descr);
+							u->last_descr = xstrdup(u->descr);
+
 							if (GG_S_D(u->status))
 								u->status = GG_STATUS_NOT_AVAIL_DESCR;
 							else

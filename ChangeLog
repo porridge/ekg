@@ -4,6 +4,14 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-02-17
+
+- libgadu: podbicie API z 3.1 do 3.2 (sz)
+- libgadu: dodanie gg_remind_passwd3, która dodatkowo pobiera email
+  jako parametr (zigi/sz)
+- konsekwentne zachowanie przy ,,ignore_empty_msg'' równym 0 i otrzymaniu
+  pustej wiadomo¶ci z obrazkiem(ami). wy¶wietlana jest pusta wiadomo¶æ (zigi/sz)
+
 // 2005-02-15
 
 - zdarzenia ,,connectionlost'' oraz ,,disconnected'' (reef/sz)
