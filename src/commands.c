@@ -4085,7 +4085,9 @@ COMMAND(cmd_alias_exec)
 			array_free(arr);
 
 		} else {
-			string_append(str, (char *) tmp->data);
+			char *s = format_string((char *) tmp->data);
+			string_append(str, s);
+			xfree(s);
 			
 			if (params[0]) {
 				string_append(str, " ");
