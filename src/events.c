@@ -1192,6 +1192,8 @@ void handle_failure(struct gg_event *e)
  */
 void handle_success(struct gg_event *e)
 {
+	struct in_addr addr;
+
 	if (config_reason && GG_S_D(config_status)) {
 		char *r1, *r2;
 
@@ -1212,8 +1214,6 @@ void handle_success(struct gg_event *e)
 
 	/* zapiszmy adres serwera */
 	if (config_server_save) {
-		struct in_addr addr;
-
 		addr.s_addr = sess->server_addr;
 		
 		xfree(config_server);
@@ -1246,6 +1246,9 @@ void handle_success(struct gg_event *e)
 	update_status_myip();
 
 	last_conn_event = time(NULL);
+
+	addr.s_addr = sess->server_addr;
+	event_check(EVENT_CONNECTED, 0, inet_ntoa(addr));
 }
 
 /*
@@ -1263,7 +1266,12 @@ void handle_event(struct gg_session *s)
 	struct handler *h;
 
 	if (!(e = gg_watch_fd(sess))) {
+		struct in_addr addr;
 		print("conn_broken");
+
+		addr.s_addr = sess->server_addr;
+		event_check(EVENT_DISCONNECTED, 0, inet_ntoa(addr));
+
 		list_remove(&watches, sess, 0);
 		gg_logoff(sess);
 		gg_free_session(sess);
@@ -1661,8 +1669,13 @@ void handle_userlist(struct gg_event *e)
  */
 void handle_disconnect(struct gg_event *e)
 {
+	struct in_addr addr;
+
 	print("conn_disconnected");
 	ui_event("disconnected");
+
+	addr.s_addr = sess->server_addr;
+	event_check(EVENT_DISCONNECTED, 0, inet_ntoa(addr));
 
 	gg_logoff(sess);	/* a zobacz.. mo¿e siê uda ;> */
 	list_remove(&watches, sess, 0);

@@ -232,6 +232,8 @@ struct event_label event_labels[EVENT_LABELS_COUNT + 2] = {
 	{ EVENT_NEWMAIL, "newmail" },
 	{ EVENT_BLOCKED, "blocked" },
 	{ EVENT_DCCFINISH, "dccfinish" },
+	{ EVENT_CONNECTED, "connected" },
+	{ EVENT_DISCONNECTED, "disconnected" },
 
 	{ INACTIVE_EVENT, NULL },
 	{ 0, NULL }
