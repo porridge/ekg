@@ -955,7 +955,7 @@ int main(int argc, char **argv)
 "  -a, --away[=OPIS]          domy¶lnie zmienia stan na ,,zajêty''\n"
 "  -b, --back[=OPIS]          domy¶lnie zmienia stan na ,,dostêpny''\n"
 "  -i, --invisible[=OPIS]     domy¶lnie zmienia stan na ,,niewidoczny''\n"
-"  -p, --private              domy¶lnie ustawia tryb ,,tylko dla przyjació³''\n"
+"  -p, --private              domy¶lnie ustawia tryb ,,tylko dla znajomych''\n"
 "  -v, --version              wy¶wietla wersje programu i wychodzi\n"
 #ifdef WITH_IOCTLD
 "  -I, --ioctld-path=¦CIE¯KA  ustawia ¶cie¿kê do ioctld\n"
