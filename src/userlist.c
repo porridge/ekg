@@ -120,11 +120,16 @@ int userlist_read()
 
 		entry = array_make(buf, ";", 9, 0, 0);
 
+		if ((count = array_count(entry)) < 7) {
+			array_free(entry);
+			continue;
+		}
+
 		uin = entry[6];
 		if (!strncasecmp(uin, "gg:", 3))
 			uin += 3;
 
-		if ((count = array_count(entry)) < 7 || (strcmp(uin, "") && !(u.uin = atoi(uin)))) {
+		if ((strcmp(uin, "") && !(u.uin = atoi(uin)))) {
 			array_free(entry);
 			xfree(buf);
 			continue;
@@ -219,11 +224,16 @@ int userlist_set(const char *contacts, int config)
 
 		entry = array_make(buf, ";", 8, 0, 0);
 		
+		if ((count = array_count(entry)) < 7) {
+			array_free(entry);
+			continue;
+		}
+
 		uin = entry[6];
 		if (!strncasecmp(uin, "gg:", 3))
 			uin += 3;
 		
-		if ((count = array_count(entry)) < 7 || (strcmp(uin, "") && !(u.uin = atoi(uin)))) {
+		if ((strcmp(uin, "") && !(u.uin = atoi(uin)))) {
 			array_free(entry);
 			continue;
 		}
