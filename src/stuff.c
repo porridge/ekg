@@ -401,7 +401,7 @@ char *base64_decode(const char *buf)
  *
  * wy¶wietla listê przypisanych komend.
  */
-void binding_list(int quiet, int all) 
+void binding_list(int quiet, const char *name, int all) 
 {
 	list_t l;
 
@@ -410,6 +410,12 @@ void binding_list(int quiet, int all)
 
 	for (l = bindings; l; l = l->next) {
 		struct binding *b = l->data;
+
+		if (name) {
+			if (strcasestr(b->key, name))
+				printq("bind_seq_list", b->key, b->action);
+			continue;
+		}
 
 		if (!b->internal || (all && b->internal))
 			printq("bind_seq_list", b->key, b->action);
@@ -4027,4 +4033,22 @@ char color_map(unsigned char r, unsigned char g, unsigned char b)
 	fprintf(stderr, "mindist=%ld, color=%c\n", mindist, ch);
 
 	return ch;	
+}
+
+/*
+ * strcasestr()
+ *
+ * robi to samo co strstr() tyle ¿e bez zwracania uwagi na wielko¶æ
+ * znaków.
+ */
+char *strcasestr(const char *haystack, const char *needle)
+{
+	int i, hlen = strlen(haystack), nlen = strlen(needle);
+
+	for (i = 0; i <= hlen - nlen; i++) {
+		if (!strncasecmp(haystack + i, needle, nlen))
+			return (char*) (haystack + i);
+	}
+
+	return NULL;
 }

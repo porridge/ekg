@@ -1022,7 +1022,7 @@ static int ui_readline_event(const char *event, ...)
 					bind_sequence(p2, NULL, quiet);
 			
 			} else 
-				binding_list(quiet, 0);
+				binding_list(quiet, p1, 0);
 
 			result = 1;
 		}

@@ -318,7 +318,7 @@ void alias_free();
 char *base64_encode(const char *buf);
 char *base64_decode(const char *buf);
 
-void binding_list(int quiet, int all);
+void binding_list(int quiet, const char *name, int all);
 void binding_free();
 
 int buffer_add(int type, const char *target, const char *line, int max_lines);
@@ -417,6 +417,7 @@ int transfer_id();
 char *xstrmid(const char *str, int start, int length);
 const char *http_error_string(int h);
 char color_map(unsigned char r, unsigned char g, unsigned char b);
+char *strcasestr(const char *haystack, const char *needle);
 
 struct timer *timer_add(time_t period, int persistent, int type, int at, const char *name, const char *command);
 int timer_remove(const char *name, int at, const char *command);

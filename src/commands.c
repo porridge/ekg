@@ -4448,10 +4448,10 @@ void command_init()
 	( "bind", "???", cmd_bind, 0,
 	  " [opcje]", "przypisywanie akcji klawiszom",
 	  "\n"
-	  "  -a, --add <sekwencja> <akcja>  przypisuje now± sekwencjê\n"
-	  "  -d, --del <sekwencja>          usuwa podan± sekwencjê\n"
-	  " [-l, --list]                    wy¶wietla przypisane sekwencje\n"
-	  "  -L, --list-default             j.w. plus domy¶lne sekwencje\n"
+	  "  -a, --add <sekwencja> <akcja>   przypisuje now± sekwencjê\n"
+	  "  -d, --del <sekwencja>           usuwa podan± sekwencjê\n"
+	  " [-l, --list] [sekwencja]         wy¶wietla przypisane sekwencje\n"
+	  "  -L, --list-default [sekwencja]  j.w. plus domy¶lne sekwencje\n"
 	  "\n"
 	  "Dostêpne sekwencje to: Ctrl-<znak>, Alt-<znak>, F<liczba>, Enter, "
 	  "Backspace, Delete, Insert, Home, End, Left, Right, Up, Down, "
