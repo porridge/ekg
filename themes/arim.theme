@@ -55,15 +55,15 @@ invalid_uin %! %RNiew³a¶ciwy numer%n %Wuin%n\n
 invisible %c%#%n %> %MJestem niewidzialny :)%n\n
 invisible_descr %c%#%n %> %MJestem niewidzialny: %1%n\n
 known_user %1
-list_avail %gdostêpn%@2%n%K...%n   %W<%n%G+%n%W>%n   %g%[12]1%n |%K%[,-15]3%n|\n
-list_avail_descr %gdostêpn%@2%n%K...%n   %W<%n%G+%n%W>%n   %g%[12]1%n |%K%[,-15]3%n| %K[%5]%n\n
-list_busy %czajêt%@2%n%K.....%n   %W<%n%C?%n%W>%n   %c%[12]1%n |%K%[,-15]3%n|\n
-list_busy_descr %czajêt%@2%n%K.....%n   %W<%n%C?%n%W>%n   %c%[12]1%n |%K%[,-15]3%n| %K[%5]%n\n
+list_avail %gdostêpn%@2%K...   %W<%G+%W>   %g%[12]1%n |%K%[,-15]3%n|\n
+list_avail_descr %gdostêpn%@2%K...   %W<%G+%W>   %g%[12]1%n |%K%[,-15]3%n| %K[%5]%n\n
+list_busy %czajêt%@2%K.....   %W<%C?%W>   %c%[12]1%n |%K%[,-15]3%n|\n
+list_busy_descr %czajêt%@2%K.....   %W<%C?%W>   %c%[12]1%n |%K%[,-15]3%n| %K[%5]%n\n
 list_empty %> %WTwoja lista jest pusta%n\n
-list_not_avail %Kniedostêpn%@2   %n%W<%n%R-%n%W>%n   %K%[12]1%n |%K...............%n|\n
-list_not_avail %Kniedostêpn%@2   %W<%R-%W>%n   %K%[12]1%n |%K...............%n| %k%5%n\n
+list_not_avail %Kniedostêpn%@2   %W<%R-%W>   %K%[12]1%n |%K...............%n|\n
 list_not_avail_descr %Kniedostêpn%@2   %W<%R-%W>   %K%[12]1%n |%K...............%n| %K[%5]%n\n
-list_invisible %mniewidoczn%@2%n   %W<%n%M*%n%W>%n   %m%[12]1%n |%K...............%n|\n
+list_invisible %mniewidoczn%@2   %W<%M*%W>   %m%[12]1%n |%K...............%n|\n
+list_invisible_descr %mniewidoczn%@2   %W<%M*%W>   %m%[12]1%n |%K...............%n| %K[%5]%n\n
 modify_done %> %WDane zmienione%n\n
 not_connected %! %RNie jeste¶ po³±czony z serwerem!%n\n
 not_enough_params %! %RZa ma³o parametrów%n\n
@@ -170,7 +170,7 @@ userlist_get_error %! %RB³±d podczas pobierania listy kontaktów!%n\n
 userlist_get_ok %) %WListê kontaktów wczytano z serwera.%n\n
 userlist_put_error %! %RB³±d podczas wysy³ania listy kontaktów!%n\n
 userlist_put_ok %) %WListê kontaktów zachowano na serwerze.%n\n
-variable %> %K%[_20]1%n%W%2%n\n
+variable %> %K%[_25]1%W%2%n\n
 variable_invalid %! %Wset:%n %r[%1]%n <- z³a warto¶æ.\n
 variable_not_found %! %RNieznana zmienna%n%W:%n %K[%n%W%1%n%K]%n\n
 statusbar  %c|%w%{time}%c|%w %c(%w%{?!nick uin}%{nick}%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) (%wwin%c/%w%{window}%{?query %c:%W}%{query}%c)%w%{?activity  %c(%wact%c/%w}%{activity}%{?activity %c)%w}%{?mail  %c(%wmail%c/%w}%{mail}%{?mail %c)}%{?more  %c(%Gwiêcej%c)}%{?debug  %c(%Cdebug%c)}
