@@ -979,7 +979,7 @@ static struct window *window_new(const char *target, int new_id)
 
 		u = userlist_find(0, target);
 
-		if (!in_autoexec && !valid_nick(target))
+		if (!strcmp(target, "$"))
 			return window_current;
 	}
 
