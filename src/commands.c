@@ -2872,6 +2872,9 @@ COMMAND(cmd_dcc)
 			}
 
 			if ((u = userlist_find(tt->uin, NULL))) {
+				if (tt->dcc->established)
+					continue;
+
 				if (!strcasecmp(params[1], itoa(u->uin)) || (u->display && !strcasecmp(params[1], u->display))) {
 					t = tt;
 					break;
