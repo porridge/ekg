@@ -8,6 +8,8 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 
 - dodanie do informacji wypisywanych w momencie segfaulta tekstu na
   temat mo¿liwo¶ci otrzymania core przy pomocy ,,ulimit'' (gophi)
+- poprawienie poprzedniego commita (z rozpêdu ¼le na³o¿y³em patcha) 
+  (gophi)
 
 // 2005-01-11
 

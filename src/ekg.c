@@ -809,8 +809,8 @@ static void handle_sigsegv()
 "zanotowaæ kilka ostatnich linii, a nastêpnie zanotowaæ wynik polecenia\r\n"
 ",,bt''. Dziêki temu autorzy dowiedz± siê, w którym miejscu wyst±pi³ b³±d\r\n"
 "i najprawdopodobniej pozwoli to unikn±æ tego typu sytuacji w przysz³o¶ci.\r\n"
-+"Je¶li core nie zosta³ utworzony a problem jest powtarzalny, spróbuj przed\r\n"
-+"uruchomieniem ekg wydaæ polecenie ,,ulimit -c unlimited'' i powtórzyæ b³±d.\r\n"
+"Je¶li core nie zosta³ utworzony a problem jest powtarzalny, spróbuj przed\r\n"
+"uruchomieniem ekg wydaæ polecenie ,,ulimit -c unlimited'' i powtórzyæ b³±d.\r\n"
 "Wiêcej szczegó³ów w dokumentacji, w pliku ,,gdb.txt''.\r\n"
 "\r\n",
 config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, argv0, config_dir);
