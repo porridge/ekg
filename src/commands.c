@@ -2736,6 +2736,7 @@ COMMAND(cmd_key)
 		while ((d = readdir(dir))) {
 			struct stat st;
 			char *name = saprintf("%s/%s", path, d->d_name);
+			struct tm *tm;
 			const char *tmp;
 
 			if ((tmp = strstr(d->d_name, ".pem")) && !tmp[4] && !stat(name, &st) && S_ISREG(st.st_mode)) {
@@ -2743,8 +2744,12 @@ COMMAND(cmd_key)
 
 				if (uin) {
 					char *fp = sim_key_fingerprint(uin);
+					char ts[100];
 
-					print("key_list", format_user(uin), (fp) ? fp : "");
+					tm = localtime(&st.st_mtime);
+					strftime(ts, sizeof(ts), format_find("key_list_timestamp"), tm);
+
+					print("key_list", format_user(uin), (fp) ? fp : "", ts);
 					count++;
 
 					xfree(fp);

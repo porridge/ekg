@@ -1352,5 +1352,6 @@ void theme_init()
 	format_add("key_public_write_failed", "%! B³±d podczas zapisu klucza publicznego: %1\n", 1);
 	format_add("key_send_success", "%> Wys³ano klucz publiczny do %1\n", 1);
 	format_add("key_send_error", "%! B³±d podczas wysy³ania klucza publicznego\n", 1);
-	format_add("key_list", "%> %1\n    %2\n", 1);
+	format_add("key_list", "%> %1 (%3)\n%) %2\n", 1);
+	format_add("key_list_timestamp", "%Y-%m-%d %H:%M", 1);
 }
