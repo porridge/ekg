@@ -561,41 +561,47 @@ COMMAND(cmd_exec)
 	int pid;
 
 	if (params[0]) {
-		char *tmp;
+		char **args = NULL, *tmp, *tg = xstrdup(target);
 		int fd[2] = { 0, 0 }, buf = 0, msg = 0;
+		const char *command = NULL;
 		struct gg_exec s;
-		char *p = NULL, *tg = xstrdup(target);
 
-		if (match_arg(params[0], 'm', "msg", 2) || (buf = match_arg(params[0], 'b', "bmsg", 2))) {
-			int uin;
-			struct userlist *u;
+		if (params[0][0] == '-') {
+			args = array_make(params[0], " \t", 3, 1, 1);
 
-			if (!params[1] || !params[2]) {
-				printq("not_enough_params", name);
-				return -1;
-			}
+			if (match_arg(args[0], 'm', "msg", 2) || (buf = match_arg(args[0], 'b', "bmsg", 2))) {
+				struct userlist *u;
+				int uin;
 
-			if (strcmp(params[1], "%")) {
-				if (!(uin = get_uin(params[1]))) {
-					printq("user_not_found", params[1]);
+				if (!args[1] || !args[2]) {
+					printq("not_enough_params", name);
+					array_free(args);
 					return -1;
 				}
 
-				if ((u = userlist_find(uin, NULL)))
-					tg = xstrdup(u->display);
-				else
-					tg = xstrdup(itoa(uin));
+				if (strcmp(args[1], "%")) {
+					if (!(uin = get_uin(args[1]))) {
+						array_free(args);
+						return -1;
+					}
+
+					if ((u = userlist_find(uin, NULL)))
+						tg = xstrdup(u->display);
+					else
+						tg = xstrdup(itoa(uin));
+				}
+
+				msg = (buf) ? 2 : 1;
+				command = args[2];
+			} else {
+				printq("invalid_params", name);
+				return -1;
 			}
-
-			msg = (buf) ? 2 : 1;
-			params = params + 2;
-		}
-
-		p = array_join((char **) params, " ");
+		} else
+			command = params[0];
 
 		if (pipe(fd)) {
 			printq("exec_error", strerror(errno));
-			xfree(p);
 			xfree(tg);
 			return -1;
 		}
@@ -607,13 +613,12 @@ COMMAND(cmd_exec)
 				dup2(fd[1], 1);
 				close(fd[1]);
 			}	
-			execl("/bin/sh", "sh", "-c", ((p[0] == '^' && strlen(p) > 1) ? p + 1 : p), (void *) NULL);
+			execl("/bin/sh", "sh", "-c", ((command[0] == '^' && strlen(command) > 1) ? command + 1 : command), (void *) NULL);
 			exit(1);
 		}
 
 		if (pid < 0) {
 			printq("exec_error", strerror(errno));
-			xfree(p);
 			xfree(tg);
 			return -1;
 		}
@@ -634,15 +639,17 @@ COMMAND(cmd_exec)
 		list_add(&watches, &s, sizeof(s));
 		close(fd[1]);
 		
-		if (quiet || p[0] == '^')
-			tmp = saprintf("\002%s", p + 1);
+		if (quiet || command[0] == '^')
+			tmp = saprintf("\002%s", command + 1);
 		else
-			tmp = xstrdup(p);
+			tmp = xstrdup(command);
 
 		process_add(pid, tmp);
 
+		if (args)
+			array_free(args);
+
 		xfree(tmp);
-		xfree(p);
 		xfree(tg);
 	} else {
 		for (l = children; l; l = l->next) {
@@ -4190,15 +4197,16 @@ void command_init()
 	  "");
 	  
 	command_add
-	( "exec", "?u?", cmd_exec, 0,
+	( "exec", "?", cmd_exec, 0,
 	  " [opcje] <polecenie>", "uruchamia polecenie systemowe",
 	  "\n"
 	  "  -m, --msg  [numer/alias] wysy³a wynik do danej osoby\n"
 	  "  -b, --bmsg [numer/alias] wysy³a wynik w jednej wiadomo¶ci\n"
 	  "\n"
-	  "Poprzedzenie polecenia znakiem %T^%n ukryje informacjê o zakoñczeniu. "
-	  "Je¶li jako alias podamy %T%%%n, wynik bêdzie wys³any do rozmówcy z "
-	  "aktualnego okna. ");
+	  "Poprzedzenie polecenia znakiem %T^%n ukryje informacjê o "
+	  "zakoñczeniu. Je¶li jako alias podamy %T%%%n, wynik bêdzie "
+	  "wys³any do rozmówcy z aktualnego okna. Ze wzglêdu na budowê "
+	  "klienta, numery i aliasy %Tnie bêd±%n dope³niane Tabem.");
 	  
 	command_add
 	( "!", "?", cmd_exec, 0,

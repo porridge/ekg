@@ -16,6 +16,7 @@ zg³osi³ b³±d.
 - kosmetyka opisów niektórych komend w /help (sz)
 - mo¿na wyciszyæ za pomoc± ^ komendê ,,exec'' (sz)
 - poprawki akcji ,,exec'' w ,,on'' (Murphy/sz)
+- poprawki komendy ,,exec'', ¿eby nie psu³a escapowania (w)
 
 // 2003-01-27
 
