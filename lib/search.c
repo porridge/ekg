@@ -183,6 +183,8 @@ struct gg_search *gg_search(struct gg_search_request *r, int async)
 		return NULL;
 	}
 
+	free(query);
+
 	GG_SEARCH_COPY;
 	
 	if (!async)
