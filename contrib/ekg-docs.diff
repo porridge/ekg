@@ -1,0 +1,52 @@
+diff -ur ekg-20011114-vanilla/ChangeLog ekg-20011114/ChangeLog
+--- ekg-20011114-vanilla/ChangeLog	Sun Nov 11 00:10:36 2001
++++ ekg-20011114/ChangeLog	Thu Nov 15 19:49:48 2001
+@@ -3,7 +3,7 @@
+ - make shared/static + jakis tam spec dla rpm'a... (speedy)
+ - poprawiona dokumentacja [ja chce wpisywac polskie krzaki i nie wiem jak] 
+   (wojtekka)
+-- logowanie wielolinijowych wiadomosci (wojtekka)
++- logowanie wielolinijkowych wiadomosci (wojtekka)
+ - poprawiony segfault na bsd w pewnych warunkach (smarkacz/wojtekka)
+ 
+ // 2001-11-04 
+diff -ur ekg-20011114-vanilla/README ekg-20011114/README
+--- ekg-20011114-vanilla/README	Sun Nov 11 14:47:15 2001
++++ ekg-20011114/README	Thu Nov 15 19:50:37 2001
+@@ -55,7 +55,7 @@
+     je¶li nie mo¿esz wpisywaæ polskich liter, dopisz do pliku /etc/inputrc
+     lub ~/.inputrc nastêpuj±ce linie:
+ 
+-        set meta-flag on
++	set meta-flag on
+ 	set convert-meta off
+ 	set output-meta on
+     
+diff -ur ekg-20011114-vanilla/docs/ekg.man ekg-20011114/docs/ekg.man
+--- ekg-20011114-vanilla/docs/ekg.man	Thu Nov  1 00:22:13 2001
++++ ekg-20011114/docs/ekg.man	Thu Nov 15 19:45:16 2001
+@@ -14,12 +14,12 @@
+ 
+ .SH OPIS
+ .B ekg
+-Jest to eksperymentalny klient gadu-gadu.
++Jest to eksperymentalny klient Gadu-Gadu.
+ 
+ .SH OPCJE
+ .TP
+ .BI \-d 
+-W³±cza tryb "debug" - jest to specialny tryb pokazuj±cy co robi 
++W³±cza tryb "debug" - jest to specialny tryb, pokazuj±cy, co robi 
+ program w danej chwili.
+ .TP
+ .BI \-n 
+@@ -27,7 +27,7 @@
+ z serwerami gg. 
+ .TP
+ .BI \-u "\ " username
+-Zezwala na uruchomienie gg z innym \"u¿ytkownikiem\". 
++Zezwala na uruchomienie ekg z innym \"u¿ytkownikiem\". 
+ Standardowo konfiguracja ekg znajduje sie w katalogu ~/ekg - Ta 
+-opcja pozwala na stworzenie struktury podkatalogow z oddzielnymi 
++opcja pozwala na stworzenie struktury podkatalogów z oddzielnymi 
+ konfiguracjami.
