@@ -4245,13 +4245,16 @@ void command_init()
 	  "  -o, --offline              b±d¼ niedostêpny dla danej osoby\n"
 	  "  -O, --online               b±d¼ dostêpny dla danej osoby\n"
 	  "\n"
+	  "Dwie ostatnie opcje dzia³aj± tylko, gdy w³±czony jest tryb ,,tylko "
+	  "dla przyjació³''.\n"
+	  "\n"
 	  "Lista kontaktów na serwerze \"list [-p|-g|-c|-P|-G|-C]\":\n"
 	  "  -p, --put         umieszcza na serwerze\n"
 	  "  -P, --put-config  umieszcza na serwerze razem z konfiguracj±\n"
 	  "  -g, --get         pobiera z serwera\n"
 	  "  -G, --get-config  pobiera z serwera razem z konfiguracj±\n"
-	  "  -c, --clear       umieszcza pust± listê na serwerze\n"
-	  "  -C, --clear-config umieszcza pust± listê na serwerze razem z pust± konfiguracj±");
+	  "  -c, --clear       usuwa listê z serwera\n"
+	  "  -C, --clear-config usuwa listê wraz z konfiguracj± z serwera");
 	  
 	command_add
 	( "msg", "u?", cmd_msg, 0,

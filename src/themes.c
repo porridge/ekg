@@ -1221,14 +1221,14 @@ void theme_init()
 	format_add("userlist_put_error", "%! B³±d podczas wysy³ania listy kontaktów\n", 1);
 	format_add("userlist_get_ok", "%) Listê kontaktów wczytano z serwera\n", 1);
 	format_add("userlist_get_error", "%! B³±d podczas pobierania listy kontaktów\n", 1);
-	format_add("userlist_clear_ok", "%) Pust± listê kontaktów zachowano na serwerze\n", 1);
-	format_add("userlist_clear_error", "%! B³±d podczas wysy³ania pustej listy kontaktów\n", 1);
+	format_add("userlist_clear_ok", "%) Usuniêto listê kontaktów z serwera\n", 1);
+	format_add("userlist_clear_error", "%! B³±d podczas usuwania listy kontaktów\n", 1);
 	format_add("userlist_config_put_ok", "%) Listê kontaktów i konfiguracjê zachowano na serwerze\n", 1);
 	format_add("userlist_config_put_error", "%! B³±d podczas wysy³ania listy kontaktów i konfiguracji\n", 1);
 	format_add("userlist_config_get_ok", "%) Listê kontaktów i konfiguracjê wczytano z serwera\n", 1);
 	format_add("userlist_config_get_error", "%! B³±d podczas pobierania listy kontaktów i konfiguracji\n", 1);
-	format_add("userlist_config_clear_ok", "%) Pust± listê kontaktów i konfiguracjê zachowano na serwerze\n", 1);
-	format_add("userlist_config_clear_error", "%! B³±d podczas wysy³ania pustej listy kontaktów i konfiguracji\n", 1);
+	format_add("userlist_config_clear_ok", "%) Usuniêto listê kontaktów i konfiguracjê z serwera\n", 1);
+	format_add("userlist_config_clear_error", "%! B³±d podczas usuwania listy kontaktów i konfiguracji\n", 1);
 
 	/* szybka lista kontaktów pod F2 */
 	format_add("quick_list", "%)%1\n", 1);
