@@ -510,6 +510,10 @@ void handle_msg(struct gg_event *e)
 				i += 3;
 		}
 
+		/*
+		 * ignorujemy puste wiadomosci z jednym obrazkiem - ktos nas pewnie 
+		 * szpieguje (a my i tak nie obslugujemy wyswietlania obrazkow)
+		 */
 		if (imageno && strlen(e->event.msg.message) == 0)
 			return;
 	}
@@ -2242,14 +2246,8 @@ void handle_image_request(struct gg_event *e)
 {
 	gg_debug(GG_DEBUG_MISC, "// ekg: image_request: sender=%d, size=%d, crc32=%.8x\n", e->event.image_request.sender, e->event.image_request.size, e->event.image_request.crc32);
 
-	if (e->event.image_request.crc32 == GG_CRC32_INVISIBLE) {
-		char *tmp = saprintf("gg:%d", e->event.image_request.sender);
-		struct userlist *u = userlist_find(e->event.ack.recipient, NULL);
-
-		print("user_is_connected", (u->display) ? u->display : itoa(u->uin));
-
-		xfree(tmp);
-	}
+	if (e->event.image_request.crc32 == GG_CRC32_INVISIBLE)
+		print("user_is_connected", format_user(e->event.ack.recipient)); 
 }
 
 /*

@@ -5517,42 +5517,41 @@ COMMAND(cmd_queue)
 COMMAND(cmd_check_conn)
 {
 	#define SIZE 20
-	struct userlist *u;
-	char *tmp;
+	uin_t uin;
 	const char *par;
 
 	struct gg_msg_richtext_format_img {
 		struct gg_msg_richtext rt;
 		struct gg_msg_richtext_format f;
 		struct gg_msg_richtext_image image;
-	}msg;
+	} msg;
 
-	msg.rt.flag=2;
-	msg.rt.length=13;
-	msg.f.position=0;
-	msg.f.font=0x80;
-	msg.image.unknown1=0x0109;
-	msg.image.size=SIZE;
-	msg.image.crc32=GG_CRC32_INVISIBLE; 
+	msg.rt.flag = 2;
+	msg.rt.length = 13;
+	msg.f.position = 0;
+	msg.f.font = 0x80;
+	msg.image.unknown1 = 0x0109;
+	msg.image.size = SIZE;
+	msg.image.crc32 = GG_CRC32_INVISIBLE; 
 
 	if (!params[0] && !target) {
 		printq("not_enough_params", name);
 		return -1;
 	}
 
+	if (!sess || sess->state != GG_STATE_CONNECTED) {
+		printq("not_connected");
+		return -1;
+	}
+
 	par = params[0] ? params[0] : target;
 
-	tmp = xstrdup(par);
-        xfree((char *) par);
-        par = xstrdup(strip_chars(tmp, '"'));
-
-	if (!(u = userlist_find(atoi(par), par))) {
+	if (!(uin = get_uin(par))) {
 		printq("user_not_found", par);
 		return -1;
 	}
 
-
-	if (gg_send_message_richtext(sess, GG_CLASS_MSG, u->uin , "", (const char *) &msg, sizeof(msg)) == -1) {
+	if (gg_send_message_richtext(sess, GG_CLASS_MSG, uin , "", (const char *) &msg, sizeof(msg)) == -1) {
 		gg_debug(GG_DEBUG_MISC,"-- check_conn - shits happens\n");
 		return -1;
 	}
@@ -5803,7 +5802,7 @@ void command_init()
 	  "wszystkich aktualnych rozmówców.");
 	
 	command_add
-	( "check_conn", "u", cmd_check_conn, 0,
+	( "check_conn", "u?", cmd_check_conn, 0,
 	  " <numer/alias>", "sprawdza czy podany u¿ytkownik jest po³±czony z serwerem",
 	  "EKSPERYMENTALNE! Sprawdza czy podana osoba jest po³±czona. Klient tej osoby "
 	  "musi obs³ugiwaæ obrazki. Przetestowane na GG 6.0 dla Windows. W przypadku "
