@@ -10,6 +10,7 @@ zg³osi³ b³±d.
 
 - poprawka segfaulta w readline przy dope³nianiu nazw plików, gdy
   brak funkcji ,,rl_filename_completion_function'' (sz)
+- poprawka stanów opisowych zawieraj±cych znaki poni¿ej 32 (adaml/w)
 
 // 2003-04-07
 

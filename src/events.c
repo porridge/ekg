@@ -735,7 +735,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 			event_check(EVENT_BLOCKED, uin, NULL);
 	}
 
-	if (!descr)
+	if (!descr) 
 		descr = xstrdup(idescr);
 	
 	/* zapamiêtaj adres, port i protokó³ */
@@ -756,10 +756,14 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 		descr = xstrdup("");
 
 	if (descr) {
-		char *tmp = NULL;
+		char *tmp;
 
-		while ((tmp = strchr(descr, '\n')))
-			*tmp = ' ';
+		for (tmp = descr; *tmp; tmp++) {
+			if (*tmp == 13 || *tmp == 10 || *tmp == 9)
+				*tmp = ' ';
+			if (*tmp < 32)
+				*tmp = '?';
+		}
 
 		cp_to_iso(descr);
 	}
