@@ -120,6 +120,7 @@ struct window {
 	int edge;		/* okienko brzegowe */
 	int last_update;	/* czas ostatniego uaktualnienia */
 	int nowrap;		/* nie zawijamy linii */
+	int hide;		/* ukrywamy, bo jest zbyt du¿e */
 	
 	char *target;		/* nick query albo inna nazwa albo NULL */
 	
@@ -491,42 +492,66 @@ void window_resize()
 	width = right - left;
 	height = bottom - top;
 
+	if (width < 1)
+		width = 1;
+	if (height < 1)
+		height = 1;
+
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
 
 		if (!w->edge)
 			continue;
 
+		w->hide = 0;
+
 		if ((w->edge & WF_LEFT)) {
-			w->left = left;
-			w->top = top;
-			w->height = height;
-			width -= w->width;
-			left += w->width;
+			if (w->width * 2 > width)
+				w->hide = 1;
+			else {
+				w->left = left;
+				w->top = top;
+				w->height = height;
+				w->hide = 0;
+				width -= w->width;
+				left += w->width;
+			}
 		}
 
 		if ((w->edge & WF_RIGHT)) {
-			w->left = right - w->width;
-			w->top = top;
-			w->height = height;
-			width -= w->width;
-			right -= w->width;
+			if (w->width * 2 > width)
+				w->hide = 1;
+			else {
+				w->left = right - w->width;
+				w->top = top;
+				w->height = height;
+				width -= w->width;
+				right -= w->width;
+			}
 		}
 
 		if ((w->edge & WF_TOP)) {
-			w->left = left;
-			w->top = top;
-			w->width = width;
-			height -= w->height;
-			top += w->height;
+			if (w->height * 2 > height)
+				w->hide = 1;
+			else {
+				w->left = left;
+				w->top = top;
+				w->width = width;
+				height -= w->height;
+				top += w->height;
+			}
 		}
 
 		if ((w->edge & WF_BOTTOM)) {
-			w->left = left;
-			w->top = bottom - w->height;
-			w->width = width;
-			height -= w->height;
-			bottom -= w->height;
+			if (w->height * 2 > height)
+				w->hide = 1;
+			else {
+				w->left = left;
+				w->top = bottom - w->height;
+				w->width = width;
+				height -= w->height;
+				bottom -= w->height;
+			}
 		}
 
 		wresize(w->window, w->height, w->width);
@@ -848,13 +873,14 @@ static void window_refresh()
 		if (w->redraw)
 			window_redraw(w);
 
-		wnoutrefresh(w->window);
+		if (!w->hide)
+			wnoutrefresh(w->window);
 	}
 
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
 
-		if (!w->floating)
+		if (!w->floating || w->hide)
 			continue;
 
 		if (w->handle_redraw)
@@ -1397,6 +1423,9 @@ void contacts_changed()
 					contacts_order[j] = args[i][j + 6] - '0';	
 			}
 		}
+
+		if (contacts_margin < 0)
+			contacts_margin = 0;
 
 		array_free(args);
 	}
