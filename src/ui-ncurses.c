@@ -2491,7 +2491,7 @@ again:
 
 void python_generator(const char *text, int len)
 {
-	const char *words[] = { "load", "unload", "run", "exec", "list", NULL };
+	const char *words[] = { "exec", "list", "load", "restart", "run", "unload", NULL };
 	int i;
 
 	for (i = 0; words[i]; i++)

@@ -337,7 +337,7 @@ char *userlist_dump()
 int userlist_write()
 {
 	const char *filename;
-	char *contacts;
+	char *contacts, tmp[PATH_MAX];
 	FILE *f;
 
 	if (!(contacts = userlist_dump()))
@@ -347,16 +347,26 @@ int userlist_write()
 		xfree(contacts);
 		return -1;
 	}
+
+	snprintf(tmp, sizeof(tmp), "%s.%d.%ld", filename, (int) getpid(), (long) time(NULL));
 	
-	if (!(f = fopen(filename, "w"))) {
+	if (!(f = fopen(tmp, "w"))) {
 		xfree(contacts);
 		return -2;
 	}
+
 	fchmod(fileno(f), 0600);
+	
 	fputs(contacts, f);
-	fclose(f);
+	
+	if (fclose(f) == EOF) {
+		unlink(tmp);
+		return -2;
+	}
 	
 	xfree(contacts);
+
+	rename(tmp, filename);
 
 	return 0;
 }

@@ -410,7 +410,7 @@ static char *window_generator(char *text, int state)
 
 static char *python_generator(char *text, int state)
 {
-	char *commands[] = { "load", "unload", "run", "exec", "list", NULL };
+	char *commands[] = { "load", "unload", "run", "exec", "list", "restart", NULL };
 	static int len, i;
 
 	if (!state) {

@@ -422,19 +422,27 @@ void config_write_main(FILE *f, int base64)
  */
 int config_write(const char *filename)
 {
+	char tmp[PATH_MAX];
 	FILE *f;
 
 	if (!filename && !(filename = prepare_path("config", 1)))
 		return -1;
+
+	snprintf(tmp, sizeof(tmp), "%s.%d.%ld", filename, (int) getpid(), (long) time(NULL));
 	
-	if (!(f = fopen(filename, "w")))
+	if (!(f = fopen(tmp, "w")))
 		return -1;
 	
 	fchmod(fileno(f), 0600);
 
 	config_write_main(f, 1);
 
-	fclose(f);
+	if (fclose(f) == EOF) {
+		return -1;
+		unlink(tmp);
+	}
+
+	rename(tmp, filename);
 	
 	return 0;
 }
@@ -536,7 +544,12 @@ pass:
 	xfree(wrote);
 	
 	fclose(fi);
-	fclose(fo);
+
+	if (fclose(fo) == EOF) {
+		unlink(newfn);
+		xfree(newfn);
+		return -1;
+	}
 	
 	rename(newfn, filename);
 
