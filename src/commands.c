@@ -1291,6 +1291,27 @@ COMMAND(cmd_msg)
 	iso_to_cp(msg);
 	count = array_count(nicks);
 
+#ifdef HAVE_OPENSSL
+	if (config_encryption == 1 && array_count(nicks) == 1 && (uin = get_uin(nicks[0]))) {
+		char *enc = xmalloc(4096);	/* XXX idiotyzm */
+		int len;
+		
+		memset(enc, 0, 4096);
+		
+		len = SIM_Message_Encrypt(msg, enc, strlen(msg), uin);
+		
+		gg_debug(GG_DEBUG_MISC, "// encrypted length: %d\n", len);
+
+		if (len > 0) {
+			xfree(msg);
+			msg = enc;
+			secure = 1;
+		}
+
+		gg_debug(GG_DEBUG_MISC, "// encrypted message: %s\n", enc);
+	}
+#endif
+
 	for (p = nicks; *p; p++) {
 		if (!strcmp(*p, ""))
 			continue;
@@ -1315,27 +1336,6 @@ COMMAND(cmd_msg)
 
 	xfree(escaped);
 	xfree(last);
-
-#ifdef HAVE_OPENSSL
-	if (config_encryption == 1 && array_count(nicks) == 1 && (uin = get_uin(nicks[0]))) {
-		char *enc = xmalloc(4096);	/* XXX idiotyzm */
-		int len;
-		
-		memset(enc, 0, 4096);
-		
-		len = SIM_Message_Encrypt(msg, enc, strlen(msg), uin);
-		
-		gg_debug(GG_DEBUG_MISC, "// encrypted length: %d\n", len);
-
-		if (len > 0) {
-			xfree(msg);
-			msg = enc;
-			secure = 1;
-		}
-
-		gg_debug(GG_DEBUG_MISC, "// encrypted message: %s\n", enc);
-	}
-#endif
 
 	if (count > 1 && chat) {
 		uin_t *uins = xmalloc(count * sizeof(uin_t));
