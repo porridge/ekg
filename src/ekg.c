@@ -5,6 +5,8 @@
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *                          Adam Osuchowski <adwol@polsl.gliwice.pl>
+ *                          Dawid Jarosz <dawjar@poczta.onet.pl>
+ *                          Wojciech Bojdo³ <wojboj@htcon.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -91,6 +93,7 @@ static struct {
 	{ GG_SESSION_DCC_VOICE, (VV) handle_dcc, (VV) gg_dcc_free },
 	{ GG_SESSION_SEARCH, (VV) handle_search, (VV) reaper_search },
 	{ GG_SESSION_REGISTER, (VV) handle_pubdir, (VV) gg_register_free },
+	{ GG_SESSION_UNREGISTER, (VV) handle_pubdir, (VV) gg_pubdir_free },
 	{ GG_SESSION_PASSWD, (VV) handle_pubdir, (VV) gg_change_passwd_free },
 	{ GG_SESSION_REMIND, (VV) handle_pubdir, (VV) gg_remind_passwd_free },
 	{ GG_SESSION_CHANGE, (VV) handle_pubdir, (VV) gg_change_pubdir_free },
@@ -99,6 +102,7 @@ static struct {
 	{ GG_SESSION_USER0, NULL, (VV) reaper_user },
 	{ GG_SESSION_USER1, NULL, (VV) reaper_user },
 	{ GG_SESSION_USER2, (VV) handle_voice, (VV) reaper_user },
+	{ GG_SESSION_USER3, NULL, (VV) reaper_user },
 	{ -1, NULL, NULL }, 
 };
 
@@ -131,6 +135,37 @@ void get_char_from_pipe(struct gg_common *c)
 		}
 	}
 }
+
+/*
+ * get_line_from_pipe()
+ *
+ * funkcja pobiera z potoku steruj±cego znak do bufora, a gdy dojdzie
+ * do konca linii puszcza na ekran.
+ *
+ * - c - struktura steruj±ca przechowuj±ca m.in. deskryptor potoku.
+ */
+void get_line_from_pipe(struct gg_common *c)
+{
+	static char buf[PIPE_MSG_MAX_BUF_LEN + 1];
+	char ch;
+  
+	if (!c)
+  		return;
+
+	if (read(c->fd, &ch, 1) > 0) {
+		if (ch != '\n' && ch != '\r') {
+			if (strlen(buf) < PIPE_MSG_MAX_BUF_LEN)
+				buf[strlen(buf)] = ch;
+		}
+		if (ch == '\n' || (strlen(buf) >= PIPE_MSG_MAX_BUF_LEN)) {
+			print("exec", buf, itoa(c->id));
+			memset(buf, 0, PIPE_MSG_MAX_BUF_LEN + 1);
+		}
+	} else {
+		list_remove(&watches, c, 1);
+	}
+}
+
 
 /*
  * ekg_wait_for_key()
@@ -247,6 +282,9 @@ void ekg_wait_for_key()
 					case GG_SESSION_REGISTER:
 						if (!errmsg)
 							errmsg = "register_timeout";
+					case GG_SESSION_UNREGISTER:
+						if (!errmsg)
+							errmsg = "unregister_timeout";
 					case GG_SESSION_PASSWD:
 						if (!errmsg)
 							errmsg = "passwd_timeout";
@@ -349,7 +387,7 @@ void ekg_wait_for_key()
 
 					if (pid != p->pid)
 						continue;
-
+					
 					if (p->name[0] == '\001') {
 						print((!(WEXITSTATUS(status))) ? "sms_sent" : "sms_failed", p->name + 1);
 					} else if (p->name[0] == '\002') {
@@ -383,6 +421,11 @@ void ekg_wait_for_key()
 
 				if (c->type == GG_SESSION_USER2) {
 					handle_voice();
+					break;
+				}
+				
+				if (c->type == GG_SESSION_USER3) {
+					get_line_from_pipe(c);
 					break;
 				}
 
@@ -720,22 +763,19 @@ int main(int argc, char **argv)
 			away = 0;
 			break;
 		case GG_STATUS_AVAIL_DESCR:
-			away = 0;
-			config_status = (config_status & GG_STATUS_FRIENDS_MASK) | GG_STATUS_AVAIL;
+			away = 4;
 			break;
 		case GG_STATUS_BUSY:
 			away = 1;
 			break;
 		case GG_STATUS_BUSY_DESCR:
-			away = 1;
-			config_status = (config_status & GG_STATUS_FRIENDS_MASK) | GG_STATUS_BUSY;
+			away = 3;
 			break;
 		case GG_STATUS_INVISIBLE:
 			away = 2;
 			break;
 		case GG_STATUS_INVISIBLE_DESCR:
-			away = 2;
-			config_status = (config_status & GG_STATUS_FRIENDS_MASK) | GG_STATUS_INVISIBLE;
+			away = 5;
 			break;
 	}
 	

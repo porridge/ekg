@@ -222,6 +222,7 @@ void ekg_wait_for_key();
 int ekg_hash(const char *name);
 void ekg_exit();
 char *log_escape(const char *str);
+char *xstrmid(const char *str, int start, int length);
 
 int process_add(int pid, const char *name);
 int process_remove(int pid);
@@ -261,6 +262,7 @@ void changed_dcc(const char *var);
 void changed_theme(const char *var);
 void changed_proxy(const char *var);
 void changed_uin(const char *var);
+void changed_xxx_reason(const char *var);
 
 int event_add(int flags, uin_t uin, const char *action, int quiet);
 int event_remove(int flags, uin_t uin);

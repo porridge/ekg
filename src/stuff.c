@@ -2272,6 +2272,29 @@ void changed_uin(const char *var)
 }
 
 /*
+ * changed_xxx_reason()
+ *
+ * funkcja wywo³ywana przy zmianie domy¶lnych powodów.
+ */
+void changed_xxx_reason(const char *var)
+{
+	char *tmp = NULL;
+
+	if (!strcmp(var, "away_reason"))
+		tmp = config_away_reason;
+	if (!strcmp(var, "back_reason"))
+		tmp = config_back_reason;
+	if (!strcmp(var, "quit_reason"))
+		tmp = config_quit_reason;
+
+	if (!tmp)
+		return;
+
+	if (strlen(tmp) > GG_STATUS_DESCR_MAXSIZE)
+		print("descr_too_long", itoa(GG_STATUS_DESCR_MAXSIZE));
+}
+
+/*
  * do_connect()
  *
  * przygotowuje wszystko pod po³±czenie gg_login i ³±czy siê.
@@ -2295,6 +2318,7 @@ void do_connect()
 	p.uin = config_uin;
 	p.password = config_password;
 	p.status = config_status;
+	p.status_descr = config_reason;
 	p.async = 1;
 #ifdef HAVE_VOIP
 	p.has_audio = 1;
@@ -2821,4 +2845,40 @@ int last_count_get(uin_t uin)
 	}
 
 	return last_count;
+}
+
+/* 
+ * xstrmid()
+ *
+ * wycina fragment tekstu alokuj±c dla niego pamiêæ.
+ *
+ *  - str - tekst ¼ród³owy,
+ *  - start - pierwszy znak,
+ *  - length - d³ugo¶æ wycinanego tekstu, je¶li -1 
+ */
+char *xstrmid(const char *str, int start, int length)
+{
+	char *res, *q;
+	const char *p;
+
+	if (!str)
+		return xstrdup("");
+
+	if (length == -1)
+		length = strlen(str) - start;
+
+	if (length < 1)
+		return xstrdup("");
+
+	if (length > strlen(str) - start)
+		length = strlen(str) - start;
+	
+	res = xmalloc(length + 1);
+	
+	for (p = str + start, q = res; length; p++, q++, length--)
+		*q = *p;
+
+	*q = 0;
+
+	return res;
 }

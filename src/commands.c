@@ -4,7 +4,7 @@
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@infomex.pl>
- *                          Wojciech Bojdol <wojboj@htc.net.pl>
+ *                          Wojciech Bojdo³ <wojboj@htc.net.pl>
  *                          Piotr Wysocki <wysek@linux.bydg.org>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *
@@ -326,27 +326,28 @@ COMMAND(cmd_away)
 
 	ui_event("my_status_raw", config_status, reason);
 
-	if (reason)
+	if (reason) {
 		config_reason = reason;
+		if (strlen(reason) > GG_STATUS_DESCR_MAXSIZE)
+			print("descr_too_long", itoa(GG_STATUS_DESCR_MAXSIZE));
+	}
 
 	return;
 }
 
 COMMAND(cmd_status)
 {
-	char *av, *ad, *bs, *bd, *na, *in, *id, *pr, *np;
 	struct userlist *u;
-
-	av = format_string(format_find("show_status_avail"));
-	ad = format_string(format_find("show_status_avail_descr"), config_reason);
-	bs = format_string(format_find("show_status_busy"));
-	bd = format_string(format_find("show_status_busy_descr"), config_reason);
-	in = format_string(format_find("show_status_invisible"));
-	id = format_string(format_find("show_status_invisible_descr"), config_reason);
-	na = format_string(format_find("show_status_not_avail"));
-	pr = format_string(format_find("show_status_private_on"));
-	np = format_string(format_find("show_status_private_off"));
-
+	struct in_addr i;
+	char *tmp, *priv, *r1, *r2, *status_table[6] = {
+		"show_status_avail",
+		"show_status_busy",
+		"show_status_invisible",
+		"show_status_busy_descr",
+		"show_status_avail_descr",
+		"show_status_invisible_descr"
+	};
+	
 	if (config_user && strcmp(config_user, ""))
 		print("show_status_profile", config_user);
 
@@ -356,31 +357,33 @@ COMMAND(cmd_status)
 		print("show_status_uin", itoa(config_uin));
 	
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
-		print("show_status", na, "", "0.0.0.0", "0", itoa(config_uin), config_user);
-	} else {
-		char *foo[6];
-		struct in_addr i;
+		char *tmp = format_string(format_find("show_status_not_avail"));
 
-		foo[0] = av;
-		foo[1] = bs;
-		foo[2] = in;
-		foo[3] = bd;
-		foo[4] = ad;
-		foo[5] = id;
+		print("show_status_status", tmp, "");
+		xfree(tmp);
 
-		i.s_addr = sess->server_addr;
-		print("show_status", foo[away], (private_mode) ? pr : np, inet_ntoa(i), itoa(sess->port), itoa(sess->uin), config_user);
+		return;
 	}
 
-	free(av);
-	free(ad);
-	free(bs);
-	free(bd);
-	free(na);
-	free(in);
-	free(id);
-	free(pr);
-	free(np);
+	if (private_mode)
+		priv = format_string(format_find("show_status_private_on"));
+	else
+		priv = format_string(format_find("show_status_private_off"));
+
+	r1 = xstrmid(config_reason, 0, GG_STATUS_DESCR_MAXSIZE);
+	r2 = xstrmid(config_reason, GG_STATUS_DESCR_MAXSIZE, -1);
+
+	tmp = format_string(format_find(status_table[away]), r1, r2);
+
+	xfree(r1);
+	xfree(r2);
+	
+	i.s_addr = sess->server_addr;
+	print("show_status_status", tmp, priv);
+	print("show_status_server", inet_ntoa(i), itoa(sess->port));
+
+	xfree(tmp);
+	xfree(priv);
 }
 
 COMMAND(cmd_connect)
@@ -474,11 +477,39 @@ COMMAND(cmd_exec)
 
 	if (params[0]) {
 		char *tmp;
+		int fd[2] = { 0, 0 };
+		struct gg_session s;
 
+		if (pipe(fd) && params[0][0] != '^') {
+			print("exec_error", strerror(errno));
+			return;
+		}
+		
 		if (!(pid = fork())) {
+			if (fd[1]) {
+				close(fd[0]);
+				dup2(fd[1], 2);
+				dup2(fd[1], 1);
+				close(fd[1]);
+			}	
 			execl("/bin/sh", "sh", "-c", (params[0][0] == '^') ? params[0] + 1 : params[0], NULL);
 			exit(1);
 		}
+
+		if (pid < 0) {
+			print("exec_error", strerror(errno));
+			return;
+		}
+	
+		s.fd = fd[0];
+		s.check = GG_CHECK_READ;
+		s.state = GG_STATE_READING_DATA;
+		s.type = GG_SESSION_USER3;
+		s.id = pid;
+		s.timeout = 60;
+		list_add(&watches, &s, sizeof(s));
+		close(fd[1]);
+		
 		if (params[0][0] == '^')
 			tmp = saprintf("\002%s", params[0] + 1);
 		else
@@ -697,42 +728,33 @@ COMMAND(cmd_modify)
 		return;
 	}
 
-	if (!params[1]) {
-		char *groups = group_to_string(u->groups);
-		
-		print("user_info", u->first_name, u->last_name, u->nickname, u->display, u->mobile, groups);
-		
-		free(groups);
-
-		return;
-	} else 
-		argv = array_make(params[1], " \t", 0, 1, 1);
+	argv = array_make(params[1], " \t", 0, 1, 1);
 
 	for (i = 0; argv[i]; i++) {
 		
 		if (match_arg(argv[i], 'f', "first", 2) && argv[i + 1]) {
-			free(u->first_name);
+			xfree(u->first_name);
 			u->first_name = xstrdup(argv[++i]);
 		}
 		
 		if (match_arg(argv[i], 'l', "last", 2) && argv[i + 1]) {
-			free(u->last_name);
+			xfree(u->last_name);
 			u->last_name = xstrdup(argv[++i]);
 		}
 		
 		if (match_arg(argv[i], 'n', "nickname", 2) && argv[i + 1]) {
-			free(u->nickname);
+			xfree(u->nickname);
 			u->nickname = xstrdup(argv[++i]);
 		}
 		
 		if (match_arg(argv[i], 'd', "display", 2) && argv[i + 1]) {
-			free(u->display);
+			xfree(u->display);
 			u->display = xstrdup(argv[++i]);
 			userlist_replace(u);
 		}
 		
 		if (match_arg(argv[i], 'p', "phone", 2) && argv[i + 1]) {
-			free(u->mobile);
+			xfree(u->mobile);
 			u->mobile = xstrdup(argv[++i]);
 		}
 		
@@ -894,6 +916,7 @@ COMMAND(cmd_list)
 	char *tmp, **argv = NULL;
 
 	if (params[0] && *params[0] != '-') {
+		char *status, *groups;
 		struct userlist *u;
 		uin_t uin;
 		
@@ -908,40 +931,38 @@ COMMAND(cmd_list)
 			return;
 		}
 
-		{
-			char *status, *groups = group_to_string(u->groups);
-			
-			switch (u->status) {
-				case GG_STATUS_AVAIL:
-					status = format_string(format_find("user_info_avail"), u->display);
-					break;
-				case GG_STATUS_AVAIL_DESCR:
-					status = format_string(format_find("user_info_avail_descr"), u->display, u->descr);
-					break;
-				case GG_STATUS_BUSY:
-					status = format_string(format_find("user_info_busy"), u->display);
-					break;
-				case GG_STATUS_BUSY_DESCR:
-					status = format_string(format_find("user_info_busy_descr"), u->display, u->descr);
-					break;
-				case GG_STATUS_NOT_AVAIL:
-					status = format_string(format_find("user_info_not_avail"), u->display);
-					break;
-				case GG_STATUS_NOT_AVAIL_DESCR:
-					status = format_string(format_find("user_info_not_avail_descr"), u->display, u->descr);
-					break;
-				case GG_STATUS_INVISIBLE:
-					status = format_string(format_find("user_info_invisble"), u->display);
-					break;
-				default:
-					status = format_string(format_find("user_info_unknown"), u->display);
-			}
-		
-			print("user_info", u->first_name, u->last_name, u->nickname, u->display, u->mobile, groups, itoa(u->uin), status);
-		
-			free(groups);
-			free(status);
+		switch (u->status) {
+			case GG_STATUS_AVAIL:
+				status = format_string(format_find("user_info_avail"), (u->first_name) ? u->first_name : u->display);
+				break;
+			case GG_STATUS_AVAIL_DESCR:
+				status = format_string(format_find("user_info_avail_descr"), (u->first_name) ? u->first_name : u->display, u->descr);
+				break;
+			case GG_STATUS_BUSY:
+				status = format_string(format_find("user_info_busy"), (u->first_name) ? u->first_name : u->display);
+				break;
+			case GG_STATUS_BUSY_DESCR:
+				status = format_string(format_find("user_info_busy_descr"), (u->first_name) ? u->first_name : u->display, u->descr);
+				break;
+			case GG_STATUS_NOT_AVAIL:
+				status = format_string(format_find("user_info_not_avail"), (u->first_name) ? u->first_name : u->display);
+				break;
+			case GG_STATUS_NOT_AVAIL_DESCR:
+				status = format_string(format_find("user_info_not_avail_descr"), (u->first_name) ? u->first_name : u->display, u->descr);
+				break;
+			case GG_STATUS_INVISIBLE:
+				status = format_string(format_find("user_info_invisble"), (u->first_name) ? u->first_name : u->display);
+				break;
+			default:
+				status = format_string(format_find("user_info_unknown"), (u->first_name) ? u->first_name : u->display);
 		}
+		
+		groups = group_to_string(u->groups);
+
+		print("user_info", u->first_name, u->last_name, (u->nickname) ? u->nickname : u->display, u->display, u->mobile, groups, itoa(u->uin), status);
+		
+		free(groups);
+		free(status);
 
 		return;
 	}
@@ -1771,6 +1792,7 @@ COMMAND(cmd_test_watches)
 			case GG_SESSION_HTTP: type = "HTTP"; break;
 			case GG_SESSION_SEARCH: type = "SEARCH"; break;
 			case GG_SESSION_REGISTER: type = "REGISTER"; break;
+			case GG_SESSION_UNREGISTER: type = "UNREGISTER"; break;
 			case GG_SESSION_REMIND: type = "REMIND"; break;
 			case GG_SESSION_CHANGE: type = "CHANGE"; break;
 			case GG_SESSION_PASSWD: type = "PASSWD"; break;
@@ -1902,33 +1924,58 @@ COMMAND(cmd_register)
 	struct gg_http *h;
 	list_t l;
 
-	if (registered_today) {
-		print("registered_today");
-		return;
-	}
-	
-	if (!params[0] || !params[1]) {
-		print("not_enough_params", name);
-		return;
-	}
-
-	for (l = watches; l; l = l->next) {
-		struct gg_common *s = l->data;
-
-		if (s->type == GG_SESSION_REGISTER) {
-			print("register_pending");
+	if (name[0] == 'r') {
+		if (registered_today) {
+			print("registered_today");
 			return;
 		}
-	}
 	
-	if (!(h = gg_register(params[0], params[1], 1))) {
-		print("register_failed", strerror(errno));
-		return;
+		if (!params[0] || !params[1]) {
+			print("not_enough_params", name);
+			return;
+		}
+	
+		for (l = watches; l; l = l->next) {
+			struct gg_common *s = l->data;
+
+			if (s->type == GG_SESSION_REGISTER) {
+				print("register_pending");
+				return;
+			}
+		}
+	
+		if (!(h = gg_register(params[0], params[1], 1))) {
+			print("register_failed", strerror(errno));
+			return;
+		}
+
+		list_add(&watches, h, 0);
+
+		reg_password = xstrdup(params[1]);
+	} else {
+		uin_t uin = 0;
+		const char *pwd = NULL;
+		
+		if (!params[0] || (!params[1] && !config_password) || (!params[2] && !config_uin)) {
+			print("not_enough_params", name);
+			return;
+		} 
+		
+		pwd = (params[1] ? params[1] : config_password);
+		uin = ((params[1] && params[2]) ? get_uin(params[2]) : config_uin);
+
+		if (uin <= 0) {
+			print("unregister_bad_uin", uin);
+			return;
+		}
+
+		if (!(h = gg_unregister(uin, pwd, params[0], 1))) {
+			print("unregister_failed", strerror(errno));
+			return;
+		}
+
+		list_add(&watches, h, 0);
 	}
-
-	list_add(&watches, h, 0);
-
-	reg_password = xstrdup(params[1]);
 }
 
 COMMAND(cmd_passwd)
@@ -2736,8 +2783,8 @@ void command_init()
 	command_add
 	( "invisible", "?", cmd_away, 0,
 	  " [powód]", "zmienia stan na niewidoczny",
-          "Je¶li w³±czona jest odpowiednia opcja %wrandom_reason%n i nie\n"
-	  "podano powodu, zostanie wylosowany z pliku %wquit.reasons%n");
+          "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie\n"
+	  "podano powodu, zostanie wylosowany z pliku %Tquit.reasons%n");
 
 	command_add
 	( "list", "u?", cmd_list, 0,
@@ -2790,7 +2837,8 @@ void command_init()
 	command_add
 	( "quit", "?", cmd_quit, 0,
 	  " [powód]", "wychodzi z programu",
-	  "");
+          "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie\n"
+	  "podano powodu, zostanie wylosowany z pliku %Tquit.reasons%n");
 	  
 	command_add
 	( "reconnect", "", cmd_connect, 0,
@@ -2829,6 +2877,11 @@ void command_init()
 	command_add
 	( "status", "", cmd_status, 0,
 	  "", "wy¶wietla aktualny stan",
+	  "");
+
+	command_add
+	( "unregister", "???", cmd_register, 0,
+	  " <email> [<has³o> [<uin/nick>]]", "usuwa konto z serwera",
 	  "");
 
 	command_add

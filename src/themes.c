@@ -149,10 +149,8 @@ char *va_format_string(const char *format, va_list ap)
 	for (i = 0; i < 9; i++)
 		args[i] = NULL;
 
-	for (i = 0; i < argc; i++) {
-		if (!(args[i] = va_arg(ap, char*)))
-			break;
-	}
+	for (i = 0; i < argc; i++)
+		args[i] = va_arg(ap, char*);
 
 	if (!dont_resolve) {
 		dont_resolve = 1;
@@ -719,6 +717,7 @@ void theme_init()
 	format_add("private_mode_on", "%> W³±czono tryb ,,tylko dla przyjació³''\n", 1);
 	format_add("private_mode_off", "%> Wy³±czono tryb ,,tylko dla przyjació³''\n", 1);
 	format_add("private_mode_invalid", "%! Nieprawid³owa warto¶æ\n", 1);
+	format_add("descr_too_long", "%! Opis jest zbyt d³ugi. Widoczne bêdzie tylko pierwsze %1 znaków\n", 1);
 	
 	/* pomoc */
 	format_add("help", "%> %1%2 - %3%4\n", 1);
@@ -806,7 +805,7 @@ void theme_init()
 	format_add("conn_timeout", "%! Przekroczono limit czasu operacji ³±czenia z serwerem\n", 1);
 	format_add("connected", "%> Po³±czono %c(%C%#%c)%n\n", 1);
 	format_add("disconnected", "%> Roz³±czono %c(%C%#%c)%n\n", 1);
-	format_add("disconnected_descr", "%> Roz³±czono %c(%C%#%c): %1%n\n", 1);
+	format_add("disconnected_descr", "%> Roz³±czono: %1 %c(%C%#%c)%n\n", 1);
 	format_add("already_connected", "%! Klient jest ju¿ po³±czony. Wpisz %Treconnect%n aby po³±czyæ ponownie\n", 1);
 	format_add("during_connect", "%! £±czenie trwa. Wpisz %Tdisconnect%n aby przerwaæ\n", 1);
 	format_add("conn_broken", "%! Serwer zerwa³ po³±czenie %c(%C%#%c)%n\n", 1);
@@ -832,6 +831,12 @@ void theme_init()
 	format_add("register_pending", "%! Rejestracja w toku\n", 1);
 	format_add("register_timeout", "%! Przekroczono limit czasu operacji rejestrowania\n", 1);
 	format_add("registered_today", "%! Ju¿ zarejestrowano jeden numer. Nie nadu¿ywaj\n", 1);
+
+	/* kasowanie konta uzytkownika z katalogu publiczengo */
+	format_add("unregister", "%> Konto %T%1%n wykasowane.\n", 1);
+	format_add("unregister_timeout", "%! Przekroczono limit czasu operacji usuwania konta\n", 1);
+	format_add("unregister_bad_uin", "%! Nie poprawny UIN: %T%1%n\n", 1);
+	format_add("unregister_failed", "%! B³±d podczas usuwania konta\n", 1);
 	
 	/* przypomnienie has³a */
 	format_add("remind", "%> Has³o zosta³o wys³ane\n", 1);
@@ -883,6 +888,8 @@ void theme_init()
 	format_add("process", "%> %(-5)1 %2\n", 1);
 	format_add("no_processes", "%! Nie ma dzia³aj±cych procesów\n", 1);
 	format_add("process_exit", "%> Proces %1 (%2) zakoñczy³ dzia³anie z wynikiem %3\n", 1);
+	format_add("exec", "%1\n",1);	/* %1 tre¶æ, %2 pid */
+	format_add("exec_error", "%! B³±d uruchamiania procesu: %1\n", 1);
 
 	/* szczegó³owe informacje o u¿ytkowniku */
 	format_add("user_info", "%) Pseudonim: %T%3%n\n%) Numer: %T%7%n\n%) Stan: %8\n%) Imiê i nazwisko: %T%1 %2%n\n%) Alias: %T%4%n\n%) Numer telefonu: %T%5%n\n%) Grupy: %T%6%n\n", 1);
@@ -895,16 +902,17 @@ void theme_init()
 	format_add("user_info_invisible", "%cniewidoczn%@1%n", 1);
 
 	/* status */
-	format_add("show_status_profile", "%) Profil: %1\n", 1);
-	format_add("show_status_uin", "%) Numer: %1\n", 1);
-	format_add("show_status_uin_nick", "%) Numer: %1 (%2)\n", 1);
-	format_add("show_status", "%) Aktualny stan: %1%2\n%) Aktualny serwer: %3:%4\n", 1);
+	format_add("show_status_profile", "%) Profil: %T%1%n\n", 1);
+	format_add("show_status_uin", "%) Numer: %T%1%n\n", 1);
+	format_add("show_status_uin_nick", "%) Numer: %T%1%n (%T%2%n)\n", 1);
+	format_add("show_status_status", "%) Aktualny stan: %T%1%2%n\n", 1);
+	format_add("show_status_server", "%) Aktualny serwer: %T%1%n:%T%2%n\n", 1);
 	format_add("show_status_avail", "%Ydostêpny%n", 1);
-	format_add("show_status_avail_descr", "%Ydostêpny%n (%1)", 1);
+	format_add("show_status_avail_descr", "%Ydostêpny%n (%T%1%n%2)", 1);
 	format_add("show_status_busy", "%Gzajêty%n", 1);
-	format_add("show_status_busy_descr", "%Gzajêty%n (%1)", 1);
+	format_add("show_status_busy_descr", "%Gzajêty%n (%T%1%n%2)", 1);
 	format_add("show_status_invisible", "%bniewidoczny%n", 1);
-	format_add("show_status_invisible_descr", "%bniewidoczny%n (%1)", 1);
+	format_add("show_status_invisible_descr", "%bniewidoczny%n (%T%1%n%2)", 1);
 	format_add("show_status_not_avail", "%rniedostêpny%n", 1);
 	format_add("show_status_private_on", ", tylko dla znajomych", 1);
 	format_add("show_status_private_off", "", 1);

@@ -201,7 +201,7 @@ Spis tre¶ci:
 
         PRZYK£AD: pwd=sekret&email=moj@adres.email.pl&code=1104465363
 
-        Je¶li wszystko przepieg³o poprawnie serwer odpowie:
+        Je¶li wszystko przebieg³o poprawnie serwer odpowie:
         reg_success:$UIN
 
         UIN - nowy uin, który w³a¶nie otrzymali¶my
@@ -216,6 +216,7 @@ Spis tre¶ci:
         fmnumber     $UIN
         fmpwd        haslo, plain text
         delete       1
+        fmemail      email podany przy rejestracji konta
         pwd          nowe przypadkowe has³o ???
         email        deletedaccount@gadu.gadu.pl
         code         http hash liczony z email+pwd

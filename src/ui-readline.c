@@ -5,7 +5,7 @@
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *                          Adam Osuchowski <adwol@polsl.gliwice.pl>
- *                          Wojtek Bojdo/l <wojboj@htcon.pl>
+ *                          Wojtek Bojdo³ <wojboj@htcon.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as

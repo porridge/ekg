@@ -833,6 +833,10 @@ void handle_pubdir(struct gg_http *h)
 			good = "register";
 			bad = "register_failed";
 			break;
+		case GG_SESSION_UNREGISTER:
+			good = "unregister";
+			bad = "unregister_failed";
+			break;
 		case GG_SESSION_PASSWD:
 			good = "passwd";
 			bad = "passwd_failed";
@@ -878,6 +882,21 @@ void handle_pubdir(struct gg_http *h)
 		}
 
 		registered_today = 1;
+	}
+
+	if (h->type == GG_SESSION_UNREGISTER) {
+		if (!s->uin) {
+			print(bad);
+			goto fail;
+		}
+
+		if (s->uin == config_uin) {
+			config_uin = 0;
+			config_password = 0;
+			config_changed = 1;
+			command_exec(NULL, "disconnect");
+			print("no_config");
+		}
 	}
 	
 	print(good, itoa(s->uin));

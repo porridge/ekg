@@ -5,7 +5,6 @@ zacznê byæ niemi³y. --w
 biblioteka:
 - komunikacja miêdzy klientami, bezpo¶rednie rozmowy,
 - uaktualniæ dokumentacjê,
-- usuwanie konta,
 
 klient:
 - uzupe³niæ dope³nienia (w tym nicki ze spacjami),
@@ -13,11 +12,10 @@ klient:
 - korzystaæ z getopt.
 - round-robin serwerów.
 - find bez paremtrów szuka aktualnego rozmówcy.
-- usuwanie konta,
+- uaktualnianie w³asnego stanu w userli¶cie,
 
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,
-  + naprawiæ /exec,
   + naprawiæ debugowanie,
   + dodaæ /bind,
   + zrobiæ listê kontaktów po prawej (marzenia),

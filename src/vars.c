@@ -48,8 +48,8 @@ void variable_init()
 	variable_add("auto_away", VAR_INT, 1, &config_auto_away, NULL, NULL);
 	variable_add("auto_reconnect", VAR_INT, 1, &config_auto_reconnect, NULL, NULL);
 	variable_add("auto_save", VAR_INT, 1, &config_auto_save, NULL, NULL);
-	variable_add("away_reason", VAR_STR, 1, &config_away_reason, NULL, NULL);
-	variable_add("back_reason", VAR_STR, 1, &config_back_reason, NULL, NULL);
+	variable_add("away_reason", VAR_STR, 1, &config_away_reason, changed_xxx_reason, NULL);
+	variable_add("back_reason", VAR_STR, 1, &config_back_reason, changed_xxx_reason, NULL);
 	variable_add("beep", VAR_BOOL, 1, &config_beep, NULL, NULL);
 	variable_add("beep_msg", VAR_BOOL, 1, &config_beep_msg, NULL, NULL);
 	variable_add("beep_chat", VAR_BOOL, 1, &config_beep_chat, NULL, NULL);
@@ -74,7 +74,7 @@ void variable_init()
 	variable_add("make_window", VAR_INT, 1, &config_make_window, NULL, variable_map(3, 0, 0, "none", 1, 0, "usefree", 2, 0, "always"));
 	variable_add("proxy", VAR_STR, 1, &config_proxy, changed_proxy, NULL);
 	variable_add("random_reason", VAR_MAP, 1, &config_random_reason, NULL, variable_map(5, 0, 0, "none", 1, 0, "away", 2, 0, "notavail", 4, 0, "avail", 8, 0, "invisible"));
-	variable_add("quit_reason", VAR_STR, 1, &config_quit_reason, NULL, NULL);
+	variable_add("quit_reason", VAR_STR, 1, &config_quit_reason, changed_xxx_reason, NULL);
 	variable_add("query_commands", VAR_BOOL, 1, &config_query_commands, NULL, NULL);
 	variable_add("save_password", VAR_BOOL, 1, &config_save_password, NULL, NULL);
 	variable_add("server", VAR_STR, 1, &config_server, NULL, NULL);
