@@ -2092,10 +2092,12 @@ char *base64_encode(const char *buf)
 				k = (buf[j] & 252) >> 2;
 				break;
 			case 1:
-				k = ((buf[j] & 3) << 4) | ((buf[++j] & 240) >> 4);
+				k = ((buf[j] & 3) << 4) | ((buf[j + 1] & 240) >> 4);
+				j++;
 				break;
 			case 2:
-				k = ((buf[j] & 15) << 2) | ((buf[++j] & 192) >> 6);
+				k = ((buf[j] & 15) << 2) | ((buf[j + 1] & 192) >> 6);
+				j++;
 				break;
 			case 3:
 				k = buf[j++] & 63;

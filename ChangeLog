@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - wy¶wietlanie wyniku wysy³ania smsów (wojboj/w)
 - poprawki konferencji, wy¶wietlanie jej nazwy (DJ/w)
 - wyrzucenie -I/usr/include z flag kompilatora (malekith/w)
+- poprawka kodu o niezdefiniowanym dzia³aniu (malekith/w)
 
 // 2002-10-02
 
