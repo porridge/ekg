@@ -1575,8 +1575,8 @@ void ui_ncurses_init()
 	ui_screen_width = stdscr->_maxx + 1;
 	ui_screen_height = stdscr->_maxy + 1;
 	
-	window_current = window_new(NULL, 0);
 	window_new("__debug", -1);
+	window_current = window_new(NULL, 0);
 
 	status = newwin(1, stdscr->_maxx + 1, stdscr->_maxy - 1, 0);
 	input = newwin(1, stdscr->_maxx + 1, stdscr->_maxy, 0);
@@ -2762,6 +2762,10 @@ static void window_prev()
 			break;
 		prev = l->data;
 	}
+
+	if (!prev->id && window_current->id == 1)
+		for (l = windows; l; l = l->next)
+			prev = l->data;
 
 	window_switch(prev->id);
 }

@@ -6,6 +6,10 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-01-21
+
+- window next/prev omija okno z debugiem (sz)
+
 // 2003-01-20
 
 - poprawki wczytywania zmiennych w wersji skompilowanej z ncurses
