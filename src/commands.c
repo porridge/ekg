@@ -1543,24 +1543,42 @@ COMMAND(command_dcc)
 		for (l = transfers; l; l = l->next) {
 			struct transfer *t = l->data;
 
-			if (!t->dcc || (t->dcc->state != GG_STATE_SENDING_FILE && t->dcc->state != GG_STATE_GETTING_FILE)) {
+			if (!t->dcc || !t->dcc->established) {
 				if (!pending) {
 					my_printf("dcc_show_pending_header");
 					pending = 1;
 				}
-				my_printf((t->type == GG_SESSION_DCC_SEND) ? "dcc_show_pending_send" : "dcc_show_pending_get", itoa(t->id), format_user(t->uin), (t->filename) ? t->filename : "(?)");
+				switch (t->type) {
+					case GG_SESSION_DCC_SEND:
+						my_printf("dcc_show_pending_send", itoa(t->id), format_user(t->uin), t->filename);
+						break;
+					case GG_SESSION_DCC_GET:
+						my_printf("dcc_show_pending_get", itoa(t->id), format_user(t->uin), t->filename);
+						break;
+					case GG_SESSION_DCC_VOICE:
+						my_printf("dcc_show_pending_voice", itoa(t->id), format_user(t->uin));
+				}
 			}
 		}
 
 		for (l = transfers; l; l = l->next) {
 			struct transfer *t = l->data;
 
-			if (t->dcc && (t->dcc->state == GG_STATE_SENDING_FILE || t->dcc->state == GG_STATE_GETTING_FILE)) {
+			if (t->dcc && t->dcc->established) {
 				if (!active) {
 					my_printf("dcc_show_active_header");
 					active = 1;
 				}
-				my_printf((t->type == GG_SESSION_DCC_SEND) ? "dcc_show_active_send" : "dcc_show_active_get", itoa(t->id), format_user(t->uin), t->filename);
+				switch (t->type) {
+					case GG_SESSION_DCC_SEND:
+						my_printf("dcc_show_active_send", itoa(t->id), format_user(t->uin), t->filename);
+						break;
+					case GG_SESSION_DCC_GET:
+						my_printf("dcc_show_active_get", itoa(t->id), format_user(t->uin), t->filename);
+						break;
+					case GG_SESSION_DCC_VOICE:
+						my_printf("dcc_show_active_voice", itoa(t->id), format_user(t->uin));
+				}
 			}
 		}
 
@@ -1635,14 +1653,40 @@ COMMAND(command_dcc)
 	}
 
 	if (params[0][0] == 'v') {			/* voice */
+#ifdef HAVE_VOIP
 		struct userlist *u;
+		struct transfer *t, tt;
 
 		if (!params[1]) {
 			my_printf("not_enough_params");
 			return 0;
 		}
 		
-		/* XXX sprawdzaæ przychodz±ce po³±czenia */
+		/* sprawdzamy najpierw przychodz±ce po³±czenia */
+		
+		for (t = NULL, l = transfers; l; l = l->next) {
+			struct userlist *u;
+			
+			t = l->data;
+
+			if (!t->dcc || t->type != GG_SESSION_DCC_VOICE)
+				continue;
+			
+			if (params[1][0] == '#' && atoi(params[1] + 1) == t->id)
+				break;
+
+			if ((u = userlist_find(t->uin, NULL))) {
+				if (!strcasecmp(params[1], itoa(u->uin)) || !strcasecmp(params[1], u->display))
+					break;
+			}
+		}
+
+		if (t) {
+			list_add(&watches, t->dcc, 0);
+			return 0;
+		}
+
+		/* je¶li nie by³o, to próbujemy sami zainicjowaæ */
 
 		if (!(uin = get_uin(params[1])) || !(u = userlist_find(uin, NULL))) {
 			my_printf("user_not_found", params[1]);
@@ -1654,11 +1698,11 @@ COMMAND(command_dcc)
 			return 0;
 		}
 
-		t.uin = uin;
-		t.id = transfer_id();
-		t.type = GG_SESSION_DCC_VOICE;
-		t.filename = NULL;
-		t.dcc = NULL;
+		tt.uin = uin;
+		tt.id = transfer_id();
+		tt.type = GG_SESSION_DCC_VOICE;
+		tt.filename = NULL;
+		tt.dcc = NULL;
 
 		if (u->port < 10 || (params[2] && !strcmp(params[2], "--reverse"))) {
 			/* nie mo¿emy siê z nim po³±czyæ, wiêc on spróbuje */
@@ -1673,11 +1717,13 @@ COMMAND(command_dcc)
 
 			list_add(&watches, d, 0);
 
-			t.dcc = d;
+			tt.dcc = d;
 		}
 
-		list_add(&transfers, &t, sizeof(t));
-
+		list_add(&transfers, &tt, sizeof(t));
+#else
+		my_printf("dcc_voice_unsupported");
+#endif
 		return 0;
 	}
 
@@ -1812,6 +1858,7 @@ COMMAND(command_test_watches)
 			case GG_SESSION_DCC_SOCKET: type = "DCC_SOCKET"; break;
 			case GG_SESSION_DCC_SEND: type = "DCC_SEND"; break;
 			case GG_SESSION_DCC_GET: type = "DCC_GET"; break;
+			case GG_SESSION_DCC_VOICE: type = "DCC_VOICE"; break;
 			case GG_SESSION_USERLIST_PUT: type = "USERLIST_PUT"; break;
 			case GG_SESSION_USERLIST_GET: type = "USERLIST_GET"; break;
 			case GG_SESSION_USER0: type = "USER0"; break;

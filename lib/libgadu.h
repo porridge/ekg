@@ -148,6 +148,7 @@ struct gg_dcc {
 	int chunk_offset;	/* offset w aktualnym kawa³ku */
 	struct gg_file_info file_info;
 				/* informacje o pliku */
+	int established;	/* po³±czenie ustanowione */
 };
 
 /*
@@ -225,6 +226,7 @@ enum gg_state_enum {
 	GG_STATE_READING_VOICE_DATA,	/* czeka na dane voip */
 	GG_STATE_SENDING_VOICE_ACK,	/* wysy³a potwierdzenie voip */
 	GG_STATE_SENDING_VOICE_REQUEST,	/* wysy³a ¿±danie voip */
+	GG_STATE_READING_TYPE,		/* czeka na typ po³±czenia */
 };
 
 /*
@@ -288,10 +290,11 @@ enum {
 	GG_EVENT_DCC_ERROR,		/* b³±d */
 	GG_EVENT_DCC_DONE,		/* skoñczy³ */
 	GG_EVENT_DCC_CLIENT_ACCEPT,	/* moment akceptacji klienta */
+	GG_EVENT_DCC_CALLBACK,		/* klient siê po³±czy³ bo wo³ali¶my */
 	GG_EVENT_DCC_NEED_FILE_INFO,	/* trzeba wype³niæ file_info */
 	GG_EVENT_DCC_NEED_FILE_ACK,	/* czeka na potwierdzenie pliku */
 	GG_EVENT_DCC_NEED_VOICE_ACK,	/* czeka na potwierdzenie voip */
-	GG_EVENT_DCC_VOICE_FRAME,	/* ramka danych voip */
+	GG_EVENT_DCC_VOICE_DATA,	/* ramka danych voip */
 };
 
 /*
@@ -366,6 +369,10 @@ struct gg_event {
 		/* dotycz±ce gg_dcc */
 		struct gg_dcc *dcc_new;
 		int dcc_error;
+		struct {
+			uint8_t *data;
+			int length;
+		} dcc_voice_data;
         } event;
 };
 
@@ -524,7 +531,11 @@ int gg_dcc_request(struct gg_session *sess, uin_t uin);
 struct gg_dcc *gg_dcc_send_file(unsigned long ip, unsigned short port, uin_t my_uin, uin_t peer_uin);
 struct gg_dcc *gg_dcc_get_file(unsigned long ip, unsigned short port, uin_t my_uin, uin_t peer_uin);
 struct gg_dcc *gg_dcc_voice_chat(unsigned long ip, unsigned short port, uin_t my_uin, uin_t peer_uin);
+void gg_dcc_set_type(struct gg_dcc *d, int type);
 int gg_dcc_fill_file_info(struct gg_dcc *d, const char *filename);
+int gg_dcc_voice_send(struct gg_dcc *d, char *buf, int length);
+
+#define GG_DCC_VOICE_FRAME_LENGTH 195
 
 struct gg_dcc *gg_dcc_socket_create(uin_t uin, unsigned int port);
 #define gg_dcc_socket_free gg_free_dcc

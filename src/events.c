@@ -32,6 +32,7 @@
 #include "commands.h"
 #include "themes.h"
 #include "userlist.h"
+#include "voice.h"
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure();
@@ -878,13 +879,28 @@ void handle_dcc(struct gg_dcc *d)
 			}
 			break;	
 
+		case GG_EVENT_DCC_CALLBACK:
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_CALLBACK\n");
+			
+			for (l = transfers; l; l = l->next) {
+				struct transfer *t = l->data;
+
+				if (t->uin == d->peer_uin && !t->dcc) {
+					t->dcc = d;
+					gg_dcc_set_type(d, t->type);
+					break;
+				}
+			}
+			
+			break;	
+
 		case GG_EVENT_DCC_NEED_FILE_INFO:
 			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_NEED_FILE_INFO\n");
 
 			for (l = transfers; l; l = l->next) {
 				struct transfer *t = l->data;
 
-				if (t->uin == d->peer_uin || !t->dcc) {
+				if (t->dcc == d) {
 					if (gg_dcc_fill_file_info(d, t->filename) == -1) {
 						gg_debug(GG_DEBUG_MISC, "## gg_dcc_fill_file_info() failed (%s)\n", strerror(errno));
 						my_printf("dcc_open_error", t->filename);
@@ -893,8 +909,6 @@ void handle_dcc(struct gg_dcc *d)
 						gg_free_dcc(d);
 						break;
 					}
-					t->dcc = d;
-					t->type = GG_SESSION_DCC_SEND;
 					break;
 				}
 			}
@@ -930,6 +944,7 @@ void handle_dcc(struct gg_dcc *d)
 			
 		case GG_EVENT_DCC_NEED_VOICE_ACK:
 			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_NEED_VOICE_ACK\n");
+#ifdef HAVE_VOIP
 			/* ¿eby nie sprawdza³o, póki luser nie odpowie */
 			list_remove(&watches, d, 0);
 
@@ -948,7 +963,19 @@ void handle_dcc(struct gg_dcc *d)
 			t->type = GG_SESSION_DCC_VOICE;
 
 			my_printf("dcc_voice_offer", format_user(t->uin), itoa(t->id));
+#else
+			list_remove(&watches, d, 1);
+			remove_transfer(d);
+			gg_free_dcc(d);
+#endif
+			break;
 
+		case GG_EVENT_DCC_VOICE_DATA:
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_VOICE_DATA\n");
+
+#ifdef HAVE_VOIP
+			voice_play(e->event.dcc_voice_data.data, e->event.dcc_voice_data.length);
+#endif
 			break;
 			
 		case GG_EVENT_DCC_DONE:
@@ -976,6 +1003,7 @@ void handle_dcc(struct gg_dcc *d)
 					my_printf("dcc_error_unknown", "");
 			}
 			list_remove(&watches, d, 0);
+			remove_transfer(d);
 			gg_free_dcc(d);
 			break;
 	}
@@ -985,3 +1013,34 @@ void handle_dcc(struct gg_dcc *d)
 	return;
 }
 
+/*
+ * handle_voice()
+ *
+ * obs³uga danych przychodz±cych z urz±dzenia wej¶ciowego.
+ *
+ * brak.
+ */
+void handle_voice()
+{
+#ifdef HAVE_VOIP
+	struct list *l;
+	struct gg_dcc *d = NULL;
+	char buf[GG_DCC_VOICE_FRAME_LENGTH];
+	
+	for (l = transfers; l; l = l->next) {
+		struct transfer *t = l->data;
+
+		if (t->type == GG_SESSION_DCC_VOICE && t->dcc && (t->dcc->state == GG_STATE_READING_VOICE_HEADER || t->dcc->state == GG_STATE_READING_VOICE_SIZE || t->dcc->state == GG_STATE_READING_VOICE_DATA)) {
+			d = t->dcc;
+			break;
+		}
+	}
+
+	if (!d)
+		return;
+
+	voice_record(buf, sizeof(buf));		/* XXX b³êdy */
+
+	gg_dcc_voice_send(d, buf, sizeof(buf));	/* XXX b³êdy */
+#endif /* HAVE_VOIP */
+}

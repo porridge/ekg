@@ -10,6 +10,10 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - mocna przebudowa kodu dcc. makra gg_read() i gg_write() odchudzi³y
   nieco kod i zwiêkszy³y odporno¶æ na b³êdy sieci. przygotowanie pod
   rozmowy g³osowe. (w)
+- zmiana API, dodane zdarzenie GG_EVENT_DCC_CALLBACK, po którym nale¿y
+  wywo³aæ gg_dcc_set_type() (w)
+- dodane <gsm.h> i -lgsm, je¶li s± w systemie. teoretycznie obs³uguje
+  rozmowy g³osowe, ale nie testowano dobrze. (w)
 
 // 2002-06-13
 

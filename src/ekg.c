@@ -62,6 +62,7 @@ static struct {
 	{ GG_SESSION_DCC_SOCKET, (void (*)(void*)) handle_dcc, },
 	{ GG_SESSION_DCC_SEND, (void (*)(void*)) handle_dcc, },
 	{ GG_SESSION_DCC_GET, (void (*)(void*)) handle_dcc, },
+	{ GG_SESSION_DCC_VOICE, (void (*)(void*)) handle_dcc, },
 	{ GG_SESSION_SEARCH, (void (*)(void*)) handle_search, },
 	{ GG_SESSION_REGISTER, (void (*)(void*)) handle_pubdir, },
 	{ GG_SESSION_PASSWD, (void (*)(void*)) handle_pubdir, },
@@ -69,6 +70,7 @@ static struct {
 	{ GG_SESSION_CHANGE, (void (*)(void*)) handle_pubdir, },
 	{ GG_SESSION_USERLIST_GET, (void (*)(void*)) handle_userlist, },
 	{ GG_SESSION_USERLIST_PUT, (void (*)(void*)) handle_userlist, },
+	{ GG_SESSION_USER2, (void (*)(void*)) handle_voice, },
 	{ -1, NULL, }, 
 };
 
@@ -322,14 +324,22 @@ int my_getc(FILE *f)
 					break;
 				}
 
+				if (c->type == GG_SESSION_USER2) {
+					handle_voice();
+					break;
+				}
+
 				for (i = 0; handlers[i].type != -1; i++)
 					if (c->type == handlers[i].type) {
 						(handlers[i].handler)(c);
 						break;
 					}
 
-				if (handlers[i].type == -1)
+				if (handlers[i].type == -1) {
 					printf("\n*** FATAL ERROR: Unknown session type. Application may fail.\n*** Mail this to the authors:\n*** ekg-" VERSION "/type=%d/state=%d/id=%d\n", c->type, c->state, c->id);
+					list_remove(&watches, c, 1);
+					break;
+				}
 				
 				break;
 			}

@@ -127,6 +127,10 @@ if test -d src; then
     AC_DEFINE(HAVE_RL_SET_KEY)
   fi
 
+  AC_CHECK_LIB(gsm, gsm_decode, [
+    AC_CHECK_HEADERS([linux/soundcard.h gsm.h])
+    LIBS="$LIBS -lgsm"])
+
   AC_ARG_WITH(ioctld,
     [  --with-ioctld           Compile with ioctld (Linux only)])
 

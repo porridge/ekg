@@ -170,7 +170,17 @@ musimy zwracaæ uwagê na nastêpuj±ce zdarzenia:
 		gg_dcc_free(klient);
 	}
 
-3) GG_EVENT_DCC_NEED_FILE_ACK -- klient chce wys³aæ nam plik. w strukturze
+3) GG_EVENT_DCC_CALLBACK -- poprosili¶my klienta, ¿eby siê z nami po³±czy³
+   za pomoc± gg_dcc_request() i on teraz pyta siê, czego chcemy. zaraz po
+   tym zdarzeniu nale¿y wywo³aæ funkcjê:
+
+	gg_dcc_set_type(klient, rodzaj_po³±czenia);
+
+   gdzie rodzaj to GG_SESSION_DCC_SEND albo GG_SESSION_DCC_VOICE. je¶li
+   wysy³amy plik, mo¿na od razu wywo³aæ gg_dcc_fill_file_info(), ale nie
+   jest to wymagane. kiedy przyjdzie pora, libgadu sama nas o to poprosi.
+
+4) GG_EVENT_DCC_NEED_FILE_ACK -- klient chce wys³aæ nam plik. w strukturze
    gg_dcc->file_info znajduj± siê wszystkie informacje na temat pliku, jak
    jego nazwa, rozmiar, atrybuty, data i czas utworzenia itp. je¶li nie
    chcemy pliku, zamykamy po³±czenie w podobny sposób jak przy braku
@@ -179,7 +189,7 @@ musimy zwracaæ uwagê na nastêpuj±ce zdarzenia:
    deskryptora zapisujemy do gg_dcc->file_fd. dalej libgadu zajmie siê
    transferem.
 
-4) GG_EVENT_DCC_NEED_FILE_INFO -- wcze¶niej poprosili¶my drug± stronê by
+5) GG_EVENT_DCC_NEED_FILE_INFO -- wcze¶niej poprosili¶my drug± stronê by
    siê z nami po³±czy³a, bo jest za maskarad±, a my chcemy wys³aæ plik.
    w tym wypadku mo¿emy albo sami wype³niæ strukturê gg_dcc->file_info,
    któr± biblioteka wy¶le drugiej stronie, albo skorzystaæ z funkcji
@@ -191,14 +201,15 @@ musimy zwracaæ uwagê na nastêpuj±ce zdarzenia:
 		gg_dcc_free(klient);
 	}
 
-5) GG_EVENT_DCC_DONE -- zakoñczono transfer, mo¿na ju¿ nie patrzeæ na
+6) GG_EVENT_DCC_DONE -- zakoñczono transfer, mo¿na ju¿ nie patrzeæ na
    deskryptor i zwolniæ pamiêæ po po³±czeniu.
 
-6) GG_EVENT_DCC_ERROR -- b³±d. mo¿liwy kod b³êdu to GG_ERROR_DCC_HANDSHAKE
+7) GG_EVENT_DCC_ERROR -- b³±d. mo¿liwy kod b³êdu to GG_ERROR_DCC_HANDSHAKE
    gdy nie powiod³o siê ustanowienie po³±czenia z klientem, GG_ERROR_DCC_NET
    kiedy nie uda³o siê wys³aæ lub odczytaæ czego¶ z socketa, GG_ERROR_DCC_FILE
    gdy nie mo¿na by³o odczytaæ albo zapisaæ do pliku, GG_ERROR_DCC_EOF gdy
-   plik lub po³±czenie zbyt wcze¶nie siê skoñczy.
+   plik lub po³±czenie zbyt wcze¶nie siê skoñczy, GG_ERROR_DCC_REFUSED gdy
+   u¿ytkownik po drugiej stronie odmówi³ po³±czenia.
 
 tutaj równie¿ nale¿y pamiêtaæ o wywo³ywaniu gg_event_free().
 

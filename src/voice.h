@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -17,25 +17,14 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef __EVENTS_H
-#define __EVENTS_H
+#ifndef __VOICE_H
+#define __VOICE_H
 
-#include "libgadu.h"
+int voice_fd;
 
-struct handler {
-	int type;
-	void (*handler)(struct gg_event *e);
-};
-
-void handle_event(struct gg_session *s);
-void handle_dcc(struct gg_dcc *s);
-void handle_msg(struct gg_event *e);
-void handle_voice();
-
-void handle_search(struct gg_http *s);
-void handle_pubdir(struct gg_http *s);
-void handle_userlist(struct gg_http *s);
-
-void handle_disconnect(struct gg_event *e);
+int voice_open();
+void voice_close();
+int voice_play(char *buf, int length);
+int voice_record(char *buf, int length);
 
 #endif

@@ -734,9 +734,11 @@ void init_theme()
 	add_format("dcc_show_pending_header", "%> Po³±czenia oczekuj±ce:\n", 1);
 	add_format("dcc_show_pending_send", "%) #%1, %2, wysy³anie %W%3%n\n", 1);
 	add_format("dcc_show_pending_get", "%) #%1, %2, odbiór %W%3%n\n", 1);
+	add_format("dcc_show_pending_voice", "%) #%1, %2, rozmowa\n", 1);
 	add_format("dcc_show_active_header", "%> Po³±czenia aktywne:\n", 1);
 	add_format("dcc_show_active_send", "%) #%1, %2, wysy³anie %W%3%n\n", 1);
 	add_format("dcc_show_active_get", "%) #%1, %2, odbiór %W%3%n\n", 1);
+	add_format("dcc_show_active_voice", "%) #%1, %2, rozmowa\n", 1);
 	add_format("dcc_show_empty", "%> Brak bezpo¶rednich po³±czeñ\n", 1);
 	add_format("dcc_show_debug", "%> id=%1, type=%2, filename=%3, uin=%4, dcc=%5\n", 1);
 	
@@ -744,6 +746,8 @@ void init_theme()
 	add_format("dcc_done_send", "%> Zakoñczono wysy³anie pliku %W%2%n do %1\n", 1);
 	
 	add_format("dcc_get_offer", "%) %1 przesy³a plik %W%2%n o rozmiarze %W%3%n\n%) Wpisz %Wdcc get #%4%n by go odebraæ, lub %Wdcc close #%4%n by anulowaæ\n", 1);
+	add_format("dcc_voice_offer", "%) %1 chce rozmawiaæ%) Wpisz %Wdcc voice #%2%n by rozpocz±æ rozmowê, lub %Wdcc close #%2%n by anulowaæ\n", 1);
+	add_format("dcc_voice_unsupported", "%) Nie wkompilowano obs³ugi rozmów g³osowych. Przeczytaj %Wdocs/voip.txt%n\n", 1);
 	add_format("dcc_get_not_found", "%! Nie znaleziono po³±czenia %W%1%n\n", 1);
 	add_format("dcc_get_getting", "%) Rozpoczêto pobieranie pliku %W%2%n od %1\n", 1);
 	add_format("dcc_get_cant_create", "%! Nie mo¿na utworzyæ pliku %W%1%n\n", 1);

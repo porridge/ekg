@@ -12,7 +12,7 @@ MAKE = @MAKE@
 AR = @AR@
 INSTALL = @INSTALL@
 
-OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o ekg.o ../lib/libgadu.a
+OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o voice.o ekg.o ../lib/libgadu.a
 
 #
 

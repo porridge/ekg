@@ -20,6 +20,14 @@
 #undef HAVE_RL_GET_SCREEN_SIZE
 #undef HAVE_RL_SET_KEY
 
+/* voice stuff */
+#undef HAVE_LINUX_SOUNDCARD_H
+#undef HAVE_GSM_H
+
+#if defined(HAVE_LINUX_SOUNDCARD_H) && defined(HAVE_GSM_H)
+#define HAVE_VOIP
+#endif
+
 /* silly types */
 #undef HAVE_INT8_T
 #undef HAVE_U_INT8_T
@@ -53,4 +61,3 @@ typedef int int32_t;
 #define HAVE_U_INT32_T 1
 typedef unsigned int u_int32_t;
 #endif
-
