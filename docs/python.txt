@@ -8,6 +8,11 @@ niewiele jeszcze dzia³a. w zasadzie to prawie nic. przyk³adowy skrypt:
    import ekg
    ekg.printf("generic", "Jestem skryptem w Pythonie!")
    ekg.command("msg 123 hej!")
+   ekg.disconnect()
+   ekg.config.uin = 12345
+   ekg.config.password = "test123"
+   ekg.connect()
+
 
 który ³adujemy komend± ,,_load test.py''. nic wiêcej.
 

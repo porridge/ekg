@@ -23,5 +23,7 @@
 int python_initialize();
 int python_finalize();
 int python_load(const char *filename);
+int python_function(const char *name);
+int python_exec(const char *command);
 
 #endif /* __PYTHON_H */

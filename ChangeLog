@@ -11,6 +11,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   u¿ywalnym bêdzie dopiero za pó³ roku. szczegó³y w docs/python.txt (w)
 - dodane timery, które przydadz± siê w skryptach. do tego mo¿na nimi
   zarz±dzaæ komend± ,,timer'' (w)
+- dalsze psucie pythona. dodanie przyk³adowego skryptu. dodanie komendy
+  _py, która wykona kod w pythonie (w)
 
 // 2002-08-19
 

@@ -2208,6 +2208,16 @@ COMMAND(cmd_test_load)
 
 	return 0;
 }
+
+COMMAND(cmd_test_python)
+{
+	if (!params[0])
+		print("not_enough_params");
+	else
+		python_exec(params[0]);
+
+	return 0;
+}
 #endif
 
 /*
@@ -2600,6 +2610,9 @@ void command_init()
 	command_add
 	( "_load", "?", cmd_test_load, 0, "", "",
 	  "£aduje skrypt");
+	command_add
+	( "_py", "?", cmd_test_python, 0, "", "",
+	  "Wykonuje polecenie Pythona");
 #endif
 }
 
