@@ -469,9 +469,32 @@ static char **my_completion(char *text, int start, int end)
  */
 static void ui_readline_print(const char *target, int separate, const char *line)
 {
-        int old_end = rl_end, id = 0;
-	char *old_prompt = NULL;
+        int old_end = rl_end, id = 0, in_esc_code;
+	char *old_prompt = NULL; 
+	const char *p;
+	string_t s = NULL;
 	
+	if (config_speech_app)
+		s = string_init(NULL);
+
+	in_esc_code = 0;
+	for (p = line; *p; p++) {
+		if (*p == '\n')
+			pager_lines++;
+
+		if (*p == 27) 
+			in_esc_code = 1;
+
+		/* zak³adamy, ¿e 'm' koñczy eskejpow± sekwencje */
+		if (in_esc_code && *p == 'm') {
+			in_esc_code = 0;
+			continue;
+		}
+			
+		if (config_speech_app && !in_esc_code) 
+			string_append_c(s, *p);
+	}
+
 	/* znajd¼ odpowiednie okienko i ewentualnie je utwórz */
 	if (target && separate)
 		id = window_find_query(target);
@@ -483,12 +506,12 @@ static void ui_readline_print(const char *target, int separate, const char *line
         if (id && id != window_current->id) {
                 window_write(id, line);
                 /* XXX trzeba jeszcze waln±æ od¶wie¿enie prompta */
-                return;
+                goto done;
         }
 
 	/* je¶li mamy ukrywaæ wszystko, wychodzimy */
 	if (pager_lines == -2)
-		return;
+		goto done;
 
 	window_write(window_current->id, line);
 
@@ -509,12 +532,6 @@ static void ui_readline_print(const char *target, int separate, const char *line
 	printf("%s", line);
 
 	if (pager_lines >= 0) {
-		const char *p;
-
-		for (p = line; *p; p++)
-			if (*p == '\n')
-				pager_lines++;
-
 		if (pager_lines >= screen_lines - 2) {
 			char *tmp;
 			const char *prompt = format_find("readline_more");
@@ -534,14 +551,30 @@ static void ui_readline_print(const char *target, int separate, const char *line
 			printf("\033[A\033[K");		/* XXX */
 		}
 	}
-	
+
 	/* je¶li jeste¶my w readline, poka¿ z powrotem prompt */
-        if (in_readline) {
-                rl_end = old_end;
+	if (in_readline) {
+		rl_end = old_end;
 		rl_set_prompt(old_prompt);
 		xfree(old_prompt);
 		rl_forced_update_display();
-        }
+	}
+	
+done:
+	/* say it! ;) */
+	if (config_speech_app) {
+		char *tmp = saprintf("%s 2>/dev/null", config_speech_app);
+		FILE *f = popen(tmp, "w");
+		
+		xfree(tmp);
+
+		if (f) {
+			fprintf(f, "%s.", s->str);
+			fclose(f);
+		}
+
+		string_free(s, 1);
+	}
 }
 
 /*

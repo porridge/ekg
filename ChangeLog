@@ -9,7 +9,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - poprawienie wielolinijkowych wiadomo¶ci w ui-readline (d)
 - drobna poprawka w syntezie mowy (d)
-
+- synteza mowy w ui-readline (d)
+	
 // 2002-10-15
 
 - dodanie syntezy mowy, szczegó³y w README. uprzedzaj±c pytania, dzia³a
