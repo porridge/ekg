@@ -746,12 +746,15 @@ COMMAND(cmd_exec)
 		}
 
 		if (!(pid = fork())) {
+			dup2(open("/dev/null", O_RDONLY), 0);
+
 			if (fd[1]) {
 				close(fd[0]);
 				dup2(fd[1], 2);
 				dup2(fd[1], 1);
 				close(fd[1]);
 			}	
+
 			execl("/bin/sh", "sh", "-c", ((command[0] == '^' && strlen(command) > 1) ? command + 1 : command), (void *) NULL);
 			exit(1);
 		}

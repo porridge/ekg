@@ -1803,29 +1803,22 @@ char *strip_spaces(char *line)
  */
 int play_sound(const char *sound_path)
 {
-	int pid;
+	char *params[2];
+	int res;
 
 	if (!config_sound_app || !sound_path) {
 		errno = EINVAL;
 		return -1;
 	}
 
-	if ((pid = fork()) == -1)
-		return -1;
+	params[0] = saprintf("%s %s", config_sound_app, sound_path);
+	params[1] = NULL;
 
-	if (!pid) {
-		int i;
+	res = cmd_exec("exec", (const char**) params, NULL, 1);
 
-		for (i = 0; i < 255; i++)
-			close(i);
-			
-		execlp(config_sound_app, config_sound_app, sound_path, (void *) NULL);
-		exit(1);
-	}
+	xfree(params[0]);
 
-	process_add(pid, "\003");
-
-	return 0;
+	return res;
 }
 
 /*

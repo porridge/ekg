@@ -48,6 +48,7 @@ void command_free();
 int command_exec(const char *target, const char *line, int quiet);
 
 COMMAND(cmd_alias_exec);
+COMMAND(cmd_exec);
 
 /*
  * jaka¶ malutka lista tych, do których by³y wysy³ane wiadomo¶ci.
