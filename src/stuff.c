@@ -76,11 +76,7 @@
 #endif
 
 #ifndef PATH_MAX
-#  ifdef _POSIX_PATH_MAX
-#    define PATH_MAX _POSIX_PATH_MAX
-#  else
-#    define PATH_MAX 255
-#  endif
+#  define PATH_MAX _POSIX_PATH_MAX
 #endif
 
 struct gg_session *sess = NULL;

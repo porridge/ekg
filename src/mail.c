@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#if !defined(HAVE_UTIMES) && defined(HAVE_UTIME)
+#ifndef HAVE_UTIMES
 #  include <utime.h>
 #endif
 
@@ -239,7 +239,7 @@ int check_mail_mbox()
 				utimes(m->fname, foo);
 			}
 
-#elif defined(HAVE_UTIME)
+#else
 			{
 				struct utimbuf foo;
 

@@ -424,13 +424,13 @@ char color_map(unsigned char r, unsigned char g, unsigned char b);
 char *strcasestr(const char *haystack, const char *needle);
 
 /* makra, dziêki którym pozbywamy siê warning'ów */
-#define xisxdigit(c) isxdigit((int) c)
-#define xisdigit(c) isdigit((int) c)
-#define xisalpha(c) isalpha((int) c)
-#define xisalnum(c) isalnum((int) c)
-#define xisspace(c) isspace((int) c)
-#define xtolower(c) tolower((int) c)
-#define xtoupper(c) toupper((int) c)
+#define xisxdigit(c) isxdigit((int) (unsigned char) c)
+#define xisdigit(c) isdigit((int) (unsigned char) c)
+#define xisalpha(c) isalpha((int) (unsigned char) c)
+#define xisalnum(c) isalnum((int) (unsigned char) c)
+#define xisspace(c) isspace((int) (unsigned char) c)
+#define xtolower(c) tolower((int) (unsigned char) c)
+#define xtoupper(c) toupper((int) (unsigned char) c)
 
 struct timer *timer_add(time_t period, int persistent, int type, int at, const char *name, const char *command);
 int timer_remove(const char *name, int at, const char *command);

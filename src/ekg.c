@@ -72,15 +72,7 @@
 #include "xmalloc.h"
 
 #ifndef PATH_MAX
-#  ifdef _POSIX_PATH_MAX
-#    define PATH_MAX _POSIX_PATH_MAX
-#  else
-#    define PATH_MAX 255
-#  endif
-#endif
-
-#ifndef WEXITSTATUS
-#  define WEXITSTATUS(status)	((unsigned int) (status) >> 8)
+#  define PATH_MAX _POSIX_PATH_MAX
 #endif
 
 static pid_t ekg_pid = 0;
