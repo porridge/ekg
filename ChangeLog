@@ -10,6 +10,7 @@ zg³osi³ b³±d.
 
 - kosmetyka komunikatów o b³êdach przy /ignore i /block (sz)
 - przeniesienie obs³ugi logowania i /last do log.c (sz)
+- poprawka dokumentacji zmiennych (embe/w)
 
 // 2003-03-23
 
