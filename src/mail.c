@@ -258,20 +258,7 @@ int check_mail_mbox()
 			else
 				s = saprintf("%d,%d\n", m->fhash, f_new);
 
-			{
-				int sent = 0, left = strlen(s);
-				char *ptr = s;
-
-				while (left > 0) {
-					sent = write(fd[1], ptr, sizeof(ptr));
-	
-					if (sent == -1)
-						break;
-
-					left -= sent;
-					ptr += sent;
-				}
-			}
+			write(fd[1], s, strlen(s));
 
 			xfree(s);
 
@@ -339,43 +326,31 @@ int check_mail_maildir()
 			struct mail_folder *m = l->data;
 			char *tmp = saprintf("%s/new", m->fname);
 
-			if (!(dir = opendir(tmp))) {
-				xfree(tmp);
-				continue;
-			}
+			if ((dir = opendir(tmp)) != NULL) {
 
-			while ((d = readdir(dir))) {
-				char *fname = saprintf("%s/%s", tmp, d->d_name);
-				struct stat st;
+				while ((d = readdir(dir))) {
+					char *fname = saprintf("%s/%s", tmp, d->d_name);
+					struct stat st;
 
-				if (d->d_name[0] != '.' && !stat(fname, &st) && S_ISREG(st.st_mode))
-					d_new++;
+					if (d->d_name[0] != '.' && !stat(fname, &st) && S_ISREG(st.st_mode))
+						d_new++;
 
-				xfree(fname);
-			}
+					xfree(fname);
+				}
+			
+				closedir(dir);
+
+			} else
+				d_new = 0;
 	
 			xfree(tmp);
-			closedir(dir);
 
-			if (!l->next)
-				s = saprintf("%d,%d", m->fhash, d_new);
-			else
+			if (l->next)
 				s = saprintf("%d,%d\n", m->fhash, d_new);
+			else
+				s = saprintf("%d,%d", m->fhash, d_new);
 
-			{
-				int sent = 0, left = strlen(s);
-				char *ptr = s;
-
-				while (left > 0) {
-					sent = write(fd[1], ptr, sizeof(ptr));
-
-					if (sent == -1)
-						break;
-
-					left -= sent;
-					ptr += sent;
-				}
-			}
+			write(fd[1], s, strlen(s));
 
 			xfree(s);
 
@@ -508,6 +483,7 @@ void changed_check_mail_folders(const char *var)
 
 		xfree(f);
 	}
+
 }
 
 /*

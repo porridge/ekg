@@ -248,9 +248,9 @@ static void get_line_from_pipe(struct gg_exec *c)
 			if (strlen(line) > 1 && line[strlen(line) - 1] == '\r')
 				line[strlen(line) - 1] = 0;
 
-			if (c->type == GG_SESSION_USER4)
+			if (c->type == GG_SESSION_USER4) {
 				check_mail_update(line, 1);
-			else if (!c->quiet) {
+			} else if (!c->quiet) {
 				switch (c->msg) {
 					case 0:
 						print_window(c->target, 0, "exec", line, itoa(c->id));
@@ -277,9 +277,9 @@ static void get_line_from_pipe(struct gg_exec *c)
 
 	if ((ret == -1 && errno != EAGAIN) || ret == 0) {
 		if (c->buf->len) {
-			if (c->type == GG_SESSION_USER4)
+			if (c->type == GG_SESSION_USER4) {
 				check_mail_update(c->buf->str, 0);
-			else if (!c->quiet) {
+			} else if (!c->quiet) {
 				switch (c->msg) {
 					case 0:
 						print_window(c->target, 0, "exec", c->buf->str, itoa(c->id));
