@@ -2333,17 +2333,20 @@ COMMAND(cmd_remind)
 
 COMMAND(cmd_query)
 {
-	if (params[0] && !get_uin(params[0])) {
-		print("user_not_found", params[0]);
-		return;
-	}
-
 	if (params[0] && (params[0][0] == '@' || strchr(params[0], ','))) {
 		struct conference *c = conference_create(params[0]);
-
-		ui_event("command", "query", c->name, NULL);
-	} else
-		ui_event("command", "query", params[0], NULL);
+		
+		if (c)
+			ui_event("command", "query", c->name, NULL);
+		else
+			return;
+	} else {
+		if (params[0] && !get_uin(params[0])) {
+			print("user_not_found", params[0]);
+			return;
+		} else
+			ui_event("command", "query", params[0], NULL);
+	}
 		
 	if (params[1])
 		cmd_msg("chat", params);
@@ -3289,8 +3292,9 @@ void command_init()
 	  
 	command_add
 	( "query", "u?", cmd_query, 0,
-	  " <numer/alias> [wiadomo¶æ]", "w³±cza rozmowê z dan± osob±",
-	  "");
+	  " <numer/alias/@grupa> [wiadomo¶æ]", "w³±cza rozmowê z dan± osob±",
+	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub\n"
+	  "pseudonimy przecinkiem (ale bez odstêpów).");
 
 	command_add
 	( "queue", "uu", cmd_queue, 0,
