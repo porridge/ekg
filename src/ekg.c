@@ -52,6 +52,7 @@
 #include "xmalloc.h"
 #include "ui.h"
 #include "python.h"
+#include "msgqueue.h"
 #ifdef HAVE_OPENSSL
 #  include "sim.h"
 #endif

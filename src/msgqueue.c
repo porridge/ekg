@@ -45,7 +45,7 @@ list_t msg_queue = NULL;
  * 
  * msg_class - typ wiadomo¶ci,
  * msg_seq - numer sekwencyjny,
- * uin_count - ilo¶c adresatów,
+ * uin_count - ilo¶æ adresatów,
  * uins - adresaci wiadomo¶ci,
  * msg - wiadomo¶æ,
  * secure - czy ma byæ zaszyfrowana.
@@ -249,7 +249,7 @@ int msg_queue_write()
 		if (m->msg_seq != -1)
 			continue;
 
-		fn = saprintf("%s/%d.%d", path, m->time, num++);
+		fn = saprintf("%s/%ld.%d", path, (long) m->time, num++);
 
 		if (!(f = fopen(fn, "w"))) {
 			xfree(fn);
@@ -261,7 +261,7 @@ int msg_queue_write()
 		for (i = 0; i < m->uin_count; i++)
 			fprintf(f, "%d\n", m->uins[i]);
 
-		fprintf(f, "%d\n%ld\n%s", m->secure, m->time, m->msg);
+		fprintf(f, "%d\n%ld\n%s", m->secure, (long) m->time, m->msg);
 
 		fclose(f);
 
@@ -327,7 +327,7 @@ int msg_queue_read()
 			fscanf(f, "%d\n", &m.uins[i]);
 
 		fscanf(f, "%d\n", &m.secure);
-		fscanf(f, "%ld\n", &m.time);
+		fscanf(f, "%ld\n", (long *) &m.time);
 
 		/* dziwny plik? */
 		if (!m.time || !m.msg_seq || !m.msg_class) {
@@ -362,4 +362,3 @@ int msg_queue_read()
 
 	return 0;
 }
-
