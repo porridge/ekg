@@ -2801,7 +2801,7 @@ void window_kill(struct window *w, int quiet)
 		for (l = windows; l; l = l->next) {
 			struct window *w = l->data;
 
-			if (w->id > id)
+			if (w->id > 1 && w->id > id)
 				w->id--;
 		}
 	}
@@ -2978,12 +2978,13 @@ static int ui_ncurses_event(const char *event, ...)
 
 		if (!strcasecmp(name, "sort_windows") && config_sort_windows) {
 			list_t l;
-			int id = 1;
+			int id = 2;
 
 			for (l = windows; l; l = l->next) {
 				struct window *w = l->data;
 				
-				w->id = id++;
+				if (w->id > 1)
+					w->id = id++;
 			}
 		}
 
