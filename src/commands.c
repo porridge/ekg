@@ -287,6 +287,10 @@ COMMAND(cmd_add)
 		remove_send_nick(itoa(uin));
 		config_changed = 1;
 		ui_event("userlist_changed", itoa(uin), params[1], NULL);
+		if (uin == config_uin) {
+			update_status();
+			update_status_myip();
+		}
 	}
 
 	if (params[2])
