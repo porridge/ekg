@@ -10,6 +10,7 @@ zg³osi³ b³±d.
 
 - poprawione zachowanie zmiennych ui-ncurses przy w³±czonym ui-readline
   (kbns/w)
+- kosmetyka /list, nie wyswietla wlasnego IP przy braku polaczenia (sz)
 
 // 2003-01-13
 

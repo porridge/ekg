@@ -3473,6 +3473,9 @@ void update_status_myip()
 
 	if (!u)
 		return;
+
+	if (!sess || sess->state != GG_STATE_CONNECTED)
+		goto fail;
 	
 	if (config_dcc && config_dcc_ip) {
 		list_t l;
@@ -3483,7 +3486,7 @@ void update_status_myip()
 			struct sockaddr_in foo;
 			int bar = sizeof(foo);
 
-			if (!sess || getsockname(sess->fd, (struct sockaddr *) &foo, &bar))
+			if (getsockname(sess->fd, (struct sockaddr *) &foo, &bar))
 				goto fail;
 
 			u->ip.s_addr = foo.sin_addr.s_addr; 
@@ -3500,11 +3503,12 @@ void update_status_myip()
 			}
 		}
 
-	} else {
-fail:
-		u->ip.s_addr = inet_addr("0.0.0.0");
-		u->port = 0;
+		return;
 	}
+
+fail:
+	memset(&u->ip, 0, sizeof(struct in_addr));
+	u->port = 0;
 }
 
 /*

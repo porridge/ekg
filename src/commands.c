@@ -1235,14 +1235,13 @@ COMMAND(cmd_block)
 COMMAND(cmd_list)
 {
 	list_t l;
-	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, show_descr = 0, show_blocked = 0, show_offline = 0, j, p;
+	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, show_descr = 0, show_blocked = 0, show_offline = 0, j;
 	char **argv = NULL, *show_group = NULL, *ip_str;
 	const char *tmp;
 
 	if (params[0] && *params[0] != '-') {
 		char *status, *groups;
 		struct userlist *u;
-		struct in_addr in;
 
 		/* list @grupa */
 		if (params[0][0] == '@' && strlen(params[0]) > 1) {
@@ -1286,16 +1285,7 @@ COMMAND(cmd_list)
 
 		groups = group_to_string(u->groups, 0);
 
-		p = u->port;
-		
-		if (u->uin == config_uin || GG_S_A(u->status) || GG_S_B(u->status))
-			in.s_addr = u->ip.s_addr;
-		else {
-			in.s_addr = inet_addr("0.0.0.0");
-			p = 0;
-		}
-
-		ip_str = saprintf("%s:%s", inet_ntoa(in), itoa(p));
+		ip_str = saprintf("%s:%s", inet_ntoa(u->ip), itoa(u->port));
 
 		print("user_info", (u->nickname) ? u->nickname : u->display, itoa(u->uin), status, ip_str, u->first_name, u->last_name, u->display, u->mobile, groups);
 		
