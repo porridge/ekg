@@ -3458,7 +3458,7 @@ fail:
 void change_status(int status, const char *arg, int autom)
 {
 	const char *filename, *config_x_reason, *format, *format_descr, *auto_format = NULL, *auto_format_descr = NULL;
-	int random_mask, away1, away2, status_descr;
+	int random_mask, status_descr;
 	char *reason = NULL, *tmp = NULL;
 
 	switch (status) {
@@ -3467,8 +3467,6 @@ void change_status(int status, const char *arg, int autom)
 			random_mask = 1;
 			filename = "away.reasons";
 			config_x_reason = config_away_reason;
-			away1 = 3;
-			away2 = 1;
 			format = "away";
 			format_descr = "away_descr";
 			auto_format = "auto_away";
@@ -3479,8 +3477,6 @@ void change_status(int status, const char *arg, int autom)
 			random_mask = 4;
 			filename = "back.reasons";
 			config_x_reason = config_back_reason;
-			away1 = 4;
-			away2 = 0;
 			format = "back";
 			format_descr = "back_descr";
 			auto_format = "auto_back";
@@ -3491,8 +3487,6 @@ void change_status(int status, const char *arg, int autom)
 			random_mask = 8;
 			filename = "quit.reasons";
 			config_x_reason = config_quit_reason;
-			away1 = 5;
-			away2 = 2;
 			format = "invisible";
 			format_descr = "invisible_descr";
 			break;
@@ -3501,8 +3495,6 @@ void change_status(int status, const char *arg, int autom)
 			random_mask = 8;
 			filename = "quit.reasons";
 			config_x_reason = config_quit_reason;
-			away1 = 5;
-			away2 = 2;
 			format = "invisible";
 			format_descr = "invisible_descr";
 			break;
