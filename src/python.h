@@ -45,6 +45,6 @@ int python_exec(const char *command);
 int python_run(const char *filename);
 int python_list();
 int python_function(const char *function, const char *arg);
-int python_autorun()
+void python_autorun();
 
 #endif /* __PYTHON_H */

@@ -19,6 +19,8 @@
  */
 
 #include <Python.h>
+#include <sys/types.h>
+#include <dirent.h>
 #include "xmalloc.h"
 #include "stuff.h"
 #include "themes.h"
@@ -411,7 +413,50 @@ int python_function(const char *function, const char *arg)
 	return -1;
 }
 
-int python_autorun()
+void python_autorun()
 {
-	return -1;
+	const char *path = prepare_path("scripts/autorun", 0);
+	struct dirent *d;
+	struct stat st;
+	char *tmp;
+	DIR *dir;
+	
+	if (!(dir = opendir(path)))
+		return;
+
+	/* nale¿y utworzyæ plik ~/.gg/scripts/autorun/__init__.py, inaczej
+	 * python nie bêdzie mo¿na ³adowaæ skryptów przez ,,autorun.nazwa'' */
+	
+	tmp = saprintf("%s/__init__.py", path);
+
+	if (stat(tmp, &st)) {
+		FILE *f = fopen(tmp, "w");
+		if (f)
+			fclose(f);
+	}
+
+	xfree(tmp);
+
+	while ((d = readdir(dir))) {
+		tmp = saprintf("%s/%s", path, d->d_name);
+
+		if (stat(tmp, &st) || S_ISDIR(st.st_mode)) {
+			xfree(tmp);
+			continue;
+		}
+
+		xfree(tmp);
+
+		if (strlen(d->d_name) < 3 || strcmp(d->d_name + strlen(d->d_name) - 3, ".py"))
+			continue;
+
+		tmp = saprintf("autorun.%s", d->d_name);
+		tmp[strlen(tmp) - 3] = 0;
+
+		python_load(tmp);
+
+		xfree(tmp);
+	}
+
+	closedir(dir);
 }

@@ -84,6 +84,11 @@ klawiszach, wys³anej linii itp.)
 
 ***
 
+skrypty umieszczone w katalogu ~/.gg/scripts/autorun bêd± ³adowane
+automagicznie przy starcie ekg.
+
+***
+
 przyk³ady u¿ycia modu³u ekg w skryptach:
 
    ekg.printf("generic", "Jestem skryptem w Pythonie!")
