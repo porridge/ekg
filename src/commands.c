@@ -583,6 +583,7 @@ COMMAND(cmd_del)
 	struct userlist *u;
 	const char *tmp;
 	char *nick;
+	char type;
 	uin_t uin = 0;
 	int del_all = ((params[0] && !strcmp(params[0], "*")) ? 1 : 0);
 
@@ -605,7 +606,7 @@ COMMAND(cmd_del)
 			l = l->next;
 
 			if (sess)
-				gg_remove_notify(sess, uin);
+				gg_remove_notify_ex(sess, uin, userlist_type(u));
 			userlist_remove(u);
 		}
 
@@ -618,10 +619,12 @@ COMMAND(cmd_del)
 	nick = xstrdup(u->display);
 	tmp = format_user(u->uin);
 
+	type = userlist_type(u);
+
 	if (!userlist_remove(u)) {
 		printq("user_deleted", tmp);
 		if (sess)
-			gg_remove_notify(sess, uin);
+			gg_remove_notify_ex(sess, uin, type);
 		remove_send_nick(itoa(uin));
 		remove_send_nick(nick);
 		config_changed = 1;
@@ -1158,7 +1161,7 @@ COMMAND(cmd_modify)
 				}
 			}
 
-			gg_remove_notify(sess, u->uin);
+			gg_remove_notify_ex(sess, u->uin, userlist_type(u));
 			userlist_clear_status(u->uin);
 
 			u->uin = new_uin;
