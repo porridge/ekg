@@ -308,12 +308,25 @@ server
 	lub spacjami. po dwukropku mo¿na podaæ port serwera.
 
 sms_away
-	typ: bool
+	typ: liczba
 	domy¶lna warto¶æ: 0
 
 	w³±czenie tej opcji powoduje wysy³anie otrzymanych wiadomo¶ci na
 	telefon komórkowy podczas nieobecno¶ci (stan ,,zajêty''). wymaga
 	zdefiniowania zmiennych ,,sms_number'' i ,,sms_send_app''.
+
+	je¿eli warto¶ci± jest 1, to zmienna ''sms_away_limit'' (je¶li ró¿na
+	od 0) dotyczyæ bêdzie ³±cznej liczby wiadomo¶ci wys³anych na telefon
+	komórkowy. warto¶æ 2, z kolei, wskazuje na to, ¿e limit dotyczy
+	ilo¶ci wiadomo¶ci od ka¿dej osoby.
+
+sms_away_limit
+	typ: liczba
+	domy¶lna warto¶æ: 0
+
+	okre¶la limit wiadomo¶ci, które mog± zostaæ wys³ane na telefon
+	komórkowy podczas naszej nieobecno¶ci. je¶li 0, to wiadomo¶ci nie
+	s± limitowane.	
 
 sms_max_length
 	typ: liczba
