@@ -27,30 +27,32 @@
 #include "libgadu.h"
 
 /*
- * gg_search50_new()
+ * gg_pubdir50_new()
  *
- * tworzy now± zmienn± typu gg_search50_t.
+ * tworzy now± zmienn± typu gg_search_t.
  *
  * zaalokowana zmienna lub NULL w przypadku braku pamiêci.
  */
-gg_search50_t gg_search50_new()
+gg_pubdir50_t gg_pubdir50_new(int type)
 {
-	gg_search50_t res = malloc(sizeof(struct gg_pubdir50_s));
+	gg_pubdir50_t res = malloc(sizeof(struct gg_pubdir50_s));
 
-	gg_debug(GG_DEBUG_FUNCTION, "** gg_search50_new();\n");
+	gg_debug(GG_DEBUG_FUNCTION, "** gg_pubdir50_new(%d);\n", type);
 
 	if (!res) {
-		gg_debug(GG_DEBUG_MISC, "// gg_search50_new() out of memory\n");
+		gg_debug(GG_DEBUG_MISC, "// gg_pubdir50_new() out of memory\n");
 		return NULL;
 	}
 
 	memset(res, 0, sizeof(struct gg_pubdir50_s));
 
+	res->type = type;
+
 	return res;
 }
 
 /*
- * gg_search50_add_n()  // funkcja wewnêtrzna
+ * gg_pubdir50_add_n()  // funkcja wewnêtrzna
  *
  * funkcja dodaje pole do zapytania lub odpowiedzi.
  *
@@ -61,26 +63,26 @@ gg_search50_t gg_search50_new()
  *
  * 0/-1
  */
-int gg_search50_add_n(gg_search50_t req, int num, const char *field, const char *value)
+int gg_pubdir50_add_n(gg_pubdir50_t req, int num, const char *field, const char *value)
 {
 	struct gg_pubdir50_entry *tmp = NULL, *entry;
 	char *dupfield, *dupvalue;
 
-	gg_debug(GG_DEBUG_FUNCTION, "** gg_search50_add_n(%p, %d, \"%s\", \"%s\");\n", req, num, field, value);
+	gg_debug(GG_DEBUG_FUNCTION, "** gg_pubdir50_add_n(%p, %d, \"%s\", \"%s\");\n", req, num, field, value);
 
 	if (!(dupfield = strdup(field))) {
-		gg_debug(GG_DEBUG_MISC, "// gg_search50_add_n() out of memory\n");
+		gg_debug(GG_DEBUG_MISC, "// gg_pubdir50_add_n() out of memory\n");
 		return -1;
 	}
 
 	if (!(dupvalue = strdup(value))) {
-		gg_debug(GG_DEBUG_MISC, "// gg_search50_add_n() out of memory\n");
+		gg_debug(GG_DEBUG_MISC, "// gg_pubdir50_add_n() out of memory\n");
 		free(dupfield);
 		return -1;
 	}
 
 	if (!(tmp = realloc(req->entries, sizeof(struct gg_pubdir50_entry) * (req->entries_count + 1)))) {
-		gg_debug(GG_DEBUG_MISC, "// gg_search50_add_n() out of memory\n");
+		gg_debug(GG_DEBUG_MISC, "// gg_pubdir50_add_n() out of memory\n");
 		free(dupfield);
 		free(dupvalue);
 		return -1;
@@ -99,7 +101,7 @@ int gg_search50_add_n(gg_search50_t req, int num, const char *field, const char 
 }
 
 /*
- * gg_search50_add()
+ * gg_pubdir50_add()
  *
  * funkcja dodaje pole do zapytania.
  *
@@ -109,19 +111,19 @@ int gg_search50_add_n(gg_search50_t req, int num, const char *field, const char 
  *
  * 0/-1
  */
-int gg_search50_add(gg_search50_t req, const char *field, const char *value)
+int gg_pubdir50_add(gg_pubdir50_t req, const char *field, const char *value)
 {
-	return gg_search50_add_n(req, 0, field, value);
+	return gg_pubdir50_add_n(req, 0, field, value);
 }
 
 /*
- * gg_search50_free()
+ * gg_pubdir50_free()
  *
  * zwalnia pamiêæ po zapytaniu lub rezultacie szukania u¿ytkownika.
  *
  *  - s - zwalniana zmienna,
  */
-void gg_search50_free(gg_search50_t s)
+void gg_pubdir50_free(gg_pubdir50_t s)
 {
 	int i;
 
@@ -137,7 +139,7 @@ void gg_search50_free(gg_search50_t s)
 }
 
 /*
- * gg_search50()
+ * gg_pubdir50()
  *
  * wysy³a zapytanie katalogu publicznego do serwera.
  *
@@ -146,23 +148,23 @@ void gg_search50_free(gg_search50_t s)
  *
  * numer sekwencyjny wyszukiwania lub 0 w przypadku b³êdu.
  */
-uint32_t gg_search50(struct gg_session *sess, gg_search50_t req)
+uint32_t gg_pubdir50(struct gg_session *sess, gg_pubdir50_t req)
 {
 	int i, size = 5;
 	uint32_t res;
 	char *buf, *p;
 	struct gg_pubdir50_request *r;
 
-	gg_debug(GG_DEBUG_FUNCTION, "** gg_search50(%p, %p);\n", sess, req);
+	gg_debug(GG_DEBUG_FUNCTION, "** gg_pubdir50(%p, %p);\n", sess, req);
 	
 	if (!sess || !req) {
-		gg_debug(GG_DEBUG_MISC, "// gg_search50() invalid arguments\n");
+		gg_debug(GG_DEBUG_MISC, "// gg_pubdir50() invalid arguments\n");
 		errno = EFAULT;
 		return 0;
 	}
 
 	if (sess->state != GG_STATE_CONNECTED) {
-		gg_debug(GG_DEBUG_MISC, "// gg_search50() not connected\n");
+		gg_debug(GG_DEBUG_MISC, "// gg_pubdir50() not connected\n");
 		errno = ENOTCONN;
 		return 0;
 	}
@@ -177,13 +179,13 @@ uint32_t gg_search50(struct gg_session *sess, gg_search50_t req)
 	}
 
 	if (!(buf = malloc(size))) {
-		gg_debug(GG_DEBUG_MISC, "// gg_search50() out of memory (%d bytes)\n", size);
+		gg_debug(GG_DEBUG_MISC, "// gg_pubdir50() out of memory (%d bytes)\n", size);
 		return 0;
 	}
 
 	r = (struct gg_pubdir50_request*) buf;
 	res = time(NULL);
-	r->type = GG_PUBDIR50_SEARCH_REQUEST;
+	r->type = req->type;
 	r->seq = fix32(time(NULL));
 
 	for (i = 0, p = buf + 5; i < req->entries_count; i++) {
@@ -206,47 +208,59 @@ uint32_t gg_search50(struct gg_session *sess, gg_search50_t req)
 }
 
 /*
- * gg_search50_handle_reply()  // funkcja wewnêtrzna
+ * gg_pubdir50_handle_reply()  // funkcja wewnêtrzna
  *
- * analizuje przychodz±cy pakiet odpowiedzi i zapisuje wynik wyszukiwania
- * w struct gg_event.
+ * analizuje przychodz±cy pakiet odpowiedzi i zapisuje wynik w struct gg_event.
  *
- *  - e - opis zdarzenia,
- *  - packet - zawarto¶æ pakietu odpowiedzi,
- *  - length - d³ugo¶æ pakietu odpowiedzi.
+ *  - e - opis zdarzenia
+ *  - packet - zawarto¶æ pakietu odpowiedzi
+ *  - length - d³ugo¶æ pakietu odpowiedzi
  *
  * 0/-1
  */
-int gg_search50_handle_reply(struct gg_event *e, const char *packet, int length)
+int gg_pubdir50_handle_reply(struct gg_event *e, const char *packet, int length)
 {
 	const char *end = packet + length, *p;
-	struct gg_pubdir50_reply *r;
-	gg_search50_t res;
+	struct gg_pubdir50_reply *r = (struct gg_pubdir50_reply*) packet;
+	gg_pubdir50_t res;
 	int num = 0;
 	
-	gg_debug(GG_DEBUG_FUNCTION, "** gg_search50_handle_reply(%p, %p, %d);\n", e, packet, length);
+	gg_debug(GG_DEBUG_FUNCTION, "** gg_pubdir50_handle_reply(%p, %p, %d);\n", e, packet, length);
 
 	if (!e || !packet) {
-		gg_debug(GG_DEBUG_MISC, "// gg_search50_handle_reply() invalid arguments\n");
+		gg_debug(GG_DEBUG_MISC, "// gg_pubdir50_handle_reply() invalid arguments\n");
 		errno = EINVAL;
 		return -1;
 	}
 
 	if (length < 5) {
-		gg_debug(GG_DEBUG_MISC, "// gg_search50_handle_reply() packet too short\n");
+		gg_debug(GG_DEBUG_MISC, "// gg_pubdir50_handle_reply() packet too short\n");
 		errno = EINVAL;
 		return -1;
 	}
 
-	if (!(res = gg_search50_new())) {
-		gg_debug(GG_DEBUG_MISC, "// gg_search50_handle_reply() unable to allocate reply\n");
+	if (!(res = gg_pubdir50_new(r->type))) {
+		gg_debug(GG_DEBUG_MISC, "// gg_pubdir50_handle_reply() unable to allocate reply\n");
 		return -1;
 	}
 
-	e->event.search50 = res;
+	e->event.pubdir50 = res;
 
-	r = (struct gg_pubdir50_reply*) packet;
 	res->seq = fix32(r->seq);
+
+	switch (res->type) {
+		case GG_PUBDIR50_READ:
+			e->type = GG_EVENT_PUBDIR50_READ;
+			break;
+
+		case GG_PUBDIR50_WRITE:
+			e->type = GG_EVENT_PUBDIR50_WRITE;
+			break;
+
+		default:
+			e->type = GG_EVENT_PUBDIR50_SEARCH_REPLY;
+			break;
+	}
 
 	/* pomiñ pocz±tek odpowiedzi */
 	p = packet + 5;
@@ -284,7 +298,7 @@ int gg_search50_handle_reply(struct gg_event *e, const char *packet, int length)
 		 * przez \0 */
 
 		if (p == end) {
-			gg_debug(GG_DEBUG_MISC, "// gg_search50_handle_reply() premature end of packet\n");
+			gg_debug(GG_DEBUG_MISC, "// gg_pubdir50_handle_reply() premature end of packet\n");
 			goto failure;
 		}
 
@@ -296,7 +310,7 @@ int gg_search50_handle_reply(struct gg_event *e, const char *packet, int length)
 			res->next = atoi(value);
 			num--;
 		} else {
-			if (gg_search50_add_n(res, num, field, value) == -1)
+			if (gg_pubdir50_add_n(res, num, field, value) == -1)
 				goto failure;
 		}
 	}	
@@ -306,12 +320,12 @@ int gg_search50_handle_reply(struct gg_event *e, const char *packet, int length)
 	return 0;
 
 failure:
-	gg_search50_free(res);
+	gg_pubdir50_free(res);
 	return -1;
 }
 
 /*
- * gg_search50_get()
+ * gg_pubdir50_get()
  *
  * pobiera informacjê z rezultatu wyszukiwania.
  *
@@ -321,15 +335,15 @@ failure:
  *
  * warto¶æ pola lub NULL, je¶li nie znaleziono.
  */
-const char *gg_search50_get(gg_search50_t res, int num, const char *field)
+const char *gg_pubdir50_get(gg_pubdir50_t res, int num, const char *field)
 {
 	char *value = NULL;
 	int i;
 
-	gg_debug(GG_DEBUG_FUNCTION, "** gg_search50_field(%p, %d, \"%s\");\n", res, num, field);
+	gg_debug(GG_DEBUG_FUNCTION, "** gg_pubdir50_get(%p, %d, \"%s\");\n", res, num, field);
 
 	if (!res || num < 0 || !field) {
-		gg_debug(GG_DEBUG_MISC, "// gg_search50_field() invalid arguments\n");
+		gg_debug(GG_DEBUG_MISC, "// gg_pubdir50_get() invalid arguments\n");
 		errno = EINVAL;
 		return NULL;
 	}
@@ -345,44 +359,58 @@ const char *gg_search50_get(gg_search50_t res, int num, const char *field)
 }
 
 /*
- * gg_search50_count()
+ * gg_pubdir50_count()
  *
- * zwraca ilo¶æ znalezionych osób.
+ * zwraca ilo¶æ wyników danego zapytania.
  *
- *  - res - wynik szukania.
+ *  - res - odpowied¼
  *
  * ilo¶æ lub -1 w przypadku b³êdu.
  */
-int gg_search50_count(gg_search50_t res)
+int gg_pubdir50_count(gg_pubdir50_t res)
 {
 	return (!res) ? -1 : res->count;
 }
 
 /*
- * gg_search50_next()
+ * gg_pubdir50_type()
+ *
+ * zwraca rodzaj zapytania lub odpowiedzi.
+ *
+ *  - res - zapytanie lub odpowied¼
+ *
+ * ilo¶æ lub -1 w przypadku b³êdu.
+ */
+int gg_pubdir50_type(gg_pubdir50_t res)
+{
+	return (!res) ? -1 : res->type;
+}
+
+/*
+ * gg_pubdir50_next()
  *
  * zwraca numer, od którego nale¿y rozpocz±æ kolejne wyszukiwanie, je¶li
  * zale¿y nam na kolejnych wynikach.
  *
- *  - res - wynik szukania.
+ *  - res - odpowied¼
  *
  * numer lub -1 w przypadku b³êdu.
  */
-uin_t gg_search50_next(gg_search50_t res)
+uin_t gg_pubdir50_next(gg_pubdir50_t res)
 {
 	return (!res) ? -1 : res->next;
 }
 
 /*
- * gg_search50_seq()
+ * gg_pubdir50_seq()
  *
- * zwraca numer sekwencyjny wyszukiwania.
+ * zwraca numer sekwencyjny zapytania lub odpowiedzi.
  *
- *  - res - wynik szukania.
+ *  - res - zapytanie lub odpowied¼
  *
  * numer lub -1 w przypadku b³êdu.
  */
-uint32_t gg_search50_seq(gg_search50_t res)
+uint32_t gg_pubdir50_seq(gg_pubdir50_t res)
 {
 	return (!res) ? -1 : res->seq;
 }

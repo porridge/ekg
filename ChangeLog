@@ -12,6 +12,9 @@ zg³osi³ b³±d.
 - kosmetyka themów dla /private (sz)
 - prawid³owe ustawianie stanu po ¶ci±gniêciu konfiguracji z serwera (sz)
 - poprawka ,,display_transparent'' (kotek/sz)
+- libgadu: dodanie nowego API do obs³ugi katalogu publicznego w stylu
+  GG 5.0. przyk³adowe API gg_search50*() zosta³o zachowanie, póki co,
+  i jest zgodne na poziomie ABI, ale bêdzie usuniête (Chilek/w)
 
 // 2003-01-14
 

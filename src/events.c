@@ -64,7 +64,7 @@ static struct handler handlers[] = {
 	{ GG_EVENT_CONN_SUCCESS, handle_success },
 	{ GG_EVENT_CONN_FAILED, handle_failure },
 	{ GG_EVENT_DISCONNECT, handle_disconnect },
-	{ GG_EVENT_SEARCH50_REPLY, handle_search50 },
+	{ GG_EVENT_PUBDIR50_SEARCH_REPLY, handle_search50 },
 	{ 0, NULL }
 };
 
@@ -1625,34 +1625,34 @@ void handle_voice(struct gg_common *c)
  */
 void handle_search50(struct gg_event *e)
 {
-	gg_search50_t res = e->event.search50;
+	gg_pubdir50_t res = e->event.pubdir50;
 	int i, count;
 
-	if ((count = gg_search50_count(res)) < 1) {
+	if ((count = gg_pubdir50_count(res)) < 1) {
 		print("search_not_found");
 		return;
 	}
 
 	for (i = 0; i < count; i++) {
-		const char *__fmnumber = gg_search50_get(res, i, "fmnumber");
+		const char *__fmnumber = gg_pubdir50_get(res, i, "fmnumber");
 		const char *uin = (__fmnumber) ? __fmnumber : "?";
 
-		const char *__firstname = gg_search50_get(res, i, "firstname");
+		const char *__firstname = gg_pubdir50_get(res, i, "firstname");
 		char *firstname = xstrdup((__firstname) ? __firstname : "");
 
-		const char *__lastname = gg_search50_get(res, i, "lastname");
+		const char *__lastname = gg_pubdir50_get(res, i, "lastname");
 		char *lastname = xstrdup((__lastname) ? __lastname : "");
 		
-		const char *__nickname = gg_search50_get(res, i, "nickname");
+		const char *__nickname = gg_pubdir50_get(res, i, "nickname");
 		char *nickname = xstrdup((__nickname) ? __nickname : "");
 
-		const char *__fmstatus = gg_search50_get(res, i, "fmstatus");
+		const char *__fmstatus = gg_pubdir50_get(res, i, "fmstatus");
 		int status = (__fmstatus) ? atoi(__fmstatus) : GG_STATUS_NOT_AVAIL;
 
-		const char *__birthyear = gg_search50_get(res, i, "birthyear");
+		const char *__birthyear = gg_pubdir50_get(res, i, "birthyear");
 		const char *birthyear = (__birthyear && strcmp(__birthyear, "0")) ? __birthyear : "-";
 
-		const char *__city = gg_search50_get(res, i, "city");
+		const char *__city = gg_pubdir50_get(res, i, "city");
 		char *city = xstrdup((__city) ? __city : "");
 
 		char *name, *active, *gender;
