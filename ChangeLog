@@ -30,6 +30,14 @@ zg³osi³ b³±d.
 - dodanie parametru do /save, który mówi, gdzie zapisaæ konfiguracjê (w)
 - po uruchomieniu drugiej sesji ekg nie bêdzie próbowa³o siê ³±czyæ
   ponownie (fidor/w)
+- obs³uga kolorów. niestety ze wzglêdu na niewielk± ilo¶æ kolorów na
+  terminalu ANSI bêd± problemy z odwzorowaniem prawdziwej barwy. poza
+  tym, mog± wyst±piæ problemy z atrybutami i kolorami na tym samym
+  tek¶cie (np. zielony i podkre¶lony). kolory w wysy³anych wiadomo¶ciach
+  wybiera siê przez wci¶niêcie Ctrl-R i wpisaniu za tym numeru koloru
+  (od 0 do 15). koniec kolorowej sekwencji to samo Ctrl-R. ka¿dy kolor
+  nale¿y koñczyæ. klawisz Ctrl-R jest tymczasowy, dopóki nie znajdê
+  sposobu na obs³u¿enie Ctrl-C w ncurses (w)
 
 // 2002-01-31
 

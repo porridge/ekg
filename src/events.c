@@ -116,7 +116,9 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 				formatmap[pos] = color_map(p[i + 3], p[i + 4], p[i + 5]);				
 				if (formatmap[pos] == 'k')
 					formatmap[pos] = 'n';
-			} else if ((p[i + 2] & 7) || !p[i + 2])
+			}
+
+			if ((p[i + 2] & 7) || !p[i + 2] || !(p[i + 2] && GG_FONT_COLOR) || ((p[i + 2] & GG_FONT_COLOR) && !p[i + 3] && !p[i + 4] && !p[i + 5]))
 				formatmap[pos] = attrmap[p[i + 2] & 7];
 
 			i += (p[i + 2] & GG_FONT_COLOR) ? 6 : 3;

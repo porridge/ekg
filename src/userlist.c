@@ -118,7 +118,9 @@ int userlist_read()
 		u.groups = group_init(entry[5]);
 		u.status = GG_STATUS_NOT_AVAIL;
 
-		array_free(entry);
+		for (i = 0; i < 7; i++)
+			xfree(entry[i]);
+		xfree(entry);
 
 		xfree(buf);
 

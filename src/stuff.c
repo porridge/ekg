@@ -181,6 +181,7 @@ int config_header_size = 0;
 int config_statusbar_size = 1;
 char *config_proxy_forwarding = NULL;
 int config_password_cp1250 = 0;
+char *config_interface = NULL;
 
 struct event_label event_labels[] = {
 	{ EVENT_MSG, "msg" },
@@ -2580,10 +2581,10 @@ void mesg_changed()
 int msg_encrypt(uin_t uin, unsigned char **msg)
 {
 #ifdef HAVE_OPENSSL
-	unsigned char *enc = xmalloc(4096);	/* XXX idiotyzm */
 	int len;
 		
 	if (config_encryption == 1) {
+		unsigned char *enc = xmalloc(4096);	/* XXX idiotyzm */
 		memset(enc, 0, 4096);
 		
 		len = SIM_Message_Encrypt(*msg, enc, strlen(*msg), uin);
@@ -3804,7 +3805,7 @@ const char *ekg_status_label(int status, const char *prefix)
 	return buf;
 }
 
-struct color_map default_color_map[16] = {
+struct color_map default_color_map[26] = {
 	{ 'k', 0, 0, 0 },
 	{ 'r', 168, 0, 0, },
 	{ 'g', 0, 168, 0, },
@@ -3820,7 +3821,19 @@ struct color_map default_color_map[16] = {
 	{ 'B', 0, 0, 255, },
 	{ 'M', 255, 0, 255, },
 	{ 'C', 0, 255, 255, },
-	{ 'W', 255, 255, 255, }
+	{ 'W', 255, 255, 255, },
+
+	/* dodatkowe mapowanie ró¿nych kolorów istniej±cych w GG */
+	{ 'C', 128, 255, 255, },
+	{ 'G', 128, 255, 128, },
+	{ 'M', 255, 128, 255, },
+	{ 'B', 128, 128, 255, },
+	{ 'R', 255, 128, 128, },
+	{ 'Y', 255, 255, 128, }, 
+	{ 'm', 168, 128, 168, },
+	{ 'c', 128, 168, 168, },
+	{ 'g', 64, 168, 64, },
+	{ 'm', 128, 64, 128, }
 };
 
 /*
@@ -3839,7 +3852,7 @@ char color_map(unsigned char r, unsigned char g, unsigned char b)
 	fprintf(stderr, "color=%.2x%.2x%.2x\n", r, g, b);
 
 #define __sq(x) ((x)*(x))
-	for (i = 0; i < 16; i++) {
+	for (i = 0; i < 26; i++) {
 		unsigned long dist = __sq(r - map[i].r) + __sq(g - map[i].g) + __sq(b - map[i].b);
 
 		fprintf(stderr, "%d(%c)=%.2x%.2x%.2x, dist=%ld\n", i, map[i].color, map[i].r, map[i].g, map[i].b, dist);

@@ -300,7 +300,7 @@ char *batch_line;
 int immediately_quit;
 int ekg_segv_handler;
 int ioctld_sock;
-struct color_map default_color_map[16];
+struct color_map default_color_map[16+10];
 
 int alias_add(const char *string, int quiet, int append);
 int alias_remove(const char *name, int quiet);

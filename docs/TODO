@@ -9,7 +9,6 @@ lista rzeczy, które TRZEBA zrobiæ przed wydaniem wersji 1.0:
   - uaktualniæ dokumentacjê: opis API, protoko³u,
 
 * klient:
-  - obs³uga kolorowego tekstu.
   - poprawiæ getopt(), ¿eby rozumia³ ,,--back "powód"'',
   - sensowna obs³uga kluczy dla SIM.
 

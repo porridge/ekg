@@ -3082,6 +3082,8 @@ static void binding_parse(struct binding *b, const char *action)
 	__action("ignore-query", binding_ignore_query);
 
 #undef __action
+
+	array_free(args);
 }
 
 /*

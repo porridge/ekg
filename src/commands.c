@@ -1780,15 +1780,30 @@ COMMAND(cmd_msg)
 		for (i = 0; i < strlen(params[1]); i++, p++) {
 			unsigned char rgb[3];
 
-			if (*p == 3) {
+			if (*p == 18) {
 				if (!(attr & GG_FONT_COLOR)) {
 					int num = atoi(p + 1);
+					
 					if (num < 0 || num > 15)
 						num = 0;
+
+					p++;
+
+					if (isdigit(*p)) {
+						p++;
+						i++;
+					}
+
+					if (isdigit(*p)) {
+						p++;
+						i++;
+					}
+
 					rgb[0] = default_color_map[num].r;
 					rgb[1] = default_color_map[num].g;
 					rgb[2] = default_color_map[num].b;
 				}
+
 				attr ^= GG_FONT_COLOR;
 			}
 
@@ -1801,19 +1816,29 @@ COMMAND(cmd_msg)
 
 			if (*p >= 32 || *p == 13 || *p == 10 || *p == 9) {
 				if (attr != last_attr) {
+					int color = 0;
+
 					if (!format) {
 						format = xmalloc(3);
 						format[0] = 2;
 						formatlen = 3;
 					}
 
-					format = xrealloc(format, formatlen + 3);
+					if ((attr & GG_FONT_COLOR))
+						color = 1;
+
+					if ((last_attr & GG_FONT_COLOR) && !(attr & GG_FONT_COLOR)) {
+						color = 1;
+						memset(rgb, 0, 3);
+					}
+
+					format = xrealloc(format, formatlen + ((color) ? 6 : 3));
 					format[formatlen] = (msglen & 255);
 					format[formatlen + 1] = ((msglen >> 8) & 255);
-					format[formatlen + 2] = attr;
+					format[formatlen + 2] = attr | ((color) ? GG_FONT_COLOR : 0);
 
-					if ((attr & GG_FONT_COLOR)) {
-						memcpy(format + formatlen + 3, rgb, sizeof(rgb));
+					if (color) {
+						memcpy(format + formatlen + 3, rgb, 3);
 						formatlen += 6;
 					} else
 						formatlen += 3;
@@ -3017,7 +3042,7 @@ COMMAND(cmd_remind)
 
 COMMAND(cmd_query)
 {
-	char **p = xmalloc(sizeof(params));
+	char **p = xcalloc(3, sizeof(char*));
 	int i, res = 0;
 
 	for (i = 0; params[i]; i++)
