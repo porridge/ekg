@@ -10,6 +10,9 @@ d - drg, sz - szalik).
   u¿ywa teraz AC_CHECK_HEADERS, zamiast sprawdzania obecno¶ci plików
   (pliszka/w)
 - poprawka tematu ostatniej obecno¶ci (rmrmg/w)
+- libgadu: niezainicjowana zmienna mog³a powodowaæ wywrotki w fazie
+  ³±czenia na systemach, gdzie strerror() potrafi zwróciæ NULL, np.
+  SunOS (w,sz)
 
 // 2003-06-23
 
