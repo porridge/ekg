@@ -10,7 +10,7 @@ zg³osi³ b³±d.
 
 - kosmetyka kodu usuwania niektórych list (sz)
 - dalsza kosmetyka /query (sz)
-- b³êdny zapis listy nicków w chat/msg/query wy¶wietli b³±d zamiast
+- b³êdny zapis listy nicków w chat/query wy¶wietli b³±d zamiast
   utworzenia bezsensownej konferencji (sz)
 - usuniêcie leaka przy /find (w)
 - libgadu: usuniêcie leaka przy http (w)
