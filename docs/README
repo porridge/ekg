@@ -134,14 +134,14 @@ KLAWIATURA
 
 	Page Up, Page Down	przewijanie ekranu
 	Ctrl-F, Ctrl-G		j.w.
-        Alt-N			utwórz nowe okno
+	Alt-N			utwórz nowe okno
 	Alt-K			zamknij aktualne okno
 	Alt-G			ignoruj aktualnego rozmówcê
 	Alt-Q do Alt-P		prze³±cza do okna 11 do 20
 	Ctrl-Fn			prze³±cza do podanego okna (konsola FreeBSD)
 	Ctrl-Enter		przej¶cie do trybu wielolinijkowego
 	Ctrl-P			poprzednie okno
-        Ctrl-N			kolejne okno
+	Ctrl-N			kolejne okno
 	F3			w³±cza lub wy³±cza listê kontaktów [1]
 	F4			kolejna grupa w li¶cie kontaktów
 
