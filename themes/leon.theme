@@ -70,8 +70,9 @@ list_busy %cBUS%n%n %W[%n%C?%n%W]%n %Y%[18]1%n [%K%[,-15]3%n]\n
 list_busy_descr %cBUS%n%n %W[%n%C?%n%W]%n %Y%[18]1%n [%K%[,-15]3%n] [%[26]5]\n
 list_empty %> %YTwoja lista jest pusta%n\n
 list_invisible %mINV%n %W[ ]%n %m%[18]1%n [%K%[,-15]3%n]\n
-list_not_avail_descr %RN/A%n %W[%n%R-%n%W]%n %R%[18]1%n [%R...............%n] [%[26]5]\n
+list_invisible_descr %mINV%n %W[ ]%n %m%[18]1%n [%K%[,-15]3%n] [%[26]5]\n
 list_not_avail %RN/A%n %W[%n%R-%n%W]%n %R%[18]1%n [%R...............%n]\n
+list_not_avail_descr %RN/A%n %W[%n%R-%n%W]%n %R%[18]1%n [%R...............%n] [%[26]5]\n
 message_footer %Y`----- ---- --- -- -%n\n
 message_header %> %1: %c(%Y%#%2%c)%n \n
 message_line_first,irc %c%3%n %G<%n%2%G>%n %1\n
