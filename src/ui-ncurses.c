@@ -512,7 +512,7 @@ static void update_contacts()
 		wattrset(contacts, COLOR_PAIR(3) | A_BOLD);
 		
 		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
-			mvwaddch(contacts, y, x + 2, u->display[x]);
+			mvwaddch(contacts, y, x + 2, (unsigned char) u->display[x]);
 
 		if (GG_S_D(u->status)) {
 			wattrset(contacts, COLOR_PAIR(16) | A_BOLD);
@@ -532,7 +532,7 @@ static void update_contacts()
 		wattrset(contacts, COLOR_PAIR(2));
 
 		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
-			mvwaddch(contacts, y, x + 2, u->display[x]);
+			mvwaddch(contacts, y, x + 2, (unsigned char) u->display[x]);
 
 		if (GG_S_D(u->status)) {
 			wattrset(contacts, COLOR_PAIR(16) | A_BOLD);
@@ -552,7 +552,7 @@ static void update_contacts()
 		wattrset(contacts, COLOR_PAIR(0));
 
 		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
-			mvwaddch(contacts, y, x + 2, u->display[x]);
+			mvwaddch(contacts, y, x + 2, (unsigned char) u->display[x]);
 
 		if (GG_S_D(u->status)) {
 			wattrset(contacts, COLOR_PAIR(16) | A_BOLD);

@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - tryb debugowania jest odnotowywany na pasku stanu (w)
 - usuniêcie leaka przy debugowaniu (w)
 - poprawka zapisywania szyfrowanych wiadomo¶ci do /last (szalik/w)
+- poprawka polskich liter w li¶cie kontaktów (kostoo/w)
 
 // 2002-11-16
 
