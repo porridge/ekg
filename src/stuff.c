@@ -1752,12 +1752,14 @@ struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int co
  *
  * - string - linia w formacie 'alias cmd',
  * - quiet - czy wypluwaæ mesgi na stdout.
+ * - append - czy dodajemy kolejn± komendê?
  */
 int alias_add(const char *string, int quiet, int append)
 {
 	char *cmd;
 	list_t l;
 	struct alias a;
+	char *params = NULL;
 
 	if (!string || !(cmd = strchr(string, ' '))) {
 		if (!quiet)
@@ -1776,7 +1778,21 @@ int alias_add(const char *string, int quiet, int append)
 					print("aliases_exist", string);
 				return -1;
 			} else {
+				list_t l;
+
 				list_add(&j->commands, cmd, strlen(cmd) + 1);
+				
+				/* przy wielu komendach trudno dope³niaæ, bo wg. której? */
+				for (l = commands; l; l = l->next) {
+					struct command *c = l->data;
+
+					if (!strcasecmp(c->name, j->name)) {
+						xfree(c->params);
+						c->params = xstrdup("?");
+						break;
+					}
+				}
+				
 				if (!quiet)
 					print("aliases_append", string);
 				return 0;
@@ -1791,13 +1807,18 @@ int alias_add(const char *string, int quiet, int append)
 			print("aliases_command", string);
 			return -1;
 		}
+
+		if (!strcasecmp(cmd, c->name))
+			params = xstrdup(c->params);
 	}
 
 	a.name = xstrdup(string);
 	a.commands = NULL;
 	list_add(&a.commands, cmd, strlen(cmd) + 1);
 	list_add(&aliases, &a, sizeof(a));
-	command_add(a.name, "?", cmd_alias_exec, 1, "", "", "");
+	command_add(a.name, (params) ? params : "?", cmd_alias_exec, 1, "", "", "");
+	
+	xfree(params);
 
 	if (!quiet)
 		print("aliases_add", a.name, "");
