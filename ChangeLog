@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-12-20
+
+- poprawka szukania nieprawid³owych nicków w li¶cie kontaktów (adderek/w)
+
 // 2003-12-02
 
 - poprawki zwi±zane z ,,auto_away''. dodanie zmiennej ,,auto_away_keep_descr'' (s_wilk/sz)

@@ -697,7 +697,7 @@ int valid_nick(const char *nick)
 			return 0;
 	}
 
-	if (nick[0] == '@' || nick[0] == '#' || strchr(nick, ','))
+	if (nick[0] == '@' || nick[0] == '#')
 		return 0;
 
 	return 1;
