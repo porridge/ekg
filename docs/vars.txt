@@ -336,7 +336,7 @@ events_delay
 	typ: liczba
 	domy¶lna warto¶æ: 3
 
-	okre¶la, po ilu sekundach od po³±czenia z serwerem, zaczn± dzia³aæ
+	okre¶la, po ilu sekundach od po³±czenia z serwerem zaczn± dzia³aæ
 	zdarzenia ,,on'' i d¼wiêki zwi±zane ze zmianami stanu. chodzi o to,
 	aby nie traktowaæ pocz±tkowych informacji o stanie osób po
 	po³±czeniu jako zmianê ich stanu.
@@ -361,8 +361,8 @@ last
 	typ: liczba
 	domy¶lna warto¶æ: 0
 
-	wskazuje czy zapisywaæ ostatnie wiadomo¶ci do podrêcznego bufora
-	(last_size musi byæ wiêksze od 0). dla 1, bêdzie zapisywaæ tylko
+	wskazuje, czy zapisywaæ ostatnie wiadomo¶ci do podrêcznego bufora
+	(,,last_size'' musi byæ wiêksze od 0). dla 1, bêdzie zapisywaæ tylko
 	last_size wszystkich wiadomo¶ci przychodz±cych, dla 2, last_size
 	wiadomo¶ci od ka¿dego usera. dostêpna jest jeszcze logiczna
 	warto¶æ 4, która pozwala logowaæ wiadomo¶ci wys³ane. dostêpne s±
@@ -372,13 +372,13 @@ last_size
 	typ: liczba
 	domy¶lna warto¶æ: 0
 
-	wskazuje ile ma byæ zapisywanych wiadomo¶ci dla komendy ,,last''.
+	wskazuje, ile ma byæ zapisywanych wiadomo¶ci dla komendy ,,last''.
 
 log
 	typ: liczba
 	domy¶lna warto¶æ: 0
 
-	okre¶la czy i w jaki sposób bêd± logowane wysy³ane i otrzymywane
+	okre¶la, czy i w jaki sposób bêd± logowane wysy³ane i otrzymywane
 	wiadomo¶ci. dla 0, nie bêd±. dla 1, bêd± logowane w pliku, który
 	okre¶la zmienna ,,log_path'' lub ,,~/.gg/history'' w przypadku
 	jej braku. dla 2, bêd± logowane w katalogu wskazanym przez zmienn±
@@ -392,13 +392,13 @@ log_ignored
 	typ: liczba
 	domy¶lna warto¶æ: 0
 
-	okre¶la czy logujemy ignorowane wiadomo¶ci.
+	okre¶la, czy logujemy ignorowane wiadomo¶ci.
 
 log_status
 	typ: bool
 	domy¶lna warto¶æ: 0
 
-	okre¶la czy bêd± logowane zmiany stanu ludzi z listy (zmienna
+	okre¶la, czy bêd± logowane zmiany stanu ludzi z listy (zmienna
 	,,log'' musi byæ ró¿na od 0)
 	
 log_path
