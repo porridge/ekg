@@ -6,6 +6,12 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2002-12-04
+
+- /list mo¿e ju¿ dodawaæ/usuwaæ z wielu grup (rodzielonych przecinkiem)
+  na raz. dodatkowo, nie dodaje ju¿ u¿ytkownika kilka razy do tej samej
+  grupy. kosmetyka (sz)
+
 // 2002-12-03
 
 - /list --member <grupa> wy¶wietla tylko cz³onków grupy (sz)

@@ -708,6 +708,7 @@ COMMAND(cmd_modify)
 	char **argv = NULL;
 	uin_t uin;
 	int i;
+	int modified = 0;
 
 	if (!params[0]) {
 		print("not_enough_params", name);
@@ -726,21 +727,25 @@ COMMAND(cmd_modify)
 		if (match_arg(argv[i], 'f', "first", 2) && argv[i + 1]) {
 			xfree(u->first_name);
 			u->first_name = xstrdup(argv[++i]);
+			modified = 1;
 		}
 		
 		if (match_arg(argv[i], 'l', "last", 2) && argv[i + 1]) {
 			xfree(u->last_name);
 			u->last_name = xstrdup(argv[++i]);
+			modified = 1;
 		}
 		
 		if (match_arg(argv[i], 'n', "nickname", 2) && argv[i + 1]) {
 			xfree(u->nickname);
 			u->nickname = xstrdup(argv[++i]);
+			modified = 1;
 		}
 		
 		if ((match_arg(argv[i], 'p', "phone", 2) || match_arg(argv[i], 'm', "mobile", 2)) && argv[i + 1]) {
 			xfree(u->mobile);
 			u->mobile = xstrdup(argv[++i]);
+			modified = 1;
 		}
 		
 		if (match_arg(argv[i], 'd', "display", 2) && argv[i + 1]) {
@@ -748,19 +753,38 @@ COMMAND(cmd_modify)
 			xfree(u->display);
 			u->display = xstrdup(argv[i]);
 			userlist_replace(u);
+			modified = 1;
 		}
 		
 		if (match_arg(argv[i], 'g', "group", 2) && argv[i + 1]) {
-			switch (*argv[++i]) {
-				case '-':
-					group_remove(u, argv[i] + 1);
-					break;
-				case '+':
-					group_add(u, argv[i] + 1);
-					break;
-				default:
-					group_add(u, argv[i]);
-			}
+			char **tmp = array_make(argv[++i], ",", 0, 1, 1);
+			int x;
+			
+			for (x = 0; tmp[x]; x++)
+				switch (*tmp[x]) {
+					case '-':
+						if (group_member(u, tmp[x] + 1)) {
+							group_remove(u, tmp[x] + 1);
+							modified = 1;
+						} else
+							print("group_member_not_yet", format_user(uin), tmp[x] + 1);
+						break;
+					case '+':
+						if (!group_member(u, tmp[x] + 1)) {
+							group_add(u, tmp[x] + 1);
+							modified = 1;
+						} else
+							print("group_member_already", format_user(uin), tmp[x] + 1);
+						break;
+					default:
+						if (!group_member(u, tmp[x])) {
+							group_add(u, tmp[x]);
+							modified = 1;
+						} else
+							print("group_member_already", format_user(uin), tmp[x]);
+				}
+
+			array_free(tmp);
 		}
 		
 		if (match_arg(argv[i], 'u', "uin", 2) && argv[i + 1]) {
@@ -772,24 +796,25 @@ COMMAND(cmd_modify)
 				return;
 			}	
 
-			if (sess)
-				gg_remove_notify(sess, u->uin);
-			
+			gg_remove_notify(sess, u->uin);
 			u->uin = new_uin;
-			
-			if (sess)
-				gg_add_notify(sess, u->uin);
+			gg_add_notify(sess, u->uin);
 
 			u->status = GG_STATUS_NOT_AVAIL;
 
 			ui_event("userlist_changed", u->display, u->display);
+			modified = 1;
 		}
 	}
 
-	if (strcasecmp(name, "add"))
-		print("modify_done", params[0]);
-
-	config_changed = 1;
+	if (strcasecmp(name, "add")) {
+		if (modified) {
+			print("modify_done", params[0]);
+			config_changed = 1;
+		} else
+			print("not_enough_params", name);
+	} else
+		config_changed = 1;
 
 	array_free(argv);
 }
@@ -940,22 +965,18 @@ COMMAND(cmd_list)
 				u = l->data;
 
 				if (u->groups) {
-					char *buf = group_to_string(u->groups);
-
-					if (!strcasecmp(buf, params[0]+1)) {
+					if (group_member(u, params[0]+1)) {
 						if (count++)
 							string_append(members, ", ");
 						string_append(members, u->display);
 					}
-
-					xfree(buf);
 				}
 			}
 			
 			if (count)
-				print("group_members", params[0], members->str);
+				print("group_members", params[0]+1, members->str);
 			else
-				print("group_empty", params[0]);
+				print("group_empty", params[0]+1);
 
 			string_free(members, 1);
 
@@ -969,7 +990,7 @@ COMMAND(cmd_list)
 
 		/* list <alias> [opcje] */
 		if (params[1]) {
-			cmd_modify("modify", params);
+			cmd_modify("list", params);
 			return;
 		}
 
@@ -3072,10 +3093,7 @@ void command_init()
 	  "  -a, --add <alias> <komenda>     dodaje alias\n"
           "  -A, --append <alias> <komenda>  dodaje komendê do aliasu\n"
 	  "  -d, --del <alias>               usuwa alias\n"
-	  " [-l, --list]                     wy¶wietla listê aliasów\n"
-	  "\n"
-	  "Uwaga! Usuniêcie aliasu przez samego siebie spowoduje naruszenie\n"
-	  "ochrony pamiêci.");
+	  " [-l, --list]                     wy¶wietla listê aliasów\n");
 	  
 	command_add
 	( "away", "?", cmd_away, 0,
@@ -3235,10 +3253,10 @@ void command_init()
           " [alias|@grupa|opcje]", "zarz±dzanie list± kontaktów",
 	  "\n"
 	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i|-d|-m]\":\n"
-	  "  -a, --active       dostêpne\n"
-	  "  -b, --busy         zajête\n"
-	  "  -i, --inactive     niedostêpne\n"
-	  "  -d, --description  osoby z opisem\n"
+	  "  -a, --active         dostêpne\n"
+	  "  -b, --busy           zajête\n"
+	  "  -i, --inactive       niedostêpne\n"
+	  "  -d, --description    osoby z opisem\n"
 	  "  -m, --member <grupa> osoby nale¿±ce do danej grupy\n"
 	  "\n"
 	  "Wy¶wietlanie cz³onków grupy: \"list @grupa\"\n"
@@ -3250,6 +3268,7 @@ void command_init()
 	  "  -d, --display <nazwa>     wy¶wietlana nazwa\n"
 	  "  -u, --uin <numerek>\n"
 	  "  -g, --group [+/-]<grupa>  dodaje lub usuwa z grupy\n"
+	  "                            mo¿na podaæ wiêcej grup po przecinku\n"
 	  "  -p, --phone <numer>       numer telefonu komórkowego\n"
 	  "\n"
 	  "Lista kontaktów na serwerze \"list [-p|-g]\":\n"

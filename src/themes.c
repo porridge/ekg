@@ -968,6 +968,8 @@ void theme_init()
 	format_add("user_info_invisible_descr", "%cniewidoczn%@1%n (%2)", 1);
 
 	format_add("group_members", "%) Grupa %T%1%n: %2\n", 1);
+	format_add("group_member_already", "%! %1 nale¿y ju¿ do grupy %T%2%n\n", 1);
+	format_add("group_member_not_yet", "%! %1 nie nale¿y do grupy %T%2%n\n", 1);
 
 	/* status */
 	format_add("show_status_profile", "%) Profil: %T%1%n\n", 1);
