@@ -51,6 +51,7 @@
 #include <ctype.h>
 #ifdef HAVE_OPENSSL
 #  include "sim.h"
+#  include "simlite.h"
 #endif
 #ifdef HAVE_ZLIB_H
 #  include <zlib.h>
@@ -988,20 +989,33 @@ int msg_encrypt(uin_t uin, unsigned char **msg)
 	unsigned char *enc = xmalloc(4096);	/* XXX idiotyzm */
 	int len;
 		
-	memset(enc, 0, 4096);
+	if (config_encryption == 1) {
+		memset(enc, 0, 4096);
 		
-	len = SIM_Message_Encrypt(*msg, enc, strlen(*msg), uin);
+		len = SIM_Message_Encrypt(*msg, enc, strlen(*msg), uin);
 		
-	gg_debug(GG_DEBUG_MISC, "// encrypted length: %d\n", len);
+		gg_debug(GG_DEBUG_MISC, "// encrypted length: %d\n", len);
 
-	if (len > 0) {
-		xfree(*msg);
-		*msg = enc;
-		gg_debug(GG_DEBUG_MISC, "// encrypted message: %s\n", enc);
-	} else
-		xfree(enc);
+		if (len > 0) {
+			xfree(*msg);
+			*msg = enc;
+			gg_debug(GG_DEBUG_MISC, "// encrypted message: %s\n", enc);
+		} else
+			xfree(enc);
 
-	return len;
+		return len;
+	} else {
+		char *res;
+
+		res = sim_message_encrypt(*msg, uin);
+		if (res) {
+			xfree(*msg);
+			*msg = res;
+			gg_debug(GG_DEBUG_MISC, "// simlite encrypted: %s\n", res);
+			return 1;
+		}
+		return 0;
+	}
 #else
 	return 0;
 #endif

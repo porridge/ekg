@@ -55,6 +55,7 @@
 #endif
 #ifdef HAVE_OPENSSL
 #  include "sim.h"
+#  include "simlite.h"
 #endif
 #include "msgqueue.h"
 
@@ -1524,7 +1525,7 @@ COMMAND(cmd_msg)
 	count = array_count(nicks);
 
 #ifdef HAVE_OPENSSL
-	if (config_encryption == 1 && array_count(nicks) == 1 && (uin = get_uin(nicks[0])) && (msg_encrypt(uin, &msg) > 0))
+	if (config_encryption && array_count(nicks) == 1 && (uin = get_uin(nicks[0])) && (msg_encrypt(uin, &msg) > 0))
 		secure = 1;
 #endif
 
@@ -2185,33 +2186,14 @@ COMMAND(cmd_version)
 #ifdef HAVE_OPENSSL
 COMMAND(cmd_test_keygen)
 {
-	RSA *key;
-	char *fn;
-	
-	if (!params[0]) {
-		print("not_enough_params", name);
-		return;
-	}
-	
 	print("generic", "Chwilka, generujê klucze...");
-	
-	key = SIM_RSA_GenKey(atoi(params[0]));
-
-	if (!key) {
-		print("generic", "Nie uda³o siê wygenerowaæ klucza");
-		return;
-	}
 
 	mkdir(prepare_path("keys", 1), 0700);
 
-	fn = saprintf("%s/private.pem", prepare_path("keys", 0));
-	SIM_RSA_WriteKey(key, fn, PRIVATE);
-	chmod(fn, 0400);
-	xfree(fn);
-
-	fn = saprintf("%s/%d.pem", prepare_path("keys", 0), config_uin);
-	SIM_RSA_WriteKey(key, fn, PUBLIC);
-	xfree(fn);
+	if (sim_key_generate(config_uin)) {
+		print("generic", "Nie uda³o siê wygenerowaæ klucza");
+		return;
+	}
 
 	print("generic", "Wygenerowano i zapisano klucze");
 }
@@ -3922,7 +3904,7 @@ void command_init()
 	  "wy¶wietla skrót zmiennych", "");
 #ifdef HAVE_OPENSSL
 	command_add
-	( "_keygen", "?", cmd_test_keygen, 0, " <ilo¶æ-bitów>",
+	( "_keygen", "", cmd_test_keygen, 0, "",
 	  "generuje parê kluczy", "");
 	command_add
 	( "_keysend", "u", cmd_test_keysend, 0, " <numer/alias>",

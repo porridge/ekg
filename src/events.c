@@ -43,6 +43,7 @@
 #include "ui.h"
 #ifdef HAVE_OPENSSL
 #  include "sim.h"
+#  include "simlite.h"
 #endif
 #include "msgqueue.h"
 #ifdef WITH_PYTHON
@@ -468,7 +469,7 @@ void handle_msg(struct gg_event *e)
 	}
 
 #ifdef HAVE_OPENSSL
-	if (config_encryption == 1 && !strncmp(e->event.msg.message, "-----BEGIN RSA PUBLIC KEY-----", 20)) {
+	if (config_encryption && !strncmp(e->event.msg.message, "-----BEGIN RSA PUBLIC KEY-----", 20)) {
 		char *name;
 		const char *target = (u) ? u->display : itoa(e->event.msg.sender);
 		FILE *f;
@@ -515,6 +516,17 @@ void handle_msg(struct gg_event *e)
 			gg_debug(GG_DEBUG_MISC, "// ekg: rsa decryption failed\n");
 		if (len == -3)
 			gg_debug(GG_DEBUG_MISC, "// ekg: magic number mismatch\n");
+	}
+
+	if (config_encryption == 2) {
+		char *msg = sim_message_decrypt(e->event.msg.message, e->event.msg.sender);
+
+		if (msg) {
+			strcpy(e->event.msg.message, msg);
+			xfree(msg);
+			secure = 1;
+		} else
+			gg_debug(GG_DEBUG_MISC, "// ekg: simlite decryption failed: %s\n", sim_strerror(sim_errno));
 	}
 #endif
 	

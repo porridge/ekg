@@ -13,6 +13,11 @@ zg³osi³ b³±d.
   dodano nowe formaty (w)
 - nag³ówek okna mo¿na opisaæ formatami ,,header<n>'', podobnie jak pasek
   stanu (w)
+- dodanie eksperymentalnego zamiennika sim.c. podczas testów wypada
+  trochê lepiej ni¿ orygina³, ze wzglêdu na brak zaawansowanych
+  algorytmów cache'owania kluczy. po prostu za ka¿dym razem generuje
+  nowy. kodu jest znacznie mniej i jest bardziej przejrzysty.
+  w³±czany przez ,,/set encryption 2'' (w)
 
 // 2003-01-09
 

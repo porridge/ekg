@@ -58,6 +58,7 @@
 #include "mail.h"
 #ifdef HAVE_OPENSSL
 #  include "sim.h"
+#  include "simlite.h"
 #endif
 
 #ifndef PATH_MAX
@@ -1047,6 +1048,7 @@ int main(int argc, char **argv)
 #ifdef HAVE_OPENSSL
 	SIM_KC_Init();
 	strncpy(SIM_Key_Path, prepare_path("keys/", 0), sizeof(SIM_Key_Path));
+	sim_key_path = xstrdup(prepare_path("keys/", 0));
 #endif
 
 	changed_dcc("dcc");
@@ -1157,6 +1159,8 @@ void ekg_exit()
 	last_free();
 
 	xfree(home_dir);
+
+	xfree(sim_key_path);
 
 	for (l = watches; l; l = l->next) {
 		struct gg_session *s = l->data;
