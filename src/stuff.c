@@ -1580,10 +1580,7 @@ int event_check(int event, uin_t uin, const char *data)
 	for (i = 0; actions && actions[i]; i++) {	
 		char *tmp = format_string(actions[i], uin_number, uin_display, ((data) ? data : ""), ((edata) ? edata : ""));
 
-		if (!i)
-			gg_debug(GG_DEBUG_MISC, "// event_check();\n");
-
-		gg_debug(GG_DEBUG_MISC, "//    event: %d doing: %s\n", event, tmp);
+		gg_debug(GG_DEBUG_MISC, "// event_check() event: %d doing: %s\n", event, tmp);
 		command_exec(NULL, tmp, 0);
 		xfree(tmp);
 	}
