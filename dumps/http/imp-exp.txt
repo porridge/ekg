@@ -1,4 +1,29 @@
-Import userów z serwera:
+--8<-- 
+
+Eksport userow na serwer:
+
+POST /appsvc/fmcontactsput.asp HTTP/1.0
+Host: pubdir.gadu-gadu.pl
+Content-Type: application/x-www-form-urlencoded
+User-Agent: Mozilla/4.0 (compatible; MSIE 5.0; Windows NT)
+Content-Length: 306
+Pragma: no-cache
+
+FmNum=1840944&Pass=d&Contacts=ImieArekm%3BNazwiskoArekm%3BPseudoArekm%3Barekm%3B%2B4860412121212%3Bgrupa_nr_1%3B1295336%0D%0AImieLookas%3BNazwiskoLookas%3BPseudoLookas%3BLookas%3B%2B48997%3B%3B507698%0D%0AImieKtos%3BNazwiskoKtos%3BPseudoKtos%3BKtos%3B%2B48602003456%3Bgrupa_nr_1%2Cgrupa_nr_2%3B123456%0D%0A
+
+HTTP/1.1 200 OK
+Server: Microsoft-IIS/5.0
+Date: Thu, 22 Nov 2001 17:02:32 GMT
+Connection: Keep-Alive
+Content-Length: 12
+Content-Type: text/html
+Cache-control: private
+
+put_success:
+
+--8<-- 
+
+Import userow z serwera
 
 POST /appsvc/fmcontactsget.asp HTTP/1.0
 Host: pubdir.gadu-gadu.pl
@@ -7,37 +32,27 @@ User-Agent: Mozilla/4.0 (compatible; MSIE 5.0; Windows NT)
 Content-Length: 20
 Pragma: no-cache
 
-FmNum=1840505&Pass=bHTTP/1.1 200 OK
-Server: Microsoft-IIS/5.0
-Date: Tue, 20 Nov 2001 18:40:22 GMT
-Connection: Keep-Alive
-Content-Length: 63
-Content-Type: text/html
-Cache-control: private
+FmNum=1840944&Pass=d
 
-get_results:;;arekm;arekm;;;1295336
-;;lookas;lookas;;;507698
-
-Export userów z klienta do serwera:
-
-POST /appsvc/fmcontactsput.asp HTTP/1.0
-Host: pubdir.gadu-gadu.pl
-Content-Type: application/x-www-form-urlencoded
-User-Agent: Mozilla/4.0 (compatible; MSIE 5.0; Windows NT)
-Content-Length: 113
-Pragma: no-cache
-
-FmNum=1840505&Pass=b&Contacts=%3B%3Barekm%3Barekm%3B%3B%3B1295336%0D%0A%3B%3Blookas%3Blookas%3B%3B%3B507698%0D%0A
 HTTP/1.1 200 OK
 Server: Microsoft-IIS/5.0
-Date: Tue, 20 Nov 2001 18:37:21 GMT
+Date: Thu, 22 Nov 2001 17:02:39 GMT
 Connection: Keep-Alive
-Content-Length: 12
+Content-Length: 232
 Content-Type: text/html
 Cache-control: private
 
-put_success:
+get_results:ImieArekm;NazwiskoArekm;PseudoArekm;arekm;+4860412121212;grupa_nr_1;1295336
+ImieLookas;NazwiskoLookas;PseudoLookas;Lookas;+48997;;507698
+ImieKtos;NazwiskoKtos;PseudoKtos;Ktos;+48602003456;grupa_nr_1,grupa_nr_2;123456
+
+--8<--
 
 robione z uina: 1840505
-userlista: llookas = 507698, arekm = 1295336)
+userlista: lookas = 507698 (nie nalezy do zadnej grupy)
+           arekm = 1295336 (grupy: grupa_nr_1)
+	   ktos = 123456   (grupy: grupa_nr1,grupa_nr_2)
+
+ImieXXX, NazwiskoXXX, PseudoXXX ... - odpowiednio pola w interfejsie windzianego klienta gg
+XXX - pole Wyswietlanie
 
