@@ -304,7 +304,10 @@ encryption
 	wybiera rodzaj szyfrowania wiadomo¶ci. je¶li w systemie jest
 	zainstalowana biblioteka OpenSSL mo¿liwe jest u¿ywanie SIM
 	(warto¶æ 1). opis tego szyfrowania znajduje siê na stronie
-	http://gg.wha.la/crypt/.
+	http://gg.wha.la/crypt/. warto¶æ 2 w³±czy nowszy, eksperymentalny
+	kod napisany od zera, który nie stara siê oszczêdzaæ mocy
+	procesora za wszelk± cenê, przez co powinien dzia³aæ pewniej
+	i nie gubiæ wiadomo¶ci.
 	
 enter_scrolls
 	typ: bool
