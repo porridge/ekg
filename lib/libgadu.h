@@ -763,8 +763,8 @@ int gg_send_packet(int sock, int type, ...);
 unsigned int gg_login_hash(const unsigned char *password, unsigned int seed);
 uint32_t gg_fix32(uint32_t x);
 uint16_t gg_fix16(uint16_t x);
-#define fix32 gg_fix32
 #define fix16 gg_fix16
+#define fix32 gg_fix32
 char *gg_proxy_auth(void);
 char *gg_base64_encode(const char *buf);
 char *gg_base64_decode(const char *buf);
