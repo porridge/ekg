@@ -115,6 +115,7 @@ void variable_init()
 	variable_add("auto_save", "as", VAR_INT, 1, &config_auto_save, changed_auto_save, NULL, NULL);
 #ifdef WITH_ASPELL
 	variable_add("aspell", "al", VAR_BOOL, 1, &config_aspell, changed_aspell, NULL, NULL);
+	variable_add("aspell_allowed", "ao", VAR_STR, 1, &config_aspell_allowed, NULL, NULL, NULL);
 	variable_add("aspell_lang", "ag", VAR_STR, 1, &config_aspell_lang, changed_aspell, NULL, NULL);
 	variable_add("aspell_encoding", "an", VAR_STR, 1, &config_aspell_encoding, changed_aspell, NULL, NULL);
 #endif
@@ -261,8 +262,11 @@ void variable_set_default()
 	config_display_color_map = xstrdup("nTgGbBrR");
 	config_dcc_limit = xstrdup("30/30");
 #ifdef WITH_ASPELL
+	xfree(config_aspell_allowed);
 	xfree(config_aspell_lang);
 	xfree(config_aspell_encoding);
+	
+	config_aspell_allowed = xstrdup("()[]',.`\"<>!?");
 	config_aspell_lang = xstrdup("pl");
 	config_aspell_encoding = xstrdup("iso8859-2");
 #endif
