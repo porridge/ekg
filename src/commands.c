@@ -3683,7 +3683,8 @@ COMMAND(cmd_timer)
 			if ((tmp = strchr(foo, '.')) && !(wrong = (strlen(tmp) != 3))) {
 				sscanf(tmp + 1, "%2d", &lt->tm_sec);
 				tmp[0] = 0;
-			}
+			} else
+				lt->tm_sec = 0;
 
 			/* pozb±d¼my siê dwukropka */
 			if ((tmp = strchr(foo, ':')) && !(wrong = (strlen(tmp) != 3))) {
