@@ -89,6 +89,7 @@ struct gg_session *sess;
 
 int config_dcc;
 char *config_dcc_ip;
+char *config_dcc_dir;
 int config_auto_away;
 int config_auto_save;
 time_t last_save;
@@ -211,7 +212,7 @@ int send_event(char *seq, int act);
 int correct_event(char *action);
 int events_parse_seq(char *seq, struct action_data *data);
 int init_socket();
-int init_pipe(char *path);
+int init_control_pipe(char *path);
 char *get_token(char **ptr, char sep);
 char *strdup_null(char *ptr);
 void ekg_logoff(struct gg_session *sess, char *reason);

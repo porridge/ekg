@@ -95,6 +95,7 @@ int config_status = GG_STATUS_AVAIL;
 char *reg_password = NULL;
 int config_dcc = 0;
 char *config_dcc_ip = NULL;
+char *config_dcc_dir = NULL;
 char *query_nick = NULL;
 int sock = 0;
 int length = 0;
@@ -1857,7 +1858,7 @@ void changed_dcc(char *var)
 		}
 	}
 
-	if (!strcmp(var, "dcc_ip"))
+	if (!strcmp(var, "dcc_ip")) {
 		if (config_dcc_ip) {
 			if (inet_addr(config_dcc_ip) != INADDR_NONE)
 				gg_dcc_ip = inet_addr(config_dcc_ip);
@@ -1869,6 +1870,7 @@ void changed_dcc(char *var)
 		}
 		else
 			gg_dcc_ip = 0;
+	}
 }
 	
 /*

@@ -105,6 +105,12 @@ dcc_ip
 	wymagana do bezpo¶redniego po³±czenia, poniewa¿ ekg nie potrafi
 	wykryæ domy¶lnego adresu IP.
 
+dcc_dir
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	okre¶la katalog, do którego bêd± zapisywane pobierane pliki.
+
 display_ack
 	typ: liczba
 	domy¶lna warto¶æ: 1

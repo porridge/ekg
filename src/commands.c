@@ -1636,6 +1636,7 @@ COMMAND(command_dcc)
 
 	if (!strncasecmp(params[0], "g", 1)) {		/* get */
 		struct transfer *t;
+		char *path;
 		
 		for (t = NULL, l = transfers; l; l = l->next) {
 			struct userlist *u;
@@ -1662,14 +1663,22 @@ COMMAND(command_dcc)
 			return 0;
 		}
 
-		/* XXX wiêcej sprawdzania, zrzucaæ do jakiego¶ $dcc_dir */
-		if ((t->dcc->file_fd = open(t->filename, O_WRONLY | O_CREAT, 0600)) == -1) {
-			my_printf("dcc_get_cant_create", t->filename);
+		if (config_dcc_dir) 
+		    	path = saprintf("%s/%s", config_dcc_dir, t->filename);
+		else
+		    	path = strdup(t->filename);
+		
+		/* XXX wiêcej sprawdzania */
+		if ((t->dcc->file_fd = open(path, O_WRONLY | O_CREAT, 0600)) == -1) {
+			my_printf("dcc_get_cant_create", path);
 			gg_free_dcc(t->dcc);
 			list_remove(&transfers, t, 1);
+			free(path);
 			
 			return 0;
 		}
+		
+		free(path);
 		
 		my_printf("dcc_get_getting", format_user(t->uin), t->filename);
 		
