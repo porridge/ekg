@@ -31,6 +31,7 @@ extern "C" {
 #endif
 
 #include <sys/types.h>
+#include "config.h"
 
 /*
  * typ zmiennej okre¶laj±cej numerek danej osoby.
