@@ -3614,7 +3614,7 @@ void command_init()
 	  " [-l, --list]                         wy¶wietla listê planów\n"
 	  "\n"
 	  "Czas podaje siê w formacie [[[yyyy]mm]dd]HH[:]MM[.SS], gdzie "
-	  "%Tyyyy%n to rok, %Tmm%n to miesi±c, %Tdd%n to dzieñ %THH:MM%n to godzina, "
+	  "%Tyyyy%n to rok, %Tmm%n to miesi±c, %Tdd%n to dzieñ, %THH:MM%n to godzina, "
           "a %T.SS%n to sekundy. "
 	  "Minimalny format to HH:MM (dwukropek mo¿na pomin±æ). "
 	  "Po kropce mo¿na podaæ sekundy, a przed godzin± odpowiednio: dzieñ "
