@@ -314,7 +314,7 @@ COMMAND(cmd_alias)
 			return -1;
 		}
 
-		if (!alias_add(params[1], 0, 0)) {
+		if (!alias_add(params[1], quiet, 0)) {
 			config_changed = 1;
 			return 0;
 		}
