@@ -696,8 +696,14 @@ static void ui_readline_loop()
 			continue;
 		}
 
-		if (!line)
-			break;
+		if (!line) {
+			if (config_ctrld_quits)	
+				break;
+			else {
+				printf("\n");
+				continue;
+			}
+		}
 
 		if (strlen(line) > 1 && line[strlen(line) - 1] == '\\' && line[strlen(line) - 2] == ' ') {
 			string_t s = string_init(NULL);

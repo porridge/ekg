@@ -8,6 +8,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-08-23
 
 - \n po zamkniêciu query (theKnight/w)
+- dodanie zmiennej ctrld_quits (rmrmg/w)
+- dodanie contrib/link.pl (theKnight/w)
 
 // 2002-08-22
 

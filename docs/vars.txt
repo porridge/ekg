@@ -90,6 +90,13 @@ completion_notify
 	ma byæ dopisywany do listy dope³niania klawiszem Tab. je¶li jest
 	równa 2, jest równie¿ usuwany po przej¶ciu w stan niedostêpny.
 
+ctrld_quits
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	okre¶la, czy wci¶niêcie Ctrl-D w ostatnim okienku, nie bêd±c
+	w trybie rozmowy klient na zakoñczyæ dzia³anie.
+
 dcc
 	typ: bool
 	domy¶lna warto¶æ: 0

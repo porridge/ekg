@@ -122,6 +122,7 @@ int config_make_window = 0;
 int ekg_segv_handler = 0;
 char *config_tab_command = NULL;
 int ioctld_sock = -1;
+int config_ctrld_quits = 1;
 
 static struct {
 	int event;

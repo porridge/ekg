@@ -149,6 +149,7 @@ int config_emoticons;
 int config_make_window;
 char *config_reason;
 char *config_tab_command;
+int config_ctrld_quits;
 
 char *home_dir;
 char *config_dir;

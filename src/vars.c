@@ -53,6 +53,7 @@ void variable_init()
 	variable_add("beep_chat", VAR_BOOL, 1, &config_beep_chat, NULL);
 	variable_add("beep_notify", VAR_BOOL, 1, &config_beep_notify, NULL);
 	variable_add("completion_notify", VAR_INT, 1, &config_completion_notify, NULL);
+	variable_add("ctrld_quits", VAR_BOOL, 1, &config_ctrld_quits, NULL);
 	variable_add("dcc", VAR_BOOL, 1, &config_dcc, changed_dcc);
 	variable_add("dcc_ip", VAR_STR, 1, &config_dcc_ip, changed_dcc);
 	variable_add("dcc_dir", VAR_STR, 1, &config_dcc_dir, NULL);
