@@ -537,21 +537,27 @@ void ekg_wait_for_key()
 
 				l = l->next;
 
+				if (s->timeout == -1)
+					continue;
+
 				s->timeout--;
 
-				if (s->timeout <= 0) {
+				if (s->timeout == 0) {
 					struct userlist *u = userlist_find(s->uin, NULL);
 
+					if (!u) {
+						list_remove(&spiedlist, s, 1);
+						continue;
+					}
+
+					s->timeout = -1;
 					gg_debug(GG_DEBUG_MISC, "// ekg: spying %d timeout\n", s->uin);
 			
-					if (u && group_member(u, "spied"))
-						if (GG_S_I(u->status)) {
-							int status = (GG_S_D(u->status)) ? GG_STATUS_NOT_AVAIL_DESCR : GG_STATUS_NOT_AVAIL;
-							iso_to_cp(u->descr);
-							handle_common(u->uin, status, u->descr, time(NULL), u->ip.s_addr, u->port, u->protocol, u->image_size);
-						}
-
-					list_remove(&spiedlist, s, 1);
+					if (GG_S_I(u->status)) {
+						int status = (GG_S_D(u->status)) ? GG_STATUS_NOT_AVAIL_DESCR : GG_STATUS_NOT_AVAIL;
+						iso_to_cp(u->descr);
+						handle_common(u->uin, status, u->descr, time(NULL), u->ip.s_addr, u->port, u->protocol, u->image_size);
+					}
 				}
 			}
 		}
@@ -1530,6 +1536,7 @@ void ekg_exit()
 	last_free();
 	buffer_free();
 	list_destroy(autofinds, 1);
+	list_destroy(spiedlist, 1);
 
 	xfree(home_dir);
 	xfree(last_tokenid);

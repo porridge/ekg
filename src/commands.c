@@ -5533,11 +5533,11 @@ int check_conn(uin_t uin)
 		for (l = spiedlist; l; l = l->next) {
 			struct spied *s = l->data;
 
-			if (u->uin == s->uin)
+			if (uin == s->uin)
 				return -1;
 		}
 
-		s.uin = u->uin;
+		s.uin = uin;
 		s.timeout = 15;
 		list_add(&spiedlist, &s, sizeof(s));
 
@@ -5862,7 +5862,7 @@ void command_init()
 	  "¶ledzony na bie¿±co, jednak ze wzglêdu na ró¿ne zachowanie oryginalnego klienta, nale¿y co "
 	  "pewien czas dokonywaæ rêcznego sprawdzania czy nasza wiedza o stanie niewidocznym danej osoby "
 	  "jest wci±¿ aktualna. Nale¿y wiêc dodaæ timer, który np. co 60 sekund wywo³a polecnie "
-	  "%Tcheck_conn -u%n. Mo¿na te¿ okresowo, ale dosyæ rzadko (wysy³a duzo niepotrzebnych wiadomo¶ci), "
+	  "%Tcheck_conn -u%n. Mo¿na te¿ okresowo "
 	  "wykonywaæ polecenie %Tcheck_conn -s%n, aby poprawiæ skuteczno¶æ wykrywania niewidocznych. "
 	  "Pamiêtaj, podgl±danie innych osób jest nieetyczne...");
           
