@@ -110,7 +110,7 @@ int check_mail_update(const char *s, int more)
 	if (!more && mail_count && mail_count > last_mail_count) {
 		if (config_check_mail & 4) {
 			if (mail_count == 1)
-				print("new_mail_one", itoa(mail_count));
+				print("new_mail_one");
 			else {
 				if (mail_count >= 2 && mail_count <= 4)
 					print("new_mail_two_four", itoa(mail_count));
@@ -136,7 +136,7 @@ int check_mail_update(const char *s, int more)
  */
 int check_mail_mbox()
 {
-	int fd[2], pid, cont = 0, to_check = 0;
+	int fd[2], pid, to_check = 0;
 	struct gg_exec x;
 	list_t l;
 
@@ -152,9 +152,10 @@ int check_mail_mbox()
 				xfree(buf);
 			}	
 
-			m->size = 0;
 			m->mtime = 0;
+			m->size = 0;
 			m->check = 0;
+			m->count = 0;
 
 			continue;
 		}
@@ -164,12 +165,11 @@ int check_mail_mbox()
 			m->size = st.st_size;
 			m->check = 1;
 			to_check++;
-			cont = 1;
 		} else
 			m->check = 0;
 	}
 
-	if (!cont || pipe(fd))
+	if (!to_check || pipe(fd))
 		return 1;
 
  	if ((pid = fork()) < 0) {
