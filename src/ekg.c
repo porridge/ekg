@@ -533,8 +533,10 @@ IOCTL_HELP
 #ifdef HAS_RL_SET_KEY
 	rl_set_key("\033[[A", binding_help, rl_get_keymap());
 	rl_set_key("\033OP", binding_help, rl_get_keymap());
+	rl_set_key("\033[11~", binding_help, rl_get_keymap());
 	rl_set_key("\033[[B", binding_quick_list, rl_get_keymap());
 	rl_set_key("\033OQ", binding_quick_list, rl_get_keymap());
+	rl_set_key("\033[12~", binding_quick_list, rl_get_keymap());
 #endif
 	
 #ifdef HAS_RL_GET_SCREEN_SIZE
