@@ -278,7 +278,11 @@ wiadomo¶ci. klasa wiadomo¶ci taka sama jak przy wysy³aniu:
 		char message[];
 	};
 
---- 8) otrzymywanie wiadomo¶ci ---------------------------------------------
+w przypadku pakietów ,,konferencyjnych'' na koncu pakietu doklejona jest
+struktura identyczna ze struct gg_send_recipients zawieraj±ca pozosta³ych
+rozmówców.
+
+--- 8) ping/pong -----------------------------------------------------------
 
 od czasu do czasu klient wysy³a pakiet a'la ping do serwera i dostaje pust±
 odpowied¼. o ile dobrze pamiêtam, serwer roz³±cza siê po up³ywie 5 minut od
