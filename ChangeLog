@@ -3,6 +3,9 @@
 - GG_CLASS_OFFLINE = GG_CLASS_QUEUED (arekm/s)
 - totalna reorganizacja zrodel... mam nadzieje ze sie komplikuja (s)
 - more TODO (s)
+- reorganizacja libgg. podzia³ na mniejsze pliki. wydzielenie obs³ugi
+  http z sercza. i takie tam bzdurki (w)
+- popsucie paru dumpów (w)
 
 // 2001-11-22
 
