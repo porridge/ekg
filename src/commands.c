@@ -3924,7 +3924,7 @@ COMMAND(cmd_query)
 	int i, res = 0;
 
 	/* sprawdzamy czy wszystko jest wpisane okey */
-	if(!params[0] || (params[0][0] == '@' && !params[0][1])) {
+	if (!params[0] || (params[0][0] == '@' && !params[0][1])) {
 		printq("invalid_params", name);
 		return -1;
 	}
@@ -4011,8 +4011,12 @@ COMMAND(cmd_query)
 		}
 	}
 
-	if (params[0] && params[1])
-		cmd_msg("chat", (const char **) p, NULL, quiet);
+	if (params[0] && params[1]) {
+		char *tmp = saprintf("chat %s %s", p[0], p[1]);
+		/* cmd_msg("chat", (const char **) p, NULL, quiet); */
+		command_exec(target, tmp, quiet);
+		xfree(tmp);
+	}
 
 cleanup:
 	for (i = 0; p[i]; i++)
