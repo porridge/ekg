@@ -1093,7 +1093,7 @@ void theme_init()
 	format_add("process", "%> %(-5)1 %2\n", 1);
 	format_add("no_processes", "%! Nie ma dzia³aj±cych procesów\n", 1);
 	format_add("process_exit", "%> Proces %1 (%2) zakoñczy³ dzia³anie z wynikiem %3\n", 1);
-	format_add("exec", "%1\n",1);	/* %1 tre¶æ, %2 pid */
+	format_add("exec", "%1\n",1);
 	format_add("exec_error", "%! B³±d uruchamiania procesu: %1\n", 1);
 
 	/* szczegó³owe informacje o u¿ytkowniku */

@@ -1146,8 +1146,8 @@ COMMAND(cmd_block)
 COMMAND(cmd_list)
 {
 	list_t l;
-	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, show_descr = 0, show_blocked = 0, show_offline = 0, j;
-	char *tmp, **argv = NULL, *show_group = NULL;
+	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, show_descr = 0, show_blocked = 0, show_offline = 0, j, p;
+	char *tmp, **argv = NULL, *show_group = NULL, *ip_str;
 
 	if (params[0] && *params[0] != '-') {
 		char *status, *groups;
@@ -1225,14 +1225,21 @@ COMMAND(cmd_list)
 		}
 
 		groups = group_to_string(u->groups, 0);
+
+		p = u->port;
 		
 		if (GG_S_A(u->status) || GG_S_B(u->status))
 			in.s_addr = u->ip.s_addr;
-		else
+		else {
 			in.s_addr = inet_addr("0.0.0.0");
+			p = 0;
+		}
 
-		print("user_info", (u->nickname) ? u->nickname : u->display, itoa(u->uin), status, inet_ntoa(in), u->first_name, u->last_name, u->display, u->mobile, groups);
+		ip_str = saprintf("%s:%s", inet_ntoa(in), itoa(p));
+
+		print("user_info", (u->nickname) ? u->nickname : u->display, itoa(u->uin), status, ip_str, u->first_name, u->last_name, u->display, u->mobile, groups);
 		
+		xfree(ip_str);
 		xfree(groups);
 		xfree(status);
 
