@@ -361,6 +361,25 @@ char *get_token(char **ptr, char sep)
 }
 
 /*
+ * userlist_compare()
+ *
+ * funkcja pomocna przy list_add_sorted().
+ *
+ *  - data1, data2 - dwa wpisy userlisty do porównania.
+ *
+ * zwraca wynik strcasecmp() na nazwach userów.
+ */
+int userlist_compare(void *data1, void *data2)
+{
+	struct userlist *a = data1, *b = data2;
+	
+	if (!a || !a->comment || !b || !b->comment)
+		return 0;
+
+	return strcasecmp(a->comment, b->comment);
+}
+
+/*
  * read_userlist()
  *
  * wczytuje listê kontaktów z pliku ~/.gg/userlist. mo¿e ona byæ w postaci
@@ -439,7 +458,7 @@ int read_userlist(char *filename)
 
 		u.status = GG_STATUS_NOT_AVAIL;
 
-		list_add(&userlist, &u, sizeof(u));
+		list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);
 	}
 	
 	fclose(f);
@@ -527,7 +546,7 @@ int add_user(uin_t uin, char *comment)
 	u.group = NULL;
 	u.comment = strdup(comment);
 
-	list_add(&userlist, &u, sizeof(u));
+	list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);
 	
 	return 0;
 }
@@ -561,6 +580,28 @@ int del_user(uin_t uin)
 	}
 
 	return -1;
+}
+
+/*
+ * replace_user()
+ *
+ * usuwa i dodaje na nowo u¿ytkownika, ¿eby zosta³ umieszczony na odpowiednim
+ * (pod wzglêdem kolejno¶ci alfabetycznej) miejscu. g³upie to trochê, ale
+ * przy listach jednokierunkowych nie za bardzo chce mi siê mieszaæ z
+ * przesuwaniem elementów listy.
+ * 
+ *  - u.
+ *
+ * zwraca zero je¶li jest ok, -1 je¶li b³±d.
+ */
+int replace_user(struct userlist *u)
+{
+	if (list_remove(&userlist, u, 0))
+		return -1;
+	if (list_add_sorted(&userlist, u, 0, userlist_compare))
+		return -1;
+
+	return 0;
 }
 
 /*

@@ -1,6 +1,8 @@
 // 2001-11-01
 
 - plumk, dodatkowe parametry ,,list'' (wojtekka).
+- sortowana userlista, dodana list_add_sorted() w dynstuff.c (wojtekka).
+- ,,modify'' ju¿ ma przypadkiem zostawionego printf()a (wojtekka).
 
 // 2001-10-31 
 

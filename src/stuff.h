@@ -86,6 +86,7 @@ int write_userlist(char *filename);
 void clear_userlist(void);
 int add_user(uin_t uin, char *comment);
 int del_user(uin_t uin);
+int replace_user(struct userlist *u);
 struct userlist *find_user(uin_t uin, char *comment);
 char *format_user(uin_t uin);
 uin_t get_uin(char *text);

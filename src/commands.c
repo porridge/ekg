@@ -517,11 +517,13 @@ COMMAND(command_connect)
 	                }
 		} else
 			my_printf("no_config");
-	} else {
+	} else if (sess) {
+		if (sess->state == GG_STATE_CONNECTED)
+			my_printf("disconnected");
 		gg_logoff(sess);
 		gg_free_session(sess);
 		sess = NULL;
-		my_printf("disconnected");
+		reconnect_timer = 0;
 	}
 
 	return 0;
@@ -674,9 +676,6 @@ COMMAND(command_modify)
 		return 0;
 	}
 
-	for (i = 0; argv[i]; i++)
-		printf("argv[%d] = \"%s\"\n", i, argv[i]);
-
 	if (!argv[1]) {
 		my_printf("user_info", u->first_name, u->last_name, u->nickname, u->comment, u->mobile, u->group);
 		return 0;
@@ -700,6 +699,7 @@ COMMAND(command_modify)
 		if (!strncmp(argv[i], "-a", 2) && argv[i + 1]) {
 			free(u->comment);
 			u->comment = strdup(argv[++i]);
+			replace_user(u);
 		}
 		if ((!strncmp(argv[i], "-p", 2) || !strncmp(argv[i], "-m", 2) || !strncmp(argv[i], "-s", 2)) && argv[i + 1]) {
 			free(u->mobile);

@@ -26,6 +26,7 @@ struct list {
 };
 
 void *list_add(struct list **list, void *data, int alloc_size);
+void *list_add_sorted(struct list **list, void *data, int alloc_size, int (*comparision)(void *, void *));
 int list_remove(struct list **list, void *data, int free_data);
 int list_count(struct list *list);
 
