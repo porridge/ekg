@@ -17,6 +17,8 @@ zg³osi³ b³±d.
 - libgadu: dodanie obs³ugi pkgconfig. program linkuj±ce siê z libgadu
   mog± sprawdzaæ flagi kompilatora i linkera przez ,,pkgconfig libgadu
   --libs --cflags'' (w)
+- libgadu: zlikwidowanie rozbie¿no¶ci ABI w wersji z i bez pthread
+  (adrians/w)
 
 // 2002-12-08
 
