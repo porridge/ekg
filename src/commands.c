@@ -2339,3 +2339,11 @@ int binding_help(int a, int b)
 
 	return 0;
 }
+
+int binding_toggle_debug(int a, int b)
+{
+	if (config_debug)
+		execute_line("set debug 0");
+	else
+		execute_line("set debug 1");
+}

@@ -9,6 +9,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - s/u_int/uint/, brakuj±ce #include "config.h" (w)
 - dodany opis docs/voip.txt, uaktualnienie FAQ (w)
+- dodane w³±cz/wy³±cz debug pod F12. nie bêdê siê bawi³ w obs³ugê
+  wszystkich terminali. jak komu¶ potrzebny inny, to niech pode¶le
+  patcha (w)
 
 // 2002-06-14
 

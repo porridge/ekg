@@ -40,5 +40,6 @@ char *empty_generator(char *text, int state);
 
 int binding_quick_list(int a, int b);
 int binding_help(int a, int b);
+int binding_toggle_debug(int a, int b);
 
 #endif

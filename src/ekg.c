@@ -703,6 +703,8 @@ IOCTLD_HELP
 	rl_set_key("\033OQ", binding_quick_list, rl_get_keymap());
 	rl_set_key("\033[12~", binding_quick_list, rl_get_keymap());
 	rl_set_key("\033[N", binding_quick_list, rl_get_keymap());
+	
+	rl_set_key("\033[24~", binding_toggle_debug, rl_get_keymap());
 #endif
 	
 #ifdef HAVE_RL_GET_SCREEN_SIZE
