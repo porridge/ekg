@@ -53,13 +53,12 @@ struct handler handlers[] = {
 void print_message_body(char *str, int chat)
 {
 	int width, i, j;
-	char *mesg, *buf, *line, *next, *prefix, *suffix, *save;
+	char *mesg, *buf, *line, *next, *format, *save;
 
 	if (!(width = atoi(find_format((chat) ? "chat_line_width" : "message_line_width"))))
 		width = 78;
 
-	prefix = (chat) ? "chat_line_prefix" : "message_line_prefix";
-	suffix = (chat) ? "chat_line_suffix" : "message_line_suffix";
+	format = (chat) ? "chat_line" : "message_line";
 	
 	if (!(buf = malloc(width + 1)) || !(mesg = save = strdup(str))) {
 		my_puts(str);			/* emergency ;) */
@@ -92,11 +91,7 @@ void print_message_body(char *str, int chat)
 					next++;
 			}
 
-			my_printf(prefix);
-			for (i = strlen(buf), j = 0; j < width - i; j++)
-				strcat(buf, " ");
-			my_puts(buf);
-			my_printf(suffix);
+			my_printf(format, buf);
 		}
 	}
 

@@ -84,7 +84,7 @@ int default_status = GG_STATUS_AVAIL;
 void my_puts(char *format, ...)
 {
         int old_end = rl_end, i;
-        char *old_prompt = rl_prompt;
+	char *old_prompt = rl_prompt;
         va_list ap;
 
         if (in_readline) {
@@ -104,7 +104,7 @@ void my_puts(char *format, ...)
         if (in_readline) {
                 rl_end = old_end;
                 rl_prompt = old_prompt;
-                rl_forced_update_display();
+		rl_forced_update_display();
         }
 }
 
