@@ -763,7 +763,7 @@ int main(int argc, char **argv)
 			    	printf("ekg-%s\nlibgadu-%s (headers %s, protocol 0x%.2x, client \"%s\")\n", VERSION, gg_libgadu_version(), GG_LIBGADU_VERSION, GG_DEFAULT_PROTOCOL_VERSION, GG_DEFAULT_CLIENT_VERSION);
 				return 0;
 #ifdef WITH_IOCTLD
-			csae 'I':
+			case 'I':
 				ioctld_path = optarg;
 			break;
 #endif
