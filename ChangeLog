@@ -9,6 +9,11 @@ d - drg, sz - szalik).
 - przywrócenie opisu pakietów GG_STATUS i GG_NOTIFY_REPLY (trzcionkowski/w)
 - libgadu: poprawka segfaulta przy pobieraniu listy kontaktów (Chilek/w)
 - uaktualnienie opisu protoko³u o obrazki w wiadomo¶ciach (w)
+- dodanie testowej komendy /_hexmsg, która wysy³a wiadomo¶æ o tre¶ci podanej
+  w kodzie heksadecymalnym (w)
+- libgadu: dodanie do pliku nag³ówkowego struktur dotycz±cych obrazków (w)
+- libgadu: dodanie zdarzenia GG_EVENT_IMAGE_REQUEST, gdy rozmówca prosi
+  o przes³anie obrazka (w)
 
 // 2003-10-05
 

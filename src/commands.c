@@ -3221,6 +3221,52 @@ COMMAND(cmd_test_segv)
 	return 0;
 }
 
+COMMAND(cmd_test_hexmsg)
+{
+	int size = 0, i, j;
+	char *buf;
+	
+	if (!params[0] || !params[1]) {
+		printq("not_enough_params", name);
+		return -1;
+	}
+
+	if (!sess || sess->state != GG_STATE_CONNECTED) {
+		printq("not_connected");
+		return -1;
+	}
+
+	for (i = 0; params[1][i]; i++) {
+		if (isxdigit(params[1][i]))
+			size++;
+	}
+
+	size = size / 2;
+
+	buf = xmalloc(size);
+	memset(buf, 0, size);
+	
+	for (i = 0, j = 0; params[1][i]; i++) {
+		char ch = tolower(params[1][i]), *hex = "0123456789abcdef";
+
+		if (!isxdigit(ch))
+			continue;
+
+		buf[j / 2] |= (int)(index(hex, ch) - hex);
+		
+		if ((j % 2) == 0)
+			buf[j / 2] <<= 4;
+
+		j++;
+	}
+
+	gg_send_message_ctcp(sess, GG_CLASS_MSG, get_uin(params[0]), buf, size);
+
+	xfree(buf);
+	
+	return 0;
+}
+
 COMMAND(cmd_test_resize)
 {
 	ui_resize_term = 1;
@@ -5904,6 +5950,9 @@ void command_init()
 	command_add
 	( "_msg", "u?", cmd_test_send, 0, "",
 	  "udaje, ¿e wysy³a wiadomo¶æ", "");
+	command_add
+	( "_hexmsg", "u?", cmd_test_hexmsg, 0, "",
+	  "wysy³a wiadomo¶æ o tre¶ci heksadecymalnej", "");
 	command_add
 	( "_segv", "", cmd_test_segv, 0, "", 
 	  "wywo³uje naruszenie segmentacji pamiêci", "");
