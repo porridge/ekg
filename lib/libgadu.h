@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Arkadiusz Mi¶kiewicz <misiek@pld.org.pl>
  *                          Tomasz Chiliñski <chilek@chilan.com>
@@ -511,21 +511,33 @@ const struct gg_search_request *gg_search_request_mode_3(uin_t uin, int active, 
 void gg_search_request_free(struct gg_search_request *r);
 
 /*
- * funkcje wyszukiwania dla GG 5.0.
+ * funkcje wyszukiwania dla GG 5.0. tym razem funkcje zachowuj± pewien
+ * poziom abstrakcji, ¿eby unikn±æ zmian ABI przy zmianach w protokole.
+ *
+ * NIE NALE¯Y SIÊ ODWO£YWAÆ DO PÓL gg_search50_t BEZPO¦REDNIO!
  */
-struct gg_search_s {
-	int count;
+struct gg_search50_entry {
+	int num;
+	char *field;
+	char *value;
 };
 
-typedef struct gg_search_s *gg_search_t;
+struct gg_search50_s {
+	int count;
+	int next;
+	struct gg_search50_entry *entries;
+	int entries_count;
+};
 
-int gg_search50(struct gg_session *sess, gg_search_t req);
-gg_search_t gg_search50_new();
-int gg_search50_add(gg_search_t *req, const char *field, const char *value);
-const char *gg_search50_get(gg_search_t res, int num, const char *field);
-int gg_search50_count(gg_search_t res);
-uin_t gg_search50_next(gg_search_t res);
-void gg_search50_free(gg_search_t s);
+typedef struct gg_search50_s *gg_search50_t;
+
+int gg_search50(struct gg_session *sess, gg_search50_t req);
+gg_search50_t gg_search50_new();
+int gg_search50_add(gg_search50_t req, const char *field, const char *value);
+const char *gg_search50_get(gg_search50_t res, int num, const char *field);
+int gg_search50_count(gg_search50_t res);
+uin_t gg_search50_next(gg_search50_t res);
+void gg_search50_free(gg_search50_t res);
 
 /*
  * operacje na katalogu publicznym.
@@ -753,6 +765,20 @@ struct gg_login_ext {
 #define GG_LOGIN_OK 0x0003
 
 #define GG_LOGIN_FAILED 0x0009
+
+#define GG_SEARCH50_REQUEST 0x0014
+
+struct gg_search50_request {
+	uint32_t dunno1;		/* ??? */
+	uint8_t dunno2;			/* '>' */
+} GG_PACKED;
+
+#define GG_SEARCH50_REPLY 0x000e
+
+struct gg_search50_reply {
+	uint32_t dunno1;		/* ??? */
+	uint8_t dunno2;			/* '>' */
+} GG_PACKED;
 
 #define GG_NEW_STATUS 0x0002
 

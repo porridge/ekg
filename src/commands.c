@@ -543,6 +543,7 @@ COMMAND(cmd_exec)
 	}
 }
 
+#if 0
 COMMAND(cmd_find)
 {
 	struct gg_search_request *r;
@@ -655,6 +656,95 @@ COMMAND(cmd_find)
 
 	list_add(&watches, h, 0);
 	
+	array_free(argv);
+
+	return;
+}
+#endif
+
+COMMAND(cmd_find)
+{
+	char **argv = NULL;
+	gg_search50_t req;
+	int i;
+
+	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
+		ui_event("command", "find", NULL);
+		return;
+	}
+
+	if (argv[0] && !argv[1] && argv[0][0] == '#') { /* konferencja */
+		char *tmp = saprintf("conference --find %s", argv[0]);
+		command_exec(NULL, tmp);
+		xfree(tmp);
+		array_free(argv);
+		return;
+	}
+
+	req = gg_search50_new();
+	
+	if (argv[0] && !argv[1] && argv[0][0] != '-') {
+		uin_t uin = get_uin(params[0]);
+
+		if (!get_uin(params[0])) {
+			print("user_not_found", params[0]);
+			array_free(argv);
+			return;
+		}
+
+		gg_search50_add(req, "fmnumber", itoa(uin));
+
+		goto search;
+	}
+
+	for (i = 0; argv[i]; i++) {
+		char *arg = argv[i];
+				
+		if (match_arg(arg, 'f', "first", 2) && argv[i + 1])
+			gg_search50_add(req, "firstname", argv[++i]);
+
+		if (match_arg(arg, 'l', "last", 2) && argv[i + 1])
+			gg_search50_add(req, "lastname", argv[++i]);
+
+		if (match_arg(arg, 'n', "nickname", 2) && argv[i + 1])
+			gg_search50_add(req, "nickname", argv[++i]);
+		
+		if (match_arg(arg, 'c', "city", 2) && argv[i + 1])
+			gg_search50_add(req, "city", argv[++i]);
+
+		if (match_arg(arg, 'u', "uin", 2) && argv[i + 1])
+			gg_search50_add(req, "fmnumber", argv[++i]);
+		
+		if (match_arg(arg, 's', "start", 2) && argv[i + 1])
+			gg_search50_add(req, "fmstart", argv[++i]);
+		
+		if (match_arg(arg, 'F', "female", 2))
+			gg_search50_add(req, "gender", "1");
+
+		if (match_arg(arg, 'M', "male", 2))
+			gg_search50_add(req, "gender", "2");
+
+		if (match_arg(arg, 'a', "active", 2))
+			gg_search50_add(req, "ActiveOnly", "1");
+
+		if (match_arg(arg, 'b', "born", 2) && argv[i + 1]) {
+			char *foo = strchr(argv[++i], ':');
+		
+			if (foo)
+				*foo = ' ';
+
+			gg_search50_add(req, "birthyear", argv[i]);
+		}
+
+		if (match_arg(arg, 'A', "all", 3))
+			print("generic", "Jeszcze nie jest obs³ugiwane");
+	}
+
+search:
+	if (gg_search50(sess, req))
+		print("search_failed", http_error_string(0));
+
+	gg_search50_free(req);
 	array_free(argv);
 
 	return;

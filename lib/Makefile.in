@@ -21,8 +21,8 @@ RANLIB = @RANLIB@
 STRIP = @STRIP@
 LN_S = @LN_S@
 
-OBJS = common.o libgadu.o search.o pubdir.o http.o dcc.o userlist.o events.o
-LOBJS = common.lo libgadu.lo search.lo pubdir.lo http.lo dcc.lo userlist.lo events.lo
+OBJS = common.o libgadu.o search.o pubdir.o http.o dcc.o userlist.o events.o search50.o
+LOBJS = common.lo libgadu.lo search.lo pubdir.lo http.lo dcc.lo userlist.lo events.lo search50.lo
 SRCS = $(OBJS:.o=.c)
 
 SHAREDMM = libgadu.so
