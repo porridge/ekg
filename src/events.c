@@ -33,6 +33,10 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifdef HAVE_JPEGLIB_H
+#  include <jpeglib.h>
+#endif
+
 #include "commands.h"
 #include "emoticons.h"
 #include "events.h"
@@ -1296,6 +1300,8 @@ fail:
 void handle_token(struct gg_http *h)
 {
 	struct gg_token *t = NULL;
+	char *file;
+	int fd;
 
 	if (!h)
 		return;
@@ -1313,7 +1319,89 @@ void handle_token(struct gg_http *h)
 		goto fail;
 	}
 
-	print("token");
+	xfree(last_tokenid);
+	last_tokenid = xstrdup(t->tokenid);
+
+#ifdef HAVE_MKSTEMP
+
+	file = saprintf("%s/token.XXXXXX", getenv("TMPDIR") ? getenv("TMPDIR") : "/tmp");
+
+	if ((fd = mkstemp(file)) == -1) {
+		print("token_failed", strerror(errno));
+		goto fail;
+	}
+
+	if (write(fd, h->body, h->body_size) != h->body_size) {
+		print("token_failed", strerror(errno));
+		close(fd);
+		unlink(file);
+		goto fail;
+	}
+
+	close(fd);
+
+#ifdef HAVE_LIBJPEG
+	if (config_display_token) {
+		struct jpeg_decompress_struct j;
+		struct jpeg_error_mgr e;
+		JSAMPROW buf[1];
+		int size;
+		char *out;
+		FILE *f;
+
+		if (!(f = fopen(file, "rb"))) {
+			print("token_failed", strerror(errno));
+			goto fail;
+		}
+
+		j.err = jpeg_std_error(&e);
+		jpeg_create_decompress(&j);
+		jpeg_stdio_src(&j, f);
+		jpeg_read_header(&j, TRUE);
+		jpeg_start_decompress(&j);
+
+		size = j.output_width * j.output_components;
+		buf[0] = xmalloc(size);
+		out = xmalloc(j.output_width + 1);
+		out[j.output_width] = 0;
+
+		while (j.output_scanline < j.output_height) {
+			int i;
+
+			jpeg_read_scanlines(&j, buf, 1);
+
+			for (i = 0; i < j.output_width; i++)
+				out[i] = (buf[0][i*3] + buf[0][i*3+1] + buf[0][i*3+2] < 384) ? '#' : '.';
+
+			print("token_body", out);
+		}
+
+		jpeg_finish_decompress(&j);
+		jpeg_destroy_decompress(&j);
+
+		xfree(buf[0]);
+		xfree(out);
+		fclose(f);
+		unlink(file);
+	} else
+#else
+	{
+		char *file2 = saprintf("%s.jpg", file);
+
+		if (rename(file, file2) == -1)
+			print("token", file);
+		else
+			print("token", file2);
+
+		xfree(file2);
+	}
+#endif
+
+	xfree(file);
+
+#else
+	print("token_unsupported");
+#endif
 
 fail:
 	list_remove(&watches, h, 0);

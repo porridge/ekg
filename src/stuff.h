@@ -232,6 +232,9 @@ int config_display_crap;
 int config_display_notify;
 int config_display_pl_chars;
 int config_display_sent;
+#ifdef HAVE_LIBJPEG
+int config_display_token;
+#endif
 int config_display_welcome;
 int config_display_transparent;
 char *config_email;
@@ -241,6 +244,7 @@ int config_enter_scrolls;
 int config_events_delay;
 char *config_interface;
 int config_header_size;
+int config_ignore_unknown_sender;
 int config_irssi_set_mode;
 int config_keep_reason;
 int config_last;
@@ -290,7 +294,6 @@ char *config_timestamp;
 int config_uin;
 char *config_windows_layout;
 int config_windows_save;
-int config_ignore_unknown_sender;
 #ifdef WITH_WAP
 int config_wap_enabled;
 #endif
@@ -324,6 +327,8 @@ char *last_search_first_name;
 char *last_search_last_name;
 char *last_search_nickname;
 uin_t last_search_uin;
+
+char *last_tokenid;
 
 int alias_add(const char *string, int quiet, int append);
 int alias_remove(const char *name, int quiet);

@@ -692,6 +692,7 @@ void gg_token_free(struct gg_http *h);
 /* rejestracja nowego numerka */
 struct gg_http *gg_register(const char *email, const char *password, int async);
 struct gg_http *gg_register2(const char *email, const char *password, const char *qa, int async);
+struct gg_http *gg_register3(const char *email, const char *password, const char *tokenid, const char *tokenval, int async);
 #define gg_register_watch_fd gg_pubdir_watch_fd
 #define gg_register_free gg_pubdir_free
 #define gg_free_register gg_pubdir_free
@@ -711,6 +712,7 @@ struct gg_http *gg_remind_passwd(uin_t uin, int async);
 struct gg_http *gg_change_passwd(uin_t uin, const char *passwd, const char *newpasswd, const char *newemail, int async);
 struct gg_http *gg_change_passwd2(uin_t uin, const char *passwd, const char *newpasswd, const char *email, const char *newemail, int async);
 struct gg_http *gg_change_passwd3(uin_t uin, const char *passwd, const char *newpasswd, const char *qa, int async);
+struct gg_http *gg_change_passwd4(uin_t uin, const char *email, const char *passwd, const char *newpasswd, const char *tokenid, const char *tokenval, int async);
 #define gg_change_passwd_free gg_pubdir_free
 #define gg_free_change_passwd gg_pubdir_free
 

@@ -186,11 +186,16 @@ int config_ignore_unknown_sender = 0;
 #ifdef WITH_WAP
 int config_wap_enabled = 2;
 #endif
+#ifdef HAVE_LIBJPEG
+int config_display_token = 1;
+#endif
 
 char *last_search_first_name = NULL;
 char *last_search_last_name = NULL;
 char *last_search_nickname = NULL;
 uin_t last_search_uin = 0;
+
+char *last_tokenid = NULL;
 
 struct event_label event_labels[EVENT_LABELS_COUNT + 2] = {
 	{ EVENT_MSG, "msg" },

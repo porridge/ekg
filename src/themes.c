@@ -1119,15 +1119,19 @@ void theme_init()
 	format_add("passwd", "%> Has³o zosta³o zmienione\n", 1);
 	format_add("passwd_failed", "%! B³±d podczas zmiany has³a: %1\n", 1);
 	format_add("passwd_timeout", "%! Przekroczono limit czasu operacji zmiany has³a\n", 1);
+	format_add("passwd_email", "%! Nale¿y ustawiæ zmienn± %Temail%n\n", 1);
 	
 	/* zmiana informacji w katalogu publicznym */
 	format_add("change", "%> Informacje w katalogu publicznym zosta³y zmienione\n", 1);
 	format_add("change_failed", "%! B³±d podczas zmiany informacji w katalogu publicznym\n", 1);
 	
 	/* pobieranie tokenu */
-	format_add("token", "%> Token\n", 1);
-	format_add("token_failed", "%! B³±d podczas pobierania tokenu: %1\n", 1);
-	format_add("token_timeout", "%! Przekroczono limit czasu operacji pobierania tokenu\n", 1);
+	format_add("token", "%> Token zapisano do pliku %T%1%n\n", 1);
+	format_add("token_body", "%1\n", 1);
+	format_add("token_failed", "%! B³±d pobierania tokenu: %1\n", 1);
+	format_add("token_timeout", "%! Przekroczono limit czasu pobierania tokenu\n", 1);
+	format_add("token_unsupported", "%! System operacyjny nie zawiera funkcji potrzebnych do obs³ugi tokenów\n", 1);
+	format_add("token_missing", "%! Nale¿y najpierw pobraæ z serwera token komend± %Ttoken%n\n", 1);
 
 	/* sesemesy */
 	format_add("sms_error", "%! B³±d wysy³ania SMS: %1\n", 1);

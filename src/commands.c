@@ -3198,12 +3198,12 @@ COMMAND(cmd_key)
 }
 #endif
 
-COMMAND(cmd_test_token)
+COMMAND(cmd_token)
 {
 	struct gg_http *h;
 
 	if (!(h = gg_token(1))) {
-		printq("generic_error", "Nie uda³o siê");
+		printq("token_failed", strerror(errno));
 		return -1;
 	}
 
@@ -3522,7 +3522,12 @@ COMMAND(cmd_register)
 			return -1;
 		}
 	
-		if (!params[0] || !params[1]) {
+		if (!last_tokenid) {
+			printq("token_missing");
+			return -1;
+		}
+
+		if (!params[0] || !params[1] || !params[2]) {
 			printq("not_enough_params", name);
 			return -1;
 		}
@@ -3539,11 +3544,14 @@ COMMAND(cmd_register)
 		passwd = xstrdup(params[1]);
 		iso_to_cp(passwd);
 	
-		if (!(h = gg_register2(params[0], passwd, "", 1))) {
+		if (!(h = gg_register3(params[0], passwd, last_tokenid, params[2], 1))) {
 			xfree(passwd);
 			printq("register_failed", strerror(errno));
 			return -1;
 		}
+
+		xfree(last_tokenid);
+		last_tokenid = NULL;
 
 		list_add(&watches, h, 0);
 
@@ -3556,7 +3564,7 @@ COMMAND(cmd_register)
 			printq("not_enough_params", name);
 			return -1;
 		} 
-		
+	
 		uin = get_uin(params[0]);
 
 		if (uin <= 0) {
@@ -3598,9 +3606,19 @@ COMMAND(cmd_passwd)
 {
 	struct gg_http *h;
 	char *oldpasswd, *newpasswd;
+
+	if (!last_tokenid) {
+		printq("token_missing");
+		return -1;
+	}
 	
-	if (!params[0]) {
+	if (!params[0] || !params[1]) {
 		printq("not_enough_params", name);
+		return -1;
+	}
+
+	if (!config_email) {
+		printq("passwd_email");
 		return -1;
 	}
 
@@ -3610,12 +3628,15 @@ COMMAND(cmd_passwd)
 	newpasswd = xstrdup(params[0]);
 	iso_to_cp(newpasswd);
 
-	if (!(h = gg_change_passwd3(config_uin, (oldpasswd) ? oldpasswd : "", newpasswd, "", 1))) {
+	if (!(h = gg_change_passwd4(config_uin, config_email, (oldpasswd) ? oldpasswd : "", newpasswd, last_tokenid, params[1], 1))) {
 		xfree(newpasswd);
 		xfree(oldpasswd);
 		printq("passwd_failed", strerror(errno));
 		return -1;
 	}
+
+	xfree(last_tokenid);
+	last_tokenid = NULL;
 
 	list_add(&watches, h, 0);
 
@@ -5638,9 +5659,10 @@ void command_init()
 	 
 	command_add
 	( "passwd", "??", cmd_passwd, 0,
-	  " <has³o>", "zmienia has³o u¿ytkownika",
+	  " <has³o> <token>", "zmienia has³o u¿ytkownika",
 	  "\n"
-	  "Zmiana has³a nie wymaga ju¿ ustawienia zmiennej %Temail%n.");
+	  "Przed rejestracj± nale¿y pobraæ token komend± %Ttoken%n. Niezbêdne "
+	  "jest ustawienie zmiennej %Temail%n.");
 
 	command_add
 	( "play", "f", cmd_play, 0,
@@ -5697,9 +5719,10 @@ void command_init()
 	  "");
 	  
 	command_add
-	( "register", "??", cmd_register, 0,
-	  " <email> <has³o>", "rejestruje nowe konto",
-	  "");
+	( "register", "???", cmd_register, 0,
+	  " <email> <has³o> <token>", "rejestruje nowe konto",
+	  "\n"
+	  "Przed rejestracj± nale¿y pobraæ token komend± %Ttoken%n.");
 
 	command_add
 	( "reload", "f", cmd_reload, 0,
@@ -5788,6 +5811,17 @@ void command_init()
 	  "jednorazowym uruchomieniu jest usuwany, chyba ¿e czas poprzedzimy "
 	  "wyra¿eniem ,,%T*/%n''. Wtedy timer bêdzie uruchamiany w zadanych odstêpach "
 	  "czasu, a na li¶cie bêdzie oznaczony gwiazdk±.");
+
+	command_add
+	( "token", "", cmd_token, 0,
+	  "", "pobiera z serwera token",
+	  "\n"
+	  "Komenda ta jest niezbêdna do rejestracji i zmiany has³a. Ma na celu "
+	  "zapewnienie serwera, ¿e operacjê przeprowadza u¿ytkownik, a nie "
+	  "automat. Je¶li system zawiera odpowiednie biblioteki, token "
+	  "zostanie wy¶wietlony na ekranie. W przeciwnym wypadku zostanie "
+	  "podana ¶cie¿ka, pod któr± zapisano plik graficzny zawieraj±cy "
+	  "token.");
 
 	command_add
 	( "unignore", "i?", cmd_ignore, 0,
@@ -5879,9 +5913,6 @@ void command_init()
 	command_add
 	( "_descr", "?", cmd_away, 0, " <opis>",
 	  "zmienia opis bez zmiany stanu", "");
-	command_add
-	( "_token", "", cmd_test_token, 0, "",
-	  "pobiera z serwera token", "");
 }
 
 /*
