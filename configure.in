@@ -1,0 +1,23 @@
+dnl $Id$
+
+AC_INIT(libgg.h)
+
+PACKAGE=ekg
+VERSION=0.1
+
+AC_CONFIG_HEADER(config.h)
+
+AC_PROG_CC
+AC_CHECK_CURSES
+AC_CHECK_READLINE
+
+AC_PATH_PROG(RM, rm, no)
+if test "x$RM" = "xno"; then
+    AC_MSG_ERROR([rm ])
+fi
+AC_C_BIGENDIAN
+
+AC_CHECK_LIB(nsl, t_accept, LIBS="$LIBS -lnsl")
+AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
+
+AC_OUTPUT(Makefile)

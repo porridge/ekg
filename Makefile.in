@@ -1,0 +1,32 @@
+# $Id$
+
+INCLUDES = @CURSES_INCLUDEDIR@ @READLINE_INCLUDES@
+LIBS = @LIBS@ @CURSES_LIBS@ @READLINE_LIBS@
+CC = @CC@ 
+PREFIX = @prefix@
+NAME = ekg
+VERSION = 0.90
+RM = @RM@
+
+
+CFLAGS = -Wall -O3 -ggdb @CFLAGS@ $(INCLUDES)
+OBJS = libgg.o libgg_search.o stuff.o commands.o events.o themes.o vars.o dynstuff.o
+
+all:	ekg
+
+ekg:	$(OBJS) ekg.c
+	$(CC) $(CFLAGS) ekg.c -o $(NAME) $(OBJS) $(LIBS)
+
+install: ekg
+	install ekg $(PREFIX)/bin
+
+clean:
+	$(RM) -f *.o ekg search core libgg.so* *~ config.log config.cache config.status config.h Makefile
+
+distclean:	clean
+
+shared:
+	$(CC) -fPIC -g -c libgg.c -o libgg.o
+	$(CC) -fPIC -g -c libgg_search.c -o libgg_search.o
+	$(CC) -g -shared -Wl,-soname,libgg.so -o libgg.so.0.9.0 libgg.o libgg_search.o -lc
+
