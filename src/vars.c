@@ -55,6 +55,7 @@ void variable_init()
 	variable_add("display_notify", VAR_BOOL, 1, &config_display_notify, NULL);
 	variable_add("log", VAR_INT, 1, &config_log, NULL);
 	variable_add("log_ignored", VAR_INT, 1, &config_log_ignored, NULL);
+	variable_add("log_status", VAR_BOOL, 1, &config_log_status, NULL);
 	variable_add("log_path", VAR_STR, 1, &config_log_path, NULL);
 	variable_add("use_proxy", VAR_INT, 1, &gg_http_use_proxy, NULL);
 	variable_add("proxy_port", VAR_INT, 1, &gg_http_proxy_port, NULL);

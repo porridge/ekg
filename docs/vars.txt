@@ -128,6 +128,13 @@ log_ignored
 	domyslna wartosc: 0 
 	    
 	okresla czy logujemy ignorowane wiadomosci 
+
+log_status
+        typ: bool
+        domy¶lna warto¶æ: 0
+
+        okre¶la czy bêd± logowane zmiany statusu ludzi z listy (zmienne
+        ,,log'' oraz ,,display_notify'' musz± byæ ró¿ne od 0)
 	
 log_path
 	typ: tekst

@@ -72,6 +72,7 @@ time_t last_save;
 int config_log;
 char *config_log_path;
 int config_log_ignored;
+int config_log_status;
 int config_display_color;
 int config_beep;
 int config_beep_msg;

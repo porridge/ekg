@@ -63,6 +63,7 @@ int config_auto_save = 0;
 time_t last_save = 0;
 int config_log = 0;
 int config_log_ignored = 0;
+int config_log_status = 0;
 char *config_log_path = NULL;
 int config_display_color = 1;
 int config_beep = 1, config_beep_msg = 1, config_beep_chat = 1, config_beep_notify = 1;
