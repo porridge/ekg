@@ -1096,6 +1096,12 @@ void ekg_exit()
 	SIM_KC_Finish();
 #endif
 
+	/* kapitan schodzi ostatni */
+	if (gg_debug_file) {
+		fclose(gg_debug_file);
+		gg_debug_file = NULL;
+	}
+
 	exit(0);
 }
 

@@ -907,6 +907,8 @@ static void ui_ncurses_deinit()
 
 	list_destroy(windows, 1);
 
+	keypad(input, FALSE);
+
 	werase(input);
 	wnoutrefresh(input);
 	doupdate();
