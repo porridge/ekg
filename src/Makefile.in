@@ -13,14 +13,12 @@ RM = @RM@
 MAKE = @MAKE@
 AR = @AR@
 install = @INSTALL@
-do_ioctl = @do_ioctl@
-DIOCTL = @dioctl@
 
-CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -DTHEMES_DIR=\"$(datadir)/ekg/themes\" -DIOCTL_DAEMON_PATH=\"$(prefix)/bin/ioctl_daemon\" $(DIOCTL)
+CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -DTHEMES_DIR=\"$(datadir)/ekg/themes\" -DIOCTL_DAEMON_PATH=\"$(prefix)/bin/ioctl_daemon\" @dioctl@
 OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o ekg.o
 LOBJS = ../lib/libgadu.a
 
-all:	ekg $(do_ioctl)
+all:	ekg @do_ioctl@
 
 ekg:	$(OBJS) $(LOBJS)
 	$(CC) -o $(NAME) $(OBJS) $(LOBJS) $(LIBS) 
@@ -28,15 +26,13 @@ ekg:	$(OBJS) $(LOBJS)
 ioctl_daemon:	ioctl_daemon.c
 	$(CC) ioctl_daemon.c -o $(IOCTL_DAEMON_NAME)
 
-install: ekg 
-	$(install) -m 755 ekg $(prefix)/bin
-	$(install) -m 755 docs/ekl.pl $(prefix)/bin
-	@$(install) -d $(datadir)/ekg/themes/
-	$(install) -m 644 themes/*.theme $(datadir)/ekg/themes
-	@$(install) -d $(mandir)/mann
-	$(install) -m 644 docs/ekg.man $(mandir)/mann
-	$(install) -m 4755 ioctl_daemon $(prefix)/bin
+install: all install_ekg @install_ioctl@
 
+install_ekg:
+	$(install) -m 755 ekg $(prefix)/bin
+
+install_ioctl:
+	$(install) -m 4755 ioctl_daemon $(prefix)/bin
 
 distclean:	clean
 	$(RM) -f *~ Makefile

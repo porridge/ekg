@@ -94,6 +94,8 @@ AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
 AC_SUBST(do_ioctl)
 AC_SUBST(dioctl)
 AC_SUBST(shared)
+AC_SUBST(install_ioctl)
+AC_SUBST(install_shared)
 
 AC_ARG_WITH(ioctl, 
   [  --with-ioctl  	  Compile with ioctl deamon [linux only]])
@@ -101,9 +103,11 @@ AC_ARG_WITH(ioctl,
 if test "x$with_ioctl" = "xyes"; then 
   do_ioctl="ioctl_daemon"
   dioctl=" -DIOCTL "  
+  install_ioctl="install_ioctl"
 else
   do_ioctl=""
   dioctl=""
+  install_ioctl=""
 fi
 
 AC_ARG_WITH(shared, 
@@ -111,8 +115,10 @@ AC_ARG_WITH(shared,
 
 if test "x$with_shared" = "xyes"; then 
   shared="shared"
+  install_shared="install_shared"
 else
   shared="" 
+  install_shared=""
 fi
 
 
