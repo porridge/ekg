@@ -61,17 +61,17 @@ auto_save
 	je¶li 0, nie zapisuje automatycznie.
 	
 away_reason
-        typ: tekst
-        domy¶lna warto¶æ: brak
+	typ: tekst
+	domy¶lna warto¶æ: brak
 
-        domy¶lny opis stanu zajêtego, ustawiany przy zmianie bez podania 
+	domy¶lny opis stanu zajêtego, ustawiany przy zmianie bez podania 
 	parametru.
 
 back_reason
-        typ: tekst
-        domy¶lna warto¶æ: brak
+	typ: tekst
+	domy¶lna warto¶æ: brak
 
-        domy¶lny opis stanu dostêpnego, ustawiany przy zmianie bez podania 
+	domy¶lny opis stanu dostêpnego, ustawiany przy zmianie bez podania 
 	parametru.
 
 backlog_size
