@@ -214,7 +214,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 						print("exec", c->buf->str, itoa(c->id));
 						break;
 					case GG_SESSION_USER4:
-						check_mail_update(atoi(c->buf->str));
+						mail_count = atoi(c->buf->str);
 						break;
 				}
 			} else

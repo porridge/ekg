@@ -2208,8 +2208,11 @@ static int ui_ncurses_event(const char *event, ...)
 
 		t->ui = 1;
 
-		if (count && count > last_mail_count)
+		if (count && count > last_mail_count) {
 			print((count == 1) ? "new_mail_one" : "new_mail_more", itoa(count));
+			if (config_beep && config_beep_mail)
+				ui_beep();
+		}
 
 		last_mail_count = count;
 	}

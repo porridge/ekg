@@ -116,24 +116,6 @@ int check_mail()
 }
 
 /*
- * check_mail_update()
- *
- * uaktualnia zewnêtrzn± zmienn± mail_count 
- * i wydaje d¼wiêk, je¶li trzeba.
- * 
- * - update - nowa warto¶æ mail_count.
- */
-int check_mail_update(int update)
-{
-	if ((mail_count < update) && config_beep && config_beep_mail)
-		ui_beep();
-
-	mail_count = update;
-
-	return 0;
-}
-
-/*
  * check_mail_mbox()
  *
  * tworzy dzieciaka, który sprawdza wszystkie pliki typu
