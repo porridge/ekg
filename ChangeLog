@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek).
 
+// 2004-10-29
+
+- poprawka wykrywania pthread (porridge/w)
+
 // 2004-10-28
 
 - libgadu: wspó³bie¿ny resolver tam gdzie jest gethostbyname_r (mslusarz/w)
