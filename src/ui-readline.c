@@ -493,7 +493,8 @@ static void ui_readline_beep()
 static const char *current_prompt()
 {
 	static char buf[80];	/* g³upio strdup()owaæ wszystko */
-	const char *prompt;
+	const char *prompt = buf;
+	char *tmp;
 	static char w[16]; /* stosunkowo du¿y, mo¿na wsadziæ aktywne okna */
 
 	*w = 0;
@@ -502,26 +503,42 @@ static const char *current_prompt()
                 sprintf(w, "%d", curr_window);
 
         if (win->query_nick) {
-                if ((prompt = (*w) ? format_string(format_find("readline_prompt_query_win"), win->query_nick, w) : format_string(format_find("readline_prompt_query"), win->query_nick, NULL))) {
-                        strncpy(buf, prompt, sizeof(buf)-1);
-                        prompt = buf;
+                if ((tmp = (*w) ? format_string(format_find("readline_prompt_query_win"), win->query_nick, w) : format_string(format_find("readline_prompt_query"), win->query_nick, NULL))) {
+                        strncpy(buf, tmp, sizeof(buf) - 1);
+			xfree(tmp);
                 }
         } else {
                 switch (away) {
                         case 1:
                         case 3:
-                                prompt = (*w) ? format_string(format_find("readline_prompt_away_win"), w) : format_find("readline_prompt_away");
+				if (*w) {
+                                	tmp = format_string(format_find("readline_prompt_away_win"), w);
+					strncpy(buf, tmp, sizeof(buf) - 1);
+					xfree(tmp);
+				} else
+					strncpy(buf, format_find("readline_prompt_away"), sizeof(buf) - 1);
                                 break;
                         case 2:
                         case 5:
-                                prompt = (*w) ? format_string(format_find("readline_prompt_invisible_win"), w) : format_find("readline_prompt_invisible");
+				if (*w) {
+                                	tmp = format_string(format_find("readline_prompt_invisible_win"), w);
+					strncpy(buf, tmp, sizeof(buf) - 1);
+					xfree(tmp);
+				} else
+					strncpy(buf, format_find("readline_prompt_invisible"), sizeof(buf) - 1);
                                 break;
                         default:
-                                prompt = (*w) ? format_string(format_find("readline_prompt_win"), w, NULL) : format_find("readline_prompt");
+				if (*w) {
+                                	tmp = format_string(format_find("readline_prompt_win"), w);
+					strncpy(buf, tmp, sizeof(buf) - 1);
+					xfree(tmp);
+				} else
+					strncpy(buf, format_find("readline_prompt"), sizeof(buf) - 1);
+                                break;
                 }
         }
 
-        if (no_prompt || !prompt)
+        if (no_prompt)
                 prompt = "";
 
         return prompt;
@@ -641,7 +658,7 @@ static void ui_readline_deinit()
 
 	window_free();
 
-	for (i = 0; i < send_nicks_count; i++)
+	for (i = 0; i < SEND_NICKS_MAX; i++)
 		xfree(send_nicks[i]);
 }
 
@@ -861,6 +878,8 @@ static int window_add()
         for (j = 0; j < MAX_LINES_PER_SCREEN; j++)
                 w.buff.line[j] = NULL;
 
+	w.buff.last = 0;
+
         list_add(&windows, &w, sizeof(w));
 
         return 0;
@@ -971,8 +990,8 @@ static int window_write(int id, const char *line)
 
         w->buff.last++;
 
-        if(w->buff.last == MAX_LINES_PER_SCREEN)
-                w->buff.last=0;
+        if(w->buff.last == MAX_LINES_PER_SCREEN - 1)
+                w->buff.last = 0;
 
         return 0;
 }
