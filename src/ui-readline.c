@@ -977,11 +977,24 @@ static int window_make_query(const char *nick)
 			struct window *w = l->data;
 			
 			if (!w->query_nick) {
-				char id[4];
-
-				snprintf(id, 4, "%d", win->id);
 				w->query_nick = xstrdup(nick);
-				print("window_id_query_started", id, nick);
+				
+				if (w->id == curr_window) {
+					print("query_started", nick);
+#ifdef HAVE_RL_SET_PROMPT
+					rl_set_prompt(current_prompt());
+#else /*#elif HAVE_RL_EXPAND_PROMPT*/
+					rl_expand_prompt(current_prompt());
+#endif									
+				}
+
+				else {
+					char id[4];
+
+					snprintf(id, 4, "%d", win->id);
+					print("window_id_query_started", id, nick);
+				}
+				
 				return w->id;
 			}
 		}
@@ -990,7 +1003,6 @@ static int window_make_query(const char *nick)
 	if (config_make_window == 1 || config_make_window == 2) {
 		struct list *l;
 		struct window *w = NULL;
-		char id[4];
 
 		if (window_add()) 
 			return 0;
@@ -998,10 +1010,23 @@ static int window_make_query(const char *nick)
 		for (l = windows; l; l = l->next)
 			w = (struct window*)l->data;
 		
-		
 		w->query_nick = xstrdup(nick);
-		snprintf(id, 4, "%d", w->id);
-		print("window_id_query_started", id, nick);
+		
+		if (w->id == curr_window) {
+			print("query_started", nick);
+#ifdef HAVE_RL_SET_PROMPT
+			rl_set_prompt(current_prompt());
+#else /*#elif HAVE_RL_EXPAND_PROMPT*/
+			rl_expand_prompt(current_prompt());
+#endif								
+		}
+			
+		else {
+			char id[4];
+
+			snprintf(id, 4, "%d", w->id);
+			print("window_id_query_started", id, nick);
+		}
 		return w->id;
 	}
 
