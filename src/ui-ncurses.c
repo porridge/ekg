@@ -170,7 +170,7 @@ int config_contacts_size = 8;		/* szeroko¶æ okna kontaktów */
 static int last_contacts_size = 0;	/* poprzedni rozmiar przed zmian± */
 int config_contacts = 0;		/* czy ma byæ okno kontaktów */
 int config_contacts_descr = 0;		/* i czy maj± byæ wy¶wietlane opisy */
-int config_display_transparent = 1;	/* czy chcemy prze¼roczyste t³o? */
+int config_display_transparent = 1;	/* czy chcemy przezroczyste t³o? */
 struct binding *binding_map[KEY_MAX + 1];	/* mapa bindowanych klawiszy */
 struct binding *binding_map_meta[KEY_MAX + 1];	/* j.w. z altem */
 
