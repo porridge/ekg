@@ -406,6 +406,8 @@ COMMAND(cmd_alias)
 
 COMMAND(cmd_away)
 {
+	int q = (quiet) ? 2 : 0;
+
 	in_auto_away = 0;
 
 	if (params[0] && strlen(params[0]) > GG_STATUS_DESCR_MAXSIZE) {
@@ -415,16 +417,16 @@ COMMAND(cmd_away)
 	}
 
 	if (!strcasecmp(name, "_status"))
-		change_status(config_status, params[0], 0);
+		change_status(config_status, params[0], q);
 
 	if (!strcasecmp(name, "away"))
-		change_status(GG_STATUS_BUSY, params[0], 0);
+		change_status(GG_STATUS_BUSY, params[0], q);
 
 	if (!strcasecmp(name, "invisible"))
-		change_status(GG_STATUS_INVISIBLE, params[0], 0);
+		change_status(GG_STATUS_INVISIBLE, params[0], q);
 
 	if (!strcasecmp(name, "back")) {
-		change_status(GG_STATUS_AVAIL, params[0], 0);
+		change_status(GG_STATUS_AVAIL, params[0], q);
 		sms_away_free();
 	}
 
@@ -5565,6 +5567,9 @@ void command_init()
 	command_add
 	( "_ctcp", "u", cmd_test_ctcp, 0, " <numer/alias>",
 	  "wysy³a ¿±danie bezpo¶redniego po³±czenia", "");
+	command_add
+	( "_status", "?", cmd_away, 0, " <opis>",
+	  "zmienia opis bez zmiany stanu", "");
 }
 
 /*

@@ -3007,6 +3007,7 @@ void change_status(int status, const char *arg, int autom)
 
 	switch (status) {
 		case GG_STATUS_BUSY:
+		case GG_STATUS_BUSY_DESCR:
 			status_descr = GG_STATUS_BUSY_DESCR;
 			random_mask = 1;
 			filename = "away.reasons";
@@ -3017,6 +3018,7 @@ void change_status(int status, const char *arg, int autom)
 			auto_format_descr = "auto_away_descr";
 			break;
 		case GG_STATUS_AVAIL:
+		case GG_STATUS_AVAIL_DESCR:
 			status_descr = GG_STATUS_AVAIL_DESCR;
 			random_mask = 4;
 			filename = "back.reasons";
@@ -3027,6 +3029,7 @@ void change_status(int status, const char *arg, int autom)
 			auto_format_descr = "auto_back_descr";
 			break;
 		case GG_STATUS_INVISIBLE:
+		case GG_STATUS_INVISIBLE_DESCR:
 			status_descr = GG_STATUS_INVISIBLE_DESCR;
 			random_mask = 8;
 			filename = "quit.reasons";
@@ -3035,6 +3038,7 @@ void change_status(int status, const char *arg, int autom)
 			format_descr = "invisible_descr";
 			break;
 		case GG_STATUS_NOT_AVAIL:
+		case GG_STATUS_NOT_AVAIL_DESCR:
 			status_descr = GG_STATUS_NOT_AVAIL_DESCR;
 			random_mask = 8;
 			filename = "quit.reasons";
