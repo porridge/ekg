@@ -73,7 +73,7 @@ int check_mail()
  *
  * modyfikuje liczbê nowych emaili i daje o tym znaæ.
  */
-int check_mail_update(const char *s)
+int check_mail_update(const char *s, int more)
 {
 	int h = 0, c = 0, new_count = 0;
 	char **buf = NULL;
@@ -107,7 +107,7 @@ int check_mail_update(const char *s)
 	last_mail_count = mail_count;
 	mail_count = new_count;
 
-	if (mail_count && mail_count > last_mail_count) {
+	if (!more && mail_count && mail_count > last_mail_count) {
 		if (config_check_mail & 4) {
 			if (mail_count == 1)
 				print("new_mail_one", itoa(mail_count));
@@ -148,7 +148,7 @@ int check_mail_mbox()
 		if (stat(m->fname, &st) == -1) {
 			if (m->count != 0) {
 				char *buf = saprintf("%d,%d", m->fhash, 0);
-				check_mail_update(buf);
+				check_mail_update(buf, 0);
 				xfree(buf);
 			}	
 
@@ -179,7 +179,7 @@ int check_mail_mbox()
 
 	if (!pid) {	/* born to be wild */
 		char *s = NULL, *line = NULL;
-		int f_new = 0, new = 0, in_header = 0;
+		int f_new = 0, new = 0, in_header = 0, i = 0;
 		FILE *f;
 		struct stat st;
 		struct timeval foo[1];
@@ -188,6 +188,8 @@ int check_mail_mbox()
 
 		for (l = mail_folders; l; l = l->next) {
 			struct mail_folder *m = l->data;
+
+			i++;
 
 			if (!m->check || (stat(m->fname, &st) == -1) || !(f = fopen(m->fname, "r")))
 				continue;
@@ -218,7 +220,10 @@ int check_mail_mbox()
 			utimes(m->fname, (const struct timeval *) &foo);
 #endif
 
-			s = saprintf("%d,%d\n", m->fhash, f_new);
+			if (i == list_count(mail_folders))
+				s = saprintf("%d,%d", m->fhash, f_new);
+			else
+				s = saprintf("%d,%d\n", m->fhash, f_new);
 
 			{
 				int sent = 0, left = strlen(s);
@@ -282,7 +287,7 @@ int check_mail_maildir()
 	}
 
 	if (!pid) {	/* born to be wild */
-		int d_new = 0, new = 0;
+		int d_new = 0, new = 0, i = 0;
 		char *s = NULL;
 		struct dirent *d;
 		DIR *dir;
@@ -293,6 +298,7 @@ int check_mail_maildir()
 		for (l = mail_folders; l; l = l->next) {
 			struct mail_folder *m = l->data;
 			char *tmp = saprintf("%s/%s", m->fname, "new");
+			i++;
 
 			if (!(dir = opendir(tmp))) {
 				xfree(tmp);
@@ -312,7 +318,10 @@ int check_mail_maildir()
 			xfree(tmp);
 			closedir(dir);
 
-			s = saprintf("%d,%d\n", m->fhash, d_new);
+			if (i == list_count(mail_folders))
+				s = saprintf("%d,%d", m->fhash, d_new);
+			else
+				s = saprintf("%d,%d\n", m->fhash, d_new);
 
 			{
 				int sent = 0, left = strlen(s);

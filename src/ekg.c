@@ -196,7 +196,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 
 			if (c->id) {
 				if (c->type == GG_SESSION_USER4)
-					check_mail_update(line);
+					check_mail_update(line, 1);
 				else
 					print("exec", line, itoa(c->id));
 			} else
@@ -213,7 +213,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 		if (c->buf->len) {
 			if (c->id) {
 				if (c->type == GG_SESSION_USER4)
-					check_mail_update(c->buf->str);
+					check_mail_update(c->buf->str, 0);
 				else
 					print("exec", c->buf->str, itoa(c->id));
 			} else

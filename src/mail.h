@@ -43,7 +43,7 @@ int last_mail_count;
 int check_mail();
 int check_mail_mbox();
 int check_mail_maildir();
-int check_mail_update(const char *s);
+int check_mail_update(const char *s, int more);
 void check_mail_free();
 
 void changed_check_mail(const char *var);
