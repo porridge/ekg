@@ -825,12 +825,7 @@ static struct window *window_new(const char *target, int new_id)
 			array_free(argv);
 		} else {
 			w.target = xstrdup(target);
-
-			if (w.id)
-				w.prompt = format_string(format_find("ncurses_prompt_query"), target);
-			else
-				w.prompt = format_string(format_find("ncurses_prompt_query"), "debug");
-
+			w.prompt = format_string(format_find("ncurses_prompt_query"), target);
 			w.prompt_len = strlen(w.prompt);
 		}
 	} else {
@@ -1572,7 +1567,7 @@ void ui_ncurses_init()
 	ui_screen_width = stdscr->_maxx + 1;
 	ui_screen_height = stdscr->_maxy + 1;
 	
-	window_new("__debug", -1);
+	window_new(NULL, -1);
 	window_current = window_new(NULL, 0);
 
 	status = newwin(1, stdscr->_maxx + 1, stdscr->_maxy - 1, 0);

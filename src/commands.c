@@ -1822,10 +1822,7 @@ COMMAND(cmd_msg)
 			continue;
 
 		if (!(uin = get_uin(*p))) {
-			if (valid_nick(*p)) {
-				printq("user_not_found", *p);
-			} else
-				goto cleanup;
+			printq("user_not_found", *p);
 			continue;
 		}
 		
@@ -1896,8 +1893,6 @@ COMMAND(cmd_msg)
 		xfree(e.event.msg.message);
 		xfree(u.display);
 	}
-
-cleanup:
 
 	xfree(msg);
 	xfree(raw_msg);
