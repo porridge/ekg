@@ -78,7 +78,7 @@ U¯YCIE
 
     Program mo¿na skonfigurowaæ pod wieloma wzglêdami, a wszystkie mo¿liwe
     ustawienia, które zmienia siê poleceniem ,,set'', s± opisane w pliku
-    vars.txt. Pomoc dotycz±c± poszczególnych ustawieñ mo¿na uzyskaæ za
+    vars.txt. Pomoc dotycz±c± poszczególnych ustawieñ mo¿na uzyskaæ tak¿e za
     pomoc± polecenia ,,help set <zmienna>''.
 
     Je¶li dana komenda przyjmuje ,,--parametr'' mo¿na u¿yæ równie¿
