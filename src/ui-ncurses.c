@@ -1480,6 +1480,27 @@ static void update_statusbar(int commit)
 }
 
 /*
+ * winch_handler()
+ *
+ * robi, co trzeba po zmianie rozmiaru terminala.
+ */
+static void winch_handler()
+{
+	beep();
+
+	endwin();
+	initscr();
+        ui_screen_width = stdscr->_maxx + 1;
+        ui_screen_height = stdscr->_maxy + 1;
+
+	resizeterm(stdscr->_maxx + 1, stdscr->_maxy + 1);
+
+	window_commit();
+	touchwin(window_current->window);
+	wrefresh(curscr);
+}
+
+/*
  * ui_ncurses_beep()
  *
  * ostentacyjnie wzywa u¿ytkownika do reakcji.
@@ -1547,6 +1568,7 @@ void ui_ncurses_init()
 	window_commit();
 
 	signal(SIGINT, SIG_IGN);
+	signal(SIGWINCH, winch_handler);
 	
 	memset(history, 0, sizeof(history));
 
@@ -2192,9 +2214,7 @@ static void ui_ncurses_loop()
 				break;
 
 			case KEY_RESIZE:  /* zmiana rozmiaru terminala */
-				beep();
-				window_commit();
-				wrefresh(curscr);
+				winch_handler();
 				break;
 
 			case 27:

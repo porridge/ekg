@@ -119,7 +119,6 @@ int search_type = 0;
 int config_changed = 0;
 int config_display_ack = 1;
 int config_completion_notify = 1;
-int private_mode = 0;
 int connecting = 0;
 time_t last_conn_event = 0;
 int config_display_notify = 1;
@@ -3518,6 +3517,9 @@ void change_status(int status, const char *arg, int autom)
 	const char *filename, *config_x_reason, *format, *format_descr, *auto_format = NULL, *auto_format_descr = NULL;
 	int random_mask, status_descr;
 	char *reason = NULL, *tmp = NULL;
+	int private_mask = GG_S_F(status) ? GG_STATUS_FRIENDS_MASK : 0;
+
+	status = GG_S(status);
 
 	switch (status) {
 		case GG_STATUS_BUSY:
@@ -3609,19 +3611,19 @@ void change_status(int status, const char *arg, int autom)
 	ui_event("my_status", (reason) ? format_descr : format, reason);
 	ui_event("my_status_raw", status, reason);
 
-	if (sess && sess->state == GG_STATE_CONNECTED) {
-		if (reason) {
-		    	iso_to_cp(reason);
-			gg_change_status_descr(sess, status | (private_mode ? GG_STATUS_FRIENDS_MASK : 0), reason);
-			cp_to_iso(reason);
-		} else
-		    	gg_change_status(sess, status | (private_mode ? GG_STATUS_FRIENDS_MASK : 0));
-	}
-	
 	xfree(config_reason);
 	config_reason = reason;
-	config_status = status;
+	config_status = status | private_mask;
 
+	if (sess && sess->state == GG_STATE_CONNECTED) {
+		if (config_reason) {
+		    	iso_to_cp(config_reason);
+			gg_change_status_descr(sess, config_status, config_reason);
+			cp_to_iso(config_reason);
+		} else
+		    	gg_change_status(sess, config_status);
+	}
+	
 	xfree(tmp);
 
 	update_status();
