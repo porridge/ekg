@@ -5531,6 +5531,7 @@ void command_init()
 	  "                             mo¿na podaæ wiêcej grup po\n"
 	  "                             przecinku\n"
 	  "  -p, --phone <numer>        numer telefonu komórkowego\n"
+	  "  -e, --email <adres>        adres e-mail\n"
 	  "  -o, --offline              b±d¼ niedostêpny dla danej osoby\n"
 	  "  -O, --online               b±d¼ widoczny dla danej osoby\n"
 	  "\n"
