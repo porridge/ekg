@@ -1,0 +1,60 @@
+prompt %b:%W:%Y:%n
+prompt2 %Y:%W:%b:%n
+saved %>%yZapisane%)%w\n
+quit %>%yBye!%)%w\n
+help %> %1%b%2 %> %y%3%w\n
+theme_loaded \n%>%YEKG%w theme by %BEmers%r/%BAppendix%)%w\n\n
+
+known_user %b|%w%[9]1%b|%W%[7]2%b|%Y
+
+list_empty %>%yWyglada na to, ze nie masz zadnych kolegow%)%w\n
+list_avail %1%YDostepny %b|%R(%W%#%R)%b|%w\n
+list_busy %1%MZajety   %b|%R(%W%#%R)%b|%w\n
+list_not_avail %1%R!%rdostepny%b|%R(%W%#%R)%b|%w\n
+
+away %>%wStatus%B: %YZajety%)%w\n
+back %>%wStatus%B: %YDostepny%)%w\n
+invisible %>%YStatus: %wNiewidoczny%)%w\n
+auto_away %>%yWyglada na to ze od %B%1 %wmin. jestes %rzajety%w. Powiadomie o tym innych%)%w\n
+
+status_avail %1%YDostepny %b|%R(%W%#%R)%b|%w\n
+status_busy %1%MZajety   %b|%R(%W%#%R)%b|%w\n
+status_not_avail %1%R!%rdostepny%b|%R(%W%#%R)%b|%w\n
+
+message_header %1%yOczekujaca wiadomosc%R(%W%#%R)%w\n
+chat_header %1%yWiadomosc %R(%W%#%R)%w\n
+ack_queued %1%yWiadomosc dojdzie pozniej %R(%W%#%R)%w\n
+ack_delivered %1%yWiadomosc dotarla %R(%W%#%R)%w\n
+
+not_enough_params %>%yZa malo parametrow%)%w\n
+invalid_uin %>%yNieprawidlowy numer uzytkownika%)%w\n
+user_added %1 %yzostal dodany do listy%w\n
+error_adding %>%wWystapil blad podczas dodawania uzytkownika%)%w\n
+user_not_found %>%yNie znaleziono uzytkownika %R%1%)%w\n
+user_deleted %1 %yzostal usuniety z listy%w\n
+error_deleting %>%yWystapil blad podczas usuwania uzytkownika%)%w\n
+user_exists %>%yUzytkownik %R%1%y juz istnieje na liscie%)%w\n
+ignored_list %>%W%1%)%w\n
+ignored_list_empty %>%yTak sie sklada, ze %Ynie masz%y wrogow%)%w\n
+ignored_added %>%R%1%y dodany do listy ignorowanych osob%)%w\n
+error_adding_ignored %>%YDopisanie do listy ignorowanych osob nie powiodlo sie%)%w\n
+conn_broken %>%RPolaczenie zerwane%)%w\n
+error_reading_config %>%yWystapil blad przy probie odczytania konfiguracji%)%w\n
+connecting %>%yLacze sie z serwerem...%)%W\n
+connected %>%yPolaczono %R(%W%#%R)%w\n
+conn_falied %>%yPolaczenie nie powiodlo sie %R(%W%#%R)%w\n
+disconnected %>%yRozlaczono %R(%W%#%R)%w\n
+theme_loaded %>%yWczytano wyglad o nazwie %W%1%)%w\n
+error_loading_theme %>%yWystapil blad przy probie odczytania wygladu%)%w\n
+not_connected %>%yBrak polaczenia z serwerem%)%w\n
+variable %>%R%1 %) %Y%2%w\n
+variable_not_found %>%yNieznana zmienna %r%1%)%w\n
+variable_invalid %>%yNieprawidlowa wartosc zmiennej%)%w\n
+not_implemented %>%yTej funkcji jeszcze nie ma%)%w/n
+no_config %>%wNieprawidlowa konfiguracja. Wpisz:\n%Wset uin <numerek-gg>\n%Wset password <haslo>\n%Wsave\n%yNastepnie wydaj polecenie:\n%Wconnect%w\n
+already_connected %>%yKlient jest juz polaczony%)%w\n
+during_connect %>%yLaczenie trwa%)%w\n
+search_falied %>%yWystapil blad podczas szukania %R%1%)%w\n
+search_not_found %>%yNie znaleziono%)%w\n
+unknown_command %>%yNieznane polecenie: %R%1%0%w\n
+already_searching %>%ySzukanie trwa. Poczekaj, albo uzyj %Wfind -stop%)%w\n
