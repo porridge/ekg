@@ -41,7 +41,7 @@ $(OBJS):
 	(cd ../lib; $(MAKE))
 
 clean: 	
-	$(RM) -f *~ *.o search-{sync,async} send conn-async register-{sync,async}
+	$(RM) -f *~ *.o search-{sync,async} send conn-async register-{sync,async} remind-{sync,async} httphash
 
 distclean: clean
 	$(RM) Makefile
