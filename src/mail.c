@@ -132,7 +132,7 @@ int check_mail_update(const char *s, int more)
 
 		play_sound(config_sound_mail_file);
 
-		event_check(EVENT_NEW_MAIL, 1, NULL);
+		event_check(EVENT_NEW_MAIL, 1, itoa(mail_count));
 	}
 
 	return 0;

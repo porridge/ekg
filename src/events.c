@@ -303,7 +303,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 			sprintf(waptime, "wap%5s", waptime2);
 			if ((waplog = prepare_path(waptime, 1))) {
 				if ((wap = fopen(waplog, "a"))) {
-					fprintf(wap,"%s(%s):%s\n", target, waptime2, line);
+					fprintf(wap, "%s(%s):%s\n", target, waptime2, line);
 					fclose(wap);
 				}
 			}

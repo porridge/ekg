@@ -332,8 +332,9 @@ COMMAND(cmd_alias)
 			if (aname) {
 				printq("aliases_noexist", aname);
 				return -1;
-			} else
-				printq("aliases_list_empty");
+			}
+
+			printq("aliases_list_empty");
 		}
 
 		return 0;
@@ -746,7 +747,7 @@ COMMAND(cmd_find)
 	}
 
 	if (argv[0] && !argv[1] && argv[0][0] == '#') { /* konferencja */
-		char *tmp = saprintf("conference --find %s", argv[0]);
+		char *tmp = saprintf("%sconference --find %s", ((quiet) ? "^" : ""), argv[0]);
 		int res = command_exec(NULL, tmp);
 		xfree(tmp);
 		array_free(argv);
@@ -755,7 +756,6 @@ COMMAND(cmd_find)
 
 	for (i = 0; argv[i]; i++)
 		iso_to_cp(argv[i]);
-
 
 	if (!(req = gg_pubdir50_new(GG_PUBDIR50_SEARCH)))
 		return -1;
@@ -1189,9 +1189,8 @@ COMMAND(cmd_ignore)
 
 			for (l = userlist; l; l = l->next) {
 				struct userlist *u = l->data;
-				int level = ignored_check(u->uin);
 
-				if (!level)
+				if (!ignored_check(u->uin))
 					continue;
 
 				i = 1;
@@ -1199,10 +1198,8 @@ COMMAND(cmd_ignore)
 				printq("ignored_list", format_user(u->uin));
 			}
 
-			if (!i) {
+			if (!i)
 				printq("ignored_list_empty");
-				return -1;
-			}
 
 			return 0;
 		}
@@ -1366,8 +1363,10 @@ COMMAND(cmd_block)
 			if (x) {
 				printq("blocked_deleted_all");
 				config_changed = 1;
-			} else
+			} else {
 				printq("blocked_list_empty");
+				return -1;
+			}
 
 			return 0;
 		}
@@ -2730,7 +2729,7 @@ COMMAND(cmd_key)
 
 		if (!(dir = opendir(path))) {
 			printq("key_public_noexist");
-			return -1;
+			return 0;
 		}
 		
 		while ((d = readdir(dir))) {
@@ -2761,10 +2760,8 @@ COMMAND(cmd_key)
 
 		closedir(dir);
 
-		if (!count) {
+		if (!count)
 			printq("key_public_noexist");
-			return -1;
-		}
 
 		return 0;
 	}
@@ -3698,7 +3695,7 @@ COMMAND(cmd_timer)
 
 				period += _period;
 				
-				if (*p == '\0')
+				if (!*p)
 					break;
 			}
 		}
@@ -3763,7 +3760,7 @@ cleanup:
 			if (at != t->at)
 				continue;
 
-			if (tname && strcmp(tname, t->name))
+			if (tname && strcasecmp(tname, t->name))
 				continue;
 
 			count++;
@@ -4052,7 +4049,7 @@ COMMAND(cmd_conference)
 
 		if (c) {
 			for (l = c->recipients; l; l = l->next) {
-				tmp = saprintf("find --uin %d", *((uin_t *) (l->data)));
+				tmp = saprintf("%sfind --uin %d", ((quiet) ? "^" : ""), *((uin_t *) (l->data)));
 				command_exec(NULL, tmp);
 				xfree(tmp);
 			}
@@ -4088,7 +4085,7 @@ COMMAND(cmd_last)
 			} else {
 				printq("last_list_empty");
 			}
-			return 0;
+			return -1;
 		}
 
 		if (uin) {
@@ -4118,9 +4115,10 @@ COMMAND(cmd_last)
 	if (!((uin > 0) ? last_count(uin) : list_count(lasts))) {
 		if (uin) {
 			printq("last_list_empty_nick", format_user(uin));
-		} else {
-			printq("last_list_empty");
+			return -1;
 		}
+
+		printq("last_list_empty");
 		return 0;
 	}
 
@@ -4648,7 +4646,7 @@ void command_init()
 	  " [-l, --list]                 wy¶wietla listê zdarzeñ\n"
 	  "\n"
 	  "Dostêpne zdarzenia to:\n"
-	  "  - avail, away, notavail - zmiana stanu na podany\n"
+	  "  - avail, away, notavail - zmiana stanu na podany (bez przypadku ,,online'')\n"
 	  "  - online - zmiana stanu z ,,niedostêpny'' na ,,dostêpny''\n"
 	  "  - descr - zmiana opisu\n"
 	  "  - blocked - zostali¶my zablokowani\n"
@@ -4656,10 +4654,10 @@ void command_init()
 	  "  - query - nowa rozmowa\n"
 	  "  - delivered, queued - wiadomo¶æ dostarczona lub zakolejkowana na serwerze\n"
 	  "  - dcc - otrzymanie dcc\n"
-	  "\n"
-	  "Zdarzenia, dla których numer/alias nie ma znaczenia:\n"
 	  "  - sigusr1, sigusr2 - otrzymanie przez ekg danego sygna³u\n"
-	  "  - newmail - otrzymanie nowej wiadomo¶æ e-mail\n"
+	  "  - newmail - otrzymanie nowej wiadomo¶ci e-mail\n"
+	  "\n"
+	  "    W przypadku sigusr i newmail nale¿y podaæ ,,*'' jako sprawcê zdarzenia\n"
 	  "\n"
 	  "  - * - wszystkie zdarzenia\n"
 	  "\n"
@@ -4669,8 +4667,9 @@ void command_init()
 	  "wykonana. Mo¿na podaæ wiêcej komend, oddzielaj±c je ¶rednikiem. W komendzie, %T\\%1%n "
 	  "zostanie zast±pione numerkiem sprawcy zdarzenia, a je¶li istnieje on na naszej "
 	  "li¶cie kontaktów, %T\\%2%n bêdzie zast±pione jego pseudonimem. Zamiast %T\\%3%n i "
-	  "%T\\%4%n wpisana bêdzie tre¶æ wiadomo¶ci lub opis u¿ytkownika, w zale¿no¶ci od "
-	  "zdarzenia. Format %T\\%4%n ró¿ni siê od %T\\%3%n tym, ¿e wszystkie niebiezpieczne znaki, "
+	  "%T\\%4%n wpisana bêdzie tre¶æ wiadomo¶ci, opis u¿ytkownika lub ca³kowita ilo¶æ "
+	  "nowych wiadomo¶ci e-mail - w zale¿no¶ci od zdarzenia. "
+	  "Format %T\\%4%n ró¿ni siê od %T\\%3%n tym, ¿e wszystkie niebiezpieczne znaki, "
 	  "które mog³yby zostaæ zinterpretowane przez shell, zostan± poprzedzone backslashem. "
 	  "U¿ywanie %T\\%3%n w przypadku komendy ,,exec'' jest %Tniebezpieczne%n i, je¶li naprawdê "
 	  "musisz wykorzystaæ tre¶æ wiadomo¶ci lub opis, u¿yj %T\"\\%4\"%n (w cudzys³owach).");

@@ -2059,7 +2059,7 @@ int event_remove(const char *name, int quiet)
 
 		l = l->next;
 
-		if (remove_all || (name && e->name && !strcmp(name, e->name))) {
+		if (remove_all || (name && e->name && !strcasecmp(name, e->name))) {
 			if (!remove_all)
 				printq("events_del", name);
 			xfree(e->action);
@@ -2204,7 +2204,7 @@ int event_check(int event, uin_t uin, const char *data)
 		
                 if (e->flags & event) {
 
-			if (!strcmp(e->target, "*"))
+			if (!strcmp(e->target, "*") || uin == 1)
 				action = e->action;
 
 			if (!strcmp(e->target, uin_number) || !strcasecmp(e->target, uin_display) || (u && group_member(u, e->target + 1))) {
@@ -3556,7 +3556,7 @@ int timer_remove(const char *name, int at, const char *command)
 
 		l = l->next;
 
-		if ((at == t->at) && ((name && !strcmp(name, t->name)) || (command && !strcmp(command, t->command)))) { 
+		if ((at == t->at) && ((name && !strcasecmp(name, t->name)) || (command && !strcasecmp(command, t->command)))) { 
 			xfree(t->name);
 			xfree(t->command);
 			xfree(t->id);
