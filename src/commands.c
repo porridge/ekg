@@ -3369,8 +3369,12 @@ COMMAND(cmd_conference)
 			string_free(recipients, 1);
 		}
 
-		if (!count)
-			print("conferences_list_empty");
+		if (!count) {
+			if (params[0] && params[0][0] == '#')
+				print("conferences_noexist", params[0]);
+			else
+				print("conferences_list_empty");
+		}
 
 		return;
 	}
@@ -3481,7 +3485,6 @@ COMMAND(cmd_last)
 			return;
 		}
 
-		
 		if (uin) {
 			last_del(uin);	
 			print("last_clear_uin", format_user(uin));
@@ -3502,8 +3505,8 @@ COMMAND(cmd_last)
 		}
 	} else
 		if (params[0] && !(uin = get_uin(params[0]))) {
-		print("user_not_found", params[0]);
-		return;
+			print("user_not_found", params[0]);
+			return;
 		}
 		
 	if (!((uin > 0) ? last_count(uin) : list_count(lasts))) {
