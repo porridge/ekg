@@ -78,5 +78,13 @@ A: Najprawdopodobniej masz ustawiony nieprawid³owy typ terminala. Spróbuj
    przed uruchomieniem ekg. Je¶li to nie pomo¿e, zamiast ,,ansi'' spróbuj
    podaæ ,,screen'', ,,linux'', ,,xterm-color'' lub ,,color_xterm''.
 
+Q: Jak siê zarejestrowaæ, usun±æ konto, zmieniæ has³o lub przypomnieæ has³o?
+A: Nale¿y wydaæ polecenie ,,/token'', które pobierze z serwera token
+   niezbêdny do przeprowadzenia tych operacji. Je¶li podczas kompilacji
+   w systemie by³a zainstalowana biblioteka libjpeg, zostanie on wy¶wietlony
+   na ekranie. W innym wypadku nale¿y odczytaæ podany plik. Warto¶æ tokenu
+   nale¿y podaæ jako ostatni parametr komend ,,/register'', ,,/unregister'',
+   ,,/passwd'' lub ,,/remind''.
+
 
 $Id$

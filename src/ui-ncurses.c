@@ -189,6 +189,7 @@ static struct window *window_current;	/* wska¼nik na aktualne okno */
 static int window_last_id = -1;		/* numer ostatnio wybranego okna */
 static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 static int ui_ncurses_debug = 0;	/* debugowanie */
+static int ui_ncurses_inited = 0;	/* czy zainicjowano? */
 
 static struct termios old_tio;
 
@@ -736,6 +737,11 @@ void window_redraw(struct window *w)
 			if (!(chattr & 128))
 				attr |= color_pair(chattr & 7, 0, COLOR_BLACK);
 
+			if (ch == 10) {
+				ch = '|';
+				attr |= color_pair(COLOR_BLACK, 1, COLOR_BLACK);
+			}
+
 			if (ch < 32) {
 				ch += 64;
 				attr |= A_REVERSE;
@@ -797,6 +803,7 @@ static void window_clear(struct window *w, int full)
 
 	w->start = 0;
 	w->redraw = 1;
+	w->more = 0;
 }
 
 /*
@@ -1679,13 +1686,24 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 
 			if (!strncmp(p, data[i].name, len) && p[len] == '}') {
 				char *text = data[i].text;
+				int j;
 
 				if (!config_display_pl_chars) {
 					text = xstrdup(text);
 					iso_to_ascii(text);
 				}
 
-				waddstr(w, text);
+				for (j = 0; text && j < strlen(text); j++) {
+					if (text[j] != 10) {
+						waddch(w, (unsigned char) text[j]);
+						continue;
+					}
+
+					wattrset(w, color_pair(COLOR_BLACK, 1, bgcolor));
+					waddch(w, '|');
+					wattrset(w, color_pair(fgcolor, bold, bgcolor));
+				}
+
 				p += len;
 				x += strlen(data[i].text);
 				
@@ -2042,6 +2060,8 @@ void ui_ncurses_init()
 	memset(binding_map_meta, 0, sizeof(binding_map_meta));
 
 	binding_default();
+
+	ui_ncurses_inited = 1;
 }
 
 /*
@@ -2084,8 +2104,13 @@ static void ui_ncurses_deinit()
 	list_t l;
 	int i;
 
+	if (!ui_ncurses_inited)
+		return;
+
 	if (done)
 		return;
+
+	done = 1;
 
 	if (config_windows_save) {
 		string_t s = string_init(NULL);
@@ -2180,8 +2205,6 @@ static void ui_ncurses_deinit()
 
 	if (getenv("TERM") && !strncmp(getenv("TERM"), "xterm", 5) && !getenv("EKG_NO_TITLE"))
 		write(1, "\033]2;\007", 5);
-
-	done = 1;
 }
 
 /*
@@ -4450,8 +4473,8 @@ static int ui_ncurses_event(const char *event, ...)
 
 			if (!strcasecmp(p1, "clear")) {
 				window_clear(window_current, 0);
-				
 				window_commit();
+				window_current->more = 0;
 
 				goto cleanup;
 			}
