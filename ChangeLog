@@ -1,9 +1,9 @@
 Teksty w nawiasach na koñcu linii mówi± o tym, kto dokona³ poprawki.
 Je¶li jest postaci ,,nick'', powinno byæ jasne. Postaæ ,,nick/x''
 oznacza, ¿e pomys³odawc± jest ,,nick'', a zrobi³ to kto¶, czyjego
-pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm). 
-,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'', ,,i/nick''
-oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
+pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
+d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
+,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
 // 2001-12-26
 
@@ -44,7 +44,7 @@ oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 - szkielet zmian w katalogu publicznym / biblioteka (s)
 - dodany event GG_EVENT_PONG (w)
 - ekg ignoruje SIGPIPE (arekm/w)
-- dodana komenda ,,query'' (drg/w)
+- dodana komenda ,,query'' (d)
 
 // 2001-12-12
 
