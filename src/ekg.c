@@ -47,7 +47,7 @@ int my_getc(FILE *f)
 	struct timeval tv;
 	struct list *l, *m;
 	fd_set rd, wd;
-	int ret, maxfd;
+	int ret, maxfd, pid, status;
 
 	for (;;) {
 		FD_ZERO(&rd);
@@ -105,14 +105,16 @@ int my_getc(FILE *f)
 				my_printf("auto_away", tmp);
 			}
 
-			for (l = children; l; l = m) {
-				struct process *p = l->data;
-				char buf1[10], buf2[10];
-				int status;
+			while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
+				for (l = children; l; l = m) {
+					struct process *p = l->data;
+					char buf1[10], buf2[10];
 
-				m = l->next;
+					m = l->next;
 
-				if (waitpid(p->pid, &status, WNOHANG) > 0) {
+					if (pid != p->pid)
+						continue;
+
 					if (p->name[0] == '\001') {
 						my_printf((!(WEXITSTATUS(status))) ? "sms_sent" : "sms_failed", p->name + 1);
 					} else if (p->name[0] == '\002') {

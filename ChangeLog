@@ -1,3 +1,10 @@
+// 2001-10-26
+
+- lekko poprawi³em obs³ugê dzieciaków. nie wait()uje na ka¿dy z listy po
+  kolei, tylko na _wszystkie_ i potem po kolei sprawdza, czy przypadkiem
+  nie jest na li¶cie. powinno zlikwidowaæ dziwne przypadki tworzenia
+  zombie i zajmowania ca³ych dostêpnych zasobów (p/wojtekka)
+
 // 2001-10-24
 
 - nudny dzien w pracy... hmm.. popsulem configure... (?/speedy)
