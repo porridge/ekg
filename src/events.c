@@ -2241,6 +2241,15 @@ void handle_change50(struct gg_event *e)
 void handle_image_request(struct gg_event *e)
 {
 	gg_debug(GG_DEBUG_MISC, "// ekg: image_request: sender=%d, size=%d, crc32=%.8x\n", e->event.image_request.sender, e->event.image_request.size, e->event.image_request.crc32);
+
+	if (e->event.image_request.crc32 == GG_CRC32_INVISIBLE) {
+		char *tmp = saprintf("gg:%d", e->event.image_request.sender);
+		struct userlist *u = userlist_find(e->event.ack.recipient, NULL);
+
+		print("user_is_connected", (u->display) ? u->display : itoa(u->uin));
+
+		xfree(tmp);
+	}
 }
 
 /*

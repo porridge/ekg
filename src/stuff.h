@@ -41,6 +41,8 @@
 
 #define TOGGLE_BIT(x) (1 << (x - 1))
 
+#define GG_CRC32_INVISIBLE 99
+
 enum event_t {
 	EVENT_MSG = TOGGLE_BIT(1),
 	EVENT_CHAT = TOGGLE_BIT(2),

@@ -5512,6 +5512,54 @@ COMMAND(cmd_queue)
 	return 0;
 }
 
+/* eksperymentalne wykrywanie niewidoczno¶ci, a w zasadzie sprawdzanie czy klient
+ * jest po³±czony */
+COMMAND(cmd_check_conn)
+{
+	#define SIZE 20
+	struct userlist *u;
+	char *tmp;
+	const char *par;
+
+	struct gg_msg_richtext_format_img {
+		struct gg_msg_richtext rt;
+		struct gg_msg_richtext_format f;
+		struct gg_msg_richtext_image image;
+	}msg;
+
+	msg.rt.flag=2;
+	msg.rt.length=13;
+	msg.f.position=0;
+	msg.f.font=0x80;
+	msg.image.unknown1=0x0109;
+	msg.image.size=SIZE;
+	msg.image.crc32=GG_CRC32_INVISIBLE; 
+
+	if (!params[0] && !target) {
+		printq("not_enough_params", name);
+		return -1;
+	}
+
+	par = params[0] ? params[0] : target;
+
+	tmp = xstrdup(par);
+        xfree((char *) par);
+        par = xstrdup(strip_chars(tmp, '"'));
+
+	if (!(u = userlist_find(atoi(par), par))) {
+		printq("user_not_found", par);
+		return -1;
+	}
+
+
+	if (gg_send_message_richtext(sess, GG_CLASS_MSG, u->uin , "", (const char *) &msg, sizeof(msg)) == -1) {
+		gg_debug(GG_DEBUG_MISC,"-- check_conn - shits happens\n");
+		return -1;
+	}
+
+	return 0;
+}
+
 /*
  * command_add_compare()
  *
@@ -5753,7 +5801,19 @@ void command_init()
 	  "zostanie rozpoczêta nowa konferencja. Je¶li zamiast odbiorcy "
 	  "podany zostanie znak ,,%T*%n'', to wiadomo¶æ bêdzie wys³ana do "
 	  "wszystkich aktualnych rozmówców.");
-	  
+	
+	command_add
+	( "check_conn", "u", cmd_check_conn, 0,
+	  " <numer/alias>", "sprawdza czy podany u¿ytkownik jest po³±czony z serwerem",
+	  "EKSPERYMENTALNE! Sprawdza czy podana osoba jest po³±czona. Klient tej osoby "
+	  "musi obs³ugiwaæ obrazki. Przetestowane na GG 6.0 dla Windows. W przypadku "
+	  "klienta TLEN, kadu, ekg i ekg2 komenda nie dzia³a prawid³owo (osobie "
+	  "któr± sprawdzamy pojawia siê pusta wiadomo¶æ). Dziêki tej funkcji "
+	  "mo¿na sprawdziæ czy osoba, któr± widzimy jako niedostêpna jest "
+	  "niewidoczna. Je¿eli brak aliasu jako parametr sprawdzana jest osoba, "
+	  "z któr± rozmowa znajdujê siê w aktualnym okienku ");
+ 
+          
 	command_add
 	( "cleartab", "?", cmd_cleartab, 0,
 	  " [opcje]", "czy¶ci listê nicków do dope³nienia",

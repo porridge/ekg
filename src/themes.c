@@ -1053,6 +1053,7 @@ void theme_init()
 	format_add("status_not_avail_descr", "%> %1 jest niedostêpn%@2: %T%3%n\n", 1);
 	format_add("status_invisible", "%> %1 jest niewidoczn%@2\n", 1);
 	format_add("status_invisible_descr", "%> %1 jest niewidoczn%@2: %T%3%n\n", 1);
+	format_add("user_is_connected", "%> %1 po³±czy³ siê z serwerem%n\n", 1);
 
 	format_add("auto_away", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci\n", 1);
 	format_add("auto_away_descr", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci: %T%2%n%3\n", 1);
