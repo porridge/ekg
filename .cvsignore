@@ -10,3 +10,5 @@ unoff
 stdint.h
 autom4te.cache
 aclocal.m4
+.enable*
+.with*

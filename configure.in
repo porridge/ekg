@@ -141,13 +141,17 @@ if test -d src; then
     ui_readline_o="ui-readline.o"
   fi
 
+  if test -f .enable-ui-ncurses; then
+    enable_ui_ncurses=yes
+  fi
+  
   if test "x$enable_ui_ncurses" = "xyes"; then
     AC_DEFINE(WITH_UI_NCURSES)
     ui_ncurses_o="ui-ncurses.o"
   fi
   
   if test "x$enable_ui_ncurses" = "xyes" -a "x$enable_force_readline" = "xyes"; then 
-      AC_DEFINE(WITH_FORCE_READLINE)
+    AC_DEFINE(WITH_FORCE_READLINE)
   fi
   
   if test "x$enable_ui_ncurses" = "xyes"; then 
