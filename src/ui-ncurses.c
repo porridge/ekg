@@ -772,7 +772,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	if (config_speech_app)
 		speech = string_init(NULL);
 	
-	if (w->start == w->lines_count - w->height)
+	if (w->start == w->lines_count - w->height || (w->start == 0 && w->lines_count <= w->height))
 		bottom = 1;
 	
 	prev_count = w->lines_count;
@@ -793,14 +793,13 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	if (bottom)
 		w->start = w->lines_count - w->height;
 	else {
-		if (w->backlog_size == config_backlog_size) {
+		if (w->backlog_size == config_backlog_size)
 			w->start -= count - (w->lines_count - prev_count);
-
-			if (w->start < 0)
-				w->start = 0;
-		}
 	}
-	
+
+	if (w->start < 0)
+		w->start = 0;
+
 	if (w->start < w->lines_count - w->height)
 		w->more = 1;
 

@@ -72,7 +72,7 @@ int match_arg(const char *arg, char shortopt, const char *longopt, int longoptle
 		return 0;
 
 	arg++;
-	
+
 	if (*arg == '-') {
 		int len = strlen(++arg);
 
@@ -82,7 +82,7 @@ int match_arg(const char *arg, char shortopt, const char *longopt, int longoptle
 		return !strncmp(arg, longopt, len);
 	}
 	
-	return (*arg == shortopt);
+	return (*arg == shortopt) && (*(arg + 1) == 0);
 }
 
 /*
