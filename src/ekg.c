@@ -1362,7 +1362,7 @@ void ekg_exit()
 		array_free(vars);
 	}
 
-	if (config_changed && !config_speech_app) {
+	if (config_changed && !config_speech_app && config_save_question) {
 		char line[80];
 
 		printf("%s", format_find("config_changed"));

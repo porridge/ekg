@@ -258,6 +258,7 @@ char *config_quit_reason;
 int config_random_reason;
 char *config_reason;
 int config_reason_limit;
+int config_save_question;
 int config_save_password;
 char *config_server;
 int config_server_save;

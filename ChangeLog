@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-05-17
+
+- ,,sms_away'' mo¿e tak¿e dzia³aæ, gdy jeste¶my niewidoczni (sz)
+- zmienna ,,save_question'' (Tohver/sz)
+
 // 2003-05-16
 
 - libgadu: gg_session->port jest prawid³owo wype³niane (w)

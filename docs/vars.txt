@@ -265,7 +265,7 @@ display_color_map
 	typ: tekst
 	domy¶lna warto¶æ: "nTgGbBrR"
 
-	okre¶la jakie kolory bêd± przypisane ró¿nym atrybutom tekstu.
+	okre¶la, jakie kolory bêd± przypisane ró¿nym atrybutom tekstu.
 	musi zawieraæ 8 znaków zgodnych ze spisem z pliku docs/themes.txt.
 	ka¿dy z nich okre¶la kolejno kolor dla:
 	- brak atrybutów,
@@ -437,7 +437,7 @@ make_window
 	typ: liczba
 	domy¶lna warto¶æ: 2
 
-	okre¶la czy bêd± tworzone nowe okienka dla nowych rozmów. dla 1 bêdzie
+	okre¶la, czy bêd± tworzone nowe okienka dla nowych rozmów. dla 1 bêdzie
 	wykorzystane pierwsze wolne okno (na którym z nikim jeszcze siê nie
 	rozmawia), lub tworzone nowe w przypadku braku wolnych. dla 2
 	bezwarunkowo utworzone zostanie nowe okno.
@@ -485,7 +485,7 @@ random_reason
 	typ: liczba
 	domy¶lna warto¶æ: 0
 
-	okre¶la czy przy zmianie stanu i po³±czeniu ma byæ losowany opis (z 
+	okre¶la, czy przy zmianie stanu i po³±czeniu ma byæ losowany opis (z 
 	~/.gg/quit.reasons dla komend ,,quit'', ,,disconnect'', ,,invisible'', 
 	~/.gg/away.reasons dla ,,away'' i ~/.gg/back.reasons dla ,,back'').
 	dla 0 nie jest losowany, dla 1 losowany jest opis dotycz±cy stanu
@@ -499,16 +499,23 @@ reason_limit
 	typ: bool
 	domy¶lna warto¶æ: 0
 
-	okre¶la czy opisy stanu musz± mie¶ciæ siê w okre¶lonym przez
+	okre¶la, czy opisy stanu musz± mie¶ciæ siê w okre¶lonym przez
 	protokó³ limicie. je¶li opcja jest aktywna i d³ugo¶æ opisu
 	przekracza t± d³ugo¶æ, komendy /away, /back i /invisible nie
 	zostan± wykonane.
+
+save_question
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	okre¶la, czy ma byæ zadawane pytanie o zapis zmienionej konfiguracji
+	przy wyj¶ciu z programu.
 
 save_password
 	typ: bool
 	domy¶lna warto¶æ: 1
 
-	okre¶la czy has³o ma byæ zapisywane w pliku konfiguracyjnym. opcja
+	okre¶la, czy has³o ma byæ zapisywane w pliku konfiguracyjnym. opcja
 	ta mo¿e przydaæ siê, gdy boimy siê administratora przegl±daj±cego
 	pliki u¿ytkowników.
 
@@ -541,11 +548,11 @@ sms_away
 	w³±czenie tej opcji powoduje wysy³anie otrzymanych wiadomo¶ci na
 	telefon komórkowy podczas nieobecno¶ci (stan ,,zajêty''). wymaga
 	zdefiniowania zmiennych ,,sms_number'' i ,,sms_send_app''.
-
 	je¿eli warto¶ci± jest 1, to zmienna ,,sms_away_limit'' (je¶li ró¿na
 	od 0) dotyczyæ bêdzie ³±cznej liczby wiadomo¶ci wys³anych na telefon
 	komórkowy. warto¶æ 2, z kolei, wskazuje na to, ¿e limit dotyczy
-	ilo¶ci wiadomo¶ci od ka¿dej osoby.
+	ilo¶ci wiadomo¶ci od ka¿dej osoby. dodanie warto¶ci 4, spowoduje,
+	¿e funkcja bêdzie tak¿e aktywna, gdy jeste¶my niewidoczni.
 
 sms_away_limit
 	typ: liczba
