@@ -509,7 +509,7 @@ int SIM_Message_Decrypt(unsigned char *in, unsigned char *out, int inlen,
                         uint32_t uin)
 {
     SIM_Message msg;
-    SIM_KC *item;
+    SIM_KC *item = NULL;
     
     char *fname;
     unsigned char *iv;
@@ -538,7 +538,8 @@ int SIM_Message_Decrypt(unsigned char *in, unsigned char *out, int inlen,
 
     len = SIM_Base64_Decode(in, buf, inlen);
 
-    item = SIM_KC_Find (uin);
+    if (uin)
+       item = SIM_KC_Find (uin);
 
     y = 0;
     

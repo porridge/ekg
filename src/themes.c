@@ -701,8 +701,8 @@ static FILE *try_open(FILE *prevfd, const char *prefix, const char *filename)
  *
  * wczytuje opis wygl±du z podanego pliku. 
  *
- *  - filename - nazwa pliku z opisem.
- *  - replace - czy zastêpowaæ istniej±ce wpisy,
+ *  - filename - nazwa pliku z opisem,
+ *  - replace - czy zastêpowaæ istniej±ce wpisy.
  *
  * zwraca 0 je¶li wszystko w porz±dku, -1 w przypadku b³êdu.
  */
