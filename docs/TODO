@@ -10,7 +10,6 @@ biblioteka:
 klient:
 - uzupe³niæ dope³nienia (w tym nicki ze spacjami),
 - mo¿liwo¶æ zrobienia theme'u a'la irc,
-- osobny program ekgsearch, lub ekg --search,
 - lastlog, awaylog.
 - escapowanie tre¶ci mesgów.
 - wykrywanie niewidocznych jako opcja.

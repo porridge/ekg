@@ -1,0 +1,247 @@
+#!/usr/bin/perl
+# skrypt do szukania osób w katalogu publicznym GG
+#  na podstawie opisu ekg-20020705/docs/html.txt [1]
+# (C) Piotr Wysocki, wysek@linux.bydg.org, http://wysek.thanedd.sk
+# $Id$
+
+
+# Ró¿nice miêdzy opisem [1] a moim skryptem:
+# 1) cyfra statusu: 1-niedostêpny, 2-dostêpny, 3-zajêty
+# 2) nie zawsze wystêpuje ju¿ pole NextStart w odpowiedzi
+
+# TODO:
+# 1) przetestowaæ, przetestowaæ, przetestowaæ
+# 2) usun±æ --raw i te inne..
+
+use IO::Socket;
+
+my $host = "pubdir.gadu-gadu.pl";
+my $path = "/appsvc/fmpubquery2.asp";
+
+my $mode = undef;
+my $uin = undef;
+my $first = undef;
+my $last = undef;
+my $nick = undef;
+my $city = undef;
+my $born1 = undef;
+my $born2 = undef;
+my $phone = undef;
+my $email = undef;
+my $active = undef;
+my $gender = undef;
+my $start = undef;
+my $debug = undef;
+
+usage() if ($#ARGV < 0);
+for ($i=0;$i<=$#ARGV;$i+=2)
+{
+	usage()
+		if (($ARGV[$i] eq "-h") || ($ARGV[$i] eq "--help"));
+	if ($i < $#ARGV)
+	{	if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "--uin"))
+		{
+			usage() if (defined $uin);
+			$mode = 3;
+			$uin = $ARGV[$i+1];
+			next;
+		}
+		if (($ARGV[$i] eq "-s") || ($ARGV[$i] eq "--start"))
+		{
+			usage() if (defined $start);
+			$start = $ARGV[$i+1];
+			next;
+		}
+		if (($ARGV[$i] eq "-f") || ($ARGV[$i] eq "--first"))
+		{
+			usage() if (defined $first);
+			$first = $ARGV[$i+1];
+			next;
+		}
+		if (($ARGV[$i] eq "-l") || ($ARGV[$i] eq "--last"))
+		{
+			usage() if (defined $last);
+			$last = $ARGV[$i+1];
+			next;
+		}
+		if (($ARGV[$i] eq "-n") || ($ARGV[$i] eq "--nick"))
+		{
+			usage() if (defined $nick);
+			$nick = $ARGV[$i+1];
+			next;
+		}
+		if (($ARGV[$i] eq "-c") || ($ARGV[$i] eq "--city"))
+		{
+			usage() if (defined $city);
+			$city = $ARGV[$i+1];
+			next;
+		}
+		if (($ARGV[$i] eq "-b") || ($ARGV[$i] eq "--born"))
+		{
+			usage() if (defined $born1);
+			@born = split(/:/,$ARGV[$i+1]);
+			$born1 = @born[0];
+			$born2 = @born[1];
+			usage() if ($born1 > $born2);
+			next;
+		}
+		if (($ARGV[$i] eq "-p") || ($ARGV[$i] eq "--phone"))
+		{
+			usage() if (defined $phone);
+			$phone = $ARGV[$i+1];
+			next;
+		}
+		if (($ARGV[$i] eq "-e") || ($ARGV[$i] eq "--email"))
+		{
+			usage() if (defined $email);
+			$email = $ARGV[$i+1];
+			next;
+		}
+	}
+	if (($ARGV[$i] eq "-a") || ($ARGV[$i] eq "--active"))
+	{
+		usage() if (defined $active);
+		$active = 1;
+		$i--;
+		next;
+	}
+	if (($ARGV[$i] eq "-F") || ($ARGV[$i] eq "--female"))
+	{
+		usage() if (defined $sex);
+		$sex = 1;
+		$i--;
+		next;
+	}
+	if (($ARGV[$i] eq "-M") || ($ARGV[$i] eq "--male"))
+	{
+		usage() if (defined $sex);
+		$sex = 2;
+		$i--;
+		next;
+	}
+	if ($ARGV[$i] eq "--raw")
+	{
+		usage() if (defined $raw);
+		$raw = 1;
+		$i--;
+		next;
+	}
+	usage();
+}
+$sock = IO::Socket::INET->new(PeerAddr => $host,
+				PeerPort => 80,
+				Proto => "tcp")
+				or die "Nieudana próba po³±czenia: $!\n";
+$length = length("Mode=&UserId=&start=") + length($start);
+$tosend = "POST $path HTTP/1.0\r\nHost: $host\r\nContent-Type: application/x-www-form-urlencoded\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 5.0; Windows 98)\r\nContent-Length: ";
+if ($mode == 3)
+{
+	$content = "Mode=$mode&UserId=$uin";
+	$content .= "&start=$start" if (defined $start);
+} else
+{
+	$sex = -1 if (!defined $sex);
+	$born1 = 0 if (!defined $born1);
+	$born2 = 0 if (!defined $born2);
+	$mode = 0;
+	foreach $arg ($first,$last,$nick,$city,$phone,$email)
+	{
+		$arg =~ s/ /%20/g;
+	}
+	$content = "Mode=$mode&FirstName=$first&LastName=$last&NickName=$nick&Gender=$sex&City=$city&MinBirth=$born1&MaxBirth=$born2";
+	$content .= "&ActiveOnly=$active" if (defined $active);
+	$content .= "&start=$start" if (defined $start);
+}
+$tosend .= length($content) . "\r\nPragma: nocache\r\n\r\n" . $content;
+$sock->print($tosend);
+if (defined $raw)
+{
+	printf("Sent:\n%s\nReceived:\n",$tosend);
+	print while (<$sock>);
+	exit;
+}
+$in = <$sock>;
+if (! $in =~ /HTTP\/1\.[01] 200 OK/)
+{
+	print "B³±d, otrzyma³em: $in";
+	exit;
+}
+# ommit the header
+while (<$sock>)
+{
+	s/\r\n//;
+	last if /^$/;
+}
+$in = <$sock>;
+$in =~ s/\r\n//;
+if (! $in =~ /^query_results:$/)
+{
+	print "B³±d, otrzyma³em: \"$in\" zamiast \"query_results:\"\n";
+	exit;
+}
+for ($i=0;<$sock>;$i++)
+{
+	s/\r\n//;
+	if (/^NextStart:[0-9]+$/)
+	{
+		print $_ . "\n" if (! /^NextStart:0$/);
+		$sock->close();
+		exit;
+	}
+	for ($_)
+	{
+		if (/^1$/) { $line = "n |"; }
+		elsif (/^2$/) { $line = "d |"; }
+		elsif (/^3$/) { $line = "z |"; }
+		else { $sock->close(); exit 1; }
+	}
+	$uin = <$sock>;
+	$uin =~ s/\r\n//;
+	$line = sprintf("%s %9d |",$line,$uin);
+	$name = <$sock>;
+	$name =~ s/\r\n//;
+	$surname = <$sock>;
+	$surname =~ s/\r\n//;
+	$line = sprintf("%s %20.20s |",$line,$name . " " . $surname);
+	$nick = <$sock>;
+	$nick =~ s/\r\n//;
+	$line = sprintf("%s %12.12s |",$line,$nick);
+	$year = <$sock>;
+	$year =~ s/\r\n//;
+	$line = sprintf("%s %4d |",$line,$year);
+	$sex = <$sock>;
+	$sex =~ s/\r\n//;
+	for ($sex)
+	{
+		if (/^1$/) { $line .= " k |"; }
+		elsif (/^2$/) { $line .= " m |"; }
+		else { $line .= "   |"; }
+	}
+	$city = <$sock>;
+	$city =~ s/\r\n//;
+	$line = sprintf("%s %15.15s",$line,$city);
+	print $line . "\n";
+}
+$sock->close();
+printf("NextStart: %d\n",$uin) if ($i > 19);
+exit;
+
+sub usage
+{
+	print "U¿ycie: $0 [opcje]\n";
+	print "\t-u, --uin <numerek>\n";
+	print "\t-f, --first <imiê>\n";
+	print "\t-l, --last <nazwisko>\n";
+	print "\t-n, --nick <pseudonim>\n";
+	print "\t-c, --city <miasto>\n";
+	print "\t-b, --born <min:max>\n";
+	print "\t-p, --phone <telefon>\n";
+	print "\t-e, --email <e-mail>\n";
+	print "\t-a, --active\n";
+	print "\t-F, --female\n";
+	print "\t-M, --male\n";
+	print "\t-s, --start <od>\n";
+	print "\t--raw (surowe wyj¶cie bez parsowania odpowiedzi, przydatne wyskowi :P)\n";
+	exit;
+}
+

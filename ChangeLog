@@ -9,6 +9,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - poprawka aliasów w query (theKnight/w)
 - poprawka Makefile dla --with-shared (Charvel/w)
+- dodanie skryptu ekgsearch (wysek/w)
 
 // 2002-07-10
 
