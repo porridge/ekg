@@ -9,7 +9,6 @@ biblioteka:
 
 klient:
 - przewijanie ekranu, okienka,
-- proste rozpoznawanie p³ci,
 - uzupe³niæ dope³nienia (w tym nicki ze spacjami),
 - mo¿liwo¶æ zrobienia theme'u a'la irc,
 - kilka komend w aliasach,
@@ -18,6 +17,7 @@ klient:
 - lastlog, awaylog.
 - tryb nieinteraktywny przez jakie¶ --exec albo co¶ takiego.
 - escapowanie tre¶ci mesgów.
+- konwersja emotikonów na inne teksty (murphy).
 
 
 $Id$
