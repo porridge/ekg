@@ -13,6 +13,9 @@ zg³osi³ b³±d.
 - usuniêcie informacji o p³ywaj±cych oknach z pomocy. bez sensu siê
   w nie bawiæ przed 1.0. wiêcej z nimi k³opotów, ni¿ po¿ytku. je¶li
   kto¶ chce to s±, ale nieudokumentowane (sz?/w)
+- libgadu: uaktualnienie skryptu generuj±cego dokumentacjê o typedefy i
+  enumeracje (w)
+- libgadu: poprawka wiadomo¶ci systemowych (sz/w)
 
 // 2003-03-09
 
