@@ -86,6 +86,7 @@ struct window {
 	int more;		/* pojawi³o siê co¶ poza ekranem */
 	char *prompt;		/* sformatowany prompt lub NULL */
 	int prompt_len;		/* d³ugo¶æ prompta lub 0 */
+	int floating;		/* czy p³ywaj±ce? */
 };
 
 static WINDOW *status = NULL;		/* okno stanu */
@@ -171,6 +172,42 @@ static struct window *window_find(const char *target)
 }
 
 /*
+ * window_floating_refresh()
+ *
+ * od¶wie¿a p³ywaj±ce okienka.
+ * powinno byæ wywo³ane po window_refresh()
+ */
+static void window_floating_refresh()
+{
+	list_t l;
+
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data;
+
+		if (w->floating)
+			wnoutrefresh(w->window);
+	}
+}
+
+static void window_floating_update()
+{
+	list_t l;
+
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data, *old;
+
+		if (w->floating && w->prompt) {
+			werase(w->window);
+			w->y = 0;
+			old = window_current;
+			window_current = w;	/* YYY */
+			command_exec(w->target, w->prompt);
+			window_current = old;
+		}
+	}
+}
+
+/*
  * window_refresh()
  *
  * ncursesowo ustawia do wy¶wietlenia aktualnie wybrane okienko, a resztê
@@ -183,16 +220,22 @@ static void window_refresh()
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
 
+		if (w->floating)
+			continue;
+
 		if (window_current->id == w->id)
 			pnoutrefresh(w->window, w->start, 0, 0, 0, output_size - 1, stdscr->_maxx - CONTACTS_SIZE + 1);
 		else
 			pnoutrefresh(w->window, 0, 0, 0, 81, 0, 0);
 	}
 	
+	window_floating_refresh();
+	
 	mvwin(status, stdscr->_maxy - input_size, 0);
 	wresize(input, input_size, input->_maxx + 1);
 	mvwin(input, stdscr->_maxy - input_size + 1, 0);
 }
+
 
 /*
  * window_switch()
@@ -268,8 +311,14 @@ static struct window *window_new(const char *target)
 	w.id = id;
 	w.target = xstrdup(target);
 	if (target) {
-		w.prompt = format_string(format_find("ncurses_prompt_query"), target);
-		w.prompt_len = strlen(w.prompt);
+		if (*target == '/') {
+			w.floating = 1;
+			w.prompt = strdup(target);
+			w.prompt_len = strlen(w.prompt);
+		} else {
+			w.prompt = format_string(format_find("ncurses_prompt_query"), target);
+			w.prompt_len = strlen(w.prompt);
+		}
 	} else {
 		const char *f = format_find("ncurses_prompt_none");
 
@@ -279,7 +328,7 @@ static struct window *window_new(const char *target)
 		}
 	}
 	w.lines = stdscr->_maxy - 1;
-	w.window = newpad(w.lines, stdscr->_maxx + 1);
+	w.window = (w.floating) ? newwin(15,15,0,20) : newpad(w.lines, stdscr->_maxx + 1);
 
 	return list_add_sorted(&windows, &w, sizeof(w), window_new_compare);
 }
@@ -461,12 +510,15 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	if (w->lines - w->start > output_size)
 		w->more = 1;
 	
-	window_refresh();
-	if (contacts)
-		wnoutrefresh(contacts);
-	update_statusbar();
-	wnoutrefresh(input);
-	doupdate();
+	if (!w->floating) {
+		/* gdy piszemy do p³ywaj±cego nie od¶wie¿amy */
+		window_refresh();
+		if (contacts)
+			wnoutrefresh(contacts);
+		update_statusbar();
+		wnoutrefresh(input);
+		doupdate();
+	}
 
 	if (config_speech_app) {
 		char *tmp = saprintf("%s 2> /dev/null", config_speech_app);
@@ -1811,9 +1863,7 @@ static void ui_ncurses_loop()
 			if (line_start < 0)
 				line_start = 0;
 		}
-		window_refresh();
-		if (contacts)
-			wnoutrefresh(contacts);
+		
 		werase(input);
 		wattrset(input, COLOR_PAIR(7));
 
@@ -1845,6 +1895,7 @@ static void ui_ncurses_loop()
 			wattrset(input, COLOR_PAIR(7));
 			wmove(input, 0, line_index - line_start + window_current->prompt_len);
 		}
+		window_refresh();
 		if (contacts)
 			wnoutrefresh(contacts);
 		wnoutrefresh(status);
@@ -2101,8 +2152,9 @@ static int ui_ncurses_event(const char *event, ...)
 			}
 
 			if (!strcasecmp(p1, "new")) {
-				struct window *w = window_new(NULL);
-				window_switch(w->id);
+				struct window *w = window_new(p2);
+				if (!w->floating)
+					window_switch(w->id);
 				goto cleanup;
 			}
 
@@ -2151,6 +2203,7 @@ static int ui_ncurses_event(const char *event, ...)
 			}
 			
 			if (!strcasecmp(p1, "refresh")) {
+				window_floating_update();
 				wrefresh(curscr);
 				goto cleanup;
 			}
