@@ -1037,6 +1037,7 @@ void handle_success(struct gg_event *e)
 	hide_notavail = 1;
 
 	update_status();
+	update_status_myip();
 
 	last_conn_event = time(NULL);
 }

@@ -601,7 +601,6 @@ void changed_backlog_size(const char *var)
  */
 void changed_dcc(const char *var)
 {
-	struct userlist *u = userlist_find(config_uin, NULL);
 	struct gg_dcc *dcc = NULL;
 	list_t l;
 	
@@ -619,6 +618,8 @@ void changed_dcc(const char *var)
 		if (!config_dcc && dcc) {
 			list_remove(&watches, dcc, 0);
 			gg_free_dcc(dcc);
+			gg_dcc_ip = 0;
+			gg_dcc_port = 0;
 		}
 	
 		if (config_dcc && !dcc) {
@@ -628,9 +629,6 @@ void changed_dcc(const char *var)
 				list_add(&watches, dcc, 0);
 			}
 		}
-
-		if (u && dcc)
-			u->port = dcc->port;
 	}
 
 	if (!strcmp(var, "dcc_ip")) {
@@ -642,18 +640,14 @@ void changed_dcc(const char *var)
 					gg_dcc_ip = inet_addr(config_dcc_ip);
 				else {
 					print("dcc_invalid_ip");
+					xfree(config_dcc_ip);
 					config_dcc_ip = NULL;
 					gg_dcc_ip = 0;
 				}
 			}
 		} else
 			gg_dcc_ip = 0;
-
-		if (u)
-			u->ip.s_addr = gg_dcc_ip;
 	}
-
-	update_status_myip();
 }
 	
 /*
@@ -3767,8 +3761,6 @@ void update_status()
 
 	if (!u)
 		return;
-
-	update_status_myip();
 
 	if ((u->descr && config_reason && strcmp(u->descr, config_reason)) || (!u->descr && config_reason) || (u->descr && !config_reason))
 		event_check(EVENT_DESCR, config_uin, u->descr);

@@ -8,6 +8,8 @@ zg³osi³ b³±d.
 
 // 2003-02-25
 
+- nasz adres i port dla dcc zmienia siê na li¶cie dopiero po /reconnect,
+  co bardziej odpowiada rzeczywisto¶ci (sz)
 - mea culpa - przez kilka dni nie dzia³a³o dobrze odczytywanie listy
   kontaktów eksportowanej z gg 4.6.3 i nowszego (sz)
 - segfault przy /dcc close (sz)
