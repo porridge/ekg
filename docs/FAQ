@@ -69,5 +69,8 @@ Q: Po zmianie wielko¶ci terminala przestaj± mi dzia³aæ strza³ki!
 A: Masz star± wersjê biblioteki ncurses. Zainstaluj nowsz± wersjê lub
    popro¶ o to administratora systemu.
 
+Q: Jak wy¶wietlaæ wiadomo¶ci, które wysy³am?
+A: /set display_sent 1
+
 
 $Id$
