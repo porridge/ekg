@@ -307,3 +307,13 @@ void gg_free_search(struct gg_search *f)
 	free(f->results);
 	free(f);
 }
+
+/*
+ * Local variables:
+ * c-indentation-style: k&r
+ * c-basic-offset: 8
+ * indent-tabs-mode: notnil
+ * End:
+ *
+ * vim: expandtab shiftwidth=8:
+ */

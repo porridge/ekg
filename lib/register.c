@@ -198,3 +198,12 @@ void gg_free_register(struct gg_register *r)
 	free(r);
 }
 
+/*
+ * Local variables:
+ * c-indentation-style: k&r
+ * c-basic-offset: 8
+ * indent-tabs-mode: notnil
+ * End:
+ *
+ * vim: expandtab shiftwidth=8:
+ */

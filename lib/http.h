@@ -40,3 +40,13 @@ void gg_free_http(struct gg_http *h);
 }
 				
 #endif /* __GG_HTTP_H */
+
+/*
+ * Local variables:
+ * c-indentation-style: k&r
+ * c-basic-offset: 8
+ * indent-tabs-mode: notnil
+ * End:
+ *
+ * vim: expandtab shiftwidth=8:
+ */

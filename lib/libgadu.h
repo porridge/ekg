@@ -378,3 +378,13 @@ struct gg_recv_msg {
 #endif
 
 #endif /* __GG_LIBGG_H */
+
+/*
+ * Local variables:
+ * c-indentation-style: k&r
+ * c-basic-offset: 8
+ * indent-tabs-mode: notnil
+ * End:
+ *
+ * vim: expandtab shiftwidth=8:
+ */
