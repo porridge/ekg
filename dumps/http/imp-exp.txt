@@ -48,6 +48,13 @@ ImieKtos;NazwiskoKtos;PseudoKtos;Ktos;+48602003456;grupa_nr_1,grupa_nr_2;123456
 
 --8<--
 
+Kasacja userlisty:
+
+FmNum=1840944&Pass=d&Delete=1
+
+--8<--
+
+
 robione z uina: 1840505
 userlista: lookas = 507698 (nie nalezy do zadnej grupy)
            arekm = 1295336 (grupy: grupa_nr_1)
@@ -55,4 +62,5 @@ userlista: lookas = 507698 (nie nalezy do zadnej grupy)
 
 ImieXXX, NazwiskoXXX, PseudoXXX ... - odpowiednio pola w interfejsie windzianego klienta gg
 XXX - pole Wyswietlanie
+
 
