@@ -2166,6 +2166,38 @@ COMMAND(cmd_alias_exec)
 	return res;
 }
 
+COMMAND(cmd_timer)
+{
+	list_t l;
+
+	if (match_arg(params[0], 'a', "add", 2)) {
+		if (!params[1] || !params[2]) {
+			print("not_enough_params");
+			return 0;
+		}
+		timer_add(atoi(params[1]), NULL, params[2]);
+
+		return 0;
+	}
+
+	if (match_arg(params[0], 'd', "del", 2)) {
+		if (!params[1]) {
+			print("not_enough_params");
+			return 0;
+		}
+		timer_remove(params[1], NULL);
+		return 0;
+	}
+
+	for (l = timers; l; l = l->next) {
+		struct timer *t = l->data;
+
+		print("timer_list", t->name, itoa(t->period - (time(NULL) - t->started)), t->command);
+	}
+
+	return 0;
+}
+
 #ifdef WITH_PYTHON
 COMMAND(cmd_test_load)
 {
@@ -2512,6 +2544,17 @@ void command_init()
 	( "status", "", cmd_status, 0,
 	  "", "wy¶wietla aktualny stan",
 	  "");
+
+	command_add
+	( "timer", "???", cmd_timer, 0,
+	  " [opcje]", "zarz±dzanie timerami",
+	  "  -a, --add <czas> <komenda>  tworzy nowy timer\n"
+	  "  -d, --del <numer>           zatrzymuje timer\n"
+	  " [-l, --list]                 wy¶wietla listê timerów\n"
+	  "\n"
+	  "Czas podaje siê w sekundach. Timer po jednorazowym uruchomieniu\n"
+	  "jest usuwany. Odmierzanie czasu nie jest idealne i ma dok³adno¶æ\n"
+	  "+/- 1 sekundy.");
 
 	command_add
 	( "unignore", "i", cmd_ignore, 0,

@@ -52,13 +52,13 @@ enum event_t {
 };
 
 struct process {
-	int pid;
-	char *name;
+	int pid;		/* id procesu */
+	char *name;		/* nazwa. je¶li poprzedzona \2 to nie obchodzi nas w jaki sposób siê zakoñczy³o */
 };
 
 struct alias {
-	char *name;
-	list_t commands;		/* commands->data to (char*) */
+	char *name;		/* nazwa aliasu */
+	list_t commands;	/* commands->data to (char*) */
 };
 
 struct transfer {
@@ -70,19 +70,27 @@ struct transfer {
 };
 
 struct event {
-        uin_t uin;
-        int flags;
-        char *action;
+        uin_t uin;	/* numerek dla którego zdarzenie zachodzi */
+        int flags;	/* flagi zdarzenia */
+        char *action;	/* akcja! */
 };
 
 struct emoticon {
-	char *name;
-	char *value;
+	char *name;	/* nazwa emoticona typu "<cmok>" */
+	char *value;	/* tre¶æ emoticona typu ":-*" */
 };
 
 struct sequence {
 	char *seq;
 	char *command;
+};
+
+struct timer {
+	int started;	/* kiedy ustawiono timer */
+	int period;	/* ile sekund ma trwaæ czekanie */
+	int script;	/* czy obs³ugiwany przez skrypt */
+	char *name;	/* nazwa timera */
+	char *command;	/* komenda do wywo³ania */
 };
 
 list_t children;
@@ -92,6 +100,7 @@ list_t transfers;
 list_t events;
 list_t emoticons;
 list_t sequences;
+list_t timers;
 struct gg_session *sess;
 
 int config_dcc;
@@ -222,5 +231,8 @@ int ioctld_socket();
 int emoticon_read();
 char *emoticon_expand(const char *s);
 void emoticon_free();
+
+struct timer *timer_add(int period, const char *name, const char *command);
+int timer_remove(const char *name, const char *command);
 
 #endif /* __STUFF_H */

@@ -142,6 +142,27 @@ void ekg_wait_for_key()
 #endif
 
 	for (;;) {
+		/* przejrzyj timery */
+		for (l = timers; l; ) {
+			struct timer *t = l->data;
+
+			l = l->next;
+
+			if (time(NULL) - t->started > t->period) {
+#ifdef WITH_PYTHON
+				if (t->script)
+					python_function(t->command);
+				else
+#endif
+					command_exec(NULL, t->command);
+
+				xfree(t->name);
+				xfree(t->command);
+
+				list_remove(&timers, t, 1);
+			}
+		}
+
 		FD_ZERO(&rd);
 		FD_ZERO(&wd);
 		

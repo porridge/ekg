@@ -2093,3 +2093,83 @@ int ekg_hash(const char *name)
 
 	return hash;
 }
+
+/*
+ * timer_add()
+ *
+ * dodaje timera.
+ *
+ *  - period - za jaki czas w sekundach ma byæ uruchomiony,
+ *  - name - nazwa timera w celach identyfikacji. je¶li jest równa NULL,
+ *           zostanie przyznany pierwszy numerek z brzegu.
+ *  - command - komenda wywo³ywana po up³yniêciu czasu.
+ *
+ * zwraca zaalokowan± struct timer.
+ */
+struct timer *timer_add(int period, const char *name, const char *command)
+{
+	struct timer t;
+
+	if (!name) {
+		int i;
+
+		for (i = 1; ; i++) {
+			int gotit = 0;
+			list_t l;
+
+			for (l = timers; l; l = l->next) {
+				struct timer *tt = l->data;
+
+				if (!strcmp(tt->name, itoa(i))) {
+					gotit = 1;
+					break;
+				}
+			}
+
+			if (!gotit)
+				break;
+		}
+
+		name = itoa(i);
+	}
+
+	memset(&t, 0, sizeof(t));
+	t.started = time(NULL);
+	t.period = period;
+	t.name = xstrdup(name);
+	t.command = xstrdup(command);
+
+	return list_add(&timers, &t, sizeof(t));
+}
+
+/*
+ * timer_remove()
+ *
+ * usuwa timer.
+ *
+ *  - name - nazwa timera, mo¿e byæ NULL.
+ *  - command - komenda timera, mo¿e byæ NULL.
+ *
+ * 0/-1.
+ */
+int timer_remove(const char *name, const char *command)
+{
+	list_t l;
+	int removed = 0;
+
+	for (l = timers; l; ) {
+		struct timer *t = l->data;
+
+		l = l->next;
+
+		if ((name && !strcmp(name, t->name)) || (command && !strcmp(command, t->command))) {
+			xfree(t->name);
+			xfree(t->command);
+			list_remove(&timers, t, 1);
+			removed = 1;
+		}
+	}
+
+	return (removed) ? 0 : -1;
+}
+

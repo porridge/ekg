@@ -962,5 +962,8 @@ void theme_init()
 	format_add("bind_seq_list", "%) %1: %T%2%n\n", 1);
 	format_add("bind_seq_exist", "%! Sekwencja %T%1%n ma ju¿ przypisan± akcjê\n", 1);
 	format_add("bind_seq_list_empty", "%! Brak przypisanych akcji\n", 1);
+
+	/* timery */
+	format_add("timer_list", "%> %1, %2s, %3\n", 1);
 	
 };
