@@ -170,7 +170,24 @@ ZNANE PROBLEMY
     ¶mietnik na ekranie, dopisz te¿:
 
         set horizontal-scroll-mode on
-    
+
+ROZPOZNAWANIE P£CI
+
+    Krótka wersja: Je¶li ekg ¼le rozpoznaje p³eæ, wpisz imiê do listy
+    kontaktów. W wiêkszo¶ci przypadków pomo¿e. No tak, nie masz pojêcia,
+    jak to zrobiæ? ,,list pseudonim -f imiê''. Pomog³o? ¦wietnie. Nie
+    pomog³o? Czytaj dalej.
+
+    D³uga wersja: Jedn± z najbardziej kontrowersyjnych cech programu jest
+    automatyczne rozpoznawanie p³ci na podstawie ostatniej litery imienia
+    lub gdy jest ono nieznane, pseudonimu. Gdy ostatni± liter± jest ,,a'',
+    ekg uznaje, ¿e dana osoba jest kobiet±. Na przyk³ad, je¶li Twój znajomy
+    ma pseudonim ,,Kuba'', wpisz do listy kontaktów imiê ,,Jakub''.
+    Problemy mog± wyst±piæ z rzadko spotykanymi imionami typu Barnaba
+    czy Mercedes. W takim wypadku nale¿y do imienia dopisaæ (chocia¿by
+    po uko¶niku lub w nawiasie) literê ,,a'' dla kobiet lub inn± ni¿
+    ,,a'' dla mê¿czyzn.
+
 ZG£ASZANIE B£ÊDÓW
 
     Proszê, nie przysy³ajcie informacji, ¿e mo¿na by dodaæ co¶, co jest

@@ -50,4 +50,7 @@ A: Najwyra¼niej pad³ jeden z serwerów. Wpisz ,,set server 217.17.41.x'',
 Q: Jak usun±æ zmienn±?
 A: ,,set -zmienna''
 
+Q: ekg ¼le rozpoznaje p³eæ!
+A: Wpisz imiê do listy kontaktów. Wiêcej szczegó³ów w README.
+
 $Id$
