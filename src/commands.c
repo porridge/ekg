@@ -3281,7 +3281,7 @@ COMMAND(cmd_test_hexmsg)
 		if (!isxdigit(ch))
 			continue;
 
-		buf[j / 2] |= (int)(index(hex, ch) - hex);
+		buf[j / 2] |= (int)(strchr(hex, ch) - hex);
 		
 		if ((j % 2) == 0)
 			buf[j / 2] <<= 4;
