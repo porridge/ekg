@@ -91,7 +91,7 @@ struct command commands[] = {
 	{ "?", "c", command_help, " [polecenie]", "Synonim dla help", "" },
 	{ "ignore", "u", command_ignore, " [numer/alias]", "Dodaje do listy ignorowanych lub j± wy¶wietla", "" },
 	{ "invisible", "", command_away, "", "Zmienia stan na niewidoczny", "" },
-	{ "list", "", command_list, "", "Wy¶wietla listê kontaktów", "" },
+	{ "list", "", command_list, "[opcje]", "Wy¶wietla listê kontaktów", "  --active\n  --busy\n  --inactive\n" },
 	{ "msg", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ do podanego u¿ytkownika", "" },
 	{ "modify", "u", command_modify, " <alias> [opcje]", "Zmienia informacje w li¶cie kontaktów", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n --alias <alias>  // nazwa w li¶cie kontaktów\n  --phone <telefon>\n  --uin <numerek>\n" },
 	{ "private", "", command_away, " [on/off]", "W³±cza/wy³±cza tryb ,,tylko dla przyjació³''", "" },
@@ -797,8 +797,29 @@ COMMAND(command_ignore)
 COMMAND(command_list)
 {
 	struct list *l;
-	int count = 0;
-	char *tmp;
+	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0;
+	char *tmp, **argv;
+
+        if (params[0] && (argv = split_params(params[0], -1))) {
+		int i;
+
+		for (i = 0; argv[i]; i++) {
+			if (argv[i][0] == '-' && argv[i][1] == '-')
+				argv[i]++;
+			if (argv[i][0] == '-' && argv[i][1] == 'a') {
+				show_all = 0;
+				show_active = 1;
+			}
+			if (argv[i][0] == '-' && (argv[i][1] == 'i' || argv[i][1] == 'u' || argv[i][1] == 'n')) {
+				show_all = 0;
+				show_inactive = 1;
+			}
+			if (argv[i][0] == '-' && argv[i][1] == 'b') {
+				show_all = 0;
+				show_busy = 1;
+			}
+		}
+	}
 
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
@@ -822,11 +843,13 @@ COMMAND(command_list)
 		snprintf(__ip, sizeof(__ip), "%s", inet_ntoa(in));
 		snprintf(__port, sizeof(__port), "%d", u->port);
 
-		my_printf(tmp, format_user(u->uin), __ip, __port);
-		count++;
+		if (show_all || (show_busy && u->status == GG_STATUS_BUSY) || (show_active && u->status == GG_STATUS_AVAIL) || (show_inactive && u->status == GG_STATUS_NOT_AVAIL)) {
+			my_printf(tmp, format_user(u->uin), __ip, __port);
+			count++;
+		}
 	}
 
-	if (!count)
+	if (!count && show_all)
 		my_printf("list_empty");
 
 	return 0;
