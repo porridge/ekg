@@ -7,7 +7,7 @@ rozwi±zanie.
 Lista rzeczy, które TRZEBA zrobiæ przed wydaniem wersji 1.0:
 
 * biblioteka:
-  - nic wa¿nego,
+  - przyjrzeæ siê rozmowom g³osowym, przetestowaæ,
 
 * klient:
   - ucinanie za d³ugich szyfrowanych wiadomo¶ci
@@ -16,10 +16,12 @@ Pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
 
 * biblioteka:
   - komunikacja miêdzy klientami, bezpo¶rednie rozmowy,
+  - czas powrotu w stanach opisowych,
 
 * klient:
   - dope³nianie w ¶rodku linii (sz)
   - wykrywanie niewidocznych jako opcja (wielu),
+  - czas powrotu w stanach opisowych,
   - uporz±dkowane i dobrze dzia³aj±ce okna p³ywaj±ce (sz?)
   - mo¿liwo¶æ automagicznego wyrównywania kolejnych linii wiadomo¶ci w tematach
     ircopodobnych do d³ugo¶ci nazwy rozmówcy i timestampu (sz)
