@@ -1,6 +1,9 @@
-// 2001-11-26
+// 2001-12-02
 
 - algorytm obliczania hasha http (coxoc)
+
+// 2001-11-26
+
 - przygotowanie do obs³ugi rejestracji (w)
 - wordwrapping, haha! nowe formaty {message,chat}_line{,_width}
   do ³adnych mesgów z rameczkami i takimi tam (w)
