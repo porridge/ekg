@@ -4559,7 +4559,7 @@ void command_init()
 	  "\n"
 	  "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie "
           "podano powodu, zostanie wylosowany z pliku %Taway.reasons%n. "
- 	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez "
+ 	  "Podanie ,,%T-%n'' zamiast powodu spowoduje wyczyszczenie bez "
 	  "wzglêdu na ustawienia zmiennych.");
 
 	command_add
@@ -4583,7 +4583,7 @@ void command_init()
 	  "\n"
           "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie "
 	  "podano powodu, zostanie wylosowany z pliku %Tback.reasons%n. "
-	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez "
+	  "Podanie ,,%T-%n'' zamiast powodu spowoduje wyczyszczenie bez "
 	  "wzglêdu na ustawienia zmiennych.");
 
 	command_add
@@ -4597,7 +4597,7 @@ void command_init()
 	  "\n"
 	  "Kolejne d¼wiêki oddzielone s± przecinkami. D¼wiêk sk³ada siê "
 	  "z tonu w hercach i d³ugo¶ci trwania w mikrosekundach oddzielonej "
-	  "uko¶nikiem (%T/%n). Je¶li nie podano czasu trwania, domy¶lna "
+	  "uko¶nikiem (,,%T/%n''). Je¶li nie podano czasu trwania, domy¶lna "
 	  "warto¶æ to 0,1s.\n"
 	  "\n"
 	  "Zamiast sekwencji mo¿na podaæ nazwê formatu z themu.");
@@ -4607,7 +4607,7 @@ void command_init()
 	  " <sekwencja>", "odtwarza sekwencjê na diodach LED",
 	  "\n"
 	  "Kombinacje diod oddzielone s± przecinkami. Je¶li po kombinacji "
-	  "wystêpuje znak uko¶nika (%T/%n), po nim podany jest czas trwania "
+	  "wystêpuje znak uko¶nika (,,%T/%n''), po nim podany jest czas trwania "
 	  "w mikrosekundach. Domy¶lny czas trwania to 0,1s. Kombinacja jest "
 	  "map± bitow± o nastêpuj±cych "
 	  "warto¶ciach: 1 - NumLock, 2 - ScrollLock, 4 - CapsLock. Na "
@@ -4653,7 +4653,7 @@ void command_init()
 	  "\n"
 	  "Je¶li który¶ z parametrów nie zostanie podany, jego warto¶æ "
 	  "zostanie wyczyszczona w katalogu publicznym. Podanie parametru "
-	   ",,-'' wyczy¶ci %Twszystkie%n pola.");
+	   ",,%T-%n'' wyczy¶ci %Twszystkie%n pola.");
 	  
 	command_add
 	( "chat", "u?", cmd_msg, 0,
@@ -4718,8 +4718,8 @@ void command_init()
 	  "  -m, --msg  [numer/alias] wysy³a wynik do danej osoby\n"
 	  "  -b, --bmsg [numer/alias] wysy³a wynik w jednej wiadomo¶ci\n"
 	  "\n"
-	  "Poprzedzenie polecenia znakiem %T^%n ukryje informacjê o "
-	  "zakoñczeniu. Je¶li jako alias podamy %T$%n, wynik bêdzie "
+	  "Poprzedzenie polecenia znakiem ,,%T^%n'' ukryje informacjê o "
+	  "zakoñczeniu. Je¶li jako alias podamy ,,%T$%n'', wynik bêdzie "
 	  "wys³any do rozmówcy z aktualnego okna. Ze wzglêdu na budowê "
 	  "klienta, numery i aliasy %Tnie bêd±%n dope³niane Tabem.");
 	  
@@ -4769,7 +4769,7 @@ void command_init()
 	  "  - events - ignoruje zdarzenia zwi±zane z u¿ytkownikiem\n"
 	  "  - * - wszystkie poziomy\n"
 	  "\n"
-	  "Poziomy mo¿na ³±czyæ ze sob± za pomoc± przecinka lub ,,|''.");
+	  "Poziomy mo¿na ³±czyæ ze sob± za pomoc± przecinka lub ,,%T|%n''.");
 	  
 	command_add
 	( "invisible", "?", cmd_away, 0,
@@ -4777,7 +4777,7 @@ void command_init()
 	  "\n"
           "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie "
 	  "podano powodu, zostanie wylosowany z pliku %Tquit.reasons%n. "
-	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez "
+	  "Podanie ,,%T-%n'' zamiast powodu spowoduje wyczyszczenie bez "
 	  "wzglêdu na ustawienia zmiennych.");
 
 #ifdef HAVE_OPENSSL
@@ -4868,12 +4868,12 @@ void command_init()
 	  "  - sigusr1, sigusr2 - otrzymanie przez ekg danego sygna³u\n"
 	  "  - newmail - otrzymanie nowej wiadomo¶ci e-mail\n"
 	  "\n"
-	  "    W przypadku sigusr i newmail nale¿y podaæ ,,*'' jako sprawcê zdarzenia\n"
+	  "    W przypadku sigusr i newmail nale¿y podaæ ,,%T*%n'' jako sprawcê zdarzenia\n"
 	  "\n"
 	  "  - * - wszystkie zdarzenia\n"
 	  "\n"
-	  "Zdarzenia mo¿na ³±czyæ ze sob± za pomoc± przecinka lub ,,|''. Jako numer/alias "
-	  "mo¿na podaæ ,,*'', dziêki czemu zdarzenie bêdzie dotyczyæ ka¿dego u¿ytkownika. "
+	  "Zdarzenia mo¿na ³±czyæ ze sob± za pomoc± przecinka lub ,,%T|%n''. Jako numer/alias "
+	  "mo¿na podaæ ,,%T*%n'', dziêki czemu zdarzenie bêdzie dotyczyæ ka¿dego u¿ytkownika. "
 	  "Je¶li kto¶ posiada indywidualn± akcjê na dane zdarzenie, to tylko ona zostanie "
 	  "wykonana. Mo¿na podaæ wiêcej komend, oddzielaj±c je ¶rednikiem. W komendzie, %T\\%1%n "
 	  "zostanie zast±pione numerkiem sprawcy zdarzenia, a je¶li istnieje on na naszej "
@@ -4938,7 +4938,7 @@ void command_init()
 	  "\n"
           "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie "
 	  "podano powodu, zostanie wylosowany z pliku %Tquit.reasons%n. "
-	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez "
+	  "Podanie ,,%T-%n'' zamiast powodu spowoduje wyczyszczenie bez "
 	  "wzglêdu na ustawienia zmiennych.");
 	  
 	command_add
@@ -5023,7 +5023,7 @@ void command_init()
 	  "Czas podaje siê w sekundach. Mo¿na te¿ u¿yæ przyrostków %Td%n, %Th%n, %Tm%n, %Ts%n, "
 	  "oznaczaj±cych dni, godziny, minuty, sekundy, np. 5h20m. Timer po "
 	  "jednorazowym uruchomieniu jest usuwany, chyba ¿e czas poprzedzimy "
-	  "wyra¿eniem ,,*/''. Wtedy timer bêdzie uruchamiany w zadanych odstêpach "
+	  "wyra¿eniem ,,%T*/%n''. Wtedy timer bêdzie uruchamiany w zadanych odstêpach "
 	  "czasu, a na li¶cie bêdzie oznaczony gwiazdk±.");
 
 	command_add
