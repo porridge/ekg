@@ -438,7 +438,8 @@ COMMAND(cmd_status)
 		print("show_status_status", tmp, "");
 		if (last_conn_event)
 			print("show_status_disconnected_since", buf);
-		print("show_status_msg_queue", ((mqc = msg_queue_count()) != 0) ? itoa(mqc) : itoa(0)); 
+		if ((mqc = msg_queue_count()))
+			print("show_status_msg_queue", itoa(mqc)); 
 		xfree(tmp);
 
 		return;
@@ -1189,14 +1190,15 @@ COMMAND(cmd_list)
 				p = 0;
 			}
 
-			switch (config_status) {
-				case GG_STATUS_INVISIBLE:
-					tmp = "list_invisible";
-					break;
-				case GG_STATUS_INVISIBLE_DESCR:
-					tmp = "list_invisible_descr";
-					break;
-			}
+			if (sess && sess->state == GG_STATE_CONNECTED)
+				switch (config_status) {
+					case GG_STATUS_INVISIBLE:
+						tmp = "list_invisible";
+						break;
+					case GG_STATUS_INVISIBLE_DESCR:
+						tmp = "list_invisible_descr";
+						break;
+				}
 		}
 
 		if ((show_all || (show_busy && GG_S_B(u->status)) || (show_active && GG_S_A(u->status)) || (show_inactive && GG_S_NA(u->status)) || (show_invisible && GG_S_I(u->status))) && !(show_descr && !GG_S_D(u->status))) {
