@@ -1107,11 +1107,15 @@ int check_event(int event, uin_t uin)
                 return 1;
 
         if (strchr(evt_ptr, ';')) {
-		char *ev = strtok(evt_ptr, ";");
-                while (ev) {
-			run_event(ev);
-			ev = strtok(NULL, ";");
-                }
+		char **events = array_make(evt_ptr, ";", 0, 0, 0);
+		int i = 0;
+		
+                while (events[i]) {
+			run_event(events[i]);
+			i++;
+		}
+		
+		array_free(events);
         } else
 		run_event(evt_ptr);
 
@@ -1130,7 +1134,7 @@ int check_event(int event, uin_t uin)
 int run_event(char *act)
 {
         uin_t uin;
-        char *cmd = NULL, *arg = NULL, *data = NULL, *action;
+        char *action, *ptr, **acts;
 #ifdef IOCTL
 	int res;
 #endif
@@ -1140,55 +1144,66 @@ int run_event(char *act)
 	if (!(action = strdup(act)))
 		return 1;
 	
-        if (strchr(action, ' ')) {
-                cmd = strtok(action, " ");
-                arg = strtok(NULL, "");
-        } else {
-                cmd = action;
-		arg = NULL;
-	}
+	ptr = action;
+	
+	while (isspace(*ptr)) 
+	    ptr++;
+
+        if (strchr(ptr, ' ')) 
+	    	acts = array_make(ptr, " ", 2, 0, 0);
+        else 
+	    	acts = array_make(ptr, " ", 1, 0, 0);
 
 #ifdef IOCTL
-        if (!strncasecmp(cmd, "blink_leds", 10)) {
+        if (!strncasecmp(acts[0], "blink_leds", 10)) {
 		gg_debug(GG_DEBUG_MISC, "//   blinking leds\n");
-		res = send_event(arg, ACT_BLINK_LEDS);
+		res = send_event(acts[1], ACT_BLINK_LEDS);
 		free(action);
+		array_free(acts);
                 return res;
 	}
 
-        if (!strncasecmp(cmd, "beeps_spk", 9)) {
+        if (!strncasecmp(acts[0], "beeps_spk", 9)) {
 		gg_debug(GG_DEBUG_MISC, "//   beeping speaker\n");
-		res = send_event(arg, ACT_BEEPS_SPK);
+		res = send_event(acts[1], ACT_BEEPS_SPK);
 		free(action);
+		array_free(acts);
 		return res;
 	}
 #endif	//IOCTL
  	
-	if (!strncasecmp(cmd, "play", 4)) {
+	if (!strncasecmp(acts[0], "play", 4)) {
 		gg_debug(GG_DEBUG_MISC, "//   playing sound\n");
-		play_sound(arg);
+		play_sound(acts[1]);
 		free(action);
+		array_free(acts);
 		return 0;
 	} 
 
-	if (!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
+	if (!strncasecmp(acts[0], "chat", 4) || !strncasecmp(acts[0], "msg", 3)) {
                 struct userlist *u;
-		int chat = (!strncasecmp(cmd, "chat", 4));
+		char *data;
+		int i = 0, chat = (!strncasecmp(acts[0], "chat", 4));
 
 		gg_debug(GG_DEBUG_MISC, "//   chatting/mesging\n");
 		
-                if (!strchr(arg, ' ')) {
+                if (!strchr(acts[1], ' ')) {
 			free(action);
+			array_free(acts);
                         return 1;
 		}
 
-                strtok(arg, " ");
-                data = strtok(NULL, "");
-
-                if (!(uin = get_uin(arg))) {
+		while (isalnum(acts[1][i]))
+		    	i++;
+		acts[1][i++] = '\0';
+		
+                if (!(uin = get_uin(acts[1]))) {
 			free(action);
+			array_free(acts);
                         return 1;
 		}
+		data = acts[1] + i;
+	
 
 		u = userlist_find(uin, NULL);
 
@@ -1196,14 +1211,16 @@ int run_event(char *act)
 
                 iso_to_cp(data);
                 gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, data);
-		
+
 		free(action);
+		array_free(acts);
                 return 0;
         }
 	
 	gg_debug(GG_DEBUG_MISC, "//   unknown action\n");
 
 	free(action);
+	array_free(acts);
         return 0;
 }
 
@@ -1249,7 +1266,8 @@ int send_event(char *seq, int act)
  */
 int correct_event(char *act)
 {
-        char *cmd = NULL, *arg = NULL, *action, *ev;
+        char *action, *ev, **events;
+	int a = 0;
 
 #ifdef IOCTL
         struct action_data test;
@@ -1262,91 +1280,112 @@ int correct_event(char *act)
 		free(action);
                 return 1;
 	}
+	
+	events = array_make(action, ";", 0, 0, 0);
 
-	ev = strtok(action, ";");
-
-	while (ev) {
+	while ((ev = events[a++])) {
+	    	char **acts; int i = 0;
                 while (*ev == ' ') ev++;
 
-                if (strchr(ev, ' ')) {
-                        cmd = strtok(ev, " ");
-                        arg = strtok(NULL, "");
-                } else {
-                        cmd = ev;
-			arg = NULL;
-		}
+                if (strchr(ev, ' ')) 
+		    	acts = array_make(ev, " \t", 2, 0, 0);
+                else 
+                        acts = array_make(ev, " \t", 1, 0, 0);
+		
 
 #ifdef IOCTL
-                if (!strncasecmp(cmd, "blink_leds", 10) || !strncasecmp(cmd, "beeps_spk", 9)) {
-                        if (arg == NULL) {
-                                my_printf("events_act_no_params", cmd);
+                if (!strncasecmp(acts[0], "blink_leds", 10) || !strncasecmp(acts[0], "beeps_spk", 9)) {
+                        if (acts[1] == NULL) {
+                                my_printf("events_act_no_params", acts[0]);
 				free(action);
+				array_free(acts);
+				array_free(events);
                                 return 1;
                         }
 
-                        if (*arg == '$') {
-                                arg++;
-                                if (!strcmp(find_format(arg), "")) {
-                                        my_printf("events_seq_not_found", arg);
+                        if (*acts[1] == '$') {
+                                acts[1]++;
+                                if (!strcmp(find_format(acts[1]), "")) {
+                                        my_printf("events_seq_not_found", acts[1]);
 					free(action);
+					array_free(acts);
+					array_free(events);
                                         return 1;
                                 }
+				array_free(acts);
                                 continue;
                         }
 
-                        if (events_parse_seq(arg, &test)) {
-                                my_printf("events_seq_incorrect", arg);
+                        if (events_parse_seq(acts[1], &test)) {
+                                my_printf("events_seq_incorrect", acts[1]);
 				free(action);
+				array_free(acts);
+				array_free(events);
                                 return 1;
                         }
 
+			array_free(acts);
                         continue;
                 }
 
                 else 
 #endif // IOCTL		
 
-		if (!strncasecmp(cmd, "play", 4)) {
-			if (!arg) {
-				my_printf("events_act_no_params", cmd);
+		if (!strncasecmp(acts[0], "play", 4)) {
+			if (!acts[1]) {
+				my_printf("events_act_no_params", acts[0]);
 				free(action);
+				array_free(acts);
+				array_free(events);
 				return 1; 
 			}
 		} 
-		else if (!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
-                        if (!arg) {
-                                my_printf("events_act_no_params", cmd);
+		else if (!strncasecmp(acts[0], "chat", 4) || !strncasecmp(acts[0], "msg", 3)) {
+                        if (!acts[1]) {
+                                my_printf("events_act_no_params", acts[0]);
 				free(action);
+				array_free(acts);
+				array_free(events);
                                 return 1;
                         }
 
-                        if (!strchr(arg, ' ')) {
-                                my_printf("events_act_no_params", cmd);
+                        if (!strchr(acts[1], ' ')) {
+                                my_printf("events_act_no_params", acts[0]);
 				free(action);
+				array_free(acts);
+				array_free(events);
                                 return 1;
                         }
 
-                        strtok(arg, " ");
+			while (isalnum(acts[1][i]))
+			    	i++;
+			acts[1][i] = '\0';
 
-                        if (!get_uin(arg)) {
-                                my_printf("user_not_found", arg);
+                        if (!get_uin(acts[1])) {
+                                my_printf("user_not_found", acts[1]);
 				free(action);
+				array_free(acts);
+				array_free(events);
                                 return 1;
                         }
 
+			array_free(acts);
                         continue;
                 }
 
                 else {
                         my_printf("events_noexist");
 			free(action);
+			array_free(acts);
+			array_free(events);
                         return 1;
                 }
 
-		ev = strtok(NULL, ";");
+		array_free(acts);
         }
 
 	free(action);
+	array_free(events);
 
         return 0;
 }
