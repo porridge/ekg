@@ -179,7 +179,7 @@ struct gg_notify_reply {
 	unsigned long status;		/* status danej osoby */
 	unsigned long remote_ip;	/* adres ip delikwenta */
 	unsigned short remote_port;	/* port, na którym s³ucha klient */
-	unsigned long version;		/* == 0x0b */
+	unsigned long version;		/* wersja klienta */
 	unsigned short dunno2;		/* znowu port? */
 } __attribute__ ((packed));
 
@@ -409,6 +409,7 @@ int gg_http_hash(char *format, ...);
 #define GG_HTTPS_PORT 443
 #define GG_HTTP_USERAGENT "Mozilla/4.7 [en] (Win98; I)"
 
+#define GG_CLIENT_VERSION 0x0b
 #define GG_DEFAULT_TIMEOUT 30
 
 struct gg_header {
@@ -428,7 +429,7 @@ struct gg_login {
 	uin_t uin;			/* twój numerek */
 	unsigned long hash;		/* hash has³a */
 	unsigned long status;		/* status na dzieñ dobry */
-	unsigned long dunno;		/* == 0x0b */
+	unsigned long version;		/* moja wersja klienta */
 	unsigned long local_ip;		/* mój adres ip */
 	unsigned short local_port;	/* port, na którym s³ucham */
 } __attribute__ ((packed));
