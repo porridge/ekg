@@ -146,7 +146,6 @@ int config_protocol = 0;
 int pipe_fd = -1;
 int batch_mode = 0;
 char *batch_line = NULL;
-int config_emoticons = 1;
 int config_make_window = 2;
 char *config_tab_command = NULL;
 int ioctld_sock = -1;

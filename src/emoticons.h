@@ -24,6 +24,13 @@
 #ifndef __EMOTICONS_H
 #define __EMOTICONS_H
 
+struct emoticon {
+        char *name;
+        char *value;
+};
+
+list_t emoticons;
+
 int emoticon_read();
 char *emoticon_expand(const char *s);
 void emoticon_free();

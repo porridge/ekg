@@ -29,16 +29,14 @@
 #include <string.h>
 
 #include "dynstuff.h"
+#include "emoticons.h"
 #include "stuff.h"
 #include "userlist.h"
 #include "xmalloc.h"
 
 list_t emoticons = NULL;
 
-struct emoticon {
-	char *name;
-	char *value;
-};
+int config_emoticons = 1;
 
 /*
  * emoticon_add()

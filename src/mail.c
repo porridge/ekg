@@ -44,14 +44,14 @@
 #include "ui.h"
 #include "xmalloc.h"
 
+list_t mail_folders = NULL;
+
 int config_check_mail = 0;
 int config_check_mail_frequency = 15;
 char *config_check_mail_folders = NULL;
 
 int mail_count = 0;
 int last_mail_count = 0;
-
-list_t mail_folders = NULL;
 
 /*
  * check_mail()
