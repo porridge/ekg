@@ -9,6 +9,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - pocz±tek ui_event() (w)
 - poprawiony segfault w ,,dcc get #'' (Chilek/w)
+- update feeg.theme (feeg/w)
 
 // 2002-07-02
 
