@@ -8,7 +8,10 @@ wszystko wyrzuciæ do pluginów. ekg samo w sobie nie powinno umieæ siê
 z niczym ³±czyæ, ani nic wy¶wietlaæ. ma zawieraæ funkcje obs³ugi pluginów,
 obs³ugi komend, obs³ugi zmiennych i kilku kawa³ków kodu, które mog± byæ
 dzielone miêdzy pluginami (np. formatowanie tekstu, konferencje, przypisane
-klawisze).
+klawisze). nie wszystkie pluginy musz± byæ ³adowane dynamicznie. kilka na
+pewno bêdzie domy¶lnie linkowanych statycznie -- chodzi o mo¿liwo¶æ ³atwego
+pozbycia siê zale¿no¶ci g³ównej binarki od wielu bibliotek i zachowanie
+jednolitego API.
 
 do g³owy przychodzi mi kilka klas pluginów:
 
@@ -118,4 +121,10 @@ i tak rozmawiamy tylko na ircu.
 wypada³oby te¿ w koñcu oddzieliæ libgadu od ekg, skoro ekg ma obs³ugiwaæ
 inne protoko³y. nie do¶æ, ¿e ul¿y to autorom innych klientów GG, wymusi
 wiêkszy porz±dek w API, wersjach i binarnej kompatybilno¶ci.
+
+z okazji pluginów, dobrze by³oby te¿ siê przyjrzeæ takim wynalazkom jak
+automake i libtool. rozmiar pakietu wzro¶nie, ale nie bêdzie problemów
+z obs³ug± platform innych ni¿ te, na których pracuj± autorzy (pomy¶leæ,
+¿e jeszcze 2 lata uwa¿a³em autoconfa za z³o wcielone. pod postaci± 
+software'u.)
 
