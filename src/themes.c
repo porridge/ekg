@@ -1167,7 +1167,7 @@ void theme_init()
 	format_add("dcc_show_active_send", "%) #%1, %2, wysy³anie %T%3%n\n", 1);
 	format_add("dcc_show_active_get", "%) #%1, %2, odbiór %T%3%n\n", 1);
 	format_add("dcc_show_active_voice", "%) #%1, %2, rozmowa\n", 1);
-	format_add("dcc_show_empty", "%> Brak bezpo¶rednich po³±czeñ\n", 1);
+	format_add("dcc_show_empty", "%! Brak bezpo¶rednich po³±czeñ\n", 1);
 	format_add("dcc_show_debug", "%> id=%1, type=%2, filename=%3, uin=%4, dcc=%5, offset=%6, size=%7 (%8%%)\n", 1);
 	
 	format_add("dcc_done_get", "%> Zakoñczono pobieranie pliku %T%2%n od %1\n", 1);
