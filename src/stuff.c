@@ -345,7 +345,7 @@ int config_read()
                         if (pms && pms[0] && pms[1] && pms[2] && (flags = event_flags(pms[0])) && (uin = atoi(pms[1])) && !event_correct(pms[2]))
                                 event_add(event_flags(pms[0]), atoi(pms[1]), xstrdup(pms[2]), 1);
 			array_free(pms);
-                } else
+                } else 
 			variable_set(buf, foo, 1);
 
 		free(buf);
@@ -1740,6 +1740,9 @@ void changed_dcc(const char *var)
 	struct gg_dcc *dcc = NULL;
 	struct list *l;
 	
+	if (!config_uin)
+		return;
+	
 	if (!strcmp(var, "dcc")) {
 		for (l = watches; l; l = l->next) {
 			struct gg_common *c = l->data;
@@ -1756,8 +1759,9 @@ void changed_dcc(const char *var)
 		if (config_dcc && !dcc) {
 			if (!(dcc = gg_dcc_socket_create(config_uin, 0))) {
 				print("dcc_create_error", strerror(errno));
-			} else
+			} else {
 				list_add(&watches, dcc, 0);
+			}
 		}
 	}
 

@@ -150,6 +150,7 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 {
 	struct variable *v = variable_find(name);
 
+	printf("variable_set(\"%s\", \"%s\", %d);\n", name, value, allow_foreign);
 	if (!v && allow_foreign) {
 		variable_add(name, VAR_FOREIGN, 2, xstrdup(value), NULL);
 		return -1;
@@ -169,7 +170,7 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 			if (!strncmp(p, "0x", 2))
 				p += 2;
 
-			while (*p) {
+			while (*p && *p != ' ') {
 				if (*p < '0' || *p > '9')
 					return -2;
 				p++;

@@ -14,6 +14,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - przepisanie readline.m4 od zera. teraz siê zacznie narzekanie na mnie
   na ekg-users (w)
 - dodanie opcji --all i --debug, usuniêcie opcji --raw w ekgsearch (wysek)
+- poprawka do¶æ nieciekawego segfaulta (print() przed ui_init()) (baseciq/w)
 
 // 2002-07-11
 

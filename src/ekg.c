@@ -597,6 +597,8 @@ int main(int argc, char **argv)
 	
         ekg_pid = getpid();
 
+	ui_init();
+
 	init_theme();
 
 	in_autoexec = 1;
@@ -697,11 +699,9 @@ int main(int argc, char **argv)
 		list_add(&watches, &si, sizeof(si));
 	}
 
-	ui_init();
-
 	if (!batch_mode)
 		print("welcome", VERSION);
-	
+
 	if (!config_uin || !config_password)
 		print("no_config");
 
