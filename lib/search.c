@@ -26,7 +26,6 @@
 #endif
 #include <stdarg.h>
 #include <ctype.h>
-#include "config.h"
 #include "libgadu.h"
 
 /*
@@ -228,8 +227,7 @@ int gg_search_watch_fd(struct gg_http *h)
                 return -1;
         }
 
-	s->count = 0;
-	s->results = NULL;
+	memset(s, 0, sizeof(struct gg_search));
 	
 	if (!gg_get_line(&buf)) {
 		gg_debug(GG_DEBUG_MISC, "=> search, can't read the first line\n");
@@ -295,6 +293,9 @@ void gg_search_free(struct gg_http *h)
 			free(s->results[i].nickname);
 			free(s->results[i].city);
 		}
+
+		free(s->results);
+
 		free(s);
 	}
 

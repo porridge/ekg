@@ -11,7 +11,7 @@ VERSION_MAJOR=2
 VERSION_MINOR=7
 
 CC = @CC@ 
-CFLAGS = @CFLAGS_LIBGADU@ -I.. -Wall
+CFLAGS = @CFLAGS_LIBGADU@ -I. -I.. -Wall
 LIBS = @LIBS_LIBGADU@
 
 MAKE = @MAKE@
@@ -37,7 +37,7 @@ clean:
 	rm -f *.o *.lo *.a *.so *.so.* *~ core
 
 distclean:	clean
-	rm -f Makefile
+	rm -f Makefile libgadu-config.h
 
 #
 
@@ -66,6 +66,7 @@ install: @install_shared@ @install_static@
 install-common:
 	$(INSTALL) -d $(DESTDIR)$(includedir)
 	$(INSTALL) -m 644 libgadu.h $(DESTDIR)$(includedir)
+	$(INSTALL) -m 644 libgadu-config.h $(DESTDIR)$(includedir)
 	$(INSTALL) -d $(DESTDIR)$(libdir)
 
 install-shared:	install-common @strip_libgadu_so@

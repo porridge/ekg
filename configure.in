@@ -2,7 +2,7 @@ dnl $Id$
 
 AC_INIT(lib/libgadu.h)
 AC_PREREQ(2.50)
-AC_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS(config.h)
 
 AC_PROG_CC
 AC_PROG_CPP
@@ -58,6 +58,25 @@ AC_SUBST(make_ekgwap, "")
 AC_SUBST(install_ekgwap, "")
 
 AC_SUBST(OBJS, "")
+
+echo "/* Generated automatically by configure. Do not edit. */" > lib/libgadu-config.h
+cat lib/libgadu-config.h.in >> lib/libgadu-config.h
+
+AC_TRY_RUN([
+  int main() {
+  #ifdef WORDS_BIGENDIAN
+    return 0;
+  #else
+    return 1;
+  #endif
+  }
+], [
+  sed 's/#undef __GG_LIBGADU_BIGENDIAN/#define __GG_LIBGADU_BIGENDIAN/' < lib/libgadu-config.h > lib/libgadu-config.h-
+  mv -f lib/libgadu-config.h- lib/libgadu-config.h
+], [
+  sed 's/#undef __GG_LIBGADU_BIGENDIAN.*/\/* & *\//' < lib/libgadu-config.h > lib/libgadu-config.h-
+  mv -f lib/libgadu-config.h- lib/libgadu-config.h
+])
 
 # najpierw sprawdzamy te opcje, które s± wspólne dla libgadu i ekg.
 
@@ -132,8 +151,17 @@ if test "x$with_pthread" = "xyes"; then
     AC_CHECK_LIB(pthread, pthread_create, [
       AC_DEFINE(HAVE_PTHREAD, 1, [Define if you want to use pthread in resolver])
       LIBS="$LIBS -lpthread"
+
+      sed 's/#undef __GG_LIBGADU_HAVE_PTHREAD/#define __GG_LIBGADU_HAVE_PTHREAD/' < lib/libgadu-config.h > lib/libgadu-config.h-
+      mv -f lib/libgadu-config.h- lib/libgadu-config.h
+      libgadu_have_pthread=yes
     ])
   ])
+fi
+
+if test "x$libgadu_have_pthread" != "xyes"; then
+  sed 's/#undef __GG_LIBGADU_HAVE_PTHREAD/\/* & *\//' < lib/libgadu-config.h > lib/libgadu-config.h-
+  mv -f lib/libgadu-config.h- lib/libgadu-config.h
 fi
 
 # zachowujemy opcje dla libgadu

@@ -32,10 +32,11 @@
 extern "C" {
 #endif
 
+#include <libgadu-config.h>
 #include <sys/types.h>
 #include <stdint.h>
 
-#ifdef HAVE_PTHREAD
+#ifdef __GG_LIBGADU_HAVE_PTHREAD
 #  include <pthread.h>
 #  define gg_common_head_pthread pthread_t resolver;
 #else
