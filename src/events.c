@@ -167,6 +167,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 			target = xstrdup((chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender)));
 	} else
 	        target = xstrdup((chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender)));
+
 	cname = (c ? c->name : "");
 
 	tt = time(NULL);
