@@ -59,6 +59,12 @@
 #  include "sim.h"
 #  include "simlite.h"
 #endif
+#ifndef HAVE_STRLCPY
+#  include "../compat/strlcpy.h"
+#endif
+#ifndef HAVE_STRLCAT
+#  include "../compat/strlcat.h"
+#endif
 
 COMMAND(cmd_modify);
 
@@ -3978,7 +3984,7 @@ COMMAND(cmd_at)
 			struct timer *t = l->data;
 			struct timeval tv;
 			struct tm *at_time;
-			char *tmp, *tmp2;
+			char tmp[100], tmp2[150];
 			const char *type_str;
 			time_t sec, minutes = 0, hours = 0, days = 0;
 
@@ -3990,11 +3996,11 @@ COMMAND(cmd_at)
 			gettimeofday(&tv, NULL);
 
 			at_time = localtime((time_t *) &t->ends.tv_sec);
-			tmp = xmalloc(100);
-			strftime(tmp, 100, format_find("at_timestamp"), at_time);
+			strftime(tmp, sizeof(tmp), format_find("at_timestamp"), at_time);
 
 			if (t->persistent) {
 				sec = t->period;
+
 				if (sec > 86400) {
 					days = sec / 86400;
 					sec -= days * 86400;
@@ -4010,18 +4016,28 @@ COMMAND(cmd_at)
 					sec -= minutes * 60;
 				}
 
-				if (days)
-					tmp2 = saprintf("every %dd %dh %dm %ds", days, hours, minutes, sec);
-				else
-					if (hours)
-						tmp2 = saprintf("every %dh %dm %ds", hours, minutes, sec);
-					else
-						if (minutes)
-							tmp2 = saprintf("every %dm %ds", minutes, sec);
-						else
-							tmp2 = saprintf("every %ds", sec);
-			} else
-				tmp2 = xstrdup("");
+				strlcpy(tmp2, "every ", sizeof(tmp2));
+
+				if (days) {
+					strlcat(tmp2, itoa(days), sizeof(tmp2));
+					strlcat(tmp2, "d ", sizeof(tmp2));
+				}
+
+				if (hours) {
+					strlcat(tmp2, itoa(hours), sizeof(tmp2));
+					strlcat(tmp2, "h ", sizeof(tmp2));
+				}
+
+				if (minutes) {
+					strlcat(tmp2, itoa(minutes), sizeof(tmp2));
+					strlcat(tmp2, "m ", sizeof(tmp2));
+				}
+
+				if (sec) {
+					strlcat(tmp2, itoa(sec), sizeof(tmp2));
+					strlcat(tmp2, "s", sizeof(tmp2));
+				}
+			}
 
 			switch (t->type) {
 				case TIMER_UI:
@@ -4037,10 +4053,7 @@ COMMAND(cmd_at)
 					type_str = "unknown";
 			}
 
-			printq("at_list", t->name, tmp, t->command, type_str, tmp2);
-
-			xfree(tmp);
-			xfree(tmp2);
+			printq("at_list", t->name, tmp, t->command, type_str, ((t->persistent) ? tmp2 : ""));
 		}
 
 		if (!count) {
