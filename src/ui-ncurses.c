@@ -2777,9 +2777,6 @@ static void complete(int *line_start, int *line_index)
 	count = array_count(completions);
 
 	if (count == 1) {
-		char *tmp;
-		while ((tmp = strchr(completions[0], '\001')))
-			*tmp = ' ';
 		snprintf(start, LINE_MAXLEN - (start - line), "%s ", completions[0]);
 		*line_index = strlen(line);
 		array_free(completions);
