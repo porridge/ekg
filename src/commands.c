@@ -2378,7 +2378,7 @@ COMMAND(cmd_dcc)
 			return -1;
 		}
 
-		if (!(GG_S_A(u->status) || GG_S_B(u->status))) {
+		if (!u->ip.s_addr || u->port < 1550) {
 			printq("dcc_user_not_avail", format_user(u->uin));
 			return -1;
 		}

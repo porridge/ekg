@@ -772,31 +772,30 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 			u->port = 0;
 		}
 
-#define __SAME_GG_S(x, y)	((GG_S_A(x) && GG_S_A(y)) || (GG_S_B(x) && GG_S_B(y)) || (GG_S_I(x) && GG_S_I(y)) || (GG_S_NA(x) && GG_S_NA(y)))
-
 		if (!ignore_events && (!config_events_delay || (time(NULL) - last_conn_event) >= config_events_delay)) {
-			if (__SAME_GG_S(prev_status, s->status) && (GG_S_D(prev_status) || GG_S_D(s->status)))
+			if ((descr && u->descr && strcmp(descr, u->descr)) || (!u->descr && descr))
 				event_check(EVENT_DESCR, uin, descr);
-			else {
-				if (GG_S_NA(prev_status) && GG_S_A(s->status))
-					event_check(EVENT_ONLINE, uin, descr);
-				else if (!__SAME_GG_S(prev_status, s->status))
-					event_check(s->event, uin, descr);
-			}
+
+			if (GG_S_NA(prev_status) && GG_S_A(s->status))
+				event_check(EVENT_ONLINE, uin, descr);
+			else
+				event_check(s->event, uin, descr);
 		}
 
 		if (ignore_status)
 			break;
+		
+		if (ignore_status_descr)
+			ui_beep();
+
+#define __SAME_GG_S(x, y)	((GG_S_A(x) && GG_S_A(y)) || (GG_S_B(x) && GG_S_B(y)) || (GG_S_I(x) && GG_S_I(y)) || (GG_S_NA(x) && GG_S_NA(y)))
 
 		if (ignore_status_descr && GG_S_D(status)) {
-			xfree(descr);
+			s--;
+			status = s->status;
 
 			if (__SAME_GG_S(prev_status, status))
 				break;
-
-			/* brzydkie, ale proste */
-			s--;
-			status = s->status;
 		}
 
 #undef __SAME_GG_S
@@ -854,13 +853,9 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 
 	if (!ignore_status) {
 		u->status = status;
-
-		if (!ignore_status_descr) {
-			xfree(u->descr);
-			u->descr = descr;
-		}
-
-		ui_event("status", u->uin, u->display, status, u->descr);
+		ui_event("status", u->uin, u->display, status, (ignore_status_descr) ? u->descr : descr);
+		xfree(u->descr);
+		u->descr = descr;
 	 } else
 		xfree(descr);
 }

@@ -1113,13 +1113,6 @@ int config_read(const char *filename, const char *var)
 	if (!in_autoexec && !var) {
 		list_t l;
 
-		for (l = userlist; l; l = l->next) {
-			struct userlist *u = l->data;
-
-			if (ignored_check(u->uin))
-				ignored_remove(u->uin);
-		}
-
 		for (l = bindings; l; ) {
 			struct binding *b = l->data;
 
@@ -1167,9 +1160,6 @@ int config_read(const char *filename, const char *var)
 				*bar++ = 0;
 				variable_set(foo, bar, 1);
 			}
-		} else if (!strcasecmp(buf, "ignore")) {
-			if (atoi(foo))
-				ignored_add(atoi(foo), IGNORE_ALL);
 		} else if (!strcasecmp(buf, "alias")) {
 			gg_debug(GG_DEBUG_MISC, "\talias %s\n", foo);
 			alias_add(foo, 1, 1);
