@@ -1080,7 +1080,7 @@ static void update_contacts(int commit)
  */
 void contacts_rebuild()
 {
-	static int last_header_size = -1;
+	static int last_header_size = -1, last_statusbar_size = -1;
 	list_t l;
 
 	/* nie jeste¶my w ncurses */
@@ -1113,7 +1113,7 @@ void contacts_rebuild()
 		return;
 	}
 
-	if (config_contacts_size == last_contacts_size && config_header_size == last_header_size)
+	if (config_contacts_size == last_contacts_size && config_header_size == last_header_size && config_statusbar_size == last_statusbar_size)
 		return;
 		
 	last_contacts_size = config_contacts_size;

@@ -21,6 +21,8 @@ zg³osi³ b³±d.
   algorytmów cache'owania kluczy. po prostu za ka¿dym razem generuje
   nowy. kodu jest znacznie mniej i jest bardziej przejrzysty.
   w³±czany przez ,,/set encryption 2'' (w)
+- poprawka zachowania kontaktów przy mieszaniu paskiem stanu i nag³ówkiem
+  (sz/w)
 
 // 2003-01-09
 
