@@ -822,6 +822,9 @@ static int window_switch(int id)
                         curr_window = id;
                         window_refresh();
                         windows = tmp;
+#ifdef HAVE_RL_SET_PROMPT
+			rl_set_prompt(current_prompt());
+#endif
                         return 0;
                 }
         }
