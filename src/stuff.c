@@ -1534,7 +1534,10 @@ int run_event(char *act)
         else 
 #endif	//IOCTL
  	
-	if(!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
+	if(!strncasecmp(cmd, "play", 4)) {
+		play_sound(strdup(arg));
+	} 
+	else if(!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
                 struct userlist *u;
                 char sender[50];
 
@@ -1663,7 +1666,14 @@ int correct_event(char *act)
 
                 else 
 #endif // IOCTL		
-		if (!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
+
+		if (!strncasecmp(cmd, "play", 4)) {
+			if (arg == NULL) {
+				my_printf("events_act_no_params", cmd);
+				return 1; 
+			}
+		} 
+		else if (!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
                         if (arg == NULL) {
                                 my_printf("events_act_no_params", cmd);
                                 return 1;

@@ -17,6 +17,7 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 	
 	akcja:
 		clear - usuñ dane zdarzenie (lub jedn± flagê);
+		play [plik] - odtworz dany dzwiek 
 		chat [user] [tekst] - wy¶lij tekst do danego usera;
 		msg  [user] [tekst] -            -//- 
 		blink_leds [sekwencja] - zapalaj kontorlki NumLock, CapsLock
