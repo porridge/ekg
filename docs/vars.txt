@@ -276,6 +276,15 @@ make_window
 	nowe w przypadku braku wolnych. dla 2 bezwarunkowo utworzone zostanie 
 	nowe okienko.
 
+mesg_allow
+	typ: int
+	domy¶lna warto¶æ: 2
+
+	ustala, czy zezwalamy na wysy³anie do nas komunikatów za pomoc± write,
+	talk lub wall. dla 0 nie wyra¿amy na to zgody, dla 1 zezwalamy na
+	pisanie na nasz terminal. w przypadku warto¶ci 2, u¿ywane s± ustawienia
+	sprzed uruchomienia ekg.
+
 proxy
 	typ: tekst
 	domy¶lna warto¶æ: brak

@@ -64,6 +64,7 @@ static int ekg_pid = 0;
 static char argv0[PATH_MAX];
 static void (*ui_init)();
 static int ioctld_pid = 0;
+static int mesg_startup;
 
 time_t last_action = 0;
 char *pipe_file = NULL;
@@ -844,6 +845,8 @@ int main(int argc, char **argv)
 
         ekg_pid = getpid();
 
+	mesg_startup = mesg_set(2);
+
 #ifdef WITH_PYTHON
 	python_initialize();
 #endif
@@ -1103,6 +1106,9 @@ void ekg_exit()
 		fclose(gg_debug_file);
 		gg_debug_file = NULL;
 	}
+
+	if (config_mesg_allow != mesg_startup)
+		mesg_set(mesg_startup);
 
 	exit(0);
 }

@@ -206,6 +206,7 @@ char *config_theme;
 int config_time_deviation;
 char *config_timestamp;
 int config_uin;
+int config_mesg_allow;
 
 char *home_dir;
 char *config_dir;
@@ -325,5 +326,7 @@ int sms_away_check(uin_t uin);
 
 void contacts_rebuild();
 
+int mesg_set(int what);
+void mesg_changed();
 
 #endif /* __STUFF_H */

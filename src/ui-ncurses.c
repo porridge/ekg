@@ -849,7 +849,7 @@ void ui_ncurses_init()
 	cbreak();
 	noecho();
 	nonl();
-	use_default_colors();
+//	use_default_colors();
 
 	ui_screen_width = stdscr->_maxx + 1;
 	ui_screen_height = stdscr->_maxy + 1;
@@ -860,14 +860,14 @@ void ui_ncurses_init()
 	keypad(input, TRUE);
 
 	start_color();
-	init_pair(16, COLOR_BLACK, COLOR_DEFAULT);
-	init_pair(1, COLOR_RED, COLOR_DEFAULT);
-	init_pair(2, COLOR_GREEN, COLOR_DEFAULT);
-	init_pair(3, COLOR_YELLOW, COLOR_DEFAULT);
-	init_pair(4, COLOR_BLUE, COLOR_DEFAULT);
-	init_pair(5, COLOR_MAGENTA, COLOR_DEFAULT);
-	init_pair(6, COLOR_CYAN, COLOR_DEFAULT);
-	init_pair(7, COLOR_WHITE, COLOR_DEFAULT);
+	init_pair(16, COLOR_BLACK, COLOR_BLACK);
+	init_pair(1, COLOR_RED, COLOR_BLACK);
+	init_pair(2, COLOR_GREEN, COLOR_BLACK);
+	init_pair(3, COLOR_YELLOW, COLOR_BLACK);
+	init_pair(4, COLOR_BLUE, COLOR_BLACK);
+	init_pair(5, COLOR_MAGENTA, COLOR_BLACK);
+	init_pair(6, COLOR_CYAN, COLOR_BLACK);
+	init_pair(7, COLOR_WHITE, COLOR_BLACK);
 
 	init_pair(8, COLOR_BLACK, COLOR_BLUE);
 	init_pair(9, COLOR_RED, COLOR_BLUE);

@@ -160,6 +160,7 @@ char *config_log_timestamp = NULL;
 int config_server_save = 0;
 char *config_email = NULL;
 int config_time_deviation = 300;
+int config_mesg_allow = 2;
 
 static struct {
 	int event;
@@ -910,6 +911,53 @@ void do_reconnect()
 {
 	if (config_auto_reconnect && connecting)
 		reconnect_timer = time(NULL);
+}
+
+/*
+ * mesg_set()
+ *
+ * w³±cza/wy³±cza mo¿liwo¶æ pisania do naszego terminala za pomoc±
+ * write/talk/wall.
+ *
+ * - what - 0 wy³±cza, 1 w³±cza, 2 zwraca aktualne ustawienie.
+ * 
+ * zwraca -2 je¶li b³ad, -1 jesli wszystko w porzadku,
+ * lub aktualny stan (1 b±d¼ 0).
+*/
+int mesg_set(int what)
+{
+	char *tty;
+	struct stat s;
+
+	if ((tty = ttyname(1)) == NULL)
+		return -2;
+
+	if (stat(tty, &s) < 0)
+		return -2;
+
+	switch (what) {
+		case 0:
+			chmod(tty, s.st_mode & ~S_IWGRP);
+			break;
+		case 1:
+			chmod(tty, s.st_mode | S_IWGRP);
+			break;
+		case 2:
+			return ((s.st_mode & S_IWGRP) ? 1 : 0);
+	}
+
+	return -1;
+}
+
+/*
+ * mesg_changed()
+ *
+ * wywo³ywane przy zmianie ustawieñ.
+*/
+void mesg_changed()
+{
+	if ((config_mesg_allow == 0 || config_mesg_allow == 1) && mesg_set(2) != config_mesg_allow)
+		mesg_set(config_mesg_allow);
 }
 
 /*
