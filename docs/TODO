@@ -7,14 +7,13 @@ biblioteka:
 - konferencje,
 - zmiana informacji w katalogu publicznym,
 - wysy³anie userlisty na server 
-- timeouty, chocia¿ zastawiam siê, czy nie lepiej zrzuciæ ich na klienta.
 - uaktualniæ dokumentacjê.
 
 klient:
 - przewijanie ekranu,
 - query,
 - obs³uga nicków ze spacjami,
-- rewrite obs³ugi socketów.
+- zachowywanie wiadomo¶ci systemowej i nie powtarzanie jej.
 
 
 $Id$
