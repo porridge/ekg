@@ -225,6 +225,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 				print_window("debug", 0, "debug", c->buf->str);
 		}
 		close(c->fd);
+		xfree(c->target);
 		string_free(c->buf, 1);
 		list_remove(&watches, c, 1);
 	}
