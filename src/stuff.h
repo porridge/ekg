@@ -310,9 +310,7 @@ int buffer_count(int type);
 char *buffer_flush(int type, const char *target);
 void buffer_free();
 
-#ifdef WITH_UI_NCURSES
 void changed_backlog_size(const char *var);
-#endif
 void changed_dcc(const char *var);
 void changed_proxy(const char *var);
 void changed_theme(const char *var);
@@ -353,7 +351,6 @@ int event_remove(const char *name, int quiet);
 const char *event_format(int flags);
 int event_flags(const char *events);
 int event_check(int event, uin_t uin, const char *data);
-int event_correct(const char *action, int quiet);
 void event_free();
 
 void last_add(int type, uin_t uin, time_t t, time_t st, const char *msg);

@@ -192,7 +192,7 @@ COMMAND(cmd_add)
 		printq("user_added", params[1]);
 		if (sess)
 			gg_add_notify_ex(sess, uin, userlist_type(u));
-		remove_send_nick(itoa(uin));	/* na wszelki wypadek, ¿eby mieæ mniej ¶mieci */
+		remove_send_nick(itoa(uin));
 		config_changed = 1;
 		ui_event("userlist_changed", itoa(uin), params[1]);
 	} else
@@ -579,7 +579,7 @@ COMMAND(cmd_exec)
 					return -1;
 				}
 
-				if (strcmp(args[1], "%")) {
+				if (strcmp(args[1], "$")) {
 					if (!(uin = get_uin(args[1]))) {
 						printq("user_not_found", args[1]);
 						array_free(args);
@@ -2234,6 +2234,11 @@ COMMAND(cmd_dcc)
 			return -1;
 		}
 
+		if (!(GG_S_A(u->status) || GG_S_B(u->status))) {
+			printq("dcc_user_not_avail", format_user(u->uin));
+			return -1;
+		}
+
 		if ((fd = open(params[2], O_RDONLY)) == -1 || stat(params[2], &st)) {
 			printq("dcc_open_error", params[2], strerror(errno));
 			return -1;
@@ -2810,6 +2815,47 @@ COMMAND(cmd_test_fds)
 	return 0;
 }
 
+COMMAND(cmd_beep)
+{
+	ui_beep();
+
+	return 0;
+}
+
+#ifdef WITH_IOCTLD
+
+COMMAND(cmd_beeps_spk)
+{
+	if (!params[0]) {
+		printq("not_enough_params", name);
+		return -1;
+	}
+
+	return ((ioctld_send(params[0], ACT_BEEPS_SPK) == -1) ? -1 : 0);
+}
+
+COMMAND(cmd_blink_leds)
+{
+	if (!params[0]) {
+		printq("not_enough_params", name);
+		return -1;
+	}
+
+	return ((ioctld_send(params[0], ACT_BLINK_LEDS) == -1) ? -1 : 0);
+}
+
+#endif
+
+COMMAND(cmd_play)
+{
+	if (!params[0]) {
+		printq("not_enough_params", name);
+		return -1;
+	}
+
+	return play_sound(params[0]);
+}
+
 COMMAND(cmd_register)
 {
 	struct gg_http *h;
@@ -2992,9 +3038,6 @@ COMMAND(cmd_on)
 			printq("user_not_found", params[2]);
 			return -1;
 		}
-
-		if (event_correct(params[3], quiet))
-			return -1;
 
 		if (!event_add(flags, uin, params[3], quiet)) {
 			config_changed = 1;
@@ -3250,13 +3293,6 @@ int binding_quick_list(int a, int b)
 		print("quick_list", list->str);
 
 	string_free(list, 1);
-
-	return 0;
-}
-
-int binding_help(int a, int b)
-{
-	print("help_quick");
 
 	return 0;
 }
@@ -4243,7 +4279,7 @@ void command_init()
 	  "  -b, --bmsg [numer/alias] wysy³a wynik w jednej wiadomo¶ci\n"
 	  "\n"
 	  "Poprzedzenie polecenia znakiem %T^%n ukryje informacjê o "
-	  "zakoñczeniu. Je¶li jako alias podamy %T%%%n, wynik bêdzie "
+	  "zakoñczeniu. Je¶li jako alias podamy %T$%n, wynik bêdzie "
 	  "wys³any do rozmówcy z aktualnego okna. Ze wzglêdu na budowê "
 	  "klienta, numery i aliasy %Tnie bêd±%n dope³niane Tabem.");
 	  
@@ -4354,10 +4390,10 @@ void command_init()
 	  "pseudonimy przecinkiem (ale bez odstêpów).");
 
 	command_add
-        ( "on", "?eu?", cmd_on, 0,
+        ( "on", "?euc", cmd_on, 0,
 	  " [opcje]", "zarz±dzanie zdarzeniami",
 	  "\n"
-	  "  -a, --add <zdarzenie> <numer/alias> <akcja>  dodaje zdarzenie\n"
+	  "  -a, --add <zdarzenie> <numer/alias> <komenda>  dodaje zdarzenie\n"
 	  "  -d, --del <numer>|*         usuwa zdarzenie o podanym numerze\n"
 	  " [-l, --list]                 wy¶wietla listê zdarzeñ\n"
 	  "\n"
@@ -4526,6 +4562,21 @@ void command_init()
 	  "  exec <komenda>   uruchamia komendê\n"
 	  "  list             wy¶wietla listê za³adowanych skryptów\n");
 #endif
+
+	command_add
+	( "beep", "", cmd_beep, 0,
+	  "", "wydaje d¼wiêk", "");
+#ifdef WITH_IOCTLD
+	command_add
+	( "beeps_spk", "?", cmd_beeps_spk, 0,
+	  " <sekwencja>", "wydaje d¼wiêki zgodnie z sekwencj±", "");
+	command_add
+	( "blink_leds", "?", cmd_blink_leds, 0,
+	  " <sekwencja>", "odtwarza sekwencjê na diodach LED", "");
+#endif
+	command_add
+	( "play", "f", cmd_play, 0,
+	  " <plik>", "odtwarza plik d¼wiêkowy", "");
 
 	command_add
 	( "_add", "?", cmd_test_add, 0, "",

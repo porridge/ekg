@@ -1,7 +1,7 @@
 sk³adnia komendy on:
 
 on [opcje]
-	-a, --add <zdarzenie> <numer/alias> <akcja>  dodaje zdarzenie
+	-a, --add <zdarzenie> <numer/alias> <komenda>  dodaje zdarzenie
 	-d, --del <numer>|*         usuwa zdarzenie o podanym numerze
 	[-l, --list]                wy¶wietla listê zdarzeñ               
 
@@ -19,18 +19,17 @@ on [opcje]
 		                    na serwerze.
 		new_mail - otrzymanie nowej wiadomo¶ci e-mail
 		* - wszystkie zdarzenia
-	zdarzenia mo¿na ³±czyæ ze sob± operatorem '|'.
+	zdarzenia mo¿na ³±czyæ ze sob± operatorem '|' lub przecinkiem.
 
 	numer/alias - nazwa u¿ytkownika z listy lub uin, * oznacza dowolnego 
 	              u¿ytkownika, przy czym, je¿eli u¿ytkownik ma przypisan±
                       indywidualn± akcjê - ta z * nie brana jest pod uwagê.
 	
-	akcja:
-		beep - wysy³a \007 na terminal czyli zwyk³e beepniêcie
-		play [plik] - odtwórz dany d¼wiêk
-		chat [user] [tekst] - wy¶lij tekst do danego usera
-		msg  [user] [tekst] -            -//- 
-		blink_leds [sekwencja] - zapalaj kontorlki NumLock, CapsLock
+	komenda:
+		dowolna komenda ekg. dodatkowe dwie komendy dostêpne po
+		skompilowaniu z daemonem ioctld:
+
+		blink_leds <sekwencja> - zapalaj kontorlki NumLock, CapsLock
 		      i ScrollLock na klawiaturze 'w rytm' podanej sekwencji.
                       kombinacje diod oddzielane s± od siebie przecinkami,
                       je¿eli po kombinacji wyst±pi znak '/' - po nim podany
@@ -38,20 +37,17 @@ on [opcje]
                       kombinacje tworzy siê dodaj±c do siebie bity:
                       1 - NumLock,  2 - ScrollLock, 4 - CapsLock i tak np.
                       pod¶wietlenie NumLock i CapsLock to 1+4 czyli 5.
-		beeps_spk [sekwencja] - odgrywa sekwencjê na sprzêtowym 
+		beeps_spk <sekwencja> - odgrywa sekwencjê na sprzêtowym 
                       g³o¶niczku. tony s± oddzielane przecinkami, odstêpy czasu,
                       tak jak przy blink_leds wystêpujê po znaku '/'.
-		command [komenda] - wywo³uje komendê klienta
-		exec [komenda] - wywo³uje polecenie systemowe
 
 		dodatkowo przy blink_leds i beeps_spk, je¿eli sekwencja zacznie
 		siê od znaku '$', bêdzie ona poszukiwana w themes (przyk³adem
 		jest standardowe blah.led dla blink_leds).
 
-		akcje mo¿na ³±czyæ ze sob±, oddzielaj±c je ¶rednikiem (mo¿liwe
-		nie wiêcej ni¿ 10 akcji).
+		mo¿na podaæ wiêcej komend, oddzielaj±c je ¶rednikiem.
 
-		je¶li w akcji wyst±pi %1, jest zastêpowane przez numer sprawcy
+		je¶li w komendzie wyst±pi %1, jest zastêpowane przez numer sprawcy
 		zdarzenia. %2 jest jego pseudonimem, je¶li figuruje w naszej
 		li¶cie kontaktów, lub numerkiem w przeciwnym razie. %3
 		wystêpuje przy wiadomo¶ciach i zawiera jej tre¶æ. w przypadku 
@@ -64,7 +60,7 @@ on [opcje]
 		¿aden program nie jest idealny, wiêc który¶ znak specjalnie
 		interpretowany przez shella móg³ zostaæ przypadkowo pominiêty.
 
-akcje blink_leds oraz beeps_spk musz± mieæ dostêp do /dev/console, wiêc
+komendy blink_leds oraz beeps_spk musz± mieæ dostêp do /dev/console, wiêc
 uruchamiany jest specjalny daemon (ioctld) z prawami roota. po wyj¶ciu 
 z ekg, daemon ten jest zabijany. aby go w³±czyæ, nale¿y uruchomiæ skrypt
 configure z parametrem --enable-ioctld.
@@ -76,7 +72,7 @@ przyk³ady:
 	on -a chat * blink_leds 4, 1, 2
 	on -a * * blink_leds $blah.led
 	on -a msg|chat * msg %1 nie ma mnie. zostaw wiadomo¶æ.
-	on -a sigusr1 * command disconnect
+	on -a sigusr1 * disconnect
 	on -a chat jarek echo "/msg szpieg %4" > ~/.gg/innyuser/pipe
 
 $Id$

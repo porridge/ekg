@@ -1209,9 +1209,6 @@ void theme_init()
         format_add("events_exist", "%! Zdarzenie %T%1%n istnieje dla %2\n", 1);
         format_add("events_del_noexist", "%! Zdarzenie %T%1%n nie istnieje\n", 1);
         format_add("events_seq_not_found", "%! Sekwencja %T%1%n nie znaleziona\n", 1);
-	format_add("events_act_wrong", "%! Nieprawid³owa akcja %T%1%n\n", 1);
-        format_add("events_act_no_params", "%! Brak parametrów w akcji\n", 1);
-	format_add("events_act_toomany_params", "%! Za du¿o parametrów w akcji\n", 1);
 	format_add("events_seq_incorrect", "%! Nieprawid³owa sekwencja\n", 1);
 
 	/* lista kontaktów z serwera */
