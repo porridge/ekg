@@ -229,4 +229,3 @@ void emoticon_free()
 	list_destroy(emoticons, 1);
 	emoticons = NULL;
 }
-
