@@ -33,6 +33,7 @@ while (<>) {
     # jest zamieniane na _ (bez powtorzen)
     $nick =~ tr/a-zA-Z0-9_/_/cs;
     $hash{$uin} = $nick;
+    $hash{"$uin.gz"} = $nick;
 }
 
 
