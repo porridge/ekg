@@ -806,7 +806,7 @@ static struct window *window_find(const char *target)
 	}
 
 	if (target)
-		u = userlist_find(atoi(target), target);
+		u = userlist_find(str_to_uin(target), target);
 
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
@@ -933,9 +933,6 @@ static void window_switch(int id)
 		
 		if (w->redraw)
 			window_redraw(w);
-
-		if (w->floating)
-			window_floating_update(id);
 
 		touchwin(w->window);
 
@@ -1245,7 +1242,6 @@ crap:
 		string_free(speech, 1);
 	}
 }
-
 
 /*
  * contacts_update()
@@ -2420,7 +2416,7 @@ void python_generator(const char *text, int len)
 
 void window_generator(const char *text, int len)
 {
-	const char *words[] = { "new", "kill", "move", "next", "resize", "prev", "switch", "clear", "refresh", "list", NULL };
+	const char *words[] = { "new", "kill", "move", "next", "resize", "prev", "switch", "clear", "refresh", "list", "active", NULL };
 	int i;
 
 	for (i = 0; words[i]; i++)
@@ -4031,6 +4027,24 @@ static int ui_ncurses_event(const char *event, ...)
 					}
 				}
 
+				goto cleanup;
+			}
+
+			if (!strcasecmp(p1, "active")) {
+				list_t l;
+				int id = 0;
+		
+				for (l = windows; l; l = l->next) {
+					struct window *w = l->data;
+
+					if (w->act && !w->floating && w->id) {
+						id = w->id;
+						break;
+					}
+				}
+
+				if (id)
+					window_switch(id);
 				goto cleanup;
 			}
 

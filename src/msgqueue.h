@@ -49,4 +49,6 @@ int msg_queue_count_uin(uin_t uin);
 int msg_queue_read();
 int msg_queue_write();
 
+int find_in_uins(int uin_count, uin_t *uins, uin_t uin);
+
 #endif /* __MSGQUEUE_H */

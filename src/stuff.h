@@ -393,8 +393,6 @@ void iso_to_cp(unsigned char *buf);
 void iso_to_ascii(unsigned char *buf);
 char *strip_spaces(char *line);
 
-int find_in_uins(int uin_count, uin_t *uins, uin_t uin);
-
 int play_sound(const char *sound_path);
 
 int process_add(int pid, const char *name);

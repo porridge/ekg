@@ -2980,24 +2980,6 @@ char *strip_spaces(char *line)
 }
 
 /*
- * find_in_uins()
- *
- * sprawdza, czy w ci±gu uin'ów znajduje siê dany uin.
- *
- * 1 je¶li znaleziono, 0 je¶li nie.
- */
-int find_in_uins(int uin_count, uin_t *uins, uin_t uin)
-{
-	int i;
-
-	for (i = 0; i < uin_count; i++)
-		if (uins[i] == uin)
-			return 1;
-
-	return 0;
-}
-
-/*
  * play_sound()
  *
  * odtwarza dzwiêk o podanej nazwie.

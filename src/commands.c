@@ -5456,6 +5456,8 @@ void command_init()
 	  "  next                 prze³±cza do nastêpnego okna\n"
 	  "  prev                 prze³±cza do poprzedniego okna\n"
 	  "  switch <numer_okna>  prze³±cza do podanego okna\n"
+	  "  active               prze³±cza do pierwszego okna, w\n"
+	  "                       którym co¶ siê dzieje\n"
 	  "  clear                czy¶ci aktualne okno\n"
 	  "  refresh              od¶wie¿a aktualne okno\n"
 	  "  list                 wy¶wietla listê okien\n"
