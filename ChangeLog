@@ -10,6 +10,7 @@
   uruchamianiu.
 - mo¿liwo¶æ zmiany gg_session->initial_status w libgg zaraz po wywo³aniu
   gg_login(). trochê nie³adne, ale ciê¿ko to zrobiæ inaczej ;/
+- posortowanie listy zmiennych (w)
 - popsucie 10 innych rzeczy (w)
 
 // 2001-11-19 
