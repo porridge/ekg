@@ -540,8 +540,8 @@ char *buffer_flush(int type, const char *target)
 			continue;
 
 		string_append(str, b->line);
-		string_append_c(str, '\n');
                 string_append_c(str, '\r');
+		string_append_c(str, '\n');
 
 		xfree(b->line);
 		xfree(b->target);
