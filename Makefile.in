@@ -24,7 +24,7 @@ ekg:	$(OBJS) $(LOBJS) ekg.c
 
 install: ekg
 	$(install) -m 755 ekg $(prefix)/bin
-	$(install) -m 755 docs/ekg.pl $(prefix)/bin
+	$(install) -m 755 docs/ekl.pl $(prefix)/bin
 	@$(install) -d $(datadir)/ekg/themes/
 	$(install) -m 644 themes/*.theme $(datadir)/ekg/themes
 	@$(install) -d $(mandir)/mann
