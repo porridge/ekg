@@ -12,11 +12,12 @@ AR = @AR@
 
 CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES)
 OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o
+LOBJS = libgg.o libgg_search.o
 
 all:	ekg
 
-ekg:	static $(OBJS) ekg.c
-	$(CC) $(CFLAGS) ekg.c -o $(NAME) $(OBJS) $(LIBS) libgg.a
+ekg:	$(OBJS) $(LOBJS) ekg.c
+	$(CC) $(CFLAGS) ekg.c -o $(NAME) $(OBJS) $(LOBJS) $(LIBS) 
 
 install: ekg
 	install ekg $(PREFIX)/bin
