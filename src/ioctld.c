@@ -1,9 +1,7 @@
-/* $Id$ */
-
 /*
- *  (C) Copyright 2002 Pawe³ Maziarz <drg@infomex.pl>
- *                     Wojtek Kaniewski <wojtekka@irc.pl>
- *                     Robert J. Wo¼ny <speedy@ziew.org>
+ *  (C) Copyright 2002-2004 Pawe³ Maziarz <drg@hehe.pl>
+ *                          Wojtek Kaniewski <wojtekka@irc.pl>
+ *                          Robert J. Wo¼ny <speedy@ziew.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -23,17 +21,19 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/un.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 #ifdef __FreeBSD__
-#  include <sys/kbio.h>			
+#  include <sys/kbio.h>
 #endif
 #ifdef sun /* Solaris */
 #  include <sys/kbd.h>
 #  include <sys/kbio.h>
-#endif 
+#endif
 #ifdef __linux__
-#  include <linux/cdrom.h>		  
-#  include <linux/kd.h>			 
+#  include <linux/cdrom.h>
+#  include <linux/kd.h>
 #endif
 
 #include <fcntl.h>
@@ -158,11 +158,12 @@ void quit()
 
 int main(int argc, char **argv) 
 {
-    	int sock, length;
+    	int sock, length, netsock, rsock, netport = 0, size, i, on = 1;
 	struct sockaddr_un addr;
+	struct sockaddr_in netaddr, rnetaddr;
 	struct action_data data;
 	
-	if (argc != 2) {
+	if (argc != 2 && argc != 3) {
 		printf("program ten nie jest przeznaczony do samodzielnego wykonywania!\n");
 	    	exit(1);
 	}
@@ -174,6 +175,16 @@ int main(int argc, char **argv)
 	if (strlcpy(addr.sun_path, sock_path, sizeof(addr.sun_path)) >= sizeof(addr.sun_path))
 		exit(1);
 	length = sizeof(addr);
+
+	if (argv[2]) {
+		netport = atoi(argv[2]);
+	
+		if (netport < 1 || netport > 65535)
+			exit(1);
+		
+		/* niepotrzebne nam niepotrzebne uprawnienia ;) */
+		setuid(getuid());
+	}
 
 	signal(SIGQUIT, quit);
 	signal(SIGTERM, quit);
@@ -191,16 +202,59 @@ int main(int argc, char **argv)
 
 	chown(sock_path, getuid(), -1);
 
-	while (1) {
-	    	if (recvfrom(sock, &data, sizeof(data), 0, (struct sockaddr *)&addr, &length) == -1) 
-		    	continue;
-		
-		if (data.act == ACT_BLINK_LEDS)  
-		    	blink_leds(data.value, data.delay);
+	if (netport) {
+		/* network stuff */
+		if ((netsock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == -1) {
+			unlink(sock_path);
+			exit(3);
+		}
 
-		else if (data.act == ACT_BEEPS_SPK) 
-		    	beeps_spk(data.value, data.delay);
+		/* czasem sie moze przydac */
+		setsockopt(netsock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+
+		netaddr.sin_family=AF_INET;
+		netaddr.sin_port=htons(netport);
+		netaddr.sin_addr.s_addr=INADDR_ANY;
+
+
+		/* nie rezygnujmy od razu */
+		for (i = 180; i; i--) {
+			if (bind(netsock, (struct sockaddr *)&netaddr, sizeof(struct sockaddr_in)))
+			break;
+			sleep(1);
+		}
+		if (i == 0) {
+			unlink(sock_path);
+			exit(4);
+		}
+
+		size = sizeof(netaddr);
+
+		listen(netsock, 1);
+
+netaccept:
+		if ((rsock = accept(netsock, (struct sockaddr *)&rnetaddr, &size)) == -1)
+			goto netaccept;
 	}
-	
+
+	/* czytamy z lokalnego socketa... */
+	while (1) {
+		if (recvfrom(sock, &data, sizeof(data), 0, (struct sockaddr *)&addr, &length) == -1) 
+			continue;
+
+		if (netport) {
+			if (write(rsock, &data, sizeof(data)) < 1)
+				goto netaccept;
+		}
+		
+		else {
+			if (data.act == ACT_BLINK_LEDS)
+				blink_leds(data.value, data.delay);
+
+			else if (data.act == ACT_BEEPS_SPK)
+				beeps_spk(data.value, data.delay);
+		}
+	}
+
 	exit(0);
 }

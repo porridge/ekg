@@ -1216,16 +1216,22 @@ int main(int argc, char **argv)
 	ui_event("xterm_update");
 	
 #ifdef WITH_IOCTLD
-	if (!batch_mode) {
+	if (!batch_mode && config_ioctld_enable > 0) {
+		
 		sock_path = prepare_path(".socket", 1);
 	
 		if (!(ioctld_pid = fork())) {
-			execl(ioctld_path, "ioctld", sock_path, (void *) NULL);
+			if (config_ioctld_enable == 1)
+				execl(ioctld_path, "ioctld", sock_path, (void *) NULL);
+			else if (config_ioctld_enable == 2) {
+				char *portstr = saprintf("%d", config_ioctld_net_port);
+				execl(ioctld_path, "ioctld", sock_path, portstr, (void*)NULL);
+			}
 			exit(0);
 		}
 	
 		ioctld_socket(sock_path);
-	
+		
 		atexit(ioctld_kill);
 	}
 #endif /* WITH_IOCTLD */

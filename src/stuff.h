@@ -309,6 +309,10 @@ int config_windows_save;
 #ifdef WITH_WAP
 int config_wap_enabled;
 #endif
+#ifdef WITH_IOCTLD
+int config_ioctld_enable;
+int config_ioctld_net_port;
+#endif
 
 char *home_dir;
 char *config_dir;

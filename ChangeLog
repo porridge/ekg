@@ -6,6 +6,8 @@ d - drg, sz - szalik, del - deletek).
 
 // 2004-02-26
 
+- dodanie zmiennych ioctld_enable oraz ioctld_net_port, które umo¿liwiaj±
+  zdalne dzia³anie daemona ioctld (d)
 - dodanie zmiennej local_ip, pozwalajaj±cej na ustawienie adresu lokalnego (del)
 - dodanie dokumentacji s³ownika aspell (del)
 - poprawka teoretycznej mo¿liwo¶ci segfaulta w module aspell'a (del)

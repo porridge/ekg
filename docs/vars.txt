@@ -430,6 +430,24 @@ ignore_unknown_sender
 	okre¶la, czy bêd± ignorowane wiadomo¶ci od osób, których nie mamy
 	na swojej li¶cie kontaktów.
 
+ioctld_enable
+	typ: liczba
+	domy¶lna warto¶æ: 0
+
+	je¶li 1, odpalany jest lokalny daemon ioctld, który lokalnie mruga
+	diodkami i piszczy speakerem, je¿eli 2, odpalany jest daemon
+	tcp/ip na portcie ioctld_net_port, do którego przekazywane s±
+	akcje blink_leds i beeps_spk. dziêki temu, u¿ywaj±c ioctld-client.c
+	z ekg/contrib, mo¿na lokalnie blinkaæ i beepaæ maj±c odpalone ekg
+	na zdalnym ho¶cie. je¿eli 0 za¶, ioctld nie jest uruchamiany wcale.
+
+ioctld_net_port
+	typ: liczba
+	domy¶lna warto¶æ: 22004
+
+	port, na którym nas³uchiwaæ bêdzie daemon ioctld przy ioctld_enable
+	równym 2.
+
 irssi_set_mode
 	typ: bool
 	domy¶lna warto¶æ: 0

@@ -197,6 +197,10 @@ int config_wap_enabled = 2;
 #ifdef HAVE_LIBJPEG
 int config_display_token = 1;
 #endif
+#ifdef WITH_IOCTLD
+int config_ioctld_enable = 1;
+int config_ioctld_net_port = 22004;
+#endif
 
 char *last_search_first_name = NULL;
 char *last_search_last_name = NULL;
