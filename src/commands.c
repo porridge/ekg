@@ -441,9 +441,7 @@ COMMAND(command_alias)
 
 COMMAND(command_away)
 {
-	int status_table[3] = { GG_STATUS_AVAIL, GG_STATUS_BUSY, GG_STATUS_INVISIBLE };
-
-	unidle();
+	int status_table[3] = { GG_STATUS_AVAIL, GG_STATUS_BUSY, GG_STATUS_INVISIBLE };	unidle();
 	
 	if (!strcasecmp(name, "away")) {
 		away = 1;
@@ -599,6 +597,16 @@ COMMAND(command_find)
 
 	memset(&r, 0, sizeof(r));
 
+	if (!strcasecmp(name, "info") && !params[0]) {
+	    search_type = 1;
+	    r.uin = config_uin;
+	    if (!(search = gg_search(&r, 1))) {
+		my_printf("search_failed", strerror(errno));
+		return 0;
+	    }
+	    return 0;
+	};
+	
 	if (!params[0] || !(argv = split_params(params[0], -1)) || !argv[0]) {
 		my_printf("not_enough_params");
 		return 0;
