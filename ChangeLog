@@ -14,6 +14,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - uaktualnienie ,,docs/FAQ'' (d)
 - lekkie poprawki obs³ugi eventów (w)
 - poprawka wykrywania ncurses (w)
+- poprawka gg_send_message_confer (Chilek/w)
 
 // 2002-07-21
 
