@@ -62,7 +62,7 @@ list_t mail_folders = NULL;
 int check_mail()
 {
 	if (!config_check_mail)
-		return 1;
+		return -1;
 
 	if (config_check_mail & 1)
 		check_mail_mbox();
@@ -85,14 +85,14 @@ int check_mail_update(const char *s, int more)
 	list_t l;
 
 	if (!s)
-		return 1;
+		return -1;
 
 	if (!(buf = array_make(s, ",", 0, 0, 0)))
-		return 1;
+		return -1;
 
 	if (!buf[1]) {
 		array_free(buf);
-		return 1;
+		return -1;
 	}
 
 	h = atoi(buf[0]);
@@ -110,7 +110,7 @@ int check_mail_update(const char *s, int more)
 	}
 
 	if (new_count == mail_count)
-		return 1;
+		return -2;
 
 	last_mail_count = mail_count;
 	mail_count = new_count;
@@ -179,13 +179,16 @@ int check_mail_mbox()
 			m->check = 0;
 	}
 
-	if (!to_check || pipe(fd))
-		return 1;
+	if (!to_check)
+		return -2;
+
+	if (pipe(fd))
+		return -1;
 
  	if ((pid = fork()) < 0) {
 		close(fd[0]);
 		close(fd[1]);
-		return 1;
+		return -1;
 	}
 
 	if (!pid) {	/* born to be wild */
@@ -306,12 +309,12 @@ int check_mail_maildir()
 	struct gg_exec x;
 
 	if (pipe(fd))
-		return 1;
+		return -1;
 
 	if ((pid = fork()) < 0) {
 		close(fd[0]);
 		close(fd[1]);
-		return 1;
+		return -1;
 	}
 
 	if (!pid) {	/* born to be wild */

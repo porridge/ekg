@@ -302,7 +302,7 @@ int variable_add(const char *name, const char *short_name, int type, int display
 	v.map = map;
 	v.dyndisplay = dyndisplay;
 
-	return (list_add(&variables, &v, sizeof(v)) != NULL) ? 0 : -1;
+	return (list_add(&variables, &v, sizeof(v)) ? 0 : -1);
 }
 
 /*

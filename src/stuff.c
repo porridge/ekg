@@ -1426,9 +1426,8 @@ int process_add(int pid, const char *name)
 
 	p.pid = pid;
 	p.name = xstrdup(name);
-	list_add(&children, &p, sizeof(p));
 	
-	return 0;
+	return (list_add(&children, &p, sizeof(p)) ? 0 : -1);
 }
 
 /*
@@ -2967,9 +2966,8 @@ int emoticon_add(char *name, char *value)
 
 	e.name = xstrdup(name);
 	e.value = xstrdup(value);
-	list_add(&emoticons, &e, sizeof(e));
 
-	return 0;
+	return (list_add(&emoticons, &e, sizeof(e)) ? 0 : -1);
 }
 
 /*

@@ -618,9 +618,8 @@ int format_add(const char *name, const char *value, int replace)
 	f.name = xstrdup(name);
 	f.name_hash = ekg_hash(name);
 	f.value = xstrdup(value);
-	list_add(&formats, &f, sizeof(f));
-	
-	return 0;
+
+	return (list_add(&formats, &f, sizeof(f)) ? 0 : -1);
 }
 
 /*

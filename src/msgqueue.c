@@ -73,7 +73,7 @@ int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const 
 	memmove(m.format, format, formatlen * sizeof(unsigned char));
 	m.formatlen = formatlen;
 
-	return (list_add(&msg_queue, &m, sizeof(m)) != NULL) ? 0 : -1;
+	return (list_add(&msg_queue, &m, sizeof(m)) ? 0 : -1);
 }
 
 /*
@@ -114,7 +114,7 @@ int msg_queue_remove(int msg_seq)
  *
  *  - uin.
  *
- * 0 je¶li usuniêto, 1 je¶li nie ma takiej wiadomo¶ci.
+ * 0 je¶li usuniêto, -1 je¶li nie ma takiej wiadomo¶ci.
  */
 int msg_queue_remove_uin(uin_t uin)
 {
@@ -132,11 +132,11 @@ int msg_queue_remove_uin(uin_t uin)
 			xfree(m->format);
 
 			list_remove(&msg_queue, m, 1);
-			x = 1;
+			x = -1;
 		}
 	}
 
-	return (x) ? 0 : 1;
+	return x;
 }
 
 /*
@@ -165,7 +165,7 @@ void msg_queue_free()
  *
  * wysy³a wiadomo¶ci z kolejki.
  *
- * 0 je¶li wys³ano, 1 je¶li nast±pi³ b³±d przy wysy³aniu, 2 je¶li
+ * 0 je¶li wys³ano, -1 je¶li nast±pi³ b³±d przy wysy³aniu, -2 je¶li
  * kolejka pusta.
  */
 int msg_queue_flush()
@@ -173,7 +173,7 @@ int msg_queue_flush()
 	list_t l = msg_queue;
 
 	if (!l)
-		return 2;
+		return -2;
 
 	for (; l; l = l->next) {
 		struct msg_queue *m = l->data;
@@ -194,7 +194,7 @@ int msg_queue_flush()
 		if (new_seq != -1)
 			m->msg_seq = new_seq;
 		else
-			return 1;
+			return -1;
 	}
 
 	return 0;
