@@ -45,7 +45,6 @@
  */
 extern void rl_extend_line_buffer(int len);
 extern char **completion_matches();
-extern char *rl_filename_completion_function(const char *, int);
 
 /*
  * jaka¶ malutka lista tych, do których by³y wysy³ane wiadomo¶ci.
@@ -347,7 +346,9 @@ char **my_completion(char *text, int start, int end)
 						func = dcc_generator;
 						break;
 					case 'f':
+#ifdef HAS_RL_COMPLETION
 						func = rl_filename_completion_function;
+#endif
 						break;
 				}
 			}
@@ -1379,6 +1380,7 @@ COMMAND(command_test_watches)
 			case GG_STATE_READING_UIN_1: state = "READING_UIN_1"; break;
 			case GG_STATE_READING_UIN_2: state = "READING_UIN_2"; break;
 			case GG_STATE_SENDING_ACK: state = "SENDING_ACK"; break;
+			case GG_STATE_SENDING_REQUEST: state = "SENDING_REQUEST"; break;
 			case GG_STATE_READING_REQUEST: state = "READING_REQUEST"; break;
 			case GG_STATE_SENDING_FILE_INFO: state = "SENDING_FILE_INFO"; break;
 			case GG_STATE_READING_ACK: state = "READING_ACK"; break;

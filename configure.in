@@ -50,6 +50,7 @@ AC_CHECK_READLINE
 
 SAVE_LIBS="$LIBS"
 LIBS="$LIBS $READLINE_LIBS"
+
 AC_CACHE_CHECK([for rl_set_prompt() in readline], ac_cv_has_rl_set_prompt,
 [AC_TRY_LINK([#include <stdio.h>
 #include <readline/readline.h>
@@ -57,6 +58,15 @@ AC_CACHE_CHECK([for rl_set_prompt() in readline], ac_cv_has_rl_set_prompt,
 if test x"$ac_cv_has_rl_set_prompt" != xno; then
     AC_DEFINE(HAS_RL_SET_PROMPT)
 fi
+
+AC_CACHE_CHECK([for rl_filename_completion_function() in readline], ac_cv_has_rl_completion,
+[AC_TRY_LINK([#include <stdio.h>
+#include <readline/readline.h>
+], [char *x = rl_filename_completion_function("", 0);], [ac_cv_has_rl_completion=yes], [ac_cv_has_rl_completion=no])])
+if test x"$ac_cv_has_rl_completion" != xno; then
+    AC_DEFINE(HAS_RL_COMPLETION)
+fi
+
 LIBS="$SAVE_LIBS"
 
 AC_PATH_PROG(RM, rm, no)

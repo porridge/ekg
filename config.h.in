@@ -16,4 +16,5 @@
 /* readline stuff */
 #undef HAS_READLINE
 #undef HAS_RL_SET_PROMPT
+#undef HAS_RL_COMPLETION
 
