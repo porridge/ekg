@@ -2,7 +2,6 @@
 biblioteka:
 + ctcp
 ! zak³adanie kont
-- proxy // vinil [czy jest to potrzebne ? err. implementowac socks4 ?]
 - wysy³anie has³a na maila // vaxior
 
 klient:
