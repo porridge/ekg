@@ -1277,6 +1277,9 @@ COMMAND(command_list)
 			case GG_STATUS_AVAIL:
 				tmp = "list_avail";
 				break;
+			case GG_STATUS_AVAIL_DESCR:
+				tmp = "list_avail_descr";
+				break;
 			case GG_STATUS_NOT_AVAIL:
 				tmp = "list_not_avail";
 				break;
