@@ -68,7 +68,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_status(), command_register(), command_test_watches(),
 	command_remind(), command_dcc(), command_query(), command_passwd(),
 	command_test_ping(), command_on(), command_change(),
-	command_test_fds();
+	command_test_fds(), command_test_segv();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -85,10 +85,10 @@ int command_add(), command_away(), command_del(), command_alias(),
 
 struct command commands[] = {
 	{ "add", "U??", command_add, " <numer> <alias> [opcje]", "Dodaje u¿ytkownika do listy kontaktów", "Opcje identyczne jak dla polecenia %Wmodify%n" },
-	{ "alias", "??", command_alias, " [opcje]", "Zarz±dzanie aliasami", "  --add <alias> <komenda>\n  --del <alias>\n  [--list]\n" },
+	{ "alias", "??", command_alias, " [opcje]", "Zarz±dzanie aliasami", "  -a, --add <alias> <komenda>\n  -d, --del <alias>\n  [-l, --list]\n" },
 	{ "away", "?", command_away, " [powód]", "Zmienia stan na zajêty", "" },
 	{ "back", "", command_away, "", "Zmienia stan na dostêpny", "" },
-	{ "change", "?", command_change, " <opcje>", "Zmienia informacje w katalogu publicznym", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>\n  --email <adres>\n  --born <rok urodzenia>\n  --city <miasto>\n  --female  \n  --male" },
+	{ "change", "?", command_change, " <opcje>", "Zmienia informacje w katalogu publicznym", "  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>\n  -e, --email <adres>\n  -b, --born <rok urodzenia>\n  -c, --city <miasto>\n  -F, --female  \n  -M, --male" },
 	{ "chat", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ w ramach rozmowy", "" },
 	{ "cleartab", "", command_cleartab, "", "Czy¶ci listê nicków do dope³nienia", "" },
 	{ "connect", "", command_connect, "", "£±czy siê z serwerem", "" },
@@ -97,13 +97,13 @@ struct command commands[] = {
 	{ "disconnect", "", command_connect, "", "Roz³±cza siê z serwerem", "" },
 	{ "exec", "?", command_exec, " <polecenie>", "Uruchamia polecenie systemowe", "" },
 	{ "!", "?", command_exec, " <polecenie>", "Synonim dla %Wexec%n", "" },
-	{ "find", "u", command_find, " [opcje]", "Interfejs do katalogu publicznego", "  --uin <numerek>\n  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>\n  --city <miasto>\n  --birth <min:max>\n  --phone <telefon>\n  --email <e-mail>\n  --active\n  --female\n  --male\n  --start <od>" },
+	{ "find", "u", command_find, " [opcje]", "Interfejs do katalogu publicznego", "  -u, --uin <numerek>\n  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>\n  -c, --city <miasto>\n  -b, --born <min:max>\n  -p, --phone <telefon>\n  -e, --email <e-mail>\n  -a, --active\n  -F, --female\n  -M, --male\n  --start <od>" },
 /*	{ "info", "u", command_find, " <numer/alias>", "Interfejs do katalogu publicznego", "" }, */
 	{ "help", "c", command_help, " [polecenie]", "Wy¶wietla informacjê o poleceniach", "" },
 	{ "?", "c", command_help, " [polecenie]", "Synonim dla %Whelp%n", "" },
 	{ "ignore", "u", command_ignore, " [numer/alias]", "Dodaje do listy ignorowanych lub j± wy¶wietla", "" },
 	{ "invisible", "", command_away, "", "Zmienia stan na niewidoczny", "" },
-	{ "list", "u?", command_list, " [alias|opcje]", "Zarz±dzanie list± kontaktów", "--active\n  --busy\n  --inactive\n\n  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n  --display <nazwa>  // wy¶wietlana nazwa\n  --phone <telefon>\n  --uin <numerek>\n  --group [+/-]<grupa>\n\n  --put\n  --get" },
+	{ "list", "u?", command_list, " [alias|opcje]", "Zarz±dzanie list± kontaktów", "  -a, --active\n  -b, --busy\n  -i, --inactive\n\n  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>  // tylko informacja\n  -d, --display <nazwa>  // wy¶wietlana nazwa\n  -p, --phone <telefon>\n  -u, --uin <numerek>\n  -g, --group [+/-]<grupa>\n\n  -p, --put\n  -g, --get" },
 	{ "msg", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ do podanego u¿ytkownika", "" },
         { "on", "?u?", command_on, " <zdarzenie|...> <numer/alias> <akcja>|clear", "Dodaje lub usuwa zdarzenie", "" },
 	{ "passwd", "??", command_passwd, " <has³o> <e-mail>", "Zmienia has³o i adres e-mail u¿ytkownika", "" },
@@ -123,8 +123,22 @@ struct command commands[] = {
 	{ "_watches", "", command_test_watches, "", "", "" },
 	{ "_ping", "", command_test_ping, "", "", "" },
 	{ "_fds", "", command_test_fds, "", "", "" },
+	{ "_segv", "", command_test_segv, "", "", "" },
 	{ NULL, NULL, NULL, NULL, NULL }
 };
+
+int match_arg(char *arg, char shortopt, char *longopt)
+{
+	if (!arg || *arg != '-')
+		return 0;
+
+	arg++;
+	
+	if (*arg == '-')
+		return !strcmp(++arg, longopt);
+	
+	return (*arg == shortopt);
+}
 
 char *command_generator(char *text, int state)
 {
@@ -463,12 +477,7 @@ COMMAND(command_add)
 
 COMMAND(command_alias)
 {
-	char *arg;
-	
-	if ((arg = params[0]) && *arg == '-' && *(arg + 1) == '-')
-		arg++;
-
-	if (!arg || !strncasecmp(arg, "-l", 2)) {
+	if (!params[0] || match_arg(params[0], 'l', "list")) {
 		struct list *l;
 		int count = 0;
 
@@ -485,14 +494,14 @@ COMMAND(command_alias)
 		return 0;
 	}
 
-	if (!strncasecmp(arg, "-a", 2)) {
+	if (match_arg(params[0], 'a', "add")) {
 		if (!add_alias(params[1], 0))
 			config_changed = 1;
 
 		return 0;
 	}
 
-	if (!strncasecmp(arg, "-d", 2)) {
+	if (match_arg(params[0], 'd', "del")) {
 		if (!del_alias(params[1]))
 			config_changed = 1;
 
@@ -732,32 +741,29 @@ COMMAND(command_find)
 		for (i = 0; argv[i]; i++) {
 			char *arg = argv[i];
 			
-			if (*arg == '-' && *(arg + 1) == '-')
-				arg++;
-
-			if (!strncmp(arg, "-f", 2) && arg[2] != 'e' && argv[i + 1])
+			if (match_arg(arg, 'f', "first") && argv[i + 1])
 				r.first_name = argv[++i];
-			if (!strncmp(arg, "-l", 2) && argv[i + 1])
+			if (match_arg(arg, 'l', "last") && argv[i + 1])
 				r.last_name = argv[++i];
-			if (!strncmp(arg, "-n", 2) && argv[i + 1])
+			if (match_arg(arg, 'n', "nickname") && argv[i + 1])
 				r.nickname = argv[++i];
-			if (!strncmp(arg, "-c", 2) && argv[i + 1])
+			if (match_arg(arg, 'c', "city") && argv[i + 1])
 				r.city = argv[++i];
-			if (!strncmp(arg, "-p", 2) && argv[i + 1])
+			if (match_arg(arg, 'p', "phone") && argv[i + 1])
 				r.phone = argv[++i];
-			if (!strncmp(arg, "-e", 2) && argv[i + 1])
+			if (match_arg(arg, 'e', "email") && argv[i + 1])
 				r.email = argv[++i];
-			if (!strncmp(arg, "-u", 2) && argv[i + 1])
+			if (match_arg(arg, 'u', "uin") && argv[i + 1])
 				r.uin = strtol(argv[++i], NULL, 0);
-			if (!strncmp(arg, "-s", 2) && argv[i + 1])
+			if (match_arg(arg, 's', "start") && argv[i + 1])
 				r.start = strtol(argv[++i], NULL, 0);
-			if (!strncmp(arg, "-fe", 3))
+			if (match_arg(arg, 'F', "female"))
 				r.gender = GG_GENDER_FEMALE;
-			if (!strncmp(arg, "-m", 2))
+			if (match_arg(arg, 'M', "male"))
 				r.gender = GG_GENDER_MALE;
-			if (!strncmp(arg, "-a", 2))
+			if (match_arg(arg, 'a', "active"))
 				r.active = 1;
-			if (!strncmp(arg, "-b", 2) && argv[i + 1]) {
+			if (match_arg(arg, 'b', "born") && argv[i + 1]) {
 				char *foo = strchr(argv[++i], ':');
 	
 				if (!foo) {
@@ -814,43 +820,39 @@ COMMAND(command_change)
 	}
 	
 	for (i = 0; argv[i]; i++) {
-		char *arg = argv[i];
 		
-		if (*arg == '-' && *(arg + 1) == '-')
-			arg++;
-		
-		if (!strncmp(arg, "-f", 2) && strncmp(arg, "-fe", 3) && argv[i + 1]) {
+		if (match_arg(argv[i], 'f', "first") && argv[i + 1]) {
 			free(r->first_name);
 			r->first_name = strdup(argv[++i]);
 		}
 		
-		if (!strncmp(arg, "-l", 2) && argv[i + 1]) {
+		if (match_arg(argv[i], 'l', "last") && argv[i + 1]) {
 			free(r->last_name);
 			r->last_name = strdup(argv[++i]);
 		}
 		
-		if (!strncmp(arg, "-n", 2) && argv[i + 1]) {
+		if (match_arg(argv[i], 'n', "nickname") && argv[i + 1]) {
 			free(r->nickname);
 			r->nickname = strdup(argv[++i]);
 		}
 		
-		if (!strncmp(arg, "-e", 2) && argv[i + 1]) {
+		if (match_arg(argv[i], 'e', "email") && argv[i + 1]) {
 			free(r->email);
 			r->email = strdup(argv[++i]);
 		}
 
-		if (!strncmp(arg, "-c", 2) && argv[i + 1]) {
+		if (match_arg(argv[i], 'c', "city") && argv[i + 1]) {
 			free(r->city);
 			r->city = strdup(argv[++i]);
 		}
 		
-		if (!strncmp(arg, "-b", 2) && argv[i + 1])
+		if (match_arg(argv[i], 'b', "born") && argv[i + 1])
 			r->born = atoi(argv[++i]);
 		
-		if (!strncmp(arg, "-fe", 3))
+		if (match_arg(argv[i], 'F', "female"))
 			r->gender = GG_GENDER_FEMALE;
 
-		if (!strncmp(arg, "-m", 2))
+		if (match_arg(argv[i], 'M', "male"))
 			r->gender = GG_GENDER_MALE;
 	}
 
@@ -900,38 +902,34 @@ COMMAND(command_modify)
 	}
 
 	for (i = 0; argv[i]; i++) {
-		char *arg = argv[i];
 		
-		if (*arg == '-' && *(arg + 1) == '-')
-			arg++;
-		
-		if (!strncmp(arg, "-f", 2) && argv[i + 1]) {
+		if (match_arg(argv[i], 'f', "first") && argv[i + 1]) {
 			free(u->first_name);
 			u->first_name = strdup(argv[++i]);
 		}
 		
-		if (!strncmp(arg, "-l", 2) && argv[i + 1]) {
+		if (match_arg(argv[i], 'l', "last") && argv[i + 1]) {
 			free(u->last_name);
 			u->last_name = strdup(argv[++i]);
 		}
 		
-		if (!strncmp(arg, "-n", 2) && argv[i + 1]) {
+		if (match_arg(argv[i], 'n', "nickname") && argv[i + 1]) {
 			free(u->nickname);
 			u->nickname = strdup(argv[++i]);
 		}
 		
-		if (!strncmp(arg, "-d", 2) && argv[i + 1]) {
+		if (match_arg(argv[i], 'd', "display") && argv[i + 1]) {
 			free(u->display);
 			u->display = strdup(argv[++i]);
 			userlist_replace(u);
 		}
 		
-		if ((!strncmp(arg, "-p", 2) || !strncmp(arg, "-m", 2) || !strncmp(arg, "-s", 2)) && argv[i + 1]) {
+		if (match_arg(argv[i], 'p', "phone") && argv[i + 1]) {
 			free(u->mobile);
 			u->mobile = strdup(argv[++i]);
 		}
 		
-		if (!strncmp(arg, "-g", 2) && argv[i + 1]) {
+		if (match_arg(argv[i], 'g', "group") && argv[i + 1]) {
 			switch (*argv[++i]) {
 				case '-':
 					group_remove(u, argv[i] + 1);
@@ -944,7 +942,7 @@ COMMAND(command_modify)
 			}
 		}
 		
-		if (!strncmp(arg, "-u", 2) && argv[i + 1])
+		if (match_arg(argv[i], 'u', "uin") && argv[i + 1])
 			u->uin = strtol(argv[++i], NULL, 0);
 	}
 
@@ -1077,7 +1075,7 @@ COMMAND(command_list)
 	}
 
 	/* list --get */
-	if (params[0] && (!strncasecmp(params[0], "-g", 2) || !strncasecmp(params[0], "--g", 3))) {
+	if (params[0] && match_arg(params[0], 'g', "get")) {
 		struct gg_http *h;
 		
 		if (!(h = gg_userlist_get(config_uin, config_password, 1))) {
@@ -1091,7 +1089,7 @@ COMMAND(command_list)
 	}
 
 	/* list --put */
-	if (params[0] && (!strncasecmp(params[0], "-p", 2) || !strncasecmp(params[0], "--p", 3))) {
+	if (params[0] && match_arg(params[0], 'p', "put")) {
 		struct gg_http *h;
 		char *contacts = userlist_dump();
 		
@@ -1118,20 +1116,16 @@ COMMAND(command_list)
 			int i;
 
 	 		for (i = 0; argv[i]; i++) {
-				char *arg = argv[i];
-			
-				if (*arg == '-' && *(arg + 1) == '-')
-					arg++;
 				
-				if (!strncasecmp(arg, "-a", 2)) {
+				if (match_arg(argv[i], 'a', "active")) {
 					show_all = 0;
 					show_active = 1;
 				}
-				if (!strncasecmp(arg, "-u", 2) || !strncasecmp(arg, "-i", 2) || !strncasecmp(arg, "-n", 2)) {
+				if (match_arg(argv[i], 'i', "inactive") || match_arg(argv[i], 'n', "notavail")) {
 					show_all = 0;
 					show_inactive = 1;
 				}
-				if (!strncasecmp(arg, "-b", 2)) {
+				if (match_arg(argv[i], 'b', "busy")) {
 					show_all = 0;
 					show_busy = 1;
 				}
@@ -1537,6 +1531,13 @@ COMMAND(command_dcc)
 	my_printf("dcc_unknown_command", params[0]);
 	
 	return 0;
+}
+
+COMMAND(command_test_segv)
+{
+	char *foo = NULL;
+
+	return (*foo = 'A');
 }
 
 COMMAND(command_test_ping)

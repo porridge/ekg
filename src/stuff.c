@@ -93,6 +93,7 @@ int sock = 0;
 int length = 0;
 struct sockaddr_un addr;
 char *busy_reason = NULL;
+char *home_dir = NULL;
 
 /*
  * my_puts()
@@ -202,27 +203,17 @@ void reset_prompt()
 char *prepare_path(char *filename)
 {
 	static char path[PATH_MAX];
-	char *home = getenv("HOME");
-	struct passwd *pw;
-	
-	if (!home) {
-		if (!(pw = getpwuid(getuid())))
-			return NULL;
-		home = pw->pw_dir;
-	}
 	
 	if (filename == "" || !filename) {
-		if (config_user != "" || !config_user) {
-			snprintf(path, sizeof(path), "%s/.gg/%s", home, config_user);
-		} else {
-			snprintf(path, sizeof(path), "%s/.gg", home);
-		}
+		if (config_user != "" || !config_user)
+			snprintf(path, sizeof(path), "%s/.gg/%s", home_dir, config_user);
+		else
+			snprintf(path, sizeof(path), "%s/.gg", home_dir);
 	} else {
-		if (config_user != "" || !config_user) {
-			snprintf(path, sizeof(path), "%s/.gg/%s/%s", home, config_user, filename);
-		} else {
-			snprintf(path, sizeof(path), "%s/.gg/%s", home, filename);
-		}
+		if (config_user != "" || !config_user)
+			snprintf(path, sizeof(path), "%s/.gg/%s/%s", home_dir, config_user, filename);
+		else
+			snprintf(path, sizeof(path), "%s/.gg/%s", home_dir, filename);
 	}
 	
 	return path;
@@ -239,9 +230,8 @@ char *prepare_path(char *filename)
  */
 void put_log(uin_t uin, char *format, ...)
 {
- 	char *home = getenv("HOME"), *lp = config_log_path;
+ 	char *lp = config_log_path;
 	char path[PATH_MAX];
-	struct passwd *pw;
 	va_list ap;
 	FILE *f;
 
@@ -255,14 +245,9 @@ void put_log(uin_t uin, char *format, ...)
 			lp = "gg.log";
 	}
 
-	if (*lp == '~') {
-		if (!home) {
-			if (!(pw = getpwuid(getuid())))
-				return;
-			home = pw->pw_dir;
-		}
-		snprintf(path, sizeof(path), "%s%s", home, lp + 1);
-	} else
+	if (*lp == '~')
+		snprintf(path, sizeof(path), "%s%s", home_dir, lp + 1);
+	else
 		strncpy(path, lp, sizeof(path));
 
 	if (config_log == 2) {
@@ -409,42 +394,24 @@ int read_sysmsg(char *filename)
 	return 0;
 }
 
-
 /*
- * config_write()
+ * config_write_main()
  *
- * zapisuje aktualn± konfiguracjê -- zmienne i listê ignorowanych do pliku
- * ~/.gg/config lub podanego.
+ * w³a¶ciwa funkcja zapisuj±ca konfiguracjê do podanego pliku.
  *
- *  - filename.
+ *  - f - plik, do którego piszemy,
+ *  - base64 - czy kodowaæ ukryte pola?
  */
-int config_write(char *filename)
+void config_write_main(FILE *f, int base64)
 {
 	struct list *l;
-	char *tmp;
-	FILE *f;
-
-	if (!(tmp = prepare_path("")))
-		return -1;
-    	
-	mkdir(tmp, 0700);
-
-	if (!filename) {
-		if (!(filename = prepare_path("config")))
-			return -1;
-	}
-	
-	if (!(f = fopen(filename, "w")))
-		return -1;
-	
-	fchmod(fileno(f), 0600);
 
 	for (l = variables; l; l = l->next) {
 		struct variable *v = l->data;
 		
 		if (v->type == VAR_STR) {
 			if (*(char**)(v->ptr)) {
-				if (!v->display) {
+				if (!v->display && base64) {
 					char *tmp = base64_encode(*(char**)(v->ptr));
 					fprintf(f, "%s \001%s\n", v->name, tmp);
 					free(tmp);
@@ -474,6 +441,61 @@ int config_write(char *filename)
 
                 fprintf(f, "on %s %lu %s\n", format_events(e->flags), e->uin, e->action);
         }
+}
+
+/*
+ * config_write_crash()
+ *
+ * funkcja zapisuj±ca awaryjnie konfiguracjê. nie powinna alokowaæ ¿adnej
+ * pamiêci.
+ */
+void config_write_crash()
+{
+	char name[32];
+	FILE *f;
+
+	chdir(home_dir);
+	chdir(".gg");
+
+	snprintf(name, sizeof(name), "config.%d", getpid());
+	if (!(f = fopen(name, "w")))
+		return;
+	
+	config_write_main(f, 0);
+	
+	fclose(f);
+}
+
+/*
+ * config_write()
+ *
+ * zapisuje aktualn± konfiguracjê -- zmienne i listê ignorowanych do pliku
+ * ~/.gg/config lub podanego.
+ *
+ *  - filename.
+ *  - base64 - czy kodowaæ zmienne?
+ */
+int config_write(char *filename)
+{
+	char *tmp;
+	FILE *f;
+
+	if (!(tmp = prepare_path("")))
+		return -1;
+    	
+	mkdir(tmp, 0700);
+
+	if (!filename) {
+		if (!(filename = prepare_path("config")))
+			return -1;
+	}
+	
+	if (!(f = fopen(filename, "w")))
+		return -1;
+	
+	fchmod(fileno(f), 0600);
+
+	config_write_main(f, 1);
 
 	fclose(f);
 	

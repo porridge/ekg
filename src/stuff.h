@@ -96,6 +96,7 @@ int config_display_notify;
 int config_status;
 int config_auto_reconnect;
 
+char *home_dir;
 int in_readline;
 int away;
 int in_autoexec;
@@ -119,6 +120,7 @@ char *busy_reason;
 
 int config_read(char *filename);
 int config_write(char *filename);
+void config_write_crash();
 
 void my_puts(char *format, ...);
 char *my_readline();

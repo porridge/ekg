@@ -56,6 +56,7 @@ struct list *ignored;
 
 int userlist_read(char *filename);
 int userlist_write(char *filename);
+void userlist_write_crash();
 void userlist_clear_status(void);
 int userlist_add(uin_t uin, char *display);
 int userlist_remove(struct userlist *u);

@@ -309,10 +309,33 @@ void kill_ioctl_daemon()
                 kill(ioctl_daemon_pid, SIGINT);
 }
 
+void sigsegv_handler()
+{
+	signal(SIGSEGV, SIG_DFL);
+	
+	fprintf(stderr, "\n\
+*** Naruszenie ochrony pamiêci ***\n\
+\n\
+Próbujê zapisaæ ustawienia do pliku ~/.gg/config.%d i listê kontaktów\n\
+do pliku ~/.gg/userlist.%d, ale nie obiecujê, ¿e cokolwiek z tego\n\
+wyjdzie.\n\
+\n\
+Je¶li zostanie utworzy plik ~/.gg/core, spróbuj uruchomiæ program ,,gdb''\n\
+zgodnie z instrukcjami zawartymi w pliku README. Dziêki temu autorzy\n\
+dowiedz± siê, w którym miejscu wyst±pi³ b³±d i najprawdopodobniej pozwoli\n\
+to unikn±æ tego typu b³êdów w przysz³o¶ci.\n\
+\n", getpid(), getpid());
+
+	config_write_crash();
+	userlist_write_crash();
+
+	raise(SIGSEGV);			/* niech zrzuci core */
+}
+
 int main(int argc, char **argv)
 {
 	int auto_connect = 1, force_debug = 0, i, new_status = 0 ;
-	char *home = getenv("HOME"), *load_theme = NULL, *ioctl_daemon_path = IOCTL_DAEMON_PATH;
+	char *load_theme = NULL, *ioctl_daemon_path = IOCTL_DAEMON_PATH;
 #ifdef IOCTL
     	char *sock_path = NULL;
 #	define IOCTL_HELP "  -I, --ioctl-daemon-path [¦CIE¯KA]    ustawia ¶cie¿kê do ioctl_daemon-a\n"
@@ -324,6 +347,20 @@ int main(int argc, char **argv)
 	struct gg_common si;
 	
 	variable_init();
+
+	if (!(home_dir = getenv("HOME")))
+		if ((pw = getpwuid(getuid())))
+			home_dir = pw->pw_dir;
+
+	if (home_dir)
+		home_dir = strdup(home_dir);
+
+	if (!home_dir) {
+		fprintf(stderr, "Nie mogê znale¼æ katalogu domowego. Popro¶ administratora, ¿eby to naprawi³.\n");
+		return 1;
+	}
+
+	signal(SIGSEGV, sigsegv_handler);
 
 	config_user = "";
 
@@ -463,12 +500,10 @@ IOCTL_HELP
 		my_printf("no_config");
 
 	if (!config_log_path) {
-	    if (!home) { pw = getpwuid(getuid()); home = pw->pw_dir; }
-	    if (config_user != "") {
-		config_log_path = gg_alloc_sprintf("%s/.gg/%s/history", home, config_user);
-	    } else {
-		config_log_path = gg_alloc_sprintf("%s/.gg/history", home);
-	    }
+		if (config_user != "")
+			config_log_path = gg_alloc_sprintf("%s/.gg/%s/history", home_dir, config_user);
+		else
+			config_log_path = gg_alloc_sprintf("%s/.gg/history", home_dir);
 	}
 	
 	changed_dcc("dcc");

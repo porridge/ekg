@@ -294,6 +294,50 @@ int userlist_write(char *filename)
 }
 
 /*
+ * userlist_write_crash()
+ *
+ * zapisuje listê kontaktów w sytuacji kryzysowej jak najmniejszym
+ * nak³adem pamiêci i pracy.
+ */
+void userlist_write_crash()
+{
+	struct list *l;
+	char name[32];
+	FILE *f;
+
+	chdir(home_dir);
+	chdir(".gg");
+	
+	snprintf(name, sizeof(name), "userlist.%d", getpid());
+	if (!(f = fopen(name, "w")))
+		return;
+		
+	for (l = userlist; l; l = l->next) {
+		struct userlist *u = l->data;
+		struct list *m;
+		
+		fprintf(f, "%s;%s;%s;%s;%s;", 
+			(u->first_name) ? u->first_name : u->display,
+			(u->last_name) ? u->last_name : "", (u->nickname) ?
+			u->nickname : u->display, u->display, (u->mobile) ?
+			u->mobile : "");
+		
+		for (m = u->groups; m; m = m->next) {
+			struct group *g = m->data;
+
+			if (m != u->groups)
+				fprintf(f, ",");
+
+			fprintf(f, g->name);
+		}
+		
+		fprintf(f, ";%lu\n", u->uin);
+	}	
+
+	fclose(f);
+}
+
+/*
  * userlist_clear_status()
  *
  * czy¶ci stan u¿ytkowników na li¶cie.
