@@ -34,7 +34,7 @@ struct action_data {
 
 enum {
 	ACT_BLINK_LEDS = 1,
-	ACT_BEEPS_SPK = 2,
+	ACT_BEEPS_SPK = 2
 };
 
 int blink_leds(int *flag, int *delay);

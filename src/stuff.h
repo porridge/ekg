@@ -54,7 +54,7 @@ enum event_t {
 
 	EVENT_ALL = 16383,	/* uaktualniaæ za ka¿d± zmian± */
 
-	INACTIVE_EVENT = 32768, /* nieaktywne zdarzenie */
+	INACTIVE_EVENT = 32768	/* nieaktywne zdarzenie */
 };
 
 struct process {

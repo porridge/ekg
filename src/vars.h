@@ -27,7 +27,7 @@ enum {
 	VAR_INT,		/* liczba ca³kowita */
 	VAR_BOOL,		/* 0/1, tak/nie, yes/no, on/off */
 	VAR_FOREIGN,		/* nieznana zmienna */
-	VAR_MAP,		/* bitmapa */
+	VAR_MAP			/* bitmapa */
 };
 
 struct value_map {
