@@ -475,9 +475,9 @@ static void handle_common(uin_t uin, int status, const char *descr, struct gg_no
 	    	event_check(s->event, uin, NULL);
 
 		/* zaloguj */
-		if (config_log_status && GG_S_D(s->status))
-			put_log(uin, "status,%ld,%s,%s,%ld,%s\n", uin, u->display, inet_ntoa(u->ip), time(NULL), s->log);
 		if (config_log_status && !GG_S_D(s->status))
+			put_log(uin, "status,%ld,%s,%s,%ld,%s\n", uin, u->display, inet_ntoa(u->ip), time(NULL), s->log);
+		if (config_log_status && GG_S_D(s->status) && u->descr)
 		    	put_log(uin, "status,%ld,%s,%s,%ld,%s (%s)\n", uin, u->display, inet_ntoa(u->ip), time(NULL), s->log, u->descr);
 
 		/* jak dostêpny lub zajêty, dopiszmy do taba
