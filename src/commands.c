@@ -5310,10 +5310,10 @@ void command_init()
 	( "last", "uu", cmd_last, 0,
 	  " [opcje]", "wy¶wietla lub czy¶ci ostatnie wiadomo¶ci",
 	  "\n"
-	  "  -s, --stime [numer/alias]  wy¶wietla czas wys³ania wiadomo¶ci\n"
-	  "  -c, --clear [numer/alias]  czy¶ci podane wiadomo¶ci lub wszystkie\n"
-	  "  -n, --number <n>           wy¶wietla %Tn%n ostatnich wiadomo¶ci\n"
-	  "  [numer/alias]              wy¶wietla ostatnie wiadomo¶ci\n"
+	  "  -c, --clear [numer/alias]      czy¶ci podane wiadomo¶ci lub wszystkie\n"
+	  "  -s, --stime [numer/alias]      wy¶wietla czas wys³ania wiadomo¶ci\n"
+	  "  -n, --number <n> [numer/alias] wy¶wietla %Tn%n ostatnich wiadomo¶ci\n"
+	  "  [numer/alias]                  wy¶wietla ostatnie wiadomo¶ci\n"
 	  "\n"
 	  "W przypadku opcji %T--stime%n czas wy¶wietlany jest "
 	  ",,inteligentnie'' zgodnie ze zmienn± %Ttime_deviation.%n");
