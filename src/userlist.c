@@ -108,7 +108,7 @@ int userlist_read()
 
 	while ((buf = read_file(f))) {
 		struct userlist u;
-		char **entry;
+		char **entry, *uin;
 		int i, count;
 		
 		memset(&u, 0, sizeof(u));
@@ -120,7 +120,11 @@ int userlist_read()
 
 		entry = array_make(buf, ";", 8, 0, 0);
 
-		if ((count = array_count(entry)) < 7 || !(u.uin = atoi(entry[6]))) {
+		uin = entry[6];
+		if (!strncasecmp(uin, "gg:", 3))
+			uin += 3;
+
+		if ((count = array_count(entry)) < 7 || !(u.uin = atoi(uin))) {
 			array_free(entry);
 			xfree(buf);
 			continue;
@@ -186,7 +190,7 @@ int userlist_set(const char *contacts, int config)
 	
 	while ((buf = gg_get_line(&cont))) {
 		struct userlist u;
-		char **entry;
+		char **entry, *uin;
 		int i;
 		
 		memset(&u, 0, sizeof(u));
@@ -212,7 +216,11 @@ int userlist_set(const char *contacts, int config)
 
 		entry = array_make(buf, ";", 8, 0, 0);
 		
-		if (array_count(entry) < 7 || !(u.uin = atoi(entry[6]))) {
+		uin = entry[6];
+		if (!strncasecmp(uin, "gg:", 3))
+			uin += 3;
+		
+		if (array_count(entry) < 7 || !(u.uin = atoi(uin))) {
 			array_free(entry);
 			continue;
 		}
