@@ -251,6 +251,9 @@ if (defined $debug)
 	if ($i <= 19)
 	{
 		printf("koniec danych\n");
+	}
+	else
+	{
 		printf("brak opcji --all\n") if (! defined $all);
 	}
 }
