@@ -451,6 +451,7 @@ void binding_list(int quiet, const char *name, int all)
 	}
 }
 
+
 /*
  * binding_free()
  *
@@ -626,6 +627,20 @@ void changed_auto_save(const char *var)
 	   bardziej ,,naturalne'' */
 	last_save = time(NULL);
 }
+
+/*
+ * changed_aspell()
+ *
+ * wywo³ywane po zmianie warto¶ci zmiennej ,,aspell'' lub ,,aspell_lang'' lub ,,aspell_encoding''.
+ */
+void changed_aspell(const char *var)
+{
+#ifdef WITH_ASPELL
+	/* probujemy zainicjowac jeszcze raz aspell'a */
+	spellcheck_init();
+#endif
+}
+
 
 /*
  * changed_backlog_size()
@@ -2275,6 +2290,8 @@ int ioctld_parse_seq(const char *seq, struct action_data *data)
 
 	return 0;
 }
+
+
 
 /*
  * ioctld_socket()

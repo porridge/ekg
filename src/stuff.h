@@ -209,6 +209,11 @@ int config_auto_find;
 int config_auto_conference;
 int config_auto_reconnect;
 int config_auto_save;
+#ifdef WITH_ASPELL
+int config_aspell;
+char *config_aspell_lang;
+char *config_aspell_encoding;
+#endif
 char *config_back_reason;
 int config_beep;
 int config_beep_msg;
@@ -354,6 +359,7 @@ char *buffer_tail(int type);
 void buffer_free();
 
 void changed_auto_save(const char *var);
+void changed_aspell(const char *var);
 void changed_backlog_size(const char *var);
 void changed_dcc(const char *var);
 void changed_mesg(const char *var);
@@ -447,5 +453,9 @@ int ekg_hide_descr_status(int status);
 /* funkcje poza stuff.c */
 void ekg_wait_for_key();
 void ekg_exit();
+
+#ifdef WITH_ASPELL
+void spellcheck_init(void);
+#endif
 
 #endif /* __STUFF_H */

@@ -5,6 +5,8 @@
  *                          Wojtek Bojdo³ <wojboj@htcon.pl>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *
+ *  Aspell support added by Piotr 'Deletek' Kupisiewicz <deli@rzepaknet.us>
+ *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
  *  published by the Free Software Foundation.
@@ -72,6 +74,9 @@
 #endif
 #ifndef HAVE_STRLCPY
 #  include "../compat/strlcpy.h"
+#endif
+#ifdef WITH_ASPELL
+#	include <aspell.h>
 #endif
 #include "stuff.h"
 #include "themes.h"
@@ -224,6 +229,14 @@ static int contacts_update(struct window *w);
 #  define COLOR_DEFAULT (-1)
 #endif
 
+#ifdef WITH_ASPELL
+#  define ASPELLCHAR 5
+AspellConfig * spell_config;
+AspellSpeller * spell_checker = 0;
+static char aspell_first;
+static char *aspell_line;
+#endif
+
 /*
  * contacts_size()
  *
@@ -249,6 +262,20 @@ int contacts_size()
 	char *ui_debug_tmp = saprintf("UI " x); \
 	ui_ncurses_print("__debug", 0, ui_debug_tmp); \
 	xfree(ui_debug_tmp); \
+}
+
+/*
+ * sprawdza czy podany znak jest znakiem alphanumerycznym (uwzlglednia polskie znaki)
+ */
+int isalpha_pl(unsigned char c)
+{
+//    gg_debug(GG_DEBUG_MISC, "c: %d\n", c);
+    if(isalpha(c)) // normalne znaki
+        return 1;
+    else if(c == 177 || c == 230 || c == 234 || c == 179 || c == 241 || c == 243 || c == 182 || c == 191 || c == 188) // polskie literki
+	return 1;
+    else 
+	return 0;
 }
 
 /*
@@ -1966,6 +1993,32 @@ static void ui_ncurses_beep()
 	beep();
 }
 
+#ifdef WITH_ASPELL
+/*
+ * inicjuje slownik, ustawia kodowanie na takie jakie mamy w konfigu.
+ */
+void spellcheck_init(void)
+{
+        AspellCanHaveError * possible_err;
+	if(config_aspell != 1)
+	    return;
+        spell_config = new_aspell_config();
+        aspell_config_replace(spell_config, "encoding", config_aspell_encoding);
+        aspell_config_replace(spell_config, "lang", config_aspell_lang);
+	possible_err = new_aspell_speller(spell_config);
+
+        if (aspell_error_number(possible_err) != 0)
+        {
+	    gg_debug(GG_DEBUG_MISC, "Aspell error: %s\n", aspell_error_message(possible_err));
+            config_aspell = 0;
+        }
+        else
+            spell_checker = to_aspell_speller(possible_err);
+}
+#endif
+			    
+			    
+
 /*
  * ui_ncurses_init()
  *
@@ -2209,6 +2262,9 @@ static void ui_ncurses_deinit()
 	}
 
 	xfree(line);
+#ifdef WITH_ASPELL
+	xfree(aspell_line);
+#endif
 	xfree(yanked);
 
 	if (getenv("TERM") && !strncmp(getenv("TERM"), "xterm", 5) && !getenv("EKG_NO_TITLE"))
@@ -2902,6 +2958,30 @@ void print_char(WINDOW *w, int y, int x, unsigned char ch)
 	wattrset(w, A_NORMAL);
 }
 
+/*
+ * print_char_underlined()
+ *
+ * wy¶wietla w danym okienku podkreslony znak, bior±c pod uwagê znaki ,,niewy¶wietlalne''.
+ */
+void print_char_underlined(WINDOW *w, int y, int x, unsigned char ch)
+{
+        wattrset(w, A_UNDERLINE);
+
+        if (ch < 32) {
+                wattrset(w, A_REVERSE | A_UNDERLINE);
+                ch += 64;
+        }
+
+        if (ch >= 128 && ch < 160) {
+                ch = '?';
+                wattrset(w, A_REVERSE | A_UNDERLINE);
+        }
+
+        mvwaddch(w, y, x, ch);
+        wattrset(w, A_NORMAL);
+}
+
+
 /* 
  * ekg_getch()
  *
@@ -3369,6 +3449,72 @@ static void binding_ui_ncurses_debug_toggle(const char *arg)
 	update_statusbar(1);
 }
 
+
+#ifdef WITH_ASPELL
+
+/* 
+ * Funkcja sprawdzajaca pisownie
+ */
+
+static void spellcheck(char *what, char *where)
+{
+        char *word;             /* aktualny wyraz */
+        register int i = 0;     /* licznik */
+	register int j = 0;     /* licznik */
+	int size;	/* zmienna tymczasowa */
+	
+        /* Sprawdzamy czy nie mamy doczynienia z 47 (wtedy nie sprawdzamy reszty ) */
+        if(what[0] == 47 || what == NULL)
+            return;       /* konczymy funkcje */
+	    
+	for(i = 0; what[i] != '\0' && what[i] != '\n' && what[i] != '\r' && i < strlen(what); i++)
+	{
+	    if(((what[i] == ' ' || what[i] == '\n') || i == 0 ) && what[i+1] != '\0') // spacja/koniec lini/koniec stringu
+	    {
+		size = strlen(what);
+        	word = malloc(size);
+        	memset(word, 0, size); /* czyscimy pamiec */
+		
+		if(what[i] == ' ')
+		    i++;
+
+		/* wrzucamy aktualny wyraz do zmiennej word */		    
+		for(j=0;(j == 0 || isalpha_pl(what[i])) && strlen(what) >= i; i++)
+		{
+		    if(what[i] != ' ')
+		    {
+		    	    word[j]= what[i];
+			    j++;
+		    }
+		}
+		word[j] = '\0';
+		if(i > 0)
+		    i--;
+
+/*		gg_debug(GG_DEBUG_MISC, "Word: %s\n", word); */
+
+		/* sprawdzamy pisownie tego wyrazu */
+        	if(aspell_speller_check(spell_checker, word, strlen(word) ) == 0)
+        	{
+		    if(i - strlen(word) == -1)
+		    	    aspell_first = ASPELLCHAR;
+		    else
+		    	    where[i - strlen(word)] = ASPELLCHAR;
+        	}
+        	else /* jesli wyraz jest napisany poprawnie */
+        	{
+		    if((i - strlen(word)) != -1)
+			    where[i - strlen(word)] = ' ';
+		    else 
+			    aspell_first = ' ';
+        	}
+		free(word);
+	    }	
+	}
+}
+
+#endif
+
 /*
  * ui_ncurses_loop()
  *
@@ -3376,9 +3522,14 @@ static void binding_ui_ncurses_debug_toggle(const char *arg)
  */
 static void ui_ncurses_loop()
 {
+#ifdef WITH_ASPELL
+	int mispelling = 0; /* zmienna pomocnicza */
+#endif	
 	line = xmalloc(LINE_MAXLEN);
+#ifdef WITH_ASPELL
+	aspell_line = xmalloc(LINE_MAXLEN);
+#endif
 	strlcpy(line, "", LINE_MAXLEN);
-
 	history[0] = line;
 
 	for (;;) {
@@ -3506,11 +3657,49 @@ static void ui_ncurses_loop()
 					break;
 
 				p = lines[lines_start + i];
+				
+#ifdef WITH_ASPELL
+				/* maly cleanup */
+				memset(aspell_line, 32, LINE_MAXLEN);
+				aspell_first = ' ';
+				
+				/* sprawdzamy pisownie */
+				if(config_aspell == 1)
+					spellcheck(p, aspell_line);
 
-				for (j = 0; j + line_start < strlen(p) && j < input->_maxx + 1; j++)
-					print_char(input, i, j, p[j + line_start]);
+                                for (j = 0, mispelling = 0; j + line_start < strlen(p) && j < input->_maxx + 1; j++)
+                                {
+                                    /* sprawdzamy czy pierwszy wyraz jest zaznaczony */
+                                    if(aspell_first == ASPELLCHAR && (line_start + j) == 0)
+				    {
+                                        mispelling = 1;
+					print_char_underlined(input, i, j, p[line_start + j]);
+				    }
+                                    /* czy nastepny wyraz nie jest bledny ? */
+                                    else if(aspell_line[line_start + j] == ASPELLCHAR)
+                                    {
+                                        mispelling = 1;
+                                        print_char(input, i, j, p[j + line_start]);
+                                    }
+				    
+                                    /* to chyba juz koniec blednego wyrazu */
+                                    else if(p[line_start + j] == ' ' && mispelling == 1 && aspell_line[line_start + j] == ' ')
+				    {
+                                        mispelling = 0;
+					print_char(input, i, j, p[line_start + j]);
+				    }
+                                    /* jesli bledny to wyswietlamy */
+                                    else if(mispelling == 1)
+                                        print_char_underlined(input, i, j, p[line_start + j]);
+                                    /* jesli jest wszystko okey to wyswietlamy normalny */
+                                    else
+				        print_char(input, i, j, p[j + line_start]);
+				}
+#else
+                                for (j = 0; j + line_start < strlen(p) && j < input->_maxx + 1; j++)
+                                        print_char(input, i, j, p[j + line_start]);
+#endif
 			}
-
 			wmove(input, lines_index - lines_start, line_index - line_start);
 		} else {
 			int i;
@@ -3518,8 +3707,47 @@ static void ui_ncurses_loop()
 			if (window_current->prompt)
 				mvwaddstr(input, 0, 0, window_current->prompt);
 
-			for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++)
-				print_char(input, 0, i + window_current->prompt_len, line[line_start + i]);
+#ifdef WITH_ASPELL			
+			/* maly cleanup */
+			memset(aspell_line, 32, LINE_MAXLEN);
+			aspell_first = ' ';
+
+			/* sprawdzamy pisownie */
+			if(config_aspell == 1)
+		        	spellcheck(line, aspell_line);
+
+                        for (i = 0, mispelling = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++)
+                        {
+		              /* sprawdzamy czy pierwszy wyraz jest zaznaczony */
+                                if(aspell_first == ASPELLCHAR && (line_start + i) == 0)
+				{
+                                    mispelling = 1;
+				    print_char_underlined(input, 0, i + window_current->prompt_len, line[line_start + i]);
+				}
+				/* czy nastepny wyraz nie jest bledny ? */
+                                else if(aspell_line[line_start + i] == ASPELLCHAR)
+                                {
+                                    mispelling = 1;
+                                    print_char(input, 0, i + window_current->prompt_len, ' ');
+                                }
+				
+                                /* to chyba juz koniec blednego wyrazu */
+                                else if(line[line_start + i] == ' ' && mispelling == 1 && aspell_line[line_start + i] == ' ')
+				{
+                                    mispelling = 0;
+				    print_char(input, 0, i + window_current->prompt_len, line[line_start + i]);
+				}
+                                /* jesli bledny to wyswietlamy */
+                                else if(mispelling == 1)
+                                    print_char_underlined(input, 0, i + window_current->prompt_len, line[line_start + i]);
+                                /* jesli jest wszystko okey to wyswietlamy normalny */
+                                else
+                                    print_char(input, 0, i + window_current->prompt_len, line[line_start + i]);
+			}
+#else
+                        for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++)
+                                print_char(input, 0, i + window_current->prompt_len, line[line_start + i]);
+#endif
 
 			wattrset(input, color_pair(COLOR_BLACK, 1, COLOR_BLACK));
 			if (line_start > 0)

@@ -496,6 +496,37 @@ AC_ARG_ENABLE(wap,
 	fi
 fi
 
+
+dnl
+dnl  Sprawdzamy, czy u¿ytkownik chce aspell
+dnl
+
+AC_ARG_ENABLE(aspell,
+	[  --enable-aspell            Enable aspell support])
+
+	if test "x$enable_aspell" = "xyes"; then 
+	AC_CHECK_HEADERS(aspell.h,
+	[
+		have_aspell_includes=yes
+	])
+	if test "x$have_aspell_includes" = "xyes"; then
+	    AC_CHECK_LIB(aspell, new_aspell_config,
+	    [
+		have_aspell_libs=yes
+	    ])
+ 	    if test "x$have_aspell_libs" = "xyes"; then
+		if test "x$ui_ncurses_default" = "xyes"; then    
+ 		    AC_DEFINE(WITH_ASPELL, 1, [define if you want aspell support])
+ 		    LDFLAGS="$LDFLAGS -laspell"		
+		fi
+	    else 
+	        enable_aspell=no
+	    fi
+	else 
+	    enable_aspell=no
+	fi
+fi
+
 dnl
 dnl  Sprawdzamy ioctld
 dnl
@@ -634,6 +665,16 @@ fi
 
 if test "x$enable_wap" = "xyes"; then
 	echo " - rtg: enabled"
+fi
+
+if test "x$enable_aspell" = "xyes"; then
+	if test "x$ui_ncurses_default" = "xyes"; then    
+		echo " - aspell: enabled"
+	else 
+		echo " - aspell: wanted, but it's not avaiable without ncurses"
+	fi
+else
+	echo " - aspell: disabled"
 fi
 
 echo
