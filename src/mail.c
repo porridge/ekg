@@ -289,7 +289,7 @@ int check_mail_mbox()
 	fcntl(x.fd, F_SETFL, O_NONBLOCK);
 
 	list_add(&watches, &x, sizeof(x));
-	process_add(pid, "\002");
+	process_add(pid, "\003");
 
 	close(fd[1]);
 
@@ -390,7 +390,7 @@ int check_mail_maildir()
 	fcntl(x.fd, F_SETFL, O_NONBLOCK);
 
 	list_add(&watches, &x, sizeof(x));
-	process_add(pid, "\002");
+	process_add(pid, "\003");
 
 	close(fd[1]);
 

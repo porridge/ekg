@@ -216,10 +216,11 @@ static void get_line_from_pipe(struct gg_exec *c)
 			if (c->id) {
 				if (c->type == GG_SESSION_USER4)
 					check_mail_update(line, 1);
-				else {
+				else if (!c->quiet) {
 					switch (c->msg) {
 						case 0:
-							print_window(c->target, 0, "exec", line, itoa(c->id));
+							if (!c->quiet)
+								print_window(c->target, 0, "exec", line, itoa(c->id));
 							break;
 						case 1:
 						{
@@ -250,7 +251,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 			if (c->id) {
 				if (c->type == GG_SESSION_USER4)
 					check_mail_update(c->buf->str, 0);
-				else {
+				else if (!c->quiet) {
 					switch (c->msg) {
 						case 0:
 							print_window(c->target, 0, "exec", c->buf->str, itoa(c->id));
@@ -273,7 +274,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 			}
 		}
 
-		if (c->msg == 2) {
+		if (!c->quiet && c->msg == 2) {
 			char *out = buffer_flush(BUFFER_EXEC, c->target);
 			char *tmp = saprintf("chat %s %s", c->target, out);
 
@@ -482,10 +483,12 @@ void ekg_wait_for_key()
 					continue;
 
 				switch (p->name[0]) {
-					case 1:
+					case '\001':
 						print((!(WEXITSTATUS(status))) ? "sms_sent" : "sms_failed", p->name + 1);
 						break;
-					case 2:
+					case '\002':
+						break;
+					case '\003':
 						break;
 					default:
 						print("process_exit", itoa(p->pid), p->name, itoa(WEXITSTATUS(status)));

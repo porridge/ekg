@@ -627,13 +627,14 @@ COMMAND(cmd_exec)
 		s.buf = string_init(NULL);
 		s.target = xstrdup(tg);
 		s.msg = msg;
+		s.quiet = quiet;
 
 		fcntl(s.fd, F_SETFL, O_NONBLOCK);
 
 		list_add(&watches, &s, sizeof(s));
 		close(fd[1]);
 		
-		if (p[0] == '^')
+		if (quiet || p[0] == '^')
 			tmp = saprintf("\002%s", p + 1);
 		else
 			tmp = xstrdup(p);
@@ -655,11 +656,14 @@ COMMAND(cmd_exec)
 				case '\002':
 					tmp = saprintf("^%s", p->name + 1);
 					break;
+				case '\003':
+					break;
 				default:
 					tmp = xstrdup(p->name);
 			}
 
-			printq("process", itoa(p->pid), tmp);
+			if (tmp)
+				printq("process", itoa(p->pid), tmp);
 			xfree(tmp);
 		}
 

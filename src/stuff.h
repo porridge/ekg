@@ -137,6 +137,7 @@ struct gg_exec {
 	int msg;	/* czy wysy³amy stdout komu¶? 1 - tak, 2 - tak, buforujemy */
 	string_t buf;	/* bufor na stdout procesu */
 	char *target;	/* okno, do którego ma lecieæ wynik */
+	int quiet;	/* czy byæ cicho ? */
 };
 
 enum buffer_type {

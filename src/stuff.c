@@ -71,6 +71,8 @@
 #  define PATH_MAX _POSIX_PATH_MAX
 #endif
 
+COMMAND(cmd_exec);
+
 struct gg_session *sess = NULL;
 list_t children = NULL;
 list_t aliases = NULL;
@@ -2092,17 +2094,13 @@ static int event_run(const char *act)
 	} 
 
 	if (!strcasecmp(acts[0], "exec")) {
-		char *tmp = saprintf("exec %s", action + 5);
-		
-		if (tmp) {
-			gg_debug(GG_DEBUG_MISC, "//   executing program\n");
-			command_exec(NULL, tmp);
-			xfree(tmp);
-		} else
-			gg_debug(GG_DEBUG_MISC, "//   not enough memory\n");
-		
-		goto cleanup;
-	} 
+		char **p = array_make(action + 5, " \t", 3 , 1, 0);
+
+		/* ¿eby command_exec() nie dotyka³ ,,quotes'' */
+		gg_debug(GG_DEBUG_MISC, "//   executing program\n");
+		cmd_exec("exec", (const char **) p, NULL, 0);
+		array_free(p);
+	}
 
 	if (!strcasecmp(acts[0], "command")) {
 		gg_debug(GG_DEBUG_MISC, "//   executing command\n");
@@ -2111,14 +2109,8 @@ static int event_run(const char *act)
 	} 
 
 	if (!strcasecmp(acts[0], "chat") || !strcasecmp(acts[0], "msg")) {
-		char *tmp;
-
 		gg_debug(GG_DEBUG_MISC, "//   chatting/mesging\n");
-
-		tmp = xstrdup(action);
-		command_exec(NULL, tmp);
-		xfree(tmp);
-		
+		command_exec(NULL, action);
 		goto cleanup;
         }
 
