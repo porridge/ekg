@@ -9,6 +9,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - dodanie zmiennej ,,mesg_allow'' (mateusza,szalik/w)
 - poprawka leon.theme (leon/w)
+- inteligentne timestampy w /status (szalik/w)
 
 // 2002-11-19
 

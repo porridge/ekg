@@ -429,7 +429,7 @@ COMMAND(cmd_status)
 		print("show_status_uin", itoa(config_uin));
 	
 	lce = localtime((const time_t*)&last_conn_event);
-	strftime(buf, sizeof(buf), format_find("show_status_last_conn_event"), (const struct tm*)lce);
+	strftime(buf, sizeof(buf), format_find((last_conn_event / 86400 == time(NULL) / 86400) ? "show_status_last_conn_event_today" : "show_status_last_conn_event"), (const struct tm*)lce);
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		char *tmp = format_string(format_find("show_status_not_avail"));

@@ -982,6 +982,7 @@ void theme_init()
 	format_add("show_status_connected_since", "%) Po³±czony od: %T%1%n\n", 1);
 	format_add("show_status_disconnected_since", "%) Roz³±czony od: %T%1%n\n", 1);
 	format_add("show_status_last_conn_event", "%Y-%m-%d %H:%M", 1);
+	format_add("show_status_last_conn_event_today", "%H:%M", 1);
 
 	/* aliasy */
 	format_add("aliases_invalid", "%! Nieprawid³owy parametr\n", 1);
