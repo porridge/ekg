@@ -2068,14 +2068,15 @@ static void complete(int *line_start, int *line_index)
 	cmd = saprintf("%s%s ", (line[0] == '/') ? "/" : "", (config_tab_command) ? config_tab_command : "chat");
 
 	if (!strcmp(line, "") || (!strncasecmp(line, cmd, strlen(cmd)) && blanks == 2 && send_nicks_count > 0) || !strcasecmp(line, cmd)) {
+		if (send_nicks_index >= send_nicks_count)
+			send_nicks_index = 0;
+
 		if (send_nicks_count)
 			snprintf(line, LINE_MAXLEN, (window_current->target && line[0] != '/') ? "/%s%s " : "%s%s ", cmd, send_nicks[send_nicks_index++]);
 		else
 			snprintf(line, LINE_MAXLEN, (window_current->target && line[0] != '/') ? "/%s" : "%s", cmd);
 		*line_start = 0;
 		*line_index = strlen(line);
-		if (send_nicks_index >= send_nicks_count)
-			send_nicks_index = 0;
 
 		xfree(cmd);
 		array_free(completions);
