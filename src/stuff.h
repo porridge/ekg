@@ -77,6 +77,9 @@ int completion_notify;
 char *bold_font;
 int private_mode;
 int connecting;
+char *sound_msg_file;
+char *sound_chat_file;
+char *sound_app;
 
 void my_puts(char *format, ...);
 char *my_readline();
@@ -113,5 +116,6 @@ int on_off(char *value);
 int add_alias(char *string, int quiet);
 int del_alias(char *name);
 char *is_alias(char *foo);
+int play_sound(char *sound_path);
 
 #endif

@@ -53,6 +53,9 @@ int log = 0;
 char *log_path = NULL;
 int display_color = 1;
 int enable_beep = 1, enable_beep_msg = 1, enable_beep_chat = 1, enable_beep_notify = 1;
+char *sound_msg_file = NULL;
+char *sound_chat_file = NULL;
+char *sound_app = NULL;
 int config_uin = 0;
 char *config_password = NULL;
 int sms_away = 0;
@@ -120,7 +123,7 @@ char *my_readline()
 	prompt = (!away) ? readline_prompt : readline_prompt_away;
 
 	if (no_prompt || !prompt)
-		prompt = "";
+		prompt = NULL;
 
         in_readline = 1;
         res = readline(prompt);
@@ -945,6 +948,38 @@ int send_sms(char *recipient, char *message, int show_result)
 		strcpy(buf, "\002");
 
 	add_process(pid, buf);
+
+	return 0;
+}
+
+/*
+ * play_sound()
+ *
+ * odtwarza dzwiêk o podanej nazwie.
+ */
+int play_sound(char *sound_path)
+{
+	int pid;
+
+	if (!sound_app || !sound_path) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	if ((pid = fork()) == -1)
+		return -1;
+
+	if (!pid) {
+		int i;
+
+		for (i = 0; i < 255; i++)
+			close(i);
+			
+		execlp(sound_app, sound_app, sound_path, NULL);
+		exit(1);
+	}
+
+	add_process(pid, "\002");
 
 	return 0;
 }

@@ -82,6 +82,8 @@ void handle_msg(struct gg_event *e)
 	if (enable_beep && ((chat) ? enable_beep_chat : enable_beep_msg))
 		my_puts("\007");
 
+	play_sound((chat) ? sound_chat_file : sound_msg_file);
+
 	if (u)
 		snprintf(sender, sizeof(sender), "%s/%lu", u->comment, u->uin);
 	else
