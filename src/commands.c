@@ -292,7 +292,7 @@ COMMAND(command_away)
 			    	reason = xstrdup(config_away_reason);
 		}
 		else
-		    	reason = params[0];
+		    	reason = xstrdup(params[0]);
 		
 		away = (reason) ? 3 : 1;
 		print((reason) ? "away_descr" : "away", reason);
@@ -307,7 +307,7 @@ COMMAND(command_away)
 			    	reason = xstrdup(config_quit_reason);
 		}
 		else
-		    	reason = params[0];
+		    	reason = xstrdup(params[0]);
 		
 		away = (reason) ? 5 : 2;
 		print((reason) ? "invisible_descr" : "invisible", reason);
@@ -323,7 +323,7 @@ COMMAND(command_away)
 			    	reason = xstrdup(config_back_reason);
 		}
 		else
-		    	reason = params[0];
+		    	reason = xstrdup(params[0]);
 		
 		away = (reason) ? 4 : 0;
 		print((reason) ? "back_descr" : "back", reason);
