@@ -841,6 +841,7 @@ int main(int argc, char **argv)
 {
 	int auto_connect = 1, new_status = 0, ui_set = 0;
 	int c = 0, set_private = 0, no_global_config = 0;
+	char *tmp = NULL;
 	char *load_theme = NULL, *new_reason = NULL, *new_profile = NULL;
 #ifdef WITH_IOCTLD
 	const char *sock_path = NULL, *ioctld_path = IOCTLD_PATH;
@@ -1025,22 +1026,16 @@ int main(int argc, char **argv)
 
 	config_profile = new_profile;
 
-	if (!ui_set && !batch_mode) {
-		char *tmp;
-
-		if ((tmp = config_read_variable("interface"))) {
-			ekg_ui_set(tmp);
-			xfree(tmp);
-		}
+	if (!batch_mode && !ui_set && (tmp = config_read_variable("interface"))) {
+		ekg_ui_set(tmp);
+		xfree(tmp);
 	}
 
 #ifdef HAVE_USLEEP
 
-	{
-		char *tmp = config_read_variable("fade_in");
-		config_fade_in = atoi(tmp);
-		xfree(tmp);
-	}
+	tmp = config_read_variable("fade_in");
+	config_fade_in = atoi(tmp);
+	xfree(tmp);
 
 	if (config_fade_in && getenv("TERM") && !strcmp(getenv("TERM"), "linux") && !fork()) {
 		int i;
@@ -1107,8 +1102,6 @@ int main(int argc, char **argv)
 
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
-		char *tmp;
-
 		tmp = config_read_variable("display_transparent");
 		config_display_transparent = atoi(tmp);
 		xfree(tmp);
