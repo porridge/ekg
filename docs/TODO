@@ -5,7 +5,6 @@ zacznê byæ niemi³y. --w
 biblioteka:
 - komunikacja miêdzy klientami, w tym wysy³anie plików i odbieranie plików,
 - konferencje,
-- zmiana informacji w katalogu publicznym,
 - przechowywanie userlisty na serwerze,
 - uaktualniæ dokumentacjê,
 
@@ -13,7 +12,7 @@ klient:
 - przewijanie ekranu,
 - query,
 - obs³uga nicków ze spacjami,
-- zachowywanie wiadomo¶ci systemowej i nie powtarzanie jej,
+- zmiana informacji w katalogu publicznym,
 - proste rozpoznawanie p³ci,
 - dope³nienia,
 
