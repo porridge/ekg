@@ -1148,7 +1148,7 @@ COMMAND(command_set)
 		}
 	} else {
 		reset_theme_cache();
-		switch (variable_set(params[0], params[1])) {
+		switch (variable_set(params[0], params[1], 0)) {
 			case 0:
 				if (!in_autoexec) {
 					my_printf("variable", params[0], params[1]);

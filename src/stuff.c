@@ -325,10 +325,10 @@ int config_read(char *filename)
 			char *bar;
 
 			if (!(bar = strchr(foo, ' ')))
-				variable_set(foo, NULL);
+				variable_set(foo, NULL, 1);
 			else {
 				*bar++ = 0;
-				variable_set(foo, bar);
+				variable_set(foo, bar, 1);
 			}
 		} else if (!strcasecmp(buf, "ignore")) {
 			if (atoi(foo))
@@ -345,7 +345,7 @@ int config_read(char *filename)
                         else
                             my_printf("config_line_incorrect");
                 } else
-			variable_set(buf, foo);
+			variable_set(buf, foo, 1);
 
 		free(buf);
 	}

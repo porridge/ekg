@@ -110,8 +110,6 @@ int variable_add(char *name, int type, int display, void *ptr, void (*notify)(ch
 {
 	struct variable v;
 
-	gg_debug(GG_DEBUG_FUNCTION, "// variable_add(\"%s\", ...);\n", name);
-
 	v.name = strdup(name);
 	v.type = type;
 	v.display = display;
@@ -128,16 +126,15 @@ int variable_add(char *name, int type, int display, void *ptr, void (*notify)(ch
  * zmienia ci±g na liczbê. w przypadku binarnych, rozumie zwroty typu `on',
  * `off', `yes', `no' itp.
  *
- * - name,
- * - value.
+ *  - name,
+ *  - value,
+ *  - allow_foreign - czy ma pozwalaæ dopisywaæ obce zmienne.
  */
-int variable_set(char *name, char *value)
+int variable_set(char *name, char *value, int allow_foreign)
 {
 	struct variable *v = variable_find(name);
 
-	gg_debug(GG_DEBUG_FUNCTION, "// variable_set(\"%s\", \"%s\");\n", name, value);
-
-	if (!v)	{
+	if (!v && allow_foreign) {
 		variable_add(name, VAR_FOREIGN, 2, strdup(value), NULL);
 		return -1;
 	}

@@ -40,6 +40,6 @@ struct list *variables;
 void variable_init();
 struct variable *variable_find(char *name);
 int variable_add(char *name, int type, int display, void *ptr, void (*notify)(char *name));
-int variable_set(char *name, char *value);
+int variable_set(char *name, char *value, int allow_foreign);
 
 #endif
