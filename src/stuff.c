@@ -1978,16 +1978,17 @@ char *random_line(const char *path)
 
 	rewind(f);
 
-	if (max)
+	if (max) {
 		item = rand() / (RAND_MAX / max + 1);
 
-	while ((line = read_file(f))) {
-		if (tmp == item) {
-			fclose(f);
-			return line;
+		while ((line = read_file(f))) {
+			if (tmp == item) {
+				fclose(f);
+				return line;
+			}
+			xfree(line);
+			tmp++;
 		}
-		xfree(line);
-		tmp++;
 	}
 
 	fclose(f);
