@@ -20,8 +20,8 @@ ekg:	$(OBJS) ekg.c
 install: ekg
 	install ekg $(PREFIX)/bin
 
-distclean:
-	$(RM) -f *.o ekg search core libgg.so* *~ config.log config.cache config.status config.h Makefile
+distclean:	clean
+	$(RM) -f *~ config.log config.cache config.status config.h Makefile
 
 clean:
 	$(RM) -f *.o ekg search core libgg.so*

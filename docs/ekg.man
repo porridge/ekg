@@ -4,7 +4,9 @@ ekg \- Eksperymentalny Klient Gadu-Gadu
 .SH SK£ADNIA
 .B ekg 
 [
-.BI \-dn 
+.BI \-d
+] [
+.BI \-n 
 ] [
 .BI \-u 
 .IR username

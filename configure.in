@@ -3,7 +3,7 @@ dnl $Id$
 AC_INIT(libgg.h)
 
 PACKAGE=ekg
-VERSION=0.1
+VERSION=0.9
 
 AC_CONFIG_HEADER(config.h)
 
@@ -29,7 +29,7 @@ else
   LIBS="$LIBS $TERMCAP_LIB"
 fi
 
-if test "x$TERMCAP_LIB" == "x"; then 
+if test "x$TERMCAP_LIB" = "x"; then 
    AC_CHECK_CURSES
 fi
 
