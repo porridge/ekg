@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-01-04
+
+- libgadu: poprawka po³±czenia przez proxy (porridge/w)
+
 // 2004-12-28
 
 - libgadu: dodanie funkcji gg_dcc_fill_file_info2() pozwalaj±cej na podanie
