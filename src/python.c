@@ -28,6 +28,9 @@
 #include "version.h"
 #include "vars.h"
 #include "python.h"
+#include "ui.h"
+
+int python_handle_result = -1;
 
 static PyObject* ekg_connect(PyObject *self, PyObject *args)
 {
@@ -90,11 +93,43 @@ static PyObject* ekg_command(PyObject *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
+static PyObject* ekg_print_header(PyObject *self, PyObject *args)
+{
+	char *text = NULL;
+	int x, y;
+
+	if (!PyArg_ParseTuple(args, "iis", &x, &y, &text))
+		return NULL;
+
+#ifdef WITH_UI_NCURSES
+	print_statusbar(header, x, y, text, NULL);
+#endif
+
+	return Py_BuildValue("");
+}
+
+static PyObject* ekg_print_statusbar(PyObject *self, PyObject *args)
+{
+	char *text = NULL;
+	int x, y;
+
+	if (!PyArg_ParseTuple(args, "iis", &x, &y, &text))
+		return NULL;
+
+#ifdef WITH_UI_NCURSES
+	print_statusbar(status, x, y, text, NULL);
+#endif
+
+	return Py_BuildValue("");
+}
+
 static PyMethodDef ekg_methods[] = {
 	{ "connect", ekg_connect, METH_VARARGS, "" },
 	{ "disconnect", ekg_disconnect, METH_VARARGS, "" },
 	{ "printf", ekg_printf, METH_VARARGS, "" },
 	{ "command", ekg_command, METH_VARARGS, "" },
+	{ "print_header", ekg_print_header, METH_VARARGS, "" },
+	{ "print_statusbar", ekg_print_statusbar, METH_VARARGS, "" },
 	{ NULL, NULL, 0, NULL }
 };
 
@@ -361,6 +396,10 @@ int python_load(const char *name)
 	m.handle_connect = python_get_func(module, "handle_connect");
 	m.handle_disconnect = python_get_func(module, "handle_disconnect");
 	m.handle_status = python_get_func(module, "handle_status");
+	m.handle_redraw_header = python_get_func(module, "handle_redraw_header");
+	m.handle_redraw_statusbar = python_get_func(module, "handle_redraw_statusbar");
+	m.handle_keypress = python_get_func(module, "handle_keypress");
+	m.handle_command_line = python_get_func(module, "handle_command_line");
 
 	list_add(&modules, &m, sizeof(m));
 	

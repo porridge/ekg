@@ -33,7 +33,48 @@ struct module {
 	PyObject *handle_connect;
 	PyObject *handle_disconnect;
 	PyObject *handle_status;
+	PyObject *handle_redraw_header;
+	PyObject *handle_redraw_statusbar;
+	PyObject *handle_keypress;
+	PyObject *handle_command_line;
 };
+
+#define PYTHON_HANDLE_HEADER(event, args...) \
+{ \
+	list_t __py_l; \
+	\
+	for (__py_l = modules; __py_l; __py_l = __py_l->next) { \
+		struct module *__py_m = __py_l->data; \
+		PyObject *__py_r; \
+		\
+		if (!__py_m->handle_##event) \
+			continue; \
+		\
+		__py_r = PyObject_CallFunction(__py_m->handle_##event, args); \
+		\
+		if (!__py_r) \
+			PyErr_Print(); \
+		\
+		python_handle_result = -1; \
+		\
+		if (__py_r && PyInt_Check(__py_r)) \
+			python_handle_result = PyInt_AsLong(__py_r); \
+		\
+		if (__py_r && PyTuple_Check(__py_r))
+
+#define PYTHON_HANDLE_RESULT(args...) \
+			if (!PyArg_ParseTuple(__py_r, args)) \
+				PyErr_Print(); \
+			else
+				
+#define PYTHON_HANDLE_FOOTER() \
+		\
+		Py_XDECREF(__py_r); \
+		break; \
+	} \
+}
+
+int python_handle_result;
 
 list_t modules;
 

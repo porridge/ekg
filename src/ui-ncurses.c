@@ -66,6 +66,9 @@
 #include "ui.h"
 #include "version.h"
 #include "mail.h"
+#ifdef WITH_PYTHON
+#  include "python.h"
+#endif
 
 static void ui_ncurses_loop();
 static void ui_ncurses_print(const char *target, int separate, const char *line);
@@ -140,8 +143,8 @@ struct format_data {
 	char *text;			/* tre¶æ */
 };
 
-static WINDOW *status = NULL;		/* okno stanu */
-static WINDOW *header = NULL;		/* okno nag³ówka */
+WINDOW *status = NULL;		/* okno stanu */
+WINDOW *header = NULL;		/* okno nag³ówka */
 static WINDOW *input = NULL;		/* okno wpisywania tekstu */
 static WINDOW *contacts = NULL;		/* okno kontaktów */
 
@@ -1182,10 +1185,11 @@ static void update_header(int commit)
  *
  * zwraca ilo¶æ dopisanych znaków.
  */
-int print_statusbar(WINDOW *w, int x, int y, const char *format, struct format_data *data)
+int print_statusbar(WINDOW *w, int x, int y, const char *format, void *data_)
 {
 	const char *p = format;
-	int orig_x = x;
+	int orig_x = x, pair_index = 8;
+	struct format_data *data = data_;
 
 	wmove(w, y, x);
 			
@@ -1204,8 +1208,8 @@ int print_statusbar(WINDOW *w, int x, int y, const char *format, struct format_d
 			break;
 
 #define __color(x,y,z) \
-		case x: wattrset(w, COLOR_PAIR(8 + z)); break; \
-		case y: wattrset(w, COLOR_PAIR(8 + z) | A_BOLD); break;
+		case x: wattrset(w, COLOR_PAIR(pair_index + z)); break; \
+		case y: wattrset(w, COLOR_PAIR(pair_index + z) | A_BOLD); break;
 
 		if (*p != '{' && config_display_color) {
 			switch (*p) {
@@ -1217,6 +1221,12 @@ int print_statusbar(WINDOW *w, int x, int y, const char *format, struct format_d
 				__color('m', 'M', 5);
 				__color('c', 'C', 6);
 				__color('w', 'W', 7);
+				case 'l':
+					pair_index = 0;
+					break;
+				case 'e':
+					pair_index = 8;
+					break;
 				case 'n':
 					wattrset(status, (config_display_color) ? COLOR_PAIR(15) : A_NORMAL);
 					break;
@@ -1232,7 +1242,7 @@ int print_statusbar(WINDOW *w, int x, int y, const char *format, struct format_d
 		if (!*p)
 			break;
 
-		for (i = 0; data[i].name; i++) {
+		for (i = 0; data && data[i].name; i++) {
 			int len;
 
 			if (!data[i].text)
@@ -1260,7 +1270,7 @@ int print_statusbar(WINDOW *w, int x, int y, const char *format, struct format_d
 				p++;
 			}
 
-			for (i = 0; data[i].name; i++) {
+			for (i = 0; data && data[i].name; i++) {
 				int len, matched = (int) data[i].text;
 
 				if (neg)
@@ -1453,6 +1463,16 @@ static void update_statusbar(int commit)
 		xfree(formats[i].text);
 
 	xfree(formats);
+
+#ifdef WITH_PYTHON
+	PYTHON_HANDLE_HEADER(redraw_header, "")
+	;
+	PYTHON_HANDLE_FOOTER()
+	
+	PYTHON_HANDLE_HEADER(redraw_statusbar, "")
+	;
+	PYTHON_HANDLE_FOOTER()
+#endif
 	
 	if (commit)
 		window_commit();
@@ -2139,6 +2159,22 @@ static void ui_ncurses_loop()
 
 		ch = wgetch(input);
 
+#ifdef WITH_PYTHON
+		PYTHON_HANDLE_HEADER(keypress, "(ii)", 0, ch)
+		{
+			int dummy;
+
+			PYTHON_HANDLE_RESULT("ii", &dummy, &ch)
+			{
+			}
+		}
+
+		PYTHON_HANDLE_FOOTER()
+
+		if (python_handle_result == 0 || python_handle_result == 2)
+			continue;
+#endif
+
 		if (ch != 27 && binding_map[ch] && binding_map[ch]->action) {
 			command_exec(NULL, binding_map[ch]->action);
 			continue;
@@ -2157,6 +2193,22 @@ static void ui_ncurses_loop()
 
 			case 27:
 				ch = wgetch(input);
+
+#ifdef WITH_PYTHON
+				PYTHON_HANDLE_HEADER(keypress, "(ii)", 27, ch)
+				{
+					int dummy;
+
+					PYTHON_HANDLE_RESULT("ii", &dummy, &ch)
+					{
+					}
+				}
+		
+				PYTHON_HANDLE_FOOTER()
+		
+				if (python_handle_result == 0 || python_handle_result == 2)
+					continue;
+#endif
 
 				if (binding_map_meta[ch] && binding_map_meta[ch]->action) {
 					command_exec(NULL, binding_map_meta[ch]->action);

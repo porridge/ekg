@@ -78,6 +78,19 @@ oto lista wywo³ywanych funkcji:
   nie bêdzie ignorowana, ale nie zostanie wy¶wietlona. je¶li zwróci krotkê
   o takich samych argumentach jak funkcja, dane zostan± zmienione.
 
+- handle_keypress(meta, key)
+
+  gdy zostaje wci¶niêty klawisz o kodzie key. je¶li wcze¶niejszym kodem
+  by³ 27, meta jest równe 27.
+
+- handle_redraw_header()
+
+  gdy nale¿y od¶wie¿yæ nag³ówek okna.
+
+- handle_redraw_statusbar()
+
+  gdy nale¿y od¶wie¿yæ pasek stanu.
+
 pó¼niej zostan± dodane funkcje dotycz±ce wszystkich zdarzeñ zwi±zanych
 z sesj± gg, plus obs³uga interfejsu u¿ytkownika (informacja o wci¶niêtych
 klawiszach, wys³anej linii itp.)

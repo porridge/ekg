@@ -44,9 +44,16 @@ extern void ui_readline_init();
 #endif
 
 #ifdef WITH_UI_NCURSES
+
+#include <ncurses.h>
+
+WINDOW *header, *status;
+
+int print_statusbar(WINDOW *w, int x, int y, const char *format, void *data_);
 int config_backlog_size;
 extern void ui_ncurses_init();
 extern void header_statusbar_resize();
+
 #endif
 
 #endif /* __UI_H */

@@ -384,47 +384,30 @@ void handle_msg(struct gg_event *e)
 	char *tmp;
 	
 #ifdef WITH_PYTHON
-	list_t l;
-	
-	for (l = modules; l; l = l->next) {
-		struct module *m = l->data;
-		PyObject *res;
+	cp_to_iso(e->event.msg.message);
 
-		if (!m->handle_msg)
-			continue;
+	PYTHON_HANDLE_HEADER(msg, "(isisii)", e->event.msg.sender, (u) ? u->display : "", e->event.msg.msgclass, e->event.msg.message, e->event.msg.time, 0)
+	{
+		char *b, *d;
+		int f;
 
-		cp_to_iso(e->event.msg.message);
-
-		res = PyObject_CallFunction(m->handle_msg, "(isisii)", e->event.msg.sender, (u) ? u->display : "", e->event.msg.msgclass, e->event.msg.message, e->event.msg.time, 0);
-
-		iso_to_cp(e->event.msg.message);
-
-		if (!res)
-			PyErr_Print();
-
-		if (res && PyInt_Check(res)) {
-			switch (PyInt_AsLong(res)) {
-				case 0:
-					Py_XDECREF(res);
-					return;
-				case 2:
-					hide = 2;
-			}
+		PYTHON_HANDLE_RESULT("isisii", &e->event.msg.sender, &b, &e->event.msg.msgclass, &d, &e->event.msg.time, &f)
+		{
+			xfree(e->event.msg.message);
+			e->event.msg.message = xstrdup(d);
 		}
-
-		if (res && PyTuple_Check(res)) {
-			char *b, *d;
-			int f;
-
-			if (PyArg_ParseTuple(res, "isisii", &e->event.msg.sender, &b, &e->event.msg.msgclass, &d, &e->event.msg.time, &f)) {
-				xfree(e->event.msg.message);
-				e->event.msg.message = xstrdup(d);
-			} else
-				PyErr_Print();
-		}
-
-		Py_XDECREF(res);
 	}
+	
+	PYTHON_HANDLE_FOOTER()
+
+	switch (python_handle_result) {
+		case 0:
+			return;
+		case 2:
+			hide = 1;
+	}
+
+	iso_to_cp(e->event.msg.message);
 #endif
 	
 	if (!e->event.msg.message)
