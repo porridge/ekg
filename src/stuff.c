@@ -573,6 +573,9 @@ char *get_token(char **ptr, char sep)
  */
 void cp_to_iso(unsigned char *buf)
 {
+	if (!buf)
+		return;
+
 	while (*buf) {
 		if (*buf == (unsigned char)'¥') *buf = '¡';
 		if (*buf == (unsigned char)'¹') *buf = '±';
@@ -597,6 +600,9 @@ void cp_to_iso(unsigned char *buf)
  */
 void iso_to_cp(unsigned char *buf)
 {
+	if (!buf)
+		return;
+
 	while (*buf) {
 		if (*buf == (unsigned char)'¡') *buf = '¥';
 		if (*buf == (unsigned char)'±') *buf = '¹';

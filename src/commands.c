@@ -98,7 +98,6 @@ struct command commands[] = {
 	{ "exec", "?", command_exec, " <polecenie>", "Uruchamia polecenie systemowe", "" },
 	{ "!", "?", command_exec, " <polecenie>", "Synonim dla %Wexec%n", "" },
 	{ "find", "u", command_find, " [opcje]", "Interfejs do katalogu publicznego", "  -u, --uin <numerek>\n  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>\n  -c, --city <miasto>\n  -b, --born <min:max>\n  -p, --phone <telefon>\n  -e, --email <e-mail>\n  -a, --active\n  -F, --female\n  -M, --male\n  --start <od>" },
-/*	{ "info", "u", command_find, " <numer/alias>", "Interfejs do katalogu publicznego", "" }, */
 	{ "help", "c", command_help, " [polecenie]", "Wy¶wietla informacjê o poleceniach", "" },
 	{ "?", "c", command_help, " [polecenie]", "Synonim dla %Whelp%n", "" },
 	{ "ignore", "u", command_ignore, " [numer/alias]", "Dodaje do listy ignorowanych lub j± wy¶wietla", "" },
@@ -127,15 +126,21 @@ struct command commands[] = {
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 
-int match_arg(char *arg, char shortopt, char *longopt)
+int match_arg(char *arg, char shortopt, char *longopt, int longoptlen)
 {
 	if (!arg || *arg != '-')
 		return 0;
 
 	arg++;
 	
-	if (*arg == '-')
-		return !strcmp(++arg, longopt);
+	if (*arg == '-') {
+		int len = strlen(++arg);
+
+		if (longoptlen > len)
+			len = longoptlen;
+
+		return !strncmp(arg, longopt, len);
+	}
 	
 	return (*arg == shortopt);
 }
@@ -478,7 +483,7 @@ COMMAND(command_add)
 
 COMMAND(command_alias)
 {
-	if (!params[0] || match_arg(params[0], 'l', "list")) {
+	if (!params[0] || match_arg(params[0], 'l', "list", 2)) {
 		struct list *l;
 		int count = 0;
 
@@ -495,14 +500,14 @@ COMMAND(command_alias)
 		return 0;
 	}
 
-	if (match_arg(params[0], 'a', "add")) {
+	if (match_arg(params[0], 'a', "add", 2)) {
 		if (!add_alias(params[1], 0))
 			config_changed = 1;
 
 		return 0;
 	}
 
-	if (match_arg(params[0], 'd', "del")) {
+	if (match_arg(params[0], 'd', "del", 2)) {
 		if (!del_alias(params[1]))
 			config_changed = 1;
 
@@ -713,76 +718,71 @@ COMMAND(command_find)
 	memset(&r, 0, sizeof(r));
 
 	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
-		my_printf("not_enough_params");
-		array_free(argv);
-		free(query);
-		return 0;
-	}
+		r.uin = config_uin;
+		id = id * 2;
 
-/*	XXX przerobiæ to na watches 
-	
-	if (!strncasecmp(argv[0], "--s", 3) || !strncasecmp(argv[0], "-s", 2)) {
-		if (search)
-			gg_http_stop(search);
-		gg_free_search(search);
-		search = NULL;
-		my_printf("search_stopped");
-		return 0;
-	}
-*/
-	if (argv[0] && !argv[1] && argv[0][0] != '-') {
-		id = id * 2;	/* single search */
-		if (!(r.uin = get_uin(params[0]))) {
-			my_printf("user_not_found", params[0]);
-			free(query);
-			array_free(argv);
-			return 0;
-		}
 	} else {
-		id = id * 2 + 1;	/* multiple search */
-		for (i = 0; argv[i]; i++) {
-			char *arg = argv[i];
-			
-			if (match_arg(arg, 'f', "first") && argv[i + 1])
-				r.first_name = argv[++i];
-			if (match_arg(arg, 'l', "last") && argv[i + 1])
-				r.last_name = argv[++i];
-			if (match_arg(arg, 'n', "nickname") && argv[i + 1])
-				r.nickname = argv[++i];
-			if (match_arg(arg, 'c', "city") && argv[i + 1])
-				r.city = argv[++i];
-			if (match_arg(arg, 'p', "phone") && argv[i + 1])
-				r.phone = argv[++i];
-			if (match_arg(arg, 'e', "email") && argv[i + 1])
-				r.email = argv[++i];
-			if (match_arg(arg, 'u', "uin") && argv[i + 1])
-				r.uin = strtol(argv[++i], NULL, 0);
-			if (match_arg(arg, 's', "start") && argv[i + 1])
-				r.start = strtol(argv[++i], NULL, 0);
-			if (match_arg(arg, 'F', "female"))
-				r.gender = GG_GENDER_FEMALE;
-			if (match_arg(arg, 'M', "male"))
-				r.gender = GG_GENDER_MALE;
-			if (match_arg(arg, 'a', "active"))
-				r.active = 1;
-			if (match_arg(arg, 'b', "born") && argv[i + 1]) {
-				char *foo = strchr(argv[++i], ':');
-	
-				if (!foo) {
-					r.min_birth = atoi(argv[i]);
-					r.max_birth = atoi(argv[i]);
-				} else {
-					*foo = 0;
-					r.min_birth = atoi(argv[i]);
-					r.max_birth = atoi(++foo);
+		if (argv[0] && !argv[1] && argv[0][0] != '-') {
+			id = id * 2;	/* single search */
+			if (!(r.uin = get_uin(params[0]))) {
+				my_printf("user_not_found", params[0]);
+				free(query);
+				array_free(argv);
+				return 0;
+			}
+		} else {
+			id = id * 2 + 1;	/* multiple search */
+			for (i = 0; argv[i]; i++) {
+				char *arg = argv[i];
+				
+				if (match_arg(arg, 'f', "first", 2) && argv[i + 1])
+					r.first_name = argv[++i];
+				if (match_arg(arg, 'l', "last", 2) && argv[i + 1])
+					r.last_name = argv[++i];
+				if (match_arg(arg, 'n', "nickname", 2) && argv[i + 1])
+					r.nickname = argv[++i];
+				if (match_arg(arg, 'c', "city", 2) && argv[i + 1])
+					r.city = argv[++i];
+				if (match_arg(arg, 'p', "phone", 2) && argv[i + 1])
+					r.phone = argv[++i];
+				if (match_arg(arg, 'e', "email", 2) && argv[i + 1])
+					r.email = argv[++i];
+				if (match_arg(arg, 'u', "uin", 2) && argv[i + 1])
+					r.uin = strtol(argv[++i], NULL, 0);
+				if (match_arg(arg, 's', "start", 2) && argv[i + 1])
+					r.start = strtol(argv[++i], NULL, 0);
+				if (match_arg(arg, 'F', "female", 2))
+					r.gender = GG_GENDER_FEMALE;
+				if (match_arg(arg, 'M', "male", 2))
+					r.gender = GG_GENDER_MALE;
+				if (match_arg(arg, 'a', "active", 2))
+					r.active = 1;
+				if (match_arg(arg, 'b', "born", 2) && argv[i + 1]) {
+					char *foo = strchr(argv[++i], ':');
+		
+					if (!foo) {
+						r.min_birth = atoi(argv[i]);
+						r.max_birth = atoi(argv[i]);
+					} else {
+						*foo = 0;
+						r.min_birth = atoi(argv[i]);
+						r.max_birth = atoi(++foo);
+					}
+					if (r.min_birth < 100)
+						r.min_birth += 1900;
+					if (r.max_birth < 100)
+						r.max_birth += 1900;
 				}
-				if (r.min_birth < 100)
-					r.min_birth += 1900;
-				if (r.max_birth < 100)
-					r.max_birth += 1900;
 			}
 		}
 	}
+
+	iso_to_cp(r.first_name);
+	iso_to_cp(r.last_name);
+	iso_to_cp(r.nickname);
+	iso_to_cp(r.city);
+	iso_to_cp(r.phone);
+	iso_to_cp(r.email);
 
 	if (!(h = gg_search(&r, 1))) {
 		my_printf("search_failed", strerror(errno));
@@ -823,38 +823,38 @@ COMMAND(command_change)
 	
 	for (i = 0; argv[i]; i++) {
 		
-		if (match_arg(argv[i], 'f', "first") && argv[i + 1]) {
+		if (match_arg(argv[i], 'f', "first", 2) && argv[i + 1]) {
 			free(r->first_name);
 			r->first_name = strdup(argv[++i]);
 		}
 		
-		if (match_arg(argv[i], 'l', "last") && argv[i + 1]) {
+		if (match_arg(argv[i], 'l', "last", 2) && argv[i + 1]) {
 			free(r->last_name);
 			r->last_name = strdup(argv[++i]);
 		}
 		
-		if (match_arg(argv[i], 'n', "nickname") && argv[i + 1]) {
+		if (match_arg(argv[i], 'n', "nickname", 2) && argv[i + 1]) {
 			free(r->nickname);
 			r->nickname = strdup(argv[++i]);
 		}
 		
-		if (match_arg(argv[i], 'e', "email") && argv[i + 1]) {
+		if (match_arg(argv[i], 'e', "email", 2) && argv[i + 1]) {
 			free(r->email);
 			r->email = strdup(argv[++i]);
 		}
 
-		if (match_arg(argv[i], 'c', "city") && argv[i + 1]) {
+		if (match_arg(argv[i], 'c', "city", 2) && argv[i + 1]) {
 			free(r->city);
 			r->city = strdup(argv[++i]);
 		}
 		
-		if (match_arg(argv[i], 'b', "born") && argv[i + 1])
+		if (match_arg(argv[i], 'b', "born", 2) && argv[i + 1])
 			r->born = atoi(argv[++i]);
 		
-		if (match_arg(argv[i], 'F', "female"))
+		if (match_arg(argv[i], 'F', "female", 2))
 			r->gender = GG_GENDER_FEMALE;
 
-		if (match_arg(argv[i], 'M', "male"))
+		if (match_arg(argv[i], 'M', "male", 2))
 			r->gender = GG_GENDER_MALE;
 	}
 
@@ -905,33 +905,33 @@ COMMAND(command_modify)
 
 	for (i = 0; argv[i]; i++) {
 		
-		if (match_arg(argv[i], 'f', "first") && argv[i + 1]) {
+		if (match_arg(argv[i], 'f', "first", 2) && argv[i + 1]) {
 			free(u->first_name);
 			u->first_name = strdup(argv[++i]);
 		}
 		
-		if (match_arg(argv[i], 'l', "last") && argv[i + 1]) {
+		if (match_arg(argv[i], 'l', "last", 2) && argv[i + 1]) {
 			free(u->last_name);
 			u->last_name = strdup(argv[++i]);
 		}
 		
-		if (match_arg(argv[i], 'n', "nickname") && argv[i + 1]) {
+		if (match_arg(argv[i], 'n', "nickname", 2) && argv[i + 1]) {
 			free(u->nickname);
 			u->nickname = strdup(argv[++i]);
 		}
 		
-		if (match_arg(argv[i], 'd', "display") && argv[i + 1]) {
+		if (match_arg(argv[i], 'd', "display", 2) && argv[i + 1]) {
 			free(u->display);
 			u->display = strdup(argv[++i]);
 			userlist_replace(u);
 		}
 		
-		if (match_arg(argv[i], 'p', "phone") && argv[i + 1]) {
+		if (match_arg(argv[i], 'p', "phone", 2) && argv[i + 1]) {
 			free(u->mobile);
 			u->mobile = strdup(argv[++i]);
 		}
 		
-		if (match_arg(argv[i], 'g', "group") && argv[i + 1]) {
+		if (match_arg(argv[i], 'g', "group", 2) && argv[i + 1]) {
 			switch (*argv[++i]) {
 				case '-':
 					group_remove(u, argv[i] + 1);
@@ -944,7 +944,7 @@ COMMAND(command_modify)
 			}
 		}
 		
-		if (match_arg(argv[i], 'u', "uin") && argv[i + 1])
+		if (match_arg(argv[i], 'u', "uin", 2) && argv[i + 1])
 			u->uin = strtol(argv[++i], NULL, 0);
 	}
 
@@ -1077,7 +1077,7 @@ COMMAND(command_list)
 	}
 
 	/* list --get */
-	if (params[0] && match_arg(params[0], 'g', "get")) {
+	if (params[0] && match_arg(params[0], 'g', "get", 2)) {
 		struct gg_http *h;
 		
 		if (!(h = gg_userlist_get(config_uin, config_password, 1))) {
@@ -1091,7 +1091,7 @@ COMMAND(command_list)
 	}
 
 	/* list --put */
-	if (params[0] && match_arg(params[0], 'p', "put")) {
+	if (params[0] && match_arg(params[0], 'p', "put", 2)) {
 		struct gg_http *h;
 		char *contacts = userlist_dump();
 		
@@ -1119,20 +1119,20 @@ COMMAND(command_list)
 
 	 		for (i = 0; argv[i]; i++) {
 				
-				if (match_arg(argv[i], 'w', "wait"))
+				if (match_arg(argv[i], 'w', "wait", 2))
 					page_wait = 1;
 				
-				if (match_arg(argv[i], 'a', "active")) {
+				if (match_arg(argv[i], 'a', "active", 2)) {
 					show_all = 0;
 					show_active = 1;
 				}
 				
-				if (match_arg(argv[i], 'i', "inactive") || match_arg(argv[i], 'n', "notavail")) {
+				if (match_arg(argv[i], 'i', "inactive", 2) || match_arg(argv[i], 'n', "notavail", 2)) {
 					show_all = 0;
 					show_inactive = 1;
 				}
 				
-				if (match_arg(argv[i], 'b', "busy")) {
+				if (match_arg(argv[i], 'b', "busy", 2)) {
 					show_all = 0;
 					show_busy = 1;
 				}

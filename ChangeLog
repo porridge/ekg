@@ -9,6 +9,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - porz±dki w kodzie i Makefile (wojboj/w)
 - dodany ekl2.sh (tri10o/w)
+- ,,find'' bez parametrów mówi o sobie (w)
+- poprawka obs³ugi parametrów komend (wasyl/w)
+- konwersja iso->cp przy szukaniu (wasyl/w)
 
 // 2002-03-20
 
