@@ -704,7 +704,7 @@ COMMAND(cmd_exec)
 						return -1;
 					}
 
-					if ((u = userlist_find(uin, NULL)))
+					if ((u = userlist_find(uin, NULL)) && u->display)
 						tg = xstrdup(u->display);
 					else
 						tg = xstrdup(itoa(uin));
@@ -1111,7 +1111,7 @@ COMMAND(cmd_modify)
 				}
 			}
 			
-			ui_event("userlist_changed", u->display, argv[i], NULL);
+			ui_event("userlist_changed", ((u->display) ? u->display : itoa(u->uin)), argv[i], NULL);
 			xfree(u->display);
 			u->display = xstrdup(argv[i]);
 			userlist_replace(u);
@@ -1585,7 +1585,7 @@ COMMAND(cmd_list)
 			return 0;
 		}
 
-		if (!(u = userlist_find(get_uin(params[0]), NULL)) || (u && !u->display)) {
+		if (!(u = userlist_find(get_uin(params[0]), NULL)) || !u->display) {
 			printq("user_not_found", params[0]);
 			return -1;
 		}
@@ -1990,7 +1990,7 @@ COMMAND(cmd_msg)
 					struct group *g = m->data;
 
 					if (!strcasecmp(g->name, tmp[i] + 1)) {
-						if (!array_contains(nicks, u->display, 0))
+						if (u->display && !array_contains(nicks, u->display, 0))
 							array_add(&nicks, xstrdup(u->display));
 						count++;
 					}
@@ -2625,7 +2625,7 @@ COMMAND(cmd_dcc)
 			}
 
 			if (t && (u = userlist_find(t->uin, NULL))) {
-				if (!strcasecmp(params[1], itoa(u->uin)) || !strcasecmp(params[1], u->display)) {
+				if (!strcasecmp(params[1], itoa(u->uin)) || (u->display && !strcasecmp(params[1], u->display))) {
 					t = f;
 					break;
 				}
@@ -2734,7 +2734,7 @@ COMMAND(cmd_dcc)
 			}
 
 			if ((u = userlist_find(tt->uin, NULL))) {
-				if (!strcasecmp(params[1], itoa(u->uin)) || !strcasecmp(params[1], u->display)) {
+				if (!strcasecmp(params[1], itoa(u->uin)) || (u->display && !strcasecmp(params[1], u->display))) {
 					t = tt;
 					break;
 				}
@@ -3743,6 +3743,9 @@ int binding_quick_list(int a, int b)
 		struct userlist *u = l->data;
 		const char *format = NULL;
 		char *tmp;
+
+		if (!u->display)
+			continue;
 		
 		switch (u->status) {
 			case GG_STATUS_AVAIL:
@@ -4528,7 +4531,7 @@ COMMAND(cmd_conference)
 				uin_t uin = *((uin_t *) (r->data));
 				struct userlist *u = userlist_find(uin, NULL);
 
-				if (u)
+				if (u && u->display)
 					recipient = u->display;
 				else
 					recipient = itoa(uin);
