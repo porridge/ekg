@@ -8,16 +8,43 @@ VERSION=0.1
 AC_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
-AC_CHECK_CURSES
+
+AC_SUBST(DFLAGS)
+AC_ARG_WITH(debug, 
+  [  --without-debug  	  Compile without debug [-Wall, -ggdb]])
+
+if test "x$with_debug" = "xno"; then 
+  DFLAGS=""
+else
+  DFLAGS="-Wall -ggdb" 
+fi
+
+AC_ARG_WITH(termcap, 
+  [  --without-termcap       Used to force curses/ncurses])
+
+if test "x$with_termcap" = "xno"; then 
+  TERMCAP_LIB=""
+else
+  AC_CHECK_LIB(termcap, tgetent, TERMCAP_LIB=-ltermcap)
+  LIBS="$LIBS $TERMCAP_LIB"
+fi
+
+if test "x$TERMCAP_LIB" == "x"; then 
+   AC_CHECK_CURSES
+fi
+
+
 AC_CHECK_READLINE
 
 AC_PATH_PROG(RM, rm, no)
 if test "x$RM" = "xno"; then
     AC_MSG_ERROR([rm ])
 fi
+
 AC_C_BIGENDIAN
 
 AC_CHECK_LIB(nsl, t_accept, LIBS="$LIBS -lnsl")
 AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
+
 
 AC_OUTPUT(Makefile)

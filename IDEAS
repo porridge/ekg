@@ -1,3 +1,9 @@
+10:52 < e-Undis> hm... to mi sie nie podoba:
+10:52 < e-Undis> gcc  -Wall -O3 -ggdb -g -O2
+10:59 <@arekm> btw /me mia³ problemy z jakim¶ progem
+               kompilowanym z -ggdb .. bez tego posz³o
+10:59 <@arekm> gcc siê sypa³
+
 ~OutSideR~ <outsider@langusta.starnet.pl>
 
 > list - tu by sie przydalo mozliwosc sortowania chociazby z wykorzystaniem

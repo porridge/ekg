@@ -1,3 +1,8 @@
+// 2001-10-27 
+- popsulem configure [kompatybilnosc z termcapem + wymuszenie curses 
+  --without-termcap + mozliwosc wylaczenia -Wall -ggdb --without-debug]
+  pierwsze (i/wojtekka), drugie (i/undefined)
+
 // 2001-10-26
 
 - lekko poprawi³em obs³ugê dzieciaków. nie wait()uje na ka¿dy z listy po

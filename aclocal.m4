@@ -381,7 +381,7 @@ dnl	CFLAGS=${CFLAGS--O}
 	AC_SUBST(READLINE_INCLUDES)
 
 	AC_ARG_WITH(readline,
-	  [  --with-readline[=dir]  Compile with readline/locate base dir [no compile]],
+	  [  --with-readline[=dir]   Compile with readline/locate base dir],
 	  if test "x$withval" = "xno" ; then
 		search_readline=false
 	  elif test "x$withval" != "xyes" ; then
@@ -428,6 +428,6 @@ AC_DEFUN(AC_SEARCH_READLINE, [
     AC_READLINE(/usr/include/readline, readline.h, -lreadline, -I/usr/include/readline, "readline on /usr/include/readline")
     AC_READLINE(/usr/local/include, readline.h, -L/usr/local/lib -lreadline, -I/usr/local/include, "readline on /usr/local")
     AC_READLINE(/usr/local/include/readline, readline.h, -L/usr/local/lib -L/usr/local/lib/readline -lreadline, -I/usr/local/include/readline, "readline on /usr/local/include/readline")
-    AC_READLINE(/usr/freeware/include/readline, readline.h, -L/usr/freeware/lib32 -lreadline, "readline on /usr/freeware/include/readline")
+    AC_READLINE(/usr/freeware/include/readline, readline.h, -L/usr/freeware/lib32 -lreadline, -I/usr/freeware/include, "readline on /usr/freeware/include/readline")
 ] ) 
 
