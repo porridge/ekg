@@ -25,6 +25,10 @@
 extern "C" {
 #endif
 
+#ifdef sun
+  #define INADDR_NONE 0xffffffff
+#endif
+
 /*
  * typ zmiennej okre¶laj±cej numerek danej osoby.
  */

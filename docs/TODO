@@ -2,8 +2,7 @@
 biblioteka:
 + ctcp
 ! zak³adanie kont
-- proxy, https // vinil
-- fixowanie w gg_notify_reply // vinil
+- proxy, https // vinil [czy jest potrzebne sparcie socks'ow ?]
 - wysy³anie has³a na maila // vaxior
 
 klient:
