@@ -229,15 +229,33 @@ static void ui_ncurses_print(const char *target, const char *line)
 	struct window *w;
 	const char *p;
 	int x = 0;
+	list_t l;
 
-	if (config_make_window == 2) {
-		if (!(w = window_find(target))) {
-			w = window_new(target);
-			print("window_id_query_started", itoa(w->id), target);
-		}
-	} else {
-		if (!(w = window_find(target)))
-			return;
+	switch (config_make_window) {
+		case 1:
+			if ((w = window_find(target)))
+				break;
+
+			for (l = windows; l; l = l->next) {
+				struct window *w = l->data;
+
+				if (!w->target && w->id != 1) {
+					w->target = xstrdup(target);
+					print("window_id_query_started", itoa(w->id), target);
+					break;
+				}
+			}
+
+		case 2:
+			if (!(w = window_find(target))) {
+				w = window_new(target);
+				print("window_id_query_started", itoa(w->id), target);
+			}
+			break;
+
+		default:
+			if (!(w = window_find(target)))
+				w = window_current;
 	}
 
 	if (w != window_current) {
@@ -1130,8 +1148,13 @@ static int ui_ncurses_event(const char *event, ...)
 				struct window *w;
 
 				if ((w = window_find(param))) {
-					print("query_exist", param, itoa(w->id));
+					window_switch(w->id);
 					goto cleanup;
+				}
+
+				if (config_make_window == 2) {
+					w = window_new(param);
+					window_switch(w->id);
 				}
 
 				print("query_started", param);
@@ -1148,14 +1171,25 @@ static int ui_ncurses_event(const char *event, ...)
 		if (!strcasecmp(command, "window")) {
 			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*);
 
-			if (!p1) {
-				print("not_enough_params", "window");
+			if (!p1 || !strcasecmp(p1, "list")) {
+				list_t l;
+
+				for (l = windows; l; l = l->next) {
+					struct window *w = l->data;
+
+					if (w->target)
+						print("window_list_query", itoa(w->id), w->target);
+					else
+						print("window_list_nothing", itoa(w->id));
+				}
+
 				goto cleanup;
 			}
 
 			if (!strcasecmp(p1, "new")) {
 				struct window *w = window_new(NULL);
 				window_switch(w->id);
+				goto cleanup;
 			}
 
 			if (!strcasecmp(p1, "switch")) {
@@ -1164,7 +1198,8 @@ static int ui_ncurses_event(const char *event, ...)
 					goto cleanup;
 				}
 				window_switch(atoi(p2));
-			}
+				goto cleanup;
+			}			
 			
 			if (!strcasecmp(p1, "kill")) {
 				struct window *w = window_current;
@@ -1188,7 +1223,15 @@ static int ui_ncurses_event(const char *event, ...)
 				}
 
 				window_kill(w);
+				goto cleanup;
 			}
+
+			if (!strcasecmp(p1, "next") || !strcasecmp(p1, "prev") || !strcasecmp(p1, "clear") || !strcasecmp(p1, "refresh")) {
+				print("not_implemented");
+				goto cleanup;
+			}
+			
+			print("window_invalid");
 		}
 	}
 

@@ -907,7 +907,7 @@ void theme_init()
 	format_add("dcc_invalid_ip", "%! Nieprawid³owy adres IP\n", 1);
 
 	/* query */
-	format_add("query_started", "%) Rozpoczêto rozmowê z %T%1%n. Aby zakoñczyæ, wci¶nij Ctrl-D\n", 1);
+	format_add("query_started", "%) Rozpoczêto rozmowê z %T%1%n\n", 1);
 	format_add("query_finished", "%) Zakoñczono rozmowê z %T%1%n\n", 1);
 	format_add("query_exist", "%! Rozmowa z %T%1%n jest ju¿ prowadzona w okienku nr %T%2%n\n", 1);
 
