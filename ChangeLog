@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-12-22
+
+- poprawka segfaultu przy wielolinijkowych wiadomo¶ciach (nyarlath/w)
+
 // 2003-12-21
 
 - poprawka ,,auto_back'' i ,,auto_away_keep_descr'' (s_wilk/sz)
