@@ -3715,7 +3715,7 @@ COMMAND(cmd_conference)
 		}
 
 		if (params[2]) {
-			if (params[2][0] != '#') {
+			if (params[1][0] != '#') {
 				printq("conferences_name_error");
 				return -1;
 			} else
