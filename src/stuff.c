@@ -174,6 +174,7 @@ static struct {
 	{ EVENT_SIGUSR2, "sigusr2" },
 	{ EVENT_DELIVERED, "delivered" },
 	{ EVENT_QUEUED, "queued" },
+	{ INACTIVE_EVENT, NULL },
 	{ 0, NULL },
 };
 
@@ -490,8 +491,11 @@ int config_read()
                         int flags;
                         uin_t uin;
                         char **pms = array_make(foo, " \t", 3, 1, 0);
-                        if (pms && pms[0] && pms[1] && pms[2] && (flags = event_flags(pms[0])) && (uin = atoi(pms[1])) && !event_correct(pms[2]))
-                                event_add(event_flags(pms[0]), atoi(pms[1]), pms[2], 1);
+                        if (pms && pms[0] && pms[1] && pms[2] && (flags = event_flags(pms[0])) && (uin = atoi(pms[1]))) {
+				if (event_correct(pms[2]))
+					flags |= INACTIVE_EVENT; /* nieaktywne */
+                                event_add(flags, atoi(pms[1]), pms[2], 1);
+			}
 			array_free(pms);
 		} else if (!strcasecmp(buf, "bind")) {
 			char **pms = array_make(foo, " \t", 2, 1, 0);
@@ -1808,7 +1812,7 @@ const char *event_format(int flags)
 	if (flags == EVENT_ALL)
 		return "*";
 
-	for (i = 0; event_labels[i].event; i++) {
+	for (i = 0; event_labels[i].name; i++) {
 		if ((flags & event_labels[i].event)) {
 			if (!first)
 				strcat(buf, ",");
@@ -1838,7 +1842,7 @@ int event_flags(const char *events)
 	for (j = 0; a[j]; j++) {
 		if (!strcmp(a[j], "*"))
 			flags |= EVENT_ALL;
-		for (i = 0; event_labels[i].event; i++)
+		for (i = 0; event_labels[i].name; i++)
 			if (!strcasecmp(a[j], event_labels[i].name))
 				flags |= event_labels[i].event;
 	}
@@ -2045,6 +2049,9 @@ int event_check(int event, uin_t uin, const char *data)
         for (l = events; l; l = l->next) {
                 struct event *e = l->data;
 
+		if (e->flags & INACTIVE_EVENT)
+			return 0;
+		
                 if ((e->flags & event) && (e->uin == uin || e->uin == 1)) {
 			action = e->action;
 			break;

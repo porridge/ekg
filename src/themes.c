@@ -1033,6 +1033,7 @@ void theme_init()
 	/* zdarzenia */
         format_add("events_list_empty", "%! Brak zdarzeñ\n", 1);
         format_add("events_list", "%> on %G%1 %T%2 %B%3%n\n", 1);
+	format_add("events_list_inactive", "%> on %G%1 %T%2 %B%3 %g(nieaktywne)%n\n", 1);
         format_add("events_incorrect", "%! Nieprawid³owo zdefiniowane zdarzenie\n", 1);
         format_add("events_add", "%> Dodano zdarzenie\n", 1);
         format_add("events_exist", "%! Zdarzenie %1 istnieje dla %2\n", 1);

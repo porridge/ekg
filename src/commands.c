@@ -2319,7 +2319,7 @@ COMMAND(cmd_on)
                 for (l = events; l; l = l->next) {
                         struct event *ev = l->data;
 
-                        print("events_list", event_format(ev->flags), (ev->uin == 1) ? "*" : format_user(ev->uin), ev->action);
+                        print((ev->flags & INACTIVE_EVENT) ? "events_list_inactive" :"events_list", event_format(abs(ev->flags)), (ev->uin == 1) ? "*" : format_user(ev->uin), ev->action);
                         count++;
                 }
 
