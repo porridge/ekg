@@ -17,6 +17,11 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
 #include "stuff.h"
 #include "ui.h"
 
@@ -42,10 +47,18 @@ static int event(const char *foo, ...)
 
 void ui_none_init()
 {
+	int fd, dn = open("/dev/null", O_RDWR);
+
+	for (fd = 0; fd < 3; fd++) {
+		close(fd);
+		dup2(dn, fd);
+	}
+
 	ui_postinit = nop;
 	ui_print = nop;
 	ui_loop = loop;
 	ui_beep = nop;
 	ui_event = event;
 	ui_deinit = nop;
+
 }

@@ -1228,7 +1228,7 @@ int main(int argc, char **argv)
 	time(&last_action);
 
 	/* dodajemy stdin do ogl±danych deskryptorów */
-	if (!batch_mode) {
+	if (!batch_mode && ui_init != ui_none_init) {
 		memset(&si, 0, sizeof(si));
 		si.fd = 0;
 		si.check = GG_CHECK_READ;
