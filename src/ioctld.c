@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2002  Pawel Maziarz <drg@go2.pl>
+ *  (C) Copyright 2002  Pawe³ Maziarz <drg@infomex.pl>
  *			Wojtek Kaniewski <wojtekka@irc.pl>
  *			Robert J. Wozny <speedy@ziew.org>
  *
@@ -24,16 +24,26 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include <linux/cdrom.h>		// linux specific  
-#include <linux/kd.h>			// -||- 
+#ifdef __linux__
+#  include <linux/cdrom.h>		  
+#  include <linux/kd.h>			 
+#endif
+#ifdef __FreeBSD__
+#  include <sys/kbio.h>			
+#endif
 #include <ctype.h>
 #include <sys/un.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <limits.h>
 #include <signal.h>
 #include "ioctld.h"
+
+#ifndef PATH_MAX
+#  define PATH_MAX _POSIX_PATH_MAX
+#endif
 
 char sock_path[PATH_MAX] =  "";
 
@@ -66,6 +76,9 @@ int beeps_spk(int *tone, int *delay)
 		fd = STDOUT_FILENO;
 		
 	for(s=0; tone[s] >= 0 && s <= MAX_ITEMS; s++) {
+#ifdef __FreeBSD__
+		ioctl(fd, KIOCSOUND, 0);
+#endif
 	    	ioctl(fd, KIOCSOUND, tone[s]);
 		if (delay[s] && delay[s] <= MAX_DELAY)
 			usleep(delay[s]);

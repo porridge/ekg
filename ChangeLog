@@ -13,6 +13,7 @@ zg³osi³ b³±d.
 - usuniêcie leaka przy /find (w)
 - libgadu: usuniêcie leaka przy http (w)
 - drobne zmiany w ioctld (przy ,,beeps_spk'' ioctld nie potrzebuje +s) (d)
+- zdarzenia ,,beeps_spk'' i ,,blink_leds'' mog± dzia³aæ na FreeBSD (d)
 
 // 2002-11-30
 
