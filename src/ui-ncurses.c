@@ -1193,6 +1193,12 @@ void contacts_rebuild()
 	/* nie jeste¶my w ncurses */
 	if (!windows)
 		return;
+
+	if (config_contacts_size > stdscr->_maxx / 2)
+		config_contacts_size = stdscr->_maxx / 2;
+
+	if (config_contacts_size < 0)
+		config_contacts_size = 0;
 	
 	ui_screen_width = stdscr->_maxx - CONTACTS_SIZE;
 
