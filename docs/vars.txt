@@ -89,7 +89,14 @@ aspell
 	domy¶lna warto¶æ: 0
 
 	okre¶la, czy s³ownik ma zostaæ w³±czony. 
-	wiêcej o samym s³owniku w slownik.txt	
+	wiêcej o samym s³owniku w slownik.txt.	
+
+aspell_allowed 
+	typ: tekst
+	domy¶lna warto¶æ: "()[]',.`\"<>!?"
+	
+	pozwala na ustawienie skrajnych znaków, które maj± byæ ignorowane 
+	przez s³ownik (np skrajne nawiasy, cudzys³owia).
 
 aspell_lang
 	typ: tekst
@@ -99,7 +106,7 @@ aspell_lang
 
 aspell_encoding
 	typ: tekst
-	domy¶lna warto¶æ: iso8859-2
+	domy¶lna warto¶æ: "iso8859-2"
 
 	okre¶la kodowanie u¿ywane przez s³ownik.
 
