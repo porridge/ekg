@@ -2939,10 +2939,10 @@ static void binding_accept_line(const char *arg)
 		line[line_index] = 0;
 		
 		line_index = 0;
+		line_start = 0;
 		lines_index++;
 
 		lines_adjust();
-		line_adjust();
 	
 		return;
 	}
@@ -3051,9 +3051,11 @@ static void binding_backward_char(const char *arg)
 		if (line_index > 0)
 			line_index--;
 		else {
-			if (lines_index > 0)
+			if (lines_index > 0) {
 				lines_index--;
-			lines_adjust();
+				lines_adjust();
+				line_adjust();
+			}
 		}
 
 		return;
@@ -3069,8 +3071,11 @@ static void binding_forward_char(const char *arg)
 		if (line_index < strlen(line))
 			line_index++;
 		else {
-			if (lines_index < array_count(lines) - 1)
+			if (lines_index < array_count(lines) - 1) {
 				lines_index++;
+				line_index = 0;
+				line_start = 0;
+			}
 			lines_adjust();
 		}
 
