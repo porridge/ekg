@@ -260,7 +260,7 @@ dnl <ekg>
     
   AC_CHECK_PYTHON
   
-  if test "x$have_python" = "xtrue"; then
+  if test "x$have_python" = "xyes"; then
     OBJS="$OBJS python.o"
     LDFLAGS="$PYTHON_LIBS $LDFLAGS"
     CFLAGS="$CFLAGS $PYTHON_INCLUDES"
@@ -270,7 +270,7 @@ dnl <ekg>
 
   AC_CHECK_OPENSSL
 
-  if test "x$have_openssl" = "xtrue"; then
+  if test "x$have_openssl" = "xyes"; then
     OBJS="$OBJS sim.o"
     LDFLAGS="$OPENSSL_LIBS $LDFLAGS"
     CFLAGS="$CFLAGS $OPENSSL_INCLUDES"
@@ -387,10 +387,16 @@ fi
 
 dnl <ekg>
 
-if test "x$have_openssl" = "xtrue"; then
+if test "x$have_openssl" = "xyes"; then
   echo " - openssl: enabled"
 else
   echo " - openssl: disabled"
+fi
+
+if test "x$have_ioctld_includes" = "xyes"; then
+  echo " - ioctld: enabled"
+else
+  echo " - ioctld: disabled"
 fi
 
 if test "x$ui_readline_enabled" = "xyes"; then

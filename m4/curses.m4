@@ -38,7 +38,7 @@ AC_DEFUN(AC_CHECK_NCURSES,[
         AC_MSG_RESULT($include/ncurses.h)
 	CURSES_LIBS="$lib"
 	CURSES_INCLUDES="-I$include -I$incl"
-	have_ncurses=true
+	have_ncurses=yes
 	ldflags_old="$LDFLAGS"
 	LDFLAGS="$CURSES_LIBS"
 	AC_DEFINE(HAVE_NCURSES, 1, [define if You want ncurses])
@@ -52,7 +52,7 @@ AC_DEFUN(AC_CHECK_NCURSES,[
     done
   fi
 
-  if test "x$have_ncurses" != "xtrue"; then
+  if test "x$have_ncurses" != "xyes"; then
     AC_MSG_RESULT(not found)
   fi
 ])
