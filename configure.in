@@ -223,7 +223,6 @@ if test -d src; then
     LIBS="$LIBS $PYTHON_LIBS"
     LDFLAGS="$PYTHON_LIBS $LDFLAGS"
     CFLAGS="$CFLAGS $PYTHON_INCLUDES"
-    echo $LIBS
   fi
 
   # sprawdzamy libz.so, <zlib.h>
