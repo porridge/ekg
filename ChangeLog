@@ -1,3 +1,7 @@
+// 2001-12-06
+
+- dodana funkcja wysy³ania has³a juzerom do libgg (thrull/w)
+
 // 2001-12-04
 
 - kolejny rewrite http. jeszcze czeka sporo poprawek, ale kszta³t jest

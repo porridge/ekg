@@ -8,7 +8,7 @@ MAKE = @MAKE@
 
 OBJS = ../lib/libgg.a
 
-all:	search-sync search-async register-sync register-async conn-async send
+all:	search-sync search-async register-sync register-async conn-async send remind-async remind-sync
 
 search-sync:	search.c $(OBJS)
 	$(CC) $(CFLAGS) search.c -o search-sync $(OBJS)
@@ -21,6 +21,12 @@ register-sync:	register.c $(OBJS)
 
 register-async:	register.c $(OBJS)
 	$(CC) $(CFLAGS) register.c -o register-async -DASYNC $(OBJS)
+
+remind-sync:	remind.c $(OBJS)
+	$(CC) $(CFLAGS) remind.c -o remind-sync $(OBJS)
+
+remind-async:	remind.c $(OBJS)
+	$(CC) $(CFLAGS) remind.c -o remind-async -DASYNC $(OBJS)
 
 send:	send.c $(OBJS)
 	$(CC) $(CFLAGS) send.c -o send $(OBJS)

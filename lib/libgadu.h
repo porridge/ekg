@@ -108,6 +108,7 @@ enum {
 	GG_SESSION_HTTP,	/* ogólna sesja http */
 	GG_SESSION_SEARCH,	/* szukanie */
 	GG_SESSION_REGISTER,	/* rejestrowanie */
+	GG_SESSION_REMIND,	/* przypominanie has³a */
 };
 
 /*
@@ -322,10 +323,15 @@ struct gg_pubdir {
 };
 
 struct gg_http *gg_register(char *email, char *password, int async);
-void gg_free_register(struct gg_http *f);
+#define gg_register_watch_fd gg_pubdir_watch_fd
+#define gg_free_register gg_free_pubdir
+
+struct gg_http *gg_remind_passwd(uin_t uin, int async);
+#define gg_remind_passwd_watch_fd gg_pubdir_watch_fd
+#define gg_free_remind_passwd gg_free_pubdir
 
 int gg_pubdir_watch_fd(struct gg_http *f);
-#define gg_register_watch_fd gg_pubdir_watch_fd
+void gg_free_pubdir(struct gg_http *f);
 
 /*
  * je¶li chcemy sobie podebugowaæ, wystarczy ustawiæ `gg_debug_level'.
@@ -377,6 +383,9 @@ int gg_http_hash(unsigned char *email, unsigned char *password);
 #define GG_PUBDIR_PORT 80
 #define GG_REGISTER_HOST "register.gadu-gadu.pl"
 #define GG_REGISTER_PORT 80
+#define GG_REMIND_HOST "retr.gadu-gadu.pl"
+#define GG_REMIND_PORT 80
+
 #define GG_DEFAULT_PORT 8074
 #define GG_HTTPS_PORT 443
 #define GG_HTTP_USERAGENT "Mozilla/4.7 [en] (Win98; I)"

@@ -1,0 +1,16 @@
+przypomnienie has³a:
+
+--8<--
+
+POST /appsvc/fmsendpwd.asp HTTP/1.0
+Host: retr.gadu-gadu.pl
+Content-Type: application/x-www-form-urlencoded
+User-Agent: Mozilla/4.0 (compatible; MSIE 5.0; Windows NT)
+Content-Length: 28
+Pragma: no-cache
+
+userid=123456&code=896294500
+
+--8<--
+
+
