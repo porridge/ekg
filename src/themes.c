@@ -1165,7 +1165,6 @@ void theme_init()
 	format_add("dcc_error_unknown", "%! Nieznany b³±d po³±czenia bezpo¶redniego\n", 1);
 	format_add("dcc_error_handshake", "%! Nie mo¿na nawi±zaæ po³±czenia z %1\n", 1);
 	format_add("dcc_timeout", "%! Przekroczono limit czasu operacji bezpo¶redniego po³±czenia\n", 1);
-	format_add("dcc_unknown_command", "%! Nieznana opcja: %T%1%n\n", 1);
 	format_add("dcc_not_supported", "%! Opcja %T%1%n nie jest jeszcze obs³ugiwana\n", 1);
 	format_add("dcc_open_error", "%! Nie mo¿na otworzyæ %T%1%n: %2\n", 1);
 	format_add("dcc_open_directory", "%! Nie mo¿na otworzyæ %T%1%n: Jest katalogiem\n", 1);

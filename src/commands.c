@@ -2488,7 +2488,7 @@ COMMAND(cmd_dcc)
 		return 0;
 	}
 
-	printq("dcc_unknown_command", params[0]);
+	printq("invalid_params", name);
 
 	return -1;
 }
@@ -2595,14 +2595,6 @@ COMMAND(cmd_test_keydel)
 
 #endif
 
-COMMAND(cmd_test_debug)
-{
-	if (params[0])
-		gg_debug(GG_DEBUG_MISC, "%s\n", params[0]);
-
-	return 0;
-}
-
 COMMAND(cmd_test_segv)
 {
 	char *foo = NULL;
@@ -2644,6 +2636,22 @@ COMMAND(cmd_test_add)
 {
 	if (params[0])
 		add_send_nick(params[0]);
+
+	return 0;
+}
+
+COMMAND(cmd_test_del)
+{
+	if (params[0])
+		remove_send_nick(params[0]);
+
+	return 0;
+}
+
+COMMAND(cmd_test_debug)
+{
+	if (params[0])
+		gg_debug(GG_DEBUG_MISC, "%s\n", params[0]);
 
 	return 0;
 }
@@ -4524,8 +4532,13 @@ void command_init()
 	( "_add", "?", cmd_test_add, 0, "",
 	  "dodaje do listy dope³niania TABem", "");
 	command_add
+	( "_del", "?", cmd_test_del, 0, "",
+	  "usuwa z listy dope³niania TABem", "");
+#if 0
+	command_add
 	( "_fds", "", cmd_test_fds, 0, "", 
 	  "wy¶wietla otwarte deskryptory", "");
+#endif
 	command_add
 	( "_msg", "u?", cmd_test_send, 0, "",
 	  "udaje, ¿e wysy³a wiadomo¶æ", "");
@@ -4540,7 +4553,7 @@ void command_init()
 	  "wy¶wietla listê sprawdzanych deskryptorów", "");
 	command_add
 	( "_debug", "", cmd_test_debug, 0, "",
-	  "wy¶wietla tekst", "");
+	  "wy¶wietla tekst w oknie debug", "");
 	command_add
 	( "_debug_dump", "", cmd_test_debug_dump, 0, "",
 	  "zrzuca debug do pliku", "");
