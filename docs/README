@@ -44,7 +44,7 @@ INSTALACJA
     systemowe itd. Je¶li skrypt ./configure zg³osi jakie¶ b³êdy,
     skontaktuj siê ze swoim administratorem.
 
-    ekg powinien dzia³aæ na wiêkszo¶ci systemów un*xowych, jak Linux,
+    ekg powinien dzia³aæ na wiêkszo¶ci systemów uniksowych, jak Linux,
     *BSD, SunOS, IRIX itp. lecz czasami przy dodawaniu nowych funkcji
     nie sposób sprawdziæ ich zachowania na wszystkich popularnych
     systemach. W takim wypadku przydatne s± informacje o b³êdach z
@@ -153,7 +153,7 @@ GDZIE SZUKAÆ POMOCY
     siê, czy co¶ da siê zrobiæ, albo ¿e przyda³oby siê. Program jest
     rozwijany od ponad roku, wielu ludzi korzysta z niego na co dzieñ,
     wiêc wiêkszo¶æ ,,bajerów'', o których mo¿esz pomy¶leæ, na pewno jest
-    ju¿ w programie. Przejrzyj listê zmiennych, 
+    ju¿ w programie.
 
 WYSY£ANIE SMSÓW
 
@@ -210,23 +210,38 @@ ROZPOZNAWANIE P£CI
 
 ZG£ASZANIE B£ÊDÓW
 
-    Proszê, nie przysy³ajcie informacji, ¿e mo¿na by dodaæ co¶, co jest
-    ju¿ wymienione w TODO. Nie przysy³ajcie informacji, ¿e jest jaki¶
-    b³±d, je¶li poprawka jest wymieniona w TODO. Nie przysy³ajcie
-    informacji o ostrze¿eniach przy kompilacji -- dopiero je¶li nie chce
-    siê w ogóle skompilowaæ, dajcie znaæ. Zaznaczcie, co to za system,
-    jaka dystrybucja, jaka wersja. Je¶li b³±d jest powtarzalny i zwi±zany
-    z sieci±, prosi³bym o to, co wyrzuca ekg uruchomione z opcj± ,,-d''.
-    Je¶li segfaultuje i zrzuca core, prosi³bym o podes³anie tego, co
-    poka¿e ,,gdb ekg core'' (g³ównie chodzi o liniê, w której wyst±pi³
-    b³±d), a nastêpnie ,,bt''. Informacjê o b³êdzie proszê przesy³aæ
-    na listê ekg-users (szczegó³y ni¿ej), poniewa¿ w ten sposób dostan±
-    j± inni developerzy. Dziêki temu jest szansa, ¿e zostanie poprawione
-    wcze¶niej.
+    Je¶li zauwa¿ysz jaki¶ b³±d, sprawd¼ najnowsz± wersjê. Wiêkszo¶æ
+    b³êdów jest poprawiana w ci±gu jednego lub dwóch dni od chwili
+    pojawienia siê. Przy zg³aszaniu b³êdu, zaznacz, w której wersji
+    wystêpuje.
+
+    Nie pisz o sprawach, które s± ju¿ wymienione w pliku TODO, bo doskonale
+    wiemy, ¿e co¶ trzeba poprawiæ.
+
+    Zaznacz, co to za system, jaka dystrybucja, jaka wersja.
+    
+    Je¶li b³±d jest powtarzalny i zwi±zany z sieci±, uruchom ekg z opcj±
+    ,,-d'' i przy¶lij to, co zostanie wy¶wietlone przed samym wyst±pieniem
+    b³êdu (zwykle ~20 linijek wystarczy).
+
+    Je¶li program powoduje naruszenie ochrony pamiêci i powstaje plik
+    ,,core'', postêpuj zgodnie z instrukcjami pokazanymi na ekranie --
+    uruchom ,,gdb ekg core'', przy¶lij to, co siê pojawi. Potem wydaj
+    polecenie ,,bt'' i jego wynik równie¿ za³±cz do listu.
+
+    Je¶li program siê zawiesi, nie reaguje na nic i zajmuje 100% czasu
+    procesora, w innym oknie terminala wydaj polecenie ,,strace -p <pid>'',
+    gdzie <pid> to numer procesu ekg (uzyskasz go poleceniem ,,ps x'')
+    i wy¶lij ostatnie 20 linii.
+
+    Informacjê o b³êdzie nale¿y przesy³aæ na listê ekg-users (szczegó³y
+    ni¿ej), poniewa¿ w ten sposób dostan± j± (prawie) wszyscy autorzy
+    kodu. Mo¿liwe te¿, ¿e który¶ z u¿ytkowników natkn±³ siê na to samo
+    i wie, jak sobie z tym poradziæ.
 
 ¬RÓD£A
 
-    Snapshoty kodu s± dostêpne pod adresem http://dev.null.pl/ekg/.
+    Snapshotu kodu s± dostêpne pod adresem http://213.146.38.147/ekg/.
     Je¶li nie wyst±pi ¿adne trzêsienie ziemi, brak pr±du ani barykady na
     drogach, powinny byæ robione co 24 godziny, wieczorem.
 
@@ -249,7 +264,7 @@ LISTA DYSKUSYJNA
     
 AUTORZY
 
-    Wymienieni ludzie mieli mniejszy lub wiêkszy wp³yw na rozwój biblioteki
+    Wymienione osoby mia³y mniejszy lub wiêkszy wp³yw na rozwój biblioteki
     i klienta. Niektórzy pisali kod, pomagali analizowaæ protokó³, testowali
     na ró¿nych systemach, inni podsy³ali patche i bugreporty. Je¶li kto¶
     zosta³ pominiêty, niech da znaæ. W ka¿dym razie za to, jak wygl±da ekg

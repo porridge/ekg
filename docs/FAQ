@@ -59,6 +59,7 @@ Q: Dlaczego w logach zamiast czasu jest jaka¶ dziwna liczba?
 A: Czas jest zapisywany jako ilo¶æ sekund od 1 stycznia 1970 UTC. Dziêki
    temu, ró¿ne programy i skrypty nie bêd± mia³y problemów z analizowaniem
    historii rozmów. Do czytania historii do³±czone s± skrypty o nazwach
-   ekl w katalogu contrib/.
+   ekl w katalogu contrib/. Mo¿esz równie¿ zmieniæ zmienn± ,,log_timestamp''
+   i dostosowaæ format czasu do swoich potrzeb.
 
 $Id$
