@@ -774,7 +774,7 @@ COMMAND(command_find)
 	memset(&r, 0, sizeof(r));
 
 	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
-		r.uin = config_uin;
+		r.uin = (query_nick) ? query_uin : config_uin;
 		id = id * 2;
 
 	} else {

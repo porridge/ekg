@@ -7,6 +7,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 // 2002-05-07
 
+- poprawka autosave (baseciq/w)
+- find w query szuka rozmówcy (dawszy/w)
+- update docs/on.txt (w)
 - uaktualnienie ,,docs/vars.txt'' (d)
 
 // 2002-05-06
