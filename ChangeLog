@@ -9,6 +9,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - poprawki dope³nieñ w ui-ncurses (theKnight/w)
 - zmiany stanu zawsze wrzuca do pierwszego okna (theKnight/w)
+- wska¼nik (more) w ui-ncurses (duparyba/w)
 
 // 2002-09-18
 

@@ -36,15 +36,6 @@
  * 22:02 <@bkU> ostatnio s³ysza³em przecieki, ¿e w NASA u¿ywaj± w³a¶nie ekg.
  */
 
-/*
- * XXX TODO:
- * - reakcja na zmianê rozmiaru terminala,
- * - exec,
- * - debug,
- * - bindowanie,
- * - listy kontaktów po prawej.
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -81,6 +72,7 @@ struct window {
 	int start;		/* od której linii zaczyna siê wy¶wietlanie */
 	int id;			/* numer okna */
 	int act;		/* czy co¶ siê zmieni³o? */
+	int more;		/* pojawi³o siê co¶ poza ekranem */
 	char *prompt;		/* sformatowany prompt lub NULL */
 	int prompt_len;		/* d³ugo¶æ prompta lub 0 */
 };
@@ -421,8 +413,12 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	}
 
 	w->y++;
+
+	if (w->lines - w->start > output_size)
+		w->more = 1;
 	
 	window_refresh();
+	update_statusbar();
 	wnoutrefresh(input);
 	doupdate();
 }
@@ -593,6 +589,9 @@ static void update_statusbar()
 				}
 
 				p += 8;
+			} else if (!strncmp(p, "more ", 5)) {
+				matched = (window_current->more);
+				p += 4;
 			}
 
 			if (!matched) {
@@ -672,7 +671,7 @@ void ui_ncurses_init()
 	init_pair(14, COLOR_CYAN, COLOR_BLUE);
 	init_pair(15, COLOR_WHITE, COLOR_BLUE);
 	
-	format_add("statusbar", " %c(%w%{time}%c)%w %c(%wuin%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) (%wwin%c/%w%{window}%{?query %c:%W}%{query}%c)%w %{?activity %c(%wact%c/%w}%{activity}%{?activity %c)%w}", 1);
+	format_add("statusbar", " %c(%w%{time}%c)%w %c(%wuin%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) (%wwin%c/%w%{window}%{?query %c:%W}%{query}%c)%w%{?activity  %c(%wact%c/%w}%{activity}%{?activity %c)%w}%{?more  %c(%Gmore%c)}", 1);
 	format_add("ncurses_prompt_none", "", 1);
 	format_add("ncurses_prompt_query", "[%1] ", 1);
 	format_add("no_prompt_cache", "", 1);
@@ -913,7 +912,7 @@ static void complete(int *line_start, int *line_index)
 			if (strlen(completions[i]) + 2 > maxlen)
 				maxlen = strlen(completions[i]) + 2;
 
-		cols = (stdscr->_maxx + 1) / maxlen;
+		cols = (stdscr->_maxx - 5) / maxlen;
 		if (cols == 0)
 			cols = 1;
 
@@ -1467,6 +1466,11 @@ static void ui_ncurses_loop()
 				window_current->start += output_size;
 				if (window_current->start > window_current->lines - output_size)
 					window_current->start = window_current->lines - output_size;
+
+				if (window_current->start == window_current->lines - output_size) {
+					window_current->more = 0;
+					update_statusbar();
+				}
 
 				break;
 				
