@@ -76,7 +76,7 @@ int my_getc(FILE *f)
 
 		if (reg_req && reg_req->state != GG_STATE_IDLE) {
 			if (reg_req->fd > maxfd)
-				maxfd = reg->fd;
+				maxfd = reg_req->fd;
 			if ((reg_req->check & GG_CHECK_READ))
 				FD_SET(reg_req->fd, &rd);
 			if ((reg_req->check & GG_CHECK_WRITE))
