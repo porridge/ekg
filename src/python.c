@@ -50,7 +50,7 @@ static PyObject* ekg_disconnect(PyObject *self, PyObject *args)
 	if (!PyArg_ParseTuple(args, "|s", &reason))
 		return NULL;
 
-	command_exec("disconnect", reason, 0);
+	command_exec(NULL, "disconnect", reason, 0);
 
 	return Py_BuildValue("");
 }
@@ -458,7 +458,12 @@ int python_load(const char *name)
  */
 int python_exec(const char *command)
 {
-	char *tmp = saprintf("import ekg\n%s\n", command);
+	char *tmp;
+
+	if (!command)
+		return 0;
+
+ 	tmp = saprintf("import ekg\n%s\n", command);
 
 	PyRun_SimpleString(tmp);
 	xfree(tmp);
