@@ -1,14 +1,14 @@
 
-                    Eksperymentalny Klient Gadu-gadu
+                    Eksperymentalny Klient Gadu-Gadu
 
         (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>,
-  	                        Robert J. Wo¼ny <speedy@ziew.org>
+  	                        Robert J. Wo¼ny <speedy@ziew.org>,
 				Adam Osuchowski <adwol@polsl.gliwice.pl>
 
 LICENCJA
 
     Program jest udostêpniony na zasadach licencji GPL, której tre¶æ
-    za³±czono w pliku src/COPYING. Biblioteka libgadu obs³uguj±ca
+    za³±czono w pliku src/COPYING. Bibliotekê libgadu obs³uguj±ca
     warstwê sieciow± udostêpniono na zasadach licencji LGPL, której
     tre¶æ znajduje siê w pliku lib/COPYING.
     
@@ -48,13 +48,13 @@ U¯YCIE
     jednoznaczne. Wysy³anie wiadomo¶ci komend± ,,msg'', rozmowa komend±
     ,,chat''. Informacje o ludziach ,,find <numer/nick>''. Szukanie t±
     sam± komend±, ale z ró¿nymi parametrami. ,,help'' Twoim przyjacielem.
-    je¶li dana komenda ma ró¿ne opcje, pomaga ,,help <komenda>''. By
+    Je¶li dana komenda ma ró¿ne opcje, pomaga ,,help <komenda>''. By
     wys³aæ kilkulinijkow± wiadomo¶æ, zamiast tre¶ci wpisz ,,\''
     (backslash). Koñczy siê lini± z sam± kropk±, anuluje Ctrl-D. 
 
     Je¶li dana komenda przyjmuje ,,--parametr'' mo¿na u¿yæ równie¿
     skrótu ,,-p'', je¶li nie powoduje to niejednoznaczno¶ci. Uwaga!
-    brana pod uwagê jest zwykle pierwsza litera, wiêc je¶li wpiszesz
+    Brana pod uwagê jest zwykle pierwsza litera, wiêc je¶li wpiszesz
     ,,list --gone'', ekg potraktuje to jako ,,list --get''.
 
     Komendy mo¿na wysy³aæ tak¿e przez potok. By go uaktywniæ, nale¿y
@@ -104,14 +104,14 @@ ZG£ASZANIE B£ÊDÓW
     ju¿ wymienione w TODO. Nie przysy³ajcie informacji, ¿e jest jaki¶
     b³±d, je¶li poprawka jest wymieniona w TODO. Nie przysy³ajcie
     informacji o ostrze¿eniach przy kompilacji -- dopiero je¶li nie chce
-    siê w ogóle skompilowaæ, dajcie znaæ. Zaznacznie, co to za system,
+    siê w ogóle skompilowaæ, dajcie znaæ. Zaznaczcie, co to za system,
     jaka dystrybucja, jaka wersja. Je¶li b³±d jest powtarzalny i zwi±zany
     z sieci±, prosi³bym o to, co wyrzuca ekg uruchomione z opcj± ,,-d''.
     Je¶li segfaultuje i zrzuca core, prosi³bym o podes³anie tego, co
     poka¿e ,,gdb ekg core'' (g³ównie chodzi o liniê, w której wyst±pi³
     b³±d), a nastêpnie ,,bt''. Informacjê o b³êdzie proszê przesy³aæ
     na listê ekg-users (szczegó³y ni¿ej), poniewa¿ w ten sposób dostan±
-    j± inni developerowie. Dziêki temu jest szansa, ¿e zostanie poprawione
+    j± inni developerzy. Dziêki temu jest szansa, ¿e zostanie poprawione
     wcze¶niej.
 
 ¬RÓD£A

@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <pwd.h>
+#include <limits.h>
 #include <sys/time.h>
 #ifndef _AIX
 #  include <string.h>

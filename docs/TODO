@@ -15,16 +15,5 @@ klient:
 - korzystaæ z getopt.
 - zapamiêtywaæ reasony.
 
-display_notify
-        typ: bool
-        domyslna wartosc: 1
-        okresla, czy zmiany stanu znajomych maja byc wyswietlane.
-
-Wg mnie mo¿e warto by by³o dodaæ które zmiany stanów nas interesuj± np:
-        0 - ¿adne
-        1 - wszystkie
-        2 - dostêpny <-> niedostêpny
-
-
 $Id$
 
