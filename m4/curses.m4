@@ -37,7 +37,7 @@ AC_DEFUN(AC_CHECK_NCURSES,[
       if test "x$include" != "x"; then
         AC_MSG_RESULT($include/ncurses.h)
 	CURSES_LIBS="$lib"
-	CURSES_INCLUDES="-I$include"
+	CURSES_INCLUDES="-I$include -I$incl"
 	have_ncurses=true
 	ldflags_old="$LDFLAGS"
 	LDFLAGS="$CURSES_LIBS"
