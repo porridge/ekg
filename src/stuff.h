@@ -35,10 +35,6 @@
 #include "dynstuff.h"
 #include "ioctld.h"
 
-#ifndef DIR_DELIMINATOR
-#  define DIR_DELIMINATOR '/'
-#endif
-
 enum event_t {
 	EVENT_MSG = 1,
 	EVENT_CHAT = 2,
@@ -316,5 +312,9 @@ void last_count_add(uin_t uin);
 void sms_away_add(uin_t uin);
 void sms_away_destroy();
 int sms_away_check(uin_t uin);
+
+#ifndef HAVE_DIRNAME
+char *dirname(const char *path);
+#endif
 
 #endif /* __STUFF_H */

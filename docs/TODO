@@ -18,6 +18,7 @@ klient:
 - poprawiæ getopt(), ¿eby rozumia³ ,,--back "powód"'',
 - dodaæ ,,list --add'', które dopisuje informacje do listy kontaktów,
 - sensowna obs³uga kluczy dla SIM,
+- opisy stanu w statusie ncurses (FIG),
 
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,

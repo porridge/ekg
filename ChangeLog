@@ -5,6 +5,14 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-11-12
+
+- usuniêcie basename() i jego u¿ycia (w)
+- dodanie nag³ówków do compatowego dirname() (w)
+- zmiana domy¶lnego wygl±du statusu w ncurses. zamiast ,,uin'' jest w³asny
+  nick, je¶li jest zdefiniowany w li¶cie kontaktów (FIG/w)
+- dodanie serwera w docs/FAQ (szalik/w)
+
 // 2002-11-11
 
 - 1. Limitowanie wysy?anych sms'ów przy w??czonym sms_away (szalik/s)

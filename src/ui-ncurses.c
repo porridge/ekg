@@ -42,6 +42,8 @@
 #include <dirent.h>
 #ifdef HAVE_LIBGEN_H
 #  include <libgen.h>
+#else
+#  include "../compat/dirname.h"
 #endif
 #include <ncurses.h>
 #include <signal.h>
@@ -645,6 +647,9 @@ static void update_statusbar()
 				p += 4;
 			}
 
+			if (neg)
+				matched = !matched;
+
 			if (!matched) {
 				while (*p && *p != '}')
 					p++;
@@ -930,7 +935,14 @@ void file_generator(const char *text, int len)
 
 	dirc = xstrdup(text);
 	basec = xstrdup(text);
-	bname = basename(basec);
+
+	bname = strrchr(text, '/');
+
+	if (bname)
+		bname++;
+	else
+		bname = text;
+				
 	dname = dirname(dirc);
 
 	if (text[len - 1] == '/') {
