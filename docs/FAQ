@@ -72,5 +72,11 @@ A: Masz star± wersjê biblioteki ncurses. Zainstaluj nowsz± wersjê lub
 Q: Jak wy¶wietlaæ wiadomo¶ci, które wysy³am?
 A: /set display_sent 1
 
+Q: Nie mam kolorów w ekg, co robiæ?
+A: Najprawdopodobniej masz ustawiony nieprawid³owy typ terminala. Spróbuj
+   wpisaæ ,,export TERM=ansi'' (lub ,,setenv TERM ansi'' dla pow³oki *csh)
+   przed uruchomieniem ekg. Je¶li to nie pomo¿e, zamiast ,,ansi'' spróbuj
+   podaæ ,,screen'', ,,linux'', ,,xterm-color'' lub ,,color_xterm''.
+
 
 $Id$
