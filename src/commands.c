@@ -86,7 +86,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 struct command commands[] = {
 	{ "add", "U??", command_add, " <numer> <alias> [opcje]", "Dodaje u¿ytkownika do listy kontaktów", "Opcje identyczne jak dla polecenia %Wmodify%n" },
 	{ "alias", "??", command_alias, " [opcje]", "Zarz±dzanie aliasami", "  --add <alias> <komenda>\n  --del <alias>\n  [--list]\n" },
-	{ "away", "?", command_away, "[powód]", "Zmienia stan na zajêty", "" },
+	{ "away", "?", command_away, " [powód]", "Zmienia stan na zajêty", "" },
 	{ "back", "", command_away, "", "Zmienia stan na dostêpny", "" },
 	{ "change", "?", command_change, " <opcje>", "Zmienia informacje w katalogu publicznym", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>\n  --email <adres>\n  --born <rok urodzenia>\n  --city <miasto>\n  --female  \n  --male" },
 	{ "chat", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ w ramach rozmowy", "" },
@@ -129,20 +129,23 @@ struct command commands[] = {
 char *command_generator(char *text, int state)
 {
 	static int index = 0, len;
+	int slash = 0;
 	char *name;
 
-	if (*text == '/')
+	if (*text == '/') {
+		slash = 1;
 		text++;
+	}
 
 	if (!*rl_line_buffer) {
 		if (state)
 			return NULL;
 		if (!send_nicks_count)
-			return strdup("msg");
+			return strdup((query_nick) ? "/msg" : "msg");
 		send_nicks_index = (send_nicks_count > 1) ? 1 : 0;
 		if (!(name = malloc(6 + strlen(send_nicks[0]))))
 			return NULL;
-		sprintf(name, "chat %s", send_nicks[0]);
+		sprintf(name, (query_nick) ? "/chat %s" : "chat %s", send_nicks[0]);
 		
 		return name;
 	}
@@ -153,8 +156,20 @@ char *command_generator(char *text, int state)
 	}
 
 	while ((name = commands[index++].name))
-		if (!strncasecmp(text, name, len))
-			return strdup(name);
+		if (!strncasecmp(text, name, len)) {
+			char *tmp = malloc(strlen(name) + 2);
+			
+			if (!tmp)
+				return NULL;
+			
+			if (query_nick) {
+				strcpy(tmp, "/");
+				strcat(tmp, name);
+			} else
+				strcpy(tmp, name);
+			
+			return tmp;
+		}
 
 	return NULL;
 }
@@ -1212,7 +1227,8 @@ COMMAND(command_msg)
 
 	put_log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), msg);
 
-	add_send_nick(params[0]);
+	if (!query_nick || strcasecmp(query_nick, params[0]))
+		add_send_nick(params[0]);
 	iso_to_cp(msg);
 	gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
 
@@ -1861,7 +1877,9 @@ int execute_line(char *line)
 	if (query_nick && *line != '/') {
 		char *params[] = { query_nick, line, NULL };
 
-		command_msg("chat", params);
+		if (strcmp(line, ""))
+			command_msg("chat", params);
+
 		return 0;
 	}
 	

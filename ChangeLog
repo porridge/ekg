@@ -5,6 +5,13 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-03-09
+
+- tab completion przy query nie dope³nia do nicka rozmówcy, bo i po co,
+  i zostawia w spokoju ,,/'' przy dope³nianiu komend (yoyo/w)
+- wci¶niêcie enter w pustej linii w query nie wysy³a niczego (w)
+- literówka w helpie (yoyo/w)
+
 // 2002-03-08
 
 - próbna obs³uga kolorków. (w)

@@ -174,9 +174,10 @@ void handle_msg(struct gg_event *e)
 		return;
 	};
 			
-	if (u)
-		add_send_nick(u->display);
-	else
+	if (u) {
+		if (!query_nick || strcasecmp(query_nick, u->display))
+			add_send_nick(u->display);
+	} else
 		add_send_nick(itoa(e->event.msg.sender));
 
 	tm = localtime(&e->event.msg.time);
