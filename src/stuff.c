@@ -53,6 +53,7 @@ int auto_reconnect = 10;
 int reconnect_timer = 0;
 int auto_away = 600;
 int log = 0;
+int log_ignored = 0;
 char *log_path = NULL;
 int display_color = 1;
 int enable_beep = 1, enable_beep_msg = 1, enable_beep_chat = 1, enable_beep_notify = 1;

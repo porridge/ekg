@@ -46,6 +46,7 @@ struct variable variables[MAX_VARS] = {
 	{ "display_notify", VAR_BOOL, 1, &display_notify, NULL },
 	{ "log", VAR_INT, 1, &log, NULL },
 	{ "log_path", VAR_STR, 1, &log_path, NULL },
+	{ "log_ignored", VAR_INT, 1, &log_ignored, NULL },
 	{ "use_proxy", VAR_INT, 1, &gg_http_use_proxy, NULL },
 	{ "proxy_port", VAR_INT, 1, &gg_http_proxy_port, NULL },
 	{ "proxy_host", VAR_STR, 1, &gg_http_proxy_host, NULL },

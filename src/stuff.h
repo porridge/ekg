@@ -70,6 +70,7 @@ struct gg_session *sess;
 int auto_away;
 int log;
 char *log_path;
+int log_ignored;
 int display_color;
 int enable_beep, enable_beep_msg, enable_beep_chat, enable_beep_notify, display_debug;
 int config_uin;
