@@ -1081,7 +1081,8 @@ void theme_init()
 	format_add("conn_disconnected", "%! Serwer zerwa³ po³±czenie\n", 1);
 	format_add("not_connected", "%! Brak po³±czenia z serwerem. Wpisz %Tconnect%n\n", 1);
 	format_add("not_connected_msg_queued", "%! Brak po³±czenia z serwerem. Wiadomo¶æ bêdzie wys³ana po po³±czeniu.%n\n", 1);
-
+	format_add("invalid_local_ip", "%! Nieprawid³owy adres lokalny.\n", 1);
+	
 	/* obs³uga motywów */
 	format_add("theme_loaded", "%> Wczytano motyw %T%1%n\n", 1);
 	format_add("theme_default", "%> Ustawiono domy¶lny motyw\n", 1);
@@ -1417,6 +1418,7 @@ void theme_init()
 	format_add("http_failed_reading", "Serwer zerwa³ po³±czenie", 1);
 	format_add("http_failed_writing", "Serwer zerwa³ po³±czenie", 1);
 	format_add("http_failed_memory", "Brak pamiêci", 1);
+	
 
 #ifdef HAVE_OPENSSL
 	/* szyfrowanie */

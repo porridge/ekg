@@ -119,6 +119,7 @@ char *config_sound_app = NULL;
 int config_uin = 0;
 int config_last_sysmsg = 0;
 int config_last_sysmsg_changed = 0;
+char *config_local_ip = NULL;
 char *config_password = NULL;
 int config_sms_away = 0;
 int config_sms_away_limit = 0;
@@ -709,6 +710,29 @@ void changed_dcc(const char *var)
 		} else
 			gg_dcc_ip = 0;
 	}
+}
+
+/*
+ * changed_local_ip()
+ * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,local_ip''.
+ */
+void changed_local_ip(const char *var)
+{
+    int tmp;
+
+    if(config_local_ip == NULL)
+	gg_local_ip = htonl(INADDR_ANY);
+    else
+    {    
+	tmp = inet_pton(AF_INET, config_local_ip, &gg_local_ip);
+	if(tmp == 0 || tmp == -1)
+	{
+	    	print("invalid_local_ip");
+		xfree(config_local_ip);
+	        config_local_ip = NULL;
+		gg_local_ip = htonl(INADDR_ANY);
+	}
+    }
 }
 
 /*

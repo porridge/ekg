@@ -440,6 +440,13 @@ last_size
 
 	wskazuje, ile ma byæ zapisywanych wiadomo¶ci dla komendy ,,last''.
 
+local_ip
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	okre¶la adres IP, z którego nastêpuj± wszelkiego rodzaju po³±czenia,
+	na przyk³ad z serwerem GG. w przypadku b³êdnie wpisanej warto¶ci, 
+	zostanie ona usuniêta.
 log
 	typ: liczba
 	domy¶lna warto¶æ: 0
