@@ -11,7 +11,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - drobna poprawka w syntezie mowy (d)
 - synteza mowy w ui-readline (d)
 - nowe zdarzenia ,,delivered'' i ,,queued'' (Murphy/w)
-	
+- poprawki opisu protoko³u: d³ugo¶æ opisu, informacje zwracane przez
+  huba (adaml/w)	
+
 // 2002-10-15
 
 - dodanie syntezy mowy, szczegó³y w README. uprzedzaj±c pytania, dzia³a
