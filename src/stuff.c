@@ -916,6 +916,24 @@ void do_reconnect()
 }
 
 /*
+ * find_in_uins()
+ *
+ * sprawdza, czy w ci±gu uin'ów znajduje siê dany uin.
+ *
+ * zwraca 1 je¶li znaleziono, 0 je¶li nie.
+ */
+int find_in_uins(int uin_count, uin_t *uins, uin_t uin)
+{
+	int i;
+
+	for (i = 0; i < uin_count; i++)
+		if (uins[i] == uin)
+			return 1;
+
+	return 0;
+}
+
+/*
  * msg_queue_add()
  *
  * dodaje wiadomo¶æ do kolejki wiadomo¶ci.
@@ -933,7 +951,7 @@ int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const 
 {
 	struct msg_queue m;
 
-	if (*uins == config_uin)	/* nie dostaniemy potwierdzenia, je¶li wy¶lemy wiadomo¶æ do siebie */
+	if (uin_count == 1 && *uins == config_uin)	/* nie dostaniemy potwierdzenia, je¶li wy¶lemy wiadomo¶æ do siebie */
 		return 1;
 
 	m.msg_class = msg_class;
@@ -984,7 +1002,7 @@ int msg_queue_remove(int msg_seq)
  * usuwa wiadomo¶æ z kolejki wiadomo¶ci dla danego
  * u¿ytkownika.
  *
- * - uin
+ * - uin.
  *
  * 0 je¶li usuniêto, 1 je¶li nie ma takiej wiadomo¶ci.
  */
@@ -996,13 +1014,13 @@ int msg_queue_remove_uin(uin_t uin)
 	for (l = msg_queue; l; l = l->next) {
 		struct msg_queue *m = l->data;
 
-		if (*(m->uins) == uin) {	/* XXX konferencje */
+		if (find_in_uins(m->uin_count, m->uins, uin)) {
 			xfree(m->uins);
 			xfree(m->msg);
 			xfree(m->raw_msg);
 
 			list_remove(&msg_queue, m, 1);
-			x++;
+			x = 1;
 		}
 	}
 
@@ -1089,7 +1107,7 @@ int msg_queue_count_uin(uin_t uin)
 	for (l = msg_queue; l; l = l->next) {
 		struct msg_queue *m = l->data;
 
-		if (*(m->uins) == uin)	/* XXX konferencje */
+		if (find_in_uins(m->uin_count, m->uins, uin))
 			count++;
 	}
 

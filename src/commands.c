@@ -2921,9 +2921,10 @@ COMMAND(cmd_queue)
         for (l = msg_queue; l; l = l->next) {
                 struct msg_queue *m = l->data;
 		struct tm *tm;
+		char *fu = NULL;
 		char buf[100];
 
-		if (!uin || *(m->uins) == uin) {	/* XXX konferencje */
+		if (!uin || find_in_uins(m->uin_count, m->uins, uin)) {
 			tm = localtime(&m->time);
 			strftime(buf, sizeof(buf), format_find("queue_list_timestamp"), tm);
 
@@ -2934,8 +2935,25 @@ COMMAND(cmd_queue)
 				cp_to_iso(tmp);
 			}
 
-			print("queue_list_message", buf, format_user(*(m->uins)), tmp);	/* XXX konferencje */
+			if (m->uin_count > 1) {
+				string_t s = string_init(format_user(*(m->uins)));
+				int i;
+
+				for (i = 1; i < m->uin_count; i++) {
+					string_append(s, ",");
+					string_append(s, format_user(m->uins[i]));
+				}
+				
+				fu = xstrdup(s->str);
+				string_free(s, 1);
+			} else
+				fu = (char *)format_user(*(m->uins));
+				
+			print("queue_list_message", buf, fu, tmp);
 			xfree(tmp);
+
+			if (m->uin_count > 1)
+				xfree(fu);
 		}
 	}
 }
@@ -3256,7 +3274,8 @@ void command_init()
 	  " [opcje]", "wy¶wietla lub czy¶ci wiadomo¶ci do wys³ania po po³±czeniu",
 	  " [numer/alias]             wy¶wietla kolejkê wiadomo¶ci\n"
 	  " -c, --clear [numer/alias] usuwa wiadomo¶ci dla numer/alias lub wszystkie\n"
-	  "Mo¿na u¿yæ tylko wtedy, gdy nie jeste¶my po³±czeni.\n"
+	  "Mo¿na u¿yæ tylko wtedy, gdy nie jeste¶my po³±czeni. W przypadku\n"
+	  "konferencji wy¶wietla wszystkich uczestników.\n"
 	  );
 	  
 	command_add

@@ -349,4 +349,6 @@ int msg_queue_flush();
 int msg_queue_count();
 int msg_queue_count_uin(uin_t uin);
 
+int find_in_uins(int uin_count, uin_t *uins, uin_t uin);
+
 #endif /* __STUFF_H */
