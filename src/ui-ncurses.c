@@ -1190,7 +1190,8 @@ static void ui_ncurses_deinit()
 
 	if (lines) {
 		for (i = 0; lines[i]; i++) {
-			xfree(lines[i]);
+			if (lines[i] != line)
+				xfree(lines[i]);
 			lines[i] = NULL;
 		}
 
