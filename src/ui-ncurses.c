@@ -109,7 +109,7 @@ static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 
 int config_ctxwin_size = 10;		/* szerokosc okna kontaktow */
 static int last_ctxwin_size = 10;	/* poprzedni rozmiar przed zmiana */
-int config_ctxwin_enabled = 1;		/* czy ma byc okno kontaktow */
+int config_ctxwin_enabled = 0;		/* czy ma byc okno kontaktow */
 
 /* rozmiar okna wy¶wietlaj±cego tekst */
 #define output_size (stdscr->_maxy - input_size)
@@ -432,13 +432,13 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 			if (config_speech_app)
 				string_append_c(s, *p);
 		    			
-			if (!x)
+			if (!x) {
 			    if (target) {
 				if (strcasecmp(target,"__ctx"))
 				    x += print_timestamp(w);
 			    } else
 				x += print_timestamp(w);
-		     
+		     	};
 			waddch(w->window, (unsigned char) *p);
 			count++;
 			x++;
