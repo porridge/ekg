@@ -926,7 +926,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 			break;
 
 		/* zaloguj */
-		if (config_log_status && (!GG_S_D(s->status) || !descr))
+		if ((config_log_status == 1) && (!GG_S_D(s->status) || !descr))
 			put_log(uin, "status,%ld,%s,%s:%d,%s,%s\n", uin, ((u->display) ? u->display : ""), inet_ntoa(u->ip), u->port, log_timestamp(time(NULL)), s->log);
 		if (config_log_status && GG_S_D(s->status) && descr)
 		    	put_log(uin, "status,%ld,%s,%s:%d,%s,%s,%s\n", uin, ((u->display) ? u->display : ""), inet_ntoa(u->ip), u->port, log_timestamp(time(NULL)), s->log, descr);
