@@ -22,14 +22,10 @@
  *
  *  2002-10-17 wojtekka:
  *   - usuniêcie ostrze¿eñ o niezainicjowanych zmiennych,
- *   - poprawienei SIM_Message_Decrypt, ¿eby informowa³o o nieszyfrowanej
+ *   - poprawienie SIM_Message_Decrypt, ¿eby informowa³o o nieszyfrowanej
  *     wiadomo¶ci zwracan± warto¶ci±, nie doklejanym tekstem.
  *  
  */
-
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
 
 #include <openssl/bio.h>
 #include <openssl/evp.h>
@@ -38,6 +34,10 @@
 #include <openssl/err.h>
 #include <openssl/pem.h>
 #include <openssl/sha.h>
+
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
 
 #include "libgadu.h"
 #include "sim.h"

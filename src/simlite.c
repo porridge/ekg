@@ -22,11 +22,6 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <limits.h>
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
-
 #include <openssl/bio.h>
 #include <openssl/evp.h>
 #include <openssl/rsa.h>
@@ -34,6 +29,11 @@
 #include <openssl/err.h>
 #include <openssl/pem.h>
 #include <openssl/sha.h>
+
+#include <limits.h>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
 
 #include "libgadu.h"
 #include "simlite.h"

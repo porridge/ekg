@@ -46,9 +46,18 @@
 #endif
 #include "stuff.h"
 #include "themes.h"
+#include "ui.h"
 #include "userlist.h"
 #include "vars.h"
 #include "xmalloc.h"
+
+#ifndef PATH_MAX
+#  ifdef _POSIX_PATH_MAX
+#    define PATH_MAX _POSIX_PATH_MAX
+#  else
+#    define PATH_MAX 255
+#  endif
+#endif
 
 list_t userlist = NULL;
 
@@ -630,7 +639,8 @@ int valid_nick(const char *nick)
  *
  * je¶li podany tekst jest liczb± (ale nie jednocze¶nie nazw± u¿ytkownika),
  * zwraca jej warto¶æ. je¶li jest nazw± u¿ytkownika w naszej li¶cie kontaktów,
- * zwraca jego numerek. inaczej zwraca zero.
+ * zwraca jego numerek. je¶li tekstem jestem znak ,,$'', pyta ui o aktualnego
+ * rozmówcê i zwraca jego uin. inaczej zwraca zero.
  *
  *  - text.
  */
@@ -641,8 +651,11 @@ uin_t get_uin(const char *text)
 
 	if (u)
 		return u->uin;
-	else
-		return uin;
+
+	if (text && !strcmp(text, "$"))
+		ui_event("command", 0, "query-current", &uin, NULL);
+
+	return uin;
 }
 
 /*

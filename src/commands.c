@@ -192,7 +192,7 @@ COMMAND(cmd_add)
 {
 	int params_free = 0, result = 0;
 	struct userlist *u;
-	uin_t uin;
+	uin_t uin = 0;
 
 	if (params[0] && !xisdigit(params[0][0]) && !match_arg(params[0], 'f', "find", 2)) {
 		ui_event("command", quiet, "add", params[0], NULL);
@@ -200,7 +200,7 @@ COMMAND(cmd_add)
 		if (params[1]) {
 			const char *name = params[0], *s1 = params[1], *s2 = params[2];
 			params_free = 1;
-			params = xmalloc(4 * sizeof(char*));
+			params = xmalloc(4 * sizeof(char *));
 			params[0] = NULL;
 			params[1] = name;
 			params[2] = saprintf("%s %s", s1, ((s2) ? s2 : ""));
@@ -234,10 +234,10 @@ COMMAND(cmd_add)
 
 		params_free = 1;
 
-		params = xmalloc(4 * sizeof(char*));
+		params = xmalloc(4 * sizeof(char *));
 		params[0] = itoa(last_search_uin);
 		params[1] = nickname;
-		params[2] = saprintf("-f \"%s\" -l \"%s\"", (last_search_first_name) ? last_search_first_name : "", (last_search_last_name) ? last_search_last_name : "");
+		params[2] = saprintf("-f \"%s\" -l \"%s\"", ((last_search_first_name) ? last_search_first_name : ""), ((last_search_last_name) ? last_search_last_name : ""));
 		params[3] = NULL;
 	}
 
@@ -247,7 +247,10 @@ COMMAND(cmd_add)
 		goto cleanup;
 	}
 
-	if (!(uin = str_to_uin(params[0]))) {
+	if (!strcmp(params[0], "$"))
+		uin = get_uin(params[0]);
+
+	if (!uin && !(uin = str_to_uin(params[0]))) {
 		printq("invalid_uin");
 		result = -1;
 		goto cleanup;
@@ -701,18 +704,16 @@ COMMAND(cmd_exec)
 					return -1;
 				}
 
-				if (strcmp(args[1], "$")) {
-					if (!(uin = get_uin(args[1]))) {
-						printq("user_not_found", args[1]);
-						array_free(args);
-						return -1;
-					}
-
-					if ((u = userlist_find(uin, NULL)) && u->display)
-						tg = xstrdup(u->display);
-					else
-						tg = xstrdup(itoa(uin));
+				if (!(uin = get_uin(args[1]))) {
+					printq("user_not_found", args[1]);
+					array_free(args);
+					return -1;
 				}
+
+				if ((u = userlist_find(uin, NULL)) && u->display)
+					tg = xstrdup(u->display);
+				else
+					tg = xstrdup(itoa(uin));
 
 				msg = (buf) ? 2 : 1;
 				command = args[2];
@@ -844,7 +845,7 @@ COMMAND(cmd_find)
 
 	if (argv[0] && !argv[1] && argv[0][0] == '#') { /* konferencja */
 		char *tmp = saprintf("/conference --find %s", argv[0]);
-		int res = command_exec(NULL, tmp, quiet);
+		int res = command_exec(target, tmp, quiet);
 		xfree(tmp);
 		array_free(argv);
 		return res;
@@ -1347,7 +1348,7 @@ COMMAND(cmd_ignore)
 			int res;
 			
 			tmp = saprintf("/conference --ignore %s", params[0]);
-			res = command_exec(NULL, tmp, quiet);
+			res = command_exec(target, tmp, quiet);
 			xfree(tmp);
 			return res;
 		}
@@ -1389,7 +1390,7 @@ COMMAND(cmd_ignore)
 			int res;
 			
 			tmp = saprintf("/conference --unignore %s", params[0]);
-			res = command_exec(NULL, tmp, quiet);
+			res = command_exec(target, tmp, quiet);
 			xfree(tmp);
 			return res;
 		}
@@ -4669,7 +4670,7 @@ COMMAND(cmd_conference)
 		if (c) {
 			for (l = c->recipients; l; l = l->next) {
 				tmp = saprintf("/find --uin %d", *((uin_t *) (l->data)));
-				command_exec(NULL, tmp, quiet);
+				command_exec(target, tmp, quiet);
 				xfree(tmp);
 			}
 		} else {
@@ -5171,11 +5172,10 @@ void command_init()
 	  "  -b, --bmsg [numer/alias] wysy³a wynik w jednej wiadomo¶ci\n"
 	  "\n"
 	  "Poprzedzenie polecenia znakiem ,,%T^%n'' ukryje informacjê o "
-	  "zakoñczeniu. Je¶li jako alias podamy ,,%T$%n'', wynik bêdzie "
-	  "wys³any do rozmówcy z aktualnego okna. Zapisanie opcji wielkimi "
-	  "literami (np. %T-B%n) spowoduje umieszczenie polecenia w pierwszej "
-	  "linii wysy³anego wyniku. Ze wzglêdu na budowê klienta, numery i "
-	  "aliasy %Tnie bêd±%n dope³niane Tabem.");
+	  "zakoñczeniu. Zapisanie opcji wielkimi literami (np. %T-B%n) "
+	  "spowoduje umieszczenie polecenia w pierwszej linii wysy³anego "
+	  "wyniku. Ze wzglêdu na budowê klienta, numery i aliasy "
+	  "%Tnie bêd±%n dope³niane Tabem.");
 	  
 	command_add
 	( "!", "?", cmd_exec, 0,

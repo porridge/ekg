@@ -6,6 +6,11 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-03-08
+
+- ,,$'' w miejscu ,,numer/alias'' bêdzie zast±pione w ka¿dej komendzie
+  aktualnym rozmówc± (sz)
+
 // 2003-03-07
 
 - uporz±dkowanie #include'owanych plików, dodanie potrzebnych, usuniêcie

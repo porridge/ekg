@@ -976,7 +976,11 @@ static struct window *window_new(const char *target, int new_id)
 		struct window *w = window_find(target);
 		if (w)
 			return w;
+
 		u = userlist_find(0, target);
+
+		if (!in_autoexec && !valid_nick(target))
+			return window_current;
 	}
 
 	if (target && *target == '*' && !u)
@@ -3227,8 +3231,11 @@ static void ui_ncurses_loop()
 			if (b && b->action) {
 				if (b->function)
 					b->function(b->arg);
-				else
-					command_exec(window_current->target, b->action, 0);
+				else {
+					char *tmp = saprintf("%s%s", ((b->action[0] == '/') ? "" : "/"), b->action);
+					command_exec(window_current->target, tmp, 0);
+					xfree(tmp);
+				}
 			} else {
 				/* obs³uga Ctrl-F1 - Ctrl-F12 na FreeBSD */
 				if (ch == '[') {
@@ -3241,8 +3248,11 @@ static void ui_ncurses_loop()
 			if ((b = binding_map[ch]) && b->action) {
 				if (b->function)
 					b->function(b->arg);
-				else
-					command_exec(window_current->target, b->action, 0);
+				else {
+					char *tmp = saprintf("%s%s", ((b->action[0] == '/') ? "" : "/"), b->action);
+					command_exec(window_current->target, tmp, 0);
+					xfree(tmp);
+				}
 			} else if (ch < 255 && strlen(line) < LINE_MAXLEN - 1) {
 					
 				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
@@ -3942,6 +3952,17 @@ static int ui_ncurses_event(const char *event, ...)
 			command_exec(window_current->target, tmp, 0);
 
 			xfree(tmp);
+
+			goto cleanup;
+		}
+
+		if (!strcasecmp(command, "query-current")) {
+			int *param = va_arg(ap, uin_t*);
+
+			if (window_current->target)
+				*param = get_uin(window_current->target);
+			else
+				*param = 0;
 
 			goto cleanup;
 		}
