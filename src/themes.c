@@ -871,6 +871,7 @@ void theme_init()
 	format_add("during_connect", "%! £±czenie trwa. Wpisz %Tdisconnect%n aby przerwaæ\n", 1);
 	format_add("conn_broken", "%! Serwer zerwa³ po³±czenie\n", 1);
 	format_add("not_connected", "%! Brak po³±czenia z serwerem. Wpisz %Tconnect%n\n", 1);
+	format_add("not_connected_msg_queued", "%! Brak po³±czenia z serwerem. Wiadomo¶æ bêdzie wys³ana po po³±czeniu.%n\n", 1);
 
 	/* obs³uga themeów */
 	format_add("theme_loaded", "%> Wczytano opis wygl±du o nazwie %T%1%n\n", 1);
@@ -983,6 +984,7 @@ void theme_init()
 	format_add("show_status_disconnected_since", "%) Roz³±czony od: %T%1%n\n", 1);
 	format_add("show_status_last_conn_event", "%Y-%m-%d %H:%M", 1);
 	format_add("show_status_last_conn_event_today", "%H:%M", 1);
+	format_add("show_status_msg_queue", "%) Ilo¶æ wiadomo¶ci w kolejce do wys³ania: %T%1%n\n", 1);
 
 	/* aliasy */
 	format_add("aliases_invalid", "%! Nieprawid³owy parametr\n", 1);
@@ -1099,6 +1101,13 @@ void theme_init()
 	format_add("last_list_timestamp", "%m-%d-%Y %H:%M", 1);
 	format_add("last_clear_uin", "%) Wiadomo¶ci od %W%1%n wyczyszczone.\n", 1);
 	format_add("last_clear", "%) Wszystkie wiadomo¶ci wyczyszczone.\n", 1);
+
+	/* queue */
+	format_add("queue_list_timestamp", "%m-%d-%Y %H:%M", 1);
+	format_add("queue_list_message", "%) %G >>%n [%1] %2 %3\n", 1);
+	format_add("queue_wrong_use", "%) Komenda dzia³a tylko przy braku po³±czenia z serwerem.\n", 1);
+	format_add("queue_cleared","%) Kolejka wiadomo¶ci wyczyszczona.\n", 1);
+	format_add("queue_empty", "%) Kolejka wiadomo¶ci jest pusta.\n", 1);
 
 	/* conference */
 	format_add("conferences_invalid", "%! Nieprawid³owy parametr\n", 1);

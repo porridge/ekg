@@ -78,6 +78,7 @@ list_t lasts = NULL;
 list_t lasts_count = NULL;
 list_t conferences = NULL;
 list_t sms_away = NULL;
+list_t msg_queue = NULL;
 
 int away = 0;
 int in_autoexec = 0;
@@ -914,6 +915,129 @@ void do_reconnect()
 }
 
 /*
+ * msg_queue_add()
+ *
+ * dodaje wiadomo¶æ do kolejki wiadomo¶ci.
+ * 
+ * msg_class - typ wiadomo¶ci,
+ * msg_seq - numer sekwencyjny,
+ * uin_count - ilo¶c adresatów,
+ * uins - adresaci wiadomo¶ci,
+ * msg - wiadomo¶æ,
+ * raw_msg - wiadomo¶æ niezaszyfrowana, mo¿e byæ NULL.
+ *
+ * 0 je¶li siê uda³o, 1 je¶li b³±d.
+ */
+int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const char *msg, const char *raw_msg)
+{
+	struct queue m;
+
+	if (*uins == config_uin)	/* nie dostaniemy potwierdzenia, je¶li wy¶lemy wiadomo¶æ do siebie */
+		return 1;
+
+	m.msg_class = msg_class;
+	m.msg_seq = msg_seq;
+	m.uin_count = uin_count;
+	m.uins = xmalloc(uin_count * sizeof(uin_t));
+	memmove(m.uins, uins, uin_count * sizeof(uin_t));
+	m.msg = xstrdup(msg);
+	m.raw_msg = xstrdup(raw_msg);
+	m.time = time(NULL);
+
+	return (list_add(&msg_queue, &m, sizeof(m)) != NULL) ? 0 : 1;
+}
+
+/*
+ * msg_queue_remove()
+ *
+ * usuwa wiadomo¶æ z kolejki wiadomo¶ci.
+ *
+ * msg_seq - numer sekwencyjny wiadomo¶ci.
+ *
+ * 0 je¶li usuniêto, 1 je¶li nie ma takiej wiadomo¶ci.
+ */
+int msg_queue_remove(int msg_seq)
+{
+	list_t l;
+
+	for (l = msg_queue; l; l = l->next) {
+		struct queue *m = l->data;
+
+		if (m->msg_seq == msg_seq) {
+			xfree(m->uins);
+			xfree(m->msg);
+			xfree(m->raw_msg);
+
+			list_remove(&msg_queue, m, 1);
+
+			return 0;
+		}
+	}
+
+	return 1; 
+}
+
+/*
+ * msg_queue_destroy()
+ *
+ * pozbywa siê kolejki wiadomo¶ci.
+ */
+void msg_queue_destroy()
+{
+	list_t l;
+
+	for (l = msg_queue; l; l = l->next) {
+		struct queue *m = l->data;
+
+		xfree(m->uins);
+		xfree(m->msg);
+		xfree(m->raw_msg);
+	}
+
+	list_destroy(msg_queue, 1);
+	msg_queue = NULL;
+}
+
+/*
+ * msg_queue_flush()
+ *
+ * wysy³a wiadomo¶ci z kolejki.
+ *
+ * 0 je¶li wys³ano, 1 je¶li nast±pi³ b³±d przy wysy³aniu.
+ */
+int msg_queue_flush()
+{
+	list_t l;
+
+	for (l = msg_queue; l; l = l->next) {
+		struct queue *m = l->data;
+		int new_msg_seq;
+
+		if (m->uin_count == 1)
+			new_msg_seq = gg_send_message(sess, m->msg_class, *(m->uins), m->msg);
+		else
+			new_msg_seq = gg_send_message_confer(sess, m->msg_class, m->uin_count, m->uins, m->msg);
+
+		if (new_msg_seq != -1)
+			m->msg_seq = new_msg_seq;
+		else
+			return 1;
+	}
+
+	return 0;
+}
+
+/*
+ * msg_queue_count()
+ *
+ * zwraca liczbê wiadomo¶ci w kolejce.
+ */
+int msg_queue_count()
+{
+	return list_count(msg_queue);
+}
+
+/*
  * mesg_set()
  *
  * w³±cza/wy³±cza mo¿liwo¶æ pisania do naszego terminala za pomoc±
@@ -921,8 +1045,7 @@ void do_reconnect()
  *
  * - what - 0 wy³±cza, 1 w³±cza, 2 zwraca aktualne ustawienie.
  * 
- * zwraca -2 je¶li b³ad, -1 jesli wszystko w porzadku,
- * lub aktualny stan (1 b±d¼ 0).
+ * -2 je¶li b³ad, -1 jesli wszystko w porzadku, lub aktualny stan (0/1)
 */
 int mesg_set(int what)
 {
@@ -988,7 +1111,7 @@ void sms_away_add(uin_t uin)
 	}
 
 	/* szukamy delikwenta i zwiekszamy mu licznik ... */
-	for(l = sms_away; l; l = l->next) {
+	for (l = sms_away; l; l = l->next) {
 		struct sms_away_count *s = l->data;
 
 		if (s->uin == uin) {
@@ -1023,7 +1146,7 @@ void sms_away_destroy()
  *
  * - uin
  *
- * zwraca 1 je¶li tak, 0 je¶li nie.
+ * 1 je¶li tak, 0 je¶li nie.
  */
 int sms_away_check(uin_t uin)
 {
@@ -1036,7 +1159,7 @@ int sms_away_check(uin_t uin)
 
 	/* limit dotyczy ³±cznej liczby sms'ów */
 	if (config_sms_away == 1) {
-		for(l = sms_away; l; l = l->next) {
+		for (l = sms_away; l; l = l->next) {
 			struct sms_away_count *s = l->data;
 
 			x += s->count;

@@ -411,6 +411,7 @@ COMMAND(cmd_status)
 	struct userlist *u;
 	struct in_addr i;
 	struct tm *lce;
+	int mqc;
 	char *tmp, *priv, *r1, *r2, buf[100], *status_table[6] = {
 		"show_status_avail",
 		"show_status_busy",
@@ -437,6 +438,7 @@ COMMAND(cmd_status)
 		print("show_status_status", tmp, "");
 		if (last_conn_event)
 			print("show_status_disconnected_since", buf);
+		print("show_status_msg_queue", ((mqc = msg_queue_count()) != 0) ? itoa(mqc) : itoa(0)); 
 		xfree(tmp);
 
 		return;
@@ -1210,14 +1212,12 @@ COMMAND(cmd_list)
 COMMAND(cmd_msg)
 {
 	struct userlist *u;
-	char **nicks = NULL, **p, *msg = NULL, *escaped, *nick, *last;
+	char **nicks = NULL, **p, *msg = NULL, *escaped, *nick, *raw_msg = NULL;
 	uin_t uin;
-	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0;
+	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0, msg_seq;
 
-	if (!sess || sess->state != GG_STATE_CONNECTED) {
-		print("not_connected");
-		return;
-	}
+	if (!sess || sess->state != GG_STATE_CONNECTED)
+		print("not_connected_msg_queued");
 
 	if (!params[0] || !params[1]) {
 		print("not_enough_params", name);
@@ -1289,7 +1289,7 @@ COMMAND(cmd_msg)
 	}
 
 	msg = xstrdup(params[1]);
-	last = xstrdup(params[1]);
+	raw_msg = xstrdup(params[1]);
 	escaped = log_escape(msg);
 	iso_to_cp(msg);
 	count = array_count(nicks);
@@ -1329,16 +1329,17 @@ COMMAND(cmd_msg)
 		put_log(uin, "%s,%ld,%s,%s,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", log_timestamp(time(NULL)), escaped);
 
 		if (config_last & 4)
-			last_add(1, uin, time(NULL), last);
+			last_add(1, uin, time(NULL), raw_msg);
 
 		if (!chat || count == 1) {
-			gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
+			msg_seq = gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
+			msg_queue_add((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, msg_seq, 1, &uin, msg, (secure) ? raw_msg : NULL);
+
 			valid++;
 		}
 	}
 
 	xfree(escaped);
-	xfree(last);
 
 	if (count > 1 && chat) {
 		uin_t *uins = xmalloc(count * sizeof(uin_t));
@@ -1348,12 +1349,15 @@ COMMAND(cmd_msg)
 			if ((uin = get_uin(*p)))
 				uins[realcount++] = uin;
 	
-		gg_send_message_confer(sess, GG_CLASS_CHAT, realcount, uins, msg);
+		msg_seq = gg_send_message_confer(sess, GG_CLASS_CHAT, realcount, uins, msg);
+		msg_queue_add((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, msg_seq, count, uins, msg, (secure) ? raw_msg : NULL);
 
 		valid++;
 
 		xfree(uins);
 	}
+
+	xfree(raw_msg);
 
 	add_send_nick(nick);
 
@@ -2869,6 +2873,49 @@ COMMAND(cmd_last)
 
 }
 
+COMMAND(cmd_queue)
+{
+        list_t l;
+	int count = 0;
+	char *tmp = NULL;
+
+	if (sess && sess->state == GG_STATE_CONNECTED) {
+		print("queue_wrong_use");
+		
+		return;
+	}
+
+	if (match_arg(params[0], 'c', "clear", 2)) {
+		msg_queue_destroy();
+		print("queue_cleared");
+
+		return;
+	}
+
+        for (l = msg_queue; l; l = l->next) {
+                struct queue *m = l->data;
+		struct tm *tm;
+		char buf[100];
+
+		tm = localtime(&m->time);
+		strftime(buf, sizeof(buf), format_find("queue_list_timestamp"), tm);
+
+		if (m->raw_msg)
+			tmp = xstrdup(m->raw_msg);
+		else {
+			tmp = xstrdup(m->msg);
+			cp_to_iso(tmp);
+		}
+
+		print("queue_list_message", buf, format_user(*(m->uins)), tmp);	/* XXX w przypadku konferencji wy¶wietla tylko pierwszy uin */
+		xfree(tmp);
+		count++;
+	}
+
+	if (count == 0) 
+		print("queue_empty");
+}
+
 /*
  * command_add_compare()
  *
@@ -2914,7 +2961,7 @@ int command_add(const char *name, const char *params, command_func_t function, i
 	c.brief_help = xstrdup(brief_help);
 	c.long_help = xstrdup(long_help);
 
-	return (list_add_sorted(&commands, &c, sizeof(c), command_add_compare) != NULL);
+	return (list_add_sorted(&commands, &c, sizeof(c), command_add_compare) != NULL) ? 0 : -1;
 }
 
 /*
@@ -3172,6 +3219,13 @@ void command_init()
 	( "query", "u?", cmd_query, 0,
 	  " <numer/alias> [wiadomo¶æ]", "w³±cza rozmowê z dan± osob±",
 	  "");
+
+	command_add
+	( "queue", "?", cmd_queue, 0,
+	  " [opcje]", "wy¶wietl lub wyczy¶æ wiadomo¶ci do wys³ania po po³±czeniu",
+	  " -c, --clear czy¶ci kolejkê wiadomo¶ci\n"
+	  "Mo¿na u¿yæ tylko wtedy, gdy nie jeste¶my po³±czeni.\n"
+	  );
 	  
 	command_add
 	( "quit", "?", cmd_quit, 0,

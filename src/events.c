@@ -492,6 +492,8 @@ void handle_ack(struct gg_event *e)
 	if (!e->event.ack.seq)	/* ignorujemy potwierdzenia ctcp */
 		return;
 
+	msg_queue_remove(e->event.ack.seq);
+
 	event_check((queued) ? EVENT_QUEUED : EVENT_DELIVERED, e->event.ack.recipient, NULL);
 
 	if (!config_display_ack)
@@ -757,6 +759,8 @@ void handle_success(struct gg_event *e)
 		else
 			gg_change_status_descr(sess, config_status, config_reason);
 	}
+
+	msg_queue_flush();
 
 	/* zapiszmy adres serwera */
 	if (config_server_save) {

@@ -9,6 +9,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - dodanie w³asnej implementacji scandir(). co prawda nie dzia³a jeszcze,
   ale ui-ncurses skompiluje siê na SunOSach (Murphy/w)
+- dodanie kolejkowania wiadomo¶ci wysy³anych przy roz³±czonej sesji.
+  komenda /queue (Murphy,szalik/w)
 
 // 2002-11-20
 
