@@ -314,7 +314,7 @@ int check_mail_maildir()
 				char *fname = saprintf("%s/%s", tmp, d->d_name);
 				struct stat st;
 
-				if (!stat(fname, &st) && S_ISREG(st.st_mode))
+				if (d->d_name[0] != '.' && !stat(fname, &st) && S_ISREG(st.st_mode))
 					d_new++;
 
 				xfree(fname);
