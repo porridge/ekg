@@ -589,6 +589,9 @@ void window_resize()
 			}
 		}
 
+		if (w->overflow > height)
+			w->overflow = height;
+
 		w->height = height;
 
 		if (w->height < 1)

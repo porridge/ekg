@@ -5351,7 +5351,8 @@ void command_init()
 	  "  -B, --blocked          blokuj±ce nas\n"
 	  "  -d, --description      osoby z opisem\n"
 	  "  -m, --member <@grupa>  osoby nale¿±ce do danej grupy\n"
-	  "  -o, --offline          osoby dla których jeste¶my niedostêpni\n"
+	  "  -o, --offline          osoby dla których jeste¶my\n"
+	  "                         niedostêpni\n"
 	  "\n"
 	  "Wy¶wietlanie cz³onków grupy: \"list @grupa\". Wy¶wietlanie osób "
 	  "spoza grupy: \"list !@grupa\".\n"
@@ -5363,7 +5364,8 @@ void command_init()
 	  "  -d, --display <nazwa>      wy¶wietlana nazwa\n"
 	  "  -u, --uin <numerek>\n"
 	  "  -g, --group [+/-]<@grupa>  dodaje lub usuwa z grupy\n"
-	  "                             mo¿na podaæ wiêcej grup po przecinku\n"
+	  "                             mo¿na podaæ wiêcej grup po\n"
+	  "                             przecinku\n"
 	  "  -p, --phone <numer>        numer telefonu komórkowego\n"
 	  "  -o, --offline              b±d¼ niedostêpny dla danej osoby\n"
 	  "  -O, --online               b±d¼ widoczny dla danej osoby\n"
@@ -5373,11 +5375,13 @@ void command_init()
 	  "\n"
 	  "Lista kontaktów na serwerze \"list [-p|-g|-c|-P|-G|-C]\":\n"
 	  "  -p, --put          umieszcza na serwerze\n"
-	  "  -P, --put-config   umieszcza na serwerze razem z konfiguracj±\n"
+	  "  -P, --put-config   umieszcza na serwerze razem\n"
+	  "                     z konfiguracj±\n"
 	  "  -g, --get          pobiera z serwera\n"
 	  "  -G, --get-config   pobiera z serwera razem z konfiguracj±\n"
 	  "  -c, --clear        usuwa listê z serwera\n"
-	  "  -C, --clear-config usuwa listê wraz z konfiguracj± z serwera");
+	  "  -C, --clear-config usuwa listê wraz z konfiguracj±\n"
+	  "                     z serwera");
 	  
 	command_add
 	( "msg", "u?", cmd_msg, 0,
