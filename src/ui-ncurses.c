@@ -309,7 +309,7 @@ static int print_timestamp(struct window *w)
 	set_cursor(w);
 
 	for (i = 0; i < strlen(buf); i++) {
-		waddch(w->window, buf[i]);
+		waddch(w->window, (unsigned char) buf[i]);
 		x++;
 	}
 
@@ -632,7 +632,7 @@ static void update_statusbar()
 		}
 
 		if (*p != '%') {
-			waddch(status, *p);
+			waddch(status, (unsigned char) *p);
 			continue;
 		}
 	
@@ -714,6 +714,10 @@ static void update_statusbar()
 			if (window_current->target)
 				waddstr(status, window_current->target);
 			p += 5;
+		} else if (!strncmp(p, "descr}", 6)) {
+			if (config_reason)
+				waddstr(status, config_reason);
+			p += 5;
 		} else if (!strncmp(p, "activity}", 9)) {
 			string_t s = string_init("");
 			int first = 1;
@@ -751,6 +755,9 @@ static void update_statusbar()
 			
 			if (!strncmp(p, "debug ", 6)) {
 				matched = (config_debug);
+				p += 5;
+			} else if (!strncmp(p, "descr ", 6)) {
+				matched = (config_reason);
 				p += 5;
 			} else if (!strncmp(p, "away ", 5)) {
 				matched = (away == 1 || away == 3);
@@ -1887,6 +1894,15 @@ static void window_kill(struct window *w)
 {
 	int id = w->id;
 
+	if (id == 1 && w->target) {
+		print("query_finished", window_current->target);
+		xfree(window_current->target);
+		xfree(window_current->prompt);
+		window_current->target = NULL;
+		window_current->prompt = NULL;
+		window_current->prompt_len = 0;
+	}
+	
 	if (id == 1) {
 		print("window_kill_status");
 		return;

@@ -18,7 +18,7 @@ klient:
 - poprawiæ getopt(), ¿eby rozumia³ ,,--back "powód"'',
 - dodaæ ,,list --add'', które dopisuje informacje do listy kontaktów,
 - sensowna obs³uga kluczy dla SIM,
-- opisy stanu w statusie ncurses (FIG),
+- zmienna beep_*_away (rmrmg)
 
 klient (ncurses):
 - reakcja na zmianê rozmiaru terminala,

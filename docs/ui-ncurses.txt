@@ -29,6 +29,7 @@ rozszerzone informacje:
 	%{query}	rozmówca w aktualnym oknie
 	%{activity}	lista okien, w których siê co¶ pojawi³o
 	%{nick}		w³asny pseudonim
+	%{descr}	opis stanu
 
 konstrukcje warunkowe pozwalaj± dodawaæ do pasku stanu teksty (ale ju¿
 nie rozszerzone informacje lub kolejne warunki) tylko gdy spe³niony
@@ -43,6 +44,7 @@ a dostêpne warunki to:
 	%{?avail ...}		stan dostêpny
 	%{?notavail ...}	stan niedostêpny (niepo³±czony)
 	%{?invisible ...}	stan niewidoczny
+	%{?descr ...}		stan z opisem
 	%{?query ...}		w aktualnym oknie jest rozmowa
 	%{?activity ...}	w innych oknach co¶ siê dzieje
 	%{?more ...}		dopisano co¶ do okna, gdy jest przewiniête
