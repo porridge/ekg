@@ -1238,6 +1238,13 @@ void handle_userlist(struct gg_http *h)
 		update_status();
 		update_status_myip();
 
+		for (l = userlist; l; l = l->next) {
+			struct userlist *u = l->data;
+
+			if (u->display)
+				ui_event("userlist_changed", itoa(u->uin), u->display, NULL);
+		}
+
 		config_changed = 1;
 	}
 

@@ -198,12 +198,13 @@ COMMAND(cmd_add)
 {
 	int params_free = 0, result = 0;
 	struct userlist *u = NULL;
-	uin_t uin = 0;
+	uin_t uin = 0, __uin;
 
-	ui_event("command", quiet, "query-current", &uin, NULL);
+	ui_event("command", quiet, "query-current", &__uin, NULL);
 
-	if (params[0] && strcmp(params[0], "$") && uin && (!(u = userlist_find(uin, NULL)) || !u->display)) {
+	if (params[0] && strcmp(params[0], "$") && !str_to_uin(params[0]) && __uin && (!(u = userlist_find(__uin, NULL)) || !u->display)) {
 		const char *name = params[0], *s1 = params[1], *s2 = params[2];
+		uin = __uin;
 		params_free = 1;
 		params = xmalloc(4 * sizeof(char *));
 		params[0] = itoa(uin);
@@ -640,7 +641,14 @@ COMMAND(cmd_del)
 
 			if (sess)
 				gg_remove_notify_ex(sess, u->uin, userlist_type(u));
-			userlist_remove(u);
+
+			uin = u->uin;
+			nick = xstrdup(u->display);
+
+			if (!userlist_remove(u))
+				ui_event("userlist_changed", nick, itoa(uin), NULL);
+
+			xfree(nick);
 		}
 
 		printq("user_cleared_list");
