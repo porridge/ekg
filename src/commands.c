@@ -5032,10 +5032,13 @@ COMMAND(cmd_queue)
 		count = msg_queue_count();
 
 	if (!count) {
-		if (uin)
+		if (uin) {
 			printq("queue_empty_uin");
-		else
+			return -1;
+		} else
 			printq("queue_empty");
+
+		return 0;
 	}
 
         for (l = msg_queue; l; ) {
