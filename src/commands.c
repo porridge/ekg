@@ -1151,6 +1151,10 @@ COMMAND(cmd_modify)
 		if (match_arg(argv[i], 'f', "first", 2) && argv[i + 1]) {
 			xfree(u->first_name);
 			u->first_name = xstrdup(argv[++i]);
+			if (!strcmp(u->first_name, "")) {
+				xfree(u->first_name);
+				u->first_name = NULL;
+			}
 			modified = 1;
 			continue;
 		}
@@ -1158,6 +1162,10 @@ COMMAND(cmd_modify)
 		if (match_arg(argv[i], 'l', "last", 2) && argv[i + 1]) {
 			xfree(u->last_name);
 			u->last_name = xstrdup(argv[++i]);
+			if (!strcmp(u->last_name, "")) {
+				xfree(u->last_name);
+				u->last_name = NULL;
+			}
 			modified = 1;
 			continue;
 		}
@@ -1165,6 +1173,10 @@ COMMAND(cmd_modify)
 		if (match_arg(argv[i], 'e', "email", 2) && argv[i + 1]) {
 			xfree(u->email);
 			u->email = xstrdup(argv[++i]);
+			if (!strcmp(u->email, "")) {
+				xfree(u->email);
+				u->email = NULL;
+			}
 			modified = 1;
 			continue;
 		}
@@ -1172,6 +1184,10 @@ COMMAND(cmd_modify)
 		if (match_arg(argv[i], 'n', "nickname", 2) && argv[i + 1]) {
 			xfree(u->nickname);
 			u->nickname = xstrdup(argv[++i]);
+			if (!strcmp(u->nickname, "")) {
+				xfree(u->nickname);
+				u->nickname = NULL;
+			}
 			modified = 1;
 			continue;
 		}
@@ -1179,6 +1195,10 @@ COMMAND(cmd_modify)
 		if (match_arg(argv[i], 'p', "phone", 2) && argv[i + 1]) {
 			xfree(u->mobile);
 			u->mobile = xstrdup(argv[++i]);
+			if (!strcmp(u->mobile, "")) {
+				xfree(u->mobile);
+				u->mobile = NULL;
+			}
 			modified = 1;
 			continue;
 		}
