@@ -1125,8 +1125,10 @@ int main(int argc, char **argv)
 
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
+#ifndef GG_DEBUG_DISABLE
 		if (!gg_debug_file)
 			gg_debug_handler = debug_handler;
+#endif
 
 		gg_debug_level = 255;
 	}
