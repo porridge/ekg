@@ -5,6 +5,7 @@
 - dopisa³em urla do README, bo mam ju¿ do¶æ pytañ, sk±d to ¶ci±gn±æ (w).
 - wywalone z IDEAS to, co ju¿ zrobione (w).
 - po ,,disconnect'' nie powinien próbowaæ siê ³±czyæ (w).
+- poprawka segfaultu na nie-x86 (w).
 
 // 2001-11-01
 
