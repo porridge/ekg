@@ -190,9 +190,9 @@ if test -d src; then
   fi
 
   AC_ARG_ENABLE(ioctld,
-    [  --enable-ioctld         Compile ioctld (Linux only, autodetected)])
+    [  --enable-ioctld         Compile ioctld (Linux only)])
 
-  if test "x$enable_ioctld" = "xyes" -o "x$have_linux_kd_h" = "xyes" -a "x$enable_ioctld" != "xno"; then 
+  if test "x$enable_ioctld" = "xyes" -a "x$have_linux_kd_h" = "xyes"; then 
     CFLAGS="$CFLAGS -DWITH_IOCTLD -DIOCTLD_PATH=\\\"${libexecdir}/ioctld\\\""
     ioctld="ioctld"
     install_ioctld="install-ioctld"

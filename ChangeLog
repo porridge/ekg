@@ -5,6 +5,16 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-08-18
+
+- g³upie porz±dki w kodzie. mniejszenie ilo¶ci #ifdef WITH_IOCTLD,
+  zmiany nazw funkcji dotycz±cych ioctld itd. (w)
+- pozbycie siê g³upiego b³êdu z czyszczeniem ekranu po w³±czeniu ekg (w)
+- wy³±czenie domy¶lnej kompilacji ioctld. czasami jest z tym jednak
+  wiêcej k³opotów ni¿ po¿ytku (w)
+- segfault w _msg (w)
+- mo¿liwo¶æ robienia theme'ów ircopodobnych. przyk³ad w themes/irc.theme (w)
+
 // 2002-08-15
 
 - poprawki wspó³pracy z ekgwap (serek/w)

@@ -1,0 +1,8 @@
+# prosty przyk³ad ircopodobnego wy¶wietlania wiadomo¶ci
+
+message_line_first %3 %G<%n%2%G>%n %1\n
+message_line         %1\n
+message_line_width 78
+chat_line_first %3 %C<%n%2%C>%n %1\n
+chat_line         %1\n
+chat_line_width 78

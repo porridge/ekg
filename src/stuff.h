@@ -28,9 +28,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#ifdef WITH_IOCTLD
-#include <sys/un.h>
-#endif /* WITH_IOCTLD */
 #include "config.h"
 #include "libgadu.h"
 #include "dynstuff.h"
@@ -158,11 +155,6 @@ int use_proxy;
 int proxy_port;
 char *proxy_host;
 char *reg_password;
-int sock;
-int length;
-#ifdef WITH_IOCTLD
-struct sockaddr_un addr;
-#endif /* WITH_IOCTLD */
 int quit_message_send;
 int registered_today;
 int pipe_fd;
@@ -170,6 +162,7 @@ int batch_mode;
 char *batch_line;
 int immediately_quit;
 int ekg_segv_handler;
+int ioctld_sock;
 
 void unidle();
 const char *timestamp(const char *format);
@@ -222,12 +215,9 @@ int event_remove(int flags, uin_t uin);
 int event_flags(const char *events);
 const char *event_format(int flags);
 int event_check(int event, uin_t uin, const char *data);
-int event_run(const char *action);
-int event_send(const char *seq, int act);
 int event_correct(const char *action);
-int event_parse_seq(const char *seq, struct action_data *data);
 void event_free();
-int init_socket();
+int ioctld_socket();
 
 int emoticon_read();
 char *emoticon_expand(const char *s);

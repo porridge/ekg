@@ -636,7 +636,7 @@ Optional ekg Features:
   --disable-ui-readline   Disable readline UI
   --enable-ui-ncurses     Enable ncurses UI
   --enable-wap            Compile WAP gateway
-  --enable-ioctld         Compile ioctld (Linux only, autodetected)
+  --enable-ioctld         Compile ioctld (Linux only)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -3349,7 +3349,7 @@ if test "${enable_ioctld+set}" = set; then
 
 fi;
 
-  if test "x$enable_ioctld" = "xyes" -o "x$have_linux_kd_h" = "xyes" -a "x$enable_ioctld" != "xno"; then
+  if test "x$enable_ioctld" = "xyes" -a "x$have_linux_kd_h" = "xyes"; then
     CFLAGS="$CFLAGS -DWITH_IOCTLD -DIOCTLD_PATH=\\\"${libexecdir}/ioctld\\\""
     ioctld="ioctld"
     install_ioctld="install-ioctld"

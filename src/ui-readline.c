@@ -1253,7 +1253,7 @@ static int bind_handler_window(int a, int key)
 		
 static int bind_sequence(const char *seq, const char *command, int quiet)
 {
-	char *nice_seq;
+	char *nice_seq = NULL;
 	
 	if (!seq)
 		return -1;

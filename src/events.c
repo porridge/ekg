@@ -66,42 +66,73 @@ static struct handler handlers[] = {
  */
 void print_message(struct gg_event *e, struct userlist *u, int chat)
 {
-	int width, i, j;
-	char *mesg, *buf, *line, *next, *format = NULL, *head = NULL, *foot = NULL, *save;
+	int width, next_width, i, j, mem_width = 0;
+	char *mesg, *buf, *line, *next, *format = NULL, *format_first = "", *next_format = NULL, *head = NULL, *foot = NULL, *save;
 	char *line_width = NULL, timestr[100];
 	const char *target = (chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender));
 	struct tm *tm;
 	
 	switch (chat) {
 		case 0:
-		    format = "message_line";
-		    line_width = "message_line_width";
-		    head = "message_header";
-		    foot = "message_footer";
-		    break;		
+			format = "message_line";
+			format_first = "message_line_first";
+			line_width = "message_line_width";
+			head = "message_header";
+			foot = "message_footer";
+			break;		
 		case 1:
-		    format = "chat_line"; 
-		    line_width = "chat_line_width";
-		    head = "chat_header";
-		    foot = "chat_footer";
-		    break;
+			format = "chat_line"; 
+			format_first = "chat_line_first";
+			line_width = "chat_line_width";
+			head = "chat_header";
+			foot = "chat_footer";
+			break;
 		case 2:
-		    format = "sysmsg_line"; 
-		    line_width = "sysmsg_line_width";
-		    head = "sysmsg_header";
-		    foot = "sysmsg_footer";
-		    break;
+			format = "sysmsg_line"; 
+			line_width = "sysmsg_line_width";
+			head = "sysmsg_header";
+			foot = "sysmsg_footer";
+			break;
 	}	
 
 	tm = localtime(&e->event.msg.time);
 	strftime(timestr, sizeof(timestr), format_find("timestamp"), tm);
 
-	print_window(target, head, format_user(e->event.msg.sender), timestr);
-
 	if (!(width = atoi(format_find(line_width))))
 		width = 78;
+
+	next_width = width;
 	
-	buf = xmalloc(width + 1);
+	if (!strcmp(format_find(format_first), "")) {
+		print_window(target, head, format_user(e->event.msg.sender), timestr);
+		next_format = format;
+		mem_width = width + 1;
+	} else {
+		char *tmp, *p;
+
+		next_format = format;
+		format = format_first;
+
+		/* zmniejsz d³ugo¶æ pierwszej linii o d³ugo¶æ prefiksu z rozmówc±, timestampem itd. */
+		tmp = format_string(format_find(format), "", format_user(e->event.msg.sender), timestr);
+		mem_width = width + strlen(tmp);
+		for (p = tmp; *p && *p != '\n'; p++) {
+			if (*p == 27) {
+				/* pomiñ kolorki */
+				while (*p && *p != 'm')
+					p++;
+			} else
+				width--;
+		}
+		
+		xfree(tmp);
+
+		tmp = format_string(format_find(next_format), "", "", "");
+		next_width -= strlen(tmp);
+		xfree(tmp);
+	}
+
+	buf = xmalloc(mem_width);
 	mesg = save = xstrdup(e->event.msg.message);
 
 	for (i = 0; i < strlen(mesg); i++)	/* XXX ³adniejsze taby */
@@ -151,7 +182,10 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 					next++;
 			}
 
-			print_window(target, format, buf);
+			print_window(target, format, buf, format_user(e->event.msg.sender), timestr);
+
+			width = next_width;
+			format = next_format;
 		}
 
 		if (new_line)
@@ -161,7 +195,8 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 	free(buf);
 	free(save);
 
-	print_window(target, foot);
+	if (!strcmp(format_find(format_first), ""))
+		print_window(target, foot);
 }
 
 /*

@@ -73,7 +73,10 @@ int config_log_ignored = 0;
 int config_log_status = 0;
 char *config_log_path = NULL;
 int config_display_color = 1;
-int config_beep = 1, config_beep_msg = 1, config_beep_chat = 1, config_beep_notify = 1;
+int config_beep = 1;
+int config_beep_msg = 1;
+int config_beep_chat = 1;
+int config_beep_notify = 1;
 char *config_sound_msg_file = NULL;
 char *config_sound_chat_file = NULL;
 char *config_sound_sysmsg_file = NULL;
@@ -98,11 +101,6 @@ char *reg_password = NULL;
 int config_dcc = 0;
 char *config_dcc_ip = NULL;
 char *config_dcc_dir = NULL;
-int sock = 0;
-int length = 0;
-#ifdef WITH_IOCTLD
-struct sockaddr_un addr;
-#endif 
 char *config_reason = NULL;
 char *home_dir = NULL;
 char *config_quit_reason = NULL;
@@ -123,6 +121,7 @@ int config_emoticons = 1;
 int config_make_window = 0;
 int ekg_segv_handler = 0;
 char *config_tab_command = NULL;
+int ioctld_sock = -1;
 
 static struct {
 	int event;
@@ -144,11 +143,11 @@ static struct {
 /*
  * emoticon_expand()
  *
- * rozwija definicje makr (najczesciej to beda emoticony)
+ * rozwija definicje makr (najczê¶ciej to bêd± emoticony)
  *
  * - s - string z makrami
  *
- * zwraca zaalokowany, rozwiniety string.
+ * zwraca zaalokowany, rozwiniêty string.
  */
 char *emoticon_expand(const char *s)
 {
@@ -1051,6 +1050,124 @@ void alias_free()
 
 	list_destroy(aliases, 1);
 }
+
+#ifdef WITH_IOCTLD
+
+/*
+ * ioctld_parse_seq()
+ *
+ * zamieñ string na odpowiedni± strukturê dla ioctld.
+ *
+ *  - seq.
+ *  - data.
+ *
+ * 0/-1.
+ */
+int ioctld_parse_seq(const char *seq, struct action_data *data)
+{
+        char tmp_buff[16] = "";
+        int i = 0, a, l = 0, default_delay = 10000;
+
+        if (!data || !seq || !isdigit(seq[0]))
+                return -1;
+
+        for (a = 0; a <= strlen(seq) && a < MAX_ITEMS; a++) {
+                if (i > 15)
+			return -1;
+                if (isdigit(seq[a]))
+                        tmp_buff[i++] = seq[a];
+                else if (seq[a] == '/') {
+                        data->value[l] = atoi(tmp_buff);
+                        memset(tmp_buff, 0, 16);
+                        for (i = 0; isdigit(seq[++a]); i++)
+                                tmp_buff[i] = seq[a];
+                        data->delay[l] = default_delay = atoi(tmp_buff);
+                        memset(tmp_buff, 0, 16);
+                        i = 0;
+                        l++;
+                }
+                else if (seq[a] == ',') {
+                        data->value[l] = atoi(tmp_buff);
+                        data->delay[l] = default_delay;
+                        memset(tmp_buff, 0, 16);
+                        i = 0;
+                        l++;
+                } else if (seq[a] == ' ')
+                        continue;
+                else if (seq[a] == '\0') {
+                        data->value[l] = atoi(tmp_buff);
+                        data->delay[l] = default_delay;
+                        data->value[++l] = data->delay[l] = -1;
+                } else
+			return -1;
+        }
+
+	return 0;
+}
+
+/*
+ * ioctld_socket()
+ *
+ * inicjuje gniazdo dla ioctld.
+ *
+ * - path - ¶cie¿ka do gniazda.
+ *
+ * 0/-1.
+ */
+int ioctld_socket(char *path)
+{
+	struct sockaddr_un sun;
+
+	if (ioctld_sock != -1)
+		close(ioctld_sock);
+
+	if ((ioctld_sock = socket(AF_UNIX, SOCK_DGRAM, 0)) == -1)
+		return -1;
+
+	sun.sun_family = AF_UNIX;
+	strcpy(sun.sun_path, path);
+
+	if (connect(ioctld_sock, (struct sockaddr*) &sun, sizeof(sun)) == -1)
+		return -1;
+
+        return 0;
+}
+
+/*
+ * ioctld_send()
+ *
+ * wysy³a do ioctld polecenie uruchomienia danej akcji.
+ *
+ * - seq - sekwencja danych
+ * - act - rodzaj akcji
+ *
+ * 0/-1.
+ */
+int ioctld_send(const char *seq, int act)
+{
+	const char *s;
+	struct action_data data;
+
+	if (*seq == '$') {
+		seq++;
+		s = format_find(seq);
+		if (!strcmp(s, "")) {
+			print("events_seq_not_found", seq);
+			return -1;
+		}
+	} else
+		s = seq;
+
+	data.act = act;
+
+	if (ioctld_parse_seq(s, &data))
+		return -1;
+
+	return send(ioctld_sock, &data, sizeof(data), 0);
+}
+
+#endif /* WITH_IOCTLD */
+
 /*
  * event_format()
  *
@@ -1182,6 +1299,103 @@ int event_remove(int flags, uin_t uin)
 }
 
 /*
+ * event_run()
+ *
+ * wykonuje dan± akcjê.
+ *
+ * - act - tre¶æ akcji.
+ */
+static int event_run(const char *act)
+{
+        char *action, *ptr, **acts;
+
+	gg_debug(GG_DEBUG_MISC, "// event_run(\"%s\");\n", act);
+
+	action = xstrdup(act);
+	
+	ptr = action;
+	
+	while (isspace(*ptr)) 
+		ptr++;
+
+        if (strchr(ptr, ' ')) 
+		acts = array_make(ptr, " ", 2, 0, 0);
+        else 
+		acts = array_make(ptr, " ", 1, 0, 0);
+
+#ifdef WITH_IOCTLD
+        if (!strncasecmp(acts[0], "blink", 5)) {
+		gg_debug(GG_DEBUG_MISC, "//   blinking leds\n");
+		if (ioctld_send(acts[1], ACT_BLINK_LEDS) == -1)
+			goto fail;
+		goto cleanup;
+	}
+
+        if (!strncasecmp(acts[0], "beeps", 5) || !strncasecmp(acts[0], "sound", 5)) {
+		gg_debug(GG_DEBUG_MISC, "//   making sounds\n");
+		if (ioctld_send(acts[1], ACT_BEEPS_SPK) == -1)
+			goto fail;
+		goto cleanup;
+	}
+#endif
+ 	
+	if (!strcasecmp(acts[0], "play")) {
+		gg_debug(GG_DEBUG_MISC, "//   playing sound\n");
+		play_sound(acts[1]);
+		goto cleanup;
+	} 
+
+	if (!strcasecmp(acts[0], "exec")) {
+		char *tmp = saprintf("exec %s", action + 5);
+		
+		if (tmp) {
+			gg_debug(GG_DEBUG_MISC, "//   executing program\n");
+			command_exec(NULL, tmp);
+			xfree(tmp);
+		} else
+			gg_debug(GG_DEBUG_MISC, "//   not enough memory\n");
+		
+		goto cleanup;
+	} 
+
+	if (!strcasecmp(acts[0], "command")) {
+		gg_debug(GG_DEBUG_MISC, "//   executing command\n");
+		command_exec(NULL, action + 8);
+		goto cleanup;
+	} 
+
+	if (!strcasecmp(acts[0], "chat") || !strcasecmp(acts[0], "msg")) {
+		char *tmp;
+
+		gg_debug(GG_DEBUG_MISC, "//   chatting/mesging\n");
+
+		tmp = xstrdup(action);
+		command_exec(NULL, tmp);
+		xfree(tmp);
+		
+		goto cleanup;
+        }
+
+        if (!strcasecmp(acts[0], "beep")) {
+                gg_debug(GG_DEBUG_MISC, "//   beeping\n");
+		ui_beep();
+		goto cleanup;
+        }
+
+	gg_debug(GG_DEBUG_MISC, "//   unknown action\n");
+
+cleanup:
+	free(action);
+	array_free(acts);
+        return 0;
+
+fail:
+	free(action);
+	array_free(acts);
+        return 1;
+}
+
+/*
  * event_check()
  *
  * sprawdza i ewentualnie uruchamia akcjê na podane zdarzenie.
@@ -1253,160 +1467,6 @@ int event_check(int event, uin_t uin, const char *data)
 }
 
 /*
- * event_run()
- *
- * wykonuje dan± akcjê.
- *
- * - act.
- */
-int event_run(const char *act)
-{
-        uin_t uin;
-        char *action, *ptr, **acts;
-#ifdef WITH_IOCTLD
-	int res;
-#endif /* WITH_IOCTLD */
-
-	gg_debug(GG_DEBUG_MISC, "// event_run(\"%s\");\n", act);
-
-	action = xstrdup(act);
-	
-	ptr = action;
-	
-	while (isspace(*ptr)) 
-	    ptr++;
-
-        if (strchr(ptr, ' ')) 
-	    	acts = array_make(ptr, " ", 2, 0, 0);
-        else 
-	    	acts = array_make(ptr, " ", 1, 0, 0);
-
-#ifdef WITH_IOCTLD
-        if (!strncasecmp(acts[0], "blink", 5)) {
-		gg_debug(GG_DEBUG_MISC, "//   blinking leds\n");
-		res = event_send(acts[1], ACT_BLINK_LEDS);
-		free(action);
-		array_free(acts);
-                return res;
-	}
-
-        if (!strncasecmp(acts[0], "beeps", 5)) {
-		gg_debug(GG_DEBUG_MISC, "//   beeping speaker\n");
-		res = event_send(acts[1], ACT_BEEPS_SPK);
-		free(action);
-		array_free(acts);
-		return res;
-	}
-#endif /* WITH_IOCTLD */
- 	
-	if (!strcasecmp(acts[0], "play")) {
-		gg_debug(GG_DEBUG_MISC, "//   playing sound\n");
-		play_sound(acts[1]);
-		goto cleanup;
-	} 
-
-	if (!strcasecmp(acts[0], "exec")) {
-		char *tmp = saprintf("exec %s", action + 5);
-		
-		if (tmp) {
-			gg_debug(GG_DEBUG_MISC, "//   executing program\n");
-			command_exec(NULL, tmp);
-			xfree(tmp);
-		} else
-			gg_debug(GG_DEBUG_MISC, "//   not enough memory\n");
-		
-		goto cleanup;
-	} 
-
-	if (!strcasecmp(acts[0], "command")) {
-		gg_debug(GG_DEBUG_MISC, "//   executing command\n");
-		command_exec(NULL, action + 8);
-		goto cleanup;
-	} 
-
-	if (!strcasecmp(acts[0], "chat") || !strcasecmp(acts[0], "msg")) {
-                struct userlist *u;
-		char *data;
-		int i = 0, chat = (!strcasecmp(acts[0], "chat"));
-
-		gg_debug(GG_DEBUG_MISC, "//   chatting/mesging\n");
-		
-                if (!strchr(acts[1], ' '))
-			goto fail;
-
-		while (isalnum(acts[1][i]))
-		    	i++;
-		acts[1][i++] = '\0';
-		
-                if (!(uin = get_uin(acts[1])))
-			goto fail;
-
-		data = acts[1] + i;	
-
-		u = userlist_find(uin, NULL);
-
-                log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), data);
-
-                iso_to_cp(data);
-                gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, data);
-		goto cleanup;
-        }
-
-        if (!strcasecmp(acts[0], "beep")) {
-                gg_debug(GG_DEBUG_MISC, "//   BEEP\n");
-		ui_beep();
-		goto cleanup;
-        }
-
-	gg_debug(GG_DEBUG_MISC, "//   unknown action\n");
-
-cleanup:
-	free(action);
-	array_free(acts);
-        return 0;
-
-fail:
-	free(action);
-	array_free(acts);
-        return 1;
-}
-
-#ifdef WITH_IOCTLD
-/*
- * event_send()
- *
- * wysy³a do ioctld polecenie uruchomienia akcji z ioctl.
- *
- * - seq
- * - act
-*/
-int event_send(const char *seq, int act)
-{
-	const char *s;
-	struct action_data data;
-
-	if (*seq == '$') {
-		seq++;
-		s = format_find(seq);
-		if (!strcmp(s, "")) {
-			print("events_seq_not_found", seq);
-			return 1;
-		}
-	} else
-		s = seq;
-
-	data.act = act;
-
-	if (event_parse_seq(s, &data))
-		return 1;
-
-	sendto(sock, &data, sizeof(data), 0,(struct sockaddr *)&addr, length);
-
-	return 0;
-}
-#endif /* WITH_IOCTLD */
-
-/*
  * event_correct()
  *
  * sprawdza czy akcja na zdarzenie jest poprawna.
@@ -1417,10 +1477,6 @@ int event_correct(const char *action)
 {
         char *event, **events = NULL, **acts = NULL;
 	int i = 0;
-
-#ifdef WITH_IOCTLD
-        struct action_data test;
-#endif /* WITH_IOCTLD */
 
         if (!strncasecmp(action, "clear", 5))
                 return 1;
@@ -1437,7 +1493,9 @@ int event_correct(const char *action)
                         acts = array_make(event, " \t", 1, 0, 0);
 		
 #ifdef WITH_IOCTLD
-                if (!strncasecmp(acts[0], "blink", 5) || !strncasecmp(acts[0], "beeps", 5)) {
+                if (!strncasecmp(acts[0], "blink", 5) || !strncasecmp(acts[0], "beeps", 5) || !strncasecmp(acts[0], "sound", 5)) {
+        		struct action_data test;
+
                         if (!acts[1]) {
                                 print("events_act_no_params", acts[0]);
 				goto fail;
@@ -1448,7 +1506,7 @@ int event_correct(const char *action)
                                         print("events_seq_not_found", acts[1] + 1);
 					goto fail;
 				}
-                        } else if (event_parse_seq(acts[1], &test)) {
+                        } else if (ioctld_parse_seq(acts[1], &test)) {
                                 print("events_seq_incorrect", acts[1]);
 				goto fail;
                         }
@@ -1457,15 +1515,7 @@ int event_correct(const char *action)
                 }
 #endif /* WITH_IOCTLD */
 
-		if (!strncasecmp(acts[0], "play", 4)) {
-			if (!acts[1]) {
-				print("events_act_no_params", acts[0]);
-				goto fail;
-			}
-			goto check;
-		} 
-		
-		if (!strcasecmp(acts[0], "exec") || !strcasecmp(acts[0], "command")) {
+		if (!strncasecmp(acts[0], "play", 4) || !strcasecmp(acts[0], "exec") || !strcasecmp(acts[0], "command")) {
 			if (!acts[1]) {
 				print("events_act_no_params", acts[0]);
 				goto fail;
@@ -1507,58 +1557,6 @@ fail:
 	array_free(events);
 	array_free(acts);
         return 1;
-}
-
-/*
- * event_parse_seq()
- *
- * zamieñ string na odpowiedni± strukturê.
- *
- *  - seq.
- *  - data.
- *
- * je¶li w porz±dku 0, je¶li nie w porz±dku > 0.
- */
-int event_parse_seq(const char *seq, struct action_data *data)
-{
-        char tmp_buff[16] = "";
-        int i = 0, a, l = 0, default_delay = 10000;
-
-        if (!data || !seq || !isdigit(seq[0]))
-                return 1;
-
-        for (a = 0; a <= strlen(seq) && a < MAX_ITEMS; a++) {
-                if (i > 15)
-			return 2;
-                if (isdigit(seq[a]))
-                        tmp_buff[i++] = seq[a];
-                else if (seq[a] == '/') {
-                        data->value[l] = atoi(tmp_buff);
-                        memset(tmp_buff, 0, 16);
-                        for (i = 0; isdigit(seq[++a]); i++)
-                                tmp_buff[i] = seq[a];
-                        data->delay[l] = default_delay = atoi(tmp_buff);
-                        memset(tmp_buff, 0, 16);
-                        i = 0;
-                        l++;
-                }
-                else if (seq[a] == ',') {
-                        data->value[l] = atoi(tmp_buff);
-                        data->delay[l] = default_delay;
-                        memset(tmp_buff, 0, 16);
-                        i = 0;
-                        l++;
-                } else if (seq[a] == ' ')
-                        continue;
-                else if (seq[a] == '\0') {
-                        data->value[l] = atoi(tmp_buff);
-                        data->delay[l] = default_delay;
-                        data->value[++l] = data->delay[l] = -1;
-                } else
-			return 3;
-        }
-
-	return 0;
 }
 
 /*
@@ -1604,30 +1602,6 @@ int init_control_pipe(const char *pipe_file)
 	}
 	return fd;
 }
-
-#ifdef WITH_IOCTLD
-
-/*
- * init_socket()
- *
- * inicjuje gniazdo oraz strukturê addr dla ioctld.
- *
- * - sock_path
-*/
-int init_socket(char *sock_path)
-{
-        sock = socket(AF_UNIX, SOCK_DGRAM, 0);
-
-        if (sock < 0) perror("socket");
-
-        addr.sun_family = AF_UNIX;
-        strcpy(addr.sun_path, sock_path);
-        length = sizeof(addr);
-
-        return 0;
-}
-
-#endif /* WITH_IOCTLD */
 
 static char base64_charset[] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";

@@ -655,11 +655,13 @@ int main(int argc, char **argv)
 		sock_path = prepare_path(".socket", 1);
 	
 		if (!(ioctld_pid = fork())) {
+			close(1);
+			close(2);
 			execl(ioctld_path, "ioctld", sock_path, NULL);
 			exit(0);
 		}
 	
-		init_socket(sock_path);
+		ioctld_socket(sock_path);
 	
 		atexit(kill_ioctld);
 	}
