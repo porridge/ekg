@@ -631,9 +631,6 @@ void config_write_crash()
  *
  * zapisuje aktualn± konfiguracjê -- zmienne i listê ignorowanych do pliku
  * ~/.gg/config lub podanego.
- *
- *  - filename.
- *  - base64 - czy kodowaæ zmienne?
  */
 int config_write()
 {
@@ -654,6 +651,86 @@ int config_write()
 	
 	return 0;
 }
+
+/*
+ * config_write_status()
+ *
+ * zapisuje aktualny stan i jego opis, nie zmieniaj±c reszty konfiguracji.
+ * konfiguracjê -- zmienne i listê ignorowanych do pliku
+ * ~/.gg/config lub podanego.
+ */
+int config_write_status()
+{
+	int wrote_status = 0, wrote_reason = 0;
+	const char *filename;
+	char *newfn, *line;
+	FILE *fi, *fo;
+
+	if (!(filename = prepare_path("config", 1)))
+		return -1;
+	
+	if (!(fi = fopen(filename, "r")))
+		return -1;
+
+	newfn = saprintf("%s.%d.%d", filename, getpid(), time(NULL));
+
+	if (!(fo = fopen(newfn, "w"))) {
+		xfree(newfn);
+		fclose(fi);
+		return -1;
+	}
+	
+	fchmod(fileno(fo), 0600);
+
+	while ((line = read_file(fi))) {
+		if (!strncmp(line, "set status ", 11)) {
+			wrote_status = 1;
+			xfree(line);
+			line = saprintf("set status %d", config_status);
+		}
+
+		if (!strncmp(line, "status ", 7)) {
+			wrote_status = 1;
+			xfree(line);
+			line = saprintf("status %d", config_status);
+		}
+
+		if (!strncmp(line, "set reason ", 11)) {
+			wrote_reason = 1;
+			xfree(line);
+			if (config_reason)
+				line = saprintf("set reason %s", config_reason);
+		}
+
+		if (!strncmp(line, "reason ", 7)) {
+			wrote_reason = 1;
+			xfree(line);
+			if (config_reason)
+				line = saprintf("reason %s", config_reason);
+		}
+			
+		if (line)
+			fprintf(fo, "%s\n", line);
+
+		xfree(line);
+	}
+
+	if (!wrote_status)
+		fprintf(fo, "status %d\n", config_status);
+
+	if (!wrote_reason && config_reason)
+		fprintf(fo, "reason %s\n", config_reason);
+
+	fclose(fi);
+	fclose(fo);
+	
+	rename(newfn, filename);
+
+	xfree(newfn);
+
+	return 0;
+}
+
 
 /*
  * sysmsg_write()
@@ -870,7 +947,8 @@ int play_sound(const char *sound_path)
 /*
  * read_file()
  *
- * czyta linijkê tekstu z pliku alokuj±c przy tym odpowiedni buforek.
+ * czyta linijkê tekstu z pliku alokuj±c przy tym odpowiedni buforek. usuwa
+ * znaki koñca linii.
  */
 char *read_file(FILE *f)
 {

@@ -9,6 +9,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - poprawka segfaulta przy /reconnect (szalik/w)
 - usuniêcie kodu /history (w)
+- przy w³±czonym keep_reason, stan i opis zostan± zapisane w konfiguracji
+  bez potrzebny wydawania komendy /save (w)
 
 // 2002-11-01
 

@@ -18,7 +18,6 @@ klient:
 - poprawiæ getopt(), ¿eby rozumia³ ,,--back "powód"'',
 - dodaæ ,,list --add'', które dopisuje informacje do listy kontaktów,
 - sensowna obs³uga kluczy dla SIM,
-- zapisywanie opisu i stanu bez /save, ¿eby keep_reason mia³o wiêkszy sens,
 
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,

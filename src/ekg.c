@@ -1007,6 +1007,9 @@ void ekg_exit()
 	gg_free_session(sess);
 	sess = NULL;
 
+	if (config_keep_reason)
+		config_write_status();
+
 	ui_deinit();
 
 	if (config_changed && !config_speech_app) {

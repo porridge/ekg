@@ -245,6 +245,7 @@ int play_sound(const char *sound_path);
 
 int config_read();
 int config_write();
+int config_write_status();
 void config_write_crash();
 
 int sysmsg_read();
