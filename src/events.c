@@ -1747,7 +1747,7 @@ void handle_dcc(struct gg_dcc *d)
 
 				snprintf(tmp, sizeof(tmp), "%s", inet_ntoa(*((struct in_addr*) &d->remote_addr)));
 				
-				print("dcc_spoof", format_user(d->uin), inet_ntoa(u->ip), tmp);
+				print("dcc_spoof", format_user(d->peer_uin), inet_ntoa(u->ip), tmp);
 			}
 
 			break;
