@@ -275,7 +275,6 @@ static char *ignored_uin_generator(char *text, int state)
 {
 	static list_t l;
 	static int len;
-	struct userlist *u;
 
 	if (!state) {
 		l = userlist;
