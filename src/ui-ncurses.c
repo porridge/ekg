@@ -524,6 +524,11 @@ static void update_statusbar()
 		} else if (!strncmp(p, "uin}", 4)) {
 			waddstr(status, itoa(config_uin));
 			p += 3;
+		} else if (!strncmp(p, "nick}", 5)) {
+			struct userlist *u = userlist_find(config_uin, NULL);
+			if (u && u->display)
+				waddstr(status, u->display);
+			p += 4;
 		} else if (!strncmp(p, "query}", 6)) {
 			if (window_current->target)
 				waddstr(status, window_current->target);
@@ -592,6 +597,11 @@ static void update_statusbar()
 			} else if (!strncmp(p, "more ", 5)) {
 				matched = (window_current->more);
 				p += 4;
+			} else if (!strncmp(p, "nick ", 5)) {
+				struct userlist *u = userlist_find(config_uin, NULL);
+				
+				matched = (u && u->display);
+				p += 4;
 			}
 
 			if (!matched) {
@@ -631,7 +641,7 @@ static void ui_ncurses_beep()
  */
 static void ui_ncurses_theme_init()
 {
-	format_add("statusbar", " %c(%w%{time}%c)%w %c(%wuin%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) (%wwin%c/%w%{window}%{?query %c:%W}%{query}%c)%w%{?activity  %c(%wact%c/%w}%{activity}%{?activity %c)%w}%{?more  %c(%Gmore%c)}", 1);
+	format_add("statusbar", " %c(%w%{time}%c)%w %c(%w%{nick}%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) (%wwin%c/%w%{window}%{?query %c:%W}%{query}%c)%w%{?activity  %c(%wact%c/%w}%{activity}%{?activity %c)%w}%{?more  %c(%Gmore%c)}", 1);
 	format_add("ncurses_prompt_none", "", 1);
 	format_add("ncurses_prompt_query", "[%1] ", 1);
 	format_add("no_prompt_cache", "", 1);

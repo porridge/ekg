@@ -13,6 +13,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - ³adowanie themu zeruje poprzedni (Arim/w)
 - pocz±tek obs³ugi xtermowych tytu³ów (jojo/w)
 - dodana zmienna keep_reason (jojo/w)
+- format statusbara %{nick} i %{?nick ...} (FIG/w)
+- ³adniejszy /status (FIG/w)
 
 // 2002-09-18
 

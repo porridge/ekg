@@ -335,6 +335,7 @@ COMMAND(cmd_away)
 COMMAND(cmd_status)
 {
 	char *av, *ad, *bs, *bd, *na, *in, *id, *pr, *np;
+	struct userlist *u;
 
 	av = format_string(format_find("show_status_avail"));
 	ad = format_string(format_find("show_status_avail_descr"), config_reason);
@@ -346,6 +347,14 @@ COMMAND(cmd_status)
 	pr = format_string(format_find("show_status_private_on"));
 	np = format_string(format_find("show_status_private_off"));
 
+	if (config_user && strcmp(config_user, ""))
+		print("show_status_profile", config_user);
+
+	if ((u = userlist_find(config_uin, NULL)) && u->display)
+		print("show_status_uin_nick", itoa(config_uin), u->display);
+	else
+		print("show_status_uin", itoa(config_uin));
+	
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		print("show_status", na, "", "0.0.0.0", "0", itoa(config_uin), config_user);
 	} else {
