@@ -430,8 +430,6 @@ void change_status(int status, const char *arg, int autom);
 const char *ekg_status_label(int status, const char *prefix);
 
 /* funkcje poza stuff.c */
-void contacts_rebuild();
-void send_userlist();
 void ekg_wait_for_key();
 void ekg_exit();
 

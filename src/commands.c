@@ -3597,7 +3597,6 @@ int binding_toggle_contacts(int a, int b)
 		config_contacts = 0;
 	}
 
-	contacts_rebuild();
 	ui_event("variable_changed", "contacts", NULL);
 	config_changed = 1;
 #endif

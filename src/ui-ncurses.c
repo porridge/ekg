@@ -80,6 +80,7 @@ static void ui_ncurses_deinit();
 
 static void window_switch(int id);
 static void update_statusbar(int commit);
+static void contacts_update(int commit);
 
 static void binding_add(const char *key, const char *action, int internal, int quiet);
 static void binding_delete(const char *key, int quiet);
@@ -170,7 +171,6 @@ static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 
 int config_backlog_size = 1000;		/* maksymalny rozmiar backloga */
 int config_contacts_size = 8;		/* szeroko¶æ okna kontaktów */
-static int last_contacts_size = 0;	/* poprzedni rozmiar przed zmian± */
 int config_contacts = 0;		/* czy ma byæ okno kontaktów */
 int config_contacts_descr = 0;		/* i czy maj± byæ wy¶wietlane opisy */
 int config_display_transparent = 1;	/* czy chcemy przezroczyste t³o? */
@@ -183,9 +183,25 @@ static void window_redraw(struct window *w);
 static void window_clear(struct window *w, int full);
 static void window_refresh();
 
-#define COLOR_DEFAULT (-1)
+#ifndef COLOR_DEFAULT
+#  define COLOR_DEFAULT (-1)
+#endif
 
-#define CONTACTS_SIZE ((config_contacts) ? (config_contacts_size + 2) : 0)
+/*
+ * contacts_size()
+ *
+ * liczy szeroko¶æ okna z list± kontaktów.
+ */
+int contacts_size()
+{
+	if (!contacts || !config_contacts)
+		return 0;
+
+	if (config_contacts_size + 2 > (stdscr->_maxx + 1) / 2)
+		return 0;
+
+	return config_contacts_size + 2;
+}
 
 /* rozmiar okna wy¶wietlaj±cego tekst */
 #define OUTPUT_SIZE (stdscr->_maxy + 1 - input_size - config_statusbar_size - config_header_size)
@@ -207,7 +223,7 @@ static void window_refresh();
  * zwraca numer COLOR_PAIR odpowiadaj±cej danej parze atrybutów: kolorze
  * tekstu (plus pogrubienie) i kolorze t³a.
  */
-int color_pair(int fg, int bold, int bg)
+static int color_pair(int fg, int bold, int bg)
 {
 	if (fg >= 8) {
 		bold = 1;
@@ -239,7 +255,7 @@ void window_commit()
 {
 	window_refresh();
 
-	if (contacts)
+	if (contacts && contacts_size() > 0)
 		wnoutrefresh(contacts);
 	
 	if (header)
@@ -437,9 +453,15 @@ void window_resize()
 {
 	list_t l;
 
+	if (contacts) {
+		wresize(contacts, OUTPUT_SIZE, contacts_size());
+		mvwin(contacts, config_header_size, stdscr->_maxx - config_contacts_size - 1);
+		contacts_update(0);
+	}
+
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
-		int delta;
+		int delta, width;
 
 		delta = OUTPUT_SIZE - w->height;
 
@@ -456,9 +478,37 @@ void window_resize()
 		}
 
 		w->height = OUTPUT_SIZE;
+
+		if (w->height < 1)
+			w->height = 1;
+
+		width = stdscr->_maxx + 1 - contacts_size();
+
+		if (width < 10)
+			width = 10;
+
+		if (w->width != width) {
+			w->width = width;
+			window_backlog_split(w, 1, 0);
+		}
+
+		w->width = width;
+		
 		wresize(w->window, w->height, w->width);
 
 		w->top = config_header_size;
+		w->left = 0;
+
+		if (w->left < 0)
+			w->left = 0;
+		if (w->left > stdscr->_maxx)
+			w->left = stdscr->_maxx;
+
+		if (w->top < 0)
+			w->top = 0;
+		if (w->top > stdscr->_maxy)
+			w->top = stdscr->_maxy;
+
 		mvwin(w->window, w->top, w->left);
 
 		w->redraw = 1;
@@ -890,11 +940,11 @@ static struct window *window_new(const char *target, int new_id)
 	if (w.left > stdscr->_maxx)
 		w.left = 0;
 	if (w.top > stdscr->_maxy)
-		w.top = 0;
+		w.top = config_header_size;
 	if (!w.height)
 		w.height = OUTPUT_SIZE;
  	if (!w.width)
-		w.width = stdscr->_maxx + 1 - CONTACTS_SIZE;
+		w.width = stdscr->_maxx + 1 - contacts_size();
 	if (w.left + w.width > stdscr->_maxx + 1)
 		w.width = stdscr->_maxx + 1 - w.left;
 	if (w.top + w.height > stdscr->_maxy + 1)
@@ -1074,18 +1124,18 @@ crap:
 
 
 /*
- * update_contacts()
+ * contacts_update()
  *
  * uaktualnia listê kontaktów po prawej.
  *
  *  - commit - czy rzuciæ od razu na ekran?
  */
-static void update_contacts(int commit)
+static void contacts_update(int commit)
 {
 	int y = 0;
 	list_t l;
 		
-	if (!config_contacts || !contacts)
+	if (!contacts)
 		return;
 	
 	werase(contacts);
@@ -1181,75 +1231,24 @@ static void update_contacts(int commit)
 }
 
 /*
- * contacts_rebuild()
+ * contacts_changed()
  *
- * wywo³ywane przy zmianach rozmiaru.
+ * wywo³ywane przy zmianach rozmiaru i w³±czeniu klienta.
  */
-void contacts_rebuild()
+void contacts_changed()
 {
-	static int last_header_size = -1, last_statusbar_size = -1;
-	list_t l;
+	ui_screen_width = stdscr->_maxx - contacts_size();
 
-	/* nie jeste¶my w ncurses */
-	if (!windows)
-		return;
-
-	if (config_contacts_size > stdscr->_maxx / 2)
-		config_contacts_size = stdscr->_maxx / 2;
-
-	if (config_contacts_size < 0)
-		config_contacts_size = 0;
-	
-	ui_screen_width = stdscr->_maxx - CONTACTS_SIZE;
-
-	if (!config_contacts) {
-		if (contacts)
-			delwin(contacts);
-
-		contacts = NULL;
-
-		last_contacts_size = 0;
-
-		for (l = windows; l; l = l->next) {
-			struct window *w = l->data;
-
-			if (w->floating)
-				continue;
-
-			w->width = stdscr->_maxx + 1;
-			wresize(w->window, w->height, w->width);
-			window_backlog_split(w, 1, 0);
-		}
-
-		window_commit();
-
-		return;
-	}
-
-	if (config_contacts_size == last_contacts_size && config_header_size == last_header_size && config_statusbar_size == last_statusbar_size)
-		return;
-		
-	last_contacts_size = config_contacts_size;
-	last_header_size = config_header_size;
-	
-	if (contacts) {
-		wresize(contacts, OUTPUT_SIZE, config_contacts_size + 2);
-		mvwin(contacts, config_header_size, stdscr->_maxx - config_contacts_size - 1);
-	} else
+	if (config_contacts && !contacts)
 		contacts = newwin(OUTPUT_SIZE, config_contacts_size + 2, config_header_size, stdscr->_maxx - config_contacts_size - 1);
-
-	for (l = windows; l; l = l->next) {
-		struct window *w = l->data;
-
-		if (w->floating)
-			continue;
-
-		w->width = stdscr->_maxx + 1 - CONTACTS_SIZE;
-		wresize(w->window, w->height, w->width);
-		window_backlog_split(w, 1, 0);
+	
+	if (!config_contacts && contacts) {
+		delwin(contacts);
+		contacts = NULL;
 	}
 
-	update_contacts(1);
+	window_resize();
+	window_commit();
 }
 
 /*
@@ -1606,18 +1605,25 @@ static void update_statusbar(int commit)
  */
 static void winch_handler()
 {
+	static int lock = 0;
+
+	while (lock)
+		sleep(1);
+
+	lock = 1;
+
 	endwin();
 	refresh();
 
-        ui_screen_width = stdscr->_maxx + 1;
+        ui_screen_width = stdscr->_maxx - contacts_size() + 1;
         ui_screen_height = stdscr->_maxy + 1;
 
 	window_resize();
-	window_refresh();
-	contacts_rebuild();
 	window_commit();
 
 	changed_backlog_size("backlog_size");
+
+	lock = 0;
 }
 
 /*
@@ -1696,7 +1702,7 @@ void ui_ncurses_init()
 
 #undef __init_bg
 
-	contacts_rebuild();
+	contacts_changed();
 	window_commit();
 
 	signal(SIGINT, SIG_IGN);
@@ -2372,11 +2378,6 @@ static void update_input()
 	}
 	
 	window_resize();
-
-	if (contacts) {
-		wresize(contacts, OUTPUT_SIZE, contacts->_maxx + 1);
-		update_contacts(0);
-	}
 
 	window_redraw(window_current);
 	touchwin(window_current->window);
@@ -3471,6 +3472,9 @@ static int ui_ncurses_event(const char *event, ...)
 				window_backlog_split(w, 1, 0);
 			}
 		}
+
+		if (!strncasecmp(name, "contacts", 8))
+			contacts_changed();
 	}
 
 	if (!strcmp(event, "conference_rename")) {
@@ -3872,7 +3876,7 @@ static int ui_ncurses_event(const char *event, ...)
 cleanup:
 	va_end(ap);
 
-	update_contacts(0);
+	contacts_update(0);
 	update_statusbar(1);
 	
 	return 0;
@@ -3900,8 +3904,6 @@ void header_statusbar_resize()
 	if (config_statusbar_size > 5)
 		config_statusbar_size = 5;
 
-	window_resize();
-
 	if (config_header_size) {
 		if (!header)
 			header = newwin(config_header_size, stdscr->_maxx + 1, 0, 0);
@@ -3916,12 +3918,14 @@ void header_statusbar_resize()
 		header = NULL;
 	}
 
+	window_resize();
+
 	wresize(status, config_statusbar_size, stdscr->_maxx + 1);
 	mvwin(status, config_header_size + OUTPUT_SIZE, 0);
 
 	update_statusbar(0);
 
-	contacts_rebuild();	/* commitnie */
+	window_commit();
 }
 
 /*

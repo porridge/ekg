@@ -12,6 +12,9 @@ zg³osi³ b³±d.
 - taby w docs/vars.txt (sz)
 - ustawienie ,,contacts'' na warto¶æ 2 nie oznacza wcale, ¿e 
   ,,beep_notify'' czy te¿ ,,sound_notify_file'' ma przestaæ dzia³aæ (sz)
+- poprawka kompilacji biblioteki dzielonej na OpenBSD (bartek/w)
+- poprawka obs³ugi zmiany rozmiaru terminala (perry/w)
+- je¶li terminal jest zbyt ma³y, lista kontaktów jest ukrywana (w)
 	
 // 2003-02-05
 
