@@ -2101,6 +2101,9 @@ COMMAND(cmd_query)
 		ui_event("command", "query", c->name, NULL);
 	} else
 		ui_event("command", "query", params[0], NULL);
+		
+	if (params[1])
+		cmd_msg("chat", params);
 }
 
 COMMAND(cmd_on)
@@ -2914,8 +2917,8 @@ void command_init()
 	  "");
 	  
 	command_add
-	( "query", "u", cmd_query, 0,
-	  " <numer/alias>", "w³±cza rozmowê z dan± osob±",
+	( "query", "u?", cmd_query, 0,
+	  " <numer/alias> [wiadomo¶æ]", "w³±cza rozmowê z dan± osob±",
 	  "");
 	  
 	command_add
