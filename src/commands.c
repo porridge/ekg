@@ -1352,6 +1352,8 @@ COMMAND(cmd_set)
 				break;
 		}
 	}
+
+	xfree(value);
 }
 
 COMMAND(cmd_sms)

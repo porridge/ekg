@@ -15,6 +15,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - rewolucja w krainie autoconfa (s,w)
 - informacje o rozpoznawaniu p³ci w dokumentacji (w)
 - poprawka segfaulta przy quicie (s/w)
+- poprawka g³upiego zachowania readline (Zwierz/w)
+- dodanie debugów do ui-ncurses (w)
+- usuniêcie leaka przy /set (w)
 
 // 2002-09-22
 

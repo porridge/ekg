@@ -66,6 +66,17 @@ void reaper_user(void *foo)
 }
 
 /*
+ * usuwanie sesji GG_SESSION_USER3.
+ */
+void reaper_user3(struct gg_exec *e)
+{
+	if (e->buf)
+		string_free(e->buf, 1);
+
+	xfree(e);
+}
+
+/*
  * usuwanie sesji wyszukiwania.
  */
 void reaper_search(struct gg_http *s)
@@ -102,7 +113,7 @@ static struct {
 	{ GG_SESSION_USER0, NULL, (VV) reaper_user },
 	{ GG_SESSION_USER1, NULL, (VV) reaper_user },
 	{ GG_SESSION_USER2, (VV) handle_voice, (VV) reaper_user },
-	{ GG_SESSION_USER3, (VV) get_line_from_pipe, (VV) reaper_user },
+	{ GG_SESSION_USER3, (VV) get_line_from_pipe, (VV) reaper_user3 },
 	{ -1, NULL, NULL }, 
 };
 
@@ -155,13 +166,18 @@ void get_line_from_pipe(struct gg_exec *c)
 		if (ch != '\n' && ch != '\r')
 			string_append_c(c->buf, ch);
 		if (ch == '\n') {
-			print("exec", c->buf->str, itoa(c->id));
+			if (c->id)
+				print("exec", c->buf->str, itoa(c->id));
+			else
+				print_window("debug", 0, "debug", c->buf->str);
 			string_free(c->buf, 1);
 			c->buf = string_init(NULL);
 		}
 	} else {
 		if (c->buf->len)
 			print("exec", c->buf->str, itoa(c->id));
+		else
+			print_window("debug", 0, "debug", c->buf->str);
 		string_free(c->buf, 1);
 		list_remove(&watches, c, 1);
 	}
@@ -542,6 +558,31 @@ char *prepare_batch_line(int argc, char *argv[], int n)
 	return bl;
 }
 
+extern FILE *gg_debug_file;
+
+static void setup_debug()
+{
+	struct gg_exec se;
+	int fd[2];
+
+	if (pipe(fd) == -1)
+		return;
+
+	memset(&se, 0, sizeof(se));
+
+	se.fd = fd[0];
+	se.check = GG_CHECK_READ;
+	se.state = GG_STATE_READING_DATA;
+	se.type = GG_SESSION_USER3;
+	se.id = 0;
+	se.timeout = -1;
+	se.buf = string_init(NULL);
+	
+	gg_debug_file = fdopen(fd[1], "w");
+
+	list_add(&watches, &se, sizeof(se));
+}
+	
 int main(int argc, char **argv)
 {
 	int auto_connect = 1, force_debug = 0, i, new_status = 0, ui_set = 0;
@@ -821,6 +862,8 @@ int main(int argc, char **argv)
 		si.timeout = -1;
 		list_add(&watches, &si, sizeof(si));
 	}
+
+	setup_debug();
 
 	if (!batch_mode)
 		print("welcome", VERSION);
