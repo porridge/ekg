@@ -23,8 +23,8 @@ int main(int argc, char **argv)
 	gg_debug_level = 255;
 
 	memset(&p, 0, sizeof(p));
-	p.uin = atoi(argv[2]);
-	p.password = argv[1];
+	p.uin = atoi(argv[1]);
+	p.password = argv[2];
 	
 	if (!(sess = gg_login(&p))) {
 		printf("Nie uda³o siê po³±czyæ: %s\n", strerror(errno));
