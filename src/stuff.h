@@ -277,7 +277,7 @@ int ioctld_sock;
 
 int alias_add(const char *string, int quiet, int append);
 int alias_remove(const char *name, int quiet);
-list_t alias_check(const char *foo);
+list_t alias_check(const char *line);
 void alias_free();
 
 char *base64_encode(const char *buf);

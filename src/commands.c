@@ -3255,7 +3255,7 @@ COMMAND(cmd_alias_exec)
 	for (; m; ) {
 		char *tmp = saprintf("%s%s%s%s", (*(char*)(m->data) == '/') ? "" : "/", (char*) m->data, (params[0]) ? " " : "", (params[0]) ? params[0] : "");
 		m = m->next;
-		command_exec(NULL, tmp);
+		command_exec(target, tmp);
 		xfree(tmp);
 	}
 
