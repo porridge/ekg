@@ -1,0 +1,26 @@
+~OutSideR~ <outsider@langusta.starnet.pl>
+
+> list - tu by sie przydalo mozliwosc sortowania chociazby z wykorzystaniem
+> zewnecznego sort ( cos like a list | sort ). Przydalo by sie tez cos
+> takiego jak definiowanie wyswietlanych userow wzgledem statusu w jakim
+> obecnie sa - czyli np tylko users online...
+>
+> add - mile by bylo gdyby to mialo od razu takie cuda jak modify - aby
+> potem nie trzeba bylo poprawiac tylko od razu ten tego to wprowadzic co
+> sie chce...
+
+12:05 <ArEkMaT> Jest tylko ma³y irytuj±cy bug w ekg ... po disconnect On ci±gle
+                próbuje siê ³±czyæ ..
+
+11:59 <ascent-> Zwalnianko pustej zmiennej jest w vars.c
+11:59 <ascent-> 114 linia czy jakos tak
+11:59 <ascent-> wczoraj se troche podebugowalem ;]
+
+Mateusz Adamowski <mateusza@staszic.waw.pl>
+
+> 2. logowanie wiadomosci ignorowanych userow do pliku
+> a moze zdarzy im sie napisac cos madrego? :)
+
+> 5. ekg nie obsluguje rozmowy z wieloma osobami na raz, a jest to fajna
+> funkcja
+
