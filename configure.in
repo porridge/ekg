@@ -61,7 +61,7 @@ fi
 
 AC_CHECK_TOOL(AR, ar, no)
 
-f test "x$AR" = "xno"; then
+if test "x$AR" = "xno"; then
 	AC_MSG_ERROR([ar ])
 fi
 
