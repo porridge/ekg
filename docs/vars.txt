@@ -39,6 +39,13 @@ auto_away
 	zmieniony na ,,zajêty''. podaje siê w sekundach. je¶li równa 0,
 	nie bêdzie automatycznej zmiany.
 
+auto_away_keep_descr
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	okre¶la, czy zachowywaæ opis przy automatycznym przej¶ciu w stan
+	,,zajêty'' niezale¿nie od warto¶ci zmiennej ,,keep_reason''.
+
 auto_back
 	typ: liczba
 	domy¶lna warto¶æ: 0

@@ -107,6 +107,7 @@ void variable_init()
 	variable_add("audio_device", "ad", VAR_STR, 1, &config_audio_device, NULL, NULL, NULL);
 #endif
 	variable_add("auto_away", "aa", VAR_INT, 1, &config_auto_away, NULL, NULL, NULL);
+	variable_add("auto_away_keep_descr", "ak", VAR_BOOL, 1, &config_auto_away_keep_descr, NULL, NULL, NULL);
 	variable_add("auto_back", "ab", VAR_INT, 1, &config_auto_back, NULL, NULL, NULL);
 	variable_add("auto_conference", "aC", VAR_BOOL, 1, &config_auto_conference, NULL, NULL, NULL);
 	variable_add("auto_find", "af", VAR_BOOL, 1, &config_auto_find, NULL, NULL, NULL);

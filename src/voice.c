@@ -166,6 +166,9 @@ int voice_play(const char *buf, int length, int null)
 	gsm_signal output[160];
 	const char *pos = buf;
 
+	if (length <= 0)
+		return 0;
+
 	/* XXX g³upi ³orkaraund do rozmów g³osowych GG 5.0.5 */
 	if (length == GG_DCC_VOICE_FRAME_LENGTH_505 && *buf == 0) {
 		pos++;

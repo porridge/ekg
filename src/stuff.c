@@ -94,6 +94,7 @@ int in_auto_away = 0;
 int config_auto_reconnect = 10;
 int reconnect_timer = 0;
 int config_auto_away = 600;
+int config_auto_away_keep_descr = 1;
 int config_auto_save = 0;
 int config_auto_find = 0;
 int config_auto_conference = 1;
@@ -2803,10 +2804,10 @@ void change_status(int status, const char *arg, int autom)
 			return;
 	}
 
-	if (!(autom % 60))
-		tmp = saprintf("%dm", autom / 60);
+	if (!(config_auto_away % 60))
+		tmp = saprintf("%dm", config_auto_away / 60);
 	else
-		tmp = saprintf("%ds", autom);
+		tmp = saprintf("%ds", config_auto_away);
 								
 	if (!arg) {
 		if (config_random_reason & random_mask) {

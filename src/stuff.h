@@ -203,6 +203,7 @@ int mesg_startup;
 char *config_audio_device;
 char *config_away_reason;
 int config_auto_away;
+int config_auto_away_keep_descr;
 int config_auto_back;
 int config_auto_find;
 int config_auto_conference;
