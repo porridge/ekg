@@ -1887,6 +1887,7 @@ static void update_statusbar(int commit)
 static void sigwinch_handler()
 {
 	ui_resize_term = 1;
+	signal(SIGWINCH, sigwinch_handler);
 }
 #endif
 

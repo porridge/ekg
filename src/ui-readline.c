@@ -169,6 +169,7 @@ static void sigint_handler()
 static void sigwinch_handler()
 {
 	ui_resize_term = 1;
+	signal(SIGWINCH, sigwinch_handler);
 }
 #endif
 
