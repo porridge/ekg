@@ -916,16 +916,25 @@ int main(int argc, char **argv)
 	while ((c = getopt_long(argc, argv, "b::a::i::pdnc:f:hI:ot:u:vN", ekg_options, NULL)) != -1) {
 		switch (c) {
 			case 'b':
+				if (!optarg && argv[optind] && argv[optind][0] != '-')
+					optarg = argv[optind++];
+
 				new_status = (optarg) ? GG_STATUS_AVAIL_DESCR : GG_STATUS_AVAIL;
 				xfree(new_reason);
 				new_reason = xstrdup(optarg);
 			        break;
 			case 'a':
+				if (!optarg && argv[optind] && argv[optind][0] != '-')
+					optarg = argv[optind++];
+
 				new_status = (optarg) ? GG_STATUS_BUSY_DESCR : GG_STATUS_BUSY;
 				xfree(new_reason);
 				new_reason = xstrdup(optarg);
 			        break;
 			case 'i':
+				if (!optarg && argv[optind] && argv[optind][0] != '-')
+					optarg = argv[optind++];
+
 				new_status = (optarg) ? GG_STATUS_INVISIBLE_DESCR : GG_STATUS_INVISIBLE;
 				xfree(new_reason);
 				new_reason = xstrdup(optarg);
