@@ -10,6 +10,8 @@ zg³osi³ b³±d.
 
 - kosmetyka kodu usuwania niektórych list (sz)
 - dalsza kosmetyka /query (sz)
+- usuniêcie leaka przy /find (w)
+- libgadu: usuniêcie leaka przy http (w)
 - drobne zmiany w ioctld (przy ,,beeps_spk'' ioctld nie potrzebuje +s) (d)
 
 // 2002-11-30

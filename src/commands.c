@@ -640,7 +640,7 @@ COMMAND(cmd_find)
 	struct gg_search_request *r;
 	struct gg_http *h;
 	list_t l;
-	char **argv = NULL, *query = NULL;
+	char **argv = NULL;
 	int i, id = 1;
 
 	/* wybieramy sobie identyfikator sercza */
@@ -654,9 +654,6 @@ COMMAND(cmd_find)
 			id = h->id / 2 + 1;
 	}
 	
-	if (params[0])
-		query = xstrdup(params[0]);
-	
 	r = xmalloc(sizeof(*r));
 	memset(r, 0, sizeof(*r));
 
@@ -665,20 +662,19 @@ COMMAND(cmd_find)
 		r->uin = config_uin;
 		id = id * 2;
 		xfree(r);
-		xfree(query);
 		return;
 
 	} else {
 		if (argv[0] && !argv[1] && argv[0][0] == '#') { /* konferencja */
-			query = saprintf("conference --find %s", argv[0]);
-			command_exec(NULL, query);
-			xfree(query);
+			char *tmp = saprintf("conference --find %s", argv[0]);
+			command_exec(NULL, tmp);
+			xfree(tmp);
+			array_free(argv);
 			return;
 		} else if (argv[0] && !argv[1] && argv[0][0] != '-') {
 			id = id * 2;	/* single search */
 			if (!(r->uin = get_uin(params[0]))) {
 				print("user_not_found", params[0]);
-				xfree(query);
 				array_free(argv);
 				xfree(r);
 				return;
@@ -738,7 +734,6 @@ COMMAND(cmd_find)
 
 	if (!(h = gg_search(r, 1))) {
 		print("search_failed", http_error_string(0));
-		xfree(query);
 		array_free(argv);
 		gg_search_request_free(r);
 		return;
