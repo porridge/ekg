@@ -4350,7 +4350,9 @@ void header_statusbar_resize()
  */
 static void binding_default()
 {
+#ifndef GG_DEBUG_DISABLE
 	binding_add("Alt-`", "/window switch 0", 1, 1);
+#endif
 	binding_add("Alt-1", "/window switch 1", 1, 1);
 	binding_add("Alt-2", "/window switch 2", 1, 1);
 	binding_add("Alt-3", "/window switch 3", 1, 1);
