@@ -738,7 +738,7 @@ COMMAND(cmd_exec)
 		s.id = pid;
 		s.timeout = 60;
 		if (add_commandline) {
-			char *tmp = saprintf("$ %s\n", ((command[0] == '^') ? command + 1 : command));
+			char *tmp = format_string(format_find("exec_prompt"), ((command[0] == '^') ? command + 1 : command));
 			s.buf = string_init(tmp);
 			xfree(tmp);
 		} else
