@@ -153,15 +153,18 @@ void handle_msg(struct gg_event *e)
 	};
 	
 	if (e->event.msg.sender == 0) {
-		my_printf("sysmsg_header");
-		cp_to_iso(e->event.msg.message);
-		print_message_body(e->event.msg.message, 2);
-		my_printf("sysmsg_footer");
+		if (e->event.msg.msgclass > last_sysmsg) {
+		    my_printf("sysmsg_header");
+		    cp_to_iso(e->event.msg.message);
+		    print_message_body(e->event.msg.message, 2);
+		    my_printf("sysmsg_footer");
 
-		if (enable_beep)
-			my_puts("\007");
-		play_sound(sound_sysmsg_file);
-		
+		    if (enable_beep)
+			    my_puts("\007");
+		    play_sound(sound_sysmsg_file);
+		    last_sysmsg = e->event.msg.msgclass;
+		    write_sysmsg(NULL);
+		};
 		return;
 	};
 			

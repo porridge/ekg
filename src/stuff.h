@@ -73,6 +73,7 @@ char *log_path;
 int display_color;
 int enable_beep, enable_beep_msg, enable_beep_chat, enable_beep_notify, display_debug;
 int config_uin;
+int last_sysmsg;
 char *config_password;
 char *config_user;
 int sms_away;
@@ -104,8 +105,10 @@ char *my_readline();
 
 int read_config(char *filename);
 int read_userlist(char *filename);
+int read_sysmsg(char *filename);
 int write_config(char *filename);
 int write_userlist(char *filename);
+int write_sysmsg(char *filename);
 void clear_userlist(void);
 int add_user(uin_t uin, char *comment);
 int del_user(uin_t uin);

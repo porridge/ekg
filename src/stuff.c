@@ -61,6 +61,7 @@ char *sound_chat_file = NULL;
 char *sound_sysmsg_file = NULL;
 char *sound_app = NULL;
 int config_uin = 0;
+int last_sysmsg = 0;
 char *config_password = NULL;
 int sms_away = 0;
 char *sms_number = NULL;
@@ -318,6 +319,49 @@ int read_config(char *filename)
 	return 0;
 }
 
+/*
+ * read_sysmsg()
+ *
+ *  - filename.
+ */
+int read_sysmsg(char *filename)
+{
+	char *buf, *foo;
+	FILE *f;
+
+	if (!filename) {
+		if (!(filename = prepare_path("sysmsg")))
+			return -1;
+	}
+	
+	if (!(f = fopen(filename, "r")))
+		return -1;
+
+	while ((buf = read_file(f))) {
+		if (buf[0] == '#') {
+			free(buf);
+			continue;
+		}
+
+		if (!(foo = strchr(buf, ' '))) {
+			free(buf);
+			continue;
+		}
+
+		*foo++ = 0;
+		
+		if (!strcasecmp(buf, "last_sysmsg")) {
+			if (atoi(foo))
+				last_sysmsg = atoi(foo);
+		}
+		free(buf);
+	}
+	
+	fclose(f);
+	
+	return 0;
+}
+
 
 /*
  * write_config()
@@ -369,6 +413,37 @@ int write_config(char *filename)
 		fprintf(f, "alias %s %s\n", a->alias, a->cmd);
 	}
 
+	fclose(f);
+	
+	return 0;
+}
+
+/*
+ * write_sysmsg()
+ *
+ *  - filename.
+ */
+int write_sysmsg(char *filename)
+{
+	char *tmp;
+	FILE *f;
+
+	if (!(tmp = prepare_path("")))
+		return -1;
+	mkdir(tmp, 0700);
+
+	if (!filename) {
+		if (!(filename = prepare_path("sysmsg")))
+			return -1;
+	}
+	
+	if (!(f = fopen(filename, "w")))
+		return -1;
+	
+	fchmod(fileno(f), 0600);
+	
+	fprintf(f, "last_sysmsg %i\n", last_sysmsg);
+	
 	fclose(f);
 	
 	return 0;

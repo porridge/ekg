@@ -337,7 +337,8 @@ u¿ycie: %s [OPCJE]
 	}
 	
 	read_config(NULL);
-
+	read_sysmsg(NULL);
+	
 	/* okre¶lanie stanu klienta po w³±czeniu */
 	if (new_status)
 		default_status = new_status;
