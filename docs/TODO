@@ -10,7 +10,13 @@ klient:
 - uzupe³niæ dope³nienia (w tym nicki ze spacjami),
 - wykrywanie niewidocznych jako opcja.
 - korzystaæ z getopt.
-- sprawy wymienione w src/ui-ncurses.c
+
+- dokoñczyæ ui-ncurses:
+  + reakcja na zmianê rozmiaru terminala,
+  + naprawiæ /exec,
+  + naprawiæ debugowanie,
+  + dodaæ /bind,
+  + zrobiæ listê kontaktów po prawej (marzenia),
 
 - przej¶æ na ui-ncurses domy¶lnie, a co za tym idzie:
   + usun±æ timestampy z formatów,
