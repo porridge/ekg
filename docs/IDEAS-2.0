@@ -115,3 +115,7 @@ oddzielnie dla ka¿dego protoko³u, bo np. podczas rozmów na GG nie chcemy
 za¶miecaæ sobie listy znajomymi, których numery by³y kiedy¶tam wpisane, ale
 i tak rozmawiamy tylko na ircu.
 
+wypada³oby te¿ w koñcu oddzieliæ libgadu od ekg, skoro ekg ma obs³ugiwaæ
+inne protoko³y. nie do¶æ, ¿e ul¿y to autorom innych klientów GG, wymusi
+wiêkszy porz±dek w API, wersjach i binarnej kompatybilno¶ci.
+
