@@ -656,7 +656,7 @@ void theme_init()
 	/* czêsto wykorzystywane, ró¿ne, przydatne itd. */
 	format_add("none", "%1\n", 1);
 	format_add("generic", "%> %1\n", 1);
-	format_add("not_enough_params", "%! Za ma³o parametrów\n", 1);
+	format_add("not_enough_params", "%! Za ma³o parametrów. Spróbuj %Thelp %1%n\n", 1);
 	format_add("invalid_uin", "%! Nieprawid³owy numer u¿ytkownika\n", 1);
 	format_add("user_not_found", "%! Nie znaleziono u¿ytkownika %T%1%n\n", 1);
 	format_add("not_implemented", "%! Tej funkcji jeszcze nie ma\n", 1);

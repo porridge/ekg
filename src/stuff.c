@@ -932,7 +932,7 @@ int alias_add(const char *string, int quiet, int append)
 
 	if (!string || !(cmd = strchr(string, ' '))) {
 		if (!quiet)
-			print("not_enough_params");
+			print("not_enough_params", "alias");
 		return -1;
 	}
 
@@ -988,7 +988,7 @@ int alias_remove(const char *name)
 	list_t l;
 
 	if (!name) {
-		print("not_enough_params");
+		print("not_enough_params", "alias");
 		return -1;
 	}
 

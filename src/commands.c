@@ -144,7 +144,7 @@ COMMAND(cmd_add)
 	uin_t uin;
 
 	if (!params[0] || !params[1]) {
-		print("not_enough_params");
+		print("not_enough_params", name);
 		return;
 	}
 
@@ -425,7 +425,7 @@ COMMAND(cmd_del)
 	const char *tmp;
 
 	if (!params[0]) {
-		print("not_enough_params");
+		print("not_enough_params", name);
 		return;
 	}
 
@@ -589,7 +589,7 @@ COMMAND(cmd_change)
 	int i;
 
 	if (!params[0]) {
-		print("not_enough_params");
+		print("not_enough_params", name);
 		return;
 	}
 
@@ -656,7 +656,7 @@ COMMAND(cmd_modify)
 	int i;
 
 	if (!params[0]) {
-		print("not_enough_params");
+		print("not_enough_params", name);
 		return;
 	}
 
@@ -817,7 +817,7 @@ COMMAND(cmd_ignore)
 
 	} else {
 		if (!params[0]) {
-			print("not_enough_params");
+			print("not_enough_params", name);
 			return;
 		}
 		
@@ -1015,7 +1015,7 @@ COMMAND(cmd_msg)
 	}
 
 	if (!params[0] || !params[1]) {
-		print("not_enough_params");
+		print("not_enough_params", name);
 		return;
 	}
 
@@ -1157,7 +1157,7 @@ COMMAND(cmd_sms)
 	char *number = NULL;
 
 	if (!params[1]) {
-		print("not_enough_params");
+		print("not_enough_params", name);
 		return;
 	}
 
@@ -1180,7 +1180,7 @@ COMMAND(cmd_history)
 	int n = 10; /* DOMYSLNA WARTOSC: 10 linii */
 	
 	if (!params[0]) {
-		print("not_enough_params");
+		print("not_enough_params", name);
 		return;
 	}
 	
@@ -1302,7 +1302,7 @@ COMMAND(cmd_dcc)
 		int fd;
 
 		if (!params[1] || !params[2]) {
-			print("not_enough_params");
+			print("not_enough_params", name);
 			return;
 		}
 		
@@ -1366,7 +1366,7 @@ COMMAND(cmd_dcc)
 		struct transfer *t, tt;
 
 		if (!params[1]) {
-			print("not_enough_params");
+			print("not_enough_params", name);
 			return;
 		}
 		
@@ -1526,7 +1526,7 @@ COMMAND(cmd_dcc)
 		uin_t uin;
 
 		if (!params[1]) {
-			print("not_enough_params");
+			print("not_enough_params", name);
 			return;
 		}
 		
@@ -1761,7 +1761,7 @@ COMMAND(cmd_register)
 	}
 	
 	if (!params[0] || !params[1]) {
-		print("not_enough_params");
+		print("not_enough_params", name);
 		return;
 	}
 
@@ -1789,7 +1789,7 @@ COMMAND(cmd_passwd)
 	struct gg_http *h;
 	
 	if (!params[0] || !params[1]) {
-		print("not_enough_params");
+		print("not_enough_params", name);
 		return;
 	}
 
@@ -1843,7 +1843,7 @@ COMMAND(cmd_on)
         }
 
         if (!params[1] || !params[2]) {
-                print("not_enough_params");
+                print("not_enough_params", name);
                 return;
         }
 
@@ -2124,7 +2124,7 @@ COMMAND(cmd_timer)
 
 	if (match_arg(params[0], 'a', "add", 2)) {
 		if (!params[1] || !params[2]) {
-			print("not_enough_params");
+			print("not_enough_params", name);
 			return;
 		}
 		timer_add(atoi(params[1]), NULL, params[2]);
@@ -2134,7 +2134,7 @@ COMMAND(cmd_timer)
 
 	if (match_arg(params[0], 'd', "del", 2)) {
 		if (!params[1]) {
-			print("not_enough_params");
+			print("not_enough_params", name);
 			return;
 		}
 		timer_remove(params[1], NULL);
@@ -2153,7 +2153,7 @@ COMMAND(cmd_timer)
 COMMAND(cmd_test_python)
 {
 	if (!params[0]) {
-		print("not_enough_params");
+		print("not_enough_params", name);
 		return;
 	}
 

@@ -808,7 +808,7 @@ static int ui_readline_event(const char *event, ...)
 			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*);
 
 			if (!p1) {
-		                print("not_enough_params");
+		                print("not_enough_params", "window");
 				result = 1;
 				goto cleanup;
 		        }
@@ -829,7 +829,7 @@ static int ui_readline_event(const char *event, ...)
 				
 		        } else if (!strcasecmp(p1, "switch")) {
 		                if (!p2)
-		                        print("window_not_enough_params");
+		                        print("not_enough_params", "window");
 		                else
 		                	window_switch(atoi(p2));
 
@@ -854,13 +854,13 @@ static int ui_readline_event(const char *event, ...)
 			
 			if (p1 && (!strcasecmp(p1, "-a") || !strcasecmp(p1, "--add") ||!strcasecmp(p1, "--add-quiet"))) {
 				if (!p2 || !p3)
-					print("bind_not_enough_params");
+					print("not_enough_params", "bind");
 				else
 					bind_sequence(p2, p3, (!strcasecmp(p1, "--add-quiet")) ? 1 : 0);
 			
 			} else if (p1 && (!strcasecmp(p1, "-d") || !strcasecmp(p1, "--del"))) {
 				if (!p2)
-					print("bind_not_enough_params");
+					print("not_enough_params", "bind");
 				else
 					bind_sequence(p2, NULL, 0);
 			
