@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2004 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Piotr Wysocki <wysek@linux.bydg.org>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *                          Piotr Domagalski <szalik@szalik.net>
@@ -768,15 +768,23 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 	};
 	struct status_table *s;
 	int prev_status, hide = 0;
+	int have_unknown = 0;
 	int ignore_status, ignore_status_descr, ignore_events, ignore_notify;
 	unsigned char *descr = NULL;
 #ifdef WITH_PYTHON
 	list_t l;
 #endif
 
-	/* nie pokazujemy nieznajomych */
-	if (!(u = userlist_find(uin, NULL)))
-		return;
+	/* nie pokazujemy nieznajomych, chyba ze display_notify & 4 */
+	if (!(u = userlist_find(uin, NULL))) {
+		if (config_display_notify & 4) {
+			have_unknown = 1;
+			u = (struct userlist *) xmalloc(sizeof(struct userlist));
+			u->uin = uin;
+			u->display = xstrdup(itoa(uin));
+		} else
+			return;
+	}
 
 	ignore_status = ignored_check(uin) & IGNORE_STATUS;
 	ignore_status_descr = ignored_check(uin) & IGNORE_STATUS_DESCR;
@@ -849,6 +857,10 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 	/* je¶li status taki sam i ewentualnie opisy te same, ignoruj */
 	if (!GG_S_D(status) && (u->status == status)) {
 		xfree(descr);
+		if (have_unknown) {
+			xfree(u->display);
+			xfree(u);
+		}
 		return;
 	}
 	
@@ -876,6 +888,10 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 
 	if (GG_S_D(status) && (u->status == status) && u->descr && !strcmp(u->descr, descr)) {
 		xfree(descr);
+		if (have_unknown) {
+			xfree(u->display);
+			xfree(u);
+		}
 		return;
 	}
 
@@ -933,20 +949,22 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 		if (config_log_status && GG_S_D(s->status) && descr)
 		    	put_log(uin, "status,%ld,%s,%s:%d,%s,%s,%s\n", uin, ((u->display) ? u->display : ""), inet_ntoa(u->ip), u->port, log_timestamp(time(NULL)), s->log, descr);
 
-		/* jak dostêpny lub zajêty, dopiszmy do taba
+		/* jak dostêpny lub zajêty i mamy go na li¶cie, dopiszmy do taba
 		 * jak niedostêpny, usuñmy */
-		if (GG_S_A(s->status) && config_completion_notify && u->display) 
-			add_send_nick(u->display);
-		if (GG_S_B(s->status) && (config_completion_notify & 4) && u->display)
-			add_send_nick(u->display);
-		if (GG_S_NA(s->status) && (config_completion_notify & 2) && u->display)
-			remove_send_nick(u->display);
+		if (!have_unknown) {
+			if (GG_S_A(s->status) && config_completion_notify && u->display) 
+				add_send_nick(u->display);
+			if (GG_S_B(s->status) && (config_completion_notify & 4) && u->display)
+				add_send_nick(u->display);
+			if (GG_S_NA(s->status) && (config_completion_notify & 2) && u->display)
+				remove_send_nick(u->display);
+		}
 
 		/* wy¶wietlaæ na ekranie ? */
-		if (!config_display_notify || hide)
+		if (!(config_display_notify & ~4) || hide)
 			break;
 
-		if (config_display_notify == 2) {
+		if ((config_display_notify & ~4) == 2) {
 			/* je¶li na zajêty, ignorujemy */
 			if (GG_S_B(s->status) && !GG_S_NA(prev_status))
 				break;
@@ -1001,6 +1019,11 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 		ui_event("status", u->uin, ((u->display) ? u->display : ""), status, (ignore_status_descr) ? NULL : u->descr);
 	 } else
 		xfree(descr);
+
+	if (have_unknown) {
+		xfree(u->display);
+		xfree(u);
+	}
 }
 
 /*

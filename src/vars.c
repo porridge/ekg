@@ -160,7 +160,7 @@ void variable_init()
 	if (ui_init == ui_ncurses_init)
 		variable_add("display_crap", "dr", VAR_BOOL, 1, &config_display_crap, NULL, NULL, NULL);
 #endif
-	variable_add("display_notify", "dn", VAR_INT, 1, &config_display_notify, NULL, variable_map(3, 0, 0, "none", 1, 2, "all", 2, 1, "significant"), NULL);
+	variable_add("display_notify", "dn", VAR_MAP, 1, &config_display_notify, NULL, variable_map(4, 0, 0, "none", 1, 2, "all", 2, 1, "significant", 4, 0, "unknown"), NULL);
 	variable_add("display_pl_chars", "dp", VAR_BOOL, 1, &config_display_pl_chars, NULL, NULL, NULL);
 	variable_add("display_sent", "ds", VAR_BOOL, 1, &config_display_sent, NULL, NULL, NULL);
 #ifdef HAVE_LIBJPEG
