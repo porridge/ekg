@@ -1060,7 +1060,7 @@ void theme_init()
 	format_add("change_timeout", "%! Przekroczono limit czasu operacji zmiany katalogu publicznego\n", 1);
 	
 	/* sesemesy */
-	format_add("sms_error", "%! B³±d wysy³ania SMS\n", 1);
+	format_add("sms_error", "%! B³±d wysy³ania SMS: %1\n", 1);
 	format_add("sms_unknown", "%! %1 nie ma podanego numeru komórki\n", 1);
 	format_add("sms_sent", "%> SMS do %T%1%n zosta³ wys³any\n", 1);
 	format_add("sms_failed", "%! SMS do %T%1%n nie zosta³ wys³any\n", 1);

@@ -531,8 +531,13 @@ COMMAND(cmd_exec)
 	} else {
 		for (l = children; l; l = l->next) {
 			struct process *p = l->data;
-
-			print("process", itoa(p->pid), p->name);
+			
+			if (p->name[0] == '\001') {
+				char *tmp = saprintf("wysy³anie sms do %s", p->name+1);
+				print("process", itoa(p->pid), tmp);
+				xfree(tmp);
+			} else
+				print("process", itoa(p->pid), p->name);
 		}
 
 		if (!children)
@@ -1835,16 +1840,13 @@ COMMAND(cmd_sms)
 {
 	struct userlist *u;
 	const char *number = NULL;
-	uin_t uin;
 
 	if (!params[0] || !params[1]) {
 		print("not_enough_params", name);
 		return;
 	}
 
-	uin = get_uin(params[0]);
-
-	if ((u = userlist_find(uin, params[0]))) {
+	if ((u = userlist_find(get_uin(params[0]), NULL))) {
 		if (!u->mobile || !strcmp(u->mobile, "")) {
 			print("sms_unknown", format_user(u->uin));
 			return;
