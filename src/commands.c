@@ -6,6 +6,7 @@
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *                          Wojciech Bojdol <wojboj@htc.net.pl>
  *                          Piotr Wysocki <wysek@linux.bydg.org>
+ *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -799,6 +800,7 @@ COMMAND(cmd_help)
 COMMAND(cmd_ignore)
 {
 	uin_t uin;
+	char *tmp;
 
 	if (*name == 'i' || *name == 'I') {
 		if (!params[0]) {
@@ -813,6 +815,13 @@ COMMAND(cmd_ignore)
 			if (!ignored) 
 				print("ignored_list_empty");
 
+			return;
+		}
+
+		if (params[0][0] == '#') {
+			tmp = saprintf("conference --ignore %s", params[0]);
+			command_exec(NULL, tmp);
+			xfree(tmp);
 			return;
 		}
 		
@@ -830,6 +839,13 @@ COMMAND(cmd_ignore)
 	} else {
 		if (!params[0]) {
 			print("not_enough_params", name);
+			return;
+		}
+
+		if (params[0][0] == '#') {
+			tmp = saprintf("conference --unignore %s", params[0]);
+			command_exec(NULL, tmp);
+			xfree(tmp);
 			return;
 		}
 		

@@ -5,6 +5,7 @@
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *                          Adam Osuchowski <adwol@polsl.gliwice.pl>
+ *                          Wojtek Bojdo/l <wojboj@htcon.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -986,28 +987,28 @@ static int window_remove(int id)
 		return -1;
 	}
 
-	/* i sortujemy okienka, w razie potrzeby... */
-        if (config_sort_windows) {
-		list_t l;
-		int wid = w->id;
-
-		for (l = windows; l; l = l->next) {
-			struct window *w = l->data;
-			
-			if (w->id > wid)
-				w->id--;
-		}
-	}
-
 	/* je¶li usuwano aktualne okienko, nie kombinuj tylko ustaw 1-sze. */
 	if (window_current == w) {
 		struct window *newwin = windows->data;
 
 		/* je¶li usuwane jest pierwszy, we¼ drugie. */
-		if (newwin == w)
+		if (newwin == w) 
 			newwin = windows->next->data;
 		
 		window_switch(newwin->id);
+	}
+
+	/* i sortujemy okienka, w razie potrzeby... */
+	if (config_sort_windows) {
+		list_t l;
+		int wid = w->id;
+
+		for (l = windows; l; l = l->next) {
+			struct window *wtmp = l->data;
+			
+			if (wtmp->id > wid)
+				wtmp->id--;
+		}
 	}
 
 	/* usuñ dane zajmowane przez okno. */
