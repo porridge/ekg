@@ -563,13 +563,20 @@ COMMAND(cmd_connect)
 		} else
 		    	tmp = xstrdup(params[0]);
 
+		if (config_keep_reason && config_reason && !tmp)
+			tmp = xstrdup(config_reason);
+
+		if (config_keep_reason) {
+			xfree(config_reason);
+			config_reason = xstrdup(tmp);
+		}
+
 		if (params && params[0] && !strcmp(params[0], "-")) {
 			xfree(config_reason);
 			config_reason = NULL;
 			xfree(tmp);
 			tmp = NULL;
-		} else if (config_keep_reason && config_reason && !tmp)
-			tmp = xstrdup(config_reason);
+		}
 
 		connecting = 0;
 
@@ -2367,6 +2374,11 @@ COMMAND(cmd_quit)
 
 	if (config_keep_reason && !tmp && config_reason)
 		tmp = xstrdup(config_reason);
+
+	if (config_keep_reason) {
+		xfree(config_reason);
+		config_reason = xstrdup(tmp);
+	}
 
 	if (params[0] && !strcmp(params[0], "-")) {
 		xfree(config_reason);
