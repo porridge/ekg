@@ -1134,7 +1134,6 @@ void theme_init()
 
 	/* wyszukiwanie u¿ytkowników */
 	format_add("search_failed", "%! Wyst±pi³ b³±d podczas szukania: %1\n", 1);
-	format_add("search_timeout", "%! Przekroczono limit czasu operacji szukania\n", 1);
 	format_add("search_not_found", "%! Nie znaleziono\n", 1);
 	format_add("search_no_last", "%! Brak wyników ostatniego wyszukiwania\n", 1);
 	format_add("search_no_last_nickname", "%! Brak pseudonimu w ostatnim wyszukiwaniu\n", 1);
