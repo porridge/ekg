@@ -8,6 +8,7 @@ zg³osi³ b³±d.
 
 // 2003-01-02
 
+- nowe man'y dla ekl2 (porridge/sz)
 - generowanie kluczy dla SIM na maszynach bez /dev/urandom (sz)
 - zabezpieczenie podczas wykonywania aliasu na wypadek, gdyby alias
   sam siebie usuwa³ (sz)
