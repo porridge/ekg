@@ -1,4 +1,4 @@
-/* $Id$	*/
+/* $Id$ */
 
 /*
  *  (C) Copyright 2001-2002 Piotr Domagalski <szalik@szalik.net>
