@@ -1146,8 +1146,6 @@ void theme_init()
 	format_add("exec_prompt", "$ %1\n", 1);
 
 	/* szczegó³owe informacje o u¿ytkowniku */
-	format_add("user_info", "%) Pseudonim: %T%1%n\n%) Numer: %T%2%n\n%) Stan: %3\n%) Adres IP: %T%4%n\n%) Imiê i nazwisko: %T%5 %6%n\n%) Alias: %T%7%n\n%) Numer telefonu: %T%8%n\n%) Grupy: %T%9%n\n", 1);	/* XXX do usuniêcia */
-			
 	format_add("user_info_header", "%K.--%n %T%1%n/%2 %K--- -- -%n\n", 1);
 	format_add("user_info_nickname", "%K| %nPseudonim: %T%1%n\n", 1);
 	format_add("user_info_name", "%K| %nImiê i nazwisko: %T%1 %2%n\n", 1);

@@ -27,6 +27,12 @@ parê wymagañ i wskazówek dla developerów:
    pamiêci, funkcje te same zajm± siê grzecznym zamkniêciem programu.
    dbaj o zwalnianie buforów, gdy nie s± one ju¿ potrzebne.
 
+   zamiast strncpy() oraz strncat() u¿ywaj strlcpy() i strlcat(), które
+   przyjmuj± jako parametr ca³kowity rozmiar bufora. nie trzeba siê martwiæ
+   o to, ile w buforze pozosta³o jeszcze miejsca, czy znak zerowy siê zmie¶ci,
+   etc. obie funkcje _zawsze_ zwracaj± ilo¶æ znaków, jaka zosta³a(by) zapisana
+   do bufora.
+
 7) je¶li nie masz pojêcia o alokacji pamiêci i obs³udze stringów w C,
    najlepiej daj sobie spokój. nawet je¶li kod dzia³a, ale nie trzyma
    siê kupy, zostanie odrzucony.

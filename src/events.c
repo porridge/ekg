@@ -573,7 +573,7 @@ void handle_msg(struct gg_event *e)
 		}
 
 		return;
-	};
+	}
 			
 	if (u)
 		add_send_nick(u->display);

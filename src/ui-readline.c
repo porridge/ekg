@@ -1546,4 +1546,3 @@ static int bind_sequence(const char *seq, const char *command, int quiet)
 
 	return 1;
 }
-

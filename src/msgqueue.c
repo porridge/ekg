@@ -339,7 +339,8 @@ int msg_queue_read()
 		fscanf(f, "%d\n", &m.msg_seq);
 		fscanf(f, "%d\n", &m.uin_count);
 
-		if (m.uin_count < 1 || m.uin_count > 100) {	/* XXX jaki¶ zdrowy limit */
+		/* jaki¶ zdrowy limit */
+		if (m.uin_count < 1 || m.uin_count > 100) {
 			fclose(f);
 			xfree(fn);
 			continue;

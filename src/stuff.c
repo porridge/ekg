@@ -3978,10 +3978,8 @@ void change_status(int status, const char *arg, int autom)
 		}
 	}
 
-	if (!ignored_check(config_uin)) {
-		ui_event("my_status", (reason) ? format_descr : format, reason, NULL);
-		ui_event("my_status_raw", status, reason, NULL);
-	}
+	ui_event("my_status", (reason) ? format_descr : format, reason, NULL);
+	ui_event("my_status_raw", status, reason, NULL);
 
 	xfree(config_reason);
 	config_reason = reason;

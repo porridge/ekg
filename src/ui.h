@@ -57,4 +57,3 @@ extern void header_statusbar_resize();
 #endif
 
 #endif /* __UI_H */
-
