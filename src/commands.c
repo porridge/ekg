@@ -2698,7 +2698,16 @@ int binding_toggle_debug(int a, int b)
 int binding_toggle_contacts(int a, int b)
 {
 #ifdef WITH_UI_NCURSES
-	config_contacts = !config_contacts;
+	static int last_contacts = -1;
+
+	if (!config_contacts) {
+		if ((config_contacts = last_contacts) == -1)
+			config_contacts = 2;
+	} else {
+		last_contacts = config_contacts;
+		config_contacts = 0;
+	}
+
 	contacts_rebuild();
 	ui_event("variable_changed", "contacts", NULL);
 #endif

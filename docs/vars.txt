@@ -154,11 +154,12 @@ ctrld_quits
 	tylko dla interfejsu readline.
 
 contacts
-	typ: bool
+	typ: liczba
 	domy¶lna warto¶æ: 0
 
 	okre¶la, czy okienko z list± obecnych ma byæ wy¶wietlone z prawej
-	strony ekranu. dzia³a tylko w interfejsie ncurses.
+	strony ekranu. je¶li jest równe 2, informacje o zmianie stanu nie
+	s± wy¶wietlane. dzia³a tylko w interfejsie ncurses.
 	
 contacts_size
 	typ: liczba

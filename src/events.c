@@ -680,7 +680,7 @@ static void handle_common(uin_t uin, int status, const char *descr, struct gg_no
 			remove_send_nick(u->display);
 		
 		/* czy mamy wy¶wietlaæ na ekranie? */
-		if (!config_display_notify)
+		if (!config_display_notify || config_contacts == 2)
 			break;
 		
 		if (config_display_notify == 2) {
