@@ -1925,20 +1925,20 @@ void iso_to_ascii(unsigned char *buf)
 	}
 }
 
-/* strip_chars()
+/*
+ * strip_chars()
  *
  * pozbywa siê podanego znaku na pocz±tku i koñcu ³ancucha
- *
  */
-char *strip_chars(char *line, unsigned char what) {
-        char *buf;
-
-        for (buf = line; *buf == what; buf++);
+char *strip_chars(char *line, unsigned char what)
+{
+	while (*line == what)
+		line++;
 
         if (line[strlen(line) - 1] == what)
-        	line[strlen(buf) - 1] = 0;
+        	line[strlen(line) - 1] = 0;
 
-        return buf;
+        return line;
 }
 
 /*
