@@ -5,6 +5,15 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-11-09 
+
+- poprawka wykrywania openssl (s)
+
+// 2002-11-08
+
+- poprawka dla "starych" systemow - libgen.h pojawilo sie dopiero 
+  w fbsd 4.2. (s)
+  
 // 2002-11-06
 
 - poprawka wykrywania <gsm/gsm.h> na Debianach (pawsku/w)
