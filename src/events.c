@@ -482,6 +482,38 @@ void handle_msg(struct gg_event *e)
 		return;
 	}
 
+	if (e->event.msg.formats_length > 0) {
+		unsigned char *p = e->event.msg.formats;
+		int i, imageno = 0;
+		
+		gg_debug(GG_DEBUG_MISC, "// ekg: received formatting info (len=%d):", e->event.msg.formats_length);
+		for (i = 0; i < e->event.msg.formats_length; i++)
+			gg_debug(GG_DEBUG_MISC, " %.2x", p[i]);
+		gg_debug(GG_DEBUG_MISC, "\n");
+
+		for (i = 0; i < e->event.msg.formats_length; ) {
+			unsigned char font = p[i + 2];
+
+			i += 3;
+
+			if ((font & GG_FONT_IMAGE)) {
+				struct gg_msg_richtext_image *m = (void*) &p[i];
+
+				gg_debug(GG_DEBUG_MISC, "// ekg: inline image: sender=%d, size=%d, crc32=%.8x\n", e->event.msg.sender, m->size, m->crc32);
+
+				imageno++;
+
+				i += sizeof(*m);
+			}
+
+			if ((font & GG_FONT_COLOR))
+				i += 3;
+		}
+
+		if (imageno && strlen(e->event.msg.message) == 0)
+			return;
+	}
+
 #ifdef HAVE_OPENSSL
 	if (config_encryption) {
 		char *msg = sim_message_decrypt(e->event.msg.message, e->event.msg.sender);
@@ -655,33 +687,6 @@ void handle_msg(struct gg_event *e)
 			xfree(tmp);
 		}
 	}
-
-	if (e->event.msg.formats_length > 0) {
-		unsigned char *p = e->event.msg.formats;
-		int i;
-		
-		gg_debug(GG_DEBUG_MISC, "// ekg: received formatting info (len=%d):", e->event.msg.formats_length);
-		for (i = 0; i < e->event.msg.formats_length; i++)
-			gg_debug(GG_DEBUG_MISC, " %.2x", p[i]);
-		gg_debug(GG_DEBUG_MISC, "\n");
-
-		for (i = 0; i < e->event.msg.formats_length; ) {
-			unsigned char font = p[i + 2];
-
-			i += 3;
-
-			if ((font & GG_FONT_IMAGE)) {
-				struct gg_msg_richtext_image *m = (void*) &p[i];
-
-				gg_debug(GG_DEBUG_MISC, "// ekg: inline image: sender=%d, size=%d, crc32=%.8x\n", e->event.msg.sender, m->size, m->crc32);
-
-				i += sizeof(*m);
-			}
-
-			if ((font & GG_FONT_COLOR))
-				i += 3;
-		}
-	}
 }
 
 /*
@@ -696,7 +701,7 @@ void handle_msg(struct gg_event *e)
 void handle_ack(struct gg_event *e)
 {
 	struct userlist *u = userlist_find(e->event.ack.recipient, NULL);
-	int queued = (e->event.ack.status == GG_ACK_QUEUED), filtered = 0;
+	int queued = (e->event.ack.status == GG_ACK_QUEUED);
 	const char *tmp, *target = ((u && u->display) ? u->display : itoa(e->event.ack.recipient));
 
 	if (!e->event.ack.seq)	/* ignorujemy potwierdzenia ctcp */
@@ -708,8 +713,8 @@ void handle_ack(struct gg_event *e)
 		event_check((queued) ? EVENT_QUEUED : EVENT_DELIVERED, e->event.ack.recipient, NULL);
 
 	if (u && !queued && GG_S_NA(u->status) && !(ignored_check(u->uin) & IGNORE_STATUS)) {
-		filtered = 1;
 		print_window(target, 0, "ack_filtered", format_user(e->event.ack.recipient));
+		return;
 	}
 
 	if (!config_display_ack)
@@ -721,10 +726,8 @@ void handle_ack(struct gg_event *e)
 	if (config_display_ack == 3 && !queued)
 		return;
 
-	if (!filtered) {
-		tmp = queued ? "ack_queued" : "ack_delivered";
-		print_window(target, 0, tmp, format_user(e->event.ack.recipient));
-	}
+	tmp = queued ? "ack_queued" : "ack_delivered";
+	print_window(target, 0, tmp, format_user(e->event.ack.recipient));
 }
 
 /*
