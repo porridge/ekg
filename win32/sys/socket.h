@@ -1,10 +1,9 @@
 /*
- * win32/sys/socket.h
+ * <sys/socket.h>
  *
- * (C) Copyright 2002 Wojtek Kaniewski <wojtekka@irc.pl>
- *                    Hao <hao@astercity.net>
- * 
- * wrapper uniksowych funkcji do windzianych.
+ * wrapper wielu funkcji i sta³ych niezbêdnyc do obs³ugi socketów.
+ *
+ * $Id$
  */
 
 #ifndef COMPAT_SYS_SOCKET_H

@@ -1,3 +1,13 @@
+/*
+ * <sys/ioctl.h>
+ *
+ * zast±pienie ioctl() przez ioctlsocket(). zwyk³y #define
+ * to za ma³o ze wzglêdu na niezgodno¶æ typu ostatniego argumentu obu
+ * funkcji.
+ *
+ * $Id$
+ */
+
 #ifndef COMPAT_SYS_IOCTL_H
 #define COMPAT_SYS_IOCTL_H
 

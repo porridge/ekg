@@ -1,3 +1,12 @@
+/*
+ * <stdint.h>
+ *
+ * standardowe typy liczb ca³kowitych. zak³adamy domy¶lne warto¶ci dla
+ * wszystkich kompilatorów win32.
+ *
+ * $Id$
+ */
+
 #ifndef COMPAT_STDINT_H
 #define COMPAT_STDINT_H
 

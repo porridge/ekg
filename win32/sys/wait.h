@@ -1,3 +1,12 @@
+/*
+ * <sys/wait.h>
+ *
+ * funkcje wait() i waitpid() zwracaj± -1. tyle wystarczy, ¿eby skompilowaæ
+ * obs³ugê synchronicznych po³±czeñ.
+ *
+ * $Id$
+ */
+
 #ifndef COMPAT_SYS_WAIT_H
 #define COMPAT_SYS_WAIT_H
 
