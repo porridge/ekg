@@ -677,6 +677,12 @@ void handle_failure(struct gg_event *e)
 	print("conn_failed", (tmp) ? tmp : "?");
 	xfree(tmp);
 
+	/* je¶li siê nie powiod³o, usuwamy nasz serwer i ³±czymy przez huba */
+	if (config_server_save) {
+		xfree(config_server);
+		config_server = NULL;
+	}
+
 	list_remove(&watches, sess, 0);
 	gg_logoff(sess);
 	gg_free_session(sess);
@@ -717,6 +723,16 @@ void handle_success(struct gg_event *e)
 			gg_change_status_descr(sess, config_status, config_reason);
 	}
 
+	/* zapiszmy adres serwera */
+	if (config_server_save) {
+		struct in_addr addr;
+
+		addr.s_addr = sess->server_addr;
+		
+		xfree(config_server);
+		config_server = xstrdup(inet_ntoa(addr));
+	}
+	
 	if (batch_mode && batch_line) {
  		command_exec(NULL, batch_line);
  		xfree(batch_line);

@@ -974,8 +974,8 @@ void theme_init()
 	format_add("show_status_not_avail", "%rniedostêpny%n", 1);
 	format_add("show_status_private_on", ", tylko dla znajomych", 1);
 	format_add("show_status_private_off", "", 1);
-	format_add("show_status_connected_since", "%) Po³±czony od: %T%1%n", 1);
-	format_add("show_status_disconnected_since", "%) Roz³±czony od: %T%1%n", 1);
+	format_add("show_status_connected_since", "%) Po³±czony od: %T%1%n\n", 1);
+	format_add("show_status_disconnected_since", "%) Roz³±czony od: %T%1%n\n", 1);
 	format_add("show_status_last_conn_event", "%Y-%m-%d %H:%M", 1);
 
 	/* aliasy */

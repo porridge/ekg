@@ -292,7 +292,7 @@ random_reason
 
 save_password
 	typ: bool
-	domyslna warto¶æ: 1
+	domy¶lna warto¶æ: 1
 
 	okre¶la czy has³o ma byæ zapisywane w pliku konfiguracyjnym. opcja
 	ta mo¿e przydaæ siê, gdy boimy siê administratora przegl±daj±cego
@@ -306,6 +306,15 @@ server
 	pomijaj±c w³a¶ciw± procedurê ³±czenia siê. przydane podczas awarii
 	g³ównego serwera. adresy nale¿y oddzielaæ przecinkami, ¶rednikami
 	lub spacjami. po dwukropku mo¿na podaæ port serwera.
+
+server_save
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	okre¶la, czy serwer ma zapamiêtywaæ serwer, z którym ostatnio uda³o
+	siê po³±czyæ. w przypadku w³±czenia tej zmiennej, zmienna ,,server''
+	bêdzie automatycznie uaktualniana, a zawarto¶æ wpisana przez
+	u¿ytkownika zapominana.
 
 sms_away
 	typ: liczba

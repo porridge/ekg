@@ -999,6 +999,7 @@ int main(int argc, char **argv)
 
 void ekg_exit()
 {
+	char **vars = NULL;
 	list_t l;
 	int i;
 
@@ -1007,10 +1008,20 @@ void ekg_exit()
 	gg_free_session(sess);
 	sess = NULL;
 
-	if (config_keep_reason)
-		config_write_status();
-
 	ui_deinit();
+
+	if (config_keep_reason) {
+		array_add(&vars, xstrdup("status"));
+		array_add(&vars, xstrdup("reason"));
+	}
+
+	if (config_server_save)
+		array_add(&vars, xstrdup("server"));
+
+	if (vars) {
+		config_write_partly(vars);
+		array_free(vars);
+	}
 
 	if (config_changed && !config_speech_app) {
 		char line[80];

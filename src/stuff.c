@@ -156,6 +156,7 @@ char *config_audio_device = NULL;
 char *config_speech_app = NULL;
 int config_encryption = 0;
 char *config_log_timestamp = NULL;
+int config_server_save = 0;
 
 static struct {
 	int event;
@@ -552,6 +553,36 @@ int sysmsg_read()
 }
 
 /*
+ * config_write_variable()
+ *
+ * zapisuje jedn± zmienn± do pliku konfiguracyjnego.
+ *
+ *  - f - otwarty plik konfiguracji,
+ *  - v - wpis zmiennej,
+ *  - base64 - czy wolno nam u¿ywaæ base64 i zajmowaæ pamiêæ?
+ */
+void config_write_variable(FILE *f, struct variable *v, int base64)
+{
+	if (!f || !v)
+		return;
+
+	if (v->type == VAR_STR) {
+		if (*(char**)(v->ptr)) {
+			if (!v->display && base64) {
+				char *tmp = base64_encode(*(char**)(v->ptr));
+				if (config_save_password)
+					fprintf(f, "%s \001%s\n", v->name, tmp);
+				xfree(tmp);
+			} else 	
+				fprintf(f, "%s %s\n", v->name, *(char**)(v->ptr));
+		}
+	} else if (v->type == VAR_FOREIGN)
+		fprintf(f, "%s %s\n", v->name, (char*) v->ptr);
+	else
+		fprintf(f, "%s %d\n", v->name, *(int*)(v->ptr));
+}
+
+/*
  * config_write_main()
  *
  * w³a¶ciwa funkcja zapisuj±ca konfiguracjê do podanego pliku.
@@ -563,24 +594,11 @@ void config_write_main(FILE *f, int base64)
 {
 	list_t l;
 
-	for (l = variables; l; l = l->next) {
-		struct variable *v = l->data;
-		
-		if (v->type == VAR_STR) {
-			if (*(char**)(v->ptr)) {
-				if (!v->display && base64) {
-					char *tmp = base64_encode(*(char**)(v->ptr));
-					if (config_save_password)
-						fprintf(f, "%s \001%s\n", v->name, tmp);
-					xfree(tmp);
-				} else 	
-					fprintf(f, "%s %s\n", v->name, *(char**)(v->ptr));
-			}
-		} else if (v->type == VAR_FOREIGN)
-			fprintf(f, "%s %s\n", v->name, (char*) v->ptr);
-		else
-			fprintf(f, "%s %d\n", v->name, *(int*)(v->ptr));
-	}	
+	if (!f)
+		return;
+
+	for (l = variables; l; l = l->next)
+		config_write_variable(f, l->data, base64);
 
 	for (l = ignored; l; l = l->next) {
 		struct ignored *i = l->data;
@@ -659,18 +677,23 @@ int config_write()
 }
 
 /*
- * config_write_status()
+ * config_write_partly()
  *
- * zapisuje aktualny stan i jego opis, nie zmieniaj±c reszty konfiguracji.
- * konfiguracjê -- zmienne i listê ignorowanych do pliku
- * ~/.gg/config lub podanego.
+ * zapisuje podane zmienne, nie zmieniaj±c reszty konfiguracji.
+ *  
+ *  - vars - tablica z nazwami zmiennych do zapisania.
+ * 
+ * 0/-1.
  */
-int config_write_status()
+int config_write_partly(char **vars)
 {
-	int wrote_status = 0, wrote_reason = 0;
 	const char *filename;
 	char *newfn, *line;
 	FILE *fi, *fo;
+	int *wrote, i;
+
+	if (!vars)
+		return -1;
 
 	if (!(filename = prepare_path("config", 1)))
 		return -1;
@@ -686,47 +709,72 @@ int config_write_status()
 		return -1;
 	}
 	
+	wrote = xcalloc(array_count(vars) + 1, sizeof(int));
+	
 	fchmod(fileno(fo), 0600);
 
 	while ((line = read_file(fi))) {
-		if (!strncmp(line, "set status ", 11)) {
-			wrote_status = 1;
-			xfree(line);
-			line = saprintf("set status %d", config_status);
-		}
+		char *tmp;
 
-		if (!strncmp(line, "status ", 7)) {
-			wrote_status = 1;
-			xfree(line);
-			line = saprintf("status %d", config_status);
-		}
+		if (line[0] == '#' || line[0] == ';' || (line[0] == '/' && line[1] == '/'))
+			goto pass;
 
-		if (!strncmp(line, "set reason ", 11)) {
-			wrote_reason = 1;
-			xfree(line);
-			if (config_reason)
-				line = saprintf("set reason %s", config_reason);
-		}
+		if (!strchr(line, ' '))
+			goto pass;
 
-		if (!strncmp(line, "reason ", 7)) {
-			wrote_reason = 1;
-			xfree(line);
-			if (config_reason)
-				line = saprintf("reason %s", config_reason);
-		}
+		if (!strncasecmp(line, "ignore ", 7))
+			goto pass;
+
+		if (!strncasecmp(line, "alias ", 6))
+			goto pass;
+
+		if (!strncasecmp(line, "on ", 3))
+			goto pass;
+
+		if (!strncasecmp(line, "bind ", 5))
+			goto pass;
+
+		tmp = line;
+
+		if (!strncasecmp(tmp, "set ", 4))
+			tmp += 4;
+		
+		for (i = 0; vars[i]; i++) {
+			int len = strlen(vars[i]);
+
+			if (strlen(tmp) < len + 1)
+				continue;
+
+			if (strncasecmp(tmp, vars[i], len) || tmp[len] != ' ')
+				continue;
 			
-		if (line)
-			fprintf(fo, "%s\n", line);
+			config_write_variable(fo, variable_find(vars[i]), 1);
 
+			wrote[i] = 1;
+			
+			xfree(line);
+			line = NULL;
+			
+			break;
+		}
+
+		if (!line)
+			continue;
+
+pass:
+		fprintf(fo, "%s\n", line);
 		xfree(line);
 	}
 
-	if (!wrote_status)
-		fprintf(fo, "status %d\n", config_status);
+	for (i = 0; vars[i]; i++) {
+		if (wrote[i])
+			continue;
 
-	if (!wrote_reason && config_reason)
-		fprintf(fo, "reason %s\n", config_reason);
+		config_write_variable(fo, variable_find(vars[i]), 1);
+	}
 
+	xfree(wrote);
+	
 	fclose(fi);
 	fclose(fo);
 	

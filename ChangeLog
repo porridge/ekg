@@ -9,6 +9,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - poprawka obs³ugi proxy http (Chilek/w)
 - poprawka segfaulta przy szukaniu (*/w)
+- poprawka themów czasu po³±czenia (FIG,szalik/w)
+- dodanie zmiennej ,,server_save'' (*/w)
 
 // 2002-11-13
 
