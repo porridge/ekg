@@ -178,6 +178,7 @@ int config_password_cp1250 = 0;
 char *config_interface = NULL;
 int config_reason_limit = 0;
 char *config_reason_first = NULL;
+char *config_dcc_limit = NULL;
 
 char *last_search_first_name = NULL;
 char *last_search_last_name = NULL;

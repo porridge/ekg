@@ -1856,12 +1856,27 @@ static void update_statusbar(int commit)
 			xfree(tmp);
 		}
 
-		if (ui_ncurses_debug) {
-			char *tmp = saprintf(" lines_count=%d start=%d height=%d overflow=%d screen_width=%d", window_current->lines_count, window_current->start, window_current->height, window_current->overflow, ui_screen_width);
-			window_printat(status, 0, y, tmp, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
-			xfree(tmp);
-		} else
-			window_printat(status, 0, y, p, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
+		switch (ui_ncurses_debug) {
+			case 0:
+				window_printat(status, 0, y, p, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
+				break;
+				
+			case 1:
+			{
+				char *tmp = saprintf(" debug: lines_count=%d start=%d height=%d overflow=%d screen_width=%d", window_current->lines_count, window_current->start, window_current->height, window_current->overflow, ui_screen_width);
+				window_printat(status, 0, y, tmp, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
+				xfree(tmp);
+				break;
+			}
+
+			case 2:
+			{
+				char *tmp = saprintf(" debug: lines(count=%d,start=%d,index=%d), line(start=%d,index=%d)", array_count(lines), lines_start, lines_index, line_start, line_index);
+				window_printat(status, 0, y, tmp, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
+				xfree(tmp);
+				break;
+			}
+		}
 	}
 
 	for (i = 0; formats[i].name; i++)
@@ -2923,6 +2938,7 @@ static void binding_accept_line(const char *arg)
 		lines_index++;
 
 		lines_adjust();
+		line_adjust();
 	
 		return;
 	}
@@ -3178,7 +3194,9 @@ static void binding_next_contacts_group(const char *arg)
 
 static void binding_ui_ncurses_debug_toggle(const char *arg)
 {
-	ui_ncurses_debug = !ui_ncurses_debug;
+	if (ui_ncurses_debug++ > 2)
+		ui_ncurses_debug = 0;
+
 	update_statusbar(1);
 }
 

@@ -112,14 +112,16 @@ Mo¿liwe wpisy to:
 
 - zmiana stanu:
 
-	status,<numer>,<nick>,<adres_ip>,<czas>,<stan>
-	status,<numer>,<nick>,<adres_ip>,<czas>,<stan>,<opis>
+	status,<numer>,<nick>,<adres_ip>[:port],<czas>,<stan>
+	status,<numer>,<nick>,<adres_ip>[:port],<czas>,<stan>,<opis>
 
 gdzie:
 - <numer> - numer nadawcy, odbiorcy lub osoby zmieniaj±cej stan,
 - <nick> - pseudonim osoby,
 - <czas> - domy¶lnie ilo¶æ sekund od 1 stycznia 1970r. UTC, ale u¿ytkownik
-           mo¿e zmieniæ format tego pola za pomoc± zmiennej log_timestamp.
+           mo¿e zmieniæ format tego pola za pomoc± zmiennej log_timestamp,
+- <adres_ip> - je¶li jest nieznany, zapisuje siê ,,0.0.0.0'',
+- <stan> - jeden z ,,avail'', ,,busy'', ,,invisble'' i ,,notavail''.
 
 * * *
 

@@ -61,6 +61,9 @@ void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 
 static int hide_notavail = 0;	/* czy ma ukrywaæ niedostêpnych -- tylko zaraz po po³±czeniu */
 
+static int dcc_limit_time = 0;	/* czas pierwszego liczonego po³±czenia */
+static int dcc_limit_count = 0;	/* ilo¶æ po³±czeñ od ostatniego razu */
+
 static struct handler handlers[] = {
 	{ GG_EVENT_MSG, handle_msg },
 	{ GG_EVENT_ACK, handle_ack },
@@ -813,10 +816,10 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 			break;
 
 		/* zaloguj */
-		if (config_log_status && !GG_S_D(s->status))
-			put_log(uin, "status,%ld,%s,%s,%s,%s\n", uin, ((u->display) ? u->display : ""), inet_ntoa(u->ip), log_timestamp(time(NULL)), s->log);
+		if (config_log_status && (!GG_S_D(s->status) || !descr))
+			put_log(uin, "status,%ld,%s,%s:%d,%s,%s\n", uin, ((u->display) ? u->display : ""), inet_ntoa(u->ip), u->port, log_timestamp(time(NULL)), s->log);
 		if (config_log_status && GG_S_D(s->status) && descr)
-		    	put_log(uin, "status,%ld,%s,%s,%s,%s,%s\n", uin, ((u->display) ? u->display : ""), inet_ntoa(u->ip), log_timestamp(time(NULL)), s->log, descr);
+		    	put_log(uin, "status,%ld,%s,%s:%d,%s,%s,%s\n", uin, ((u->display) ? u->display : ""), inet_ntoa(u->ip), u->port, log_timestamp(time(NULL)), s->log, descr);
 
 		/* jak dostêpny lub zajêty, dopiszmy do taba
 		 * jak niedostêpny, usuñmy */
@@ -1324,6 +1327,36 @@ void handle_dcc(struct gg_dcc *d)
 	switch (e->type) {
 		case GG_EVENT_DCC_NEW:
 			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_CLIENT_NEW\n");
+
+			if (config_dcc_limit) {
+				int c, t = 60;
+				char *tmp;
+				
+				if ((tmp = strchr(config_dcc_limit, '/')))
+					t = atoi(tmp + 1);
+
+				c = atoi(config_dcc_limit);
+
+				if (time(NULL) - dcc_limit_time > t) {
+					dcc_limit_time = time(NULL);
+					dcc_limit_count = 0;
+				}
+
+				dcc_limit_count++;
+
+				if (dcc_limit_count > c) {
+					print("dcc_limit");
+					config_dcc = 0;
+					changed_dcc("dcc");
+
+					dcc_limit_time = 0;
+					dcc_limit_count = 0;
+
+					gg_dcc_free(e->event.dcc_new);
+					e->event.dcc_new = NULL;
+					break;
+				}
+			}
 
 			list_add(&watches, e->event.dcc_new, 0);
 			e->event.dcc_new = NULL;

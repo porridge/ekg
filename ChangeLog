@@ -11,6 +11,12 @@ zg³osi³ b³±d.
 - poprawka polskich liter w opisach (sz)
 - wspomnienie w README o konfiguracji za pomoc± zmiennych i polecenia
   /set, bo chyba nie zawsze by³o to oczywiste (sz)
+- dok³adniejszy opis logów w dokumentacji, logowanie portów (Chilek/w)
+- poprawka Entera wielolinijkowych (w)
+- poprawka informacji o dcc z samym sob± (wojtu¶/w)
+- dodanie zmiennej ,,dcc_limit'' okre¶laj±cej limit po³±czeñ w danym
+  przedziale czasu. domy¶lna warto¶æ to 30 po³±czeñ na 30 sekund. potem
+  zostaje wy³±czone dcc, ¿eby ekg nie da³o siê ubiæ (w)
 
 // 2003-04-08
 

@@ -233,6 +233,17 @@ dcc_dir
 
 	okre¶la katalog, do którego bêd± zapisywane pobierane pliki.
 
+dcc_limit
+	typ: tekst
+	domy¶lna warto¶æ: 30/30
+
+	okre¶la limit bezpo¶rednich po³±czeñ w danym przedziale czasu.
+	liczba przed uko¶nikiem okre¶la maksymaln± ilo¶æ po³±czeñ, a liczba
+	po uko¶niku ilo¶æ sekund. po przekroczeniu tego progu bezpo¶rednie
+	po³±czenia zostaj± wy³±czone, by zapobiec atakom polegaj±cym na
+	wyczerpaniu zasobów klienta. zwykle po ponownym w³±czeniu
+	bezpo¶rednich po³±czeñ nale¿y po³±czyæ siê ponownie z serwerem.
+
 display_ack
 	typ: liczba
 	domy¶lna warto¶æ: 3
