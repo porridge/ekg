@@ -2948,15 +2948,7 @@ static void complete(int *line_start, int *line_index)
 							continue;
 						
 						s = string_init("\"");
-
-						for (p = completions[j]; *p; p++) {
-							if (!strchr("\"\\", *p))
-								string_append_c(s, *p);
-							else {
-								string_append_c(s, '\\');
-								string_append_c(s, *p);
-							}
-						}
+						string_append(s, completions[j]);
 						string_append_c(s, '\"');
 
 						xfree(completions[j]);
