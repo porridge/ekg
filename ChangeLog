@@ -9,7 +9,8 @@ zg³osi³ b³±d.
 // 2002-11-27
 
 - poprawka od¶wie¿ania prompta przy activity w ui-readline (d)
-	
+- /query wymaga podania prawid³ego u¿ytkownika lub numer (Murphy/w)
+
 // 2002-11-26
 
 - dodanie zmiennej sound_notify_file (sz)
