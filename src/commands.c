@@ -1324,6 +1324,67 @@ COMMAND(cmd_list)
 		return;
 	}
 
+	/* list --clear */
+	if (params[0] && (match_arg(params[0], 'c', "clear", 2) || match_arg(params[0], 'C', "clear-config", 8))) {
+		struct gg_http *h;
+		char *contacts = NULL;
+		
+		if (match_arg(params[0], 'c', "clear", 2)) {
+			string_t s = string_init(contacts);
+			char *vars = variable_digest();
+			int i, count;
+
+			count = strlen(vars) / 120;
+
+			if (strlen(vars) % 120 != 0)
+				count++;
+
+			for (i = 0; i < count; i++) {
+				string_append(s, "__config");
+				string_append(s, itoa(i));
+				string_append_c(s, ';');
+
+				for (j = 0; j < 5; j++) {
+					char *tmp;
+
+					if (i * 120 + j * 24 < strlen(vars)) 
+						tmp = xstrmid(vars, i * 120 + j * 24, 24);
+					else
+						tmp = xstrdup("");
+
+					string_append(s, tmp);
+					string_append_c(s, ';');
+					xfree(tmp);
+				}
+
+				string_append(s, itoa(rand() % 3000000 + 10000));
+				string_append(s, "\r\n");
+			}
+
+			xfree(contacts);
+			
+			contacts = string_free(s, 0);
+		}
+			
+		if (!contacts) {
+			print("userlist_put_error", strerror(ENOMEM));
+			return;
+		}
+		
+		if (!(h = gg_userlist_put(config_uin, config_password, contacts, 1))) {
+			print("userlist_put_error", strerror(errno));
+			return;
+		}
+
+		h->user_data = (char*) 1;
+		
+		xfree(contacts);
+		
+		list_add(&watches, h, 0);
+
+		return;
+	}
+	
 	/* list --put */
 	if (params[0] && (match_arg(params[0], 'p', "put", 2) || match_arg(params[0], 'P', "put-config", 5))) {
 		struct gg_http *h;
@@ -3949,7 +4010,9 @@ void command_init()
 	  "  -p, --put         umieszcza na serwerze\n"
 	  "  -P, --put-config  umieszcza na serwerze razem z konfiguracj±\n"
 	  "  -g, --get         pobiera z serwera\n"
-	  "  -G, --get-config  pobiera z serwera razem z konfiguracj±\n");
+	  "  -G, --get-config  pobiera z serwera razem z konfiguracj±\n"
+	  "  -c, --clear       umieszcza pust± listê na serwerze\n"
+	  "  -C, --clear-config umieszcza pust± listê na serwerze razem z pust± konfiguracj±");
 	  
 	command_add
 	( "msg", "u?", cmd_msg, 0,
