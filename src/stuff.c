@@ -142,6 +142,7 @@ int config_sort_windows = 0;
 int config_last_size = 10;
 int config_last = 0;
 int config_keep_reason = 0;
+int config_enter_scrolls = 0;
 
 static struct {
 	int event;

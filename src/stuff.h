@@ -186,6 +186,7 @@ int config_sort_windows;
 int config_last_size;
 int config_last;
 int config_keep_reason;
+int config_enter_scrolls;
 
 char *home_dir;
 char *config_dir;

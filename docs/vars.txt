@@ -150,6 +150,13 @@ display_sent
 	zwróciæ uwagê, ¿e przy make_window = 2, wys³anie wiadomo¶ci utworzy
 	automatycznie okienko rozmowy.
 
+enter_scrolls
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	je¶li w³±czone, wci¶niêcie klawisza Enter w pustej linii spowoduje
+	przesuniêcie ekranu o jedn± liniê.
+
 keep_reason
 	typ: bool
 	domy¶lna warto¶æ: 0

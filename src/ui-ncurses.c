@@ -1340,7 +1340,11 @@ static void ui_ncurses_loop()
 					history[0] = xstrdup(line);
 					xfree(history[HISTORY_MAX - 1]);
 					memmove(&history[1], &history[0], sizeof(history) - sizeof(history[0]));
+				} else {
+					if (config_enter_scrolls)
+						print("none", "");
 				}
+
 				history[0] = line;
 				history_index = 0;
 				line[0] = 0;

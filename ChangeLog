@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   w stanie sprawdziæ tego w ka¿dej mo¿liwej konfiguracji (wiele_osób/w)
 - poprawka debugowania (nie blokuje ju¿ rurki, co doprowadza³o do wieszania
   siê ekg przy du¿ej ilo¶ci debugowych tekstów) (w)
+- dodanie zmiennej enter_scrolls (jp/w)
 
 // 2002-09-28
 
