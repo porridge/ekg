@@ -253,6 +253,16 @@ int userlist_set(char *contacts, int config)
 		char *tmp = string_free(vars, 0);
 		gg_debug(GG_DEBUG_MISC, "// received ekg variables digest: %s\n", tmp);
 		variable_undigest(tmp);	/* XXX kod b³êdu */
+
+		if (sess && sess->state == GG_STATE_CONNECTED) {
+			if (config_reason) {
+				iso_to_cp(config_reason);
+				gg_change_status_descr(sess, config_status, config_reason);
+				cp_to_iso(config_reason);
+			} else
+				gg_change_status(sess, config_status);
+		}
+
 		xfree(tmp);
 	}
 

@@ -255,19 +255,17 @@ COMMAND(cmd_alias)
 
 COMMAND(cmd_away)
 {
-	int private_mask = GG_S_F(config_status) ? GG_STATUS_FRIENDS_MASK : 0;
-
 	if (params[0] && strlen(params[0]) > GG_STATUS_DESCR_MAXSIZE)
 		print("descr_too_long", itoa(strlen(params[0]) - GG_STATUS_DESCR_MAXSIZE));
 
 	if (!strcasecmp(name, "away"))
-		change_status(GG_STATUS_BUSY | private_mask, params[0], 0);
+		change_status(GG_STATUS_BUSY, params[0], 0);
 
 	if (!strcasecmp(name, "invisible"))
-		change_status(GG_STATUS_INVISIBLE | private_mask, params[0], 0);
+		change_status(GG_STATUS_INVISIBLE, params[0], 0);
 
 	if (!strcasecmp(name, "back")) {
-		change_status(GG_STATUS_AVAIL | private_mask, params[0], 0);
+		change_status(GG_STATUS_AVAIL, params[0], 0);
 		sms_away_free();
 	}
 

@@ -1282,8 +1282,9 @@ void handle_userlist(struct gg_http *h)
 		cp_to_iso(h->data);
 		userlist_set(h->data, (h->user_data) ? 1 : 0);
 		userlist_send();
-		config_changed = 1;
 		update_status();
+
+		config_changed = 1;
 	}
 
 	list_remove(&watches, h, 0);

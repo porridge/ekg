@@ -3547,7 +3547,7 @@ void change_status(int status, const char *arg, int autom)
 	const char *filename, *config_x_reason, *format, *format_descr, *auto_format = NULL, *auto_format_descr = NULL;
 	int random_mask, status_descr;
 	char *reason = NULL, *tmp = NULL;
-	int private_mask = GG_S_F(config_status) ? GG_STATUS_FRIENDS_MASK : 0;
+	int private_mask = (GG_S_F(config_status) ? GG_STATUS_FRIENDS_MASK : 0);
 
 	status = GG_S(status);
 

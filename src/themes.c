@@ -870,10 +870,10 @@ void theme_init()
 	format_add("back_descr", "%> Zmieniono stan na dostêpny: %T%1%n%2%n\n", 1);
 	format_add("invisible", "%> Zmieniono stan na niewidoczny\n", 1);
 	format_add("invisible_descr", "%> Zmieniono stan na niewidoczny: %T%1%n%2\n", 1);
-	format_add("private_mode_is_on", "%> Tryb ,,tylko dla przyjació³'' jest w³±czony\n", 1);
-	format_add("private_mode_is_off", "%> Tryb ,,tylko dla przyjació³'' jest wy³±czony\n", 1);
-	format_add("private_mode_on", "%> W³±czono tryb ,,tylko dla przyjació³''\n", 1);
-	format_add("private_mode_off", "%> Wy³±czono tryb ,,tylko dla przyjació³''\n", 1);
+	format_add("private_mode_is_on", "%> Tryb ,,tylko dla znajomych'' jest w³±czony\n", 1);
+	format_add("private_mode_is_off", "%> Tryb ,,tylko dla znajomych'' jest wy³±czony\n", 1);
+	format_add("private_mode_on", "%> W³±czono tryb ,,tylko dla znajomych''\n", 1);
+	format_add("private_mode_off", "%> Wy³±czono tryb ,,tylko dla znajomych''\n", 1);
 	format_add("private_mode_invalid", "%! Nieprawid³owa warto¶æ\n", 1);
 	format_add("descr_too_long", "%! D³ugo¶æ opisu przekracza limit. Ilo¶æ uciêtych znaków: %T%1%n\n", 1);
 	
