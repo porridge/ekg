@@ -1295,10 +1295,10 @@ COMMAND(command_dcc)
 			if (params[1][0] == '#' && atoi(params[1] + 1) == t->id)
 				break;
 
-			if (u = find_user(t->uin, NULL)) {
+			if ((u = find_user(t->uin, NULL))) {
 				char buf[16];
 
-				snprintf(buf, sizeof(buf), u->uin);
+				snprintf(buf, sizeof(buf), "%ld", u->uin);
 
 				if (!strcasecmp(params[1], buf) || !strcasecmp(params[1], u->comment))
 					break;
