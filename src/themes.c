@@ -951,10 +951,11 @@ void theme_init()
 	format_add("window_no_windows", "%! Nie mo積a zamkn望 ostatniego okna\n", 1);
 	format_add("window_del", "%) Zamkni皻o okno\n", 1);
 	format_add("windows_max", "%! Wyczerpano limit ilo軼i okien\n", 1);
-	format_add("window_list_query", "%) #%1: rozmowa z %T%2%n\n", 1);
-	format_add("window_list_nothing", "%) #%1: puste\n", 1);
+	format_add("window_list_query", "%) %1: rozmowa z %T%2%n\n", 1);
+	format_add("window_list_nothing", "%) %1: brak rozmowy\n", 1);
 	format_add("window_invalid", "%! Nieprawid這wy parametr\n", 1);
-	format_add("window_id_query_started", "%) Rozmowa z %T%2%n rozpocz皻a w oknie %W#%1%n\n", 1);
+	format_add("window_id_query_started", "%) Rozmowa z %T%2%n rozpocz皻a w oknie %W%1%n\n", 1);
+	format_add("window_kill_status", "%! Nie mo積a zamkn望 okna statusowego\n", 1);
 
 	/* bind */
 	format_add("bind_seq_incorrect", "%! Sekwencja %T%1%n jest nieprawid這wa\n", 1); 

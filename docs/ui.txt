@@ -1,8 +1,3 @@
-od 20020629 interfejs u¿ytkownika oparty na ncurses jest ju¿ u¿ywalny,
-je¶li kto¶ lubi nowo¶ci. brakuje dope³niania tabem, brakuje prompta,
-brakuje query, brakuje kilku klawiszy. i pewnie ma jeszcze masê b³êdów.
-w ka¿dym razie, mo¿na przewijaæ do góry klawiszami PageUp i PageDown (;
-
 od 20020627 ekg jest przygotowane do obs³ugi ró¿nych interfejsów u¿ytkowika.
 zrobi³em ca³kiem spor± reorganizacjê kodu, dziêki czemu nie trzeba bêdzie
 psuæ zbyt du¿o, ¿eby dodaæ frontend w ncurses czy jakikolwiek inny.

@@ -78,6 +78,12 @@ int rl_set_key(const char *key, void *function, void *keymap)
 }
 #endif
 
+struct window {
+	int id;
+	char *query_nick;
+	char *line[MAX_LINES_PER_SCREEN];
+};
+
 /* deklaracje funkcji interfejsu */
 static void ui_readline_loop();
 static void ui_readline_print(const char *target, const char *line);
@@ -86,7 +92,7 @@ static int ui_readline_event(const char *event, ...);
 static void ui_readline_deinit();
 
 static int in_readline = 0, no_prompt = 0, pager_lines = -1, screen_lines = 24, screen_columns = 80;
-list_t windows = NULL;
+static list_t windows = NULL;
 struct window *window_current = NULL;
 
 /* kod okienek napisany jest na podstawie ekg-windows nilsa */

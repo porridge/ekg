@@ -35,12 +35,6 @@ extern void ui_batch_init();
 
 #define MAX_LINES_PER_SCREEN 50
 
-struct window {
-        int id;
-        char *query_nick;
-        char *line[MAX_LINES_PER_SCREEN];
-};
-
 extern void ui_readline_init();
 #endif
 

@@ -11,6 +11,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - ³adniejsze, dresiarskie prompty w ui-ncurses (w)
 - pocz±tek timestampów _przed_ lini± (w)
 - ui-ncurses obs³uguje Ctrl-W (w)
+- obs³uga okienek w ui-ncurses. jest jeszcze niekompletna w stosunku do
+  okienek z ui-readline, ale ma te¿ sporo zalet -- dresiarski status i
+  informowanie o zmianach w oknach. szczegó³y w docs/ui-ncurses.txt (w)
 
 // 2002-09-03
 

@@ -18,9 +18,29 @@
  */
 
 /*
+ * 21:56 <@Kooba> MASZ OKIENKA ALA IRSSI?
+ * 21:56 <@Kooba> no to chlopie.
+ * 21:56 <@Kooba> wywalam gaima.
+ * 21:56 <@Kooba> bo taki ekg obsluguje dzwiek.
+ * 21:56 <@Kooba> dcc
+ * 21:56 <@bkU> JA CIE!
+ * 21:56 <@Kooba> i lepiej wyszukuje.
+ * 21:56 <@Kooba> i lepiej sie podrywa LASKI!
+ *
+ * 21:59 <@bkU> elluin, mo¿esz napisaæ, tak jak w ³añcuszkach szczê¶cia
+ * 21:59 <@bkU> Hosse Pedro Alvaros z po³udniowej Gwatemali
+ * 21:59 <@bkU> przesta³ u¿ywaæ ekg
+ * 21:59 <@bkU> i w ci±gu 7 dni straci³ wszystko
+ *
+ * 22:02 <@bkU> ekg mo¿e wszystko!
+ * 22:02 <@bkU> ostatnio s³ysza³em przecieki, ¿e w NASA u¿ywaj± w³a¶nie ekg.
+ */
+
+/*
  * roadmap:
- * - okienka,
- * - mo¿liwo¶æ w³±czenia listy kontaktów po prawej,
+ * - wielolinijkowe wiadomo¶ci,
+ * - bindowanie,
+ * - listy kontaktów po prawej.
  */
 
 #include <stdio.h>
@@ -48,13 +68,23 @@ static void ui_ncurses_beep();
 static int ui_ncurses_event(const char *event, ...);
 static void ui_ncurses_deinit();
 
-static WINDOW *status = NULL, *input = NULL, *output = NULL;
+static void window_switch(int id);
+static void update_statusbar();
+
+struct window {
+	WINDOW *window;
+	char *target;
+	int lines, y, start, id, act;
+};
+
+static WINDOW *status = NULL, *input = NULL;
 #define HISTORY_MAX 1000
 static char *history[HISTORY_MAX];
 static int history_index = 0;
-static int lines = 0, y = 0, start = 0;
 static char line[1000] = "", *yanked = NULL;
 static char **completions = NULL;	/* lista dope³nieñ */
+static list_t windows = NULL;
+static struct window *window_current;
 
 #define output_size (stdscr->_maxy - 1)
 
@@ -64,24 +94,158 @@ static char **completions = NULL;	/* lista dope³nieñ */
 	xfree(ui_debug_tmp); \
 }
 
-
-static void set_cursor()
+static void set_cursor(struct window *w)
 {
-	if (y == lines) {
-		if (start == lines - output_size)
-			start++;
-		wresize(output, y + 1, 80);
-		lines++;
+	if (w->y == w->lines) {
+		if (w->start == w->lines - output_size)
+			w->start++;
+		wresize(w->window, w->y + 1, 80);
+		w->lines++;
 	}
-	wmove(output, y, 0);
+	wmove(w->window, w->y, 0);
+}
+
+/*
+ * window_find()
+ *
+ * szuka okna o podanym celu. zwraca strukturê opisuj±c± je.
+ */
+static struct window *window_find(const char *target)
+{
+	list_t l;
+
+	if (!target || !strcasecmp(target, "__current"))
+		return window_current;
+
+	if (!strcasecmp(target, "__status"))
+		return windows->data;
+	
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data;
+
+		if (w->target && !strcasecmp(target, w->target))
+			return w;
+	}
+
+	return NULL;
+}
+
+/*
+ * window_refresh()
+ *
+ * ncursesowo ustawia do wy¶wietlenia aktualnie wybrane okienko, a resztê
+ * ucina, ¿eby siê schowa³y.
+ */
+static void window_refresh()
+{
+	list_t l;
+
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data;
+		
+		if (window_current->id == w->id)
+			pnoutrefresh(w->window, w->start, 0, 0, 0, output_size - 1, 80);
+		else
+			pnoutrefresh(w->window, 0, 0, 0, 81, 0, 0);
+	}
+}
+
+static void window_kill(struct window *w)
+{
+	if (w->id == 1) {
+		print("window_kill_status");
+		return;
+	}
+
+	if (w == window_current) {
+		struct window *newwin = windows->data;
+
+		if (newwin == w)
+			newwin = windows->next->data;
+
+		window_switch(newwin->id);
+	}
+		
+	xfree(w->target);
+	delwin(w->window);
+	list_remove(&windows, w, 1);
+}
+
+static void window_switch(int id)
+{
+	list_t l;
+
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data;
+
+		if (id == w->id) {
+			window_current = w;
+
+			w->act = 0;
+
+			window_refresh();
+			wnoutrefresh(status);
+			wnoutrefresh(input);
+			doupdate();
+			update_statusbar();
+
+			return;
+		}
+	}
+}
+
+static struct window *window_new(const char *target)
+{
+	struct window w;
+	list_t l;
+	int id = 1, done = 0;
+
+	while (!done) {
+		done = 1;
+
+		for (l = windows; l; l = l->next) {
+			struct window *w = l->data;
+
+			if (w->id == id) {
+				done = 0;
+				id++;
+				break;
+			}
+		}
+	}
+	
+	memset(&w, 0, sizeof(w));
+
+	w.id = id;
+	w.target = xstrdup(target);
+	w.lines = stdscr->_maxy - 1;
+	w.window = newpad(w.lines, 80);
+
+	return list_add(&windows, &w, sizeof(w));
 }
 
 static void ui_ncurses_print(const char *target, const char *line)
 {
+	struct window *w;
 	const char *p;
 	int x = 0;
 
-	set_cursor();
+	if (config_make_window == 2) {
+		if (!(w = window_find(target))) {
+			w = window_new(target);
+			print("window_id_query_started", itoa(w->id), target);
+		}
+	} else {
+		if (!(w = window_find(target)))
+			return;
+	}
+
+	if (w != window_current) {
+		w->act = 1;
+		update_statusbar();
+	}
+
+	set_cursor(w);
 
 	if (config_timestamp) {
 		time_t t;
@@ -94,7 +258,7 @@ static void ui_ncurses_print(const char *target, const char *line)
 		strftime(buf, sizeof(buf), config_timestamp, tm);
 
 		for (i = 0; i < strlen(buf); i++) {
-			waddch(output, buf[i]);
+			waddch(w->window, buf[i]);
 			x++;
 		}
 	}
@@ -117,13 +281,13 @@ static void ui_ncurses_print(const char *target, const char *line)
 					a2 += 16;
 				if (*p == 'm') {
 					if (a1 == 0 && a2 == -1)
-						wattrset(output, COLOR_PAIR(7));
+						wattrset(w->window, COLOR_PAIR(7));
 					else if (a1 == 1 && a2 == -1)
-						wattrset(output, COLOR_PAIR(7) | A_BOLD);
+						wattrset(w->window, COLOR_PAIR(7) | A_BOLD);
 					else if (a2 == -1)
-						wattrset(output, COLOR_PAIR(a1 - 30));
+						wattrset(w->window, COLOR_PAIR(a1 - 30));
 					else
-						wattrset(output, COLOR_PAIR(a2 - 30) | ((a1) ? A_BOLD : A_NORMAL));
+						wattrset(w->window, COLOR_PAIR(a2 - 30) | ((a1) ? A_BOLD : A_NORMAL));
 				}		
 			} else {
 				while (*p && ((*p >= '0' && *p <= '9') || *p == ';'))
@@ -133,23 +297,23 @@ static void ui_ncurses_print(const char *target, const char *line)
 		} else if (*p == 10) {
 			if (!*(p + 1))
 				break;
-			y++;
+			w->y++;
 			x = 0;
-			set_cursor();
+			set_cursor(w);
 		} else {
-			waddch(output, (unsigned char) *p);
+			waddch(w->window, (unsigned char) *p);
 			x++;
 			if (x == stdscr->_maxx + 1) {
-				y++;
+				w->y++;
 				x = 0;
-				set_cursor();
+				set_cursor(w);
 			}
 		}
 	}
 
-	y++;
-		
-	pnoutrefresh(output, start, 0, 0, 0, output_size - 1, 80);
+	w->y++;
+	
+	window_refresh();
 	wnoutrefresh(status);
 	wnoutrefresh(input);
 	doupdate();
@@ -245,9 +409,37 @@ static void update_statusbar()
 
 			xfree(fmt);
 			p = q - 1;
+		} else if (!strncmp(p, "window}", 7)) {
+			waddstr(status, itoa(window_current->id));
+			p += 6;
 		} else if (!strncmp(p, "uin}", 4)) {
 			waddstr(status, itoa(config_uin));
 			p += 3;
+		} else if (!strncmp(p, "query}", 6)) {
+			if (window_current->target)
+				waddstr(status, window_current->target);
+			p += 5;
+		} else if (!strncmp(p, "activity}", 9)) {
+			string_t s = string_init("");
+			int first = 1;
+			list_t l;
+
+			for (l = windows; l; l = l->next) {
+				struct window *w = l->data;
+
+				if (w->act) {
+					if (!first) 
+						string_append_c(s, ',');
+					string_append(s, itoa(w->id));
+					first = 0;
+				}
+			}
+			
+			waddstr(status, s->str);
+
+			string_free(s, 1);
+
+			p += 8;
 		} else if (*p == '?') {
 			int matched = 0, neg = 0;
 
@@ -273,6 +465,20 @@ static void update_statusbar()
 				p += 9;
 			} else if (!strncmp(p, "notavail ", 9)) {
 				matched = (!sess || sess->state != GG_STATE_CONNECTED);
+				p += 8;
+			} else if (!strncmp(p, "query ", 6)) {
+				matched = (window_current->target != NULL);
+				p += 5;
+			} else if (!strncmp(p, "activity ", 9)) {
+				list_t l;
+
+				for (l = windows; l; l = l->next) {
+					struct window *w = l->data;
+
+					if (w->act)
+						matched = 1;
+				}
+
 				p += 8;
 			}
 
@@ -316,11 +522,9 @@ void ui_ncurses_init()
 	noecho();
 	nonl();
 
-	lines = stdscr->_maxy - 1;
-
-	output = newpad(lines, 80);
-	status = newwin(1, 80, lines, 0);
-	input = newwin(1, 80, lines + 1, 0);
+	window_current = window_new(NULL);
+	status = newwin(1, 80, stdscr->_maxy - 1, 0);
+	input = newwin(1, 80, stdscr->_maxy, 0);
 	keypad(input, TRUE);
 
 	start_color();
@@ -342,13 +546,12 @@ void ui_ncurses_init()
 	init_pair(14, COLOR_CYAN, COLOR_BLUE);
 	init_pair(15, COLOR_WHITE, COLOR_BLUE);
 	
-	format_add("statusbar", " %c(%w%{time}%c)%w %c(%wuin%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) %c(%wekg%c/%w" VERSION "%c)%w", 1);
+	format_add("statusbar", " %c(%w%{time}%c)%w %c(%wuin%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) (%wwin%c/%w%{window}%{?query %c:%w}%{query}%c)%w %{?activity %c(%wact%c/%w}%{activity}%{?activity %c)%w}", 1);
 	format_add("no_prompt_cache", "", 1);
 	format_add("prompt", "%K:%g:%G:%n", 1);
 	format_add("prompt2", "%K:%c:%C:%n", 1);
 	format_add("error", "%K:%r:%R:%n", 1);
 
-	wnoutrefresh(output);
 	wnoutrefresh(status);
 	wnoutrefresh(input);
 	doupdate();
@@ -363,10 +566,20 @@ void ui_ncurses_init()
 
 static void ui_ncurses_deinit()
 {
+	list_t l;
+
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data;
+
+		xfree(w->target);
+		delwin(w->window);
+	}
+
+	list_destroy(windows, 1);
+
 	werase(input);
 	wnoutrefresh(input);
 	doupdate();
-	delwin(output);
 	delwin(input);
 	delwin(status);
 	endwin();
@@ -680,6 +893,24 @@ static void ui_ncurses_loop()
 
 		ekg_wait_for_key();
 		switch ((ch = wgetch(input))) {
+			case 27:
+				ch = wgetch(input);
+
+				if (ch >= '1' && ch <= '9')
+					window_switch(ch - '1' + 1);
+				else if (ch == '0')
+					window_switch(10);
+
+				if (ch == 'k')
+					window_kill(window_current);
+
+				if (ch == 'n') {
+					struct window *w = window_new(NULL);
+					window_switch(w->id);
+				}
+
+				break;
+				
 			case KEY_BACKSPACE:
 			case 8:
 			case 127:
@@ -689,6 +920,7 @@ static void ui_ncurses_loop()
 					line_index--;
 				}
 				break;
+
 			case 'Y' - 64:
 				if (yanked && strlen(yanked) + strlen(line) + 1 < sizeof(line)) {
 					memmove(line + line_index + strlen(yanked), line + line_index, sizeof(line) - line_index - strlen(yanked));
@@ -696,6 +928,7 @@ static void ui_ncurses_loop()
 					line_index += strlen(yanked);
 				}
 				break;
+
 			case KEY_DC:
 			case 'D' - 64:
 				if (line_index < strlen(line)) {
@@ -703,11 +936,13 @@ static void ui_ncurses_loop()
 					line[sizeof(line) - 1] = 0;
 				}
 				break;	
+				
 			case KEY_ENTER:
-			case 13: {
+			case 13:
+			{
 				char *tmp = xstrdup(line);
 				
-				command_exec(NULL, tmp);
+				command_exec(window_current->target, tmp);
 				xfree(tmp);
 				if (history[0] != line)
 					xfree(history[0]);
@@ -720,12 +955,14 @@ static void ui_ncurses_loop()
 				adjust();
 				break;	
 			}
+
 			case 'U' - 64:
 				xfree(yanked);
 				yanked = strdup(line);
 				line[0] = 0;
 				adjust();
 				break;
+
 			case 'W' - 64:
 			{
 				char *p;
@@ -747,31 +984,38 @@ static void ui_ncurses_loop()
 
 				break;
 			}
+
 			case 'L' - 64:
 				break;
+				
 			case 9:
 				complete(&line_start, &line_index);
 
 				break;
+				
 			case KEY_LEFT:
 				if (line_index > 0)
 					line_index--;
 				break;
+				
 			case KEY_RIGHT:
 				if (line_index < strlen(line))
 					line_index++;
 				break;
+				
 			case 'E' - 64:
 			case KEY_END:
 			case KEY_SELECT:
 				adjust();
 				break;
+				
 			case 'A' - 64:
 			case KEY_HOME:
 			case KEY_FIND:
 				line_index = 0;
 				line_start = 0;
 				break;
+				
 			case KEY_UP:
 				if (history[history_index + 1]) {
 					if (history_index == 0)
@@ -781,6 +1025,7 @@ static void ui_ncurses_loop()
 					adjust();
 				}
 				break;
+				
 			case KEY_DOWN:
 				if (history_index > 0) {
 					history_index--;
@@ -792,19 +1037,29 @@ static void ui_ncurses_loop()
 					}
 				}
 				break;
+				
 			case KEY_PPAGE:
-				start -= output_size;
-				if (start < 0)
-					start = 0;
+				window_current->start -= output_size;
+				if (window_current->start < 0)
+					window_current->start = 0;
+
 				break;
+
 			case KEY_NPAGE:
-				start += output_size;
-				if (start > lines - output_size)
-					start = lines - output_size;
+				window_current->start += output_size;
+				if (window_current->start > window_current->lines - output_size)
+					window_current->start = window_current->lines - output_size;
+
 				break;
+				
+			case KEY_F(1):
+				binding_help(0, 0);
+				break;
+
 			case KEY_F(12):
 				binding_toggle_debug(0, 0);
 				break;
+				
 			default:
 				if (ch < 32)
 					break;
@@ -828,7 +1083,7 @@ static void ui_ncurses_loop()
 			if (line_start < 0)
 				line_start = 0;
 		}
-		pnoutrefresh(output, start, 0, 0, 0, output_size - 1, 80);
+		window_refresh();
 		werase(input);
 		wattrset(input, COLOR_PAIR(7));
 		mvwaddstr(input, 0, 0, line + line_start);
@@ -845,15 +1100,101 @@ static void ui_ncurses_loop()
 	}
 }
 
+
 static int ui_ncurses_event(const char *event, ...)
 {
+	va_list ap;
+
+	va_start(ap, event);
+
 	update_statusbar();
 
-	if (event && !strcmp(event, "refresh_time")) {
+	if (!event)
+		return 0;
+
+	if (!strcmp(event, "refresh_time")) {
 		struct timer *t = timer_add(1, "ui-ncurses-time", "refresh_time");
 		t->ui = 1;
 	}
 
+	if (!strcmp(event, "command")) {
+		char *command = va_arg(ap, char*);
+
+		if (!strcasecmp(command, "query")) {
+			char *param = va_arg(ap, char*);
+
+			if (!param && !window_current->target)
+				goto cleanup;
+
+			if (param) {
+				struct window *w;
+
+				if ((w = window_find(param))) {
+					print("query_exist", param, itoa(w->id));
+					goto cleanup;
+				}
+
+				print("query_started", param);
+				xfree(window_current->target);
+				window_current->target = xstrdup(param);
+			} else {
+				print("query_finished", window_current->target);
+				xfree(window_current->target);
+				window_current->target = NULL;
+			}
+			update_statusbar();
+		}
+
+		if (!strcasecmp(command, "window")) {
+			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*);
+
+			if (!p1) {
+				print("not_enough_params", "window");
+				goto cleanup;
+			}
+
+			if (!strcasecmp(p1, "new")) {
+				struct window *w = window_new(NULL);
+				window_switch(w->id);
+			}
+
+			if (!strcasecmp(p1, "switch")) {
+				if (!p2) {
+					print("not_enough_params", "window");
+					goto cleanup;
+				}
+				window_switch(atoi(p2));
+			}
+			
+			if (!strcasecmp(p1, "kill")) {
+				struct window *w = window_current;
+
+				if (p2) {
+					list_t l;
+
+					for (w = NULL, l = windows; l; l = l->next) {
+						struct window *ww = l->data;
+
+						if (ww->id == atoi(p2)) {
+							w = ww;
+							break;
+						}
+					}
+
+					if (!w) {
+						print("window_noexist");
+						goto cleanup;
+					}
+				}
+
+				window_kill(w);
+			}
+		}
+	}
+
+cleanup:
+	va_end(ap);
+	
 	return 0;
 }
 
