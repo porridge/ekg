@@ -6,6 +6,13 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2002-01-09
+
+- dodanie komendy ukrytej _queue dla tych, którzy czasami chc± wiedzieæ,
+  co siê dok³adnie dzieje w kolejce wiadomo¶ci (sz)
+- ma³a poprawka timerów. nadal niektórym po reorganizacji ekg siê wysypuje,
+  zg³aszajcie swoje b³êdy/obserwacje (sz)
+
 // 2002-01-08
 
 - poprawka ostrze¿eñ przy kompilacji gcc 3.x (MuchaR/w)

@@ -3422,7 +3422,7 @@ COMMAND(cmd_queue)
 	list_t l;
 	uin_t uin = 0;
 
-	if (sess && sess->state == GG_STATE_CONNECTED) {
+	if (strcmp(name, "_queue") && sess && sess->state == GG_STATE_CONNECTED) {
 		print("queue_wrong_use");
 		return;
 	}
@@ -3478,15 +3478,13 @@ COMMAND(cmd_queue)
 					string_append(s, format_user(m->uins[i]));
 				}
 				
-				fu = xstrdup(s->str);
-				string_free(s, 1);
+				fu = string_free(s, 0);
 			} else
-				fu = (char *)format_user(*(m->uins));
+				fu = xstrdup(format_user(*(m->uins)));
 				
 			print("queue_list_message", buf, fu, m->msg);
 
-			if (m->uin_count > 1)
-				xfree(fu);
+			xfree(fu);
 		}
 	}
 }
@@ -4016,6 +4014,9 @@ void command_init()
 	( "_keydel", "u", cmd_test_keydel, 0, " <numer/alias>",
 	  "usuwa klucz publiczny danej osoby", "");
 #endif
+	command_add
+	( "_queue", "uu", cmd_queue, 0, " [opcje]",
+	  "pozwala obserwowaæ kolejkê wiadomo¶ci tak¿e podczas po³±czenia", "");
 }
 
 /*
