@@ -3,6 +3,9 @@
 - plumk, dodatkowe parametry ,,list'' (wojtekka).
 - sortowana userlista, dodana list_add_sorted() w dynstuff.c (wojtekka).
 - ,,modify'' ju¿ ma przypadkiem zostawionego printf()a (wojtekka).
+- ,,add'' mo¿e przyjmowaæ takie same parametry jak ,,modify'' (wojtekka).
+- dodany prompt do rozszerzonych helpów (wojtekka).
+- poprawka README (wojtekka).
 
 // 2001-10-31 
 

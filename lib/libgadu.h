@@ -221,6 +221,7 @@ void gg_debug(int level, char *format, ...);
 int gg_resolve(int *fd, int *pid, char *hostname);
 int gg_connect(void *addr, int port, int async);
 char *gg_alloc_sprintf(char *format, ...);
+char *gg_get_line(char **ptr);
 
 #define GG_APPMSG_HOST "appmsg.gadu-gadu.pl"
 #define GG_APPMSG_PORT 80

@@ -23,22 +23,22 @@ INSTALACJA
     bêdzie IGNOROWANY. po co czytaæ listy od ludzi, którym nie chce siê
     nawet czytaæ do³±czonej dokumentacji.
 
-    ekg powinien dzia³aæ na wiêkszo¶ci popularnych dystrybucji Linuksa
-    (testowano na RedHacie, Slackware i PLD), OpenBSD i FreeBSD. uda³o
-    siê nawet go skompilowaæ z drobnymi poprawkami cygwinem, ale nie za
-    bardzo chcia³ chodziæ ;) na MacOS-ie wypada³oby uruchomiæ
-    ,,./configure --cc=cc'', ¿eby bez problemu siê skompilowa³o.
+    ekg powinien dzia³aæ na wiêkszo¶ci systemów un*xowych, jak Linux,
+    *BSD, SunOS, IRIX itp. je¶li uda Ci siê skompilowaæ go na jakim¶
+    egzotycznym systemie lub rzadko spotykanej architekturze, daj znaæ.
 
 U¯YCIE
 
     jest na tyle intuicyjne, ¿e nie powinno sprawiæ problemów (wszyscy
     betatesterzy poradzili sobie bez jakiejkolwiek dokumentacji).
-    interfejs jest podobny do ircii. dope³nianie tabem jest dostêpne
-    w wiêkszo¶ci komend. wysy³anie wiadomo¶ci komend± ,,msg'', rozmowa
-    komend± ,,chat''. informacje o ludzikach ,,find <numer/nick>''.
-    szukanie t± sam± komend±, ale z ró¿nymi parametrami. ,,help'' Twoim
-    przyjacielem. by wys³aæ kilkulinijkow± wiadomo¶æ, zamiast tre¶ci
-    wpisz ,,\'' (backslash). koñczy siê lini± z sam± kropk±.
+    interfejs jest podobny do ircii. dope³nianie tabem jest dostêpne w
+    wiêkszo¶ci komend. komendy mo¿na wywo³ywaæ skrótami, o ile s± one
+    jednoznaczne. wysy³anie wiadomo¶ci komend± ,,msg'', rozmowa komend±
+    ,,chat''. informacje o ludzikach ,,find <numer/nick>''. szukanie t±
+    sam± komend±, ale z ró¿nymi parametrami. ,,help'' Twoim przyjacielem.
+    je¶li dana komenda ma ró¿ne opcje, pomaga ,,help <komenda>''. by
+    wys³aæ kilkulinijkow± wiadomo¶æ, zamiast tre¶ci wpisz ,,\''
+    (backslash).  koñczy siê lini± z sam± kropk±.
 
 WYSY£ANIE SMSÓW
 

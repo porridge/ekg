@@ -73,41 +73,6 @@ static char *gg_urlencode(char *str)
 }
 
 /*
- * gg_get_line() // funkcja wewnêtrzna
- *
- * podaje kolejn± liniê z bufora tekstowego. psuje co bezpowrotnie, dziel±c
- * na kolejne stringi. zdarza siê, nie ma potrzeby pisania funkcji dubluj±cej
- * bufor ¿eby tylko mieæ nieruszone dane wej¶ciowe, skoro i tak nie bêd± nam
- * po¼niej potrzebne. obcina `\r\n'.
- *
- *  - ptr - wska¼nik do zmiennej, która przechowuje aktualn± pozycjê
- *    w przemiatanym buforze.
- *
- * wska¼nik do kolejnej linii tekstu lub NULL, je¶li to ju¿ koniec bufora.
- */
-static char *gg_get_line(char **ptr)
-{
-        char *foo, *res;
-
-        if (!ptr || !*ptr || !strcmp(*ptr, ""))
-                return NULL;
-
-        res = *ptr;
-
-        if (!(foo = strchr(*ptr, '\n')))
-                *ptr += strlen(*ptr);
-        else {
-                *ptr = foo + 1;
-                *foo = 0;
-		if (res[strlen(res) - 1] == '\r')
-			res[strlen(res) - 1] = 0;
-        }
-
-        return res;
-}
-
-
-/*
  * gg_search()
  *
  * rozpoczyna szukanie u¿ytkowników. informacje o tym, czego dok³adnie szukamy

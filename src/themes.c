@@ -447,6 +447,7 @@ void init_theme()
 	add_format("error_deleting", "%! Wyst±pi³ b³±d podczas usuwania u¿ytkownika\n", 1);
 	add_format("user_exists", "%! U¿ytkownik %W%1%n ju¿ istnieje w li¶cie kontaktów\n", 1);
 	add_format("help", "%> %1%2 - %3\n", 1);
+	add_format("help_more", "%) %1\n", 1);
 	add_format("generic", "%> %1\n", 1);
 	add_format("ignored_list", "%> %1\n", 1);
 	add_format("ignored_list_empty", "%! Lista ignorowanych u¿ytkowników jest pusta\n", 1);

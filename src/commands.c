@@ -75,7 +75,7 @@ int command_add(), command_away(), command_del(), command_alias(),
  */
 
 struct command commands[] = {
-	{ "add", "U?", command_add, " <numer> <alias>", "Dodaje u¿ytkownika do listy kontaktów", "" },
+	{ "add", "U??", command_add, " <numer> <alias> [opcje]", "Dodaje u¿ytkownika do listy kontaktów", "Opcje identyczne jak dla polecenia %Wmodify%n" },
 	{ "alias", "??", command_alias, " [opcje]", "Zarz±dzanie aliasami", "  --add <alias> <komenda>\n  --del <alias>\n  [--list]\n" },
 	{ "away", "", command_away, "", "Zmienia stan na zajêty", "" },
 	{ "back", "", command_away, "", "Zmienia stan na dostêpny", "" },
@@ -85,15 +85,15 @@ struct command commands[] = {
 	{ "del", "u", command_del, " <numer/alias>", "Usuwa u¿ytkownika z listy kontaktów", "" },
 	{ "disconnect", "", command_connect, "", "Roz³±cza siê z serwerem", "" },
 	{ "exec", "?", command_exec, " <polecenie>", "Uruchamia polecenie systemowe", "" },
-	{ "!", "?", command_exec, " <polecenie>", "Synonim dla exec", "" },
+	{ "!", "?", command_exec, " <polecenie>", "Synonim dla %Wexec%n", "" },
 	{ "find", "u", command_find, " [opcje]", "Interfejs do katalogu publicznego", "  --uin <numerek>\n  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>\n  --city <miasto>\n  --birth <min:max>\n  --phone <telefon>\n  --email <e-mail>\n  --active\n" },
 	{ "help", "c", command_help, " [polecenie]", "Wy¶wietla informacjê o poleceniach", "" },
-	{ "?", "c", command_help, " [polecenie]", "Synonim dla help", "" },
+	{ "?", "c", command_help, " [polecenie]", "Synonim dla %Whelp%n", "" },
 	{ "ignore", "u", command_ignore, " [numer/alias]", "Dodaje do listy ignorowanych lub j± wy¶wietla", "" },
 	{ "invisible", "", command_away, "", "Zmienia stan na niewidoczny", "" },
-	{ "list", "", command_list, "[opcje]", "Wy¶wietla listê kontaktów", "  --active\n  --busy\n  --inactive\n" },
+	{ "list", "", command_list, " [opcje]", "Wy¶wietla listê kontaktów", "  --active\n  --busy\n  --inactive\n" },
 	{ "msg", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ do podanego u¿ytkownika", "" },
-	{ "modify", "u", command_modify, " <alias> [opcje]", "Zmienia informacje w li¶cie kontaktów", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n --alias <alias>  // nazwa w li¶cie kontaktów\n  --phone <telefon>\n  --uin <numerek>\n" },
+	{ "modify", "u?", command_modify, " <alias> [opcje]", "Zmienia informacje w li¶cie kontaktów", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n  --alias <alias>  // nazwa w li¶cie kontaktów\n  --phone <telefon>\n  --uin <numerek>\n" },
 	{ "private", "", command_away, " [on/off]", "W³±cza/wy³±cza tryb ,,tylko dla przyjació³''", "" },
 	{ "save", "", command_save, "", "Zapisuje ustawienia programu", "" },
 	{ "set", "v?", command_set, " <zmienna> <warto¶æ>", "Wy¶wietla lub zmienia ustawienia", "" },
@@ -371,7 +371,7 @@ COMMAND(command_add)
 		return 0;
 	}
 
-	if (find_user(0, params[1])) {
+	if (find_user(atoi(params[0]), params[1])) {
 		my_printf("user_exists", params[1]);
 		return 0;
 	}
@@ -382,11 +382,16 @@ COMMAND(command_add)
 	}
 
 	if (!add_user(uin, params[1])) {
-		my_printf("user_added", format_user(uin));
+		my_printf("user_added", params[1]);
 		gg_add_notify(sess, uin);
 		config_changed = 1;
 	} else
 		my_printf("error_adding");
+
+	if (params[2]) {
+		params++;
+		command_modify("add", params);
+	}
 
 	return 0;
 }
@@ -666,22 +671,24 @@ COMMAND(command_modify)
 	uin_t uin;
 	int i;
 
-	if (!params[0] || !(argv = split_params(params[0], -1)) || !argv[0]) {
+	if (!params[0]) {
 		my_printf("not_enough_params");
 		return 0;
 	}
 
-	if (!(uin = get_uin(argv[0])) || !(u = find_user(uin, NULL))) {
-		my_printf("user_not_found", argv[0]);
+	if (!(uin = get_uin(params[0])) || !(u = find_user(uin, NULL))) {
+		my_printf("user_not_found", params[0]);
 		return 0;
 	}
 
-	if (!argv[1]) {
+	if (!params[1]) {
 		my_printf("user_info", u->first_name, u->last_name, u->nickname, u->comment, u->mobile, u->group);
 		return 0;
+	} else {
+		argv = split_params(params[1], -1);
 	}
 
-	for (i = 1; argv[i]; i++) {
+	for (i = 0; argv[i]; i++) {
 		if (argv[i][0] == '-' && argv[i][1] == '-')
 			argv[i]++;
 		if (!strncmp(argv[i], "-f", 2) && argv[i + 1]) {
@@ -713,7 +720,8 @@ COMMAND(command_modify)
 			u->uin = strtol(argv[++i], NULL, 0);
 	}
 
-	my_printf("modify_done", argv[0]);
+	if (strcasecmp(name, "add"))
+		my_printf("modify_done", params[0]);
 
 	config_changed = 1;
 
@@ -728,7 +736,20 @@ COMMAND(command_help)
 		for (c = commands; c->name; c++)
 			if (!strcasecmp(c->name, params[0])) {
 				my_printf("help", c->name, c->params_help, c->brief_help);
-				my_printf("none", c->long_help);
+				if (c->long_help && strcmp(c->long_help, "")) {
+					char *foo, *tmp, *plumk, *bar = strdup(c->long_help);
+
+					if ((foo = bar)) {
+						while ((tmp = gg_get_line(&foo))) {
+							plumk = format_string(tmp);
+							if (plumk) {
+								my_printf("help_more", plumk);
+								free(plumk);
+							}
+						}
+						free(bar);
+					}
+				}
 
 				return 0;
 			}
