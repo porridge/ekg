@@ -585,7 +585,7 @@ const char *format_user(uin_t uin)
 	struct userlist *u = userlist_find(uin, NULL);
 	static char buf[100], *tmp;
 	
-	if (!u)
+	if (!u || !u->display)
 		tmp = format_string(format_find("unknown_user"), itoa(uin));
 	else
 		tmp = format_string(format_find("known_user"), u->display, itoa(uin));
