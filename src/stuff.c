@@ -3428,6 +3428,8 @@ void update_status_myip()
 		return;
 	
 	if (config_dcc && config_dcc_ip) {
+		list_t l;
+
 		if (strcmp(config_dcc_ip, "auto"))
 			u->ip.s_addr = inet_addr(config_dcc_ip);
 		else {
@@ -3440,7 +3442,16 @@ void update_status_myip()
 			u->ip.s_addr = foo.sin_addr.s_addr; 
 		}
 
-		u->port = 1550;
+		u->port = 0;
+
+		for (l = watches; l; l = l->next) {
+			struct gg_dcc *d = l->data;
+
+			if (d->type == GG_SESSION_DCC_SOCKET) {
+				u->port = d->port;
+				break;
+			}
+		}
 
 	} else {
 fail:
