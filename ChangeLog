@@ -18,6 +18,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - brakuj±ce sent_line_first (dawjar/w)
 - usuniêcie kilku drobnych leaków (w)
 - ekg pyta siê o zapisanie konfiguracji, nie ui (Arim/w)
+- Ctrl-Fx zmienia okno na konsoli FreeBSD (cukier/w)
 	
 // 2002-09-06
 

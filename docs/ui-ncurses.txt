@@ -4,9 +4,10 @@
 interfejs ten ró¿ni siê nieco od readline z okienkami. g³ówn± ró¿nic± jest
 fakt, ¿e pierwsze okienko istnieje _zawsze_ i jest oknem stanu. do niego
 lec± informacje o pojawianiu siê i znikaniu ludzi. do kolejnych okien
-przechodzi siê klawiszem Alt-<numer> lub Esc, potem cyfra. mo¿na te¿
-przej¶æ komend± ,,window switch <numer>''. okna zamyka siê klawiszem Alt-k
-lub Esc, k, albo komend± ,,window kill [numer]''.
+przechodzi siê klawiszem Alt-<numer> lub Esc, potem cyfra, lub klawiszami
+Ctrl-F1 do Ctrl-F12 na konsoli FreeBSD. mo¿na te¿ przej¶æ komend± ,,window
+switch <numer>''. okna zamyka siê klawiszem Alt-k lub Esc, k, albo komend±
+,,window kill [numer]''.
 
 zalecane ustawienia:
 

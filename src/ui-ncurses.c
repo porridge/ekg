@@ -995,6 +995,14 @@ static void ui_ncurses_loop()
 			case 27:
 				ch = wgetch(input);
 
+				/* obs³uga Ctrl-F1 - Ctrl-F12 na FreeBSD */
+				if (ch == '[') {
+					ch = wgetch(input);
+					if (ch >= 107 && ch <= 118)
+						window_switch(ch - 106);
+					break;
+				}
+				
 				if (ch >= '1' && ch <= '9')
 					window_switch(ch - '1' + 1);
 				else if (ch == '0')
