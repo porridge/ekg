@@ -30,8 +30,16 @@ ekg po otrzymaniu w wiadomo¶ci klucza publicznego (to znaczy wiadomo¶ci
 zaczynaj±cej siê od ,,-----BEGIN RSA PUBLIC KEY-----'') zapisze go jako
 klucz nadawcy. 
 
-brakuje sensownej obs³ugi kluczy publicznej, zarz±dzania nimi itd. no i
-przyda³oby siê przepisaæ sim.c od zera.
+by usun±æ klucz danej osoby, nale¿y wykonaæ polecenie:
+
+	_keydel <numer/alias>
+
+by wys³aæ do danej osoby swój klucz publiczny nale¿y wykonaæ:
+
+	_keysend <numer/alias>
+
+w przysz³o¶ci komendy zaczynaj±ce siê od ,,_key'' zostan± zgrupowane w
+jedno polecenie do zarz±dzania kluczami.
 
 
 $Id$

@@ -344,6 +344,8 @@ void handle_msg(struct gg_event *e)
 		fprintf(f, "%s", e->event.msg.message);
 		fclose(f);
 
+		SIM_KC_Free(SIM_KC_Find(e->event.msg.sender));
+
 		return;
 	}
 

@@ -1113,5 +1113,6 @@ void theme_init()
 	/* szyfrowanie */
 	format_add("public_key_received", "%> %1 wys³a³ swój klucz publiczny\n", 1);
 	format_add("public_key_write_failed", "%! Nie uda³o siê zapisaæ klucza publicznego: %1\n", 1);
-
+	format_add("public_key_not_found", "%! Nie znaleziono klucza publicznego %1\n", 1);
+	format_add("public_key_deleted", "%! Klucz publiczny %1 zosta³ usuniêty\n", 1);
 };

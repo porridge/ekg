@@ -1884,6 +1884,73 @@ COMMAND(cmd_test_keygen)
 
 	print("generic", "Wygenerowano i zapisano klucze");
 }
+
+COMMAND(cmd_test_keysend)
+{
+	string_t s = string_init(NULL);
+	char *tmp, buf[128];
+	uin_t uin;
+	FILE *f;
+	
+	if (!params[0]) {
+		print("not_enough_params", name);
+		return;
+	}
+
+	if (!(uin = get_uin(params[0]))) {
+		print("user_not_found", params[0]);
+		return;
+	}
+
+	if (!sess || sess->state != GG_STATE_CONNECTED) {
+		print("not_connected");
+		return;
+	}
+
+	tmp = saprintf("%s/%d.pem", prepare_path("keys", 0), config_uin);
+	f = fopen(tmp, "r");
+	xfree(tmp);
+
+	if (!f) {
+		print("public_key_not_found", format_user(config_uin));
+		return;
+	}
+
+	while (fgets(buf, sizeof(buf), f))
+		string_append(s, buf);
+
+	fclose(f);
+
+	gg_send_message(sess, GG_CLASS_MSG, uin, s->str);
+
+	string_free(s, 1);
+}
+
+COMMAND(cmd_test_keydel)
+{
+	char *tmp;
+	uin_t uin;
+
+	if (!params[0]) {
+		print("not_enough_params", name);
+		return;
+	}
+
+	if (!(uin = get_uin(params[0]))) {
+		print("user_not_found", params[0]);
+		return;
+	}
+	
+	tmp = saprintf("%s/%d.pem", prepare_path("keys", 0), uin);
+	if (unlink(tmp) == -1)
+		print("public_key_not_found", format_user(uin));
+	else
+		print("public_key_deleted", format_user(uin));
+	xfree(tmp);
+
+	SIM_KC_Free(SIM_KC_Find(uin));
+}
+
 #endif
 
 COMMAND(cmd_test_debug)
@@ -3116,8 +3183,14 @@ void command_init()
 	  "wy¶wietla tekst", "");
 #ifdef HAVE_OPENSSL
 	command_add
-	( "_keygen", "<ilo¶æ-bitów>", cmd_test_keygen, 0, "",
+	( "_keygen", "?", cmd_test_keygen, 0, " <ilo¶æ-bitów>",
 	  "generuje parê kluczy", "");
+	command_add
+	( "_keysend", "u", cmd_test_keysend, 0, " <numer/alias>",
+	  "wysy³a klucz publiczny do danej osoby", "");
+	command_add
+	( "_keydel", "u", cmd_test_keydel, 0, " <numer/alias>",
+	  "usuwa klucz publiczny danej osoby", "");
 #endif
 #ifdef WITH_PYTHON
 	command_add
