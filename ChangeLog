@@ -12,6 +12,7 @@ zg³osi³ b³±d.
 - poprawka zawijania wiadomo¶ci przy niestandardowych timestampach (mp/o)
 - ekg nie wysy³a ju¿ niepotrzebnie zmiany stanu po zalogowaniu, dziêki
   czemu Kadu nie wykrywa niewidzialno¶ci (scooty/w)
+- poprawka tajemniczego b³êdu 'handle_command_line' w pythonie (sznik,sz/w)
 
 // 2003-04-06
 

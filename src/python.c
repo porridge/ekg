@@ -449,6 +449,8 @@ int python_load(const char *name)
 	m.handle_keypress = python_get_func(module, "handle_keypress");
 	m.handle_command_line = python_get_func(module, "handle_command_line");
 
+	PyErr_Clear();
+
 	list_add(&modules, &m, sizeof(m));
 	
 	xfree(name2);
