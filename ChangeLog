@@ -21,6 +21,8 @@ zg³osi³ b³±d.
 - libgadu: dodanie makra GG_S_BL() (w)
 - libgadu: podbicie wersji API do 2.9 (w)
 - dokoñczenie kilku zapomnianych rzeczy w /list (sz/w)
+- eksperymentalne wprowadzenie ,,make dep''. mam nadziejê, ¿e na egzotycznych
+  systemach nie bêdzie sprawiaæ problemów (w)
 
 // 2003-01-03
 

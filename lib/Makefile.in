@@ -23,18 +23,19 @@ LN_S = @LN_S@
 
 OBJS = common.o libgadu.o search.o pubdir.o http.o dcc.o userlist.o events.o
 LOBJS = common.lo libgadu.lo search.lo pubdir.lo http.lo dcc.lo userlist.lo events.lo
+SRCS = $(OBJS:.o=.c)
 
 SHAREDMM = libgadu.so
 SHAREDM = $(SHAREDMM).$(VERSION_MAJOR)
 SHARED = $(SHAREDM).$(VERSION_MINOR)
 STATIC = libgadu.a
 
-all:	@static@ @shared@
+all:	dep @static@ @shared@
 
 #
 
 clean:
-	rm -f *.o *.lo *.a *.so *.so.* *~ core
+	rm -f *.o *.lo *.a *.so *.so.* *~ core .depend
 
 distclean:	clean
 	rm -f Makefile libgadu-config.h libgadu.pc
@@ -61,6 +62,11 @@ $(SHARED): $(LOBJS)
 
 #
 
+dep:
+	$(CC) -MM $(CFLAGS) $(SRCS) 1> .depend
+
+#
+
 install: @install_shared@ @install_static@
 
 install-common:
@@ -81,4 +87,10 @@ install-static:	install-common
 
 strip-libgadu-so:
 	$(STRIP) $(SHARED)
+
+#
+
+ifneq ($(wildcard .depend),)
+include .depend
+endif
 

@@ -4,3 +4,4 @@ so_locations
 libgadu.pc
 libgadu-config.h
 *.lo
+.depend

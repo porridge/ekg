@@ -18,16 +18,20 @@ INSTALL = @INSTALL@
 STRIP = @STRIP@
 
 OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o ekg.o xmalloc.o mail.o msgqueue.o @OBJS@ ui-batch.o ui-none.o ui-automaton.o
+SRCS = $(OBJS:.o=.c)
 
 #
 
-all:	ekg @ioctld@
+all:	dep ekg @ioctld@
 
 ekg:	$(OBJS)
 	$(CC) $(CFLAGS) -o ekg $(OBJS) -L../lib $(LDFLAGS) $(LIBS) @lgadu@
 
 ioctld:	ioctld.c
 	$(CC) $(CFLAGS) ioctld.c -o ioctld $(LIBS)
+
+dep:
+	$(CC) -MM $(CFLAGS) $(SRCS) 1> .depend
 
 #
 
@@ -50,9 +54,14 @@ strip-ioctld:
 #
 
 clean:
-	rm -f *.o ekg ioctld search core 
+	rm -f *.o ekg ioctld search core .depend
 
 distclean:	clean
 	rm -f *~ Makefile
 
+#
+
+ifneq ($(wildcard .depend),)
+include .depend
+endif
 

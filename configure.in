@@ -53,6 +53,7 @@ AC_SUBST(install_ekg, "")
 AC_SUBST(clean_ekg, "")
 AC_SUBST(distclean_ekg, "")
 AC_SUBST(uninstall_ekg, "")
+AC_SUBST(dep_ekg, "")
 
 AC_SUBST(make_ekgwap, "")
 AC_SUBST(install_ekgwap, "")
@@ -382,8 +383,7 @@ dnl   fi
     lib_static_default=no
     lgadu="-lgadu"
   else
-    OBJS="$OBJS ../lib/libgadu.a"
-    lgadu=""
+    lgadu="../lib/libgadu.a"
     lib_shared_default=no
     lib_static_default=yes
   fi
@@ -392,6 +392,7 @@ dnl   fi
   clean_ekg="clean-ekg"
   distclean_ekg="distclean-ekg"
   uninstall_ekg="uninstall-ekg"
+  dep_ekg="dep-ekg"
 
 dnl </ekg>
 

@@ -6,3 +6,4 @@ ioctld
 *.rej
 .DS_Store
 vekg
+.depend

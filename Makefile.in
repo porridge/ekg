@@ -30,6 +30,16 @@ examples:
 
 #
 
+dep:	dep-libgadu @dep_ekg@
+
+dep-libgadu:
+	cd lib && $(MAKE) dep
+
+dep-ekg:
+	cd src && $(MAKE) dep
+
+#
+
 configure:	configure.in m4/*
 	./autogen.sh
 
