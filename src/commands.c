@@ -3526,7 +3526,6 @@ COMMAND(cmd_reload)
 	if (res != -1) {
 		printq("config_read_success", (res != -2 && filename) ? filename : prepare_path("config", 0));
 		config_changed = 0;
-		update_status();
 	}
 
 	return res;
