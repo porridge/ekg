@@ -755,22 +755,25 @@ static int ekg_ui_set(const char *name)
 	if (!name)
 		return 0;
 
-	if (!strcasecmp(optarg, "none"))
+	if (!strcasecmp(name, "none"))
 		ui_init = ui_none_init;
-	else if (!strcasecmp(optarg, "batch"))
+	else if (!strcasecmp(name, "batch"))
 		ui_init = ui_batch_init;
-	else if (!strcasecmp(optarg, "automaton"))
+	else if (!strcasecmp(name, "automaton"))
 		ui_init = ui_automaton_init;
 #ifdef WITH_UI_READLINE
-	else if (!strcasecmp(optarg, "readline"))
+	else if (!strcasecmp(name, "readline"))
 		ui_init = ui_readline_init;
 #endif
 #ifdef WITH_UI_NCURSES
-	else if (!strcasecmp(optarg, "ncurses"))
+	else if (!strcasecmp(name, "ncurses"))
 		ui_init = ui_ncurses_init;
 #endif
 	else
 		return -1;
+
+	xfree(config_interface);
+	config_interface = xstrdup(name);
 
 	return 0;
 }
@@ -951,6 +954,13 @@ int main(int argc, char **argv)
 	variable_init();
 	config_profile = new_profile;
 
+	if (!ui_set) {
+		config_read(NULL, "interface");
+		if (config_interface && strcmp(config_interface, ""))
+			ekg_ui_set(config_interface);
+
+	}
+
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
 		setup_debug();
@@ -974,7 +984,8 @@ int main(int argc, char **argv)
 	ui_screen_height = getenv("LINES") ? atoi(getenv("LINES")) : 24;
 
 #ifdef WITH_UI_NCURSES
-	config_read(NULL, "display_transparent");
+	if (ui_init == ui_ncurses_init)
+		config_read(NULL, "display_transparent");
 #endif
 
 	ui_init();

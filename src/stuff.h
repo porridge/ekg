@@ -202,6 +202,7 @@ char *config_email;
 int config_emoticons;
 int config_encryption;
 int config_enter_scrolls;
+char *config_interface;
 int config_header_size;
 int config_keep_reason;
 int config_last;

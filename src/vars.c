@@ -196,6 +196,7 @@ void variable_init()
 	variable_add("status", "st", VAR_INT, 2, &config_status, NULL, NULL, NULL);
 	variable_add("protocol", "pR", VAR_INT, 2, &config_protocol, NULL, NULL, NULL);
 	variable_add("reason", "re", VAR_STR, 2, &config_reason, NULL, NULL, NULL);
+	variable_add("interface", "in", VAR_STR, 2, &config_interface, NULL, NULL, NULL);
 }
 
 /*
@@ -450,7 +451,8 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 			if (v->notify)
 				(v->notify)(v->name);
 
-			ui_event("variable_changed", v->name);
+			if (ui_event)
+				ui_event("variable_changed", v->name);
 
 			return 0;
 		}

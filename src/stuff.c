@@ -1092,12 +1092,17 @@ int config_read(const char *filename, const char *var)
 			continue;
 		}
 
-		if (!(foo = strchr(buf, ' ')) || (var && strcmp(buf, var))) {
+		if (!(foo = strchr(buf, ' '))) {
 			xfree(buf);
 			continue;
 		}
 
 		*foo++ = 0;
+
+		if (var && strcmp(buf, var)) {
+			xfree(buf);
+			continue;
+		}
 
 		if (!strcasecmp(buf, "set")) {
 			char *bar;
