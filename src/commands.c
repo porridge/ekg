@@ -2331,25 +2331,68 @@ COMMAND(cmd_remind)
 	list_add(&watches, h, 0); 
 }
 
+static int count_params(const char **params) {
+	int count = 0;
+
+	while (*(params++))
+		count++;
+
+	return count;
+}
+
 COMMAND(cmd_query)
 {
+	/* XXX bardzo brzydkie, ale musimy mieæ mo¿liwo¶æ zmiany params */
+	const char **tmp = params;
+	char **p = (char **) xmalloc(count_params(params) * sizeof(char *));
+	int i = 0;
+
+	while (*tmp) {
+		p[i] = (char *)params[i];
+		i++;
+		tmp++;
+	}
+
 	if (params[0] && (params[0][0] == '@' || strchr(params[0], ','))) {
 		struct conference *c = conference_create(params[0]);
 		
-		if (c)
-			ui_event("command", "query", c->name, NULL);
-		else
-			return;
+		if (!c)
+			goto cleanup;
+
+		ui_event("command", "query", c->name, NULL);
+
+		xfree(p[0]);
+		p[0] = xstrdup(c->name);
+
 	} else {
-		if (params[0] && !get_uin(params[0])) {
-			print("user_not_found", params[0]);
-			return;
-		} else
-			ui_event("command", "query", params[0], NULL);
+		if (params[0] && params[0][0] == '#') {
+			struct conference *c = conference_find(params[0]);
+
+			if (!c) {
+				print("conferences_noexist", params[0]);
+				goto cleanup;
+			}
+		
+			ui_event("command", "query", c->name, NULL);
+
+			xfree(p[0]);
+			p[0] = xstrdup(c->name);
+
+		} else {
+
+			if (params[0] && !get_uin(params[0])) {
+				print("user_not_found", params[0]);
+				goto cleanup;
+			} else
+				ui_event("command", "query", params[0], NULL);
+		}
 	}
 		
 	if (params[0] && params[1])
-		cmd_msg("chat", params);
+		cmd_msg("chat", (const char **)p);
+
+cleanup:
+	xfree(p);
 }
 
 COMMAND(cmd_on)
@@ -2896,8 +2939,8 @@ COMMAND(cmd_last)
 				st = localtime(&ll->sent_time);
 				strftime(buf2, sizeof(buf2), format_find((ll->sent_time / 86400 == time(NULL) / 86400) ? "last_list_timestamp_today" : "last_list_timestamp"), st);
 
-				strlcat(buf, "/", sizeof(buf));
-				strlcat(buf, buf2, sizeof(buf));
+				strncat(buf, "/", sizeof(buf) - strlen(buf) - 1);
+				strncat(buf, buf2, sizeof(buf) - strlen(buf) - 1);
 			}
 
 			if (config_last & 4 && ll->type == 1)
