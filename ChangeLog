@@ -9,6 +9,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - poprawiony segfault w okienkach (d)
 - lekko zmodyfikowane funkcje window_0X (d)
+- drobna poprawka od¶wie¿ania przy ,,window_switch()'' (d)
 
 // 2002-07-04
 

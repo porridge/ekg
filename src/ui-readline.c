@@ -821,6 +821,8 @@ static int window_switch(int id)
                         windows = tmp;
 #ifdef HAVE_RL_SET_PROMPT
 			rl_set_prompt(current_prompt());
+#else /*#elif HAVE_RL_EXPAND_PROMPT*/
+			rl_expand_prompt(current_prompt());
 #endif
                         return 0;
                 }
