@@ -56,7 +56,7 @@ static int window_switch(int id);
 static int window_refresh();
 static int window_write(int id, const char *line);
 static int window_clear();
-static int windows_sort();
+static int window_sort();
 static int window_query_id(const char *qnick);
 static void window_list();
 static int window_make_query(const char *nick);
@@ -423,7 +423,7 @@ static void ui_readline_print(const char *target, const char *line)
 
         if ((win->query_nick && target && !strcmp(win->query_nick, target)))
                 win_id = 0;
-        else if (windows_count >1)
+        else if (windows_count > 1)
                 win_id = window_query_id(target);
 
 	if (config_make_window > 0 && win_id < 0 && windows_count < MAX_WINDOWS && strncmp(target, "__", 2))
@@ -906,7 +906,7 @@ static int window_del(int id)
                 if (w->id == id) {
                         print("window_del");
                         list_remove(&windows, w, 1);
-                        windows_sort();
+                        window_sort();
                         windows_count--;
                         if (curr_window == id)
                                 window_switch((id > 1 || curr_window > windows_count) ? id-1 : 1);
@@ -1015,22 +1015,26 @@ static int window_clear()
         return 0;
 }
 
-static int windows_sort()
+static int window_sort()
 {
         list_t l;
         int id = 1, new_id = 0;
+	struct window *new_win = NULL;
 
         for (l = windows; l; l = l->next) {
                 struct window *w = l->data;
 
-		if (w->id == curr_window)
+		if (w->id == curr_window) {
+			new_win = w;
 			new_id = id;
+		}
 
                 w->id = id++;
         }
 
-	if (new_id) {
+	if (new_id && new_win) {
 		curr_window = new_id;
+		win = new_win;
 		window_refresh();
 	}
         
