@@ -102,7 +102,7 @@ struct command commands[] = {
 	{ "invisible", "", command_away, "", "Zmienia stan na niewidoczny", "" },
 	{ "list", "", command_list, " [opcje]", "Wy¶wietla listê kontaktów", "  --active\n  --busy\n  --inactive\n" },
 	{ "msg", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ do podanego u¿ytkownika", "" },
-	{ "modify", "u?", command_modify, " <alias> [opcje]", "Zmienia informacje w li¶cie kontaktów", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n  --alias <alias>  // nazwa w li¶cie kontaktów\n  --phone <telefon>\n  --uin <numerek>\n" },
+	{ "modify", "u?", command_modify, " <alias> [opcje]", "Zmienia informacje w li¶cie kontaktów", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n  --alias <alias>  // nazwa w li¶cie kontaktów\n  --phone <telefon>\n  --uin <numerek>\n  \n  --group <grupa>" },
 	{ "passwd", "??", command_passwd, " <has³o> <e-mail>", "Zmienia has³o i adres e-mail u¿ytkownika", "" },
 	{ "private", "", command_away, " [on/off]", "W³±cza/wy³±cza tryb ,,tylko dla przyjació³''", "" },
 	{ "query", "u", command_query, " <numer/alias>", "W³±cza rozmowê z dan± osob±", "" },

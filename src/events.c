@@ -137,7 +137,9 @@ void handle_msg(struct gg_event *e)
 	char sender[100];
 	struct tm *tm;
 	char czas[100];
-
+	
+	if (!e->event.msg.message)
+		return;
 	
 	if (is_ignored(e->event.msg.sender)) {
 		if (log_ignored) {
@@ -329,6 +331,7 @@ void handle_failure(struct gg_event *e)
 {
 	my_printf("conn_failed", strerror(errno));
 	list_remove(&watches, sess, 0);
+	gg_logoff(sess);
 	gg_free_session(sess);
 	sess = NULL;
 	do_reconnect();

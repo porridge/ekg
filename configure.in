@@ -38,6 +38,11 @@ fi
 
 AC_CHECK_READLINE
 
+if test "x$READLINE_LIBS" = "x"; then
+    AC_MSG_RESULT([not found])
+    AC_MSG_ERROR([You need both readline and readline-devel packages.])
+fi
+
 SAVE_LIBS="$LIBS"
 LIBS="$LIBS $READLINE_LIBS"
 

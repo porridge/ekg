@@ -502,7 +502,7 @@ void gg_debug(int level, char *format, ...);
 char *gg_alloc_sprintf(char *format, ...);
 char *gg_get_line(char **ptr);
 int gg_connect(void *addr, int port, int async);
-void gg_read_line(int sock, char *buf, int length);
+char *gg_read_line(int sock, char *buf, int length);
 void gg_chomp(char *line);
 char *gg_urlencode(char *str);
 int gg_http_hash(char *format, ...);

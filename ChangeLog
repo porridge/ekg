@@ -5,6 +5,13 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-01-22
+
+- dodane ,,--group'' w helpie do ,,modify'' (adaml/w)
+- poprawka obs³uga wielolinijkowych sysmsg (jajcus@bnet.pl/w)
+- zamykanie po³±czenia jeszcze raz dla pewno¶ci po nieudanym po³±czeniu (jam/w)
+- wywala b³±d w przypadku braku readline{,-devel} (leszek@php.net/w)
+
 // 2002-01-17 
 
 - poprawka base64 na !linux'owych systemach ;>>> (p/kfazi)
