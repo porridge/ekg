@@ -1012,14 +1012,7 @@ static int ui_readline_event(const char *event, ...)
 		struct timer *t = timer_add(config_check_mail_frequency, "check-mail-time", "check_mail");
 
 		t->ui = 1;
-
-		if (count && count > last_mail_count) {
-			print((count == 1) ? "new_mail_one" : "new_mail_more", itoa(count));
-			if (config_beep && config_beep_mail)
-				ui_beep();
-		}
-
-		last_mail_count = count;
+		check_mail();
 	}
 
 cleanup:

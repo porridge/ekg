@@ -49,22 +49,14 @@ int last_mail_count = 0;
 /*
  * check_mail()
  *
- * zwraca liczbê nowych wiadomo¶ci. je¶li trzeba, to
- * czyni odpowiednie kroki, aby uaktualniæ licznik 
- * nowych wiadomo¶ci.
+ * wywo³uje odpowiednie sprawdzanie poczty.
  */
 int check_mail()
 {
-	static time_t last_check = 0;
 	char **folders = NULL;
 	
 	if (!config_check_mail)
-		return 0;
-
-	if (last_check && last_check + config_check_mail_frequency >= time(NULL))
-		return mail_count;
-
-	last_check = time(NULL);
+		return -1;
 
 	if (config_check_mail_folders) {
 		int i;
@@ -90,7 +82,7 @@ int check_mail()
 			if (!pw) {
 				if (folders)
 					array_free(folders);
-				return 0;
+				return -1;
 			}
 
 			/* oby¶my trafili w dobre miejsce... */
@@ -112,7 +104,29 @@ int check_mail()
 	if (folders)
 		array_free(folders);
 
-	return mail_count;
+	return 0;
+}
+
+/*
+ * check_mail_update()
+ *
+ * modyfikuje liczbê nowych emaili i daje o tym znaæ.
+ */
+int check_mail_update(int update)
+{
+	if (update == mail_count)
+		return -1;
+
+	last_mail_count = mail_count;
+	mail_count = update;
+
+	if (mail_count && mail_count > last_mail_count) {
+		print((mail_count == 1) ? "new_mail_one" : "new_mail_more", itoa(mail_count));
+		if (config_beep && config_beep_mail)
+			ui_beep();
+	}
+
+	return 0;
 }
 
 /*
@@ -317,7 +331,7 @@ int check_mail_maildir(const char **folders)
 /*
  * changed_check_mail()
  *
- * wywo³ywane przy zmianie zmiennej check_mail
+ * wywo³ywane przy zmianie zmiennej check_mail.
  */
 void changed_check_mail(const char *var)
 {
