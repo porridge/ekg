@@ -2942,7 +2942,6 @@ static void complete(int *line_start, int *line_index)
 
 					for (j = 0; completions && completions[j]; j++) {
 						string_t s;
-						const char *p;
 
 						if (!strchr(completions[j], '"') && !strchr(completions[j], '\\') && !strchr(completions[j], ' '))
 							continue;
