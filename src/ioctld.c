@@ -177,7 +177,7 @@ int main(int argc, char **argv)
 		exit(1);
 
 	addr.sun_family = AF_UNIX;
-	strlcpy(addr.sun_path, sock_path, sizeof(add.sun_path));
+	strlcpy(addr.sun_path, sock_path, sizeof(addr.sun_path));
 	length = sizeof(addr);
 
 	if (bind(sock, (struct sockaddr *)&addr, length) == -1) 
