@@ -333,6 +333,7 @@ void ekg_wait_for_key()
 						print("conn_timeout");
 						list_remove(&watches, s, 0);
 						gg_free_session(s);
+						userlist_clear_status();
 						sess = NULL;
 						do_reconnect();
 						break;
@@ -505,6 +506,7 @@ static void sighup_handler()
 		ekg_logoff(sess, NULL);
 		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
+		userlist_clear_status();
 		sess = NULL;
 	}
 	
