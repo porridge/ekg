@@ -2867,6 +2867,7 @@ int msg_encrypt(uin_t uin, unsigned char **msg)
 			gg_debug(GG_DEBUG_MISC, "// simlite encrypted: %s\n", res);
 			return 1;
 		}
+		gg_debug(GG_DEBUG_MISC, "// simlite encryption error: %s\n", sim_strerror(sim_errno));
 		return 0;
 	}
 #else

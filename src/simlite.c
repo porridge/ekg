@@ -2,6 +2,7 @@
 
 /*
  *  (C) Copyright 2003 Wojtek Kaniewski <wojtekka@irc.pl>
+ *                     Piotr Domagalski <szalik@szalik.net>
  *
  *  Idea and concept from SIM by Michal J. Kubski available at
  *  http://gg.wha.la/crypt/. Original source code can be found
@@ -23,6 +24,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <openssl/bio.h>
 #include <openssl/evp.h>
@@ -33,6 +35,8 @@
 #include <openssl/sha.h>
 
 #include "simlite.h"
+
+#include "libgadu.h"
 
 char *sim_key_path = NULL;
 int sim_errno = 0;
@@ -232,6 +236,28 @@ const char *sim_strerror(int error)
 }
 
 /*
+ * sim_seed_prng()
+ */
+static int sim_seed_prng()
+{
+	char rubbish[512];
+	struct {
+		time_t time;
+		void * foo;
+		void * foo2;
+	} data;
+
+	data.time = time(NULL);
+	data.foo = (void *) &data;
+	data.foo2 = (void *) &rubbish;
+
+	RAND_seed((const void *) &data, sizeof(data));
+	RAND_seed((const void *) &rubbish, sizeof(rubbish));
+
+	return sizeof(data) + sizeof(rubbish);
+}
+
+/*
  * sim_message_encrypt()
  *
  * szyfruje wiadomo¶æ przeznaczon± dla podanej osoby, zwracaj±c jej
@@ -259,6 +285,10 @@ char *sim_message_encrypt(const unsigned char *message, uint32_t uin)
 		goto cleanup;
 	}
 
+	/* trzeba nakarmiæ potwora? */
+	if (!RAND_status())
+		sim_seed_prng();
+
 	/* wylosuj klucz symetryczny */
 	if (RAND_bytes(bf_key, sizeof(bf_key)) != 1) {
 		sim_errno = SIM_ERROR_RAND;
@@ -273,7 +303,7 @@ char *sim_message_encrypt(const unsigned char *message, uint32_t uin)
 
 	/* przygotuj zawarto¶æ pakietu do szyfrowania blowfishem */
 	memset(&head, 0, sizeof(head));
-	head.magic = SIM_MAGIC_V1;
+	head.magic = gg_fix16(SIM_MAGIC_V1);
 
 	if (RAND_bytes(head.init, sizeof(head.init)) != 1) {
 		sim_errno = SIM_ERROR_RAND;
@@ -415,7 +445,7 @@ char *sim_message_decrypt(const unsigned char *message, uint32_t uin)
 
 	memcpy(&head, data, sizeof(head));
 
-	if (head.magic != SIM_MAGIC_V1) {
+	if (head.magic != gg_fix16(SIM_MAGIC_V1)) {
 		sim_errno = SIM_ERROR_MAGIC;
 		goto cleanup;
 	}

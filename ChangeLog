@@ -6,6 +6,11 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-02-25
+
+- poprawki sim oraz simlite: ¿eby dzia³a³y dobrze na maszynach
+  bigendianowych oraz tam, gdzie nie ma /dev/urandom (sz)
+
 // 2003-02-24
 
 - pozbycie siê kosmicznych warningów (sz)

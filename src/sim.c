@@ -1,6 +1,7 @@
 /*
  *
- *    (C) Copyright 2002 Michal J. Kubski, Wojtek Kaniewski
+ *    (C) Copyright 2002-2003 Michal J. Kubski, Wojtek Kaniewski
+ *                                              Piotr Domagalski
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License Version
@@ -15,6 +16,9 @@
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
+ *  2003-02-25 szalik:
+ *   - dodanie sim_seed_prng(),
+ *   - poprawne dzia³anie na maszynach bigendianowych.
  *
  *  2002-10-17 wojtekka:
  *   - usuniêcie ostrze¿eñ o niezainicjowanych zmiennych,
@@ -36,6 +40,7 @@
 
 #include "sim.h"
 
+#include "libgadu.h"
 
 
 /* path to key files */
@@ -43,6 +48,25 @@ char SIM_Key_Path[255];
 
 /* 'not encrypted' string */
 char SIM_Not_Encrypted[255];
+
+static int sim_seed_prng()
+{
+	char rubbish[512];
+	struct {
+		time_t time;
+		void * foo;
+		void * foo2;
+	} data;
+
+	data.time = time(NULL);
+	data.foo = (void *) &data;
+	data.foo2 = (void *) &rubbish;
+
+	RAND_seed((const void *) &data, sizeof(data));
+	RAND_seed((const void *) &rubbish, sizeof(rubbish));
+
+	return sizeof(data) + sizeof(rubbish);
+}
 
 /*
  * 
@@ -424,10 +448,12 @@ int SIM_Message_Encrypt(unsigned char *in, unsigned char *out, int inlen,
 	SIM_KC_Add(item);
     }
 
-    msg.magicnumber = SIM_MAGICNUMBER_V1;
+    msg.magicnumber = gg_fix16(SIM_MAGICNUMBER_V1);
     msg.flags = 0;
 
-    /* should be seeded somewhere!!! */
+    if (!RAND_status())
+	sim_seed_prng();
+
     msg.init = (unsigned char *) OPENSSL_malloc(SIM_SYMMETRIC_BLOCKSIZE);
     RAND_bytes(msg.init, SIM_SYMMETRIC_BLOCKSIZE);
 
@@ -534,7 +560,7 @@ int SIM_Message_Decrypt(unsigned char *in, unsigned char *out, int inlen,
        memcpy(&msg.magicnumber, &buf2[SIM_SYMMETRIC_BLOCKSIZE], sizeof(msg.magicnumber));
        OPENSSL_free (buf2);
 
-       if (msg.magicnumber != SIM_MAGICNUMBER_V1) {
+       if (msg.magicnumber != gg_fix16(SIM_MAGICNUMBER_V1)) {
            /* update key in cache */
            OPENSSL_free(key);
            key = (unsigned char *) OPENSSL_malloc(SIM_RSA_KEYSIZE);
@@ -566,7 +592,7 @@ int SIM_Message_Decrypt(unsigned char *in, unsigned char *out, int inlen,
     klen = SIM_SYMMETRIC_BLOCKSIZE;
     memcpy(&msg.magicnumber, &buf2[klen], (a = sizeof(msg.magicnumber)));
     klen += a;
-    if (msg.magicnumber != SIM_MAGICNUMBER_V1)
+    if (msg.magicnumber != gg_fix16(SIM_MAGICNUMBER_V1))
 	    return -3;
     memcpy(&msg.flags, &buf2[klen], (a = sizeof(msg.flags)));
     klen += a;
