@@ -76,6 +76,11 @@ U¯YCIE
     (backslash) i zakoñcz lini± z sam± kropk± (szczegó³y poni¿ej, w rodziale
     ,,KLAWIATURA'').
 
+    Program mo¿na skonfigurowaæ pod wieloma wzglêdami, a wszystkie mo¿liwe
+    ustawienia, które zmienia siê poleceniem ,,set'', s± opisane w pliku
+    vars.txt. Pomoc dotycz±c± poszczególnych ustawieñ mo¿na uzyskaæ za
+    pomoc± polecenia ,,help set <zmienna>''.
+
     Je¶li dana komenda przyjmuje ,,--parametr'' mo¿na u¿yæ równie¿
     skrótu ,,-p'', je¶li nie powoduje to niejednoznaczno¶ci. Uwaga!
     Brana pod uwagê jest zwykle pierwsza litera, wiêc je¶li wpiszesz
