@@ -59,7 +59,7 @@ U¯YCIE
     ,,list --gone'', ekg potraktuje to jako ,,list --get''.
 
     Komendy mo¿na wysy³aæ tak¿e przez potok. By go uaktywniæ, nale¿y
-    uruchomiæ ekg z parametrem ,,-c'' i ¶ciê¿k± potoku. Ze wzglêdu na
+    uruchomiæ ekg z parametrem ,,-c'' i ¶cie¿k± potoku. Ze wzglêdu na
     specyfikê potoków, wyniki poleceñ wysy³ane bêd± na terminal na którym
     jest uruchomione ekg (tak jak normalnie). Pisaæ do potoku mo¿na tak
     jak do normalnego pliku (choæby zwyk³ym echem).
@@ -67,7 +67,7 @@ U¯YCIE
     Je¶li w linii poleceñ shella podasz po nazwie programu i parametrach
     zaczynaj±cych siê od my¶lnika co¶ jeszcze, to zostanie to zinterpretowane
     jako komenda wsadowa. ekg wykona tylko t± komendê, i od razu wyjdzie.
-    Je¶li na serwerze GG czekaj± na Ciebie jakies wiadomo¶ci to serwer je
+    Je¶li na serwerze GG czekaj± na Ciebie jakie¶ wiadomo¶ci to serwer je
     przy¶le zaraz po po³±czeniu i w trybie wsadowym ekg wypisze je na
     terminal. Je¶li wiêc zamierzasz przekierowaæ wyj¶cie do /dev/null i nie
     masz loga z wiadomo¶ci to licz siê z tym, ¿e mog± one zgin±æ bezpowrotnie.

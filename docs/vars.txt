@@ -1,6 +1,5 @@
 // ma³y opis dostêpnych zmiennych
 // (c) copyright 2001-2002 by wojtek kaniewski <wojtekka@irc.pl>
-// $Id$
 
 uin
 	typ: liczba
@@ -139,9 +138,9 @@ log
 
 log_ignored 
 	typ: liczba
-	domy¶lna wartosc: 0 
+	domy¶lna warto¶æ: 0 
 	    
-	okre¶la czy logujemy ignorowane wiadomosci 
+	okre¶la czy logujemy ignorowane wiadomo¶ci.
 
 log_status
         typ: bool
@@ -284,3 +283,4 @@ protocol
 	do udawania nowszego klienta, gdy biblioteka jeszcze jej nie zna.
 	zmienna ta nie powinna byæ u¿ywana przez zwyk³ych u¿ytkowników.
 
+$Id$

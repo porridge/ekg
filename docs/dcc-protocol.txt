@@ -115,5 +115,5 @@ odbiorca siê spodziewa.
 3. otrzymujemy nag³ówek paczki i paczkê z danymi zadeklarowanej d³ugo¶ci
 4. je¶li nag³ówek by³ typu GG_DCC_LAST_FILEHEADER to otrzymali¶my ca³o¶æ, 
 wiêc zamykamy po³±czenie. Je¶li nie, to wracamy do kroku 3.
-		
-	  
+
+$Id$

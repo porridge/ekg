@@ -18,4 +18,4 @@ typowy przyklad reverse engineering for interoperability (w przypadku
 Polski - art. 75 ust. 2 pkt 3 ustawy o p.a. - spelnione sa wszystkie
 warunki z podpunktow a, b i c). 
 
-
+$Id$

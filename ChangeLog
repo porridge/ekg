@@ -12,6 +12,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - przygotowanie gg_gethostbyname() pod wielobie¿no¶æ (w)
 - poprawka p³ci w /list (neeo/w)
 - --without-debug naprawdê pozbywa siê debugów z binarek (w)
+- poprawki dokumentacji (fig/w)
+- dodanie \$\I\d\$ w docach (fig/w)
 
 // 2002-06-08
 

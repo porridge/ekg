@@ -47,4 +47,4 @@ A: Najwyra¼niej pad³ jeden z serwerów. Wpisz ,,set server 217.17.41.84''
 Q: Jak usun±æ zmienn±?
 A: ,,set -zmienna''
 
-// $Id$
+$Id$

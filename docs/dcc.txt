@@ -193,4 +193,4 @@ spróbuje siê z nami po³±czyæ, je¶li ma tak± mo¿liwo¶æ.
 
 
 
-// $Id$
+$Id$

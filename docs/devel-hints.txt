@@ -24,4 +24,5 @@ i broñ Bo¿e nie mam zamiaru siê zachowywaæ jak jaki¶ Linus, i wrzucaæ do
 pijam. byle tylko by³y zachowane pewne zasady i nie by³o po miesi±cu
 burdelu w kodzie. oczywi¶cie bêdê przegl±daæ _wszystkie_ zmiany i w razie
 czego bêdê krzyczeæ ;)
-     
+
+$Id$
