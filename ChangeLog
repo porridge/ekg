@@ -9,6 +9,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - poprawka statusbara (sdas/w)
 - /find bez parametrów szuka nas samych (sdas/w)
+- puste linie nie s± zapisywane w historii (sdas/w)
 
 // 2002-09-19
 

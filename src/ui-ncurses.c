@@ -1313,11 +1313,13 @@ static void ui_ncurses_loop()
 				
 				command_exec(window_current->target, tmp);
 				xfree(tmp);
-				if (history[0] != line)
-					xfree(history[0]);
-				history[0] = xstrdup(line);
-				xfree(history[HISTORY_MAX - 1]);
-				memmove(&history[1], &history[0], sizeof(history) - sizeof(history[0]));
+				if (strcmp(line, "")) {
+					if (history[0] != line)
+						xfree(history[0]);
+					history[0] = xstrdup(line);
+					xfree(history[HISTORY_MAX - 1]);
+					memmove(&history[1], &history[0], sizeof(history) - sizeof(history[0]));
+				}
 				history[0] = line;
 				history_index = 0;
 				line[0] = 0;
