@@ -551,6 +551,12 @@ sound_sysmsg_file
 
 	plik d¼wiêkowy odtwarzany po otrzymaniu wiadomo¶ci systemowej.
 
+sound_mail_file
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	plik d¼wiêkowy odtwarzany po otrzymaniu nowej wiadomo¶ci e-mail.
+
 speech_app
 	typ: tekst
 	domy¶lna warto¶æ: brak

@@ -249,6 +249,7 @@ char *config_sound_chat_file;
 char *config_sound_msg_file;
 char *config_sound_sysmsg_file;
 char *config_sound_notify_file;
+char *config_sound_mail_file;
 char *config_speech_app;
 int config_status;
 int config_statusbar_size;

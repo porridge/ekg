@@ -176,6 +176,7 @@ void variable_init()
 	variable_add("sound_chat_file", "Sc", VAR_STR, 1, &config_sound_chat_file, NULL, NULL, dd_sound);
 	variable_add("sound_sysmsg_file", "Ss", VAR_STR, 1, &config_sound_sysmsg_file, NULL, NULL, dd_sound);
 	variable_add("sound_notify_file", "Sn", VAR_STR, 1, &config_sound_notify_file, NULL, NULL, dd_sound);
+	variable_add("sound_mail_file", "SM", VAR_STR, 1, &config_sound_mail_file, NULL, NULL, dd_sound);
 	variable_add("sound_app", "Sa", VAR_STR, 1, &config_sound_app, NULL, NULL, NULL);
 	variable_add("speech_app", "SA", VAR_STR, 1, &config_speech_app, NULL, NULL, NULL);
 #ifdef WITH_UI_NCURSES

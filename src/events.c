@@ -817,9 +817,8 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 		if (config_beep && config_beep_notify)
 			ui_beep();
 
-		/* lub muzyczk± */
-		if (config_sound_notify_file)
-			play_sound(config_sound_notify_file);
+		/* i muzyczk± */
+		play_sound(config_sound_notify_file);
 
 		break;
 	}
