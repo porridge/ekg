@@ -7,6 +7,8 @@ d - drg, sz - szalik).
 // 2003-05-10
 
 - poprawka obs³ugi polskich liter w /find (FIG/sz)
+- poprawka wyboru opisów z plików *.reasons - lepiej losuje i nie
+  wywraca siê przy pustym pliku (sz)
 
 // 2003-05-05
 
