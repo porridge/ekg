@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - uaktualnienie klith.theme (klith/w)
 - poprawki niewidzialnych (klith/w)
 - pokazywane opisy przy ,,away'' i ,,quit'' (klith/w)
+- pager przy ,,help'' (wojboj/w)
 
 // 2002-03-25
 

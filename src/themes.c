@@ -694,5 +694,7 @@ void init_theme()
 	add_format("userlist_get_ok", "%) Listê kontaktów wczytano z serwera\n", 1);
 	add_format("userlist_get_error", "%! B³±d podczas pobierania listy kontaktów: %1\n", 1);
 	add_format("change_not_enough_params", "%! Polecenie wymaga podania %wwszystkich%n parametrów\n", 1);
+
+	add_format("more", "-- Wci¶nij Enter by kontynuowaæ --", 1);
 };
 

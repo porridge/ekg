@@ -65,6 +65,14 @@ if test x"$ac_cv_has_rl_completion" != xno; then
     AC_DEFINE(HAS_RL_COMPLETION)
 fi
 
+AC_CACHE_CHECK([for rl_get_screen_size() in readline], ac_cv_has_rl_get_screen_size,
+[AC_TRY_LINK([#include <stdio.h>
+#include <readline/readline.h>
+], [int x,y; rl_get_screen_size(&y,&x);], [ac_cv_has_rl_get_screen_size=yes], [ac_cv_has_rl_get_screen_size=no])])
+if test x"$ac_cv_has_rl_get_screen_size" != xno; then
+    AC_DEFINE(HAS_RL_GET_SCREEN_SIZE)
+fi
+
 LIBS="$SAVE_LIBS"
 CFLAGS="$SAVE_CFLAGS"
 
@@ -138,6 +146,7 @@ if test ! -e  config.h; then
 fi
 
 AC_OUTPUT(Makefile lib/Makefile src/Makefile examples/Makefile)
-    echo "----------------------------------------------------------------"
-    echo "configure is DONE!"
-    echo "----------------------------------------------------------------"
+#    echo "----------------------------------------------------------------"
+#    echo "configure is DONE!"
+#    echo "----------------------------------------------------------------"
+

@@ -32,6 +32,7 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "config.h"
 #include "libgadu.h"
 #include "stuff.h"
 #include "dynstuff.h"
@@ -962,6 +963,7 @@ COMMAND(command_modify)
 COMMAND(command_help)
 {
 	struct command *c;
+	int width = 0, height = 24, lines = 0;
 	
 	if (params[0]) {
 		for (c = commands; c->name; c++)
@@ -992,6 +994,10 @@ COMMAND(command_help)
 			}
 	}
 
+#if HAS_RL_GET_SCREEN_SIZE
+	rl_get_screen_size(&height, &width);
+#endif
+
 	for (c = commands; c->name; c++)
 		if (isalnum(*c->name)) {
 		    	char *blah = NULL;
@@ -1001,6 +1007,13 @@ COMMAND(command_help)
 	
 			my_printf("help", c->name, c->params_help, blah ? blah : c->brief_help);
 			free(blah);
+
+			if (++lines > height - 2) {
+				char *foo = readline(find_format("more"));
+				free(foo);
+
+				lines = 0;
+			}
 		}
 
 	return 0;
@@ -1214,7 +1227,7 @@ COMMAND(command_list)
 		if (show_all || (show_busy && (u->status == GG_STATUS_BUSY || u->status == GG_STATUS_BUSY_DESCR)) || (show_active && u->status == GG_STATUS_AVAIL) || (show_inactive && (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)) || (show_invisible && (u->status == GG_STATUS_INVISIBLE))) {
 			my_printf(tmp, format_user(u->uin), inet_ntoa(in), itoa(u->port), u->descr);
 			if ((++count % (screen_lines - 1)) == 0 && page_wait) {
-				char *foo = readline("-- Wci¶nij Enter by kontynuowaæ. --");
+				char *foo = readline(find_format("more"));
 				free(foo);
 			}
 		}
