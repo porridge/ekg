@@ -1,0 +1,29 @@
+// rozmowy g³osowe w ekg
+// (c) copyright 2002 wojtek kaniewski <wojtekka@irc.pl>
+
+opis dla 20020615. je¶li masz nowsz± wersjê, to pewnie nic siê nie zmieni³o.
+
+lista wad:
+- dzia³a tylko odbiór g³osu,
+- dzia³a tylko na Linuksie ze sterownikami OSS,
+- dzia³a tylko z kartami d¼wiêkowymi obs³uguj±cymi full-duplex,
+  czêstotliwo¶æ próbkowania 8000Hz i 16-bitow± rozdzielczo¶æ,
+- dzia³a tylko je¶li jest zainstalowana biblioteka libgsm skompilowana
+  z opcj± -DWAV49 (w PLD wystarczy zainstalowaæ pakiety libgsm oraz
+  libgsm-devel),
+- wy¶wietla _duuuu¿o_ ¶mieci w trybie debugowania,
+- windowsowe GG najprawdopodobniej zerwie po³±czenie, gdy zbyt d³ugo nie
+  bêdzie dostawaæ strumienia d¼wiêkowego od ekg.
+
+by rozpocz±æ rozmowê (a w³a¶ciwie wys³uchiwanie monologu) nale¿y wpisaæ:
+
+   dcc voice <pseudonim>
+
+by zakoñczyæ:
+
+   dcc close <#numer>
+
+gdzie <#numer> to numer po³±czenia wy¶wietlony przez polecenie ,,dcc show''. 
+
+
+$Id$

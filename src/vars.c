@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include "stuff.h"
 #include "vars.h"
+#include "config.h"
 #include "libgadu.h"
 #include "dynstuff.h"
 

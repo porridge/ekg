@@ -25,6 +25,7 @@
 #include <time.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include "config.h"
 #include "libgadu.h"
 #include "dynstuff.h"
 

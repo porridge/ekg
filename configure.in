@@ -26,7 +26,7 @@ if test "x$AR" = "xno"; then
   AC_MSG_ERROR([ar ])
 fi
 
-AC_CHECK_TYPES([int8_t, u_int8_t, int16_t, u_int16_t, int32_t, u_int32_t])
+AC_CHECK_TYPES([int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t])
 AC_C_BIGENDIAN
 
 AC_SUBST(CFLAGS_LIBGADU)

@@ -20,6 +20,7 @@
 #ifndef __EVENTS_H
 #define __EVENTS_H
 
+#include "config.h"
 #include "libgadu.h"
 
 struct handler {

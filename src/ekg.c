@@ -36,6 +36,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
+#include "config.h"
 #include "libgadu.h"
 #include "stuff.h"
 #include "commands.h"
@@ -44,7 +45,6 @@
 #include "version.h"
 #include "userlist.h"
 #include "vars.h"
-#include "config.h"
 
 time_t last_action = 0;
 int ioctl_daemon_pid = 0;

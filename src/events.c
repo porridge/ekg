@@ -26,6 +26,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <errno.h>
+#include "config.h"
 #include "libgadu.h"
 #include "stuff.h"
 #include "events.h"
@@ -33,7 +34,6 @@
 #include "themes.h"
 #include "userlist.h"
 #include "voice.h"
-#include "config.h"
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure();

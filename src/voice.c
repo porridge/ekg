@@ -28,6 +28,7 @@
 #include <sys/ioctl.h>
 #include <linux/soundcard.h>
 #include <gsm.h>
+#include "config.h"
 #include "libgadu.h"
 #include "voice.h"
 #include "stuff.h"
@@ -67,6 +68,11 @@ int voice_open()
 	value = 1;
 	
 	if (ioctl(voice_fd, SNDCTL_DSP_CHANNELS, &value) == -1)
+		goto fail;
+
+	value = AFMT_S16_LE;
+	
+	if (ioctl(voice_fd, SNDCTL_DSP_SETFMT, &value) == -1)
 		goto fail;
 
 	if (!(voice_gsm_dec = gsm_create()) || !(voice_gsm_enc = gsm_create()))

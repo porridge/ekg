@@ -2407,9 +2407,9 @@ cat >>confdefs.h <<EOF
 EOF
 
 fi
-echo "$as_me:2410: checking for u_int8_t" >&5
-echo $ECHO_N "checking for u_int8_t... $ECHO_C" >&6
-if test "${ac_cv_type_u_int8_t+set}" = set; then
+echo "$as_me:2410: checking for uint8_t" >&5
+echo $ECHO_N "checking for uint8_t... $ECHO_C" >&6
+if test "${ac_cv_type_uint8_t+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   cat >conftest.$ac_ext <<_ACEOF
@@ -2419,9 +2419,9 @@ $ac_includes_default
 int
 main ()
 {
-if ((u_int8_t *) 0)
+if ((uint8_t *) 0)
   return 0;
-if (sizeof (u_int8_t))
+if (sizeof (uint8_t))
   return 0;
   ;
   return 0;
@@ -2439,20 +2439,20 @@ if { (eval echo "$as_me:2431: \"$ac_compile\"") >&5
   ac_status=$?
   echo "$as_me:2440: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_type_u_int8_t=yes
+  ac_cv_type_uint8_t=yes
 else
   echo "$as_me: failed program was:" >&5
 cat conftest.$ac_ext >&5
-ac_cv_type_u_int8_t=no
+ac_cv_type_uint8_t=no
 fi
 rm -f conftest.$ac_objext conftest.$ac_ext
 fi
-echo "$as_me:2450: result: $ac_cv_type_u_int8_t" >&5
-echo "${ECHO_T}$ac_cv_type_u_int8_t" >&6
-if test $ac_cv_type_u_int8_t = yes; then
+echo "$as_me:2450: result: $ac_cv_type_uint8_t" >&5
+echo "${ECHO_T}$ac_cv_type_uint8_t" >&6
+if test $ac_cv_type_uint8_t = yes; then
 
 cat >>confdefs.h <<EOF
-#define HAVE_U_INT8_T 1
+#define HAVE_UINT8_T 1
 EOF
 
 fi
@@ -2505,9 +2505,9 @@ cat >>confdefs.h <<EOF
 EOF
 
 fi
-echo "$as_me:2508: checking for u_int16_t" >&5
-echo $ECHO_N "checking for u_int16_t... $ECHO_C" >&6
-if test "${ac_cv_type_u_int16_t+set}" = set; then
+echo "$as_me:2508: checking for uint16_t" >&5
+echo $ECHO_N "checking for uint16_t... $ECHO_C" >&6
+if test "${ac_cv_type_uint16_t+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   cat >conftest.$ac_ext <<_ACEOF
@@ -2517,9 +2517,9 @@ $ac_includes_default
 int
 main ()
 {
-if ((u_int16_t *) 0)
+if ((uint16_t *) 0)
   return 0;
-if (sizeof (u_int16_t))
+if (sizeof (uint16_t))
   return 0;
   ;
   return 0;
@@ -2537,20 +2537,20 @@ if { (eval echo "$as_me:2529: \"$ac_compile\"") >&5
   ac_status=$?
   echo "$as_me:2538: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_type_u_int16_t=yes
+  ac_cv_type_uint16_t=yes
 else
   echo "$as_me: failed program was:" >&5
 cat conftest.$ac_ext >&5
-ac_cv_type_u_int16_t=no
+ac_cv_type_uint16_t=no
 fi
 rm -f conftest.$ac_objext conftest.$ac_ext
 fi
-echo "$as_me:2548: result: $ac_cv_type_u_int16_t" >&5
-echo "${ECHO_T}$ac_cv_type_u_int16_t" >&6
-if test $ac_cv_type_u_int16_t = yes; then
+echo "$as_me:2548: result: $ac_cv_type_uint16_t" >&5
+echo "${ECHO_T}$ac_cv_type_uint16_t" >&6
+if test $ac_cv_type_uint16_t = yes; then
 
 cat >>confdefs.h <<EOF
-#define HAVE_U_INT16_T 1
+#define HAVE_UINT16_T 1
 EOF
 
 fi
@@ -2603,9 +2603,9 @@ cat >>confdefs.h <<EOF
 EOF
 
 fi
-echo "$as_me:2606: checking for u_int32_t" >&5
-echo $ECHO_N "checking for u_int32_t... $ECHO_C" >&6
-if test "${ac_cv_type_u_int32_t+set}" = set; then
+echo "$as_me:2606: checking for uint32_t" >&5
+echo $ECHO_N "checking for uint32_t... $ECHO_C" >&6
+if test "${ac_cv_type_uint32_t+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   cat >conftest.$ac_ext <<_ACEOF
@@ -2615,9 +2615,9 @@ $ac_includes_default
 int
 main ()
 {
-if ((u_int32_t *) 0)
+if ((uint32_t *) 0)
   return 0;
-if (sizeof (u_int32_t))
+if (sizeof (uint32_t))
   return 0;
   ;
   return 0;
@@ -2635,20 +2635,20 @@ if { (eval echo "$as_me:2627: \"$ac_compile\"") >&5
   ac_status=$?
   echo "$as_me:2636: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_type_u_int32_t=yes
+  ac_cv_type_uint32_t=yes
 else
   echo "$as_me: failed program was:" >&5
 cat conftest.$ac_ext >&5
-ac_cv_type_u_int32_t=no
+ac_cv_type_uint32_t=no
 fi
 rm -f conftest.$ac_objext conftest.$ac_ext
 fi
-echo "$as_me:2646: result: $ac_cv_type_u_int32_t" >&5
-echo "${ECHO_T}$ac_cv_type_u_int32_t" >&6
-if test $ac_cv_type_u_int32_t = yes; then
+echo "$as_me:2646: result: $ac_cv_type_uint32_t" >&5
+echo "${ECHO_T}$ac_cv_type_uint32_t" >&6
+if test $ac_cv_type_uint32_t = yes; then
 
 cat >>confdefs.h <<EOF
-#define HAVE_U_INT32_T 1
+#define HAVE_UINT32_T 1
 EOF
 
 fi

@@ -30,6 +30,7 @@
 #ifdef WITH_IOCTLD
 #include <sys/un.h>
 #endif /* WITH_IOCTLD */
+#include "config.h"
 #include "libgadu.h"
 #include "dynstuff.h"
 #include "ioctld.h"
