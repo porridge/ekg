@@ -19,8 +19,8 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef __GG_LIBGG_H
-#define __GG_LIBGG_H
+#ifndef __GG_LIBGADU_H
+#define __GG_LIBGADU_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -729,7 +729,7 @@ struct gg_dcc_big_packet {
 }
 #endif
 
-#endif /* __GG_LIBGG_H */
+#endif /* __GG_LIBGADU_H */
 
 /*
  * Local variables:
