@@ -212,7 +212,11 @@ void variable_init()
 	variable_add("speech_app", "SA", VAR_STR, 1, &config_speech_app, NULL, NULL, NULL);
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init)
+	{
 		variable_add("statusbar_size", "sS", VAR_INT, 1, &config_statusbar_size, header_statusbar_resize, NULL, NULL);
+		variable_add("statusbar_fgcolor", "sF", VAR_INT, 1, &config_statusbar_fgcolor, NULL, NULL, NULL);
+		variable_add("statusbar_bgcolor", "sB", VAR_INT, 1, &config_statusbar_bgcolor, NULL, NULL, NULL);
+	}
 #endif
 	variable_add("tab_command", "tc", VAR_STR, 1, &config_tab_command, NULL, NULL, NULL);
 	variable_add("theme", "th", VAR_STR, 1, &config_theme, changed_theme, NULL, NULL);

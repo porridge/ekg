@@ -206,6 +206,7 @@ static int contacts_frame = WF_LEFT;
 static int contacts_descr = 0;
 static int contacts_wrap = 0;
 static int contacts_order[5] = { 0, 1, 2, 3, -1 };
+static int contacts_framecolor = 4;
 static int contacts_group_index = 0;
 
 struct binding *binding_map[KEY_MAX + 1];	/* mapa bindowanych klawiszy */
@@ -665,7 +666,7 @@ void window_redraw(struct window *w)
 	}
 	
 	werase(w->window);
-	wattrset(w->window, color_pair(COLOR_BLUE, 0, COLOR_BLACK));
+	wattrset(w->window, color_pair(contacts_framecolor, 0, COLOR_BLACK));
 
 	if (w->floating) {
 		if ((w->frames & WF_LEFT)) {
@@ -1488,6 +1489,10 @@ void contacts_changed()
 			if (!strcasecmp(args[i], "nodescr"))
 				contacts_descr = 0;
 
+			if (!strncasecmp(args[i], "framecolor=", 11))
+				if (args[i][11])
+					sscanf(args[i] + 11, "%d", &contacts_framecolor);
+
 			if (!strncasecmp(args[i], "order=", 6)) {
 				int j;
 				
@@ -1785,9 +1790,9 @@ static void update_statusbar(int commit)
 	struct format_data *formats = NULL;
 	int formats_count = 0, i, y;
 
-	wattrset(status, color_pair(COLOR_WHITE, 0, COLOR_BLUE));
+	wattrset(status, color_pair(config_statusbar_fgcolor, 0, config_statusbar_bgcolor));
 	if (header)
-		wattrset(header, color_pair(COLOR_WHITE, 0, COLOR_BLUE));
+		wattrset(header, color_pair(config_statusbar_fgcolor, 0, config_statusbar_bgcolor));
 
 	/* inicjalizujemy wszystkie opisowe bzdurki */
 
@@ -1884,7 +1889,7 @@ static void update_statusbar(int commit)
 			xfree(tmp);
 		}
 
-		window_printat(header, 0, y, p, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
+		window_printat(header, 0, y, p, formats, config_statusbar_fgcolor, 0, config_statusbar_bgcolor, 1);
 	}
 
 	for (y = 0; y < config_statusbar_size; y++) {
@@ -1903,13 +1908,13 @@ static void update_statusbar(int commit)
 
 		switch (ui_ncurses_debug) {
 			case 0:
-				window_printat(status, 0, y, p, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
+				window_printat(status, 0, y, p, formats, config_statusbar_fgcolor, 0, config_statusbar_bgcolor, 1);
 				break;
 				
 			case 1:
 			{
 				char *tmp = saprintf(" debug: lines_count=%d start=%d height=%d overflow=%d screen_width=%d", window_current->lines_count, window_current->start, window_current->height, window_current->overflow, ui_screen_width);
-				window_printat(status, 0, y, tmp, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
+				window_printat(status, 0, y, tmp, formats, config_statusbar_fgcolor, 0, config_statusbar_bgcolor, 1);
 				xfree(tmp);
 				break;
 			}
@@ -1917,7 +1922,7 @@ static void update_statusbar(int commit)
 			case 2:
 			{
 				char *tmp = saprintf(" debug: lines(count=%d,start=%d,index=%d), line(start=%d,index=%d)", array_count(lines), lines_start, lines_index, line_start, line_index);
-				window_printat(status, 0, y, tmp, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
+				window_printat(status, 0, y, tmp, formats, config_statusbar_fgcolor, 0, config_statusbar_bgcolor, 1);
 				xfree(tmp);
 				break;
 			}

@@ -220,6 +220,7 @@ contacts_options
 	lista dostêpnych opcji:
 	- left, right, top, bottom - po³o¿enie listy kontaktów na ekranie,
 	- frame, noframe - lista oddzielona ramk± od g³ównego okna lub nie,
+	- framecolor=n - kolor ramki oddzielaj±cej od g³ównego okna
 	- margin=n, nomargin - margines miêdzy list± a g³ównym oknem lub brak,
 	- wrap, nowrap - tre¶æ listy bêdzie zawijana lub ucinana,
 	- descr, nodescr - opisy stanu bêd± lub nie bêd± wy¶wietlane,
@@ -694,6 +695,19 @@ statusbar_size
 	domy¶lna warto¶æ: 1
 
 	okre¶la rozmiar paska stanu w liniach w zakresie od 1 do 5.
+
+statusbar_fgcolor
+	typ: liczba
+	domy¶lna warto¶æ: 7
+
+	okre¶la kolor tekstu w pasku stanu. z regu³y jest nadpisany
+	przez themik, wiec ta zmienna jest malo przydatna.
+
+statusbar_bgcolor
+	typ: liczba
+	domy¶lna warto¶æ: 4
+
+	okre¶la kolor t³a pasku stanu. domy¶lnie niebieski.
 
 tab_command
 	typ: tekst

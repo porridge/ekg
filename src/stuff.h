@@ -290,6 +290,8 @@ char *config_sound_mail_file;
 char *config_speech_app;
 int config_status;
 int config_statusbar_size;
+int config_statusbar_fgcolor;
+int config_statusbar_bgcolor;
 char *config_tab_command;
 char *config_theme;
 int config_time_deviation;
