@@ -6,6 +6,10 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-04-02
+
+- poprawka konferencji na bigendianach (pmb/sz)
+
 // 2003-04-01
 
 - libgadu: wywo³anie gg_watch_fd() w stanie GG_STATE_CONNECTING_GG
