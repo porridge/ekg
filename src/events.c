@@ -120,7 +120,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 			char waplog[50];
 
 			sprintf(waplog,"%.30s/wap%5s",config_dir,timestr);
-			if(wap=fopen(waplog,"a")) {
+			if((wap=fopen(waplog,"a"))) {
 				fprintf(wap,"%s(%s):%s\n",target,timestr,line);
 				fclose(wap);
 			}
@@ -406,6 +406,9 @@ void handle_notify(struct gg_event *e)
 			
 			if (config_completion_notify)
 				add_send_nick(u->display);
+
+			if (config_beep && config_beep_notify)
+				ui_beep();
 		}
 		
 		if (n->status == GG_STATUS_NOT_AVAIL) {
@@ -414,6 +417,8 @@ void handle_notify(struct gg_event *e)
                                 log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail");
 			if (config_display_notify)
 			    	print("status_not_avail", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
+			if (config_completion_notify)
+				remove_send_nick(u->display);
 		}
 
 		if (n->status == GG_STATUS_NOT_AVAIL_DESCR) {
@@ -424,6 +429,8 @@ void handle_notify(struct gg_event *e)
                                 log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail", u->descr);
 			if (config_display_notify)
 			    	print("status_not_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
+			if (config_completion_notify)
+				remove_send_nick(u->display);
 		}
 
 		n++;
@@ -512,9 +519,11 @@ void handle_status(struct gg_event *e)
 		if (config_log_status && !GG_S_D(s->status))
 		    	log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, inet_ntoa(u->ip), time(NULL), s->log, u->descr);
 
-		/* je¶li dostêpny, dopiszmy do taba */
+		/* jak dostêpny, dopiszmy do taba; jak niedostêpny, usuñmy */
 		if (GG_S_A(s->status) && config_completion_notify)
 			add_send_nick(u->display);
+		if (GG_S_NA(s->status) && config_completion_notify)
+			remove_send_nick(u->display);
 		
 		/* czy mamy wy¶wietlaæ na ekranie? */
 		if (!config_display_notify)

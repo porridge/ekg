@@ -73,6 +73,11 @@ int match_arg(char *arg, char shortopt, char *longopt, int longoptlen)
 	return (*arg == shortopt);
 }
 
+/*
+ * add_send_nick()
+ *
+ * dodaje do listy nicków dope³nianych automagicznie tabem.
+ */
 void add_send_nick(const char *nick)
 {
 	int i, count = send_nicks_count, dont_add = 0;
@@ -96,6 +101,29 @@ void add_send_nick(const char *nick)
 		send_nicks_count++;
 	
 	send_nicks[0] = xstrdup(nick);	
+}
+
+/*
+ * remove_send_nick()
+ *
+ * usuwa z listy dope³nianych automagicznie tabem.
+ */
+void remove_send_nick(const char *nick)
+{
+	int i, j;
+
+	for (i = 0; i < send_nicks_count; i++) {
+		if (send_nicks[i] && !strcmp(send_nicks[i], nick)) {
+			xfree(send_nicks[i]);
+
+			for (j = i + 1; j < send_nicks_count; j++)
+				send_nicks[j - 1] = send_nicks[j];
+
+			send_nicks[--send_nicks_count] = NULL;
+
+			break;
+		}
+	}
 }
 
 COMMAND(cmd_cleartab)

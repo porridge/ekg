@@ -14,6 +14,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawka segfaultu w status (FIG/w)
 - poprawka --enable-wap (serek/w)
 - nowa zmienna ,,tab_command'' (Murphy/w)
+- niedostêpni nie bêd± dope³niani tabem (Murphy/w)
 
 // 2002-08-11
 

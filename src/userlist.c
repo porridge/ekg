@@ -300,10 +300,8 @@ int userlist_write_wap()
 	if (!(filename = prepare_path("wapstatus", 1)))
 		return -1;
 
-	if (!(f = fopen(filename, "w"))) {
-		free(contacts);
+	if (!(f = fopen(filename, "w")))
 		return -1;
-	}
 
 	fchmod(fileno(f), 0600);
 	fprintf(f, "%s\n", (sess) ? "C" : "D");
