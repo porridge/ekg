@@ -232,7 +232,9 @@ ZG£ASZANIE B£ÊDÓW
     
     Je¶li b³±d jest powtarzalny i zwi±zany z sieci±, przejd¼ do okna debug
     i przy¶lij to, co zostaje tam wy¶wietlone przed samym wyst±pieniem
-    b³êdu (zwykle ~20 linijek wystarczy).
+    b³êdu (zwykle ~20 linijek wystarczy). Mo¿esz te¿ skorzystaæ z ukrytego
+    polecenia ,,_debug_dump'', które zapisze ostatnie linie z debug do
+    pliku.
 
     Je¶li program powoduje naruszenie ochrony pamiêci i powstaje plik
     ,,core'', postêpuj zgodnie z instrukcjami pokazanymi na ekranie --

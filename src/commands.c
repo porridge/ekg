@@ -559,11 +559,6 @@ COMMAND(cmd_exec)
 		struct gg_exec s;
 		char *p = NULL, *tg = xstrdup(target);
 
-		if (pipe(fd)) {
-			printq("exec_error", strerror(errno));
-			return -1;
-		}
-
 		if (match_arg(params[0], 'm', "msg", 2) || (buf = match_arg(params[0], 'b', "bmsg", 2))) {
 			int uin;
 			struct userlist *u;
@@ -586,10 +581,17 @@ COMMAND(cmd_exec)
 			}
 
 			msg = (buf) ? 2 : 1;
+			params = params + 2;
+		}
 
-			p = array_join((char **) params + 2, " ");
-		} else
-			p = array_join((char **) params, " ");
+		p = array_join((char **) params, " ");
+
+		if (pipe(fd)) {
+			printq("exec_error", strerror(errno));
+			xfree(p);
+			xfree(tg);
+			return -1;
+		}
 
 		if (!(pid = fork())) {
 			if (fd[1]) {
@@ -598,7 +600,7 @@ COMMAND(cmd_exec)
 				dup2(fd[1], 1);
 				close(fd[1]);
 			}	
-			execl("/bin/sh", "sh", "-c", (p[0] == '^') ? p + 1 : p, (void *) NULL);
+			execl("/bin/sh", "sh", "-c", ((p[0] == '^' && strlen(p) > 1) ? p + 1 : p), (void *) NULL);
 			exit(1);
 		}
 
