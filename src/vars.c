@@ -95,7 +95,6 @@ void variable_init()
 	variable_add("uin", "ui", VAR_INT, 1, &config_uin, changed_uin, NULL, NULL);
 	variable_add("password", "pa", VAR_STR, 0, &config_password, NULL, NULL, NULL);
 	variable_add("email", "em", VAR_STR, 1, &config_email, NULL, NULL, NULL);
-
 #ifdef HAVE_VOIP
 	variable_add("audio_device", "ad", VAR_STR, 1, &config_audio_device, NULL, NULL, NULL);
 #endif
@@ -723,4 +722,3 @@ void variable_help(const char *name)
 	
 	print("help_set_footer", name);
 }
-

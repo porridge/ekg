@@ -1235,4 +1235,3 @@ void ekg_exit()
 
 	exit(0);
 }
-

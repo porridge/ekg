@@ -474,7 +474,7 @@ int userlist_replace(struct userlist *u)
 {
 	if (list_remove(&userlist, u, 0))
 		return -1;
-	if (list_add_sorted(&userlist, u, 0, userlist_compare))
+	if (!list_add_sorted(&userlist, u, 0, userlist_compare))
 		return -1;
 
 	return 0;
@@ -933,7 +933,7 @@ char *group_to_string(list_t groups, int meta)
 		}
 
 		if (comma)
-			string_append_c(foo, ',');
+			string_append(foo, ", ");
 
 		comma = 1;
 

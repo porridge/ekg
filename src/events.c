@@ -875,7 +875,7 @@ void handle_failure(struct gg_event *e)
 		{ GG_FAILURE_WRITING, "conn_failed_disconnected" },
 		{ GG_FAILURE_PASSWORD, "conn_failed_password" },
 		{ GG_FAILURE_404, "conn_failed_404" },
-		{ 0, NULL },
+		{ 0, NULL }
 	};
 
 	char *tmp = NULL;
