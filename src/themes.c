@@ -848,6 +848,7 @@ void theme_init()
 	/* czêsto wykorzystywane, ró¿ne, przydatne itd. */
 	format_add("none", "%1\n", 1);
 	format_add("generic", "%> %1\n", 1);
+	format_add("generic2", "%) %1\n", 1);
 	format_add("generic_error", "%! %1\n", 1);
 	format_add("debug", "%n%1\n", 1);
 	format_add("not_enough_params", "%! Za ma³o parametrów. Spróbuj %Thelp %1%n\n", 1);
@@ -1080,9 +1081,9 @@ void theme_init()
 	format_add("registered_today", "%! Ju¿ zarejestrowano jeden numer. Nie nadu¿ywaj\n", 1);
 
 	/* kasowanie konta uzytkownika z katalogu publiczengo */
-	format_add("unregister", "%> Konto %T%1%n wykasowane.\n", 1);
+	format_add("unregister", "%> Konto %T%1%n wykasowano\n", 1);
 	format_add("unregister_timeout", "%! Przekroczono limit czasu operacji usuwania konta\n", 1);
-	format_add("unregister_bad_uin", "%! Nie poprawny numer: %T%1%n\n", 1);
+	format_add("unregister_bad_uin", "%! Niepoprawny numer: %T%1%n\n", 1);
 	format_add("unregister_failed", "%! B³±d podczas usuwania konta: %1\n", 1);
 	
 	/* przypomnienie has³a */
@@ -1169,7 +1170,7 @@ void theme_init()
 	format_add("user_info_unknown", "%Mnieznany%n", 1);
 
 	/* grupy */
-	format_add("group_members", "%) Grupa %T%1%n: %2\n", 1);
+	format_add("group_members", "%> %|Grupa %T%1%n: %2\n", 1);
 	format_add("group_member_already", "%! %1 nale¿y ju¿ do grupy %T%2%n\n", 1);
 	format_add("group_member_not_yet", "%! %1 nie nale¿y do grupy %T%2%n\n", 1);
 	format_add("group_empty", "%! Grupa %T%1%n jest pusta\n", 1);
@@ -1256,8 +1257,8 @@ void theme_init()
         format_add("events_list", "%> %4, on %1 %2 %3\n", 1);
 	format_add("events_list_inactive", "%> %4, on %1 %2 %3 %K(nieaktywne)%n\n", 1);
         format_add("events_add", "%> Dodano zdarzenie %T%1%n\n", 1);
-        format_add("events_del", "%> Usuniêto zdarzenie %T%1%n\n", 1);
-        format_add("events_del_all", "%> Usuniêto wszystkie zdarzenia\n", 1);
+        format_add("events_del", "%) Usuniêto zdarzenie %T%1%n\n", 1);
+        format_add("events_del_all", "%) Usuniêto wszystkie zdarzenia\n", 1);
         format_add("events_exist", "%! Zdarzenie %T%1%n istnieje dla %2\n", 1);
         format_add("events_del_noexist", "%! Zdarzenie %T%1%n nie istnieje\n", 1);
         format_add("events_seq_not_found", "%! Sekwencja %T%1%n nie znaleziona\n", 1);
@@ -1300,17 +1301,17 @@ void theme_init()
 
 	/* bind */
 	format_add("bind_seq_incorrect", "%! Sekwencja %T%1%n jest nieprawid³owa\n", 1); 
-	format_add("bind_seq_add", "%) Dodano sekwencjê %T%1%n\n", 1);
+	format_add("bind_seq_add", "%> Dodano sekwencjê %T%1%n\n", 1);
 	format_add("bind_seq_remove", "%) Usuniêto sekwencjê %T%1%n\n", 1);	
-	format_add("bind_seq_list", "%) %1: %T%2%n\n", 1);
+	format_add("bind_seq_list", "%> %1: %T%2%n\n", 1);
 	format_add("bind_seq_exist", "%! Sekwencja %T%1%n ma ju¿ przypisan± akcjê\n", 1);
 	format_add("bind_seq_list_empty", "%! Brak przypisanych akcji\n", 1);
 
 	/* at */
 	format_add("at_list", "%> %1, %2, %3 %K(%4)%n %5\n", 1);
 	format_add("at_added", "%> Utworzono plan %T%1%n\n", 1);
-	format_add("at_deleted", "%> Usuniêto plan %T%1%n\n", 1);
-	format_add("at_deleted_all", "%> Usuniêto plany u¿ytkownika\n", 1);
+	format_add("at_deleted", "%) Usuniêto plan %T%1%n\n", 1);
+	format_add("at_deleted_all", "%) Usuniêto plany u¿ytkownika\n", 1);
 	format_add("at_exist", "%! Plan %T%1%n ju¿ istnieje\n", 1);
 	format_add("at_noexist", "%! Plan %T%1%n nie istnieje\n", 1);
 	format_add("at_empty", "%! Brak planów\n", 1);
@@ -1320,8 +1321,8 @@ void theme_init()
 	/* timer */
 	format_add("timer_list", "%> %1, %2s, %3 %K(%4)%n %T%5%n\n", 1);
 	format_add("timer_added", "%> Utworzono timer %T%1%n\n", 1);
-	format_add("timer_deleted", "%> Usuniêto timer %T%1%n\n", 1);
-	format_add("timer_deleted_all", "%> Usuniêto timery u¿ytkownika\n", 1);
+	format_add("timer_deleted", "%) Usuniêto timer %T%1%n\n", 1);
+	format_add("timer_deleted_all", "%) Usuniêto timery u¿ytkownika\n", 1);
 	format_add("timer_exist", "%! Timer %T%1%n ju¿ istnieje\n", 1);
 	format_add("timer_noexist", "%! Timer %T%1%n nie istnieje\n", 1);
 	format_add("timer_empty", "%! Brak timerów\n", 1);
@@ -1344,16 +1345,16 @@ void theme_init()
 	format_add("queue_wrong_use", "%! Komenda dzia³a tylko przy braku po³±czenia z serwerem\n", 1);
 	format_add("queue_empty", "%! Kolejka wiadomo¶ci jest pusta\n", 1);
 	format_add("queue_empty_uin", "%! Brak wiadomo¶ci w kolejce dla %T%1%n\n", 1);
-	format_add("queue_flush", "%) Wys³ano zaleg³e wiadomo¶ci z kolejki\n", 1);
+	format_add("queue_flush", "%> Wys³ano zaleg³e wiadomo¶ci z kolejki\n", 1);
 
 	/* conference */
 	format_add("conferences_list_empty", "%! Brak konferencji\n", 1);
 	format_add("conferences_list", "%> %T%1%n: %2\n", 1);
 	format_add("conferences_list_ignored", "%> %T%1%n: %2 (%yingorowana%n)\n", 1);
 	format_add("conferences_add", "%> Utworzono konferencjê %T%1%n\n", 1);
-	format_add("conferences_not_added", "%) Nie utworzono konferencji %T%1%n\n", 1);
-	format_add("conferences_del", "%> Usuniêto konferencjê %T%1%n\n", 1);
-	format_add("conferences_del_all", "%> Usuniêto wszystkie konferencje\n", 1);
+	format_add("conferences_not_added", "%! Nie utworzono konferencji %T%1%n\n", 1);
+	format_add("conferences_del", "%) Usuniêto konferencjê %T%1%n\n", 1);
+	format_add("conferences_del_all", "%) Usuniêto wszystkie konferencje\n", 1);
 	format_add("conferences_exist", "%! Konferencja %T%1%n ju¿ istnieje\n", 1);
 	format_add("conferences_noexist", "%! Konferencja %T%1%n nie istnieje\n", 1);
 	format_add("conferences_name_error", "%! Nazwa konferencji powinna zaczynaæ siê od %T#%n\n", 1);
@@ -1373,7 +1374,7 @@ void theme_init()
 	format_add("key_generating_success", "%> Wygenerowano i zapisano klucze\n", 1);
 	format_add("key_generating_error", "%! Wyst±pi³ b³±d podczas generowania kluczy: %1\n", 1);
 	format_add("key_private_exist", "%! Posiadasz ju¿ swoj± parê kluczy\n", 1);
-	format_add("key_public_deleted", "%> Klucz publiczny %1 zosta³ usuniêty\n", 1);
+	format_add("key_public_deleted", "%) Klucz publiczny %1 zosta³ usuniêty\n", 1);
 	format_add("key_public_not_found", "%! Nie znaleziono klucza publicznego %1\n", 1);
 	format_add("key_public_noexist", "%! Brak kluczy publicznych\n", 1);
 	format_add("key_public_received", "%> Otrzymano klucz publiczny od %1\n", 1);

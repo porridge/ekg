@@ -46,7 +46,7 @@ parametr z samym pseudonimem.
 
 * * *
 
-%>  prompt (domy¶lnie ¿ó³tozielony)
+%>  prompt (domy¶lnie zielony)
 %!  error (domy¶lnie czerwony)
 %)  prompt2 (domy¶lnie turkusowy)
 %#  timestamp (domy¶lnie GG:MM)
