@@ -131,7 +131,7 @@ int userlist_read()
 		u.first_name = xstrdup(entry[0]);
 		u.last_name = xstrdup(entry[1]);
 		u.nickname = xstrdup(entry[2]);
-		if (!valid_nick(entry[3]))
+		if (entry[3] && !valid_nick(entry[3]))
 			u.display = saprintf("_%s", entry[3]);
 		else
 			u.display = xstrdup(entry[3]);
@@ -175,6 +175,7 @@ int userlist_set(const char *contacts, int config)
 	while ((buf = gg_get_line(&cont))) {
 		struct userlist u;
 		char **entry;
+		int i;
 		
 		memset(&u, 0, sizeof(u));
 			
@@ -183,7 +184,6 @@ int userlist_set(const char *contacts, int config)
 
 		if (!strncmp(buf, "__config", 8)) {
 			char **entry;
-			int i;
 
 			if (!config)
 				continue;
@@ -205,10 +205,17 @@ int userlist_set(const char *contacts, int config)
 			continue;
 		}
 
+		for (i = 0; i < 6; i++) {
+			if (!strcmp(entry[i], "(null)") || !strcmp(entry[i], "")) {
+				xfree(entry[i]);
+				entry[i] = NULL;
+			}
+		}
+
 		u.first_name = xstrdup(entry[0]);
 		u.last_name = xstrdup(entry[1]);
 		u.nickname = xstrdup(entry[2]);
-		if (!valid_nick(entry[3]))
+		if (entry[3] && !valid_nick(entry[3]))
 			u.display = saprintf("_%s", entry[3]);
 		else
 			u.display = xstrdup(entry[3]);
