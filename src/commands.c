@@ -3102,7 +3102,11 @@ cleanup:
 			ret = timer_remove(params[1], NULL);
 		
 		if (!ret) {
-			print((at) ? "at_deleted" : "timer_deleted", params[1]);
+			if (del_all)
+				print((at) ? "at_deleted_all" : "timer_deleted_all");
+			else
+				print((at) ? "at_deleted" : "timer_deleted", params[1]);
+
 			config_changed = 1;
 		} else
 			if (del_all)

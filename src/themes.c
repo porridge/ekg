@@ -1240,6 +1240,7 @@ void theme_init()
 	format_add("at_list", "%> %1, %2, %3 %K(%4)%n\n", 1);
 	format_add("at_added", "%> Utworzono plan %T%1%n\n", 1);
 	format_add("at_deleted", "%> Usuniêto plan %T%1%n\n", 1);
+	format_add("at_deleted_all", "%> Usuniêto plany u¿ytkownika\n", 1);
 	format_add("at_exist", "%! Plan %T%1%n ju¿ istnieje\n", 1);
 	format_add("at_noexist", "%! Plan %T%1%n nie istnieje\n", 1);
 	format_add("at_empty", "%! Brak planów\n", 1);
@@ -1250,6 +1251,7 @@ void theme_init()
 	format_add("timer_list", "%> %1, %2s, %3 %K(%4)%n %T%5%n\n", 1);
 	format_add("timer_added", "%> Utworzono timer %T%1%n\n", 1);
 	format_add("timer_deleted", "%> Usuniêto timer %T%1%n\n", 1);
+	format_add("timer_deleted_all", "%> Usuniêto timery u¿ytkownika\n", 1);
 	format_add("timer_exist", "%! Timer %T%1%n ju¿ istnieje\n", 1);
 	format_add("timer_noexist", "%! Timer %T%1%n nie istnieje\n", 1);
 	format_add("timer_empty", "%! Brak timerów\n", 1);
