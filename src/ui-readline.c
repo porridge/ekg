@@ -991,7 +991,7 @@ static int window_make_query(const char *nick)
 				else {
 					char id[4];
 
-					snprintf(id, 4, "%d", win->id);
+					snprintf(id, 4, "%d", w->id);
 					print("window_id_query_started", id, nick);
 				}
 				
