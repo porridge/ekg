@@ -524,7 +524,7 @@ COMMAND(command_alias)
 
 COMMAND(command_away)
 {
-	int status_table[4] = { GG_STATUS_AVAIL, GG_STATUS_BUSY, GG_STATUS_INVISIBLE, GG_STATUS_BUSY_DESCR };
+	int status_table[6] = { GG_STATUS_AVAIL, GG_STATUS_BUSY, GG_STATUS_INVISIBLE, GG_STATUS_BUSY_DESCR, GG_STATUS_AVAIL_DESCR, GG_STATUS_INVISIBLE_DESCR };
 	char *reason = NULL;
 	
 	unidle();
@@ -550,11 +550,39 @@ COMMAND(command_away)
 		away = (reason) ? 3 : 1;
 		my_printf((reason) ? "away_descr" : "away", reason);
 	} else if (!strcasecmp(name, "invisible")) {
-		away = 2;
-		my_printf("invisible");
+	    	if (!params[0]) {
+		    	if (config_random_reason & 8) {
+			    	char *path = prepare_path("quit.reasons");
+
+				reason = get_random_reason(path);
+				if (!reason && config_quit_reason)
+				    	reason = strdup(config_quit_reason);
+			}
+			else if (config_quit_reason)
+			    	reason = strdup(config_quit_reason);
+		}
+		else
+		    	reason = params[0];
+		
+		away = (reason) ? 5 : 2;
+		my_printf((reason) ? "invisible_descr" : "invisible", reason);
 	} else if (!strcasecmp(name, "back")) {
-		away = 0;
-		my_printf("back");
+	    	if (!params[0]) {
+		    	if (config_random_reason & 4) {
+			    	char *path = prepare_path("back.reasons");
+
+				reason = get_random_reason(path);
+				if (!reason && config_back_reason)
+				    	reason = strdup(config_back_reason);
+			}
+			else if (config_back_reason)
+			    	reason = strdup(config_back_reason);
+		}
+		else
+		    	reason = params[0];
+		
+		away = (reason) ? 4 : 0;
+		my_printf((reason) ? "back_descr" : "back", reason);
 	} else {
 		int tmp;
 
@@ -592,29 +620,33 @@ COMMAND(command_away)
 
 COMMAND(command_status)
 {
-	char *av, *bs, *bd, *na, *in, *pr, *np;
+	char *av, *ad, *bs, *bd, *na, *in, *id, *pr, *np;
 
 	av = format_string(find_format("show_status_avail"));
+	ad = format_string(find_format("show_status_avail_descr"), busy_reason);
 	bs = format_string(find_format("show_status_busy"));
 	bd = format_string(find_format("show_status_busy_descr"), busy_reason);
-	na = format_string(find_format("show_status_not_avail"));
 	in = format_string(find_format("show_status_invisible"));
+	id = format_string(find_format("show_status_invisible_descr"), busy_reason);
+	na = format_string(find_format("show_status_not_avail"));
 	pr = format_string(find_format("show_status_private_on"));
 	np = format_string(find_format("show_status_private_off"));
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		my_printf("show_status", na, "");
 	} else {
-		char *foo[4] = { av, bs, in, bd };
+		char *foo[6] = { av, bs, in, bd, ad, id };
 
 		my_printf("show_status", foo[away], (private_mode) ? pr : np);
 	}
 
 	free(av);
+	free(ad);
 	free(bs);
 	free(bd);
 	free(na);
 	free(in);
+	free(id);
 	free(pr);
 	free(np);
 
@@ -1126,6 +1158,9 @@ COMMAND(command_list)
 			switch (u->status) {
 				case GG_STATUS_AVAIL:
 					status = format_string(find_format("user_info_avail"));
+					break;
+				case GG_STATUS_AVAIL_DESCR:
+					status = format_string(find_format("user_info_avail_descr"), u->descr);
 					break;
 				case GG_STATUS_BUSY:
 					status = format_string(find_format("user_info_busy"));

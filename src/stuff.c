@@ -102,6 +102,7 @@ char *home_dir = NULL;
 int screen_lines = 24;
 char *config_quit_reason = NULL;
 char *config_away_reason = NULL;
+char *config_back_reason = NULL;
 int config_random_reason = 0;
 int config_query_commands = 0;
 char *config_proxy = NULL;

@@ -528,11 +528,13 @@ void init_theme()
 	add_format("ack_queued", "%> Wiadomo¶æ do %1 zostanie dostarczona pó¼niej %c(%C%#%c)%n\n", 1);
 	add_format("ack_delivered", "%> Wiadomo¶æ do %1 zosta³a dostarczona %c(%C%#%c)%n\n", 1);
 	add_format("status_avail", "%> %1 jest dostêpny %c(%C%#%c)%n\n", 1);
+	add_format("status_avail_descr", "%> %1 jest dostêpny: %2 %c(%C%#%c)%n\n", 1);
 	add_format("status_busy", "%> %1 jest zajêty %c(%C%#%c)%n\n", 1);
 	add_format("status_busy_descr", "%> %1 jest zajêty: %2 %c(%C%#%c)%n\n", 1);
 	add_format("status_not_avail", "%> %1 jest niedostêpny %c(%C%#%c)%n\n", 1);
 	add_format("status_not_avail_descr", "%> %1 jest niedostêpny: %2 %c(%C%#%c)%n\n", 1);
 	add_format("status_invisible", "%> %1 jest niewidoczny %c(%C%#%c)%n\n", 1);
+	add_format("status_invisible_descr", "%> %1 jest niewidoczny: %2 %c(%C%#%c)%n\n", 1);
 	add_format("conn_broken", "%! Serwer zerwa³ po³±czenie: %1 %c(%C%#%c)%n\n", 1);
 	add_format("auto_away", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci %c(%C%#%c)%n\n", 1);
 	add_format("auto_away_descr", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci %c(%C%#%c)%n: %2\n", 1);
@@ -614,6 +616,7 @@ void init_theme()
 	add_format("modify_done", "%> Zmieniono wpis w li¶cie kontaktów\n", 1);
 	add_format("user_info", "%) Pseudonim: %W%3%n\n%) Numer: %W%7%n\n%) Stan: %8\n%) Imiê i nazwisko: %W%1 %2%n\n%) Alias: %W%4%n\n%) Numer telefonu: %W%5%n\n%) Grupy: %W%6%n\n", 1);
 	add_format("user_info_avail", "%Ydostêpny%n", 1);
+	add_format("user_info_avail_descr", "%Ydostêpny%n (%1)", 1);
 	add_format("user_info_busy", "%Gzajêty%n", 1);
 	add_format("user_info_busy_descr", "%Gzajêty%n (%1)", 1);
 	add_format("user_info_not_avail", "%rniedostêpny%n", 1);
@@ -631,9 +634,11 @@ void init_theme()
 	
 	add_format("show_status", "%) Aktualny stan: %1%2\n", 1);
 	add_format("show_status_avail", "%Ydostêpny%n", 1);
+	add_format("show_status_avail_descr", "%Ydostêpny%n (%1)", 1);
 	add_format("show_status_busy", "%Gzajêty%n", 1);
 	add_format("show_status_busy_descr", "%Gzajêty%n (%1)", 1);
 	add_format("show_status_invisible", "%bniewidoczny%n", 1);
+	add_format("show_status_invisible_descr", "%bniewidoczny%n (%1)", 1);
 	add_format("show_status_not_avail", "%rniedostêpny%n", 1);
 	add_format("show_status_private_on", ", tylko dla znajomych", 1);
 	add_format("show_status_private_off", "", 1);

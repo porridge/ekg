@@ -297,6 +297,18 @@ void handle_notify(struct gg_event *e)
 			    	my_printf("status_busy_descr", format_user(n->uin), u->descr);
 		}
 
+		if (n->status == GG_STATUS_AVAIL_DESCR) {
+			check_event(EVENT_AVAIL, u->uin);
+			free(u->descr);
+			/* XXX sprawdziæ strdup()y */
+			u->descr = (e->event.notify_descr.descr) ? strdup(e->event.notify_descr.descr) : strdup("");
+			cp_to_iso(u->descr);
+                        if (config_log_status)
+                                put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
+			if (config_display_notify)
+			    	my_printf("status_avail_descr", format_user(n->uin), u->descr);
+		}
+
 		if (n->status == u->status && n->remote_port == u->port) {
 			n++;
 			continue;
@@ -369,6 +381,9 @@ void handle_status(struct gg_event *e)
 	if (e->event.status.status == GG_STATUS_NOT_AVAIL_DESCR && !e->event.status.descr)
 		e->event.status.status = GG_STATUS_NOT_AVAIL;
 	
+	if (e->event.status.status == GG_STATUS_AVAIL_DESCR && !e->event.status.descr)
+		e->event.status.status = GG_STATUS_AVAIL;
+	
 	if (e->event.status.descr) {
 		u->descr = strdup(e->event.status.descr);
 		cp_to_iso(u->descr);
@@ -382,6 +397,15 @@ void handle_status(struct gg_event *e)
 			if (config_completion_notify)
 				add_send_nick(u->display);
 			my_printf("status_avail", format_user(e->event.status.uin));
+			if (config_beep && config_beep_notify)
+				my_puts("\007");
+		} else if (e->event.status.status == GG_STATUS_AVAIL_DESCR) {
+                        if (config_log_status)
+			    	put_log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
+		    	check_event(EVENT_AVAIL, e->event.status.uin);
+			if (config_completion_notify)
+				add_send_nick(u->display);
+			my_printf("status_avail_descr", format_user(e->event.status.uin), u->descr);
 			if (config_beep && config_beep_notify)
 				my_puts("\007");
 		} else if (e->event.status.status == GG_STATUS_BUSY && u->status != GG_STATUS_BUSY) 

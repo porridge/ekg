@@ -203,17 +203,17 @@ int my_getc(FILE *f)
 				char tmp[16], *reason = NULL;
 
 
-				if (config_random_reason & 2) {
+				if (config_random_reason & 1) {
 				    	char *path = prepare_path("away.reasons");
 
 					reason = get_random_reason(path);
-					if (!reason && config_quit_reason)
-					    	reason = strdup(config_quit_reason);
+					if (!reason && config_away_reason)
+					    	reason = strdup(config_away_reason);
 				}
-				else if (config_quit_reason)
-				    	reason = strdup(config_quit_reason);
+				else if (config_away_reason)
+				    	reason = strdup(config_away_reason);
 				
-				away = 1;
+				away = (reason) ? 3 : 1;
 				reset_prompt();
 
 				if (reason) {
@@ -474,6 +474,10 @@ IOCTL_HELP
 		case GG_STATUS_AVAIL:
 			away = 0;
 			break;
+		case GG_STATUS_AVAIL_DESCR:
+			away = 0;
+			config_status = (config_status & GG_STATUS_FRIENDS_MASK) | GG_STATUS_AVAIL;
+			break;
 		case GG_STATUS_BUSY:
 			away = 1;
 			break;
@@ -483,6 +487,10 @@ IOCTL_HELP
 			break;
 		case GG_STATUS_INVISIBLE:
 			away = 2;
+			break;
+		case GG_STATUS_INVISIBLE_DESCR:
+			away = 2;
+			config_status = (config_status & GG_STATUS_FRIENDS_MASK) | GG_STATUS_INVISIBLE;
 			break;
 	}
 	

@@ -100,6 +100,7 @@ int config_status;
 int config_auto_reconnect;
 char *config_quit_reason;
 char *config_away_reason;
+char *config_back_reason;
 int config_random_reason;
 int config_query_commands;
 char *config_proxy;
