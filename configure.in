@@ -315,5 +315,3 @@ if test -d src; then
 fi
 
 AC_OUTPUT
-
-
