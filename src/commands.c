@@ -3560,7 +3560,12 @@ COMMAND(cmd_register)
 	} else {
 		uin_t uin = 0;
 		
-		if (!params[0] || !params[1]) {
+		if (!last_tokenid) {
+			printq("token_missing");
+			return -1;
+		}
+
+		if (!params[0] || !params[1] || !params[2]) {
 			printq("not_enough_params", name);
 			return -1;
 		} 
@@ -3572,10 +3577,13 @@ COMMAND(cmd_register)
 			return -1;
 		}
 
-		if (!(h = gg_unregister2(uin, params[1], "", 1))) {
+		if (!(h = gg_unregister3(uin, params[1], last_tokenid, params[2], 1))) {
 			printq("unregister_failed", strerror(errno));
 			return -1;
 		}
+
+		xfree(last_tokenid);
+		last_tokenid = NULL;
 
 		list_add(&watches, h, 0);
 	}
@@ -5773,12 +5781,13 @@ void command_init()
 	  "");
 
 	command_add
-	( "unregister", "??", cmd_register, 0,
-	  " <uin/alias> <has³o>", "usuwa konto z serwera",
+	( "unregister", "???", cmd_register, 0,
+	  " <uin/alias> <has³o> <token>", "usuwa konto z serwera",
 	  "\n"
 	  "Podanie numeru i has³a jest niezbêdne ze wzglêdów bezpieczeñstwa. "
 	  "Nikt nie chcia³by chyba usun±æ konta przypadkowo, bez ¿adnego "
-	  "potwierdzenia.");
+	  "potwierdzenia. Przed operacj±  nale¿y pobraæ token komend± "
+	  "%Ttoken%n.");
 
 	command_add
 	( "conference", "??u", cmd_conference, 0,

@@ -699,6 +699,7 @@ struct gg_http *gg_register3(const char *email, const char *password, const char
 
 struct gg_http *gg_unregister(uin_t uin, const char *password, const char *email, int async);
 struct gg_http *gg_unregister2(uin_t uin, const char *password, const char *qa, int async);
+struct gg_http *gg_unregister3(uin_t uin, const char *password, const char *tokenid, const char *tokenval, int async);
 #define gg_unregister_watch_fd gg_pubdir_watch_fd
 #define gg_unregister_free gg_pubdir_free
 
