@@ -1922,6 +1922,7 @@ int process_remove(int pid)
 		struct process *p = l->data;
 
 		if (p->pid == pid) {
+			xfree(p->name);
 			list_remove(&children, p, 1);
 			return 0;
 		}
