@@ -783,8 +783,11 @@ static void update_statusbar()
 				waddstr(status, config_reason);
 			p += 5;
 		} else if (!strncmp(p, "mail}", 5)) {
-			if (config_check_mail && mail_count)
-				waddstr(status, itoa(check_mail()));
+			int count = check_mail();
+
+			if (config_check_mail && count)
+				waddstr(status, itoa(count));
+			
 			p += 4;
 		} else if (!strncmp(p, "activity}", 9)) {
 			string_t s = string_init("");
