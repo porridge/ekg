@@ -540,6 +540,16 @@ void buffer_free()
 	buffers = NULL;
 }
 
+#ifdef WITH_UI_NCURSES
+void changed_backlog_size(const char *var)
+{
+	int min = ui_screen_height - 1 - config_statusbar_size - config_header_size;
+
+	if (config_backlog_size < min)
+		config_backlog_size = min;
+}
+#endif
+
 /*
  * changed_dcc()
  *

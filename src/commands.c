@@ -4249,7 +4249,7 @@ void command_init()
 	  
 	command_add
 	( "!", "?", cmd_exec, 0,
-	  " <polecenie>", "synonim dla %Texec%n",
+	  " [opcje] <polecenie>", "synonim dla %Texec%n",
 	  "");
 
 	command_add
@@ -4283,7 +4283,7 @@ void command_init()
 	 
 	command_add
 	( "ignore", "u", cmd_ignore, 0,
-	  " [opcje] [numer/alias]", "dodaje do listy ignorowanych",
+	  " [numer/alias]", "dodaje do listy ignorowanych",
 	  "\n"
 	  "W przysz³o¶ci bêdzie mo¿liwe wybranie zdarzeñ zwi±zanych z dan± "
 	  "osob±, takich jak wiadomo¶ci, zmiana stanu, zmiana opisu itp.");

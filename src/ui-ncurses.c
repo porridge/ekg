@@ -1522,10 +1522,15 @@ static void winch_handler()
 	endwin();
 	refresh();
 
+        ui_screen_width = stdscr->_maxx + 1;
+        ui_screen_height = stdscr->_maxy + 1;
+
 	window_resize();
 	window_refresh();
 	contacts_rebuild();
 	window_commit();
+
+	changed_backlog_size("backlog_size");
 }
 
 /*

@@ -9,6 +9,7 @@ zg³osi³ b³±d.
 // 2003-01-30
 
 - bardziej precyzyjny opis zmiennej ,,auto_back'' (pmb/sz)
+- ekg nie pozwala na niebezpiecznie ma³e warto¶ci ,,backlog_size'' (sz)
 - poprawka kombinacji Ctrl-<kursor> na terminalach BSD (sz/w)
 - ignorowanie SIGQUIT, przez co Ctrl-4 i Ctrl-\ nie bêd± wychodziæ (sz/w)
 - libgadu: usuniêcie kodu gg_search50() (w)

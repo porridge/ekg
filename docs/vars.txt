@@ -79,9 +79,9 @@ backlog_size
 	domy¶lna warto¶æ: 1000
 
 	ilo¶æ linii, która bêdzie zapisywana w buforze ekranu (tym, który
-	jest przewijany klawiszami Page Up i Page Down). je¶li warto¶æ
-	bêdzie mniejsza ni¿ ilo¶æ linii na ekranie, zachowanie ekg bêdzie
-	nieprzewidziane. dzia³a tylko w interfejsie ncurses.
+	jest przewijany klawiszami Page Up i Page Down). nie mo¿e byæ
+	mniejsza ni¿ ilo¶æ linii na ekranie. dzia³a tylko w interfejsie
+	ncurses.
 
 beep
 	typ: bool

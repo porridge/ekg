@@ -310,6 +310,9 @@ int buffer_count(int type);
 char *buffer_flush(int type, const char *target);
 void buffer_free();
 
+#ifdef WITH_UI_NCURSES
+void changed_backlog_size(const char *var);
+#endif
 void changed_dcc(const char *var);
 void changed_proxy(const char *var);
 void changed_theme(const char *var);

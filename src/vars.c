@@ -106,7 +106,7 @@ void variable_init()
 	variable_add("back_reason", "br", VAR_STR, 1, &config_back_reason, changed_xxx_reason, NULL, NULL);
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init)
-		variable_add("backlog_size", "bs", VAR_INT, 1, &config_backlog_size, NULL, NULL, NULL);
+		variable_add("backlog_size", "bs", VAR_INT, 1, &config_backlog_size, changed_backlog_size, NULL, NULL);
 #endif
 	variable_add("beep", "be", VAR_BOOL, 1, &config_beep, NULL, NULL, NULL);
 	variable_add("beep_msg", "bm", VAR_BOOL, 1, &config_beep_msg, NULL, NULL, dd_beep);
