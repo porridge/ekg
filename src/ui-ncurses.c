@@ -278,7 +278,7 @@ static struct window *window_new(const char *target)
  *
  * wy¶wietla timestamp na pocz±tku linii, je¶li trzeba.
  */
-int print_timestamp(struct window *w)
+static int print_timestamp(struct window *w)
 {
 	struct tm *tm;
 	char buf[80];
@@ -412,7 +412,9 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 					p++;
 				else
 					w->y++;
-				x += print_timestamp(w);
+				set_cursor(w);
+				x = 4;
+				wmove(w->window, w->y, x);
 			}
 		}
 	}
