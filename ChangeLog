@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   i zostawia w spokoju ,,/'' przy dope³nianiu komend (yoyo/w)
 - wci¶niêcie enter w pustej linii w query nie wysy³a niczego (w)
 - literówka w helpie (yoyo/w)
+- ,,const char'' w libgadu, gdzie trzeba (tomee/w)
 
 // 2002-03-08
 

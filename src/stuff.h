@@ -115,6 +115,7 @@ uin_t query_uin;
 int sock;
 int length;
 struct sockaddr_un addr;
+char *busy_reason;
 
 int config_read(char *filename);
 int config_write(char *filename);

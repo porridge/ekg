@@ -231,13 +231,13 @@ enum gg_check_enum {
 	GG_CHECK_READ = 2,		/* sprawdzamy mo¿liwo¶æ odczytu */
 };
 
-struct gg_session *gg_login(uin_t uin, char *password, int async);
+struct gg_session *gg_login(uin_t uin, const char *password, int async);
 void gg_free_session(struct gg_session *sess);
 void gg_logoff(struct gg_session *sess);
 int gg_change_status(struct gg_session *sess, int status);
-int gg_change_status_descr(struct gg_session *sess, int status, char *descr);
-int gg_send_message(struct gg_session *sess, int msgclass, uin_t recipient, unsigned char *message);
-int gg_send_message_ctcp(struct gg_session *sess, int msgclass, uin_t recipient, unsigned char *message, int message_len);
+int gg_change_status_descr(struct gg_session *sess, int status, const char *descr);
+int gg_send_message(struct gg_session *sess, int msgclass, uin_t recipient, const unsigned char *message);
+int gg_send_message_ctcp(struct gg_session *sess, int msgclass, uin_t recipient, const unsigned char *message, int message_len);
 int gg_ping(struct gg_session *sess);
 
 
@@ -354,7 +354,7 @@ int gg_remove_notify(struct gg_session *sess, uin_t uin);
  * OBS£UGA HTTP
  */
 
-struct gg_http *gg_http_connect(char *hostname, int port, int async, char *method, char *path, char *header);
+struct gg_http *gg_http_connect(const char *hostname, int port, int async, const char *method, const char *path, const char *header);
 int gg_http_watch_fd(struct gg_http *h);
 void gg_http_stop(struct gg_http *h);
 void gg_http_free(struct gg_http *h);
@@ -440,7 +440,7 @@ void gg_pubdir_free(struct gg_http *f);
 #define gg_free_pubdir gg_pubdir_free
 
 /* rejestracja nowego numerka */
-struct gg_http *gg_register(char *email, char *password, int async);
+struct gg_http *gg_register(const char *email, const char *password, int async);
 #define gg_register_watch_fd gg_pubdir_watch_fd
 #define gg_register_free gg_pubdir_free
 #define gg_free_register gg_pubdir_free
@@ -452,7 +452,7 @@ struct gg_http *gg_remind_passwd(uin_t uin, int async);
 #define gg_free_remind_passwd gg_pubdir_free
 
 /* zmiana has³a */
-struct gg_http *gg_change_passwd(uin_t uin, char *passwd, char *newpasswd, char *newemail, int async);
+struct gg_http *gg_change_passwd(uin_t uin, const char *passwd, const char *newpasswd, const char *newemail, int async);
 #define gg_change_passwd_watch_fd gg_pubdir_watch_fd
 #define gg_change_passwd_free gg_pubdir_free
 #define gg_free_change_passwd gg_pundir_free
@@ -468,7 +468,7 @@ struct gg_change_info_request {
 	char *city;		/* miasto */
 };
 
-struct gg_change_info_request *gg_change_info_request_new(char *first_name, char *last_name, char *nickname, char *email, int born, int gender, char *city);
+struct gg_change_info_request *gg_change_info_request_new(const char *first_name, const char *last_name, const char *nickname, const char *email, int born, int gender, const char *city);
 void gg_change_info_request_free(struct gg_change_info_request *r);
 
 struct gg_http *gg_change_info(uin_t uin, char *passwd, struct gg_change_info_request *request, int async);
@@ -480,11 +480,11 @@ struct gg_http *gg_change_info(uin_t uin, char *passwd, struct gg_change_info_re
  * FUNKCJE DOTYCZ¡CE LISTY KONTAKTÓW NA SERWERZE
  */
 
-struct gg_http *gg_userlist_get(uin_t uin, char *password, int async);
+struct gg_http *gg_userlist_get(uin_t uin, const char *password, int async);
 int gg_userlist_get_watch_fd(struct gg_http *f);
 void gg_userlist_get_free(struct gg_http *f);
 
-struct gg_http *gg_userlist_put(uin_t uin, char *password, char *contacts, int async);
+struct gg_http *gg_userlist_put(uin_t uin, const char *password, const char *contacts, int async);
 int gg_userlist_put_watch_fd(struct gg_http *f);
 void gg_userlist_put_free(struct gg_http *f);
 
@@ -498,7 +498,7 @@ extern unsigned long gg_dcc_ip;
 int gg_dcc_request(struct gg_session *sess, uin_t uin);
 
 struct gg_dcc *gg_dcc_send_file(unsigned long ip, unsigned short port, uin_t my_uin, uin_t peer_uin);
-int gg_dcc_fill_file_info(struct gg_dcc *d, char *filename);
+int gg_dcc_fill_file_info(struct gg_dcc *d, const char *filename);
 
 struct gg_dcc *gg_dcc_socket_create(uin_t uin, unsigned int port);
 #define gg_dcc_socket_free gg_free_dcc
@@ -523,7 +523,7 @@ extern int gg_debug_level;
 #define GG_DEBUG_FUNCTION 8
 #define GG_DEBUG_MISC 16
 
-void gg_debug(int level, char *format, ...);
+void gg_debug(int level, const char *format, ...);
 
 /*
  * Pare ma³ych zmiennych do obs³ugi "http proxy"
@@ -542,18 +542,17 @@ extern int gg_http_proxy_port;
  * -------------------------------------------------------------------------
  */
 
-int gg_resolve(int *fd, int *pid, char *hostname);
-void gg_debug(int level, char *format, ...);
-char *gg_alloc_sprintf(char *format, ...);
+int gg_resolve(int *fd, int *pid, const char *hostname);
+char *gg_alloc_sprintf(const char *format, ...);
 char *gg_get_line(char **ptr);
 int gg_connect(void *addr, int port, int async);
 char *gg_read_line(int sock, char *buf, int length);
 void gg_chomp(char *line);
-char *gg_urlencode(char *str);
-int gg_http_hash(char *format, ...);
+char *gg_urlencode(const char *str);
+int gg_http_hash(const char *format, ...);
 void *gg_recv_packet(struct gg_session *sess);
 int gg_send_packet(int sock, int type, ...);
-unsigned int gg_login_hash(unsigned char *password, unsigned int seed);
+unsigned int gg_login_hash(const unsigned char *password, unsigned int seed);
 unsigned long fix32(unsigned long x);
 unsigned short fix16(unsigned short x);
 

@@ -40,7 +40,7 @@
  * zwraca zaalokowan± strukturê `gg_http', któr± po¼niej nale¿y zwolniæ
  * funkcj± gg_userlist_get_send(), albo NULL je¶li wyst±pi³ b³±d.
  */
-struct gg_http *gg_userlist_get(uin_t uin, char *passwd, int async)
+struct gg_http *gg_userlist_get(uin_t uin, const char *passwd, int async)
 {
 	struct gg_http *h;
 	char *form, *query, *__passwd;
@@ -181,7 +181,7 @@ void gg_userlist_get_free(struct gg_http *h)
  * zwraca zaalokowan± strukturê `gg_http', któr± po¼niej nale¿y zwolniæ
  * funkcj± gg_userlist_send(), albo NULL je¶li wyst±pi³ b³±d.
  */
-struct gg_http *gg_userlist_put(uin_t uin, char *passwd, char *contacts, int async)
+struct gg_http *gg_userlist_put(uin_t uin, const char *passwd, const char *contacts, int async)
 {
 	struct gg_http *h;
 	char *form, *query, *__passwd, *__contacts = NULL;

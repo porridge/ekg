@@ -617,9 +617,10 @@ void init_theme()
 	add_format("private_mode_off", "%> Wy³±czono tryb ,,tylko dla przyjació³''\n", 1);
 	add_format("private_mode_invalid", "%! Nieprawid³owa warto¶æ\n", 1);
 	
-	add_format("show_status", "%) Aktywny stan: %1%2\n", 1);
+	add_format("show_status", "%) Aktualny stan: %1%2\n", 1);
 	add_format("show_status_avail", "%Ydostêpny%n", 1);
 	add_format("show_status_busy", "%Gzajêty%n", 1);
+	add_format("show_status_busy_descr", "%Gzajêty%n (%1)", 1);
 	add_format("show_status_invisible", "%bniewidoczny%n", 1);
 	add_format("show_status_not_avail", "%rniedostêpny%n", 1);
 	add_format("show_status_private_on", ", tylko dla znajomych", 1);

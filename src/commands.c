@@ -509,6 +509,9 @@ COMMAND(command_away)
 	char *reason = NULL;
 	
 	unidle();
+
+	free(busy_reason);
+	busy_reason = NULL;
 	
 	if (!strcasecmp(name, "away")) {
 		reason = params[0];
@@ -546,15 +549,19 @@ COMMAND(command_away)
 			gg_change_status(sess, config_status);
 	}
 
+	if (reason)
+		busy_reason = strdup(params[0]);
+
 	return 0;
 }
 
 COMMAND(command_status)
 {
-	char *av, *bs, *na, *in, *pr, *np;
+	char *av, *bs, *bd, *na, *in, *pr, *np;
 
 	av = format_string(find_format("show_status_avail"));
 	bs = format_string(find_format("show_status_busy"));
+	bd = format_string(find_format("show_status_busy_descr"), busy_reason);
 	na = format_string(find_format("show_status_not_avail"));
 	in = format_string(find_format("show_status_invisible"));
 	pr = format_string(find_format("show_status_private_on"));
@@ -563,13 +570,14 @@ COMMAND(command_status)
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		my_printf("show_status", na, "");
 	} else {
-		char *foo[3] = { av, bs, in };
+		char *foo[4] = { av, bs, in, bd };
 
 		my_printf("show_status", foo[away], (private_mode) ? pr : np);
 	}
 
 	free(av);
 	free(bs);
+	free(bd);
 	free(na);
 	free(in);
 	free(pr);

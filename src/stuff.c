@@ -92,6 +92,7 @@ uin_t query_uin = 0;
 int sock = 0;
 int length = 0;
 struct sockaddr_un addr;
+char *busy_reason = NULL;
 
 /*
  * my_puts()
