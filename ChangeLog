@@ -9,6 +9,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - update arim.theme (Arim/w)
 - ui-readline respektuje zmienn± ,,sort_windows'' (d)
+- ui-ncurses poprawnie wykrywa p³eæ przy imionach z polskimi znakami.
+  widocznie ncurses co¶ psuje (Arim/w)
 
 // 2002-09-05
 
