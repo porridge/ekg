@@ -117,6 +117,7 @@ KLAWIATURA
         Ctrl-L			czyszczenie/od¶wie¿anie ekranu
         Ctrl-M, Enter		zatwierdzenie linii
         Ctrl-Q			odblokowanie terminala
+	Ctrl-R			kolor tekstu [3]
         Ctrl-S			zablokowanie terminala
 	Ctrl-T			pochy³a czcionka [3]
 	Ctrl-V			pozwala wpisaæ dowolny znak [2]
@@ -181,7 +182,8 @@ KLAWIATURA
 	Ctrl-U.
 
     [3] W miejscu wci¶niêcia klawisza pojawi siê znak oznaczaj±cy kod
-        klawisza w negatywie.
+        klawisza w negatywie. By zmieniæ kolor tekstu, nale¿y po Ctrl-R
+	wpisaæ numer koloru od 0 do 15.
 
 PLIK KONFIGURACYJNY
 
