@@ -1029,6 +1029,9 @@ int main(int argc, char **argv)
 		xfree(tmp);
 	}
 
+	variable_init();
+	variable_set_default();
+
 #ifdef HAVE_USLEEP
 
 	if ((tmp = config_read_variable("fade_in"))) {
@@ -1115,9 +1118,6 @@ int main(int argc, char **argv)
 
 	ui_init();
 	ui_event("theme_init");
-
-	variable_init();
-	variable_set_default();
 
 	if (ui_set && config_interface && strcmp(config_interface, "")) {
 		char **arr = NULL;
