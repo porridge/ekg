@@ -454,8 +454,10 @@ void ekg_wait_for_key()
 		}
 
 		/* timeout autoawaya */
-		if (config_auto_away && GG_S_A(config_status) && time(NULL) - last_action > config_auto_away && sess->state == GG_STATE_CONNECTED)
+		if (config_auto_away && GG_S_A(config_status) && time(NULL) - last_action > config_auto_away && sess->state == GG_STATE_CONNECTED) {
 			change_status(GG_STATUS_BUSY, NULL, config_auto_away);
+			in_auto_away = 1;
+		}
 
 		/* auto save */
 		if (config_auto_save && config_changed && time(NULL) - last_save > config_auto_save) {
@@ -604,8 +606,10 @@ void ekg_wait_for_key()
 				continue;
 
 			if (c->type == GG_SESSION_USER0) {
-				if (config_auto_back == 2 && GG_S_B(config_status))
+				if (config_auto_back == 2 && GG_S_B(config_status) && in_auto_away) {
 					change_status(GG_STATUS_AVAIL, NULL, 1);
+					in_auto_away = 0;
+				}
 
 				if (config_auto_back == 2)
 					unidle();
@@ -962,7 +966,7 @@ int main(int argc, char **argv)
 				load_theme = optarg;
 				break;
 			case 'v':
-			    	printf("ekg-%s\nlibgadu-%s (headers %s, protocol 0x%.2x, client \"%s\")\nCompile time: %s\n", VERSION, gg_libgadu_version(), GG_LIBGADU_VERSION, GG_DEFAULT_PROTOCOL_VERSION, GG_DEFAULT_CLIENT_VERSION, compile_time());
+			    	printf("ekg-%s\nlibgadu-%s (headers %s, protocol 0x%.2x, client \"%s\")\ncompile time: %s\n", VERSION, gg_libgadu_version(), GG_LIBGADU_VERSION, GG_DEFAULT_PROTOCOL_VERSION, GG_DEFAULT_CLIENT_VERSION, compile_time());
 				return 0;
 #ifdef WITH_IOCTLD
 			case 'I':

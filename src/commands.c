@@ -299,6 +299,8 @@ COMMAND(cmd_alias)
 
 COMMAND(cmd_away)
 {
+	in_auto_away = 0;
+
 	if (params[0] && strlen(params[0]) > GG_STATUS_DESCR_MAXSIZE)
 		printq("descr_too_long", itoa(strlen(params[0]) - GG_STATUS_DESCR_MAXSIZE));
 
@@ -1666,7 +1668,7 @@ COMMAND(cmd_msg)
 		return -1;
 	}
 
-	if (config_auto_back == 1 && GG_S_B(config_status))
+	if (config_auto_back == 1 && GG_S_B(config_status) && in_auto_away)
 		change_status(GG_STATUS_AVAIL, NULL, 1);
 
 	nick = xstrdup(params[0]);
@@ -4249,11 +4251,11 @@ void command_init()
 	  "dla przyjació³''.\n"
 	  "\n"
 	  "Lista kontaktów na serwerze \"list [-p|-g|-c|-P|-G|-C]\":\n"
-	  "  -p, --put         umieszcza na serwerze\n"
-	  "  -P, --put-config  umieszcza na serwerze razem z konfiguracj±\n"
-	  "  -g, --get         pobiera z serwera\n"
-	  "  -G, --get-config  pobiera z serwera razem z konfiguracj±\n"
-	  "  -c, --clear       usuwa listê z serwera\n"
+	  "  -p, --put          umieszcza na serwerze\n"
+	  "  -P, --put-config   umieszcza na serwerze razem z konfiguracj±\n"
+	  "  -g, --get          pobiera z serwera\n"
+	  "  -G, --get-config   pobiera z serwera razem z konfiguracj±\n"
+	  "  -c, --clear        usuwa listê z serwera\n"
 	  "  -C, --clear-config usuwa listê wraz z konfiguracj± z serwera");
 	  
 	command_add
