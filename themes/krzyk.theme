@@ -19,9 +19,10 @@ header %{?query %{?query_away %wzajêty}%{?query_avail %Wdostêpny}%{?query_notava
 
 known_user %1
 known_user,speech %1
-unknown_user [%r%1%n]
+unknown_user %n[%r%1%n]
 none %1\n
 generic %> %1\n
+generic2 %) %1\n
 generic_error %! %1\n
 debug %n%1\n
 not_enough_params %! %RZa ma³o parametrów%n \n
@@ -34,9 +35,9 @@ user_not_found %! %RNie ma na li¶cie u¿ytkownika%n %W%1%n\n
 not_implemented %! Tej funkcji jeszcze nie ma\n
 unknown_command %! %RNieznane polecenie%n: %W%0%1%n\n
 
-welcome  %cE%n%Wksperymentalny%n %K(C)2001-2003 Wojtek Kaniewski <wojtekka@irc.pl> i inni%n \n %cK%n%Wlient%n          %KProgram jest rozprowadzany na zasadach licencji GPL%n\n %cG%n%Wadu-Gadu%n       %KPrzed u¿yciem przeczytaj ulotkê (polecenie 'help' lub F1)%n\n
+welcome %> %TEKG-%1%n (Eksperymentalny Klient Gadu-Gadu)\n%> Program jest rozprowadzany na zasadach licencji GPL v2\n%> %RPrzed u¿yciem wci¶nij F1 lub wpisz ,,help''%n\n\n
 welcome,speech witamy w e k g
-ekg_version %) %cEKG%n - %CE%nksperymentalny %CK%nlient %CG%nadu-Gadu (%W%1%n)\n
+ekg_version %) EKG - Eksperymentalny Klient Gadu-Gadu (%T%1%n)\n%) libgadu-%1 (protokó³ %2, klient %3)\n%) skompilowano: %4\n
 
 secure %y(szyfrowane)%n 
 
@@ -81,7 +82,8 @@ help_set_footer
 
 ignored_added %> Od teraz ignorujesz %W%1%n\n
 ignored_deleted %> Skasowano%n %W%1%n z listy ignorów\n
-ignored_deleted %> Skasowano%n wszystkich z listy ignorów\n
+ignored_deleted_all %> Skasowano%n wszystkich z listy ignorów\n
+ignored_exist %! %1 jest ju¿ ignorowany\n
 ignored_list %> ig: %1\n
 ignored_list_empty %> Lista ignorów jest pusta\n
 error_not_ignored %! %RPodana osoba nie jest ignorowana%n \n
@@ -110,43 +112,42 @@ modify_online %> %W%1%n bêdzie widzieæ nasz stan \n
 modify_done %> Dane zmienione \n
 
 contacts_header 
-contacts_header_group %W_%1________________________%n
+contacts_header_group %b_%r%1%n%b__________________________________________%n
 contacts_avail_header 
 contacts_avail  %W%1%n 
 contacts_avail_descr %ri%n%W%1%n 
-contacts_avail_descr_full %ri%n%W%1%n %2
-contacts_avail_footer 
+contacts_avail_descr_full %ri%n%W%1%n: %K%2%n
+contacts_avail_footer %b-------------------------------------------------%n
 contacts_busy_header 
 contacts_busy  %w%1%n 
 contacts_busy_descr %ri%n%w%1%n 
-contacts_busy_descr_full %ri%n%w%1%n %2
-contacts_busy_footer 
+contacts_busy_descr_full %ri%n%w%1%n: %K%2%n
+contacts_busy_footer %b-----------------------------------------------%n
 contacts_not_avail_header 
 contacts_not_avail  %K%1%n 
 contacts_not_avail_descr %ri%n%K%1%n 
-contacts_not_avail_descr_full %ri%n%K%1%n %2
-contacts_not_avail_footer 
+contacts_not_avail_descr_full %ri%n%K%1%n: %K%2%n
+contacts_not_avail_footer %b-----------------------------------------------%n
 contacts_invisible_header 
 contacts_invisible  %C%1%n 
 contacts_invisible_descr %ri%n%C%1%n 
-contacts_invisible_descr_full %ri%n%C%1%n %2
-contacts_invisible_footer 
+contacts_invisible_descr_full %ri%n%C%1%n: %K%2%n
+contacts_invisible_footer %b-----------------------------------------------%n
 contacts_blocking_header 
 contacts_blocking  %m%1%n 
-contacts_blocking_footer 
+contacts_blocking_footer %b-----------------------------------------------%n
 contacts_footer 
-contacts_footer_group 
+contacts_footer_group
 
-quit %> %GP%n%Ca%n%Rp%n%Ba%n %W....%n\n\n
-quit_descr %> %GP%n%Ca%n%Rp%n%Ba%n %W....%1%n%2\n\n
+quit %> %WP%n%wa%n%Kp%n%Ka%n %W....%n\n\n
+quit_descr %> %WP%n%wa%n%Kp%n%Ka%n %W....%1%n%2\n\n
 
 config_changed Zapisaæ now± konfiguracjê? (tak/nie)
 saved %r%#%n %> %WZapisano !%n\n
 error_saving %!%RWyst±pi³ b³ad podczas zapisu konfiguracji%n\n
 
 
-message_header %W%1%n %K[%#]%n \n
-#message_conference_header %W%1 [%#]%n\n
+message_header %w%n %W%1%n %K[%#]%n \n
 message_conference_header %g.-- %g[%T%3%g] -- %n%1 %c%2%4%g--- -- -%n\n
 message_footer 
 message_line   %1\n
@@ -160,8 +161,7 @@ message_line,speech %1\n
 message_footer,speech .
 
 
-chat_header %W%1%n %K[%#]%n \n
-#chat_conference_header %W%1 [%#]%n\n
+chat_header %w%n %W%1%n %K[%#]%n \n
 chat_conference_header %c.-- %c[%T%3%c] -- %n%1 %c%2%4%c--- -- -%n\n
 chat_footer 
 chat_line   %1\n
@@ -174,10 +174,10 @@ chat_conference_header,speech wiadomo¶æ od %1 w konferencji %3:
 chat_line,speech %1\n
 chat_footer,speech .
 
-sent_header %W%1%n %K[%#]%n \n
-#sent_conference_header %W%1 [%#]%n\n
+sent_header %w%n %W%1%n %K[%#]%n \n
+sent_conference_header %W%1 [%#]%n\n
 sent_footer 
-sent_line    %K%1%n \n
+sent_line   %K%1%n \n
 sent_line_width -8
 sent_timestamp %H:%M
 
@@ -191,6 +191,7 @@ sysmsg_footer,speech .
 
 ack_queued %) %K ack|%1 %K(%n%c%#%n%K)%n -dodano do kolejki-%n \n
 ack_delivered %) %K ack|%1 %K(%n%c%#%n%K) -dostarczono-%n \n
+ack_filtered %! %|Wiadomo¶æ do %1 najprawdopodobniej nie zosta³a dostarczona, poniewa¿ dana osoba jest niedostêpna, a serwer twierdzi, ¿e dorêczy³ wiadomo¶æ. Sytuacja taka ma miejsce, gdy wiadomo¶æ zosta³a odrzucona przez filtry serwera (np. zawiera adres strony WWW)\n
 message_too_long %! %RWiadomo¶æ jest zbyt d³uga i zosta³a skrócona%n \n
 
 status_avail %r%#%n %> %W%[14]1%n [%W+%n]  %Wdostêpn%@2%n \n
@@ -219,7 +220,7 @@ conn_failed_memory Brak pamiêci
 conn_stopped %! %RPrzerwano ³±czenie %n\n
 conn_timeout %! %RPrzekroczono limit czasu operacji ³±czenia z serwerem %n\n
 connected %r%#%n %> %WPo³±czono z serwerem%n \n
-connected_descr %r%#%n %> %c[%n%G OK %n%c]%n  %GPo³±czono z serwerem: %W%1%n%2\n
+connected_descr %r%#%n %> Po³±czono z serwerem: %W%1%n%2\n
 disconnected %r%#%n %> %WRoz³±czono%n \n
 disconnected_descr %> %r%#%n %WRoz³±czono%n: %K%1%n%2\n
 already_connected %! %RJu¿ jeste¶ po³±czony%n\n
@@ -229,7 +230,7 @@ conn_disconnected %! %r%#%n %R--/%n%r*%n%W/---%n %RSerwerem zerwa³ po³±czenie%n\
 not_connected %! %RNie jeste¶ po³±czony z serwerem%n\n
 not_connected_msg_queued %! %RNie jeste¶ po³±czony z serwerem. Wiadomo¶æ bêdzie wys³ana po po³±czeniu.%n\n
 
-theme_loaded %r%#%n %> theme wczytany %r-%n%b=%n%Kk%n%wr%n%Wz%n%wy%n%Kk%n%r=%n%b-%n \n
+theme_loaded %r%#%n %> theme wczytany %Kk%n%wr%n%Wz%n%wy%n%Kk%n \n
 theme_default %r%#%n %> Ustawiono domy¶lny wygl±d\n
 error_loading_theme %r%#%n %! %R£adowanie theme'a nie powiod³o siê%n\n
 
@@ -268,7 +269,7 @@ change_timeout %! %RPrzekroczono limit czasu operacji zmiany katalogu publiczneg
 
 sms_error %! %RB³±d podczas wysy³ania sms'a%n\n
 sms_unknown %! %W%1%n %Rnie ma ustawionego numeru%n\n
-sms_sent %> %GWys³ano sms'a do%n %W%1%n\n
+sms_sent %> %WWys³ano sms'a do%n %K%1%n\n
 sms_failed %! %RSms do%n %W%1%n %Rnie zosta³ dostarczony%n\n
 sms_msg EKG: msg %1 %# >> %2
 sms_chat EKG: chat %1 %# >> %2
@@ -313,6 +314,8 @@ user_info_status               %KStan%n: %W%1%n \n
 user_info_block              %rBlokowan%@1%n \n
 user_info_ip              %KAdres%n: %W%1%n \n
 user_info_offline            %rNie widzi stanu%n \n
+user_info_not_in_contacts          %RNie ma nas w swoich kontaktach\n
+user_info_firewalled            %rZnajduje siê za firewall/NAT\n
 user_info_mobile            %KTelefon%n: %W%1%n \n
 user_info_groups              %KGrupy%n: %W%1%n \n
 user_info_footer \n
@@ -406,17 +409,17 @@ query_exist %! %RRozmowa z %W%1%n%R jest ju¿ prowadzona w okienku nr %W%2%n \n
 events_list_inactive %> %W%4%n, on %1 %2 %3 %K(nieaktywne)%n\n
 events_seq_incorrect %! %RNieprawid³owa sekwencja%n\n
 
-userlist_put_ok %) %GLista kontaktów zosta³a zapisana na serwerze%n\n
+userlist_put_ok %) %WLista kontaktów zosta³a zapisana na serwerze%n\n
 userlist_put_error %! %RB³±d podczas zapisywania listy kontaktów%n\n
-userlist_get_ok %) %GListê kontaktów pobrano z serwera%n\n
+userlist_get_ok %) %WListê kontaktów pobrano z serwera%n\n
 userlist_get_error %! %RB³±d podczas pobierania listy kontaktów%n\n
-userlist_clear_ok %) %GUsuniêto listê kontaktów z serwera%n\n
+userlist_clear_ok %) %WUsuniêto listê kontaktów z serwera%n\n
 userlist_clear_error %! %RB³±d podczas usuwania listy kontaktów%n\n
-userlist_config_put_ok %) %GListê kontaktów i konfiguracjê zachowano na serwerze%n\n
+userlist_config_put_ok %) %WListê kontaktów i konfiguracjê zachowano na serwerze%n\n
 userlist_config_put_error %! %RB³±d podczas wysy³ania listy kontaktów i konfiguracji%n\n
-userlist_config_get_ok %) %GListê kontaktów i konfiguracjê wczytano z serwera%n\n
+userlist_config_get_ok %) %WListê kontaktów i konfiguracjê wczytano z serwera%n\n
 userlist_config_get_error %! %RB³±d podczas pobierania listy kontaktów i konfiguracji%n\n
-userlist_config_clear_ok %) %GUsuniêto listê kontaktów i konfiguracjê z serwera%n\n
+userlist_config_clear_ok %) %WUsuniêto listê kontaktów i konfiguracjê z serwera%n\n
 userlist_config_clear_error %! %RB³±d podczas usuwania listy kontaktów i konfiguracji%n\n
 
 quick_list %)%1\n
@@ -427,8 +430,8 @@ quick_list_busy  %w%1%n
 quick_list_busy,speech %1 jest zajêty, 
 quick_list_invisible  %C%1%n
 
-window_add %) %GUtworzono nowe okno%n\n
-window_noexist %G! %RWybrane okno nie istnieje%n\n
+window_add %) %WUtworzono nowe okno%n\n
+window_noexist %! %RWybrane okno nie istnieje%n\n
 window_no_windows %! %RNie mo¿na zamkn±æ ostatniego okna%n\n
 window_del %) Zamkniêto okno\n
 windows_max %! %RWyczerpano limit ilo¶ci okien%n\n
@@ -473,7 +476,7 @@ last_clear_uin %) Wiadomo¶ci dla %T%1%n wyczyszczone\n
 last_clear %) Wszystkie wiadomo¶ci wyczyszczone\n
 
 queue_list_timestamp %d-%m-%Y %H:%M
-queue_list_message %) %G >>%n [%1] %2 %3\n
+queue_list_message %) %W >>%n [%1] %2 %3\n
 queue_clear %) Kolejka wiadomo¶ci wyczyszczona\n
 queue_clear_uin %) Kolejka wiadomo¶ci wyczyszczona dla %T%1%n\n
 queue_wrong_use %! Komenda dzia³a tylko przy braku po³±czenia z serwerem\n

@@ -1795,12 +1795,12 @@ static void update_statusbar(int commit)
 
 		string_free(s, 1);
 	}
-	
+
 	__add_format("debug", (!window_current->id), "");
-	__add_format("away", GG_S_B(config_status), "");
-	__add_format("busy", GG_S_B(config_status), "");
-	__add_format("avail", GG_S_A(config_status), "");
-	__add_format("invisible", GG_S_I(config_status), "");
+	__add_format("away", (sess && sess->state == GG_STATE_CONNECTED && GG_S_B(config_status)), "");
+	__add_format("busy", (sess && sess->state == GG_STATE_CONNECTED && GG_S_B(config_status)), "");
+	__add_format("avail", (sess && sess->state == GG_STATE_CONNECTED && GG_S_A(config_status)), "");
+	__add_format("invisible", (sess && sess->state == GG_STATE_CONNECTED && GG_S_I(config_status)), "");
 	__add_format("notavail", (!sess || sess->state != GG_STATE_CONNECTED), "");
 	__add_format("more", (window_current->more), "");
 
