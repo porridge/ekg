@@ -910,6 +910,7 @@ char *group_to_string(list_t groups, int meta)
 {
 	string_t foo;
 	list_t l;
+	int comma = 0;
 
 	if (!(foo = string_init(NULL)))
 		return NULL;
@@ -920,12 +921,16 @@ char *group_to_string(list_t groups, int meta)
 		if (!g || !g->name)
 			continue;
 		
-		if (!meta && !strncmp(g->name, "__", 2))
+		if (!meta && !strncmp(g->name, "__", 2)) {
+			comma = 0;
 			continue;
+		}
 
-		if (l != groups)
+		if (comma)
 			string_append_c(foo, ',');
-		
+
+		comma = 1;
+
 		string_append(foo, g->name);
 	}
 
