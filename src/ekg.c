@@ -1404,7 +1404,7 @@ int main(int argc, char **argv)
 
 	if (config_auto_save)
 		last_save = time(NULL);
-	
+
 	ui_loop();
 
 	ekg_exit();

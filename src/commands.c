@@ -5518,6 +5518,24 @@ COMMAND(cmd_queue)
 
 /* eksperymentalne wykrywanie niewidoczno¶ci, a w zasadzie sprawdzanie czy klient
  * jest po³±czony */
+
+COMMAND(cmd_test_check_conn_update)
+{
+        list_t l;
+
+        for (l = userlist; l; l = l->next) {
+                struct userlist *u = l->data;
+
+                if (GG_S_I(u->status)) {
+                        char *tmp = saprintf("/check_conn %d", u->uin);
+                        command_exec(NULL, tmp, 1);
+                        xfree(tmp);
+                }
+        }
+
+	return 0;
+}
+
 COMMAND(cmd_check_conn)
 {
 	uin_t uin;
@@ -5820,11 +5838,11 @@ void command_init()
 	  "mo¿na sprawdziæ czy osoba, któr± widzimy jako niedostêpna jest "
 	  "niewidoczna. Je¿eli brak aliasu jako parametr, sprawdzana jest osoba, "
 	  "z któr± rozmowa znajdujê siê w aktualnym okienku.\n"
+	  "\n"
 	  "Je¶li osoba nale¿y do grupy %Tspied%n, to w miarê mo¿liwo¶ci jej stan jest "
-	  "¶ledzony na bie¿±co i u¿ywanie komendy %Tcheck_conn%n jest zbêdne - jej u¿ycie "
-	  "spowoduje jedynie ,,upewnienie siê'', ¿e dana osob± jest niewidoczna. Je¶li oka¿e "
-	  "siê, ¿e jest jednak rzeczywi¶cie niedostêpna, to jej stan uaktualni siê z 10 sekundowym "
-	  "opó¼nieniem.");
+	  "¶ledzony na bie¿±co. Aby w pe³ni umo¿liwiæ takie ¶ledzenie, nale¿y dodaæ timer, "
+	  "który np. co 30 sekund wywo³a polecenie %T_check_conn_update%n. Pamiêtaj, podgl±danie "
+	  "innych osób jest nieetyczne...");
           
 	command_add
 	( "cleartab", "?", cmd_cleartab, 0,
@@ -6323,6 +6341,9 @@ void command_init()
 	command_add
 	( "_vars", "", cmd_test_vars, 0, "",
 	  "wy¶wietla skrót zmiennych", "");
+	command_add
+	( "_check_conn_update", "", cmd_test_check_conn_update, 0, "",
+	  "uaktualnia stan ¶ledzonych osób", "");
 	command_add
 	( "_queue", "uu", cmd_queue, 0, " [opcje]",
 	  "pozwala obserwowaæ kolejkê wiadomo¶ci podczas po³±czenia", "");
