@@ -2028,7 +2028,7 @@ char *read_file(FILE *f)
 		res = xrealloc(res, new_size);
 		if (first)
 			*res = 0;
-		strcpy(res + strlen(res), buf);
+		strlcpy(res + strlen(res), buf, new_size - strlen(res));
 
 		if (strchr(buf, '\n'))
 			break;

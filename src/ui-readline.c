@@ -473,7 +473,7 @@ static char **my_completion(char *text, int start, int end)
 					xfree(tmp);
 					send_nicks_index++;
 					rl_extend_line_buffer(strlen(buf));
-					strcpy(rl_line_buffer, buf);
+					strlcpy(rl_line_buffer, buf, strlen(buf) + 1);
 					rl_end = strlen(buf);
 					rl_point = rl_end;
 					rl_redisplay();

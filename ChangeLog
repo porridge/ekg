@@ -8,6 +8,11 @@ d - drg, sz - szalik).
 
 - libgadu: gg_session->port jest prawid³owo wype³niane (w)
 - poprawka server_save dla po³±czeñ TLS (perry/w)
+- leak w aliasach (sz)
+- pozbycie siê strcat(), strcpy() i sprintf(). w OpenBSD s± brzydkie
+  warningi (sz)
+- poprawka dope³niania, aby dope³nia³o dobrze np. u¿ytkowników
+  ,,piotr_nowak'' oraz ,,piotr kowalski'' (sz)
 - informacja o szyfrowanym po³±czeniu w /status (scooty/w)
 
 // 2003-05-15

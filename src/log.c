@@ -332,14 +332,14 @@ void put_log(uin_t uin, const char *format, ...)
 				char *e, *tmp = va_arg(ap, char*);
 
 				e = log_escape(tmp);
-				strcat(buf, e);
+				strlcat(buf, e, size + 1);
 				xfree(e);
 			}
 
 			if (*p == 'd') {
 				int tmp = ((long_int) ? va_arg(ap, long) : va_arg(ap, int));
 
-				strcat(buf, itoa(tmp));
+				strlcat(buf, itoa(tmp), size + 1);
 			}
 		} else {
 			buf[strlen(buf) + 1] = 0;

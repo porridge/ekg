@@ -374,11 +374,13 @@ COMMAND(cmd_alias)
 			int first = 1, i;
 			char *tmp = xcalloc(strlen(a->name) + 1, 1);
 			
-			if (aname && strcasecmp(aname, a->name))
+			if (aname && strcasecmp(aname, a->name)) {
+				xfree(tmp);
 				continue;
+			}
 
 			for (i = 0; i < strlen(a->name); i++)
-				strcat(tmp, " ");
+				strlcat(tmp, " ", strlen(a->name) + 1);
 
 			for (m = a->commands; m; m = m->next) {
 				printq((first) ? "aliases_list" : "aliases_list_next", a->name, (char*) m->data, tmp);

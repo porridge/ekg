@@ -30,6 +30,12 @@
 
 #include "dynstuff.h"
 #include "emoticons.h"
+#ifndef HAVE_STRLCAT
+#  include "../compat/strlcat.h"
+#endif
+#ifndef HAVE_STRLCPY
+#  include "../compat/strlcpy.h"
+#endif
 #include "stuff.h"
 #include "userlist.h"
 #include "xmalloc.h"
@@ -196,7 +202,7 @@ char *emoticon_expand(const char *s)
 
 		if (l) {
 			e = l->data;
-			strcat(ms, e->value);
+			strlcat(ms, e->value, n + 1);
 			ss += strlen(e->name) - 1;
 		} else
 			ms[strlen(ms)] = *ss;

@@ -213,7 +213,7 @@ char *sim_key_fingerprint(uint32_t uin)
 	}
 
 	for (i = 0; i < md_len; i++)
-		sprintf(result + i * 3, (i != md_len - 1) ? "%.2x:" : "%.2x", md_value[i]);
+		snprintf(result + i * 3, (md_len * 3 - i * 3), (i != md_len - 1) ? "%.2x:" : "%.2x", md_value[i]);
 
 cleanup:
 	RSA_free(key);

@@ -794,9 +794,9 @@ static char *prepare_batch_line(int argc, char *argv[], int n)
 	buf = xmalloc(len);
 
 	for (i = n; i < argc; i++) {
-		strcat(buf, argv[i]);
+		strlcat(buf, len, argv[i]);
 		if (i < argc - 1)
-			strcat(buf, " ");
+			strlcat(buf, len, " ");
 	}
 
 	return buf;

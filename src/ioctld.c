@@ -45,6 +45,12 @@
 #include <unistd.h>
 
 #include "ioctld.h"
+#ifndef HAVE_STRLCAT
+#  include "../compat/strlcat.h"
+#endif
+#ifndef HAVE_STRLCPY
+#  include "../compat/strlcpy.h"
+#endif
 
 #ifndef PATH_MAX
 #  define PATH_MAX _POSIX_PATH_MAX
@@ -163,7 +169,7 @@ int main(int argc, char **argv)
 
 	close(STDERR_FILENO);
 	
-	strcpy(sock_path, argv[1]);
+	strlcpy(sock_path, argv[1], sizeof(sock_path));
 	
 	unlink(sock_path);
 
@@ -171,7 +177,7 @@ int main(int argc, char **argv)
 		exit(1);
 
 	addr.sun_family = AF_UNIX;
-	strcpy(addr.sun_path, sock_path);
+	strlcpy(addr.sun_path, sock_path, sizeof(add.sun_path));
 	length = sizeof(addr);
 
 	if (bind(sock, (struct sockaddr *)&addr, length) == -1) 

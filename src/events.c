@@ -319,7 +319,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 
 			strftime(waptime2, sizeof(waptime2), "%H:%M", tm);
 
-			sprintf(waptime, "wap%5s", waptime2);
+			snprintf(waptime, sizeof(waptime), "wap%5s", waptime2);
 			if ((waplog = prepare_path(waptime, 1))) {
 				if ((wap = fopen(waplog, "a"))) {
 					fprintf(wap, "%s(%s):%s\n", target, waptime2, line);
@@ -333,7 +333,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 			char *emotted = NULL, *formatted;
 
 			if (strlen(line) <= width) {
-				strcpy(buf, line);
+				strlcpy(buf, line, mem_width);
 				next = line + strlen(line);
 			} else {
 				int len = width;
@@ -344,7 +344,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 						break;
 					}
 
-				strncpy(buf, line, len);
+				strlcpy(buf, line, len);
 				buf[len] = 0;
 				next = line + len;
 
@@ -454,7 +454,7 @@ void handle_msg(struct gg_event *e)
 		char *msg = sim_message_decrypt(e->event.msg.message, e->event.msg.sender);
 
 		if (msg) {
-			strcpy(e->event.msg.message, msg);
+			strlcpy(e->event.msg.message, msg, strlen(e->event.msg.message) + 1);
 			xfree(msg);
 			secure = 1;
 		} else

@@ -2557,7 +2557,7 @@ static void complete(int *line_start, int *line_index)
 		for (i = 0; i < rows; i++) {
 			int j;
 
-			strcpy(tmp, "");
+			strlcpy(tmp, "", cols * maxlen + 2);
 
 			for (j = 0; j < cols; j++) {
 				int cell = j * rows + i;
@@ -2565,15 +2565,15 @@ static void complete(int *line_start, int *line_index)
 				if (cell < array_count(completions)) {
 					int k;
 
-					strcat(tmp, completions[cell]); 
+					strlcat(tmp, completions[cell], cols * maxlen + 2); 
 
 					for (k = 0; k < maxlen - strlen(completions[cell]); k++)
-						strcat(tmp, " ");
+						strlcat(tmp, " ", cols * maxlen + 2);
 				}
 			}
 
 			if (strcmp(tmp, "")) {
-				strcat(tmp, "\n");
+				strlcat(tmp, "\n", cols * maxlen + 2);
 				ui_ncurses_print(NULL, 0, tmp);
 			}
 		}
@@ -2720,20 +2720,26 @@ static void complete(int *line_start, int *line_index)
 		completions = NULL;
 	}
 
+#define __IS_QUOTED(x) (x[0] == '"' && x[strlen(x) - 1] == '"')
+#define __STRLEN_QUOTED(x) (strlen(x) - (__IS_QUOTED(x) * 2))
+
 	if (count > 1) {
-		int common = 0, minlen = strlen(completions[0]);
+		int common = 0, minlen = __STRLEN_QUOTED(completions[0]);
 
 		for (i = 1; i < count; i++) {
-			if (strlen(completions[i]) < minlen)
-				minlen = strlen(completions[i]);
+			if (__STRLEN_QUOTED(completions[i]) < minlen)
+				minlen = __STRLEN_QUOTED(completions[i]);
 		}
 
+		if (__IS_QUOTED(completions[0]))
+			common++;
+
 		for (i = 0; i < minlen; i++, common++) {
-			char c = completions[0][i];
+			char c = completions[0][i + __IS_QUOTED(completions[0])];
 			int j, out = 0;
 
 			for (j = 1; j < count; j++) {
-				if (completions[j][i] != c) {
+				if (completions[j][i + __IS_QUOTED(completions[j])] != c) {
 					out = 1;
 					break;
 				}
@@ -2748,6 +2754,9 @@ static void complete(int *line_start, int *line_index)
 			*line_index = strlen(line);
 		}
 	}
+
+#undef __STRLEN_QUOTED
+#undef __IS_QUOTED
 
 	array_free(words);
 
@@ -2771,7 +2780,7 @@ static void update_input()
 		lines = NULL;
 
 		line = xmalloc(LINE_MAXLEN);
-		strcpy(line, "");
+		strlcpy(line, "", LINE_MAXLEN);
 
 		history[0] = line;
 
@@ -2783,7 +2792,7 @@ static void update_input()
 		lines = xmalloc(2 * sizeof(char*));
 		lines[0] = xmalloc(LINE_MAXLEN);
 		lines[1] = NULL;
-		strcpy(lines[0], line);
+		strlcpy(lines[0], line, LINE_MAXLEN);
 		xfree(line);
 		line = lines[0];
 		history[0] = NULL;
@@ -2935,7 +2944,7 @@ static void binding_backward_delete_char(const char *arg)
 		int i;
 
 		line_index = strlen(lines[lines_index - 1]);
-		strcat(lines[lines_index - 1], lines[lines_index]);
+		strlcat(lines[lines_index - 1], lines[lines_index], LINE_MAXLEN);
 		
 		xfree(lines[lines_index]);
 
@@ -2976,7 +2985,7 @@ static void binding_delete_char(const char *arg)
 	if (line_index == strlen(line) && lines_index < array_count(lines) - 1 && strlen(line) + strlen(lines[lines_index + 1]) < LINE_MAXLEN) {
 		int i;
 
-		strcat(line, lines[lines_index + 1]);
+		strlcat(line, lines[lines_index + 1], LINE_MAXLEN);
 
 		xfree(lines[lines_index + 1]);
 
@@ -3007,7 +3016,7 @@ static void binding_accept_line(const char *arg)
 			lines[i + 1] = lines[i];
 
 		lines[lines_index + 1] = xmalloc(LINE_MAXLEN);
-		strcpy(lines[lines_index + 1], line + line_index);
+		strlcpy(lines[lines_index + 1], line + line_index, LINE_MAXLEN);
 		line[line_index] = 0;
 		
 		line_index = 0;
@@ -3188,7 +3197,7 @@ static void binding_previous_history(const char *arg)
 		if (history_index == 0)
 			history[0] = xstrdup(line);
 		history_index++;
-		strcpy(line, history[history_index]);
+		strlcpy(line, history[history_index], LINE_MAXLEN);
 		line_adjust();
 	}
 }
@@ -3210,7 +3219,7 @@ static void binding_next_history(const char *arg)
 
 	if (history_index > 0) {
 		history_index--;
-		strcpy(line, history[history_index]);
+		strlcpy(line, history[history_index], LINE_MAXLEN);
 		line_adjust();
 		if (history_index == 0) {
 			xfree(history[0]);
@@ -3289,7 +3298,7 @@ static void binding_ui_ncurses_debug_toggle(const char *arg)
 static void ui_ncurses_loop()
 {
 	line = xmalloc(LINE_MAXLEN);
-	strcpy(line, "");
+	strlcpy(line, "", LINE_MAXLEN);
 
 	history[0] = line;
 
