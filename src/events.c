@@ -1699,6 +1699,8 @@ void handle_search50(struct gg_event *e)
 		return;
 	}
 
+	gg_debug(GG_DEBUG_MISC, "handle_search50, count = %d\n", gg_pubdir50_count(res));
+
 	for (l = searches; l; l = l->next) {
 		gg_pubdir50_t req = l->data;
 
