@@ -1160,7 +1160,9 @@ void ekg_exit()
 
 	xfree(home_dir);
 
+#ifdef HAVE_OPENSSL
 	xfree(sim_key_path);
+#endif
 
 	for (l = watches; l; l = l->next) {
 		struct gg_session *s = l->data;
