@@ -1,5 +1,6 @@
 // ma³y opis dostêpnych zmiennych
-// (c) copyright 2001-2003 wojtek kaniewski <wojtekka@irc.pl>
+// (c) copyright 2001-2004 wojtek kaniewski <wojtekka@irc.pl>
+//                         adam wysocki <gophi@ekg.apcoh.org>
 
 uin
 	typ: liczba
@@ -116,6 +117,15 @@ back_reason
 
 	domy¶lny opis stanu dostêpnego, ustawiany przy zmianie bez podania 
 	parametru.
+
+backlog_overlap
+	typ: liczba
+	domy¶lna warto¶æ: 0
+
+	ilo¶æ zachodz±cych na siebie podczas przewijania (Page Up, Page 
+	Down) linii. musi byæ mniejsza od rozmiaru okienka, w przeciwnym 
+	wypadku warto¶æ zostanie zignorowana. dzia³a tylko w interfejsie 
+	ncurses.
 
 backlog_size
 	typ: liczba

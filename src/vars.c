@@ -1,8 +1,9 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2004 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
+ *                          Adam Wysocki <gophi@ekg.apcoh.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -121,8 +122,10 @@ void variable_init()
 	variable_add("away_reason", "ar", VAR_STR, 1, &config_away_reason, changed_xxx_reason, NULL, NULL);
 	variable_add("back_reason", "br", VAR_STR, 1, &config_back_reason, changed_xxx_reason, NULL, NULL);
 #ifdef WITH_UI_NCURSES
-	if (ui_init == ui_ncurses_init)
+	if (ui_init == ui_ncurses_init) {
+		variable_add("backlog_overlap", "bo", VAR_INT, 1, &config_backlog_overlap, NULL, NULL, NULL);
 		variable_add("backlog_size", "bs", VAR_INT, 1, &config_backlog_size, changed_backlog_size, NULL, NULL);
+	}
 #endif
 	variable_add("beep", "be", VAR_BOOL, 1, &config_beep, NULL, NULL, NULL);
 	variable_add("beep_msg", "bm", VAR_BOOL, 1, &config_beep_msg, NULL, NULL, dd_beep);
@@ -755,6 +758,11 @@ void variable_help(const char *name)
 	}
 
 	while ((line = read_file(f))) {
+		if (strlen(line) >= 2 && line[0] == '/' && line[1] == '/') {
+			xfree(line);
+			continue;
+		}
+
 		if (!strcasecmp(line, name)) {
 			found = 1;
 			xfree(line);

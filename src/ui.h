@@ -1,7 +1,8 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2002-2004 Wojtek Kaniewski <wojtekka@irc.pl>
+ *                          Adam Wysocki <gophi@ekg.apcoh.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -58,6 +59,7 @@ extern void ui_readline_init();
 WINDOW *header, *status;
 
 int window_printat(WINDOW *w, int x, int y, const char *format, void *data_, int fgcolor, int bold, int bgcolor, int status);
+int config_backlog_overlap;
 int config_backlog_size;
 extern void ui_ncurses_init();
 extern void header_statusbar_resize();

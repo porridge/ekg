@@ -202,6 +202,7 @@ static int ui_ncurses_inited = 0;	/* czy zainicjowano? */
 
 static struct termios old_tio;
 
+int config_backlog_overlap = 0;		/* liczba zachodz±cych linii przy przewijaniu */
 int config_backlog_size = 1000;		/* maksymalny rozmiar backloga */
 int config_display_transparent = 1;	/* czy chcemy przezroczyste t³o? */
 int config_contacts_size = 9;		/* szeroko¶æ okna kontaktów */
@@ -3590,7 +3591,14 @@ static void binding_next_history(const char *arg)
 
 static void binding_backward_page(const char *arg)
 {
-	window_current->start -= window_current->height;
+	int lines;
+
+	if (config_backlog_overlap < window_current->height)
+		lines = window_current->height - config_backlog_overlap;
+	else
+		lines = window_current->height;
+
+	window_current->start -= lines;
 	if (window_current->start < 0)
 		window_current->start = 0;
 	window_redraw(window_current);
@@ -3598,7 +3606,14 @@ static void binding_backward_page(const char *arg)
 
 static void binding_forward_page(const char *arg)
 {
-	window_current->start += window_current->height;
+	int lines;
+
+	if (config_backlog_overlap < window_current->height)
+		lines = window_current->height - config_backlog_overlap;
+	else
+		lines = window_current->height;
+
+	window_current->start += lines;
 
 	if (window_current->start > window_current->lines_count - window_current->height + window_current->overflow)
 		window_current->start = window_current->lines_count - window_current->height + window_current->overflow;
