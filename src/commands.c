@@ -575,6 +575,7 @@ COMMAND(command_away)
 	config_status = status_table[away] | ((private_mode) ? GG_STATUS_FRIENDS_MASK : 0);
 
 	if (sess && sess->state == GG_STATE_CONNECTED) {
+		gg_debug(GG_DEBUG_MISC, "-- config_status = 0x%.2x\n", config_status);
 		if (reason) {
 			iso_to_cp(reason);
 			gg_change_status_descr(sess, config_status, reason);

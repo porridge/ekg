@@ -642,7 +642,7 @@ __attribute__ ((packed))
 #define GG_STATUS_AVAIL 0x0002			/* dostêpny */
 #define GG_STATUS_AVAIL_DESCR 0x0004		/* dostêpny z opisem (4.9) */
 #define GG_STATUS_BUSY 0x0003			/* zajêty */
-#define GG_STATUS_BUSY_DESCR 0x0004		/* zajêty z opisem (4.8) */
+#define GG_STATUS_BUSY_DESCR 0x0005		/* zajêty z opisem (4.8) */
 #define GG_STATUS_INVISIBLE 0x0014		/* niewidoczny (4.6) */
 #define GG_STATUS_INVISIBLE_DESCR 0x0016	/* niewidoczny z opisem (4.9) */
 
