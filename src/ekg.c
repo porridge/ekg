@@ -200,7 +200,7 @@ int my_getc(FILE *f)
 			}
 
 			/* timeout autoawaya */
-			if (sess && config_auto_away && away != 1 && away != 3 && time(NULL) - last_action > config_auto_away && sess->state == GG_STATE_CONNECTED) {
+			if (sess && config_auto_away && (away == 0 || away == 4) && time(NULL) - last_action > config_auto_away && sess->state == GG_STATE_CONNECTED) {
 				char tmp[16], *reason = NULL;
 
 				if (config_random_reason & 1) {
