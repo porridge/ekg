@@ -1052,6 +1052,22 @@ int find_in_uins(int uin_count, uin_t *uins, uin_t uin)
 }
 
 /*
+ * valid_nick()
+ *
+ * sprawdza, czy nick nie zawiera znaków specjalnych,
+ * co mog³oby powodowaæ problemy.
+ *
+ * zwraca 1 je¶li nick jest w porz±dku, w przeciwnym razie 0.
+ */
+int valid_nick(const char *nick)
+{
+	if (nick && (nick[0] == '@' || nick[0] == '#' || strchr(nick, ',') || !strcmp(nick, "(null)")))
+		return 0;
+	else
+		return 1;
+}
+
+/*
  * mesg_set()
  *
  * w³±cza/wy³±cza mo¿liwo¶æ pisania do naszego terminala za pomoc±
@@ -1537,6 +1553,7 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 					print("group_empty", gname);
 					print("conferences_not_added", name);
 				}
+
 				xfree(gname);
 
 				return NULL;
@@ -1563,21 +1580,18 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 	for (p = nicks, i = 0; *p; p++) {
 		uin_t uin;
-		struct userlist *u;
 
 		if (!strcmp(*p, ""))
 		        continue;
 
-		uin = get_uin(*p);
-
-		if (!(u = userlist_find(uin, *p))) {
+		if (!(uin = get_uin(*p))) {
 			if (!quiet)
 			        print("user_not_found", *p);
 			continue;
 		}
 
 
-		list_add(&(c.recipients), &(u->uin), sizeof(u->uin));
+		list_add(&(c.recipients), &uin, sizeof(uin));
 		i++;
 	}
 

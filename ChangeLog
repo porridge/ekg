@@ -6,6 +6,15 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-01-03
+
+- ekg nie pozwala dodaæ kogo¶ m.in. z '@' lub '#' na pocz±tku w nazwie,
+  ¿eby unikn±æ dziwnych problemów (sz)
+- kosmetyka, m.in. rzeczy zwi±zanych z obs³uga uin/nick w komendach (sz)
+- ignore/unignore powoduje, odpowiednio, wyczyszczenie/uaktualnienie stanu
+  danego u¿ytkownika. w ogóle, to trzeba bêdzie nied³ugo zrobiæ ró¿ne
+  stopnie ignorowania... (sz)
+
 // 2003-01-02
 
 - czyszczenie stanów ludzi z listy kontaktów po timeout'cie (pmb/sz)

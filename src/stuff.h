@@ -354,6 +354,7 @@ int msg_encrypt(uin_t uin, unsigned char **msg);
 
 int find_in_uins(int uin_count, uin_t *uins, uin_t uin);
 uin_t str_to_uin(const char *text);
+int valid_nick(const char *nick);
 
 void binding_list();
 void binding_free();

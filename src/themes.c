@@ -840,6 +840,7 @@ void theme_init()
 	format_add("not_enough_params", "%! Za ma這 parametr闚. Spr鏏uj %Thelp %1%n\n", 1);
 	format_add("invalid_params", "%! Nieprawid這we parametry. Spr鏏uj %Thelp %1%n\n", 1);
 	format_add("invalid_uin", "%! Nieprawid這wy numer u篡tkownika\n", 1);
+	format_add("invalid_nick", "%! Nieprawid這wa nazwa u篡tkownika\n", 1);
 	format_add("user_not_found", "%! Nie znaleziono u篡tkownika %T%1%n\n", 1);
 	format_add("not_implemented", "%! Tej funkcji jeszcze nie ma\n", 1);
 	format_add("unknown_command", "%! Nieznane polecenie: %T%1%n\n", 1);

@@ -155,6 +155,7 @@ COMMAND(cmd_add)
 {
 	uin_t uin;
 	struct userlist *u;
+	int fallthrough = 0;
 
 	if (!params[0] || !params[1]) {
 		print("not_enough_params", name);
@@ -166,7 +167,12 @@ COMMAND(cmd_add)
 		return;
 	}
 
-	if ((u = userlist_find(uin, params[1]))) {
+	if (!valid_nick(params[1])) {
+		print("invalid_nick");
+		return;
+	}
+
+	if ((u = userlist_find(uin, params[1])) && u->display) {
 		if (!strcmp(params[1], u->display) && u->uin == uin)
 			print("user_exists", params[1]);
 		else
@@ -175,7 +181,23 @@ COMMAND(cmd_add)
 		return;
 	}
 
-	if (userlist_add(uin, params[1])) {
+	/* kto¶ istnieje, bo jest np. ignorowany, ale nie ma nazwy */
+	if (u) {
+		char *foo = saprintf("-d %s", params[1]);
+		char **p = xcalloc(sizeof(char *), 2);
+
+		p[0] = (char *) itoa(u->uin);
+		p[1] = foo;
+
+		cmd_modify("add", (const char **) p, NULL);
+
+		xfree(foo);
+		xfree(p);
+
+		fallthrough = 1;
+	}
+
+	if (fallthrough || userlist_add(uin, params[1])) {
 		print("user_added", params[1]);
 		gg_add_notify(sess, uin);
 		config_changed = 1;
@@ -434,7 +456,6 @@ COMMAND(cmd_connect)
 COMMAND(cmd_del)
 {
 	struct userlist *u;
-	uin_t uin;
 	const char *tmp;
 	char *nick;
 
@@ -443,15 +464,12 @@ COMMAND(cmd_del)
 		return;
 	}
 
-	uin = get_uin(params[0]);
-
-	if (!(u = userlist_find(uin, params[0]))) {
+	if (!(u = userlist_find(get_uin(params[0]), NULL))) {
 		print("user_not_found", params[0]);
 		return;
 	}
 
 	nick = xstrdup(u->display);
-	
 	tmp = format_user(u->uin);
 
 	if (!userlist_remove(u)) {
@@ -719,7 +737,6 @@ COMMAND(cmd_modify)
 {
 	struct userlist *u;
 	char **argv = NULL;
-	uin_t uin;
 	int i;
 	int modified = 0;
 
@@ -728,9 +745,7 @@ COMMAND(cmd_modify)
 		return;
 	}
 
-	uin = get_uin(params[0]);
-
-	if (!(u = userlist_find(uin, params[0]))) {
+	if (!(u = userlist_find(get_uin(params[0]), NULL))) {
 		print("user_not_found", params[0]);
 		return;
 	}
@@ -935,9 +950,8 @@ COMMAND(cmd_help)
 
 COMMAND(cmd_ignore)
 {
-	uin_t uin;
 	char *tmp;
-	struct userlist *u = NULL;
+	uin_t uin;
 
 	if (*name == 'i' || *name == 'I') {
 		if (!params[0]) {
@@ -969,15 +983,22 @@ COMMAND(cmd_ignore)
 			return;
 		}
 
-		uin = get_uin(params[0]);	
-
-		if (!(u = userlist_find(uin, params[0]))) {
+		if (!(uin = get_uin(params[0]))) {
 			print("user_not_found", params[0]);
 			return;
 		}
 		
-		if (!ignored_add(u->uin, IGNORE_ALL)) {
+		if (!ignored_add(uin, IGNORE_ALL)) {
+			struct userlist *u = userlist_find(uin, NULL);
+
 			print("ignored_added", params[0]);
+
+			if (u) {
+				if (sess)
+					gg_remove_notify(sess, uin);
+				u->status = GG_STATUS_NOT_AVAIL;
+			}
+
 			config_changed = 1;
 		} else
 			print("error_adding_ignored");
@@ -995,18 +1016,20 @@ COMMAND(cmd_ignore)
 			return;
 		}
 		
-		uin = get_uin(params[0]);
-
-		if (!(u = userlist_find(uin, params[0]))) {
+		if (!(uin = get_uin(params[0]))) {
 			print("user_not_found", params[0]);
 			return;
 		}
 		
-		if (!ignored_remove(u->uin)) {
-			print("ignored_deleted", format_user(u->uin));
+		if (!ignored_remove(uin)) {
+			print("ignored_deleted", format_user(uin));
+			if (sess) {
+				gg_remove_notify(sess, uin);
+				gg_add_notify(sess, uin);
+			}
 			config_changed = 1;
 		} else
-			print("error_not_ignored", format_user(u->uin));
+			print("error_not_ignored", format_user(uin));
 	
 	}
 }
@@ -1014,7 +1037,6 @@ COMMAND(cmd_ignore)
 COMMAND(cmd_block)
 {
 	uin_t uin;
-	struct userlist *u = NULL;
 
 	if (*name == 'b' || *name == 'B') {
 		if (!params[0]) {
@@ -1038,14 +1060,12 @@ COMMAND(cmd_block)
 			return;
 		}
 
-		uin = get_uin(params[0]);
-
-		if (!(u = userlist_find(uin, params[0]))) {
+		if (!(uin = get_uin(params[0]))) {
 			print("user_not_found", params[0]);
 			return;
 		}
 		
-		blocked_add(u->uin);
+		blocked_add(uin);
 		print("blocked_added", params[0]);
 		config_changed = 1;
 	} else {
@@ -1054,18 +1074,16 @@ COMMAND(cmd_block)
 			return;
 		}
 
-		uin = get_uin(params[0]);
-
-		if (!(u = userlist_find(uin, params[0]))) {
+		if (!(uin = get_uin(params[0]))) {
 			print("user_not_found", params[0]);
 			return;
 		}
 		
-		if (!blocked_remove(u->uin)) {
-			print("blocked_deleted", format_user(u->uin));
+		if (!blocked_remove(uin)) {
+			print("blocked_deleted", format_user(uin));
 			config_changed = 1;
 		} else
-			print("error_not_blocked", format_user(u->uin));
+			print("error_not_blocked", format_user(uin));
 	
 	}
 }
@@ -1079,7 +1097,6 @@ COMMAND(cmd_list)
 	if (params[0] && *params[0] != '-') {
 		char *status, *groups;
 		struct userlist *u;
-		uin_t uin;
 
 		/* list @grupa */
 		if (params[0][0] == '@' && strlen(params[0]) > 1) {
@@ -1108,9 +1125,7 @@ COMMAND(cmd_list)
 			return;
 		}
 
-		uin = get_uin(params[0]);
-
-		if (!(u = userlist_find(uin, params[0]))) {
+		if (!(u = userlist_find(get_uin(params[0]), NULL)) || (u && !u->display)) {
 			print("user_not_found", params[0]);
 			return;
 		}
@@ -2336,8 +2351,10 @@ COMMAND(cmd_test_send)
 	e->event.msg.sender = get_uin(params[0]);
 	e->event.msg.message = xstrdup(params[1]);
 	e->event.msg.msgclass = GG_CLASS_MSG;
+	e->event.msg.time = time(NULL);
 	
 	handle_msg(e);
+	event_free(e);
 }
 
 COMMAND(cmd_test_add)
@@ -3632,7 +3649,8 @@ void command_init()
 	( "query", "u?", cmd_query, 0,
 	  " <numer/alias/@grupa> [wiadomo¶æ]", "w³±cza rozmowê z dan± osob±",
 	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub\n"
-	  "pseudonimy przecinkiem (ale bez odstêpów).");
+	  "pseudonimy przecinkiem (ale bez odstêpów). W takim wypadku\n"
+          "zostanie rozpoczêta rozmowa grupowa.");
 
 	command_add
 	( "queue", "uu", cmd_queue, 0,

@@ -116,12 +116,19 @@ int userlist_read()
 
 		} else {
 			char **entry = array_make(buf, ";", 7, 0, 0);
+			int i;
 			
 			if (!entry[0] || !entry[1] || !entry[2] || !entry[3] || !entry[4] || !entry[5] || !entry[6] || !(u.uin = strtol(entry[6], NULL, 0))) {
 				array_free(entry);
 				xfree(buf);
 				continue;
 			}
+
+			for (i = 0; i < 6; i++)
+				if (entry[i] && !strcmp(entry[i], "(null)")) {
+					xfree(entry[i]);
+					entry[i] = NULL;
+				}
 			
 			u.first_name = xstrdup(entry[0]);
 			u.last_name = xstrdup(entry[1]);
@@ -512,7 +519,7 @@ struct userlist *userlist_find(uin_t uin, const char *display)
 
                 if (uin && u->uin == uin)
 			return u;
-                if (display && !strcasecmp(u->display, display))
+                if (display && u->display && !strcasecmp(u->display, display))
                         return u;
         }
 
@@ -547,24 +554,21 @@ char userlist_type(struct userlist *u)
 /*
  * get_uin()
  *
- * je¶li podany tekst jest liczb±, zwraca jej warto¶æ. je¶li jest nazw±
- * u¿ytkownika w naszej li¶cie kontaktów, zwraca jego numerek. inaczej
- * zwraca zero.
+ * je¶li podany tekst jest liczb± (ale nie jednocze¶nie nazw± u¿ytkownika),
+ * zwraca jej warto¶æ. je¶li jest nazw± u¿ytkownika w naszej li¶cie kontaktów,
+ * zwraca jego numerek. inaczej zwraca zero.
  *
  *  - text.
  */
 uin_t get_uin(const char *text)
 {
 	uin_t uin = str_to_uin(text);
-	struct userlist *u;
+	struct userlist *u = userlist_find(uin, text);
 
-	if (!uin) {
-		if (!(u = userlist_find(0, text)))
-			return 0;
-		uin = u->uin;
-	}
-
-	return uin;
+	if (u)
+		return u->uin;
+	else
+		return uin;
 }
 
 /*
@@ -779,6 +783,7 @@ void userlist_send()
         gg_notify_ex(sess, uins, types, count);
 
         xfree(uins);
+	xfree(types);
 }
 
 /*
