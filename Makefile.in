@@ -78,7 +78,7 @@ install-ekgwap:
 
 uninstall:	@uninstall_ekg@
 	rm -f $(DESTDIR)$(libdir)/libgadu.{a,so*}
-	rm -f $(DESTDIR)$(includedir)/libgadu.h
+	rm -f $(DESTDIR)$(includedir)/libgadu{,-config,-stdint}.h
 
 uninstall-ekg:
 	rm -f $(DESTDIR)$(bindir)/{ekg,ekgsearch,ekgwapd}
