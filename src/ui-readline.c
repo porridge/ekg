@@ -1008,7 +1008,6 @@ static int ui_readline_event(const char *event, ...)
 	}
 
 	if (!strcasecmp(event, "check_mail")) {
-		int count = check_mail();
 		struct timer *t = timer_add(config_check_mail_frequency, "check-mail-time", "check_mail");
 
 		t->ui = 1;

@@ -36,6 +36,7 @@
 #include "dynstuff.h"
 #include "mail.h"
 #include "stuff.h"
+#include "themes.h"
 #include "ui.h"
 #include "xmalloc.h"
 
