@@ -114,6 +114,7 @@ int userlist_read(char *filename)
 			u.display = strdup(++display);
 			u.mobile = NULL;
 			u.groups = NULL;
+			u.descr = NULL;
 
 		} else {
 			char **entry = array_make(buf, ";", 7, 0, 0);
@@ -130,6 +131,7 @@ int userlist_read(char *filename)
 			u.display = strdup_null(entry[3]);
 			u.mobile = strdup_null(entry[4]);
 			u.groups = group_init(entry[5]);
+			u.descr = NULL;
 
 			array_free(entry);
 		}
@@ -184,6 +186,7 @@ int userlist_set(char *contacts)
 			u.display = strdup(++display);
 			u.mobile = NULL;
 			u.groups = NULL;
+			u.descr = NULL;
 
 		} else {
 			char **entry = array_make(buf, ";", 7, 0, 0);
@@ -199,6 +202,7 @@ int userlist_set(char *contacts)
 			u.display = strdup_null(entry[3]);
 			u.mobile = strdup_null(entry[4]);
 			u.groups = group_init(entry[5]);
+			u.descr = NULL;
 
 			array_free(entry);
 		}

@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - obs³uga opisów stanów -- wy¶wietla przy po³±czeniu, zmianie stanów. (w)
 - komenda ,,away'' ma parametr, który okre¶la powód. (w)
 - podbicie wersji do 0x15. raz kozie ¶mieræ. (w)
+- poprawka nowo¶ci (kfazi/w)
 
 // 2002-03-07
 
