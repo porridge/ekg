@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-03-25
 
 - format_string() przy wy¶wietlaniu krótkich helpów (d)
+- poprawka cp->iso w opisie w³asnej zajêto¶ci (wasyl/w)
 
 // 2002-03-24
 

@@ -561,6 +561,7 @@ COMMAND(command_away)
 		if (reason) {
 			iso_to_cp(reason);
 			gg_change_status_descr(sess, config_status, reason);
+			cp_to_iso(reason);
 		} else
 			gg_change_status(sess, config_status);
 	}
