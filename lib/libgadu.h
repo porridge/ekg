@@ -235,6 +235,7 @@ struct gg_session *gg_login(uin_t uin, char *password, int async);
 void gg_free_session(struct gg_session *sess);
 void gg_logoff(struct gg_session *sess);
 int gg_change_status(struct gg_session *sess, int status);
+int gg_change_status_descr(struct gg_session *sess, int status, char *descr);
 int gg_send_message(struct gg_session *sess, int msgclass, uin_t recipient, unsigned char *message);
 int gg_send_message_ctcp(struct gg_session *sess, int msgclass, uin_t recipient, unsigned char *message, int message_len);
 int gg_ping(struct gg_session *sess);
@@ -244,6 +245,7 @@ enum {
 	GG_EVENT_NONE = 0,
 	GG_EVENT_MSG,
 	GG_EVENT_NOTIFY,
+	GG_EVENT_NOTIFY_DESCR,
 	GG_EVENT_STATUS,
 	GG_EVENT_ACK,
 	GG_EVENT_PONG,
@@ -314,13 +316,18 @@ struct gg_event {
 			int recipients_count;
 			uin_t *recipients;
 			/* kolorki */
-			int formats_count;
-			struct gg_msg_format *formats;
+			int formats_length;
+			void *formats;
                 } msg;
                 struct gg_notify_reply *notify;
+		struct {
+			struct gg_notify_reply *notify;
+			char *descr;
+		} notify_descr;
                 struct {
 			uin_t uin;
 			unsigned long status;
+			char *descr;
 		} status;
                 struct {
                         uin_t recipient;
@@ -611,9 +618,11 @@ __attribute__ ((packed))
 #define GG_STATUS_NOT_AVAIL 0x0001	/* roz³±czony */
 #define GG_STATUS_AVAIL 0x0002		/* dostêpny */
 #define GG_STATUS_BUSY 0x0003		/* zajêty */
-#define GG_STATUS_INVISIBLE 0x0014	/* niewidoczny (GG 4.6) */
+#define GG_STATUS_BUSY_DESCR 0x0004	/* zajêty z opisem (4.8) */
+#define GG_STATUS_INVISIBLE 0x0014	/* niewidoczny (4.6) */
+#define GG_STATUS_NOT_AVAIL_DESCR 0x0015	/* niedostêpny z opisem (4.8) */
 
-#define GG_STATUS_FRIENDS_MASK 0x8000	/* tylko dla znajomych (GG 4.6) */
+#define GG_STATUS_FRIENDS_MASK 0x8000	/* tylko dla znajomych (4.6) */
 
 struct gg_new_status {
 	unsigned long status;			/* na jaki zmieniæ? */

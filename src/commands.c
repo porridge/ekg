@@ -86,7 +86,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 struct command commands[] = {
 	{ "add", "U??", command_add, " <numer> <alias> [opcje]", "Dodaje u¿ytkownika do listy kontaktów", "Opcje identyczne jak dla polecenia %Wmodify%n" },
 	{ "alias", "??", command_alias, " [opcje]", "Zarz±dzanie aliasami", "  --add <alias> <komenda>\n  --del <alias>\n  [--list]\n" },
-	{ "away", "", command_away, "", "Zmienia stan na zajêty", "" },
+	{ "away", "?", command_away, "[powód]", "Zmienia stan na zajêty", "" },
 	{ "back", "", command_away, "", "Zmienia stan na dostêpny", "" },
 	{ "change", "?", command_change, " <opcje>", "Zmienia informacje w katalogu publicznym", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>\n  --email <adres>\n  --born <rok urodzenia>\n  --city <miasto>\n  --female  \n  --male" },
 	{ "chat", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ w ramach rozmowy", "" },
@@ -490,10 +490,14 @@ COMMAND(command_alias)
 
 COMMAND(command_away)
 {
-	int status_table[3] = { GG_STATUS_AVAIL, GG_STATUS_BUSY, GG_STATUS_INVISIBLE };	unidle();
+	int status_table[4] = { GG_STATUS_AVAIL, GG_STATUS_BUSY, GG_STATUS_INVISIBLE, GG_STATUS_BUSY_DESCR };
+	char *reason = NULL;
+	
+	unidle();
 	
 	if (!strcasecmp(name, "away")) {
-		away = 1;
+		reason = params[0];
+		away = (reason) ? 3 : 1;
 		my_printf("away");
 	} else if (!strcasecmp(name, "invisible")) {
 		away = 2;
@@ -520,8 +524,12 @@ COMMAND(command_away)
 
 	config_status = status_table[away] | ((private_mode) ? GG_STATUS_FRIENDS_MASK : 0);
 
-	if (sess && sess->state == GG_STATE_CONNECTED)
-		gg_change_status(sess, config_status);
+	if (sess && sess->state == GG_STATE_CONNECTED) {
+		if (reason)
+			gg_change_status_descr(sess, config_status, reason);
+		else
+			gg_change_status(sess, config_status);
+	}
 
 	return 0;
 }

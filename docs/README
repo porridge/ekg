@@ -51,6 +51,11 @@ U¯YCIE
     (backslash). Koñczy siê lini± z sam± kropk±, anuluje Ctrl-D. Nie
     mo¿na przesy³aæ plików, ani nawi±zywaæ bezpo¶rednich po³±czeñ.
 
+    Je¶li dana komenda przyjmuje ,,--parametr'' mo¿na u¿yæ równie¿
+    skrótu ,,-p'', je¶li nie powoduje to niejednoznaczno¶ci. Uwaga!
+    brana pod uwagê jest zwykle pierwsza litera, wiêc je¶li wpiszesz
+    ,,list --gone'', ekg potraktuje to jako ,,list --get''.
+
     Dobra rada numer jeden: zanim zaczniesz narzekaæ, ¿e czego¶ nie ma,
     przeczytaj plik TODO.
 
