@@ -236,7 +236,10 @@ int main(int argc, char **argv)
 
 	if (display_debug)
 		gg_debug_level = 255;
-		
+
+	if (gg_debug_level == 255) 
+		display_debug = 1;
+			
 	read_userlist(NULL);
 
 	if (config_uin && config_password && auto_connect) {
