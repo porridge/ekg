@@ -789,6 +789,16 @@ void file_generator(const char *text, int len)
 
 }
 
+void window_generator(const char *text, int len)
+{
+	char *words[] = { "new", "kill", "next", "prev", "switch", "clear", "refresh", "list", NULL };
+	int i;
+
+	for (i = 0; words[i]; i++)
+		if (!strncasecmp(text, words[i], len))
+			array_add(&completions, xstrdup(words[i]));
+}
+
 static struct {
 	char ch;
 	void (*generate)(const char *text, int len);
@@ -801,6 +811,7 @@ static struct {
 	{ 'v', variable_generator },
 	{ 'd', dcc_generator },
 	{ 'f', file_generator },
+	{ 'w', window_generator },
 	{ 0, NULL }
 };
 

@@ -2639,7 +2639,7 @@ void command_init()
 	  "");
 	  
 	command_add
-	( "window", "??", cmd_window, 0,
+	( "window", "w?", cmd_window, 0,
 	  " <komenda> [numer_okna]", "zarz±dzanie okienkami",
 	  "  new\n"
 	  "  kill [numer_okna]\n"

@@ -316,6 +316,25 @@ static char *dcc_generator(char *text, int state)
 	return NULL;
 }
 
+static char *window_generator(char *text, int state)
+{
+	char *commands[] = { "new", "kill", "next", "prev", "switch", "clear", "refresh", "list", NULL };
+	static int len, i;
+
+	if (!state) {
+		i = 0;
+		len = strlen(text);
+	}
+
+	while (commands[i]) {
+		if (!strncasecmp(text, commands[i], len))
+			return xstrdup(commands[i++]);
+		i++;
+	}
+
+	return NULL;
+}
+
 static char *empty_generator(char *text, int state)
 {
 	return NULL;
@@ -426,6 +445,9 @@ static char **my_completion(char *text, int start, int end)
 						break;
 					case 'f':
 						func = rl_filename_completion_function;
+						break;
+					case 'w':
+						func = window_generator;
 						break;
 				}
 			}
