@@ -130,7 +130,8 @@ check_mail_folders
 	domy¶lna warto¶æ: brak
 
 	zawiera pliki (mbox) lub katalogi (Maildir) rozdzielone przecinkiem lub
-	spacj±, które ekg ma sprawdzaæ, poza g³ówn± skrzynk± pocztow±.
+	spacj±, które ekg ma sprawdzaæ, poza g³ówn± skrzynk± pocztow±. mo¿e to
+	byæ scie¿ka bezwzglêdna lub wzglêdem katalogu domowego.
 
 	g³ówna w przypadku mbox to ta zapisana w zmiennej systemowej MAIL lub
 	/var/mail/user przy braku tej zmiennej. dla Maildir z kolei, to katalog

@@ -64,8 +64,19 @@ int check_mail()
 
 	last_check = time(NULL);
 
-	if (config_check_mail_folders)
+	if (config_check_mail_folders) {
+		int i;
+
 		folders = array_make(config_check_mail_folders, ", ", 0, 1, 0);
+
+		for (i = 0; folders[i]; i++)
+			if (folders[i][0] != '/') {
+				char *buf = saprintf("%s/%s", home_dir, folders[i]);
+				
+				xfree(folders[i]);
+				folders[i] = buf;
+			}
+	}
 
 	/* mbox */
 	if (config_check_mail & 1) {
