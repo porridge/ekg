@@ -618,10 +618,10 @@ char *variable_digest()
 /*
  * variable_undigest()
  *
- * rozszyfrowuje skrót zmiennych z listy kontaktów i ustawia wszystko
+ * rozszyfrowuje skrót zmiennych z listy kontaktów i ustawia wszystko,
  * co trzeba.
  *
- *  - str - ci±g znaków.
+ *  - digest - ci±g znaków.
  *
  * 0/-1
  */
