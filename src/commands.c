@@ -3147,20 +3147,20 @@ COMMAND(cmd_register)
 COMMAND(cmd_reload)
 {
 	const char *filename = NULL;
+	int res = 0;
 
 	if (params[0])
 		filename = params[0];
 
-	config_changed = 0;
-
 	if (config_read(filename, NULL)) {
 		printq("error_reading_config", strerror(errno));
-		return -1;
+		res = -1;
 	}
 
+	config_changed = 0;
 	update_status();
 
-	return 0;
+	return res;
 }
 
 COMMAND(cmd_passwd)
