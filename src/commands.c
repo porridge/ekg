@@ -1956,7 +1956,7 @@ COMMAND(cmd_list)
 		struct userlist *u = l->data;
 		int show;
 
-		if (!u->display)
+		if (!u->display || !u->uin)
 			continue;
 
 		tmp = ekg_status_label(u->status, "list_");
@@ -2673,7 +2673,7 @@ COMMAND(cmd_dcc)
 			return -1;
 		}
 
-		if (!u->ip.s_addr) {
+		if (!u->ip.s_addr && params[0][0] != 'r') {
 			printq("dcc_user_aint_dcc", format_user(u->uin));
 			return -1;
 		}

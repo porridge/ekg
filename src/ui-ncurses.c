@@ -1342,7 +1342,7 @@ static int contacts_update(struct window *w)
 			const char *format;
 			char *line;
 
-			if ((u->status != table[i].status1 && u->status != table[i].status2) || !u->display)
+			if ((u->status != table[i].status1 && u->status != table[i].status2) || !u->display || !u->uin)
 				continue;
 
 			if (group && !group_member(u, group))

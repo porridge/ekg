@@ -7,6 +7,8 @@ d - drg, sz - szalik).
 // 2003-06-22
 
 - dodanie informacji o kompilacji rtg (rinoa/w)
+- ekg nie usuwa u¿ytkowników bez podanego numeru z listy kontaktów
+  (a.latanski/w)
 
 // 2003-06-21
 

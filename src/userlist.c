@@ -124,7 +124,7 @@ int userlist_read()
 		if (!strncasecmp(uin, "gg:", 3))
 			uin += 3;
 
-		if ((count = array_count(entry)) < 7 || !(u.uin = atoi(uin))) {
+		if ((count = array_count(entry)) < 7 || (strcmp(uin, "") && !(u.uin = atoi(uin)))) {
 			array_free(entry);
 			xfree(buf);
 			continue;
@@ -226,7 +226,7 @@ int userlist_set(const char *contacts, int config)
 		if (!strncasecmp(uin, "gg:", 3))
 			uin += 3;
 		
-		if ((count = array_count(entry)) < 7 || !(u.uin = atoi(uin))) {
+		if ((count = array_count(entry)) < 7 || (strcmp(uin, "") && !(u.uin = atoi(uin)))) {
 			array_free(entry);
 			continue;
 		}
@@ -309,14 +309,14 @@ char *userlist_dump()
 
 		groups = group_to_string(u->groups, 1, 0);
 		
-		line = saprintf("%s;%s;%s;%s;%s;%s;%d;%s%s\r\n",
+		line = saprintf("%s;%s;%s;%s;%s;%s;%s;%s%s\r\n",
 			(u->first_name) ? u->first_name : "",
 			(u->last_name) ? u->last_name : "",
 			(u->nickname) ? u->nickname : ((u->display) ? u->display: ""),
 			(u->display) ? u->display : "",
 			(u->mobile) ? u->mobile : "",
 			groups,
-			u->uin,
+			(u->uin) ? itoa(u->uin) : "",
 			(u->email) ? u->email : "",
 			(u->foreign) ? u->foreign : "");
 		
@@ -434,7 +434,7 @@ void userlist_write_crash()
 			fprintf(f, "%s", g->name);
 		}
 		
-		fprintf(f, ";%u;%s%s\r\n", u->uin, (u->email) ? u->email : "", u->foreign);
+		fprintf(f, ";%s;%s%s\r\n", (u->uin) ? itoa(u->uin) : "", (u->email) ? u->email : "", u->foreign);
 	}	
 
 	fclose(f);
