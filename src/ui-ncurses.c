@@ -1607,7 +1607,7 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 		int i, nest;
 
 		if (*p != '%') {
-			waddch(w, *p);
+			waddch(w, (unsigned char) *p);
 			p++;
 			x++;
 			continue;
@@ -1695,7 +1695,7 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 
 				for (j = 0; text && j < strlen(text); j++) {
 					if (text[j] != 10) {
-						waddch(w, text[j]);
+						waddch(w, (unsigned char) text[j]);
 						continue;
 					}
 
@@ -4473,8 +4473,8 @@ static int ui_ncurses_event(const char *event, ...)
 
 			if (!strcasecmp(p1, "clear")) {
 				window_clear(window_current, 0);
+				
 				window_commit();
-				window_current->more = 0;
 
 				goto cleanup;
 			}
