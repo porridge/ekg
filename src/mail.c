@@ -232,7 +232,7 @@ int check_mail_mbox()
 
 #ifdef HAVE_UTIMES
 			{
-				struct timeval foo[1];
+				struct timeval foo[2];
 
 				foo[0].tv_sec = st.st_atime;
 				foo[1].tv_sec = st.st_mtime;
