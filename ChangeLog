@@ -15,6 +15,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - libgadu: w±tkowany resolver. w³±czany przez #define HAVE_PTHREAD lub
   ./configure --with-pthread (adrians/w)
 - kosmetyka wygl±du w³asnego stanu (szalik/w)
+- poprawki dokumentacji (mati/w)
 
 // 2002-11-17
 
