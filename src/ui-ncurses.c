@@ -1499,7 +1499,10 @@ void contacts_changed()
 
 	if (config_contacts_size < 0)
 		config_contacts_size = 0;
-
+	
+	if (config_contacts_size == 0) 
+		config_contacts = 0;
+		
 	if (config_contacts_size > 1000)
 		config_contacts_size = 1000;
 	
