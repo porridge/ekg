@@ -206,8 +206,14 @@ static void get_line_from_pipe(struct gg_exec *c)
 		string_append(c->buf, buf);
 
 		while ((tab = strchr(c->buf->str, '\t'))) {
+			int count;
+			
 			*tab = ' ';
-			string_insert(c->buf, (tab - c->buf->str), "   ");
+
+			count = 8 - ((int) (tab - c->buf->str)) % 8;
+
+			if (count > 1)
+				string_insert_n(c->buf, (tab - c->buf->str), "        ", count - 1);
 		}
 
 		while ((tmp = strchr(c->buf->str, '\n'))) {
