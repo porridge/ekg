@@ -19,7 +19,7 @@ Jest to eksperymentalny klient Gadu-Gadu.
 .SH OPCJE
 .TP
 .BI \-d 
-W³±cza tryb "debug" - jest to specialny tryb, pokazuj±cy, co robi 
+W³±cza tryb "debug" - jest to specjalny tryb, pokazuj±cy, co robi 
 program w danej chwili.
 .TP
 .BI \-n 
