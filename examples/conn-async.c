@@ -12,7 +12,7 @@
 #include <sys/wait.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#include "libgg.h"
+#include "libgadu.h"
 
 int main()
 {

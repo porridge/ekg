@@ -1,7 +1,8 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *                          Robert J. Wo¼ny <speedy@ziew.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -41,10 +42,9 @@
 #include "themes.h"
 #include "commands.h"
 #include "vars.h"
+#include "userlist.h"
 
 struct gg_session *sess = NULL;
-struct list *userlist = NULL;
-struct list *ignored = NULL;
 struct list *children = NULL;
 struct list *aliases = NULL;
 struct list *watches = NULL;
@@ -323,7 +323,7 @@ int read_config(char *filename)
 
 		if (!strcasecmp(buf, "ignore")) {
 			if (atoi(foo))
-				add_ignored(atoi(foo));
+				ignored_add(atoi(foo));
 		} else if (!strcasecmp(buf, "alias")) {
 			add_alias(foo, 1);
 		} else if (!strcasecmp(buf, "on")) {
@@ -501,7 +501,7 @@ char *get_token(char **ptr, char sep)
 {
 	char *foo, *res;
 
-	if (!ptr || !sep || !*ptr)
+	if (!ptr || !sep || !*ptr || !**ptr)
 		return NULL;
 
 	res = *ptr;
@@ -514,393 +514,6 @@ char *get_token(char **ptr, char sep)
 	}
 
 	return res;
-}
-
-/*
- * userlist_compare()
- *
- * funkcja pomocna przy list_add_sorted().
- *
- *  - data1, data2 - dwa wpisy userlisty do porównania.
- *
- * zwraca wynik strcasecmp() na nazwach userów.
- */
-int userlist_compare(void *data1, void *data2)
-{
-	struct userlist *a = data1, *b = data2;
-	
-	if (!a || !a->comment || !b || !b->comment)
-		return 0;
-
-	return strcasecmp(a->comment, b->comment);
-}
-
-/*
- * read_userlist()
- *
- * wczytuje listê kontaktów z pliku ~/.gg/userlist. mo¿e ona byæ w postaci
- * linii ,,<numerek> <opis>'' lub w postaci eksportu tekstowego listy
- * kontaktów windzianego klienta.
- *
- *  - filename.
- */
-int read_userlist(char *filename)
-{
-	FILE *f;
-	char *buf;
-
-	if (!filename) {
-		if (!(filename = prepare_path("userlist")))
-			return -1;
-	}
-	
-	if (!(f = fopen(filename, "r")))
-		return -1;
-
-	while ((buf = read_file(f))) {
-		struct userlist u;
-		char *comment;
-		
-		if (buf[0] == '#') {
-			free(buf);
-			continue;
-		}
-
-		if (!strchr(buf, ';')) {
-			if (!(comment = strchr(buf, ' '))) {
-				free(buf);
-				continue;
-			}
-
-			u.uin = strtol(buf, NULL, 0);
-		
-			if (!u.uin) {
-				free(buf);
-				continue;
-			}
-
-			u.first_name = NULL;
-			u.last_name = NULL;
-			u.nickname = NULL;
-			u.comment = strdup(++comment);
-			u.mobile = NULL;
-			u.group = NULL;
-
-		} else {
-			char *first_name, *last_name, *nickname, *comment, *mobile, *group, *uin, *foo = buf;
-
-			first_name = get_token(&foo, ';');
-			last_name = get_token(&foo, ';');
-			nickname = get_token(&foo, ';');
-			comment = get_token(&foo, ';');
-			mobile = get_token(&foo, ';');
-			group = get_token(&foo, ';');
-			uin = get_token(&foo, ';');
-
-			if (!uin || !(u.uin = strtol(uin, NULL, 0))) {
-				free(buf);
-				continue;
-			}
-
-			u.first_name = strdup(first_name);
-			u.last_name = strdup(last_name);
-			u.nickname = strdup(nickname);
-			u.comment = strdup(comment);
-			u.mobile = strdup(mobile);
-			u.group = strdup(group);
-		}
-
-		free(buf);
-
-		u.status = GG_STATUS_NOT_AVAIL;
-
-		list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);
-	}
-	
-	fclose(f);
-
-	return 0;
-}
-
-/*
- * write_userlist()
- *
- * zapisuje listê kontaktów w pliku ~/.gg/userlist
- *
- *  - filename.
- */
-int write_userlist(char *filename)
-{
-	struct list *l;
-	char *tmp;
-	FILE *f;
-
-	if (!(tmp = prepare_path("")))
-		return -1;
-	mkdir(tmp, 0700);
-
-	if (!filename) {
-		if (!(filename = prepare_path("userlist")))
-			return -1;
-	}
-	
-	if (!(f = fopen(filename, "w")))
-		return -2;
-
-	fchmod(fileno(f), 0600);
-	
-	for (l = userlist; l; l = l->next) {
-		struct userlist *u = l->data;
-
-		fprintf(f, "%s;%s;%s;%s;%s;%s;%lu\r\n", (u->first_name) ?
-			u->first_name : u->comment, (u->last_name) ?
-			u->last_name : "", (u->nickname) ? u->nickname :
-			u->comment, u->comment, (u->mobile) ? u->mobile :
-			"", (u->group) ? u->group : "", u->uin);
-	}	
-
-	fclose(f);
-	
-	return 0;
-}
-
-/*
- *
- * clear_userlist()
- *
- * czysci tablice userlist
- *
- */
-
-void clear_userlist(void) {
-        struct list *l;
-
-        for (l = userlist; l; l = l->next) {
-                struct userlist *u = l->data;
-                u->status = GG_STATUS_NOT_AVAIL;
-        };
-};
-
-/*
- * add_user()
- *
- * dodaje u¿ytkownika do listy.
- *
- *  - uin,
- *  - comment.
- */
-int add_user(uin_t uin, char *comment)
-{
-	struct userlist u;
-
-	u.uin = uin;
-	u.status = GG_STATUS_NOT_AVAIL;
-	u.first_name = NULL;
-	u.last_name = NULL;
-	u.nickname = NULL;
-	u.mobile = NULL;
-	u.group = NULL;
-	u.comment = strdup(comment);
-
-	list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);
-	
-	return 0;
-}
-
-/*
- * del_user()
- *
- * usuwa danego u¿ytkownika z listy kontaktów.
- *
- *  - uin.
- */
-int del_user(uin_t uin)
-{
-	struct list *l;
-	
-	for (l = userlist; l; l = l->next) {
-		struct userlist *u = l->data;
-
-		if (u->uin == uin) {
-			free(u->first_name);
-			free(u->last_name);
-			free(u->nickname);
-			free(u->comment);
-			free(u->mobile);
-			free(u->group);
-
-			list_remove(&userlist, u, 1);
-
-			return 0;
-		}
-	}
-
-	return -1;
-}
-
-/*
- * replace_user()
- *
- * usuwa i dodaje na nowo u¿ytkownika, ¿eby zosta³ umieszczony na odpowiednim
- * (pod wzglêdem kolejno¶ci alfabetycznej) miejscu. g³upie to trochê, ale
- * przy listach jednokierunkowych nie za bardzo chce mi siê mieszaæ z
- * przesuwaniem elementów listy.
- * 
- *  - u.
- *
- * zwraca zero je¶li jest ok, -1 je¶li b³±d.
- */
-int replace_user(struct userlist *u)
-{
-	if (list_remove(&userlist, u, 0))
-		return -1;
-	if (list_add_sorted(&userlist, u, 0, userlist_compare))
-		return -1;
-
-	return 0;
-}
-
-/*
- * find_user()
- *
- * znajduje odpowiedni± strukturê `userlist' odpowiadaj±c± danemu numerkowi
- * lub jego opisowi.
- *
- *  - uin,
- *  - comment.
- */
-struct userlist *find_user(uin_t uin, char *comment)
-{
-	struct list *l;
-
-	for (l = userlist; l; l = l->next) {
-		struct userlist *u = l->data;
-
-                if (uin && u->uin == uin)
-			return u;
-                if (comment && !strcasecmp(u->comment, comment))
-                        return u;
-        }
-
-        return NULL;
-}
-
-/*
- * get_uin()
- *
- * je¶li podany tekst jest liczb±, zwraca jej warto¶æ. je¶li jest nazw±
- * u¿ytkownika w naszej li¶cie kontaktów, zwraca jego numerek. inaczej
- * zwraca zero.
- *
- *  - text.
- */
-uin_t get_uin(char *text)
-{
-	uin_t uin = atoi(text);
-	struct userlist *u;
-
-	if (!uin) {
-		if (!(u = find_user(0, text)))
-			return 0;
-		uin = u->uin;
-	}
-
-	return uin;
-}
-
-/*
- * format_user()
- *
- * zwraca ³adny (ew. kolorowy) tekst opisuj±cy dany numerek. je¶li jest
- * w naszej li¶cie kontaktów, formatuje u¿ywaj±c `known_user', w przeciwnym
- * wypadku u¿ywa `unknown_user'. wynik jest w statycznym buforze.
- *
- *  - uin - numerek danej osoby.
- */
-char *format_user(uin_t uin)
-{
-	struct userlist *u = find_user(uin, NULL);
-	static char buf[100], *tmp;
-	
-	if (!u)
-		tmp = format_string(find_format("unknown_user"), itoa(uin));
-	else
-		tmp = format_string(find_format("known_user"), u->comment, itoa(uin));
-	
-	strncpy(buf, tmp, sizeof(buf) - 1);
-	
-	free(tmp);
-
-	return buf;
-}
-
-/*
- * del_ignored()
- *
- * usuwa z listy ignorowanych numerków.
- *
- *  - uin.
- */
-int del_ignored(uin_t uin)
-{
-	struct list *l;
-
-	for (l = ignored; l; l = l->next) {
-		struct ignored *i = l->data;
-
-		if (i->uin == uin) {
-			list_remove(&ignored, i, 1);
-			return 0;
-		}
-	}
-
-	return -1;
-}
-
-/*
- * add_ignored()
- *
- * dopisuje do listy ignorowanych numerków.
- *
- *  - uin.
- */
-int add_ignored(uin_t uin)
-{
-	struct list *l;
-	struct ignored i;
-
-	for (l = ignored; l; l = l->next) {
-		struct ignored *j = l->data;
-
-		if (j->uin == uin)
-			return -1;
-	}
-
-	i.uin = uin;
-	list_add(&ignored, &i, sizeof(i));
-	
-	return 0;
-}
-
-/*
- * is_ignored()
- *
- * czy dany numerek znajduje siê na li¶cie ignorowanych.
- *
- *  - uin.
- */
-int is_ignored(uin_t uin)
-{
-	struct list *l;
-
-	for (l = ignored; l; l = l->next) {
-		struct ignored *i = l->data;
-
-		if (i->uin == uin)
-			return 1;
-	}
-
-	return 0;
 }
 
 /*
@@ -1019,32 +632,6 @@ void parse_autoexec(char *filename)
 	in_autoexec = 0;
 	
 	fclose(f);
-}
-
-/*
- * send_userlist()
- *
- * wysy³a do serwera userlistê, wywo³uj±c gg_notify()
- */
-void send_userlist()
-{
-        struct list *l;
-        uin_t *uins;
-        int i, count;
-
-	count = list_count(userlist);
-
-        uins = (void*) malloc(count * sizeof(uin_t));
-
-	for (i = 0, l = userlist; l; i++, l = l->next) {
-		struct userlist *u = l->data;
-
-                uins[i] = u->uin;
-	}
-
-        gg_notify(sess, uins, count);
-
-        free(uins);
 }
 
 /*
@@ -1171,7 +758,7 @@ char *read_file(FILE *f)
 }
 
 /*
- * add_ignored()
+ * add_process()
  *
  * dopisuje do listy uruchomionych dzieci procesów.
  *
@@ -1550,8 +1137,8 @@ int run_event(char *act)
                 if (!(uin = get_uin(arg)))
                         return 1;
 
-                if ((u = find_user(uin, NULL)))
-                        snprintf(sender, sizeof(sender), "%s/%lu", u->comment, u->uin);
+                if ((u = userlist_find(uin, NULL)))
+                        snprintf(sender, sizeof(sender), "%s/%lu", u->display, u->uin);
                 else
                         snprintf(sender, strlen(sender), "%s", arg);
 
@@ -1974,3 +1561,19 @@ int transfer_id()
 
 	return id;
 }
+
+/*
+ * strdup_null()
+ *
+ * dzia³a tak samo jak strdup(), tyle ¿e przy argumencie równym NULL
+ * zwraca NULL zamiast segfaultowaæ.
+ *
+ *  - ptr - bufor do skopiowania.
+ *
+ * zwraca zaalokowany bufor lub NULL.
+ */
+char *strdup_null(char *ptr)
+{
+	return (ptr) ? strdup(ptr) : NULL;
+}
+

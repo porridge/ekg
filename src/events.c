@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -32,6 +32,7 @@
 #include "events.h"
 #include "commands.h"
 #include "themes.h"
+#include "userlist.h"
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure();
@@ -132,7 +133,7 @@ void print_message_body(char *str, int chat)
  */
 void handle_msg(struct gg_event *e)
 {
-	struct userlist *u = find_user(e->event.msg.sender, NULL);
+	struct userlist *u = userlist_find(e->event.msg.sender, NULL);
 	int chat = ((e->event.msg.msgclass & 0x0f) == GG_CLASS_CHAT);
 	char sender[100];
 	struct tm *tm;
@@ -141,11 +142,11 @@ void handle_msg(struct gg_event *e)
 	if (!e->event.msg.message)
 		return;
 	
-	if (is_ignored(e->event.msg.sender)) {
+	if (ignored_check(e->event.msg.sender)) {
 		if (log_ignored) {
 			cp_to_iso(e->event.msg.message);
 			if (u)
-				snprintf(sender, sizeof(sender), "%s/%lu", u->comment, u->uin);
+				snprintf(sender, sizeof(sender), "%s/%lu", u->display, u->uin);
 			else
 				snprintf(sender, sizeof(sender), "%lu", e->event.msg.sender);
 			put_log(e->event.msg.sender, ">> ignorowana %s %s (%s)\n%s\n", (chat) ?
@@ -173,7 +174,7 @@ void handle_msg(struct gg_event *e)
 	};
 			
 	if (u)
-		add_send_nick(u->comment);
+		add_send_nick(u->display);
 	else
 		add_send_nick(itoa(e->event.msg.sender));
 
@@ -192,7 +193,7 @@ void handle_msg(struct gg_event *e)
 	play_sound((chat) ? sound_chat_file : sound_msg_file);
 
 	if (u)
-		snprintf(sender, sizeof(sender), "%s/%lu", u->comment, u->uin);
+		snprintf(sender, sizeof(sender), "%s/%lu", u->display, u->uin);
 	else
 		snprintf(sender, sizeof(sender), "%lu", e->event.msg.sender);
 
@@ -263,20 +264,20 @@ void handle_notify(struct gg_event *e)
 	struct userlist *u;		
 
 	while (n->uin) {
-		if (is_ignored(n->uin)) {
+		if (ignored_check(n->uin)) {
 			n++;
 			continue;
 		}
 
-		if ((u = find_user(n->uin, NULL))) {
+		if ((u = userlist_find(n->uin, NULL))) {
 			u->status = n->status;
-			u->ip = n->remote_ip;
+			u->ip.s_addr = n->remote_ip;
 			u->port = n->remote_port;
 		}
 		if (n->status == GG_STATUS_AVAIL) {
 			my_printf("status_avail", format_user(n->uin));
 			if (u && completion_notify)
-				add_send_nick(u->comment);
+				add_send_nick(u->display);
 			if (enable_beep && enable_beep_notify)
 				my_puts("\007");
 		} else if (n->status == GG_STATUS_BUSY)
@@ -298,17 +299,17 @@ void handle_status(struct gg_event *e)
 {
 	struct userlist *u;
 
-	if (is_ignored(e->event.status.uin))
+	if (ignored_check(e->event.status.uin))
 		return;
 	
-	if (!(u = find_user(e->event.status.uin, NULL)))
+	if (!(u = userlist_find(e->event.status.uin, NULL)))
 		return;
 
 	if (display_notify) {
 		if (e->event.status.status == GG_STATUS_AVAIL && u->status != GG_STATUS_AVAIL) {
 		    	check_event(EVENT_AVAIL, e->event.status.uin);
-			if (u && completion_notify)
-				add_send_nick(u->comment);
+			if (completion_notify)
+				add_send_nick(u->display);
 			my_printf("status_avail", format_user(e->event.status.uin));
 			if (enable_beep && enable_beep_notify)
 				my_puts("\007");
@@ -341,6 +342,7 @@ void handle_failure(struct gg_event *e)
 	list_remove(&watches, sess, 0);
 	gg_logoff(sess);
 	gg_free_session(sess);
+	userlist_clear_status();
 	sess = NULL;
 	do_reconnect();
 }
@@ -359,7 +361,7 @@ void handle_success(struct gg_event *e)
         int status_table[3] = { GG_STATUS_AVAIL, GG_STATUS_BUSY, GG_STATUS_INVISIBLE };
 
 	my_printf("connected");
-	send_userlist();
+	userlist_send();
 
 	if (away || private_mode)
 		gg_change_status(sess, status_table[away] | ((private_mode) ? GG_STATUS_FRIENDS_MASK : 0));
@@ -570,6 +572,7 @@ void handle_disconnect(struct gg_event *e)
 	auto_reconnect = 0;
 	gg_logoff(sess);	/* a zobacz.. mo¿e siê uda ;> */
 	list_remove(&watches, sess, 0);
+	userlist_clear_status();
 	gg_free_session(sess);
 	sess = NULL;	
 }

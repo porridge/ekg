@@ -2,14 +2,14 @@
 
                           Protokó³ G*du-G*du 4.x
 
-     (C) Copyright 2001 by Wojtek Kaniewski <wojtekka@irc.pl>,
-                           Robert J. Wo¼ny <speedy@atman.pl>,
-                           Tomasz Jarzynka <tomee@cpi.pl>,
-                           Adam Ludwikowski <adam.ludwikowski@wp.pl>,
-                           Marek Kozina <klith@hybrid.art.pl>,
-			   Rafa³ Florek <raf@regionet.regionet.pl>,
-			   Igor Popik <igipop@wsfiz.edu.pl>,
-                           Rafa³ Cyran <ajron@wp.pl>
+   (C) Copyright 2001-2002 by Wojtek Kaniewski <wojtekka@irc.pl>,
+                              Robert J. Wo¼ny <speedy@atman.pl>,
+                              Tomasz Jarzynka <tomee@cpi.pl>,
+                              Adam Ludwikowski <adam.ludwikowski@wp.pl>,
+                              Marek Kozina <klith@hybrid.art.pl>,
+                              Rafa³ Florek <raf@regionet.regionet.pl>,
+                              Igor Popik <igipop@wsfiz.edu.pl>,
+                              Rafa³ Cyran <ajron@wp.pl>
 
 --- 0) disclaimer ---------------------------------------------------------
 

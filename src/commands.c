@@ -1,8 +1,8 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
- *		        Robert J. Wo¼ny <speedy@ziew.org>
+ *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *                          Robert J. Wo¼ny <speedy@ziew.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -39,6 +39,7 @@
 #include "events.h"
 #include "themes.h"
 #include "vars.h"
+#include "userlist.h"
 
 /*
  * g³upie readline z wersji na wersjê ma inne include'y, grr.
@@ -100,9 +101,9 @@ struct command commands[] = {
 	{ "?", "c", command_help, " [polecenie]", "Synonim dla %Whelp%n", "" },
 	{ "ignore", "u", command_ignore, " [numer/alias]", "Dodaje do listy ignorowanych lub j± wy¶wietla", "" },
 	{ "invisible", "", command_away, "", "Zmienia stan na niewidoczny", "" },
-	{ "list", "", command_list, " [opcje]", "Wy¶wietla listê kontaktów", "  --active\n  --busy\n  --inactive\n" },
+	{ "list", "u", command_list, " [alias|opcje]", "Wy¶wietla listê kontaktów lub informacje o osobie", "  --active\n  --busy\n  --inactive\n" },
 	{ "msg", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ do podanego u¿ytkownika", "" },
-	{ "modify", "u?", command_modify, " <alias> [opcje]", "Zmienia informacje w li¶cie kontaktów", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n  --alias <alias>  // nazwa w li¶cie kontaktów\n  --phone <telefon>\n  --uin <numerek>\n  \n  --group <grupa>" },
+	{ "modify", "u?", command_modify, " <alias> [opcje]", "Zmienia informacje w li¶cie kontaktów", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n  --display <nazwa>  // wy¶wietlana nazwa\n  --phone <telefon>\n  --uin <numerek>\n  \n  --group [+/-]<grupa>" },
         { "on", "?u?", command_on, " <zdarzenie|...> <numer/alias> <akcja>|clear", "Dodaje lub usuwa zdarzenie", "" },
 	{ "passwd", "??", command_passwd, " <has³o> <e-mail>", "Zmienia has³o i adres e-mail u¿ytkownika", "" },
 	{ "private", "", command_away, " [on/off]", "W³±cza/wy³±cza tryb ,,tylko dla przyjació³''", "" },
@@ -172,8 +173,8 @@ char *known_uin_generator(char *text, int state)
 
 		l = l->next;
 
-		if (!strncasecmp(text, u->comment, len))
-			return strdup(u->comment);
+		if (u->display && !strncasecmp(text, u->display, len))
+			return strdup(u->display);
 	}
 
 	return NULL;
@@ -228,12 +229,12 @@ char *ignored_uin_generator(char *text, int state)
 
 		l = l->next;
 
-		if (!(u = find_user(i->uin, NULL))) {
+		if (!(u = userlist_find(i->uin, NULL))) {
 			if (!strncasecmp(text, itoa(i->uin), len))
 				return strdup(itoa(i->uin));
 		} else {
-			if (!strncasecmp(text, u->comment, len))
-				return strdup(u->comment);
+			if (u->display && !strncasecmp(text, u->display, len))
+				return strdup(u->display);
 		}
 	}
 
@@ -413,7 +414,7 @@ COMMAND(command_add)
 		return 0;
 	}
 
-	if (find_user(atoi(params[0]), params[1])) {
+	if (userlist_find(atoi(params[0]), params[1])) {
 		my_printf("user_exists", params[1]);
 		return 0;
 	}
@@ -423,7 +424,7 @@ COMMAND(command_add)
 		return 0;
 	}
 
-	if (!add_user(uin, params[1])) {
+	if (!userlist_add(uin, params[1])) {
 		my_printf("user_added", params[1]);
 		gg_add_notify(sess, uin);
 		config_changed = 1;
@@ -577,6 +578,7 @@ COMMAND(command_connect)
 		gg_logoff(sess);
 		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
+		userlist_clear_status();
 		sess = NULL;
 		reconnect_timer = 0;
 	}
@@ -586,6 +588,7 @@ COMMAND(command_connect)
 
 COMMAND(command_del)
 {
+	struct userlist *u;
 	uin_t uin;
 	char *tmp;
 
@@ -594,14 +597,14 @@ COMMAND(command_del)
 		return 0;
 	}
 
-	if (!(uin = get_uin(params[0])) || !find_user(uin, NULL)) {
+	if (!(uin = get_uin(params[0])) || !(u = userlist_find(uin, NULL))) {
 		my_printf("user_not_found", params[0]);
 		return 0;
 	}
 
 	tmp = format_user(uin);
 
-	if (!del_user(uin)) {
+	if (!userlist_remove(u)) {
 		my_printf("user_deleted", tmp);
 		gg_remove_notify(sess, uin);
 	} else
@@ -764,13 +767,18 @@ COMMAND(command_modify)
 		return 0;
 	}
 
-	if (!(uin = get_uin(params[0])) || !(u = find_user(uin, NULL))) {
+	if (!(uin = get_uin(params[0])) || !(u = userlist_find(uin, NULL))) {
 		my_printf("user_not_found", params[0]);
 		return 0;
 	}
 
 	if (!params[1]) {
-		my_printf("user_info", u->first_name, u->last_name, u->nickname, u->comment, u->mobile, u->group);
+		char *groups = group_to_string(u->groups);
+		
+		my_printf("user_info", u->first_name, u->last_name, u->nickname, u->display, u->mobile, groups);
+		
+		free(groups);
+
 		return 0;
 	} else {
 		argv = split_params(params[1], -1);
@@ -779,31 +787,46 @@ COMMAND(command_modify)
 	for (i = 0; argv[i]; i++) {
 		if (argv[i][0] == '-' && argv[i][1] == '-')
 			argv[i]++;
+		
 		if (!strncmp(argv[i], "-f", 2) && argv[i + 1]) {
 			free(u->first_name);
 			u->first_name = strdup(argv[++i]);
 		}
+		
 		if (!strncmp(argv[i], "-l", 2) && argv[i + 1]) {
 			free(u->last_name);
 			u->last_name = strdup(argv[++i]);
 		}
+		
 		if (!strncmp(argv[i], "-n", 2) && argv[i + 1]) {
 			free(u->nickname);
 			u->nickname = strdup(argv[++i]);
 		}
-		if (!strncmp(argv[i], "-a", 2) && argv[i + 1]) {
-			free(u->comment);
-			u->comment = strdup(argv[++i]);
-			replace_user(u);
+		
+		if (!strncmp(argv[i], "-d", 2) && argv[i + 1]) {
+			free(u->display);
+			u->display = strdup(argv[++i]);
+			userlist_replace(u);
 		}
+		
 		if ((!strncmp(argv[i], "-p", 2) || !strncmp(argv[i], "-m", 2) || !strncmp(argv[i], "-s", 2)) && argv[i + 1]) {
 			free(u->mobile);
 			u->mobile = strdup(argv[++i]);
 		}
+		
 		if (!strncmp(argv[i], "-g", 2) && argv[i + 1]) {
-			free(u->group);
-			u->group = strdup(argv[++i]);
+			switch (*argv[++i]) {
+				case '-':
+					group_remove(u, argv[i] + 1);
+					break;
+				case '+':
+					group_add(u, argv[i] + 1);
+					break;
+				default:
+					group_add(u, argv[i]);
+			}
 		}
+		
 		if (!strncmp(argv[i], "-u", 2) && argv[i + 1])
 			u->uin = strtol(argv[++i], NULL, 0);
 	}
@@ -875,7 +898,7 @@ COMMAND(command_ignore)
 			return 0;
 		}
 		
-		if (!add_ignored(uin)) {
+		if (!ignored_add(uin)) {
 			if (!in_autoexec) 
 				my_printf("ignored_added", params[0]);
 		} else
@@ -892,7 +915,7 @@ COMMAND(command_ignore)
 			return 0;
 		}
 		
-		if (!del_ignored(uin)) {
+		if (!ignored_remove(uin)) {
 			if (!in_autoexec)
 				my_printf("ignored_deleted", format_user(uin));
 		} else
@@ -908,6 +931,25 @@ COMMAND(command_list)
 	struct list *l;
 	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0;
 	char *tmp, **argv;
+
+	if (params[0] && *params[0] != '-') {
+		struct userlist *u;
+		char *groups;
+		uin_t uin;
+		
+		if (!(uin = get_uin(params[0])) || !(u = userlist_find(uin, NULL))) {
+			my_printf("user_not_found", params[0]);
+			return 0;
+		}
+
+		groups = group_to_string(u->groups);
+		
+		my_printf("user_info", u->first_name, u->last_name, u->nickname, u->display, u->mobile, groups);
+		
+		free(groups);
+
+		return 0;
+	}
 
         if (params[0] && (argv = split_params(params[0], -1))) {
 		int i;
@@ -947,7 +989,7 @@ COMMAND(command_list)
 				break;
 		}
 
-		in.s_addr = u->ip;
+		in.s_addr = u->ip.s_addr;
 
 		if (show_all || (show_busy && u->status == GG_STATUS_BUSY) || (show_active && u->status == GG_STATUS_AVAIL) || (show_inactive && u->status == GG_STATUS_NOT_AVAIL)) {
 			my_printf(tmp, format_user(u->uin), inet_ntoa(in), itoa(u->port));
@@ -983,8 +1025,8 @@ COMMAND(command_msg)
 		return 0;
 	}
 
-        if ((u = find_user(uin, NULL)))
-                snprintf(sender, sizeof(sender), "%s/%lu", u->comment, u->uin);
+        if ((u = userlist_find(uin, NULL)))
+                snprintf(sender, sizeof(sender), "%s/%lu", u->display, u->uin);
         else
                 snprintf(sender, sizeof(sender), "%lu", uin);
 
@@ -1037,7 +1079,7 @@ COMMAND(command_msg)
 
 COMMAND(command_save)
 {
-	if (!write_userlist(NULL) && !write_config(NULL)) {
+	if (!userlist_write(NULL) && !write_config(NULL)) {
 		my_printf("saved");
 		config_changed = 0;
 	} else
@@ -1129,7 +1171,7 @@ COMMAND(command_sms)
 		return 0;
 	}
 
-	if ((u = find_user(0, params[0]))) {
+	if ((u = userlist_find(0, params[0]))) {
 		if (!u->mobile || !strcmp(u->mobile, "")) {
 			my_printf("sms_unknown", format_user(u->uin));
 			return 0;
@@ -1216,7 +1258,7 @@ COMMAND(command_dcc)
 			return 0;
 		}
 		
-		if (!(uin = get_uin(params[1])) || !(u = find_user(uin, NULL))) {
+		if (!(uin = get_uin(params[1])) || !(u = userlist_find(uin, NULL))) {
 			my_printf("user_not_found", params[1]);
 			return 0;
 		}
@@ -1249,7 +1291,7 @@ COMMAND(command_dcc)
 		} else {
 			struct gg_dcc *d;
 			
-			if (!(d = gg_dcc_send_file(u->ip, u->port, config_uin, uin))) {
+			if (!(d = gg_dcc_send_file(u->ip.s_addr, u->port, config_uin, uin))) {
 				my_printf("dcc_error", strerror(errno));
 				return 0;
 			}
@@ -1287,8 +1329,8 @@ COMMAND(command_dcc)
 			if (params[1][0] == '#' && atoi(params[1] + 1) == t->id)
 				break;
 
-			if ((u = find_user(t->uin, NULL))) {
-				if (!strcasecmp(params[1], itoa(u->uin)) || !strcasecmp(params[1], u->comment))
+			if ((u = userlist_find(t->uin, NULL))) {
+				if (!strcasecmp(params[1], itoa(u->uin)) || !strcasecmp(params[1], u->display))
 					break;
 			}
 		}

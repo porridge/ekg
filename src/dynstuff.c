@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -155,6 +155,32 @@ int list_count(struct list *list)
 		count++;
 
 	return count;
+}
+
+/*
+ * list_destroy()
+ *
+ * niszczy wszystkie elementy listy.
+ *
+ *  - list - lista,
+ *  - free_data - czy zwalniaæ bufor danych?
+ */
+int list_destroy(struct list *list, int free_data)
+{
+	struct list *tmp;
+	
+	while (list) {
+		if (free_data)
+			free(list->data);
+
+		tmp = list->next;
+
+		free(list);
+
+		list = tmp;
+	}
+
+	return 0;
 }
 
 /*

@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "libgg.h"
+#include "libgadu.h"
 
 int main(int argc, char **argv)
 {

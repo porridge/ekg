@@ -1,8 +1,8 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
- *			Robert J. Wo¼ny <speedy@ziew.org>
+ *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *                          Robert J. Wo¼ny <speedy@ziew.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -33,18 +33,6 @@
 
 enum { EVENT_MSG = 1, EVENT_CHAT = 2, EVENT_AVAIL = 4, EVENT_NOT_AVAIL = 8, EVENT_AWAY = 16, EVENT_DCC = 32 };
 
-struct userlist {
-	char *first_name, *last_name, *nickname, *comment, *mobile, *group;
-	uin_t uin;
-	int status;
-	unsigned long ip;
-	unsigned short port;
-};
-
-struct ignored {
-	uin_t uin;
-};
-
 struct process {
 	int pid;
 	char *name;
@@ -69,14 +57,11 @@ struct event {
         char *action;
 };
 
-struct list *userlist;
-struct list *ignored;
 struct list *children;
 struct list *aliases;
 struct list *watches;
 struct list *transfers;
 struct list *events;
-int ignored_count;
 int in_readline, away, in_autoexec, auto_reconnect, reconnect_timer;
 int use_dcc;
 time_t last_action;
@@ -122,21 +107,9 @@ struct sockaddr_un addr;
 void my_puts(char *format, ...);
 char *my_readline();
 int read_config(char *filename);
-int read_userlist(char *filename);
 int read_sysmsg(char *filename);
 int write_config(char *filename);
-int write_userlist(char *filename);
 int write_sysmsg(char *filename);
-void clear_userlist(void);
-int add_user(uin_t uin, char *comment);
-int del_user(uin_t uin);
-int replace_user(struct userlist *u);
-struct userlist *find_user(uin_t uin, char *comment);
-char *format_user(uin_t uin);
-uin_t get_uin(char *text);
-int add_ignored(uin_t uin);
-int del_ignored(uin_t uin);
-int is_ignored(uin_t uin);
 void cp_to_iso(unsigned char *buf);
 void iso_to_cp(unsigned char *buf);
 void unidle();
@@ -174,4 +147,7 @@ int send_event(char *seq, int act);
 int correct_event(char *action);
 int events_parse_seq(char *seq, struct action_data *data);
 int init_socket();
+char *get_token(char **ptr, char sep);
+char *strdup_null(char *ptr);
+
 #endif

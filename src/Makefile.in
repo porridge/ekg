@@ -17,13 +17,13 @@ do_ioctl = @do_ioctl@
 DIOCTL = @dioctl@
 
 CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -DTHEMES_DIR=\"$(datadir)/ekg/themes\" -DIOCTL_DAEMON_PATH=\"$(prefix)/bin/ioctl_daemon\" $(DIOCTL)
-OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o
+OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o ekg.o
 LOBJS = ../lib/libgadu.a
 
 all:	ekg $(do_ioctl)
 
-ekg:	$(OBJS) $(LOBJS) ekg.c
-	$(CC) $(CFLAGS) ekg.c -o $(NAME) $(OBJS) $(LOBJS) $(LIBS) 
+ekg:	$(OBJS) $(LOBJS)
+	$(CC) -o $(NAME) $(OBJS) $(LOBJS) $(LIBS) 
 
 ioctl_daemon:	ioctl_daemon.c
 	$(CC) ioctl_daemon.c -o $(IOCTL_DAEMON_NAME)

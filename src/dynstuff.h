@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -29,6 +29,7 @@ void *list_add(struct list **list, void *data, int alloc_size);
 void *list_add_sorted(struct list **list, void *data, int alloc_size, int (*comparision)(void *, void *));
 int list_remove(struct list **list, void *data, int free_data);
 int list_count(struct list *list);
+int list_destroy(struct list *list, int free_data);
 
 struct string {
 	char *str;

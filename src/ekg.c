@@ -1,8 +1,8 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
- *                     Robert J. Wo¼ny <speedy@ziew.org>
+ *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *                          Robert J. Wo¼ny <speedy@ziew.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -40,6 +40,7 @@
 #include "events.h"
 #include "themes.h"
 #include "version.h"
+#include "userlist.h"
 
 time_t last_action = 0;
 int ioctl_daemon_pid = 0;
@@ -359,7 +360,7 @@ IOCTL_HELP
 	
         ekg_pid = getpid();
 
-        read_userlist(NULL);
+        userlist_read(NULL);
 	read_config(NULL);
 	read_sysmsg(NULL);
 
@@ -508,7 +509,7 @@ IOCTL_HELP
 
 		if ((line = readline(prompt))) {
 			if (!strcasecmp(line, "tak") || !strcasecmp(line, "yes") || !strcasecmp(line, "t") || !strcasecmp(line, "y")) {
-				if (!write_userlist(NULL) && !write_config(NULL))
+				if (!userlist_write(NULL) && !write_config(NULL))
 					my_printf("saved");
 				else
 					my_printf("error_saving");

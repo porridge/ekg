@@ -1,7 +1,7 @@
 /* $Id$ */
 
 #include <stdio.h>
-#include "libgg.h"
+#include "libgadu.h"
 
 #ifdef ASYNC
 

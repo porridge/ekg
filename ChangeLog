@@ -11,6 +11,19 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawka --ioctl-... w helpie, bo siê nie kompilowa³o na gcc 3.0 (w)
 - dodane exit(0) za execl() ioctl-daemona, bo przy jego braku program
   szed³ dalej i dzia³a³y dwie sesje ekg (w)
+- wydzielenie kodu userlist i ignorowanych do userlist.c, dodanie
+  kodu obs³ugi grup u¿ytkowników (w)
+- czyszczenie stanu userów po roz³±czeniu (w)
+- komenda ,,list <alias>'' wyswietla informacje o danej osobie z listy
+  kontaktów (w)
+- komenda ,,modify <alias> --group ...'' mo¿e dodawaæ lub usuwaæ
+  u¿ytkownika z danej grupy (w)
+- parê fixów, ¿eby funkcje systemowe na pewno nie dosta³y NULL jako
+  argumentu (w)
+- kopirajty od 2001-2002 i dopisanie vinila gdzieniegdzie (w)
+- s/libgg/libgadu/ w examples/ (w)
+- wywalenie ekg.c do ekg.o, niech siê na koñcu linkuje wszystko
+  i niech rekompilacja pakietu bêdzie szybsza (w)
 
 // 2002-02-03
 

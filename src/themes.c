@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -602,7 +602,7 @@ void init_theme()
 	add_format("process_exit", "%> Proces %1 (%2) zakoñczy³ dzia³anie z wynikiem %3\n", 1);
 
 	add_format("modify_done", "%> Zmieniono wpis w li¶cie kontaktów\n", 1);
-	add_format("user_info", "%) Imiê i nazwisko: %W%1 %2%n\n%) Pseudonim: %W%3%n\n%) Alias: %W%4%n\n%) Numer telefonu: %W%5%n\n%) Grupa: %W%6%n\n", 1);
+	add_format("user_info", "%) Imiê i nazwisko: %W%1 %2%n\n%) Pseudonim: %W%3%n\n%) Alias: %W%4%n\n%) Numer telefonu: %W%5%n\n%) Grupy: %W%6%n\n", 1);
 
 	add_format("config_changed", "Zapisaæ now± konfiguracjê? (tak/nie) ", 1);
 	add_format("config_unknown", "%! Zmiana tego ustawienia mo¿e nie odnie¶æ zamierzonego efektu\n", 1);
