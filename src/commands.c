@@ -1321,11 +1321,28 @@ COMMAND(cmd_list)
 		p = u->port;
 
 		if (u->uin == config_uin) {
-			if (!config_dcc || !config_dcc_ip) {
+			if (config_dcc && config_dcc_ip) {
+
+				if (strcmp(config_dcc_ip, "auto"))
+					in.s_addr = inet_addr(config_dcc_ip);
+				else {
+					struct sockaddr_in foo;
+					int bar = sizeof(foo);
+
+					if (!sess || getsockname(sess->fd, (struct sockaddr *) &foo, &bar))
+						goto fail;
+
+					in.s_addr = foo.sin_addr.s_addr; 
+				}
+
+				p = 1550;
+
+			} else {
+fail:
 				in.s_addr = inet_addr("0.0.0.0");
 				p = 0;
 			}
-
+				
 			if (sess && sess->state == GG_STATE_CONNECTED)
 				switch (config_status) {
 					case GG_STATUS_INVISIBLE:
