@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-07-06
 
 - sprawdzanie czy query istnieje (d)
+- poprawka gg_dcc_debug_data (Chilek/w)
 
 // 2002-07-05
 
