@@ -1364,7 +1364,7 @@ struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int co
 			}
 		}
 
-		if (matched == list_count(c->recipients)) 
+		if (matched == list_count(c->recipients) && matched == (from == config_uin ? count : count + 1))
 			return l->data;
 	}
 
