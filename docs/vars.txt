@@ -113,7 +113,7 @@ beep_mail
 
 check_mail
 	typ: liczba
-	domy¶lna warto¶æ: 1
+	domy¶lna warto¶æ: 0
 
 	okre¶la, czy ekg ma sprawdzaæ, czy nadesz³a nowa poczta i informowaæ
 	o tym na pasku statusu. warto¶æ 1 odpowiada sprawdzaniu skrzynki typu
