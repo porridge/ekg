@@ -44,6 +44,7 @@
 #ifdef HAVE_OPENSSL
 #  include "sim.h"
 #endif
+#include "msgqueue.h"
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure();

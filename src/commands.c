@@ -54,6 +54,7 @@
 #ifdef HAVE_OPENSSL
 #  include "sim.h"
 #endif
+#include "msgqueue.h"
 
 COMMAND(cmd_modify);
 
@@ -1321,7 +1322,11 @@ COMMAND(cmd_msg)
 			last_add(1, uin, time(NULL), raw_msg);
 
 		if (!chat || count == 1) {
-			msg_seq = gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
+			if (sess)
+				msg_seq = gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
+			else
+				msg_seq = -1;
+
 			msg_queue_add((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, msg_seq, 1, &uin, raw_msg, secure);
 
 			valid++;
@@ -1337,8 +1342,12 @@ COMMAND(cmd_msg)
 		for (p = nicks; *p; p++)
 			if ((uin = get_uin(*p)))
 				uins[realcount++] = uin;
-	
-		msg_seq = gg_send_message_confer(sess, GG_CLASS_CHAT, realcount, uins, msg);
+		
+		if (sess)
+			msg_seq = gg_send_message_confer(sess, GG_CLASS_CHAT, realcount, uins, msg);
+		else
+			msg_seq = -1;
+
 		msg_queue_add((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, msg_seq, count, uins, raw_msg, 0);
 
 		valid++;
@@ -2905,7 +2914,7 @@ COMMAND(cmd_queue)
 			msg_queue_remove_uin(uin);
 			print("queue_clear_uin", format_user(uin));
 		} else {
-			msg_queue_destroy();
+			msg_queue_free();
 			print("queue_clear");
 		}
 

@@ -866,6 +866,7 @@ int main(int argc, char **argv)
 	config_read();
 	sysmsg_read();
 	emoticon_read();
+	msg_queue_read();
 	in_autoexec = 0;
 
 	ui_event("xterm_update");
@@ -1016,6 +1017,8 @@ void ekg_exit()
 
 	ui_deinit();
 
+	msg_queue_write();
+
 	if (config_keep_reason) {
 		array_add(&vars, xstrdup("status"));
 		array_add(&vars, xstrdup("reason"));
@@ -1062,6 +1065,7 @@ void ekg_exit()
 	if (pipe_file)
 		unlink(pipe_file);
 	
+	msg_queue_free();
 	alias_free();
 	conference_free();
 	userlist_free();
