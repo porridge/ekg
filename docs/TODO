@@ -23,6 +23,8 @@ Pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
   - wykrywanie niewidocznych jako opcja (wielu),
   - czas powrotu w stanach opisowych,
   - zmienna wy³±czaj±ca pytanie o zapisanie konfiguracji (Tohver),
+  - autofind - szukanie osób, które do nas pisz±, a nie mamy ich w li¶cie
+    kontaktów (mateusza)
   - uporz±dkowane i dobrze dzia³aj±ce okna p³ywaj±ce (sz?)
   - mo¿liwo¶æ automagicznego wyrównywania kolejnych linii wiadomo¶ci w tematach
     ircopodobnych do d³ugo¶ci nazwy rozmówcy i timestampu (sz)
