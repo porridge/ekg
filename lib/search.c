@@ -33,7 +33,7 @@
  *
  * rozpoczyna szukanie u¿ytkowników. informacje o tym, czego dok³adnie szukamy
  * s± zawarte w strukturze `gg_search_request'. ze wzglêdu na specyfikê ich
- * przeszukiwarki, niektórych pól nie mo¿na mieszaæ. s± oznaczone w libgg.h
+ * przeszukiwarki, niektórych pól nie mo¿na mieszaæ. s± oznaczone w libgadu.h
  * jako osobne mode'y.
  *
  *  - r - informacja o tym, czego szukamy,
