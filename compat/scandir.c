@@ -23,7 +23,7 @@
 #endif
 #include <errno.h>
 
-struct dirent foo;
+static struct dirent foo;
 #define __DIRENT_SIZE(d)	\
 	(sizeof(foo) - sizeof(foo.d_name) + strlen((d)->d_name) + 1)
 
