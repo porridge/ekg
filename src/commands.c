@@ -1116,13 +1116,10 @@ COMMAND(cmd_modify)
 		}
 		
 		if (match_arg(argv[i], 'd', "display", 2) && argv[i + 1]) {
-			list_t l;
-			struct userlist *u;
-
 			i++;
 
-			if ((u = userlist_find(0, argv[i]))) {
-				printq("user_exists", u->display);
+			if (userlist_find(0, argv[i])) {
+				printq("user_exists", argv[i]);
 				array_free(argv);
 				return -1;
 			}
@@ -1186,7 +1183,7 @@ COMMAND(cmd_modify)
 		
 		if (match_arg(argv[i], 'u', "uin", 2) && argv[i + 1]) {
 			uin_t new_uin = str_to_uin(argv[++i]);
-			list_t l;
+			struct userlist *existing;
 
 			if (!new_uin) {
 				printq("invalid_uin");
@@ -1194,31 +1191,25 @@ COMMAND(cmd_modify)
 				return -1;
 			}
 
-			for (l = userlist; l; l = l->next) {
-				struct userlist *_u = l->data;
-				
-				if (new_uin == _u->uin) {
-					if (_u->display) {
-						printq("user_exists_other", argv[i], format_user(_u->uin));
-						array_free(argv);
-						return -1;
-					} else {
-						/* zmieniamy komu¶ uin, a taki uin jest ju¿ blokowany/ignorowany
-					 	   ale nie jest widoczny na naszej li¶cie */
-						int level;
+			if ((existing = userlist_find(new_uin, NULL))) {
+				if (existing->display) {
+					printq("user_exists_other", argv[i], format_user(existing->uin));
+					array_free(argv);
+					return -1;
+				} else {
+					char *egroups = group_to_string(existing->groups, 1, 0);
+					
+					if (egroups) {
+						char **arr = array_make(egroups, ",", 0, 0, 0);
+						int i;
 
-						if (group_member(_u, "__blocked"))
-							blocked_add(u->uin);
+						for (i = 0; arr[i]; i++)
+							group_add(u, arr[i]);
 
-						if (group_member(_u, "__offline"))
-							group_add(u, "__offline");
-
-						if ((level = ignored_check(_u->uin)))
-							ignored_add(u->uin, level);
-
-						userlist_remove(_u);
-						break;
+						array_free(arr);
 					}
+
+					userlist_remove(existing);
 				}
 			}
 
