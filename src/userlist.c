@@ -895,7 +895,7 @@ int blocked_add(uin_t uin)
 	struct userlist *u = userlist_find(uin, NULL);
 
 	if (u && group_member(u, "__blocked"))
-		return 0;
+		return -1;
 	
 	if (!u)
 		u = userlist_add(uin, NULL);

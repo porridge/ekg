@@ -1494,9 +1494,13 @@ COMMAND(cmd_block)
 			return -1;
 		}
 		
-		blocked_add(uin);
-		printq("blocked_added", format_user(uin));
-		config_changed = 1;
+		if (!blocked_add(uin)) {
+			printq("blocked_added", format_user(uin));
+			config_changed = 1;
+		} else {
+			printq("blocked_exist", format_user(uin));
+			return -1;
+		}
 	} else {
 		int unblock_all = ((params[0] && !strcmp(params[0], "*")) ? 1 : 0);
 

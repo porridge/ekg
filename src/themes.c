@@ -926,13 +926,14 @@ void theme_init()
 	format_add("ignored_added", "%> Dodano %T%1%n do listy ignorowanych\n", 1);
 	format_add("ignored_deleted", "%) Usuniêto %1 z listy ignorowanych\n", 1);
 	format_add("ignored_deleted_all", "%) Usuniêto wszystkich z listy ignorowanych\n", 1);
-	format_add("ignored_exist", "%! %1 jest ju¿ ignorowany\n", 1);
+	format_add("ignored_exist", "%! %1 jest ju¿ na li¶cie ignorowanych\n", 1);
 	format_add("ignored_list", "%> %1 %2\n", 1);
 	format_add("ignored_list_empty", "%! Lista ignorowanych u¿ytkowników jest pusta\n", 1);
 	format_add("error_not_ignored", "%! %1 nie jest na li¶cie ignorowanych\n", 1);
 	format_add("blocked_added", "%> Dodano %T%1%n do listy blokowanych\n", 1);
 	format_add("blocked_deleted", "%) Usuniêto %1 z listy blokowanych\n", 1);
 	format_add("blocked_deleted_all", "%) Usuniêto wszystkich z listy blokowanych\n", 1);
+	format_add("blocked_exist", "%! %1 jest ju¿ na li¶cie blokowanych\n", 1);
 	format_add("blocked_list", "%> %1\n", 1);
 	format_add("blocked_list_empty", "%! Lista blokowanych u¿ytkowników jest pusta\n", 1);
 	format_add("error_not_blocked", "%! %1 nie jest na li¶cie blokowanych\n", 1);
