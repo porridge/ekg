@@ -725,22 +725,22 @@ void changed_dcc(const char *var)
  */
 void changed_local_ip(const char *var)
 {
-    if (config_local_ip == NULL)
-	gg_local_ip = htonl(INADDR_ANY);
-    else
-    {    
-#ifdef HAVE_INET_PTON
-	tmp = inet_pton(AF_INET, config_local_ip, &gg_local_ip);
-	if (tmp == 0 || tmp == -1) {
-	    	print("invalid_local_ip");
-		xfree(config_local_ip);
-	        config_local_ip = NULL;
+	if (config_local_ip == NULL)
 		gg_local_ip = htonl(INADDR_ANY);
-	}
+	else {
+#ifdef HAVE_INET_PTON
+		int tmp = inet_pton(AF_INET, config_local_ip, &gg_local_ip);
+		
+		if (tmp == 0 || tmp == -1) {
+		    	print("invalid_local_ip");
+			xfree(config_local_ip);
+		        config_local_ip = NULL;
+			gg_local_ip = htonl(INADDR_ANY);
+		}
 #else
-	gg_local_ip = inet_addr(config_local_ip);
+		gg_local_ip = inet_addr(config_local_ip);
 #endif
-    }
+	}
 }
 
 /*
