@@ -11,6 +11,7 @@ d - drg, sz - szalik, del - deletek, g - gophi).
   jako parametr (zigi/sz)
 - konsekwentne zachowanie przy ,,ignore_empty_msg'' równym 0 i otrzymaniu
   pustej wiadomo¶ci z obrazkiem(ami). wy¶wietlana jest pusta wiadomo¶æ (zigi/sz)
+- reorganizacja polecenia check_conn, patrz /help_check_conn (zigi/sz)
 
 // 2005-02-15
 

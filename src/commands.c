@@ -5519,45 +5519,9 @@ COMMAND(cmd_queue)
 /* eksperymentalne wykrywanie niewidoczno¶ci, a w zasadzie sprawdzanie czy klient
  * jest po³±czony */
 
-COMMAND(cmd_test_check_conn_update)
+int check_conn(uin_t uin)
 {
-        list_t l;
-
-        for (l = userlist; l; l = l->next) {
-                struct userlist *u = l->data;
-
-                if (GG_S_I(u->status)) {
-                        char *tmp = saprintf("/check_conn %d", u->uin);
-                        command_exec(NULL, tmp, 1);
-                        xfree(tmp);
-                }
-        }
-
-	return 0;
-}
-
-COMMAND(cmd_check_conn)
-{
-	uin_t uin;
-	const char *par;
 	struct userlist *u;
-
-	if (!params[0] && !target) {
-		printq("not_enough_params", name);
-		return -1;
-	}
-
-	if (!sess || sess->state != GG_STATE_CONNECTED) {
-		printq("not_connected");
-		return -1;
-	}
-
-	par = params[0] ? params[0] : target;
-
-	if (!(uin = get_uin(par))) {
-		printq("user_not_found", par);
-		return -1;
-	}
 
 	if ((u = userlist_find(uin, NULL)) && group_member(u, "spied")) {
 		list_t l;
@@ -5575,14 +5539,70 @@ COMMAND(cmd_check_conn)
 
 		if (!onlist) {
 			struct spied s;
+
 			s.uin = u->uin;
 			s.timeout = 10;
 			list_add(&spiedlist, &s, sizeof(s));
+
 			gg_debug(GG_DEBUG_MISC, "// ekg: spying %d\n", s.uin);
+		}
+	} else
+		return -1;
+
+	return gg_image_request(sess, uin, 1, GG_CRC32_INVISIBLE);
+}
+
+COMMAND(cmd_check_conn)
+{
+	uin_t uin;
+	const char *par;
+
+	if (!params[0] && !target) {
+		printq("not_enough_params", name);
+		return -1;
+	}
+
+	if (!sess || sess->state != GG_STATE_CONNECTED) {
+		printq("not_connected");
+		return -1;
+	}
+
+	if (params[0]) {
+		if (match_arg(params[0], 'u', "update", 2)) {
+			list_t l;
+
+			for (l = userlist; l; l = l->next) {
+				struct userlist *u = l->data;
+
+				if (GG_S_I(u->status))
+					check_conn(u->uin);
+			}
+
+			return 0;
+		}
+
+		if (match_arg(params[0], 's', "scan", 2)) {
+			list_t l;
+
+			for (l = userlist; l; l = l->next) {
+				struct userlist *u = l->data;
+
+				if (GG_S_NA(u->status) && group_member(u, "spied"))
+					check_conn(u->uin);
+			}
+
+			return 0;
 		}
 	}
 
-	return gg_image_request(sess, uin, 1, GG_CRC32_INVISIBLE);
+	par = params[0] ? params[0] : target;
+
+	if (!(uin = get_uin(par))) {
+		printq("user_not_found", par);
+		return -1;
+	}
+
+	return check_conn(uin);
 }
 
 /*
@@ -5829,7 +5849,11 @@ void command_init()
 	
 	command_add
 	( "check_conn", "u?", cmd_check_conn, 0,
-	  " <numer/alias>", "sprawdza czy podany u¿ytkownik jest po³±czony z serwerem",
+	  " [opcje] [numer/alias]", "sprawdza, czy podany u¿ytkownik jest po³±czony z serwerem",
+	  "\n"
+	  "  -u, --update  sprawdza, czy osoby oznaczone jako niewidoczne s± nadal po³±czone\n"
+	  "  -s, --scan    sprawdza, czy osoby nale¿±ce do grupy %Tspied%n i maj±ce stan\n"
+	  "                %Tniedostêpny%n s± po³±czone z serwerem\n"
 	  "\n"
 	  "EKSPERYMENTALNE! Sprawdza, czy podana osoba jest po³±czona. Klient tej osoby "
 	  "musi obs³ugiwaæ obrazki. Dzia³a w przypadku GG 6.0 dla Windows. Je¶li kto¶ "
@@ -5840,10 +5864,10 @@ void command_init()
 	  "z któr± rozmowa znajdujê siê w aktualnym okienku.\n"
 	  "\n"
 	  "Je¶li osoba nale¿y do grupy %Tspied%n, to w miarê mo¿liwo¶ci jej stan jest "
-	  "¶ledzony na bie¿±co. Aby w pe³ni umo¿liwiæ takie ¶ledzenie, nale¿y dodaæ timer, "
-	  "który np. co 30 sekund wywo³a polecenie %T_check_conn_update%n. W przeciwnym razie, "
-	  "osoby wykryte jako niewidoczne, mog± mieæ nadal ustawiony taki stan na li¶cie kontaktów mimo, "
-	  "¿e w rzeczywisto¶ci przesz³y do stanu %Tniedostêpny%n. "
+	  "¶ledzony na bie¿±co, jednak ze wzglêdu na ró¿ne zachowanie oryginalnego klienta, nale¿y co "
+	  "pewien czas dokonywaæ rêcznego sprawdzania czy nasza wiedza o stanie niewidocznym danej osoby "
+	  "jest wci±¿ aktualna. Nale¿y wiêc dodaæ timery, które np. co 60 sekund wywo³aj± polecnie "
+	  "%Tcheck_conn -u%n, a np. co kilka minut polecenie %Tcheck_conn -s%n (rzadziej potrzebne). "
 	  "Pamiêtaj, podgl±danie innych osób jest nieetyczne...");
           
 	command_add
@@ -6344,9 +6368,6 @@ void command_init()
 	command_add
 	( "_vars", "", cmd_test_vars, 0, "",
 	  "wy¶wietla skrót zmiennych", "");
-	command_add
-	( "_check_conn_update", "", cmd_test_check_conn_update, 0, "",
-	  "sprawdza, czy osoby oznaczone jako niewidoczne nadal s± po³±czone", "");
 	command_add
 	( "_queue", "uu", cmd_queue, 0, " [opcje]",
 	  "pozwala obserwowaæ kolejkê wiadomo¶ci podczas po³±czenia", "");
