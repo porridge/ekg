@@ -740,6 +740,22 @@ COMMAND(cmd_find)
 		printq("not_connected");
 		return -1;
 	}
+
+	if (params[0] && match_arg(params[0], 'S', "stop", 3)) {
+		list_t l;
+
+		for (l = searches; l; ) {
+			gg_pubdir50_t s = l->data;
+
+			l = l->next;
+			gg_pubdir50_free(s);
+			list_remove(&searches, s, 0);
+		}
+
+		printq("search_stopped");
+
+		return 0;
+	}
 		
 	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
 		ui_event("command", quiet, "find", NULL);
@@ -792,7 +808,7 @@ COMMAND(cmd_find)
 		if (match_arg(arg, 'u', "uin", 2) && argv[i + 1])
 			gg_pubdir50_add(req, GG_PUBDIR50_UIN, argv[++i]);
 		
-		if (match_arg(arg, 's', "start", 2) && argv[i + 1])
+		if (match_arg(arg, 's', "start", 3) && argv[i + 1])
 			gg_pubdir50_add(req, GG_PUBDIR50_START, argv[++i]);
 		
 		if (match_arg(arg, 'F', "female", 2))
@@ -814,7 +830,8 @@ COMMAND(cmd_find)
 		}
 
 		if (match_arg(arg, 'A', "all", 3)) {
-			gg_pubdir50_add(req, GG_PUBDIR50_START, "0");
+			if (!gg_pubdir50_get(req, 0, GG_PUBDIR50_START))
+				gg_pubdir50_add(req, GG_PUBDIR50_START, "0");
 			all = 1;
 		}
 	}
@@ -4545,7 +4562,8 @@ void command_init()
 	  "  -F, --female            kobiety\n"
 	  "  -M, --male              mê¿czy¼ni\n"
 	  "  -s, --start <n>         wy¶wietla od n-tego numeru\n"
-	  "  -A, --all               wy¶wietla wszystkich");
+	  "  -A, --all               wy¶wietla wszystkich\n"
+	  "  -S, --stop              zatrzymuje wszystkie poszukiwania");
 	  
 	command_add
 	( "help", "cv", cmd_help, 0,

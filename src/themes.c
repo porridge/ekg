@@ -1093,6 +1093,7 @@ void theme_init()
 	format_add("search_not_found", "%! Nie znaleziono\n", 1);
 	format_add("search_no_last", "%! Brak wyników ostatniego wyszukiwania\n", 1);
 	format_add("search_no_last_nickname", "%! Brak pseudonimu w ostatnim wyszukiwaniu\n", 1);
+	format_add("search_stopped", "%> Zatrzymano wyszukiwanie\n", 1);
 
 	/* 1 uin, 2 name, 3 nick, 4 city, 5 born, 6 gender, 7 active */
 	format_add("search_results_multi_active", "%Y<>%n", 1);
