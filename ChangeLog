@@ -11,6 +11,11 @@ zg³osi³ b³±d.
 - poprawka segfaulta przy display_crap = 0 (FIG,wojboj/w)
 - poprawka listy kontaktów i wielolinijkowych wiadomo¶ci (w)
 - poprawka segfaulta przy wielolinikowych wiadomo¶ciach (w)
+- komunikat o nowej poczcie zawsze zawiera s³owo ,,nowe'',
+  aby nie powodowaæ niejasno¶ci co do tego, o jak± ilo¶æ
+  emaili chodzi (Arim/sz)
+- du¿a ilo¶æ wywo³añ /exec, /sms lub sprawdzanie poczty po
+  pewnym czasie powodowa³o brak wolnych deskryptorów (sz)
 
 // 2002-12-07
 

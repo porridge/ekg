@@ -744,8 +744,9 @@ void theme_init()
 	format_add("ekg_version", "%) EKG - Eksperymentalny Klient Gadu-Gadu (%T%1%n)\n%) libgadu-%1 (protokó³ %2, klient %3)\n", 1);
 	format_add("group_empty", "%! Grupa %T%1%n jest pusta\n", 1);
 	format_add("secure", "%Y(szyfrowane)%n ", 1);
-	format_add("new_mail_one", "%) Masz now± wiadomo¶æ email.\n", 1);
-	format_add("new_mail_more", "%) Masz %1 wiadomo¶ci email.\n", 1);
+	format_add("new_mail_one", "%) Masz now± wiadomo¶æ email\n", 1);
+	format_add("new_mail_two_four", "%) Masz %1 nowe wiadomo¶ci email\n", 1);
+	format_add("new_mail_more", "%) Masz %1 nowych wiadomo¶ci email\n", 1);
 
 	/* add, del */
 	format_add("user_added", "%> Dopisano %T%1%n do listy kontaktów\n", 1);
