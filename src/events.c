@@ -774,14 +774,17 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 			break;
 
 		/* eventy */
-		if (GG_S_D(s->status) && prev_status == s->status)	/* tylko zmiana opisu */
+#define __SAME_GG_S(x, y)	((GG_S_A(x) && GG_S_A(y)) || (GG_S_B(x) && GG_S_B(y)) || (GG_S_I(x) && GG_S_I(y)) || (GG_S_NA(x) && GG_S_NA(y)))
+
+		if (GG_S_D(s->status) && (prev_status == s->status || (!GG_S_D(prev_status) && __SAME_GG_S(prev_status, s->status))))
 			event_check(EVENT_DESCR, uin, u->descr);
 		else {
 			if (GG_S_NA(prev_status) && GG_S_A(s->status))
 				event_check(EVENT_ONLINE, uin, u->descr);
-			else
+			else if (!__SAME_GG_S(prev_status, s->status))
     				event_check(s->event, uin, u->descr);
 		}
+#undef __SAME_GG_S
 
 		/* zaloguj */
 		if (config_log_status && !GG_S_D(s->status))
