@@ -156,11 +156,7 @@ char *config_back_reason;
 int config_beep;
 int config_beep_msg;
 int config_beep_chat;
-int config_beep_mail;
 int config_beep_notify;
-int config_check_mail;
-int config_check_mail_frequency;
-char *config_check_mail_folders;
 int config_completion_notify;
 int config_contacts;
 int config_contacts_size;
@@ -243,8 +239,6 @@ char *batch_line;
 int immediately_quit;
 int ekg_segv_handler;
 int ioctld_sock;
-
-int mail_count;
 
 void unidle();
 const char *timestamp(const char *format);
@@ -347,11 +341,6 @@ int msg_encrypt(uin_t uin, char **msg);
 
 int find_in_uins(int uin_count, uin_t *uins, uin_t uin);
 uin_t str_to_uin(const char *text);
-
-int check_mail();
-int check_mail_update(int update);
-int check_mail_mbox(const char **folders);
-int check_mail_maildir(const char **folders);
 
 void binding_list();
 

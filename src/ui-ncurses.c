@@ -835,9 +835,6 @@ static void update_statusbar()
 			} else if (!strncmp(p, "notavail ", 9)) {
 				matched = (!sess || sess->state != GG_STATE_CONNECTED);
 				p += 8;
-			} else if (!strncmp(p, "mail ", 5)) {
-				matched = (check_mail() > 0) ? 1 : 0;
-				p += 4;
 			} else if (!strncmp(p, "query ", 6)) {
 				matched = (window_current->target != NULL);
 				p += 5;
