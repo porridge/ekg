@@ -632,7 +632,7 @@ COMMAND(command_connect)
 			my_printf("disconnected");
 		else if (sess->state != GG_STATE_IDLE)
 			my_printf("conn_stopped");
-		ekg_logoff(sess, params[0]);
+		ekg_logoff(sess, (params) ? params[0] : NULL);
 		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
 		userlist_clear_status();
