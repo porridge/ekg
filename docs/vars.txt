@@ -425,7 +425,7 @@ ignore_unknown_sender
 
 ioctld_enable
 	typ: liczba
-	domy¶lna warto¶æ: 0
+	domy¶lna warto¶æ: 1
 
 	je¶li 1, odpalany jest lokalny daemon ioctld, który lokalnie mruga
 	diodkami i piszczy speakerem, je¿eli 2, odpalany jest daemon
