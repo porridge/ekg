@@ -5590,7 +5590,7 @@ void command_init()
 	  " [opcje]", "zarz±dzanie konferencjami",
 	  "\n"
 	  "  -a, --add [#nazwa] <numer/alias/@grupa>  tworzy now± konferencjê\n"
-	  "  -j, --join [#nazwa] <numer/alias>  przy³±cza osobê do konferencji\n"
+	  "  -j, --join <#nazwa> <numer/alias>  przy³±cza osobê do konferencji\n"
 	  "  -d, --del <#nazwa>|*        usuwa konferencjê\n"
 	  "  -i, --ignore <#nazwa>       oznacza konferencjê jako ignorowan±\n"
 	  "  -u, --unignore <#nazwa>     oznacza konferencjê jako nieignorowan±\n"
