@@ -6,6 +6,7 @@ mandir = @mandir@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
 libdir = @libdir@
+libexecdir = @libexecdir@
 includedir = @includedir@
 
 MAKE = @MAKE@

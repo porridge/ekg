@@ -1514,7 +1514,7 @@ void unknown_uin_generator(const char *text, int len)
 
 	for (i = 0; i < send_nicks_count; i++) {
 		if (isdigit(send_nicks[i][0]) && !strncasecmp(text, send_nicks[i], len))
-			array_add(&completions, send_nicks[i]);
+			array_add(&completions, xstrdup(send_nicks[i]));
 	}
 }
 
