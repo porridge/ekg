@@ -14,6 +14,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   wywo³aæ gg_dcc_set_type() (w)
 - dodane <gsm.h> i -lgsm, je¶li s± w systemie. teoretycznie obs³uguje
   rozmowy g³osowe, ale nie testowano dobrze. (w)
+- dodanie ,,dcc close #x'', które przydaje siê w g³osowych (w)
 
 // 2002-06-13
 

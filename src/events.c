@@ -33,6 +33,7 @@
 #include "themes.h"
 #include "userlist.h"
 #include "voice.h"
+#include "config.h"
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure();
@@ -858,19 +859,6 @@ void handle_dcc(struct gg_dcc *d)
 		case GG_EVENT_DCC_CLIENT_ACCEPT:
 			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_CLIENT_ACCEPT\n");
 			
-#if 0
-			for (tmp = 0, l = transfers; l; l = l->next) {
-				struct transfer *t = l->data;
-
-				if (t->uin == d->peer_uin && config_uin == d->uin) {
-					tmp = 1;
-					break;
-				}
-			}
-			
-			if (!tmp) {
-#endif
-
 			if (!userlist_find(d->peer_uin, NULL) || config_uin != d->uin) {
 				gg_debug(GG_DEBUG_MISC, "## unauthorized client (uin=%ld), closing connection\n", d->peer_uin);
 				list_remove(&watches, d, 0);
@@ -880,19 +868,33 @@ void handle_dcc(struct gg_dcc *d)
 			break;	
 
 		case GG_EVENT_DCC_CALLBACK:
+		{
+			int found = 0;
+			
 			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_CALLBACK\n");
 			
 			for (l = transfers; l; l = l->next) {
 				struct transfer *t = l->data;
 
+				gg_debug(GG_DEBUG_MISC, "// transfer id=%d, uin=%d, type=%d\n", t->id, t->uin, t->type);
+
 				if (t->uin == d->peer_uin && !t->dcc) {
+					gg_debug(GG_DEBUG_MISC, "## found transfer, uin=%d, type=%d\n", d->peer_uin, t->type);
 					t->dcc = d;
 					gg_dcc_set_type(d, t->type);
+					found = 1;
 					break;
 				}
 			}
 			
+			if (!found) {
+				gg_debug(GG_DEBUG_MISC, "## connection from %d not found\n", d->peer_uin);
+				list_remove(&watches, d, 0);
+				gg_dcc_free(d);	/* XXX segfaultuje */
+			}
+			
 			break;	
+		}
 
 		case GG_EVENT_DCC_NEED_FILE_INFO:
 			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_NEED_FILE_INFO\n");
@@ -964,7 +966,7 @@ void handle_dcc(struct gg_dcc *d)
 
 			my_printf("dcc_voice_offer", format_user(t->uin), itoa(t->id));
 #else
-			list_remove(&watches, d, 1);
+			list_remove(&watches, d, 0);
 			remove_transfer(d);
 			gg_free_dcc(d);
 #endif
@@ -974,6 +976,7 @@ void handle_dcc(struct gg_dcc *d)
 			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_VOICE_DATA\n");
 
 #ifdef HAVE_VOIP
+			voice_open();
 			voice_play(e->event.dcc_voice_data.data, e->event.dcc_voice_data.length);
 #endif
 			break;
@@ -1002,6 +1005,10 @@ void handle_dcc(struct gg_dcc *d)
 				default:
 					my_printf("dcc_error_unknown", "");
 			}
+
+			if (d->type == GG_SESSION_DCC_VOICE)
+				voice_close();
+			
 			list_remove(&watches, d, 0);
 			remove_transfer(d);
 			gg_free_dcc(d);

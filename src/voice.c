@@ -1,8 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>,
- *                          Robert J. Wo¼ny <speedy@ziew.org>
+ *  (C) Copyright 2002 Wojtek Kaniewski <wojtekka@irc.pl>,
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License Version
@@ -49,6 +48,9 @@ int voice_open()
 	struct gg_session s;
 	int value;
 	
+	if (voice_fd != -1)
+		return -1;
+
 	if ((voice_fd = open("/dev/dsp", O_RDWR)) == -1)
 		goto fail;
 

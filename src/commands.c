@@ -44,6 +44,7 @@
 #include "vars.h"
 #include "userlist.h"
 #include "version.h"
+#include "voice.h"
 
 /*
  * g³upie readline z wersji na wersjê ma inne include'y, grr.
@@ -1683,6 +1684,7 @@ COMMAND(command_dcc)
 
 		if (t) {
 			list_add(&watches, t->dcc, 0);
+			voice_open();
 			return 0;
 		}
 
@@ -1698,11 +1700,10 @@ COMMAND(command_dcc)
 			return 0;
 		}
 
+		memset(&tt, 0, sizeof(tt));
 		tt.uin = uin;
 		tt.id = transfer_id();
 		tt.type = GG_SESSION_DCC_VOICE;
-		tt.filename = NULL;
-		tt.dcc = NULL;
 
 		if (u->port < 10 || (params[2] && !strcmp(params[2], "--reverse"))) {
 			/* nie mo¿emy siê z nim po³±czyæ, wiêc on spróbuje */
@@ -1720,7 +1721,8 @@ COMMAND(command_dcc)
 			tt.dcc = d;
 		}
 
-		list_add(&transfers, &tt, sizeof(t));
+		list_add(&transfers, &tt, sizeof(tt));
+		voice_open();
 #else
 		my_printf("dcc_voice_unsupported");
 #endif
@@ -1781,7 +1783,40 @@ COMMAND(command_dcc)
 	}
 	
 	if (!strncasecmp(params[0], "c", 1)) {		/* close */
-		my_printf("dcc_not_supported", params[0]);
+		struct transfer *t;
+		uin_t uin;
+
+		if (!params[1]) {
+			my_printf("not_enough_params");
+			return 0;
+		}
+		
+		for (t = NULL, l = transfers; l; l = l->next) {
+			t = l->data;
+
+			if (params[1][0] == '#' && atoi(params[1] + 1) == t->id)
+				break;
+		}
+
+		if (!t) {
+			my_printf("dcc_close_notfound");
+			return 0;
+		}
+
+		if (t->dcc) {
+			list_remove(&watches, t->dcc, 0);
+			gg_dcc_free(t->dcc);
+		}
+
+		uin = t->uin;
+
+		if (t->filename)
+			free(t->filename);
+
+		list_remove(&transfers, t, 1);
+
+		my_printf("dcc_close", format_user(uin));
+		
 		return 0;
 	}
 
