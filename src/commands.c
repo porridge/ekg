@@ -1211,6 +1211,8 @@ COMMAND(command_msg)
 		if (!(s = string_init(NULL)))
 			return 0;
 
+		rl_bind_key('\t', rl_insert);		/* XXX */
+		
 		no_prompt = 1;
 
 		while ((line = my_readline())) {
@@ -1224,6 +1226,8 @@ COMMAND(command_msg)
 		}
 
 		no_prompt = 0;
+
+		rl_bind_key('\t', rl_complete);		/* XXX */
 
 		if (!line) {
 			printf("\n");
