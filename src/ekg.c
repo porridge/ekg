@@ -212,7 +212,7 @@ int main(int argc, char **argv)
 	rl_getc_function = my_getc;
 	rl_readline_name = "gg";
 	rl_attempted_completion_function = (CPPFunction *) my_completion;
-	rl_completion_entry_function = (Function *) empty_generator;
+	rl_completion_entry_function = (void*) empty_generator;
 //	rl_parse_and_bind("set bell-style none\n");
 
 	init_theme();
