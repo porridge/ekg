@@ -168,6 +168,7 @@ char *config_email = NULL;
 int config_time_deviation = 300;
 int config_mesg_allow = 2;
 int config_display_welcome = 1;
+int config_auto_back = 0;
 
 static struct {
 	int event;
@@ -3314,5 +3315,137 @@ void update_status()
 		u->status = (u->descr) ? GG_STATUS_NOT_AVAIL_DESCR : GG_STATUS_NOT_AVAIL;
 	else
 		u->status = st[away];
+}
+
+/*
+ * change_status()
+ *
+ * zmienia stan sesji.
+ *
+ *  - status - nowy stan. warto¶æ stanu libgadu, bez _DESCR.
+ *  - reason - opis stanu, mo¿e byæ NULL.
+ *  - autom - czy zmiana jest automatyczna?
+ */
+void change_status(int status, const char *arg, int autom)
+{
+	const char *filename, *config_x_reason, *format, *format_descr, *auto_format = NULL, *auto_format_descr = NULL;
+	int random_mask, away1, away2, status_descr;
+	char *reason = NULL, *tmp = NULL;
+
+	switch (status) {
+		case GG_STATUS_BUSY:
+			status_descr = GG_STATUS_BUSY_DESCR;
+			random_mask = 1;
+			filename = "away.reasons";
+			config_x_reason = config_away_reason;
+			away1 = 3;
+			away2 = 3;
+			format = "away";
+			format_descr = "away_descr";
+			auto_format = "auto_away";
+			auto_format_descr = "auto_away_descr";
+			break;
+		case GG_STATUS_AVAIL:
+			status_descr = GG_STATUS_AVAIL_DESCR;
+			random_mask = 4;
+			filename = "back.reasons";
+			config_x_reason = config_back_reason;
+			away1 = 4;
+			away2 = 0;
+			format = "back";
+			format_descr = "back_descr";
+			auto_format = "auto_back";
+			auto_format_descr = "auto_back_descr";
+			break;
+		case GG_STATUS_INVISIBLE:
+			status_descr = GG_STATUS_INVISIBLE_DESCR;
+			random_mask = 8;
+			filename = "quit.reasons";
+			config_x_reason = config_quit_reason;
+			away1 = 5;
+			away2 = 2;
+			format = "invisible";
+			format_descr = "invisible_descr";
+			break;
+		case GG_STATUS_NOT_AVAIL:
+			status_descr = GG_STATUS_NOT_AVAIL_DESCR;
+			random_mask = 8;
+			filename = "quit.reasons";
+			config_x_reason = config_quit_reason;
+			away1 = 5;
+			away2 = 2;
+			format = "invisible";
+			format_descr = "invisible_descr";
+			break;
+		default:
+			return;
+	}
+
+	if (!(autom % 60))
+		tmp = saprintf("%dm", autom / 60);
+	else
+		tmp = saprintf("%ds", autom);
+								
+	if (!arg) {
+		if (config_random_reason & random_mask) {
+			reason = random_line(prepare_path(filename, 0));
+			if (!reason && config_x_reason)
+			    	reason = xstrdup(config_x_reason);
+		} else if (config_x_reason)
+		    	reason = xstrdup(config_x_reason);
+	} else
+		reason = xstrdup(arg);
+
+	if (!reason && config_keep_reason && config_reason)
+		reason = xstrdup(config_reason);
+	
+	if (arg && !strcmp(arg, "-")) {
+		xfree(reason);
+		reason = NULL;
+	}
+
+	if (reason)
+		status = status_descr;
+
+	away = (reason) ? away1 : away2;
+
+	if (reason) {
+		char *r1, *r2;
+
+		r1 = xstrmid(reason, 0, GG_STATUS_DESCR_MAXSIZE);
+		r2 = xstrmid(reason, GG_STATUS_DESCR_MAXSIZE, -1);
+
+		if (autom)
+			print(auto_format_descr, tmp, r1, r2);
+		else
+			print(format_descr, r1, r2);
+	
+		xfree(r1);
+		xfree(r2);
+	} else {
+		if (autom)
+			print(auto_format, tmp);
+		else
+			print(format);
+	}
+
+	ui_event("my_status", (reason) ? format_descr : format, reason);
+	ui_event("my_status_raw", status, reason);
+
+	if (sess && sess->state == GG_STATE_CONNECTED) {
+		if (reason) {
+		    	iso_to_cp(reason);
+			gg_change_status_descr(sess, status | (private_mode ? GG_STATUS_FRIENDS_MASK : 0), reason);
+			cp_to_iso(reason);
+		} else
+		    	gg_change_status(sess, status | (private_mode ? GG_STATUS_FRIENDS_MASK : 0));
+	}
+	
+	xfree(config_reason);
+	config_reason = reason;
+
+	xfree(tmp);
+
+	update_status();
 }
 

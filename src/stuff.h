@@ -149,6 +149,7 @@ int config_changed;
 char *config_audio_device;
 char *config_away_reason;
 int config_auto_away;
+int config_auto_back;
 int config_auto_reconnect;
 int config_auto_save;
 char *config_back_reason;
@@ -259,6 +260,7 @@ char *log_escape(const char *str);
 char *xstrmid(const char *str, int start, int length);
 const char *http_error_string(int h);
 void update_status();
+void change_status(int status, const char *arg, int autom);
 
 int process_add(int pid, const char *name);
 int process_remove(int pid);

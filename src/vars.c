@@ -83,6 +83,7 @@ void variable_init()
 	variable_add("audio_device", VAR_STR, 1, &config_audio_device, NULL, NULL, NULL);
 #endif
 	variable_add("auto_away", VAR_INT, 1, &config_auto_away, NULL, NULL, NULL);
+	variable_add("auto_back", VAR_INT, 1, &config_auto_back, NULL, NULL, NULL);
 	variable_add("auto_reconnect", VAR_INT, 1, &config_auto_reconnect, NULL, NULL, NULL);
 	variable_add("auto_save", VAR_INT, 1, &config_auto_save, NULL, NULL, NULL);
 	variable_add("away_reason", VAR_STR, 1, &config_away_reason, changed_xxx_reason, NULL, NULL);

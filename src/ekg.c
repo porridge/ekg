@@ -384,53 +384,8 @@ void ekg_wait_for_key()
 			}
 
 			/* timeout autoawaya */
-			if (sess && config_auto_away && (away == 0 || away == 4) && time(NULL) - last_action > config_auto_away && sess->state == GG_STATE_CONNECTED) {
-				char tmp[16], *reason = NULL;
-
-				if (config_random_reason & 1) {
-					reason = random_line(prepare_path("away.reasons", 0));
-					if (!reason && config_away_reason)
-					    	reason = xstrdup(config_away_reason);
-				} else if (config_away_reason)
-				    	reason = xstrdup(config_away_reason);
-
-				if (!reason && config_keep_reason && config_reason)
-					reason = xstrdup(config_reason);
-				
-				away = (reason) ? 3 : 1;
-
-				update_status();
-
-				if (reason) {
-				    	iso_to_cp(reason);
-					gg_change_status_descr(sess, GG_STATUS_BUSY_DESCR | (private_mode ? GG_STATUS_FRIENDS_MASK : 0), reason);
-					cp_to_iso(reason);
-				} else
-				    	gg_change_status(sess, GG_STATUS_BUSY | (private_mode ? GG_STATUS_FRIENDS_MASK : 0));
-				
-				if (!(config_auto_away % 60))
-					snprintf(tmp, sizeof(tmp), "%dm", config_auto_away / 60);
-				else
-					snprintf(tmp, sizeof(tmp), "%ds", config_auto_away);
-				
-				if (reason) {
-					char *r1, *r2;
-
-					r1 = xstrmid(reason, 0, GG_STATUS_DESCR_MAXSIZE);
-					r2 = xstrmid(reason, GG_STATUS_DESCR_MAXSIZE, -1);
-
-					print("auto_away_descr", tmp, r1, r2);
-					
-					xfree(r1);
-					xfree(r2);
-				} else
-					print("auto_away", tmp);
-
-				ui_event("my_status", "away", reason);
-				ui_event("my_status_raw", GG_STATUS_BUSY, reason);	/* XXX */
-				xfree(config_reason);
-				config_reason = reason;
-			}
+			if (sess && config_auto_away && (away == 0 || away == 4) && time(NULL) - last_action > config_auto_away && sess->state == GG_STATE_CONNECTED)
+				change_status(GG_STATUS_BUSY, NULL, config_auto_away);
 
 			/* auto save */
 			if (config_changed && config_auto_save && time(NULL) - last_save > config_auto_save) {
@@ -477,8 +432,15 @@ void ekg_wait_for_key()
 				if (!c || (!FD_ISSET(c->fd, &rd) && !FD_ISSET(c->fd, &wd)))
 					continue;
 
-				if (c->type == GG_SESSION_USER0) 
+				if (c->type == GG_SESSION_USER0) {
+					if (config_auto_back == 2 && (away == 1 || away == 3)) 
+						change_status(GG_STATUS_AVAIL, NULL, 1);
+
+					if (config_auto_back == 2)
+						unidle();
+
 					return;
+				}
 
 				if (c->type == GG_SESSION_USER1) {
 					get_char_from_pipe(c);

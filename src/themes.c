@@ -850,6 +850,8 @@ void theme_init()
 
 	format_add("auto_away", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci\n", 1);
 	format_add("auto_away_descr", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci: %T%2%n%3\n", 1);
+	format_add("auto_back", "%> Automagicznie zmieniono stan na dostêpny\n", 1);
+	format_add("auto_back_descr", "%> Automagicznie zmieniono stan na dostêpny: %T%2%n%3\n", 1);
 
 	/* po³±czenie z serwerem */
 	format_add("connecting", "%> £±czê siê z serwerem...\n", 1);

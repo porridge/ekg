@@ -239,132 +239,25 @@ COMMAND(cmd_alias)
 
 COMMAND(cmd_away)
 {
-	int status_table[6] = { GG_STATUS_AVAIL, GG_STATUS_BUSY, GG_STATUS_INVISIBLE, GG_STATUS_BUSY_DESCR, GG_STATUS_AVAIL_DESCR, GG_STATUS_INVISIBLE_DESCR };
-	char *reason = NULL;
-	
 	unidle();
 
-	if (!config_keep_reason && !params[0]) {
-		xfree(config_reason);
-		config_reason = NULL;
+	if (params[0] && strlen(params[0]) > GG_STATUS_DESCR_MAXSIZE)
+		print("descr_too_long", itoa(strlen(params[0]) - GG_STATUS_DESCR_MAXSIZE));
+
+	if (!strcasecmp(name, "away"))
+		change_status(GG_STATUS_BUSY, params[0], 0);
+
+	if (!strcasecmp(name, "invisible"))
+		change_status(GG_STATUS_INVISIBLE, params[0], 0);
+
+	if (!strcasecmp(name, "back")) {
+		change_status(GG_STATUS_AVAIL, params[0], 0);
+		sms_away_free();
 	}
 
-	/* XXX trzeba pozbyæ siê trzech identycznych bloków kodu */
-	
-	if (!strcasecmp(name, "away")) {
-	    	if (!params[0]) {
-		    	if (config_random_reason & 1) {
-				reason = random_line(prepare_path("away.reasons", 0));
-				if (!reason && config_away_reason)
-				    	reason = xstrdup(config_away_reason);
-			} else if (config_away_reason)
-			    	reason = xstrdup(config_away_reason);
-		} else
-		    	reason = xstrdup(params[0]);
+	/* XXX mo¿e by tak do osobnej funkcji? */
 
-		if (config_keep_reason && !reason)
-			reason = config_reason;
-		
-		if (params[0] && !strcmp(params[0], "-")) {
-			xfree(reason);
-			reason = NULL;
-		}
-		
-		away = (reason) ? 3 : 1;
-
-		if (reason) {
-			char *r1, *r2;
-			
-			r1 = xstrmid(reason, 0, GG_STATUS_DESCR_MAXSIZE);
-			r2 = xstrmid(reason, GG_STATUS_DESCR_MAXSIZE, -1);
-			
-			print("away_descr", r1, r2);
-
-			xfree(r1);
-			xfree(r2);
-		} else
-			print("away");
-
-		ui_event("my_status", "away", reason);
-		
-	} else if (!strcasecmp(name, "invisible")) {
-		
-	    	if (!params[0]) {
-		    	if (config_random_reason & 8) {
-				reason = random_line(prepare_path("quit.reasons", 0));
-				if (!reason && config_quit_reason)
-				    	reason = xstrdup(config_quit_reason);
-			} else if (config_quit_reason)
-			    	reason = xstrdup(config_quit_reason);
-		} else
-		    	reason = xstrdup(params[0]);
-		
-		if (config_keep_reason && !reason)
-			reason = config_reason;
-		
-		if (params[0] && !strcmp(params[0], "-")) {
-			xfree(reason);
-			reason = NULL;
-		}
-
-
-		away = (reason) ? 5 : 2;
-		
-		if (reason) {
-			char *r1, *r2;
-			
-			r1 = xstrmid(reason, 0, GG_STATUS_DESCR_MAXSIZE);
-			r2 = xstrmid(reason, GG_STATUS_DESCR_MAXSIZE, -1);
-			
-			print("invisible_descr", r1, r2);
-
-			xfree(r1);
-			xfree(r2);
-		} else
-			print("invisible");
-
-		ui_event("my_status", "invisible", reason);
-
-	} else if (!strcasecmp(name, "back")) {
-
-	    	if (!params[0]) {
-		    	if (config_random_reason & 4) {
-			    	reason = random_line(prepare_path("back.reasons", 0));
-				if (!reason && config_back_reason)
-				    	reason = xstrdup(config_back_reason);
-			}
-			else if (config_back_reason)
-			    	reason = xstrdup(config_back_reason);
-		} else
-		    	reason = xstrdup(params[0]);
-
-		if (config_keep_reason && !reason)
-			reason = config_reason;
-		
-		if (params[0] && !strcmp(params[0], "-")) {
-			xfree(reason);
-			reason = NULL;
-		}
-
-		away = (reason) ? 4 : 0;
-
-		if (reason) {
-			char *r1, *r2;
-			
-			r1 = xstrmid(reason, 0, GG_STATUS_DESCR_MAXSIZE);
-			r2 = xstrmid(reason, GG_STATUS_DESCR_MAXSIZE, -1);
-			
-			print("back_descr", r1, r2);
-
-			xfree(r1);
-			xfree(r2);
-		} else
-			print("back");
-
-		ui_event("my_status", "back", reason);
-
-		sms_away_free();
-	} else {
+	if (!strcasecmp(name, "private")) {
 		int tmp;
 
 		if (!params[0]) {
@@ -380,31 +273,20 @@ COMMAND(cmd_away)
 		private_mode = tmp;
 		print((private_mode) ? "private_mode_on" : "private_mode_off");
 		ui_event("my_status", "private", (private_mode) ? "on" : "off");
+
+		config_status = config_status & ~GG_STATUS_FRIENDS_MASK;
+		config_status |= ((private_mode) ? GG_STATUS_FRIENDS_MASK : 0);
+
+		if (sess && sess->state == GG_STATE_CONNECTED) {
+			gg_debug(GG_DEBUG_MISC, "-- config_status = 0x%.2x\n", config_status);
+			if (config_reason) {
+				iso_to_cp(config_reason);
+				gg_change_status_descr(sess, config_status, config_reason);
+				cp_to_iso(config_reason);
+			} else
+				gg_change_status(sess, config_status);
+		}
 	}
-
-	config_status = status_table[away] | ((private_mode) ? GG_STATUS_FRIENDS_MASK : 0);
-
-	if (sess && sess->state == GG_STATE_CONNECTED) {
-		gg_debug(GG_DEBUG_MISC, "-- config_status = 0x%.2x\n", config_status);
-		if (reason) {
-			iso_to_cp(reason);
-			gg_change_status_descr(sess, config_status, reason);
-			cp_to_iso(reason);
-		} else
-			gg_change_status(sess, config_status);
-	}
-
-	ui_event("my_status_raw", config_status, reason);
-
-	if (reason) {
-		config_reason = reason;
-		if (strlen(reason) > GG_STATUS_DESCR_MAXSIZE)
-			print("descr_too_long", itoa(strlen(reason) - GG_STATUS_DESCR_MAXSIZE));
-	}
-
-	update_status();
-
-	return;
 }
 
 COMMAND(cmd_status)
@@ -1268,6 +1150,9 @@ COMMAND(cmd_msg)
 		print("not_enough_params", name);
 		return;
 	}
+
+	if (config_auto_back == 1 && (away == 1 || away == 3))
+		change_status(GG_STATUS_AVAIL, NULL, 1);
 
 	if (!sess || sess->state != GG_STATE_CONNECTED)
 		print("not_connected_msg_queued");

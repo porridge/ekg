@@ -12,6 +12,9 @@ zg³osi³ b³±d.
 - poprawka reakcji na F3 (Murphy/w)
 - sprawdzanie, czy podany uin dla /add, /del itp. jest sensowny (sz)
 - /list @grupa wy¶wietla cz³onków grupy (pmb/sz)
+- dodanie zmiennej auto_back (pmb/w)
+- spora reorganizacja zmiany stanu w /away, /back, /invisible, auto_away
+  itp. wiêc teoretycznie mog± wyst±piæ problemy (w)
 
 // 2002-12-01
 
