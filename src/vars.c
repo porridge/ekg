@@ -365,7 +365,6 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 		case VAR_MAP:
 		{
 			const char *p = value;
-			char *ptr;
 			int hex, tmp;
 
 			if (!value)
@@ -438,7 +437,7 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 				p++;
 			}
 
-			tmp = strtol(value, &ptr, 0);
+			tmp = strtol(value, NULL, 0);
 
 			if (v->map && v->type == VAR_MAP) {
 				int i;

@@ -1031,9 +1031,10 @@ int main(int argc, char **argv)
 
 #ifdef HAVE_USLEEP
 
-	tmp = config_read_variable("fade_in");
-	config_fade_in = atoi(tmp);
-	xfree(tmp);
+	if ((tmp = config_read_variable("fade_in"))) {
+		config_fade_in = atoi(tmp);
+		xfree(tmp);
+	}
 
 	if (config_fade_in && getenv("TERM") && !strcmp(getenv("TERM"), "linux") && !fork()) {
 		int i;
@@ -1100,13 +1101,15 @@ int main(int argc, char **argv)
 
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
-		tmp = config_read_variable("display_transparent");
-		config_display_transparent = atoi(tmp);
-		xfree(tmp);
+		if ((tmp = config_read_variable("display_transparent"))) {
+			config_display_transparent = atoi(tmp);
+			xfree(tmp);
+		}
 
-		tmp = config_read_variable("contacts");
-		config_contacts = atoi(tmp);
-		xfree(tmp);
+		if ((tmp = config_read_variable("contacts"))) {
+			config_contacts = atoi(tmp);
+			xfree(tmp);
+		}
 	}
 #endif
 

@@ -436,8 +436,10 @@ void changed_check_mail(const char *var)
 		/* brzydki hack, ¿eby siê nikt nie czepia³ */
 		if (in_autoexec) {
 			char *tmp = config_read_variable("check_mail_frequency");
-			config_check_mail_frequency = atoi(tmp);
-			xfree(tmp);
+			if (tmp) {
+				config_check_mail_frequency = atoi(tmp);
+				xfree(tmp);
+			}
 		}
 
 		t = timer_add(config_check_mail_frequency, 1, TIMER_UI, 0, "check-mail-time", "check_mail");
