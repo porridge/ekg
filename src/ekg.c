@@ -380,6 +380,8 @@ void sigsegv_handler()
 {
 	signal(SIGSEGV, SIG_DFL);
 	
+	kill_ioctl_daemon();
+	
 	fprintf(stderr, "\n\
 *** Naruszenie ochrony pamiêci ***\n\
 \n\
