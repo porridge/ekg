@@ -2768,6 +2768,8 @@ static void complete(int *line_start, int *line_index)
 		xfree(start);
 		return;
 	}
+	
+	words = xcalloc(1, sizeof(char *));
 
 	/* podziel (uwzglêdniaj±c cudzys³owia)*/
 	for (i = 0; i < strlen(line); i++) {
@@ -2961,23 +2963,32 @@ problem:
 		int common = 0;
 		int tmp = 0;
 		int quotes = 0;
-		
-		/* ten kawalek kodu nadaje sie do przepisania, ale poki co nie mam czasu */		
+
+		/* 
+		 * mo¿e nie za ³adne programowanie, ale skuteczne i w sumie jedyne w 100% spe³niaj±ce	
+	 	 * wymagania dope³niania (uwzglêdnianie cudzyws³owiów itp...)
+		 */
 		for(i=1, j = 0; ; i++, common++) { 
 			for(j=1; j < count; j++) {
-				if(completions[j][0] == '"')
+				if(completions[j][0] == '"') 
 					quotes = 1;
-				tmp = strncasecmp(completions[0], completions[j], i);
+				if(completions[j][0] == '"' && completions[0][0] != '"')					
+					tmp = strncasecmp(completions[0], completions[j] + 1, i); 
+				else if(completions[0][0] == '"' && completions[j][0] != '"')					
+					tmp = strncasecmp(completions[0] + 1, completions[j], i); 
+				else
+					tmp = strncasecmp(completions[0], completions[j], i); 
 				/* gg_debug(GG_DEBUG_MISC,"strncasecmp(\"%s\", \"%s\", %d) = %d\n", completions[0], completions[j], i, strncasecmp(completions[0], completions[j], i));  */
 				if( tmp < 0 || ( tmp > 0 && tmp < i))
 					break;
 			}
 			if( tmp < 0 || ( tmp > 0 && tmp < i))
 				break;
-		}
+		} 
+		
 
 		
-/*		gg_debug(GG_DEBUG_MISC,"common :%d\n", common); */
+		/* gg_debug(GG_DEBUG_MISC,"common :%d\n", common); */
 
 		if (strlen(line) + common < LINE_MAXLEN) {
 		
@@ -2986,6 +2997,8 @@ problem:
 				if(i == word) {
 					if(quotes == 1 && completions[0][0] != '"')
 						strcat(line, "\"");
+					if(completions[0][0] == '"')
+						common++;
 					strncat(line, str_tolower(completions[0]), common);
 					*line_index = strlen(line);
 				}
@@ -2996,12 +3009,14 @@ problem:
 						strcat(line, words[i]);
 				}
 				if(i != array_count(words) - 1) {
+					/* 
+					 * zmienna tymczasowa, tylko i wy³±cznie po to, aby dalej u¿ywaæ strcat'a 
+					 */
 					char tmp[2];
 					tmp[0] = separators[i];
 					tmp[1] = '\0';
 					strcat(line, tmp);
 				}
-				
 			}
 		}
 	}
