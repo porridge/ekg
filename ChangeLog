@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2004-11-25
+
+- kilka poprawek w dokumentacji (gophi)
+- poprawienie debugowania ncurses (gophi)
+
 // 2004-11-22
 
 - poprawienie b³êdu ,,Za ma³o parametrów. Spróbuj help chat'' podczas 

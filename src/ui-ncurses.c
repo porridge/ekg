@@ -3644,7 +3644,7 @@ static void binding_next_contacts_group(const char *arg)
 
 static void binding_ui_ncurses_debug_toggle(const char *arg)
 {
-	if (ui_ncurses_debug++ > 2)
+	if (++ui_ncurses_debug > 2)
 		ui_ncurses_debug = 0;
 
 	update_statusbar(1);

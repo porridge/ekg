@@ -1,7 +1,7 @@
 
                      Eksperymentalny Klient Gadu-Gadu
 
-          (C) Copyright 2001-2003 Autorzy (pe³na lista poni¿ej)
+          (C) Copyright 2001-2004 Autorzy (pe³na lista poni¿ej)
 
 LICENCJA
 
@@ -12,11 +12,11 @@ LICENCJA
     Wyj±tkiem od licencji GPL v2 jest mo¿liwo¶æ kompilacji, konsolidacji
     i u¿ywania programu z bibliotek± OpenSSL autorstwa Projektu OpenSSL
     (The OpenSSL Project) dostêpn± pod adresem http://www.openssl.org/
-    
+
     Bibliotekê libgadu obs³uguj±ca warstwê sieciow± udostêpniono na
     zasadach licencji LGPL v2.1, której tre¶æ znajduje siê w pliku
     lib/COPYING.
-    
+
     Program i biblioteka zosta³y napisane na podstawie informacji
     uzyskanych przez badanie pakietów wysy³anych miêdzy klientem
     a serwerem oraz od osób trzecich. Autorzy nie disasemblowali
@@ -84,12 +84,13 @@ U¯YCIE
 
     Je¶li dana komenda przyjmuje ,,--parametr'', mo¿na u¿yæ równie¿
     skrótu ,,-p'', gdy nie powoduje to niejednoznaczno¶ci. Uwaga!
-    Brana pod uwagê jest zwykle pierwsza litera, wiêc je¶li wpiszesz
-    ,,list --gone'', ekg potraktuje to jako ,,list --get''.
+    Brana pod uwagê jest zwykle pierwsza litera, wiêc je¶li chcesz 
+    skróciæ ,,list --gone'' do ,,list -g'', ekg potraktuje to jako 
+    ,,list --get''.
 
     Komendy mo¿na wysy³aæ tak¿e przez potok. By go uaktywniæ, nale¿y
     uruchomiæ ekg z parametrem ,,-c'' i ¶cie¿k± potoku. Ze wzglêdu na
-    specyfikê potoków, wyniki poleceñ wysy³ane bêd± na terminal na którym
+    specyfikê potoków, wyniki poleceñ wysy³ane bêd± na terminal, na którym
     jest uruchomione ekg (tak jak normalnie). Pisaæ do potoku mo¿na tak
     jak do normalnego pliku (choæby poleceniem echo).
 
@@ -136,7 +137,7 @@ KLAWIATURA
 
     Lista ta obejmuje klawisze obs³ugiwane przed interfejs readline
     i ncurses, i nie zawiera kombinacji specyficznych dla tego pierwszego.
-    
+
     Interfejs readline obs³uguje równie¿ inne kombinacje klawiszy. Dok³adna
     lista znajduje siê w stronie manuala ,,readline'' w rozdziale ,,DEFAULT
     KEY BINDINGS''. Dodatkowo:
@@ -159,6 +160,7 @@ KLAWIATURA
 	Ctrl-N			kolejne okno
 	F3			w³±cza lub wy³±cza listê kontaktów [1]
 	F4			kolejna grupa w li¶cie kontaktów
+	F11			wybór informacji w pasku statusu
 
     Po wej¶ciu do trybu wielolinijkowego poruszamy siê za pomoc± kursorów
     i zatwierdzamy ponownym wci¶niêciem Ctrl-Enter. By anulowaæ, wciskamy
@@ -175,7 +177,7 @@ KLAWIATURA
     [1] Klawisz F3 zmienia warto¶æ zmiennej ,,contacts''. Je¶li warto¶æ tej
         zmiennej by³a równa 0, wci¶niêcie klawisza zmienia jej warto¶æ na 2.
 	Je¶li by³a równa 1, kolejne wci¶niêcia F3 bêd± zmienia³y warto¶æ
-	z 1 na 0 i z 0 na 1. 
+	z 1 na 0 i z 0 na 1.
 
     [2] Po wci¶niêciu Ctrl-V nale¿y wcisn±æ klawisz, który chcemy wkleiæ.
         Dziêki temu mo¿liwe jest wpisanie znaków typu Escape, Ctrl-L czy
@@ -211,7 +213,7 @@ GDZIE SZUKAÆ POMOCY
 
     Dobra rada numer cztery: je¶li jeste¶ nowym u¿ytkownikiem, nie pytaj
     siê, czy co¶ da siê zrobiæ, albo ¿e przyda³oby siê. Program jest
-    rozwijany od ponad roku, wielu ludzi korzysta z niego na co dzieñ,
+    rozwijany od kilku lat, wielu ludzi korzysta z niego na co dzieñ,
     wiêc wiêkszo¶æ ,,bajerów'', o których mo¿esz pomy¶leæ, na pewno jest
     ju¿ w programie.
 
@@ -272,14 +274,14 @@ ZG£ASZANIE B£ÊDÓW
 
     Je¶li zauwa¿ysz jaki¶ b³±d, sprawd¼ najnowsz± wersjê. Wiêkszo¶æ
     b³êdów jest poprawiana w ci±gu jednego lub dwóch dni od chwili
-    pojawienia siê. Przy zg³aszaniu b³êdu, zaznacz, w której wersji
+    pojawienia siê. Przy zg³aszaniu b³êdu zaznacz, w której wersji
     wystêpuje.
 
     Nie pisz o sprawach, które s± ju¿ wymienione w pliku TODO, bo doskonale
     wiemy, ¿e co¶ trzeba poprawiæ.
 
     Zaznacz, co to za system, jaka dystrybucja, jaka wersja.
-    
+
     Je¶li b³±d jest powtarzalny i zwi±zany z sieci±, przejd¼ do okna debug
     i przy¶lij to, co zostaje tam wy¶wietlone przed samym wyst±pieniem
     b³êdu (zwykle ~20 linijek wystarczy). Mo¿esz te¿ skorzystaæ z ukrytego
@@ -328,11 +330,11 @@ LISTA DYSKUSYJNA
     Istnieje lista dyskusyjna dla u¿ytkowników ekg o adresie 
     ekg-users@lists.ziew.org. Aby siê zapisaæ, nale¿y wej¶æ na 
     stronê o adresie:
-	    
+
 	http://lists.ziew.org/mailman/listinfo/ekg-users
-	
+
     oraz postêpowaæ wed³ug instrukcji tam zawartych.
-    
+
 AUTORZY
 
     Wymienione osoby mia³y mniejszy lub wiêkszy wp³yw na rozwój biblioteki
@@ -389,6 +391,7 @@ AUTORZY
 	Leszek Urbañski <tygrys@moo.pl>
 	Robert J. Wo¼ny <speedy@ziew.org>
 	Krzysztof Wójtowicz <misiolek@misiolki.prv.pl>
+	Adam Wysocki <gophi@ekg.apcoh.org>
 	Piotr Wysocki <wysek@linux.bydg.org>
-	 
+
 $Id$
