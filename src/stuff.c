@@ -275,15 +275,12 @@ int alias_add(const char *string, int quiet, int append)
 
 	for (l = commands; l; l = l->next) {
 		struct command *c = l->data;
-		char *tmp = cmd;
+		char *tmp = ((*cmd == '/') ? cmd + 1 : cmd);
 
 		if (!strcasecmp(string, c->name) && !c->alias) {
 			printq("aliases_command", string);
 			return -1;
 		}
-
-		if (*tmp == '/')
-			tmp++;
 
 		if (!strcasecmp(tmp, c->name))
 			params = xstrdup(c->params);
@@ -294,7 +291,7 @@ int alias_add(const char *string, int quiet, int append)
 	list_add(&a.commands, cmd, strlen(cmd) + 1);
 	list_add(&aliases, &a, sizeof(a));
 
-	command_add(a.name, (params) ? params: "?", cmd_alias_exec, 1, "", "", "");
+	command_add(a.name, ((params) ? params: "?"), cmd_alias_exec, 1, "", "", "");
 	
 	xfree(params);
 
@@ -3392,7 +3389,7 @@ int ioctld_parse_seq(const char *seq, struct action_data *data)
  *
  * 0/-1.
  */
-int ioctld_socket(char *path)
+int ioctld_socket(const char *path)
 {
 	struct sockaddr_un sockun;
 	int i, usecs = 50000;

@@ -671,8 +671,9 @@ status
 reason
 	typ: tekst, zmienna wewnêtrzna, ukryta
 
-	okre¶la opis stanu klienta po uruchomieniu i pierwszym po³±czeniu.
-	zachowywana przy poleceniu ,,save''.
+	okre¶la opis stanu klienta. zachowywana przy poleceniu ,,save''.
+	jest usuwana przy ka¿dej zmianie stanu lub wyj¶ciu z klienta,
+	chyba ¿e w³±czona jest zmienna ,,keep_reason''.
 
 fade_in
 	typ: liczba, zmienna wewnêtrzna, ukryta

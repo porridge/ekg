@@ -3784,11 +3784,77 @@ COMMAND(cmd_alias_exec)
 		}
 	}
 	
-	for (; m; ) {
-		char *tmp = saprintf("%s%s%s%s", ((*((char *) m->data) == '/') ? "" : "/"), (char *) m->data, ((params[0]) ? " " : ""), ((params[0]) ? params[0] : ""));
-		m = m->next;
-		command_exec(target, tmp, quiet);
-		xfree(tmp);
+	for (; m; m = m->next) {
+		char *p;
+		int need_args = 0;
+		string_t str;
+
+		if (*((char *) m->data) == '/')
+			str = string_init(NULL);
+		else
+			str = string_init("/");
+
+		for (p = m->data; *p; p++) {
+			if (*p == '\\' && p[1] == '%') {
+				p += 2;
+				continue;
+			}
+
+			if (*p != '%')
+				continue;
+
+			p++;
+
+			if (!*p)
+				break;
+
+			if (*p >= '1' && *p <= '9' && (*p - '0') > need_args)
+				need_args = *p - '0';
+		}
+
+		if (need_args) {
+			char *args[9], **arr, *tmp;
+			int i;
+
+			if (!params[0]) {
+				printq("aliases_not_enough_params", name);
+				string_free(str, 1);
+				return -1;
+			}
+
+			arr = array_make(params[0], "\t ", need_args, 1, 0);
+
+			if (array_count(arr) < need_args) {
+				printq("aliases_not_enough_params", name);
+				string_free(str, 1);
+				array_free(arr);
+				return -1;
+			}
+
+			for (i = 0; i < 9; i++) {
+				if (i < need_args)
+					args[i] = arr[i];
+				else
+					args[i] = NULL;
+			}
+
+			tmp = format_string((char *) m->data, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
+			string_append(str, tmp);
+			xfree(tmp);
+
+			array_free(arr);
+
+		} else {
+			string_append(str, (char *) m->data);
+			
+			if (params[0]) {
+				string_append(str, " ");
+				string_append(str, params[0]);
+			}
+		}
+
+		command_exec(target, str->str, quiet);
+		string_free(str, 1);
 	}
 
 	return 0;
@@ -4868,7 +4934,7 @@ void command_init()
 	  "\n"
 	  "Pozosta³e opcje identyczne jak dla polecenia %Tlist%n (dotycz±ce "
 	  "wpisu). W oknie rozmowy z kim¶ spoza naszej listy kontaktów jako "
-	  "parametr mo¿na podaæ sam alias.\n");
+	  "parametr mo¿na podaæ sam alias.");
 	  
 	command_add
 	( "alias", "??", cmd_alias, 0,
@@ -4877,7 +4943,10 @@ void command_init()
 	  "  -a, --add <alias> <komenda>     dodaje alias\n"
           "  -A, --append <alias> <komenda>  dodaje komendê do aliasu\n"
 	  "  -d, --del <alias>|*             usuwa alias\n"
-	  " [-l, --list] [alias]             wy¶wietla listê aliasów\n");
+	  " [-l, --list] [alias]             wy¶wietla listê aliasów\n"
+	  "\n"
+	  "W komendzie mo¿na u¿yæ formatów od %T\\%1%n do %T\\%9%n i w "
+	  "ten sposób ustaliæ kolejno¶æ przekazywanych argumentów.");
 	  
 	command_add
 	( "away", "?", cmd_away, 0,

@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -573,8 +573,8 @@ char *array_join(char **array, const char *sep)
  *
  * stwierdza, czy tablica zawiera podany element.
  *
- *  - array - tablica
- *  - string - szukany ci±g znaków
+ *  - array - tablica,
+ *  - string - szukany ci±g znaków,
  *  - casesensitive - czy mamy zwracaæ uwagê na wielko¶æ znaków?
  *
  * 0/1

@@ -1209,6 +1209,7 @@ void theme_init()
 	format_add("aliases_exist", "%! Alias %T%1%n ju¿ istnieje\n", 1);
 	format_add("aliases_noexist", "%! Alias %T%1%n nie istnieje\n", 1);
 	format_add("aliases_command", "%! %T%1%n jest wbudowan± komend±\n", 1);
+	format_add("aliases_not_enough_params", "%! Alias %T%1%n wymaga wiêkszej ilo¶æi parametrów\n", 1);
 
 	/* po³±czenia bezpo¶rednie */
 	format_add("dcc_attack", "%! %|Program otrzyma³ zbyt wiele ¿±dañ bezpo¶rednich po³±czeñ, ostatnie od %1\n", 1);
