@@ -29,6 +29,9 @@
 
 void ekg_oom_handler()
 {
+	if (old_stderr)
+		dup2(old_stderr, 2);
+
 	fprintf(stderr,
 "\n"
 "*** Brak pamiêci ***\n"
@@ -36,10 +39,14 @@ void ekg_oom_handler()
 "Próbujê zapisaæ ustawienia do pliku %s/config.%d i listê kontaktów\n"
 "do pliku %s/userlist.%d, ale nie obiecujê, ¿e cokolwiek z tego\n"
 "wyjdzie.\n"
-"\n", config_dir, getpid(), config_dir, getpid());
+"\n"
+"Do pliku %s/debug.%d zapiszê ostatanie komunikaty\n"
+"z okna debugowania.\n"
+"\n", config_dir, getpid(), config_dir, getpid(), config_dir, getpid());
 
 	config_write_crash();
 	userlist_write_crash();
+	debug_write_crash();
 
 	exit(1);
 }

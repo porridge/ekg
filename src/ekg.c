@@ -77,6 +77,7 @@ static void get_line_from_pipe(struct gg_exec *c);
 static int get_char_from_pipe(struct gg_common *c);
 
 extern FILE *gg_debug_file;
+
 int old_stderr = 0;
 
 /*

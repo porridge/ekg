@@ -163,6 +163,8 @@ time_t last_save;
 char *config_profile;
 int config_changed;
 
+int old_stderr;
+
 char *config_audio_device;
 char *config_away_reason;
 int config_auto_away;
