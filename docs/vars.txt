@@ -46,6 +46,13 @@ away_reason
         domy¶lny opis stanu zajêtego, ustawiany przy zmianie bez podania 
 	parametru.
 
+back_reason
+        typ: tekst
+        domy¶lna warto¶æ: brak
+
+        domy¶lny opis stanu dostêpnego, ustawiany przy zmianie bez podania 
+	parametru.
+
 beep
 	typ: bool
 	domy¶lna warto¶æ: 1
@@ -66,7 +73,7 @@ beep_chat
 	typ: bool
 	domy¶lna warto¶æ: 1
 
-	czy beepaæ przy rozmowach. wy³±czenie ,,beep'' wy³±cza róznie¿ t±
+	czy beepaæ przy rozmowach. wy³±czenie ,,beep'' wy³±cza równie¿ t±
 	opcjê.
 
 beep_notify
@@ -74,7 +81,7 @@ beep_notify
 	domy¶lna warto¶æ: 1
 
 	czy beepaæ przy zmianie stanu którego¶ ze znajomych. wy³±czenie
-	,,beep'' wy³±cza róznie¿ t± opcjê.
+	,,beep'' wy³±cza równie¿ t± opcjê.
 
 completion_notify
 	typ: bool
@@ -97,7 +104,7 @@ dcc_ip
 
 	okre¶la adres IP, który jest wysy³any serwerowi. póki co, jest
 	wymagana do bezpo¶redniego po³±czenia, poniewa¿ ekg nie potrafi
-	wykryæ doy¶lnego adresu IP.
+	wykryæ domy¶lnego adresu IP.
 
 display_ack
 	typ: liczba
@@ -132,9 +139,9 @@ log
 
 log_ignored 
 	typ: liczba
-	domyslna wartosc: 0 
+	domy¶lna wartosc: 0 
 	    
-	okresla czy logujemy ignorowane wiadomosci 
+	okre¶la czy logujemy ignorowane wiadomosci 
 
 log_status
         typ: bool

@@ -7,7 +7,7 @@ Q: Sk±d ¶ci±gn±æ?
 A: http://dev.null.pl/ekg/
 
 Q: ./configure wyrzuca b³êdy. Co robiæ?
-A: Naprawdopodobniej nie masz narzêdzi i pakietów potrzebnych do
+A: Najprawdopodobniej nie masz narzêdzi i pakietów potrzebnych do
    skompilowania EKG. Upewnij siê, ¿e masz zainstalowany kompilator
    C, narzêdzia takie jak make, install, bibliotekê readline i
    odpowiednie pliki nag³ówkowe.

@@ -10,7 +10,7 @@ obecnej mo¿na odbieraæ pliki. by w³±czyæ dcc nale¿y wpisaæ:
 od tej chwili mo¿emy odbieraæ wysy³ane do nas pliki. je¶li kto¶ spróbuje
 co¶ do nas wys³aæ, pojawi siê:
 
-	->- ktos/123 przesy³a plik zdjecie.jpg o rozmiarze 129117
+	->- kto¶/123 przesy³a plik zdjecie.jpg o rozmiarze 129117
 	->- Wpisz dcc get #1 by go odebraæ, lub dcc close #1 by anulowaæ
 
 dalszych instrukcji chyba nie trzeba podawaæ. inne opcje dcc bêd±
@@ -21,7 +21,7 @@ kiedy bêdzie dzia³aæ.
 // api kodu dcc
 
 to jest pocz±tkowy opis pocz±tkowych stadiów kodu. wszystko mo¿e siê
-zmieniæ i naprawdopodobniej spora czê¶æ ulegnie zmianie.
+zmieniæ i najprawdopodobniej spora czê¶æ ulegnie zmianie.
 
 gadu-gadu, w przeciwieñstwie do irc, umo¿liwia po³±czenia w obie strony,
 bez wzglêdu na to, który klient nadaje, a który odbiera. do tego, je¶li
@@ -33,7 +33,7 @@ a) mam publiczny lub niepubliczny adres IP i chcê wys³aæ plik do kogo¶
    mówiê czego chcê i je¶li to zaakceptuje, zaczynam wysy³aæ plik. bardzo
    to przypomina zwyk³e po³±czenia dcc klientów irc.
 
-b) mam publiczny adres IP i wys³am plik do kogo¶ za maskarad± -- wysy³am
+b) mam publiczny adres IP i wysy³am plik do kogo¶ za maskarad± -- wysy³am
    do niego odpowiedni pakiet ctcp (client-to-client protocol). jest to
    pakiet klasy GG_CLASS_CTCP (0x10) o tre¶ci sk³adaj±cej siê z jednego
    znaku o kodzie 0x02. druga strona, odebrawszy taki pakiet ³±czy siê
@@ -105,7 +105,7 @@ GG_SESSION_DCC_SOCKET mog± to byæ:
 
 3) GG_EVENT_DCC_NEW -- nowe po³±czenie od klienta. w polu
    event->event.dcc_new jest struktura gg_dcc typu GG_SESSION_DCC,
-   któr± dodajemy do listy przegl±danych desktyptorów.
+   któr± dodajemy do listy przegl±danych deskryptorów.
 
 w ka¿dym z tych wypadków nale¿y po sprawdzeniu zdarzenia wywo³aæ funkcjê:
 
@@ -114,7 +114,7 @@ w ka¿dym z tych wypadków nale¿y po sprawdzeniu zdarzenia wywo³aæ funkcjê:
 by zwolniæ pamiêæ po zdarzeniu.
 
 
-gdy nadejdzie po³±czenie i dopiszemy je do listy przegl±danych deskyptorów,
+gdy nadejdzie po³±czenie i dopiszemy je do listy przegl±danych deskryptorów,
 musimy zwracaæ uwagê na nastêpuj±ce zdarzenia:
 
 1) GG_EVENT_NONE -- nic siê nie zdarzy³o.
@@ -155,7 +155,7 @@ musimy zwracaæ uwagê na nastêpuj±ce zdarzenia:
 
 6) GG_EVENT_DCC_ERROR -- b³±d. mo¿liwy kod b³êdu to GG_ERROR_DCC_HANDSHAKE
    gdy nie powiod³o siê ustanowienie po³±czenia z klientem, GG_ERROR_DCC_NET
-   kiedy nie uda³o siê wys³ac lub odczytaæ czego¶ z socketa, GG_ERROR_DCC_FILE
+   kiedy nie uda³o siê wys³aæ lub odczytaæ czego¶ z socketa, GG_ERROR_DCC_FILE
    gdy nie mo¿na by³o odczytaæ albo zapisaæ do pliku, GG_ERROR_DCC_EOF gdy
    plik lub po³±czenie zbyt wcze¶nie siê skoñczy.
 

@@ -11,7 +11,7 @@ parê wskazówek dla developerów:
    ,,nfoo''.
 
 4) nie zmieniajcie api bez powodu. je¶li co¶ wymaga³oby potwornych hacków,
-   jak na przyklad zmiana gg_session->initial_status zaraz po gg_login()
+   jak na przyk³ad zmiana gg_session->initial_status zaraz po gg_login()
    i ich ilo¶æ zaczê³aby siê zwiêkszaæ, wypada³oby o tym pomy¶leæ. warto
    te¿ stosowaæ funkcjê typu _ex(). przyk³ad: chcemy dodaæ kolejny
    parametr do gg_login(). g³upio zmieniaæ API nagle. zamiast tego mo¿na

@@ -3,13 +3,13 @@ sk³adnia komendy on:
 on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 
 	zdarzenie:
-		msg, chat - wiadomo¶æi od kogo¶;
+		msg, chat - wiadomo¶æ od kogo¶;
 		avail - zmiana przez kogo¶ statusu na 'dostêpny';
 		away  -            -//-               'zajêty';
 		invisible -        -//-               'niewidoczny';
 		disconnect -       -//-	              'niedostêpny';
 		dcc - otrzymanie od kogo¶ dcc;
-		* - wszystkie zdadrzenia;
+		* - wszystkie zdarzenia;
 	zdarzenia mo¿na ³±czyæ ze sob± operatorem '|'.
 
 	user - nazwa u¿ytkownika z listy lub uin, * oznacza dowolnego 
@@ -19,19 +19,19 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 	akcja:
 		clear - usuñ dane zdarzenie (lub jedn± flagê);
 		beep - wysy³a \007 na terminal czyli zwyk³e beepniêcie;
-		play [plik] - odtworz dany dzwiek 
+		play [plik] - odtwórz dany dzwiek 
 		chat [user] [tekst] - wy¶lij tekst do danego usera;
 		msg  [user] [tekst] -            -//- 
 		blink_leds [sekwencja] - zapalaj kontorlki NumLock, CapsLock
 		      i ScrollLock na klawiaturze 'w rytm' podanej sekwencji.
-                      kombinacje diod oddzielane sa od siebie przecinkami,
+                      kombinacje diod oddzielane s± od siebie przecinkami,
                       je¿eli po kombinacji wyst±pi znak '/' - po nim podany
                       musi byæ odstêp czasu do kolejnej kombinacji.
                       kombinacje tworzy siê dodaj±c do siebie bity:
                       1 - NumLock,  2 - ScrollLocl, 4 - CapsLock i tak np.
                       pod¶wietlenie NumLock i CapsLock to 1+4 czyli 5.
 		beeps_spk [sekwencja] - odgrywa sekwencjê na sprzêtowym 
-                      g³o¶niczku. tony sa oddzielane przecinkami, odstêpy czasu,
+                      g³o¶niczku. tony s± oddzielane przecinkami, odstêpy czasu,
                       tak jak przy blink_leds wystêpujê po znaku '/'.
 
 		dodatkowo przy blink_leds i beeps_spk, je¿eli sekwencja zacznie
