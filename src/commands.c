@@ -4231,7 +4231,7 @@ COMMAND(cmd_timer)
 			struct timeval tv;
 			char *tmp;
 			const char *type_str;
-			time_t usec, sec, minutes = 0, hours = 0, days = 0;
+			long usec, sec, minutes = 0, hours = 0, days = 0;
 
 			if (t->at || (t_name && strcasecmp(t->name, t_name)))
 				continue;

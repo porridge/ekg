@@ -115,7 +115,7 @@ int userlist_read()
 
 		entry = array_make(buf, ";", 7, 0, 0);
 
-		if (array_count(entry) < 7 || !(u.uin = strtol(entry[6], NULL, 0))) {
+		if (array_count(entry) < 7 || !(u.uin = str_to_uin(entry[6]))) {
 			array_free(entry);
 			xfree(buf);
 			continue;
@@ -136,10 +136,7 @@ int userlist_read()
 		u.groups = group_init(entry[5]);
 		u.status = GG_STATUS_NOT_AVAIL;
 
-		for (i = 0; i < 7; i++)
-			xfree(entry[i]);
-		xfree(entry);
-
+		array_free(entry);
 		xfree(buf);
 
 		list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);
@@ -200,7 +197,7 @@ int userlist_set(const char *contacts, int config)
 
 		entry = array_make(buf, ";", 7, 0, 0);
 		
-		if (array_count(entry) < 7 || !(u.uin = strtol(entry[6], NULL, 0))) {
+		if (array_count(entry) < 7 || !(u.uin = str_to_uin(entry[6]))) {
 			array_free(entry);
 			continue;
 		}

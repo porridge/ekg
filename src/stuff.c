@@ -1245,10 +1245,10 @@ int config_read(const char *filename, const char *var)
 
 				if (!strncmp(p[1], "*/", 2)) {
 					period = atoi(p[1] + 2);
-					period_str = saprintf("*/%ld", period);
+					period_str = saprintf("*/%ld", (long) period);
 				} else {
 					period = atoi(p[1]) - time(NULL);
-					period_str = saprintf("%ld", period);
+					period_str = saprintf("%ld", (long) period);
 				}
 		
 				if (period > 0) {
@@ -1531,7 +1531,7 @@ int config_write_partly(char **vars)
 	if (!(fi = fopen(filename, "r")))
 		return -1;
 
-	newfn = saprintf("%s.%d.%ld", filename, getpid(), time(NULL));
+	newfn = saprintf("%s.%d.%ld", filename, getpid(), (long) time(NULL));
 
 	if (!(fo = fopen(newfn, "w"))) {
 		xfree(newfn);
