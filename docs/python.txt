@@ -1,0 +1,14 @@
+// obs³uga skryptów w pythonie
+
+z braku czasu/chêci/czegokolwiek, ./configure --with-python bierze
+includy z /usr/include/python2.1 i linkuje z libpython2.1.so. je¶li
+nie odpowiada to Twojemu systemowi, popraw ./configure. aktualnie
+niewiele jeszcze dzia³a. w zasadzie to prawie nic. przyk³adowy skrypt:
+
+   import ekg
+   ekg.printf("generic", "Jestem skryptem w Pythonie!")
+   ekg.command("msg 123 hej!")
+
+który ³adujemy komend± ,,_load test.py''. nic wiêcej.
+
+$Id$

@@ -29,3 +29,6 @@
 
 /* ekgwap */
 #undef WITH_WAP
+
+/* python */
+#undef WITH_PYTHON

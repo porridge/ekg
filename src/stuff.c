@@ -243,7 +243,7 @@ const char *prepare_path(const char *filename, int do_mkdir)
 }
 
 /*
- * log()
+ * put_log()
  *
  * wrzuca do logów informacjê od/do danego numerka. podaje siê go z tego
  * wzglêdu, ¿e gdy `log = 2', informacje lec± do $config_log_path/$uin.
@@ -251,7 +251,7 @@ const char *prepare_path(const char *filename, int do_mkdir)
  * - uin,
  * - format...
  */
-void log(uin_t uin, const char *format, ...)
+void put_log(uin_t uin, const char *format, ...)
 {
  	char *lp = config_log_path;
 	char path[PATH_MAX];

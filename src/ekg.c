@@ -47,6 +47,7 @@
 #include "vars.h"
 #include "xmalloc.h"
 #include "ui.h"
+#include "python.h"
 
 time_t last_action = 0;
 int ioctld_pid = 0;
@@ -485,11 +486,7 @@ int main(int argc, char **argv)
 #ifdef WITH_UI_NCURSES
 	ui_init = ui_ncurses_init;
 #else
-#  ifdef WITH_UI_READLINE
 	ui_init = ui_readline_init;
-#  else
-	ui_init = ui_stdout_init;
-#  endif
 #endif
 
 	srand(time(NULL));
@@ -638,6 +635,10 @@ int main(int argc, char **argv)
 	}
 	
         ekg_pid = getpid();
+
+#ifdef WITH_PYTHON
+	python_initialize();
+#endif
 
 	ui_init();
 
@@ -815,6 +816,10 @@ int main(int argc, char **argv)
 
 	xfree(gg_proxy_host);
 	xfree(config_dir);
+
+#ifdef WITH_PYTHON
+	python_finalize();
+#endif
 
 	return 0;
 }

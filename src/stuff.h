@@ -169,7 +169,7 @@ const char *timestamp(const char *format);
 const char *prepare_path(const char *filename, int do_mkdir);
 void send_userlist();
 void do_reconnect();
-void log(uin_t uin, const char *format, ...);
+void put_log(uin_t uin, const char *format, ...);
 int send_sms(const char *recipient, const char *message, int show_result);
 char *read_file(FILE *f);
 int init_control_pipe(const char *path);

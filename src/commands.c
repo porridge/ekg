@@ -46,6 +46,7 @@
 #include "voice.h"
 #include "xmalloc.h"
 #include "ui.h"
+#include "python.h"
 
 COMMAND(cmd_modify);
 
@@ -1042,7 +1043,7 @@ COMMAND(cmd_msg)
 		
 	        u = userlist_find(uin, NULL);
 
-		log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), params[1]);
+		put_log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), params[1]);
 
 		if (!chat || count == 1)
 			gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
@@ -2165,6 +2166,18 @@ COMMAND(cmd_alias_exec)
 	return res;
 }
 
+#ifdef WITH_PYTHON
+COMMAND(cmd_test_load)
+{
+	if (!params[0])
+		print("not_enough_params");
+	else
+		python_load(params[0]);
+
+	return 0;
+}
+#endif
+
 /*
  * command_add_compare()
  *
@@ -2540,6 +2553,11 @@ void command_init()
 	command_add
 	( "_watches", "", cmd_test_watches, 0, "", "",
 	  "Wy¶wietla listê sprawdzanych deskryptorów");
+#ifdef WITH_PYTHON
+	command_add
+	( "_load", "?", cmd_test_load, 0, "", "",
+	  "£aduje skrypt");
+#endif
 }
 
 /*
