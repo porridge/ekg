@@ -1227,6 +1227,7 @@ int main(int argc, char **argv)
 			else if (config_ioctld_enable == 2) {
 				char *portstr = saprintf("%d", config_ioctld_net_port);
 				execl(ioctld_path, "ioctld", sock_path, portstr, (void*)NULL);
+				xfree(portstr);
 			}
 			exit(0);
 		}

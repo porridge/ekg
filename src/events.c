@@ -579,8 +579,6 @@ void handle_msg(struct gg_event *e)
 		return;
 	}
 #endif
-	
-
 
 	if (!(ignored_check(e->event.msg.sender) & IGNORE_EVENTS))
 		event_check((chat) ? EVENT_CHAT : EVENT_MSG, e->event.msg.sender, e->event.msg.message);

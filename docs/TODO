@@ -9,8 +9,6 @@ rozwi±zanie.
   - sniffn±æ rejestracjê konta, zmieni³a siê (Carol)
 
 * klient:
-  - mo¿liwy wyciek pamiêci - parê raportów, i¿ EKG po paru dniach u¿ytkowania
-    ro¶nie do ogromnych rozmiarów (pamiêciowo) (dredzik)
   - po pierwszym wy¶wietleniu: 
 	 ::: Wiadomo¶æ do [...] najprawdopodobniej nie zosta³a...
 	ma siê pojawiaæ zamiast tego komunikatu jego skrócona wersja (joshua)

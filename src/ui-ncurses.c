@@ -2864,12 +2864,14 @@ static void complete(int *line_start, int *line_index)
 	}
 
 	/* trzeba pododawaæ trochê do liczników w spefycicznych (patrz warunki) sytuacjach */
-	if((xisspace(line[strlen(line) - 1]) || line[strlen(line) - 1] == ',') && word + 1== array_count(words) -1 ) 
-		word++;
-	if(xisspace(line[strlen(line) - 1]) && words_count == word_current) 
-		word_current++;
-	if(xisspace(line[strlen(line) - 1])) 
-		words_count++;
+	if (strlen(line) > 1) {
+		if((xisspace(line[strlen(line) - 1]) || line[strlen(line) - 1] == ',') && word + 1== array_count(words) -1 ) 
+			word++;
+		if(xisspace(line[strlen(line) - 1]) && words_count == word_current) 
+			word_current++;
+		if(xisspace(line[strlen(line) - 1])) 
+			words_count++;
+	}
 		
 /*	gg_debug(GG_DEBUG_MISC, "word = %d\n", word);
 	gg_debug(GG_DEBUG_MISC, "start = \"%s\"\n", start);   
