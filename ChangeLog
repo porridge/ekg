@@ -15,6 +15,7 @@ zg³osi³ b³±d.
 - poprawka obs³ugi zmiennej ,,interface'' (a.latanski/w)
 - dodana zmienna ,,reason_limit'' (jojo/w)
 - poprawki ,,reload plik'', gdy kto¶ u¿ywa zarówno readline jak i ncurses (sz)
+- kosmetyka /change (sz)
 
 // 2003-02-06
 

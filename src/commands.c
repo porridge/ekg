@@ -887,7 +887,7 @@ COMMAND(cmd_change)
 	struct gg_change_info_request *r;
 	struct gg_http *h;
 	char **argv = NULL;
-	int i;
+	int i, match = 0;
 
 	if (!params[0]) {
 		printq("not_enough_params", name);
@@ -903,36 +903,52 @@ COMMAND(cmd_change)
 		if (match_arg(argv[i], 'f', "first", 2) && argv[i + 1]) {
 			xfree(r->first_name);
 			r->first_name = xstrdup(argv[++i]);
+			match = 1;
 		}
 		
 		if (match_arg(argv[i], 'l', "last", 2) && argv[i + 1]) {
 			xfree(r->last_name);
 			r->last_name = xstrdup(argv[++i]);
+			match = 1;
 		}
 		
 		if (match_arg(argv[i], 'n', "nickname", 2) && argv[i + 1]) {
 			xfree(r->nickname);
 			r->nickname = xstrdup(argv[++i]);
+			match = 1;
 		}
 		
 		if (match_arg(argv[i], 'e', "email", 2) && argv[i + 1]) {
 			xfree(r->email);
 			r->email = xstrdup(argv[++i]);
+			match = 1;
 		}
 
 		if (match_arg(argv[i], 'c', "city", 2) && argv[i + 1]) {
 			xfree(r->city);
 			r->city = xstrdup(argv[++i]);
+			match = 1;
 		}
 		
-		if (match_arg(argv[i], 'b', "born", 2) && argv[i + 1])
+		if (match_arg(argv[i], 'b', "born", 2) && argv[i + 1]) {
 			r->born = atoi(argv[++i]);
+			match = 1;
+		}
 		
-		if (match_arg(argv[i], 'F', "female", 2))
+		if (match_arg(argv[i], 'F', "female", 2)) {
 			r->gender = GG_GENDER_FEMALE;
+			match = 1;
+		}
 
-		if (match_arg(argv[i], 'M', "male", 2))
+		if (match_arg(argv[i], 'M', "male", 2)) {
 			r->gender = GG_GENDER_MALE;
+			match = 1;
+		}
+	}
+
+	if (!match && strcmp(params[0], "-")) {
+		printq("not_enough_params", name);
+		return -1;
 	}
 
 	if (!r->first_name)
@@ -3659,7 +3675,7 @@ COMMAND(cmd_timer)
 			return -1;
 		}
 
-		if (isalpha_pl_PL(*p) || isdigit(params[2][0]) || !strncmp(params[2], "*/", 2)) {
+		if (isdigit(params[2][0]) || !strncmp(params[2], "*/", 2)) {
 			t_name = xstrdup(p);
 
 			if (!strcmp(t_name, "(null)")) {
@@ -4558,7 +4574,8 @@ void command_init()
 	  "  -M, --male                   mê¿czyzna\n"
 	  "\n"
 	  "Je¶li który¶ z parametrów nie zostanie podany, jego warto¶æ "
-	  "zostanie wyczyszczona w katalogu publicznym.");
+	  "zostanie wyczyszczona w katalogu publicznym. Podanie parametru "
+	   ",,-'' wyczy¶ci %Twszystkie%n pola.");
 	  
 	command_add
 	( "chat", "u?", cmd_msg, 0,
