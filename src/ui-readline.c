@@ -59,6 +59,7 @@ static int window_clear();
 static int windows_sort();
 static int window_query_id(const char *qnick);
 static void window_list();
+static int window_make_query(const char *nick);
 
 /* a jak ju¿ przy okienkach jeste¶my... */
 static void window_01() { if (curr_window == 1) return; window_switch(1); }
@@ -379,14 +380,17 @@ static char **my_completion(char *text, int start, int end)
  */
 static void ui_readline_print(const char *target, const char *line)
 {
-        int old_end = rl_end, i, win_id;
+        int old_end = rl_end, i, win_id = -1;
 	char *old_prompt = rl_prompt;
 
-        if ((win->query_nick && target && !strcmp(win->query_nick, target)) || windows_count <= 1)
+        if ((win->query_nick && target && !strcmp(win->query_nick, target)))
                 win_id = 0;
-        else
+        else if (windows_count >1)
                 win_id = window_query_id(target);
 
+	if (config_make_window > 0 && win_id < 0 && windows_count < MAX_WINDOWS && strncmp(target, "__", 2))
+		win_id = window_make_query(target);
+	
         if (win_id > 0) {
                 window_write(win_id, line);
                 /* trzeba jeszcze waln±æ od¶wie¿enie prompta */
@@ -963,3 +967,43 @@ static void window_list()
 			print("window_list_nothing", id);
 	}
 }		
+
+static int window_make_query(const char *nick)
+{
+	if (config_make_window == 1) {
+		struct list *l;
+
+		for (l = windows; l; l = l->next) {
+			struct window *w = l->data;
+			
+			if (!w->query_nick) {
+				char id[4];
+
+				snprintf(id, 4, "%d", win->id);
+				w->query_nick = xstrdup(nick);
+				print("window_id_query_started", id, nick);
+				return w->id;
+			}
+		}
+	}
+	
+	if (config_make_window == 1 || config_make_window == 2) {
+		struct list *l;
+		struct window *w = NULL;
+		char id[4];
+
+		if (window_add()) 
+			return 0;
+
+		for (l = windows; l; l = l->next)
+			w = (struct window*)l->data;
+		
+		
+		w->query_nick = xstrdup(nick);
+		snprintf(id, 4, "%d", w->id);
+		print("window_id_query_started", id, nick);
+		return w->id;
+	}
+
+	return 0;
+}

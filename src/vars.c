@@ -82,6 +82,7 @@ void variable_init()
 	variable_add("status", VAR_INT, 2, &config_status, NULL);
 	variable_add("debug", VAR_BOOL, 2, &config_debug, changed_debug);
 	variable_add("protocol", VAR_INT, 2, &config_protocol, NULL);
+	variable_add("make_window", VAR_INT, 1, &config_make_window, NULL);
 }
 
 /*

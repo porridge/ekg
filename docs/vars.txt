@@ -161,6 +161,16 @@ log_path
 
 	¶cie¿ka, gdzie bêd± zachowywane wysy³ane i otrzymane wiadomo¶ci.
 
+make_window
+	typ: int
+	domy¶lna warto¶æ: 0
+
+	okre¶la czy bêd± tworzone nowe okienka dla przychodz±cych wiadomo¶ci
+	od nowych rozmówców. dla 1 bêdzie wykorzystane do nowego query pierwsze
+	wolne okno (na którym z nikim jeszcze siê nie rozmawia), lub tworzone
+	nowe w przypadku braku wolnych. dla 2 bezwarunkowo utworzone zostanie 
+	nowe okienko.
+
 proxy
 	typ: tekst
 	domy¶lna warto¶æ: brak

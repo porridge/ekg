@@ -134,6 +134,7 @@ char *config_proxy;
 char *config_server;
 int config_protocol;
 int config_emoticons;
+int config_make_window;
 
 char *home_dir;
 char *config_dir;
