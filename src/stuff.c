@@ -747,7 +747,7 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 {
 	struct conference c;
 	char **nicks, **p;
-	char *buf;
+	char *buf, *tmp;
 	list_t l;
 	int i, count;
 
@@ -757,15 +757,16 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 		return NULL;
 
 	buf = xstrdup(nicklist);
+	tmp = buf;
 	buf = strip_spaces(buf);
 	
 	if (buf[0] == ',' || buf[strlen(buf) - 1] == ',') {
 		printq("invalid_params", "chat");
-		xfree(buf);
+		xfree(tmp);
 		return NULL;
 	}
 
-	xfree(buf);
+	xfree(tmp);
 
 	nicks = array_make(nicklist, " ,", 0, 1, 0);
 
