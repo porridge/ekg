@@ -57,8 +57,12 @@ struct module {
 		\
 		python_handle_result = -1; \
 		\
-		if (__py_r && PyInt_Check(__py_r)) \
-			python_handle_result = PyInt_AsLong(__py_r); \
+		if (__py_r && PyInt_Check(__py_r)) { \
+			int tmp = PyInt_AsLong(__py_r); \
+			\
+			if (python_handle_result != 2 && tmp != 1) \
+				python_handle_result = tmp; \
+		} \
 		\
 		if (__py_r && PyTuple_Check(__py_r))
 
@@ -70,7 +74,9 @@ struct module {
 #define PYTHON_HANDLE_FOOTER() \
 		\
 		Py_XDECREF(__py_r); \
-		break; \
+		\
+		if (python_handle_result == 0) \
+			break; \
 	} \
 }
 
