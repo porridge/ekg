@@ -1470,7 +1470,7 @@ COMMAND(cmd_set)
 				char *string = *(char**)(v->ptr);
 				int value = *(int*)(v->ptr);
 
-				if (!show_all && v->dyndisplay && !(*v->dyndisplay)(v->name))
+				if (!show_all && !arg && v->dyndisplay && !(*v->dyndisplay)(v->name))
 					continue;
 
 				if (!v->display) {
