@@ -212,7 +212,7 @@ display_ack
 
 	okre¶la, czy i które powiadomienia o wys³aniu wiadomo¶ci maj±
 	byæ wy¶wietlane. 0 - ¿adne, 1 - wszystkie, 2 - tylko kiedy wiadomo¶æ
-	dotar³a	do adresata, 3 - tylko kiedy adresat jest niedostêpny i
+	dotar³a do adresata, 3 - tylko kiedy adresat jest niedostêpny i
 	wiadomo¶æ zosta³a zachowania na serwerze.
 
 display_color

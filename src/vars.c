@@ -625,7 +625,7 @@ int variable_undigest(const char *digest)
  * wy¶wietla pomoc dotycz±c± danej zmiennej na podstawie pliku
  * ${datadir}/ekg/vars.txt.
  *
- * - name - nazwa zmiennej
+ *  - name - nazwa zmiennej.
  */
 void variable_help(const char *name)
 {
@@ -663,6 +663,8 @@ void variable_help(const char *name)
 		type = xstrdup("?");
 	
 	xfree(line);
+
+	tmp = NULL;
 	
 	line = read_file(f);
 	if ((tmp = strstr(line, ": ")))
@@ -676,7 +678,8 @@ void variable_help(const char *name)
 	xfree(type);
 	xfree(def);
 
-	xfree(read_file(f));	/* pomijamy liniê */
+	if (tmp)			/* je¶li nie jest to ukryta zmienna... */
+		xfree(read_file(f));	/* ... pomijamy liniê */
 
 	while ((line = read_file(f))) {
 		if (line[0] != '\t') {
