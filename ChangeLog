@@ -6,6 +6,16 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-02-18
+
+- uaktualnianie timeout'ów sesji nie czê¶ciej ni¿ raz na sekundê, ¿eby
+  timeout timeout'owi by³ równy (sz)
+- poprawka wczytywania pojedynczych zmiennych, m.in. ,,fade_in'' i
+  ,,interface''. ta ostatania nie by³a zawsze zapisywana. teraz odbywa
+  siê to automagicznie po uruchomieniu ekg z opcj± -f (sz)
+- kosmetyka dcc. standardowo wiêcej informacji w /dcc list. pe³niejszy
+  komunikat o timeout'cie po³±czenia (sz)
+
 // 2003-02-16
 
 - usuniêcie leak'a w /exec (sz)

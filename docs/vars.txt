@@ -691,8 +691,8 @@ interface
 	typ: tekst, zmienna wewnêtrzna, ukryta
 
 	okre¶la domy¶lny interfejs programu. jej warto¶æ jest zmieniana
-	przez podanie parametru -f w wywo³aniu programu, a zapisywana
-	dopiero za pomoc± komendy ,,save''.
+	przez podanie parametru -f w wywo³aniu programu i automatycznie
+	zapisywana.
 
 password_cp1250
 	typ: bool, zmienna wewnêtrzna, ukryta

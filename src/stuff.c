@@ -1110,11 +1110,10 @@ void conference_free()
  * czyta z pliku ~/.gg/config lub podanego konfiguracjê.
  *
  *  - filename,
- *  - var - zmienna lub NULL, je¶li wszystkie.
  *
  * 0/-1
  */
-int config_read(const char *filename, const char *var)
+int config_read(const char *filename)
 {
 	char *buf, *foo;
 	FILE *f;
@@ -1136,9 +1135,9 @@ int config_read(const char *filename, const char *var)
 		return -1;
 	}
 
-	gg_debug(GG_DEBUG_MISC, "// config_read(%s);\n", ((var) ? var : ""));
+	gg_debug(GG_DEBUG_MISC, "// config_read();\n");
 
-	if (!in_autoexec && !var) {
+	if (!in_autoexec) {
 		list_t l;
 
 		for (l = bindings; l; ) {
@@ -1174,11 +1173,6 @@ int config_read(const char *filename, const char *var)
 		}
 
 		*foo++ = 0;
-
-		if (var && strcmp(buf, var)) {
-			xfree(buf);
-			continue;
-		}
 
 		if (!strcasecmp(buf, "set")) {
 			char *bar;
@@ -1280,8 +1274,8 @@ int config_read(const char *filename, const char *var)
 	
 	fclose(f);
 
-	if (!good_file && !home && !in_autoexec && !var) {
-		config_read(NULL, NULL);
+	if (!good_file && !home && !in_autoexec) {
+		config_read(NULL);
 		errno = EINVAL;
 		return -2;
 	}
@@ -1482,8 +1476,7 @@ void config_write_main(FILE *f, int base64)
 /*
  * config_write()
  *
- * zapisuje aktualn± konfiguracjê -- zmienne i listê ignorowanych do pliku
- * ~/.gg/config lub podanego.
+ * zapisuje aktualn± konfiguracjê do pliku ~/.gg/config lub podanego.
  *
  * 0/-1
  */

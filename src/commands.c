@@ -2413,16 +2413,6 @@ COMMAND(cmd_dcc)
 	if (!params[0] || !strncasecmp(params[0], "li", 2)) {	/* list */
 		int pending = 0, active = 0;
 
-		if (params[0] && params[1] && params[1][0] == 'd') {	/* list debug */
-			for (l = transfers; l; l = l->next) {
-				struct transfer *t = l->data;
-				
-				printq("dcc_show_debug", itoa(t->id), (t->type == GG_SESSION_DCC_SEND) ? "SEND" : "GET", t->filename, format_user(t->uin), (t->dcc) ? "yes" : "no", (t->dcc) ? itoa(t->dcc->offset) : "0", (t->dcc) ? itoa(t->dcc->file_info.size) : "0", (t->dcc) ? itoa(100*t->dcc->offset/t->dcc->file_info.size) : "0");
-			}
-
-			return 0;
-		}
-
 		for (l = transfers; l; l = l->next) {
 			struct transfer *t = l->data;
 
@@ -2454,10 +2444,10 @@ COMMAND(cmd_dcc)
 				}
 				switch (t->type) {
 					case GG_SESSION_DCC_SEND:
-						printq("dcc_show_active_send", itoa(t->id), format_user(t->uin), t->filename);
+						printq("dcc_show_active_send", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa(100*t->dcc->offset/t->dcc->file_info.size));
 						break;
 					case GG_SESSION_DCC_GET:
-						printq("dcc_show_active_get", itoa(t->id), format_user(t->uin), t->filename);
+						printq("dcc_show_active_get", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa(100*t->dcc->offset/t->dcc->file_info.size));
 						break;
 					case GG_SESSION_DCC_VOICE:
 						printq("dcc_show_active_voice", itoa(t->id), format_user(t->uin));
@@ -3283,7 +3273,7 @@ COMMAND(cmd_reload)
 	if (params[0])
 		filename = params[0];
 
-	if ((res = config_read(filename, NULL)))
+	if ((res = config_read(filename)))
 		printq("error_reading_config", strerror(errno));
 
 	if (res != -1) {

@@ -1303,7 +1303,7 @@ static struct transfer *find_transfer(struct gg_dcc *d)
  *
  * nie zwraca nic.
  */
-static void remove_transfer(struct gg_dcc *d)
+void remove_transfer(struct gg_dcc *d)
 {
 	struct transfer *t = find_transfer(d);
 
@@ -1333,6 +1333,7 @@ void handle_dcc(struct gg_dcc *d)
 		event_check(EVENT_DCC, d->peer_uin, NULL);
 
 	if (ignored_check(d->peer_uin) & IGNORE_DCC) {
+		remove_transfer(d);
 		list_remove(&watches, d, 0);
 		gg_free_dcc(d);
 		return;

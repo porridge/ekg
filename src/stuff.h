@@ -347,7 +347,7 @@ int conference_set_ignore(const char *name, int flag, int quiet);
 int conference_rename(const char *oldname, const char *newname, int quiet);
 void conference_free();
 
-int config_read(const char *filename, const char *var);
+int config_read(const char *filename);
 char *config_read_variable(const char *var);
 int config_write(const char *filename);
 int config_write_partly(char **vars);

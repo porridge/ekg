@@ -42,4 +42,6 @@ void handle_disconnect(struct gg_event *e);
 
 void print_message(struct gg_event *e, struct userlist *u, int chat, int secure);
 
+void remove_transfer(struct gg_dcc *d);
+
 #endif /* __EVENTS_H */

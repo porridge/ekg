@@ -371,9 +371,12 @@ void ekg_wait_for_key()
 			struct gg_common *c = l->data;
 			struct gg_http *h = l->data;
 			struct gg_dcc *d = l->data;
+			static time_t last_check = 0;
 
-			if (!c || c->timeout == -1)
+			if (!c || c->timeout == -1 || time(NULL) == last_check)
 				continue;
+
+			last_check = time(NULL);
 
 			c->timeout--;
 
@@ -435,8 +438,8 @@ void ekg_wait_for_key()
 				case GG_SESSION_DCC:
 				case GG_SESSION_DCC_GET:
 				case GG_SESSION_DCC_SEND:
-					/* XXX informowaæ który */
-					print("dcc_timeout");
+					print("dcc_timeout", format_user(d->uin));
+					remove_transfer(d);
 					list_remove(&watches, d, 0);
 					gg_free_dcc(d);
 					break;
@@ -828,10 +831,8 @@ static int ekg_ui_set(const char *name)
 	else
 		return -1;
 
-	if (config_interface && strcmp(name, config_interface)) {
-		xfree(config_interface);
-		config_interface = xstrdup(name);
-	}
+	xfree(config_interface);
+	config_interface = xstrdup(name);
 
 	return 0;
 }
@@ -1024,21 +1025,23 @@ int main(int argc, char **argv)
 
 	config_profile = new_profile;
 
-	if (!ui_set) {
+	if (!ui_set && !batch_mode) {
 		char *tmp;
 
 		if ((tmp = config_read_variable("interface"))) {
-			xfree(config_interface);
-			config_interface = tmp;
+			ekg_ui_set(tmp);
+			xfree(tmp);
 		}
-			
-		if (config_interface && strcmp(config_interface, ""))
-			ekg_ui_set(config_interface);
 	}
 
-	variable_init();
-
 #ifdef HAVE_USLEEP
+
+	{
+		char *tmp = config_read_variable("fade_in");
+		config_fade_in = atoi(tmp);
+		xfree(tmp);
+	}
+
 	if (config_fade_in && getenv("TERM") && !strcmp(getenv("TERM"), "linux") && !fork()) {
 		int i;
 
@@ -1104,29 +1107,46 @@ int main(int argc, char **argv)
 
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
-		config_read(NULL, "display_transparent");
-		config_read(NULL, "contacts");
+		char *tmp;
+
+		tmp = config_read_variable("display_transparent");
+		config_display_transparent = atoi(tmp);
+		xfree(tmp);
+
+		tmp = config_read_variable("contacts");
+		config_contacts = atoi(tmp);
+		xfree(tmp);
 	}
 #endif
 
 	ui_init();
 	ui_event("theme_init");
 
+	variable_init();
 	variable_set_default();
 
-	if (!no_global_config)
-		config_read(SYSCONFDIR "/ekg.conf", NULL);
+	if (ui_set && config_interface && strcmp(config_interface, "")) {
+		char **arr = NULL;
 
-	config_read(NULL, NULL);
+		array_add(&arr, xstrdup("interface"));
+		config_write_partly(arr);
+		array_free(arr);
+	}
 
 	if (!no_global_config)
-		config_read(SYSCONFDIR "/ekg-override.conf", NULL);
+		config_read(SYSCONFDIR "/ekg.conf");
+
+	config_read(NULL);
+
+	if (!no_global_config)
+		config_read(SYSCONFDIR "/ekg-override.conf");
 	
         userlist_read();
 	update_status();
 	sysmsg_read();
 	emoticon_read();
 	msg_queue_read();
+
 	in_autoexec = 0;
 
 	ui_postinit();
