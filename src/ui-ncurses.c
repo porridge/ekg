@@ -1402,6 +1402,10 @@ static void ui_ncurses_loop()
 
 		ekg_wait_for_key();
 		switch ((ch = wgetch(input))) {
+			case -1:	/* stracony terminal */
+				ekg_exit();
+				break;
+
 			case KEY_RESIZE:  /* zmiana rozmiaru terminala */
 				beep();
 				window_refresh();
