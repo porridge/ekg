@@ -127,16 +127,6 @@ struct gg_exec {
 	string_t buf;	/* bufor na stdout procesu */
 };
 
-struct msg_queue {
-	int msg_class;
-	int msg_seq;
-	int uin_count;
-	uin_t *uins;
-	char *msg;
-	int secure;
-	time_t time;
-};
-
 list_t children;
 list_t aliases;
 list_t watches;
@@ -149,7 +139,6 @@ list_t lasts;
 list_t lasts_count;
 list_t conferences;
 list_t sms_away;
-list_t msg_queue;
 struct gg_session *sess;
 
 time_t last_save;
@@ -342,14 +331,6 @@ void contacts_rebuild();
 
 int mesg_set(int what);
 void mesg_changed();
-
-int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const char *msg, int secure);
-int msg_queue_remove(int msg_seq);
-int msg_queue_remove_uin(uin_t uin);
-void msg_queue_destroy();
-int msg_queue_flush();
-int msg_queue_count();
-int msg_queue_count_uin(uin_t uin);
 
 int msg_encrypt(uin_t uin, char **msg);
 

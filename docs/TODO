@@ -11,7 +11,6 @@ klient:
 - uzupe³niæ dope³nienia (w tym nicki ze spacjami, lista nicków (joshua)),
 - wykrywanie niewidocznych jako opcja.
 - zapisywanie konfiguracji do innego pliku,
-- kolejka wiadomo¶ci w pliku (Murphy).
 - poprawiæ mo¿liwo¶æ ustawienia powodu przy wywo³ywaniu ekg (jojo),
 - poprawiæ getopt(), ¿eby rozumia³ ,,--back "powód"'',
 - dodaæ ,,list --add'', które dopisuje informacje do listy kontaktów,
