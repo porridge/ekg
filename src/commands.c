@@ -4919,8 +4919,6 @@ COMMAND(cmd_last)
 		}
 	}
 
-	gg_debug(GG_DEBUG_MISC, "// LAST: last_n == %d, uin == %d, period_start == %d, period_end == %d, count == %d\n", last_n, uin, period_start, period_end, count);
-
 	if (!count) {
 		if (uin) {
 			printq("last_list_empty_nick", format_user(uin));
