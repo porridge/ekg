@@ -55,7 +55,7 @@ $(STATIC): $(OBJS)
 shared:	$(SHARED)
 
 $(SHARED): $(LOBJS)
-	$(CC) -g -shared -Wl,-soname=libgadu.so.$(VERSION_MAJOR) -o $(SHARED) $(LOBJS) $(LIBS) -lc
+	$(CC) -shared -Wl,-soname=libgadu.so.$(VERSION_MAJOR) -o $(SHARED) $(LOBJS) $(LIBS) -lc
 	$(LN_S) -f $(SHARED) $(SHAREDM)
 	$(LN_S) -f $(SHARED) $(SHAREDMM)
 

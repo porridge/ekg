@@ -1023,6 +1023,7 @@ COMMAND(cmd_list)
 {
 	list_t l;
 	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, j, p;
+	int show_descr=0;
 	char *tmp, **argv = NULL;
 
 	if (params[0] && *params[0] != '-') {
@@ -1142,6 +1143,9 @@ COMMAND(cmd_list)
 				show_all = 0;
 				show_invisible = 1;
 			}
+
+			if (match_arg(argv[i], 'd', "description", 2))
+				show_descr = 1;
 		}
 		array_free(argv);
 	}
@@ -1194,7 +1198,7 @@ COMMAND(cmd_list)
 			}
 		}
 
-		if (show_all || (show_busy && (u->status == GG_STATUS_BUSY || u->status == GG_STATUS_BUSY_DESCR)) || (show_active && (u->status == GG_STATUS_AVAIL || u->status == GG_STATUS_AVAIL_DESCR)) || (show_inactive && (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)) || (show_invisible && (u->status == GG_STATUS_INVISIBLE))) {
+		if ((show_all || (show_busy && GG_S_B(u->status)) || (show_active && GG_S_A(u->status)) || (show_inactive && GG_S_NA(u->status)) || (show_invisible && GG_S_I(u->status))) && !(show_descr && !GG_S_D(u->status))) {
 			print(tmp, format_user(u->uin), (u->first_name) ? u->first_name : u->display, inet_ntoa(in), itoa(p), u->descr);
 			count++;
 		}
@@ -3126,9 +3130,10 @@ void command_init()
           " [alias|opcje]", "zarz±dzanie list± kontaktów",
 	  "\n"
 	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i]\":\n"
-	  "  -a, --active    dostêpne\n"
-	  "  -b, --busy      zajête\n"
-	  "  -i, --inactive  niedostêpne\n"
+	  "  -a, --active       dostêpne\n"
+	  "  -b, --busy         zajête\n"
+	  "  -i, --inactive     niedostêpne\n"
+	  "  -d, --description  osoby z opisem\n"
 	  "\n"
 	  "Zmiana wpisów listy kontaktów \"list <alias> <opcje...>\":\n"
 	  "  -f, --first <imiê>\n"
