@@ -12,6 +12,8 @@ zg³osi³ b³±d.
 - dodanie implementacji funkcji strlcpy/strlcat z OpenBSD. mo¿na z nich 
   wiêc korzystaæ na ka¿dym systemie (sz)
 - poprawka segfaulta przy automatycznym reconnect'cie (acze/sz)
+- poprawka otwierania nowych okien z nickami z '+' lub '*' na
+  pocz±tku (K.Gibas/sz)
 - poprawka segfaultów i b³êdów z w³±czonym sort_windows (*/w)
 - dodanie zmiennej ,,fade_in'' (w)
 

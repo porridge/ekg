@@ -957,8 +957,12 @@ static struct window *window_new(const char *target, int new_id)
 	struct window w, *result = NULL;
 	int id = 1, done = 0;
 	list_t l;
+	struct userlist *u = NULL;
 
-	if (target && *target == '*')
+	if (target)
+		u = userlist_find(0, target);
+
+	if (target && *target == '*' && !u)
 		id = 100;
 
 	while (!done) {
@@ -1022,12 +1026,12 @@ static struct window *window_new(const char *target, int new_id)
 			w.nowrap = !contacts_wrap;
 		}
 
-		if (*target == '+') {
+		if (*target == '+' && !u) {
 			w.doodle = 1;
 			w.target = xstrdup(target + 1);
 		}
 		
-		if (*target == '*') {
+		if (*target == '*' && !u) {
 			const char *tmp = index(target, '/');
 			char **argv;
 			
