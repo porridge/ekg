@@ -5,6 +5,13 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-07-12
+
+- przepisanie curses.m4 od zera unikaj±c wielokrotnego wywo³ywania makr.
+  dziêki temu configure zajmuje ~100kB mniej (w)
+- dodanie $(DESTDIR) do Makefile (jajcus/w)
+- instalacja libgadu.h, polskich manów, ekgsearch (w)
+
 // 2002-07-11
 
 - poprawka aliasów w query (theKnight/w)

@@ -1,5 +1,10 @@
 # $Id$
 
+prefix = $(DESTDIR)@prefix@
+exec_prefix = @exec_prefix@
+libdir = @libdir@
+includedir = @includedir@
+
 # increased with ABI changes
 VERSION_MAJOR=0
 # increased with API changes
@@ -13,10 +18,6 @@ MAKE = @MAKE@
 AR = @AR@
 INSTALL = @INSTALL@
 RANLIB = @RANLIB@
-
-prefix = @prefix@
-exec_prefix = @exec_prefix@
-libdir = @libdir@
 
 OBJS = common.o libgadu.o search.o pubdir.o http.o dcc.o userlist.o events.o
 
@@ -52,11 +53,14 @@ $(SHARED): $(OBJS)
 
 install: @install_shared@ @install_static@
 
-install-shared:
+install-common:
+	$(INSTALL) -d $(includedir)
+	$(INSTALL) -m 644 libgadu.h $(includedir)
 	$(INSTALL) -d $(libdir)
+
+install-shared:	install-common
 	$(INSTALL) -m 755 $(SHARED) $(libdir)
 
-install-static:
-	$(INSTALL) -d $(libdir)
+install-static:	install-common
 	$(INSTALL) -m 755 $(STATIC) $(libdir)
 	

@@ -101,7 +101,7 @@ AC_DEFUN(AC_READLINE, [
 ])
 
 AC_DEFUN(AC_SEARCH_READLINE, [
-    AC_MSG_CHECKING(for location of readline.h)
+    AC_MSG_CHECKING(for readline.h)
 
     AC_READLINE(/usr/include, readline.h, -lreadline,, /usr/include)
     AC_READLINE(/usr/include/readline, readline.h, -lreadline, -I/usr/include/readline, /usr/include/readline)

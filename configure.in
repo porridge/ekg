@@ -93,7 +93,7 @@ if test -d src; then
   fi
     
   if test "x$enable_ui_ncurses" = "xyes"; then 
-    AC_CHECK_CURSES
+    AC_CHECK_NCURSES
     LIBS="$LIBS $CURSES_LIBS"
     CFLAGS="$CFLAGS $CURSES_INCLUDEDIR"
   fi
@@ -110,7 +110,7 @@ if test -d src; then
     fi
 
     if test "x$TERMCAP_LIB" = "x" -a "x$CURSES_LIBS" = "x"; then
-      AC_CHECK_CURSES
+      AC_CHECK_NCURSES
       LIBS="$LIBS $CURSES_LIBS"
       CFLAGS="$CFLAGS $CURSES_INCLUDEDIR"
     fi
