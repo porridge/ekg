@@ -3451,6 +3451,24 @@ static int ui_ncurses_event(const char *event, ...)
 		int quiet = va_arg(ap, int);
 		char *command = va_arg(ap, char*);
 
+		if (!strcasecmp(command, "add")) {
+			char *p = va_arg(ap, char *);
+
+			if (window_current->target && window_current->id > 1) {
+				struct userlist *u = userlist_find(0, window_current->target);
+
+				if (!u) {
+					char *tmp = saprintf("%sadd %s %s", ((quiet) ? "^" : ""), window_current->target, p);
+					command_exec(NULL, tmp);
+					xfree(tmp);
+				} else
+					printq("user_exists", format_user(u->uin));
+			} else
+				printq("not_enough_params", "add");
+
+			goto cleanup;
+		}
+
 		if (!strcasecmp(command, "bind")) {
 			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*), *p3 = va_arg(ap, char*);
 

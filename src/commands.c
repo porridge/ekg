@@ -159,6 +159,11 @@ COMMAND(cmd_add)
 	uin_t uin;
 	struct userlist *u;
 
+	if (params[0] && !params[1] && isalpha_pl_PL(params[0][0])) {
+		ui_event("command", quiet, "add", params[0], NULL);
+		return 0;
+	}
+
 	if (!params[0] || !params[1]) {
 		printq("not_enough_params", name);
 		return -1;
@@ -2926,6 +2931,18 @@ COMMAND(cmd_register)
 	return 0;
 }
 
+COMMAND(cmd_reload)
+{
+	if (config_read(NULL, NULL)) {
+		printq("generic_error", "Wyst±pi³ b³±d przy odczycie pliku konfiguracyjnego\n");
+		return -1;
+	}
+
+	config_changed = 0;
+
+	return 0;
+}
+
 COMMAND(cmd_passwd)
 {
 	struct gg_http *h;
@@ -4159,7 +4176,9 @@ void command_init()
 	( "add", "U??", cmd_add, 0,
 	  " <numer> <alias> [opcje]", "dodaje u¿ytkownika do listy kontaktów",
 	  "\n"
-	  "Opcje identyczne jak dla polecenia %Tlist%n (dotycz±ce wpisu)");
+	  "Opcje identyczne jak dla polecenia %Tlist%n (dotycz±ce wpisu). W oknie
+	  rozmowy z kim¶ spoza naszej listy kontaktów jako parametr mo¿na podaæ
+	  sam alias.");
 	  
 	command_add
 	( "alias", "??", cmd_alias, 0,
@@ -4477,7 +4496,7 @@ void command_init()
 	  "  unload <skrypt>  usuwa skrypt z pamiêci\n"
 	  "  run <plik>       uruchamia skrypt\n"
 	  "  exec <komenda>   uruchamia komendê\n"
-	  "  list             wy¶wietla listê za³adowanych skryptów\n");
+	  "  list             wy¶wietla listê za³adowanych skryptów");
 #endif
 
 	command_add
@@ -4492,8 +4511,8 @@ void command_init()
 	( "queue", "uu", cmd_queue, 0,
 	  " [opcje]", "zarz±dzanie wiadomo¶ciami do wys³ania po po³±czeniu",
 	  "\n"
-	  " -c, --clear [numer/alias] usuwa podane wiadomo¶ci lub wszystkie\n"
-	  " [numer/alias]             wy¶wietla kolejkê wiadomo¶ci\n"
+	  "  -c, --clear [numer/alias] usuwa podane wiadomo¶ci lub wszystkie\n"
+	  "  [numer/alias]             wy¶wietla kolejkê wiadomo¶ci\n"
 	  "\n"
 	  "Mo¿na u¿yæ tylko wtedy, gdy nie jeste¶my po³±czeni. W przypadku "
 	  "konferencji wy¶wietla wszystkich uczestników.");
@@ -4515,6 +4534,11 @@ void command_init()
 	command_add
 	( "register", "??", cmd_register, 0,
 	  " <email> <has³o>", "rejestruje nowe konto",
+	  "");
+
+	command_add
+	( "reload", "", cmd_reload, 0,
+	  "", "wczytuje na nowo plik konfiguracyjny u¿ytkownika",
 	  "");
 	  
 	command_add
@@ -4621,8 +4645,6 @@ void command_init()
 	  "z której strony wystêpuj± ramki (1 - lewo, 2 - góra, 4 - prawo, "
           "8 - dó³), a komenda okre¶la, jakiej komendy wynik ma byæ "
 	  "wy¶wietlany regularnie w oknie.");
-
-
 
 
 	command_add
