@@ -1494,7 +1494,7 @@ void handle_dcc(struct gg_dcc *d)
 		case GG_EVENT_DCC_ERROR:
 		{
 			struct in_addr addr;
-			short int port = d->remote_port;
+			unsigned short port = d->remote_port;
 			char *tmp;
 		
 			addr.s_addr = d->remote_addr;
