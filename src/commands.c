@@ -714,7 +714,7 @@ COMMAND(cmd_help)
 		for (l = commands; l; l = l->next) {
 			struct command *c = l->data;
 			
-			if (!strcasecmp(c->name, params[0])) {
+			if (!strcasecmp(c->name, params[0]) && !c->alias) {
 			    	char *blah = NULL;
 
 				if (strstr(c->brief_help, "%"))
@@ -745,7 +745,7 @@ COMMAND(cmd_help)
 	for (l = commands; l; l = l->next) {
 		struct command *c = l->data;
 
-		if (isalnum(*c->name)) {
+		if (isalnum(*c->name) && !c->alias) {
 		    	char *blah = NULL;
 
 			if (strstr(c->brief_help, "%"))
@@ -2149,18 +2149,47 @@ static int command_add_compare(void *data1, void *data2)
  *
  * 0 je¶li siê uda³o, -1 je¶li b³±d.
  */
-int command_add(const char *name, const char *params, command_func_t function, const char *params_help, const char *brief_help, const char *long_help)
+int command_add(const char *name, const char *params, command_func_t function, int alias, const char *params_help, const char *brief_help, const char *long_help)
 {
 	struct command c;
 
 	c.name = xstrdup(name);
 	c.params = xstrdup(params);
 	c.function = function;
+	c.alias = alias;
 	c.params_help = xstrdup(params_help);
 	c.brief_help = xstrdup(brief_help);
 	c.long_help = xstrdup(long_help);
 
 	return (list_add_sorted(&commands, &c, sizeof(c), command_add_compare) != NULL);
+}
+
+/*
+ * command_remove()
+ *
+ * usuwa komendê z listy.
+ *
+ *  - name - nazwa komendy.
+ */
+int command_remove(const char *name)
+{
+	list_t l;
+
+	for (l = commands; l; l = l->next) {
+		struct command *c = l->data;
+
+		if (!strcasecmp(name, c->name)) {
+			xfree(c->name);
+			xfree(c->params);
+			xfree(c->params_help);
+			xfree(c->brief_help);
+			xfree(c->long_help);
+			list_remove(&commands, c, 1);
+			return 0;
+		}
+	}
+
+	return -1;
 }
 
 /*
@@ -2183,12 +2212,12 @@ int command_add(const char *name, const char *params, command_func_t function, c
 void command_init()
 {
 	command_add
-	( "add", "U??", cmd_add,
+	( "add", "U??", cmd_add, 0,
 	  " <numer> <alias> [opcje]", "Dodaje u¿ytkownika do listy kontaktów",
 	  "Opcje identyczne jak dla polecenia %Wlist%n (dotycz±ce wpisu)");
 	  
 	command_add
-	( "alias", "??", cmd_alias,
+	( "alias", "??", cmd_alias, 0,
 	  " [opcje]", "Zarz±dzanie aliasami",
 	  "  -a, --add <alias> <komenda>     dodaje alias\n"
           "  -A, --append <alias> <komenda>  dodaje komendê do aliasu\n"
@@ -2196,26 +2225,26 @@ void command_init()
 	  " [-l, --list]                     wy¶wietla listê aliasów");
 	  
 	command_add
-	( "away", "?", cmd_away,
+	( "away", "?", cmd_away, 0,
 	  " [powód]", "Zmienia stan na zajêty",
 	  "Je¶li w³±czona jest odpowiednia opcja %Wrandom_reason%n i nie\n"
           "podano powodu, zostanie wylosowany z pliku %Waway.reasons%n");
 	  
 	command_add
-	( "back", "?", cmd_away,
+	( "back", "?", cmd_away, 0,
 	  " [powód]", "zmienia stan na dostêpny",
           "je¶li w³±czona jest odpowiednia opcja %wrandom_reason%n i nie\n"
 	  "podano powodu, zostanie wylosowany z pliku %wback.reasons%n");
 	  
 	command_add
-	( "bind", "???", cmd_bind,
+	( "bind", "???", cmd_bind, 0,
 	  " <opcja> [sekwencja] [komenda]", "bindowanie klawiszy",
 	  " -a, --add <sekwencja> <komenda>  binduje now± sekwencjê\n"
 	  " -d, --del <sekwencja>            usuwa podan± sekwencjê\n"
 	  " -l, --list                       wy¶wietla zabindowane sekwencje");
 
 	command_add
-	( "change", "?", cmd_change,
+	( "change", "?", cmd_change, 0,
 	  " <opcje>", "zmienia informacje w katalogu publicznym",
 	  "  -f, --first <imiê>\n"
           "  -l, --last <nazwisko>\n"
@@ -2229,22 +2258,22 @@ void command_init()
 	  "nale¿y podaæ %wwszystkie%n opcje.");
 	  
 	command_add
-	( "chat", "u?", cmd_msg,
+	( "chat", "u?", cmd_msg, 0,
 	  " <numer/alias> <wiadomo¶æ>", "wysy³a wiadomo¶æ w ramach rozmowy",
 	  "");
 	  
 	command_add
-	( "cleartab", "", cmd_cleartab,
+	( "cleartab", "", cmd_cleartab, 0,
 	  "", "czy¶ci listê nicków do dope³nienia",
 	  "");
 	  
 	command_add
-	( "connect", "", cmd_connect,
+	( "connect", "", cmd_connect, 0,
 	  "", "³±czy siê z serwerem",
 	  "");
 	  
 	command_add
-	( "dcc", "duf?", cmd_dcc,
+	( "dcc", "duf?", cmd_dcc, 0,
 	  " [opcje]", "obs³uga bezpo¶rednich po³±czeñ",
 	  "  send <numer/alias> <¶cie¿ka>  wysy³a podany plik\n"
 	  "  get [numer/alias/#id]         akceptuje przysy³any plik\n"
@@ -2256,34 +2285,34 @@ void command_init()
 	  "dok³adny opis znajduje siê w pliku %wdocs/dcc.txt%n");
 	  
 	command_add
-	( "del", "u", cmd_del,
+	( "del", "u", cmd_del, 0,
 	  " <numer/alias>", "usuwa u¿ytkownika z listy kontaktów",
 	  "");
 	
 	command_add
-	( "disconnect", "?", cmd_connect,
+	( "disconnect", "?", cmd_connect, 0,
 	  " [powód]", "roz³±cza siê z serwerem",
 	  "je¶li w³±czona jest opcja %wauto_reconnect%n, po wywo³aniu\n"
 	  "tej komendy, program nadal bêdzie próbowa³ siê automatycznie\n"
 	  "³±czyæ po okre¶lonym czasie.");
 	  
 	command_add
-	( "echo", "?", cmd_echo,
+	( "echo", "?", cmd_echo, 0,
 	  " <tekst>", "wy¶wietla podany tekst",
 	  "");
 	  
 	command_add
-	( "exec", "?", cmd_exec,
+	( "exec", "?", cmd_exec, 0,
 	  " <polecenie>", "uruchamia polecenie systemowe",
 	  "poprzedzenie znakiem %w^%n ukryje informacjê o zakoñczeniu.");
 	  
 	command_add
-	( "!", "?", cmd_exec,
+	( "!", "?", cmd_exec, 0,
 	  " <polecenie>", "synonim dla %wexec%n",
 	  "");
 
 	command_add
-	( "find", "u", cmd_find,
+	( "find", "u", cmd_find, 0,
 	  " [opcje]", "przeszukiwanie katalogu publicznego",
 	  "  -u, --uin <numerek>\n"
 	  "  -f, --first <imiê>\n"
@@ -2302,35 +2331,35 @@ void command_init()
 	  "  opcji nie mo¿na ze sob± ³±czyæ");
 	  
 	command_add
-	( "help", "c", cmd_help,
+	( "help", "c", cmd_help, 0,
 	  " [polecenie]", "wy¶wietla informacjê o poleceniach",
 	  "");
 
 #if 0
 	command_add
-        ( "history", "u?", cmd_history,
+        ( "history", "u?", cmd_history, 0,
 	  " <numer/alias> [n]", "wy¶wietla ostatnie wypowiedzi",
 	  "");
 #endif
 	  
 	command_add
-	( "?", "c", cmd_help,
+	( "?", "c", cmd_help, 0,
 	  " [polecenie]", "synonim dla %whelp%n",
 	  "");
 	 
 	command_add
-	( "ignore", "u", cmd_ignore,
+	( "ignore", "u", cmd_ignore, 0,
 	  " [numer/alias]", "dodaje do listy ignorowanych lub j± wy¶wietla",
 	  "");
 	  
 	command_add
-	( "invisible", "?", cmd_away,
+	( "invisible", "?", cmd_away, 0,
 	  " [powód]", "zmienia stan na niewidoczny",
           "je¶li w³±czona jest odpowiednia opcja %wrandom_reason%n i nie\n"
 	  "podano powodu, zostanie wylosowany z pliku %wquit.reasons%n");
 
 	command_add
-	( "list", "u?", cmd_list,
+	( "list", "u?", cmd_list, 0,
           " [alias|opcje]", "zarz±dzanie list± kontaktów",
 	  "\n"
 	  "wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i]\":\n"
@@ -2352,82 +2381,82 @@ void command_init()
 	  "  -g, --get  pobiera z serwera");
 	  
 	command_add
-	( "msg", "u?", cmd_msg,
+	( "msg", "u?", cmd_msg, 0,
 	  " <numer/alias> <wiadomo¶æ>", "wysy³a wiadomo¶æ",
 	  "");
 
 	command_add
-        ( "on", "?u?", cmd_on,
+        ( "on", "?u?", cmd_on, 0,
 	  " <zdarzenie|...> <numer/alias> <akcja>|clear", "obs³uga zdarzeñ",
 	  "szczegó³y dotycz±ce tego polecenia w pliku %wdocs/on.txt%n");
 	 
 	command_add
-	( "passwd", "??", cmd_passwd,
+	( "passwd", "??", cmd_passwd, 0,
 	  " <has³o> <e-mail>", "zmienia has³o i adres e-mail u¿ytkownika",
 	  "");
 
 	command_add
-	( "private", "", cmd_away,
+	( "private", "", cmd_away, 0,
 	  " [on/off]", "w³±cza/wy³±cza tryb ,,tylko dla przyjació³''",
 	  "");
 	  
 	command_add
-	( "query", "u", cmd_query,
+	( "query", "u", cmd_query, 0,
 	  " <numer/alias>", "w³±cza rozmowê z dan± osob±",
 	  "");
 	  
 	command_add
-	( "quit", "?", cmd_quit,
+	( "quit", "?", cmd_quit, 0,
 	  " [powód]", "wychodzi z programu",
 	  "");
 	  
 	command_add
-	( "reconnect", "", cmd_connect,
+	( "reconnect", "", cmd_connect, 0,
 	  "", "roz³±cza i ³±czy ponownie", "");
 	  
 	command_add
-	( "register", "??", cmd_register,
+	( "register", "??", cmd_register, 0,
 	  " <email> <has³o>", "rejestruje nowe konto",
 	  "");
 	  
 	command_add
-	( "remind", "", cmd_remind,
+	( "remind", "", cmd_remind, 0,
 	  "", "wysy³a has³o na skrzynkê pocztow±",
 	  "");
 	  
 	command_add
-	( "save", "", cmd_save,
+	( "save", "", cmd_save, 0,
 	  "", "zapisuje ustawienia programu",
 	  "aktualny stan zostanie zapisany i zostanie przywrócony przy\n"
 	  "nastêpnym uruchomieniu programu");
 	  
 	command_add
-	( "set", "v?", cmd_set,
+	( "set", "v?", cmd_set, 0,
   	  " [-]<zmienna> [warto¶æ]", "wy¶wietla lub zmienia ustawienia",
 	  "u¿ycie ,,set -zmienna'' czy¶ci zawarto¶æ zmiennej.");
 
 	command_add
-	( "sms", "u?", cmd_sms,
+	( "sms", "u?", cmd_sms, 0,
 	  " <numer/alias> <tre¶æ>", "wysy³a smsa do podanej osoby",
 	  "polecenie wymaga zdefiniowana zmiennej %wsms_send_app%n");
 
 	command_add
-	( "status", "", cmd_status,
+	( "status", "", cmd_status, 0,
 	  "", "wy¶wietla aktualny stan",
 	  "");
 
 	command_add
-	( "unignore", "i", cmd_ignore,
+	( "unignore", "i", cmd_ignore, 0,
 	  " <numer/alias>", "Usuwa z listy ignorowanych osób",
 	  "");
 	  
 	command_add
-	( "version", "", cmd_version,
+	( "version", "", cmd_version, 0,
 	  "", "Wy¶wietla wersje programu",
 	  "");
 	  
 	command_add
-	( "window", "??", cmd_window,
+	( "window", "??", cmd_window, 0,
 	  " <komenda> [numer_okna]", "Zarz±dzanie okienkami",
 	  "  new\n"
 	  "  kill [numer_okna]\n"
@@ -2439,22 +2468,22 @@ void command_init()
 	  "  list");
   
 	command_add
-	( "_add", "?", cmd_test_add, "", "",
+	( "_add", "?", cmd_test_add, 0, "", "",
 	  "Dodaje do listy dope³niania TABem");
 	command_add
-	( "_fds", "", cmd_test_fds, "", "",
+	( "_fds", "", cmd_test_fds, 0, "", "",
 	  "Wy¶wietla otwarte deskryptory");
 	command_add
-	( "_msg", "u?", cmd_test_send, "", "",
+	( "_msg", "u?", cmd_test_send, 0, "", "",
 	  "Udaje, ¿e wysy³a wiadomo¶æ");
 	command_add
-	( "_ping", "", cmd_test_ping, "", "",
+	( "_ping", "", cmd_test_ping, 0, "", "",
 	  "Wysy³a pakiet ping do serwera");
 	command_add
-	( "_segv", "", cmd_test_segv, "", "",
+	( "_segv", "", cmd_test_segv, 0, "", "",
 	  "Wywo³uje naruszenie segmentacji pamiêci");
 	command_add
-	( "_watches", "", cmd_test_watches, "", "",
+	( "_watches", "", cmd_test_watches, 0, "", "",
 	  "Wy¶wietla listê sprawdzanych deskryptorów");
 }
 

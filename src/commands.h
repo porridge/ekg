@@ -27,6 +27,7 @@ struct command {
 	char *name;
 	char *params;
 	command_func_t *function;
+	int alias;
 	char *params_help;
 	char *brief_help;
 	char *long_help;
@@ -34,7 +35,8 @@ struct command {
 
 list_t commands;
 
-int command_add(const char *name, const char *params, command_func_t function, const char *params_help, const char *brief_help, const char *long_help);
+int command_add(const char *name, const char *params, command_func_t function, int alias, const char *params_help, const char *brief_help, const char *long_help);
+int command_remove(const char *name);
 void command_init();
 void command_free();
 int command_exec(char *target, char *line);

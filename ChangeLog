@@ -5,6 +5,11 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-08-05
+
+- aliasy naprawione. s± ju¿ traktowane na równi z komendami, wiêc nie
+  powinno byæ sytuacji, gdy komendy dzia³aj±, aliasy nie (w)
+
 // 2002-08-04
 
 - s/ekg_execute/command_exec/ (w)
