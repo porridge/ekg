@@ -12,6 +12,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - przeniesienie contribów z docs/ do contrib/ (w)
 - dodanie contrib/ekgnv.sh ¶ci±gaj±cego i buduj±cego now± wersjê (jojo/w)
 - dodane zmienne ,,away_reason'' oraz ,,random_reason'' (d)
+- poprawka przy ,,display_notify'' (elluin/d)
 
 // 2002-03-27
 

@@ -283,7 +283,8 @@ void handle_notify(struct gg_event *e)
 			cp_to_iso(u->descr);
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
-			my_printf("status_busy_descr", format_user(n->uin), u->descr);
+			if (config_display_notify)
+			    	my_printf("status_busy_descr", format_user(n->uin), u->descr);
 		}
 
 		if (n->status == u->status && n->remote_port == u->port) {
@@ -302,7 +303,8 @@ void handle_notify(struct gg_event *e)
 		    	if (config_log_status)
 			    	put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail");
 			check_event(EVENT_AVAIL, u->uin);
-			my_printf("status_avail", format_user(u->uin));
+			if (config_display_notify)
+			    	my_printf("status_avail", format_user(u->uin));
 			
 			if (config_completion_notify)
 				add_send_nick(u->display);
@@ -312,12 +314,14 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away");
 			check_event(EVENT_AWAY, u->uin);
-			my_printf("status_busy", format_user(n->uin));
+			if (config_display_notify)
+			    	my_printf("status_busy", format_user(n->uin));
 		} else if (n->status == GG_STATUS_INVISIBLE) {
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%ld,%s\n", n->uin, u->display, time(NULL), "invisible");
 		   	check_event(EVENT_INVISIBLE, u->uin); 
-			my_printf("status_invisible", format_user(n->uin));
+			if (config_display_notify)
+			    	my_printf("status_invisible", format_user(n->uin));
 		}
 		
 		n++;
