@@ -79,7 +79,7 @@ int rl_set_key(const char *key, void *function, void *keymap)
 #endif
 
 struct window {
-	int id;
+	int id, act;
 	char *query_nick;
 	char *line[MAX_LINES_PER_SCREEN];
 };
@@ -107,6 +107,7 @@ static int window_make_query(const char *nick);
 static void window_free();
 static struct window *window_find(int id);
 static int window_find_query(const char *qnick);
+static char *window_activity();
 
 static int bind_sequence(const char *seq, const char *command, int quiet);
 static int bind_seq_list();
@@ -529,30 +530,40 @@ static const char *current_prompt()
 	static char buf[80];
 	const char *prompt = buf;
 	int count = list_count(windows);
-	char *tmp;
+	char *tmp, *act = window_activity();
 
         if (window_current->query_nick) {
-		if (count > 1 || window_current->id != 1)
-			tmp = format_string(format_find("readline_prompt_query_win"), window_current->query_nick, itoa(window_current->id));
-		else
+		if (count > 1 || window_current->id != 1) {
+			if (act) {
+				tmp = format_string(format_find("readline_prompt_query_win_act"), window_current->query_nick, itoa(window_current->id), act);
+				xfree(act);
+			} else
+				tmp = format_string(format_find("readline_prompt_query_win"), window_current->query_nick, itoa(window_current->id));
+		} else
 			tmp = format_string(format_find("readline_prompt_query"), window_current->query_nick, NULL);
 		strncpy(buf, tmp, sizeof(buf) - 1);
 		xfree(tmp);
         } else {
-		char *format_win = "readline_prompt_win", *format_nowin = "readline_prompt";
+		char *format_win = "readline_prompt_win", *format_nowin = "readline_prompt", *format_win_act = "readline_prompt_win_act";
 			
 		if (away == 1 || away == 3) {
 			format_win = "readline_prompt_away_win";
 			format_nowin = "readline_prompt_away";
+			format_win_act = "readline_prompt_away_win_act";
 		}
 
 		if (away == 2 || away == 5) {
 			format_win = "readline_prompt_invisible_win";
 			format_nowin = "readline_prompt_invisible";
+			format_win_act = "readline_prompt_invisible_win_act";
 		}
 		
 		if (count > 1 || window_current->id != 1) {
-			tmp = format_string(format_find(format_win), itoa(window_current->id));
+			if (act) {
+				tmp = format_string(format_find(format_win_act), itoa(window_current->id), act);
+				xfree(act);
+			} else
+				tmp = format_string(format_find(format_win), itoa(window_current->id));
 			strncpy(buf, tmp, sizeof(buf) - 1);
 			xfree(tmp);
 		} else
@@ -991,6 +1002,7 @@ static int window_switch(int id)
 	}
 
 	window_current = w;
+	w->act = 0;
 	window_refresh();
 #ifdef HAVE_RL_SET_PROMPT
 	rl_set_prompt(current_prompt());
@@ -1050,6 +1062,15 @@ static int window_write(int id, const char *line)
 			break;
 		}
 
+	if (w != window_current) {
+		w->act = 1;
+#ifdef HAVE_RL_SET_PROMPT
+		rl_set_prompt(current_prompt());
+#else
+		rl_expand_prompt(current_prompt());
+#endif
+	}
+	
         return 0;
 }
 
@@ -1185,7 +1206,37 @@ static void window_free()
 	list_destroy(windows, 1);
 	windows = NULL;
 }
+/*
+ * window_activity()
+ *
+ * zwraca string z actywnymi oknami 
+ */
+static char *window_activity() 
+{
+	string_t s = string_init("");
+	int first = 1;
+	list_t l;
+	char *act = NULL;
 
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data;
+		
+		if (w->act) {
+			if (!first)
+				string_append_c(s, ',');
+			string_append(s, itoa(w->id));
+			first = 0;
+		}
+	}
+
+	if (!first)
+		act = strdup(s->str);
+	
+	string_free(s, 1);
+	
+	return act;
+}
+		
 /*
  * bind_find_command()
  *

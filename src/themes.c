@@ -651,6 +651,11 @@ void theme_init()
 	format_add("readline_prompt_away_win", "%1/ ", 1);
 	format_add("readline_prompt_invisible_win", "%1. ", 1);
 	format_add("readline_prompt_query_win", "%2:%1> ", 1);
+	format_add("readline_prompt_win_act", "%1 (act/%2)%% ", 1);
+	format_add("readline_prompt_away_win_act", "%1 (act/%2)/ ", 1);
+	format_add("readline_prompt_invisible_win_act", "%1 (act/%2). ", 1);
+	format_add("readline_prompt_query_win_act", "%2:%1 (act/%3)> ", 1);
+					
 	format_add("readline_more", "-- Wci¶nij Enter by kontynuowaæ lub Ctrl-D by przerwaæ --", 1);
 
 	/* dla funkcji format_user() */
