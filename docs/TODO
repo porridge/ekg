@@ -14,7 +14,8 @@ biblioteka:
 klient:
 - sensowne wy¶wietlanie mesgów (t³o, wordwrap itp),
 - przewijanie ekranu,
-- query.
+- query,
+- obs³uga nicków ze spacjami.
 
 
 $Id$
