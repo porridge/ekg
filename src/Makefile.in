@@ -1,6 +1,6 @@
 # $Id$
 
-prefix = $(DESTDIR)@prefix@
+prefix = @prefix@
 datadir = @datadir@
 mandir = @mandir@
 exec_prefix = @exec_prefix@
@@ -31,12 +31,12 @@ ioctld:	ioctld.c
 install: all install-ekg @install_ioctld@
 
 install-ekg:
-	$(INSTALL) -d $(bindir)
-	$(INSTALL) -m 755 ekg $(bindir)
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+	$(INSTALL) -m 755 ekg $(DESTDIR)$(bindir)
 
 install-ioctld:
-	$(INSTALL) -d $(bindir)
-	$(INSTALL) -m 4755 ioctld $(bindir)
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+	$(INSTALL) -m 4755 ioctld $(DESTDIR)$(bindir)
 
 #
 
