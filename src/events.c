@@ -2322,6 +2322,8 @@ void handle_image_reply(struct gg_event *e)
 				u->status = GG_STATUS_INVISIBLE_DESCR;
 			else
 				u->status = GG_STATUS_INVISIBLE;
+
+			event_check(EVENT_INVISIBLE, u->uin, u->descr);
 		}
 
 	} else if (e->event.image_request.crc32 == GG_CRC32_INVISIBLE) {
