@@ -1227,6 +1227,9 @@ void ekg_connect()
 		if (server_index >= array_count(servers))
 			server_index = 0;
 
+		if (!servers[server_index])
+			goto skip_server;
+
 		server = sserver = xstrdup(servers[server_index++]);
 
 		if (!strncasecmp(server, "tls:", 4)) {
