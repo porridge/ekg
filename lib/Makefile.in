@@ -1,7 +1,7 @@
 # $Id$
 
 CC = @CC@ 
-CFLAGS = @CFLAGS_LIBGADU@ -I.. -fPIC
+CFLAGS = @CFLAGS_LIBGADU@ -I.. -fPIC -Wall
 LIBS = @LIBS_LIBGADU@
 
 MAKE = @MAKE@

@@ -3,7 +3,8 @@
 /*
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>,
  *                          Robert J. Wo¼ny <speedy@ziew.org>,
- *                          Arkadiusz Mi¶kiewicz <misiek@pld.ORG.PL>
+ *                          Arkadiusz Mi¶kiewicz <misiek@pld.org.pl>,
+ *                          Tomasz Chiliñski <chilek@chilan.com>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License Version

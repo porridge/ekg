@@ -10,6 +10,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - du¿e poprawki configure.in, */Makefile.in, przygotowuj±ce pod
   osobn± dystrybucjê libgadu (w)
 - drobne poprawki dcc (w)
+- dodanie -Wall (w)
+- ,,dcc send 12345 plik --reverse'' wysy³a pasywnie bez wzglêdu na to
+  czy klient jest za maskarad± czy nie (w)
 
 // 2002-06-10
 

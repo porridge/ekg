@@ -96,7 +96,7 @@ struct command commands[] = {
 	{ "chat", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ w ramach rozmowy", "" },
 	{ "cleartab", "", command_cleartab, "", "Czy¶ci listê nicków do dope³nienia", "" },
 	{ "connect", "", command_connect, "", "£±czy siê z serwerem", "" },
-	{ "dcc", "duf", command_dcc, " [opcje]", "Obs³uga bezpo¶rednich po³±czeñ", "  send <numer/alias> <¶cie¿ka>\n  get [numer/alias]\n  close [numer/alias/id]\n  show\n" },
+	{ "dcc", "duf?", command_dcc, " [opcje]", "Obs³uga bezpo¶rednich po³±czeñ", "  send <numer/alias> <¶cie¿ka>\n  get [numer/alias]\n  close [numer/alias/id]\n  show\n" },
 	{ "del", "u", command_del, " <numer/alias>", "Usuwa u¿ytkownika z listy kontaktów", "" },
 	{ "disconnect", "?", command_connect, " [powód]", "Roz³±cza siê z serwerem", "" },
 	{ "exec", "?", command_exec, " <polecenie>", "Uruchamia polecenie systemowe", "" },
@@ -1605,7 +1605,7 @@ COMMAND(command_dcc)
 		t.filename = strdup(params[2]);
 		t.dcc = NULL;
 
-		if (u->port < 10) {
+		if (u->port < 10 || params[3] && !strcmp(params[3], "--reverse")) {
 			/* nie mo¿emy siê z nim po³±czyæ, wiêc on spróbuje */
 			gg_dcc_request(sess, uin);
 		} else {

@@ -5,14 +5,14 @@ datadir = @datadir@
 mandir = @mandir@
 
 CC = @CC@ 
-CFLAGS = @CFLAGS@ -I.. -I../lib -DTHEMES_DIR=\"$(datadir)/ekg/themes\"
-LIBS = @LIBS@ ../lib/libgadu.a
+CFLAGS = @CFLAGS@ -I.. -I../lib -DTHEMES_DIR=\"$(datadir)/ekg/themes\" -Wall
+LIBS = @LIBS@
 
 MAKE = @MAKE@
 AR = @AR@
 INSTALL = @INSTALL@
 
-OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o ekg.o
+OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o ekg.o ../lib/libgadu.a
 
 #
 
