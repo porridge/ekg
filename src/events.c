@@ -558,6 +558,9 @@ void handle_msg(struct gg_event *e)
 	else
 		add_send_nick(itoa(e->event.msg.sender));
 
+	if (u && GG_S_NA(u->status))
+		u->last_seen = time(NULL);
+
 	if (!hide) {
 		print_message(e, u, chat, secure);
 
@@ -1721,6 +1724,7 @@ void handle_search50(struct gg_event *e)
 		char *name, *active, *gender;
 
 		const char *target = NULL;
+		struct userlist *u = userlist_find(atoi(uin), NULL);
 
 		cp_to_iso(firstname);
 		cp_to_iso(lastname);
@@ -1772,6 +1776,9 @@ void handle_search50(struct gg_event *e)
 		print_window(target, 0, __format(""), uin, name, nickname, city, birthyear, gender, active);
 
 #undef __format
+
+		if (u && GG_S_I(status))
+			u->last_seen = time(NULL);
 
 		xfree(name);
 		xfree(active);
