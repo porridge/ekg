@@ -1208,7 +1208,7 @@ struct conference *conference_create(const char *nicks)
 {
 	struct conference *c;
 	static int count = 1;
-	char *name = saprintf("#%d", count++);
+	char *name = saprintf("#conf%d", count++);
 
 	c = conference_add(name, nicks, 0);
 

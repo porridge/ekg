@@ -1057,6 +1057,8 @@ static void update_input()
 		line = xmalloc(LINE_MAXLEN);
 		strcpy(line, "");
 
+		history[0] = line;
+
 		line_start = 0;
 		line_index = 0; 
 		lines_start = 0;
