@@ -534,6 +534,9 @@ void handle_msg(struct gg_event *e)
 		    
 			play_sound(config_sound_sysmsg_file);
 			config_last_sysmsg = e->event.msg.msgclass;
+
+			xfree(config_server);
+			config_server = NULL;
 		}
 
 		return;
