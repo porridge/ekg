@@ -9,6 +9,7 @@ zg³osi³ b³±d.
 // 2003-04-18
 
 - poprawka zachowania /find (mateusza/w)
+- nieblokuj±ca obs³uga klawiatury w ncurses (FIG/w)
 
 // 2003-04-17
 

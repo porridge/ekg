@@ -1954,6 +1954,7 @@ void ui_ncurses_init()
 	status = newwin(1, stdscr->_maxx + 1, stdscr->_maxy - 1, 0);
 	input = newwin(1, stdscr->_maxx + 1, stdscr->_maxy, 0);
 	keypad(input, TRUE);
+	nodelay(input, TRUE);
 
 	start_color();
 
@@ -3232,10 +3233,8 @@ static void ui_ncurses_loop()
 
 		ch = ekg_getch(0);
 
-		if (ch == -1) {		/* stracony terminal */
-			ekg_exit();
+		if (ch == -1)		/* dziwny b³±d? */
 			continue;
-		}
 
 		if (ch == -2)		/* python ka¿e ignorowaæ */
 			continue;
