@@ -2,6 +2,7 @@
 
 /*
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ * 			    Piotr Kupisiewicz <deli@rzepaknet.us>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -1072,9 +1073,9 @@ void theme_init()
 	format_add("conn_stopped", "%! Przerwano ³±czenie\n", 1);
 	format_add("conn_timeout", "%! Przekroczono limit czasu operacji ³±czenia z serwerem\n", 1);
 	format_add("connected", "%> Po³±czono\n", 1);
-	format_add("connected_descr", "%> Po³±czono: %T%1%n%2\n", 1);
+	format_add("connected_descr", "%> Po³±czono: %T%1%n\n", 1);
 	format_add("disconnected", "%> Roz³±czono\n", 1);
-	format_add("disconnected_descr", "%> Roz³±czono: %T%1%n%2\n", 1);
+	format_add("disconnected_descr", "%> Roz³±czono: %T%1%n\n", 1);
 	format_add("already_connected", "%! Klient jest ju¿ po³±czony. Wpisz %Treconnect%n aby po³±czyæ ponownie\n", 1);
 	format_add("during_connect", "%! £±czenie trwa. Wpisz %Tdisconnect%n aby przerwaæ\n", 1);
 	format_add("conn_broken", "%! Po³±czenie zosta³o przerwane\n", 1);
