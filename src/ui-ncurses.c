@@ -3783,6 +3783,7 @@ static void binding_default()
 	binding_add("Ctrl-D", "delete-char", 1, 1);
 	binding_add("Delete", "delete-char", 1, 1);
 	binding_add("Ctrl-E", "end-of-line", 1, 1);
+	binding_add("End", "end-of-line", 1, 1);
 	binding_add("Ctrl-K", "kill-line", 1, 1);
 	binding_add("Ctrl-Y", "yank", 1, 1);
 	binding_add("Enter", "accept-line", 1, 1);

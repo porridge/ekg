@@ -3117,42 +3117,31 @@ void sms_away_free()
  */
 int ioctld_parse_seq(const char *seq, struct action_data *data)
 {
-        char tmp_buff[16] = "";
-        int i = 0, a, l = 0, default_delay = DEFAULT_DELAY;
+	char **entries;
+	int i;
 
-        if (!data || !seq || !isdigit(seq[0]))
+        if (!data || !seq)
                 return -1;
 
-        for (a = 0; a <= strlen(seq) && a < MAX_ITEMS; a++) {
-                if (i > 15)
-			return -1;
-                if (isdigit(seq[a]))
-                        tmp_buff[i++] = seq[a];
-                else if (seq[a] == '/') {
-                        data->value[l] = atoi(tmp_buff);
-                        memset(tmp_buff, 0, 16);
-                        for (i = 0; isdigit(seq[++a]); i++)
-                                tmp_buff[i] = seq[a];
-                        data->delay[l] = default_delay = atoi(tmp_buff);
-                        memset(tmp_buff, 0, 16);
-                        i = 0;
-                        l++;
-                }
-                else if (seq[a] == ',') {
-                        data->value[l] = atoi(tmp_buff);
-                        data->delay[l] = default_delay;
-                        memset(tmp_buff, 0, 16);
-                        i = 0;
-                        l++;
-                } else if (seq[a] == ' ')
-                        continue;
-                else if (seq[a] == '\0') {
-                        data->value[l] = atoi(tmp_buff);
-                        data->delay[l] = default_delay;
-                        data->value[++l] = data->delay[l] = -1;
-                } else
-			return -1;
-        }
+	memset(data, 0, sizeof(struct action_data));
+
+	entries = array_make(seq, ",", 0, 0, 1);
+
+	for (i = 0; entries[i] && i < IOCTLD_MAX_ITEMS; i++) {
+		int delay;
+		char *tmp;
+		
+		if ((tmp = strchr(entries[i], '/'))) {
+			*tmp = 0;
+			delay = atoi(tmp + 1);
+		} else
+			delay = IOCTLD_DEFAULT_DELAY;
+			
+		data->value[i] = atoi(entries[i]);
+		data->delay[i] = delay;
+	}
+
+	array_free(entries);
 
 	return 0;
 }
@@ -3169,7 +3158,7 @@ int ioctld_parse_seq(const char *seq, struct action_data *data)
 int ioctld_socket(char *path)
 {
 	struct sockaddr_un sockun;
-	int i, retry = 5, usecs = 50000;
+	int i, usecs = 50000;
 
 	if (ioctld_sock != -1)
 		close(ioctld_sock);
@@ -3180,9 +3169,10 @@ int ioctld_socket(char *path)
 	sockun.sun_family = AF_UNIX;
 	strcpy(sockun.sun_path, path);
 
-	for (i = 0; i <= retry; i++) {
+	for (i = 5; i; i--) {
 		if (connect(ioctld_sock, (struct sockaddr*) &sockun, sizeof(sockun)) != -1)
 			return 0;
+
 		usleep(usecs);
 	}
 
@@ -3201,22 +3191,25 @@ int ioctld_socket(char *path)
  */
 int ioctld_send(const char *seq, int act, int quiet)
 {
-	const char *s;
 	struct action_data data;
 
-	if (*seq == '$') {
+	if (*seq == '$')	/* dla kompatybilno¶ci ze starym zachowaniem */
 		seq++;
-		s = format_find(seq);
-		if (!strcmp(s, "")) {
+
+	if (!isdigit(*seq)) {
+		const char *tmp = format_find(seq);
+
+		if (!strcmp(tmp, "")) {
 			printq("events_seq_not_found", seq);
 			return -1;
 		}
-	} else
-		s = seq;
+
+		seq = tmp;
+	}
 
 	data.act = act;
 
-	if (ioctld_parse_seq(s, &data)) {
+	if (ioctld_parse_seq(seq, &data)) {
 		printq("events_seq_incorrect", seq);
 		return -1;
 	}

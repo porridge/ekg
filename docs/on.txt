@@ -41,9 +41,8 @@ on [opcje]
                       g³o¶niczku. tony s± oddzielane przecinkami, odstêpy czasu,
                       tak jak przy blink_leds wystêpujê po znaku '/'.
 
-		dodatkowo przy blink_leds i beeps_spk, je¿eli sekwencja zacznie
-		siê od znaku '$', bêdzie ona poszukiwana w themes (przyk³adem
-		jest standardowe blah.led dla blink_leds).
+		dodatkowo przy blink_leds i beeps_spk mo¿emy podaæ sekwencjê
+		z themu -- zamiast liczb nale¿y podaæ nazwê formatu.
 
 		mo¿na podaæ wiêcej komend, oddzielaj±c je ¶rednikiem.
 

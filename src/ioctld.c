@@ -66,7 +66,7 @@ int blink_leds(int *flag, int *delay)
 		fd = STDOUT_FILENO;
 #endif
 
-	for (s = 0; flag[s] >= 0 && s <= MAX_ITEMS; s++) {
+	for (s = 0; flag[s] >= 0 && s <= IOCTLD_MAX_ITEMS; s++) {
 #ifdef sun
 		int leds = 0;
 		/* tak.. na sunach jest to troszkê inaczej */
@@ -81,7 +81,7 @@ int blink_leds(int *flag, int *delay)
 #else
 	    	ioctl(fd, KDSETLED, flag[s]);
 #endif 
-		if (delay[s] && delay[s] <= MAX_DELAY)
+		if (delay[s] && delay[s] <= IOCTLD_MAX_DELAY)
 			usleep(delay[s]);
 	}
 
@@ -107,7 +107,7 @@ int beeps_spk(int *tone, int *delay)
 		fd = STDOUT_FILENO;
 #endif
 		
-	for (s = 0; tone[s] >= 0 && s <= MAX_ITEMS; s++) {
+	for (s = 0; tone[s] >= 0 && s <= IOCTLD_MAX_ITEMS; s++) {
 
 #ifdef __FreeBSD__
 		ioctl(fd, KIOCSOUND, 0);
@@ -120,7 +120,7 @@ int beeps_spk(int *tone, int *delay)
 		putchar('\a');
 		fflush(stdout);
 #endif
-		if (delay[s] && delay[s] <= MAX_DELAY)
+		if (delay[s] && delay[s] <= IOCTLD_MAX_DELAY)
 			usleep(delay[s]);
 	}
 

@@ -22,14 +22,14 @@
 #ifndef __IOCTLD_H
 #define __IOCTLD_H
 
-#define MAX_ITEMS 	50
-#define MAX_DELAY 	2000000
-#define DEFAULT_DELAY 	100000
+#define IOCTLD_MAX_ITEMS 	50
+#define IOCTLD_MAX_DELAY 	2000000
+#define IOCTLD_DEFAULT_DELAY 	100000
 
 struct action_data {
 	int act;
-	int value[MAX_ITEMS];
-	int delay[MAX_ITEMS];
+	int value[IOCTLD_MAX_ITEMS];
+	int delay[IOCTLD_MAX_ITEMS];
 };
 
 enum {

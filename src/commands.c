@@ -4571,10 +4571,27 @@ void command_init()
 #ifdef WITH_IOCTLD
 	command_add
 	( "beeps_spk", "?", cmd_beeps_spk, 0,
-	  " <sekwencja>", "wydaje d¼wiêki zgodnie z sekwencj±", "");
+	  " <sekwencja>", "wydaje d¼wiêki zgodnie z sekwencj±",
+	  "\n"
+	  "Kolejne d¼wiêki oddzielone s± przecinkami. D¼wiêk sk³ada siê "
+	  "z tonu w hercach i d³ugo¶ci trwania w mikrosekundach oddzielonej "
+	  "uko¶nikiem (%T/%n). Je¶li nie podano czasu trwania, domy¶lna "
+	  "warto¶æ to 0,1s.\n"
+	  "\n"
+	  "Zamiast sekwencji mo¿na podaæ nazwê formatu z themu.");
 	command_add
 	( "blink_leds", "?", cmd_blink_leds, 0,
-	  " <sekwencja>", "odtwarza sekwencjê na diodach LED", "");
+	  " <sekwencja>", "odtwarza sekwencjê na diodach LED",
+	  "\n"
+	  "Kombinacje diod oddzielone s± przecinkami. Je¶li po kombinacji "
+	  "wystêpuje znak uko¶nika (%T/%n), po nim podany jest czas trwania "
+	  "w mikrosekundach. Domy¶lny czas trwania to 0,1s. Kombinacja jest "
+	  "map± bitow± o nastêpuj±cych "
+	  "warto¶ciach: 1 - NumLock, 2 - ScrollLock, 4 - CapsLock. Na "
+	  "przyk³ad w³±czenie NumLock i CapsLock jednocze¶nie to 1+4 czyli "
+	  "5.\n"
+	  "\n"
+	  "Zamiast sekwencji mo¿na podaæ nazwê formatu z themu.");
 #endif
 	command_add
 	( "play", "f", cmd_play, 0,

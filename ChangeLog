@@ -21,6 +21,9 @@ zg³osi³ b³±d.
 - libgadu: usuniêcie kodu gg_search50() (w)
 - libgadu: usuniêcie kodu gg_search() i zast±pienie go funkcjami
   zwracaj±cymi b³±d (w)
+- poprawka klawisza End (Brzezi/w)
+- rewrite kodu parsowania zdarzeñ dla ioctld (w)
+- poprawki helpów nowych komend (w)
 
 // 2003-01-29
 
