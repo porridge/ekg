@@ -1143,6 +1143,15 @@ COMMAND(cmd_set)
 		arg++;
 	}
 
+	if (params[1]) {
+		char **tmp = array_make(params[1], "", 0, 0, 1);
+
+		xfree(params[1]);
+		params[1] = tmp[0];
+		tmp[0] = NULL;
+		array_free(tmp);
+	}
+
 	if ((!params[0] || !params[1]) && !unset) {
 		for (l = variables; l; l = l->next) {
 			struct variable *v = l->data;
@@ -2526,7 +2535,7 @@ void command_init()
 	  
 	command_add
 	( "chat", "u?", cmd_msg, 0,
-	  " <numer/alias/@grupa> <wiadomo¶æ>", "wysy³a wiadomo¶æ w ramach rozmowy",
+	  " <numer/alias/@grupa> <wiadomo¶æ>", "wysy³a wiadomo¶æ w rozmowie",
 	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub\n"
 	  "pseudonimy przecinkiem (ale bez odstêpów). W takim wypadku\n"
 	  "zostanie rozpoczêta rozmowa grupowa.");
@@ -2711,7 +2720,7 @@ void command_init()
 	  "U¿ycie %Tset -zmienna%n czy¶ci zawarto¶æ zmiennej. Dla zmiennych\n"
 	  "bêd±cymi mapami bitowymi mo¿na okre¶liæ, czy warto¶æ ma byæ\n"
 	  "dodana (poprzedzone plusem), usuniêta (minusem) czy ustawiona\n"
-	  "(bez prefiksu).");
+	  "(bez prefiksu). Warto¶æ zmiennej mo¿na wzi±æ w cudzys³ów.");
 
 	command_add
 	( "sms", "u?", cmd_sms, 0,

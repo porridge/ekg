@@ -275,6 +275,43 @@ static struct window *window_new(const char *target)
 }
 
 /*
+ * print_timestamp()
+ *
+ * wy¶wietla timestamp na pocz±tku linii, je¶li trzeba.
+ */
+int print_timestamp(struct window *w)
+{
+	struct tm *tm;
+	char buf[80];
+	time_t t;
+	int i, x = 0, attr, pair;
+
+	if (!config_timestamp) {
+		set_cursor(w);
+		return 0;
+	}
+
+	t = time(NULL);
+	tm = localtime(&t);
+	strftime(buf, sizeof(buf), config_timestamp, tm);
+
+	wattr_get(w->window, &attr, &pair, NULL);
+
+	wattrset(w->window, A_NORMAL);
+
+	set_cursor(w);
+
+	for (i = 0; i < strlen(buf); i++) {
+		waddch(w->window, buf[i]);
+		x++;
+	}
+
+	wattrset(w->window, COLOR_PAIR(pair) | attr);
+
+	return x;
+}
+
+/*
  * ui_ncurses_print()
  *
  * wy¶wietla w podanym okienku, co trzeba.
@@ -328,24 +365,6 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 		update_statusbar();
 	}
 
-#if 0
-	if (config_timestamp) {
-		time_t t;
-		struct tm *tm;
-		char buf[80];
-		int i;
-
-		t = time(NULL);
-		tm = localtime(&t);
-		strftime(buf, sizeof(buf), config_timestamp, tm);
-
-		for (i = 0; i < strlen(buf); i++) {
-			waddch(w->window, buf[i]);
-			x++;
-		}
-	}
-#endif
-	
 	for (p = line; *p; p++) {
 		if (*p == 27) {
 			p++;
@@ -383,20 +402,18 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 			if (!*(p + 1))
 				break;
 			w->y++;
-			x = 0;
-			set_cursor(w);
+			x = print_timestamp(w);
 		} else {
 			if (!x)
-				set_cursor(w);
+				x += print_timestamp(w);
 			waddch(w->window, (unsigned char) *p);
 			x++;
 			if (x == stdscr->_maxx + 1) {
-				if (*(p + 1) == 10) 
+				if (*(p + 1) == 10)
 					p++;
 				else
 					w->y++;
-				x = 0;
-				set_cursor(w);
+				x += print_timestamp(w);
 			}
 		}
 	}
@@ -404,7 +421,6 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	w->y++;
 	
 	window_refresh();
-	wnoutrefresh(status);
 	wnoutrefresh(input);
 	doupdate();
 }
@@ -1769,7 +1785,6 @@ static int ui_ncurses_event(const char *event, ...)
 				wmove(w->window, w->y, 0);
 
 				window_refresh();
-				wnoutrefresh(status);
 				wnoutrefresh(input);
 				doupdate();
 
