@@ -5,15 +5,12 @@ zacznê byæ niemi³y. --w
 biblioteka:
 - komunikacja miêdzy klientami, w tym wysy³anie plików i odbieranie plików,
 - konferencje,
-- zmiana informacji w katalogu publicznym,
 - uaktualniæ dokumentacjê,
 
 klient:
-- przewijanie ekranu,
-- okienka,
-- obs³uga nicków ze spacjami,
+- przewijanie ekranu, okienka,
 - proste rozpoznawanie p³ci,
-- uzupe³niæ dope³nienia,
+- uzupe³niæ dope³nienia (w tym nicki ze spacjami),
 
 
 $Id$

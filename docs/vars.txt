@@ -231,11 +231,6 @@ default_status
 	po uruchomieniu i pierwszym po³±czeniu. zachowywana przy poleceniu
 	,,save''.
 
-bold_font
-	typ: tekst, zmienna wewnêtrzna, ukryta
-
-	dla zachowania zgodno¶ci z GNU Gadu autorstwa Igora Popika.
-
 debug
 	typ: bool, zmienna wewnêtrzna, ukryta
 

@@ -53,14 +53,14 @@ typedef unsigned long uin_t;
 	void (*destroy)(x*); 	/* funkcja niszczenia */
 
 struct gg_common {
-	gg_common_head(struct gg_common);
+	gg_common_head(struct gg_common)
 };
 
 /*
  * struktura opisuj±ca dan± sesjê. tworzona przez gg_login().
  */
 struct gg_session {
-	gg_common_head(struct gg_session);
+	gg_common_head(struct gg_session)
 
         int async;      	/* czy po³±czenie jest asynchroniczne */
 	int pid;        	/* pid procesu resolvera */
@@ -89,7 +89,7 @@ struct gg_session {
  * ogólna struktura opisuj±ca stan wszystkich operacji http.
  */
 struct gg_http {
-	gg_common_head(struct gg_http);
+	gg_common_head(struct gg_http)
 
         int async;              /* czy po³±czenie asynchroniczne */
 	int pid;                /* pid procesu resolvera */
@@ -128,7 +128,9 @@ struct gg_file_info {
  * struktura opisuj±ca nas³uchuj±ce gniazdo po³±czeñ miêdzy klientami.
  */
 struct gg_dcc {
-	gg_common_head(struct gg_dcc);
+	gg_common_head(struct gg_dcc)
+
+	struct gg_event *event;	/* opis zdarzenia */
 
 	int active;		/* czy to my siê ³±czymy? */
 	int port;		/* port, na którym siedzi */
@@ -414,7 +416,31 @@ struct gg_pubdir {
 	uin_t uin;		/* otrzymany numerek. 0 je¶li b³±d */
 };
 
-struct gg_modify {
+/* ogólne funkcje, nie powinny byæ u¿ywane */
+int gg_pubdir_watch_fd(struct gg_http *f);
+void gg_pubdir_free(struct gg_http *f);
+#define gg_free_pubdir gg_pubdir_free
+
+/* rejestracja nowego numerka */
+struct gg_http *gg_register(char *email, char *password, int async);
+#define gg_register_watch_fd gg_pubdir_watch_fd
+#define gg_register_free gg_pubdir_free
+#define gg_free_register gg_pubdir_free
+
+/* przypomnienie has³a e-mailem */
+struct gg_http *gg_remind_passwd(uin_t uin, int async);
+#define gg_remind_passwd_watch_fd gg_pubdir_watch_fd
+#define gg_remind_passwd_free gg_pubdir_free
+#define gg_free_remind_passwd gg_pubdir_free
+
+/* zmiana has³a */
+struct gg_http *gg_change_passwd(uin_t uin, char *passwd, char *newpasswd, char *newemail, int async);
+#define gg_change_passwd_watch_fd gg_pubdir_watch_fd
+#define gg_change_passwd_free gg_pubdir_free
+#define gg_free_change_passwd gg_pundir_free
+
+/* zmiana informacji w katalogu publicznym */
+struct gg_change_info_request {
 	char *first_name;	/* imiê */
 	char *last_name;	/* nazwisko */
 	char *nickname;		/* pseudonim */
@@ -424,28 +450,13 @@ struct gg_modify {
 	char *city;		/* miasto */
 };
 
-struct gg_http *gg_register(char *email, char *password, int async);
-#define gg_register_watch_fd gg_pubdir_watch_fd
-#define gg_register_free gg_free_pubdir
-#define gg_free_register gg_free_pubdir
+struct gg_change_info_request *gg_change_info_request_new(char *first_name, char *last_name, char *nickname, char *email, int born, int gender, char *city);
+void gg_change_info_request_free(struct gg_change_info_request *r);
 
-struct gg_http *gg_remind_passwd(uin_t uin, int async);
-#define gg_remind_passwd_watch_fd gg_pubdir_watch_fd
-#define gg_remind_passwd_free gg_free_pubdir
-#define gg_free_remind_passwd gg_free_pubdir
-
-struct gg_http *gg_change_passwd(uin_t uin, char *passwd, char *newpasswd, char *newemail, int async);
-#define gg_change_passwd_watch_fd gg_pubdir_watch_fd
-#define gg_change_passwd_free gg_free_pubdir
-#define gg_free_change_passwd gg_free_pubdir
-
-struct gg_http *gg_change_pubdir(uin_t uin, char *passwd, struct gg_modify *modify, int async);
+struct gg_http *gg_change_info(uin_t uin, char *passwd, struct gg_change_info_request *request, int async);
 #define gg_change_pubdir_watch_fd gg_pubdir_watch_fd
-#define gg_change_pubdir_free gg_free_pubdir
-#define gg_free_change_pubdir gg_free_pubdir
-
-int gg_pubdir_watch_fd(struct gg_http *f);
-void gg_free_pubdir(struct gg_http *f);
+#define gg_change_pubdir_free gg_pubdir_free
+#define gg_free_change_pubdir gg_pubdir_free
 
 /*
  * FUNKCJE DOTYCZ¡CE LISTY KONTAKTÓW NA SERWERZE
@@ -471,12 +482,14 @@ int gg_dcc_request(struct gg_session *sess, uin_t uin);
 struct gg_dcc *gg_dcc_send_file(unsigned long ip, unsigned short port, uin_t my_uin, uin_t peer_uin);
 int gg_dcc_fill_file_info(struct gg_dcc *d, char *filename);
 
-struct gg_dcc *gg_dcc_create_socket(uin_t uin, unsigned int port);
-#define gg_free_dcc_socket gg_free_dcc
+struct gg_dcc *gg_dcc_socket_create(uin_t uin, unsigned int port);
+#define gg_dcc_socket_free gg_free_dcc
+#define gg_dcc_socket_watch_fd gg_dcc_watch_fd
+
 struct gg_event *gg_dcc_watch_fd(struct gg_dcc *d);
 
-void gg_free_dcc(struct gg_dcc *c);
-#define gg_dcc_free gg_free_dcc
+void gg_dcc_free(struct gg_dcc *c);
+#define gg_free_dcc gg_dcc_free
 
 /*
  * je¶li chcemy sobie podebugowaæ, wystarczy ustawiæ `gg_debug_level'.

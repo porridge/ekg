@@ -45,6 +45,12 @@ struct gg_http *gg_userlist_get(uin_t uin, char *passwd, int async)
 	struct gg_http *h;
 	char *form, *query, *__passwd;
 
+	if (!passwd) {
+		gg_debug(GG_DEBUG_MISC, "=> userlist_get, NULL parameter\n");
+		errno = EINVAL;
+		return NULL;
+	}
+
 	if (!(__passwd = gg_urlencode(passwd))) {
 		gg_debug(GG_DEBUG_MISC, "=> userlist_get, not enough memory for form fields\n");
 		free(__passwd);
@@ -179,6 +185,12 @@ struct gg_http *gg_userlist_put(uin_t uin, char *passwd, char *contacts, int asy
 {
 	struct gg_http *h;
 	char *form, *query, *__passwd, *__contacts = NULL;
+
+	if (!passwd || !contacts) {
+		gg_debug(GG_DEBUG_MISC, "=> userlist_put, NULL parameter\n");
+		errno = EINVAL;
+		return NULL;
+	}
 
 	if (!(__passwd = gg_urlencode(passwd)) || !(__contacts = gg_urlencode(contacts))) {
 		gg_debug(GG_DEBUG_MISC, "=> userlist_put, not enough memory for form fields\n");

@@ -67,7 +67,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_sms(), command_find(), command_modify(), command_cleartab(),
 	command_status(), command_register(), command_test_watches(),
 	command_remind(), command_dcc(), command_query(), command_passwd(),
-	command_test_ping(), command_on(), command_test_userlist();
+	command_test_ping(), command_on();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -101,9 +101,8 @@ struct command commands[] = {
 	{ "?", "c", command_help, " [polecenie]", "Synonim dla %Whelp%n", "" },
 	{ "ignore", "u", command_ignore, " [numer/alias]", "Dodaje do listy ignorowanych lub j± wy¶wietla", "" },
 	{ "invisible", "", command_away, "", "Zmienia stan na niewidoczny", "" },
-	{ "list", "u", command_list, " [alias|opcje]", "Wy¶wietla listê kontaktów lub informacje o osobie", "  --active\n  --busy\n  --inactive\n" },
+	{ "list", "u", command_list, " [alias|opcje]", "Zarz±dzanie list± kontaktów", "--active\n  --busy\n  --inactive\n\n  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n  --display <nazwa>  // wy¶wietlana nazwa\n  --phone <telefon>\n  --uin <numerek>\n  --group [+/-]<grupa>\n\n  --put\n  --get" },
 	{ "msg", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ do podanego u¿ytkownika", "" },
-	{ "modify", "u?", command_modify, " <alias> [opcje]", "Zmienia informacje w li¶cie kontaktów", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n  --display <nazwa>  // wy¶wietlana nazwa\n  --phone <telefon>\n  --uin <numerek>\n  \n  --group [+/-]<grupa>" },
         { "on", "?u?", command_on, " <zdarzenie|...> <numer/alias> <akcja>|clear", "Dodaje lub usuwa zdarzenie", "" },
 	{ "passwd", "??", command_passwd, " <has³o> <e-mail>", "Zmienia has³o i adres e-mail u¿ytkownika", "" },
 	{ "private", "", command_away, " [on/off]", "W³±cza/wy³±cza tryb ,,tylko dla przyjació³''", "" },
@@ -122,8 +121,6 @@ struct command commands[] = {
 	{ "_add", "?", command_test_add, "", "", "" },
 	{ "_watches", "", command_test_watches, "", "", "" },
 	{ "_ping", "", command_test_ping, "", "", "" },
-	{ "_ul_put", "", command_test_userlist, "", "", "" },
-	{ "_ul_get", "", command_test_userlist, "", "", "" },
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 
@@ -957,6 +954,12 @@ COMMAND(command_list)
 			return 0;
 		}
 
+		/* list <alias> [opcje] */
+		if (params[1]) {
+			command_modify("modify", params);
+			return 0;
+		}
+
 		groups = group_to_string(u->groups);
 		
 		my_printf("user_info", u->first_name, u->last_name, u->nickname, u->display, u->mobile, groups);
@@ -966,12 +969,50 @@ COMMAND(command_list)
 		return 0;
 	}
 
+	/* list --get */
+	if (params[0] && (!strncasecmp(params[0], "-g", 2) || !strncasecmp(params[0], "--g", 3))) {
+		struct gg_http *h;
+		
+		if (!(h = gg_userlist_get(config_uin, config_password, 1))) {
+			my_printf("userlist_get_error", strerror(errno));
+			return 0;
+		}
+		
+		list_add(&watches, h, 0);
+		
+		return 0;
+	}
+
+	/* list --put */
+	if (params[0] && (!strncasecmp(params[0], "-p", 2) || !strncasecmp(params[0], "--p", 3))) {
+		struct gg_http *h;
+		char *contacts = userlist_dump();
+		
+		if (!contacts) {
+			my_printf("userlist_put_error", strerror(ENOMEM));
+			return 0;
+		}
+		
+		if (!(h = gg_userlist_put(config_uin, config_password, contacts, 1))) {
+			my_printf("userlist_put_error", strerror(errno));
+			return 0;
+		}
+		
+		free(contacts);
+		
+		list_add(&watches, h, 0);
+
+		return 0;
+	}
+
+	/* list --active | --busy | --inactive */
         if (params[0] && (argv = array_make(params[0], " \t", 0, 1, 1))) {
 		int i;
 
 		for (i = 0; argv[i]; i++) {
 			if (argv[i][0] == '-' && argv[i][1] == '-')
 				argv[i]++;
+			
 			if (argv[i][0] == '-' && argv[i][1] == 'a') {
 				show_all = 0;
 				show_active = 1;
@@ -1216,10 +1257,7 @@ COMMAND(command_dcc)
 	struct list *l;
 	uin_t uin;
 
-	if (!params[0])
-		params[0] = "show";
-
-	if (!strncasecmp(params[0], "sh", 2)) {		/* show */
+	if (!params[0] || !strncasecmp(params[0], "sh", 2)) {	/* show */
 		int pending = 0, active = 0;
 
 		if (params[1] && params[1][0] == 'd') {	/* show debug */
@@ -1637,33 +1675,6 @@ COMMAND(command_on)
         add_event(flags, uin, params[2]);
         config_changed = 1;
         return 0;
-}
-
-COMMAND(command_test_userlist)
-{
-	struct gg_http *h;
-	
-	if (!strstr(name, "get")) {
-		char *contacts = userlist_dump();
-		if (!contacts) {
-			my_printf("userlist_put_error", strerror(ENOMEM));
-			return 0;
-		}
-		if (!(h = gg_userlist_put(config_uin, config_password, contacts, 1))) {
-			my_printf("userlist_put_error", strerror(errno));
-			return 0;
-		}
-		free(contacts);
-	} else {
-		if (!(h = gg_userlist_get(config_uin, config_password, 1))) {
-			my_printf("userlist_get_error", strerror(errno));
-			return 0;
-		}
-	}
-
-	list_add(&watches, h, 0);
-
-	return 0;
 }
 
 char *strip_spaces(char *line)

@@ -780,10 +780,10 @@ void handle_dcc(struct gg_dcc *d)
 		case GG_EVENT_DCC_ERROR:
 			switch (e->event.dcc_error) {
 				case GG_ERROR_DCC_HANDSHAKE:
-					my_printf("dcc_error_handshake");
+					my_printf("dcc_error_handshake", "");
 					break;
 				default:
-					my_printf("dcc_error_unknown");
+					my_printf("dcc_error_unknown", "");
 			}
 			list_remove(&watches, d, 0);
 			gg_free_dcc(d);

@@ -5,8 +5,7 @@ obecnej mo¿na odbieraæ pliki. by w³±czyæ dcc nale¿y wpisaæ:
 
 	set dcc 1
 	set dcc_ip <adres_ip>
-	disconnect
-	connect
+	reconnect
 
 od tej chwili mo¿emy odbieraæ wysy³ane do nas pliki. je¶li kto¶ spróbuje
 co¶ do nas wys³aæ, pojawi siê:

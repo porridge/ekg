@@ -5,7 +5,15 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
-// 2002-02-29
+// 2002-02-10
+
+- przerzucenie wszystkich funkcji userlisty (w tym modify) do jednego
+  polecenia ,,list''. userlista z serwera to ,,list --get'', na serwer
+  ,,list --put'' (w)
+- drobne poprawki w docach (w)
+- drobne poprawki w dcc i http (w)
+
+// 2002-02-09
 
 - nowe funkcje array_make() i array_free() s³u¿± do ³adnego dzielenia
   tekstów na pola. obs³uguje eskejpowanie, cudzys³owie itp. dziêki

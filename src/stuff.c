@@ -1516,7 +1516,7 @@ void changed_dcc(char *var)
 	}
 
 	if (config_dcc && !dcc) {
-		if (!(dcc = gg_dcc_create_socket(config_uin, 0))) {
+		if (!(dcc = gg_dcc_socket_create(config_uin, 0))) {
 			my_printf("dcc_create_error", strerror(errno));
 		} else
 			list_add(&watches, dcc, 0);

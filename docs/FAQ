@@ -12,19 +12,25 @@ A: Naprawdopodobniej nie masz narzêdzi i pakietów potrzebnych do
    C, narzêdzia takie jak make, install, bibliotekê readline i
    odpowiednie pliki nag³ówkowe.
 
-Q: Nie mogê wysy³aæ wiadomo¶ci do ludzi ze spacj± w nazwie. Dlaczego?
-A: Klient jeszcze nie rozró¿nia cudzys³owiów, ani '\ ' w parametrach
-   komend. Póki co, trzeba albo rêcznie zmieniæ w userli¶cie, albo
-   wpisaæ ,,modify <numerek> --display bezspacji''.
+Q: Jak wys³aæ wiadomo¶æ do kogo¶ ze spacj± w nazwie?
+A: Wpisaæ nazwê w cudzys³owach. Niestety dope³nianie jeszcze nie dzia³a
+   jak trzeba. ¯eby siê nie mêczyæ, mo¿na zmieniæ w li¶cie kontaktów jego
+   nazwê: ,,list <numerek> --display bezspacji''.
  
 Q: Jak zarejestrowaæ nowego u¿ytkownika?
-A: Uzyæ polecenia "register <email> <haslo>"
+A: U¿yæ polecenia ,,register <email> <has³o>''
+
+Q: Jak wys³aæ smsy?
+A: Patrz pierwsza odpowied¼.
+
+Q: Jak pobraæ listê u¿ytkowników z serwera lub j± tam umie¶ciæ?
+A: Odpowiednio ,,list --get'' i ,,list --put''.
 
 Q: Jak wys³aæ plik, zmieniæ informacje w katalogu publicznym?
 A: Póki co, nie da siê. Trzeba u¿yæ oryginalnego klienta (dzia³a pod wine,
    vmware i pod Windows).
 
-Q: Dlaczego PageUp nie dzia³a?
+Q: Dlaczego PageUp nie dzia³a? Mo¿na otworzyæ osobne okienko do rozmowy?
 A: Bo nie. Nie ma takiej mo¿liwo¶ci. Nie wiadomo, czy w ogóle bêdzie.
 
 Q: Kiedy bêdzie mo¿na?
