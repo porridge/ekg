@@ -244,6 +244,9 @@ int msg_queue_write()
 	list_t l;
 	int num = 0;
 
+	if (!msg_queue)
+		return 0;
+
 	path = prepare_path("queue", 1);
 
 	if (mkdir(path, 0700) && errno != EEXIST)

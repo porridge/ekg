@@ -10,6 +10,7 @@ zg³osi³ b³±d.
 
 - poprawka /private (cukier/sz)
 - kilka mozliwych segfaultow (w/sz)
+- kosmetyka w msg_queue_write() (fig/sz)
 - uaktualnienie arim.theme (Arim/w)
 - wiêcej szczegó³ów o F3 i zabawie z ,,contacts'' i ,,display_notify''
   w dokumentacji (tokugawa/w)
