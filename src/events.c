@@ -1166,7 +1166,7 @@ void handle_pubdir(struct gg_http *h)
 	}
 
 	if (gg_pubdir_watch_fd(h) || h->state == GG_STATE_ERROR) {
-		print(bad, strerror(errno));
+		print(bad, http_error_string(h->error));
 		goto fail;
 	}
 	
@@ -1174,7 +1174,7 @@ void handle_pubdir(struct gg_http *h)
 		return;
 
 	if (!(s = h->data) || !s->success) {
-		print(bad, strerror(errno));
+		print(bad, http_error_string(h->error));
 		goto fail;
 	}
 
@@ -1189,7 +1189,7 @@ void handle_pubdir(struct gg_http *h)
 
 	if (h->type == GG_SESSION_REGISTER) {
 		if (!s->uin) {
-			print(bad);
+			print(bad, "Serwer odrzuci³ ¿±danie");	/* XXX themy */
 			goto fail;
 		}
 		
@@ -1208,7 +1208,7 @@ void handle_pubdir(struct gg_http *h)
 
 	if (h->type == GG_SESSION_UNREGISTER) {
 		if (!s->uin) {
-			print(bad);
+			print(bad, "Serwer odrzuci³ ¿±danie");	/* XXX themy */
 			goto fail;
 		}
 

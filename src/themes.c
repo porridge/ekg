@@ -1020,7 +1020,7 @@ void theme_init()
 	
 	/* rejestracja nowego numera */
 	format_add("register", "%> Rejestracja poprawna. Wygrany numerek: %T%1%n\n", 1);
-	format_add("register_failed", "%! B³±d podczas rejestracji\n", 1);
+	format_add("register_failed", "%! B³±d podczas rejestracji: %1\n", 1);
 	format_add("register_pending", "%! Rejestracja w toku\n", 1);
 	format_add("register_timeout", "%! Przekroczono limit czasu operacji rejestrowania\n", 1);
 	format_add("registered_today", "%! Ju¿ zarejestrowano jeden numer. Nie nadu¿ywaj\n", 1);
@@ -1029,22 +1029,22 @@ void theme_init()
 	format_add("unregister", "%> Konto %T%1%n wykasowane.\n", 1);
 	format_add("unregister_timeout", "%! Przekroczono limit czasu operacji usuwania konta\n", 1);
 	format_add("unregister_bad_uin", "%! Nie poprawny numer: %T%1%n\n", 1);
-	format_add("unregister_failed", "%! B³±d podczas usuwania konta\n", 1);
+	format_add("unregister_failed", "%! B³±d podczas usuwania konta: %1\n", 1);
 	
 	/* przypomnienie has³a */
 	format_add("remind", "%> Has³o zosta³o wys³ane\n", 1);
-	format_add("remind_failed", "%! B³±d podczas wysy³ania has³a\n", 1);
+	format_add("remind_failed", "%! B³±d podczas wysy³ania has³a: %1\n", 1);
 	format_add("remind_timeout", "%! Przekroczono limit czasu operacji wys³ania has³a\n", 1);
 	
 	/* zmiana has³a */
 	format_add("passwd", "%> Has³o zosta³o zmienione\n", 1);
-	format_add("passwd_failed", "%! B³±d podczas zmiany has³a\n", 1);
+	format_add("passwd_failed", "%! B³±d podczas zmiany has³a: %1\n", 1);
 	format_add("passwd_timeout", "%! Przekroczono limit czasu operacji zmiany has³a\n", 1);
 	
 	/* zmiana informacji w katalogu publicznym */
 	format_add("change_not_enough_params", "%! Polecenie wymaga podania %Twszystkich%n parametrów\n", 1);
 	format_add("change", "%> Informacje w katalogu publicznym zosta³y zmienione\n", 1);
-	format_add("change_failed", "%! B³±d podczas zmiany informacji w katalogu publicznym\n", 1);
+	format_add("change_failed", "%! B³±d podczas zmiany informacji w katalogu publicznym: %1\n", 1);
 	format_add("change_timeout", "%! Przekroczono limit czasu operacji zmiany katalogu publicznego\n", 1);
 	
 	/* sesemesy */
