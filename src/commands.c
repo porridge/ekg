@@ -4532,7 +4532,7 @@ void command_init()
 
 	command_add
 	( "key", "?u", cmd_key, 0,
-	  " [opcje]", "zarz±dza kluczami dla SIM",
+	  " [opcje]", "zarz±dzanie kluczami dla SIM",
 	  "\n"
 	  "  -g, --generate              generuje parê kluczy u¿ytkownika\n"
 	  "  -s, --send <numer/alias>    wysy³a nasz klucz publiczny\n"
