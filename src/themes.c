@@ -912,7 +912,7 @@ void theme_init()
 	format_add("window_invalid", "%! Nieprawid這wy parametr.\n", 1);
 	format_add("window_id_query_started", "%) Rozmowa z %G%2%n rozpocz皻a w okienku nr %B%1%n.\n", 1);
 	format_add("bind_seq_command_too_long", "%! Za d逝ga komenda!\n", 1);
-	format_add("bind_seq_incorrect", "%! Sekwencja %R%1%n nieprawod這wa.\n", 1); 
+	format_add("bind_seq_incorrect", "%! Sekwencja %R%1%n jest nieprawid這wa.\n", 1); 
 	format_add("bind_seq_add", "%) Sekwencja %G%1%n dodana.\n", 1);
 	format_add("bind_seq_remove", "%) Sekwencja %G%1%n usuni皻a.\n", 1);	
 	format_add("bind_invalid", "%! Nieprawid這wy parametr.\n", 1);
