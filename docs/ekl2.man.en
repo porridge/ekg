@@ -1,0 +1,40 @@
+.TH EKL2 1 "23 March 2002" 
+.SH NAME
+ekl2 \- EKG history viewer.
+.SH SYNTAX
+.B ekl2 [-d format] [-h] [-l] [-m name] [-n] [-s date] [-t] [-v] log_file [
+.BI options
+.B ]
+
+.SH SUMMARY
+.B ekl2
+Jest to aplikacja umo¿liwiaj±ca podgl±d historii rozmów, tworzonej przez
+Eksperymentalnego Klienta Gadu-Gadu.
+.SH OPTIONS
+.TP
+.BI \-d\ format
+Sets format of displayed date (see date(1))
+.TP
+.BI \-h\ 
+Prints help.
+.TP
+.BI \-L\ 
+Prints the list of available log files. (from ~\/.gg\/history)
+.TP
+.BI \-l\ 
+Prints the list of sessions in given log file.
+.TP
+.BI \-m\ name
+Your own nick (default: $USER)
+.TP
+.BI \-s\ date
+Beginning date. (see date(1))
+.TP
+.BI \-n\ 
+No colors.
+.TP 
+.BI \-t\ 
+Prints history keeping original intervals between incoming messages.
+.TP
+.BI \-v\ 
+Prints script version.
