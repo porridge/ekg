@@ -1616,10 +1616,13 @@ COMMAND(cmd_list)
 	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, show_descr = 0, show_blocked = 0, show_offline = 0, j;
 	char **argv = NULL, *show_group = NULL, *ip_str;
 	const char *tmp;
+	int params_null = 0;
 	uin_t uin;
 
-	if (!params[0] && (uin = get_uin("$")))
+	if (!params[0] && (uin = get_uin("$"))) {
+		params_null = 1;
 		params[0] = itoa(uin);
+	}
 
 	if (params[0] && *params[0] != '-') {
 		char *status, *groups;
@@ -1667,11 +1670,13 @@ COMMAND(cmd_list)
 
 		if (!(u = userlist_find(get_uin(params[0]), NULL)) || !u->display) {
 			printq("user_not_found", params[0]);
+			if (params_null)
+				params[0] = NULL;
 			return -1;
 		}
 
 		/* list <alias> [opcje] */
-		if (params[1])
+		if (!params_null && params[1])
 			return cmd_modify("list", params, NULL, quiet);
 
 		status = format_string(format_find(ekg_status_label(u->status, "user_info_")), (u->first_name) ? u->first_name : u->display, u->descr);
@@ -1734,6 +1739,8 @@ COMMAND(cmd_list)
 		xfree(groups);
 		xfree(status);
 
+		if (params_null)
+			params[0] = NULL;
 		return 0;
 	}
 
