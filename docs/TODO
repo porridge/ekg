@@ -3,18 +3,19 @@ z poni¿szej listy, albo zwi±zanego z tym bêd± albo ignorowane, albo
 zacznê byæ niemi³y. --w
 
 biblioteka:
-- komunikacja miêdzy klientami, w tym wysy³anie plików,
+- komunikacja miêdzy klientami, w tym wysy³anie plików i odbieranie plików,
 - konferencje,
 - zmiana informacji w katalogu publicznym,
-- wysy³anie userlisty na server 
-- uaktualniæ dokumentacjê.
+- przechowywanie userlisty na serwerze,
+- uaktualniæ dokumentacjê,
 
 klient:
 - przewijanie ekranu,
 - query,
 - obs³uga nicków ze spacjami,
-- zachowywanie wiadomo¶ci systemowej i nie powtarzanie jej.
-- proste rozpoznawanie p³ci.
+- zachowywanie wiadomo¶ci systemowej i nie powtarzanie jej,
+- proste rozpoznawanie p³ci,
+- dope³nienia,
 
 
 $Id$
