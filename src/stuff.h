@@ -84,6 +84,9 @@ char *sound_chat_file;
 char *sound_app;
 int display_notify;
 int default_status;
+int use_proxy;
+int proxy_port;
+char *proxy_host;
 
 void my_puts(char *format, ...);
 char *my_readline();
