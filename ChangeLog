@@ -8,6 +8,7 @@ d - drg, sz - szalik).
 
 - poprawka obs³ugi zdarzeñ w pythonie (rmrmg/w)
 - dodanie show_status_{header,footer} i %} w tematach (viraptor/w)
+- poprawka segfaulta przy mieszaniu histori± poleceñ (Goblin/w)
 
 // 2003-07-02
 

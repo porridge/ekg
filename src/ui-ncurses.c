@@ -3248,8 +3248,10 @@ static void binding_next_history(const char *arg)
 		strlcpy(line, history[history_index], LINE_MAXLEN);
 		line_adjust();
 		if (history_index == 0) {
-			xfree(history[0]);
-			history[0] = line;
+			if (history[0] != line) {
+				xfree(history[0]);
+				history[0] = line;
+			}
 		}
 	}
 }
