@@ -190,15 +190,17 @@ AC_ARG_WITH(pthread,
   [  --with-pthread          Use pthread in resolver])
 
 if test "x$with_pthread" = "xyes"; then
-  AC_CHECK_HEADER(pthread.h, [
-    AC_CHECK_LIB(pthread, pthread_create, [
-      AC_DEFINE(HAVE_PTHREAD, 1, [Define if you want to use pthread in resolver])
-      LIBS="$LIBS -lpthread"
+  ACX_PTHREAD([
+    LIBS="$PTHREAD_LIBS $LIBS"
+    CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+    CC="$PTHREAD_CC"
+    have_pthread=yes
 
-      sed 's/#undef __GG_LIBGADU_HAVE_PTHREAD/#define __GG_LIBGADU_HAVE_PTHREAD/' < lib/libgadu-config.h > lib/libgadu-config.h-
-      mv -f lib/libgadu-config.h- lib/libgadu-config.h
-      libgadu_have_pthread=yes
-    ])
+    sed 's/#undef __GG_LIBGADU_HAVE_PTHREAD/#define __GG_LIBGADU_HAVE_PTHREAD/' < lib/libgadu-config.h > lib/libgadu-config.h-
+    mv -f lib/libgadu-config.h- lib/libgadu-config.h
+    libgadu_have_pthread=yes
+  ], [
+    AC_MSG_ERROR([Your system is not supporting pthreads])
   ])
 fi
 
@@ -496,6 +498,12 @@ if test "x$have_zlib" = "xyes"; then
   echo " - zlib: enabled"
 else
   echo " - zlib: disabled"
+fi
+
+if test "x$have_pthread" = "xyes"; then
+  echo " - pthread: enabled"
+else
+  echo " - pthread: disabled"
 fi
 
 if test "x$ui_readline_enabled" = "xyes"; then
