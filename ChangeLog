@@ -15,6 +15,7 @@ zg³osi³ b³±d.
 - poprawka segv przy opcji -f (d)
 - poprawka bindowaniu w ui-readline (d) 
 - dodanie opisu us³ug http do docs/protocol.html (pm/w)
+- dodanie opisu nowego protoko³u katalogu publicznego (w)
 
 // 2003-02-03
 
