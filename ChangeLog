@@ -14,6 +14,9 @@ zg³osi³ b³±d.
 - libgadu: generowanie pliku <libgadu-config.h> z konfiguracj± systemu
   niezbêdn± do w³±czenia biblioteki do programu. niestety nie bêdzie on
   regenerowany przez skrypt config.status (adrians/w)
+- libgadu: dodanie obs³ugi pkgconfig. program linkuj±ce siê z libgadu
+  mog± sprawdzaæ flagi kompilatora i linkera przez ,,pkgconfig libgadu
+  --libs --cflags'' (w)
 
 // 2002-12-08
 

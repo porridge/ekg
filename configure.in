@@ -386,7 +386,7 @@ dnl   fi
 
 dnl </ekg>
 
-AC_CONFIG_FILES(Makefile lib/Makefile examples/Makefile)
+AC_CONFIG_FILES(Makefile lib/Makefile examples/Makefile lib/libgadu.pc)
 dnl <ekg>
 AC_CONFIG_FILES(src/Makefile)
 dnl </ekg>
