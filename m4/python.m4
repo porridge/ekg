@@ -25,21 +25,21 @@ AC_DEFUN(AC_CHECK_PYTHON,[
 		if test "$PYTHON" = ""; then AC_PATH_PROG(PYTHON, python2.0) fi
 		
 		if test "$PYTHON" != ""; then 
-			PYTHON_VERSION=`$PYTHON -c "import sys; print sys.version[[0:3]]"`
-			PYTHON_PREFIX=`$PYTHON -c "import sys; print sys.prefix"`
-			echo Found Python version $PYTHON_VERSION [$PYTHON_PREFIX]
+			PY_VERSION=`$PYTHON -c "import sys; print sys.version[[0:3]]"`
+			PY_PREFIX=`$PYTHON -c "import sys; print sys.prefix"`
+			echo "Found Python version $PY_VERSION [$PY_PREFIX]"
 		fi
 
 		AC_MSG_CHECKING(for Python.h)
 		
-		PYTHON_EXEC_PREFIX=`$PYTHON -c "import sys; print sys.exec_prefix"`
+		PY_EXEC_PREFIX=`$PYTHON -c "import sys; print sys.exec_prefix"`
 		
-		if test "$PYTHON_VERSION" != ""; then 
-		    if test -f $PYTHON_PREFIX/include/python$PYTHON_VERSION/Python.h ; then 
-			AC_MSG_RESULT($PYTHON_PREFIX/include/python$PYTHON_VERSION/Python.h)
-			PY_LIB_LOC="-L$PYTHON_EXEC_PREFIX/lib/python$PYTHON_VERSION/config"
-			PY_CFLAGS="-I$PYTHON_PREFIX/include/python$PYTHON_VERSION"
-			PY_MAKEFILE="$PYTHON_EXEC_PREFIX/lib/python$PYTHON_VERSION/config/Makefile"
+		if test "$PY_VERSION" != ""; then 
+		    if test -f $PY_PREFIX/include/python$PY_VERSION/Python.h ; then 
+			AC_MSG_RESULT($PY_PREFIX/include/python$PY_VERSION/Python.h)
+			PY_LIB_LOC="-L$PY_EXEC_PREFIX/lib/python$PY_VERSION/config"
+			PY_CFLAGS="-I$PY_PREFIX/include/python$PY_VERSION"
+			PY_MAKEFILE="$PY_EXEC_PREFIX/lib/python$PY_VERSION/config/Makefile"
 
 			PY_LOCALMODLIBS=`sed -n -e 's/^LOCALMODLIBS=\(.*\)/\1/p' $PY_MAKEFILE`
 			PY_BASEMODLIBS=`sed -n -e 's/^BASEMODLIBS=\(.*\)/\1/p' $PY_MAKEFILE`
@@ -48,7 +48,7 @@ AC_DEFUN(AC_CHECK_PYTHON,[
 			PY_OTHER_LIBC=`sed -n -e 's/^LIBM=\(.*\)/\1/p' $PY_MAKEFILE`
 			PY_LIBS="$PY_LOCALMODLIBS $PY_BASEMODLIBS $PY_OTHER_LIBS $PY_OTHER_LIBC $PY_OTHER_LIBM"
 
-			PYTHON_LIBS="-L$PYTHON_EXEC_PREFIX/lib $PY_LIB_LOC -lpython$PYTHON_VERSION $PY_LIBS"
+			PYTHON_LIBS="-L$PY_EXEC_PREFIX/lib $PY_LIB_LOC -lpython$PY_VERSION $PY_LIBS"
 			PYTHON_INCLUDES="$PY_CFLAGS"
 			AC_DEFINE(WITH_PYTHON, 1, [define if You want python])
 			have_python=true
