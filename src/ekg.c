@@ -482,7 +482,7 @@ void ekg_wait_for_key()
 			/* ¿eby unikn±æ przekrêcenia licznika mikrosekund przy
 			 * wiêkszych czasach, pomijamy d³ugie timery */
 
-			if (t->ends.tv_usec - tv2.tv_usec > 5)
+			if (t->ends.tv_sec - tv2.tv_sec > 5)
 				continue;
 			
 			/* zobacz, ile zosta³o do wywo³ania timera */
