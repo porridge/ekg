@@ -4,6 +4,15 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-10-20
+
+- zmiana '\n' w opisach stanów na '|' (s_wilk/w)
+- libgadu: porz±dki z w±tkowanym resolverem (sz/w)
+
+// 2003-10-19
+
+- libgadu: wy¶wietla prawid³owy powód b³êdu przy nieudanym po³±czeniu SSL (w)
+
 // 2003-10-17
 
 - libgadu: dodanie funkcji gg_image_reply() (w)
