@@ -2153,6 +2153,8 @@ static void binding_add(const char *key, const char *action, int quiet)
 	
 			if (!strcmp(b.key, foo->key)) {
 				print("bind_seq_exist", b.key);
+				xfree(b.key);
+				xfree(b.action);
 				return;
 			}
 		}
