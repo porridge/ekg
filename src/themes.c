@@ -281,6 +281,8 @@ char *va_format_string(const char *format, va_list ap)
 				string_append(buf, error_cache);
 			if (*p == '|')
 				string_append(buf, "\033[00m");	/* g³upie, wiem */
+			if (*p == ']')
+				string_append(buf, "\033[000m");	/* jeszcze g³upsze */
 			if (*p == '#')
 				string_append(buf, timestamp(timestamp_cache));
 			if (config_display_color && isalpha(*p) && automaton_color_escapes) {
@@ -428,6 +430,7 @@ fstring_t reformat_string(const char *str)
 	res->str = xmalloc(len + 1);
 	res->attr = xmalloc(len + 1);
 	res->prompt_len = 0;
+	res->prompt_empty = 0;
 
 	for (i = 0, j = 0; str[i]; i++) {
 		if (str[i] == 27) {
@@ -453,6 +456,12 @@ fstring_t reformat_string(const char *str)
 						/* prompt jako \033[00m */
 						if (str[i - 1] == '0' && str[i - 2] == '0')
 							res->prompt_len = j;
+
+						/* odstêp jako \033[000m */
+						if (i > 3 && str[i - 1] == '0' && str[i - 2] == '0' && str[i - 3] == 0) {
+							res->prompt_len = j;
+							res->prompt_empty = 1;
+						}
 					}
 
 					if (tmp == 1)
@@ -1341,4 +1350,5 @@ void theme_init()
 	format_add("key_public_write_failed", "%! B³±d podczas zapisu klucza publicznego: %1\n", 1);
 	format_add("key_send_success", "%> Wys³ano klucz publiczny do %1\n", 1);
 	format_add("key_send_error", "%! B³±d podczas wysy³ania klucza publicznego\n", 1);
+	format_add("key_list", "%> %1\n    %2\n", 1);
 }

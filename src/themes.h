@@ -34,7 +34,8 @@ struct fstring_s {
 	int ts;		/* timestamp */
 
 	int prompt_len;	/* d³ugo¶æ promptu, który bêdzie powtarzany przy i
-			   przej¶ciu do kolejnej linii */
+			   przej¶ciu do kolejnej linii. */
+	int prompt_empty;	/* prompt przy przenoszeniu bêdzie pusty */
 };
 
 typedef struct fstring_s *fstring_t;

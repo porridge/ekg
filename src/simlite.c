@@ -135,6 +135,57 @@ static RSA *sim_key_read(uint32_t uin)
 }
 
 /*
+ * sim_key_fingerprint()
+ *
+ * zwraca fingerprint danego klucza.
+ *
+ *  - uin - numer posiadacza klucza.
+ *
+ * zaalokowany bufor.
+ */
+char *sim_key_fingerprint(uint32_t uin)
+{
+	RSA *key = sim_key_read(uin);
+	unsigned char md_value[EVP_MAX_MD_SIZE], *buf, *newbuf;
+	char *result = NULL;
+	EVP_MD_CTX ctx;
+	int md_len, size, i;
+
+	if (!key)
+		return NULL;
+
+	if (uin)
+		size = i2d_RSAPublicKey(key, NULL);
+	else
+		size = i2d_RSAPrivateKey(key, NULL);
+
+	if (!(newbuf = buf = malloc(size)))
+		goto cleanup;
+
+	if (uin)
+		size = i2d_RSAPublicKey(key, &newbuf);
+	else
+		size = i2d_RSAPrivateKey(key, &newbuf);
+	
+	EVP_DigestInit(&ctx, EVP_sha1());	
+	EVP_DigestUpdate(&ctx, buf, size);
+	EVP_DigestFinal(&ctx, md_value, &md_len);
+
+	free(buf);
+
+	if (!(result = malloc(md_len * 3)))
+		goto cleanup;
+
+	for (i = 0; i < md_len; i++)
+		sprintf(result + i * 3, (i != md_len - 1) ? "%.2x:" : "%.2x", md_value[i]);
+
+cleanup:
+	RSA_free(key);
+
+	return result;
+}
+
+/*
  * sim_strerror()
  *
  * zamienia kod b³êdu simlite na komunikat.

@@ -2696,8 +2696,12 @@ COMMAND(cmd_key)
 				int uin = atoi(d->d_name);
 
 				if (uin) {
-					printq("generic", format_user(uin));
+					char *fp = sim_key_fingerprint(uin);
+
+					print("key_list", format_user(uin), (fp) ? fp : "");
 					count++;
+
+					xfree(fp);
 				}
 			}
 

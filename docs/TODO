@@ -10,7 +10,6 @@ lista rzeczy, które TRZEBA zrobiæ przed wydaniem wersji 1.0:
 
 * klient:
   - poprawiæ getopt(), ¿eby rozumia³ ,,--back "powód"'',
-  - sensowna obs³uga kluczy dla SIM.
 
 pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
 

@@ -366,8 +366,13 @@ int window_backlog_split(struct window *w, int full, int removed)
 			l->backlog = i;
 
 			l->prompt_len = w->backlog[i]->prompt_len;
-			l->prompt_str = w->backlog[i]->str;
-			l->prompt_attr = w->backlog[i]->attr;
+			if (!w->backlog[i]->prompt_empty) {
+				l->prompt_str = w->backlog[i]->str;
+				l->prompt_attr = w->backlog[i]->attr;
+			} else {
+				l->prompt_str = NULL;
+				l->prompt_attr = NULL;
+			}
 
 			if (!w->floating && config_timestamp) {
 				struct tm *tm = localtime(&ts);
@@ -531,7 +536,12 @@ void window_redraw(struct window *w)
 
 		for (x = 0; x < l->prompt_len; x++) {
 			int attr = A_NORMAL;
-			unsigned char ch = l->prompt_str[x];
+			unsigned char ch;
+			
+			if (!l->prompt_str)
+				continue;
+				
+			ch = l->prompt_str[x];
 
 			if ((l->prompt_attr[x] & 64))
 				attr |= A_BOLD;
