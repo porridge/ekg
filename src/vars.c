@@ -108,6 +108,7 @@ void variable_init()
 #endif
 	variable_add("auto_away", "aa", VAR_INT, 1, &config_auto_away, NULL, NULL, NULL);
 	variable_add("auto_back", "ab", VAR_INT, 1, &config_auto_back, NULL, NULL, NULL);
+	variable_add("auto_find", "af", VAR_INT, 1, &config_auto_find, NULL, NULL, NULL);
 	variable_add("auto_reconnect", "ac", VAR_INT, 1, &config_auto_reconnect, NULL, NULL, NULL);
 	variable_add("auto_save", "as", VAR_INT, 1, &config_auto_save, changed_auto_save, NULL, NULL);
 	variable_add("away_reason", "ar", VAR_STR, 1, &config_away_reason, changed_xxx_reason, NULL, NULL);
@@ -169,6 +170,7 @@ void variable_init()
 	if (ui_init == ui_ncurses_init)
 		variable_add("header_size", "hs", VAR_INT, 1, &config_header_size, header_statusbar_resize, NULL, NULL);
 #endif
+	variable_add("ignore_unknown_sender", "iu", VAR_BOOL, 1, &config_ignore_unknown_sender, NULL, NULL, NULL);
 	variable_add("keep_reason", "kr", VAR_INT, 1, &config_keep_reason, NULL, NULL, NULL);
 	variable_add("last", "la", VAR_MAP, 1, &config_last, NULL, variable_map(4, 0, 0, "none", 1, 2, "all", 2, 1, "separate", 4, 0, "sent"), NULL);
 	variable_add("last_size", "ls", VAR_INT, 1, &config_last_size, NULL, NULL, NULL);
@@ -210,6 +212,9 @@ void variable_init()
 	variable_add("theme", "th", VAR_STR, 1, &config_theme, changed_theme, NULL, NULL);
 	variable_add("time_deviation", "td", VAR_INT, 1, &config_time_deviation, NULL, NULL, NULL);
 	variable_add("timestamp", "ts", VAR_STR, 1, &config_timestamp, NULL, NULL, NULL);
+#ifdef WITH_WAP
+	variable_add("wap_enabled", "we", VAR_INT, 1, &config_wap_enabled, NULL, NULL, NULL);
+#endif
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
 		variable_add("windows_save", "ws", VAR_BOOL, 1, &config_windows_save, NULL, NULL, NULL);

@@ -934,10 +934,12 @@ void theme_init()
 
 	/* ignore, unignore, block, unblock */
 	format_add("ignored_added", "%> Dodano %T%1%n do listy ignorowanych\n", 1);
+	format_add("ignored_modified", "%> Zmodyfikowano poziom ignorowania %T%1%n\n", 1);
 	format_add("ignored_deleted", "%) Usuniêto %1 z listy ignorowanych\n", 1);
 	format_add("ignored_deleted_all", "%) Usuniêto wszystkich z listy ignorowanych\n", 1);
 	format_add("ignored_exist", "%! %1 jest ju¿ na li¶cie ignorowanych\n", 1);
 	format_add("ignored_list", "%> %1 %2\n", 1);
+	format_add("ignored_list_unknown_sender", "%> Ignorowanie wiadomo¶ci od nieznanych u¿ytkowników\n", 1);
 	format_add("ignored_list_empty", "%! Lista ignorowanych u¿ytkowników jest pusta\n", 1);
 	format_add("error_not_ignored", "%! %1 nie jest na li¶cie ignorowanych\n", 1);
 	format_add("blocked_added", "%> Dodano %T%1%n do listy blokowanych\n", 1);
@@ -1191,6 +1193,8 @@ void theme_init()
 	format_add("user_info_never_seen", "%K| %nNigdy nie widziano\n", 1);
 	format_add("user_info_last_seen", "%K| %nOstatnio widziano: %T%1%n\n", 1);
 	format_add("user_info_last_seen_time", "%Y-%m-%d %H:%M", 1);
+	format_add("user_info_last_descr","%K| %nOstatni opis: %T%1%n\n", 1);
+	format_add("user_info_last_ip","%K| %nOstatni adres IP: %T%1%n\n", 1);
 	format_add("user_info_footer", "%K`----- ---- --- -- -%n\n", 1);
 
 	format_add("user_info_avail", "%Ydostêpn%@1%n", 1);

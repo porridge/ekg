@@ -14,25 +14,17 @@ rozwi±zanie.
     przewijaæ linijka po linijce w /help zamiast zablokowaæ przed i
     zwolniæ ekran po? (w)
   - informcja o opisie w /find (scooty/w)
-  - Ctrl-W powinno wrzucaæ do yankbuffera (w)
   - dope³nianie w ¶rodku linii (sz)
   - wykrywanie niewidocznych jako opcja (wielu)
   - czas powrotu w stanach opisowych (?)
-  - autofind - szukanie osób, które do nas pisz±, a nie mamy ich w li¶cie
-    kontaktów (mateusza)
-  - odpowiednik ircowego /whowas (ostatni IP, opis, ...) (joshua)
   - wariant /list, który w query bez parameterów poka¿e info rozmówcy (weirdo)
-  - /last, który potrafi pokazaæ wiadomo¶ci z pewnego przedzia³u czasu
   - uporz±dkowane i dobrze dzia³aj±ce okna p³ywaj±ce (sz?)
   - mo¿liwo¶æ automagicznego wyrównywania kolejnych linii wiadomo¶ci w tematach
     ircopodobnych do d³ugo¶ci nazwy rozmówcy i timestampu (sz)
-  - zmienna beep_*_away (rmrmg)
   - zapis do historii zgodny z http://kadu.net/history_format.html (Chilek)
   - lista kontaktów w pierwszym oknie, rozmowy w kolejnych (jojo)
   - osobna historia dla ka¿dego okna (koniu)
   - zapisywanie backlog'a z okna do pliku (G.Sulek)
-  - zdarzenie dotycz±ce nowej konferencji (pmb)
-  - /ignore dla u¿ytkowników spoza listy kontaktów (mateusza)
   - dalsza rozbudowa on (?) - zaprzeczenia i inne operatory (krzyk)
   - mo¿liwo¶æ definiowania kolorów p³ywaj±cych okien: t³o, ramka (w)
   - ,,wje¿d¿anie'' i automatyczne chowanie listy kontaktów, co¶ na wzór pasku

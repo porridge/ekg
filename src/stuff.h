@@ -39,31 +39,33 @@
 
 #define DEBUG_MAX_LINES	50	/* ile linii z debug zrzucaæ do pliku */
 
+#define TOGGLE_BIT(x) (1 << (x - 1))
+
 enum event_t {
-	EVENT_MSG = 1,
-	EVENT_CHAT = 2,
-	EVENT_AVAIL = 4,
-	EVENT_NOT_AVAIL = 8,
-	EVENT_AWAY = 16,
-	EVENT_DCC = 32,
-	EVENT_INVISIBLE = 64,
-	EVENT_DESCR = 128,
-	EVENT_ONLINE = 256,
-	EVENT_SIGUSR1 = 512,
-	EVENT_SIGUSR2 = 1024,
-	EVENT_DELIVERED = 2048,
-	EVENT_QUEUED = 4096,
-	EVENT_NEWMAIL = 8192,
-	EVENT_QUERY = 16384,
-	EVENT_BLOCKED = 32768,
+	EVENT_MSG = TOGGLE_BIT(1),
+	EVENT_CHAT = TOGGLE_BIT(2),
+	EVENT_CONFERENCE = TOGGLE_BIT(3),
+	EVENT_QUERY = TOGGLE_BIT(4),
+	EVENT_AVAIL = TOGGLE_BIT(5),
+	EVENT_ONLINE = TOGGLE_BIT(6),
+	EVENT_NOT_AVAIL = TOGGLE_BIT(7),
+	EVENT_AWAY = TOGGLE_BIT(8),
+	EVENT_INVISIBLE = TOGGLE_BIT(9),
+	EVENT_DESCR = TOGGLE_BIT(10),
+	EVENT_DCC = TOGGLE_BIT(11),
+	EVENT_SIGUSR1 = TOGGLE_BIT(12),
+	EVENT_SIGUSR2 = TOGGLE_BIT(13),
+	EVENT_DELIVERED = TOGGLE_BIT(14),
+	EVENT_QUEUED = TOGGLE_BIT(15),
+	EVENT_NEWMAIL = TOGGLE_BIT(16),
+	EVENT_BLOCKED = TOGGLE_BIT(17),
 
-	EVENT_ALL = 65535,	/* uaktualniaæ za ka¿d± zmian± */
-
-	INACTIVE_EVENT = 65536	/* nieaktywne zdarzenie */
+	EVENT_ALL = TOGGLE_BIT(18) - 1,
+	INACTIVE_EVENT = TOGGLE_BIT(18)
 };
 
-#define EVENT_LABELS_MAX 18	/* uaktualniæ ! */
-struct event_label event_labels[EVENT_LABELS_MAX];
+#define EVENT_LABELS_COUNT 17	/* uaktualniæ ! */
+struct event_label event_labels[EVENT_LABELS_COUNT + 2];
 
 struct event_label {
 	int event;
@@ -72,6 +74,7 @@ struct event_label {
 
 struct process {
 	int pid;		/* id procesu */
+	int died;		/* proces umar³, ale najpierw pobieramy do koñca z bufora dane */
 	char *name;		/* nazwa. je¶li poprzedzona \2 to nie obchodzi */
 				/* nas w jaki sposób siê zakoñczy³o, \3 to samo, */
 				/* ale nie wy¶wietla na li¶cie procesów */
@@ -172,6 +175,7 @@ struct color_map {
 	unsigned char r, g, b;
 };
 
+list_t autofinds;
 list_t children;
 list_t aliases;
 list_t watches;
@@ -199,6 +203,7 @@ char *config_audio_device;
 char *config_away_reason;
 int config_auto_away;
 int config_auto_back;
+int config_auto_find;
 int config_auto_reconnect;
 int config_auto_save;
 char *config_back_reason;
@@ -284,6 +289,10 @@ char *config_timestamp;
 int config_uin;
 char *config_windows_layout;
 int config_windows_save;
+int config_ignore_unknown_sender;
+#ifdef WITH_WAP
+int config_wap_enabled;
+#endif
 
 char *home_dir;
 char *config_dir;
@@ -400,6 +409,7 @@ const char *http_error_string(int h);
 char color_map(unsigned char r, unsigned char g, unsigned char b);
 char *strcasestr(const char *haystack, const char *needle);
 int say_it(const char *str);
+time_t parsetimestr(const char *p);
 
 /* makra, dziêki którym pozbywamy siê warning'ów */
 #define xisxdigit(c) isxdigit((int) (unsigned char) c)

@@ -3098,6 +3098,8 @@ static void binding_word_rubout(const char *arg)
 	char *p;
 	int eaten = 0;
 
+	xfree(yanked);
+
 	p = line + line_index;
 	while (p > line && xisspace(*(p-1))) {
 		p--;
@@ -3109,6 +3111,10 @@ static void binding_word_rubout(const char *arg)
 			eaten++;
 		}
 	}
+
+	yanked = xmalloc(eaten + 1);
+	strlcpy(yanked, p, eaten + 1);
+
 	memmove(p, line + line_index, strlen(line) - line_index + 1);
 	line_index -= eaten;
 }

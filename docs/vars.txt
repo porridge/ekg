@@ -47,7 +47,14 @@ auto_back
 	dostêpny, je¶li obecny stan ,,zajêty'' zosta³ ustawiony automatycznie.
 	je¶li równa 1, stan jest zmieniany na dostêpny przy wys³aniu
 	jakiejkolwiek wiadomo¶ci. je¶li równa 2, przy wci¶niêciu klawisza.
-	
+
+auto_find
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	okre¶la, czy osoby, których nie mamy na li¶cie kontaktów, a wys³a³y
+	do nas wiadomo¶æ, maj± byæ automatycznie wyszukane w katalogu.
+
 auto_reconnect
 	typ: liczba
 	domy¶lna warto¶æ: 10
@@ -366,6 +373,13 @@ header_size
 	okre¶la rozmiar nag³ówka okna wy¶wietlanego na górze ekranu.
 	maksymalna ilo¶æ linii to 5.
 
+ignore_unknown_sender
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	okre¶la, czy bêd± ignorowane wiadomo¶ci od osób, których nie mamy
+	na swojej li¶cie kontaktów.
+
 keep_reason
 	typ: liczba
 	domy¶lna warto¶æ: 0
@@ -678,6 +692,13 @@ timestamp
 	w interfejsie ncurses okre¶la format czasu wy¶wietlanego na
 	pocz±tku ka¿dej linii. dok³adny opis formatu zawiera strona
 	manuala strftime(3).
+
+wap_enabled
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	je¶li wkompilowano obs³ugê WAP, pozawala tymczasowo wy³±czyæ tê
+	us³ugê.
 
 windows_save
 	typ: bool

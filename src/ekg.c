@@ -207,7 +207,7 @@ static int get_char_from_pipe(struct gg_common *c)
  */
 static void get_line_from_pipe(struct gg_exec *c)
 {
-	char buf[16384];
+	char buf[8192];
 	int ret;
 
 	if (!c)
@@ -677,7 +677,7 @@ void ekg_wait_for_key()
 					if (!config_speech_app)
 						xfree(buffer_flush(BUFFER_SPEECH, NULL));
 
-					if (buffer_count(BUFFER_SPEECH) && !WEXITSTATUS(status)) {
+					if (buffer_count(BUFFER_SPEECH) && !(WEXITSTATUS(status))) {
 						char *str = buffer_tail(BUFFER_SPEECH);
 						say_it(str);
 						xfree(str);
@@ -687,16 +687,47 @@ void ekg_wait_for_key()
 				switch (p->name[0]) {
 					case '\001':
 						print((!(WEXITSTATUS(status))) ? "sms_sent" : "sms_failed", p->name + 1);
-					case '\002':
-					case '\003':
+					
+						xfree(p->name);
+						list_remove(&children, p, 1);
 						break;
 					default:
-						print("process_exit", itoa(p->pid), p->name, itoa(WEXITSTATUS(status)));
+						p->died = 1;
 						break;
 				}
+			}
+		}
 
-				xfree(p->name);
-				list_remove(&children, p, 1);
+		for (l = children; l; l = m) {
+			struct process *p = l->data;
+
+			m = l->next;
+
+			if (p->died) {
+				int left = 0;
+#ifdef FIONREAD
+				list_t l;
+				int fd = -1;
+
+				for (l = watches; l; l = l->next) {
+					struct gg_common *c = l->data;
+
+					if (c->type == GG_SESSION_USER3 && c->id == p->pid) {
+						fd = c->fd;
+						break;
+					}
+				}
+
+				if (fd > 0)
+					ioctl(fd, FIONREAD, &left);
+#endif
+			
+				if (!left) {
+					if (p->name[0] != '\002' && p->name[0] != '\003')
+						print("process_exit", itoa(p->pid), p->name, itoa(WEXITSTATUS(status)));
+					xfree(p->name);
+					list_remove(&children, p, 1);
+				}
 			}
 		}
 
@@ -1431,6 +1462,7 @@ void ekg_exit()
 	binding_free();
 	last_free();
 	buffer_free();
+	list_destroy(autofinds, 1);
 
 	xfree(home_dir);
 

@@ -75,6 +75,7 @@
 #endif
 
 struct gg_session *sess = NULL;
+list_t autofinds = NULL;
 list_t children = NULL;
 list_t aliases = NULL;
 list_t watches = NULL;
@@ -93,6 +94,7 @@ int config_auto_reconnect = 10;
 int reconnect_timer = 0;
 int config_auto_away = 600;
 int config_auto_save = 0;
+int config_auto_find = 0;
 time_t last_save = 0;
 int config_display_color = 1;
 int config_beep = 1;
@@ -180,29 +182,35 @@ char *config_interface = NULL;
 int config_reason_limit = 0;
 char *config_reason_first = NULL;
 char *config_dcc_limit = NULL;
+int config_ignore_unknown_sender = 0;
+#ifdef WITH_WAP
+int config_wap_enabled = 1;
+#endif
 
 char *last_search_first_name = NULL;
 char *last_search_last_name = NULL;
 char *last_search_nickname = NULL;
 uin_t last_search_uin = 0;
 
-struct event_label event_labels[EVENT_LABELS_MAX] = {
+struct event_label event_labels[EVENT_LABELS_COUNT + 2] = {
 	{ EVENT_MSG, "msg" },
 	{ EVENT_CHAT, "chat" },
+	{ EVENT_CONFERENCE, "conference" },
+	{ EVENT_QUERY, "query" },
 	{ EVENT_AVAIL, "avail" },
+	{ EVENT_ONLINE, "online" },
 	{ EVENT_NOT_AVAIL, "notavail" },
 	{ EVENT_AWAY, "away" },
-	{ EVENT_DCC, "dcc" },
 	{ EVENT_INVISIBLE, "invisible" },
 	{ EVENT_DESCR, "descr" },
-	{ EVENT_ONLINE, "online" },
+	{ EVENT_DCC, "dcc" },
 	{ EVENT_SIGUSR1, "sigusr1" },
 	{ EVENT_SIGUSR2, "sigusr2" },
 	{ EVENT_DELIVERED, "delivered" },
 	{ EVENT_QUEUED, "queued" },
 	{ EVENT_NEWMAIL, "newmail" },
-	{ EVENT_QUERY, "query" },
 	{ EVENT_BLOCKED, "blocked" },
+
 	{ INACTIVE_EVENT, NULL },
 	{ 0, NULL }
 };
@@ -909,6 +917,8 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 	c.name = xstrdup(name);
 
 	add_send_nick(name);
+
+	event_check(EVENT_CONFERENCE, 1, name);
 
 	return list_add(&conferences, &c, sizeof(c));
 }
@@ -1916,6 +1926,7 @@ int process_add(int pid, const char *name)
 
 	p.pid = pid;
 	p.name = xstrdup(name);
+	p.died = 0;
 	
 	return (list_add(&children, &p, sizeof(p)) ? 0 : -1);
 }
@@ -3071,4 +3082,83 @@ int say_it(const char *str)
 
 	process_add(pid, "\003");
 	return 0;
+}
+
+/*
+ * parsetimestr()
+ *
+ * przekszta³ca zapis czasu w formacie [[[yyyy]mm]dd]HH[:]MM[.SS]
+ * na ,,time_t''. zwraca -1 w przypadku b³êdu.
+ */
+time_t parsetimestr(const char *p)
+{
+	struct tm *lt;
+	time_t now = time(NULL);
+	char *tmp, *foo = xstrdup(p);
+	int wrong = 0;
+
+	lt = localtime(&now);
+	lt->tm_isdst = -1;
+
+	/* wyci±gamy sekundy, je¶li s± i obcinamy */
+	if ((tmp = strchr(foo, '.')) && !(wrong = (strlen(tmp) != 3))) {
+		sscanf(tmp + 1, "%2d", &lt->tm_sec);
+		tmp[0] = 0;
+	} else
+		lt->tm_sec = 0;
+
+	/* pozb±d¼my siê dwukropka */
+	if ((tmp = strchr(foo, ':')) && !(wrong = (strlen(tmp) != 3))) {
+		tmp[0] = tmp[1];
+		tmp[1] = tmp[2];
+		tmp[2] = 0;
+	}
+
+	/* jedziemy ... */
+	if (!wrong) {
+		switch (strlen(foo)) {
+			int ret;
+
+			case 12:
+				ret = sscanf(foo, "%4d%2d%2d%2d%2d", &lt->tm_year, &lt->tm_mon, &lt->tm_mday, &lt->tm_hour, &lt->tm_min);
+				if (ret != 5)
+					wrong = 1;
+				lt->tm_year -= 1900;
+				lt->tm_mon -= 1;
+				break;
+			case 10:
+				ret = sscanf(foo, "%2d%2d%2d%2d%2d", &lt->tm_year, &lt->tm_mon, &lt->tm_mday, &lt->tm_hour, &lt->tm_min);
+				if (ret != 5)
+					wrong = 1;
+				lt->tm_year += 100;
+				lt->tm_mon -= 1;
+				break;
+			case 8:
+				ret = sscanf(foo, "%2d%2d%2d%2d", &lt->tm_mon, &lt->tm_mday, &lt->tm_hour, &lt->tm_min);
+				if (ret != 4)
+					wrong = 1;
+				lt->tm_mon -= 1;
+				break;
+			case 6:
+				ret = sscanf(foo, "%2d%2d%2d", &lt->tm_mday, &lt->tm_hour, &lt->tm_min);
+				if (ret != 3)
+					wrong = 1;
+				break;	
+			case 4:
+				ret = sscanf(foo, "%2d%2d", &lt->tm_hour, &lt->tm_min);
+				if (ret != 2)
+					wrong = 1;
+				break;
+			default:
+				wrong = 1;
+		}
+	}
+
+	xfree(foo);
+
+	/* nie ma b³êdów ? */
+	if (wrong || lt->tm_hour > 23 || lt->tm_min > 59 || lt->tm_sec > 59 || lt->tm_mday > 31 || !lt->tm_mday || lt->tm_mon > 11)
+		return -1;
+	else
+		return mktime(lt);
 }

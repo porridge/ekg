@@ -57,7 +57,7 @@
 
 list_t userlist = NULL;
 
-struct ignore_label ignore_labels[IGNORE_LABELS_MAX] = {
+struct ignore_label ignore_labels[IGNORE_LABELS_COUNT + 1] = {
 	{ IGNORE_STATUS, "status" },
 	{ IGNORE_STATUS_DESCR, "descr" },
 	{ IGNORE_NOTIFY, "notify" },
@@ -445,9 +445,13 @@ void userlist_clear_status(uin_t uin)
 		if (!uin || uin == u->uin) {
 			u->status = GG_STATUS_NOT_AVAIL;
 			memset(&u->ip, 0, sizeof(struct in_addr));
+			memset(&u->last_ip, 0, sizeof(struct in_addr));
 			u->port = 0;
+			u->last_port = 0;
 			xfree(u->descr);
+			xfree(u->last_descr);
 			u->descr = NULL;
+			u->last_descr = NULL;
 		}
         }
 }
@@ -505,6 +509,7 @@ int userlist_remove(struct userlist *u)
 	xfree(u->mobile);
 	xfree(u->descr);
 	xfree(u->foreign);
+	xfree(u->last_descr);
 
 	for (l = u->groups; l; l = l->next) {
 		struct group *g = l->data;

@@ -64,6 +64,8 @@ static int hide_notavail = 0;	/* czy ma ukrywaæ niedostêpnych -- tylko zaraz po 
 static int dcc_limit_time = 0;	/* czas pierwszego liczonego po³±czenia */
 static int dcc_limit_count = 0;	/* ilo¶æ po³±czeñ od ostatniego razu */
 
+static int auto_find_limit = 100; /* ilo¶æ osób, których nie znamy, a szukali¶my po odebraniu msg */
+
 static struct handler handlers[] = {
 	{ GG_EVENT_MSG, handle_msg },
 	{ GG_EVENT_ACK, handle_ack },
@@ -312,7 +314,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 		int buf_offset;
 
 #ifdef WITH_WAP
-		{
+		if (config_wap_enabled && e->event.msg.sender != config_uin) {
 			FILE *wap;
 			char waptime[10], waptime2[10];
 			const char *waplog;
@@ -496,7 +498,7 @@ void handle_msg(struct gg_event *e)
 			return;
 	}
 
-	if (ignored_check(e->event.msg.sender) & IGNORE_MSG) {
+	if (ignored_check(e->event.msg.sender) & IGNORE_MSG || config_ignore_unknown_sender) {
 		if (config_log_ignored)
 			put_log(e->event.msg.sender, "%sign,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), e->event.msg.message);
 
@@ -591,6 +593,35 @@ void handle_msg(struct gg_event *e)
 				send_sms(config_sms_number, foo, 0);
 	
 			xfree(foo);
+		}
+	}
+
+	if (!u && config_auto_find) {
+		list_t l;
+		int do_find = 1, i;
+
+		for (l = autofinds, i = 0; l; l = l->next, i++) {
+			uin_t *d = l->data;	
+
+			if (*d == e->event.msg.sender) {
+				do_find = 0;	
+				break;
+			}
+		}
+
+		if (do_find) {
+			char *tmp;
+
+			if (i == auto_find_limit) {
+				gg_debug(GG_DEBUG_MISC, "// autofind reached %d limit, removing the oldest uin: %d\n", auto_find_limit, *((uin_t *)autofinds->data));
+				list_remove(&autofinds, autofinds->data, 1);
+			}
+
+			list_add(&autofinds, &e->event.msg.sender, sizeof(uin_t));
+
+			tmp = saprintf("/find -u %d", e->event.msg.sender);
+			command_exec(itoa(e->event.msg.sender), tmp, 0);
+			xfree(tmp);
 		}
 	}
 
@@ -732,6 +763,8 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 	}
 #endif
 
+#define __USER_QUITING ((GG_S_NA(status) || GG_S_I(status)) && !(GG_S_NA(u->status) || GG_S_I(u->status)))
+
 	if (GG_S_BL(status) && !GG_S_BL(u->status)) {
 		u->status = status;	/* poza list± stanów */
 		if (!ignore_events)
@@ -743,6 +776,10 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 	
 	/* zapamiêtaj adres, port i protokó³ */
 	if (n) {
+		if (__USER_QUITING) {
+			u->last_ip.s_addr = u->ip.s_addr;
+			u->last_port = u->port;
+		}
 		u->port = n->remote_port;
 		u->ip.s_addr = n->remote_ip;
 		u->protocol = n->version;
@@ -777,8 +814,13 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 	}
 
 	/* jesli kto¶ nam znika, to sobie to zapamietujemy */
-	if ((GG_S_NA(status) || GG_S_I(status)) && !(GG_S_NA(u->status) || GG_S_I(u->status)))
+	if (__USER_QUITING) {
 		u->last_seen = time(NULL);
+		xfree(u->last_descr);
+		u->last_descr = xstrdup(u->descr);
+	}
+
+#undef __USER_QUITING
 
 	prev_status = u->status;
 	
@@ -1678,6 +1720,8 @@ void handle_search50(struct gg_event *e)
 
 		char *name, *active, *gender;
 
+		const char *target = NULL;
+
 		cp_to_iso(firstname);
 		cp_to_iso(lastname);
 		cp_to_iso(nickname);
@@ -1715,8 +1759,17 @@ void handle_search50(struct gg_event *e)
 		}
 
 		gender = format_string(format_find(__format("_unknown")), "");
+
+		for (l = autofinds; l; l = l->next) {
+			uin_t *d = l->data;
+
+			if (*d == atoi(uin)) {
+				target = uin;
+				break;
+			}
+		}
 		
-		print(__format(""), uin, name, nickname, city, birthyear, gender, active);
+		print_window(target, 0, __format(""), uin, name, nickname, city, birthyear, gender, active);
 
 #undef __format
 

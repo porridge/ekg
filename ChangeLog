@@ -4,6 +4,23 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-05-29
+
+- Ctrl-W wrzuca do yankbuffera (w/sz)
+- automagiczne szukanie nieznajmoych, zmienna ,,auto_find'' (mateusza/sz)
+- zdarzenie ,,conference'' (pmb/sz)
+- zmienna ,,ignore_unknown_sender''. wrr. w /ignore by³oby za du¿o do
+  mieszania, ¿eby to osi±gnaæ. (sz)
+- nie trzeba usuwaæ u¿ytkownika z listy ignorowanych, aby dodaæ kolejny
+  poziom (sz)
+- status wykonanego polecenia /exec nie powinien siê ju¿ nigdy pojawiæ zanim
+  ca³y wynik polecenia nie zostanie wy¶wietlony (?/sz)
+- ekg pamiêta, z jakim opisem i adresem IP ostatnio kogo¶ widzia³ (joshua/sz)
+- zmienna ,,wap_enabled''. niezapisywanie do WAP w³asnych wiadomo¶ci,
+  niezale¿nie od ustawieñ ,,display_sent'' (serek/sz)
+- lekka zmiana zachowania /last, mo¿e teraz pokazaæ wiadomo¶ci z danego
+  przedzia³u czasu (sz)
+
 // 2003-05-28
 
 - libgadu: poprawka w±tkowego resolvera przy po³±czeniach http (sz)

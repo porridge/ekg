@@ -32,6 +32,7 @@
 
 #include "libgadu.h"
 #include "dynstuff.h"
+#include "stuff.h"
 
 struct userlist {
 	char *first_name;	/* imiê */
@@ -42,12 +43,15 @@ struct userlist {
 	list_t groups;		/* grupy, do których nale¿y */
 	uin_t uin;		/* numer */
 	int status;		/* aktualny stan */
-	time_t last_seen;	/* jesli jest niedostepny/ukryty to od kiedy */
 	char *descr;		/* opis/powód stanu */
 	struct in_addr ip;	/* adres ip */
 	unsigned short port;	/* port */
 	int protocol;		/* wersja protoko³u */
 	char *foreign;		/* dla kompatybilno¶ci */
+	time_t last_seen;	/* jesli jest niedostepny/ukryty, to od kiedy */
+	char *last_descr;	/* j.w. ostatni opis */
+	struct in_addr last_ip; /* j.w. ostatni adres ip */
+	unsigned short last_port; /* j.w. ostatni port */
 };
 
 struct group {
@@ -55,18 +59,18 @@ struct group {
 };
 
 enum ignore_t {
-	IGNORE_STATUS = 1,
-	IGNORE_STATUS_DESCR = 2,
-	IGNORE_MSG = 4,
-	IGNORE_DCC = 8,
-	IGNORE_EVENTS = 16,
-	IGNORE_NOTIFY = 32,
+	IGNORE_STATUS = TOGGLE_BIT(1),
+	IGNORE_STATUS_DESCR = TOGGLE_BIT(2),
+	IGNORE_MSG = TOGGLE_BIT(3),
+	IGNORE_DCC = TOGGLE_BIT(4),
+	IGNORE_EVENTS = TOGGLE_BIT(5),
+	IGNORE_NOTIFY = TOGGLE_BIT(6),
 	
 	IGNORE_ALL = 255
 };
 
-#define	IGNORE_LABELS_MAX 7
-struct ignore_label ignore_labels[IGNORE_LABELS_MAX];
+#define	IGNORE_LABELS_COUNT 6
+struct ignore_label ignore_labels[IGNORE_LABELS_COUNT + 1];
 
 struct ignore_label {
 	int level;

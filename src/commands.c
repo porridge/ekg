@@ -200,6 +200,7 @@ COMMAND(cmd_add)
 	int params_free = 0, result = 0;
 	struct userlist *u = NULL;
 	uin_t uin = 0, __uin;
+	list_t l;
 
 	ui_event("command", quiet, "query-current", &__uin, NULL);
 
@@ -297,6 +298,15 @@ COMMAND(cmd_add)
 
 	if (params[2])
 		cmd_modify("add", &params[1], NULL, quiet);
+
+	for (l = autofinds; l; l = l->next) {
+		uin_t *d = l->data;
+
+		if (*d == uin) {
+			list_remove(&autofinds, &uin, 1);
+			break;
+		}
+	}	
 
 cleanup:
 	if (params_free) {
@@ -1371,7 +1381,7 @@ COMMAND(cmd_ignore)
 	uin_t uin = 0;
 
 	if (*name == 'i' || *name == 'I') {
-		int flags;
+		int flags, modified = 0;
 
 		if (!params[0]) {
 			list_t l;
@@ -1389,6 +1399,11 @@ COMMAND(cmd_ignore)
 				printq("ignored_list", format_user(u->uin), ignore_format(level));
 			}
 
+			if (config_ignore_unknown_sender) {
+				i = 1;
+				printq("ignored_list_unknown_sender");
+			}
+
 			if (!i)
 				printq("ignored_list_empty");
 
@@ -1404,28 +1419,36 @@ COMMAND(cmd_ignore)
 			return res;
 		}
 
-		if (params[1]) {
-			flags = ignore_flags(params[1]);
+		if ((flags = ignored_check(get_uin(params[0]))))
+			modified = 1;
 
-			if (!flags) {
+		if (params[1]) {
+			int __flags = ignore_flags(params[1]);
+
+			if (!__flags) {
 				printq("invalid_params", name);
 				return -1;
 			}
 
+			flags |= __flags;
+
 		} else
-			flags = IGNORE_ALL;
+			flags |= IGNORE_ALL;
 
 		if (!(uin = get_uin(params[0]))) {
 			printq("user_not_found", params[0]);
 			return -1;
 		}
 
+		if (ignored_check(uin))
+			ignored_remove(uin);
+
 		if (!ignored_add(uin, flags)) {
-			printq("ignored_added", format_user(uin));
+			if (modified)
+				printq("ignored_modified", format_user(uin));
+			else
+				printq("ignored_added", format_user(uin));
 			config_changed = 1;
-		} else {
-			printq("ignored_exist", format_user(uin));
-			return -1;
 		}
 
 	} else {
@@ -1688,6 +1711,15 @@ COMMAND(cmd_list)
 				last_seen_time = localtime(&(u->last_seen));
 				strftime(buf, sizeof(buf), format_find("user_info_last_seen_time"), last_seen_time);
 				printq("user_info_last_seen", buf);
+
+				if (u->last_descr && strcmp(u->last_descr, "") && (!u->descr || strcmp(u->descr, u->last_descr)))
+					printq("user_info_last_descr", u->last_descr);
+
+				if (u->last_ip.s_addr) {
+					char *tmp = saprintf("%s:%s", inet_ntoa(u->last_ip), itoa(u->last_port));
+					printq("user_info_last_ip", tmp);
+					xfree(tmp);
+				}
 			} else 
 				printq("user_info_never_seen");
 		}
@@ -4042,9 +4074,9 @@ COMMAND(cmd_at)
 	list_t l;
 
 	if (match_arg(params[0], 'a', "add", 2)) {
-		const char *p, *a_name = NULL;
-		char *a_command = NULL;
-		time_t period = 0, freq = 0;
+		const char *a_name = NULL;
+		char *p, *a_command = NULL, *freq_str = NULL, *tmp;
+		time_t period = 0, freq = 0, parsed;
 		struct timer *t;
 
 		if (!params[1] || !params[2]) {
@@ -4069,138 +4101,72 @@ COMMAND(cmd_at)
 				}
 			}
 
-			p = params[2];
+			p = xstrdup(params[2]);
 		} else
-			p = params[1];
+			p = xstrdup(params[1]);
 
-		{
-			struct tm *lt;
-			time_t now = time(NULL);
-			char *tmp, *freq_str = NULL, *foo = xstrdup(p);
-			int wrong = 0;
+		if ((tmp = strchr(p, '/'))) {
+			*tmp = 0;
+			freq_str = ++tmp;
+		}
 
-			lt = localtime(&now);
-			lt->tm_isdst = -1;
+		if ((parsed = parsetimestr(p)) == -1) {
+			printq("invalid_params", name);
+			xfree(p);
+			return -1;
+		}
 
-			/* czêstotliwo¶æ */
-			if ((tmp = strchr(foo, '/'))) {
-				*tmp = 0;
-				freq_str = ++tmp;
-			}
+		if (freq_str) {
+			for (;;) {
+				time_t _period = 0;
 
-			/* wyci±gamy sekundy, je¶li s± i obcinamy */
-			if ((tmp = strchr(foo, '.')) && !(wrong = (strlen(tmp) != 3))) {
-				sscanf(tmp + 1, "%2d", &lt->tm_sec);
-				tmp[0] = 0;
-			} else
-				lt->tm_sec = 0;
-
-			/* pozb±d¼my siê dwukropka */
-			if ((tmp = strchr(foo, ':')) && !(wrong = (strlen(tmp) != 3))) {
-				tmp[0] = tmp[1];
-				tmp[1] = tmp[2];
-				tmp[2] = 0;
-			}
-
-			/* jedziemy ... */
-			if (!wrong) {
-				switch (strlen(foo)) {
-					int ret;
-
-					case 12:
-						ret = sscanf(foo, "%4d%2d%2d%2d%2d", &lt->tm_year, &lt->tm_mon, &lt->tm_mday, &lt->tm_hour, &lt->tm_min);
-						if (ret != 5)
-							wrong = 1;
-						lt->tm_year -= 1900;
-						lt->tm_mon -= 1;
-						break;
-					case 10:
-						ret = sscanf(foo, "%2d%2d%2d%2d%2d", &lt->tm_year, &lt->tm_mon, &lt->tm_mday, &lt->tm_hour, &lt->tm_min);
-						if (ret != 5)
-							wrong = 1;
-						lt->tm_year += 100;
-						lt->tm_mon -= 1;
-						break;
-					case 8:
-						ret = sscanf(foo, "%2d%2d%2d%2d", &lt->tm_mon, &lt->tm_mday, &lt->tm_hour, &lt->tm_min);
-						if (ret != 4)
-							wrong = 1;
-						lt->tm_mon -= 1;
-						break;
-					case 6:
-						ret = sscanf(foo, "%2d%2d%2d", &lt->tm_mday, &lt->tm_hour, &lt->tm_min);
-						if (ret != 3)
-							wrong = 1;
-						break;	
-					case 4:
-						ret = sscanf(foo, "%2d%2d", &lt->tm_hour, &lt->tm_min);
-						if (ret != 2)
-							wrong = 1;
-						break;
-					default:
-						wrong = 1;
-				}
-			}
-
-			/* nie ma b³êdów ? */
-			if (wrong || lt->tm_hour > 23 || lt->tm_min > 59 || lt->tm_sec > 59 || lt->tm_mday > 31 || !lt->tm_mday || lt->tm_mon > 11) {
-				printq("invalid_params", name);
-				xfree(foo);
-				return -1;
-			}
-
-			if (freq_str) {
-				for (;;) {
-					time_t _period = 0;
-
-					if (xisdigit(*freq_str))
-						_period = atoi(freq_str);
-					else {
-						printq("invalid_params", name);
-						xfree(foo);
-						return -1;
-					}
-
-					freq_str += strlen(itoa(_period));
-
-					if (strlen(freq_str)) {
-						switch (xtolower(*freq_str++)) {
-							case 'd':
-								_period *= 86400;
-								break;
-							case 'h':
-								_period *= 3600;
-								break;
-							case 'm':
-								_period *= 60;
-								break;
-							case 's':
-								break;
-							default:
-								printq("invalid_params", name);
-								xfree(foo);
-								return -1;
-						}
-					}
-
-					freq += _period;
-					
-					if (!*freq_str)
-						break;
-				}
-			}
-
-			xfree(foo);
-
-			/* plany na przesz³o¶æ? */
-			if ((period = mktime(lt) - now) <= 0) {
-				if (freq) {
-					while (period <= 0)
-						period += freq;
-				} else {
-					printq("at_back_to_past");
+				if (xisdigit(*freq_str))
+					_period = atoi(freq_str);
+				else {
+					printq("invalid_params", name);
+					xfree(p);
 					return -1;
 				}
+
+				freq_str += strlen(itoa(_period));
+
+				if (strlen(freq_str)) {
+					switch (xtolower(*freq_str++)) {
+						case 'd':
+							_period *= 86400;
+							break;
+						case 'h':
+							_period *= 3600;
+							break;
+						case 'm':
+							_period *= 60;
+							break;
+						case 's':
+							break;
+						default:
+							printq("invalid_params", name);
+							xfree(p);
+							return -1;
+					}
+				}
+
+				freq += _period;
+				
+				if (!*freq_str)
+					break;
+			}
+		}
+
+		xfree(p);
+
+		/* plany na przesz³o¶æ? */
+		if ((period = parsed - time(NULL)) <= 0) {
+			if (freq) {
+				while (period <= 0)
+					period += freq;
+			} else {
+				printq("at_back_to_past");
+				return -1;
 			}
 		}
 
@@ -4849,10 +4815,8 @@ COMMAND(cmd_last)
 {
         list_t l;
 	uin_t uin = 0;
-	int show_sent = 0, last_n = 0, count = 0, i = 0;
-	char **arr = NULL;
-	const char *nick = NULL;
-	time_t n;
+	int last_n = 0, count = 0, i = 0;
+	time_t n, period_start = 0, period_end = 0;
 	struct tm *now;
 
 	if (match_arg(params[0], 'c', "clear", 2)) {
@@ -4882,41 +4846,78 @@ COMMAND(cmd_last)
 	}		
 
 	if (params[0]) {
-		show_sent = match_arg(params[0], 's', "stime", 2);
+		char **arr = NULL;
 
-		if (!show_sent)
-			nick = params[0];
+		array_add(&arr, xstrdup(params[0]));
 
 		if (params[1]) {
-			arr = array_make(params[1], " \t", 0, 1, 0);
+			char **tmp = array_make(params[1], " \t", 0, 1, 1);
 
-			nick = arr[0];
+			for (i = 0; tmp[i]; i++)
+				array_add(&arr, xstrdup(tmp[i]));
+			array_free(tmp);
+		}
+
+		/* zobaczmy, co tu mamy ... */
+		for (i = 0; arr[i]; i++) {
+
+			if (match_arg(arr[i], 'u', "user", 2) && arr[i + 1]) {
+				if (!(uin = get_uin(arr[++i]))) {
+					printq("user_not_found", arr[i]);
+					array_free(arr);
+					return -1;
+				}
+
+				continue;	
+			}
+
+			if (match_arg(arr[i], 'n', "number", 2) && arr[i + 1]) {
+				last_n = strtol(arr[++i], NULL, 0);
+				continue;
+			}
+
+			if (match_arg(arr[i], 'p', "period", 2) && arr[i + 1]) {
+				char *foo, *tmp = xstrdup(arr[++i]);
+
+				if ((foo = strchr(tmp, '-'))) {
+					*foo = 0;
+					if (foo != tmp)
+						period_start = parsetimestr(tmp);
+					period_end = parsetimestr(++foo);
+				} else
+					period_start = parsetimestr(tmp);
 			
-			if (match_arg(params[0], 'n', "number", 2)) {
-				last_n = strtol(arr[0], NULL, 0);
-				nick = arr[1];
-				
-				if (arr[1] && (show_sent = match_arg(arr[1], 's', "stime", 2)))
-					nick = arr[2];
+				xfree(tmp);
+			
+				if (!(period_start == -1 || period_end == -1))
+					continue;
 			}
 
-			if (arr[1] && show_sent && match_arg(arr[0], 'n', "number", 2)) {
-				last_n = atoi(arr[1]);
-				nick = arr[2];
-			}
+			printq("invalid_params", name);
+			array_free(arr);
+			return -1;
+		}
 
+		array_free(arr);
+	}
+
+	/* musimy policzyæ rêcznie */
+	for (l = lasts; l; l = l->next) {
+		struct last *ll = l->data;
+
+		if (uin == 0 || uin == ll->uin) {
+
+			if (period_end && ll->time > period_end)
+				break;
+
+			if (!period_start || ll->time > period_start)
+				count++;
 		}
 	}
 
-	if (nick && !(uin = get_uin(nick))) {
-		printq("user_not_found", nick);
-		array_free(arr);
-		return -1;
-	}
+	gg_debug(GG_DEBUG_MISC, "// LAST: last_n == %d, uin == %d, period_start == %d, period_end == %d, count == %d\n", last_n, uin, period_start, period_end, count);
 
-	array_free(arr);
-		
-	if (!((uin > 0) ? (count = last_count(uin)) : (count = list_count(lasts)))) {
+	if (!count) {
 		if (uin) {
 			printq("last_list_empty_nick", format_user(uin));
 			return -1;
@@ -4929,29 +4930,39 @@ COMMAND(cmd_last)
 	n = time(NULL);
 	now = localtime(&n);
 
-        for (l = lasts; l; l = l->next) {
+        for (l = lasts, i = 0; l; l = l->next) {
                 struct last *ll = l->data;
 		struct tm *tm, *st;
 		char buf[100], buf2[100], *time_str = NULL;
 
 		if (uin == 0 || uin == ll->uin) {
 
+			/* jesli ma byæ pocz±tek, to go szukamy */
+			if (period_start && ll->time < period_start)
+				continue;
+
+			/* za daleko? wychodzimy! */
+			if (period_end && ll->time > period_end)
+				break;
+
+			/* jeste¶my w dobrym okresie, ile ostatnich wy¶wietliæ? */
 			if (last_n && i++ < (count - last_n))
 				continue;
 
 			tm = localtime(&ll->time);
 			strftime(buf, sizeof(buf), format_find("last_list_timestamp"), tm);
 
-			if (show_sent && ll->type == 0 && !(ll->sent_time - config_time_deviation <= ll->time && ll->time <= ll->sent_time + config_time_deviation)) {
+			if (ll->type == 0 && !(ll->sent_time - config_time_deviation <= ll->time && ll->time <= ll->sent_time + config_time_deviation)) {
 				st = localtime(&ll->sent_time);
 				strftime(buf2, sizeof(buf2), format_find((tm->tm_yday == now->tm_yday) ? "last_list_timestamp_today" : "last_list_timestamp"), st);
 				time_str = saprintf("%s/%s", buf, buf2);
 			} else
 				time_str = xstrdup(buf);
 
-			if (config_last & 4 && ll->type == 1)
-				printq("last_list_out", time_str, format_user(ll->uin), ll->message);
-			else
+			if (ll->type == 1) {
+				if (config_last & 4)
+					printq("last_list_out", time_str, format_user(ll->uin), ll->message);
+			} else
 				printq("last_list_in", time_str, format_user(ll->uin), ll->message);
 
 			xfree(time_str);
@@ -5395,7 +5406,9 @@ void command_init()
 	  "  - events - ignoruje zdarzenia zwi±zane z u¿ytkownikiem\n"
 	  "  - * - wszystkie poziomy\n"
 	  "\n"
-	  "Poziomy mo¿na ³±czyæ ze sob± za pomoc± przecinka lub ,,%T|%n''.");
+	  "Poziomy mo¿na ³±czyæ ze sob± za pomoc± przecinka lub ,,%T|%n''. "
+          "Próba dodania osoby ju¿ istniej±cej, spowoduje zmodyfikowanie (dodanie) "
+          "poziomów ignorowania.");
 	  
 	command_add
 	( "invisible", "?", cmd_away, 0,
@@ -5418,16 +5431,17 @@ void command_init()
 #endif
 
 	command_add
-	( "last", "uu", cmd_last, 0,
+	( "last", "?u", cmd_last, 0,
 	  " [opcje]", "wy¶wietla lub czy¶ci ostatnie wiadomo¶ci",
 	  "\n"
 	  "  -c, --clear [numer/alias]      czy¶ci podane wiadomo¶ci lub wszystkie\n"
-	  "  -s, --stime [numer/alias]      wy¶wietla czas wys³ania wiadomo¶ci\n"
-	  "  -n, --number <n> [numer/alias] wy¶wietla %Tn%n ostatnich wiadomo¶ci\n"
-	  "  [numer/alias]                  wy¶wietla ostatnie wiadomo¶ci\n"
+	  "  -n, --number <n>               wy¶wietla %Tn%n ostatnich wiadomo¶ci\n"
+          "  -p, --period <pocz±tek-koniec> wy¶wietla wiadomo¶ci z podanego okresu\n"
+	  "  -u, --user <numer/alias>       wy¶wietla wiadomo¶ci od u¿ytkownika\n"
 	  "\n"
-	  "W przypadku opcji %T--stime%n czas wy¶wietlany jest "
-	  ",,inteligentnie'' zgodnie ze zmienn± %Ttime_deviation.%n");
+          "Format zapisu czasu w przypadku opcji ,,%T--period%n'' jest taki sam, jak "
+          "dla polecenia %Tat%n. Mo¿na podaæ zarówno pocz±tek, jak i koniec lub tylko "
+          "jedn± z granic.");
 
 	command_add
 	( "list", "u?", cmd_list, 0,
@@ -5496,6 +5510,7 @@ void command_init()
 	  "  - blocked - zostali¶my zablokowani\n"
 	  "  - msg, chat - wiadomo¶æ\n"
 	  "  - query - nowa rozmowa\n"
+          "  - conference - nowa konferencja\n"
 	  "  - delivered, queued - wiadomo¶æ dostarczona lub zakolejkowana na serwerze\n"
 	  "  - dcc - kto¶ przysy³a nam plik\n"
 	  "  - sigusr1, sigusr2 - otrzymanie przez ekg danego sygna³u\n"
@@ -5512,7 +5527,7 @@ void command_init()
 	  "zostanie zast±pione numerkiem sprawcy zdarzenia, a je¶li istnieje on na naszej "
 	  "li¶cie kontaktów, %T\\%2%n bêdzie zast±pione jego pseudonimem. Zamiast %T\\%3%n i "
 	  "%T\\%4%n wpisana bêdzie tre¶æ wiadomo¶ci, opis u¿ytkownika, ca³kowita ilo¶æ "
-	  "nowych wiadomo¶ci e-mail lub nazwa pliku - w zale¿no¶ci od zdarzenia. "
+	  "nowych wiadomo¶ci e-mail, nazwa pliku lub nazwa konferencji - w zale¿no¶ci od zdarzenia. "
 	  "Format %T\\%4%n ró¿ni siê od %T\\%3%n tym, ¿e wszystkie niebiezpieczne znaki, "
 	  "które mog³yby zostaæ zinterpretowane przez shell, zostan± poprzedzone backslashem. "
 	  "U¿ywanie %T\\%3%n w przypadku komendy ,,exec'' jest %Tniebezpieczne%n i, je¶li naprawdê "
