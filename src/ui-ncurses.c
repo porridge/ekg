@@ -211,7 +211,6 @@ static void ui_ncurses_loop()
 		ekg_wait_for_key();
 		switch ((ch = wgetch(input))) {
 			case KEY_BACKSPACE:
-			case KEY_DC:
 			case 8:
 			case 127:
 				if (strlen(line) > 0 && line_index > 0) {
@@ -220,6 +219,7 @@ static void ui_ncurses_loop()
 					line_index--;
 				}
 				break;
+			case KEY_DC:
 			case 'D' - 64:
 				if (line_index < strlen(line)) {
 					memmove(line + line_index, line + line_index + 1, sizeof(line) - line_index - 1);
@@ -265,10 +265,12 @@ static void ui_ncurses_loop()
 				break;
 			case 'E' - 64:
 			case KEY_END:
+			case KEY_SELECT:
 				adjust();
 				break;
 			case 'A' - 64:
 			case KEY_HOME:
+			case KEY_FIND:
 				line_index = 0;
 				line_start = 0;
 				break;
