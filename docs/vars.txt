@@ -277,7 +277,8 @@ display_transparent
 	typ: bool
 	domy¶lna warto¶æ: 1
 
-	mówi, czy w interfejsie ncurses t³o ma byæ przezroczyste.
+	mówi, czy w interfejsie ncurses t³o ma byæ przezroczyste. zmiany odnios±
+	skutek po ponownym uruchomieniu.
 
 emoticons
 	typ: bool

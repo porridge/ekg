@@ -31,7 +31,7 @@ zg³osi³ b³±d.
   w³±czany przez ,,/set encryption 2'' (w)
 - poprawka zachowania kontaktów przy mieszaniu paskiem stanu i nag³ówkiem
   (sz/w)
-- dodatki do pythona: mo¿na pisaæ do nag³ówku i statusie funkcjami
+- dodatki do pythona: mo¿na pisaæ w nag³ówku i statusie funkcjami
   ekg.print_header() i ekg.print_statusbar. zdarzenie handle_keypress (w)
 
 // 2003-01-09
