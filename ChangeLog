@@ -2,6 +2,8 @@
 
 - poprawki dokumentacji (shasta/wojtekka).
 - dodane dzwiêki przy wiadomo¶ciach -- zmienne ,,sound_...'' (feeg/wojtekka).
+- ,,display_ack'': 0 - nie pokazuje nic, 1 - pokazuje wszystkie, 2 - tylko
+  dostarczone, 3 - tylko zakolejkowane. (i/klith).
 
 // 2001-11-11 
 

@@ -41,7 +41,7 @@ struct variable variables[MAX_VARS] = {
 	{ "sound_chat_file", VAR_STR, 1, &sound_chat_file },
 	{ "sound_app", VAR_STR, 1, &sound_app },
 	{ "completion_notify", VAR_BOOL, 1, &completion_notify },
-	{ "display_ack", VAR_BOOL, 1, &display_ack },
+	{ "display_ack", VAR_INT, 1, &display_ack },
 	{ "display_color", VAR_BOOL, 1, &display_color },
 	{ "log", VAR_INT, 1, &log },
 	{ "log_path", VAR_STR, 1, &log_path },

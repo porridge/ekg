@@ -114,11 +114,18 @@ void handle_msg(struct gg_event *e)
 void handle_ack(struct gg_event *e)
 {
 	char *tmp;
+	int queued = (e->event.ack.status == GG_ACK_QUEUED);
 
 	if (!display_ack)
 		return;
 
-	tmp = (e->event.ack.status == GG_ACK_QUEUED) ? "ack_queued" : "ack_delivered";
+	if (display_ack == 2 && queued)
+		return;
+
+	if (display_ack == 3 && !queued)
+		return;
+
+	tmp = queued ? "ack_queued" : "ack_delivered";
 	my_printf(tmp, format_user(e->event.ack.recipient));
 }
 
