@@ -24,3 +24,6 @@
 #undef WITH_UI_READLINE
 #undef WITH_UI_NCURSES
 
+/* ioctld */
+#undef HAVE_LINUX_KD_H
+

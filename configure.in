@@ -141,10 +141,12 @@ if test -d src; then
       LIBS="$LIBS -lgsm"])
   fi
  
+  AC_CHECK_HEADERS(linux/kd.h, [have_linux_kd_h=yes])
+
   AC_ARG_WITH(ioctld,
     [  --with-ioctld           Compile with ioctld (Linux only)])
 
-  if test "x$with_ioctld" = "xyes"; then 
+  if test "x$with_ioctld" = "xyes" -o "x$have_linux_kd_h" = "xyes"; then 
     CFLAGS="$CFLAGS -DWITH_IOCTLD -DIOCTLD_PATH=\\\"\$(prefix)/bin/ioctld\\\""
     ioctld="ioctld"
     install_ioctld="install-ioctld"
