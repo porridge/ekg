@@ -14,6 +14,7 @@ zg³osi³ b³±d.
   zg³aszajcie swoje b³êdy/obserwacje (sz)
 - libgadu: makra GG_S_*() nie zwracaj± uwagi na stan tylko dla znajomych (w)
 - libgadu: dodanie makra GG_S_F() sprawdzaj±cego stan tylko dla znajomych (w)
+- libgadu: podbicie wersji API (w)
 - uporz±dkowanie kodu timerów, timeoutów itp. (w)
 - wyrzucenie zmiennych away i private_mode, bo tylko komplikowa³y sprawy (w)
 
