@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-06-18
+
+- /list w oknie poka¿e informacje o rozmówcy (weirdo,FIG/w)
+
 // 2003-06-17
 
 - usuniêcie opcji --disable-debug z configure. sprawia tylko problemy (w)

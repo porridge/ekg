@@ -1616,6 +1616,10 @@ COMMAND(cmd_list)
 	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, show_descr = 0, show_blocked = 0, show_offline = 0, j;
 	char **argv = NULL, *show_group = NULL, *ip_str;
 	const char *tmp;
+	uin_t uin;
+
+	if (!params[0] && (uin = get_uin("$")))
+		params[0] = itoa(uin);
 
 	if (params[0] && *params[0] != '-') {
 		char *status, *groups;

@@ -1690,12 +1690,21 @@ void handle_voice(struct gg_common *c)
 void handle_search50(struct gg_event *e)
 {
 	gg_pubdir50_t res = e->event.pubdir50;
-	int i, count;
+	int i, count, all = 0;
 	list_t l;
 
 	if ((count = gg_pubdir50_count(res)) < 1) {
 		print("search_not_found");
 		return;
+	}
+
+	for (l = searches; l; l = l->next) {
+		gg_pubdir50_t req = l->data;
+
+		if (gg_pubdir50_seq(req) == gg_pubdir50_seq(res)) {
+			all = 1;
+			break;
+		}
 	}
 
 	for (i = 0; i < count; i++) {
@@ -1729,7 +1738,7 @@ void handle_search50(struct gg_event *e)
 		cp_to_iso(nickname);
 		cp_to_iso(city);
 
-		if (count == 1) {
+		if (count == 1 && !all) {
 			xfree(last_search_first_name);
 			xfree(last_search_last_name);
 			xfree(last_search_nickname);
@@ -1741,7 +1750,7 @@ void handle_search50(struct gg_event *e)
 
 		name = saprintf("%s %s", firstname, lastname);
 
-#define __format(x) ((count == 1) ? "search_results_single" x : "search_results_multi" x)
+#define __format(x) ((count == 1 && !all) ? "search_results_single" x : "search_results_multi" x)
 
 		switch (status) {
 			case GG_STATUS_AVAIL:

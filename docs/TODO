@@ -14,7 +14,6 @@ rozwi±zanie.
   - dope³nianie w ¶rodku linii (sz)
   - wykrywanie niewidocznych jako opcja (wielu)
   - czas powrotu w stanach opisowych (?)
-  - wariant /list, który w query bez parameterów poka¿e info rozmówcy (weirdo)
   - uporz±dkowane i dobrze dzia³aj±ce okna p³ywaj±ce (sz?)
   - mo¿liwo¶æ automagicznego wyrównywania kolejnych linii wiadomo¶ci w tematach
     ircopodobnych do d³ugo¶ci nazwy rozmówcy i timestampu (sz)
@@ -29,5 +28,6 @@ rozwi±zanie.
   - mo¿liwo¶æ blokowania terminala po d³u¿szym czasie nieaktywno¶ci (Gambler)
   - okienka oparte o kolejne wywo³ania xterma (fidor)
   - obs³uga myszy (mateusza)
+  - zapisywanie zawarto¶ci okna do pliku (marcinzielona@o2.pl)
 
 $Id$
