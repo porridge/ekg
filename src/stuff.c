@@ -34,7 +34,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "config.h"
-#include "libgg.h"
+#include "libgadu.h"
 #include "stuff.h"
 #include "dynstuff.h"
 #include "themes.h"

@@ -32,7 +32,7 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "libgg.h"
+#include "libgadu.h"
 #include "stuff.h"
 #include "dynstuff.h"
 #include "commands.h"
@@ -106,6 +106,7 @@ struct command commands[] = {
 	{ "passwd", "??", command_passwd, " <has³o> <e-mail>", "Zmienia has³o i adres e-mail u¿ytkownika", "" },
 	{ "private", "", command_away, " [on/off]", "W³±cza/wy³±cza tryb ,,tylko dla przyjació³''", "" },
 	{ "query", "u", command_query, " <numer/alias>", "W³±cza rozmowê z dan± osob±", "" },
+	{ "reconnect", "", command_connect, "", "Roz³±cza i ³±czy ponownie", "" },
 	{ "register", "??", command_register, " <email> <has³o>", "Rejestruje nowy uin", "" },
 	{ "remind", "", command_remind, "", "Wysy³a has³o na skrzynkê pocztow±", "" },
 	{ "save", "", command_save, "", "Zapisuje ustawienia programu", "" },
@@ -563,6 +564,9 @@ COMMAND(command_connect)
 			list_add(&watches, sess, 0);
 		} else
 			my_printf("no_config");
+	} else if (!strcasecmp(name, "reconnect")) {
+		command_connect("disconnect", NULL);
+		command_connect("connect", NULL);
 	} else if (sess) {
 		connecting = 0;
 		if (sess->state == GG_STATE_CONNECTED)

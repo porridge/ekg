@@ -1,6 +1,6 @@
 dnl $Id$
 
-AC_INIT(lib/libgg.h)
+AC_INIT(lib/libgadu.h)
 
 PACKAGE=ekg
 VERSION=0.9

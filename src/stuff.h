@@ -23,7 +23,7 @@
 
 #include <stdio.h>
 #include <time.h>
-#include "libgg.h"
+#include "libgadu.h"
 #include "dynstuff.h"
 
 struct userlist {

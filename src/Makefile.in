@@ -15,7 +15,7 @@ install = @INSTALL@
 
 CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -DTHEMES_DIR=\"$(datadir)/ekg/themes\"
 OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o
-LOBJS = ../lib/libgg.a
+LOBJS = ../lib/libgadu.a
 
 all:	ekg
 

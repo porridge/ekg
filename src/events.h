@@ -20,7 +20,7 @@
 #ifndef __EVENTS_H
 #define __EVENTS_H
 
-#include "libgg.h"
+#include "libgadu.h"
 
 struct handler {
 	int type;

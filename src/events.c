@@ -27,7 +27,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <curses.h>
-#include "libgg.h"
+#include "libgadu.h"
 #include "stuff.h"
 #include "events.h"
 #include "commands.h"

@@ -34,7 +34,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
-#include "libgg.h"
+#include "libgadu.h"
 #include "stuff.h"
 #include "commands.h"
 #include "events.h"

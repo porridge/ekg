@@ -26,7 +26,7 @@
 #include <stdarg.h>
 #include "stuff.h"
 #include "vars.h"
-#include "libgg.h"
+#include "libgadu.h"
 
 struct variable variables[MAX_VARS] = {
 	{ "uin", VAR_INT, 1, &config_uin, NULL },
