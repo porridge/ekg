@@ -139,8 +139,6 @@ int check_mail_mbox()
 		m->check = 1;
 	}
 
-	gg_debug(GG_DEBUG_MISC, "go ahead!\n");
-
  	if ((pid = fork()) < 0) {
 		close(fd[0]);
 		close(fd[1]);
