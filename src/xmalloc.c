@@ -25,6 +25,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "configfile.h"
 #include "stuff.h"
 #include "userlist.h"
 #include "libgadu.h"

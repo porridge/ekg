@@ -43,6 +43,7 @@
 #include <unistd.h>
 
 #include "commands.h"
+#include "configfile.h"
 #include "dynstuff.h"
 #include "events.h"
 #include "libgadu.h"
@@ -79,6 +80,11 @@ int change_quiet = 0;
 
 list_t commands = NULL;
 
+/*
+ * match_arg()
+ *
+ * sprawdza, czy dany argument funkcji pasuje do podanego.
+ */
 int match_arg(const char *arg, char shortopt, const char *longopt, int longoptlen)
 {
 	if (!arg || *arg != '-')
@@ -550,7 +556,7 @@ COMMAND(cmd_connect)
                 if (config_uin && config_password) {
 			printq("connecting");
 			connecting = 1;
-			do_connect();
+			ekg_connect();
 		} else {
 			printq("no_config");
 			return -1;

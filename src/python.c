@@ -44,7 +44,7 @@ int python_handle_result = -1;
 
 static PyObject* ekg_connect(PyObject *self, PyObject *args)
 {
-	do_connect();
+	ekg_connect();
 
 	return Py_BuildValue("");
 }

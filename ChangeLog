@@ -10,6 +10,8 @@ zg³osi³ b³±d.
 
 - ,,$'' w miejscu ,,numer/alias'' bêdzie zast±pione w ka¿dej komendzie
   aktualnym rozmówc± (sz)
+- libgadu: poprawki kompilacji z pthreadami (w)
+- porz±dki w kodzie, wydzielenie ¶mieci ze stuff.c (w)
 
 // 2003-03-07
 

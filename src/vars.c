@@ -208,6 +208,7 @@ void variable_init()
 	variable_add("reason", "re", VAR_STR, 2, &config_reason, NULL, NULL, NULL);
 	variable_add("interface", "in", VAR_STR, 2, &config_interface, NULL, NULL, NULL);
 	variable_add("password_cp1250", "c1", VAR_BOOL, 2, &config_password_cp1250, NULL, NULL, NULL);
+	variable_add("last_sysmsg", "LS", VAR_INT, 2, &config_last_sysmsg, NULL, NULL, NULL);
 }
 
 /*

@@ -34,6 +34,7 @@
 #include <unistd.h>
 
 #include "commands.h"
+#include "emoticons.h"
 #include "events.h"
 #include "libgadu.h"
 #include "msgqueue.h"
@@ -554,7 +555,7 @@ void handle_msg(struct gg_event *e)
 #endif
 	
 	if (e->event.msg.sender == 0) {
-		if (e->event.msg.msgclass > last_sysmsg) {
+		if (e->event.msg.msgclass > config_last_sysmsg) {
 			if (!hide)
 				print_message(e, u, 2, 0);
 
@@ -562,8 +563,7 @@ void handle_msg(struct gg_event *e)
 				ui_beep();
 		    
 			play_sound(config_sound_sysmsg_file);
-			last_sysmsg = e->event.msg.msgclass;
-			sysmsg_write();
+			config_last_sysmsg = e->event.msg.msgclass;
 		}
 
 		return;
@@ -979,7 +979,7 @@ void handle_failure(struct gg_event *e)
 	gg_free_session(sess);
 	sess = NULL;
 	userlist_clear_status(0);
-	do_reconnect();
+	ekg_reconnect();
 }
 
 /*
@@ -1066,7 +1066,7 @@ void handle_event(struct gg_session *s)
 		userlist_clear_status(0);
 		ui_event("disconnected");
 		last_conn_event = time(NULL);
-		do_reconnect();
+		ekg_reconnect();
 
 		return;
 	}

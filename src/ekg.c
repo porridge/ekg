@@ -49,6 +49,8 @@
 #include <unistd.h>
 
 #include "commands.h"
+#include "configfile.h"
+#include "emoticons.h"
 #include "events.h"
 #include "libgadu.h"
 #include "mail.h"
@@ -386,7 +388,7 @@ void ekg_wait_for_key()
 					gg_free_session(s);
 					userlist_clear_status(0);
 					sess = NULL;
-					do_reconnect();
+					ekg_reconnect();
 					break;
 
 				case GG_SESSION_REGISTER:
@@ -443,7 +445,7 @@ void ekg_wait_for_key()
 			reconnect_timer = 0;
 			print("connecting");
 			connecting = 1;
-			do_connect();
+			ekg_connect();
 		}
 
 		/* timeout pinga */
@@ -1087,7 +1089,6 @@ int main(int argc, char **argv)
 	
         userlist_read();
 	update_status();
-	sysmsg_read();
 	emoticon_read();
 	msg_queue_read();
 
@@ -1227,7 +1228,7 @@ int main(int argc, char **argv)
 	if (config_uin && config_password && auto_connect) {
 		print("connecting");
 		connecting = 1;
-		do_connect();
+		ekg_connect();
 	}
 
 	if (config_auto_save)
@@ -1264,6 +1265,8 @@ void ekg_exit()
 	xfree(last_search_first_name);
 	xfree(last_search_last_name);
 	xfree(last_search_nickname);
+
+	array_add(&vars, xstrdup("last_sysmsg"));
 
 	if (config_keep_reason) {
 		array_add(&vars, xstrdup("status"));

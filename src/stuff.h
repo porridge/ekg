@@ -97,11 +97,6 @@ struct event {
         char *action;	/* akcja! */
 };
 
-struct emoticon {
-	char *name;	/* nazwa emoticona typu "<cmok>" */
-	char *value;	/* tre¶æ emoticona typu ":-*" */
-};
-
 struct binding {
 	char *key;
 
@@ -181,7 +176,6 @@ list_t aliases;
 list_t watches;
 list_t transfers;
 list_t events;
-list_t emoticons;
 list_t bindings;
 list_t timers;
 list_t lasts;
@@ -242,6 +236,7 @@ int config_header_size;
 int config_keep_reason;
 int config_last;
 int config_last_size;
+int config_last_sysmsg;
 int config_log;
 int config_log_ignored;
 char *config_log_path;
@@ -290,7 +285,6 @@ char *config_dir;
 int in_autoexec;
 int reconnect_timer;
 time_t last_action;
-int last_sysmsg;
 int connecting;
 time_t last_conn_event;
 time_t ekg_started;
@@ -350,24 +344,11 @@ int conference_set_ignore(const char *name, int flag, int quiet);
 int conference_rename(const char *oldname, const char *newname, int quiet);
 void conference_free();
 
-int config_read(const char *filename);
-char *config_read_variable(const char *var);
-int config_write(const char *filename);
-int config_write_partly(char **vars);
-void config_write_crash();
-void debug_write_crash();
-int sysmsg_read();
-int sysmsg_write();
-
-void do_connect();
-void do_reconnect();
+void ekg_connect();
+void ekg_reconnect();
 void ekg_logoff(struct gg_session *sess, const char *reason);
 
 int ekg_hash(const char *name);
-
-int emoticon_read();
-char *emoticon_expand(const char *s);
-void emoticon_free();
 
 int event_add(int flags, const char *target, const char *action, int quiet);
 int event_remove(const char *name, int quiet);

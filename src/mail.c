@@ -36,6 +36,7 @@
 #  include <utime.h>
 #endif
 
+#include "configfile.h"
 #include "dynstuff.h"
 #include "mail.h"
 #include "stuff.h"
