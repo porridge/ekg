@@ -2716,10 +2716,10 @@ COMMAND(cmd_dcc)
 
 				switch (t->type) {
 					case GG_SESSION_DCC_SEND:
-						printq("dcc_show_active_send", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa(100*t->dcc->offset/t->dcc->file_info.size));
+						printq("dcc_show_active_send", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa(100*((float)t->dcc->offset/(float)t->dcc->file_info.size)));
 						break;
 					case GG_SESSION_DCC_GET:
-						printq("dcc_show_active_get", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa(100*t->dcc->offset/t->dcc->file_info.size));
+						printq("dcc_show_active_get", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa(100*((float)t->dcc->offset/(float)t->dcc->file_info.size)));
 						break;
 					case GG_SESSION_DCC_VOICE:
 						printq("dcc_show_active_voice", itoa(t->id), format_user(t->uin));

@@ -6,6 +6,7 @@ d - drg, sz - szalik).
 
 // 2003-11-19
 
+- poprawka /dcc list dla du¿ych plików (?/sz)
 - prosta obs³uga grup w ignore/unignore (sz)
 - zdarzenie dccfinish. mo¿liwo¶æ usuwania nie tylko ze wzglêdu na numer
   zdarzenia (struthio/sz)
