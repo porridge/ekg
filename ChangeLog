@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - ui-readline respektuje zmienn± ,,sort_windows'' (d)
 - ui-ncurses poprawnie wykrywa p³eæ przy imionach z polskimi znakami.
   widocznie ncurses co¶ psuje (Arim/w)
+- prompt z nickiem query w ui-ncurses (w)
 
 // 2002-09-05
 

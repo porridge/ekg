@@ -73,8 +73,8 @@ static void update_statusbar();
 
 struct window {
 	WINDOW *window;
-	char *target;
-	int lines, y, start, id, act;
+	char *target, *prompt;
+	int lines, y, start, id, act, prompt_len;
 };
 
 static WINDOW *status = NULL, *input = NULL;
@@ -232,6 +232,17 @@ static struct window *window_new(const char *target)
 
 	w.id = id;
 	w.target = xstrdup(target);
+	if (target) {
+		w.prompt = format_string(format_find("ncurses_prompt_query"), target);
+		w.prompt_len = strlen(w.prompt);
+	} else {
+		const char *f = format_find("ncurses_prompt_none");
+
+		if (strcmp(f, "")) {
+			w.prompt = xstrdup(f);
+			w.prompt_len = strlen(w.prompt);
+		}
+	}
 	w.lines = stdscr->_maxy - 1;
 	w.window = newpad(w.lines, stdscr->_maxx + 1);
 
@@ -263,6 +274,9 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 
 				if (!w->target && w->id != 1) {
 					w->target = xstrdup(target);
+					xfree(w->prompt);
+					w->prompt = format_string(format_find("ncurses_prompt_query"), target);
+					w->prompt_len = strlen(w->prompt);
 					print("window_id_query_started", itoa(w->id), target);
 					break;
 				}
@@ -608,6 +622,8 @@ void ui_ncurses_init()
 	init_pair(15, COLOR_WHITE, COLOR_BLUE);
 	
 	format_add("statusbar", " %c(%w%{time}%c)%w %c(%wuin%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) (%wwin%c/%w%{window}%{?query %c:%W}%{query}%c)%w %{?activity %c(%wact%c/%w}%{activity}%{?activity %c)%w}", 1);
+	format_add("ncurses_prompt_none", "", 1);
+	format_add("ncurses_prompt_query", "[%1] ", 1);
 	format_add("no_prompt_cache", "", 1);
 	format_add("prompt", "%K:%g:%G:%n", 1);
 	format_add("prompt2", "%K:%c:%C:%n", 1);
@@ -638,6 +654,7 @@ static void ui_ncurses_deinit()
 		struct window *w = l->data;
 
 		xfree(w->target);
+		xfree(w->prompt);
 		delwin(w->window);
 	}
 
@@ -661,10 +678,10 @@ static void ui_ncurses_deinit()
 #define adjust() \
 { \
 	line_index = strlen(line); \
-	if (strlen(line) < input->_maxx - 9) \
+	if (strlen(line) < input->_maxx - 9 - window_current->prompt_len) \
 		line_start = 0; \
 	else \
-		line_start = strlen(line) - strlen(line) % (input->_maxx - 9); \
+		line_start = strlen(line) - strlen(line) % (input->_maxx - 9 - window_current->prompt_len); \
 }
 
 void dcc_generator(const char *text, int len)
@@ -1151,24 +1168,28 @@ static void ui_ncurses_loop()
 			completions = NULL;
 		}
 
-		if (line_index - line_start > input->_maxx - 9)
-			line_start += input->_maxx - 19;
+		if (line_index - line_start > input->_maxx - 9 - window_current->prompt_len)
+			line_start += input->_maxx - 19 - window_current->prompt_len;
 		if (line_index - line_start < 10) {
-			line_start -= input->_maxx - 19;
+			line_start -= input->_maxx - 19 - window_current->prompt_len;
 			if (line_start < 0)
 				line_start = 0;
 		}
 		window_refresh();
 		werase(input);
 		wattrset(input, COLOR_PAIR(7));
-		mvwaddstr(input, 0, 0, line + line_start);
-		wattrset(input, COLOR_PAIR(2));
+		if (window_current->prompt) {
+			mvwaddstr(input, 0, 0, window_current->prompt);
+			mvwaddstr(input, 0, window_current->prompt_len, line + line_start);
+		} else
+			mvwaddstr(input, 0, 0, line + line_start);
+		wattrset(input, COLOR_PAIR(16) | A_BOLD);
 		if (line_start > 0)
-			mvwaddch(input, 0, 0, '<');
-		if (strlen(line) - line_start > input->_maxx + 1)
+			mvwaddch(input, 0, window_current->prompt_len, '<');
+		if (strlen(line) - line_start > input->_maxx + 1 - window_current->prompt_len)
 			mvwaddch(input, 0, input->_maxx, '>');
 		wattrset(input, COLOR_PAIR(7));
-		wmove(input, 0, line_index - line_start);
+		wmove(input, 0, line_index - line_start + window_current->prompt_len);
 		wnoutrefresh(status);
 		wnoutrefresh(input);
 		doupdate();
@@ -1304,11 +1325,24 @@ static int ui_ncurses_event(const char *event, ...)
 
 				print("query_started", param);
 				xfree(window_current->target);
+				xfree(window_current->prompt);
 				window_current->target = xstrdup(param);
+				window_current->prompt = format_string(format_find("ncurses_prompt_query"), param);
+				window_current->prompt_len = strlen(window_current->prompt);
 			} else {
+				const char *f = format_find("ncurses_prompt_none");
+
 				print("query_finished", window_current->target);
 				xfree(window_current->target);
+				xfree(window_current->prompt);
 				window_current->target = NULL;
+				window_current->prompt = NULL;
+				window_current->prompt_len = 0;
+				
+				if (strcmp(f, "")) {
+					window_current->prompt = xstrdup(f);
+					window_current->prompt_len = strlen(f);
+				}
 			}
 			update_statusbar();
 		}
