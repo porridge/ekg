@@ -2304,8 +2304,6 @@ int ekg_getch(int meta)
 {
 	int ch;
 
-	ekg_wait_for_key();
-
 	ch = wgetch(input);
 
 #ifdef WITH_PYTHON
@@ -2340,7 +2338,11 @@ static void ui_ncurses_loop()
 	history[0] = line;
 
 	for (;;) {
-		int ch = ekg_getch(0);
+		int ch;
+		
+		ekg_wait_for_key();
+		ch = ekg_getch(0);
+
 
 		if (ch == -1)
 			continue;
@@ -2589,6 +2591,8 @@ static void ui_ncurses_loop()
 
 			case 'V' - 64:	/* Ctrl-V */
 			{
+				ekg_wait_for_key();
+
 				ch = ekg_getch('V' - 64);
 
 				if (ch == -1)

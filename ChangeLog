@@ -20,6 +20,7 @@ zg³osi³ b³±d.
 - libgadu: zapisywanie wykrytych includów z uintXX_t do libgadu-config.h
   (adrians/w)
 - dodanie klawisza Ctrl-V (w)
+- poprawka kombinacji z Altem (sz/w)
 
 // 2003-01-27
 
