@@ -1,3 +1,7 @@
+ekg (CVS-1) unstable; urgency=low
+  * added changelog entry for automatic snapshot building.
+ -- Adam Kruszewski <phantom@debian.org.pl>  Thu, 09 May 2002 14:41:04 +0000
+
 ekg (20020507-1) unstable; urgency=low
   * synched with upstream version.
   * fixed all lintian errors and warnings but:
