@@ -2803,7 +2803,7 @@ static void complete(int *line_start, int *line_index)
 
 	/* inicjujemy pamiêc dla separators */
 	if (words != NULL)
-		separators = xmalloc(array_count(words));
+		separators = xmalloc(array_count(words) + 1);
 	else
 		separators = NULL;
 		
