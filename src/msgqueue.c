@@ -182,8 +182,8 @@ int msg_queue_flush()
 
 		if (m->uin_count == 1) {
 			if (m->secure)
-				msg_encrypt(*(m->uins), &tmp);
-			new_seq = gg_send_message_richtext(sess, m->msg_class, *(m->uins), tmp, m->format, m->formatlen);
+				msg_encrypt(m->uins[0], &tmp);
+			new_seq = gg_send_message_richtext(sess, m->msg_class, m->uins[0], tmp, m->format, m->formatlen);
 		} else
 			new_seq = gg_send_message_confer_richtext(sess, m->msg_class, m->uin_count, m->uins, tmp, m->format, m->formatlen);
 
@@ -360,7 +360,8 @@ int msg_queue_read()
 				fscanf(f, "%c", &m.format[i]);
 
 			fscanf(f, "%*c");
-		}
+		} else
+			m.format = NULL;
 
 		msg = string_init(NULL);
 

@@ -245,8 +245,6 @@ COMMAND(cmd_alias)
 
 COMMAND(cmd_away)
 {
-	unidle();
-
 	if (params[0] && strlen(params[0]) > GG_STATUS_DESCR_MAXSIZE)
 		print("descr_too_long", itoa(strlen(params[0]) - GG_STATUS_DESCR_MAXSIZE));
 
@@ -294,6 +292,8 @@ COMMAND(cmd_away)
 				gg_change_status(sess, config_status);
 		}
 	}
+
+	unidle();
 }
 
 COMMAND(cmd_status)
@@ -319,7 +319,7 @@ COMMAND(cmd_status)
 	else
 		print("show_status_uin", itoa(config_uin));
 	
-	lce = localtime((const time_t*) &last_conn_event);
+	lce = localtime((const time_t *) &last_conn_event);
 	strftime(buf, sizeof(buf), format_find((last_conn_event / 86400 == time(NULL) / 86400) ? "show_status_last_conn_event_today" : "show_status_last_conn_event"), (const struct tm*) lce);
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
@@ -443,20 +443,22 @@ COMMAND(cmd_del)
 		return;
 	}
 
-	if (!(uin = get_uin(params[0])) || !(u = userlist_find(uin, NULL))) {
+	uin = get_uin(params[0]);
+
+	if (!(u = userlist_find(uin, params[0]))) {
 		print("user_not_found", params[0]);
 		return;
 	}
 
 	nick = xstrdup(u->display);
 	
-	tmp = format_user(uin);
+	tmp = format_user(u->uin);
 
 	if (!userlist_remove(u)) {
 		print("user_deleted", tmp);
-		gg_remove_notify(sess, uin);
+		gg_remove_notify(sess, u->uin);
 		config_changed = 1;
-		ui_event("userlist_changed", nick, itoa(uin));
+		ui_event("userlist_changed", nick, itoa(u->uin));
 	} else
 		print("error_deleting");
 
@@ -1525,7 +1527,7 @@ COMMAND(cmd_msg)
 
 #ifdef HAVE_OPENSSL
 	if (config_encryption == 1 && array_count(nicks) == 1 && (uin = get_uin(nicks[0])) && (msg_encrypt(uin, &msg) > 0))
-			secure = 1;
+		secure = 1;
 #endif
 
 	for (p = nicks; *p; p++) {
@@ -1608,7 +1610,6 @@ COMMAND(cmd_msg)
 
 	array_free(nicks);
 
-	unidle();
 }
 
 COMMAND(cmd_save)
