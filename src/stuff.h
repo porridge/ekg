@@ -260,7 +260,7 @@ struct timer *timer_add(int period, const char *name, const char *command);
 int timer_remove(const char *name, const char *command);
 void timer_free();
 int last_add(unsigned int type, uin_t uin, time_t t, const char *msg);
-int get_last_count(uin_t uin);
+int last_count_get(uin_t uin);
 int last_count_del(uin_t uin);
 int last_count_add(uin_t uin);
 

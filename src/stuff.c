@@ -2259,7 +2259,7 @@ int last_add(unsigned int type, uin_t uin, time_t t, const char *msg)
 		return 0;
 	
 	if (config_last & 2) 
-		last_count = get_last_count(uin);
+		last_count = last_count_get(uin);
 	else
 		last_count = list_count(lasts);
 				
@@ -2349,7 +2349,7 @@ int last_count_del(uin_t uin)
 	return 0;
 }
 
-int get_last_count(uin_t uin) 
+int last_count_get(uin_t uin) 
 {
 	int last_count = 0;
 	list_t l;

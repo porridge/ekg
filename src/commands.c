@@ -2202,7 +2202,7 @@ COMMAND(cmd_last)
 		return;
 	}  
 		
-	if (!(last_count = (uin > 0) ? get_last_count(uin) : list_count(lasts))) {
+	if (!(last_count = (uin > 0) ? last_count_get(uin) : list_count(lasts))) {
 		print("last_list_empty");
 		return;
 	}
