@@ -8,11 +8,11 @@ biblioteka:
 
 klient:
 - uzupe³niæ dope³nienia (w tym nicki ze spacjami),
-- lastlog, awaylog.
 - wykrywanie niewidocznych jako opcja.
 - wyczyszczenie history.
 - korzystaæ z getopt.
-- wy¶wietlanie wysy³anych wiadomo¶ci.
+- kompresja logów.
+- sprawy wymienione w src/ui-ncurses.c
 
 $Id$
 

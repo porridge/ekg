@@ -88,12 +88,22 @@ static struct window *window_current;
 
 #define output_size (stdscr->_maxy - 1)
 
+/*
+ * ui_debug()
+ *
+ * wy¶wietla szybko sformatowany tekst w aktualnym oknie. do debugowania.
+ */
 #define ui_debug(x...) { \
 	char *ui_debug_tmp = saprintf(x); \
 	ui_ncurses_print(NULL, 0, ui_debug_tmp); \
 	xfree(ui_debug_tmp); \
 }
 
+/*
+ * set_cursor()
+ *
+ * ustawia kursor na pocz±ktu kolejnej linii okna.
+ */
 static void set_cursor(struct window *w)
 {
 	if (w->y == w->lines) {
@@ -150,6 +160,11 @@ static void window_refresh()
 	}
 }
 
+/*
+ * window_kill()
+ *
+ * usuwa podane okno.
+ */
 static void window_kill(struct window *w)
 {
 	if (w->id == 1) {
@@ -171,6 +186,11 @@ static void window_kill(struct window *w)
 	list_remove(&windows, w, 1);
 }
 
+/*
+ * window_switch()
+ *
+ * prze³±cza do podanego okna.
+ */
 static void window_switch(int id)
 {
 	list_t l;
@@ -194,6 +214,26 @@ static void window_switch(int id)
 	}
 }
 
+/*
+ * window_new_compare()
+ *
+ * do sortowania okienek.
+ */
+static int window_new_compare(void *data1, void *data2)
+{
+	struct window *a = data1, *b = data2;
+
+	if (!a || !b)
+		return 0;
+
+	return a->id - b->id;
+}
+
+/*
+ * window_new()
+ *
+ * tworzy nowe okno o podanej nazwie.
+ */
 static struct window *window_new(const char *target)
 {
 	struct window w;
@@ -221,9 +261,14 @@ static struct window *window_new(const char *target)
 	w.lines = stdscr->_maxy - 1;
 	w.window = newpad(w.lines, stdscr->_maxx + 1);
 
-	return list_add(&windows, &w, sizeof(w));
+	return list_add_sorted(&windows, &w, sizeof(w), window_new_compare);
 }
 
+/*
+ * ui_ncurses_print()
+ *
+ * wy¶wietla w podanym okienku, co trzeba.
+ */
 static void ui_ncurses_print(const char *target, int separate, const char *line)
 {
 	struct window *w;
@@ -534,11 +579,21 @@ static void update_statusbar()
 	doupdate();
 }
 
+/*
+ * ui_ncurses_beep()
+ *
+ * ostentacyjnie wzywa u¿ytkownika do reakcji.
+ */
 static void ui_ncurses_beep()
 {
 	beep();
 }
 
+/*
+ * ui_ncurses_init()
+ *
+ * inicjalizuje ca³± zabawê z ncurses.
+ */
 void ui_ncurses_init()
 {
 	struct timer *t;
@@ -578,7 +633,7 @@ void ui_ncurses_init()
 	init_pair(14, COLOR_CYAN, COLOR_BLUE);
 	init_pair(15, COLOR_WHITE, COLOR_BLUE);
 	
-	format_add("statusbar", " %c(%w%{time}%c)%w %c(%wuin%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) (%wwin%c/%w%{window}%{?query %c:%w}%{query}%c)%w %{?activity %c(%wact%c/%w}%{activity}%{?activity %c)%w}", 1);
+	format_add("statusbar", " %c(%w%{time}%c)%w %c(%wuin%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) (%wwin%c/%w%{window}%{?query %c:%W}%{query}%c)%w %{?activity %c(%wact%c/%w}%{activity}%{?activity %c)%w}", 1);
 	format_add("no_prompt_cache", "", 1);
 	format_add("prompt", "%K:%g:%G:%n", 1);
 	format_add("prompt2", "%K:%c:%C:%n", 1);
@@ -596,6 +651,11 @@ void ui_ncurses_init()
 	t->ui = 1;
 }
 
+/*
+ * ui_ncurses_deinit()
+ *
+ * zamyka, robi porz±dki.
+ */
 static void ui_ncurses_deinit()
 {
 	list_t l;
@@ -619,13 +679,18 @@ static void ui_ncurses_deinit()
 	xfree(yanked);
 }
 
+/*
+ * adjust()
+ *
+ * ustawia kursor w odpowiednim miejscu ekranu po zmianie tekstu.
+ */
 #define adjust() \
 { \
 	line_index = strlen(line); \
-	if (strlen(line) < 70) \
+	if (strlen(line) < input->_maxx - 9) \
 		line_start = 0; \
 	else \
-		line_start = strlen(line) - strlen(line) % 70; \
+		line_start = strlen(line) - strlen(line) % (input->_maxx - 9); \
 }
 
 void dcc_generator(const char *text, int len)
@@ -914,6 +979,11 @@ static void complete(int *line_start, int *line_index)
 	return;
 }
 
+/*
+ * ui_ncurses_loop()
+ *
+ * g³ówna pêtla interfejsu.
+ */
 static void ui_ncurses_loop()
 {
 	int line_start = 0, line_index = 0;
@@ -1132,7 +1202,41 @@ static void ui_ncurses_loop()
 	}
 }
 
+static void window_next()
+{
+	struct window *next = NULL;
+	list_t l;
 
+	for (l = windows; l; l = l->next) {
+		if (l->data == window_current && l->next)
+			next = l->next->data;
+	}
+
+	if (!next)
+		next = windows->data;
+
+	window_switch(next->id);
+}
+
+static void window_prev()
+{
+	struct window *prev = NULL;
+	list_t l;
+
+	for (l = windows; l; l = l->next) {
+		if (l->data == window_current && l != windows)
+			break;
+		prev = l->data;
+	}
+
+	window_switch(prev->id);
+}
+
+/*
+ * ui_ncurses_event()
+ *
+ * obs³uga zdarzeñ.
+ */
 static int ui_ncurses_event(const char *event, ...)
 {
 	va_list ap;
@@ -1245,7 +1349,17 @@ static int ui_ncurses_event(const char *event, ...)
 				goto cleanup;
 			}
 
-			if (!strcasecmp(p1, "next") || !strcasecmp(p1, "prev") || !strcasecmp(p1, "clear") || !strcasecmp(p1, "refresh")) {
+			if (!strcasecmp(p1, "next")) {
+				window_next();
+				goto cleanup;
+			}
+			
+			if (!strcasecmp(p1, "prev")) {
+				window_prev();
+				goto cleanup;
+			}
+			
+			if (!strcasecmp(p1, "clear") || !strcasecmp(p1, "refresh")) {
 				print("not_implemented");
 				goto cleanup;
 			}

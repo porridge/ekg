@@ -8,6 +8,12 @@ przechodzi siê klawiszem Alt-<numer> lub Esc, potem cyfra. mo¿na te¿
 przej¶æ komend± ,,window switch <numer>''. okna zamyka siê klawiszem Alt-k
 lub Esc, k, albo komend± ,,window kill [numer]''.
 
+zalecane ustawienia:
+
+	set display_ack 3
+	set display_sent 1
+	set make_window 2
+
 NIE MO¯NA JESZCZE BINDOWAÆ KLAWISZY ANI WYSY£AÆ WIELOLINIJKOWYCH WIADOMO¦CI!
 
 pasek stanu zawiera zegar, informacje o w³asnym numerku (kolor okre¶la
