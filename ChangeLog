@@ -11,6 +11,7 @@ zg³osi³ b³±d.
 - poprawka zachowania /window last (khhh/sz)
 - libgadu: poprawki dla bigendianowych maszyn (gs/w)
 - poprawki leaków (w)
+- poprawne wy¶wietlanie tabów w ui-ncurses (w)
 
 // 2003-03-11
 
