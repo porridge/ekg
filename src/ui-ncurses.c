@@ -37,8 +37,10 @@
  */
 
 /*
- * roadmap:
- * - wielolinijkowe wiadomo¶ci,
+ * XXX TODO:
+ * - reakcja na zmianê rozmiaru terminala,
+ * - exec,
+ * - debug,
  * - bindowanie,
  * - listy kontaktów po prawej.
  */
@@ -176,6 +178,11 @@ static void window_refresh()
 		else
 			pnoutrefresh(w->window, 0, 0, 0, 81, 0, 0);
 	}
+	
+	mvwin(status, stdscr->_maxy - input_size, 0);
+	wresize(input, input_size, input->_maxx + 1);
+	mvwin(input, stdscr->_maxy - input_size + 1, 0);
+	wmove(input, 0, 0);
 }
 
 /*
@@ -1088,11 +1095,7 @@ static void update_input()
 			w->start -= 4;
 	}
 
-	mvwin(status, stdscr->_maxy - input_size, 0);
-	wresize(input, input_size, input->_maxx + 1);
-	mvwin(input, stdscr->_maxy - input_size + 1, 0);
-	wmove(input, 0, 0);
-	
+
 	window_refresh();
 	wnoutrefresh(status);
 	wnoutrefresh(input);
@@ -1116,6 +1119,14 @@ static void ui_ncurses_loop()
 
 		ekg_wait_for_key();
 		switch ((ch = wgetch(input))) {
+			case KEY_RESIZE:  /* zmiana rozmiaru terminala */
+				window_refresh();
+				wnoutrefresh(status);
+				wnoutrefresh(input);
+				doupdate();
+				wrefresh(curscr);
+				break;
+
 			case 27:
 				ch = wgetch(input);
 
