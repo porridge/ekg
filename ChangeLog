@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-06-02
+
+- ,,ignore_unknown_sender'' nie ignoruje wiadomo¶ci systemowych (sz)
+
 // 2003-05-30
 
 - testowa poprawa wydajno¶ci wy¶wietlania - nie od¶wie¿a w obrêbie

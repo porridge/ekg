@@ -488,6 +488,22 @@ void handle_msg(struct gg_event *e)
 			hide = 1;
 	}
 #endif
+
+	if (e->event.msg.sender == 0) {
+		if (e->event.msg.msgclass > config_last_sysmsg) {
+			if (!hide)
+				print_message(e, u, 2, 0);
+
+			if (config_beep)
+				ui_beep();
+		    
+			play_sound(config_sound_sysmsg_file);
+			config_last_sysmsg = e->event.msg.msgclass;
+			config_last_sysmsg_changed = 1;
+		}
+
+		return;
+	}
 	
 	if (e->event.msg.recipients_count) {
 		struct conference *c = conference_find_by_uins(
@@ -498,7 +514,7 @@ void handle_msg(struct gg_event *e)
 			return;
 	}
 
-	if (ignored_check(e->event.msg.sender) & IGNORE_MSG || config_ignore_unknown_sender) {
+	if (config_ignore_unknown_sender || ignored_check(e->event.msg.sender) & IGNORE_MSG) {
 		if (config_log_ignored)
 			put_log(e->event.msg.sender, "%sign,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), e->event.msg.message);
 
@@ -534,21 +550,7 @@ void handle_msg(struct gg_event *e)
 	}
 #endif
 	
-	if (e->event.msg.sender == 0) {
-		if (e->event.msg.msgclass > config_last_sysmsg) {
-			if (!hide)
-				print_message(e, u, 2, 0);
 
-			if (config_beep)
-				ui_beep();
-		    
-			play_sound(config_sound_sysmsg_file);
-			config_last_sysmsg = e->event.msg.msgclass;
-			config_last_sysmsg_changed = 1;
-		}
-
-		return;
-	}
 
 	if (!(ignored_check(e->event.msg.sender) & IGNORE_EVENTS))
 		event_check((chat) ? EVENT_CHAT : EVENT_MSG, e->event.msg.sender, e->event.msg.message);
