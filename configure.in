@@ -7,6 +7,7 @@ AC_CONFIG_HEADERS(config.h)
 AC_SUBST(CFLAGS_LIBGADU)
 AC_SUBST(LIBS_LIBGADU)
 AC_SUBST(OBJS)
+AC_SUBST(IOCTLD_OBJS)
 
 AC_SUBST(strip_ekg, "")
 AC_SUBST(strip_ioctld, "")
@@ -296,8 +297,8 @@ dnl  setenv dla pythona
 AC_CHECK_FUNCS(setenv)
 
 dnl  strlcat/strlcpy wiele systemów nie posiada
-AC_CHECK_FUNCS(strlcat, , [OBJS="$OBJS ../compat/strlcat.o"])
-AC_CHECK_FUNCS(strlcpy, , [OBJS="$OBJS ../compat/strlcpy.o"])
+AC_CHECK_FUNCS(strlcat, , [OBJS="$OBJS ../compat/strlcat.o"; IOCTLD_OBJS="$IOCTLD_OBJS ../compat/strlcat.o"])
+AC_CHECK_FUNCS(strlcpy, , [OBJS="$OBJS ../compat/strlcpy.o"; IOCTLD_OBJS="$IOCTLD_OBJS ../compat/strlcpy.o"])
 
 dnl  utimes do sprawdzania poczty
 AC_CHECK_FUNCS(utimes)
