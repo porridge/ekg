@@ -2468,7 +2468,7 @@ void known_uin_generator(const char *text, int len)
 		struct userlist *u = l->data;
 
 		if (u->display && u->uin && !strncasecmp(text, u->display, len)) {
-			array_add(&completions, xstrdup(u->display));
+			array_add_check(&completions, xstrdup(u->display), 1);
 			done = 1;
 		}
 	}
@@ -2477,14 +2477,14 @@ void known_uin_generator(const char *text, int len)
 		struct userlist *u = l->data;
 
 		if (!done && u->uin && !strncasecmp(text, itoa(u->uin), len))
-			array_add(&completions, xstrdup(itoa(u->uin)));
+			array_add_check(&completions, xstrdup(itoa(u->uin)), 1);
 	}
 
 	for (l = conferences; l; l = l->next) {
 		struct conference *c = l->data;
 
 		if (!strncasecmp(text, c->name, len))
-			array_add(&completions, xstrdup(c->name));
+			array_add_check(&completions, xstrdup(c->name), 1);
 	}
 
 	unknown_uin_generator(text, len);

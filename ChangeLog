@@ -4,10 +4,15 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek).
 
+// 2004-08-09
+
+- poprawka b³êdy zawieszenia programu zwi±zanego z dope³nieniem (tros/del)
+
 // 2004-08-10
 
 - poprawka powiadamiania o nowej poczcie (atler/sz)
 
+>>>>>>> 1.1357
 // 2004-07-14
 
 - libgadu: poprawki obs³ugi proxy (the_leech/w)

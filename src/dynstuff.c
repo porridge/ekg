@@ -25,6 +25,7 @@
 
 #include "libgadu.h"
 #include "dynstuff.h"
+#include "stuff.h"
 #include "xmalloc.h"
 
 /*
@@ -691,6 +692,52 @@ char *array_join(char **array, const char *sep)
 	}
 
 	return string_free(s, 0);
+}
+
+/*
+ * array_item_contains()
+ *
+ * stwierdza czy w tablicy znajduje siê element zawieraj±cy podany ci±g
+ *
+ *  - array - tablica,
+ *  - string - szukany ci±g znaków,
+ *  - casesensitive - czy mamy zwracaæ uwagê na wielko¶æ znaków?
+ *
+ * 0/1
+ */
+int array_item_contains(char **array, const char *string, int casesensitive)
+{
+        int i;
+
+        if (!array || !string)
+                return 0;
+
+        for (i = 0; array[i]; i++) {
+                if (casesensitive && strstr(array[i], string))
+                        return 1;
+                if (!casesensitive && strcasestr(array[i], string))
+                        return 1;
+        }
+
+        return 0;
+}
+
+/*
+ * array_add_check()
+ *
+ * dodaje element do tablicy, uprzednio sprawdzaj±c
+ * czy taki ju¿ w niej nie istnieje
+ *
+ *  - array - tablica,
+ *  - string - szukany ci±g znaków,
+ *  - casesensitive - czy mamy zwracaæ uwagê na wielko¶æ znaków?
+ */
+void array_add_check(char ***array, char *string, int casesensitive)
+{
+        if (!array_item_contains(*array, string, casesensitive))
+                array_add(array, string);
+        else
+                xfree(string);
 }
 
 /*
