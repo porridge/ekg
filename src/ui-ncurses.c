@@ -2040,7 +2040,7 @@ static void ui_ncurses_deinit()
 		for (l = windows; l; l = l->next) {
 			struct window *w = l->data;
 
-			if (w->id > maxid)
+			if (!w->floating && w->id > maxid)
 				maxid = w->id;
 		}
 
@@ -2051,12 +2051,6 @@ static void ui_ncurses_deinit()
 				struct window *w = l->data;
 
 				if (w->id == i) {
-					if (w->floating) {
-						char *tmp = saprintf("*%d,%d,%d,%d,%d,", w->left, w->top, w->width, w->height, w->frames);
-						string_append(s, tmp);
-						xfree(tmp);
-					}
-				
 					target = w->target;
 					break;
 				}
@@ -2067,6 +2061,16 @@ static void ui_ncurses_deinit()
 
 			if (i < maxid)
 				string_append_c(s, '|');
+		}
+
+		for (l = windows; l; l = l->next) {
+			struct window *w = l->data;
+
+			if (w->floating && (!w->target || strncmp(w->target, "__", 2))) {
+				char *tmp = saprintf("|*%d,%d,%d,%d,%d,%s", w->left, w->top, w->width, w->height, w->frames, w->target);
+				string_append(s, tmp);
+				xfree(tmp);
+			}
 		}
 
 		config_windows_layout = string_free(s, 0);
