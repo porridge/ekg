@@ -1127,8 +1127,8 @@ void ekg_connect()
 		}
 	}
 
-	if (config_random_reason)
-		change_status(config_status, NULL, 2);
+	/* przygotuj opis zgodnie z ustawieniami */
+	change_status(config_status, NULL, 2);
 
 	memset(&p, 0, sizeof(p));
 
@@ -2992,7 +2992,7 @@ fail:
  *
  * zmienia stan sesji.
  *
- *  - status - nowy stan. warto¶æ stanu libgadu, bez _DESCR.
+ *  - status - nowy stan. warto¶æ stanu libgadu, bez lub z _DESCR.
  *  - reason - opis stanu, mo¿e byæ NULL.
  *  - autom - czy zmiana jest automatyczna?
  */
