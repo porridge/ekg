@@ -313,8 +313,4 @@ void sms_away_add(uin_t uin);
 void sms_away_destroy();
 int sms_away_check(uin_t uin);
 
-#ifndef HAVE_DIRNAME
-char *dirname(const char *path);
-#endif
-
 #endif /* __STUFF_H */

@@ -81,7 +81,6 @@ AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
 
 dnl basename - get rid of libgen
 AC_CHECK_HEADERS(libgen.h)
-AC_CHECK_FUNCS(basename)
 AC_CHECK_FUNC(dirname, , [OBJS="$OBJS ../compat/dirname.o"])
 
 # zachowujemy opcje dla libgadu

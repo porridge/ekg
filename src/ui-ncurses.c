@@ -40,6 +40,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <dirent.h>
+#include "config.h"
 #ifdef HAVE_LIBGEN_H
 #  include <libgen.h>
 #else
@@ -51,7 +52,6 @@
 #  include <string.h>
 #endif
 #include <ctype.h>
-#include "config.h"
 #include "stuff.h"
 #include "commands.h"
 #include "userlist.h"
