@@ -221,6 +221,7 @@ struct value_map *variable_map(int count, ...)
  *  - ptr - wska¼nik do zmiennej,
  *  - notify - funkcja powiadomienia,
  *  - map - mapa warto¶ci,
+ *  - dyndisplay - funkcja sprawdzaj±ca czy wy¶wietliæ zmienn±.
  *
  * zwraca 0 je¶li siê uda³o, je¶li nie to -1.
  */
