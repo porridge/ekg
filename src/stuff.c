@@ -1905,13 +1905,30 @@ int event_add(int flags, uin_t uin, const char *action, int quiet)
                 }
         }
 
+	for (f = 1; ; f++) {
+		int taken = 0;
+		
+		for (l = events; l; l = l->next) {
+			struct event *e = l->data;
+
+			if (!strcmp(e->name, itoa(f))) {
+				taken = 1;
+				break;
+			}
+		}
+
+		if (!taken)
+			break;
+	}
+
+	e.name = xstrdup(itoa(f));
         e.uin = uin;
         e.flags = flags;
         e.action = xstrdup(action);
 
         list_add(&events, &e, sizeof(e));
 
-	printq("events_add", event_format(flags), (uin == 1) ? "*" : format_user(uin), action);
+	printq("events_add", e.name);
 
         return 0;
 }
@@ -1921,44 +1938,48 @@ int event_add(int flags, uin_t uin, const char *action, int quiet)
  *
  * usuwa zdarzenie z listy zdarzeñ.
  *
- *  - flags,
- *  - uin,
- *  - quiet.
+ *  - name.
  *
  * 0/-1
  */
-int event_remove(int flags, uin_t uin, int quiet)
+int event_remove(const char *name, int quiet)
 {
 	list_t l;
-	int removed = 0;
+	int removed = 0, remove_all;
+	
+	if (!name)
+		return -1;
+
+	remove_all = !strcmp(name, "*");
 
 	for (l = events; l; ) {
 		struct event *e = l->data;
-		int event_flags;
 
 		l = l->next;
 
-		event_flags = e->flags & ~INACTIVE_EVENT;
-
-		if (e && e->uin == uin && e->flags & flags) {
-			if ((event_flags &= ~flags) == 0) {
-				printq("events_del", event_format(flags), (uin == 1) ? "*" : format_user(uin), e->action);
-				xfree(e->action);
-				list_remove(&events, e, 1);
-				removed = 1;
-			} else {
-				printq("events_del_flags", event_format(flags));
-				e->flags = event_flags;
-				return 0;
-                        }
-                }
-        }
+		if (remove_all || (name && e->name && !strcmp(name, e->name))) {
+			if (!remove_all)
+				printq("events_del", name);
+			xfree(e->action);
+			list_remove(&events, e, 1);
+			removed = 1;
+        	}
+	}
 
 	if (!removed) {
-        	printq("events_del_noexist", event_format(flags), (uin == 1) ? "*" : format_user(uin));
-        	return 1;
-	} else
+		if (remove_all) {
+			printq("events_list_empty");
+		} else {
+        		printq("events_del_noexist", name);
+		}
+
+        	return -1;
+	} else {
+		if (remove_all)
+			printq("events_del_all");
+
 		return 0;
+	}
 }
 
 /*
@@ -1983,7 +2004,7 @@ const char *event_format(int flags)
 			if (!first)
 				strncat(buf, ",", sizeof(buf) - 1 - strlen(buf));
 			strncat(buf, event_labels[i].name, sizeof(buf) - 1 - strlen(buf));
-			buf[sizeof(buf) - 1] = '\0';
+			buf[sizeof(buf) - 1] = 0;
 			first = 0;
 		}
 	}
@@ -2142,6 +2163,7 @@ int event_check(int event, uin_t uin, const char *data)
 	int i;
 
 	uin_number = itoa(uin);
+
 	if ((u = userlist_find(uin, NULL)))
 		uin_display = u->display;
 	else
@@ -2168,7 +2190,7 @@ int event_check(int event, uin_t uin, const char *data)
 		char *q;
 
 		for (p = data; *p; p++) {
-			if (strchr("`!#$&*?|\\\'\"{}[]<>\n\r", *p))
+			if (strchr("`!#$&*?|\\\'\"{}[]<>()\n\r", *p))
 				size += 2;
 			else
 				size++;
@@ -2177,7 +2199,7 @@ int event_check(int event, uin_t uin, const char *data)
 		edata = xmalloc(size);
 
 		for (p = data, q = edata; *p; p++, q++) {
-			if (strchr("`!#$&*?|\\\'\"{}[]<>", *p))
+			if (strchr("`!#$&*?|\\\'\"{}[]<>()", *p))
 				*q++ = '\\';
 			if (*p == '\n') {
 				*q++ = '\\';
@@ -2204,7 +2226,6 @@ int event_check(int event, uin_t uin, const char *data)
 	}
 
 	array_free(actions);
-
 	xfree(edata);
 
         return 0;
@@ -2290,7 +2311,7 @@ int event_correct(const char *action, int quiet)
 			goto check;
 		}
 				
-		printq("events_act_wrong");
+		printq("events_act_wrong", acts[0]);
 		goto fail;
 
 check:

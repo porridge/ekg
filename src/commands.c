@@ -2144,10 +2144,10 @@ COMMAND(cmd_dcc)
 	list_t l;
 	uin_t uin;
 
-	if (!params[0] || !strncasecmp(params[0], "sh", 2)) {	/* show */
+	if (!params[0] || !strncasecmp(params[0], "li", 2)) {	/* list */
 		int pending = 0, active = 0;
 
-		if (params[0] && params[1] && params[1][0] == 'd') {	/* show debug */
+		if (params[0] && params[1] && params[1][0] == 'd') {	/* list debug */
 			for (l = transfers; l; l = l->next) {
 				struct transfer *t = l->data;
 				
@@ -2956,17 +2956,60 @@ cleanup:
 
 COMMAND(cmd_on)
 {
-	int flags;
-	uin_t uin;
+	if (match_arg(params[0], 'a', "add", 2)) {
+		int flags;
+		uin_t uin = 1;
 
-	if (!params[0] || !strncasecmp(params[0], "-l", 2)) {
+		if (!params[1] || !params[2] || !params[3]) {
+			printq("not_enough_params", name);
+			return -1;
+		}
+
+		if (!(flags = event_flags(params[1]))) {
+			printq("events_incorrect");
+			return -1;
+		}
+
+		if (strcmp(params[2], "*"))
+			uin = get_uin(params[2]);
+
+		if (!uin) {
+			printq("user_not_found", params[2]);
+			return -1;
+		}
+
+		if (event_correct(params[3], quiet))
+			return -1;
+
+		if (!event_add(flags, uin, params[3], quiet)) {
+			config_changed = 1;
+			return 0;
+		} else
+			return -1;
+	}
+
+	if (match_arg(params[0], 'd', "del", 2)) {
+
+		if (!params[1]) {
+			printq("not_enough_params", name);
+			return -1;
+		}
+
+		if (!event_remove(params[1], quiet)) {
+			config_changed = 1;
+			return 0;
+		} else
+			return -1;
+	}
+
+	if (!params[0] || match_arg(params[0], 'l', "list", 2)) {
 		list_t l;
                 int count = 0;
 
 		for (l = events; l; l = l->next) {
 			struct event *ev = l->data;
 
-			printq((ev->flags & INACTIVE_EVENT) ? "events_list_inactive" : "events_list", event_format(abs(ev->flags)), (ev->uin == 1) ? "*" : format_user(ev->uin), ev->action);
+			printq((ev->flags & INACTIVE_EVENT) ? "events_list_inactive" : "events_list", event_format(abs(ev->flags)), (ev->uin == 1) ? "*" : format_user(ev->uin), ev->action, ev->name);
 			count++;
 		}
 
@@ -2976,39 +3019,11 @@ COMMAND(cmd_on)
 		return 0;
 	}
 
-	if (!params[1] || !params[2]) {
-		printq("not_enough_params", name);
-		return -1;
-	}
+	/* XXX mo¿e jeszcze jaki¶ parametr --modify ? */
 
-	if (!(flags = event_flags(params[0]))) {
-		printq("events_incorrect");
-		return -1;
-	}
+	printq("invalid_params", name);
 
-	if (*params[1] == '*')
-		uin = 1;
-	else
-		uin = get_uin(params[1]);
-
-	if (!uin) {
-		printq("invalid_uin");
-		return -1;
-	}
-
-        if (!strncasecmp(params[2], "clear", 5)) {
-		event_remove(flags, uin, quiet);
-		config_changed = 1;
-		return 0;
-        }
-
-	if (event_correct(params[2], quiet))
-		return -1;
-
-	event_add(flags, uin, params[2], quiet);
-	config_changed = 1;
-
-	return 0;
+	return -1;
 }
 
 COMMAND(cmd_echo)
@@ -3248,6 +3263,7 @@ int binding_toggle_contacts(int a, int b)
 
 	contacts_rebuild();
 	ui_event("variable_changed", "contacts", NULL);
+	config_changed = 1;
 #endif
 
 	return 0;
@@ -3289,7 +3305,7 @@ COMMAND(cmd_timer)
 		struct timer *t;
 		int persistent = 0;
 
-		if ((!params[1] || !params[2])) {
+		if (!params[1] || !params[2]) {
 			printq("not_enough_params", name);
 			return -1;
 		}
@@ -3365,7 +3381,7 @@ COMMAND(cmd_timer)
 			xfree(foo);
 
 			/* nie ma b³êdów ? */
-			if (wrong || lt->tm_hour > 23 || lt->tm_min > 59 || lt->tm_sec > 61 || lt->tm_mday > 31 || lt->tm_mon > 12) {
+			if (wrong || lt->tm_hour > 23 || lt->tm_min > 59 || lt->tm_sec > 59 || lt->tm_mday > 31 || lt->tm_mon > 12) {
 				printq("invalid_params", name);
 				res = -1;
 				goto cleanup;
@@ -4023,6 +4039,8 @@ int command_remove(const char *name)
  * 'c' - komenda,
  * 'i' - nicki z listy ignorowanych osób,
  * 'd' - komenda dcc,
+ * 'p' - komenda python,
+ * 'w' - komenda window,
  * 'f' - plik.
  */
 
@@ -4136,13 +4154,13 @@ void command_init()
 	  
 	command_add
 	( "dcc", "duf?", cmd_dcc, 0,
-	  " [opcje]", "obs³uga bezpo¶rednich po³±czeñ",
+	  " <komenda> [opcje]", "obs³uga bezpo¶rednich po³±czeñ",
 	  "\n"
 	  "  send <numer/alias> <¶cie¿ka>  wysy³a podany plik\n"
 	  "  get [numer/alias/#id]         akceptuje przysy³any plik\n"
-	  "  voice <numer/alias/#id>       rozpoczna rozmowê g³osow±\n"
-	  "  close [numer/alias/#id]       zamyka po³±czenie\n"
-	  " [show]                         wy¶wietla listê po³±czeñ\n"
+	  "  voice <numer/alias/#id>       rozpoczyna rozmowê g³osow±\n"
+	  "  close <numer/alias/#id>       zamyka po³±czenie\n"
+	  "  list                          wy¶wietla listê po³±czeñ\n"
 	  "\n"
 	  "Po³±czenia bezpo¶rednie wymagaj± w³±czonej opcji %Tdcc%n. "
 	  "Dok³adny opis znajduje siê w pliku %Tdocs/dcc.txt%n");
@@ -4285,8 +4303,13 @@ void command_init()
 	  "pseudonimy przecinkiem (ale bez odstêpów).");
 
 	command_add
-        ( "on", "?u?", cmd_on, 0,
-	  " <zdarzenie|...> <numer/alias> <akcja>|clear", "obs³uga zdarzeñ",
+        ( "on", "??u?", cmd_on, 0,
+	  " [opcje]", "zarz±dzanie zdarzeniami",
+	  "\n"
+	  "  -a, --add <zdarzenie> <numer/alias> <akcja>  dodaje zdarzenie\n"
+	  "  -d, --del <numer>|*         usuwa zdarzenie o podanym numerze\n"
+	  " [-l, --list]                 wy¶wietla listê zdarzeñ\n"
+	  "\n"
 	  "Szczegó³y dotycz±ce tego polecenia w pliku %Tdocs/on.txt%n");
 	 
 	command_add
@@ -4296,7 +4319,7 @@ void command_init()
 
 	command_add
 	( "private", "", cmd_away, 0,
-	  " [on/off]", "w³±cza/wy³±cza tryb ,,tylko dla przyjació³''",
+	  " [on/off]", "w³±cza/wy³±cza tryb ,,tylko dla znajomych''",
 	  "");
 	  
 	command_add
@@ -4376,7 +4399,7 @@ void command_init()
 	  "");
 
 	command_add
-	( "conference", "???", cmd_conference, 0,
+	( "conference", "??u", cmd_conference, 0,
 	  " [opcje]", "zarz±dzanie konferencjami",
 	  "\n"
 	  "  -a, --add [#nazwa] <numer/alias/@grupa>  tworzy now± konferencjê\n"
@@ -4417,7 +4440,7 @@ void command_init()
 	  
 	command_add
 	( "version", "", cmd_version, 0,
-	  "", "wy¶wietla wersje programu",
+	  "", "wy¶wietla wersjê programu",
 	  "");
 	  
 	command_add
@@ -4438,7 +4461,7 @@ void command_init()
 	  "pozycja okna na ekranie, %Tw%n i %Th%n to odpowiednio szeroko¶æ "
 	  "i wysoko¶æ okna w znakach, a %Tf%n jest map± bitow± okre¶laj±c± "
 	  "z której strony wystêpuj± ramki (1 - lewo, 2 - góra, 4 - prawo, "
-          "8 - dó³), a komenda okre¶la, jakie komendy wynik ma byæ "
+          "8 - dó³), a komenda okre¶la, jakiej komendy wynik ma byæ "
 	  "wy¶wietlany regularnie w oknie.");
 
 #ifdef WITH_PYTHON
@@ -4493,7 +4516,7 @@ void command_init()
 #endif
 	command_add
 	( "_queue", "uu", cmd_queue, 0, " [opcje]",
-	  "pozwala obserwowaæ kolejkê wiadomo¶ci tak¿e podczas po³±czenia", "");
+	  "pozwala obserwowaæ kolejkê wiadomo¶ci podczas po³±czenia", "");
 }
 
 /*

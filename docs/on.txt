@@ -1,6 +1,9 @@
 sk³adnia komendy on:
 
-on [zdarzenie] [user] [akcja]; [akcja1]; [...]
+on [opcje]
+	-a, --add <zdarzenie> <numer/alias> <akcja>  dodaje zdarzenie
+	-d, --del <numer>|*         usuwa zdarzenie o podanym numerze
+	[-l, --list]                wy¶wietla listê zdarzeñ               
 
 	zdarzenie:
 		msg, chat - wiadomo¶æ od kogo¶
@@ -18,12 +21,11 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 		* - wszystkie zdarzenia
 	zdarzenia mo¿na ³±czyæ ze sob± operatorem '|'.
 
-	user - nazwa u¿ytkownika z listy lub uin, * oznacza dowolnego 
-	       u¿ytkownika, przy czym, je¿eli u¿ytkownik ma przypisan±
-               indywidualn± akcjê - ta z * nie brana jest pod uwagê.
+	numer/alias - nazwa u¿ytkownika z listy lub uin, * oznacza dowolnego 
+	              u¿ytkownika, przy czym, je¿eli u¿ytkownik ma przypisan±
+                      indywidualn± akcjê - ta z * nie brana jest pod uwagê.
 	
 	akcja:
-		clear - usuñ dane zdarzenie (lub jedn± flagê)
 		beep - wysy³a \007 na terminal czyli zwyk³e beepniêcie
 		play [plik] - odtwórz dany d¼wiêk
 		chat [user] [tekst] - wy¶lij tekst do danego usera
@@ -68,13 +70,13 @@ z ekg, daemon ten jest zabijany. aby go w³±czyæ, nale¿y uruchomiæ skrypt
 configure z parametrem --enable-ioctld.
 
 przyk³ady:
-	on msg drg blink_leds 1, 4, 2, 7/20000, 7, 7, 7
-	on avail|away drg beeps_spk 1000, 900, 800; blink_leds 7, 5, 1
-	on disconnect kupa msg dupa nic z tego; blink_leds 7
-	on chat * blink_leds 4, 1, 2
-	on * * blink_leds $blah.led
-	on msg|chat * msg %1 nie ma mnie. zostaw wiadomo¶æ.
-	on sigusr1 * command disconnect
-	on chat jarek echo "/msg szpieg %4" > ~/.gg/innyuser/pipe
+	on -a msg drg blink_leds 1, 4, 2, 7/20000, 7, 7, 7
+	on -a avail|away drg beeps_spk 1000, 900, 800; blink_leds 7, 5, 1
+	on -a disconnect kupa msg dupa nic z tego; blink_leds 7
+	on -a chat * blink_leds 4, 1, 2
+	on -a * * blink_leds $blah.led
+	on -a msg|chat * msg %1 nie ma mnie. zostaw wiadomo¶æ.
+	on -a sigusr1 * command disconnect
+	on -a chat jarek echo "/msg szpieg %4" > ~/.gg/innyuser/pipe
 
 $Id$

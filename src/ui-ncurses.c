@@ -1782,7 +1782,7 @@ static void lines_adjust()
 
 void dcc_generator(const char *text, int len)
 {
-	char *words[] = { "close", "get", "send", "show", "voice", NULL };
+	const char *words[] = { "close", "get", "send", "list", "voice", NULL };
 	int i;
 
 	for (i = 0; words[i]; i++)
@@ -1977,9 +1977,19 @@ void file_generator(const char *text, int len)
 	xfree(namelist);
 }
 
+void python_generator(const char *text, int len)
+{
+	const char *words[] = { "load", "unload", "run", "exec", "list", NULL };
+	int i;
+
+	for (i = 0; words[i]; i++)
+		if (!strncasecmp(text, words[i], len))
+			array_add(&completions, xstrdup(words[i]));
+}
+
 void window_generator(const char *text, int len)
 {
-	char *words[] = { "new", "kill", "move", "next", "prev", "resize", "switch", "clear", "refresh", "list", NULL };
+	const char *words[] = { "new", "kill", "move", "next", "prev", "resize", "switch", "clear", "refresh", "list", NULL };
 	int i;
 
 	for (i = 0; words[i]; i++)
@@ -1999,8 +2009,9 @@ static struct {
 	{ 'b', blocked_uin_generator },
 	{ 'v', variable_generator },
 	{ 'd', dcc_generator },
-	{ 'f', file_generator },
+	{ 'p', python_generator },
 	{ 'w', window_generator },
+	{ 'f', file_generator },
 	{ 0, NULL }
 };
 

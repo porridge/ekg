@@ -846,7 +846,7 @@ void theme_init()
 	format_add("unknown_command", "%! Nieznane polecenie: %T%1%n\n", 1);
 	format_add("welcome", "%> %TEKG-%1%n (Eksperymentalny Klient Gadu-Gadu)\n%> Program jest rozprowadzany na zasadach licencji GPL v2\n%> %RPrzed u¿yciem wci¶nij F1 lub wpisz ,,help''%n\n\n", 1);
 	format_add("welcome,speech", "witamy w e k g", 1);
-	format_add("ekg_version", "%) EKG - Eksperymentalny Klient Gadu-Gadu (%T%1%n)\n%) libgadu-%1 (protokó³ %2, klient %3)\n%) Skompilowano: %4\n", 1);
+	format_add("ekg_version", "%) EKG - Eksperymentalny Klient Gadu-Gadu (%T%1%n)\n%) libgadu-%1 (protokó³ %2, klient %3)\n%) skompilowano: %4\n", 1);
 	format_add("secure", "%Y(szyfrowane)%n ", 1);
 
 	/* mail */
@@ -1201,19 +1201,18 @@ void theme_init()
 
 	/* zdarzenia */
         format_add("events_list_empty", "%! Brak zdarzeñ\n", 1);
-        format_add("events_list", "%> on %1 %2 %3\n", 1);
-	format_add("events_list_inactive", "%> on %1 %2 %3 %K(nieaktywne)%n\n", 1);
+        format_add("events_list", "%> %4, on %1 %2 %3\n", 1);
+	format_add("events_list_inactive", "%> %4, on %1 %2 %3 %K(nieaktywne)%n\n", 1);
         format_add("events_incorrect", "%! Nieprawid³owo zdefiniowane zdarzenie\n", 1);
-        format_add("events_add", "%> Dodano zdarzenie\n", 1);
-        format_add("events_del", "%> Usuniêto zdarzenie\n", 1);
+        format_add("events_add", "%> Dodano zdarzenie %T%1%n\n", 1);
+        format_add("events_del", "%> Usuniêto zdarzenie %T%1%n\n", 1);
+        format_add("events_del_all", "%> Usuniêto wszystkie zdarzenia\n", 1);
         format_add("events_exist", "%! Zdarzenie %T%1%n istnieje dla %2\n", 1);
-        format_add("events_add_flags", "%> Flagi %T%1%n dodane\n", 1);
-        format_add("events_del_flags", "%> Flagi %T%1%n usuniête\n", 1);
-        format_add("events_del_noexist", "%! Zdarzenie %T%1%n nie istnieje dla u¿ytkownika %2\n", 1);
+        format_add("events_del_noexist", "%! Zdarzenie %T%1%n nie istnieje\n", 1);
         format_add("events_seq_not_found", "%! Sekwencja %T%1%n nie znaleziona\n", 1);
-	format_add("events_act_wrong", "%! Nieprawid³owa akcja\n", 1);
-        format_add("events_act_no_params", "%! Brak parametrów\n", 1);
-	format_add("events_act_toomany_params", "%! Za du¿o parametrów\n", 1);
+	format_add("events_act_wrong", "%! Nieprawid³owa akcja %T%1%n\n", 1);
+        format_add("events_act_no_params", "%! Brak parametrów w akcji\n", 1);
+	format_add("events_act_toomany_params", "%! Za du¿o parametrów w akcji\n", 1);
 	format_add("events_seq_incorrect", "%! Nieprawid³owa sekwencja\n", 1);
 
 	/* lista kontaktów z serwera */

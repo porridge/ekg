@@ -79,6 +79,7 @@ struct transfer {
 };
 
 struct event {
+	char *name;	/* identyfikator */
         uin_t uin;	/* numerek dla którego zdarzenie zachodzi */
         int flags;	/* flagi zdarzenia */
         char *action;	/* akcja! */
@@ -327,7 +328,7 @@ char *emoticon_expand(const char *s);
 void emoticon_free();
 
 int event_add(int flags, uin_t uin, const char *action, int quiet);
-int event_remove(int flags, uin_t uin, int quiet);
+int event_remove(const char *name, int quiet);
 const char *event_format(int flags);
 int event_flags(const char *events);
 int event_check(int event, uin_t uin, const char *data);
