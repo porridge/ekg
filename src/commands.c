@@ -3136,12 +3136,12 @@ COMMAND(cmd_reload)
 	if (params[0])
 		filename = params[0];
 
+	config_changed = 0;
+
 	if (config_read(filename, NULL)) {
 		printq("error_reading_config", strerror(errno));
 		return -1;
 	}
-
-	config_changed = 0;
 
 	return 0;
 }

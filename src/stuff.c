@@ -1093,13 +1093,20 @@ int config_read(const char *filename, const char *var)
 {
 	char *buf, *foo;
 	FILE *f;
-	int wrong = 0;
+	int even_started = 0, home = ((filename) ? 0 : 1);
+	struct stat st;
 
 	if (!filename && !(filename = prepare_path("config", 0)))
 		return -1;
-	
+
 	if (!(f = fopen(filename, "r")))
 		return -1;
+
+	if (stat(filename, &st) || !S_ISREG(st.st_mode)) {
+		errno = EINVAL;
+		fclose(f);
+		return -1;
+	}
 
 	gg_debug(GG_DEBUG_MISC, "// config_read(%s);\n", ((var) ? var : ""));
 
@@ -1143,6 +1150,7 @@ int config_read(const char *filename, const char *var)
 			continue;
 		}
 
+		even_started = 1;
 		*foo++ = 0;
 
 		if (var && strcmp(buf, var)) {
@@ -1222,12 +1230,12 @@ int config_read(const char *filename, const char *var)
 			}
 				array_free(p);
                 } else {
-			if (variable_set(buf, foo, 1))
-				wrong++;
+			int wrong = variable_set(buf, foo, 1);
 
-			if (wrong > 15) {	/* to na pewno plik z konfiguracj± ? */
+			if (wrong && !home && !in_autoexec && !var) {
 				xfree(buf);
 				fclose(f);
+				config_read(NULL, NULL);
 				errno = EINVAL;
 				return -1;
 			}	
@@ -1237,6 +1245,12 @@ int config_read(const char *filename, const char *var)
 	}
 	
 	fclose(f);
+
+	if (!even_started && !home && !in_autoexec && !var) {
+		config_read(NULL, NULL);
+		errno = EINVAL;
+		return -1;
+	}
 	
 	return 0;
 }

@@ -20,6 +20,7 @@ zg³osi³ b³±d.
   to na plik z konfiguracj± - po co zawieszaæ ekg. sam tak zrobi³em,
   przez przypadek daj±c za parametr plik wielko¶ci 150 MB... (sz)
 - poprawka /blink_leds i /beeps_spk (sz)
+- usuniêcie nieaktualnego przyk³adu search.c (sz)
 - mo¿liwo¶æ wy¶wietlania tylko wybranej sekwencji w /bind (FIG/w)
 - sensowna lista kluczy publicznych (FIG/w)
 - wykrywanie p³ci w wynikach wyszukiwania (FIG/w)
