@@ -27,6 +27,7 @@ zg³osi³ b³±d.
 - poprawka klawisza End (Brzezi/w)
 - rewrite kodu parsowania zdarzeñ dla ioctld (w)
 - poprawki helpów nowych komend (w)
+- poprawka przenoszenia atrybutów do nowej linii wiadomo¶ci (*/w)
 
 // 2003-01-29
 

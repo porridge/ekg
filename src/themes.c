@@ -930,7 +930,7 @@ void theme_init()
 	format_add("message_header", "%g.-- %n%1 %c%2%4%g--- -- -%n\n", 1);
 	format_add("message_conference_header", "%g.-- %g[%T%3%g] -- %n%1 %c%2%4%g--- -- -%n\n", 1);
 	format_add("message_footer", "%g`----- ---- --- -- -%n\n", 1);
-	format_add("message_line", "%g|%n %1\n", 1);
+	format_add("message_line", "%g|%n %|%1\n", 1);
 	format_add("message_line_width", "-8", 1);
 	format_add("message_timestamp", "(%Y-%m-%d %H:%M) ", 1);
 	format_add("message_timestamp_today", "(%H:%M) ", 1);
@@ -944,7 +944,7 @@ void theme_init()
 	format_add("chat_header", "%c.-- %n%1 %c%2%4%c--- -- -%n\n", 1);
 	format_add("chat_conference_header", "%c.-- %c[%T%3%c] -- %n%1 %c%2%4%c--- -- -%n\n", 1);
 	format_add("chat_footer", "%c`----- ---- --- -- -%n\n", 1);
-	format_add("chat_line", "%c|%n %1\n", 1);
+	format_add("chat_line", "%c|%n %|%1\n", 1);
 	format_add("chat_line_width", "-8", 1);
 	format_add("chat_timestamp", "(%Y-%m-%d %H:%M) ", 1);
 	format_add("chat_timestamp_today", "(%H:%M) ", 1);
@@ -958,12 +958,12 @@ void theme_init()
 	format_add("sent_header", "%b.-- %n%1 %4%b--- -- -%n\n", 1);
 	format_add("sent_conference_header", "%b.-- %b[%T%3%b] -- %4%n%1 %b--- -- -%n\n", 1);
 	format_add("sent_footer", "%b`----- ---- --- -- -%n\n", 1);
-	format_add("sent_line", "%b|%n %1\n", 1);
+	format_add("sent_line", "%b|%n %|%1\n", 1);
 	format_add("sent_line_width", "-8", 1);
 	format_add("sent_timestamp", "%H:%M", 1);
 
 	format_add("sysmsg_header", "%m.-- %TWiadomo¶æ systemowa%m --- -- -%n\n", 1);
-	format_add("sysmsg_line", "%m|%n %1\n", 1);
+	format_add("sysmsg_line", "%m|%n %|%1\n", 1);
 	format_add("sysmsg_line_width", "-8", 1);
 	format_add("sysmsg_footer", "%m`----- ---- --- -- -%n\n", 1);	
 

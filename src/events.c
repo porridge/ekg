@@ -123,14 +123,14 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 		}
 
 		/* teraz powtarzamy formaty tam, gdzie jest przej¶cie do
-		 * nowej linii. dziêki temu oszczêdzamy sobie mieszania
-		 * ni¿ej w kodzie. */
+		 * nowej linii i odstêpy. dziêki temu oszczêdzamy sobie
+		 * mieszania ni¿ej w kodzie. */
 
 		for (i = 0; i < strlen(e->event.msg.message); i++) {
 			if (formatmap[i])
 				last_attr = formatmap[i];
 
-			if (i > 0 && e->event.msg.message[i - 1] == '\n')
+			if (i > 0 && strchr(" \n", e->event.msg.message[i - 1]))
 				formatmap[i] = last_attr;
 		}
 	}
@@ -287,6 +287,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 			mesg[i] = ' ';
 	
 	while ((line = gg_get_line(&mesg))) {
+		const char *last_format_ansi = "";
 		int buf_offset;
 
 #ifdef WITH_WAP
@@ -336,9 +337,13 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 				string_t s = string_init("");
 				int i;
 
+				string_append(s, last_format_ansi);
+
 				for (i = 0; i < strlen(buf); i++) {
-					if (formatmap[buf_offset + i])
-						string_append(s, format_ansi(formatmap[buf_offset + i]));
+					if (formatmap[buf_offset + i]) {
+						last_format_ansi = format_ansi(formatmap[buf_offset + i]);
+						string_append(s, last_format_ansi);
+					}
 
 					string_append_c(s, buf[i]);
 				}
@@ -358,7 +363,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 			xfree(formatted);
 		}
 	}
-
+	
 	xfree(buf);
 	xfree(save);
 	xfree(secure_label);
