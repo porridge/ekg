@@ -73,6 +73,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 	int width, next_width, i, j, mem_width = 0;
 	char *mesg, *buf, *line, *next, *format = NULL, *format_first = "", *next_format = NULL, *head = NULL, *foot = NULL, *timestamp = NULL, *save;
 	char *line_width = NULL, timestr[100], *target;
+	int separate = (e->event.msg.sender != config_uin || chat == 3);
 	struct tm *tm;
 
 	if (e->event.msg.recipients) {
@@ -129,6 +130,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 			foot = "sysmsg_footer";
 			break;
 		case 3:
+		case 4:
 			format = "sent_line"; 
 			format_first = "sent_line_first";
 			line_width = "sent_line_width";
@@ -154,7 +156,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 	next_width = width;
 	
 	if (!strcmp(format_find(format_first), "")) {
-		print_window(target, 1, head, format_user(e->event.msg.sender), timestr);
+		print_window(target, separate, head, format_user(e->event.msg.sender), timestr);
 		next_format = format;
 		mem_width = width + 1;
 	} else {
@@ -234,7 +236,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 					next++;
 			}
 
-			print_window(target, 1, format, buf, format_user(e->event.msg.sender), timestr);
+			print_window(target, separate, format, buf, format_user(e->event.msg.sender), timestr);
 
 			width = next_width;
 			format = next_format;
@@ -248,7 +250,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 	xfree(save);
 
 	if (!strcmp(format_find(format_first), ""))
-		print_window(target, 1, foot);
+		print_window(target, separate, foot);
 
 	xfree(target);
 }

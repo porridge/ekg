@@ -1148,7 +1148,7 @@ COMMAND(cmd_msg)
 		u.uin = 0;
 		u.display = xstrdup(nick);
 		
-		print_message(&e, &u, 3);
+		print_message(&e, &u, (chat) ? 3 : 4);
 
 		xfree(e.event.msg.message);
 		xfree(u.display);
