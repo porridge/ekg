@@ -234,7 +234,6 @@ static int contacts_update(struct window *w);
 // #  define ASPELL_ALLOWED_CHARS "()[]',.`\"<>!?"
 AspellConfig * spell_config;
 AspellSpeller * spell_checker = 0;
-static char aspell_first;
 static char *aspell_line;
 #endif
 
@@ -3468,25 +3467,49 @@ static void spellcheck(char *what, char *where)
         if(what[0] == 47 || what == NULL)
             return;       /* konczymy funkcje */
 	    
-	for(i = 0; what[i] != '\0' && what[i] != '\n' && what[i] != '\r' && i < strlen(what); i++)
+	for(i = 0; what[i] != '\0' && what[i] != '\n' && what[i] != '\r'; i++)
 	{
-	    if(((what[i] == ' ' || what[i] == '\n') || i == 0 ) && what[i+1] != '\0') // spacja/koniec lini/koniec stringu
+	    if((!isalpha_pl(what[i]) || i == 0 ) && what[i+1] != '\0' ) // separator/koniec lini/koniec stringu
 	    {
 		size = strlen(what) + 1;
         	word = xmalloc(size);
         	memset(word, 0, size); /* czyscimy pamiec */
 		
-		if(what[i] == ' ')
-		    i++;
-
-		/* wrzucamy aktualny wyraz do zmiennej word */		    
-		for(j=0;strlen(what) >= i && (j == 0 || (what[i] != '\n' && what[i] != ' ' && what[i] != '\0')); i++)
+		for(; what[i] != '\0' && what[i] != '\n' && what[i] != '\r'; i++)
 		{
-		    if(what[i] != ' ' && !(config_aspell_allowed && strchr(config_aspell_allowed, what[i])))
-		    {
-		    	    word[j]= what[i];
-			    j++;
-		    }
+		    if(isalpha_pl(what[i])) /* szukamy jakiejs pierwszej literki */
+			break; 
+		}
+		
+		/* trochê poprawiona wydajno¶æ */
+		if(what[i] == '\0' || what[i] == '\n' || what[i] == '\r')
+		{
+			i--;
+			goto aspell_loop_end; /* 
+					       * nie powinno siê u¿ywaæ goto, aczkolwiek s± du¿o szybsze
+					       * ni¿ instrukcje warunkowe i w tym przypadku nie psuj± bardzo
+					       * czytelno¶ci kodu
+					       */
+		}
+		/* sprawdzanie czy nastêpny wyraz nie rozpoczyna adresu www */ 
+		else if (what[i] == 'h' && what[i + 1] && what[i + 1] == 't' && what[i + 2] && what[i + 2] == 't' && what[i + 3] && what[i + 3] == 'p' && what[i + 4] && what[i + 4] == ':' && what[i + 5] && what[i + 5] == '/' && what[i + 6] && what[i + 6] == '/')
+		{
+			for(; what[i] != ' ' && what[i] != '\n' && what[i] != '\r' && what[i] != '\0'; i++);
+			i--;
+			goto aspell_loop_end;
+		}
+		    
+				
+		/* wrzucamy aktualny wyraz do zmiennej word */		    
+		for(j=0; what[i] != '\n' && what[i] != '\0' && isalpha_pl(what[i]); i++)
+		{
+			if(isalpha_pl(what[i]))
+		 	{
+		    		word[j]= what[i];
+				j++;
+		    	}
+		    	else 
+				break;
 		}
 		word[j] = '\0';
 		if(i > 0)
@@ -3495,20 +3518,17 @@ static void spellcheck(char *what, char *where)
 /*		gg_debug(GG_DEBUG_MISC, "Word: %s\n", word);  */
 
 		/* sprawdzamy pisownie tego wyrazu */
-        	if(aspell_speller_check(spell_checker, word, strlen(word) ) == 0)
+        	if(aspell_speller_check(spell_checker, word, strlen(word) ) == 0) /* jesli wyraz jest napisany blednie */
         	{
-		    if(i - strlen(word) == -1)
-		    	    aspell_first = ASPELLCHAR;
-		    else
-		    	    where[i - strlen(word)] = ASPELLCHAR;
+			for(j=strlen(word) - 1; j >= 0; j--)
+				where[i - j] = ASPELLCHAR;
         	}
         	else /* jesli wyraz jest napisany poprawnie */
         	{
-		    if((i - strlen(word)) != -1)
-			    where[i - strlen(word)] = ' ';
-		    else 
-			    aspell_first = ' ';
+			for(j=strlen(word) - 1; j >= 0; j--)
+				where[i - j] = ' ';
         	}
+aspell_loop_end:
 		xfree(word);
 	    }	
 	}
@@ -3662,7 +3682,6 @@ static void ui_ncurses_loop()
 #ifdef WITH_ASPELL
 				/* maly cleanup */
 				memset(aspell_line, 32, LINE_MAXLEN);
-				aspell_first = ' ';
 				if(line_start == 0) 
 					mispelling = 0;
 				    
@@ -3672,21 +3691,10 @@ static void ui_ncurses_loop()
 
                                 for (j = 0; j + line_start < strlen(p) && j < input->_maxx + 1; j++)
                                 {
-                                    /* sprawdzamy czy pierwszy wyraz jest zaznaczony */
-                                    if(aspell_first == ASPELLCHAR && (line_start + j) == 0)
-                                        mispelling = 1;
-                                    /* czy nastepny wyraz nie jest bledny ? */
-                                    else if(aspell_line[line_start + j] == ASPELLCHAR)
-                                        mispelling = 1;
-                                    /* to chyba juz koniec blednego wyrazu */
-                                    else if(p[line_start + j] == ' ' && mispelling == 1 && aspell_line[line_start + j] == ' ')
-                                        mispelling = 0;
-					
-                                    /* jesli b³êdny to wy¶wietlamy podkre¶lony (je¿eli nie jest to spacja) */
-                                    if(mispelling == 1 && !(config_aspell_allowed && strchr(config_aspell_allowed, p[line_start + j])) && p[line_start + j] != ' ')
+                                    
+				    if(aspell_line[line_start + j] == ASPELLCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
                                         print_char_underlined(input, i, j, p[line_start + j]);
-                                    /* jesli jest wszystko okey to wyswietlamy normalny */
-                                    else
+                                    else /* jesli jest wszystko okey to wyswietlamy normalny */
 				        print_char(input, i, j, p[j + line_start]);
 				}
 #else
@@ -3704,7 +3712,6 @@ static void ui_ncurses_loop()
 #ifdef WITH_ASPELL			
 			/* maly cleanup */
 			memset(aspell_line, 32, LINE_MAXLEN);
-			aspell_first = ' ';
 			if(line_start == 0) 
 				mispelling = 0;
 
@@ -3714,21 +3721,9 @@ static void ui_ncurses_loop()
 
                         for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++)
                         {
-		              /* sprawdzamy czy pierwszy wyraz jest zaznaczony */
-                                if(aspell_first == ASPELLCHAR && (line_start + i) == 0)
-                                    mispelling = 1;
-				/* czy nastepny wyraz nie jest bledny ? */
-                                else if(aspell_line[line_start + i] == ASPELLCHAR)
-                                    mispelling = 1;
-                                /* to chyba juz koniec blednego wyrazu */
-                                else if(line[line_start + i] == ' ' && mispelling == 1 && aspell_line[line_start + i] == ' ')
-                                    mispelling = 0;
-				    
-				/* jesli b³êdny to wy¶wietlamy podkre¶lony (je¿eli nie jest to spacja) */
-                                if(mispelling == 1 && !(config_aspell_allowed && strchr(config_aspell_allowed, line[line_start + i])) && line[line_start + i] != ' ')
+				if(aspell_line[line_start + i] == ASPELLCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
                                     print_char_underlined(input, 0, i + window_current->prompt_len, line[line_start + i]);
-                                /* jesli jest wszystko okey to wyswietlamy normalny */
-                                else
+                                else /* jesli jest wszystko okey to wyswietlamy normalny */
                                     print_char(input, 0, i + window_current->prompt_len, line[line_start + i]);
 			}
 #else

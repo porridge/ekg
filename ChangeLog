@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek).
 
+// 2004-02-27
+- zast±pienie zmiennej aspell_allowed wewnêtrzn± funkcj± sprawdzaj±c± (del)
+- wyczyszczony kod i dodana obs³uga adresów WWW (nie s± podkre¶lane) w s³owniku (del)
+
 // 2004-02-26
 
 - zapomniany contrib/ioctld-client.c
