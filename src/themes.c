@@ -503,7 +503,9 @@ void init_theme()
 	add_format("list_empty", "%! Lista kontaktów jest pusta\n", 1);
 	add_format("list_avail", "%> %1 %Y(dostêpny)%n %b%2:%3%n\n", 1);
 	add_format("list_busy", "%> %1 %G(zajêty)%n %b%2:%3%n\n", 1);
+	add_format("list_busy_descr", "%> %1 %G(zajêty: %n%4%G)%n %b%2:%3%n\n", 1);
 	add_format("list_not_avail", "%> %1 %r(niedostêpny)%n\n", 1);
+	add_format("list_not_avail_descr", "%> %1 %r(niedostêpny: %n%4%r)%n\n", 1);
 	add_format("list_unknown", "%> %1\n", 1);
 	add_format("saved", "%> Zapisano ustawienia\n", 1);
 	add_format("error_saving", "%! Podczas zapisu ustawieñ wyst±pi³ b³±d\n", 1);
@@ -524,7 +526,9 @@ void init_theme()
 	add_format("ack_delivered", "%> Wiadomo¶æ do %1 zosta³a dostarczona %c(%C%#%c)%n\n", 1);
 	add_format("status_avail", "%> %1 jest dostêpny %c(%C%#%c)%n\n", 1);
 	add_format("status_busy", "%> %1 jest zajêty %c(%C%#%c)%n\n", 1);
+	add_format("status_busy_descr", "%> %1 jest zajêty: %2 %c(%C%#%c)%n\n", 1);
 	add_format("status_not_avail", "%> %1 jest niedostêpny %c(%C%#%c)%n\n", 1);
+	add_format("status_not_avail_descr", "%> %1 jest niedostêpny: %2 %c(%C%#%c)%n\n", 1);
 	add_format("conn_broken", "%! Serwer zerwa³ po³±czenie: %1 %c(%C%#%c)%n\n", 1);
 	add_format("auto_away", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci %c(%C%#%c)%n\n", 1);
 	add_format("welcome", "%> EKG-%1 (Eksperymentalny Klient Gadu-gadu)\n%> (C) Copyright 2001, 2002 Wojtek Kaniewski <wojtekka@irc.pl> i inni\n%> Program jest rozprowadzany na zasadach licencji GPL\n\n", 1);

@@ -42,6 +42,7 @@ static struct handler handlers[] = {
 	{ GG_EVENT_ACK, handle_ack },
 	{ GG_EVENT_STATUS, handle_status },
 	{ GG_EVENT_NOTIFY, handle_notify },
+	{ GG_EVENT_NOTIFY_DESCR, handle_notify },
 	{ GG_EVENT_CONN_SUCCESS, handle_success },
 	{ GG_EVENT_CONN_FAILED, handle_failure },
 	{ GG_EVENT_DISCONNECT, handle_disconnect },
@@ -257,8 +258,10 @@ void handle_ack(struct gg_event *e)
  */
 void handle_notify(struct gg_event *e)
 {
-	struct gg_notify_reply *n = e->event.notify;
-	struct userlist *u;		
+	struct gg_notify_reply *n;
+	struct userlist *u;
+
+	n = (e->type == GG_EVENT_NOTIFY) ? e->event.notify : e->event.notify_descr.notify;
 
 	while (n->uin) {
 		if (ignored_check(n->uin)) {
@@ -270,6 +273,8 @@ void handle_notify(struct gg_event *e)
 			u->status = n->status;
 			u->ip.s_addr = n->remote_ip;
 			u->port = n->remote_port;
+			free(u->descr);
+			u->descr = NULL;
 		}
 		if (n->status == GG_STATUS_AVAIL) {
 			my_printf("status_avail", format_user(n->uin));
@@ -277,8 +282,13 @@ void handle_notify(struct gg_event *e)
 				add_send_nick(u->display);
 			if (config_beep && config_beep_notify)
 				my_puts("\007");
-		} else if (n->status == GG_STATUS_BUSY)
+		} else if (n->status == GG_STATUS_BUSY) {
 			my_printf("status_busy", format_user(n->uin));
+		} else if (n->status == GG_STATUS_BUSY_DESCR) {
+			u->descr = strdup(e->event.notify_descr.descr);
+			my_printf("status_busy_descr", format_user(n->uin), u->descr);
+		}
+		
 		n++;
 	}
 }
@@ -302,6 +312,9 @@ void handle_status(struct gg_event *e)
 	if (!(u = userlist_find(e->event.status.uin, NULL)))
 		return;
 
+	free(u->descr);
+	u->descr = NULL;
+
 	if (config_display_notify) {
 		if (e->event.status.status == GG_STATUS_AVAIL && u->status != GG_STATUS_AVAIL) {
 		    	check_event(EVENT_AVAIL, e->event.status.uin);
@@ -314,10 +327,20 @@ void handle_status(struct gg_event *e)
 		{
 		    	check_event(EVENT_AWAY, e->event.status.uin);
 			my_printf("status_busy", format_user(e->event.status.uin));
+		} else if (e->event.status.status == GG_STATUS_BUSY_DESCR && u->status != GG_STATUS_BUSY_DESCR) 
+		{
+		    	check_event(EVENT_AWAY, e->event.status.uin);
+			u->descr = strdup(e->event.status.descr);
+			my_printf("status_busy_descr", format_user(e->event.status.uin), u->descr);
 		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL && u->status != GG_STATUS_NOT_AVAIL)
 		{
 		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin);
 			my_printf("status_not_avail", format_user(e->event.status.uin));
+		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL_DESCR && u->status != GG_STATUS_NOT_AVAIL_DESCR)
+		{
+		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin);
+			u->descr = strdup(e->event.status.descr);
+			my_printf("status_not_avail_descr", format_user(e->event.status.uin), u->descr);
 		}
 	}
 	
@@ -355,7 +378,7 @@ void handle_failure(struct gg_event *e)
  */
 void handle_success(struct gg_event *e)
 {
-        int status_table[3] = { GG_STATUS_AVAIL, GG_STATUS_BUSY, GG_STATUS_INVISIBLE };
+        int status_table[4] = { GG_STATUS_AVAIL, GG_STATUS_BUSY, GG_STATUS_INVISIBLE, GG_STATUS_BUSY_DESCR };
 
 	my_printf("connected");
 	userlist_send();

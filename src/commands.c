@@ -1132,12 +1132,19 @@ COMMAND(command_list)
 			case GG_STATUS_BUSY:
 				tmp = "list_busy";
 				break;
+			case GG_STATUS_BUSY_DESCR:
+				tmp = "list_busy_descr";
+				break;
+			case GG_STATUS_NOT_AVAIL_DESCR:
+				tmp = "list_not_avail_descr";
+				break;
+			
 		}
 
 		in.s_addr = u->ip.s_addr;
 
-		if (show_all || (show_busy && u->status == GG_STATUS_BUSY) || (show_active && u->status == GG_STATUS_AVAIL) || (show_inactive && u->status == GG_STATUS_NOT_AVAIL)) {
-			my_printf(tmp, format_user(u->uin), inet_ntoa(in), itoa(u->port));
+		if (show_all || (show_busy && (u->status == GG_STATUS_BUSY || u->status == GG_STATUS_BUSY_DESCR)) || (show_active && u->status == GG_STATUS_AVAIL) || (show_inactive && (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR))) {
+			my_printf(tmp, format_user(u->uin), inet_ntoa(in), itoa(u->port), u->descr);
 			count++;
 		}
 	}

@@ -361,6 +361,7 @@ int userlist_remove(struct userlist *u)
 	free(u->nickname);
 	free(u->display);
 	free(u->mobile);
+	free(u->descr);
 
 	for (l = u->groups; l; l = l->next) {
 		struct group *g = l->data;

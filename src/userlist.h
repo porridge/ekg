@@ -37,6 +37,7 @@ struct userlist {
 	struct list *groups;	/* grupy, do których nale¿y */
 	uin_t uin;		/* numer */
 	int status;		/* aktualny stan */
+	char *descr;		/* opis/powód stanu */
 	struct in_addr ip;	/* adres ip */
 	unsigned short port;	/* port */
 };

@@ -570,7 +570,7 @@ unsigned short fix16(unsigned short x);
 #define GG_HTTPS_PORT 443
 #define GG_HTTP_USERAGENT "Mozilla/4.7 [en] (Win98; I)"
 
-#define GG_CLIENT_VERSION 0x14
+#define GG_CLIENT_VERSION 0x15
 #define GG_DEFAULT_TIMEOUT 30
 
 #define GG_DEFAULT_DCC_PORT 1550
