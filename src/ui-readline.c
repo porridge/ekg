@@ -879,6 +879,7 @@ static void ui_readline_loop()
 				ui_screen_height = screen_lines;
 			}
 #endif
+			continue;
 		}
 
 		/* je¶li wci¶niêto Ctrl-D i jeste¶my w query, wyjd¼my */

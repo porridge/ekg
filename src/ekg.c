@@ -493,6 +493,9 @@ void ekg_wait_for_key()
 		}
 #endif
 
+		if (ui_needs_refresh)
+			break;
+
 		/* zerknij na wszystkie niezbêdne deskryptory */
 		
 		FD_ZERO(&rd);
@@ -576,9 +579,6 @@ void ekg_wait_for_key()
 		
 		if (!ret) {
 			if (batch_mode && !batch_line)
-				break;
-
-			if (ui_needs_refresh)
 				break;
 
 			continue;
