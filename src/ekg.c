@@ -77,6 +77,7 @@ static void get_line_from_pipe(struct gg_exec *c);
 static int get_char_from_pipe(struct gg_common *c);
 
 extern FILE *gg_debug_file;
+int old_stderr = 0;
 
 /*
  * usuwanie sesji GG_SESSION_USERx. wystarczy zwolniæ.
@@ -641,6 +642,11 @@ static void handle_sigsegv()
 	
 	ioctld_kill();
 
+	if (old_stderr) {
+		close(2);
+		dup2(old_stderr, 2);
+	}
+
 	fprintf(stderr, "\n"
 "*** Naruszenie ochrony pamiêci ***\n"
 "\n"
@@ -727,6 +733,8 @@ static void setup_debug()
 
 	fcntl(fd[0], F_SETFL, O_NONBLOCK);
 	fcntl(fd[1], F_SETFL, O_NONBLOCK);
+	
+	old_stderr = fcntl(STDERR_FILENO, F_DUPFD);
 
 	dup2(fd[1], 2);
 	
