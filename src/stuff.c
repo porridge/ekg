@@ -85,7 +85,6 @@ list_t lasts_count = NULL;
 list_t conferences = NULL;
 list_t sms_away = NULL;
 
-int away = 0;
 int in_autoexec = 0;
 int config_auto_reconnect = 10;
 int reconnect_timer = 0;
@@ -3397,7 +3396,6 @@ const char *http_error_string(int h)
  */
 void update_status()
 {
-	int st[6] = { GG_STATUS_AVAIL, GG_STATUS_BUSY, GG_STATUS_INVISIBLE, GG_STATUS_BUSY_DESCR, GG_STATUS_AVAIL_DESCR, GG_STATUS_INVISIBLE_DESCR };
 	struct userlist *u = userlist_find(config_uin, NULL);
 
 	if (!u)
@@ -3409,7 +3407,7 @@ void update_status()
 	if (!sess || sess->state != GG_STATE_CONNECTED)
 		u->status = (u->descr) ? GG_STATUS_NOT_AVAIL_DESCR : GG_STATUS_NOT_AVAIL;
 	else
-		u->status = st[away];
+		u->status = config_status;
 
 	update_status_myip();
 }
@@ -3537,8 +3535,6 @@ void change_status(int status, const char *arg, int autom)
 
 	if (reason)
 		status = status_descr;
-
-	away = (reason) ? away1 : away2;
 
 	if (reason) {
 		char *r1, *r2;
