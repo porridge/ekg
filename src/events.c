@@ -431,7 +431,7 @@ void handle_msg(struct gg_event *e)
 			return;
 	}
 
-	if (ignored_check(e->event.msg.sender)) {
+	if (ignored_check(e->event.msg.sender) & IGNORE_MSG) {
 		if (config_log_ignored) {
 			char *tmp;
 			cp_to_iso(e->event.msg.message);
@@ -528,7 +528,8 @@ void handle_msg(struct gg_event *e)
 	
 	cp_to_iso(e->event.msg.message);
 
-	event_check((chat) ? EVENT_CHAT : EVENT_MSG, e->event.msg.sender, e->event.msg.message);
+	if (!(ignored_check(e->event.msg.sender) & IGNORE_EVENTS))
+		event_check((chat) ? EVENT_CHAT : EVENT_MSG, e->event.msg.sender, e->event.msg.message);
 	
 	if (e->event.msg.sender == 0) {
 		if (e->event.msg.msgclass > last_sysmsg) {
@@ -620,7 +621,8 @@ void handle_ack(struct gg_event *e)
 
 	msg_queue_remove(e->event.ack.seq);
 
-	event_check((queued) ? EVENT_QUEUED : EVENT_DELIVERED, e->event.ack.recipient, NULL);
+	if (!(ignored_check(e->event.ack.recipient) & IGNORE_EVENTS))
+		event_check((queued) ? EVENT_QUEUED : EVENT_DELIVERED, e->event.ack.recipient, NULL);
 
 	if (!config_display_ack)
 		return;
@@ -661,24 +663,27 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 		{ GG_STATUS_AVAIL_DESCR, EVENT_AVAIL, "avail", "status_avail_descr" },
 		{ GG_STATUS_BUSY, EVENT_AWAY, "busy", "status_busy" },
 		{ GG_STATUS_BUSY_DESCR, EVENT_AWAY, "busy", "status_busy_descr" },
+		{ GG_STATUS_INVISIBLE, EVENT_INVISIBLE, "invisible", "status_invisible" },
+		{ GG_STATUS_INVISIBLE_DESCR, EVENT_INVISIBLE, "invisible", "status_invisible_descr" },
 		{ GG_STATUS_NOT_AVAIL, EVENT_NOT_AVAIL, "notavail", "status_not_avail" },
 		{ GG_STATUS_NOT_AVAIL_DESCR, EVENT_NOT_AVAIL, "notavail", "status_not_avail_descr" },
-		{ 0, 0, NULL, NULL },
+		{ 0, 0, NULL, NULL }
 	};
 	struct status_table *s;
 	int prev_status, hide = 0;
+	int ignore_status = 0, ignore_status_descr = 0, ignore_events = 0;
 	char *descr = NULL;
 #ifdef WITH_PYTHON
 	list_t l;
 #endif
 
-	/* je¶li ignorujemy, nie wy¶wietlaj */
-	if (ignored_check(uin))
-		return;
-	
 	/* nie pokazujemy nieznajomych */
 	if (!(u = userlist_find(uin, NULL)))
 		return;
+
+	ignore_status = ignored_check(uin) & IGNORE_STATUS;
+	ignore_status_descr = ignored_check(uin) & IGNORE_STATUS_DESCR;
+	ignore_events = ignored_check(uin) & IGNORE_EVENTS;
 
 #ifdef WITH_PYTHON
 	for (l = modules; l; l = l->next) {
@@ -716,8 +721,11 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 	}
 #endif
 
-	if (GG_S_BL(status) && !GG_S_BL(u->status))
-		event_check(EVENT_BLOCKED, uin, NULL);
+	if (GG_S_BL(status) && !GG_S_BL(u->status)) {
+		u->status = status;	/* poza list± stanów */
+		if (!ignore_events)
+			event_check(EVENT_BLOCKED, uin, NULL);
+	}
 
 	if (!descr)
 		descr = xstrdup(idescr);
@@ -739,32 +747,20 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 		return;
 	}
 
-	/* usuñ poprzedni opis */
-	xfree(u->descr);
-	u->descr = NULL;
-
 	/* je¶li stan z opisem, a opisu brak, wpisz pusty tekst */
 	if (GG_S_D(status) && !descr)
-		u->descr = xstrdup("");
+		descr = xstrdup("");
 
-	/* a je¶li jest opis, to go zapamiêtaj */
 	if (descr) {
 		char *tmp = NULL;
-		u->descr = xstrdup(descr);
 
-		/* niektóre klienty pozwalaj± na '\n' - psuje nam to wy¶wietlanie */
-		if ((tmp = strchr(u->descr, '\n')))
+		while ((tmp = strchr(descr, '\n')))
 			*tmp = ' ';
 
-		cp_to_iso(u->descr);
+		cp_to_iso(descr);
 	}
 
-	/* zapamiêtaj stary stan, ustaw nowy */
 	prev_status = u->status;
-	u->status = status;
-
-	/* poinformuj ui */
-	ui_event("status", u->uin, u->display, status, u->descr);
 	
 	for (s = st; s->status; s++) {
 		/* je¶li nie ten, sprawdzaj dalej */
@@ -776,21 +772,31 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 			u->port = 0;
 		}
 
-		/* je¶li nie jest opisowy i taki sam, ignoruj */
-		if (!GG_S_D(s->status) && prev_status == s->status)
-			break;
-
 #define __SAME_GG_S(x, y)	((GG_S_A(x) && GG_S_A(y)) || (GG_S_B(x) && GG_S_B(y)) || (GG_S_I(x) && GG_S_I(y)) || (GG_S_NA(x) && GG_S_NA(y)))
 
-		if (!config_events_delay || (time(NULL) - last_conn_event >= config_events_delay)) {
+		if (!ignore_events && (!config_events_delay || (time(NULL) - last_conn_event) >= config_events_delay)) {
 			if (__SAME_GG_S(prev_status, s->status) && (GG_S_D(prev_status) || GG_S_D(s->status)))
-				event_check(EVENT_DESCR, uin, u->descr);
+				event_check(EVENT_DESCR, uin, descr);
 			else {
 				if (GG_S_NA(prev_status) && GG_S_A(s->status))
-					event_check(EVENT_ONLINE, uin, u->descr);
+					event_check(EVENT_ONLINE, uin, descr);
 				else if (!__SAME_GG_S(prev_status, s->status))
-					event_check(s->event, uin, u->descr);
+					event_check(s->event, uin, descr);
 			}
+		}
+
+		if (ignore_status)
+			break;
+
+		if (ignore_status_descr && GG_S_D(status)) {
+			xfree(descr);
+
+			if (__SAME_GG_S(prev_status, status))
+				break;
+
+			/* brzydkie, ale proste */
+			s--;
+			status = s->status;
 		}
 
 #undef __SAME_GG_S
@@ -798,8 +804,8 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 		/* zaloguj */
 		if (config_log_status && !GG_S_D(s->status))
 			put_log(uin, "status,%ld,%s,%s,%s,%s\n", uin, u->display, inet_ntoa(u->ip), log_timestamp(time(NULL)), s->log);
-		if (config_log_status && GG_S_D(s->status) && u->descr)
-		    	put_log(uin, "status,%ld,%s,%s,%s,%s,%s\n", uin, u->display, inet_ntoa(u->ip), log_timestamp(time(NULL)), s->log, u->descr);
+		if (config_log_status && GG_S_D(s->status) && descr)
+		    	put_log(uin, "status,%ld,%s,%s,%s,%s,%s\n", uin, u->display, inet_ntoa(u->ip), log_timestamp(time(NULL)), s->log, descr);
 
 		/* jak dostêpny lub zajêty, dopiszmy do taba
 		 * jak niedostêpny, usuñmy */
@@ -834,7 +840,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 			
 		/* no dobra, poka¿ */
 		if (!hide)
-			print_window(u->display, 0, s->format, format_user(uin), (u->first_name) ? u->first_name : u->display, u->descr);
+			print_window(u->display, 0, s->format, format_user(uin), (u->first_name) ? u->first_name : u->display, descr);
 
 		/* daj znaæ d¿wiêkiem */
 		if (config_beep && config_beep_notify)
@@ -846,7 +852,17 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 		break;
 	}
 
-	xfree(descr);
+	if (!ignore_status) {
+		u->status = status;
+
+		if (!ignore_status_descr) {
+			xfree(u->descr);
+			u->descr = descr;
+		}
+
+		ui_event("status", u->uin, u->display, status, u->descr);
+	 } else
+		xfree(descr);
 }
 
 /*
@@ -1280,7 +1296,11 @@ void handle_dcc(struct gg_dcc *d)
 	list_t l;
 	char *p;
 
-	event_check(EVENT_DCC, d->peer_uin, NULL);
+	if (!(ignored_check(d->peer_uin) & IGNORE_EVENTS))
+		event_check(EVENT_DCC, d->peer_uin, NULL);
+
+	if (ignored_check(d->peer_uin) & IGNORE_DCC)
+		return;
 	
 	if (!(e = gg_dcc_watch_fd(d))) {
 		print("dcc_error", strerror(errno));

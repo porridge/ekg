@@ -881,8 +881,6 @@ void theme_init()
 	format_add("user_cleared_list", "%> Wyczyszczono listê kontaktów\n", 1);
 	format_add("user_exists", "%! %T%1%n ju¿ istnieje w li¶cie kontaktów\n", 1);
 	format_add("user_exists_other", "%! %T%1%n ju¿ istnieje w li¶cie kontaktów jako %2\n", 1);
-	format_add("error_adding", "%! B³±d podczas dopisywania do listy kontaktów\n", 1);
-	format_add("error_deleting", "%! B³±d podczas usuwania z listy kontaktów\n", 1);
 
 	/* zmiany stanu */
 	format_add("away", "%> Zmieniono stan na zajêty\n", 1);

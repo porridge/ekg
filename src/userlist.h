@@ -54,6 +54,7 @@ enum ignored_level_t {
 	IGNORE_STATUS_DESCR = 2,
 	IGNORE_MSG = 4,
 	IGNORE_DCC = 8,
+	IGNORE_EVENTS = 16,
 	
 	IGNORE_ALL = 255
 };

@@ -144,15 +144,37 @@ COMMAND(cmd_cleartab)
 {
 	int i;
 
-	for (i = 0; i < send_nicks_count; i++) {
-		xfree(send_nicks[i]);
-		send_nicks[i] = NULL;
+	if (!params[0]) {
+		for (i = 0; i < send_nicks_count; i++) {
+			xfree(send_nicks[i]);
+			send_nicks[i] = NULL;
+		}
+
+		send_nicks_count = 0;
+		send_nicks_index = 0;
+
+		return 0;
 	}
 
-	send_nicks_count = 0;
-	send_nicks_index = 0;
+	if (match_arg(params[0], 'o', "offline", 2)) {
+		for (i = 0; i < send_nicks_count; i++) {
+			struct userlist *u = NULL;
 
-	return 0;
+			if (send_nicks[i])
+				u = userlist_find(atoi(send_nicks[i]), send_nicks[i]);
+
+			if (!u || !GG_S_NA(u->status))
+				continue;
+
+			remove_send_nick(send_nicks[i]);
+		}
+
+		return 0;
+	}
+
+	printq("invalid_params", name);
+
+	return -1;
 }
 
 COMMAND(cmd_add)
@@ -161,7 +183,7 @@ COMMAND(cmd_add)
 	struct userlist *u;
 	uin_t uin;
 
-	if (params[0] && !params[1] && isalpha_pl_PL(params[0][0])) {
+	if (params[0] && !params[1]) {
 		ui_event("command", quiet, "add", params[0], NULL);
 		return 0;
 	}
@@ -236,8 +258,7 @@ COMMAND(cmd_add)
 		remove_send_nick(itoa(uin));
 		config_changed = 1;
 		ui_event("userlist_changed", itoa(uin), params[1], NULL);
-	} else
-		printq("error_adding");
+	}
 
 	if (params[2])
 		cmd_modify("add", &params[1], NULL, quiet);
@@ -595,10 +616,6 @@ COMMAND(cmd_del)
 		remove_send_nick(nick);
 		config_changed = 1;
 		ui_event("userlist_changed", nick, itoa(uin), NULL);
-	} else {
-		printq("error_deleting");
-		xfree(nick);
-		return -1;
 	}
 
 	xfree(nick);
@@ -4538,9 +4555,10 @@ void command_init()
 	  "zostanie rozpoczêta rozmowa grupowa.");
 	  
 	command_add
-	( "cleartab", "", cmd_cleartab, 0,
-	  "", "czy¶ci listê nicków do dope³nienia",
-	  "");
+	( "cleartab", "?", cmd_cleartab, 0,
+	  " [opcje]", "czy¶ci listê nicków do dope³nienia",
+	  "\n"
+	  "  -o, --offline  usuwa tylko nieobecnych");
 	  
 	command_add
 	( "connect", "??", cmd_connect, 0,
