@@ -1210,7 +1210,13 @@ static char *bind_find_command(const char *seq)
 static int bind_handler_ctrl(int a, int key)
 {
 	char *tmp = saprintf("Ctrl-%c", 'A' + key - 1);
+	int foo = pager_lines;
+
+	if (foo < 0)
+		pager_lines = 0;
 	command_exec(NULL, bind_find_command(tmp));
+	if (foo < 0)
+		pager_lines = foo;
 	xfree(tmp);
 
 	return 0;
@@ -1224,7 +1230,13 @@ static int bind_handler_ctrl(int a, int key)
 static int bind_handler_alt(int a, int key)
 {
 	char *tmp = saprintf("Alt-%c", key);
+	int foo = pager_lines;
+
+	if (foo < 0)
+		pager_lines = 0;
 	command_exec(NULL, bind_find_command(tmp));
+	if (foo < 0)
+		pager_lines = foo;
 	xfree(tmp);
 
 	return 0;

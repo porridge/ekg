@@ -1226,7 +1226,7 @@ COMMAND(cmd_dcc)
 	if (!params[0] || !strncasecmp(params[0], "sh", 2)) {	/* show */
 		int pending = 0, active = 0;
 
-		if (params[1] && params[1][0] == 'd') {	/* show debug */
+		if (params[0] && params[1] && params[1][0] == 'd') {	/* show debug */
 			for (l = transfers; l; l = l->next) {
 				struct transfer *t = l->data;
 				
