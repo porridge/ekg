@@ -1422,7 +1422,7 @@ COMMAND(cmd_set)
 		if (arg)
 			val = params[1];
 	}
-
+	
 	if (arg && arg[0] == '-') {
 		unset = 1;
 		arg++;
@@ -2620,20 +2620,17 @@ int binding_help(int a, int b)
 
 int binding_toggle_debug(int a, int b)
 {
-	if (config_debug)
-		command_exec(NULL, "set debug 0");
-	else
-		command_exec(NULL, "set debug 1");
+	config_debug = !config_debug;
+	ui_event("variable_changed", "debug", NULL);
 
 	return 0;
 }
 
 int binding_toggle_contacts(int a, int b)
 {
-	if (config_contacts)
-		command_exec(NULL, "set contacts 0");
-	else
-		command_exec(NULL, "set contacts 1");
+	config_contacts = !config_contacts;
+	contacts_rebuild();
+	ui_event("variable_changed", "contacts", NULL);
 
 	return 0;
 }

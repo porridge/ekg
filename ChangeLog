@@ -20,6 +20,7 @@ zg³osi³ b³±d.
 - /set nie wy¶wietla ju¿ nieaktywnych opcji (np. log_path przy wy³±czonym
   logowaniu, beep_notify przy wy³±czonym beepaniu). ¿eby wy¶wietliæ
   wszystkie zmienne, wpisujemy ,,/set -a'' (Arim/w)
+- F3 i F12 nie pokazuj± informacji o zmianie zmiennej (w)
 
 // 2002-11-25
 
