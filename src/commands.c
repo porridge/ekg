@@ -6109,7 +6109,7 @@ void command_init()
 	  "\n"
 	  "Podanie numeru i has³a jest niezbêdne ze wzglêdów bezpieczeñstwa. "
 	  "Nikt nie chcia³by chyba usun±æ konta przypadkowo, bez ¿adnego "
-	  "potwierdzenia. Przed operacj±  nale¿y pobraæ token komend± "
+	  "potwierdzenia. Przed operacj± nale¿y pobraæ token komend± "
 	  "%Ttoken%n.");
 
 	command_add
