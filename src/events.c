@@ -52,7 +52,53 @@ struct handler handlers[] = {
  */
 void print_message_body(char *str, int chat)
 {
-	my_puts("%s\n", str);
+	int width, i, j;
+	char *mesg, *buf, *line, *next, *prefix, *suffix;
+
+	if (!(width = atoi(find_format((chat) ? "chat_line_width" : "message_line_width"))))
+		width = 78;
+
+	prefix = (chat) ? "chat_line_prefix" : "message_line_prefix";
+	suffix = (chat) ? "chat_line_suffix" : "message_line_suffix";
+	
+	if (!(buf = malloc(width + 1)) || !(mesg = strdup(str))) {
+		my_puts(str);			/* emergency ;) */
+		return;
+	}
+
+	for (i = 0; i < strlen(mesg); i++)	/* XXX ³adniejsze taby */
+		if (mesg[i] == '\t')
+			mesg[i] = ' ';
+	
+	while ((line = gg_get_line(&mesg))) {
+		for (; strlen(line); line = next) {
+			if (strlen(line) <= width) {
+				strcpy(buf, line);
+				next = line + strlen(line);
+			} else {
+				int len = width;
+				
+				for (j = width; j; j--)
+					if (line[j] == ' ') {
+						len = j;
+						break;
+					}
+
+				strncpy(buf, line, len);
+				buf[len] = 0;
+				next = line + len;
+
+				while (*next == ' ')
+					next++;
+			}
+
+			my_printf(prefix);
+			for (i = strlen(buf), j = 0; j < width - i; j++)
+				strcat(buf, " ");
+			my_puts(buf);
+			my_printf(suffix);
+		}
+	}
 }
 
 void handle_msg(struct gg_event *e)
