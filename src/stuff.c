@@ -2629,11 +2629,7 @@ int init_control_pipe(const char *pipe_file)
 	if (mkfifo(pipe_file, 0600) < 0 && errno != EEXIST)
 		err_str = saprintf("Nie mogê stworzyæ potoku %s: %s. Ignorujê.\n", pipe_file, strerror(errno));
 
-#ifdef O_NDELAY
-	if ((fd = open(pipe_file, O_RDWR | O_NDELAY)) < 0)
-#else
-	if ((fd = open(pipe_file, O_RDWR)) < 0)
-#endif
+	if ((fd = open(pipe_file, O_RDWR | O_NONBLOCK)) < 0)
 		err_str = saprintf("Nie mogê otworzyæ potoku %s: %s. Ignorujê.\n", pipe_file, strerror(errno));
 
 	if (err_str) {
