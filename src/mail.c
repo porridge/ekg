@@ -87,10 +87,9 @@ int check_mail_update(const char *s, int more)
 	if (!s)
 		return -1;
 
-	if (!(buf = array_make(s, ",", 0, 0, 0)))
-		return -1;
+	buf = array_make(s, ",", 0, 0, 0);
 
-	if (!buf[1]) {
+	if (array_count(buf) != 2) {
 		array_free(buf);
 		return -1;
 	}
@@ -262,6 +261,9 @@ int check_mail_mbox()
 
 				while (left > 0) {
 					sent = write(fd[1], ptr, sizeof(ptr));
+	
+					if (sent == -1)
+						break;
 
 					left -= sent;
 					ptr += sent;
@@ -364,6 +366,9 @@ int check_mail_maildir()
 				while (left > 0) {
 					sent = write(fd[1], ptr, sizeof(ptr));
 
+					if (sent == -1)
+						break;
+
 					left -= sent;
 					ptr += sent;
 				}
@@ -447,7 +452,7 @@ void changed_check_mail_folders(const char *var)
 		char **f = NULL;
 		int i;
 		
-		f = array_make(config_check_mail_folders, ", ", 0, 1, 0);
+		f = array_make(config_check_mail_folders, ", ", 0, 1, 1);
 
 		for (i = 0; f[i]; i++) {
 			if (f[i][0] != '/') {
