@@ -1059,7 +1059,7 @@ COMMAND(cmd_msg)
 	struct userlist *u;
 	char **nicks = NULL, **p, *msg, *escaped, *nick;
 	uin_t uin;
-	int count, chat = (!strcasecmp(name, "chat"));
+	int count, valid = 0, chat = (!strcasecmp(name, "chat"));
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		print("not_connected");
@@ -1118,8 +1118,10 @@ COMMAND(cmd_msg)
 		if (config_last & 4)
 			last_add(1, uin, time(NULL), msg);
 
-		if (!chat || count == 1)
+		if (!chat || count == 1) {
 			gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
+			valid++;
+		}
 	}
 
 	xfree(escaped);
@@ -1134,12 +1136,14 @@ COMMAND(cmd_msg)
 	
 		gg_send_message_confer(sess, GG_CLASS_CHAT, realcount, uins, msg);
 
+		valid++;
+
 		xfree(uins);
 	}
 
 	add_send_nick(nick);
 
-	if (config_display_sent) {
+	if (valid && config_display_sent) {
 		struct gg_event e;
 		struct userlist u;
 		
