@@ -10,6 +10,10 @@ d - drg, sz - szalik, del - deletek).
 - libgadu: poprawka wysy³ania du¿ych pakietów (mslusarz/w)
 - nowa zmienna ,,dcc_port'' (adaml/w)
 
+// 2004-10-07
+
+- libgadu: poprawka pobierania tokenow (szalik/w)
+
 // 2004-10-06
 
 - libgadu: optymalizacja zwalniania zasobów (mslusarz/w)
@@ -138,10 +142,6 @@ d - drg, sz - szalik, del - deletek).
 
 - zast±pienie zmiennej aspell_allowed wewnêtrzn± funkcj± sprawdzaj±c± (del)
 - wyczyszczony kod i dodana obs³uga adresów WWW i FTP (nie s± podkre¶lane) w s³owniku (del)
-
-// 2004-02-26
-
-- zapomniany contrib/ioctld-client.c
 
 // 2004-02-26
 
@@ -636,6 +636,10 @@ d - drg, sz - szalik, del - deletek).
 - poprawka obs³ugi polskich liter w /find (FIG/sz)
 - poprawka wyboru opisów z plików *.reasons - lepiej losuje i nie
   wywraca siê przy pustym pliku (sz)
+
+// 2003-05-05
+
+- niedostêpno¶æ osób nie bêdzie wy¶wietlana przez ,,events_delay'' sekund
   od po³±czenia (lordzik/w)
 
 // 2003-05-01
