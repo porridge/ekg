@@ -15,14 +15,13 @@ install = @INSTALL@
 
 CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -DTHEMES_DIR=\"$(datadir)/ekg/themes\" -DIOCTL_DAEMON_PATH=\"$(prefix)/bin/ioctl_daemon\"
 OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o
-LOBJS = libgg.o libgg_search.o
 
-all:	libgg ekg
+all:	libgadu ekg
 
 ekg:	
 	(cd src; $(MAKE) all)
 
-libgg:	
+libgadu:	
 	(cd lib; $(MAKE) all)
 
 install: all 
