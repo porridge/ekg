@@ -699,5 +699,6 @@ void init_theme()
 	add_format("change_not_enough_params", "%! Polecenie wymaga podania %wwszystkich%n parametrów\n", 1);
 
 	add_format("more", "-- Wci¶nij Enter by kontynuowaæ --", 1);
+	add_format("window_change_size", "%) Uaktualniono informacjê o rozmiarach okna.\n", 1);
 };
 

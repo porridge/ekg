@@ -3,6 +3,7 @@
 /*
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
+ *                          Pawe³ Maziarz <drg@infomex.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -321,6 +322,20 @@ void sighup()
 	signal(SIGHUP, sighup);
 }
 
+void sigwinch()
+{
+    	int lines;
+       
+	lines = atoi(getenv("LINES"));
+
+	if (lines > 1) {
+	    	screen_lines = lines;
+		my_printf("window_change_size");
+	}
+	
+	signal(SIGWINCH, sigwinch);
+}
+
 void kill_ioctl_daemon()
 {
         if (ioctl_daemon_pid > 0 && ekg_pid == getpid())
@@ -499,6 +514,7 @@ IOCTL_HELP
 		
 	signal(SIGCONT, sigcont);
 	signal(SIGHUP, sighup);
+	signal(SIGWINCH, sigwinch);
 	signal(SIGALRM, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
 

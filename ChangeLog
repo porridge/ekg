@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-04-04
 
 - drobna poprawka w funkcji correct_event() (D.Jarosz@elka.pw.edu.pl/d)
+- dodana obs³uga sygna³u zmiany rozmiaru okna (d)
 
 // 2002-03-31
 
