@@ -239,8 +239,6 @@ dnl <ekg>
 
 # i zaczynamy wykrywaæ ¶mieci dla ekg
 
-  AC_CHECK_FUNCS(setenv)
-
   # na wszelki wypadek
   AC_FUNC_SETVBUF_REVERSED
 
@@ -250,6 +248,8 @@ dnl <ekg>
 
   # na SunOSach nie ma scandir()
   AC_CHECK_FUNCS(scandir, , [OBJS="$OBJS ../compat/scandir.o"])
+
+  AC_CHECK_FUNCS(setenv)
 
   # strlcat/strlcpy wiele systemów nie posiada
   AC_CHECK_FUNCS(strlcat, , [OBJS="$OBJS ../compat/strlcat.o"])
