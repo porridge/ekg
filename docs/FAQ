@@ -65,4 +65,9 @@ A: Czas jest zapisywany jako ilo¶æ sekund od 1 stycznia 1970 UTC. Dziêki
    ekl w katalogu contrib/. Mo¿esz równie¿ zmieniæ zmienn± ,,log_timestamp''
    i dostosowaæ format czasu do swoich potrzeb.
 
+Q: Po zmianie wielko¶ci terminala przestaj± mi dzia³aæ strza³ki!
+A: Masz star± wersjê biblioteki ncurses. Zainstaluj nowsz± wersjê lub
+   popro¶ o to administratora systemu.
+
+
 $Id$
