@@ -6,7 +6,7 @@ d - drg, sz - szalik).
 
 // 2003-07-14
 
-- kosmetyczna poprawka dzia³ania polecania /dcc get (rinoa/sz)
+- kosmetyczna poprawka dzia³ania polecania /dcc get (struthio/sz)
 
 // 2003-07-09
 
@@ -71,7 +71,7 @@ d - drg, sz - szalik).
 
 // 2003-06-22
 
-- dodanie informacji o kompilacji rtg (rinoa/w)
+- dodanie informacji o kompilacji rtg (struthio/w)
 - ekg nie usuwa u¿ytkowników bez podanego numeru z listy kontaktów
   (a.latanski/w)
 - lepsza obs³uga padniêtego katalogu publicznego (w)
