@@ -3911,6 +3911,7 @@ void command_init()
 	  "  [numer/alias]             wy¶wietla ostatnie wiadomo¶ci\n"
 	  "  -s, --stime [numer/alias] wy¶wietla czas wys³ania wiadomo¶ci\n"
 	  "  -c, --clear [numer/alias] czy¶ci podane wiadomo¶ci lub wszystkie\n"
+	  "\n"
 	  "W przypadku opcji %T--stime%n czas wy¶wietlany jest "
 	  ",,inteligentnie'' zgodnie ze zmienn± %Ttime_deviation.%n");
 
@@ -3983,6 +3984,7 @@ void command_init()
 	  "\n"
 	  " [numer/alias]             wy¶wietla kolejkê wiadomo¶ci\n"
 	  " -c, --clear [numer/alias] usuwa wiadomo¶ci dla numer/alias lub wszystkie\n"
+	  "\n"
 	  "Mo¿na u¿yæ tylko wtedy, gdy nie jeste¶my po³±czeni. W przypadku "
 	  "konferencji wy¶wietla wszystkich uczestników.");
 	  
