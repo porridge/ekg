@@ -272,7 +272,7 @@ int userlist_write(char *filename)
 		return -1;
 	}
 
-	if (mkdir(tmp, 0700))
+	if (mkdir(tmp, 0700) && errno != EEXIST)
 		return -1;
 
 	if (!filename) {

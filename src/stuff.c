@@ -253,7 +253,7 @@ void put_log(uin_t uin, char *format, ...)
 		strncpy(path, lp, sizeof(path));
 
 	if (config_log == 2) {
-		if (mkdir(path, 0700))
+		if (mkdir(path, 0700) && errno != EEXIST)
 			return;
 		snprintf(path + strlen(path), sizeof(path) - strlen(path), "/%lu", uin);
 	}
@@ -486,7 +486,8 @@ int config_write(char *filename)
 	if (!(tmp = prepare_path("")))
 		return -1;
     	
-	mkdir(tmp, 0700);
+	if (mkdir(tmp, 0700) && errno != EEXIST)
+		return -1;
 
 	if (!filename) {
 		if (!(filename = prepare_path("config")))
@@ -517,7 +518,9 @@ int write_sysmsg(char *filename)
 
 	if (!(tmp = prepare_path("")))
 		return -1;
-	mkdir(tmp, 0700);
+
+	if (mkdir(tmp, 0700) && errno != EEXIST)
+		return -1;
 
 	if (!filename) {
 		if (!(filename = prepare_path("sysmsg")))

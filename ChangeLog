@@ -10,6 +10,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - domy¶lny powód nieobecno¶ci w zmiennej ,,quit_reason'' (matias/w)
 - poprawka inkludów readline (seiko/w)
 - obs³uga niewidocznych u¿ytkowników (klith/w)
+- poprawka poprawki mkdir (wasyl/w)
 
 // 2002-03-23
 
