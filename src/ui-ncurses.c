@@ -200,6 +200,35 @@ static void window_refresh();
 }
 
 /*
+ * color_pair()
+ *
+ * zwraca numer COLOR_PAIR odpowiadaj±cej danej parze atrybutów: kolorze
+ * tekstu (plus pogrubienie) i kolorze t³a.
+ */
+int color_pair(int fg, int bold, int bg)
+{
+	if (fg >= 8) {
+		bold = 1;
+		fg &= 7;
+	}
+
+	if (fg == COLOR_BLACK && bg == COLOR_BLACK) {
+		fg = 7;
+	} else if (fg == COLOR_WHITE && bg == COLOR_BLACK) {
+		fg = 0;
+	}
+
+	if (!config_display_color) {
+		if (bg != COLOR_BLACK)
+			return A_REVERSE;
+		else
+			return A_NORMAL | ((bold) ? A_BOLD : 0);
+	}
+		
+	return COLOR_PAIR(fg + 8 * bg) | ((bold) ? A_BOLD : 0);
+}
+
+/*
  * window_commit()
  *
  * zatwierdza wszystkie zmiany w buforach ncurses i wy¶wietla je na ekranie.
@@ -441,7 +470,7 @@ void window_redraw(struct window *w)
 	int x, y, left = 0, top = 0, height = w->height;
 	
 	werase(w->window);
-	wattrset(w->window, (config_display_color) ? COLOR_PAIR(4) : A_NORMAL);
+	wattrset(w->window, color_pair(COLOR_BLUE, 0, COLOR_BLACK));
 
 	if (w->floating) {
 		if ((w->frames & WF_LEFT)) {
@@ -502,9 +531,9 @@ void window_redraw(struct window *w)
 				attr |= A_BOLD;
 
 			if (!(l->prompt_attr[x] & 128)) {
-				int tmp = l->prompt_attr[x] & 7;
+				int fg = l->prompt_attr[x] & 7;
 
-				attr |= COLOR_PAIR((tmp) ? tmp : 16);
+				attr |= color_pair(fg, 0, COLOR_BLACK);
 			}
 
 			if (ch < 32) {
@@ -530,9 +559,9 @@ void window_redraw(struct window *w)
 				attr |= A_BOLD;
 
 			if (!(l->attr[x] & 128)) {
-				int tmp = l->attr[x] & 7;
+				int fg = l->attr[x] & 7;
 
-				attr |= COLOR_PAIR((tmp) ? tmp : 16);
+				attr |= color_pair(fg, 0, COLOR_BLACK);
 			}
 
 			if (ch < 32) {
@@ -1006,12 +1035,12 @@ static void update_contacts(int commit)
 	
 	werase(contacts);
 
-	wattrset(contacts, (config_display_color) ? COLOR_PAIR(4) : A_NORMAL);
+	wattrset(contacts, color_pair(COLOR_BLUE, 0, COLOR_BLACK));
 
 	for (y = 0; y <= contacts->_maxy; y++)
 		mvwaddch(contacts, y, 0, ACS_VLINE);
 
-	wattrset(contacts, COLOR_PAIR(0));
+	wattrset(contacts, color_pair(COLOR_WHITE, 0, COLOR_BLACK));
 	
 	for (l = userlist, y = 0; l && y <= contacts->_maxy; l = l->next) {
 		struct userlist *u = l->data;
@@ -1020,19 +1049,19 @@ static void update_contacts(int commit)
 		if (!GG_S_A(u->status))
 			continue;
 
-		wattrset(contacts, COLOR_PAIR(3) | A_BOLD);
+		wattrset(contacts, color_pair(COLOR_YELLOW, 1, COLOR_BLACK));
 		
 		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
 			mvwaddch(contacts, y, x + 2, (unsigned char) u->display[x]);
 
-		wattrset(contacts, COLOR_PAIR(7));
+		wattrset(contacts, color_pair(COLOR_WHITE, 0, COLOR_BLACK));
 
 		if (config_contacts_descr && u->descr)
 			for (z = 0, x++; *(u->descr + z) && x < config_contacts_size; x++, z++)
 				mvwaddch(contacts, y, x + 2, (unsigned char) u->descr[z]);
 
 		if (GG_S_D(u->status)) {
-			wattrset(contacts, COLOR_PAIR(16) | A_BOLD);
+			wattrset(contacts, color_pair(COLOR_BLACK, 0, COLOR_BLACK));
 			mvwaddch(contacts, y, 1, 'i');
 		}
 		
@@ -1046,12 +1075,12 @@ static void update_contacts(int commit)
 		if (!GG_S_B(u->status))
 			continue;
 		
-		wattrset(contacts, COLOR_PAIR(2));
+		wattrset(contacts, color_pair(COLOR_GREEN, 0, COLOR_BLACK));
 
 		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
 			mvwaddch(contacts, y, x + 2, (unsigned char) u->display[x]);
 
-		wattrset(contacts, COLOR_PAIR(7));
+		wattrset(contacts, color_pair(COLOR_WHITE, 0, COLOR_BLACK));
 
 		if (config_contacts_descr && u->descr)
 			for (z = 0, x++; *(u->descr + z) && x < config_contacts_size; x++, z++)
@@ -1059,7 +1088,7 @@ static void update_contacts(int commit)
 
 
 		if (GG_S_D(u->status)) {
-			wattrset(contacts, COLOR_PAIR(16) | A_BOLD);
+			wattrset(contacts, color_pair(COLOR_BLACK, 1, COLOR_BLACK));
 			mvwaddch(contacts, y, 1, 'i');
 		}
 	
@@ -1073,19 +1102,19 @@ static void update_contacts(int commit)
 		if (!GG_S_I(u->status))
 			continue;
 		
-		wattrset(contacts, COLOR_PAIR(0));
+		wattrset(contacts, color_pair(COLOR_WHITE, 0, COLOR_BLACK));
 
 		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
 			mvwaddch(contacts, y, x + 2, (unsigned char) u->display[x]);
 
-		wattrset(contacts, COLOR_PAIR(7));
+		wattrset(contacts, color_pair(COLOR_WHITE, 0, COLOR_BLACK));
 
 		if (config_contacts_descr && u->descr)
 			for (z = 0, x++; *(u->descr + z) && x < config_contacts_size; x++, z++)
 				mvwaddch(contacts, y, x + 2, (unsigned char) u->descr[z]);
 
 		if (GG_S_D(u->status)) {
-			wattrset(contacts, COLOR_PAIR(16) | A_BOLD);
+			wattrset(contacts, color_pair(COLOR_BLACK, 1, COLOR_BLACK));
 			mvwaddch(contacts, y, 1, 'i');
 		}
 	
@@ -1175,10 +1204,7 @@ static void update_header(int commit)
 	if (!header)
 		return;
 
-	if (config_display_color)
-		wattrset(header, COLOR_PAIR(15));
-	else
-		wattrset(header, A_REVERSE);
+	wattrset(header, color_pair(COLOR_WHITE, 0, COLOR_BLUE));
 
 	for (y = 0; y < config_header_size; y++) {
 		int x;
@@ -1207,14 +1233,26 @@ static void update_header(int commit)
  */
 int print_statusbar(WINDOW *w, int x, int y, const char *format, void *data_)
 {
+	int orig_x = x, bgcolor = COLOR_BLUE, fgcolor = COLOR_WHITE, bold = 0;
+	int backup_display_color = config_display_color;
 	const char *p = format;
-	int orig_x = x, bgcolor, fgcolor, bold;
 	struct format_data *data = data_;
 
+	if (config_display_color == 2)
+		config_display_color = 0;
+	
+	if (x == 0) {
+		int i;
+
+		wattrset(w, color_pair(fgcolor, 0, bgcolor));
+
+		wmove(w, y, 0);
+
+		for (i = 0; i <= w->_maxx; i++)
+			waddch(w, ' ');
+	}
+
 	wmove(w, y, x);
-	bgcolor = 1;
-	fgcolor = 7;
-	bold = 0;
 			
 	while (*p && *p != '}' && x <= w->_maxx) {
 		int i, nest;
@@ -1230,42 +1268,45 @@ int print_statusbar(WINDOW *w, int x, int y, const char *format, void *data_)
 		if (!*p)
 			break;
 
-#define __color(x,y,z) \
+#define __fgcolor(x,y,z) \
 		case x: fgcolor = z; bold = 0; break; \
 		case y: fgcolor = z; bold = 1; break;
+#define __bgcolor(x,y) \
+		case x: bgcolor = y; break;
 
 		if (*p != '{') {
 			switch (*p) {
-				__color('k', 'K', 0);
-				__color('r', 'R', 1);
-				__color('g', 'G', 2);
-				__color('y', 'Y', 3);
-				__color('b', 'B', 4);
-				__color('m', 'M', 5);
-				__color('c', 'C', 6);
-				__color('w', 'W', 7);
-				case 'l':
-					bgcolor = 1;
-					break;
-				case 'e':
-					bgcolor = 0;
-					break;
+				__fgcolor('k', 'K', COLOR_BLACK);
+				__fgcolor('r', 'R', COLOR_RED);
+				__fgcolor('g', 'G', COLOR_GREEN);
+				__fgcolor('y', 'Y', COLOR_YELLOW);
+				__fgcolor('b', 'B', COLOR_BLUE);
+				__fgcolor('m', 'M', COLOR_MAGENTA);
+				__fgcolor('c', 'C', COLOR_CYAN);
+				__fgcolor('w', 'W', COLOR_WHITE);
+				__bgcolor('l', COLOR_BLACK);
+				__bgcolor('s', COLOR_RED);
+				__bgcolor('h', COLOR_GREEN);
+				__bgcolor('z', COLOR_YELLOW);
+				__bgcolor('e', COLOR_BLUE);
+				__bgcolor('q', COLOR_MAGENTA);
+				__bgcolor('d', COLOR_CYAN);
+				__bgcolor('x', COLOR_WHITE);
 				case 'n':
-					bgcolor = 1;
-					fgcolor = 7;
+					bgcolor = COLOR_BLUE;
+					fgcolor = COLOR_WHITE;
 					bold = 0;
 					break;
 			}
 			p++;
 
-			if (config_display_color)
-				wattrset(w, COLOR_PAIR(bgcolor * 8 + fgcolor) | ((bold) ? A_BOLD : 0));
-			else
-				wattrset(w, (bgcolor == 1) ? A_REVERSE : A_NORMAL | (bold) ? A_BOLD : 0);
+			wattrset(w, color_pair(fgcolor, bold, bgcolor));
 			
 			continue;
 		}
-#undef __color
+#undef __fgcolor
+#undef __bgcolor
+
 		if (*p != '{' && !config_display_color)
 			continue;
 
@@ -1335,6 +1376,8 @@ next:
 		}
 	}
 
+	config_display_color = backup_display_color;
+
 	return x - orig_x;
 }
 
@@ -1352,15 +1395,9 @@ static void update_statusbar(int commit)
 	struct format_data *formats = NULL;
 	int formats_count = 0, i, y;
 
-	if (config_display_color) {
-		wattrset(status, COLOR_PAIR(15));
-		if (header)
-			wattrset(header, COLOR_PAIR(15));
-	} else {
-		wattrset(status, A_REVERSE);
-		if (header)
-			wattrset(header, A_REVERSE);
-	}
+	wattrset(status, color_pair(COLOR_WHITE, 0, COLOR_BLUE));
+	if (header)
+		wattrset(header, color_pair(COLOR_WHITE, 0, COLOR_BLUE));
 
 	/* inicjalizujemy wszystkie opisowe bzdurki */
 
@@ -1445,14 +1482,6 @@ static void update_statusbar(int commit)
 
 	for (y = 0; y < config_header_size; y++) {
 		const char *p;
-		int x;
-
-		wmove(header, y, 0);
-
-		for (x = 0; x <= header->_maxx; x++)
-			waddch(header, ' ');
-		
-		wmove(header, y, 0);
 
 		if (!y) {
 			p = format_find("header1");
@@ -1470,14 +1499,6 @@ static void update_statusbar(int commit)
 
 	for (y = 0; y < config_statusbar_size; y++) {
 		const char *p;
-		int x;
-
-		wmove(status, y, 0);
-
-		for (x = 0; x <= status->_maxx; x++)
-			waddch(status, ' ');
-		
-		wmove(status, y, 0);
 
 		if (!y) {
 			p = format_find("statusbar1");
@@ -1581,23 +1602,33 @@ void ui_ncurses_init()
 
 	start_color();
 
-	init_pair(16, COLOR_BLACK, background);
+	init_pair(7, COLOR_BLACK, background);	/* ma³e obej¶cie domy¶lnego koloru */
 	init_pair(1, COLOR_RED, background);
 	init_pair(2, COLOR_GREEN, background);
 	init_pair(3, COLOR_YELLOW, background);
 	init_pair(4, COLOR_BLUE, background);
 	init_pair(5, COLOR_MAGENTA, background);
 	init_pair(6, COLOR_CYAN, background);
-	init_pair(7, COLOR_WHITE, background);
 
-	init_pair(8, COLOR_BLACK, COLOR_BLUE);
-	init_pair(9, COLOR_RED, COLOR_BLUE);
-	init_pair(10, COLOR_GREEN, COLOR_BLUE);
-	init_pair(11, COLOR_YELLOW, COLOR_BLUE);
-	init_pair(12, COLOR_BLUE, COLOR_BLUE);
-	init_pair(13, COLOR_MAGENTA, COLOR_BLUE);
-	init_pair(14, COLOR_CYAN, COLOR_BLUE);
-	init_pair(15, COLOR_WHITE, COLOR_BLUE);
+#define __init_bg(x, y) \
+	init_pair(x, COLOR_BLACK, y); \
+	init_pair(x + 1, COLOR_RED, y); \
+	init_pair(x + 2, COLOR_GREEN, y); \
+	init_pair(x + 3, COLOR_YELLOW, y); \
+	init_pair(x + 4, COLOR_BLUE, y); \
+	init_pair(x + 5, COLOR_MAGENTA, y); \
+	init_pair(x + 6, COLOR_CYAN, y); \
+	init_pair(x + 7, COLOR_WHITE, y);
+
+	__init_bg(8, COLOR_RED);
+	__init_bg(16, COLOR_GREEN);
+	__init_bg(24, COLOR_YELLOW);
+	__init_bg(32, COLOR_BLUE);
+	__init_bg(40, COLOR_MAGENTA);
+	__init_bg(48, COLOR_CYAN);
+	__init_bg(56, COLOR_WHITE);
+
+#undef __init_bg
 
 	window_commit();
 
@@ -2806,7 +2837,7 @@ static void ui_ncurses_loop()
 		}
 		
 		werase(input);
-		wattrset(input, COLOR_PAIR(7));
+		wattrset(input, color_pair(COLOR_WHITE, 0, COLOR_BLACK));
 
 		if (lines) {
 			int i;
@@ -2834,12 +2865,12 @@ static void ui_ncurses_loop()
 			for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++)
 				print_char(input, 0, i + window_current->prompt_len, line[line_start + i]);
 
-			wattrset(input, COLOR_PAIR(16) | A_BOLD);
+			wattrset(input, color_pair(COLOR_BLACK, 1, COLOR_BLACK));
 			if (line_start > 0)
 				mvwaddch(input, 0, window_current->prompt_len, '<');
 			if (strlen(line) - line_start > input->_maxx + 1 - window_current->prompt_len)
 				mvwaddch(input, 0, input->_maxx, '>');
-			wattrset(input, COLOR_PAIR(7));
+			wattrset(input, color_pair(COLOR_WHITE, 0, COLOR_BLACK));
 			wmove(input, 0, line_index - line_start + window_current->prompt_len);
 		}
 		

@@ -6,6 +6,12 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2002-01-31
+
+- drobna reorganizacja kolorów w ui-ncurses (w)
+- zmienna ,,display_color = 2'' wy¶wietla kolory wszêdzie oprócz pasku
+  stanu i nag³ówka okna (Charvel/w)
+
 // 2003-01-30
 
 - bardziej precyzyjny opis zmiennej ,,auto_back'' (pmb/sz)

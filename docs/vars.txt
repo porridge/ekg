@@ -220,10 +220,12 @@ display_ack
 	wiadomo¶æ zosta³a zachowania na serwerze.
 
 display_color
-	typ: bool
+	typ: liczba
 	domy¶lna warto¶æ: 1
 
-	warto¶æ 0 wy³±cza wy¶wietlanie kolorów, warto¶æ 1 w³±cza.
+	warto¶æ 0 wy³±cza wy¶wietlanie kolorów, warto¶æ 1 w³±cza. warto¶æ
+	2 ma znaczenie tylko w interfejsie ncurses i powoduje wy¶wietlanie
+	kolorów wszêdzie poza paskiem stanu i nag³ówkiem okna.
 
 display_color_map
 	typ: tekst
