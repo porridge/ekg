@@ -1232,11 +1232,6 @@ COMMAND(command_remind)
 {
 	struct gg_http *h;
 	
-	if (!params[0] || !params[1]) {
-		my_printf("not_enough_params");
-		return 0;
-	}
-
 	if (!(h = gg_remind_passwd(config_uin, 1))) {
 		my_printf("remind_failed", strerror(errno));
 		return 0;
