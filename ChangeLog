@@ -6,6 +6,21 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-02-08
+
+- przepisanie compat/dirname.c, gdy¿ poprzednia wersja by³a na innej
+  licencji (BSD) ni¿ ca³y ekg (sz)
+- drobne porz±dki, poprawki w ustawianiu zmiennych, ,,0xF'' te¿ jest
+  prawid³ow± warto¶ci± liczbow± (sz)
+- zbyt d³uga wysy³ana wiadomo¶æ zostanie przyciêta. niestety, nie dotyczy
+  to jeszcze szyfrowanych wiadomo¶ci (w)
+- drobne poprawki kodu (w)
+- usuniêcie zmiennej ,,contacts_descr'' (w)
+- kompletna reorganizacja listy kontaków. jest nowa, kolorowa, bardziej
+  konfigurowalna, themowalna i nie szczypie w oczy. dodanie zmiennej
+  ,,contacts_options'', warto zajrzeæ do jej opisu (koniu i wiele innych
+  osób, które dzieli³y siê pomys³ami/w)
+
 // 2003-02-07
 
 - poprawka dzielenia linii po zmianie listy kontaktów (pmb/w)
@@ -24,18 +39,6 @@ zg³osi³ b³±d.
 - usuniêcie zbêdnego sprawdzania pod k±tem ,,NULL'' w userlist.c. je¶li
   komu¶ co¶ sie zepsu³o, krzyczeæ, bo trzeba wszystkie b³êdy wy³apaæ. (sz)
 - poziomy ignorowania. /help ignore (sz)
-- przepisanie compat/dirname.c, gdy¿ poprzednia wersja by³a na innej
-  licencji (BSD) ni¿ ca³y ekg (sz)
-- drobne porz±dki, poprawki w ustawianiu zmiennych, ,,0xF'' te¿ jest
-  prawid³ow± warto¶ci± liczbow± (sz)
-- zbyt d³uga wysy³ana wiadomo¶æ zostanie przyciêta. niestety, nie dotyczy
-  to jeszcze szyfrowanych wiadomo¶ci (w)
-- drobne poprawki kodu (w)
-- usuniêcie zmiennej ,,contacts_descr'' (w)
-- kompletna reorganizacja listy kontaków. jest nowa, kolorowa, bardziej
-  konfigurowalna, themowalna i nie szczypie w oczy. dodanie zmiennej
-  ,,contacts_options'', warto zajrzeæ do jej opisu (koniu i wiele innych
-  osób, które dzieli³y siê pomys³ami/w)
 
 // 2003-02-06
 
