@@ -417,7 +417,7 @@ void handle_notify(struct gg_event *e)
                                 log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail");
 			if (config_display_notify)
 			    	print("status_not_avail", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
-			if (config_completion_notify)
+			if (config_completion_notify == 2)
 				remove_send_nick(u->display);
 		}
 
@@ -429,7 +429,7 @@ void handle_notify(struct gg_event *e)
                                 log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail", u->descr);
 			if (config_display_notify)
 			    	print("status_not_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
-			if (config_completion_notify)
+			if (config_completion_notify == 2)
 				remove_send_nick(u->display);
 		}
 
@@ -522,7 +522,7 @@ void handle_status(struct gg_event *e)
 		/* jak dostêpny, dopiszmy do taba; jak niedostêpny, usuñmy */
 		if (GG_S_A(s->status) && config_completion_notify)
 			add_send_nick(u->display);
-		if (GG_S_NA(s->status) && config_completion_notify)
+		if (GG_S_NA(s->status) && config_completion_notify == 2)
 			remove_send_nick(u->display);
 		
 		/* czy mamy wy¶wietlaæ na ekranie? */
@@ -548,57 +548,6 @@ void handle_status(struct gg_event *e)
 
 		break;
 	}
-
-#if 0
-		if (e->event.status.status == GG_STATUS_AVAIL && u->status != GG_STATUS_AVAIL) {
-                        if (config_log_status)
-			    	log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "avail");
-		    	event_check(EVENT_AVAIL, e->event.status.uin, NULL);
-			if (config_completion_notify)
-				add_send_nick(u->display);
-			if (config_display_notify != 2 || (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)) 
-				print("status_avail", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
-			if (config_beep && config_beep_notify)
-				ui_beep();
-		} else if (e->event.status.status == GG_STATUS_AVAIL_DESCR) {
-                        if (config_log_status)
-			    	log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
-		    	event_check(EVENT_AVAIL, e->event.status.uin, NULL);
-			if (config_completion_notify)
-				add_send_nick(u->display);
-			if (config_display_notify != 2 || (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)) 
-				print("status_avail_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
-			if (config_beep && config_beep_notify)
-				ui_beep();
-		} else if (e->event.status.status == GG_STATUS_BUSY && u->status != GG_STATUS_BUSY) 
-		{
-                        if (config_log_status)
-			    	log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "away");
-		    	event_check(EVENT_AWAY, e->event.status.uin, NULL);
-			if (config_display_notify != 2)
-				print("status_busy", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
-		} else if (e->event.status.status == GG_STATUS_BUSY_DESCR)
-		{
-                        if (config_log_status)
-                                log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
-		    	event_check(EVENT_AWAY, e->event.status.uin, NULL);
-			if (config_display_notify != 2)
-				print("status_busy_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
-		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL)
-		{
-                        if (config_log_status)
-			    	log(e->event.status.uin, "status,%ld,%s,%ld,%s\n", e->event.status.uin, u->display, time(NULL), "notavail");
-		    	event_check(EVENT_NOT_AVAIL, e->event.status.uin, NULL);
-			print("status_not_avail", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
-		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL_DESCR)
-		{
-                        if (config_log_status)
-			    	log(e->event.status.uin, "status,%ld,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, time(NULL), "notavail", u->descr);
-		    	event_check(EVENT_NOT_AVAIL, e->event.status.uin, NULL);
-			print("status_not_avail_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
-		}
-	}
-#endif
 }
 
 /*
