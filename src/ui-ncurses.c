@@ -355,8 +355,9 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 			break;
 
 		default:
+			/* je¶li nie ma okna, rzuæ do statusowego. */
 			if (!(w = window_find(target)))
-				w = window_current;
+				w = windows->data;
 	}
 
 	if (w != window_current) {
@@ -782,6 +783,9 @@ void command_generator(const char *text, int len)
 		len--;
 	}
 
+	if (window_current->target)
+		slash = "/";
+			
 	for (l = commands; l; l = l->next) {
 		struct command *c = l->data;
 
@@ -957,9 +961,9 @@ static void complete(int *line_start, int *line_index)
 
 	if (!strcmp(line, "") || (!strncasecmp(line, cmd, strlen(cmd)) && blanks == 2 && send_nicks_count > 0) || !strcasecmp(line, cmd)) {
 		if (send_nicks_count)
-			snprintf(line, LINE_MAXLEN, (window_current->target) ? "/%s%s " : "%s%s ", cmd, send_nicks[send_nicks_index++]);
+			snprintf(line, LINE_MAXLEN, (window_current->target && line[0] != '/') ? "/%s%s " : "%s%s ", cmd, send_nicks[send_nicks_index++]);
 		else
-			snprintf(line, LINE_MAXLEN, (window_current->target) ? "/%s" : "%s", cmd);
+			snprintf(line, LINE_MAXLEN, (window_current->target && line[0] != '/') ? "/%s" : "%s", cmd);
 		*line_start = 0;
 		*line_index = strlen(line);
 		if (send_nicks_index >= send_nicks_count)
