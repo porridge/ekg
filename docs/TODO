@@ -15,9 +15,9 @@ klient:
 - osobny program ekgsearch, lub ekg --search,
 - wielolinijkowe komendy do historii.
 - lastlog, awaylog.
-- tryb nieinteraktywny przez jakie¶ --exec albo co¶ takiego.
 - escapowanie tre¶ci mesgów.
-- konwersja emotikonów na inne teksty (murphy).
+- anulowanie |more jakim¶ ^C albo ^D.
+- wykrywanie niewidocznych jako opcja.
 
 
 $Id$
