@@ -1105,6 +1105,15 @@ int config_read(const char *filename, const char *var)
 				ignored_remove(u->uin);
 		}
 
+		for (l = bindings; l; ) {
+			struct binding *b = l->data;
+
+			l = l->next;
+
+			if (!b->internal)
+				ui_event("command", 1, "bind", "--del", b->key, NULL);
+		}
+
 		alias_free();
 		timer_remove_user(-1);
 		event_free();
@@ -1146,8 +1155,8 @@ int config_read(const char *filename, const char *var)
 			if (atoi(foo))
 				ignored_add(atoi(foo), IGNORE_ALL);
 		} else if (!strcasecmp(buf, "alias")) {
-			alias_add(foo, 1, 1);
 			gg_debug(GG_DEBUG_MISC, "\talias %s\n", foo);
+			alias_add(foo, 1, 1);
 		} else if (!strcasecmp(buf, "on")) {
                         int flags;
                         char **pms = array_make(foo, " \t", 3, 1, 0);
@@ -1162,7 +1171,7 @@ int config_read(const char *filename, const char *var)
 			char **pms = array_make(foo, " \t", 2, 1, 0);
 
 			if (pms && pms[0] && pms[1]) {
-				ui_event("command", 1, "bind", "--add", pms[0], pms[1], NULL);
+				ui_event("command", 1, "bind", "--add", pms[0], pms[1]);
 				gg_debug(GG_DEBUG_MISC, "\tbind %s %s\n", pms[0], pms[1]);
 			}
 
