@@ -333,6 +333,8 @@ uin_t last_search_uin;
 
 char *last_tokenid;
 
+int strcoll_usable;
+
 int alias_add(const char *string, int quiet, int append);
 int alias_remove(const char *name, int quiet);
 void alias_free();

@@ -83,7 +83,12 @@ static int userlist_compare(void *data1, void *data2)
 	if (!a || !a->display || !b || !b->display)
 		return 1;
 
-	return strcasecmp(a->display, b->display);
+#ifdef HAVE_STRCOLL
+	if (strcoll_usable)
+		return strcoll(a->display, b->display);
+	else
+#endif
+		return strcasecmp(a->display, b->display);
 }
 
 /*

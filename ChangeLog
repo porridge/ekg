@@ -7,6 +7,7 @@ d - drg, sz - szalik).
 // 2003-12-22
 
 - poprawka segfaultu przy wielolinijkowych wiadomo¶ciach (nyarlath/w)
+- obs³uga locali przy sortowaniu listy kontaktów (rmrmg/w)
 
 // 2003-12-21
 

@@ -39,6 +39,9 @@
 #include <fcntl.h>
 #include <getopt.h>
 #include <limits.h>
+#ifdef HAVE_LOCALE_H
+#  include <locale.h>
+#endif
 #include <pwd.h>
 #include <signal.h>
 #include <stdarg.h>
@@ -629,7 +632,7 @@ void ekg_wait_for_key()
 
 			if (c->type == GG_SESSION_USER0) {
 				if (config_auto_back == 2 && GG_S_B(config_status) && in_auto_away) {
-					change_status(GG_STATUS_AVAIL, (config_auto_away_keep_descr) ? config_status : NULL, 1);
+					change_status(GG_STATUS_AVAIL, (config_auto_away_keep_descr) ? config_reason : NULL, 1);
 					in_auto_away = 0;
 				}
 
@@ -948,6 +951,13 @@ int main(int argc, char **argv)
 	};
 
 	ekg_started = time(NULL);
+
+#ifdef HAVE_SETLOCALE
+	if (getenv("LC_ALL") || getenv("LC_COLLATE")) {
+		setlocale(LC_COLLATE, "");
+		strcoll_usable = 1;
+	}
+#endif
 
 #ifdef WITH_UI_READLINE
 	ui_init = ui_readline_init;
