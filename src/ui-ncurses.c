@@ -276,17 +276,17 @@ static int tolower_pl(const unsigned char c) {
  * obs³uguje polskie znaki
  */
 
-int strncasecmp_pl(const char *s1, const char *s2, size_t n) {
-        int i;
+int strncasecmp_pl(const char * cs,const char * ct,size_t count)
+{
+        register signed char __res = 0;
 
-        if(!strcmp(s1, "") || !strcmp(s2, "")) 
-                return -4;
-        if(strlen(s1) < n || strlen(s2) < n)
-                return -3;
-        for(i=0; i <= strlen(s1) && i < n; i++)
-                if(tolower_pl(s1[i]) != tolower_pl(s2[i]))
-                        return -1;
-        return 0;
+        while (count) {
+                if ((__res = tolower_pl(*cs) - tolower_pl(*ct++)) != 0 || !*cs++)
+                        break;
+                count--;
+        }
+
+        return __res;
 }
 
 /*
