@@ -58,12 +58,13 @@ void variable_init()
 	variable_add("dcc_dir", VAR_STR, 1, &config_dcc_dir, NULL);
 	variable_add("display_ack", VAR_INT, 1, &config_display_ack, NULL);
 	variable_add("display_color", VAR_BOOL, 1, &config_display_color, NULL);
-	variable_add("display_notify", VAR_BOOL, 1, &config_display_notify, NULL);
+	variable_add("display_notify", VAR_INT, 1, &config_display_notify, NULL);
 	variable_add("emoticons", VAR_BOOL, 1, &config_emoticons, NULL);
 	variable_add("log", VAR_INT, 1, &config_log, NULL);
 	variable_add("log_ignored", VAR_INT, 1, &config_log_ignored, NULL);
 	variable_add("log_status", VAR_BOOL, 1, &config_log_status, NULL);
 	variable_add("log_path", VAR_STR, 1, &config_log_path, NULL);
+	variable_add("make_window", VAR_INT, 1, &config_make_window, NULL);
 	variable_add("proxy", VAR_STR, 1, &config_proxy, changed_proxy);
 	variable_add("random_reason", VAR_INT, 1, &config_random_reason, NULL);
 	variable_add("quit_reason", VAR_STR, 1, &config_quit_reason, NULL);
@@ -82,7 +83,7 @@ void variable_init()
 	variable_add("status", VAR_INT, 2, &config_status, NULL);
 	variable_add("debug", VAR_BOOL, 2, &config_debug, changed_debug);
 	variable_add("protocol", VAR_INT, 2, &config_protocol, NULL);
-	variable_add("make_window", VAR_INT, 1, &config_make_window, NULL);
+	variable_add("reason", VAR_STR, 2, &config_reason, NULL);
 }
 
 /*

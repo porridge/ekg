@@ -604,8 +604,10 @@ int gg_http_hash(const char *format, ...);
 void *gg_recv_packet(struct gg_session *sess);
 int gg_send_packet(int sock, int type, ...);
 unsigned int gg_login_hash(const unsigned char *password, unsigned int seed);
-unsigned long fix32(unsigned long x);
-unsigned short fix16(unsigned short x);
+uint32_t gg_fix32(uint32_t x);
+uint16_t gg_fix16(uint16_t x);
+#define fix32 gg_fix32
+#define fix16 gg_fix16
 
 #define GG_APPMSG_HOST "appmsg.gadu-gadu.pl"
 #define GG_APPMSG_PORT 80
@@ -684,6 +686,15 @@ struct gg_login_ext {
 #define GG_STATUS_INVISIBLE_DESCR 0x0016	/* niewidoczny z opisem (4.9) */
 
 #define GG_STATUS_FRIENDS_MASK 0x8000		/* tylko dla znajomych (4.6) */
+
+/*
+ * makra do szybkiego sprawdzania stanu. ich znaczenie powinno byæ jasne.
+ */
+#define GG_S_A(x) ((x) == GG_STATUS_AVAIL || (x) == GG_STATUS_AVAIL_DESCR)
+#define GG_S_NA(x) ((x) == GG_STATUS_NOT_AVAIL || (x) == GG_STATUS_NOT_AVAIL_DESCR)
+#define GG_S_B(x) ((x) == GG_STATUS_BUSY || (x) == GG_STATUS_BUSY_DESCR)
+#define GG_S_I(x) ((x) == GG_STATUS_INVISIBLE || (x) == GG_STATUS_INVISIBLE_DESCR)
+#define GG_S_D(x) ((x) == GG_STATUS_NOT_AVAIL_DESCR || (x) == GG_STATUS_AVAIL_DESCR || (x) == GG_STATUS_BUSY_DESCR || (x) == GG_STATUS_INVISIBLE_DESCR)
 
 struct gg_new_status {
 	uint32_t status;			/* na jaki zmieniæ? */

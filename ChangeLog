@@ -5,6 +5,21 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-08-03
+
+- poprawka opisów funkcji w ¼ród³ach. pora zabraæ siê za automagiczne
+  generowanie opisu api (w)
+- zamiana fix16 i fix32 na gg_fix16 i gg_fix32. nie mo¿e byæ tak, ¿e
+  libgadu.{so,a} eksportuje nazwy niepoprzedzone prefiksem gg_. dla
+  zachowania kompatybilno¶ci <libgadu.h> tworzy aliasy, ale zostan±
+  one usuniête w przysz³o¶ci. (w)
+- poprawka pubdir.c (hao/w)
+- zamiana arytmetyki (void*) na odpowiednie typy, poniewa¿ niektóre
+  kompilatory nie pozwalaj± dodawaæ (void*)'ów (hao/w)
+- przepisanie handle_status() od zera. mniej kodu, mniej b³êdów (w)
+- poprawka extract.pl (Arim/w)
+- poprawka gg_logout (hao/w)
+
 // 2002-08-02
 
 - valgrind jest *PRZEPIEKNY*, na dzisiaj dwa leaki usuniête (w)

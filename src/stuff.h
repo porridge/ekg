@@ -141,6 +141,7 @@ char *config_server;
 int config_protocol;
 int config_emoticons;
 int config_make_window;
+char *config_reason;
 
 char *home_dir;
 char *config_dir;
@@ -161,7 +162,6 @@ int length;
 #ifdef WITH_IOCTLD
 struct sockaddr_un addr;
 #endif /* WITH_IOCTLD */
-char *busy_reason;
 int quit_message_send;
 int registered_today;
 int pipe_fd;

@@ -273,8 +273,8 @@ void ekg_wait_for_key()
 					snprintf(tmp, sizeof(tmp), "%ds", config_auto_away);
 				
 				print((reason) ? "auto_away_descr" : "auto_away", tmp, reason);
-				free(busy_reason);
-				busy_reason = reason;
+				free(config_reason);
+				config_reason = reason;
 			}
 
 			/* auto save */

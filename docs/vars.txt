@@ -280,12 +280,18 @@ theme
 	zawiera nazwê pliku okre¶laj±cego wygl±d klienta (ang. theme)
 
 
-default_status
+status
 	typ: liczba, zmienna wewnêtrzna, ukryta
 
 	okre¶la stan klienta (zajêty/niewidoczny/tylko dla przyjació³)
 	po uruchomieniu i pierwszym po³±czeniu. zachowywana przy poleceniu
 	,,save''.
+
+reason
+	typ: tekst, zmienna wewnêtrzna, ukryta
+
+	okre¶la opis stanu klienta po uruchomieniu i pierwszym po³±czeniu.
+	zachowywana przy poleceniu ,,save''.
 
 debug
 	typ: bool, zmienna wewnêtrzna, ukryta

@@ -267,7 +267,7 @@ struct command commands[] = {
 	  "nastêpnym uruchomieniu programu" },
 	  
 	{ "set", "v?", command_set,
-	  " <zmienna> <warto¶æ>", "Wy¶wietla lub zmienia ustawienia",
+  	  " [-]<zmienna> [warto¶æ]", "Wy¶wietla lub zmienia ustawienia",
 	  "U¿ycie ,,set -zmienna'' czy¶ci zawarto¶æ zmiennej." },
 
 	{ "sms", "u?", command_sms,
@@ -468,8 +468,8 @@ COMMAND(command_away)
 	
 	unidle();
 
-	free(busy_reason);
-	busy_reason = NULL;
+	free(config_reason);
+	config_reason = NULL;
 	
 	if (!strcasecmp(name, "away")) {
 	    	if (!params[0]) {
@@ -550,7 +550,7 @@ COMMAND(command_away)
 	ui_event("my_status_raw", config_status, reason);
 
 	if (reason)
-		busy_reason = reason;
+		config_reason = reason;
 
 	return 0;
 }
@@ -560,11 +560,11 @@ COMMAND(command_status)
 	char *av, *ad, *bs, *bd, *na, *in, *id, *pr, *np;
 
 	av = format_string(format_find("show_status_avail"));
-	ad = format_string(format_find("show_status_avail_descr"), busy_reason);
+	ad = format_string(format_find("show_status_avail_descr"), config_reason);
 	bs = format_string(format_find("show_status_busy"));
-	bd = format_string(format_find("show_status_busy_descr"), busy_reason);
+	bd = format_string(format_find("show_status_busy_descr"), config_reason);
 	in = format_string(format_find("show_status_invisible"));
-	id = format_string(format_find("show_status_invisible_descr"), busy_reason);
+	id = format_string(format_find("show_status_invisible_descr"), config_reason);
 	na = format_string(format_find("show_status_not_avail"));
 	pr = format_string(format_find("show_status_private_on"));
 	np = format_string(format_find("show_status_private_off"));

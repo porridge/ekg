@@ -103,7 +103,7 @@ int length = 0;
 #ifdef WITH_IOCTLD
 struct sockaddr_un addr;
 #endif 
-char *busy_reason = NULL;
+char *config_reason = NULL;
 char *home_dir = NULL;
 char *config_quit_reason = NULL;
 char *config_away_reason = NULL;

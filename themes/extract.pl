@@ -8,9 +8,9 @@ open(FOO, "../src/themes.c") || die("Nie wstanê, tak bêdê le¿a³!");
 while(<FOO>) {
 	chomp;
 
-	next if (!/\tadd_format\("/);
+	next if (!/\tformat_add\("/);
 
-	s/.*add_format\("//;
+	s/.*format_add\("//;
 	s/", "/ /;
 	s/", 1\);//;
 

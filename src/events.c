@@ -353,7 +353,8 @@ void handle_notify(struct gg_event *e)
 			event_check(EVENT_AVAIL, u->uin, NULL);
 		    	if (config_log_status)
 			    	log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail");
-			if (config_display_notify == 1 || (config_status == 2 && (prev_status == GG_STATUS_NOT_AVAIL || prev_status == GG_STATUS_NOT_AVAIL_DESCR)))
+
+			if (config_display_notify == 1 || (config_status == 2 && GG_S_NA(prev_status)))
 			    	print("status_avail", format_user(u->uin), (u->first_name) ? u->first_name : u->display);
 			
 			if (config_completion_notify)
@@ -366,10 +367,13 @@ void handle_notify(struct gg_event *e)
 			event_check(EVENT_AVAIL, u->uin, NULL);
 			u->descr = (e->event.notify_descr.descr) ? xstrdup(e->event.notify_descr.descr) : xstrdup("");
 			cp_to_iso(u->descr);
+			
                         if (config_log_status)
                                 log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
-			if (config_display_notify == 1 || (config_status == 2 && (prev_status == GG_STATUS_NOT_AVAIL || prev_status == GG_STATUS_NOT_AVAIL_DESCR)))
+
+			if (config_display_notify == 1 || (config_status == 2 && GG_S_NA(prev_status)))
 			    	print("status_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
+			
 			if (config_completion_notify)
 				add_send_nick(u->display);
 		}
@@ -408,37 +412,101 @@ void handle_notify(struct gg_event *e)
 void handle_status(struct gg_event *e)
 {
 	struct userlist *u;
-	struct in_addr in;
+	struct table {
+		int status;
+		int event;
+		char *log;
+		char *format;
+	};
+	struct table st[] = {
+		{ GG_STATUS_AVAIL, EVENT_AVAIL, "avail", "status_avail" },
+		{ GG_STATUS_AVAIL_DESCR, EVENT_AVAIL, "avail", "status_avail_descr" },
+		{ GG_STATUS_BUSY, EVENT_AWAY, "busy", "status_busy" },
+		{ GG_STATUS_BUSY_DESCR, EVENT_AWAY, "busy", "status_busy_descr" },
+		{ GG_STATUS_NOT_AVAIL, EVENT_NOT_AVAIL, "notavail", "status_not_avail" },
+		{ GG_STATUS_NOT_AVAIL_DESCR, EVENT_NOT_AVAIL, "notavail", "status_not_avail_descr" },
+		{ 0, 0, NULL, NULL },
+	};
+	struct table *s;
+	int prev_status;
 
+	/* w trybie wsadowym nie obchodz± nas zmiany stanów */
 	if (batch_mode)
 		return;
 
+	/* je¶li ignorujemy, nie wy¶wietlaj */
 	if (ignored_check(e->event.status.uin))
 		return;
 	
+	/* nie pokazujemy nieznajomych */
 	if (!(u = userlist_find(e->event.status.uin, NULL)))
 		return;
 
+	/* usuñ poprzedni opis */
 	free(u->descr);
 	u->descr = NULL;
 
-	in.s_addr = u->ip.s_addr;
-	
-	if (e->event.status.status == GG_STATUS_BUSY_DESCR && !e->event.status.descr)
-		e->event.status.status = GG_STATUS_BUSY;
-	
-	if (e->event.status.status == GG_STATUS_NOT_AVAIL_DESCR && !e->event.status.descr)
-		e->event.status.status = GG_STATUS_NOT_AVAIL;
-	
-	if (e->event.status.status == GG_STATUS_AVAIL_DESCR && !e->event.status.descr)
-		e->event.status.status = GG_STATUS_AVAIL;
-	
+	/* je¶li stan z opisem, a opisu brak, wpisz pusty tekst */
+	if (GG_S_D(e->event.status.status) && !e->event.status.descr)
+		u->descr = xstrdup("");
+
+	/* a je¶li jest opis, to go zapamiêtaj */
 	if (e->event.status.descr) {
 		u->descr = xstrdup(e->event.status.descr);
 		cp_to_iso(u->descr);
 	}
 
-	if (config_display_notify) {
+	/* zapamiêtaj stary stan, ustaw nowy */
+	prev_status = u->status;	
+	u->status = e->event.status.status;
+
+	for (s = st; s->status; s++) {
+		/* je¶li nie ten, sprawdzaj dalej */
+		if (e->event.status.status != s->status)
+			continue;
+
+		/* je¶li nie jest opisowy i taki sam, ignoruj */
+		if (!GG_S_D(s->status) && prev_status == s->status)
+			break;
+
+		/* eventy */
+	    	event_check(s->event, e->event.status.uin, NULL);
+
+		/* zaloguj */
+		if (config_log_status && GG_S_D(s->status))
+			log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s\n", e->event.status.uin, u->display, inet_ntoa(u->ip), time(NULL), s->log);
+		if (config_log_status && !GG_S_D(s->status))
+		    	log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, inet_ntoa(u->ip), time(NULL), s->log, u->descr);
+
+		/* je¶li dostêpny, dopiszmy do taba */
+		if (GG_S_A(s->status) && config_completion_notify)
+			add_send_nick(u->display);
+		
+		/* czy mamy wy¶wietlaæ na ekranie? */
+		if (!config_display_notify)
+			break;
+		
+		if (config_display_notify == 2) {
+			/* je¶li na zajêty, ignorujemy */
+			if (GG_S_B(s->status) && !GG_S_NA(prev_status))
+				break;
+
+			/* je¶li na dostêpny i nie by³ niedostêpny, ignoruj */
+			if (GG_S_A(s->status) && !GG_S_NA(prev_status))
+				break;
+		}
+			
+		/* no dobra, poka¿ */
+		print(s->format, format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
+
+		/* daj znaæ d¿wiêkiem */
+		if (config_beep && config_beep_notify)
+			ui_beep();
+
+		break;
+	}
+
+#if 0
 		if (e->event.status.status == GG_STATUS_AVAIL && u->status != GG_STATUS_AVAIL) {
                         if (config_log_status)
 			    	log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "avail");
@@ -487,8 +555,7 @@ void handle_status(struct gg_event *e)
 			print("status_not_avail_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		}
 	}
-	
-	u->status = e->event.status.status;
+#endif
 }
 
 /*
@@ -527,19 +594,19 @@ void handle_success(struct gg_event *e)
 
 	userlist_send();
 
+	/* je¶li mieli¶my zachowany stan i/lub opis, zrób z niego u¿ytek */
 	if (away || private_mode) {
-		if (!busy_reason) 
+		if (!config_reason || !GG_S_D(config_status)) 
 			gg_change_status(sess, config_status);
 		else
-			gg_change_status_descr(sess, config_status, busy_reason);
+			gg_change_status_descr(sess, config_status, config_reason);
 	}
 
 	if (batch_mode && batch_line) {
  		ekg_execute(NULL, batch_line);
  		free(batch_line);
+ 		batch_line = NULL;
  	}
-	
- 	batch_line = NULL;
 }
 
 /*
