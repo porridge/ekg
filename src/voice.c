@@ -26,9 +26,7 @@
 #include <gsm.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <unistd.h>
-#include <string.h>
 
 #include "libgadu.h"
 #include "voice.h"
@@ -63,10 +61,8 @@ int voice_open()
 			pathname++;
 	}
 
-	if ((voice_fd = open(pathname, O_RDWR | O_NONBLOCK)) == -1) {
-		gg_debug(GG_DEBUG_MISC, "// ekg: failed opening %s: %s\n", pathname, strerror(errno));
+	if ((voice_fd = open(pathname, O_RDWR)) == -1)
 		goto fail;
-	}
 
 	value = 8000;
 	
@@ -88,8 +84,8 @@ int voice_open()
 	if (ioctl(voice_fd, SNDCTL_DSP_SETFMT, &value) == -1)
 		goto fail;
 
-	/* zacznij czytaæ, niech select() zwraca informacje o nowo¶ciach */
-	read(voice_fd, &tmp, sizeof(tmp));
+	if (read(voice_fd, &tmp, sizeof(tmp)) != sizeof(tmp))
+		goto fail;
 
 	if (!(voice_gsm_dec = gsm_create()) || !(voice_gsm_enc = gsm_create()))
 		goto fail;
@@ -178,17 +174,15 @@ int voice_play(const char *buf, int length, int null)
 	}
 
 	while (pos <= (buf + length - 65)) {
-		gg_debug(GG_DEBUG_MISC, "// gsm_decode(%p, %p, %p);\n", voice_gsm_dec, pos, output);
 		if (gsm_decode(voice_gsm_dec, (char*) pos, output))
 			return -1;
-		if (!null)
-			write(voice_fd, output, 320);
+		if (!null && write(voice_fd, output, 320) != 320)
+			return -1;
 		pos += 33;
-		gg_debug(GG_DEBUG_MISC, "// gsm_decode(%p, %p, %p);\n", voice_gsm_dec, pos, output);
 		if (gsm_decode(voice_gsm_dec, (char*) pos, output))
 			return -1;
-		if (!null)
-			write(voice_fd, output, 320);
+		if (!null && write(voice_fd, output, 320) != 320)
+			return -1;
 		pos += 32;
 	}
 
@@ -220,32 +214,15 @@ int voice_record(char *buf, int length, int null)
 	}
 	
 	while (pos <= (buf + length - 65)) {
-		int res;
-
-		res = read(voice_fd, input, 320);
-		
-		if (res > 0 && res < 320)
-			return 0;
-
-		if (res <= 0)
+		if (read(voice_fd, input, 320) != 320)
 			return -1;
-
 		if (!null)
 			gsm_encode(voice_gsm_enc, input, (char*) pos);
-
 		pos += 32;
-
-		res = read(voice_fd, input, 320);
-
-		if (res > 0 && res < 320)
-			return 0;
-
-		if (res <= 0)
+		if (read(voice_fd, input, 320) != 320)
 			return -1;
-
 		if (!null)
 			gsm_encode(voice_gsm_enc, input, (char*) pos);
-
 		pos += 33;
 	}
 
