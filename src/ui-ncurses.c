@@ -302,6 +302,9 @@ static void ui_ncurses_loop()
 				if (start > lines - output_size)
 					start = lines - output_size;
 				break;
+			case KEY_F(12):
+				binding_toggle_debug(0, 0);
+				break;
 			default:
 				if (ch < 32)
 					break;

@@ -28,18 +28,21 @@ AC_DEFUN(AC_CHECK_NCURSES,[
       lib=`echo "$i" | sed 's/.*://'`
 		
       if test -f $incl/ncurses/ncurses.h; then
-        AC_MSG_RESULT($incl/ncurses/ncurses.h)
-	CURSES_LIBS="$lib -lncurses"
-	CURSES_INCLUDES="-I$incl/ncurses"
-	have_ncurses=true
-	AC_DEFINE(HAVE_NCURSES)
-	break
+        include=$incl/ncurses
       elif test -f $incl/ncurses.h; then
-        AC_MSG_RESULT($incl/ncurses.h)
-	CURSES_LIBS="$lib -lncurses"
-	CURSES_INCLUDES="-I$incl"
+        include=$incl
+      fi
+
+      if test "x$include" != "x"; then
+        AC_MSG_RESULT($include/ncurses.h)
+	CURSES_LIBS="$lib"
+	CURSES_INCLUDES="-I$include"
 	have_ncurses=true
 	AC_DEFINE(HAVE_NCURSES)
+	AC_CHECK_LIB(ncurses, initscr,
+	  [CURSES_LIBS="$CURSES_LIBS -lncurses"],
+	  [AC_CHECK_LIB(curses, initscr,
+	    [CURSES_LIBS="$CURSES_LIBS -lcurses"])])
 	break
       fi
     done

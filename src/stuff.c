@@ -1258,7 +1258,7 @@ int event_run(const char *act)
 	    	acts = array_make(ptr, " ", 1, 0, 0);
 
 #ifdef WITH_IOCTLD
-        if (!strncasecmp(acts[0], "blink_leds", 10)) {
+        if (!strncasecmp(acts[0], "blink", 5)) {
 		gg_debug(GG_DEBUG_MISC, "//   blinking leds\n");
 		res = event_send(acts[1], ACT_BLINK_LEDS);
 		free(action);
@@ -1266,7 +1266,7 @@ int event_run(const char *act)
                 return res;
 	}
 
-        if (!strncasecmp(acts[0], "beeps_spk", 9)) {
+        if (!strncasecmp(acts[0], "beeps", 5)) {
 		gg_debug(GG_DEBUG_MISC, "//   beeping speaker\n");
 		res = event_send(acts[1], ACT_BEEPS_SPK);
 		free(action);
@@ -1275,13 +1275,13 @@ int event_run(const char *act)
 	}
 #endif /* WITH_IOCTLD */
  	
-	if (!strncasecmp(acts[0], "play", 4)) {
+	if (!strcasecmp(acts[0], "play")) {
 		gg_debug(GG_DEBUG_MISC, "//   playing sound\n");
 		play_sound(acts[1]);
 		goto cleanup;
 	} 
 
-	if (!strncasecmp(acts[0], "exec", 4)) {
+	if (!strcasecmp(acts[0], "exec")) {
 		char *tmp = saprintf("exec %s", action + 5);
 		
 		if (tmp) {
@@ -1294,16 +1294,16 @@ int event_run(const char *act)
 		goto cleanup;
 	} 
 
-	if (!strncasecmp(acts[0], "command", 7)) {
+	if (!strcasecmp(acts[0], "command")) {
 		gg_debug(GG_DEBUG_MISC, "//   executing command\n");
 		ekg_execute(NULL, action + 8);
 		goto cleanup;
 	} 
 
-	if (!strncasecmp(acts[0], "chat", 4) || !strncasecmp(acts[0], "msg", 3)) {
+	if (!strcasecmp(acts[0], "chat") || !strcasecmp(acts[0], "msg")) {
                 struct userlist *u;
 		char *data;
-		int i = 0, chat = (!strncasecmp(acts[0], "chat", 4));
+		int i = 0, chat = (!strcasecmp(acts[0], "chat"));
 
 		gg_debug(GG_DEBUG_MISC, "//   chatting/mesging\n");
 		
@@ -1328,7 +1328,7 @@ int event_run(const char *act)
 		goto cleanup;
         }
 
-        if (!strncasecmp(acts[0], "beep", 4)) {
+        if (!strcasecmp(acts[0], "beep")) {
                 gg_debug(GG_DEBUG_MISC, "//   BEEP\n");
 		ui_beep();
 		goto cleanup;
@@ -1389,166 +1389,100 @@ int event_send(const char *seq, int act)
  *
  * - act
  */
-int event_correct(const char *act)
+int event_correct(const char *action)
 {
-        char *action, *ev, **events;
-	int a = 0;
+        char *event, **events = NULL, **acts = NULL;
+	int i = 0;
 
 #ifdef WITH_IOCTLD
         struct action_data test;
 #endif /* WITH_IOCTLD */
 
-	action = xstrdup(act);
-
-        if (!strncasecmp(action, "clear",  5)) {
-		free(action);
+        if (!strncasecmp(action, "clear", 5))
                 return 1;
-	}
 	
 	events = array_make(action, ";", 0, 0, 0);
 
-	while ((ev = events[a++])) {
-	    	char **acts; int i = 0;
-                while (*ev == ' ') ev++;
+	while ((event = events[i++])) {
+                while (*event == ' ')
+			event++;
 
-                if (strchr(ev, ' ')) 
-		    	acts = array_make(ev, " \t", 2, 0, 0);
+                if (strchr(event, ' ')) 
+		    	acts = array_make(event, " \t", 2, 0, 0);
                 else 
-                        acts = array_make(ev, " \t", 1, 0, 0);
+                        acts = array_make(event, " \t", 1, 0, 0);
 		
-
 #ifdef WITH_IOCTLD
-                if (!strncasecmp(acts[0], "blink_leds", 10) || !strncasecmp(acts[0], "beeps_spk", 9)) {
-                        if (acts[1] == NULL) {
+                if (!strncasecmp(acts[0], "blink", 5) || !strncasecmp(acts[0], "beeps", 5)) {
+                        if (!acts[1]) {
                                 print("events_act_no_params", acts[0]);
-				free(action);
-				array_free(acts);
-				array_free(events);
-                                return 1;
-                        }
+				goto fail;
+			}
 
                         if (*acts[1] == '$') {
-			    	char *blah = xstrdup(acts[1]+1);
-				
-                                if (!strcmp(find_format(blah), "")) {
-                                        print("events_seq_not_found", blah);
-					free(blah);
-					free(action);
-					array_free(acts);
-					array_free(events);
-                                        return 1;
-                                }
-				free(blah);
-				array_free(acts);
-                                continue;
-                        }
-
-                        if (event_parse_seq(acts[1], &test)) {
+                                if (!strcmp(find_format(acts[1] + 1), "")) {
+                                        print("events_seq_not_found", acts[1] + 1);
+					goto fail;
+				}
+                        } else if (event_parse_seq(acts[1], &test)) {
                                 print("events_seq_incorrect", acts[1]);
-				free(action);
-				array_free(acts);
-				array_free(events);
-                                return 1;
+				goto fail;
                         }
 
-			array_free(acts);
-                        continue;
+			goto check;
                 }
-
-                else 
 #endif /* WITH_IOCTLD */
 
 		if (!strncasecmp(acts[0], "play", 4)) {
 			if (!acts[1]) {
 				print("events_act_no_params", acts[0]);
-				free(action);
-				array_free(acts);
-				array_free(events);
-				return 1; 
+				goto fail;
 			}
+			goto check;
 		} 
-		else if (!strncasecmp(acts[0], "exec", 4)) {
+		
+		if (!strcasecmp(acts[0], "exec") || !strcasecmp(acts[0], "command")) {
 			if (!acts[1]) {
 				print("events_act_no_params", acts[0]);
-				free(action);
-				array_free(acts);
-				array_free(events);
-				return 1; 
+				goto fail;
 			}
+			goto check;
 		} 
-		else if (!strncasecmp(acts[0], "command", 7)) {
-			if (!acts[1]) {
-				print("events_act_no_params", acts[0]);
-				free(action);
-				array_free(acts);
-				array_free(events);
-				return 1; 
-			}
-		} 
-		else if (!strncasecmp(acts[0], "chat", 4) || !strncasecmp(acts[0], "msg", 3)) {
+
+		if (!strcasecmp(acts[0], "chat") || !strcasecmp(acts[0], "msg")) {
                         if (!acts[1]) {
                                 print("events_act_no_params", acts[0]);
-				free(action);
-				array_free(acts);
-				array_free(events);
-                                return 1;
+				goto fail;
                         }
-
                         if (!strchr(acts[1], ' ')) {
                                 print("events_act_no_params", acts[0]);
-				free(action);
-				array_free(acts);
-				array_free(events);
-                                return 1;
+				goto fail;
                         }
-
-			while (isalnum(acts[1][i]))
-			    	i++;
-			acts[1][i] = '\0';
-
-#if 0
-
-// wywalone z tego wzglêdu, ¿e usera mo¿na dopisaæ dopiero po zdefiniowaniu
-// zdarzenia i mo¿e to byæ te¿ %1 lub %2.
-
-                        if (!get_uin(acts[1])) {
-                                print("user_not_found", acts[1]);
-				free(action);
-				array_free(acts);
-				array_free(events);
-                                return 1;
-                        }
-#endif
-
-			array_free(acts);
-                        continue;
+			goto check;
                 }
 
-		else if (!strncasecmp(acts[0], "beep", 4)) {
+		if (!strcasecmp(acts[0], "beep")) {
 		    	if (acts[1]) {
 			    	print("events_act_toomany_params", acts[0]);
-				free(action);
-				array_free(acts);
-				array_free(events);
-				return 1;
+				goto fail;
 			}
+			goto check;
 		}
 				
-                else {
-                        print("events_noexist");
-			free(action);
-			array_free(acts);
-			array_free(events);
-                        return 1;
-                }
+		print("events_noexist");
+		goto fail;
 
+check:
 		array_free(acts);
         }
 
-	free(action);
 	array_free(events);
+	return 0;
 
-        return 0;
+fail:
+	array_free(events);
+	array_free(acts);
+        return 1;
 }
 
 /*
