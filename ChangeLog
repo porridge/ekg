@@ -10,6 +10,8 @@ zg³osi³ b³±d.
 
 - g³upia ja, zepsu³em ,,del'' (sz)
 - ³adne od¶wie¿anie listy kontaktów po ,,list --get'' (sz)
+- nie pozwalajmy na zmianê nazwy/uin kogo¶ poprzez /list, je¶li
+  kto¶ ju¿ taka nazwê/uin posiada na naszej li¶cie (sz)
 - poprawka wy¶wietlania formatowanych wiadomo¶ci (sz/w)
 - dodanie formatu %|, szczegó³y w docs/themes.txt (w)
 - dodanie ,,/help set <zmienna>'' (w)

@@ -780,7 +780,21 @@ COMMAND(cmd_modify)
 		}
 		
 		if (match_arg(argv[i], 'd', "display", 2) && argv[i + 1]) {
-			ui_event("userlist_changed", u->display, argv[++i]);
+			list_t l;
+
+			i++;
+
+			for (l = userlist; l; l = l->next) {
+				struct userlist *u = l->data;
+
+				if (u->display && !strcmp(u->display, argv[i])) {
+					print("user_exists", u->display);
+					array_free(argv);
+					return;
+				}
+			}
+			
+			ui_event("userlist_changed", u->display, argv[i]);
 			xfree(u->display);
 			u->display = xstrdup(argv[i]);
 			userlist_replace(u);
@@ -835,12 +849,44 @@ COMMAND(cmd_modify)
 		
 		if (match_arg(argv[i], 'u', "uin", 2) && argv[i + 1]) {
 			uin_t new_uin = str_to_uin(argv[++i]);
+			list_t l;
 
 			if (!new_uin) {
 				print("invalid_uin");
 				array_free(argv);
 				return;
-			}	
+			}
+
+			for (l = userlist; l; l = l->next) {
+				struct userlist *_u = l->data;
+				
+				if (new_uin == _u->uin) {
+					if (_u->display) {
+						print("user_exists_other", argv[i], format_user(u->uin));
+						array_free(argv);
+						return;
+					} else {
+						/* zmieniamy komu¶ uin, a taki uin jest ju¿ blokowany/ignorowany
+					 	   ale nie jest widoczny na naszej li¶cie */
+
+						int level;
+
+						if (group_member(_u, "__blocked"))
+							blocked_add(u->uin);
+
+						if (group_member(_u, "__offline"))
+							group_add(u, "__offline");
+
+						if (group_member(_u, "__online"))
+							group_add(u, "__online");
+
+						if ((level = ignored_check(_u->uin)))
+							ignored_add(u->uin, level);
+
+						userlist_remove(_u);
+					}
+				}
+			}
 
 			gg_remove_notify(sess, u->uin);
 			u->uin = new_uin;
