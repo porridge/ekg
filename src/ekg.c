@@ -1171,6 +1171,7 @@ int main(int argc, char **argv)
 	if (new_reason) {
 		xfree(config_reason);
 		config_reason = new_reason;
+		config_reason_first = xstrdup(config_reason);
 	}
 
 	if (set_private)
@@ -1296,6 +1297,7 @@ void ekg_exit()
 	xfree(last_search_first_name);
 	xfree(last_search_last_name);
 	xfree(last_search_nickname);
+	xfree(config_reason_first);
 
 	if (config_last_sysmsg_changed)
 		array_add(&vars, xstrdup("last_sysmsg"));
