@@ -3536,6 +3536,15 @@ int binding_key(struct binding *b, const char *key, int add)
 			return 0;
 		}
 
+		if (!strcasecmp(key + 4, "Backspace")) {
+			b->key = xstrdup("Alt-Backspace");
+			if (add) {
+				binding_map_meta[KEY_BACKSPACE] = list_add(&bindings, b, sizeof(struct binding));
+				binding_map_meta[127] = binding_map_meta[KEY_BACKSPACE];
+			}
+			return 0;
+		}
+
 		if (strlen(key) != 5)
 			return -1;
 	
@@ -4405,6 +4414,7 @@ static void binding_default()
 	binding_add("Ctrl-U", "line-discard", 1, 1);
 	binding_add("Ctrl-V", "quoted-insert", 1, 1);
 	binding_add("Ctrl-W", "word-rubout", 1, 1);
+	binding_add("Alt-Backspace", "word-rubout", 1, 1);
 	binding_add("Ctrl-L", "/window refresh", 1, 1);
 	binding_add("Tab", "complete", 1, 1);
 	binding_add("Right", "forward-char", 1, 1);
