@@ -17,6 +17,7 @@ zg³osi³ b³±d.
 - dodana ¿a³osna namiastka ,,beeps_spk'' dla solarisa (d)
 - --enable-ioctld ju¿ nie jest tylko Linux only (d)
 - kompilacja ioctld dla solarisa. powinno wystarczyæ (d)
+- poprawia wieszaj±cego siê /exec (wojboj/w)
 
 // 2002-12-03
 

@@ -178,7 +178,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 	if (!c)
   		return;
 
-	while ((ret = read(c->fd, buf, sizeof(buf) - 1)) > 0) {
+	if ((ret = read(c->fd, buf, sizeof(buf) - 1)) > 0) {
 		char *tmp;
 
 		buf[ret] = 0;
