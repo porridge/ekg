@@ -375,8 +375,11 @@ COMMAND(cmd_away)
 {
 	in_auto_away = 0;
 
-	if (params[0] && strlen(params[0]) > GG_STATUS_DESCR_MAXSIZE)
+	if (params[0] && strlen(params[0]) > GG_STATUS_DESCR_MAXSIZE) {
 		printq("descr_too_long", itoa(strlen(params[0]) - GG_STATUS_DESCR_MAXSIZE));
+		if (config_reason_limit)
+			return -1;
+	}
 
 	if (!strcasecmp(name, "away"))
 		change_status(GG_STATUS_BUSY, params[0], 0);

@@ -185,6 +185,7 @@ int config_statusbar_size = 1;
 char *config_proxy_forwarding = NULL;
 int config_password_cp1250 = 0;
 char *config_interface = NULL;
+int config_reason_limit = 0;
 
 char *last_search_first_name = NULL;
 char *last_search_last_name = NULL;

@@ -13,6 +13,7 @@ zg³osi³ b³±d.
   do protocol.html, po³±czenie opisów formatów plików w files.txt,
   literówki i drobne poprawki dokumentacji libgadu (w)
 - poprawka obs³ugi zmiennej ,,interface'' (a.latanski/w)
+- dodana zmienna ,,reason_limit'' (jojo/w)
 
 // 2003-02-06
 

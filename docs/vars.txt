@@ -461,6 +461,14 @@ random_reason
 	nie powiedzie siê odczyt, opis bêdzie pobierany ze zmiennych
 	,,away_reason'' lub ,,quit_reason'', o ile nie s± puste.
 
+reason_limit
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	okre¶la czy opisy stanu musz± mie¶ciæ siê w limicie 45 znaków.
+	je¶li opcja jest aktywna i d³ugo¶æ opisu przekracza t± d³ugo¶æ,
+	komendy /away, /back i /invisible nie zostan± wykonane.
+
 save_password
 	typ: bool
 	domy¶lna warto¶æ: 1
