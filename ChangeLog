@@ -20,6 +20,10 @@ zg³osi³ b³±d.
 - libgadu: gdy gg_dcc_ip bêdzie równe 0xffffffff, adres bêdzie ustalany
   automatycznie na podstawie getsockname() (w)
 - zmienna dcc_ip mo¿e przyj±æ warto¶æ ,,auto'' (w)
+- dodanie docs/userlista.txt z opisem formatu listy kontaktów i zapisu
+  konfiguracji na serwerze (w)
+- dodanie mo¿liwo¶ci zapisu konfiguracji ekg na serwerze (opcje
+  --put-config i --get-config komendy /list) (w)
 
 // 2002-12-24
 

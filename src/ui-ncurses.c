@@ -285,7 +285,7 @@ int window_backlog_split(struct window *w, int full)
 			for (j = 0, word = 0; j < l->len; j++) {
 
 				if (str[j] == ' ')
-					word = j;
+					word = j + 1;
 
 				if (j == width - 1) {
 					l->len = (word) ? word : (width - 1);
@@ -293,8 +293,8 @@ int window_backlog_split(struct window *w, int full)
 				}
 			}
 
-			str += l->len + 1;
-			attr += l->len + 1;
+			str += l->len;
+			attr += l->len;
 
 			if (!str[0])
 				break;

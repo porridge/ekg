@@ -151,12 +151,16 @@ int userlist_read()
  *
  * ustawia listê kontaktów na podan±.
  */
-int userlist_set(char *contacts)
+int userlist_set(char *contacts, int config)
 {
+	string_t vars = NULL;
 	char *buf;
 
 	userlist_clear();
 
+	if (config)
+		vars = string_init(NULL);
+	
 	/* XXX argh! zmieniæ na nie ruszaj±ce ,,contacts'' */
 	
 	while ((buf = gg_get_line(&contacts))) {
@@ -164,6 +168,23 @@ int userlist_set(char *contacts)
 		char *display;
 		
 		if (buf[0] == '#') {
+			continue;
+		}
+
+		if (!strncmp(buf, "__config", 8)) {
+			char **entry;
+			int i;
+
+			if (!config)
+				continue;
+			
+			entry = array_make(buf, ";", 7, 0, 0);
+			
+			for (i = 1; i < 6; i++)
+				string_append(vars, entry[i]);
+
+			array_free(entry);
+
 			continue;
 		}
 
@@ -193,7 +214,7 @@ int userlist_set(char *contacts)
 				array_free(entry);
 				continue;
 			}
-			
+
 			u.first_name = xstrdup(entry[0]);
 			u.last_name = xstrdup(entry[1]);
 			u.nickname = xstrdup(entry[2]);
@@ -211,6 +232,13 @@ int userlist_set(char *contacts)
 		u.status = GG_STATUS_NOT_AVAIL;
 
 		list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);
+	}
+
+	if (config) {
+		char *tmp = string_free(vars, 0);
+		gg_debug(GG_DEBUG_MISC, "// received ekg variables digest: %s\n", tmp);
+		variable_undigest(tmp);	/* XXX kod b³êdu */
+		xfree(tmp);
 	}
 
 	return 0;

@@ -3249,7 +3249,7 @@ int last_count_get(uin_t uin)
  *
  *  - str - tekst ¼ród³owy,
  *  - start - pierwszy znak,
- *  - length - d³ugo¶æ wycinanego tekstu, je¶li -1 
+ *  - length - d³ugo¶æ wycinanego tekstu, je¶li -1 do koñca.
  */
 char *xstrmid(const char *str, int start, int length)
 {
@@ -3258,6 +3258,9 @@ char *xstrmid(const char *str, int start, int length)
 
 	if (!str)
 		return xstrdup("");
+
+	if (start > strlen(str))
+		start = strlen(str);
 
 	if (length == -1)
 		length = strlen(str) - start;

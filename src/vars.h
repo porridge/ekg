@@ -38,6 +38,7 @@ struct value_map {
 
 struct variable {
 	char *name;		/* nazwa zmiennej */
+	char short_name[3];	/* krótka nazwa zmiennej */
 	int name_hash;		/* hash nazwy zmiennej */
 	int type;		/* rodzaj */
 	int display;		/* 0 bez warto¶ci, 1 pokazuje, 2 w ogóle */
@@ -52,8 +53,10 @@ list_t variables;
 void variable_init();
 struct variable *variable_find(const char *name);
 struct value_map *variable_map(int count, ...);
-int variable_add(const char *name, int type, int display, void *ptr, void (*notify)(const char *name), struct value_map *map, int (*dyndisplay)(const char *name));
+int variable_add(const char *name, const char *short_name, int type, int display, void *ptr, void (*notify)(const char *name), struct value_map *map, int (*dyndisplay)(const char *name));
 int variable_set(const char *name, const char *value, int allow_foreign);
+char *variable_digest();
+int variable_undigest(const char *digest);
 void variable_free();
 
 #endif /* __VARS_H */

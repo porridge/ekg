@@ -1143,13 +1143,16 @@ COMMAND(cmd_list)
 	}
 
 	/* list --get */
-	if (params[0] && match_arg(params[0], 'g', "get", 2)) {
+	if (params[0] && (match_arg(params[0], 'g', "get", 2) || match_arg(params[0], 'G', "get-config", 5))) {
 		struct gg_http *h;
 		
 		if (!(h = gg_userlist_get(config_uin, config_password, 1))) {
 			print("userlist_get_error", strerror(errno));
 			return;
 		}
+
+		if (match_arg(params[0], 'G', "get-config", 5))
+			h->user_data = (char*) 1;
 		
 		list_add(&watches, h, 0);
 		
@@ -1157,9 +1160,46 @@ COMMAND(cmd_list)
 	}
 
 	/* list --put */
-	if (params[0] && match_arg(params[0], 'p', "put", 2)) {
+	if (params[0] && (match_arg(params[0], 'p', "put", 2) || match_arg(params[0], 'P', "put-config", 5))) {
 		struct gg_http *h;
 		char *contacts = userlist_dump();
+
+		if (match_arg(params[0], 'P', "put-config", 5)) {
+			string_t s = string_init(contacts);
+			char *vars = variable_digest();
+			int i, count;
+
+			count = strlen(vars) / 120;
+
+			if (strlen(vars) % 120 != 0)
+				count++;
+
+			for (i = 0; i < count; i++) {
+				string_append(s, "__config");
+				string_append(s, itoa(i));
+				string_append_c(s, ';');
+
+				for (j = 0; j < 5; j++) {
+					char *tmp;
+
+					if (i * 120 + j * 24 < strlen(vars)) 
+						tmp = xstrmid(vars, i * 120 + j * 24, 24);
+					else
+						tmp = xstrdup("");
+
+					string_append(s, tmp);
+					string_append_c(s, ';');
+					xfree(tmp);
+				}
+
+				string_append(s, itoa(rand() % 3000000 + 10000));
+				string_append(s, "\r\n");
+			}
+
+			xfree(contacts);
+			
+			contacts = string_free(s, 0);
+		}
 		
 		if (!contacts) {
 			print("userlist_put_error", strerror(ENOMEM));
@@ -2636,6 +2676,13 @@ COMMAND(cmd_bind)
 	ui_event("command", "bind", (params) ? params[0] : NULL, (params && params[0]) ? params[1] : NULL, (params && params[1]) ? params[2] : NULL, NULL); 
 }
 
+COMMAND(cmd_test_vars)
+{
+	char *tmp = variable_digest();
+	print("generic", tmp);
+	xfree(tmp);
+}
+
 /*
  * command_exec()
  * 
@@ -3510,8 +3557,10 @@ void command_init()
 	  "  -O, --online               b±d¼ dostêpny dla danej osoby\n"
 	  "\n"
 	  "Lista kontaktów na serwerze \"list [-p|-g]\":\n"
-	  "  -p, --put  umieszcza na serwerze\n"
-	  "  -g, --get  pobiera z serwera");
+	  "  -p, --put         umieszcza na serwerze\n"
+	  "  -P, --put-config  umieszcza na serwerze razem z konfiguracj±\n"
+	  "  -g, --get         pobiera z serwera\n"
+	  "  -G, --get-config  pobiera z serwera razem z konfiguracj±\n");
 	  
 	command_add
 	( "msg", "u?", cmd_msg, 0,
@@ -3688,6 +3737,9 @@ void command_init()
 	command_add
 	( "_debug", "", cmd_test_debug, 0, "",
 	  "wy¶wietla tekst", "");
+	command_add
+	( "_vars", "", cmd_test_vars, 0, "",
+	  "wy¶wietla skrót zmiennych", "");
 #ifdef HAVE_OPENSSL
 	command_add
 	( "_keygen", "?", cmd_test_keygen, 0, " <ilo¶æ-bitów>",
