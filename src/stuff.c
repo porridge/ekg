@@ -292,9 +292,11 @@ const char *log_timestamp(time_t t)
 
 	i = i % 2;
 
-	strftime(buf[i], sizeof(buf[0]), (config_log_timestamp) ? config_log_timestamp : "%s", tm);
-	
-	return buf[i++];
+	if (config_log_timestamp) {
+		strftime(buf[i], sizeof(buf[0]), config_log_timestamp, tm);
+		return buf[i++];
+	} else
+		return itoa(t);
 }
 
 /*
