@@ -359,7 +359,7 @@ void print(const char *theme, ...)
 	va_start(ap, theme);
 	tmp = va_format_string(format_find(theme), ap);
 	
-	ui_print("__current", (tmp) ? tmp : "");
+	ui_print("__current", 0, (tmp) ? tmp : "");
 	
 	xfree(tmp);
 	va_end(ap);
@@ -378,7 +378,7 @@ void print_status(const char *theme, ...)
 	va_start(ap, theme);
 	tmp = va_format_string(format_find(theme), ap);
 	
-	ui_print("__status", (tmp) ? tmp : "");
+	ui_print("__status", 0, (tmp) ? tmp : "");
 	
 	xfree(tmp);
 	va_end(ap);
@@ -388,8 +388,12 @@ void print_status(const char *theme, ...)
  * print_window()
  *
  * wy¶wietla tekst w podanym oknie.
+ *  
+ *  - target - nazwa okna,
+ *  - separate - czy niezbêdne jest otwieranie nowego okna?
+ *  - theme, ... - tre¶æ.
  */
-void print_window(const char *target, const char *theme, ...)
+void print_window(const char *target, int separate, const char *theme, ...)
 {
 	va_list ap;
 	char *tmp;
@@ -397,7 +401,7 @@ void print_window(const char *target, const char *theme, ...)
 	va_start(ap, theme);
 	tmp = va_format_string(format_find(theme), ap);
 	
-	ui_print(target, (tmp) ? tmp : "");
+	ui_print(target, separate, (tmp) ? tmp : "");
 	
 	xfree(tmp);
 	va_end(ap);

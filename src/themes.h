@@ -31,7 +31,7 @@ struct format {
 list_t formats;
 
 void print(const char *theme, ...);
-void print_window(const char *target, const char *theme, ...);
+void print_window(const char *target, int separate, const char *theme, ...);
 void print_status(const char *theme, ...);
 
 int format_add(const char *name, const char *value, int replace);

@@ -10,6 +10,11 @@ lub Esc, k, albo komend± ,,window kill [numer]''.
 
 NIE MO¯NA JESZCZE BINDOWAÆ KLAWISZY ANI WYSY£AÆ WIELOLINIJKOWYCH WIADOMO¦CI!
 
+pasek stanu zawiera zegar, informacje o w³asnym numerku (kolor okre¶la
+stan: czarny -- niedostêpny, bia³y -- dostêpny, szary -- zajêty, ciemnoszary
+-- niewidoczny), numer aktualnego okna, informacje o aktywno¶ci w innych
+oknach.
+
 dodano nowy format ,,statusbar''. podobnie jak i reszta obs³uguje kolory,
 ale nie ma dope³niania, mrugania itp. za to s± konstrukcje warunkowe oraz
 rozszerzone informacje:

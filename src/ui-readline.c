@@ -86,7 +86,7 @@ struct window {
 
 /* deklaracje funkcji interfejsu */
 static void ui_readline_loop();
-static void ui_readline_print(const char *target, const char *line);
+static void ui_readline_print(const char *target, int separate, const char *line);
 static void ui_readline_beep();
 static int ui_readline_event(const char *event, ...);
 static void ui_readline_deinit();
@@ -437,16 +437,16 @@ static char **my_completion(char *text, int start, int end)
  * wy¶wietla dany tekst na ekranie, uwa¿aj±c na trwaj±ce w danych chwili
  * readline().
  */
-static void ui_readline_print(const char *target, const char *line)
+static void ui_readline_print(const char *target, int separate, const char *line)
 {
         int old_end = rl_end, id = 0;
 	char *old_prompt = NULL;
 	
 	/* znajd¼ odpowiednie okienko i ewentualnie je utwórz */
-	if (target)
+	if (target && separate)
 		id = window_find_query(target);
 
-	if (config_make_window > 0 && !id && strncmp(target, "__", 2))
+	if (config_make_window > 0 && !id && strncmp(target, "__", 2) && separate)
 		id = window_make_query(target);
 	
 	/* je¶li nie piszemy do aktualnego, to zapisz do bufora i wyjd¼ */

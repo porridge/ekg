@@ -63,7 +63,7 @@
 #include "version.h"
 
 static void ui_ncurses_loop();
-static void ui_ncurses_print(const char *target, const char *line);
+static void ui_ncurses_print(const char *target, int separate, const char *line);
 static void ui_ncurses_beep();
 static int ui_ncurses_event(const char *event, ...);
 static void ui_ncurses_deinit();
@@ -90,7 +90,7 @@ static struct window *window_current;
 
 #define ui_debug(x...) { \
 	char *ui_debug_tmp = saprintf(x); \
-	ui_ncurses_print(NULL, ui_debug_tmp); \
+	ui_ncurses_print(NULL, 0, ui_debug_tmp); \
 	xfree(ui_debug_tmp); \
 }
 
@@ -224,7 +224,7 @@ static struct window *window_new(const char *target)
 	return list_add(&windows, &w, sizeof(w));
 }
 
-static void ui_ncurses_print(const char *target, const char *line)
+static void ui_ncurses_print(const char *target, int separate, const char *line)
 {
 	struct window *w;
 	const char *p;
@@ -235,6 +235,9 @@ static void ui_ncurses_print(const char *target, const char *line)
 		case 1:
 			if ((w = window_find(target)))
 				break;
+
+			if (!separate)
+				w = windows->data;
 
 			for (l = windows; l; l = l->next) {
 				struct window *w = l->data;
@@ -248,8 +251,12 @@ static void ui_ncurses_print(const char *target, const char *line)
 
 		case 2:
 			if (!(w = window_find(target))) {
-				w = window_new(target);
-				print("window_id_query_started", itoa(w->id), target);
+				if (!separate)
+					w = windows->data;
+				else {
+					w = window_new(target);
+					print("window_id_query_started", itoa(w->id), target);
+				}
 			}
 			break;
 
@@ -779,7 +786,7 @@ static void complete(int *line_start, int *line_index)
 
 			if (strcmp(tmp, "")) {
 				strcat(tmp, "\n");
-				ui_ncurses_print(NULL, tmp);
+				ui_ncurses_print(NULL, 0, tmp);
 			}
 		}
 
@@ -1137,6 +1144,11 @@ static int ui_ncurses_event(const char *event, ...)
 
 	if (!strcmp(event, "command")) {
 		char *command = va_arg(ap, char*);
+
+		if (!strcasecmp(command, "bind")) {
+			print("not_implemented");
+			goto cleanup;
+		}
 
 		if (!strcasecmp(command, "query")) {
 			char *param = va_arg(ap, char*);

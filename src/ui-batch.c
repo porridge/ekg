@@ -36,7 +36,7 @@ static int event(const char *foo, ...)
 	return 0;
 }
 
-static void print(const char *target, const char *line)
+static void print(const char *target, int separate, const char *line)
 {
 	printf("%s", line);
 }

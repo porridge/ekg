@@ -23,7 +23,7 @@
 #include "config.h"
 
 void (*ui_loop)(void);
-void (*ui_print)(const char *target, const char *line);
+void (*ui_print)(const char *target, int separate, const char *line);
 void (*ui_beep)(void);
 int (*ui_event)(const char *event, ...);
 void (*ui_deinit)(void);

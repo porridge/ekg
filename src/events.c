@@ -106,7 +106,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 	next_width = width;
 	
 	if (!strcmp(format_find(format_first), "")) {
-		print_window(target, head, format_user(e->event.msg.sender), timestr);
+		print_window(target, 1, head, format_user(e->event.msg.sender), timestr);
 		next_format = format;
 		mem_width = width + 1;
 	} else {
@@ -184,7 +184,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 					next++;
 			}
 
-			print_window(target, format, buf, format_user(e->event.msg.sender), timestr);
+			print_window(target, 1, format, buf, format_user(e->event.msg.sender), timestr);
 
 			width = next_width;
 			format = next_format;
@@ -198,7 +198,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 	free(save);
 
 	if (!strcmp(format_find(format_first), ""))
-		print_window(target, foot);
+		print_window(target, 1, foot);
 }
 
 /*
@@ -397,7 +397,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away");
 			if (config_display_notify == 1)
-			    	print("status_busy", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
+			    	print_window(u->display, 0, "status_busy", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
 		}
 
 		if (n->status == GG_STATUS_BUSY_DESCR) {
@@ -407,7 +407,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
 			if (config_display_notify == 1)
-			    	print("status_busy_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
+			    	print_window(u->display, 0, "status_busy_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		}
 
 		if (n->status == GG_STATUS_AVAIL) {
@@ -416,7 +416,7 @@ void handle_notify(struct gg_event *e)
 			    	put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail");
 
 			if (config_display_notify == 1 || (config_status == 2 && GG_S_NA(prev_status)))
-			    	print("status_avail", format_user(u->uin), (u->first_name) ? u->first_name : u->display);
+			    	print_window(u->display, 0, "status_avail", format_user(u->uin), (u->first_name) ? u->first_name : u->display);
 			
 			if (config_completion_notify)
 				add_send_nick(u->display);
@@ -433,7 +433,7 @@ void handle_notify(struct gg_event *e)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
 
 			if (config_display_notify == 1 || (config_status == 2 && GG_S_NA(prev_status)))
-			    	print("status_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
+			    	print_window(u->display, 0, "status_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
 			
 			if (config_completion_notify)
 				add_send_nick(u->display);
@@ -447,7 +447,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail");
 			if (config_display_notify && !hide_notavail)
-			    	print("status_not_avail", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
+			    	print_window(u->display, 0, "status_not_avail", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
 			if (config_completion_notify == 2)
 				remove_send_nick(u->display);
 		}
@@ -459,7 +459,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail", u->descr);
 			if (config_display_notify && !hide_notavail)
-			    	print("status_not_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
+			    	print_window(u->display, 0, "status_not_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
 			if (config_completion_notify == 2)
 				remove_send_nick(u->display);
 		}
@@ -575,7 +575,7 @@ void handle_status(struct gg_event *e)
 		}
 			
 		/* no dobra, poka¿ */
-		print(s->format, format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
+		print_window(u->display, 0, s->format, format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
 
 		/* daj znaæ d¿wiêkiem */
 		if (config_beep && config_beep_notify)

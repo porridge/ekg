@@ -335,7 +335,7 @@ COMMAND(cmd_status)
 	np = format_string(format_find("show_status_private_off"));
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
-		print("show_status", na, "", "0.0.0.0", "0");
+		print("show_status", na, "", "0.0.0.0", "0", itoa(config_uin), config_user);
 	} else {
 		char *foo[6];
 		struct in_addr i;
