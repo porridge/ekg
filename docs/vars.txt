@@ -254,7 +254,7 @@ display_notify
 	tylko zmiany z niedostêpnego na dostêpny i na odwrót.
 
 display_pl_chars
-	typ: liczba
+	typ: bool
 	domy¶lna warto¶æ: 1
 
 	je¶li w³±czone, wy¶wietlne s± polskie literki na terminalu. w przeciwnym
