@@ -217,7 +217,10 @@ rozmowy za pomoc± czê¶ci bajtów, ale raczej nie ma znaczenia. klasa
 wiadomo¶ci pozwala odró¿niæ, czy wiadomo¶æ ma siê pokazaæ w osobym
 okienku czy jako kolejna linijka w okienku rozmowy. wygl±da na to,
 ¿e to jaka¶ bitmapa, wiêc najlepiej olaæ inne bity ni¿ 0x0f. (czasem
-klienty wysy³aj± 0x04, czasem 0x24)
+klienty wysy³aj± 0x04, czasem 0x24 -- widocznie 0x20 to te¿ jaka¶
+flaga). oryginalny klient wysy³aj±c wiadomo¶æ do kilku u¿ytkowników,
+wysy³a po prostu kilka takich samych pakietów z ró¿nymi numerkami
+odbiorców. nie ma osobnego pakietu do tego.
 
 serwer po otrzymaniu wiadomo¶ci odsy³a informacjê o tym. przy okazji
 mówi, czy wiadomo¶æ dotar³a do odbiorcy (status == GG_ACK_DELIVERED),

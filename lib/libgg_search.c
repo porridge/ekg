@@ -439,6 +439,7 @@ int gg_search_watch_fd(struct gg_search *f)
 
 			/* HTTP/1.1 200 OK */
 			if (strlen(f->header_buf) < 16 || strncmp(f->header_buf + 9, "200", 3)) {
+				gg_debug(GG_DEBUG_MISC, f->header_buf);
 				gg_debug(GG_DEBUG_MISC, "=> didn't get 200 OK -- no results\n");
 				free(f->header_buf);
 				f->header_buf = NULL;
