@@ -256,8 +256,9 @@ display_pl_chars
 	typ: bool
 	domy¶lna warto¶æ: 1
 
-	je¶li w³±czone, wy¶wietlne s± polskie literki na terminalu. w przeciwnym
-	wypadku, zamieniane s± na odpowiadaj±ce im literki ASCII.
+	je¶li w³±czone, wy¶wietlne s± polskie literki na terminalu.
+	w przeciwnym wypadku, zamieniane s± na odpowiadaj±ce im literki
+	ASCII.
 
 display_sent
 	typ: bool
@@ -277,8 +278,8 @@ display_transparent
 	typ: bool
 	domy¶lna warto¶æ: 1
 
-	mówi, czy w interfejsie ncurses t³o ma byæ przezroczyste. zmiany odnios±
-	skutek po ponownym uruchomieniu.
+	mówi, czy w interfejsie ncurses t³o ma byæ przezroczyste. zmiany
+	odnios± skutek po ponownym uruchomieniu.
 
 emoticons
 	typ: bool
