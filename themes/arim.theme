@@ -44,35 +44,40 @@ theme_default %> %WUstawiono domy¶lny wygl±d.%n\n
 error_loading_theme %! %R£adowanie tematu nie powiod³o siê!%n\n
 
 user_info %)       %KPseudonim%n%W:%n %W%3%n\n%)           %KNumer%n%W:%n %W%7%n\n%)            %KStan%n%W:%n %8\n%) %KImiê i nazwisko%n%W:%n %1 %2\n%)  %KNumer telefonu%n%W:%n %5\n
-user_info_avail %gdostêpny%n
-user_info_avail_descr %gdostêpny%n [%1]
-user_info_busy %czajêty%n
-user_info_busy_descr %czajêty%n [%1]
-user_info_not_avail %Kniedostêpny%n
-user_info_not_avail_descr %Kniedostêpny%n [%1]
-user_info_invisible %mniewidoczny%n
+user_info_avail %gdostêpn%@1%n
+user_info_avail_descr %gdostêpn%@1%n [%2]
+user_info_busy %czajêt%@1%n
+user_info_busy_descr %czajêt%@1%n [%2]
+user_info_not_avail %Kniedostêpn%@1%n
+user_info_not_avail_descr %Kniedostêpn%@1%n [%2]
+user_info_invisible %mniewidoczn%@1%n
  
 modify_done %> %WDane zmienione%n\n
 
-search_results_single_active %G*%n
+search_results_single_active %G+%n
 search_results_single_inactive %r!%n
 search_results_single_female %MK%n
 search_results_single_male %BM%n
+search_results_single %W%7%[-10]1%n %K|%n %[12]3 %K|%n %6 %K|%n %[20]2 %K|%n %[4]5 %K|%n %c%[16]4%n\n
 
-search_results_single %W%7%n%W%[-10]1%n %K|%n %[12]3 %K|%n %6 %K|%n %[20]2 %K|%n %[4]5 %K|%n %c%[16]4%n\n
+search_results_multi_active %G+%n
+search_results_multi_inactive %r!%n
+search_results_multi_female %MK%n
+search_results_multi_male %BM%n
+search_results_multi %W%7%[-10]1%n %K|%n %[12]3 %K|%n %6 %K|%n %[20]2 %K|%n %[4]5 %K|%n %c%[16]4%n\n
 
 already_searching %> %RPrzeszukiwanie w toku%n %WWpisz:%n %yfind -stop%n %Waby przerwaæ...%n\n
 search_failed %! %RB³±d podczas przeszukiwania%n%W: %1%n\n
 search_not_found %! %RNie znaleziono nikogo o takich danych%n\n
 
 list_empty %> %WTwoja lista jest pusta%n\n
-list_avail %gdostêpny%n%K...%n   %W<%n%G+%n%W>%n   %g%[12]1%n |%K%[,-15]3%n|\n
-list_avail_descr %gdostêpny%n%K...%n   %W<%n%G+%n%W>%n   %g%[12]1%n |%K%[,-15]3%n| %K[%5]%n\n
-list_busy %czajêty%n%K.....%n   %W<%n%C?%n%W>%n   %c%[12]1%n |%K%[,-15]3%n|\n
-list_busy_descr %czajêty%n%K.....%n   %W<%n%C?%n%W>%n   %c%[12]1%n |%K%[,-15]3%n| %K[%5]%n\n
-list_not_avail %Kniedostêpny%n   %W<%n%R-%n%W>%n   %K%[12]1%n |%K...............%n|\n
-list_not_avail_descr %Kniedostêpny%n   %W<%n%R-%n%W>%n   %K%[12]1%n |%K...............%n| %K[%5]%n\n
-list_invisible %mniewidoczny%n   %W<%n%M*%n%W>%n   %m%[12]1%n |%K...............%n|\n
+list_avail %gdostêpn%@2%n%K...%n   %W<%n%G+%n%W>%n   %g%[12]1%n |%K%[,-15]3%n|\n
+list_avail_descr %gdostêpn%@2%n%K...%n   %W<%n%G+%n%W>%n   %g%[12]1%n |%K%[,-15]3%n| %K[%5]%n\n
+list_busy %czajêt%@2%n%K.....%n   %W<%n%C?%n%W>%n   %c%[12]1%n |%K%[,-15]3%n|\n
+list_busy_descr %czajêt%@2%n%K.....%n   %W<%n%C?%n%W>%n   %c%[12]1%n |%K%[,-15]3%n| %K[%5]%n\n
+list_not_avail %Kniedostêpn%@2%n   %W<%n%R-%n%W>%n   %K%[12]1%n |%K...............%n|\n
+list_not_avail_descr %Kniedostêpn%@1%n   %W<%n%R-%n%W>%n   %K%[12]1%n |%K...............%n| %K[%5]%n\n
+list_invisible %mniewidoczn%@2%n   %W<%n%M*%n%W>%n   %m%[12]1%n |%K...............%n|\n
 
 away %c%#%n %> %CWracam za chwilê ... %n\n
 away_descr %c%#%n %> %CWracam za chwilê: %1%n\n
@@ -83,13 +88,13 @@ invisible_descr %c%#%n %> %MJestem niewidzialny: %1%n\n
 auto_away %c%#%n %> %CPo%n %W%1%n %Crobiê sobie przerwê%n\n
 auto_away_descr %c%#%n %> %CPo%n %W%1%n %Crobiê sobie przerwê: %2%n\n
 
-status_avail %c%#%n %> %g%[12]1%n%W<%n%G+%n%W>%n   %gdostêpny%n \n
-status_avail_descr %c%#%n %> %g%[12]1%n%W<%n%G+%n%W>%n   %gdostêpny%n    %K[%3]%n \n
-status_busy %c%#%n %> %c%[12]1%n%W<%n%C?%n%W>%n   %czajêty%n\n
-status_busy_descr %c%#%n %> %c%[12]1%n%W<%n%C?%n%W>%n   %czajêty%n      %K[%3]%n \n
-status_not_avail %c%#%n %> %K%[12]1%n%W<%n%R-%n%W>%n   %Kniedostêpny%n\n
-status_not_avail_descr %c%#%n %> %K%[12]1%n%W<%n%R-%n%W>%n   %Kniedostêpny%n %K[%3]%n \n
-status_invisible %c%#%n %> %M%[12]1%n%W<%n%M*%n%W>%n   %Mniewidoczny%n \n
+status_avail %c%#%n %> %g%[12]1%n%W<%n%G+%n%W>%n   %gdostêpn%@2%n \n
+status_avail_descr %c%#%n %> %g%[12]1%n%W<%n%G+%n%W>%n   %gdostêpn%@2%n    %K[%3]%n \n
+status_busy %c%#%n %> %c%[12]1%n%W<%n%C?%n%W>%n   %czajêt%@2%n\n
+status_busy_descr %c%#%n %> %c%[12]1%n%W<%n%C?%n%W>%n   %czajêt%@2%n      %K[%3]%n \n
+status_not_avail %c%#%n %> %K%[12]1%n%W<%n%R-%n%W>%n   %Kniedostêpn%@2%n\n
+status_not_avail_descr %c%#%n %> %K%[12]1%n%W<%n%R-%n%W>%n   %Kniedostêpn%@2%n %K[%3]%n \n
+status_invisible %c%#%n %> %M%[12]1%n%W<%n%M*%n%W>%n   %Mniewidoczn%@2%n \n
 
 show_status %> %WTwój status:%n %W%1%n %2\n
 show_status_avail %W<%n%G+%n%W>%n  %gdostêpny%n

@@ -302,7 +302,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away");
 			if (config_display_notify)
-			    	my_printf("status_busy", format_user(n->uin), u->display);
+			    	my_printf("status_busy", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
 		}
 
 		if (n->status == GG_STATUS_BUSY_DESCR) {
@@ -313,7 +313,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
 			if (config_display_notify)
-			    	my_printf("status_busy_descr", format_user(n->uin), u->display, u->descr);
+			    	my_printf("status_busy_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		}
 
 		if (n->status == GG_STATUS_AVAIL) {
@@ -321,7 +321,7 @@ void handle_notify(struct gg_event *e)
 		    	if (config_log_status)
 			    	put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail");
 			if (config_display_notify)
-			    	my_printf("status_avail", format_user(u->uin), u->display);
+			    	my_printf("status_avail", format_user(u->uin), (u->first_name) ? u->first_name : u->display);
 			
 			if (config_completion_notify)
 				add_send_nick(u->display);
@@ -337,7 +337,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
 			if (config_display_notify)
-			    	my_printf("status_avail_descr", format_user(n->uin), u->display, u->descr);
+			    	my_printf("status_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		}
 		
 		if (n->status == GG_STATUS_NOT_AVAIL) {
@@ -345,7 +345,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail");
 			if (config_display_notify)
-			    	my_printf("status_not_avail", format_user(n->uin), u->display);
+			    	my_printf("status_not_avail", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
 		}
 
 		if (n->status == GG_STATUS_NOT_AVAIL_DESCR) {
@@ -356,7 +356,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail", u->descr);
 			if (config_display_notify)
-			    	my_printf("status_not_avail_descr", format_user(n->uin), u->display, u->descr);
+			    	my_printf("status_not_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		}
 
 		n++;
@@ -409,7 +409,7 @@ void handle_status(struct gg_event *e)
 		    	check_event(EVENT_AVAIL, e->event.status.uin, NULL);
 			if (config_completion_notify)
 				add_send_nick(u->display);
-			my_printf("status_avail", format_user(e->event.status.uin), u->display);
+			my_printf("status_avail", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
 			if (config_beep && config_beep_notify)
 				my_puts("\007");
 		} else if (e->event.status.status == GG_STATUS_AVAIL_DESCR) {
@@ -418,7 +418,7 @@ void handle_status(struct gg_event *e)
 		    	check_event(EVENT_AVAIL, e->event.status.uin, NULL);
 			if (config_completion_notify)
 				add_send_nick(u->display);
-			my_printf("status_avail_descr", format_user(e->event.status.uin), u->display, u->descr);
+			my_printf("status_avail_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
 			if (config_beep && config_beep_notify)
 				my_puts("\007");
 		} else if (e->event.status.status == GG_STATUS_BUSY && u->status != GG_STATUS_BUSY) 
@@ -426,25 +426,25 @@ void handle_status(struct gg_event *e)
                         if (config_log_status)
 			    	put_log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "away");
 		    	check_event(EVENT_AWAY, e->event.status.uin, NULL);
-			my_printf("status_busy", format_user(e->event.status.uin), u->display);
+			my_printf("status_busy", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
 		} else if (e->event.status.status == GG_STATUS_BUSY_DESCR)
 		{
                         if (config_log_status)
                                 put_log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
 		    	check_event(EVENT_AWAY, e->event.status.uin, NULL);
-			my_printf("status_busy_descr", format_user(e->event.status.uin), u->display, u->descr);
+			my_printf("status_busy_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL)
 		{
                         if (config_log_status)
 			    	put_log(e->event.status.uin, "status,%ld,%s,%ld,%s\n", e->event.status.uin, u->display, time(NULL), "notavail");
 		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin, NULL);
-			my_printf("status_not_avail", format_user(e->event.status.uin), u->display);
+			my_printf("status_not_avail", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
 		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL_DESCR)
 		{
                         if (config_log_status)
 			    	put_log(e->event.status.uin, "status,%ld,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, time(NULL), "notavail", u->descr);
 		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin, NULL);
-			my_printf("status_not_avail_descr", format_user(e->event.status.uin), u->display, u->descr);
+			my_printf("status_not_avail_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		}
 	}
 	

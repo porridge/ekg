@@ -5,6 +5,14 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-05-19
+
+- poprawka examples/Makefile.in (jojo/w)
+- update arim.theme (arim/w)
+- poprawka rozpoznawania p³ci. bierze najpierw imiê, potem ksywê. dlatego
+  ,,kuba'' powinien mieæ wpisane imiê ,,jakub'', je¶li nie chcemy z niego
+  robiæ dziewczynki (arim/w)
+
 // 2002-05-18
 
 - poprawka reakcji na zmiany stanu (scooty/w)
