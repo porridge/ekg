@@ -45,5 +45,4 @@ przy odbiorze nie ma znaczenia liczba po ,,__config'', nie ma znaczenia
 podzia³ na kolejne pola. wszystko jest i tak sklejane w jeden ci±g znaków
 i dopiero potem analizowane.
 
-// $Id$
-
+$Id$

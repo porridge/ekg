@@ -27,7 +27,7 @@ s³u¿± tylko i wy³±cznie tabulatory (jeden lub wiêcej). Spowodowane jest to
 wystêpowaniem spacji w oryginalnych GG-owych emoticonach.
 
 Przyk³adowy zestaw definicji mo¿na znale¼æ w docs/emoticons.sample. Nie
-zawiera on wszystkich definicji, bo nie mia³em na tyle inwencji ¿eby je
+zawiera on wszystkich definicji, bo nie mia³em na tyle inwencji, ¿eby je
 powymy¶laæ. :))
 
 $Id$

@@ -51,6 +51,17 @@ przenosny-kod.txt
 
 gdb.txt		szybki kurs obs³ugi gdb.
 
+historia.txt	opis formatu pliku, do którego zapisywana jest historia.
+
+ui.txt		wskazówki dla developerów chc±cych dodaæ nowe ui.
+
+ui-ncurses.txt	opis interfejsu ncurses oraz ustawieñ/mo¿liwo¶ci wystêpuj±cych
+		wy³±cznie w tym interfejsie.
+
+sim.txt		wskazówki dotycz±ce korzystania z szyfrowania wiadomo¶ci.
+
+python.txt	krótki opis mo¿liwo¶ci obs³ugi skryptów w pythonie przez ekg.
+
 
 [1] autor Jacek Pop³awski, <slrnaor068.54v.jp@darkwood.somewhere>
 

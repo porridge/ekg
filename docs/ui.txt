@@ -57,4 +57,4 @@ ui_loop()
 	ekg_execute(). je¶li ekg_execute() zwróci 1, funkcja powinna siê
 	zakoñczyæ.
 
-// $Id$
+$Id$

@@ -41,4 +41,4 @@ gdzie:
 - <czas> - domy¶lnie ilo¶æ sekund od 1 stycznia 1970r. UTC, ale u¿ytkownik
            mo¿e zmieniæ format tego pola za pomoc± zmiennej log_timestamp.
 
-
+$Id$
