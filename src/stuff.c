@@ -953,23 +953,33 @@ char *is_alias(char *foo)
 /*
  * format_events()
  *
- * zwraca ³añcuch zdarzeñ w oparciu o flagi.
+ * zwraca ³añcuch zdarzeñ w oparciu o flagi. statyczny bufor.
  *
- * - flags
+ *  - flags
+ * 
  */
 char *format_events(int flags)
 {
-        char buff[64] = "";
+        static char buff[64];
 
-        if (flags & EVENT_MSG) strcat(buff, *buff ? "|msg" : "msg");
-        if (flags & EVENT_CHAT) strcat(buff, *buff ? "|chat" : "chat");
-        if (flags & EVENT_AVAIL) strcat(buff, *buff ? "|avail" : "avail");
-        if (flags & EVENT_NOT_AVAIL) strcat(buff, *buff ? "|disconnect" : "disconnect");
-        if (flags & EVENT_AWAY) strcat(buff, *buff ? "|away" : "away");
-        if (flags & EVENT_DCC) strcat(buff, *buff ? "|dcc" : "dcc");
-        if (strlen(buff) > 33) strcpy(buff, "*");
+	buff[0] = 0;
 
-        return strdup(buff);
+        if (flags & EVENT_MSG)
+		strcat(buff, *buff ? "|msg" : "msg");
+        if (flags & EVENT_CHAT)
+		strcat(buff, *buff ? "|chat" : "chat");
+        if (flags & EVENT_AVAIL)
+		strcat(buff, *buff ? "|avail" : "avail");
+        if (flags & EVENT_NOT_AVAIL)
+		strcat(buff, *buff ? "|disconnect" : "disconnect");
+        if (flags & EVENT_AWAY)
+		strcat(buff, *buff ? "|away" : "away");
+        if (flags & EVENT_DCC)
+		strcat(buff, *buff ? "|dcc" : "dcc");
+        if (strlen(buff) > 33)
+		strcpy(buff, "*");
+
+        return buff;
 }
 
 /*
@@ -983,14 +993,20 @@ int get_flags(char *events)
 {
         int flags = 0;
 
-        if(!strncasecmp(events, "*", 1)) return EVENT_MSG|EVENT_CHAT|EVENT_AVAIL|EVENT_NOT_AVAIL|EVENT_AWAY|EVENT_DCC;
-        if (strstr(events, "msg") || strstr(events, "MSG")) flags |= EVENT_MSG;
-        if (strstr(events, "chat") || strstr(events, "CHAT")) flags |= EVENT_CHAT;
-        if (strstr(events, "avail") || strstr(events, "AVAIL")) flags |= EVENT_AVAIL;
-        if (strstr(events, "disconnect") || strstr(events, "disconnect")) flags
-|= EVENT_NOT_AVAIL;
-        if (strstr(events, "away") || strstr(events, "AWAY")) flags |= EVENT_AWAY;
-        if (strstr(events, "dcc") || strstr(events, "DCC")) flags |= EVENT_DCC;
+        if (!strncasecmp(events, "*", 1))
+		return EVENT_MSG|EVENT_CHAT|EVENT_AVAIL|EVENT_NOT_AVAIL|EVENT_AWAY|EVENT_DCC;
+        if (strstr(events, "msg") || strstr(events, "MSG"))
+		flags |= EVENT_MSG;
+        if (strstr(events, "chat") || strstr(events, "CHAT"))
+		flags |= EVENT_CHAT;
+        if (strstr(events, "avail") || strstr(events, "AVAIL"))
+		flags |= EVENT_AVAIL;
+        if (strstr(events, "disconnect") || strstr(events, "disconnect"))
+		flags |= EVENT_NOT_AVAIL;
+        if (strstr(events, "away") || strstr(events, "AWAY"))
+		flags |= EVENT_AWAY;
+        if (strstr(events, "dcc") || strstr(events, "DCC"))
+		flags |= EVENT_DCC;
 
         return flags;
 }
@@ -1014,19 +1030,18 @@ int add_event(int flags, uin_t uin, char *action)
                 struct event *ev = l->data;
 
                 if (ev->uin == uin && (f = ev->flags & flags) != 0) {
-                        my_printf("events_exist", format_events(f), (uin ==1) ?
-"*"  : format_user(uin));
+                        my_printf("events_exist", format_events(f), (uin == 1) ? "*"  : format_user(uin));
                         return -1;
                 }
         }
 
         e.uin = uin;
         e.flags = flags;
-        e.action = action;
+        e.action = strdup(action);
 
         list_add(&events, &e, sizeof(e));
 
-        my_printf("events_add", format_events(flags), (uin ==1) ? "*"  : format_user(uin), action);
+        my_printf("events_add", format_events(flags), (uin == 1) ? "*"  : format_user(uin), action);
 
         return 0;
 }
@@ -1047,12 +1062,12 @@ int del_event(int flags, uin_t uin)
                 struct event *e = l->data;
 
                 if (e->uin == uin && e->flags & flags) {
-                        if ((e->flags &=~ flags) == 0) {
-                                my_printf("events_del", format_events(flags), (uin ==1) ? "*"  : format_user(uin), e->action);
+                        if ((e->flags &= ~flags) == 0) {
+                                my_printf("events_del", format_events(flags), (uin == 1) ? "*" : format_user(uin), e->action);
+				free(e->action);
                                 list_remove(&events, e, 1);
                                 return 0;
-                        }
-                        else {
+                        } else {
                                 my_printf("events_del_flags", format_events(flags));
                                 list_remove(&events, e, 0);
                                 list_add_sorted(&events, e, 0, NULL);
@@ -1061,7 +1076,7 @@ int del_event(int flags, uin_t uin)
                 }
         }
 
-        my_printf("events_del_noexist", format_events(flags), (uin ==1) ? "3"  : format_user(uin));
+        my_printf("events_del_noexist", format_events(flags), (uin == 1) ? "3"  : format_user(uin));
 
         return 1;
 }
@@ -1076,40 +1091,31 @@ int del_event(int flags, uin_t uin)
  */
 int check_event(int event, uin_t uin)
 {
-        char *evt_ptr = NULL, *evs[10];
+        char *evt_ptr = NULL;
         struct list *l;
-        int y = 0, i;
 
         for (l = events; l; l = l->next) {
                 struct event *e = l->data;
 
-                if (e->flags & event) {
-                        if (e->uin == uin) {
-                                evt_ptr = strdup(e->action);
-                                break;
-                        }
-                        else if (e->uin == 1)
-                                evt_ptr = strdup(e->action);
+                if ((e->flags & event) && (e->uin == uin || e->uin == 1)) {
+			evt_ptr = strdup(e->action);
+			break;
                 }
         }
 
-        if (evt_ptr == NULL)
+        if (!evt_ptr)
                 return 1;
 
         if (strchr(evt_ptr, ';')) {
-                evs[y] = strtok(evt_ptr, ";");
-                while ((evs[++y] = strtok(NULL, ";"))) {
-                        if (y >= 10) break;
+		char *ev = strtok(evt_ptr, ";");
+                while (ev) {
+			run_event(ev);
+			ev = strtok(NULL, ";");
                 }
-        }
-        else
-                return run_event(evt_ptr);
+        } else
+		run_event(evt_ptr);
 
-        for (i = 0; i < y; i++) {
-                if (!evs[i]) continue;
-                while (*evs[i] == ' ') evs[i]++;
-                run_event(evs[i]);
-        }
+	free(evt_ptr);
 
         return 0;
 }
@@ -1124,40 +1130,65 @@ int check_event(int event, uin_t uin)
 int run_event(char *act)
 {
         uin_t uin;
-        char *cmd = NULL, *arg = NULL, *data = NULL, *action = strdup(act);
+        char *cmd = NULL, *arg = NULL, *data = NULL, *action;
+#ifdef IOCTL
+	int res;
+#endif
 
-        if(strstr(action, " ")) {
+	gg_debug(GG_DEBUG_MISC, "// run_event(\"%s\");\n", act);
+
+	if (!(action = strdup(act)))
+		return 1;
+	
+        if (strchr(action, ' ')) {
                 cmd = strtok(action, " ");
                 arg = strtok(NULL, "");
-        }
-        else
+        } else {
                 cmd = action;
+		arg = NULL;
+	}
 
 #ifdef IOCTL
-        if (!strncasecmp(cmd, "blink_leds", 4))
-                return send_event(strdup(arg), ACT_BLINK_LEDS);
+        if (!strncasecmp(cmd, "blink_leds", 10)) {
+		gg_debug(GG_DEBUG_MISC, "//   blinking leds\n");
+		res = send_event(arg, ACT_BLINK_LEDS);
+		free(action);
+                return res;
+	}
 
-        else if(!strncasecmp(cmd, "beeps_spk", 4))
-                return send_event(strdup(arg), ACT_BEEPS_SPK);
-
-        else 
+        if (!strncasecmp(cmd, "beeps_spk", 9)) {
+		gg_debug(GG_DEBUG_MISC, "//   beeping speaker\n");
+		res = send_event(arg, ACT_BEEPS_SPK);
+		free(action);
+		return res;
+	}
 #endif	//IOCTL
  	
-	if(!strncasecmp(cmd, "play", 4)) {
-		play_sound(strdup(arg));
+	if (!strncasecmp(cmd, "play", 4)) {
+		gg_debug(GG_DEBUG_MISC, "//   playing sound\n");
+		play_sound(arg);
+		free(action);
+		return 0;
 	} 
-	else if(!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
-                struct userlist *u;
-		int chat = (!strcasecmp(cmd, "chat"));
 
-                if (!strstr(arg, " "))
+	if (!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
+                struct userlist *u;
+		int chat = (!strncasecmp(cmd, "chat", 4));
+
+		gg_debug(GG_DEBUG_MISC, "//   chatting/mesging\n");
+		
+                if (!strchr(arg, ' ')) {
+			free(action);
                         return 1;
+		}
 
                 strtok(arg, " ");
                 data = strtok(NULL, "");
 
-                if (!(uin = get_uin(arg)))
+                if (!(uin = get_uin(arg))) {
+			free(action);
                         return 1;
+		}
 
 		u = userlist_find(uin, NULL);
 
@@ -1165,13 +1196,14 @@ int run_event(char *act)
 
                 iso_to_cp(data);
                 gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, data);
-
+		
+		free(action);
                 return 0;
         }
+	
+	gg_debug(GG_DEBUG_MISC, "//   unknown action\n");
 
-        else
-                my_printf("temporary_run_event", action);
-
+	free(action);
         return 0;
 }
 
@@ -1208,47 +1240,47 @@ int send_event(char *seq, int act)
         return 0;
 }
 
-/* correct_event()
+/*
+ * correct_event()
  *
  * sprawdza czy akcja na zdarzenie jest poprawna.
  *
  * - act
-*/
+ */
 int correct_event(char *act)
 {
-        int y = 0, i;
-        char *cmd = NULL, *arg = NULL, *action = strdup(act), *evs[10];
+        char *cmd = NULL, *arg = NULL, *action, *ev;
 
 #ifdef IOCTL
         struct action_data test;
 #endif // IOCTL
 
-        if (!strncasecmp(action, "clear",  5))
-                return 0;
+	if (!(action = strdup(act)))
+		return 1;
 
-        evs[y] = strtok(action, ";");
-        while ((evs[++y] = strtok(NULL, ";")))
-                if (y >= 10) break;
+        if (!strncasecmp(action, "clear",  5)) {
+		free(action);
+                return 1;
+	}
 
-        for (i = 0; i < y; i++) {
+	ev = strtok(action, ";");
 
-                if (!evs[i]) {
-                        y--;
-                        continue;
-                }
+	while (ev) {
+                while (*ev == ' ') ev++;
 
-                while (*evs[i] == ' ') evs[i]++;
-
-                if (strstr(evs[i], " ")) {
-                        cmd = strtok(evs[i], " ");
+                if (strchr(ev, ' ')) {
+                        cmd = strtok(ev, " ");
                         arg = strtok(NULL, "");
-                } else
-                        cmd = evs[i];
+                } else {
+                        cmd = ev;
+			arg = NULL;
+		}
 
 #ifdef IOCTL
                 if (!strncasecmp(cmd, "blink_leds", 10) || !strncasecmp(cmd, "beeps_spk", 9)) {
                         if (arg == NULL) {
                                 my_printf("events_act_no_params", cmd);
+				free(action);
                                 return 1;
                         }
 
@@ -1256,6 +1288,7 @@ int correct_event(char *act)
                                 arg++;
                                 if (!strcmp(find_format(arg), "")) {
                                         my_printf("events_seq_not_found", arg);
+					free(action);
                                         return 1;
                                 }
                                 continue;
@@ -1263,6 +1296,7 @@ int correct_event(char *act)
 
                         if (events_parse_seq(arg, &test)) {
                                 my_printf("events_seq_incorrect", arg);
+				free(action);
                                 return 1;
                         }
 
@@ -1273,19 +1307,22 @@ int correct_event(char *act)
 #endif // IOCTL		
 
 		if (!strncasecmp(cmd, "play", 4)) {
-			if (arg == NULL) {
+			if (!arg) {
 				my_printf("events_act_no_params", cmd);
+				free(action);
 				return 1; 
 			}
 		} 
 		else if (!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
-                        if (arg == NULL) {
+                        if (!arg) {
                                 my_printf("events_act_no_params", cmd);
+				free(action);
                                 return 1;
                         }
 
-                        if (!strstr(arg, " ")) {
+                        if (!strchr(arg, ' ')) {
                                 my_printf("events_act_no_params", cmd);
+				free(action);
                                 return 1;
                         }
 
@@ -1293,6 +1330,7 @@ int correct_event(char *act)
 
                         if (!get_uin(arg)) {
                                 my_printf("user_not_found", arg);
+				free(action);
                                 return 1;
                         }
 
@@ -1301,14 +1339,14 @@ int correct_event(char *act)
 
                 else {
                         my_printf("events_noexist");
+			free(action);
                         return 1;
                 }
+
+		ev = strtok(NULL, ";");
         }
 
-        if (y == 0) {
-                my_printf("events_noexist");
-                return 1;
-        }
+	free(action);
 
         return 0;
 }
@@ -1326,11 +1364,12 @@ int events_parse_seq(char *seq, struct action_data *data)
         char tmp_buff[16] = "";
         int i = 0, a, l = 0, default_delay = 10000;
 
-        if (!seq || !isdigit(seq[0]))
+        if (!data || !seq || !isdigit(seq[0]))
                 return 1;
 
         for (a = 0; a <= strlen(seq) && a < MAX_ITEMS; a++) {
-                if (i > 15 ) return 2;
+                if (i > 15)
+			return 2;
                 if (isdigit(seq[a]))
                         tmp_buff[i++] = seq[a];
                 else if (seq[a] == '/') {

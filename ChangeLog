@@ -10,6 +10,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - quickfix zapisywania theme'ów (jsm/w)
 - sensowne themey. zniknê³o polecenie ,,theme''. zmienia siê zmienn±
   ,,theme'' (w)
+- duuu¿o poprawek w kodzie eventów ,,on'' (macpias@poczta.fm/w)
 
 // 2002-02-14
 
