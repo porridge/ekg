@@ -2469,16 +2469,15 @@ COMMAND(cmd_dcc)
 	uin_t uin;
 
 	if (!params[0] || !strncasecmp(params[0], "li", 2)) {	/* list */
-		int pending = 0, active = 0;
+		int empty = 1;
 
 		for (l = transfers; l; l = l->next) {
 			struct transfer *t = l->data;
 
 			if (!t->dcc || !t->dcc->established) {
-				if (!pending) {
-					printq("dcc_show_pending_header");
-					pending = 1;
-				}
+				empty = 0;
+				printq("dcc_show_pending_header");
+
 				switch (t->type) {
 					case GG_SESSION_DCC_SEND:
 						printq("dcc_show_pending_send", itoa(t->id), format_user(t->uin), t->filename);
@@ -2496,10 +2495,9 @@ COMMAND(cmd_dcc)
 			struct transfer *t = l->data;
 
 			if (t->dcc && t->dcc->established) {
-				if (!active) {
-					printq("dcc_show_active_header");
-					active = 1;
-				}
+				empty = 0;
+				printq("dcc_show_active_header");
+
 				switch (t->type) {
 					case GG_SESSION_DCC_SEND:
 						printq("dcc_show_active_send", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa(100*t->dcc->offset/t->dcc->file_info.size));
@@ -2513,7 +2511,7 @@ COMMAND(cmd_dcc)
 			}
 		}
 
-		if (!active && !pending)
+		if (empty)
 			printq("dcc_show_empty");
 		
 		return 0;
@@ -2546,16 +2544,22 @@ COMMAND(cmd_dcc)
 			return -1;
 		}
 
-		if ((fd = open(params[2], O_RDONLY)) == -1 || stat(params[2], &st)) {
+		if (!u->ip.s_addr) {
+			printq("dcc_user_aint_dcc", format_user(u->uin));
+			return -1;
+		}
+
+		if ((fd = open(params[2], O_RDONLY)) == -1) {
 			printq("dcc_open_error", params[2], strerror(errno));
 			return -1;
-		} else {
-			close(fd);
-			if (S_ISDIR(st.st_mode)) {
-				printq("dcc_open_directory", params[2]);
-				return -1;
-			}
 		}
+
+		if (!stat(params[2], &st) && S_ISDIR(st.st_mode)) {
+			printq("dcc_open_error", params[2], strerror(EISDIR));
+			return -1;
+		}
+
+		close(fd);
 
 		t.uin = uin;
 		t.id = transfer_id();
@@ -2665,6 +2669,16 @@ COMMAND(cmd_dcc)
 			return -1;
 		}
 
+		if (!(GG_S_A(u->status) || GG_S_B(u->status)) && !(ignored_check(uin) & IGNORE_STATUS)) {
+			printq("dcc_user_not_avail", format_user(u->uin));
+			return -1;
+		}
+
+		if (!u->ip.s_addr) {
+			printq("dcc_user_aint_dcc", format_user(u->uin));
+			return -1;
+		}
+
 		memset(&tt, 0, sizeof(tt));
 		tt.uin = uin;
 		tt.id = transfer_id();
@@ -2723,8 +2737,8 @@ COMMAND(cmd_dcc)
 			}
 		}
 
-		if (!l || !t || !t->dcc) {
-			printq("dcc_get_not_found", (params[1]) ? params[1] : "");
+		if (!t || !t->dcc) {
+			printq("dcc_not_found", (params[1]) ? params[1] : "");
 			return -1;
 		}
 
@@ -2752,23 +2766,32 @@ COMMAND(cmd_dcc)
 	}
 	
 	if (!strncasecmp(params[0], "c", 1)) {		/* close */
-		struct transfer *t;
+		struct transfer *t = NULL;
 		uin_t uin;
 
 		if (!params[1]) {
 			printq("not_enough_params", name);
 			return -1;
 		}
-		
-		for (t = NULL, l = transfers; l; l = l->next) {
-			t = l->data;
 
-			if (params[1][0] == '#' && atoi(params[1] + 1) == t->id)
+		uin = get_uin(params[1]);		
+
+		for (l = transfers; l; l = l->next) {
+			struct transfer *tt = l->data;
+
+			if (params[1][0] == '#' && atoi(params[1] + 1) == tt->id) {
+				t = tt;
 				break;
+			}
+
+			if (uin && t->uin == uin) {
+				t = tt;
+				break;
+			}
 		}
 
 		if (!t) {
-			printq("dcc_close_notfound");
+			printq("dcc_not_found", params[1]);
 			return -1;
 		}
 

@@ -1219,10 +1219,10 @@ void theme_init()
 	format_add("dcc_error_refused", "%! Po³±czenie z %1 zosta³o odrzucone\n", 1);
 	format_add("dcc_error_unknown", "%! Nieznany b³±d po³±czenia bezpo¶redniego\n", 1);
 	format_add("dcc_error_handshake", "%! Nie mo¿na nawi±zaæ po³±czenia z %1\n", 1);
+	format_add("dcc_user_aint_dcc", "%! %1 nie ma w³±czonej obs³ugi po³±czeñ bezpo¶rednich\n", 1);
 	format_add("dcc_timeout", "%! Przekroczono limit czasu operacji bezpo¶redniego po³±czenia z %1\n", 1);
 	format_add("dcc_not_supported", "%! Opcja %T%1%n nie jest jeszcze obs³ugiwana\n", 1);
 	format_add("dcc_open_error", "%! Nie mo¿na otworzyæ %T%1%n: %2\n", 1);
-	format_add("dcc_open_directory", "%! Nie mo¿na otworzyæ %T%1%n: Jest katalogiem\n", 1);
 	format_add("dcc_show_pending_header", "%> Po³±czenia oczekuj±ce:\n", 1);
 	format_add("dcc_show_pending_send", "%) #%1, %2, wysy³anie %T%3%n\n", 1);
 	format_add("dcc_show_pending_get", "%) #%1, %2, odbiór %T%3%n\n", 1);
@@ -1232,19 +1232,19 @@ void theme_init()
 	format_add("dcc_show_active_get", "%) #%1, %2, odbiór %T%3%n, %T%4b%n z %T%5b%n (%6%%)\n", 1);
 	format_add("dcc_show_active_voice", "%) #%1, %2, rozmowa\n", 1);
 	format_add("dcc_show_empty", "%! Brak bezpo¶rednich po³±czeñ\n", 1);
-	
+
 	format_add("dcc_done_get", "%> Zakoñczono pobieranie pliku %T%2%n od %1\n", 1);
 	format_add("dcc_done_send", "%> Zakoñczono wysy³anie pliku %T%2%n do %1\n", 1);
-	
-	format_add("dcc_get_offer", "%) %1 przesy³a plik %T%2%n o rozmiarze %T%3b%n\n%) Wpisz %Tdcc get #%4%n, by go odebraæ, lub %Tdcc close #%4%n, by anulowaæ\n", 1);
+
 	format_add("dcc_voice_offer", "%) %1 chce rozmawiaæ\n%) Wpisz %Tdcc voice #%2%n, by rozpocz±æ rozmowê, lub %Tdcc close #%2%n, by anulowaæ\n", 1);
-	format_add("dcc_voice_unsupported", "%! Nie wkompilowano obs³ugi rozmów g³osowych. Przeczytaj %Tdocs/voip.txt%n\n", 1);
 	format_add("dcc_voice_running", "%! Mo¿na prowadziæ tylko jedn± rozmowê g³osow± na raz\n", 1);
-	format_add("dcc_get_not_found", "%! Nie znaleziono po³±czenia %T%1%n\n", 1);
+	format_add("dcc_voice_unsupported", "%! Nie wkompilowano obs³ugi rozmów g³osowych. Przeczytaj %Tdocs/voip.txt%n\n", 1);
+	format_add("dcc_get_offer", "%) %1 przesy³a plik %T%2%n o rozmiarze %T%3b%n\n%) Wpisz %Tdcc get #%4%n, by go odebraæ, lub %Tdcc close #%4%n, by anulowaæ\n", 1);
 	format_add("dcc_get_getting", "%) Rozpoczêto pobieranie pliku %T%2%n od %1\n", 1);
 	format_add("dcc_get_cant_create", "%! Nie mo¿na utworzyæ pliku %T%1%n\n", 1);
+	format_add("dcc_not_found", "%! Nie znaleziono po³±czenia %T%1%n\n", 1);
 	format_add("dcc_invalid_ip", "%! Nieprawid³owy adres IP\n", 1);
-	format_add("dcc_user_not_avail", "%! %1 musi byæ aktywn%@1, by móc wys³aæ plik\n", 1);
+	format_add("dcc_user_not_avail", "%! %1 musi byæ aktywn%@1, by móc nawi±zaæ po³±czenie\n", 1);
 
 	/* query */
 	format_add("query_started", "%) Rozpoczêto rozmowê z %T%1%n\n", 1);
