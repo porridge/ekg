@@ -3943,6 +3943,8 @@ static int ui_ncurses_event(const char *event, ...)
 
 			if (window_current->target)
 				*param = get_uin(window_current->target);
+			else
+				*param = 0;
 
 			goto cleanup;
 		}

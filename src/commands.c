@@ -202,7 +202,7 @@ COMMAND(cmd_add)
 
 	ui_event("command", quiet, "query-current", &uin, NULL);
 
-	if (params[0] && strcmp(params[0], "$") && uin && !userlist_find(uin, NULL)) {
+	if (params[0] && strcmp(params[0], "$") && uin && (!(u = userlist_find(uin, NULL)) || !u->display)) {
 		const char *name = params[0], *s1 = params[1], *s2 = params[2];
 		params_free = 1;
 		params = xmalloc(4 * sizeof(char *));
@@ -267,11 +267,10 @@ COMMAND(cmd_add)
 	}
 
 	if ((u = userlist_find(uin, params[1])) && u->display) {
-		if (!strcasecmp(params[1], u->display) && u->uin == uin) {
+		if (!strcasecmp(params[1], u->display) && u->uin == uin)
 			printq("user_exists", params[1]);
-		} else {
+		else
 			printq("user_exists_other", params[1], format_user(u->uin));
-		}
 
 		result = -1;
 		goto cleanup;
