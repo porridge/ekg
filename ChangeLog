@@ -10,6 +10,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - dodana komenda ,,window list'' (d)
 - dodana zmienna ,,make_window'' (d)
 - update ,,docs/vars.txt'' (d)
+- poprawka od¶wie¿ania prompta w okienkach (d)
+- poprawka obcinania chat_headera (arim/d)
 
 // 2002-07-07
 

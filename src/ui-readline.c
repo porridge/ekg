@@ -391,7 +391,7 @@ static void ui_readline_print(const char *target, const char *line)
 	if (config_make_window > 0 && win_id < 0 && windows_count < MAX_WINDOWS && strncmp(target, "__", 2))
 		win_id = window_make_query(target);
 	
-        if (win_id > 0) {
+        if (win_id > 0 && win_id != curr_window) {
                 window_write(win_id, line);
                 /* trzeba jeszcze waln±æ od¶wie¿enie prompta */
                 return;
