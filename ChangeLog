@@ -11,6 +11,7 @@ zg³osi³ b³±d.
 - dodane opcje --clear i --clear-config dla /list (fig/wysek)
 - dodatkowe testy przy %4 w zdarzeniach, bardziej szczegó³owy opis
   u¿ycia %4 w dokumentacji (jelo/w)
+- libgadu: poprawka konfiguracji pkgconfig (jajcus/w)
 
 // 2003-01-15
 
