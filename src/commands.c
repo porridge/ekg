@@ -347,10 +347,10 @@ COMMAND(cmd_alias)
 		int count = 0;
 		const char *aname = NULL;
 
-		if (params[0] && params[0][0] != '-')
-			aname = params[0];
-		else if (params[0] && match_arg(params[0], 'l', "list", 2))
+		if (params[0] && match_arg(params[0], 'l', "list", 2))
 			aname = params[1];
+		else if (params[0])
+			aname = params[0];
 
 		for (l = aliases; l; l = l->next) {
 			struct alias *a = l->data;
@@ -631,7 +631,7 @@ COMMAND(cmd_del)
 		}
 
 		printq("user_cleared_list");
-		command_exec(NULL, "cleartab", 1);
+		command_exec(NULL, "/cleartab", 1);
 		config_changed = 1;
 		return 0;
 	}
@@ -818,7 +818,7 @@ COMMAND(cmd_find)
 	}
 
 	if (argv[0] && !argv[1] && argv[0][0] == '#') { /* konferencja */
-		char *tmp = saprintf("conference --find %s", argv[0]);
+		char *tmp = saprintf("/conference --find %s", argv[0]);
 		int res = command_exec(NULL, tmp, quiet);
 		xfree(tmp);
 		array_free(argv);
@@ -1329,7 +1329,7 @@ COMMAND(cmd_ignore)
 		if (params[0][0] == '#') {
 			int res;
 			
-			tmp = saprintf("conference --ignore %s", params[0]);
+			tmp = saprintf("/conference --ignore %s", params[0]);
 			res = command_exec(NULL, tmp, quiet);
 			xfree(tmp);
 			return res;
@@ -1371,7 +1371,7 @@ COMMAND(cmd_ignore)
 		if (params[0][0] == '#') {
 			int res;
 			
-			tmp = saprintf("conference --unignore %s", params[0]);
+			tmp = saprintf("/conference --unignore %s", params[0]);
 			res = command_exec(NULL, tmp, quiet);
 			xfree(tmp);
 			return res;
@@ -3842,7 +3842,7 @@ COMMAND(cmd_at)
 			}
 
 			/* nie ma b³êdów ? */
-			if (wrong || lt->tm_hour > 23 || lt->tm_min > 59 || lt->tm_sec > 59 || lt->tm_mday > 31 || lt->tm_mon > 12) {
+			if (wrong || lt->tm_hour > 23 || lt->tm_min > 59 || lt->tm_sec > 59 || lt->tm_mday > 31 || !lt->tm_mday || lt->tm_mon > 11) {
 				printq("invalid_params", name);
 				xfree(foo);
 				return -1;
@@ -4357,10 +4357,10 @@ COMMAND(cmd_conference)
 		int count = 0;
 		const char *cname = NULL;
 	
-		if (params[0] && params[0][0] == '#')
-			cname = params[0];
-		else if (params[0] && match_arg(params[0], 'l', "list", 2))
+		if (params[0] && match_arg(params[0], 'l', "list", 2))
 			cname = params[1];
+		else if (params[0])
+			cname = params[0];
 
 		for (l = conferences; l; l = l->next) {
 			struct conference *c = l->data;
@@ -4512,7 +4512,7 @@ COMMAND(cmd_conference)
 
 		if (c) {
 			for (l = c->recipients; l; l = l->next) {
-				tmp = saprintf("find --uin %d", *((uin_t *) (l->data)));
+				tmp = saprintf("/find --uin %d", *((uin_t *) (l->data)));
 				command_exec(NULL, tmp, quiet);
 				xfree(tmp);
 			}

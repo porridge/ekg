@@ -1226,7 +1226,7 @@ int config_read(const char *filename, const char *var)
 				if (strcmp(p[0], "(null)"))
 					name = p[0];
 
-				tmp = saprintf("at -a %s %s", ((name) ? name : ""), p[1]);
+				tmp = saprintf("/at -a %s %s", ((name) ? name : ""), p[1]);
 				ret = command_exec(NULL, tmp, 1);
 				xfree(tmp);
 			}
@@ -1252,7 +1252,7 @@ int config_read(const char *filename, const char *var)
 				}
 		
 				if (period > 0) {
-					tmp = saprintf("timer --add %s %s %s", (name) ? name : "", period_str, p[2]);
+					tmp = saprintf("/timer --add %s %s %s", (name) ? name : "", period_str, p[2]);
 					ret = command_exec(NULL, tmp, 1);
 					xfree(tmp);
 				}

@@ -236,7 +236,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 							break;
 						case 1:
 						{
-							char *tmp = saprintf("chat %s %s", c->target, line);
+							char *tmp = saprintf("/chat %s %s", c->target, line);
 							command_exec(NULL, tmp, 0);
 							xfree(tmp);
 							break;
@@ -270,7 +270,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 							break;
 						case 1:
 						{
-							char *tmp = saprintf("chat %s %s", c->target, c->buf->str);
+							char *tmp = saprintf("/chat %s %s", c->target, c->buf->str);
 							command_exec(NULL, tmp, 0);
 							xfree(tmp);
 							break;
@@ -288,7 +288,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 
 		if (!c->quiet && c->msg == 2) {
 			char *out = buffer_flush(BUFFER_EXEC, c->target);
-			char *tmp = saprintf("chat %s %s", c->target, out);
+			char *tmp = saprintf("/chat %s %s", c->target, out);
 
 			command_exec(NULL, tmp, 0);
 			
