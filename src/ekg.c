@@ -678,6 +678,7 @@ int main(int argc, char **argv)
 	ui_screen_width = getenv("COLUMNS") ? atoi(getenv("COLUMNS")) : 80;
 	ui_screen_height = getenv("LINES") ? atoi(getenv("LINES")) : 24;
 	ui_init();
+	ui_event("theme_init");
 
 	in_autoexec = 1;
         userlist_read();

@@ -592,6 +592,9 @@ int theme_read(const char *filename, int replace)
 			return -1;
 	}
 
+	theme_init();
+	ui_event("theme_init");
+
         while ((buf = read_file(f))) {
                 char *value, *p;
 

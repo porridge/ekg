@@ -2215,6 +2215,7 @@ void changed_theme(const char *var)
 {
 	if (!config_theme) {
 		theme_init();
+		ui_event("theme_init");
 	} else {
 		if (!theme_read(config_theme, 1)) {
 			theme_cache_reset();

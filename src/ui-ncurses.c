@@ -625,6 +625,22 @@ static void ui_ncurses_beep()
 }
 
 /*
+ * ui_ncurses_theme_init()
+ *
+ * inicjuje theme'y tego interfejsu.
+ */
+static void ui_ncurses_theme_init()
+{
+	format_add("statusbar", " %c(%w%{time}%c)%w %c(%wuin%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) (%wwin%c/%w%{window}%{?query %c:%W}%{query}%c)%w%{?activity  %c(%wact%c/%w}%{activity}%{?activity %c)%w}%{?more  %c(%Gmore%c)}", 1);
+	format_add("ncurses_prompt_none", "", 1);
+	format_add("ncurses_prompt_query", "[%1] ", 1);
+	format_add("no_prompt_cache", "", 1);
+	format_add("prompt", "%K:%g:%G:%n", 1);
+	format_add("prompt2", "%K:%c:%C:%n", 1);
+	format_add("error", "%K:%r:%R:%n", 1);
+}
+
+/*
  * ui_ncurses_init()
  *
  * inicjalizuje ca³± zabawê z ncurses.
@@ -670,15 +686,9 @@ void ui_ncurses_init()
 	init_pair(13, COLOR_MAGENTA, COLOR_BLUE);
 	init_pair(14, COLOR_CYAN, COLOR_BLUE);
 	init_pair(15, COLOR_WHITE, COLOR_BLUE);
-	
-	format_add("statusbar", " %c(%w%{time}%c)%w %c(%wuin%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) (%wwin%c/%w%{window}%{?query %c:%W}%{query}%c)%w%{?activity  %c(%wact%c/%w}%{activity}%{?activity %c)%w}%{?more  %c(%Gmore%c)}", 1);
-	format_add("ncurses_prompt_none", "", 1);
-	format_add("ncurses_prompt_query", "[%1] ", 1);
-	format_add("no_prompt_cache", "", 1);
-	format_add("prompt", "%K:%g:%G:%n", 1);
-	format_add("prompt2", "%K:%c:%C:%n", 1);
-	format_add("error", "%K:%r:%R:%n", 1);
 
+	ui_ncurses_theme_init();
+	
 	wnoutrefresh(status);
 	wnoutrefresh(input);
 	doupdate();
@@ -1624,6 +1634,9 @@ static int ui_ncurses_event(const char *event, ...)
 
 	if (!event)
 		return 0;
+
+	if (!strcmp(event, "theme_init"))
+		ui_ncurses_theme_init(); 
 
 	if (!strcmp(event, "refresh_time")) {
 		struct timer *t = timer_add(1, "ui-ncurses-time", "refresh_time");
