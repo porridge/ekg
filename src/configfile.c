@@ -438,8 +438,8 @@ int config_write(const char *filename)
 	config_write_main(f, 1);
 
 	if (fclose(f) == EOF) {
-		return -1;
 		unlink(tmp);
+		return -1;
 	}
 
 	rename(tmp, filename);
