@@ -5876,7 +5876,7 @@ void command_init()
 	  "\n"
 	  "  -a, --add <zdarzenie> <numer/alias/@grupa> <komenda>  dodaje zdarzenie\n"
 	  "  -d, --del <numer>|*         usuwa zdarzenie o podanym numerze\n"
-	  "				 mo¿na podaæ te¿ zdarzenie oraz u¿ytkownika\n"
+	  "                              mo¿na te¿ podaæ zdarzenie i jego sprawcê\n"
 	  " [-l, --list] [numer]         wy¶wietla listê zdarzeñ\n"
 	  "\n"
 	  "Dostêpne zdarzenia to:\n"
