@@ -899,11 +899,21 @@ COMMAND(cmd_find)
 
 		return 0;
 	}
-		
+
 	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
 		ui_event("command", quiet, "find", NULL);
 		array_free(argv);
 		return -1;
+	}
+
+	if (params[1]) {
+		int i;
+		char **argv2 = array_make(params[1], " \t", 0, 1, 1);
+
+		for (i = 0; argv2[i]; i++)
+			array_add(&argv, xstrdup(argv2[i]));
+
+		array_free(argv2);
 	}
 
 	if (argv[0] && !argv[1] && argv[0][0] == '#') {
@@ -5746,7 +5756,7 @@ void command_init()
 	  "");
 
 	command_add
-	( "find", "u", cmd_find, 0,
+	( "find", "u?", cmd_find, 0,
 	  " [numer|opcje]", "przeszukiwanie katalogu publicznego",
 	  "\n"
 	  "  -u, --uin <numerek>\n"
