@@ -401,7 +401,6 @@ void handle_msg(struct gg_event *e)
 {
 	struct userlist *u = userlist_find(e->event.msg.sender, NULL);
 	int chat = ((e->event.msg.msgclass & 0x0f) == GG_CLASS_CHAT), secure = 0, hide = 0;
-	char *tmp;
 
 	if (!e->event.msg.message)
 		return;
@@ -490,11 +489,9 @@ void handle_msg(struct gg_event *e)
 	}
 
 	if (ignored_check(e->event.msg.sender) & IGNORE_MSG) {
-		if (config_log_ignored) {
-			char *tmp = log_escape(e->event.msg.message);
-			put_log(e->event.msg.sender, "%sign,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), tmp);
-			xfree(tmp);
-		}
+		if (config_log_ignored)
+			put_log(e->event.msg.sender, "%sign,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), e->event.msg.message);
+
 		return;
 	}
 
@@ -559,9 +556,7 @@ void handle_msg(struct gg_event *e)
 		play_sound((chat) ? config_sound_chat_file : config_sound_msg_file);
 	}
 
-	tmp = log_escape(e->event.msg.message);
-	put_log(e->event.msg.sender, "%s,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), tmp);
-	xfree(tmp);
+	put_log(e->event.msg.sender, "%s,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), e->event.msg.message);
 
 	if (config_sms_away && GG_S_B(config_status) && config_sms_app && config_sms_number) {
 		char *foo, sender[100];

@@ -370,7 +370,6 @@ int last_count(uin_t uin);
 void last_free();
 
 void put_log(uin_t uin, const char *format, ...);
-char *log_escape(const char *str);
 const char *log_timestamp(time_t t);
 
 int mesg_set(int what);

@@ -1927,7 +1927,7 @@ COMMAND(cmd_msg)
 {
 	struct userlist *u;
 	char **nicks = NULL, *nick = NULL, **p = NULL, *add_send = NULL;
-	unsigned char *msg = NULL, *raw_msg = NULL, *escaped = NULL, *format = NULL;
+	unsigned char *msg = NULL, *raw_msg = NULL, *format = NULL;
 	uin_t uin;
 	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0, msg_seq, formatlen = 0;
 
@@ -2108,7 +2108,6 @@ COMMAND(cmd_msg)
 	}
 
 	raw_msg = xstrdup(msg);
-	escaped = log_escape(msg);
 	iso_to_cp(msg);
 
 	count = array_count(nicks);
@@ -2124,7 +2123,7 @@ COMMAND(cmd_msg)
 		
 	        u = userlist_find(uin, NULL);
 
-		put_log(uin, "%s,%ld,%s,%s,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u && u->display) ? u->display : "", log_timestamp(time(NULL)), escaped);
+		put_log(uin, "%s,%ld,%s,%s,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u && u->display) ? u->display : "", log_timestamp(time(NULL)), raw_msg);
 
 		if (config_last & 4)
 			last_add(1, uin, time(NULL), 0, raw_msg);
@@ -2201,7 +2200,6 @@ COMMAND(cmd_msg)
 
 	xfree(msg);
 	xfree(raw_msg);
-	xfree(escaped);
 	xfree(format);
 	xfree(nick);
 
