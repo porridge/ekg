@@ -35,12 +35,12 @@
 #include <arpa/inet.h>
 #include "config.h"
 #include "libgadu.h"
-#include "stuff.h"
-#include "dynstuff.h"
-#include "themes.h"
 #include "commands.h"
-#include "vars.h"
+#include "dynstuff.h"
+#include "stuff.h"
+#include "themes.h"
 #include "userlist.h"
+#include "vars.h"
 #include "xmalloc.h"
 
 list_t userlist = NULL;

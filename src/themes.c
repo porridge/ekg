@@ -26,10 +26,10 @@
 #include <stdarg.h>
 #include <limits.h>
 #include <ctype.h>
-#include "stuff.h"
-#include "dynstuff.h"
-#include "themes.h"
 #include "config.h"
+#include "dynstuff.h"
+#include "stuff.h"
+#include "themes.h"
 #include "xmalloc.h"
 #include "ui.h"
 

@@ -31,10 +31,10 @@
 #endif
 #include <errno.h>
 #include "compat.h"
-#include "stuff.h"
 #include "dynstuff.h"
-#include "xmalloc.h"
 #include "msgqueue.h"
+#include "stuff.h"
+#include "xmalloc.h"
 
 list_t msg_queue = NULL;
 

@@ -43,15 +43,15 @@
 #include <libgadu.h>
 #include "config.h"
 #include "libgadu.h"
-#include "stuff.h"
 #include "commands.h"
 #include "events.h"
+#include "stuff.h"
 #include "themes.h"
-#include "version.h"
+#include "ui.h"
 #include "userlist.h"
 #include "vars.h"
+#include "version.h"
 #include "xmalloc.h"
-#include "ui.h"
 #ifdef WITH_PYTHON
 #  include "python.h"
 #endif

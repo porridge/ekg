@@ -57,16 +57,18 @@
 #ifndef _AIX
 #  include <string.h>
 #endif
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <ctype.h>
 #include "stuff.h"
 #include "commands.h"
-#include "userlist.h"
-#include "xmalloc.h"
-#include "themes.h"
-#include "vars.h"
-#include "ui.h"
-#include "version.h"
 #include "mail.h"
+#include "themes.h"
+#include "ui.h"
+#include "userlist.h"
+#include "vars.h"
+#include "version.h"
+#include "xmalloc.h"
 #ifdef WITH_PYTHON
 #  include "python.h"
 #endif

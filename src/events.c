@@ -31,21 +31,23 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include "config.h"
 #include "libgadu.h"
-#include "stuff.h"
 #include "events.h"
 #include "commands.h"
+#include "msgqueue.h"
+#include "stuff.h"
 #include "themes.h"
+#include "ui.h"
 #include "userlist.h"
 #include "voice.h"
 #include "xmalloc.h"
-#include "ui.h"
 #ifdef HAVE_OPENSSL
 #  include "sim.h"
 #  include "simlite.h"
 #endif
-#include "msgqueue.h"
 #ifdef WITH_PYTHON
 #  include "python.h"
 #endif

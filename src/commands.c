@@ -40,17 +40,18 @@
 #include <sys/ioctl.h>
 #include "config.h"
 #include "libgadu.h"
-#include "stuff.h"
-#include "dynstuff.h"
 #include "commands.h"
+#include "dynstuff.h"
 #include "events.h"
+#include "msgqueue.h"
+#include "stuff.h"
 #include "themes.h"
+#include "ui.h"
 #include "vars.h"
-#include "userlist.h"
 #include "version.h"
 #include "voice.h"
+#include "userlist.h"
 #include "xmalloc.h"
-#include "ui.h"
 #ifdef WITH_PYTHON
 #  include "python.h"
 #endif
@@ -58,7 +59,6 @@
 #  include "sim.h"
 #  include "simlite.h"
 #endif
-#include "msgqueue.h"
 
 COMMAND(cmd_modify);
 

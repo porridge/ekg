@@ -58,14 +58,14 @@
 #endif
 #include "compat.h"
 #include "libgadu.h"
-#include "stuff.h"
-#include "dynstuff.h"
-#include "themes.h"
 #include "commands.h"
-#include "vars.h"
-#include "userlist.h"
-#include "xmalloc.h"
+#include "dynstuff.h"
+#include "stuff.h"
+#include "themes.h"
 #include "ui.h"
+#include "userlist.h"
+#include "vars.h"
+#include "xmalloc.h"
 
 #ifndef PATH_MAX
 #  define PATH_MAX _POSIX_PATH_MAX

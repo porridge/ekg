@@ -25,15 +25,15 @@
 #endif
 #include <stdarg.h>
 #include <ctype.h>
-#include "stuff.h"
-#include "mail.h"
-#include "vars.h"
 #include "config.h"
 #include "libgadu.h"
 #include "dynstuff.h"
-#include "xmalloc.h"
-#include "ui.h"
+#include "mail.h"
+#include "stuff.h"
 #include "themes.h"
+#include "ui.h"
+#include "vars.h"
+#include "xmalloc.h"
 
 list_t variables = NULL;
 
