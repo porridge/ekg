@@ -57,6 +57,7 @@ int display_color = 1;
 int enable_beep = 1, enable_beep_msg = 1, enable_beep_chat = 1, enable_beep_notify = 1;
 char *sound_msg_file = NULL;
 char *sound_chat_file = NULL;
+char *sound_sysmsg_file = NULL;
 char *sound_app = NULL;
 int config_uin = 0;
 char *config_password = NULL;

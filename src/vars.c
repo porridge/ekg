@@ -53,6 +53,7 @@ struct variable variables[MAX_VARS] = {
 	{ "sms_send_app", VAR_STR, 1, &sms_send_app },
 	{ "sound_msg_file", VAR_STR, 1, &sound_msg_file },
 	{ "sound_chat_file", VAR_STR, 1, &sound_chat_file },
+	{ "sound_sysmsg_file", VAR_STR, 1, &sound_sysmsg_file },
 	{ "sound_app", VAR_STR, 1, &sound_app },
 	{ "theme", VAR_STR, 1, &default_theme },
 

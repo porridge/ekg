@@ -122,6 +122,19 @@ void handle_msg(struct gg_event *e)
 		return;
 	};
 	
+	if (e->event.msg.sender == 0) {
+		my_printf("sysmsg_header");
+		cp_to_iso(e->event.msg.message);
+		print_message_body(e->event.msg.message, 0);
+		my_printf("sysmsg_footer");
+
+		if (enable_beep)
+			my_puts("\007");
+		play_sound(sound_sysmsg_file);
+		
+		return;
+	};
+			
 	if (u)
 		add_send_nick(u->comment);
 	else {

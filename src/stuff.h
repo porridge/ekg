@@ -79,6 +79,7 @@ int private_mode;
 int connecting;
 char *sound_msg_file;
 char *sound_chat_file;
+char *sound_sysmsg_file;
 char *sound_app;
 int display_notify;
 int default_status;
