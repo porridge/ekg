@@ -9,6 +9,7 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 		invisible -        -//-               'niewidoczny';
 		disconnect -       -//-	              'niedostêpny';
 		dcc - otrzymanie od kogo¶ dcc;
+		sigusr1, sigusr2 - otrzymanie podanego sygna³u;
 		* - wszystkie zdarzenia;
 	zdarzenia mo¿na ³±czyæ ze sob± operatorem '|'.
 
@@ -33,6 +34,7 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 		beeps_spk [sekwencja] - odgrywa sekwencjê na sprzêtowym 
                       g³o¶niczku. tony s± oddzielane przecinkami, odstêpy czasu,
                       tak jak przy blink_leds wystêpujê po znaku '/'.
+		command [komenda] - wywo³uje komendê klienta
 
 		dodatkowo przy blink_leds i beeps_spk, je¿eli sekwencja zacznie
 		siê od znaku '$', bêdzie ona poszukiwana w themes (przyk³adem
@@ -43,7 +45,11 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 
 		je¶li w akcji wyst±pi %1, jest zastêpowane przez numer sprawcy
 		zdarzenia. %2 jest jego pseudonimem, je¶li figuruje w naszej
-		li¶cie kontaktów, lub numerkiem w przeciwnym razie.
+		li¶cie kontaktów, lub numerkiem w przeciwnym razie. %3
+		wystêpuje tylko przy wiadomo¶ciach i zawiera jej tre¶æ.
+		nale¿y uwa¿aæ przy wykonywaniu ,,command exec'' z tre¶ci±
+		wiadomo¶ci, poniewa¿ wiadomo¶æ zawieraj±ca ,,; rm -rf ~''
+		mo¿e sporo zepsuæ.
 
 akcje blink_leds oraz beeps_spk musz± mieæ dostêp do /dev/console, wiêc
 uruchamiany jest specjalny daemon (ioctl_daemon) z prawami roota. po wyj¶ciu 
@@ -58,5 +64,6 @@ przyk³ady:
 	on chat * blink_leds 4, 1, 2
 	on * * blink_leds $blah.led
 	on msg|chat * msg %1 nie ma mnie. zostaw wiadomo¶æ.
+	on sigusr1 * disconnect
 
 // $Id$
