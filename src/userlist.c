@@ -632,7 +632,7 @@ void userlist_send()
 
         gg_notify(sess, uins, count);
 
-        free(uins);
+        xfree(uins);
 }
 
 /*

@@ -141,7 +141,7 @@ COMMAND(cmd_cleartab)
 	int i;
 
 	for (i = 0; i < send_nicks_count; i++) {
-		free(send_nicks[i]);
+		xfree(send_nicks[i]);
 		send_nicks[i] = NULL;
 	}
 	send_nicks_count = 0;
@@ -203,7 +203,7 @@ COMMAND(cmd_alias)
 				count++;
 			}
 
-			free(tmp);
+			xfree(tmp);
 		}
 
 		if (!count)
@@ -526,7 +526,7 @@ COMMAND(cmd_connect)
 		} else if (sess->state != GG_STATE_IDLE)
 			print("conn_stopped");
 		ekg_logoff(sess, tmp);
-		free(tmp);
+		xfree(tmp);
 		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
 		userlist_clear_status();
@@ -674,9 +674,9 @@ COMMAND(cmd_find)
 			id = id * 2;	/* single search */
 			if (!(r->uin = get_uin(params[0]))) {
 				print("user_not_found", params[0]);
-				free(query);
+				xfree(query);
 				array_free(argv);
-				free(r);
+				xfree(r);
 				return;
 			}
 		} else {
@@ -737,7 +737,7 @@ COMMAND(cmd_find)
 
 	if (!(h = gg_search(r, 1))) {
 		print("search_failed", http_error_string(0));
-		free(query);
+		xfree(query);
 		array_free(argv);
 		gg_search_request_free(r);
 		return;
@@ -772,27 +772,27 @@ COMMAND(cmd_change)
 	for (i = 0; argv[i]; i++) {
 		
 		if (match_arg(argv[i], 'f', "first", 2) && argv[i + 1]) {
-			free(r->first_name);
+			xfree(r->first_name);
 			r->first_name = xstrdup(argv[++i]);
 		}
 		
 		if (match_arg(argv[i], 'l', "last", 2) && argv[i + 1]) {
-			free(r->last_name);
+			xfree(r->last_name);
 			r->last_name = xstrdup(argv[++i]);
 		}
 		
 		if (match_arg(argv[i], 'n', "nickname", 2) && argv[i + 1]) {
-			free(r->nickname);
+			xfree(r->nickname);
 			r->nickname = xstrdup(argv[++i]);
 		}
 		
 		if (match_arg(argv[i], 'e', "email", 2) && argv[i + 1]) {
-			free(r->email);
+			xfree(r->email);
 			r->email = xstrdup(argv[++i]);
 		}
 
 		if (match_arg(argv[i], 'c', "city", 2) && argv[i + 1]) {
-			free(r->city);
+			xfree(r->city);
 			r->city = xstrdup(argv[++i]);
 		}
 		
@@ -913,7 +913,7 @@ COMMAND(cmd_help)
 				    	blah = format_string(c->brief_help);
 				
 				print("help", c->name, c->params_help, blah ? blah : c->brief_help, "");
-				free(blah);
+				xfree(blah);
 				if (c->long_help && strcmp(c->long_help, "")) {
 					char *foo, *tmp, *plumk, *bar = xstrdup(c->long_help);
 
@@ -922,10 +922,10 @@ COMMAND(cmd_help)
 							plumk = format_string(tmp);
 							if (plumk) {
 								print("help_more", plumk);
-								free(plumk);
+								xfree(plumk);
 							}
 						}
-						free(bar);
+						xfree(bar);
 					}
 				}
 
@@ -944,7 +944,7 @@ COMMAND(cmd_help)
 			    	blah = format_string(c->brief_help);
 	
 			print("help", c->name, c->params_help, blah ? blah : c->brief_help, (c->long_help && strcmp(c->long_help, "")) ? "\033[1m *\033[0m" : "");
-			free(blah);
+			xfree(blah);
 		}
 	}
 
@@ -1074,8 +1074,8 @@ COMMAND(cmd_list)
 
 		print("user_info", u->first_name, u->last_name, (u->nickname) ? u->nickname : u->display, u->display, u->mobile, groups, itoa(u->uin), status);
 		
-		free(groups);
-		free(status);
+		xfree(groups);
+		xfree(status);
 
 		return;
 	}
@@ -1109,7 +1109,7 @@ COMMAND(cmd_list)
 			return;
 		}
 		
-		free(contacts);
+		xfree(contacts);
 		
 		list_add(&watches, h, 0);
 
@@ -1848,12 +1848,12 @@ COMMAND(cmd_dcc)
 			print("dcc_get_cant_create", path);
 			gg_free_dcc(t->dcc);
 			list_remove(&transfers, t, 1);
-			free(path);
+			xfree(path);
 			
 			return;
 		}
 		
-		free(path);
+		xfree(path);
 		
 		print("dcc_get_getting", format_user(t->uin), t->filename);
 		
@@ -1896,7 +1896,7 @@ COMMAND(cmd_dcc)
 		uin = t->uin;
 
 		if (t->filename)
-			free(t->filename);
+			xfree(t->filename);
 
 		list_remove(&transfers, t, 1);
 
@@ -2554,7 +2554,7 @@ int binding_quick_list(int a, int b)
 
 		string_append(list, tmp);
 
-		free(tmp);
+		xfree(tmp);
 	}
 	
 	if (strlen(list->str) > 0)
@@ -2599,7 +2599,7 @@ COMMAND(cmd_alias_exec)
 		char *tmp = saprintf("%s%s%s%s", (*(char*)(m->data) == '/') ? "" : "/", (char*) m->data, (params[0]) ? " " : "", (params[0]) ? params[0] : "");
 		m = m->next;
 		command_exec(NULL, tmp);
-		free(tmp);
+		xfree(tmp);
 	}
 }
 
