@@ -790,7 +790,11 @@ static void setup_debug()
 	gg_debug_file = fdopen(fd[1], "w");
 
 	gg_debug_file_buf = xcalloc(4096, sizeof(char));
+#ifdef SETVBUF_REVERSED
+	setvbuf(gg_debug_file, _IOLBF, gg_debug_file_buf, 4096);
+#else
 	setvbuf(gg_debug_file, gg_debug_file_buf, _IOLBF, 4096);
+#endif
 
 	list_add(&watches, &se, sizeof(se));
 }

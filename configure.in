@@ -218,6 +218,9 @@ dnl <ekg>
 
 # i zaczynamy wykrywaæ ¶mieci dla ekg
 
+  # na wszelki wypadek
+  AC_FUNC_SETVBUF_REVERSED
+
   # dirname - get rid of libgen
   AC_CHECK_HEADERS(libgen.h)
   AC_CHECK_FUNC(dirname, , [OBJS="$OBJS ../compat/dirname.o"])
