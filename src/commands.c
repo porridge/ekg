@@ -3158,6 +3158,8 @@ COMMAND(cmd_reload)
 		return -1;
 	}
 
+	update_status();
+
 	return 0;
 }
 
