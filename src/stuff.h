@@ -71,13 +71,13 @@ enum event_t {
 	INACTIVE_EVENT = TOGGLE_BIT(22)
 };
 
-#define EVENT_LABELS_COUNT 21	/* uaktualniæ ! */
-struct event_label event_labels[EVENT_LABELS_COUNT + 2];
-
 struct event_label {
 	int event;
 	char *name;
 };
+
+#define EVENT_LABELS_COUNT 21	/* uaktualniæ ! */
+struct event_label event_labels[EVENT_LABELS_COUNT + 2];
 
 struct process {
 	int pid;		/* id procesu */

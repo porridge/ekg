@@ -71,13 +71,13 @@ enum ignore_t {
 	IGNORE_ALL = 255
 };
 
-#define	IGNORE_LABELS_COUNT 6
-struct ignore_label ignore_labels[IGNORE_LABELS_COUNT + 1];
-
 struct ignore_label {
 	int level;
 	char *name;
 };
+
+#define	IGNORE_LABELS_COUNT 6
+struct ignore_label ignore_labels[IGNORE_LABELS_COUNT + 1];
 
 list_t userlist;
 
