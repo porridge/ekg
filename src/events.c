@@ -462,7 +462,7 @@ void handle_msg(struct gg_event *e)
 	cp_to_iso(e->event.msg.message);
 	
 #ifdef WITH_PYTHON
-	PYTHON_HANDLE_HEADER(msg, "(isisii)", e->event.msg.sender, ((u && u->display) ? u->display : ""), e->event.msg.msgclass, e->event.msg.message, e->event.msg.time, 0)
+	PYTHON_HANDLE_HEADER(msg, "(isisii)", e->event.msg.sender, ((u && u->display) ? u->display : ""), e->event.msg.msgclass, e->event.msg.message, e->event.msg.time, secure)
 	{
 		char *b, *d;
 		int f;

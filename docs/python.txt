@@ -68,8 +68,9 @@ oto lista wywo³ywanych funkcji:
   gdy ekg otrzymuje wiadomo¶æ. uin - numer nadawcy, name - jego nazwa,
   msgclass - klasa wiadomo¶ci, text - tre¶æ, secure - czy mamy do czynienia
   z odszyfrowan± wiadomo¶ci±. je¶li zwróci 0, wiadomo¶æ zostanie zignorowana.
-  je¶li zwróci krotkê/entkê/cokolwiek (ang. tuple) o takich samych argumentach
-  jak funkcja, dane zostan± zmienione.
+  gdy zwróci 2, wiadomo¶æ nie zostanie wy¶wietlona na ekranie. je¶li zwróci
+  krotkê/entkê/cokolwiek (ang. tuple) o takich samych argumentach jak funkcja,
+  dane zostan± zmienione.
 
 - handle_status(uin, name, status, descr)
 
@@ -92,8 +93,7 @@ oto lista wywo³ywanych funkcji:
   gdy nale¿y od¶wie¿yæ pasek stanu.
 
 pó¼niej zostan± dodane funkcje dotycz±ce wszystkich zdarzeñ zwi±zanych
-z sesj± gg, plus obs³uga interfejsu u¿ytkownika (informacja o wci¶niêtych
-klawiszach, wys³anej linii itp.)
+z sesj± gg, plus obs³uga interfejsu u¿ytkownika (informacja o wys³anej linii itp.)
 
 ***
 
