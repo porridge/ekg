@@ -815,7 +815,7 @@ int main(int argc, char **argv)
 
 	xfree(gg_proxy_host);
 	xfree(config_dir);
-	
+
 	return 0;
 }
 

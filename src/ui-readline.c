@@ -461,11 +461,13 @@ static void ui_readline_print(const char *target, const char *line)
 		old_prompt = xstrdup(rl_prompt);
                 rl_end = 0;
 		rl_set_prompt("");
-                rl_redisplay();
-                printf("\r");
-                for (i = 0; i < strlen(old_prompt); i++)
+		/* rl_redisplay(); */
+		printf("\r");
+                
+		for (i = 0; i < strlen(old_prompt); i++)
                         printf(" ");
-                printf("\r");
+		
+		printf("\r");
         }
 
 	printf("%s", line);
@@ -674,6 +676,7 @@ static void ui_readline_deinit()
 		xfree(send_nicks[i]);
 		send_nicks[i] = NULL;
 	}
+	send_nicks_count = 0;
 }
 
 /*
