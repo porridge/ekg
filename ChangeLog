@@ -8,6 +8,8 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 
 - poprawienie wy¶wietlania informacji na temat zakolejkowania wiadomo¶ci 
   (teraz wy¶wietlana jest pod wiadomo¶ci±) (gophi)
+- dopisanie do ,,/help on'' informacji na temat podawania sprawcy dla 
+  zdarzeñ ,,connected'' i ,,disconnected'' (zigi/g)
 
 // 2005-01-21
 
