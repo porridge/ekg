@@ -181,10 +181,7 @@ char *config_profile = NULL;
 int config_header_size = 0;
 int config_statusbar_size = 1;
 
-static struct {
-	int event;
-	char *name;
-} event_labels[] = {
+struct event_label event_labels[] = {
 	{ EVENT_MSG, "msg" },
 	{ EVENT_CHAT, "chat" },
 	{ EVENT_AVAIL, "avail" },
@@ -2094,12 +2091,10 @@ static int event_run(const char *act)
 	} 
 
 	if (!strcasecmp(acts[0], "exec")) {
-		char **p = array_make(action + 5, " \t", 3 , 1, 0);
-
-		/* ¿eby command_exec() nie dotyka³ ,,quotes'' */
+		char *tmp = saprintf("exec %s", action + 5);
 		gg_debug(GG_DEBUG_MISC, "//   executing program\n");
-		cmd_exec("exec", (const char **) p, NULL, 0);
-		array_free(p);
+		command_exec(NULL, tmp);
+		xfree(tmp);
 	}
 
 	if (!strcasecmp(acts[0], "command")) {

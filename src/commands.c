@@ -4052,6 +4052,7 @@ int command_remove(const char *name)
  * 'd' - komenda dcc,
  * 'p' - komenda python,
  * 'w' - komenda window,
+ * 'e' - events,
  * 'f' - plik.
  */
 
@@ -4315,7 +4316,7 @@ void command_init()
 	  "pseudonimy przecinkiem (ale bez odstêpów).");
 
 	command_add
-        ( "on", "??u?", cmd_on, 0,
+        ( "on", "?eu?", cmd_on, 0,
 	  " [opcje]", "zarz±dzanie zdarzeniami",
 	  "\n"
 	  "  -a, --add <zdarzenie> <numer/alias> <akcja>  dodaje zdarzenie\n"

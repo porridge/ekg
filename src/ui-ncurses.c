@@ -1818,6 +1818,29 @@ void command_generator(const char *text, int len)
 	}
 }
 
+void events_generator(const char *text, int len)
+{
+	int i;
+	const char *tmp = NULL;
+	char *pre = NULL;
+
+	if ((tmp = strrchr(text, '|')) || (tmp = strrchr(text, ','))) {
+		char *foo;
+
+		pre = xstrdup(text);
+		foo = strrchr(pre, *tmp);
+		*(foo + 1) = 0;
+
+		len -= tmp - text + 1;
+		tmp = tmp + 1;
+	} else
+		tmp = text;
+
+	for (i = 0; event_labels[i].name; i++)
+		if (!strncasecmp(tmp, event_labels[i].name, len))
+			array_add(&completions, ((tmp == text) ? xstrdup(event_labels[i].name) : saprintf("%s%s", pre, event_labels[i].name)));
+}
+
 void unknown_uin_generator(const char *text, int len)
 {
 	int i;
@@ -2012,6 +2035,7 @@ static struct {
 	{ 'p', python_generator },
 	{ 'w', window_generator },
 	{ 'f', file_generator },
+	{ 'e', events_generator },
 	{ 0, NULL }
 };
 

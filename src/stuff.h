@@ -60,6 +60,9 @@ enum event_t {
 	INACTIVE_EVENT = 32768	/* nieaktywne zdarzenie */
 };
 
+#define EVENT_LABELS_MAX 17	/* uaktualniæ ! */
+struct event_label event_labels[EVENT_LABELS_MAX];
+
 struct process {
 	int pid;		/* id procesu */
 	char *name;		/* nazwa. je¶li poprzedzona \2 to nie obchodzi nas w jaki sposób siê zakoñczy³o */
@@ -83,6 +86,11 @@ struct event {
         uin_t uin;	/* numerek dla którego zdarzenie zachodzi */
         int flags;	/* flagi zdarzenia */
         char *action;	/* akcja! */
+};
+
+struct event_label {
+	int event;
+	char *name;
 };
 
 struct emoticon {
