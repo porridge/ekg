@@ -1013,7 +1013,7 @@ COMMAND(command_ignore)
 COMMAND(command_list)
 {
 	struct list *l;
-	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0;
+	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, j;
 	char *tmp, **argv = NULL;
 
 	if (params[0] && *params[0] != '-') {
@@ -1078,27 +1078,30 @@ COMMAND(command_list)
 	}
 
 	/* list --active | --busy | --inactive */
-        if (params[0] && (argv = array_make(params[0], " \t", 0, 1, 1))) {
-		int i;
+	for (j = 0; params[j]; j++) {
+      		if ((argv = array_make(params[j], " \t", 0, 1, 1))) {
+			int i;
 
-		for (i = 0; argv[i]; i++) {
-			char *arg = argv[i];
+	 		for (i = 0; argv[i]; i++) {
+				char *arg = argv[i];
 			
-			if (*arg == '-' && *(arg + 1) == '-')
-				arg++;
-			
-			if (!strncasecmp(arg, "-a", 2)) {
-				show_all = 0;
-				show_active = 1;
+				if (*arg == '-' && *(arg + 1) == '-')
+					arg++;
+				
+				if (!strncasecmp(arg, "-a", 2)) {
+					show_all = 0;
+					show_active = 1;
+				}
+				if (!strncasecmp(arg, "-u", 2) || !strncasecmp(arg, "-i", 2) || !strncasecmp(arg, "-n", 2)) {
+					show_all = 0;
+					show_inactive = 1;
+				}
+				if (!strncasecmp(arg, "-b", 2)) {
+					show_all = 0;
+					show_busy = 1;
+				}
 			}
-			if (!strncasecmp(arg, "-u", 2) || !strncasecmp(arg, "-i", 2) || !strncasecmp(arg, "-n", 2)) {
-				show_all = 0;
-				show_inactive = 1;
-			}
-			if (!strncasecmp(arg, "-b", 2)) {
-				show_all = 0;
-				show_busy = 1;
-			}
+			array_free(argv);
 		}
 	}
 
@@ -1129,8 +1132,6 @@ COMMAND(command_list)
 
 	if (!count && show_all)
 		my_printf("list_empty");
-
-	array_free(argv);
 
 	return 0;
 }

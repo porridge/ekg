@@ -123,10 +123,7 @@ int my_getc(FILE *f)
 				struct gg_dcc *d = l->data;
 				char *errmsg = "";
 
-				if (c->timeout == -1)
-					continue;
-
-				if (--c->timeout)
+				if (!c || c->timeout == -1 || --c->timeout)
 					continue;
 				
 				switch (c->type) {
@@ -258,7 +255,7 @@ int my_getc(FILE *f)
 				struct gg_common *c = l->data;
 				int i;
 
-				if (!FD_ISSET(c->fd, &rd) && !FD_ISSET(c->fd, &wd))
+				if (!c || (!FD_ISSET(c->fd, &rd) && !FD_ISSET(c->fd, &wd)))
 					continue;
 
 				if (c->type == GG_SESSION_USER0) 

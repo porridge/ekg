@@ -8,6 +8,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-03-04
 
 - poprawka prepare_path(), bo na NetBSD nie mo¿na tworzyæ ,,x//'' (dawszy/w)
+- dodatkowe sprawdzanie NULLi (kfazi/w)
+- poprawka list (kfazi,jmk/w)
 
 // 2002-02-26
 
