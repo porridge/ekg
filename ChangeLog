@@ -9,6 +9,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - dodana komenda ,,on'' (d)
 - dodany docs/on.txt (d)
+- dodany ioctl_daemon
 - poprawka docs/ekl.pl (d)
 
 // 2002-01-29

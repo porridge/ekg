@@ -1,0 +1,51 @@
+sk³adnia komendy on:
+
+on [zdarzenie] [user] [akcja]; [akcja1]; [...]
+
+	zdarzenie:
+		msg, chat - wiadomo¶æi od kogo¶;
+		avail - zmiana przez kogo¶ statusu na 'dostêpny';
+		away  -            -//-               'zajêty';
+		disconnect -       -//-	              'niedostêpny';
+		dcc - otrzymanie od kogo¶ dcc;
+		* - wszystkie zdadrzenia;
+	zdarzenia mo¿na ³±czyæ ze sob± operatorem '|'.
+
+	user - nazwa u¿ytkownika z listy lub uin, * oznacza dowolnego 
+	       u¿ytkownika, przy czym, je¿eli u¿ytkownik ma przypisan±
+               indywidualn± akcjê - ta z * nie brana jest pod uwagê.
+	
+	akcja:
+		clear - usuñ dane zdarzenie (lub jedn± flagê);
+		chat [user] [tekst] - wy¶lij tekst do danego usera;
+		msg  [user] [tekst] -            -//- 
+		blink_leds [sekwencja] - zapalaj kontorlki NumLock, CapsLock
+		      i ScrollLock na klawiaturze 'w rytm' podanej sekwencji.
+                      kombinacje diod oddzielane sa od siebie przecinkami,
+                      je¿eli po kombinacji wyst±pi znak '/' - po nim podany
+                      musi byæ odstêp czasu do kolejnej kombinacji.
+                      kombinacje tworzy siê dodaj±c do siebie bity:
+                      1 - NumLock,  2 - ScrollLocl, 4 - CapsLock i tak np.
+                      pod¶wietlenie NumLock i CapsLock to 1+4 czyli 5.
+		beeps_spk [sekwencja] - odgrywa sekwencjê na sprzêtowym 
+                      g³o¶niczku. tony sa oddzielane przecinkami, odstêpy czasu,
+                      tak jak przy blink_leds wystêpujê po znaku '/'.
+
+		dodatkowo przy blink_leds i beeps_spk, je¿eli sekwencja zacznie
+		siê od znaku '$', bêdzie ona poszukiwana w themes (przyk³adem
+		jest standardowe blah.led dla blink_leds).
+
+		akcje mo¿na ³±czyæ ze sob±, oddzielaj±c je ¶rednikiem (mo¿liwe
+		nie wiêcej ni¿ 10 akcji).
+
+akcje blink_leds oraz beeps_spk musz± mieæ dostêp do /dev/console, wiêc
+uruchamiany jest specjalny daemon (ioctl_daemon) z prawami roota. po wyj¶ciu 
+z ekg, daemon ten jest zabijany.
+
+przyk³ady:
+	on msg drg blink_leds 1, 4, 2, 7/20000, 7, 7, 7
+	on avail|away drg beeps_spk 1000, 900, 800; blink_leds 7, 5, 1
+	on drg clear
+	on * disconnect kupa msg dupa nic z tego; blink_leds 7
+	on chat * blink_leds 4, 1, 2
+	on * * blink_leds $blah.led
