@@ -1127,6 +1127,7 @@ void theme_init()
 	
 	/* pobieranie tokenu */
 	format_add("token", "%> Token zapisano do pliku %T%1%n\n", 1);
+	format_add("token_ocr", "%> Token: %T%1%n\n", 1);
 	format_add("token_body", "%1\n", 1);
 	format_add("token_failed", "%! B³±d pobierania tokenu: %1\n", 1);
 	format_add("token_timeout", "%! Przekroczono limit czasu pobierania tokenu\n", 1);

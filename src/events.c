@@ -5,6 +5,7 @@
  *                          Piotr Wysocki <wysek@linux.bydg.org>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *                          Piotr Domagalski <szalik@szalik.net>
+ *                          Adam Czerwiñski <acze@acze.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -58,6 +59,7 @@
 #include "userlist.h"
 #include "voice.h"
 #include "xmalloc.h"
+#include "token.h"
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure(), handle_search50(),
@@ -1328,6 +1330,64 @@ fail:
 }
 
 /*
+ * token_check()
+ * 
+ * funkcja sprawdza czy w danym miejscu znajduje siê zaproponowany znaczek
+ * 
+ *  - n - numer od 0 do 15 (znaczki od 0 do f)
+ *  - x, y - wspó³rzêdne znaczka w tablicy ocr
+ */
+static int token_check(int nr, int x, int y, const char *ocr, int maxx, int maxy)
+{
+	int i;
+
+	for (i = nr * token_char_height; i < (nr + 1) * token_char_height; i++, y++) {
+		int j, xx = x;
+
+		for (j = 0; token_id[i][j] && j + xx < maxx; j++, xx++) {
+			if (token_id[i][j] != ocr[y * (maxx + 1) + xx])
+				return 0;
+		}
+	}
+  
+	return 1;
+}
+
+/*
+ * token_ocr()
+ *
+ * zwraca tre¶æ tokenu
+ */
+char *token_ocr(const char *ocr, int width, int height, int length)
+{
+	int x, y, count = 0;
+	char *token;
+
+	token = xmalloc(length + 1);
+	memset(token, 0, length + 1);
+		
+	for (x = 0; x < width; x++) {
+		for (y = 0; y < height - token_char_height; y++) {
+			int result = 0, token_part = 0;
+		      
+			do
+				result = token_check(token_part++, x, y, ocr, width, height);
+			while (!result && token_part < 16);
+			
+			if (result && count < length)
+				token[count++] = token_id_char[token_part - 1];
+		}
+	}
+
+	if (count == length)
+		return token;
+	
+	xfree(token);
+
+	return NULL;
+}
+
+/*
  * handle_token()
  *
  * funkcja zajmuj±ca siê zdarzeniami zwi±zanymi z pobieraniem tokenu.
@@ -1339,7 +1399,7 @@ fail:
 void handle_token(struct gg_http *h)
 {
 	struct gg_token *t = NULL;
-	char *file;
+	char *file = NULL;
 	int fd;
 
 	if (!h)
@@ -1383,8 +1443,9 @@ void handle_token(struct gg_http *h)
 		struct jpeg_error_mgr e;
 		JSAMPROW buf[1];
 		int size;
-		char *out;
+		char *token, *tmp;
 		FILE *f;
+		int h = 0;
 
 		if (!(f = fopen(file, "rb"))) {
 			print("token_failed", strerror(errno));
@@ -1399,29 +1460,41 @@ void handle_token(struct gg_http *h)
 
 		size = j.output_width * j.output_components;
 		buf[0] = xmalloc(size);
-		out = xmalloc(j.output_width + 1);
-		out[j.output_width] = 0;
-
+                
+                token = xmalloc((j.output_width + 1) * j.output_height);
+		
 		while (j.output_scanline < j.output_height) {
 			int i;
 
 			jpeg_read_scanlines(&j, buf, 1);
 
-			for (i = 0; i < j.output_width; i++)
-				out[i] = (buf[0][i*3] + buf[0][i*3+1] + buf[0][i*3+2] < 384) ? '#' : '.';
-
-			print("token_body", out);
+			for (i = 0; i < j.output_width; i++, h++)
+				token[h] = (buf[0][i*3] + buf[0][i*3+1] + buf[0][i*3+2] < 384) ? '#' : '.';
+			
+			token[h++] = 0;
 		}
+
+		if (!(tmp = token_ocr(token, j.output_width, j.output_height, t->length))) {
+			int i;
+
+			for (i = 0; i < j.output_height; i++)
+				print("token_body", token[i * (j.output_width + 1)]);
+		} else {
+			print("token_ocr", tmp);
+			xfree(tmp);
+		}
+
+		xfree(token);
 
 		jpeg_finish_decompress(&j);
 		jpeg_destroy_decompress(&j);
 
 		xfree(buf[0]);
-		xfree(out);
 		fclose(f);
+		
 		unlink(file);
 	} else
-#else
+#else	/* HAVE_LIBJPEG */
 	{
 		char *file2 = saprintf("%s.jpg", file);
 
@@ -1432,17 +1505,17 @@ void handle_token(struct gg_http *h)
 
 		xfree(file2);
 	}
-#endif
+#endif	/* HAVE_LIBJPEG */
+
+#else	/* HAVE_MKSTEMP */
+	print("token_unsupported");
+#endif	/* HAVE_MKSTEMP */
 
 	xfree(file);
 
-#else
-	print("token_unsupported");
-#endif
-
 fail:
 	list_remove(&watches, h, 0);
-	gg_free_pubdir(h);
+	gg_token_free(h);
 }
 
 /*

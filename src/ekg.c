@@ -1477,6 +1477,7 @@ void ekg_exit()
 	list_destroy(autofinds, 1);
 
 	xfree(home_dir);
+	xfree(last_tokenid);
 
 	xfree(gg_proxy_host);
 	xfree(gg_proxy_username);
