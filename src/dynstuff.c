@@ -415,6 +415,9 @@ char **array_make(const char *string, const char *sep, int max, int trim, int qu
 	char **result = NULL;
 	int items, last = 0;
 
+	if (!string || !sep)
+		return NULL;
+
 	for (p = string, items = 0; ; ) {
 		int len = 0;
 		char *token = NULL;

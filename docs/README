@@ -137,7 +137,7 @@ KLAWIATURA
     terminal, mo¿na u¿ywaæ Alt-Enter lub wcisn±æ Esc i zaraz po nim Enter.
 
     Dodatkowo, okre¶lonym kombinacjom klawiszy mo¿na przypisaæ ró¿ne
-    komendy za pomoc± polecenia ,,bind'' (niedostêpne jeszcze w ncurses).
+    komendy za pomoc± polecenia ,,bind''.
 
 GDZIE SZUKAÆ POMOCY
 
