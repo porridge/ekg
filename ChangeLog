@@ -5,6 +5,16 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-06-09
+
+- poprawki w komentarzach libgadu, by w przysz³o¶ci móc w ³atwy sposób
+  przerobiæ je skryptem na zgrabne ,,api reference'' (w)
+- przygotowanie gg_gethostbyname() pod wielobie¿no¶æ (w)
+
+// 2002-06-08
+
+- drobne poprawki w docach (w)
+
 // 2002-06-06
 
 - nowy contrib Auto_Make_EKG (ciacho/w)

@@ -26,22 +26,18 @@
 extern "C" {
 #endif
 
+#include <sys/types.h>
+#include <netdb.h>
+
 #if defined(sun) && !defined(INADDR_NONE)
-  #define INADDR_NONE 0xffffffff
+#define INADDR_NONE 0xffffffff
 #endif
 
-#include <sys/types.h>
-#include "config.h"
-
-/*
- * typ zmiennej okre¶laj±cej numerek danej osoby.
- */
 typedef u_int32_t uin_t;
 
 /*
  * ogólna struktura opisuj±ca ró¿ne sesje. przydatna w klientach.
  */
-
 #define gg_common_head(x) \
         int fd;                 /* podgl±dany deskryptor */ \
         int check;              /* sprawdzamy zapis czy odczyt */ \
@@ -122,14 +118,14 @@ struct gg_http {
 #define GG_MAX_PATH 276
 
 struct gg_file_info {
-	u_int32_t mode;		/* dwFileAttributes */
+	u_int32_t mode;			/* dwFileAttributes */
 	u_int32_t ctime[2];		/* ftCreationTime */
 	u_int32_t atime[2];		/* ftLastAccessTime */
 	u_int32_t mtime[2];		/* ftLastWriteTime */
 	u_int32_t size_hi;		/* nFileSizeHigh */
-	u_int32_t size;		/* nFileSizeLow */
-	u_int32_t reserved0;	/* dwReserved0 */
-	u_int32_t reserved1;	/* dwReserved1 */
+	u_int32_t size;			/* nFileSizeLow */
+	u_int32_t reserved0;		/* dwReserved0 */
+	u_int32_t reserved1;		/* dwReserved1 */
 	unsigned char filename[GG_MAX_PATH];	/* cFileName */
 };
 
@@ -268,7 +264,6 @@ int gg_send_message(struct gg_session *sess, int msgclass, uin_t recipient, cons
 int gg_send_message_ctcp(struct gg_session *sess, int msgclass, uin_t recipient, const unsigned char *message, int message_len);
 int gg_ping(struct gg_session *sess);
 
-
 enum {
 	GG_EVENT_NONE = 0,
 	GG_EVENT_MSG,
@@ -366,24 +361,21 @@ struct gg_event {
 struct gg_event *gg_watch_fd(struct gg_session *sess);
 void gg_free_event(struct gg_event *e);
 
+/*
+ * funkcje obs³ugi listy kontaktów.
+ */
 int gg_notify(struct gg_session *sess, uin_t *userlist, int count);
 int gg_add_notify(struct gg_session *sess, uin_t uin);
 int gg_remove_notify(struct gg_session *sess, uin_t uin);
 
-
 /*
- * OBS£UGA HTTP
+ * funkcje obs³ugi http.
  */
-
 struct gg_http *gg_http_connect(const char *hostname, int port, int async, const char *method, const char *path, const char *header);
 int gg_http_watch_fd(struct gg_http *h);
 void gg_http_stop(struct gg_http *h);
 void gg_http_free(struct gg_http *h);
 #define gg_free_http gg_http_free
-
-/* 
- * SZUKANIE U¯YTKOWNIKÓW
- */
 
 /*
  * struktura opisuj±ca kryteria wyszukiwania. argument gg_search().
@@ -437,6 +429,9 @@ struct gg_search_result {
 #define GG_GENDER_FEMALE 1	/* kobieta */
 #define GG_GENDER_MALE 2	/* mê¿czyzna */
 
+/*
+ * funkcje wyszukiwania.
+ */
 struct gg_http *gg_search(struct gg_search_request *r, int async);
 int gg_search_watch_fd(struct gg_http *f);
 void gg_free_search(struct gg_http *f);
@@ -447,9 +442,8 @@ struct gg_search_request *gg_search_request_mode_2(char *phone, int active, int 
 struct gg_search_request *gg_search_request_mode_3(uin_t uin, int active, int start);
 
 /*
- * OPERACJE NA KATALOGU PUBLICZNYM
+ * operacje na katalogu publicznym.
  */
-
 struct gg_pubdir {
 	int success;		/* czy siê uda³o */
 	uin_t uin;		/* otrzymany numerek. 0 je¶li b³±d */
@@ -492,15 +486,14 @@ struct gg_change_info_request {
 struct gg_change_info_request *gg_change_info_request_new(const char *first_name, const char *last_name, const char *nickname, const char *email, int born, int gender, const char *city);
 void gg_change_info_request_free(struct gg_change_info_request *r);
 
-struct gg_http *gg_change_info(uin_t uin, char *passwd, struct gg_change_info_request *request, int async);
+struct gg_http *gg_change_info(uin_t uin, const char *passwd, const struct gg_change_info_request *request, int async);
 #define gg_change_pubdir_watch_fd gg_pubdir_watch_fd
 #define gg_change_pubdir_free gg_pubdir_free
 #define gg_free_change_pubdir gg_pubdir_free
 
 /*
- * FUNKCJE DOTYCZ¡CE LISTY KONTAKTÓW NA SERWERZE
+ * funkcje dotycz±ce listy kontaktów na serwerze.
  */
-
 struct gg_http *gg_userlist_get(uin_t uin, const char *password, int async);
 int gg_userlist_get_watch_fd(struct gg_http *f);
 void gg_userlist_get_free(struct gg_http *f);
@@ -510,9 +503,8 @@ int gg_userlist_put_watch_fd(struct gg_http *f);
 void gg_userlist_put_free(struct gg_http *f);
 
 /*
- * FUNKCJE DOTYCZ¡CE KOMUNIKACJI MIÊDZY KLIENTAMI
+ * funkcje dotycz±ce komunikacji miêdzy klientami.
  */
-
 extern int gg_dcc_port;
 extern unsigned long gg_dcc_ip;
 
@@ -567,6 +559,7 @@ char *gg_saprintf(const char *format, ...);
 #define gg_alloc_sprintf gg_saprintf
 char *gg_get_line(char **ptr);
 int gg_connect(void *addr, int port, int async);
+struct hostent *gg_gethostbyname(const char *hostname);
 char *gg_read_line(int sock, char *buf, int length);
 void gg_chomp(char *line);
 char *gg_urlencode(const char *str);

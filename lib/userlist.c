@@ -26,6 +26,7 @@
 #endif
 #include <stdarg.h>
 #include <ctype.h>
+#include "config.h"
 #include "libgadu.h"
 
 /*
@@ -33,11 +34,11 @@
  *
  * wysy³a ¿±danie pobrania listy kontaktów z serwera.
  *
- *  - uin - numerek,
+ *  - uin - numer,
  *  - passwd - has³o,
  *  - async - ma byæ asynchronicznie?
  *
- * zwraca zaalokowan± strukturê `gg_http', któr± po¼niej nale¿y zwolniæ
+ * zaalokowana struktura `gg_http', któr± po¼niej nale¿y zwolniæ
  * funkcj± gg_userlist_get_send(), albo NULL je¶li wyst±pi³ b³±d.
  */
 struct gg_http *gg_userlist_get(uin_t uin, const char *passwd, int async)
@@ -103,10 +104,10 @@ struct gg_http *gg_userlist_get(uin_t uin, const char *passwd, int async)
 /*
  * gg_userlist_get_watch_fd()
  *
- * przy asynchronicznym ¶ci±ganiu userlisty wypada³oby wywo³aæ t± funkcjê
+ * przy asynchronicznym ¶ci±ganiu userlisty nale¿y wywo³aæ t± funkcjê
  * po zauwa¿eniu zmianan na gg_http->fd.
  *
- *  - h - to co¶, co zwróci³a gg_userlist_get()
+ *  - h - struktura zwrócona przez gg_userlist_get()
  *
  * je¶li wszystko posz³o dobrze to 0, inaczej -1. operacja bêdzie
  * zakoñczona, je¶li h->state == GG_STATE_DONE. je¶li wyst±pi jaki¶
@@ -156,9 +157,9 @@ int gg_userlist_get_watch_fd(struct gg_http *h)
  *
  * zwalnia pamiêæ po efektach zabawy z userlist±.
  *
- *  - h - to co¶, co nie jest ju¿ nam potrzebne.
+ *  - h - zwalniana struktura.
  *
- * nie zwraca niczego. najwy¿ej segfaultnie.
+ * brak.
  */
 void gg_userlist_get_free(struct gg_http *h)
 {
@@ -171,14 +172,14 @@ void gg_userlist_get_free(struct gg_http *h)
 /*
  * gg_userlist_put()
  *
- * wysy³a listy kontaktów na serwera.
+ * wysy³a listê kontaktów na serwera.
  *
  *  - uin - numerek,
  *  - passwd - has³o,
  *  - contacts - lista kontaktów,
  *  - async - ma byæ asynchronicznie?
  *
- * zwraca zaalokowan± strukturê `gg_http', któr± po¼niej nale¿y zwolniæ
+ * zaalokowana struktura `gg_http', któr± po¼niej nale¿y zwolniæ
  * funkcj± gg_userlist_send(), albo NULL je¶li wyst±pi³ b³±d.
  */
 struct gg_http *gg_userlist_put(uin_t uin, const char *passwd, const char *contacts, int async)
@@ -247,7 +248,7 @@ struct gg_http *gg_userlist_put(uin_t uin, const char *passwd, const char *conta
 /*
  * gg_userlist_put_watch_fd()
  *
- * przy asynchronicznym wysy³aniu userlisty wypada³oby wywo³aæ t± funkcjê
+ * przy asynchronicznym wysy³aniu userlisty nale¿y wywo³aæ t± funkcjê
  * po zauwa¿eniu zmianan na gg_http->fd.
  *
  *  - h - to co¶, co zwróci³a gg_userlist_put()
@@ -300,9 +301,9 @@ int gg_userlist_put_watch_fd(struct gg_http *h)
  *
  * zwalnia pamiêæ po efektach zabawy z userlist±.
  *
- *  - h - to co¶, co nie jest ju¿ nam potrzebne.
+ *  - h - zwalniana struktura.
  *
- * nie zwraca niczego. najwy¿ej segfaultnie.
+ * brak.
  */
 void gg_userlist_put_free(struct gg_http *h)
 {

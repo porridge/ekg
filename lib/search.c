@@ -26,6 +26,7 @@
 #endif
 #include <stdarg.h>
 #include <ctype.h>
+#include "config.h"
 #include "libgadu.h"
 
 /*
@@ -39,7 +40,7 @@
  *  - r - informacja o tym, czego szukamy,
  *  - async - ma byæ asynchronicznie?
  *
- * zwraca zaalokowan± strukturê `gg_http', któr± po¼niej nale¿y zwolniæ
+ * zaalokowana struktura `gg_http', któr± po¼niej nale¿y zwolniæ
  * funkcj± gg_free_search(), albo NULL je¶li wyst±pi³ b³±d.
  */
 struct gg_http *gg_search(struct gg_search_request *r, int async)
@@ -185,10 +186,10 @@ struct gg_http *gg_search(struct gg_search_request *r, int async)
 /*
  * gg_search_watch_fd()
  *
- * przy asynchronicznym szukaniu userów wypada³oby wywo³aæ t± funkcjê przy
- * jaki¶ zmianach na gg_search->fd.
+ * przy asynchronicznym wyszukiwaniu nale¿y wywo³aæ t± funkcjê przy
+ * zmianach na gg_search->fd.
  *
- *  - f - to co¶, co zwróci³o gg_search()
+ *  - f - struktura zwrócona przez gg_search()
  *
  * je¶li wszystko posz³o dobrze to 0, inaczej -1. przeszukiwanie bêdzie
  * zakoñczone, je¶li f->state == GG_STATE_DONE. je¶li wyst±pi jaki¶
@@ -277,9 +278,9 @@ int gg_search_watch_fd(struct gg_http *h)
  *
  * zwalnia pamiêæ po efektach szukania userów.
  *
- *  - f - to co¶, co nie jest ju¿ nam potrzebne.
+ *  - f - zwalniana struktura.
  *
- * nie zwraca niczego. najwy¿ej segfaultnie ;)
+ * brak.
  */
 void gg_free_search(struct gg_http *h)
 {

@@ -5,8 +5,6 @@
   	                        Robert J. Wo¼ny <speedy@ziew.org>
 				Adam Osuchowski <adwol@polsl.gliwice.pl>
 
-                Motto: ,,Bunkrów nie ma, ale te¿ jest...''
-
 LICENCJA
 
     Program jest udostêpniony na zasadach licencji GPL, której tre¶æ
@@ -106,7 +104,7 @@ ZG£ASZANIE B£ÊDÓW
     Proszê, nie przysy³ajcie informacji, ¿e mo¿na by dodaæ co¶, co jest
     ju¿ wymienione w TODO. Nie przysy³ajcie informacji, ¿e jest jaki¶
     b³±d, je¶li poprawka jest wymieniona w TODO. Nie przysy³ajcie
-    informacji o warningach podczas kompilacji -- dopiero je¶li nie chce
+    informacji o ostrze¿eniach przy kompilacji -- dopiero je¶li nie chce
     siê w ogóle skompilowaæ, dajcie znaæ. Zaznacznie, co to za system,
     jaka dystrybucja, jaka wersja. Je¶li b³±d jest powtarzalny i zwi±zany
     z sieci±, prosi³bym o to, co wyrzuca ekg uruchomione z opcj± ,,-d''.
@@ -119,17 +117,16 @@ ZG£ASZANIE B£ÊDÓW
 
 ¬RÓD£A
 
-    Czê¶æ jest ³adnie udokumentowana, czê¶æ nie. Komentarze czasami s±
-    bardzo g³upie, ale je¶li siê do trzeciej rano siedzi nad dziwnym
-    segfaultem, ciê¿ko siê pohamowaæ. Ca³y program objêty jest licencj±
-    GPL, wiêc pamiêtaj o tym, korzystaj±c z jego ¼róde³. Je¶li napiszesz
-    jakiegokolwiek klienta, frontend czy co¶ takiego, by³bym wdziêczny
-    za informacje o nim. Chêtnie umieszczê odno¶niki do innych tego typu
-    projektów na stronie.
-
     Snapshoty kodu s± dostêpne pod adresem http://dev.null.pl/ekg/.
     Je¶li nie wyst±pi ¿adne trzêsienie ziemi, brak pr±du ani barykady na
     drogach, powinny byæ robione co 24 godziny, wieczorem.
+
+    Czê¶æ jest ³adnie udokumentowana, czê¶æ nie. Komentarze czasami s±
+    bardzo g³upie, ale je¶li siê do trzeciej rano siedzi nad dziwnym
+    segfaultem, ciê¿ko siê pohamowaæ. Je¶li napiszesz jakiegokolwiek
+    klienta, frontend czy co¶ takiego, by³bym wdziêczny za informacje
+    o nim. Chêtnie umieszczê odno¶niki do innych tego typu projektów
+    na stronie.
 
 LISTA DYSKUSYJNA
 
@@ -147,7 +144,7 @@ PODZIÊKOWANIA
     pomin±³em, przepraszam, niech da znaæ. W ka¿dym razie wielkie dziêki
     nale¿± siê poni¿szym osobom:
 
-	Robert J. Wo¼ny (speedy@atman.pl)
+	Robert J. Wo¼ny (speedy@ziew.org)
 	Darek Jackowski (ascent@linux.pl)
 	Arkadiusz Mi¶kiewicz (misiek@pld.org.pl)
 	Tomasz Jarzynka (tomee@cpi.pl)
