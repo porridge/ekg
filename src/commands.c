@@ -3042,7 +3042,6 @@ COMMAND(cmd_key)
 }
 #endif
 
-#if 0
 COMMAND(cmd_test_segv)
 {
 	char *foo = NULL;
@@ -3071,7 +3070,6 @@ COMMAND(cmd_test_send)
 
 	return 0;
 }
-#endif
 
 COMMAND(cmd_test_addtab)
 {
@@ -5622,13 +5620,13 @@ void command_init()
 	command_add
 	( "_fds", "", cmd_test_fds, 0, "", 
 	  "wy¶wietla otwarte deskryptory", "");
+#endif
 	command_add
 	( "_msg", "u?", cmd_test_send, 0, "",
 	  "udaje, ¿e wysy³a wiadomo¶æ", "");
 	command_add
 	( "_segv", "", cmd_test_segv, 0, "", 
 	  "wywo³uje naruszenie segmentacji pamiêci", "");
-#endif
 	command_add
 	( "_ping", "", cmd_test_ping, 0, "", 
 	  "wysy³a pakiet ping do serwera", "");
