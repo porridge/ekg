@@ -380,6 +380,15 @@ ignore_unknown_sender
 	okre¶la, czy bêd± ignorowane wiadomo¶ci od osób, których nie mamy
 	na swojej li¶cie kontaktów.
 
+irssi_set_mode
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	je¶li 1, to podczas wykonania komendy /set arg1 wy¶wietlane
+	bêd± wszystkie ustawienia, które w swojej nazwie zawieraj± arg1
+	(domy¶lnie arg1 musi byæ równe tej nazwie). pomys³ zaczerpniêty
+	z irssi.
+
 keep_reason
 	typ: liczba
 	domy¶lna warto¶æ: 0

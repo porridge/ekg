@@ -2411,7 +2411,7 @@ COMMAND(cmd_set)
 		for (l = variables; l; l = l->next) {
 			struct variable *v = l->data;
 			
-			if ((!arg || !strcasecmp(arg, v->name)) && (v->display != 2 || strcmp(name, "set"))) {
+			if ((!arg || (config_is==0?!strcasecmp(arg, v->name):strstr(v->name, arg)!=NULL)) && (v->display != 2 || strcmp(name, "set"))) {
 				char *string = *(char**)(v->ptr);
 				int value = *(int*)(v->ptr);
 
