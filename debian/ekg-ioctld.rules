@@ -19,7 +19,6 @@ clean:
 binary:
 	$(MAKE) -f debian/build.rules CONFOPTS="$(CONFOPTS)" BUILDLIB=$(BUILDLIB) INSDIR=$(INSDIR) LIBINSDIR=$(LIBINSDIR) PACKAGE_SUFFIX=$(PACKAGE_SUFFIX) ORGMAKE="$(ORGMAKE)" binary
 	$(install) -m 4755 src/ioctld $(INSDIR)/bin
-	if [ ! -f potato-build ]; then dh_installman -pekg$(PACKAGE_SUFFIX) debian/ioctld.1;fi
-	if [ -f potato-build ]; then dh_installmanpages -pekg$(PACKAGE_SUFFIX) debian/ioctld.1;fi
+	dh_undocumented -pekg-ioctld ioctld.1
 	$(MAKE) -f debian/build.rules CONFOPTS="$(CONFOPTS)" BUILDLIB=$(BUILDLIB) INSDIR=$(INSDIR) LIBINSDIR=$(LIBINSDIR) PACKAGE_SUFFIX=$(PACKAGE_SUFFIX) clean
 .PHONY: binary
