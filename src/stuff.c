@@ -23,6 +23,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
 #include <pwd.h>
 #include <limits.h>
 #ifndef _AIX
@@ -98,6 +100,8 @@ char *busy_reason = NULL;
 char *home_dir = NULL;
 int screen_lines = 24;
 char *config_quit_reason = NULL;
+char *config_away_reason = NULL;
+int config_random_reason = 0;
 
 /*
  * my_puts()
@@ -1752,9 +1756,6 @@ void ekg_logoff(struct gg_session *sess, char *reason)
 
 	if (reason)
 		tmp = strdup(reason);
-	else
-		if (config_quit_reason)
-			tmp = strdup(config_quit_reason);
 	
 	if (tmp) {
 		iso_to_cp(tmp);
@@ -1766,4 +1767,44 @@ void ekg_logoff(struct gg_session *sess, char *reason)
 	gg_logoff(sess);
 }
 
+char *get_random_reason(char *path)
+{
+        int max = 0, embryo, item, fd, tmp = 0;
+        char buf[256], *ret;
+        FILE *f;
+
+        if ((f = fopen(path, "r")) == NULL)
+                return NULL;
+
+        while (fgets(buf, sizeof(buf) - 1, f))
+                max++;
+
+        rewind(f);
+
+        if((fd = open("/dev/urandom", O_RDONLY)) > 0) {
+                read(fd, &embryo, sizeof(embryo));
+                close(fd);
+        }
+        else
+                embryo=(int)time(NULL);
+
+        srandom(embryo);
+
+        item = (random()%max) + 1;
+
+        while (fgets(buf, sizeof(buf) - 1, f)) {
+                tmp++;
+                if (tmp == item) {
+                        fclose(f);
+                        if (buf[strlen(buf) - 1] == '\n')
+                                buf[strlen(buf) - 1] = '\0';
+                        ret = (char*)malloc(strlen(buf));
+                        strcpy(ret, buf);
+                        return ret;
+                }
+        }
+
+        fclose(f);
+        return NULL;
+}
 

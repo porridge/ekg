@@ -3,6 +3,7 @@
 /*
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
+ *                          Pawe³ Maziarz <drg@go2.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -530,7 +531,20 @@ COMMAND(command_away)
 	busy_reason = NULL;
 	
 	if (!strcasecmp(name, "away")) {
-		reason = params[0];
+	    	if (!params[0]) {
+		    	if (config_random_reason & 1) {
+			    	char *path = prepare_path("away.reasons");
+
+				reason = get_random_reason(path);
+				if (!reason && config_away_reason)
+				    	reason = strdup(config_away_reason);
+			}
+			else if (config_away_reason)
+			    	reason = strdup(config_away_reason);
+		}
+		else
+		    	reason = params[0];
+		
 		away = (reason) ? 3 : 1;
 		my_printf((reason) ? "away_descr" : "away", reason);
 	} else if (!strcasecmp(name, "invisible")) {
@@ -568,7 +582,7 @@ COMMAND(command_away)
 	}
 
 	if (reason)
-		busy_reason = strdup(params[0]);
+		busy_reason = (params[0] ? strdup(params[0]) : reason);
 
 	return 0;
 }
@@ -1429,9 +1443,25 @@ COMMAND(command_sms)
 
 COMMAND(command_quit)
 {
-	my_printf((params[0]) ? "quit_descr" : "quit", params[0]);
+    	char *tmp = NULL;
 
-	ekg_logoff(sess, params[0]);
+	if (!params[0]) {
+	    	if (config_random_reason & 2) {
+		    	char *path = prepare_path("quit.reasons");
+
+			tmp = get_random_reason(path);
+			if (!tmp && config_quit_reason)
+			    	tmp = strdup(config_quit_reason);
+		}
+		else if (config_quit_reason)
+		    	tmp = strdup(config_quit_reason);
+	}
+	else
+	    	tmp = params[0];
+	
+	my_printf((tmp) ? "quit_descr" : "quit", tmp);
+
+	ekg_logoff(sess, tmp);
 	list_remove(&watches, sess, 0);
 	gg_free_session(sess);
 	sess = NULL;

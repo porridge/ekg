@@ -98,6 +98,8 @@ int config_display_notify;
 int config_status;
 int config_auto_reconnect;
 char *config_quit_reason;
+char *config_away_reason;
+int config_random_reason;
 
 char *home_dir;
 int in_readline;
@@ -172,5 +174,6 @@ int init_socket();
 char *get_token(char **ptr, char sep);
 char *strdup_null(char *ptr);
 void ekg_logoff(struct gg_session *sess, char *reason);
+char *get_random_reason(char *path);
 
 #endif

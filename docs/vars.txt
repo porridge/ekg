@@ -39,6 +39,13 @@ auto_save
 	po jakim czasie automatycznie zapisaæ ustawienia, w sekundach.
 	je¶li 0, nie zapisuje automatycznie.
 	
+away_reason
+        typ: tekst
+        domy¶lna warto¶æ: brak
+
+        domy¶lny opis stanu zajêtego, ustawiany przy zmianie bez podania 
+	parametru.
+
 beep
 	typ: bool
 	domy¶lna warto¶æ: 1
@@ -163,6 +170,17 @@ quit_reason
 	domy¶lna warto¶æ: brak
 
 	domy¶lny opis stanu niedostêpnego, ustawiany przy wychodzeniu.
+
+random_reason
+	typ: liczba
+	domy¶lna warto¶æ: 0
+
+	okre¶la czy przy zmianie stanu na zajêty lub niedostêpny ma byæ 
+	losowany opis (z ~/.gg/quit.reasons lub ~/.gg/away.reasons).
+	dla 0 nie jest losowany, dla 1 losowany jest opis dotycz±cy stanu
+	zajêty, dla 2 niedostêpny, dla 3 i ten i ten. je¿eli z jakich¶
+	przyczyn nie powiedzie siê odczyt, opis bêdzie pobierany ze zmiennych
+	,,away_reason'' lub ,,quit_reason'', o ile nie s± puste.
 
 sms_away
 	typ: bool
