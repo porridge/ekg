@@ -749,6 +749,9 @@ void handle_ack(struct gg_event *e)
 static void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_t ip, uint16_t port, int version, int image_size)
 {
 	struct userlist *u;
+	static struct userlist ucache[20];
+	static time_t seencache[20];
+	static char first_time = 1;
 	struct status_table {
 		int status;
 		int event;
@@ -775,15 +778,53 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 	list_t l;
 #endif
 
+	if (first_time) {
+		first_time = 0;
+		memset (ucache, 0, sizeof(ucache));
+		memset (seencache, 0, sizeof(seencache));
+	}
+
 	/* nie pokazujemy nieznajomych, chyba ze display_notify & 4 */
 	if (!(u = userlist_find(uin, NULL))) {
-		if (config_display_notify & 4) {
-			have_unknown = 1;
-			u = (struct userlist *) xmalloc(sizeof(struct userlist));
-			u->uin = uin;
-			u->display = xstrdup(itoa(uin));
-		} else
+		if (!(config_display_notify & 4))
 			return;
+		else {
+			int i;
+			time_t cur = time(NULL);
+
+			have_unknown = 1;
+
+			/* najpierw przeszukanie cache numerków. */
+			for (i = 0; i < sizeof(ucache) / sizeof(ucache[0]); i++) {
+				if (ucache[i].uin == uin) {
+					u = &ucache[i];
+					seencache[i] = cur;
+					break;
+				}
+			}
+
+			/* je¶li nie znale¼li¶my w cache, to wybieramy najdawniej 
+			 * widziany element cache i zastêpujemy go nowym. je¶li 
+			 * które¶ pole w cache jest wolne, to jest przypisywane 
+			 * aktualnemu numerkowi (bo wtedy oldest == 0 i nic nie 
+			 * bêdzie od niego mniejsze). */
+			if (!u) {
+				time_t oldest = time(NULL), *sptr = (time_t *) NULL;
+
+				for (i = 0; i < sizeof(ucache) / sizeof(ucache[0]); i++) {
+					if (seencache[i] < oldest) {
+						sptr = &seencache[i];
+						oldest = *sptr;
+						u = &ucache[i];
+					}
+				}
+
+				memset(u, 0, sizeof(struct userlist));
+				u->uin = uin;
+				u->status = GG_STATUS_NOT_AVAIL;
+				*sptr = time(NULL);
+			}
+		}
 	}
 
 	ignore_status = ignored_check(uin) & IGNORE_STATUS;
@@ -838,7 +879,6 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 	if (!descr) 
 		descr = xstrdup(idescr);
 
-
 	/* zapamiêtaj adres, port i protokó³ */
 	if (__USER_QUITING) {
 		u->last_ip.s_addr = u->ip.s_addr;
@@ -857,10 +897,6 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 	/* je¶li status taki sam i ewentualnie opisy te same, ignoruj */
 	if (!GG_S_D(status) && (u->status == status)) {
 		xfree(descr);
-		if (have_unknown) {
-			xfree(u->display);
-			xfree(u);
-		}
 		return;
 	}
 	
@@ -888,10 +924,6 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 
 	if (GG_S_D(status) && (u->status == status) && u->descr && !strcmp(u->descr, descr)) {
 		xfree(descr);
-		if (have_unknown) {
-			xfree(u->display);
-			xfree(u);
-		}
 		return;
 	}
 
@@ -950,7 +982,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 		    	put_log(uin, "status,%ld,%s,%s:%d,%s,%s,%s\n", uin, ((u->display) ? u->display : ""), inet_ntoa(u->ip), u->port, log_timestamp(time(NULL)), s->log, descr);
 
 		/* jak dostêpny lub zajêty i mamy go na li¶cie, dopiszmy do taba
-		 * jak niedostêpny, usuñmy */
+		 * jak niedostêpny, usuñmy. nie dotyczy osób spoza listy. */
 		if (!have_unknown) {
 			if (GG_S_A(s->status) && config_completion_notify && u->display) 
 				add_send_nick(u->display);
@@ -996,7 +1028,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 #endif
 			
 		/* no dobra, poka¿ */
-		if (u->display) {
+		if (u->display || have_unknown) {
 			char *tmp = xstrdup(descr), *p;
 
 			for (p = tmp; p && *p; p++) {
@@ -1004,7 +1036,10 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 					*p = '|';
 			}
 
-			print_window(u->display, 0, s->format, format_user(uin), (u->first_name) ? u->first_name : u->display, tmp);
+			if (have_unknown)
+				print_window(itoa(uin), 0, s->format, format_user(uin), itoa(uin), tmp);
+			else
+				print_window(u->display, 0, s->format, format_user(uin), (u->first_name) ? u->first_name : u->display, tmp);
 
 			xfree(tmp);
 		}
@@ -1019,11 +1054,6 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 		ui_event("status", u->uin, ((u->display) ? u->display : ""), status, (ignore_status_descr) ? NULL : u->descr);
 	 } else
 		xfree(descr);
-
-	if (have_unknown) {
-		xfree(u->display);
-		xfree(u);
-	}
 }
 
 /*
