@@ -390,6 +390,8 @@ struct gg_search_result {
 #define GG_GENDER_FEMALE 1	/* kobieta */
 #define GG_GENDER_MALE 2	/* mê¿czyzna */
 
+#define gg_modify gg_search_result
+
 struct gg_http *gg_search(struct gg_search_request *r, int async);
 int gg_search_watch_fd(struct gg_http *f);
 void gg_free_search(struct gg_http *f);
@@ -408,6 +410,8 @@ struct gg_pubdir {
 	uin_t uin;		/* otrzymany numerek. 0 je¶li b³±d */
 };
 
+#define gg_modify gg_search_result
+
 struct gg_http *gg_register(char *email, char *password, int async);
 #define gg_register_watch_fd gg_pubdir_watch_fd
 #define gg_free_register gg_free_pubdir
@@ -419,6 +423,10 @@ struct gg_http *gg_remind_passwd(uin_t uin, int async);
 struct gg_http *gg_change_passwd(uin_t uin, char *passwd, char *newpasswd, char *newemail, int async);
 #define gg_change_passwd_watch_fd gg_pubdir_watch_fd
 #define gg_free_change_passwd gg_free_pubdir
+
+struct gg_http *gg_change_pubdir(uin_t uin, char *passwd, struct gg_modify *modify, int async);
+#define gg_change_pubdir_watch_fd gg_pubdir_watch_fd
+#define gg_free_change_pubdir gg_free_pubdir
 
 int gg_pubdir_watch_fd(struct gg_http *f);
 void gg_free_pubdir(struct gg_http *f);
