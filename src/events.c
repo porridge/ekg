@@ -40,6 +40,8 @@
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure();
 
+static int hide_notavail = 0;	/* czy ma ukrywaæ niedostêpnych -- tylko zaraz po po³±czeniu */
+
 static struct handler handlers[] = {
 	{ GG_EVENT_MSG, handle_msg },
 	{ GG_EVENT_ACK, handle_ack },
@@ -382,6 +384,9 @@ void handle_notify(struct gg_event *e)
 			u->descr = NULL;
 		}
 
+		if (!GG_S_NA(n->status) && hide_notavail)
+			hide_notavail = 0;
+
 		if (n->status == GG_STATUS_BUSY) {
 			event_check(EVENT_AWAY, u->uin, NULL);
                         if (config_log_status)
@@ -436,7 +441,7 @@ void handle_notify(struct gg_event *e)
 			event_check(EVENT_NOT_AVAIL, u->uin, NULL);
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail");
-			if (config_display_notify)
+			if (config_display_notify && !hide_notavail)
 			    	print("status_not_avail", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
 			if (config_completion_notify == 2)
 				remove_send_nick(u->display);
@@ -448,7 +453,7 @@ void handle_notify(struct gg_event *e)
 			cp_to_iso(u->descr);
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail", u->descr);
-			if (config_display_notify)
+			if (config_display_notify && !hide_notavail)
 			    	print("status_not_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
 			if (config_completion_notify == 2)
 				remove_send_nick(u->display);
@@ -555,6 +560,14 @@ void handle_status(struct gg_event *e)
 			if (GG_S_A(s->status) && !GG_S_NA(prev_status))
 				break;
 		}
+
+		/* czy ukrywaæ niedostêpnych */
+		if (hide_notavail) {
+			if (GG_S_NA(s->status))
+				break;
+			else
+				hide_notavail = 0;
+		}
 			
 		/* no dobra, poka¿ */
 		print(s->format, format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
@@ -639,6 +652,8 @@ void handle_success(struct gg_event *e)
  		free(batch_line);
  		batch_line = NULL;
  	}
+
+	hide_notavail = 1;
 }
 
 /*

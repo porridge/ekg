@@ -8,7 +8,7 @@ bindir = @bindir@
 libexecdir = @libexecdir@
 
 CC = @CC@ 
-CFLAGS = @CFLAGS@ -I.. -I../lib -Wall -DTHEMES_DIR=\"${datadir}/ekg/themes\"
+CFLAGS = -I.. -I../lib @CFLAGS@ -Wall -DTHEMES_DIR=\"${datadir}/ekg/themes\"
 LIBS = @LIBS@
 
 MAKE = @MAKE@
