@@ -27,7 +27,7 @@
 			return 1
 			
 		if regulka.match(descr):
-			return 0
+			return 2
 		else:
 			return 1
 
@@ -35,7 +35,24 @@
 
 skrypty pythonowe w ekg maj± byæ naprawdê proste w pisaniu, w przeciwieñstwie
 do skryptów perlowych w irssi, które ciê¿ko z pocz±tku zrozumieæ. jest kilka
-funkcji, które bêd± wywo³ywane przez ekg w szczególnych przypadkach:
+funkcji, które bêd± wywo³ywane przez ekg w szczególnych przypadkach. je¶li
+która¶ funkcja zwróci warto¶æ 0, zdarzenie zostanie ignorowane, je¶li
+charakter zdarzenia na to pozwala (wiadomo¶ci, zmiany stanu itp.). je¶li
+zwróci 1, zdarzenie zostanie normalnie obs³u¿one przez ekg. je¶li zdarzenie 
+wi±¿e siê z wy¶wietleniem jakiego¶ tekstu, zwrócenie warto¶ci 2 powoduje
+ukrycie informacji o nim, ale zostanie ono obs³u¿one przez ekg. je¶li zdarzenie
+zwróci krotkê/entkê/cokolwiek (ang. tuple) o takim samym wygl±dzie jak
+argumenty funkcji, informacje o zdarzeniu zostan± zmienione na podane.
+na przyk³ad:
+
+	def handle_msg(uin, name, msgclass, text, time, secure):
+		if string.find(text, ":(((") != -1:
+			text = "(zbyt smutny tekst, ukryto)"
+			return (uin, name, msgclass, text, time, secure)
+
+		return 1
+
+oto lista wywo³ywanych funkcji:
 
 - init()
 
@@ -46,22 +63,25 @@ funkcji, które bêd± wywo³ywane przez ekg w szczególnych przypadkach:
 
   gdy skrypt jest usuwany z pamiêci.
 
-- handle_msg(uin, name, msgclass, text, secure)
+- handle_msg(uin, name, msgclass, text, time, secure)
 
   gdy ekg otrzymuje wiadomo¶æ. uin - numer nadawcy, name - jego nazwa,
   msgclass - klasa wiadomo¶ci, text - tre¶æ, secure - czy mamy do czynienia
   z odszyfrowan± wiadomo¶ci±. je¶li zwróci 0, wiadomo¶æ zostanie zignorowana.
+  je¶li zwróci krotkê/entkê/cokolwiek (ang. tuple) o takich samych argumentach
+  jak funkcja, dane zostan± zmienione.
 
 - handle_status(uin, name, status, descr)
 
   gdy kto¶ zmienia stan. nazwy parametrów powinny byæ zrozumia³e. je¶li
-  zwróci 0, wiadomo¶æ zostanie zignorowana.
+  zwróci 0, zmiana stanu zostanie zignorowana. je¶li zwróci 2, zmiana stanu
+  nie bêdzie ignorowana, ale nie zostanie wy¶wietlona. je¶li zwróci krotkê
+  o takich samych argument
 
 pó¼niej zostan± dodane funkcje dotycz±ce wszystkich zdarzeñ zwi±zanych
-z sesj± gg. zostanie te¿ dodana mo¿liwo¶æ zmiany argumentów zdarzenia,
-a nie tylko ignorowania, przez zwrócenie krotki (? ang. tuple) tej samej
-postaci, co argumenty funkcji.
-	
+z sesj± gg, plus obs³uga interfejsu u¿ytkownika (informacja o wci¶niêtych
+klawiszach, wys³anej linii itp.)
+
 ***
 
 przyk³ady u¿ycia modu³u ekg w skryptach:
@@ -72,5 +92,8 @@ przyk³ady u¿ycia modu³u ekg w skryptach:
    ekg.config.uin = 12345
    ekg.config.password = "test123"
    ekg.connect()
+
+pó¼niej dojd± funkcje wywo³ywania podstawowych komend typu ,,msg'' itp.
+obs³uga okienek, themów, itd, itd.
 
 $Id$

@@ -276,6 +276,11 @@ int python_run(const char *filename)
 	return 0;
 }
 
+/*
+ * python_get_func()
+ *
+ * zwraca dan± funkcjê modu³u.
+ */
 PyObject *python_get_func(PyObject *module, const char *name)
 {
 	PyObject *result = PyObject_GetAttrString(module, (char*) name);

@@ -379,7 +379,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 void handle_msg(struct gg_event *e)
 {
 	struct userlist *u = userlist_find(e->event.msg.sender, NULL);
-	int chat = ((e->event.msg.msgclass & 0x0f) == GG_CLASS_CHAT), secure = 0;
+	int chat = ((e->event.msg.msgclass & 0x0f) == GG_CLASS_CHAT), secure = 0, hide = 0;
 	char *tmp;
 	
 #ifdef WITH_PYTHON
@@ -392,14 +392,34 @@ void handle_msg(struct gg_event *e)
 		if (!m->handle_msg)
 			continue;
 
-		res = PyObject_CallFunction(m->handle_msg, "(isisii)", e->event.msg.sender, (u) ? ((u->display) ? u->display : "") : "", e->event.msg.msgclass, e->event.msg.message, e->event.msg.time, 0);
+		cp_to_iso(e->event.msg.message);
+
+		res = PyObject_CallFunction(m->handle_msg, "(isisii)", e->event.msg.sender, (u) ? u->display : "", e->event.msg.msgclass, e->event.msg.message, e->event.msg.time, 0);
+
+		iso_to_cp(e->event.msg.message);
 
 		if (!res)
 			PyErr_Print();
 
-		if (res && PyInt_Check(res) && !PyInt_AsLong(res)) {
-			Py_XDECREF(res);
-			return;
+		if (res && PyInt_Check(res)) {
+			switch (PyInt_AsLong(res)) {
+				case 0:
+					Py_XDECREF(res);
+					return;
+				case 2:
+					hide = 2;
+			}
+		}
+
+		if (res && PyTuple_Check(res)) {
+			char *b, *d;
+			int f;
+
+			if (PyArg_ParseTuple(res, "isisii", &e->event.msg.sender, &b, &e->event.msg.msgclass, &d, &e->event.msg.time, &f)) {
+				xfree(e->event.msg.message);
+				e->event.msg.message = xstrdup(d);
+			} else
+				PyErr_Print();
 		}
 
 		Py_XDECREF(res);
@@ -504,7 +524,8 @@ void handle_msg(struct gg_event *e)
 	
 	if (e->event.msg.sender == 0) {
 		if (e->event.msg.msgclass > last_sysmsg) {
-			print_message(e, u, 2, 0);
+			if (!hide)
+				print_message(e, u, 2, 0);
 
 			if (config_beep)
 				ui_beep();
@@ -522,7 +543,8 @@ void handle_msg(struct gg_event *e)
 	else
 		add_send_nick(itoa(e->event.msg.sender));
 
-	print_message(e, u, chat, secure);
+	if (!hide)
+		print_message(e, u, chat, secure);
 
 	if (config_beep && ((chat) ? config_beep_chat : config_beep_msg))
 		ui_beep();
@@ -614,7 +636,7 @@ void handle_ack(struct gg_event *e)
  *  - descr - nowy opis,
  *  - n - dodatki od gg_notify.
  */
-static void handle_common(uin_t uin, int status, const char *descr, struct gg_notify_reply *n)
+static void handle_common(uin_t uin, int status, const char *idescr, struct gg_notify_reply *n)
 {
 	struct userlist *u;
 	struct status_table {
@@ -633,7 +655,8 @@ static void handle_common(uin_t uin, int status, const char *descr, struct gg_no
 		{ 0, 0, NULL, NULL },
 	};
 	struct status_table *s;
-	int prev_status;
+	int prev_status, hide = 0;
+	char *descr = NULL;
 #ifdef WITH_PYTHON
 	list_t l;
 #endif
@@ -654,27 +677,36 @@ static void handle_common(uin_t uin, int status, const char *descr, struct gg_no
 		if (!m->handle_status)
 			continue;
 
-		res = PyObject_CallFunction(m->handle_status, "(isis)", uin, (u) ? u->display : NULL, status, descr);
+		res = PyObject_CallFunction(m->handle_status, "(isis)", uin, (u) ? u->display : NULL, status, idescr);
 
 		if (!res)
 			PyErr_Print();
 
-		if (res && PyInt_Check(res) && !PyInt_AsLong(res)) {
-			Py_XDECREF(res);
-			return;
+		if (res && PyInt_Check(res)) {
+			switch (PyInt_AsLong(res)) {
+				case 0:
+					Py_XDECREF(res);
+					return;
+				case 2:
+					hide = 1;
+			}
 		}
 
 		if (res && PyTuple_Check(res)) {
-			char *foo1, *foo2;
+			char *newnick, *newdescr;
 
-			if (PyArg_ParseTuple(res, "(isis)", &uin, &foo1, &status, &foo2)) {
+			if (PyArg_ParseTuple(res, "isis", &uin, &newnick, &status, &newdescr)) {
+				descr = xstrdup(newdescr);
+			} else
 				PyErr_Print();
-			}
 		}
 
 		Py_XDECREF(res);
 	}
 #endif
+
+	if (!descr)
+		descr = xstrdup(idescr);
 	
 	/* zapamiêtaj adres i port */
 	if (n) {
@@ -683,10 +715,15 @@ static void handle_common(uin_t uin, int status, const char *descr, struct gg_no
 	}
 
 	/* je¶li status taki sam i ewentualnie opisy te same, ignoruj */
-	if (!GG_S_D(status) && (u->status == status))
+	if (!GG_S_D(status) && (u->status == status)) {
+		xfree(descr);
 		return;
-	if (GG_S_D(status) && (u->status == status) && u->descr && descr && !strcmp(u->descr, descr))
+	}
+	
+	if (GG_S_D(status) && (u->status == status) && u->descr && descr && !strcmp(u->descr, descr)) {
+		xfree(descr);
 		return;
+	}
 
 	/* usuñ poprzedni opis */
 	xfree(u->descr);
@@ -762,7 +799,8 @@ static void handle_common(uin_t uin, int status, const char *descr, struct gg_no
 		}
 			
 		/* no dobra, poka¿ */
-		print_window(u->display, 0, s->format, format_user(uin), (u->first_name) ? u->first_name : u->display, u->descr);
+		if (!hide)
+			print_window(u->display, 0, s->format, format_user(uin), (u->first_name) ? u->first_name : u->display, u->descr);
 
 		/* daj znaæ d¿wiêkiem */
 		if (config_beep && config_beep_notify)
@@ -774,6 +812,8 @@ static void handle_common(uin_t uin, int status, const char *descr, struct gg_no
 
 		break;
 	}
+
+	xfree(descr);
 }
 
 /*
