@@ -10,8 +10,6 @@ zg³osi³ b³±d.
 
 - dodanie komendy ukrytej _queue dla tych, którzy czasami chc± wiedzieæ,
   co siê dok³adnie dzieje w kolejce wiadomo¶ci (sz)
-- ma³a poprawka timerów. nadal niektórym po reorganizacji ekg siê wysypuje,
-  zg³aszajcie swoje b³êdy/obserwacje (sz)
 - libgadu: makra GG_S_*() nie zwracaj± uwagi na stan tylko dla znajomych (w)
 - libgadu: dodanie makra GG_S_F() sprawdzaj±cego stan tylko dla znajomych (w)
 - libgadu: podbicie wersji API (w)
