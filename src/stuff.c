@@ -1430,7 +1430,7 @@ int correct_event(char *act)
                         continue;
                 }
 
-		if (!strncasecmp(acts[0], "beep", 4)) {
+		else if (!strncasecmp(acts[0], "beep", 4)) {
 		    	if (acts[1]) {
 			    	my_printf("events_act_toomany_params", acts[0]);
 				free(action);
