@@ -322,15 +322,17 @@ char **my_completion(char *text, int start, int end)
 				if (isspace(rl_line_buffer[i]))
 					word++;
 			}
-			if (word == 2) {
-				char buf[100];
-				
-				snprintf(buf, sizeof(buf), "chat %s ", send_nicks[send_nicks_index++]);
-				rl_extend_line_buffer(strlen(buf));
-				strcpy(rl_line_buffer, buf);
-				rl_end = strlen(buf);
-				rl_point = rl_end;
-				rl_redisplay();
+			if (word == 2 && isspace(rl_line_buffer[strlen(rl_line_buffer) - 1])) {
+				if (send_nicks_count > 0) {
+					char buf[100];
+
+					snprintf(buf, sizeof(buf), "chat %s ", send_nicks[send_nicks_index++]);
+					rl_extend_line_buffer(strlen(buf));
+					strcpy(rl_line_buffer, buf);
+					rl_end = strlen(buf);
+					rl_point = rl_end;
+					rl_redisplay();
+				}
 
 				if (send_nicks_index == send_nicks_count)
 					send_nicks_index = 0;
