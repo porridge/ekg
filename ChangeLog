@@ -7,6 +7,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 // 2002-09-11
 
+- dodany skrót "-A" dla parametru "--all" w ekgsearch (wysek)
 - komenda set akceptuje i wy¶wietla flagi dla niektórych zmiennych. mo¿liwe
   jest dodawanie flag poprzedzaj±c warto¶æ plusem, lub usuwanie poprzedzaj±c
   minusem. na przyk³ad ,,set log +gzip'' lub ,,set random_reason -away'' (w)

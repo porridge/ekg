@@ -118,7 +118,7 @@ for ($i=0;$i<=$#ARGV;$i+=2)
 		$i--;
 		next;
 	}
-	if ($ARGV[$i] eq "--all")
+	if (($ARGV[$i] eq "--all") || ($ARGV[$i] eq "-A"))
 	{
 		usage() if (defined $all);
 		$all = 1;
@@ -240,7 +240,7 @@ sub usage
 	print "\t-F, --female\n";
 	print "\t-M, --male\n";
 	print "\t-s, --start <od>\n";
-	print "\t--all\n";
+	print "\t-A, --all\n";
 	print "\t--debug\n";
 	exit;
 }
