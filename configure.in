@@ -425,7 +425,7 @@ AC_ARG_WITH(libjpeg,
 	[  --without-libjpeg        Compile without JPEG token support])
 
 if test "x$with_libjpeg" != "xno"; then
-	AC_CHECK_LIB(jpeg, gsm_decode,
+	AC_CHECK_LIB(jpeg, jpeg_start_decompress,
 	[ 
 		AC_CHECK_HEADERS(jpeglib.h,
 		[

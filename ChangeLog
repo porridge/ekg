@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-10-01
+
+- poprawka wykrywania libjpeg (embe/w)
+
 // 2003-09-30
 
 - poprawienie zachowania siê /set dla irssi_set_mode == 1 (weirdo/wysek)
