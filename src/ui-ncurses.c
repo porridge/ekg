@@ -40,6 +40,7 @@
 #include "themes.h"
 #include "vars.h"
 #include "ui.h"
+#include "version.h"
 
 static void ui_ncurses_loop();
 static void ui_ncurses_print(const char *target, const char *line);
@@ -316,7 +317,7 @@ void ui_ncurses_init()
 	init_pair(14, COLOR_CYAN, COLOR_BLUE);
 	init_pair(15, COLOR_WHITE, COLOR_BLUE);
 	
-	format_add("statusbar", " %c(%w%{time}%c)%w %{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%n", 1);
+	format_add("statusbar", " %c(%w%{time}%c)%w %c(%wuin%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) %c(%wekg%c/%w" VERSION "%c)%w", 1);
 
 	wnoutrefresh(output);
 	wnoutrefresh(status);
