@@ -516,6 +516,7 @@ COMMAND(command_connect)
 		}
                 if (config_uin && config_password) {
 			my_printf("connecting");
+			connecting = 1;
 			if (!(sess = gg_login(config_uin, config_password, 1))) {
 	                        my_printf("conn_failed", strerror(errno));
 	                        do_reconnect();
@@ -523,6 +524,7 @@ COMMAND(command_connect)
 		} else
 			my_printf("no_config");
 	} else if (sess) {
+		connecting = 0;
 		if (sess->state == GG_STATE_CONNECTED)
 			my_printf("disconnected");
 		gg_logoff(sess);

@@ -82,6 +82,7 @@ int my_getc(FILE *f)
 			if (!sess && reconnect_timer && time(NULL) - reconnect_timer >= auto_reconnect && config_uin && config_password) {
 				reconnect_timer = 0;
 				my_printf("connecting");
+				connecting = 1;
 				if (!(sess = gg_login(config_uin, config_password, 1))) {
 					my_printf("conn_failed", strerror(errno));
 					do_reconnect();
@@ -231,6 +232,7 @@ int main(int argc, char **argv)
 
 	if (config_uin && config_password && auto_connect) {
 		my_printf("connecting");
+		connecting = 1;
 		if (!(sess = gg_login(config_uin, config_password, 1))) {
 			my_printf("conn_failed", strerror(errno));
 			do_reconnect();

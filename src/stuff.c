@@ -65,6 +65,7 @@ int display_ack = 1;
 int completion_notify = 1;
 char *bold_font = NULL;		/* dla kompatybilno¶ci z gnu gadu */
 int private_mode = 0;
+int connecting = 0;
 
 /*
  * my_puts()
@@ -901,7 +902,7 @@ void send_userlist()
  */
 void do_reconnect()
 {
-	if (auto_reconnect)
+	if (auto_reconnect && connecting)
 		reconnect_timer = time(NULL);
 }
 

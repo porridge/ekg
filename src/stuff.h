@@ -75,6 +75,7 @@ int display_ack;
 int completion_notify;
 char *bold_font;
 int private_mode;
+int connecting;
 
 void my_puts(char *format, ...);
 char *my_readline();
