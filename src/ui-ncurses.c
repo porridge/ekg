@@ -2652,13 +2652,14 @@ static struct {
  */
 static void complete(int *line_start, int *line_index)
 {
-	char *start = line, *cmd, **words;
-	int i, count, word;
-	const char *p;
+	char *start, *cmd, **words;
+	int i, count, word, j;
 
-	/* nie obs³ugujemy dope³niania w ¶rodku tekstu */
-	if (*line_index != strlen(line))
-		return;
+        /* jeli linia jest pusta: return */
+        if (!strcmp(line, ""))
+    		return;
+
+        start = xmalloc(strlen(line) + 1);
 
 	/* je¶li uzbierano ju¿ co¶ */
 	if (completions) {
@@ -2702,7 +2703,7 @@ static void complete(int *line_start, int *line_index)
 		}
 
 		xfree(tmp);
-
+		xfree(start);
 		return;
 	}
 
@@ -2711,34 +2712,15 @@ static void complete(int *line_start, int *line_index)
 	if (strlen(line) > 1 && line[strlen(line) - 1] == ' ')
 		array_add(&words, xstrdup(""));
 
-	/* sprawd¼, gdzie jeste¶my */
-	for (p = line, start = line, word = -1; *p; ) {
-		while (*p && xisspace(*p))
-			p++;
-		start = (char*) p;
-		word++;
-		if (!*p)
-			break;
-		if (*p == '"') {
-			p++;
-			while (*p && *p != '"') {
-				if (*p == '\\') {
-					p++;
-					if (!*p)
-						break;
-				}
-				p++;
-			}
-			if (*p)
-				p++;
-		} else {
-			while (*p && !xisspace(*p))
-				p++;
-		}
-	}
+        /* sprawd¼, gdzie jeste¶my */
+        for (word = 0, i = 0; i < strlen(line); word++, i++) {
+        	for(j = 0; i < strlen(line) && !xisspace(line[i]); j++, i++) 
+            		start[j] = line[i];
+        	start[j] = '\0';
+        	if(i >= *line_index)
+            		break;
+        }
 
-	if (word == -1)
-		word = 0;
 	
 /*	gg_debug(GG_DEBUG_MISC, "word = %d\n", word);
 	gg_debug(GG_DEBUG_MISC, "start = \"%s\"\n", start); */
@@ -2763,7 +2745,7 @@ static void complete(int *line_start, int *line_index)
 		array_free(completions);
 		array_free(words);
 		completions = NULL;
-
+		xfree(start);
 		return;
 	}
 
@@ -2771,7 +2753,7 @@ static void complete(int *line_start, int *line_index)
 
 	/* pocz±tek komendy? */
 	if (word == 0)
-		command_generator(line, strlen(line));
+		command_generator(start, strlen(start));
 	else {
 		char *params = NULL;
 		int abbrs = 0, i;
@@ -2843,8 +2825,17 @@ static void complete(int *line_start, int *line_index)
 	count = array_count(completions);
 
 	if (count == 1) {
-		snprintf(start, LINE_MAXLEN - (start - line), "%s ", completions[0]);
-		*line_index = strlen(line);
+              line[0] = '\0';
+                for(i = 0; i < array_count(words); i++) {
+                        if(i == word)
+                        {
+                                strcat(line, completions[0]);
+                                *line_index = strlen(line) + 1;
+                        }
+                        else
+                        	strcat(line, words[i]);
+                        strcat(line, " ");
+                }
 		array_free(completions);
 		completions = NULL;
 	}
@@ -2878,17 +2869,27 @@ static void complete(int *line_start, int *line_index)
 				break;
 		}
 
-		if (common > strlen(start) && start - line + common < LINE_MAXLEN) {
-			snprintf(start, common + 1, "%s", completions[0]);
-			*line_index = strlen(line);
-		}
+                if (strlen(line) + common < LINE_MAXLEN) {
+                        line[0] = '\0';
+                        for(i = 0; i < array_count(words); i++) {
+                                if(i == word)
+                                {
+                                        strncat(line, completions[0], common);
+                                        *line_index = strlen(line);
+                                }
+                                else
+                                        strcat(line, words[i]);\
+                                if(i != array_count(words) - 1)
+                                        strcat(line, " ");
+            		}
+		}		
 	}
 
 #undef __STRLEN_QUOTED
 #undef __IS_QUOTED
 
 	array_free(words);
-
+	xfree(start);
 	return;
 }
 
