@@ -10,6 +10,7 @@ zg³osi³ b³±d.
 
 - bardziej precyzyjny opis zmiennej ,,auto_back'' (pmb/sz)
 - ekg nie pozwala na niebezpiecznie ma³e warto¶ci ,,backlog_size'' (sz)
+- /list pokazuje nasz przyciêty opis, a nie taki, który wpisali¶my (sz)
 - poprawka kombinacji Ctrl-<kursor> na terminalach BSD (sz/w)
 - ignorowanie SIGQUIT, przez co Ctrl-4 i Ctrl-\ nie bêd± wychodziæ (sz/w)
 - libgadu: usuniêcie kodu gg_search50() (w)

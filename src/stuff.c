@@ -3872,7 +3872,9 @@ void change_status(int status, const char *arg, int autom)
 		else
 			print(format_descr, r1, r2);
 	
-		xfree(r1);
+		xfree(reason);
+		reason = r1;
+
 		xfree(r2);
 	} else {
 		if (autom)
