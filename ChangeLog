@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-11-20
+
+- poprawka /find dla u¿ytkowników ze spacj± w nazwie (pi/sz)
+
 // 2003-11-19
 
 - poprawka /dcc list dla du¿ych plików (?/sz)

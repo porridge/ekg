@@ -876,7 +876,8 @@ COMMAND(cmd_find)
 {
 	char **argv = NULL, *user;
 	gg_pubdir50_t req;
-	int i, res = 0, all = 0;
+	int i, j, res = 0, all = 0;
+	string_t user_str;
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		printq("not_connected");
@@ -913,10 +914,17 @@ COMMAND(cmd_find)
 		return res;
 	}
 
-	user = xstrdup(argv[0]);
+	user_str = string_init(argv[0]);
 
-	for (i = 0; argv[i]; i++)
-		iso_to_cp(argv[i]);
+	for (i = 1; argv[i] && argv[i][0] != '-'; i++) {
+		string_append_c(user_str, ' ');
+		string_append(user_str, argv[i]);
+	}
+
+	user = string_free(user_str, 0);
+
+	for (j = 0; argv[j]; j++)
+		iso_to_cp(argv[j]);
 
 	if (!(req = gg_pubdir50_new(GG_PUBDIR50_SEARCH))) {
 		array_free(argv);
@@ -936,7 +944,6 @@ COMMAND(cmd_find)
 
 		gg_pubdir50_add(req, GG_PUBDIR50_UIN, itoa(uin));
 
-		i = 1;
 	} else
 		i = 0;
 
@@ -944,7 +951,7 @@ COMMAND(cmd_find)
 
 	for (; argv[i]; i++) {
 		char *arg = argv[i];
-				
+
 		if (match_arg(arg, 'f', "first", 2) && argv[i + 1]) {
 			gg_pubdir50_add(req, GG_PUBDIR50_FIRSTNAME, argv[++i]);
 			continue;
