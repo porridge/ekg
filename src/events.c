@@ -302,7 +302,7 @@ void handle_msg(struct gg_event *e)
 			cp_to_iso(e->event.msg.message);
 			tmp = log_escape(e->event.msg.message);
 			/* XXX eskejpowanie */
-			put_log(e->event.msg.sender, "%sign,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgsend", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, tmp);
+			put_log(e->event.msg.sender, "%sign,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), tmp);
 			xfree(tmp);
 		}
 		return;
@@ -397,7 +397,7 @@ void handle_msg(struct gg_event *e)
 	play_sound((chat) ? config_sound_chat_file : config_sound_msg_file);
 
 	tmp = log_escape(e->event.msg.message);
-	put_log(e->event.msg.sender, "%s,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, tmp);
+	put_log(e->event.msg.sender, "%s,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), tmp);
 	xfree(tmp);
 
 	if (away && away != 4 && config_sms_away && config_sms_app && config_sms_number) {
@@ -548,9 +548,9 @@ static void handle_common(uin_t uin, int status, const char *descr, struct gg_no
 
 		/* zaloguj */
 		if (config_log_status && !GG_S_D(s->status))
-			put_log(uin, "status,%ld,%s,%s,%ld,%s\n", uin, u->display, inet_ntoa(u->ip), time(NULL), s->log);
+			put_log(uin, "status,%ld,%s,%s,%s,%s\n", uin, u->display, inet_ntoa(u->ip), log_timestamp(time(NULL)), s->log);
 		if (config_log_status && GG_S_D(s->status) && u->descr)
-		    	put_log(uin, "status,%ld,%s,%s,%ld,%s (%s)\n", uin, u->display, inet_ntoa(u->ip), time(NULL), s->log, u->descr);
+		    	put_log(uin, "status,%ld,%s,%s,%s,%s (%s)\n", uin, u->display, inet_ntoa(u->ip), log_timestamp(time(NULL)), s->log, u->descr);
 
 		/* jak dostêpny lub zajêty, dopiszmy do taba
 		 * jak niedostêpny, usuñmy */

@@ -189,6 +189,7 @@ int config_enter_scrolls;
 char *config_audio_device;
 char *config_speech_app;
 int config_encryption;
+char *config_log_timestamp;
 
 char *home_dir;
 char *config_dir;
@@ -220,6 +221,7 @@ const char *prepare_path(const char *filename, int do_mkdir);
 void send_userlist();
 void do_reconnect();
 void put_log(uin_t uin, const char *format, ...);
+const char *log_timestamp(time_t t);
 int send_sms(const char *recipient, const char *message, int show_result);
 char *read_file(FILE *f);
 int init_control_pipe(const char *path);

@@ -78,6 +78,7 @@ void variable_init()
 	variable_add("log_ignored", VAR_INT, 1, &config_log_ignored, NULL, NULL);
 	variable_add("log_status", VAR_BOOL, 1, &config_log_status, NULL, NULL);
 	variable_add("log_path", VAR_STR, 1, &config_log_path, NULL, NULL);
+	variable_add("log_timestamp", VAR_STR, 1, &config_log_timestamp, NULL, NULL);
 	variable_add("make_window", VAR_INT, 1, &config_make_window, NULL, variable_map(3, 0, 0, "none", 1, 0, "usefree", 2, 0, "always"));
 	variable_add("proxy", VAR_STR, 1, &config_proxy, changed_proxy, NULL);
 	variable_add("random_reason", VAR_MAP, 1, &config_random_reason, NULL, variable_map(5, 0, 0, "none", 1, 0, "away", 2, 0, "notavail", 4, 0, "avail", 8, 0, "invisible"));

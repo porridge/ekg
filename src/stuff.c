@@ -151,6 +151,7 @@ int server_index = 0;
 char *config_audio_device = NULL;
 char *config_speech_app = NULL;
 int config_encryption = 0;
+char *config_log_timestamp = NULL;
 
 static struct {
 	int event;
@@ -271,6 +272,29 @@ const char *prepare_path(const char *filename, int do_mkdir)
 	}
 	
 	return path;
+}
+
+/* 
+ * log_timestamp()
+ *
+ * zwraca timestamp logów zgodnie z ¿yczeniem u¿ytkownika. 
+ *
+ *  - t - czas, który mamy zamieniæ.
+ *
+ * zwraca na przemian jeden z dwóch statycznych buforów, wiêc w obrêbie
+ * jednego wyra¿enia mo¿na wywo³aæ t± funkcjê dwukrotnie.
+ */
+const char *log_timestamp(time_t t)
+{
+	static char buf[2][100];
+	struct tm *tm = localtime(&t);
+	static int i = 0;
+
+	i = i % 2;
+
+	strftime(buf[i], sizeof(buf[0]), (config_log_timestamp) ? config_log_timestamp : "%s", tm);
+	
+	return buf[i++];
 }
 
 /*

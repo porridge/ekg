@@ -236,6 +236,14 @@ log_path
 
 	¶cie¿ka, gdzie bêd± zachowywane wysy³ane i otrzymane wiadomo¶ci.
 
+log_timestamp
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	okre¶la format czasu zapisywanego w historii. w przypadku braku,
+	zmiennej, zapisuje w postaci ilo¶ci sekund od 1 stycznia 1970r.
+	UTC. dok³adny opis formatu zawiera strona manuala strftime(3).
+
 make_window
 	typ: int
 	domy¶lna warto¶æ: 0
