@@ -183,6 +183,10 @@ static int window_last_id = -1;		/* numer ostatnio wybranego okna */
 static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 static int ui_ncurses_debug = 0;	/* debugowanie */
 
+#ifdef SIGWINCH
+static int need_resize_term = 0;
+#endif
+
 int config_backlog_size = 1000;		/* maksymalny rozmiar backloga */
 int config_display_transparent = 1;	/* czy chcemy przezroczyste t³o? */
 int config_contacts_size = 9;		/* szeroko¶æ okna kontaktów */
@@ -1880,19 +1884,10 @@ static void update_statusbar(int commit)
 		window_commit();
 }
 
-/*
- * winch_handler()
- *
- * robi, co trzeba po zmianie rozmiaru terminala.
- */
-static void winch_handler()
+#ifdef SIGWINCH
+static void ncurses_resize_term()
 {
-	static int lock = 0;
-
-	while (lock)
-		sleep(1);
-
-	lock = 1;
+	need_resize_term = 0;
 
 	endwin();
 	refresh();
@@ -1900,11 +1895,16 @@ static void winch_handler()
 
 	window_resize();
 	window_commit();
+	header_statusbar_resize();
 
 	changed_backlog_size("backlog_size");
-
-	lock = 0;
 }
+
+static void winch_handler()
+{
+	need_resize_term = 1;
+}
+#endif
 
 /*
  * ui_ncurses_beep()
@@ -3192,8 +3192,14 @@ static void ui_ncurses_loop()
 	for (;;) {
 		struct binding *b = NULL;
 		int ch;
-		
+
 		ekg_wait_for_key();
+
+#ifdef SIGWINCH
+		if (need_resize_term)
+			ncurses_resize_term(); 
+#endif
+
 		ch = ekg_getch(0);
 
 		if (ch == -1) {		/* stracony terminal */
