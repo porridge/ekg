@@ -591,11 +591,13 @@ COMMAND(cmd_connect)
 			if (params && params[0] && !strcmp(params[0], "-")) {
 				xfree(tmp);
 				tmp = NULL;
-				config_status = ekg_hide_descr_status(config_status);
 			}
 
 			if (config_keep_reason)
 				config_reason = xstrdup(tmp);
+
+			if (!config_reason)
+				config_status = ekg_hide_descr_status(config_status);
 		} else
 			tmp = xstrdup(config_reason);
 
