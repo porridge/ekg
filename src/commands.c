@@ -201,34 +201,6 @@ COMMAND(cmd_add)
 
 COMMAND(cmd_alias)
 {
-	if (!params[0] || match_arg(params[0], 'l', "list", 2)) {
-		list_t l;
-		int count = 0;
-
-		for (l = aliases; l; l = l->next) {
-			struct alias *a = l->data;
-			list_t m;
-			int first = 1, i;
-			char *tmp = xcalloc(strlen(a->name) + 1, 1);
-			
-			for (i = 0; i < strlen(a->name); i++)
-				strcat(tmp, " ");
-
-			for (m = a->commands; m; m = m->next) {
-				print((first) ? "aliases_list" : "aliases_list_next", a->name, (char*) m->data, tmp);
-				first = 0;
-				count++;
-			}
-
-			xfree(tmp);
-		}
-
-		if (!count)
-			print("aliases_list_empty");
-
-		return;
-	}
-
 	if (match_arg(params[0], 'a', "add", 2)) {
 		if (!alias_add(params[1], 0, 0))
 			config_changed = 1;
@@ -244,8 +216,56 @@ COMMAND(cmd_alias)
 	}
 
 	if (match_arg(params[0], 'd', "del", 2)) {
-		if (!alias_remove(params[1]))
+		int ret;
+
+		if (!params[1]) {
+			print("not_enough_params", name);
+			return;
+		}
+
+		if (!strcmp(params[1], "*"))
+			ret = alias_remove(NULL);
+		else
+			ret = alias_remove(params[1]);
+
+		if (!ret)
 			config_changed = 1;
+
+		return;
+	}
+	
+	if (!params[0] || match_arg(params[0], 'l', "list", 2) || params[0][0] != '-') {
+		list_t l;
+		int count = 0;
+		const char *aname = ((params[0] && params[0][0] != '-') ? params[0] : NULL);
+
+		for (l = aliases; l; l = l->next) {
+			struct alias *a = l->data;
+			list_t m;
+			int first = 1, i;
+			char *tmp = xcalloc(strlen(a->name) + 1, 1);
+			
+			if (aname && strcmp(aname, a->name))
+				continue;
+
+			for (i = 0; i < strlen(a->name); i++)
+				strcat(tmp, " ");
+
+			for (m = a->commands; m; m = m->next) {
+				print((first) ? "aliases_list" : "aliases_list_next", a->name, (char*) m->data, tmp);
+				first = 0;
+				count++;
+			}
+
+			xfree(tmp);
+		}
+
+		if (!count) {
+			if (aname)
+				print("aliases_noexist", aname);
+			else
+				print("aliases_list_empty");
+		}
 
 		return;
 	}
@@ -3279,87 +3299,103 @@ cleanup:
 		return;
 	}
 
-	for (l = timers; l; l = l->next) {
-		struct timer *t = l->data;
-		struct timeval tv;
-		char *tmp;
-		const char *type_str;
-		int usec, sec, minutes = 0, hours = 0, days = 0;
+	if (!params[0] || match_arg(params[0], 'l', "list", 2) || params[0][0] != '-') {
+		const char *tname = ((params[0] && params[0][0] != '-') ? params[0] : NULL);
 
-		if (at != t->at)
-			continue;
+		for (l = timers; l; l = l->next) {
+			struct timer *t = l->data;
+			struct timeval tv;
+			char *tmp;
+			const char *type_str;
+			int usec, sec, minutes = 0, hours = 0, days = 0;
 
-		count++;
+			if (at != t->at)
+				continue;
 
-		gettimeofday(&tv, NULL);
+			if (tname && strcmp(tname, t->name))
+				continue;
 
-		if (at) {
-			struct tm *foo = localtime((time_t *) &t->ends.tv_sec);
+			count++;
 
-			tmp = xmalloc(100);
-			strftime(tmp, 100, format_find("at_timestamp"), foo);
+			gettimeofday(&tv, NULL);
 
-		} else {
+			if (at) {
+				struct tm *foo = localtime((time_t *) &t->ends.tv_sec);
 
-			if (t->ends.tv_usec < tv.tv_usec) {
-				sec = t->ends.tv_sec - tv.tv_sec - 1;
-				usec = (t->ends.tv_usec - tv.tv_usec + 1000000) / 1000;
+				tmp = xmalloc(100);
+				strftime(tmp, 100, format_find("at_timestamp"), foo);
+
 			} else {
-				sec = t->ends.tv_sec - tv.tv_sec;
-				usec = (t->ends.tv_usec - tv.tv_usec) / 1000;
-			}
 
-			if (sec > 86400) {
-				days = sec / 86400;
-				sec -= days * 86400;
-			}
+				if (t->ends.tv_usec < tv.tv_usec) {
+					sec = t->ends.tv_sec - tv.tv_sec - 1;
+					usec = (t->ends.tv_usec - tv.tv_usec + 1000000) / 1000;
+				} else {
+					sec = t->ends.tv_sec - tv.tv_sec;
+					usec = (t->ends.tv_usec - tv.tv_usec) / 1000;
+				}
 
-			if (sec > 3600) {
-				hours = sec / 3600;
-				sec -= hours * 3600;
-			}
-		
-			if (sec > 60) {
-				minutes = sec / 60;
-				sec -= minutes * 60;
-			}
+				if (sec > 86400) {
+					days = sec / 86400;
+					sec -= days * 86400;
+				}
 
-			if (days)
-				tmp = saprintf("%dd %dh %dm %d.%.3d", days, hours, minutes, sec, usec);
-			else
-				if (hours)
-					tmp = saprintf("%dh %dm %d.%.3d", hours, minutes, sec, usec);
+				if (sec > 3600) {
+					hours = sec / 3600;
+					sec -= hours * 3600;
+				}
+			
+				if (sec > 60) {
+					minutes = sec / 60;
+					sec -= minutes * 60;
+				}
+
+				if (days)
+					tmp = saprintf("%dd %dh %dm %d.%.3d", days, hours, minutes, sec, usec);
 				else
-					if (minutes)
-						tmp = saprintf("%dm %d.%.3d", minutes, sec, usec);
+					if (hours)
+						tmp = saprintf("%dh %dm %d.%.3d", hours, minutes, sec, usec);
 					else
-						tmp = saprintf("%d.%.3d", sec, usec);
+						if (minutes)
+							tmp = saprintf("%dm %d.%.3d", minutes, sec, usec);
+						else
+							tmp = saprintf("%d.%.3d", sec, usec);
+			}
+
+			switch (t->type) {
+				case TIMER_UI:
+					type_str = "ui";
+					break;
+				case TIMER_SCRIPT:
+					type_str = "script";
+					break;
+				case TIMER_COMMAND:
+					type_str = "command";
+					break;
+				default:
+					type_str = "unknown";
+			}
+			
+			if (at)
+				print("at_list", t->name, tmp, t->command, type_str);
+			else
+				print("timer_list", t->name, tmp, t->command, type_str, (t->persistent) ? "*" : "");
+
+			xfree(tmp);
+
 		}
 
-		switch (t->type) {
-			case TIMER_UI:
-				type_str = "ui";
-				break;
-			case TIMER_SCRIPT:
-				type_str = "script";
-				break;
-			case TIMER_COMMAND:
-				type_str = "command";
-				break;
-			default:
-				type_str = "unknown";
+		if (!count) {
+			if (tname)
+				print((at) ? "at_noexist" : "timer_noexist", tname);
+			else
+				print((at) ? "at_empty" : "timer_empty");
 		}
-		
-		if (at)
-			print("at_list", t->name, tmp, t->command, type_str);
-		else
-			print("timer_list", t->name, tmp, t->command, type_str, (t->persistent) ? "*" : "");
 
-		xfree(tmp);
+		return;
 	}
 
-		if (!count)
-			print((at) ? "at_empty" : "timer_empty");
+	print("invalid_params", name);
 }
 
 #ifdef WITH_PYTHON
@@ -3406,7 +3442,7 @@ COMMAND(cmd_conference)
 	if (!params[0] || match_arg(params[0], 'l', "list", 2) || params[0][0] == '#') {
 		list_t l, r;
 		int count = 0;
-		const char *cname = (params[0] && params[0][0] == '#') ? params[0] : NULL;
+		const char *cname = ((params[0] && params[0][0] == '#') ? params[0] : NULL);
 
 		for (l = conferences; l; l = l->next) {
 			struct conference *c = l->data;
@@ -3790,8 +3826,8 @@ void command_init()
 	  "\n"
 	  "  -a, --add <alias> <komenda>     dodaje alias\n"
           "  -A, --append <alias> <komenda>  dodaje komendê do aliasu\n"
-	  "  -d, --del <alias>               usuwa alias\n"
-	  " [-l, --list]                     wy¶wietla listê aliasów\n");
+	  "  -d, --del <alias>|*             usuwa alias lub wszystkie\n"
+	  " [-l, --list, <alias>]            wy¶wietla listê aliasów\n");
 	  
 	command_add
 	( "away", "?", cmd_away, 0,
@@ -3808,7 +3844,7 @@ void command_init()
 	  "\n"
 	  "  -a, --add [nazwa] <czas> <komenda>  tworzy nowy plan\n"
 	  "  -d, --del <numer/nazwa>|*           usuwa plan lub wszystkie\n"
-	  " [-l, --list]                         wy¶wietla listê planów\n"
+	  " [-l, --list, <nazwa>]                wy¶wietla listê planów\n"
 	  "\n"
 	  "Czas podaje siê w formacie [[[yyyy]mm]dd]HH[:]MM[.SS], gdzie "
 	  "%Tyyyy%n to rok, %Tmm%n to miesi±c, %Tdd%n to dzieñ, %THH:MM%n to godzina, "
@@ -3837,7 +3873,7 @@ void command_init()
 	  "\n"
 	  "  -a, --add <sekwencja> <komenda>  przypisuje now± sekwencjê\n"
 	  "  -d, --del <sekwencja>            usuwa podan± sekwencjê\n"
-	  "  -l, --list                       wy¶wietla przypisane sekwencje\n"
+	  " [-l, --list]                      wy¶wietla przypisane sekwencje\n"
 	  "\n"
 	  "Dostêpne sekwencje to: Ctrl-<znak>, Alt-<znak>.");
 
@@ -3972,9 +4008,9 @@ void command_init()
 	( "last", "uu", cmd_last, 0,
 	  " [opcje]", "wy¶wietla lub czy¶ci ostatnie wiadomo¶ci",
 	  "\n"
-	  "  [numer/alias]             wy¶wietla ostatnie wiadomo¶ci\n"
 	  "  -s, --stime [numer/alias] wy¶wietla czas wys³ania wiadomo¶ci\n"
 	  "  -c, --clear [numer/alias] czy¶ci podane wiadomo¶ci lub wszystkie\n"
+	  "  [numer/alias]             wy¶wietla ostatnie wiadomo¶ci\n"
 	  "\n"
 	  "W przypadku opcji %T--stime%n czas wy¶wietlany jest "
 	  ",,inteligentnie'' zgodnie ze zmienn± %Ttime_deviation.%n");
@@ -4048,8 +4084,8 @@ void command_init()
 	( "queue", "uu", cmd_queue, 0,
 	  " [opcje]", "zarz±dzanie wiadomo¶ciami do wys³ania po po³±czeniu",
 	  "\n"
+	  " -c, --clear [numer/alias] usuwa podane wiadomo¶ci lub wszystkie\n"
 	  " [numer/alias]             wy¶wietla kolejkê wiadomo¶ci\n"
-	  " -c, --clear [numer/alias] usuwa wiadomo¶ci dla numer/alias lub wszystkie\n"
 	  "\n"
 	  "Mo¿na u¿yæ tylko wtedy, gdy nie jeste¶my po³±czeni. W przypadku "
 	  "konferencji wy¶wietla wszystkich uczestników.");
@@ -4134,7 +4170,7 @@ void command_init()
 	  "\n"
 	  "  -a, --add [nazwa] [*/]<czas> <komenda>  tworzy nowy timer\n"
 	  "  -d, --del <numer/nazwa>|*           zatrzymuje timer lub wszystkie\n"
-	  " [-l, --list]                         wy¶wietla listê timerów\n"
+	  " [-l, --list, <nazwa>]                wy¶wietla listê timerów\n"
 	  "\n"
 	  "Czas podaje siê w sekundach. Mo¿na te¿ u¿yæ przyrostków d, h, m, s, "
 	  "oznaczaj±cych dni, godziny, minuty, sekundy, np. 5h20m. Timer po "

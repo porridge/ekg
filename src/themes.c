@@ -1138,6 +1138,7 @@ void theme_init()
 	format_add("aliases_add", "%> Utworzono alias %T%1%n\n", 1);
 	format_add("aliases_append", "%> Dodano do aliasu %T%1%n\n", 1);
 	format_add("aliases_del", "%) Usuniêto alias %T%1%n\n", 1);
+	format_add("aliases_del_all", "%) Usuniêto wszystkie aliasy\n", 1);
 	format_add("aliases_exist", "%! Alias %T%1%n ju¿ istnieje\n", 1);
 	format_add("aliases_noexist", "%! Alias %T%1%n nie istnieje\n", 1);
 	format_add("aliases_command", "%! %T%1%n jest wbudowan± komend±\n", 1);

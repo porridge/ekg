@@ -1916,33 +1916,42 @@ int alias_add(const char *string, int quiet, int append)
  *
  * usuwa alias z listy aliasów.
  *
- * - name - alias.
+ * - name - alias lub NULL.
  */
 int alias_remove(const char *name)
 {
 	list_t l;
+	int removed = 0;
 
-	if (!name) {
-		print("not_enough_params", "alias");
-		return -1;
-	}
-
-	for (l = aliases; l; l = l->next) {
+	for (l = aliases; l; ) {
 		struct alias *a = l->data;
 
-		if (!strcasecmp(a->name, name)) {
-			print("aliases_del", name);
+		l = l->next;
+
+		if (!name || !strcasecmp(a->name, name)) {
+			if (name)
+				print("aliases_del", name);
 			command_remove(a->name);
 			xfree(a->name);
 			list_destroy(a->commands, 1);
 			list_remove(&aliases, a, 1);
-			return 0;
+			removed = 1;
 		}
 	}
 
-	print("aliases_noexist", name);
+	if (!removed) {
+		if (name)
+			print("aliases_noexist", name);
+		else
+			print("aliases_list_empty");
 
-	return -1;
+		return -1;
+	}
+
+	if (removed && !name)
+		print("aliases_del_all");
+
+	return 0;
 }
 
 /*

@@ -897,8 +897,8 @@ void handle_failure(struct gg_event *e)
 	list_remove(&watches, sess, 0);
 	gg_logoff(sess);
 	gg_free_session(sess);
-	userlist_clear_status(0);
 	sess = NULL;
+	userlist_clear_status(0);
 	do_reconnect();
 }
 
@@ -982,6 +982,7 @@ void handle_event(struct gg_session *s)
 		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
 		sess = NULL;
+		userlist_clear_status(0);
 		ui_event("disconnected");
 		last_conn_event = time(NULL);
 		do_reconnect();
@@ -1307,9 +1308,9 @@ void handle_disconnect(struct gg_event *e)
 
 	gg_logoff(sess);	/* a zobacz.. mo¿e siê uda ;> */
 	list_remove(&watches, sess, 0);
-	userlist_clear_status(0);
 	gg_free_session(sess);
 	sess = NULL;	
+	userlist_clear_status(0);
 	update_status();
 	last_conn_event = time(NULL);
 	do_reconnect();
