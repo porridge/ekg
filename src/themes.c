@@ -739,15 +739,17 @@ void theme_init()
 	format_add("message_footer", "%g`----- ---- --- -- -%n\n", 1);
 	format_add("message_line", "%g|%n %1\n", 1);
 	format_add("message_line_width", "75", 1);
+	format_add("message_timestamp", "%Y-%m-%d %H:%M", 1);
 	format_add("chat_header", "%c.-- %n%1 %c(%C%#%c/%2)%n %c--- -- -\n", 1);
 	format_add("chat_footer", "%c`----- ---- --- -- -%n\n", 1);
 	format_add("chat_line", "%c|%n %1\n", 1);
 	format_add("chat_line_width", "75", 1);
+	format_add("chat_timestamp", "%Y-%m-%d %H:%M", 1);
 	format_add("sent_header", "%b.-- %n%1 %c(%C%#%c)%n %b--- -- -\n", 1);
 	format_add("sent_footer", "%b`----- ---- --- -- -%n\n", 1);
 	format_add("sent_line", "%b|%n %1\n", 1);
 	format_add("sent_line_width", "75", 1);
-	format_add("sysmsg_header", "%m.-- %TWiadomo¶æ systemowa %m--- -- -\n", 1);
+	format_add("sysmsg_header", "%m.-- %TWiadomo¶æ systemowa %c(%C%#%c)%n --- -- -\n", 1);
 	format_add("sysmsg_line", "%m|%n %1\n", 1);
 	format_add("sysmsg_line_width", "75", 1);
 	format_add("sysmsg_footer", "%m`----- ---- --- -- -%n\n", 1);	

@@ -110,7 +110,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 		       last_add(0, e->event.msg.sender, e->event.msg.time, e->event.msg.message);
 	
 	tm = localtime(&e->event.msg.time);
-	strftime(timestr, sizeof(timestr), format_find("timestamp"), tm);
+	strftime(timestr, sizeof(timestr), format_find((chat) ? "chat_timestamp" : "message_timestamp"), tm);
 
 	if (!(width = atoi(format_find(line_width))))
 		width = 78;
