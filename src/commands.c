@@ -104,7 +104,7 @@ struct command commands[] = {
 	{ "?", "c", command_help, " [polecenie]", "Synonim dla %Whelp%n", "" },
 	{ "ignore", "u", command_ignore, " [numer/alias]", "Dodaje do listy ignorowanych lub j± wy¶wietla", "" },
 	{ "invisible", "", command_away, "", "Zmienia stan na niewidoczny", "" },
-	{ "list", "u?", command_list, " [alias|opcje]", "Zarz±dzanie list± kontaktów", "Wy¶wietlanie kontaktów o podanym stanie \"list [-a | -b | -i]\"\n  -a, --active\n  -b, --busy\n  -i, --inactive\n  -w, --wait\n\nZmiana informacji w li¶cie kontaktów \"list <alias> <opcje...>\"\n  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>  // tylko informacja\n  -d, --display <nazwa>  // wy¶wietlana nazwa\n  -p, --phone <telefon>\n  -u, --uin <numerek>\n  -g, --group [+/-]<grupa>\n\nLista kontaktów na serwerze \"list [-p | -g]\"\n  -p, --put\n  -g, --get" },
+	{ "list", "u?", command_list, " [alias|opcje]", "Zarz±dzanie list± kontaktów", "\nWy¶wietlanie osób o podanym stanie \"list [-a|-b|-i]\":\n  -a, --active\n  -b, --busy\n  -i, --inactive\n  -w, --wait\n\nZmiana wpisów listy kontaktów \"list <alias> <opcje...>\":\n  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>  // tylko informacja\n  -d, --display <nazwa>  // wy¶wietlana nazwa\n  -p, --phone <telefon>\n  -u, --uin <numerek>\n  -g, --group [+/-]<grupa>\n\nLista kontaktów na serwerze \"list [-p|-g]\":\n  -p, --put\n  -g, --get" },
 	{ "msg", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ do podanego u¿ytkownika", "" },
         { "on", "?u?", command_on, " <zdarzenie|...> <numer/alias> <akcja>|clear", "Dodaje lub usuwa zdarzenie", "" },
 	{ "passwd", "??", command_passwd, " <has³o> <e-mail>", "Zmienia has³o i adres e-mail u¿ytkownika", "" },
@@ -1737,215 +1737,342 @@ COMMAND(command_test_watches)
 			case GG_STATE_RESOLVING: state = "RESOLVING"; break;
 			case GG_STATE_CONNECTING: state = "CONNECTING"; break;
 			case GG_STATE_READING_DATA: state = "READING_DATA"; break;
-			case GG_STATE_ERROIONet(arEMIND: typ0ONNECSEND break;
-			0ONNECSENDEADING_DATA: state = "READINGA
-				DATA break;
-			caA
-				DATAEADING_DATA: state = "READIERROSESse GG_STAERROSEADING_DATA: c ||_savss
-			w/	} elsONNECTING"; break;0ONNECSEND_EGISse GG_STA0ONNECSEND_EGEADING_DATA: state = "READINGA
-				KEY break;
-			caA
-				KEYEADING_DATA: state = "READINGA
-				REPLY break;
-			caA
-				REPLYTATE_ERROIONet(arEMIND: typ0ONNECSEeckse GG_STA0ONNECSEION_USERLIST_Gc ||_sl; l =CONNECTING"; break;: st				H st_SESse GG_STA: st				H st_STATE_ERROIONet(arEMIND: typPARSEND break;
-			PARSENDTATE_ERROIONet(arEMIND: typif 	case GG_STAif 	EADING_DATA: c ||_s0;
-		CONNECTING"; break;"; bENEND break;
-			"; bENENDEADING_DATA: state = "READINGA
-				UIN__USse GG_STA: st				UIN__EADING_DATA: state = "READINGA
-				UIN__USse GG_STA: st				UIN_"USER5"; break;
-			caseREADI
-				my_ACKUSse GG_STA
-				my_ACKEADING_DATA: state = "READI
-				my_REQUESk;
-se GG_STA
-				my_REQUESkEADING_DATA: state = "READINGA
-				REQUESk;
-se GG_STA: st				REQUESkEADING_DATA: state = "READI
-				my_my_p_INFO;
-se GG_STA
-				my_my_p_INFOEADING_DATA: state = "READINGA
-				ACKUSse GG_STA: st				ACKEADING_DATA: state = "READINGA
-				my_p_ACKUSse GG_STA: st				my_p_ACKEADING_DATA: state = "READI
-				my_my_p_H st_SESse GG_STA
-				my_prin	H st_SEADING_DATA: state = "READISEND) ? "dcc;
-se GG_STA
-				my_SEND) ? "dccEADING_DATA: state = "READI
-				my_my_p;
-se GG_STA
-				my_
-				my_princheck = "W"; break;
-		se GG_STA_CHECK_READ | GG_CHECK_WR_WRI;
-				rl_end = strlen(buf);%dG_CHEC=s[0lis=% trse GG=s[0lte = =s[0lis=% trg");out=% s)
-notrg GG_S"; f trse GG0lte = _S"; e);
-"; b");outlenam(command_te|| eri
-}
-
-LL;
-			
-	int i, id = 1;
-
-	/* wybieramy seventfd0, pahar 01] && parse G!(u = rcpy(rl_linee_buf))) {
-	atcurn 0;
-}
-
-COMMAN2048g(arg, 'l',ck;
-f_modet_a_pri(config_rad(t->uin, N_WRIst_findLL;ick,dG_r *t) {
-		type = GSWDESSION_DCC_SEONNEIst_findLL; u-msg l-en(buf);ist_(pr)CC_ %l->u>eve %l-], 'pION_r)C, 'pION_>eve) {
-		type = G;
-		ESSION_DCC_SEND;
-		ms[1])) ock->stasaatchems[1])) ock->st-1)SSI1)S0] ms[1])) ock->st-1)*!v-saatchems[1])) ock->st-cha*		rS0] ms[1])) ock->st-in*!v-saatche))) sa_ (para>event.m((ses			if (gg_(copeer->daet_a_prea_pr_ (p			t.dcc = d;
-	uin, ten(bEMALocke 0;fooget_ 1;
-			*/
-		st.id = transRITE: checa.pr_familyvariable",("vaAF_UNIX = commauin, ten(bEMALocke 0;avexEMAble_invaems[, ten(bEMI1)			unon);
-ble_invaeatus = formECTINGAF_INGET				bhems[, ten(bEMALocke 0;"));EMAble_invaems[, ten(bEM"));
-				f		r			AVAIL:
-intf("vahems[, ten(bEMA:Able_invaems[, ten(bEMams[1			hs(		r			AVA}
-		}intf("vaheatus = formEname, u->displems[, ten(bEMALocke 0;Able_invaems[, ten(bEMams[1sa.pr_familyvble_invriable", argramstype = GG_SESSION_DCC_SEtchems[, ten(bEMAarams[2]);ble_iamstype = GCHSESSION_DCC_SEtchems[, ten(bEMArcpyf (conftype = GBL	ESSION_DCC_SEtchems[, ten(bEMAbi +	
-		iamstype = GFIFOESSION_DCC_SEONNEIs[, ten(bEMAfiara		iamstype = GLN	ESSION_DCC_SEtchems[, ten(bEMAsym u 	
-		iams(command_te|| eri
-}
-
-LL;
-			
-	h = for);
+			case GG_STATE_ERROR: state = "ERROR"; break;
+			/* gg_session */	     
+			case GG_STATE_CONNECTING_GG: state = "CONNECTING_GG"; break;
+			case GG_STATE_READING_KEY: state = "READING_KEY"; break;
+			case GG_STATE_READING_REPLY: state = "READING_REPLY"; break;
+			case GG_STATE_CONNECTED: state = "CONNECTED"; break;
+			/* gg_http */
+			case GG_STATE_READING_HEADER: state = "READING_HEADER"; break;
+			case GG_STATE_PARSING: state = "PARSING"; break;
+			case GG_STATE_DONE: state = "DONE"; break;
+			/* gg_dcc */
+			case GG_STATE_LISTENING: state = "LISTENING"; break;
+			case GG_STATE_READING_UIN_1: state = "READING_UIN_1"; break;
+			case GG_STATE_READING_UIN_2: state = "READING_UIN_2"; break;
+			case GG_STATE_SENDING_ACK: state = "SENDING_ACK"; break;
+			case GG_STATE_SENDING_REQUEST: state = "SENDING_REQUEST"; break;
+			case GG_STATE_READING_REQUEST: state = "READING_REQUEST"; break;
+			case GG_STATE_SENDING_FILE_INFO: state = "SENDING_FILE_INFO"; break;
+			case GG_STATE_READING_ACK: state = "READING_ACK"; break;
+			case GG_STATE_READING_FILE_ACK: state = "READING_FILE_ACK"; break;
+			case GG_STATE_SENDING_FILE_HEADER: state = "SENDING_FILE_HEADER"; break;
+			case GG_STATE_GETTING_FILE: state = "SENDING_GETTING_FILE"; break;
+			case GG_STATE_SENDING_FILE: state = "SENDING_SENDING_FILE"; break;
+			default: state = "(unknown)"; break;
+		}
+		
+		snprintf(buf, sizeof(buf), "%d: type=%s, fd=%d, state=%s, check=%s, id=%d, timeout=%d", no, type, s->fd, state, check, s->id, s->timeout);
+		my_printf("generic", buf);
+	}
 
 	return 0;
 }
 
-COMMAND(commregnamer.message = strdl; l = l->next) {
-		struct  NULL;", params[0]);
-		return 0;
-	}
+COMMAND(command_test_fds)
+{
+#if 0
+	struct stat st;
+	char buf[1000];
+	int i;
+	
+	for (i = 0; i < 2048; i++) {
+		if (fstat(i, &st) == -1)
+			continue;
 
-	if (!strcmp(params[1], "\\")) {
-		struct stri;
-			case GG_SESSION_HTTP: type = ; break;
-			case GG_SESSION_SEARCH: tamstype"; breasfers; l; l = lSWD: typir */
-		if ((t->dcregnamer_; l; l 
-		my_printf((private_			my_prinwatches,regnamer			id = id *	return 0;
-	list_add(&watches, regnamer_st_add(&watches, sess, 0);
-			struct userlis    		if ((argv = array_makeregon)      d_send_nick(params[0]); l->next, no++) {
-		struct gg_cn)   e identyfikator l; l = l-> NULL;", params[0]);
-		return 0;
-	}
+		sprintf(buf, "%d: ", i);
 
-	if (!strcmp(params[1], "\\")) {
-		struct stri;
-ULL;"turn 0;
+		if (S_ISREG(st.st_mode))
+			sprintf(buf + strlen(buf), "file, inode %lu, size %lu", st.st_ino, st.st_size);
+
+		if (S_ISSOCK(st.st_mode)) {
+			struct sockaddr sa;
+			struct sockaddr_un *sun = (struct sockaddr_un*) &sa;
+			struct sockaddr_in *sin = (struct sockaddr_in*) &sa;
+			int sa_len = sizeof(sa);
+			
+			if (getpeername(i, &sa, &sa_len) == -1) {
+				strcat(buf, "socket, not connected");
+			} else {
+				switch (sa.sa_family) {
+					case AF_UNIX:
+						strcat(buf, "socket, unix, ");
+						strcat(buf, sun->sun_path);
+						break;
+					case AF_INET:
+						strcat(buf, "socket, inet, ");
+						strcat(buf, inet_ntoa(sin->sin_addr));
+						strcat(buf, ":");
+						strcat(buf, itoa(ntohs(sin->sin_port)));
+						break;
+					default:
+						strcat(buf, "socket, ");
+						strcat(buf, itoa(sa.sa_family));
+				}
+			}
+		}
+		
+		if (S_ISDIR(st.st_mode))
+			strcat(buf, "directory");
+		
+		if (S_ISCHR(st.st_mode))
+			strcat(buf, "char");
+
+		if (S_ISBLK(st.st_mode))
+			strcat(buf, "block");
+
+		if (S_ISFIFO(st.st_mode))
+			strcat(buf, "fifo");
+
+		if (S_ISLNK(st.st_mode))
+			strcat(buf, "symlink");
+
+		my_printf("generic", buf);
+	}
+#endif
+	return 0;
 }
 
-COMMn)   e	list_add(&watches, h, 0);
-
-		fers; l; l 	return 0;
-	list_add(&watches, n)   e
+COMMAND(command_register)
+{
+	struct gg_http *h;
+	struct list *l;
 	
-	array_free(argv);
+	if (!params[0] || !params[1]) {
+		my_printf("not_enough_params");
+		return 0;
+	}
 
-	return	struct userlis    		if ((argv = array_makeregon)      d_send_nick(paramfoo =  l->next, no++) {
-		struct gg_c	uibie identyfikator l; l = l-> NULL;"watches,reibieon)   e	list_add(&wa	list_add(&watches, reibieost_add(&watches, sess, 0);
-			struct userlis    		if ((argv = array_ma  l->next, no++) {
-		struct gg_c
+	for (l = watches; l; l = l->next) {
+		struct gg_common *s = l->data;
 
-COMM1])) {
-		my_printf("user_exists"play
-	if (free 0;
-'f', "first", 2)
-	if (free t uin;
-
-	i
-	if (free le_iGG_CLASS_MSandom_rearlist *u;ntf("user_not_found", paraGG_CLAobiish
-
-	re
-			if (t->dGG_CLA? parle_iGG_CLAargv);= 0;
-	struct userlist *u;1]);
-		= id * 2 + 1;	/* multiple_init(NULL)))
+		if (s->type == GG_SESSION_REGISTER) {
+			my_printf("register_pending");
 			return 0;
+		}
+	}
+	
+	if (!(h = gg_register(params[0], params[1], 1))) {
+		my_printf("register_failed", strerror(errno));
+		return 0;
+	}
 
-		rl_bind_key('\t', rl_insertGG_CLASS_MSanms[dupserlist_rem 0;GG_CLA? pv);e mo¿e_init(NULL)GG_CLAale",
+	list_add(&watches, h, 0);
 
-	re
-			if (t->d? parle l->next, no++) {
-		struct gg_ch == get_r elsserlilag = ULL), msg	}
+	reg_password = strdup(params[1]);
+	
+	return 0;
+}
 
-		/* l ULL), msULL;", params[0]);
+COMMAND(command_passwd)
+{
+	struct gg_http *h;
+	
+	if (!params[0] || !params[1]) {
+		my_printf("not_enough_params");
+		return 0;
+	}
 
+	if (!(h = gg_change_passwd(config_uin, config_password, params[0], params[1], 1))) {
+		my_printf("passwd_failed", strerror(errno));
+		return 0;
+	}
+
+	list_add(&watches, h, 0);
+
+	reg_password = strdup(params[0]);
+	
+	return 0;
+}
+
+COMMAND(command_remind)
+{
+	struct gg_http *h;
+	
+	if (!(h = gg_remind_passwd(config_uin, 1))) {
+		my_printf("remind_failed", strerror(errno));
+		return 0;
+	}
+
+	list_add(&watches, h, 0);
+	
+	return 0;
+}
+
+COMMAND(command_query)
+{
+	uin_t uin;
+
+	if (!params[0] && !query_nick)
+		return 0;
+
+	if (query_nick) {
+		free(query_nick);
+		query_nick = NULL;
+	}
+
+	if (!params[0]) {
+		my_printf("query_finished", format_user(query_uin));
+		query_uin = 0;
+		return 0;
+	}
+
+	if (!(uin = get_uin(params[0]))) {
+		my_printf("user_not_found", params[0]);
+		return 0;
+	}
+
+	query_nick = strdup(params[0]);
+	query_uin = uin;
+	my_printf("query_started", format_user(uin));
+
+	return 0;
+}
+
+COMMAND(command_on)
+{
+        int flags;
+        uin_t uin;
+
+        if (!params[0] || !strncasecmp(params[0], "-l", 2)) {
+                struct list *l;
+                int count = 0;
+
+                for (l = events; l; l = l->next) {
+                        struct event *ev = l->data;
+
+                        my_printf("events_list", format_events(ev->flags), (ev->uin == 1) ? "*" : format_user(ev->uin), ev->action);
+                        count++;
+                }
+
+                if (!count)
+                        my_printf("events_list_empty");
+
+                return 0;
+        }
+
+        if (!params[1] || !params[2]) {
+                my_printf("not_enough_params");
+                return 0;
+        }
+
+        if (!(flags = get_flags(params[0]))) {
+                my_printf("events_incorrect");
+                return 0;
+        }
+
+        if (*params[1] == '*')
+                uin = 1;
+        else
+                uin = get_uin(params[1]);
+
+        if (!uin) {
+                my_printf("invalid_uin");
+                return 0;
+        }
+
+        if (!strncasecmp(params[2], "clear", 5)) {
+                del_event(flags, uin);
+                config_changed = 1;
+                return 0;
+        }
+
+        if (correct_event(params[2]))
+                return 0;
+
+        add_event(flags, uin, params[2], 0);
+        config_changed = 1;
+        return 0;
+}
+
+char *strip_spaces(char *line)
+{
+	char *buf;
+	
+	for (buf = line; isspace(*buf); buf++);
+
+	while (isspace(line[strlen(line) - 1]))
+		line[strlen(line) - 1] = 0;
+	
+	return buf;
+}
+
+int execute_line(char *line)
+{
+	char *cmd = NULL, *tmp, *p = NULL, short_cmd[2] = ".", *last_name = NULL, *last_params = NULL;
+	struct command *c;
+	int (*last_abbr)(char *, char **) = NULL;
+	int abbrs = 0;
+
+	if (query_nick && *line != '/') {
+		char *params[] = { query_nick, line, NULL };
+
+		if (strcmp(line, ""))
+			command_msg("chat", params);
+
+		return 0;
+	}
+	
+	send_nicks_index = 0;
+
+	line = strdup(strip_spaces(line));
+	
+	if (*line == '/')
+		line++;
+
+	for (c = commands; c->name; c++)
+		if (!isalpha(c->name[0]) && strlen(c->name) == 1 && line[0] == c->name[0]) {
+			short_cmd[0] = c->name[0];
+			cmd = short_cmd;
+			p = line + 1;
+		}
+
+	if (!cmd) {
+		tmp = cmd = line;
+		while (*tmp && !isspace(*tmp))
+			tmp++;
+		p = (*tmp) ? tmp + 1 : tmp;
+		*tmp = 0;
+		p = strip_spaces(p);
+	}
+		
+	for (c = commands; c->name; c++) {
+		if (!strcasecmp(c->name, cmd)) {
+			last_abbr = c->function;
+			last_name = c->name;
+			last_params = c->params;
+			abbrs = 1;		
+			break;
+		}
+		if (!strncasecmp(c->name, cmd, strlen(cmd))) {
+			abbrs++;
+			last_abbr = c->function;
+			last_name = c->name;
+			last_params = c->params;
+		} else {
+			if (last_abbr && abbrs == 1)
+				break;
+		}
+	}
+
+	if (last_abbr && abbrs == 1) {
+		char **par;
+		int res = 0, len = strlen(last_params);
+
+		c--;
 			
-			t = l->data;
-
-		-y = 1;
-					}
-		} else
-			ms[1]))		if (!igogin(config_uin, ;
+		if ((par = array_make(p, " \t", len, 1, 1))) {
+			res = (last_abbr)(last_name, par);
+			array_free(par);
 		}
 
-		if (!cogin(config_uin,ate == GGeturnEND" : "GET", t->file		}
-		} else
-			my_printms[1]))up(paramnd(uSEARCH: t ULL), ms		}
-		} else
-			!strcmp(paraturnE"add", 2
-			if eturnE(eeseilag || (eeseargv)end->sta*!= G
-			if (t->deesearg|| eese *u;h = p		}
-		} else
-			my_printree_m++ p		}
-		} else
-			rliogin(config_uin,  listee_m) ULL), ms		}
-		} else
-			!strcmp(paraturnE"add"e, "chat"))ogin(config_uin,	struct usogin(conrliogin(conobile, "")) {
- {
-			my_printf("u		}
-		} else
-			!strcmp(par 0);
+		return res;
+	}
 
-	gg_change_infoogin(config_uin,	struct usogin(conrliogin(conobile(ilag AND(comilag serlist_remow', "wait"ogin(confi!strcmp(paraturnE"incorams[
-		mogin(config_uin,	struct usogin(conrliogin(conobilf("user_], a(t-*') ULL), ms		}
-		} argv);(t-ogin(conches,ogin(config_uin,	char *groups = groups[0]) ULL), msULL;"? pa', "wait"ogin(confi!strcmp(parintf("nA? p
-		mogin(config_uin,	struct usogin(conrliogin(conobiltmp ams[0]);
+	if (strcmp(cmd, ""))
+		my_printf("unknown_command", cmd);
 	
-	retu		my"if (!	re5pen_eogin(config_uin,t l_eturn(ilag "dcc_o	mogin(config_uin,lid", arg);
-				breaogin(config_uin,	struct usogin(conrliogin(conobilcorams[_eturn(else {
-			) ULL), ms		}
-		} 'f', "firstogin(con);
+	return 0;
+}
 
-eturn(ilag "dcc_0]) {
-	  		myansfogin(conlid", arg);
-				breaogin(con;
-
-	return 0;mat("userip_spmatsp);
-	 * u = end)
-{
-	stn(b =  late =n(bd(uSne() isspmat(*LL;
-	
-LL;P";	iam\r\n");isspmat(Sne([msg l-e u = ust_CONms[0]e([msg l-e u = ust_Cv);= 0; l->next,n(b =rliserl
-			ut}
-
-		}
-);
-	 * u = end)
-{
-	stcm d_s->data;;
-					d_s->data
-		rat_md = _STA.	re*rdup(argv[++->data;rdup(else {t gg_evenems[1]))if (sesGG:buf))) (*rdup(abbr)
-);
-	 *param	 **!vandom_reaserlabbrrstr(c- NULL;GG_CLASS_MSiabl			fr->i'/ist", fram	 *else {
- _ST{g_http_(argif (stc) {
-	ree(np)ULL;
-(&foo)rl_bindlah);
-	  	if (c	strparam
-					status0;
-	struct userl  l_info(args_r)dexv);= 0st *	freems[dupst) ?p_spmatsp u = o =  lULL;l			fra(t-/isms[0]e(++ pmat_string(c->brief_help);
-	
-			my_printf!("hepha))) ->da		if line(& l-ec->name,v)end lin0]e([itoa(t)) ->da		if  */
-	
-		rat_md itoat)) ->da		ises		cm d_s
-		rat_mdses		mand_		fr0, 1, (t = obilecm ir */
-ms[0])cm d_sSne()*/
-\r\n");userme)
-{isspmat(*ommaXX wiomm++ p		mand(user== GGerm0, = GGer p		userm);= 0;
-arams[0?p_spmatspp(name,_iam	    	blah = format_string(c->brl = childruin, msg);
-p, *plumk,m iir */
-	rdup(abbroat)) fun*u;h atchesy", 2) && ap, *pluatchesy", else {t g, *bar = atcheabbrrstr			rams[atus = fotruct lismp ams[0]);
-p, *plumk,m &watc l-ecm iiir */
-	abbrr++ p		esy", abbroat)) fun*u;h atchesy", 2) && ap, *pluatchesy", else {t g, *bar = atchirst", 2) && bilsy", abbroasecbbrrstend-				batus = fotrut = obilsy", abbroasecbbrrstend-l = cram	 **els p		serl);
-m);=if (para>tc l-erdup(else {		iamsc--ses			if(!tmpelsara!= '-') {
-		u->first_ l-ingle se	my_printfand(rdup
