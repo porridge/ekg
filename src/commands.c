@@ -5242,8 +5242,8 @@ void command_init()
 	  " [-l, --list] [alias]             wy¶wietla listê aliasów\n"
 	  "\n"
 	  "W komendzie mo¿na u¿yæ formatów od %T%%1%n do %T%%9%n i w "
-	  "ten sposób ustaliæ kolejno¶æ przekazywanych argumentów. Nale¿y "
-          "u¿yæ dwukrotnie znaku %T%%%n, je¶li format ma byæ dos³ownie u¿yty.");
+	  "ten sposób ustaliæ kolejno¶æ przekazywanych argumentów. Aby otrzymaæ "
+          "znak procenta w aliasie, nale¿y zastosowaæ zapis %T%%%%%n.");
 	  
 	command_add
 	( "away", "?", cmd_away, 0,
