@@ -162,13 +162,15 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 #ifdef WITH_WAP
 		{
 			FILE *wap;
-			char waptime[10];
+			char waptime[10], waptime2[10];
 			const char *waplog;
 
-			sprintf(waptime, "wap%5s", timestr);
+			strftime(waptime2, sizeof(waptime2), "%H:%M", tm);
+
+			sprintf(waptime, "wap%5s", waptime2);
 			if ((waplog = prepare_path(waptime, 1))) {
 				if ((wap = fopen(waplog, "a"))) {
-					fprintf(wap,"%s(%s):%s\n", target, timestr, line);
+					fprintf(wap,"%s(%s):%s\n", target, waptime2, line);
 					fclose(wap);
 				}
 			}
