@@ -23,7 +23,7 @@ int main()
 
 	gg_debug_level = ~0;
 	
-	sess = gg_login(535333, "dupa123", 1);
+	sess = gg_login(123456, "dupa.8", 1);
 
 	for (;;) {
 		FD_ZERO(&rd);
