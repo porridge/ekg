@@ -4840,7 +4840,7 @@ void command_init()
 	  "  -u, --unignore <#nazwa>     oznacza konferencjê jako nieingorowan±\n"
 	  "  -r, --rename <#old> <#new>  zmienia nazwê konferencji\n"
 	  "  -f, --find <#nazwa>         wyszukuje uczestnikow w katalogu\n"
-	  " [-l, --list ] [#nazwa]       wy¶wietla listê konferencji\n"
+	  " [-l, --list] [#nazwa]        wy¶wietla listê konferencji\n"
 	  "\n"
 	  "Dodaje nazwê konferencji i definiuje, kto bierze w niej udzia³. "
 	  "Kolejne numery, pseudonimy lub grupy mog± byc odzielone "
