@@ -530,6 +530,8 @@ COMMAND(command_connect)
 		connecting = 0;
 		if (sess->state == GG_STATE_CONNECTED)
 			my_printf("disconnected");
+		else if (sess->state != GG_STATE_IDLE)
+			my_printf("conn_stopped");
 		gg_logoff(sess);
 		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
@@ -704,6 +706,8 @@ COMMAND(command_find)
 
 	h->id = id * 2 + ((argv[1]) ? 1 : 0);
 	h->user_data = query;
+
+	list_add(&watches, h, 0);
 	
 	return 0;
 }

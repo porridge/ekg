@@ -526,6 +526,7 @@ void init_theme()
 	add_format("offline_mode", "%! Tryb off-line\n", 1);
 	add_format("connecting", "%> £±czê siê z serwerem...\n", 1);
 	add_format("conn_failed", "%! Po³±czenie nie uda³o siê: %1\n", 1);
+	add_format("conn_stopped", "%! Przerwano ³±czenie\n", 1);
 	add_format("connected", "%> Po³±czono %c(%C%#%c)%n\n", 1);
 	add_format("disconnected", "%> Roz³±czono %c(%C%#%c)%n\n", 1);
 	add_format("theme_loaded", "%> Wczytano opis wygl±du o nazwie %W%1%n\n", 1);

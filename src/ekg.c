@@ -53,7 +53,7 @@ int my_getc(FILE *f)
 	for (;;) {
 		FD_ZERO(&rd);
 		FD_ZERO(&wd);
-		FD_SET(0, &rd);
+		
 		maxfd = 0;
 
 		for (l = watches; l; l = l->next) {
@@ -165,24 +165,24 @@ int my_getc(FILE *f)
 						if (gg_search_watch_fd(h) == -1) {
 							my_printf("search_failed", strerror(errno));
 							free(h->user_data);
-							gg_free_search(h);
 							list_remove(&watches, h, 0);
+							gg_free_search(h);
 							break;
 						}
 						if (h->state == GG_STATE_ERROR) {
 							gg_debug(GG_DEBUG_MISC, "++ gg_search()... error\n");
 							my_printf("search_failed", strerror(errno));
 							free(h->user_data);
-							gg_free_search(h);
 							list_remove(&watches, h, 0);
+							gg_free_search(h);
 							break;
 						}
 						if (h->state == GG_STATE_DONE) {	
 							gg_debug(GG_DEBUG_MISC, "++ gg_search()... done\n");
 							handle_search(h);
 							free(h->user_data);
-							gg_free_search(h);
 							list_remove(&watches, h, 0);
+							gg_free_search(h);
 							break;
 						}
 						break;
@@ -190,25 +190,26 @@ int my_getc(FILE *f)
 					case GG_SESSION_REGISTER:
 						if (gg_register_watch_fd(h)) {
 							my_printf("register_failed", strerror(errno));
-							gg_free_register(h);
 							list_remove(&watches, h, 0);
+							gg_free_register(h);
 							free(reg_password);
 							break;
 						}
 						if (s->state == GG_STATE_ERROR) {
 							my_printf("register_failed", strerror(errno));
-							gg_free_register(h);
 							list_remove(&watches, h, 0);
+							gg_free_register(h);
 							free(reg_password);
 							break;
 						}
 						if (s->state == GG_STATE_DONE) {	
 							handle_register(h);
-							gg_free_register(h);
 							list_remove(&watches, h, 0);
+							gg_free_register(h);
 							break;
 						}
 					}
+				break;
 			}
 		}
 	}
@@ -326,8 +327,9 @@ u¿ycie: %s [OPCJE]
 	/* dodajemy stdin do ogl±danych deskryptorów */
 	si.fd = 0;
 	si.check = GG_CHECK_READ;
-	si.state = GG_STATE_IDLE;
+	si.state = GG_STATE_READING_DATA;
 	si.type = GG_SESSION_USER0;
+	si.id = 0;
 	list_add(&watches, &si, sizeof(si));
 
 	rl_initialize();
@@ -335,7 +337,6 @@ u¿ycie: %s [OPCJE]
 	rl_readline_name = "gg";
 	rl_attempted_completion_function = (CPPFunction *) my_completion;
 	rl_completion_entry_function = (void*) empty_generator;
-//	rl_parse_and_bind("set bell-style none\n");
 
 	if (load_theme)
 		read_theme(load_theme, 1);
