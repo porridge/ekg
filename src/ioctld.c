@@ -69,7 +69,7 @@ int blink_leds(int *flag, int *delay)
 	for(s=0; flag[s] >= 0 && s <= MAX_ITEMS; s++) {
 #ifdef sun
 		int leds = 0;
-		/* tak.. na sunach jest to troszke inaczej */
+		/* tak.. na sunach jest to troszkê inaczej */
 		if (flag[s] & 1) 
 			leds |= LED_NUM_LOCK;
 		if (flag[s] & 2) 
@@ -99,26 +99,36 @@ int blink_leds(int *flag, int *delay)
 
 int beeps_spk(int *tone, int *delay)
 {
-#ifndef sun /* dla Solarisa moze byc z tym ciezko... */
-    	int s, fd;
+    	int s;
+#ifndef sun
+	int fd;
 
     	if ((fd = open("/dev/console", O_WRONLY)) == -1)
 		fd = STDOUT_FILENO;
+#endif
 		
 	for(s=0; tone[s] >= 0 && s <= MAX_ITEMS; s++) {
+
 #ifdef __FreeBSD__
 		ioctl(fd, KIOCSOUND, 0);
 #endif
+
+#ifndef sun
 	    	ioctl(fd, KIOCSOUND, tone[s]);
+#else
+		/* ¿a³osna namiastka... */
+		putchar('\a');
+		fflush(stdout);
+#endif
 		if (delay[s] && delay[s] <= MAX_DELAY)
 			usleep(delay[s]);
 	}
 
+#ifndef sun
 	ioctl(fd, KIOCSOUND, 0);
 	
 	if (fd != STDOUT_FILENO)
 		close(fd);
-
 #endif
 
 	return 0;
@@ -175,10 +185,8 @@ int main(int argc, char **argv)
 		if (data.act == ACT_BLINK_LEDS)  
 		    	blink_leds(data.value, data.delay);
 		
-#ifndef sol
 		else if (data.act == ACT_BEEPS_SPK) 
 		    	beeps_spk(data.value, data.delay);
-#endif
 	}
 	
 	exit(0);
