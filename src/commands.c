@@ -2674,7 +2674,7 @@ int binding_toggle_debug(int a, int b)
 
 int binding_toggle_contacts(int a, int b)
 {
-#ifdef HAVE_UI_NCURSES
+#ifdef WITH_UI_NCURSES
 	config_contacts = !config_contacts;
 	contacts_rebuild();
 	ui_event("variable_changed", "contacts", NULL);
