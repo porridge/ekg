@@ -163,13 +163,9 @@ int check_mail_mbox(const char **folders)
 		return 1;
 	}
 
-	/* TODO                                                            */
-	/* - nie czytaæ ca³ego pliku co chwilê, je¶li nie siê nie zmieni³o */
-
 	if (!pid) {	/* born to be wild */
 		char *str_new = NULL, *line = NULL;
-		int f_new = 0, new = 0, f_total = 0, total = 0;
-		int i = 0, in_header = 0;
+		int f_new = 0, new = 0, i = 0, in_header = 0;
 		FILE *f;
 		struct stat st;
 		struct timeval foo[1];
@@ -178,12 +174,7 @@ int check_mail_mbox(const char **folders)
 
 		while (folders[i]) {
 
-			if (stat(folders[i], &st)) {
-				i++;
-				continue;
-			}
-
-			if (!(f = fopen(folders[i], "r"))) {
+			if (stat(folders[i], &st) == -1 || !(f = fopen(folders[i], "r"))) {
 				i++;
 				continue;
 			}
@@ -191,7 +182,6 @@ int check_mail_mbox(const char **folders)
 			while ((line = read_file(f))) {
 				if (!strncmp(line, "From ", 5)) {
 					in_header = 1;
-					f_total++;
 					f_new++;
 				}
 
@@ -216,10 +206,7 @@ int check_mail_mbox(const char **folders)
 #endif
 
 			new += f_new;
-			total += f_total;
-
 			f_new = 0;
-			f_total = 0;
 
 			i++;
 		}
@@ -274,9 +261,6 @@ int check_mail_maildir(const char **folders)
 		close(fd[1]);
 		return 1;
 	}
-
-	/* TODO                                                  */
-	/* - nie sprawdzaæ co chwilê, je¶li siê nic nie zmieni³o */
 
 	if (!pid) {	/* born to be wild */
 		int d_new = 0, new = 0, i = 0;

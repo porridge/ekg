@@ -28,4 +28,5 @@ int check_mail_update();
 int check_mail_mbox(const char **folders);
 int check_mail_maildir(const char **folders);
 void changed_check_mail(const char *var);
+
 #endif	/* __MAIL_H */
