@@ -10,6 +10,7 @@ zg³osi³ b³±d.
 
 - wyciszenie aliasu spowoduje wyciszenie komend w nim zawartych (sz)
 - brakuj±cy opis warto¶ci 4 zmiennej ,,completion_notify'' (sz)
+- usuwanie u¿ytkownika z listy dope³nieñ po usuniêciu go z listy (sz)
 
 // 2003-01-26
 

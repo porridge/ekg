@@ -526,6 +526,7 @@ COMMAND(cmd_del)
 		}
 
 		printq("user_cleared_list");
+		command_exec(NULL, "^cleartab");
 		config_changed = 1;
 		return 0;
 	}
@@ -537,6 +538,7 @@ COMMAND(cmd_del)
 		printq("user_deleted", tmp);
 		if (sess)
 			gg_remove_notify(sess, uin);
+		remove_send_nick(nick);
 		config_changed = 1;
 		ui_event("userlist_changed", nick, itoa(uin));
 	} else {
