@@ -126,7 +126,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 		for (i = 0; i < e->event.msg.formats_length; ) {
 			int pos = p[i] + p[i + 1] * 256;
 
-			if (pos > strlen(e->event.msg.message)) {
+			if (pos >= strlen(e->event.msg.message)) {
 				xfree(formatmap);
 				formatmap = NULL;
 				break;
