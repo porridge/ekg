@@ -44,5 +44,6 @@ void variable_init();
 struct variable *variable_find(const char *name);
 int variable_add(const char *name, int type, int display, void *ptr, void (*notify)(const char *name));
 int variable_set(const char *name, const char *value, int allow_foreign);
+void variable_free();
 
 #endif /* __VARS_H */

@@ -35,6 +35,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
+#include <libgadu.h>
 #include "config.h"
 #include "libgadu.h"
 #include "stuff.h"
@@ -53,27 +54,41 @@ int ekg_pid = 0;
 char argv0[PATH_MAX];
 
 /*
+ * usuwanie sesji GG_SESSION_USERx.
+ */
+void reaper_user(void *foo)
+{
+	xfree(foo);
+}
+
+#define VV void(*)(void*)
+
+/*
  * struktura zawieraj±ca adresy funkcji obs³uguj±cych ró¿ne sesje
+ * i zwalniaj±cych pamiêæ po nich.
  */
 static struct {
 	int type;
 	void (*handler)(void*);
+	void (*reaper)(void*);
 } handlers[] = {
-	{ GG_SESSION_GG, (void (*)(void*)) handle_event, },
-	{ GG_SESSION_DCC, (void (*)(void*)) handle_dcc, },
-	{ GG_SESSION_DCC_SOCKET, (void (*)(void*)) handle_dcc, },
-	{ GG_SESSION_DCC_SEND, (void (*)(void*)) handle_dcc, },
-	{ GG_SESSION_DCC_GET, (void (*)(void*)) handle_dcc, },
-	{ GG_SESSION_DCC_VOICE, (void (*)(void*)) handle_dcc, },
-	{ GG_SESSION_SEARCH, (void (*)(void*)) handle_search, },
-	{ GG_SESSION_REGISTER, (void (*)(void*)) handle_pubdir, },
-	{ GG_SESSION_PASSWD, (void (*)(void*)) handle_pubdir, },
-	{ GG_SESSION_REMIND, (void (*)(void*)) handle_pubdir, },
-	{ GG_SESSION_CHANGE, (void (*)(void*)) handle_pubdir, },
-	{ GG_SESSION_USERLIST_GET, (void (*)(void*)) handle_userlist, },
-	{ GG_SESSION_USERLIST_PUT, (void (*)(void*)) handle_userlist, },
-	{ GG_SESSION_USER2, (void (*)(void*)) handle_voice, },
-	{ -1, NULL, }, 
+	{ GG_SESSION_GG, (VV) handle_event, (VV) gg_free_session },
+	{ GG_SESSION_DCC, (VV) handle_dcc, (VV) gg_dcc_free },
+	{ GG_SESSION_DCC_SOCKET, (VV) handle_dcc, (VV) gg_dcc_free },
+	{ GG_SESSION_DCC_SEND, (VV) handle_dcc, (VV) gg_dcc_free },
+	{ GG_SESSION_DCC_GET, (VV) handle_dcc, (VV) gg_dcc_free },
+	{ GG_SESSION_DCC_VOICE, (VV) handle_dcc, (VV) gg_dcc_free },
+	{ GG_SESSION_SEARCH, (VV) handle_search, (VV) gg_search_free },
+	{ GG_SESSION_REGISTER, (VV) handle_pubdir, (VV) gg_register_free },
+	{ GG_SESSION_PASSWD, (VV) handle_pubdir, (VV) gg_change_passwd_free },
+	{ GG_SESSION_REMIND, (VV) handle_pubdir, (VV) gg_remind_passwd_free },
+	{ GG_SESSION_CHANGE, (VV) handle_pubdir, (VV) gg_change_pubdir_free },
+	{ GG_SESSION_USERLIST_GET, (VV) handle_userlist, (VV) gg_userlist_get_free },
+	{ GG_SESSION_USERLIST_PUT, (VV) handle_userlist, (VV) gg_userlist_put_free },
+	{ GG_SESSION_USER0, NULL, (VV) reaper_user },
+	{ GG_SESSION_USER1, NULL, (VV) reaper_user },
+	{ GG_SESSION_USER2, (VV) handle_voice, (VV) reaper_user },
+	{ -1, NULL, NULL }, 
 };
 
 #define PIPE_MSG_MAX_BUF_LEN 1024
@@ -324,7 +339,7 @@ void ekg_wait_for_key()
 				}
 
 				for (i = 0; handlers[i].type != -1; i++)
-					if (c->type == handlers[i].type) {
+					if (c->type == handlers[i].type && handlers[i].handler) {
 						(handlers[i].handler)(c);
 						break;
 					}
@@ -481,9 +496,9 @@ int main(int argc, char **argv)
 	}
 
 	if (getenv("CONFIG_DIR"))
-	    config_dir = saprintf("%s/%s/gg", home_dir, getenv("CONFIG_DIR"));
+		config_dir = saprintf("%s/%s/gg", home_dir, getenv("CONFIG_DIR"));
 	else
-	    config_dir = saprintf("%s/.gg", home_dir);
+		config_dir = saprintf("%s/.gg", home_dir);
 
 	signal(SIGSEGV, sigsegv_handler);
 	signal(SIGHUP, sighup_handler);
@@ -689,6 +704,7 @@ int main(int argc, char **argv)
 
 	/* dodajemy stdin do ogl±danych deskryptorów */
 	if (!batch_mode) {
+		memset(&si, 0, sizeof(si));
 		si.fd = 0;
 		si.check = GG_CHECK_READ;
 		si.state = GG_STATE_READING_DATA;
@@ -700,6 +716,7 @@ int main(int argc, char **argv)
 
 	/* dodajemy otwarty potok sterujacy do ogl±danych deskryptorów */
 	if (!batch_mode && pipe_fd > 0) {
+		memset(&si, 0, sizeof(si));
 		si.fd = pipe_fd;
 		si.check = GG_CHECK_READ;
 		si.state = GG_STATE_READING_DATA;
@@ -753,7 +770,32 @@ int main(int argc, char **argv)
 	if (pipe_file)
 		unlink(pipe_file);
 	
-	free(config_log_path);	
+	alias_free();
+	userlist_free();
+	theme_free();
+	variable_free();
+	event_free();
+	emoticon_free();
+
+	xfree(home_dir);
+
+	for (l = watches; l; l = l->next) {
+		struct gg_session *s = l->data;
+		int i;
+
+		for (i = 0; handlers[i].reaper; i++) {
+			if (handlers[i].type == s->type) {
+				handlers[i].reaper(s);
+				break;
+			}
+		}
+	}
+
+	list_destroy(watches, 0);
+
+	xfree(gg_proxy_host);
+	xfree(config_dir);
+	
 	return 0;
 }
 

@@ -42,5 +42,6 @@ char *format_string(const char *format, ...);
 void theme_init();
 int theme_read(const char *filename, int replace);
 void theme_cache_reset();
+void theme_free();
 
 #endif /* __THEMES_H */

@@ -1275,6 +1275,8 @@ COMMAND(command_msg)
 	
 	unidle();
 
+	array_free(nicks);
+
 	return 0;
 }
 
@@ -1441,6 +1443,8 @@ COMMAND(command_quit)
 	}
 
 	ekg_logoff(sess, tmp);
+
+	xfree(tmp);
 
 	ui_event("disconnected");
 
@@ -2147,7 +2151,7 @@ char *strip_spaces(char *line)
 
 int old_execute(char *target, char *line)
 {
-	char *cmd = NULL, *tmp, *p = NULL, short_cmd[2] = ".", *last_name = NULL, *last_params = NULL;
+	char *cmd = NULL, *tmp, *p = NULL, short_cmd[2] = ".", *last_name = NULL, *last_params = NULL, *line_save = NULL;
 	struct command *c;
 	int (*last_abbr)(char *, char **) = NULL;
 	int abbrs = 0;
@@ -2180,7 +2184,7 @@ int old_execute(char *target, char *line)
 	
 	send_nicks_index = 0;
 
-	line = xstrdup(strip_spaces(line));
+	line = line_save = xstrdup(strip_spaces(line));
 	
 	if (*line == '/')
 		line++;
@@ -2230,11 +2234,15 @@ int old_execute(char *target, char *line)
 		res = (last_abbr)(last_name, par);
 		array_free(par);
 
+		xfree(line_save);
+
 		return res;
 	}
 
 	if (strcmp(cmd, ""))
 		print("unknown_command", cmd);
+
+	xfree(line_save);
 	
 	return 0;
 }

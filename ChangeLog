@@ -8,6 +8,12 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-08-02
 
 - valgrind jest *PRZEPIEKNY*, na dzisiaj dwa leaki usuniête (w)
+- naprawienie va_format_string() -- nie siêga w va_list g³êbiej
+  ni¿ jest to potrzebne. valgrind mniej ¶mieci (w)
+- zwalnianie wszystkiego, co nie jest potrzebne ekg. tak, trochê
+  siê to ró¿ni od dotychczasowej polityki (po co zwalniaæ, skoro
+  i tak exit() siê tym zajmie), ale w ten sposób znacznie ³atwiej
+  jest wykrywaæ leaki (w)
 
 // 2002-08-01
 

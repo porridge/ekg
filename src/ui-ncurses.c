@@ -193,6 +193,9 @@ static void ui_ncurses_deinit()
 	werase(input);
 	wnoutrefresh(input);
 	doupdate();
+	delwin(output);
+	delwin(input);
+	delwin(status);
 	endwin();
 }
 

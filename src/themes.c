@@ -81,12 +81,50 @@ char *va_format_string(const char *format, va_list ap)
 	static int dont_resolve = 0;
 	string_t buf;
 	const char *p, *args[9];
-	int i;
+	int i, argc = 0;
+
+	for (p = format; *p; p++) {
+		if (*p != '%')
+			continue;
+
+		p++;
+
+		if (!*p)
+			break;
+
+		if (*p == '@') {
+			p++;
+
+			if (!*p)
+				break;
+
+			argc = *p - '0';
+		} else if (*p == '(' || *p == '[') {
+			if (*p == '(') {
+				while (*p && *p != ')')
+					p++;
+			} else {
+				while (*p && *p != ']')
+					p++;
+			}
+
+			if (*p)
+				p++;
+			
+			if (!*p)
+				break;
+			
+			argc = *p - '0';
+		} else {
+			if (*p >= '1' && *p <= '9')
+				argc = *p - '0';
+		}
+	}
 
 	for (i = 0; i < 9; i++)
 		args[i] = NULL;
 
-	for (i = 0; i < 9; i++) {
+	for (i = 0; i < argc; i++) {
 		if (!(args[i] = va_arg(ap, char*)))
 			break;
 	}
@@ -317,7 +355,7 @@ void print(const char *theme, ...)
 	
 	ui_print("__current", (tmp) ? tmp : "");
 	
-	free(tmp);
+	xfree(tmp);
 	va_end(ap);
 }
 
@@ -336,7 +374,7 @@ void print_status(const char *theme, ...)
 	
 	ui_print("__status", (tmp) ? tmp : "");
 	
-	free(tmp);
+	xfree(tmp);
 	va_end(ap);
 }
 
@@ -355,7 +393,7 @@ void print_window(const char *target, const char *theme, ...)
 	
 	ui_print(target, (tmp) ? tmp : "");
 	
-	free(tmp);
+	xfree(tmp);
 	va_end(ap);
 }
 
@@ -366,9 +404,9 @@ void print_window(const char *target, const char *theme, ...)
  */
 void theme_cache_reset()
 {
-	free(prompt_cache);
-	free(prompt2_cache);
-	free(error_cache);
+	xfree(prompt_cache);
+	xfree(prompt2_cache);
+	xfree(error_cache);
 	
 	prompt_cache = prompt2_cache = error_cache = NULL;
 	timestamp_cache = NULL;
@@ -404,7 +442,7 @@ int format_add(const char *name, const char *value, int replace)
 
 		if (hash == g->name_hash && !strcasecmp(name, g->name)) {
 			if (replace) {
-				free(g->value);
+				xfree(g->value);
 				g->value = xstrdup(value);
 			}
 
@@ -435,8 +473,8 @@ int format_remove(const char *name)
 		struct format *f = l->data;
 
 		if (!strcasecmp(f->name, name)) {
-			free(f->value);
-			free(f->name);
+			xfree(f->value);
+			xfree(f->name);
 			list_remove(&formats, f, 1);
 		
 			return 0;
@@ -520,12 +558,12 @@ int theme_read(const char *filename, int replace)
                 char *value, *p;
 
                 if (buf[0] == '#') {
-			free(buf);
+			xfree(buf);
                         continue;
 		}
 
                 if (!(value = strchr(buf, ' '))) {
-			free(buf);
+			xfree(buf);
 			continue;
 		}
 
@@ -546,12 +584,37 @@ int theme_read(const char *filename, int replace)
 		else
 			format_add(buf, value, replace);
 
-		free(buf);
+		xfree(buf);
         }
 
         fclose(f);
 
         return 0;
+}
+
+/*
+ * theme_free()
+ *
+ * usuwa formatki z pamiêci.
+ */
+void theme_free()
+{
+	list_t l;
+
+	for (l = formats; l; l = l->next) {
+		struct format *f = l->data;
+
+		xfree(f->name);
+		xfree(f->value);
+	}	
+
+	list_destroy(formats, 1);
+	formats = NULL;
+
+	xfree(prompt_cache);
+	xfree(prompt2_cache);
+	xfree(error_cache);
+	prompt_cache = prompt2_cache = error_cache = NULL;
 }
 
 /*

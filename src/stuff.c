@@ -1029,6 +1029,24 @@ list_t alias_check(const char *line)
 }
 
 /*
+ * alias_free()
+ *
+ * usuwa pamiêæ zajêt± przez aliasy.
+ */
+void alias_free()
+{
+	list_t l;
+
+	for (l = aliases; l; l = l->next) {
+		struct alias *a = l->data;
+		
+		xfree(a->name);
+		list_destroy(a->commands, 1);
+	}
+
+	list_destroy(aliases, 1);
+}
+/*
  * event_format()
  *
  * zwraca ³añcuch zdarzeñ w oparciu o flagi. statyczny bufor.
@@ -1539,6 +1557,24 @@ int event_parse_seq(const char *seq, struct action_data *data)
 }
 
 /*
+ * event_free()
+ *
+ * zwalnia pamiêæ zwi±zan± ze zdarzeniami.
+ */
+void event_free()
+{
+	list_t l;
+
+	for (l = events; l; l = l->next) {
+		struct event *e = l->data;
+
+		xfree(e->action);
+	}
+
+	list_destroy(events, 1);
+}
+
+/*
  * init_control_pipe()
  *
  * inicjuje potok nazwany do zewnêtrznej kontroli ekg
@@ -1775,14 +1811,14 @@ void changed_proxy(const char *var)
 	
 	if (!config_proxy) {
 		gg_proxy_enabled = 0;
-		free(gg_proxy_host);
+		xfree(gg_proxy_host);
 		gg_proxy_host = NULL;
 		gg_proxy_port = 0;
 		return;
 	}
 
 	gg_proxy_enabled = 1;
-	free(gg_proxy_host);
+	xfree(gg_proxy_host);
 
 	if ((tmp = strchr(config_proxy, ':'))) {
 		int len = (int) tmp - (int) config_proxy;
@@ -2036,6 +2072,25 @@ int emoticon_read()
 	fclose(f);
 	
 	return 0;
+}
+
+/*
+ * emoticon_free()
+ *
+ * usuwa pamiêæ zajêt± przez emoticony.
+ */
+void emoticon_free()
+{
+	list_t l;
+
+	for (l = emoticons; l; l = l->next) {
+		struct emoticon *e = l->data;
+
+		xfree(e->name);
+		xfree(e->value);
+	}
+
+	list_destroy(emoticons, 1);
 }
 
 /*

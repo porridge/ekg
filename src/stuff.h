@@ -205,6 +205,7 @@ void iso_to_cp(unsigned char *buf);
 int alias_add(const char *string, int quiet, int append);
 int alias_remove(const char *name);
 list_t alias_check(const char *foo);
+void alias_free();
 
 char *base64_encode(const char *buf);
 char *base64_decode(const char *buf);
@@ -223,9 +224,11 @@ int event_run(const char *action);
 int event_send(const char *seq, int act);
 int event_correct(const char *action);
 int event_parse_seq(const char *seq, struct action_data *data);
+void event_free();
 int init_socket();
 
 int emoticon_read();
 char *emoticon_expand(const char *s);
+void emoticon_free();
 
 #endif /* __STUFF_H */

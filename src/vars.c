@@ -209,7 +209,7 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 		{
 			char **tmp = (char**)(v->ptr);
 			
-			free(*tmp);
+			xfree(*tmp);
 			
 			if (value) {
 				if (*value == 1)
@@ -232,3 +232,31 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 	return -1;
 }
 
+/*
+ * variable_free()
+ *
+ * zwalnia pamiêæ u¿ywan± przez zmienne.
+ *
+ * nie zwraca niczego.
+ */
+void variable_free()
+{
+	list_t l;
+
+	for (l = variables; l; l = l->next) {
+		struct variable *v = l->data;
+
+		xfree(v->name);
+
+		if (v->type == VAR_STR) {
+			xfree(*((char**) v->ptr));
+			*((char**) v->ptr) = NULL;
+		}
+
+		if (v->type == VAR_FOREIGN)
+			xfree((char*) v->ptr);
+	}
+
+	list_destroy(variables, 1);
+	variables = NULL;
+}
