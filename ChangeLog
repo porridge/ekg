@@ -14,6 +14,7 @@ zg³osi³ b³±d.
   literówki i drobne poprawki dokumentacji libgadu (w)
 - poprawka obs³ugi zmiennej ,,interface'' (a.latanski/w)
 - dodana zmienna ,,reason_limit'' (jojo/w)
+- poprawki ,,reload plik'', gdy kto¶ u¿ywa zarówno readline jak i ncurses (sz)
 
 // 2003-02-06
 

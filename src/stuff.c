@@ -1095,7 +1095,7 @@ int config_read(const char *filename, const char *var)
 {
 	char *buf, *foo;
 	FILE *f;
-	int even_started = 0, home = ((filename) ? 0 : 1);
+	int good_file = 0, ret = 1, home = ((filename) ? 0 : 1);
 	struct stat st;
 
 	if (!filename && !(filename = prepare_path("config", 0)))
@@ -1105,7 +1105,6 @@ int config_read(const char *filename, const char *var)
 		return -1;
 
 	if (stat(filename, &st) || !S_ISREG(st.st_mode)) {
-		errno = EISDIR;	/* XXX */
 		fclose(f);
 		return -1;
 	}
@@ -1145,7 +1144,6 @@ int config_read(const char *filename, const char *var)
 			continue;
 		}
 
-		even_started = 1;
 		*foo++ = 0;
 
 		if (var && strcmp(buf, var)) {
@@ -1157,21 +1155,25 @@ int config_read(const char *filename, const char *var)
 			char *bar;
 
 			if (!(bar = strchr(foo, ' ')))
-				variable_set(foo, NULL, 1);
+				ret = variable_set(foo, NULL, 1);
 			else {
 				*bar++ = 0;
-				variable_set(foo, bar, 1);
+				ret = variable_set(foo, bar, 1);
 			}
+
+			if (ret)
+				gg_debug(GG_DEBUG_MISC, "\tunknown variable %s %s\n", buf, foo);
+		
 		} else if (!strcasecmp(buf, "alias")) {
 			gg_debug(GG_DEBUG_MISC, "\talias %s\n", foo);
-			alias_add(foo, 1, 1);
+			ret = alias_add(foo, 1, 1);
 		} else if (!strcasecmp(buf, "on")) {
                         int flags;
                         char **pms = array_make(foo, " \t", 3, 1, 0);
 
                         if (pms && pms[0] && pms[1] && pms[2] && (flags = event_flags(pms[0]))) {
-                                event_add(flags, pms[1], pms[2], 1);
 				gg_debug(GG_DEBUG_MISC, "\ton %s %s %s\n", pms[0], pms[1], pms[2]);
+                                ret = event_add(flags, pms[1], pms[2], 1);
 			}
 
 			array_free(pms);
@@ -1179,8 +1181,9 @@ int config_read(const char *filename, const char *var)
 			char **pms = array_make(foo, " \t", 2, 1, 0);
 
 			if (pms && pms[0] && pms[1]) {
-				ui_event("command", 1, "bind", "--add", pms[0], pms[1], NULL);
 				gg_debug(GG_DEBUG_MISC, "\tbind %s %s\n", pms[0], pms[1]);
+				/* XXX ui_event() nie zwraca wyniku, szkoda */
+				ui_event("command", 1, "bind", "--add", pms[0], pms[1], NULL);
 			}
 
 			array_free(pms);
@@ -1214,7 +1217,7 @@ int config_read(const char *filename, const char *var)
 		
 				if (period > 0) {
 					tmp = saprintf("^%s --add %s %s %s", (at) ? "at" : "timer", (name) ? name : "", period_str, p[2]);
-					command_exec(NULL, tmp);
+					ret = command_exec(NULL, tmp);
 					xfree(tmp);
 				}
 
@@ -1222,29 +1225,25 @@ int config_read(const char *filename, const char *var)
 			}
 				array_free(p);
                 } else {
-			int wrong = variable_set(buf, foo, 1);
+			ret = variable_set(buf, foo, 1);
 
-			if (wrong)
+			if (ret)
 				gg_debug(GG_DEBUG_MISC, "\tunknown variable %s %s\n", buf, foo);
 
-			if (wrong && !home && !in_autoexec && !var) {
-				xfree(buf);
-				fclose(f);
-				config_read(NULL, NULL);
-				errno = EINVAL;
-				return -1;
-			}	
 		}
+
+		if (!ret)
+			good_file = 1;
 
 		xfree(buf);
 	}
 	
 	fclose(f);
 
-	if (!even_started && !home && !in_autoexec && !var) {
+	if (!good_file && !home && !in_autoexec && !var) {
 		config_read(NULL, NULL);
 		errno = EINVAL;
-		return -1;
+		return -2;
 	}
 	
 	return 0;

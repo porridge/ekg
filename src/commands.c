@@ -3177,18 +3177,14 @@ COMMAND(cmd_reload)
 	if (params[0])
 		filename = params[0];
 
-	if (config_read(filename, NULL)) {
+	if ((res = config_read(filename, NULL)))
 		printq("error_reading_config", strerror(errno));
-		filename = NULL;
-		res = -1;
-		if (errno != EINVAL)
-			return res;
+
+	if (res != -1) {
+		printq("config_read_success", (res != -2 && filename) ? filename : prepare_path("config", 0));
+		config_changed = 0;
+		update_status();
 	}
-
-	printq("config_read_success", ((filename) ? filename : prepare_path("config", 0)));
-
-	config_changed = 0;
-	update_status();
 
 	return res;
 }
