@@ -954,12 +954,12 @@ static int window_refresh()
 
         for (j = win->buff.last; j < MAX_LINES_PER_SCREEN; j++) {
                 if (win->buff.line[j])
-                        printf("%d:%s", j, win->buff.line[j]);
+                        printf("%s", win->buff.line[j]);
         }
 
         for (j=0; j < win->buff.last; j++) {
                 if (win->buff.line[j])
-                        printf("%d:%s", j, win->buff.line[j]);
+                        printf("%s", win->buff.line[j]);
         }
 
         return 0;
@@ -1015,13 +1015,21 @@ static int window_clear()
 static int windows_sort()
 {
         struct list *l;
-        int id = 1;
+        int id = 1, new_id = 0;
 
         for (l = windows; l; l = l->next) {
                 struct window *w = l->data;
 
+		if (w->id == curr_window)
+			new_id = id;
+
                 w->id = id++;
         }
+
+	if (new_id) {
+		curr_window = new_id;
+		window_refresh();
+	}
         
 	return 0;
 }
