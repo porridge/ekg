@@ -806,7 +806,7 @@ static struct window *window_find(const char *target)
 	}
 
 	if (target)
-		u = userlist_find(str_to_uin(target), target);
+		u = userlist_find(get_uin(target), NULL);
 
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
@@ -821,7 +821,7 @@ static struct window *window_find(const char *target)
 			if (!strcasecmp(target, w->target))
 				return w;
 
-			if (u && !strcasecmp(u->display, w->target))
+			if (u && u->display && !strcasecmp(u->display, w->target))
 				return w;
 
 			if (u && !strcasecmp(itoa(u->uin), w->target))
