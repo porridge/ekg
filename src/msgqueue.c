@@ -52,7 +52,7 @@ list_t msg_queue = NULL;
  *  - format - formatowanie wiadomo¶ci,
  *  - formatlen - d³ugo¶æ informacji o formatowaniu.
  *
- * 0 je¶li siê uda³o, -1 je¶li b³±d.
+ * 0/-1
  */
 int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const unsigned char *msg, int secure, const unsigned char *format, int formatlen)
 {
@@ -83,7 +83,7 @@ int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const 
  *
  *  - msg_seq - numer sekwencyjny wiadomo¶ci.
  *
- * 0 je¶li usuniêto, 1 je¶li nie ma takiej wiadomo¶ci.
+ * 0 je¶li usuniêto, -1 je¶li nie ma takiej wiadomo¶ci.
  */
 int msg_queue_remove(int msg_seq)
 {
@@ -103,7 +103,7 @@ int msg_queue_remove(int msg_seq)
 		}
 	}
 
-	return 1; 
+	return -1; 
 }
 
 /*
@@ -119,7 +119,7 @@ int msg_queue_remove(int msg_seq)
 int msg_queue_remove_uin(uin_t uin)
 {
 	list_t l;
-	int x = 0;
+	int x = -1;
 
 	for (l = msg_queue; l; ) {
 		struct msg_queue *m = l->data;
@@ -132,7 +132,7 @@ int msg_queue_remove_uin(uin_t uin)
 			xfree(m->format);
 
 			list_remove(&msg_queue, m, 1);
-			x = -1;
+			x = 0;
 		}
 	}
 
@@ -237,6 +237,8 @@ int msg_queue_count_uin(uin_t uin)
  * msg_queue_write()
  *
  * zapisuje niedostarczone wiadomo¶ci na dysku.
+ *
+ * 0/-1
  */
 int msg_queue_write()
 {
@@ -245,7 +247,7 @@ int msg_queue_write()
 	int num = 0;
 
 	if (!msg_queue)
-		return 0;
+		return -1;
 
 	path = prepare_path("queue", 1);
 
@@ -297,6 +299,8 @@ int msg_queue_write()
  * msg_queue_read()
  *
  * wczytuje kolejkê niewys³anych wiadomo¶ci z dysku.
+ *
+ * 0/-1
  */
 int msg_queue_read()
 {
@@ -307,7 +311,7 @@ int msg_queue_read()
 	path = prepare_path("queue", 0);
 
 	if (!(dir = opendir(path)))
-		return 0;
+		return -1;
 
 	while ((d = readdir(dir))) {
 		struct msg_queue m;
