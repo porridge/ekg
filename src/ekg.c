@@ -303,7 +303,6 @@ static void get_line_from_pipe(struct gg_exec *c)
 	}
 }
 
-
 /*
  * ekg_wait_for_key()
  *

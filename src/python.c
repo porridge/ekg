@@ -18,6 +18,7 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include "config.h"
 #include <Python.h>
 #include <sys/types.h>
 #include <dirent.h>
@@ -221,10 +222,27 @@ int python_initialize()
 
 	if (getenv("PYTHONPATH")) {
 		char *tmp = saprintf("%s:%s", getenv("PYTHONPATH"), prepare_path("scripts", 0));
+#ifdef HAVE_SETENV
 		setenv("PYTHONPATH", tmp, 1);
+#else
+		{
+			char *s = saprintf("PYTHONPATH=%s", tmp);
+			putenv(s);
+			xfree(s);
+		}
+#endif
 		xfree(tmp);
-	} else
+	} else {
+#ifdef HAVE_SETENV
 		setenv("PYTHONPATH", prepare_path("scripts", 0), 1);
+#else
+		{
+			char *s = saprintf("PYTHONPATH=%s", prepare_path("scripts", 0));
+			putenv(s);
+			xfree(s);
+		}
+#endif
+	}
 
 	Py_Initialize();
 

@@ -239,6 +239,8 @@ dnl <ekg>
 
 # i zaczynamy wykrywaæ ¶mieci dla ekg
 
+  AC_CHECK_FUNCS(setenv)
+
   # na wszelki wypadek
   AC_FUNC_SETVBUF_REVERSED
 
