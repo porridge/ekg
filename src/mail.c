@@ -141,23 +141,30 @@ int check_mail_mbox(const char **folders)
 		return 1;
 	}
 
-	/* TODO                                                                 */
-	/* - nie czytaæ ca³ego pliku co chwilê, je¶li siê nie zmieni³,          */
-	/* - o czym¶ zapomnia³em, bo np. mój mutt nie widzi nowej poczty, je¶li */
-	/*   przejedziemy naszym dzieciakiem po skrzynce z now± wiadomo¶ci±,    */
-	/*   co¶ z czasem ostatniego dostêpu do pliku ???                       */
+	/* TODO                                                            */
+	/* - nie czytaæ ca³ego pliku co chwilê, je¶li nie siê nie zmieni³o */
 
 	if (!pid) {	/* born to be wild */
 		char *str_new = NULL, *line = NULL;
 		int f_new = 0, new = 0, f_total = 0, total = 0;
 		int i = 0, in_header = 0;
 		FILE *f;
+		struct stat st;
+		struct timeval foo[1];
 
 		close(fd[0]);
 
 		while (folders[i]) {
-			if (!(f = fopen(folders[i++], "r")))
+
+			if (stat(folders[i], &st)) {
+				i++;
 				continue;
+			}
+
+			if (!(f = fopen(folders[i], "r"))) {
+				i++;
+				continue;
+			}
 
 			while ((line = read_file(f))) {
 				if (!strncmp(line, "From ", 5)) {
@@ -179,10 +186,18 @@ int check_mail_mbox(const char **folders)
 
 			fclose(f);
 
+			/* przecie¿ my nic nie ruszali¶my ;> */			
+			foo[0].tv_sec = st.st_atime;
+			foo[1].tv_sec = st.st_mtime;
+			utimes(folders[i], (const struct timeval *) &foo);
+
 			new += f_new;
 			total += f_total;
+
 			f_new = 0;
 			f_total = 0;
+
+			i++;
 		}
 
 		str_new = saprintf("%d", new);
@@ -236,7 +251,8 @@ int check_mail_maildir(const char **folders)
 		return 1;
 	}
 
-	/* TODO - równie¿, jak przy mbox'ie, nie sprawdzaæ, je¶li nie trzeba */
+	/* TODO                                                  */
+	/* - nie sprawdzaæ co chwilê, je¶li siê nic nie zmieni³o */
 
 	if (!pid) {	/* born to be wild */
 		int d_new = 0, new = 0, i = 0;
