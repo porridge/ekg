@@ -176,7 +176,8 @@ static int get_char_from_pipe(struct gg_common *c)
 	}
 
 	if (ch == '\n' && escaped) {	/* zamazuje \\ */
-		buf[strlen(buf) - 1] = ch;
+		buf[strlen(buf) - 1] = '\r';
+		buf[strlen(buf) - 1] = '\n';
 	}
 
 	if ((ch == '\n' && !escaped) || (strlen(buf) >= sizeof(buf) - 1)) {
