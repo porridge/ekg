@@ -1285,7 +1285,7 @@ COMMAND(command_list)
 		in.s_addr = u->ip.s_addr;
 
 		if (show_all || (show_busy && (u->status == GG_STATUS_BUSY || u->status == GG_STATUS_BUSY_DESCR)) || (show_active && (u->status == GG_STATUS_AVAIL || u->status == GG_STATUS_AVAIL_DESCR)) || (show_inactive && (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)) || (show_invisible && (u->status == GG_STATUS_INVISIBLE))) {
-			my_printf(tmp, format_user(u->uin), inet_ntoa(in), itoa(u->port), u->descr);
+			my_printf(tmp, format_user(u->uin), u->display, inet_ntoa(in), itoa(u->port), u->descr);
 			count++;
 		}
 	}

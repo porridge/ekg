@@ -312,7 +312,13 @@ void my_printf(char *theme, ...)
 				my_printf_lines++;
 
 		if (my_printf_lines > screen_lines - 2) {
-			char *tmp = readline(find_format("readline_more"));
+			char *tmp, *prompt = find_format("readline_more");
+			in_readline = 1;
+#ifdef HAVE_RL_SET_PROMPT
+		        rl_set_prompt(prompt);
+#endif				
+			tmp = readline(prompt);
+			in_readline = 0;
 			free(tmp);
 			my_printf_lines = 0;
 		}
@@ -557,13 +563,13 @@ void init_theme()
 	add_format("ignored_deleted", "%> U¿ytkownika %W%1%n usuniêto z listy ignorowanych\n", 1);
 	add_format("error_not_ignored", "%! U¿ytkownik %W%1%n nie jest ignorowany\n", 1);
 	add_format("list_empty", "%! Lista kontaktów jest pusta\n", 1);
-	add_format("list_avail", "%> %1 %Y(dostêpn%@1)%n %b%2:%3%n\n", 1);
-	add_format("list_avail_descr", "%> %1 %Y(dostêpn%@1: %n%4%Y)%n %b%2:%3%n\n", 1);
-	add_format("list_busy", "%> %1 %G(zajêt%@1)%n %b%2:%3%n\n", 1);
-	add_format("list_busy_descr", "%> %1 %G(zajêt%@1: %n%4%G)%n %b%2:%3%n\n", 1);
-	add_format("list_not_avail", "%> %1 %r(niedostêpn%@1)%n\n", 1);
-	add_format("list_not_avail_descr", "%> %1 %r(niedostêpn%@1: %n%4%r)%n\n", 1);
-	add_format("list_invisible", "%> %1 %c(niewidoczn%@1)%n %b%2:%3%n\n", 1);
+	add_format("list_avail", "%> %1 %Y(dostêpn%@2)%n %b%3:%4%n\n", 1);
+	add_format("list_avail_descr", "%> %1 %Y(dostêpn%@2: %n%5%Y)%n %b%3:%4%n\n", 1);
+	add_format("list_busy", "%> %1 %G(zajêt%@2)%n %b%3:%4%n\n", 1);
+	add_format("list_busy_descr", "%> %1 %G(zajêt%@2: %n%5%G)%n %b%3:%4%n\n", 1);
+	add_format("list_not_avail", "%> %1 %r(niedostêpn%@2)%n\n", 1);
+	add_format("list_not_avail_descr", "%> %1 %r(niedostêpn%@1: %n%5%r)%n\n", 1);
+	add_format("list_invisible", "%> %1 %c(niewidoczn%@2)%n %b%3:%4%n\n", 1);
 	add_format("list_unknown", "%> %1\n", 1);
 	add_format("saved", "%> Zapisano ustawienia\n", 1);
 	add_format("error_saving", "%! Podczas zapisu ustawieñ wyst±pi³ b³±d\n", 1);

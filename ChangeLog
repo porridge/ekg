@@ -10,6 +10,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - dodany arim.theme (arim/w)
 - poprawka themeów roz³±czania (arim/w)
 - DU¯E zmiany w autoconfie i Makefileach (w)
+- poprawione wykrywanie p³ci w list (gawrysz/w)
+- s/ioctl_daemon/ioctld/ (w)
 
 // 2002-05-16
 

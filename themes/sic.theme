@@ -40,8 +40,8 @@ search_falied %! %RB³±d podczas przeszukiwania%n%Y:%n %W%1%n\n
 search_not_found %! %RNie znaleziono nikogo o takich danych%n\n
 
 list_empty %> %YTwoja lista jest pusta%n\n
-list_avail %gdostêpny%n%K...%n   %W[%n%G+%n%W]%n   %W%[12]1%n [%K%[,-15]2%n]\n
-list_busy %czajêty%n%K.....%n   %W[%n%C?%n%W]%n   %Y%[12]1%n [%K%[,-15]2%n]\n
+list_avail %gdostêpny%n%K...%n   %W[%n%G+%n%W]%n   %W%[12]1%n [%K%[,-15]3%n]\n
+list_busy %czajêty%n%K.....%n   %W[%n%C?%n%W]%n   %Y%[12]1%n [%K%[,-15]3%n]\n
 list_not_avail %Kniedostêpny%n   %W[%n%R-%n%W]%n   %K%[12]1%n [%K...............%n]\n
 
 away %c%#%n %> %CWracam za chwilê ... %n\n

@@ -17,8 +17,8 @@ readline_prompt_away [30;1m[Zzz]> [0m
 known_user %Y%1%n%
 unknown_user %W%1%n
 
-list_avail %>   [%Gonline%n] %[-30]1 [%K%2%n]\n
-list_busy %>     [%Ybusy%n] %[-30]1 [%K%2%n]\n
+list_avail %>   [%Gonline%n] %[-30]1 [%K%3%n]\n
+list_busy %>     [%Ybusy%n] %[-30]1 [%K%3%n]\n
 list_not_avail %>  [%Koffline%n] %[-30]1 [%Kn/a%n]\n
 quit \n%Kc-you%n soon :-)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n%n
 
