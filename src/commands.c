@@ -2334,8 +2334,13 @@ COMMAND(cmd_remind)
 static int count_params(const char **params) {
 	int count = 0;
 
-	while (*params++)
+	if (!params)
+		return 0;
+
+	while (*params) {
 		count++;
+		params++;
+	}
 
 	return count;
 }
