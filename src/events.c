@@ -1238,6 +1238,7 @@ void handle_userlist(struct gg_http *h)
 		userlist_set(h->data, (h->user_data) ? 1 : 0);
 		userlist_send();
 		update_status();
+		update_status_myip();
 
 		config_changed = 1;
 	}
