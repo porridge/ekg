@@ -3810,21 +3810,26 @@ void update_status()
 	if (!u)
 		return;
 
+	update_status_myip();
+
 	if ((u->descr && config_reason && strcmp(u->descr, config_reason)) || (!u->descr && config_reason) || (u->descr && !config_reason))
 		event_check(EVENT_DESCR, config_uin, u->descr);
 
 	xfree(u->descr);
 	u->descr = xstrdup(config_reason);
 
+	if (ignored_check(u->uin) & IGNORE_STATUS) {
+		u->status = GG_STATUS_NOT_AVAIL;
+		return;
+	}
+
 	if (!sess || sess->state != GG_STATE_CONNECTED)
 		u->status = (u->descr) ? GG_STATUS_NOT_AVAIL_DESCR : GG_STATUS_NOT_AVAIL;
 	else
 		u->status = config_status;
 
-	if (ignored_check(u->uin))
-		u->status = GG_STATUS_NOT_AVAIL;
-
-	update_status_myip();
+	if (ignored_check(u->uin) & IGNORE_STATUS_DESCR)
+		u->status = ekg_hide_descr_status(u->status);
 }
 
 /*
