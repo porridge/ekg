@@ -97,7 +97,7 @@ struct command commands[] = {
 	{ "exec", "?", command_exec, " <polecenie>", "Uruchamia polecenie systemowe", "" },
 	{ "!", "?", command_exec, " <polecenie>", "Synonim dla %Wexec%n", "" },
 	{ "find", "u", command_find, " [opcje]", "Interfejs do katalogu publicznego", "  --uin <numerek>\n  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>\n  --city <miasto>\n  --birth <min:max>\n  --phone <telefon>\n  --email <e-mail>\n  --active\n  --female\n  --male\n" },
-	{ "info", "u", command_find, " <numer/alias>", "Interfejs do katalogu publicznego", "" },
+/*	{ "info", "u", command_find, " <numer/alias>", "Interfejs do katalogu publicznego", "" }, */
 	{ "help", "c", command_help, " [polecenie]", "Wy¶wietla informacjê o poleceniach", "" },
 	{ "?", "c", command_help, " [polecenie]", "Synonim dla %Whelp%n", "" },
 	{ "ignore", "u", command_ignore, " [numer/alias]", "Dodaje do listy ignorowanych lub j± wy¶wietla", "" },
@@ -1266,7 +1266,7 @@ COMMAND(command_set)
 		arg++;
 	}
 
-	if (!params[1] && !unset) {
+	if ((!params[0] || !params[1]) && !unset) {
 		for (l = variables; l; l = l->next) {
 			struct variable *v = l->data;
 			

@@ -84,10 +84,13 @@ struct variable *variable_find(char *name)
 {
 	struct list *l;
 
+	if (!name)
+		return NULL;
+
 	for (l = variables; l; l = l->next) {
 		struct variable *v = l->data;
 
-		if (!strcasecmp(v->name, name))
+		if (v->name && !strcasecmp(v->name, name))
 			return v;
 	}
 
@@ -139,6 +142,9 @@ int variable_set(char *name, char *value, int allow_foreign)
 		variable_add(name, VAR_FOREIGN, 2, strdup(value), NULL);
 		return -1;
 	}
+
+	if (!v && !allow_foreign)
+		return -1;
 
 	switch (v->type) {
 		case VAR_INT:
