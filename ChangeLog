@@ -8,6 +8,8 @@ d - drg, sz - szalik).
 
 - zmiany stanu bez opisów nie bêd± logowane przy ,,log_status'' równym 2
   (brat.lukasz/w)
+- libgadu: gg_notify*() z pust± list± kontaktów wy¶le pakiet GG_LIST_EMPTY
+  (grzegorz.sowa/w)
 
 // 2003-10-30
 

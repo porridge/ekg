@@ -1071,6 +1071,8 @@ struct gg_notify {
 #define GG_USER_OFFLINE 0x01	/* bêdziemy niewidoczni dla u¿ytkownika */
 #define GG_USER_NORMAL 0x03	/* zwyk³y u¿ytkownik */
 #define GG_USER_BLOCKED 0x04	/* zablokowany u¿ytkownik */
+
+#define GG_LIST_EMPTY 0x0012
 	
 #define GG_NOTIFY_REPLY 0x000c	/* tak, to samo co GG_LOGIN */
 	
