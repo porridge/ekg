@@ -531,13 +531,21 @@ COMMAND(cmd_exec)
 	} else {
 		for (l = children; l; l = l->next) {
 			struct process *p = l->data;
+			char *tmp = NULL;
 			
-			if (p->name[0] == '\001') {
-				char *tmp = saprintf("wysy³anie sms do %s", p->name+1);
-				print("process", itoa(p->pid), tmp);
-				xfree(tmp);
-			} else
-				print("process", itoa(p->pid), p->name);
+			switch (p->name[0]) {
+				case '\001':
+					tmp = saprintf("wysy³anie sms do %s", p->name + 1);
+					break;
+				case '\002':
+					tmp = saprintf("^%s", p->name + 1);
+					break;
+				default:
+					tmp = xstrdup(p->name);
+			}
+
+			print("process", itoa(p->pid), tmp);
+			xfree(tmp);
 		}
 
 		if (!children)
