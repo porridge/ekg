@@ -156,7 +156,7 @@ unknown_user %W[%n%W%1%n%W]%n
 user_added %> %WU¿ytkownik %K%1%n %Wzosta³ dodany%n\n
 user_deleted %> %WU¿ytkownik%n %K%1%n %Wzosta³ usuniêty%n\n
 user_exists %! %WU¿ytkownik%n %K%1%n %Wju¿ istnieje%n\n
-user_info %)       %KPseudonim%n%W:%n %W%3%n\n%)           %KNumer%n%W:%n %W%7%n\n%)            %KStan%n%W:%n %8\n%) %KImiê i nazwisko%n%W:%n %1 %2\n%)  %KNumer telefonu%n%W:%n %5\n
+user_info %)       %KPseudonim%n%W:%n %W%1%n\n%)           %KNumer%n%W:%n %W%2%n\n%)            %KStan%n%W:%n %3\n%) %KImiê i nazwisko%n%W:%n %5 %6\n%)  %KNumer telefonu%n%W:%n %8\n%)%K        Numer IP%n%W:%n %4\n
 user_info_avail %gdostêpn%@1%n
 user_info_avail_descr %gdostêpn%@1%n [%2]
 user_info_busy %czajêt%@1%n
@@ -173,7 +173,9 @@ userlist_put_ok %) %WListê kontaktów zachowano na serwerze.%n\n
 variable %> %K%[_20]1%n%W%2%n\n
 variable_invalid %! %Wset:%n %r[%1]%n <- z³a warto¶æ.\n
 variable_not_found %! %RNieznana zmienna%n%W:%n %K[%n%W%1%n%K]%n\n
-statusbar %c|%w%{time}%c|%w %c(%wGG#%c%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) <%wwin%c/%w%{window}%{?query %c:%w}%{query}%c>%w %{?activity %c(%wact%c/%w}%{activity}%{?activity %c)%w}
+#statusbar %c|%w%{time}%c|%w %c(%wGG#%c%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) <%wwin%c/%w%{window}%{?query %c:%w}%{query}%c>%w %{?activity %c(%wact%c/%w}%{activity}%{?activity %c)%w}
+
+statusbar  %c|%w%{time}%c|%w %c(%w%{?!nick uin}%{nick}%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) (%wwin%c/%w%{window}%{?query %c:%W}%{query}%c)%w%{?activity  %c(%wact%c/%w}%{activity}%{?activity %c)%w}%{?mail  %c(%wmail%c/%w}%{mail}%{?mail %c)}%{?more  %c(%Gwiêcej%c)}%{?debug  %c(%Cdebug%c)}
 chat_footer %W+------------%n\n
 chat_header %W+------------%n Chat with %W%1%n %c(%C%#%c/%C%2%c)%n %W------------%n\n
 chat_line %W|%n %1\n
