@@ -537,9 +537,6 @@ void ekg_wait_for_key()
 
 				l = l->next;
 
-				if (s->timeout == -1)
-					continue;
-
 				s->timeout--;
 
 				if (s->timeout == 0) {
@@ -550,7 +547,6 @@ void ekg_wait_for_key()
 						continue;
 					}
 
-					s->timeout = -1;
 					gg_debug(GG_DEBUG_MISC, "// ekg: spying %d timeout\n", s->uin);
 			
 					if (GG_S_I(u->status)) {
@@ -558,6 +554,8 @@ void ekg_wait_for_key()
 						iso_to_cp(u->descr);
 						handle_common(u->uin, status, u->descr, time(NULL), u->ip.s_addr, u->port, u->protocol, u->image_size);
 					}
+
+					list_remove(&spiedlist, s, 1);
 				}
 			}
 		}

@@ -1253,6 +1253,9 @@ void handle_success(struct gg_event *e)
 
 	event_check(EVENT_CONNECTED, 0, inet_ntoa(addr));
 
+	list_destroy(spiedlist, 1);
+	spiedlist = NULL;
+
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
 

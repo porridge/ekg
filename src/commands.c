@@ -5551,6 +5551,7 @@ COMMAND(cmd_check_conn)
 {
 	uin_t uin;
 	const char *par;
+	list_t l;
 
 	if (!params[0] && !target) {
 		printq("not_enough_params", name);
@@ -5559,7 +5560,6 @@ COMMAND(cmd_check_conn)
 
 	if (params[0]) {
 		if (match_arg(params[0], 'u', "update", 2)) {
-			list_t l;
 
 			for (l = userlist; l; l = l->next) {
 				struct userlist *u = l->data;
@@ -5572,7 +5572,6 @@ COMMAND(cmd_check_conn)
 		}
 
 		if (match_arg(params[0], 's', "scan", 2)) {
-			list_t l;
 
 			for (l = userlist; l; l = l->next) {
 				struct userlist *u = l->data;
@@ -5595,6 +5594,16 @@ COMMAND(cmd_check_conn)
 	if (!(uin = get_uin(par))) {
 		printq("user_not_found", par);
 		return -1;
+	}
+
+	/* zresetujmy maszynê szpieguj±c±, dla testów */
+	for (l = spiedlist; l; l = l->next) {
+		struct spied *s = l->data;
+
+		if (s->uin == uin) {
+			list_remove(&spiedlist, s, 1);
+			break;
+		}
 	}
 
 	return check_conn(uin);
