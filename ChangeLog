@@ -13,6 +13,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - je¶li w themie bêdzie ,,no_prompt_cache 1'', prompty nie bêd± keszowane
   (a to dopiero nowina!) i mo¿na przez to w nich dawaæ timestampy (w)
 - niedorobiony theme 2k2 (w)
+- zmiana licencji libgadu na LGPL (w)
+- dorzucenie plików COPYING (w)
+- poprawienie README (w)
 
 // 2002-04-28
 
