@@ -12,6 +12,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   uzyskiwania rozmiaru na post-C99, ¿eby dzia³a³o poprawnie na Sunach
   (Murphy/w)
 - segfault przy completion_notify 2 i dope³nianiu tabem (Murphy/w)
+- usuniêcie niepotrzebnego ju¿ katalogu misc/ (w)
 
 // 2002-09-08
 
