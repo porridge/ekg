@@ -6,6 +6,12 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-02-19
+
+- poprawka warning'ów kompilacji z iocltd (pmb/sz)
+- poprawki window next/prev, ¿eby bardziej uwa¿a³o na pl±taj±ce siê
+  gdzieniegdzie okienka p³ywaj±ce (andylm/sz)
+
 // 2003-02-18
 
 - ,,fade_in'' jest domy¶lnie wy³±czone (ubanus,w/sz)

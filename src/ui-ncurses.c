@@ -3289,14 +3289,24 @@ static void ui_ncurses_loop()
 static void window_next()
 {
 	struct window *next = NULL;
+	int passed = 0;
 	list_t l;
 
 	for (l = windows; l; l = l->next) {
-		if (l->data == window_current && l->next)
-			next = l->next->data;
+		if (l->data == window_current)
+			passed = 1;
+
+		if (passed && l->next) {
+			struct window *w = l->next->data;
+
+			if (!w->floating) {
+				next = w;
+				break;
+			}
+		}
 	}
 
-	if (!next || next->floating)
+	if (!next)
 		next = window_find("__status");
 
 	window_switch(next->id);
@@ -3308,12 +3318,18 @@ static void window_prev()
 	list_t l;
 
 	for (l = windows; l; l = l->next) {
-		if (l->data == window_current && l != windows)
+		struct window *w = l->data;
+
+		if (w->floating)
+			continue;
+
+		if (w == window_current && l != windows)
 			break;
+
 		prev = l->data;
 	}
 
-	if ((!prev->id && window_current->id == 1) || prev->floating)
+	if (!prev->id)
 		for (l = windows; l; l = l->next) {
 			struct window *w = l->data;
 

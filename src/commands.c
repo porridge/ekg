@@ -65,6 +65,9 @@
 #ifndef HAVE_STRLCAT
 #  include "../compat/strlcat.h"
 #endif
+#ifdef WITH_IOCTLD
+#  include "ioctld.h"
+#endif
 
 COMMAND(cmd_modify);
 
