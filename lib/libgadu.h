@@ -691,6 +691,8 @@ __attribute__ ((packed))
 	
 #define GG_PONG 0x0007
 
+#define GG_DISCONNECTING 0x000b
+
 /*
  * pakiety, sta³e, struktury dla DCC
  */

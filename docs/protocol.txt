@@ -301,7 +301,15 @@ otrzymania ostatniej informacji.
 	
 	/* nie ma niczego */
 
---- 9) podziêkowania -------------------------------------------------------
+--- 9) roz³±czanie ---------------------------------------------------------
+
+je¶li serwer zechce nas roz³±czyæ, wy¶le wcze¶niej pusty pakiet:
+
+	#define GG_DISCONNECTING 0x000b
+	
+	/* nie ma niczego */
+
+--- 10) podziêkowania ------------------------------------------------------
 
 swój wk³ad w poznanie protoko³u mieli:
  - Robert J. Wo¼ny <speedy@atman.pl>:

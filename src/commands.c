@@ -65,7 +65,8 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_test_add(), command_theme(), command_set(), command_connect(),
 	command_sms(), command_find(), command_modify(), command_cleartab(),
 	command_status(), command_register(), command_test_watches(),
-	command_remind(), command_dcc(), command_query(), command_passwd();
+	command_remind(), command_dcc(), command_query(), command_passwd(),
+	command_test_ping();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -117,6 +118,7 @@ struct command commands[] = {
 	{ "_msg", "u?", command_test_send, "", "", "" },
 	{ "_add", "?", command_test_add, "", "", "" },
 	{ "_watches", "", command_test_watches, "", "", "" },
+	{ "_ping", "", command_test_ping, "", "", "" },
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 
@@ -1334,6 +1336,14 @@ COMMAND(command_dcc)
 
 	my_printf("dcc_unknown_command", params[0]);
 	
+	return 0;
+}
+
+COMMAND(command_test_ping)
+{
+	if (sess)
+		gg_ping(sess);
+
 	return 0;
 }
 

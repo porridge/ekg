@@ -11,6 +11,8 @@ oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 - informowanie o wiadomo¶ciach konferencyjnych przez API libgg (a)
 - poprawki w gg_watch_fd_connected() (w)
 - dodanie gg_session->last_event (a/w)
+- dodana komenda ,,_ping'' (w)
+- uaktualnienie docs/protocol.txt, GG_DISCONNECTING (w)
 
 // 2001-12-16
  
