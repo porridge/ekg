@@ -2658,15 +2658,13 @@ void put_log(uin_t uin, const char *format, ...)
 	}
 
 	/* teraz skonstruuj ¶cie¿kê logów */
-
 	if (!lp)
-		lp = (config_log & 2) ? "." : "gg.log";
+		lp = (config_log & 2) ? (char *) prepare_path("", 0) : (char *) prepare_path("history", 0);
 
 	if (*lp == '~')
 		snprintf(path, sizeof(path), "%s%s", home_dir, lp + 1);
-	else {
+	else
 		strlcpy(path, lp, sizeof(path));
-	}
 
 	if ((config_log & 2)) {
 		if (mkdir(path, 0700) && errno != EEXIST)
@@ -3014,6 +3012,9 @@ uin_t str_to_uin(const char *text)
 {
 	char *tmp;
 	long num;
+
+	if (!text)
+		return (uin_t) 0;
 
 	errno = 0;
 	num = strtol(text, &tmp, 0);

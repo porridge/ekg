@@ -412,6 +412,7 @@ int sms_away_check(uin_t uin);
 void sms_away_free();
 
 int ioctld_socket();
+int ioctld_send(const char *seq, int act, int quiet);
 int init_control_pipe(const char *path);
 
 const char *timestamp(const char *format);

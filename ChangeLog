@@ -11,6 +11,8 @@ zg³osi³ b³±d.
 - poprawka warning'ów kompilacji z iocltd (pmb/sz)
 - poprawki window next/prev, ¿eby bardziej uwa¿a³o na pl±taj±ce siê
   gdzieniegdzie okienka p³ywaj±ce (andylm/sz)
+- nie tworzymy niepotrzebnie nowych okien, na przyk³ad przy ,,chat numer'',
+  a pó¼niej ,,chat alias'' (pmb/sz)
 
 // 2003-02-18
 

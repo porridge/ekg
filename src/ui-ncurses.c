@@ -796,14 +796,17 @@ static struct window *window_find(const char *target)
 	int current = ((target) ? !strcasecmp(target, "__current") : 0);
 	int debug = ((target) ? !strcasecmp(target, "__debug") : 0);
 	int status = ((target) ? !strcasecmp(target, "__status") : 0);
+	struct userlist *u = NULL;
 
-	/* nie traktujemy debug jako aktualne - piszemy do statusowego */
 	if (!target || current) {
-		if (window_current && window_current->id)
+		if (window_current->id)
 			return window_current;
 		else
 			status = 1;
 	}
+
+	if (target)
+		u = userlist_find(atoi(target), target);
 
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
@@ -814,8 +817,16 @@ static struct window *window_find(const char *target)
 		if (w->id == 1 && status)
 			return w;
 
-		if (w->target && target && !strcasecmp(target, w->target))
-			return w;
+		if (w->target && target) {
+			if (!strcasecmp(target, w->target))
+				return w;
+
+			if (u && !strcasecmp(u->display, w->target))
+				return w;
+
+			if (u && !strcasecmp(itoa(u->uin), w->target))
+				return w;
+		}
 	}
 
 	return NULL;
