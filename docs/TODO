@@ -3,9 +3,8 @@ biblioteka:
 + ctcp
 ! zak³adanie kont
 - proxy, https // vinil
-- tryb tylko dla przyjació³ // vinil
-- wysy³anie has³a na maila // vaxior
 - fixowanie w gg_notify_reply // vinil
+- wysy³anie has³a na maila // vaxior
 
 klient:
 - sensowne wy¶wietlanie mesgów (t³o, wordwrap itp)

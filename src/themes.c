@@ -532,8 +532,8 @@ void init_theme()
 
 	add_format("private_mode_is_on", "%> Tryb ,,tylko dla przyjació³'' jest w³±czony\n", 1);
 	add_format("private_mode_is_off", "%> Tryb ,,tylko dla przyjació³'' jest wy³±czony\n", 1);
-	add_format("private_mode_on", "%> W³±czono tryb ,,tylko dla przyjació³\n", 1);
-	add_format("private_mode_off", "%> Wy³±czono tryb ,,tylko dla przyjació³\n", 1);
+	add_format("private_mode_on", "%> W³±czono tryb ,,tylko dla przyjació³''\n", 1);
+	add_format("private_mode_off", "%> Wy³±czono tryb ,,tylko dla przyjació³''\n", 1);
 	add_format("private_mode_invalid", "%! Nieprawid³owa warto¶æ\n", 1);
 	
 	add_format("show_status", "%) Aktywny stan: %1%2\n", 1);
