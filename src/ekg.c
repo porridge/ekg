@@ -43,6 +43,37 @@
 
 time_t last_action = 0;
 
+/*
+ * struktura zawieraj±ca adresy funkcji obs³uguj±cych ró¿ne sesje
+ */
+static struct {
+	int type;
+	void (*handler)(void*);
+} handlers[] = {
+	{ GG_SESSION_GG, (void (*)(void*)) handle_event, },
+	{ GG_SESSION_DCC, (void (*)(void*)) handle_dcc, },
+	{ GG_SESSION_DCC_SOCKET, (void (*)(void*)) handle_dcc, },
+	{ GG_SESSION_DCC_SEND, (void (*)(void*)) handle_dcc, },
+	{ GG_SESSION_DCC_GET, (void (*)(void*)) handle_dcc, },
+	{ GG_SESSION_SEARCH, (void (*)(void*)) handle_search, },
+	{ GG_SESSION_REGISTER, (void (*)(void*)) handle_pubdir, },
+	{ GG_SESSION_PASSWD, (void (*)(void*)) handle_pubdir, },
+	{ GG_SESSION_REMIND, (void (*)(void*)) handle_pubdir, },
+	{ GG_SESSION_CHANGE, (void (*)(void*)) handle_pubdir, },
+	{ -1, NULL, }, 
+};
+
+/*
+ * my_getc()
+ *
+ * funkcja wywo³ywana przez readline() do odczytania znaku. my przy okazji
+ * bêdziemy sprawdzaæ, czy co¶ siê nie zmieni³o na innych deskryptorach,
+ * by móc obs³ugiwaæ ruch podczas wprowadzania danych z klawiatury.
+ *
+ *  - f - plik, z którego czytamy. readline() podaje stdin.
+ *
+ * zwraca wczytany znak, przy okazji wykonuj±c, co trzeba.
+ */
 int my_getc(FILE *f)
 {
 	static time_t last_ping = 0;
@@ -75,19 +106,17 @@ int my_getc(FILE *f)
 		tv.tv_sec = 1;
 		tv.tv_usec = 0;
 		
-		if (display_debug) {
-			gg_debug_level = 255;
-		} else 
-			gg_debug_level = 0;
-
 		ret = select(maxfd + 1, &rd, &wd, NULL, &tv);
 	
+		/* XXX prawdziwy timeout */
+
 		if (!ret) {
 			/* timeouty danych sesji */
 			for (l = watches; l; l = l->next) {
 				struct gg_session *s = l->data;
 				struct gg_common *c = l->data;
 				struct gg_http *h = l->data;
+				struct gg_dcc *d = l->data;
 				char *errmsg = "";
 
 				if (c->timeout == -1)
@@ -132,6 +161,16 @@ int my_getc(FILE *f)
 						}
 						list_remove(&watches, h, 0);
 						gg_free_pubdir(h);
+						break;
+						
+					case GG_SESSION_DCC:
+					case GG_SESSION_DCC_GET:
+					case GG_SESSION_DCC_SEND:
+						/* XXX informowaæ który */
+						my_printf("dcc_timeout");
+						list_remove(&watches, d, 0);
+						gg_free_dcc(d);
+						break;
 				}
 			}
 			
@@ -140,6 +179,7 @@ int my_getc(FILE *f)
 				reconnect_timer = 0;
 				my_printf("connecting");
 				connecting = 1;
+				prepare_connect();
 				if (!(sess = gg_login(config_uin, config_password, 1))) {
 					my_printf("conn_failed", strerror(errno));
 					do_reconnect();
@@ -200,77 +240,24 @@ int my_getc(FILE *f)
 
 		} else {
 			for (l = watches; l; l = l->next) {
-				struct gg_session *s = l->data;
 				struct gg_common *c = l->data;
-				struct gg_http *h = l->data;
-				char *errmsg;
+				int i;
 
 				if (!FD_ISSET(c->fd, &rd) && !FD_ISSET(c->fd, &wd))
 					continue;
 
-				errmsg = NULL;
-				
-				switch (c->type) {
-					case GG_SESSION_USER0:
-						return rl_getc(stdin);
-					
-					case GG_SESSION_GG:
-						handle_event(s);
+				if (c->type == GG_SESSION_USER0) 
+					return rl_getc(f);
+
+				for (i = 0; handlers[i].type != -1; i++)
+					if (c->type == handlers[i].type) {
+						(handlers[i].handler)(c);
 						break;
-
-					case GG_SESSION_SEARCH:
-						if (gg_search_watch_fd(h) || h->state == GG_STATE_ERROR) {
-							my_printf("search_failed", strerror(errno));
-							free(h->user_data);
-							list_remove(&watches, h, 0);
-							gg_free_search(h);
-							break;
-						}
-						if (h->state == GG_STATE_DONE) {	
-							gg_debug(GG_DEBUG_MISC, "++ gg_search()... done\n");
-							handle_search(h);
-							free(h->user_data);
-							list_remove(&watches, h, 0);
-							gg_free_search(h);
-							break;
-						}
-						break;
-
-					case GG_SESSION_REGISTER:
-						if (!errmsg)
-							errmsg = "register_failed";
-					case GG_SESSION_PASSWD:
-						if (!errmsg)
-							errmsg = "passwd_failed";
-					case GG_SESSION_REMIND:
-						if (!errmsg)
-							errmsg = "remind_failed";
-					case GG_SESSION_CHANGE:
-						if (!errmsg)
-							errmsg = "change_failed";
-
-						if (gg_pubdir_watch_fd(h) || s->state == GG_STATE_ERROR) {
-							my_printf(errmsg, strerror(errno));
-							list_remove(&watches, h, 0);
-							gg_free_pubdir(h);
-							if (h->type == GG_SESSION_REGISTER) {
-								free(reg_password);
-								reg_password = NULL;
-							}
-							break;
-						}
-						
-						if (s->state == GG_STATE_DONE) {	
-							handle_pubdir(h);
-							list_remove(&watches, h, 0);
-							gg_free_pubdir(h);
-							if (h->type == GG_SESSION_REGISTER) {
-								free(reg_password);
-								reg_password = NULL;
-							}
-							break;
-						}
 					}
+
+				if (handlers[i].type == -1)
+					printf("\n*** FATAL ERROR: Unknown session type. Application may fail.\n*** Mail this to the authors:\n*** ekg-" VERSION "/type=%d/state=%d/id=%d\n", c->type, c->state, c->id);
+				
 				break;
 			}
 		}
@@ -422,8 +409,11 @@ u¿ycie: %s [OPCJE]
 		log_path = gg_alloc_sprintf("%s/.gg/history", home);
 	    }
 	}
+	
+	changed_dcc("dcc");
 
 	if (config_uin && config_password && auto_connect) {
+		prepare_connect();
 		my_printf("connecting");
 		connecting = 1;
 		if (!(sess = gg_login(config_uin, config_password, 1))) {
@@ -434,6 +424,7 @@ u¿ycie: %s [OPCJE]
 		}
 		list_add(&watches, sess, 0);
 	}
+
 
 	for (;;) {
 		char *line, *tmp = NULL;

@@ -37,6 +37,19 @@ extern "C" {
 typedef unsigned long uin_t;
 
 /*
+ * ogólna struktura opisuj±ca ró¿ne sesje. przydatna w klientach.
+ */
+struct gg_common {
+        int fd;                 /* podgl±dany deskryptor */
+        int check;              /* sprawdzamy zapis czy odczyt */
+        int state;              /* aktualny stan maszynki */
+        int error;              /* kod b³êdu dla GG_STATE_ERROR */
+	int type;		/* rodzaj sesji */
+	int id;			/* identyfikator */
+	int timeout;		/* sugerowany timeout w sekundach */
+};
+
+/*
  * struktura opisuj±ca dan± sesjê. tworzona przez gg_login().
  */
 struct gg_session {
@@ -96,9 +109,27 @@ struct gg_http {
 };
 
 /*
- * ogólna struktura opisuj±ca ró¿ne sesje. przydatna w klientach.
+ * odpowiednik windowsowej struktury WIN32_FIND_DATA niezbêdnej przy
+ * wysy³aniu plików.
  */
-struct gg_common {
+#define GG_MAX_PATH 276
+
+struct gg_file_info {
+	unsigned long mode;		/* dwFileAttributes */
+	unsigned long ctime[2];		/* ftCreationTime */
+	unsigned long atime[2];		/* ftLastAccessTime */
+	unsigned long mtime[2];		/* ftLastWriteTime */
+	unsigned long size_hi;		/* nFileSizeHigh */
+	unsigned long size;		/* nFileSizeLow */
+	unsigned long reserved0;	/* dwReserved0 */
+	unsigned long reserved1;	/* dwReserved1 */
+	char filename[GG_MAX_PATH];	/* cFileName */
+};
+
+/*
+ * struktura opisuj±ca nas³uchuj±ce gniazdo po³±czeñ miêdzy klientami.
+ */
+struct gg_dcc {
         int fd;                 /* podgl±dany deskryptor */
         int check;              /* sprawdzamy zapis czy odczyt */
         int state;              /* aktualny stan maszynki */
@@ -106,6 +137,14 @@ struct gg_common {
 	int type;		/* rodzaj sesji */
 	int id;			/* identyfikator */
 	int timeout;		/* sugerowany timeout w sekundach */
+
+	int port;		/* port, na którym siedzi */
+	uin_t uin;		/* uin klienta */
+	uin_t peer_uin;		/* uin drugiej strony */
+	int file_fd;		/* deskryptor pliku */
+	int offset;		/* offset w pliku */
+	struct gg_file_info file_info;
+				/* informacje o pliku */
 };
 
 /*
@@ -119,6 +158,10 @@ enum {
 	GG_SESSION_REMIND,	/* przypominanie has³a */
 	GG_SESSION_PASSWD,	/* zmiana has³a */
 	GG_SESSION_CHANGE,	/* zmiana informacji o sobie */
+	GG_SESSION_DCC,		/* ogólne po³±czenie DCC */
+	GG_SESSION_DCC_SOCKET,	/* nas³uchuj±cy socket */
+	GG_SESSION_DCC_SEND,	/* wysy³anie pliku */
+	GG_SESSION_DCC_GET,	/* odbieranie pliku */
 	
 	GG_SESSION_USER0 = 256,	/* zdefiniowana dla u¿ytkownika */
 	GG_SESSION_USER1,	/* j.w. */
@@ -147,6 +190,18 @@ enum {
 	GG_STATE_READING_HEADER,	/* czeka na nag³ówek http */
 	GG_STATE_PARSING,               /* przetwarza dane */
 	GG_STATE_DONE,                  /* skoñczy³ */
+
+	/* gg_dcc */
+	GG_STATE_LISTENING,		/* czeka na po³±czenia */
+	GG_STATE_READING_UIN_1,		/* czeka na uin peera */
+	GG_STATE_READING_UIN_2,		/* czeka na swój uin */
+	GG_STATE_SENDING_ACK,		/* wysy³a potwierdzenie */
+	GG_STATE_READING_REQUEST,	/* czeka na komendê */
+	GG_STATE_SENDING_FILE_INFO,	/* wysy³a informacje o pliku */
+	GG_STATE_READING_ACK,		/* czeka na potwierdzenie */
+	GG_STATE_SENDING_HEADER,	/* wysy³a nag³ówek pliku */
+	GG_STATE_GETTING_FILE,		/* odbiera plik */
+	GG_STATE_SENDING_FILE,		/* wysy³a plik */
 };
 
 /*
@@ -174,19 +229,6 @@ int gg_change_status(struct gg_session *sess, int status);
 int gg_send_message(struct gg_session *sess, int msgclass, uin_t recipient, unsigned char *message);
 int gg_ping(struct gg_session *sess);
 
-struct gg_notify_reply {
-	uin_t uin;			/* numerek */
-	unsigned long status;		/* status danej osoby */
-	unsigned long remote_ip;	/* adres ip delikwenta */
-	unsigned short remote_port;	/* port, na którym s³ucha klient */
-	unsigned long version;		/* wersja klienta */
-	unsigned short dunno2;		/* znowu port? */
-} __attribute__ ((packed));
-
-struct gg_status {
-	uin_t uin;			/* numerek */
-	unsigned long status;		/* nowy stan */
-} __attribute__ ((packed));
 
 enum {
 	GG_EVENT_NONE = 0,
@@ -196,6 +238,12 @@ enum {
 	GG_EVENT_ACK,
 	GG_EVENT_CONN_FAILED,
 	GG_EVENT_CONN_SUCCESS,
+
+	GG_EVENT_DCC_NEW,		/* nowe po³±czenie miêdzy klientami */
+	GG_EVENT_DCC_ERROR,		/* b³±d */
+	GG_EVENT_DCC_DONE,		/* skoñczy³ */
+	GG_EVENT_DCC_CLIENT_ACCEPT,	/* moment akceptacji klienta */
+	GG_EVENT_DCC_NEED_FILE_INFO,	/* trzeba wype³niæ file_info */
 };
 
 /*
@@ -218,32 +266,46 @@ enum {
  * kto¶ bêdzie chcia³, to bêdzie móg³ sprawdziæ errno. ale po co?
  */
 enum {
-	GG_ERROR_RESOLVING = 1,
-	GG_ERROR_CONNECTING,
-	GG_ERROR_READING,
-	GG_ERROR_WRITING,
+	GG_ERROR_RESOLVING = 1,		/* b³±d znajdowania hosta */
+	GG_ERROR_CONNECTING,		/* b³±d ³aczenia siê */
+	GG_ERROR_READING,		/* b³±d odczytu */
+	GG_ERROR_WRITING,		/* b³±d wysy³ania */
+
+	GG_ERROR_DCC_HANDSHAKE,		/* b³±d negocjacji */
+	GG_ERROR_DCC_FILE,		/* b³±d odczytu/zapisu pliku */
+	GG_ERROR_DCC_EOF,		/* plik siê skoñczy³? */
+	GG_ERROR_DCC_SENDING,		/* b³±d wysy³ania */
 };
 
 /*
- * struktura opisuj±ca rodzaj zdarzenia. wychodzi z gg_watch_fd()
+ * struktura opisuj±ca rodzaj zdarzenia. wychodzi z gg_watch_fd() lub
+ * z gg_dcc_watch_fd()
  */
 struct gg_event {
         int type;
         union {
-                struct {
+		/* dotycz±ce gg_session */
+		struct {
                         uin_t sender;
 			int msgclass;
 			time_t time;
                         unsigned char *message;
                 } msg;
                 struct gg_notify_reply *notify;
-                struct gg_status status;
+                struct {
+			uin_t uin;
+			unsigned long status;
+		} status;
                 struct {
                         uin_t recipient;
                         int status;
                         int seq;
                 } ack;
 		int failure;
+
+		/* dotycz±ce gg_dcc */
+		struct gg_dcc *dcc_new;
+		int dcc_error;
         } event;
 };
 
@@ -353,6 +415,23 @@ int gg_pubdir_watch_fd(struct gg_http *f);
 void gg_free_pubdir(struct gg_http *f);
 
 /*
+ * FUNKCJE DOTYCZ¡CE KOMUNIKACJI MIÊDZY KLIENTAMI
+ */
+
+int gg_dcc_port;
+char *gg_dcc_ip;
+
+int gg_dcc_send_request(struct gg_session *sess, uin_t uin);
+int gg_dcc_send_file(struct gg_dcc *d, char *filename);
+int gg_send_message_ctcp(struct gg_session *sess, int msgclass, uin_t recipient, unsigned char *message, int message_len); /* XXX lalala */
+
+struct gg_dcc *gg_create_dcc_socket(uin_t uin, unsigned int port);
+#define gg_free_dcc_socket gg_free_dcc
+struct gg_event *gg_dcc_watch_fd(struct gg_dcc *d);
+
+void gg_free_dcc(struct gg_dcc *c);
+
+/*
  * je¶li chcemy sobie podebugowaæ, wystarczy ustawiæ `gg_debug_level'.
  * niestety w miarê przybywania wpisów `gg_debug(...)' nie chcia³o mi
  * siê ustawiaæ odpowiednich leveli, wiêc wiêkszo¶æ sz³a do _MISC.
@@ -370,7 +449,6 @@ void gg_debug(int level, char *format, ...);
 
 /*
  * Pare ma³ych zmiennych do obs³ugi "http proxy"
- *   
  */
  
 extern int gg_http_use_proxy;
@@ -395,6 +473,8 @@ void gg_read_line(int sock, char *buf, int length);
 void gg_chomp(char *line);
 char *gg_urlencode(char *str);
 int gg_http_hash(char *format, ...);
+unsigned long fix32(unsigned long x);
+unsigned short fix16(unsigned short x);
 
 #define GG_APPMSG_HOST "appmsg.gadu-gadu.pl"
 #define GG_APPMSG_PORT 80
@@ -411,6 +491,8 @@ int gg_http_hash(char *format, ...);
 
 #define GG_CLIENT_VERSION 0x0b
 #define GG_DEFAULT_TIMEOUT 30
+
+#define GG_DEFAULT_DCC_PORT 1550
 
 struct gg_header {
 	unsigned long type;		/* typ pakietu */
@@ -460,7 +542,14 @@ struct gg_notify {
 	
 #define GG_NOTIFY_REPLY 0x000c	/* tak, to samo co GG_LOGIN */
 	
-/* struct gg_notify_reply zadeklarowane wy¿ej */
+struct gg_notify_reply {
+	uin_t uin;			/* numerek */
+	unsigned long status;		/* status danej osoby */
+	unsigned long remote_ip;	/* adres ip delikwenta */
+	unsigned short remote_port;	/* port, na którym s³ucha klient */
+	unsigned long version;		/* wersja klienta */
+	unsigned short dunno2;		/* znowu port? */
+} __attribute__ ((packed));
 
 #define GG_ADD_NOTIFY 0x000d
 #define GG_REMOVE_NOTIFY 0x000e
@@ -472,7 +561,10 @@ struct gg_add_remove {
 
 #define GG_STATUS 0x0002
 
-/* struct gg_status zadeklarowane wcze¶niej */
+struct gg_status {
+	uin_t uin;			/* numerek */
+	unsigned long status;		/* nowy stan */
+} __attribute__ ((packed));
 	
 #define GG_SEND_MSG 0x000b
 
@@ -480,6 +572,7 @@ struct gg_add_remove {
 #define GG_CLASS_OFFLINE GG_CLASS_QUEUED
 #define GG_CLASS_MSG 0x0004
 #define GG_CLASS_CHAT 0x0008
+#define GG_CLASS_CTCP 0x0010
 
 struct gg_send_msg {
 	unsigned long recipient;
@@ -510,6 +603,32 @@ struct gg_recv_msg {
 #define GG_PING 0x0008
 	
 #define GG_PONG 0x0007
+
+/*
+ * pakiety, sta³e, struktury dla DCC
+ */
+
+struct gg_dcc_small_packet {
+	unsigned long type;		/* rodzaj pakietu */
+};
+
+struct gg_dcc_big_packet {
+	unsigned long type;		/* rodzaj pakietu */
+	unsigned long dunno1;		/* niewiadoma */
+	unsigned long dunno2;		/* niewiadoma */
+};
+
+/*
+ * póki co, nie znamy dok³adnie protoko³u. nie wiemy, co czemu odpowiada.
+ * nazwy s± niepowa¿ne i tymczasowe.
+ */
+#define GG_DCC_WANT_FILE 0x0003		/* peer chce plik */
+#define GG_DCC_HAVE_FILE 0x0001		/* wiêc mu damy */
+#define GG_DCC_HAVE_FILEINFO 0x0003	/* niech ma informacje o pliku */
+#define GG_DCC_GIMME_FILE 0x0006	/* peer jest pewny */
+#define GG_DCC_CATCH_FILE 0x0002	/* wysy³amy plik */
+
+#define GG_DCC_FILEATTR_READONLY 0x0020
 
 #ifdef __cplusplus
 }

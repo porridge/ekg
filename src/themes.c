@@ -625,5 +625,10 @@ void init_theme()
 	add_format("aliases_del", "%) Usuniêto alias %W%1%n\n", 1);
 	add_format("aliases_exist", "%! Alias %W%1%n ju¿ istnieje\n", 1);
 	add_format("aliases_noexist", "%! Alias %W%1%n nie istnieje\n", 1);
+
+	add_format("dcc_create_error", "%! Nie mo¿na w³±czyæ DCC: %1\n", 1);
+	add_format("dcc_error_unknown", "%! B³±d krytyczny obs³ugi DCC: %1\n", 1);
+	add_format("dcc_error_handshake", "%! Nie mog± siê dogadaæ\n", 1);
+	add_format("dcc_timeout", "%! Timeout DCC\n", 1);
 };
 

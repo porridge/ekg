@@ -1,0 +1,7 @@
+.--
+| bzium! bugreport ;> wyklada sie przy wyszukiwaniu userow z podaniem info o
+| mejlu. Wyklada sie w sensie takim, ze "Wyst±pi b±d podczas szukania: Zy
+| argument". To przy podaniu --nick && --email. Natomiast sama zmienna
+| --email dziala wporzadku. EKG z data 20011208. Pozdrawiam
+`----- ---- --- -- -
+

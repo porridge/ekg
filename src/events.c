@@ -36,7 +36,7 @@
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure();
 
-struct handler handlers[] = {
+static struct handler handlers[] = {
 	{ GG_EVENT_MSG, handle_msg },
 	{ GG_EVENT_ACK, handle_ack },
 	{ GG_EVENT_STATUS, handle_status },
@@ -47,8 +47,15 @@ struct handler handlers[] = {
 };
 
 /*
- * ta funkcja kiedy¶ bêdzie siê zajmowaæ dzieleniem linii na wyrazy,
- * robieniem ³adnego t³a pod wiadomo¶ci itd, itd.
+ * print_message_body()
+ *
+ * funkcja ³adnie formatuje tre¶æ wiadomo¶ci, zawija linijki, wy¶wietla
+ * kolorowe ramki i takie tam.
+ *
+ *  - str - tre¶æ,
+ *  - chat - rodzaj wiadomo¶ci (0 - msg, 1 - chat, 2 - sysmsg)
+ *
+ * nie zwraca niczego. efekt widaæ na ekranie.
  */
 void print_message_body(char *str, int chat)
 {
@@ -113,6 +120,15 @@ void print_message_body(char *str, int chat)
 	free(save);
 }
 
+/*
+ * handle_msg()
+ *
+ * funkcja obs³uguje przychodz±ce wiadomo¶ci.
+ *
+ *  - e - opis zdarzenia.
+ *
+ * nie zwraca niczego.
+ */
 void handle_msg(struct gg_event *e)
 {
 	struct userlist *u = find_user(e->event.msg.sender, NULL);
@@ -199,6 +215,15 @@ void handle_msg(struct gg_event *e)
 	}
 }
 
+/*
+ * handle_ack()
+ *
+ * funkcja obs³uguje potwierdzenia wiadomo¶ci.
+ *
+ *  - e - opis zdarzenia.
+ *
+ * nie zwraca niczego.
+ */
 void handle_ack(struct gg_event *e)
 {
 	char *tmp;
@@ -217,6 +242,15 @@ void handle_ack(struct gg_event *e)
 	my_printf(tmp, format_user(e->event.ack.recipient));
 }
 
+/*
+ * handle_notify()
+ *
+ * funkcja obs³uguje listê obecnych.
+ *
+ *  - e - opis zdarzenia.
+ *
+ * nie zwraca niczego.
+ */
 void handle_notify(struct gg_event *e)
 {
 	struct gg_notify_reply *n = e->event.notify;
@@ -245,6 +279,15 @@ void handle_notify(struct gg_event *e)
 	}
 }
 
+/*
+ * handle_status()
+ *
+ * funkcja obs³uguje zmianê stanu ludzi z listy kontaktów.
+ *
+ *  - e - opis zdarzenia.
+ *
+ * nie zwraca niczego.
+ */
 void handle_status(struct gg_event *e)
 {
 	struct userlist *u;
@@ -271,6 +314,15 @@ void handle_status(struct gg_event *e)
 	u->status = e->event.status.status;
 }
 
+/*
+ * handle_failure()
+ *
+ * funkcja obs³uguje b³êdy przy po³±czeniu.
+ *
+ *  - e - opis zdarzenia.
+ *
+ * nie zwraca niczego.
+ */
 void handle_failure(struct gg_event *e)
 {
 	my_printf("conn_failed", strerror(errno));
@@ -280,6 +332,15 @@ void handle_failure(struct gg_event *e)
 	do_reconnect();
 }
 
+/*
+ * handle_success()
+ *
+ * funkcja obs³uguje udane po³±czenia.
+ *
+ *  - e - opis zdarzenia.
+ *
+ * nie zwraca niczego.
+ */
 void handle_success(struct gg_event *e)
 {
         int status_table[3] = { GG_STATUS_AVAIL, GG_STATUS_BUSY, GG_STATUS_INVISIBLE };
@@ -292,6 +353,15 @@ void handle_success(struct gg_event *e)
 
 }
 
+/*
+ * handle_event()
+ *
+ * funkcja obs³uguje wszystkie zdarzenia dotycz±ce danej sesji GG.
+ *
+ *  - e - opis zdarzenia.
+ *
+ * nie zwraca niczego.
+ */
 void handle_event(struct gg_session *s)
 {
 	struct gg_event *e;
@@ -314,10 +384,32 @@ void handle_event(struct gg_session *s)
 	gg_free_event(e);
 }
 
+/*
+ * handle_search()
+ *
+ * funkcja obs³uguje zdarzenia dotycz±ce wyszukiwania u¿ytkowników.
+ *
+ *  - e - opis zdarzenia.
+ *
+ * nie zwraca niczego.
+ */
 void handle_search(struct gg_http *h)
 {
 	struct gg_search *s = NULL;
 	int i;
+
+	if (gg_search_watch_fd(h) || h->state == GG_STATE_ERROR) {
+		my_printf("search_failed", strerror(errno));
+		free(h->user_data);
+		list_remove(&watches, h, 0);
+		gg_free_search(h);
+		return;
+	}
+	
+	if (h->state != GG_STATE_DONE)
+		return;
+
+	gg_debug(GG_DEBUG_MISC, "++ gg_search()... done\n");
 
 	if (!h || !(s = h->data) || !(s->count))
 		my_printf("search_not_found");
@@ -366,8 +458,21 @@ void handle_search(struct gg_http *h)
 		free(active);
 		free(gender);
 	}
+
+	free(h->user_data);
+	list_remove(&watches, h, 0);
+	gg_free_search(h);
 }
 
+/*
+ * handle_pubdir()
+ *
+ * funkcja zajmuj±ca siê wszelkimi zdarzeniami http oprócz szukania.
+ *
+ *  - h - delikwent.
+ *
+ * nie zwraca niczego.
+ */
 void handle_pubdir(struct gg_http *h)
 {
 	struct gg_pubdir *s = NULL;
@@ -375,7 +480,7 @@ void handle_pubdir(struct gg_http *h)
 
 	if (!h)
 		return;
-
+	
 	switch (h->type) {
 		case GG_SESSION_REGISTER:
 			good = "register";
@@ -389,7 +494,26 @@ void handle_pubdir(struct gg_http *h)
 			good = "remind";
 			bad = "remind_failed";
 			break;
+		case GG_SESSION_CHANGE:
+			good = "change";
+			bad = "change_failed";
+			break;
 	}
+
+	if (gg_pubdir_watch_fd(h) || h->state == GG_STATE_ERROR) {
+		my_printf(bad, strerror(errno));
+		list_remove(&watches, h, 0);
+		if (h->type == GG_SESSION_REGISTER) {
+			free(reg_password);
+			reg_password = NULL;
+		}
+		gg_free_pubdir(h);
+		
+		return;
+	}
+	
+	if (h->state != GG_STATE_DONE)
+		return;
 
 	if (!(s = h->data) || !s->success) {
 		my_printf(bad);
@@ -410,5 +534,120 @@ void handle_pubdir(struct gg_http *h)
 	
 	snprintf(uin, sizeof(uin), "%lu", s->uin);
 	my_printf(good, uin);
-};
 
+	list_remove(&watches, h, 0);
+	if (h->type == GG_SESSION_REGISTER) {
+		free(reg_password);
+		reg_password = NULL;
+	}
+	gg_free_pubdir(h);
+}
+
+/*
+ * handle_dcc()
+ *
+ * funkcja zajmuje siê obs³ug± wszystkich zdarzeñ zwi±zanych z DCC.
+ *
+ *  - d - struktura danego po³±czenia.
+ *
+ * nie zwraca niczego.
+ */
+void handle_dcc(struct gg_dcc *d)
+{
+	struct gg_event *e;
+	struct list *l;
+	int tmp;
+
+	if (!(e = gg_dcc_watch_fd(d))) {
+		my_printf("dcc_error", strerror(errno));
+		if (d->type != GG_SESSION_DCC_SOCKET) {
+			list_remove(&watches, d, 0);
+			gg_free_dcc(d);
+		}
+		return;
+	}
+
+	switch (e->type) {
+		case GG_EVENT_DCC_NEW:
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_CLIENT_NEW\n");
+			list_add(&watches, e->event.dcc_new, 0);
+			e->event.dcc_new = NULL;
+			break;
+
+		case GG_EVENT_DCC_CLIENT_ACCEPT:
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_CLIENT_ACCEPT\n");
+			
+			for (tmp = 0, l = transfers; l; l = l->next) {
+				struct transfer *t = l->data;
+
+				if (t->uin == d->peer_uin && config_uin == d->uin) {
+					tmp = 1;
+					break;
+				}
+			}
+
+			if (!tmp) {
+				gg_debug(GG_DEBUG_MISC, "## unauthorized client (uin=%ld), closing connection\n", d->peer_uin);
+				list_remove(&watches, d, 0);
+				gg_free_dcc(d);
+				return;
+			}
+			break;	
+
+		case GG_EVENT_DCC_NEED_FILE_INFO:
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_NEED_FILE_INFO\n");
+
+			for (l = transfers; l; l = l->next) {
+				struct transfer *t = l->data;
+
+				/* XXX pozbyæ siê printf()ów */
+
+				printf("transfer: uin=%ld, filename=%s\n", t->uin, t->filename);
+				if (t->uin == d->peer_uin) {
+					printf("that's it!\n");
+					if (gg_dcc_send_file(d, t->filename) == -1) {
+						gg_debug(GG_DEBUG_MISC, "## gg_dcc_send_file() failed (%s)\n", strerror(errno));
+						/* XXX my_printf */
+						list_remove(&transfers, t, 1);
+						list_remove(&watches, d, 0);
+						gg_free_dcc(d);
+						return;
+					}
+					list_remove(&transfers, t, 1);
+					break;
+				}
+			}
+			break;
+
+		case GG_EVENT_DCC_DONE:
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_DONE\n");
+
+			/* XXX my_printf() */
+
+			printf("\n*** DCC DONE\n");
+			
+			list_remove(&watches, d, 0);
+			gg_free_dcc(d);
+
+			break;
+			
+		case GG_EVENT_DCC_ERROR:
+			switch (e->event.dcc_error) {
+				case GG_ERROR_DCC_HANDSHAKE:
+					my_printf("dcc_error_handshake");
+					break;
+				default:
+					my_printf("dcc_error_unknown");
+			}
+			list_remove(&watches, d, 0);
+			gg_free_dcc(d);
+			break;
+	}
+
+	gg_free_event(e);
+	
+	return;
+}
+
+#if 0
+#endif

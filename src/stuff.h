@@ -48,13 +48,21 @@ struct alias {
 	char *cmd;
 };
 
+struct transfer {
+	uin_t uin;
+	char *filename;
+	struct gg_dcc *dcc;
+};
+
 struct list *userlist;
 struct list *ignored;
 struct list *children;
 struct list *aliases;
 struct list *watches;
+struct list *transfers;
 int ignored_count;
 int in_readline, away, in_autoexec, auto_reconnect, reconnect_timer;
+int use_dcc;
 time_t last_action;
 struct gg_session *sess;
 int auto_away;
@@ -87,6 +95,7 @@ int use_proxy;
 int proxy_port;
 char *proxy_host;
 char *reg_password;
+char *dcc_ip;
 
 void my_puts(char *format, ...);
 char *my_readline();
@@ -127,5 +136,8 @@ int play_sound(char *sound_path);
 char *encode_base64(char *buf);
 char *decode_base64(char *buf);
 void reset_prompt();
+void changed_debug(char *var);
+void changed_dcc(char *var);
+void prepare_connect();
 
 #endif

@@ -13,8 +13,11 @@ MAKE = @MAKE@
 AR = @AR@
 install = @INSTALL@
 
-CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) 
-OBJS = common.o libgg.o search.o pubdir.o http.o
+CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -fPIC
+OBJS = common.o libgg.o search.o pubdir.o http.o dcc.o
+
+SHARED = libgg.so.0.9.0
+STATIC = libgg.a
 
 all:	static shared
 
@@ -24,11 +27,15 @@ distclean:	clean
 clean:
 	$(RM) -f *.o libgg.so* libgg.a
 
-shared:	$(OBJS)
+shared:	$(SHARED)
+
+$(SHARED):	$(OBJS)
 #	$(CC) $(CFLAGS) -fPIC -c libgg.c -o libgg.o
 #	$(CC) $(CFLAGS) -fPIC -c search.c -o search.o
 #	$(CC) $(CFLAGS) -fPIC -c common.c -o common.o
-	$(CC) -g -shared -Wl,-soname,libgg.so -o libgg.so.0.9.0 $(OBJS) -lc
+	$(CC) -g -shared -Wl,-soname,libgg.so -o $(SHARED) $(OBJS) -lc
 
-static:	$(OBJS)
-	$(AR) r libgg.a $(OBJS) 
+static: $(STATIC)
+
+libgg.a:	$(OBJS)
+	$(AR) r $(STATIC) $(OBJS) 

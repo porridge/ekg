@@ -44,6 +44,7 @@ struct list *ignored = NULL;
 struct list *children = NULL;
 struct list *aliases = NULL;
 struct list *watches = NULL;
+struct list *transfers = NULL;
 int in_readline = 0;
 int no_prompt = 0;
 int away = 0;
@@ -76,6 +77,8 @@ int display_notify = 1;
 char *default_theme = NULL;
 int default_status = GG_STATUS_AVAIL;
 char *reg_password = NULL;
+int use_dcc = 0;
+char *dcc_ip = 0;
 
 /*
  * my_puts()
@@ -1286,4 +1289,66 @@ char *decode_base64(char *buf)
 	return res;
 }
 
+/*
+ * changed_debug()
+ *
+ * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,debug''.
+ */
+void changed_debug(char *var)
+{
+	if (display_debug)
+		gg_debug_level = 255;
+	else
+		gg_debug_level = 0;
+}
+
+/*
+ * changed_dcc()
+ *
+ * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,dcc''.
+ */
+void changed_dcc(char *var)
+{
+	struct gg_dcc *dcc = NULL;
+	struct list *l;
+	
+	for (l = watches; l; l = l->next) {
+		struct gg_common *c = l->data;
+
+		if (c->type == GG_SESSION_DCC_SOCKET)
+			dcc = l->data;
+	}
+
+	if (!use_dcc && dcc) {
+		list_remove(&watches, dcc, 0);
+		gg_free_dcc(dcc);
+	}
+
+	if (use_dcc && !dcc) {
+		if (!(dcc = gg_create_dcc_socket(config_uin, 0))) {
+			my_printf("dcc_create_error", strerror(errno));
+		} else
+			list_add(&watches, dcc, 0);
+	}
+}
+
+/*
+ * prepare_connect()
+ *
+ * przygotowuje wszystko pod po³±czenie gg_login.
+ */
+void prepare_connect()
+{
+	struct list *l;
+
+	for (l = watches; l; l = l->next) {
+		struct gg_dcc *d = l->data;
+		
+		if (d->type == GG_SESSION_DCC_SOCKET)
+			gg_dcc_port = d->port;
+	}
+
+	if (dcc_ip)
+		gg_dcc_ip = dcc_ip;
+}
 

@@ -29,39 +29,41 @@
 #include "libgg.h"
 
 struct variable variables[MAX_VARS] = {
-	{ "uin", VAR_INT, 1, &config_uin },
-	{ "password", VAR_STR, 0, &config_password },
+	{ "uin", VAR_INT, 1, &config_uin, NULL },
+	{ "password", VAR_STR, 0, &config_password, NULL },
 
-	{ "auto_away", VAR_INT, 1, &auto_away },
-	{ "auto_reconnect", VAR_INT, 1, &auto_reconnect },
-	{ "beep", VAR_BOOL, 1, &enable_beep },
-	{ "beep_msg", VAR_BOOL, 1, &enable_beep_msg },
-	{ "beep_chat", VAR_BOOL, 1, &enable_beep_chat },
-	{ "beep_notify", VAR_BOOL, 1, &enable_beep_notify },
-	{ "completion_notify", VAR_BOOL, 1, &completion_notify },
-	{ "display_ack", VAR_INT, 1, &display_ack },
-	{ "display_color", VAR_BOOL, 1, &display_color },
-	{ "display_notify", VAR_BOOL, 1, &display_notify },
-	{ "log", VAR_INT, 1, &log },
-	{ "log_path", VAR_STR, 1, &log_path },
-	{ "use_proxy", VAR_INT, 1, &gg_http_use_proxy },
-	{ "proxy_port", VAR_INT, 1, &gg_http_proxy_port },
-	{ "proxy_host", VAR_STR, 1, &gg_http_proxy_host },
-	{ "sms_away", VAR_BOOL, 1, &sms_away },
-	{ "sms_max_length", VAR_INT, 1, &sms_max_length },
-	{ "sms_number", VAR_STR, 1, &sms_number },
-	{ "sms_send_app", VAR_STR, 1, &sms_send_app },
-	{ "sound_msg_file", VAR_STR, 1, &sound_msg_file },
-	{ "sound_chat_file", VAR_STR, 1, &sound_chat_file },
-	{ "sound_sysmsg_file", VAR_STR, 1, &sound_sysmsg_file },
-	{ "sound_app", VAR_STR, 1, &sound_app },
-	{ "theme", VAR_STR, 1, &default_theme },
+	{ "auto_away", VAR_INT, 1, &auto_away, NULL },
+	{ "auto_reconnect", VAR_INT, 1, &auto_reconnect, NULL },
+	{ "beep", VAR_BOOL, 1, &enable_beep, NULL },
+	{ "beep_msg", VAR_BOOL, 1, &enable_beep_msg, NULL },
+	{ "beep_chat", VAR_BOOL, 1, &enable_beep_chat, NULL },
+	{ "beep_notify", VAR_BOOL, 1, &enable_beep_notify, NULL },
+	{ "completion_notify", VAR_BOOL, 1, &completion_notify, NULL },
+	{ "dcc", VAR_BOOL, 1, &use_dcc, changed_dcc },
+	{ "dcc_ip", VAR_STR, 1, &dcc_ip, NULL },
+	{ "display_ack", VAR_INT, 1, &display_ack, NULL },
+	{ "display_color", VAR_BOOL, 1, &display_color, NULL },
+	{ "display_notify", VAR_BOOL, 1, &display_notify, NULL },
+	{ "log", VAR_INT, 1, &log, NULL },
+	{ "log_path", VAR_STR, 1, &log_path, NULL },
+	{ "use_proxy", VAR_INT, 1, &gg_http_use_proxy, NULL },
+	{ "proxy_port", VAR_INT, 1, &gg_http_proxy_port, NULL },
+	{ "proxy_host", VAR_STR, 1, &gg_http_proxy_host, NULL },
+	{ "sms_away", VAR_BOOL, 1, &sms_away, NULL },
+	{ "sms_max_length", VAR_INT, 1, &sms_max_length, NULL },
+	{ "sms_number", VAR_STR, 1, &sms_number, NULL },
+	{ "sms_send_app", VAR_STR, 1, &sms_send_app, NULL },
+	{ "sound_msg_file", VAR_STR, 1, &sound_msg_file, NULL },
+	{ "sound_chat_file", VAR_STR, 1, &sound_chat_file, NULL },
+	{ "sound_sysmsg_file", VAR_STR, 1, &sound_sysmsg_file, NULL },
+	{ "sound_app", VAR_STR, 1, &sound_app, NULL },
+	{ "theme", VAR_STR, 1, &default_theme, NULL },
 
-	{ "default_status", VAR_INT, 2, &default_status },
-	{ "bold_font", VAR_STR, 2, &bold_font },	/* GNU Gadu */
-	{ "debug", VAR_BOOL, 2, &display_debug },
+	{ "default_status", VAR_INT, 2, &default_status, NULL },
+	{ "bold_font", VAR_STR, 2, &bold_font, NULL },	/* GNU Gadu */
+	{ "debug", VAR_BOOL, 2, &display_debug, changed_debug },
 
-	{ NULL, 0, 0, NULL }
+	{ NULL, 0, 0, NULL, NULL }
 };
 
 /*
@@ -115,6 +117,9 @@ int set_variable(char *name, char *value)
 
 		*(int*)(v->ptr) = atoi(value);
 
+		if (v->notify)
+			(v->notify)(v->name);
+
 		return 0;
 	}
 
@@ -128,6 +133,10 @@ int set_variable(char *name, char *value)
 			return -2;
 
 		*(int*)(v->ptr) = tmp;
+
+		if (v->notify)
+			(v->notify)(v->name);
+		
 		return 0;
 	}
 
@@ -137,6 +146,9 @@ int set_variable(char *name, char *value)
 			return -3;
 	} else
 		*(char**)(v->ptr) = NULL;
+	
+	if (v->notify)
+		(v->notify)(v->name);
 
 	return 0;
 }

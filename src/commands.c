@@ -63,7 +63,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_test_add(), command_theme(), command_set(), command_connect(),
 	command_sms(), command_find(), command_modify(), command_cleartab(),
 	command_status(), command_register(), command_test_watches(),
-	command_remind();
+	command_remind(), command_send();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -107,9 +107,10 @@ struct command commands[] = {
 	{ "theme", "f", command_theme, " <plik>", "£aduje opis wygl±du z podanego pliku", "" },
 	{ "quit", "", command_quit, "", "Wychodzi z programu", "" },
 	{ "unignore", "i", command_ignore, " <numer/alias>", "Usuwa z listy ignorowanych osób", "" },
-	{ "_send", "u?", command_test_send, "", "", "" },
+	{ "_msg", "u?", command_test_send, "", "", "" },
 	{ "_add", "?", command_test_add, "", "", "" },
 	{ "_watches", "", command_test_watches, "", "", "" },
+	{ "_send", "u?", command_send, "", "", "" },
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 
@@ -519,6 +520,7 @@ COMMAND(command_connect)
                 if (config_uin && config_password) {
 			my_printf("connecting");
 			connecting = 1;
+			prepare_connect();
 			if (!(sess = gg_login(config_uin, config_password, 1))) {
 	                        my_printf("conn_failed", strerror(errno));
 	                        do_reconnect();
@@ -1124,6 +1126,33 @@ COMMAND(command_quit)
 	return -1;
 }
 
+COMMAND(command_send)
+{
+	struct transfer t;
+	uin_t uin;
+
+	if (!params[0] || !params[1]) {
+		my_printf("not_enough_params");
+		return 0;
+	}
+	
+        if (!(uin = get_uin(params[0])) || !find_user(uin, NULL)) {
+		my_printf("user_not_found", params[0]);
+		return 0;
+	}
+
+	gg_dcc_send_request(sess, uin);
+
+	/* XXX jakie¶ checki */
+	t.uin = uin;
+	t.filename = strdup(params[1]);
+	t.dcc = NULL;
+
+	list_add(&transfers, &t, sizeof(t));
+
+	return 0;
+}
+
 COMMAND(command_test_send)
 {
 	struct gg_event *e = malloc(sizeof(struct gg_event));
@@ -1162,6 +1191,10 @@ COMMAND(command_test_watches)
 			case GG_SESSION_REMIND: type = "REMIND"; break;
 			case GG_SESSION_CHANGE: type = "CHANGE"; break;
 			case GG_SESSION_PASSWD: type = "PASSWD"; break;
+			case GG_SESSION_DCC: type = "DCC"; break;
+			case GG_SESSION_DCC_SOCKET: type = "DCC_SOCKET"; break;
+			case GG_SESSION_DCC_SEND: type = "DCC_SEND"; break;
+			case GG_SESSION_DCC_GET: type = "DCC_GET"; break;
 			case GG_SESSION_USER0: type = "USER0"; break;
 			case GG_SESSION_USER1: type = "USER1"; break;
 			case GG_SESSION_USER2: type = "USER2"; break;
@@ -1175,18 +1208,32 @@ COMMAND(command_test_watches)
 			default: check = "?"; break;
 		}
 		switch (s->state) {
+			/* gg_common */
 			case GG_STATE_IDLE: state = "IDLE"; break;
 			case GG_STATE_RESOLVING: state = "RESOLVING"; break;
 			case GG_STATE_CONNECTING: state = "CONNECTING"; break;
 			case GG_STATE_READING_DATA: state = "READING_DATA"; break;
 			case GG_STATE_ERROR: state = "ERROR"; break;
+			/* gg_session */	     
 			case GG_STATE_CONNECTING_GG: state = "CONNECTING_GG"; break;
 			case GG_STATE_READING_KEY: state = "READING_KEY"; break;
 			case GG_STATE_READING_REPLY: state = "READING_REPLY"; break;
 			case GG_STATE_CONNECTED: state = "CONNECTED"; break;
+			/* gg_http */
 			case GG_STATE_READING_HEADER: state = "READING_HEADER"; break;
 			case GG_STATE_PARSING: state = "PARSING"; break;
 			case GG_STATE_DONE: state = "DONE"; break;
+			/* gg_dcc */
+			case GG_STATE_LISTENING: state = "LISTENING"; break;
+			case GG_STATE_READING_UIN_1: state = "READING_UIN_1"; break;
+			case GG_STATE_READING_UIN_2: state = "READING_UIN_2"; break;
+			case GG_STATE_SENDING_ACK: state = "SENDING_ACK"; break;
+			case GG_STATE_READING_REQUEST: state = "READING_REQUEST"; break;
+			case GG_STATE_SENDING_FILE_INFO: state = "SENDING_FILE_INFO"; break;
+			case GG_STATE_READING_ACK: state = "READING_ACK"; break;
+			case GG_STATE_SENDING_HEADER: state = "SENDING_HEADER"; break;
+			case GG_STATE_GETTING_FILE: state = "SENDING_GETTING_FILE"; break;
+			case GG_STATE_SENDING_FILE: state = "SENDING_SENDING_FILE"; break;
 			default: state = "(unknown)"; break;
 		}
 		
