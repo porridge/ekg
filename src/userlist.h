@@ -61,6 +61,9 @@ int userlist_remove(struct userlist *u);
 int userlist_replace(struct userlist *u);
 void userlist_send();
 struct userlist *userlist_find(uin_t uin, char *display);
+char *userlist_dump();
+void userlist_clear();
+int userlist_set(char *contacts);
 
 int ignored_add(uin_t uin);
 int ignored_remove(uin_t uin);

@@ -554,6 +554,46 @@ void handle_pubdir(struct gg_http *h)
 }
 
 /*
+ * handle_userlist()
+ *
+ * funkcja zajmuj±ca siê zdarzeniami userlisty.
+ *
+ *  - h - delikwent.
+ *
+ * nie zwraca niczego.
+ */
+void handle_userlist(struct gg_http *h)
+{
+	char *format_ok, *format_error;
+	
+	if (!h)
+		return;
+	
+	format_ok = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_get_ok" : "userlist_put_ok";
+	format_error = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_get_error" : "userlist_put_error";
+
+	if (h->callback(h) || h->state == GG_STATE_ERROR) {
+		my_printf(format_error, strerror(errno));
+		list_remove(&watches, h, 0);
+		h->destroy(h);
+		return;
+	}
+	
+	if (h->state != GG_STATE_DONE)
+		return;
+
+	my_printf((h->data) ? format_ok : format_error);
+		
+	if (h->type == GG_SESSION_USERLIST_GET) {
+		userlist_set(h->data);
+		config_changed = 1;
+	}
+
+	list_remove(&watches, h, 0);
+	h->destroy(h);
+}
+
+/*
  * handle_disconnect()
  *
  * funkcja obs³uguje ostrze¿enie o roz³±czeniu.

@@ -33,6 +33,7 @@ void handle_msg(struct gg_event *e);
 
 void handle_search(struct gg_http *s);
 void handle_pubdir(struct gg_http *s);
+void handle_userlist(struct gg_http *s);
 
 void handle_disconnect(struct gg_event *e);
 

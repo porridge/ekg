@@ -67,7 +67,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_sms(), command_find(), command_modify(), command_cleartab(),
 	command_status(), command_register(), command_test_watches(),
 	command_remind(), command_dcc(), command_query(), command_passwd(),
-	command_test_ping(), command_on();
+	command_test_ping(), command_on(), command_test_userlist();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -122,6 +122,8 @@ struct command commands[] = {
 	{ "_add", "?", command_test_add, "", "", "" },
 	{ "_watches", "", command_test_watches, "", "", "" },
 	{ "_ping", "", command_test_ping, "", "", "" },
+	{ "_ul_put", "", command_test_userlist, "", "", "" },
+	{ "_ul_get", "", command_test_userlist, "", "", "" },
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 
@@ -1428,10 +1430,16 @@ COMMAND(command_test_watches)
 			case GG_SESSION_DCC_SOCKET: type = "DCC_SOCKET"; break;
 			case GG_SESSION_DCC_SEND: type = "DCC_SEND"; break;
 			case GG_SESSION_DCC_GET: type = "DCC_GET"; break;
+			case GG_SESSION_USERLIST_PUT: type = "USERLIST_PUT"; break;
+			case GG_SESSION_USERLIST_GET: type = "USERLIST_GET"; break;
 			case GG_SESSION_USER0: type = "USER0"; break;
 			case GG_SESSION_USER1: type = "USER1"; break;
 			case GG_SESSION_USER2: type = "USER2"; break;
 			case GG_SESSION_USER3: type = "USER3"; break;
+			case GG_SESSION_USER4: type = "USER4"; break;
+			case GG_SESSION_USER5: type = "USER5"; break;
+			case GG_SESSION_USER6: type = "USER6"; break;
+			case GG_SESSION_USER7: type = "USER7"; break;
 			default: type = "(unknown)"; break;
 		}
 		switch (s->check) {
@@ -1629,6 +1637,33 @@ COMMAND(command_on)
         add_event(flags, uin, params[2]);
         config_changed = 1;
         return 0;
+}
+
+COMMAND(command_test_userlist)
+{
+	struct gg_http *h;
+	
+	if (!strstr(name, "get")) {
+		char *contacts = userlist_dump();
+		if (!contacts) {
+			my_printf("userlist_put_error", strerror(ENOMEM));
+			return 0;
+		}
+		if (!(h = gg_userlist_put(config_uin, config_password, contacts, 1))) {
+			my_printf("userlist_put_error", strerror(errno));
+			return 0;
+		}
+		free(contacts);
+	} else {
+		if (!(h = gg_userlist_get(config_uin, config_password, 1))) {
+			my_printf("userlist_get_error", strerror(errno));
+			return 0;
+		}
+	}
+
+	list_add(&watches, h, 0);
+
+	return 0;
 }
 
 char *strip_spaces(char *line)

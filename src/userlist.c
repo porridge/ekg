@@ -147,6 +147,108 @@ int userlist_read(char *filename)
 }
 
 /*
+ * userlist_set()
+ *
+ * ustawia listê kontaktów na podan±.
+ */
+int userlist_set(char *contacts)
+{
+	char *buf;
+
+	userlist_clear();
+
+	/* XXX argh! */
+	
+	while ((buf = gg_get_line(&contacts))) {
+		struct userlist u;
+		char *display;
+		
+		if (buf[0] == '#') {
+			continue;
+		}
+
+		if (!strchr(buf, ';')) {
+			if (!(display = strchr(buf, ' '))) {
+				continue;
+			}
+
+			u.uin = strtol(buf, NULL, 0);
+		
+			if (!u.uin) {
+				continue;
+			}
+
+			u.first_name = NULL;
+			u.last_name = NULL;
+			u.nickname = NULL;
+			u.display = strdup(++display);
+			u.mobile = NULL;
+			u.groups = NULL;
+
+		} else {
+			char **entry = array_make(buf, ";", 7, 0, 0);
+			
+			if (!entry[0] || !entry[1] || !entry[2] || !entry[3] || !entry[4] || !entry[5] || !entry[6] || !(u.uin = strtol(entry[6], NULL, 0))) {
+				array_free(entry);
+				continue;
+			}
+			
+			u.first_name = strdup_null(entry[0]);
+			u.last_name = strdup_null(entry[1]);
+			u.nickname = strdup_null(entry[2]);
+			u.display = strdup_null(entry[3]);
+			u.mobile = strdup_null(entry[4]);
+			u.groups = group_init(entry[5]);
+
+			array_free(entry);
+		}
+
+		u.status = GG_STATUS_NOT_AVAIL;
+
+		list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);
+	}
+
+	return 0;
+}
+
+/*
+ * userlist_dump()
+ *
+ * zapisuje listê kontaktów w postaci tekstowej.
+ *
+ * zwraca zaalokowany bufor, który nale¿y zwolniæ.
+ */
+char *userlist_dump()
+{
+	struct list *l;
+	struct string *s;
+
+	if (!(s = string_init(NULL)))
+		return NULL;
+	
+	for (l = userlist; l; l = l->next) {
+		struct userlist *u = l->data;
+		char *groups, *line;
+		
+		groups = group_to_string(u->groups);
+		
+		line = gg_alloc_sprintf("%s;%s;%s;%s;%s;%s;%lu\r\n",
+			(u->first_name) ?
+			u->first_name : u->display, (u->last_name) ?
+			u->last_name : "", (u->nickname) ? u->nickname :
+			u->display, u->display, (u->mobile) ? u->mobile :
+			"", groups, u->uin);
+		
+		string_append(s, line);
+
+		free(line);
+		free(groups);
+	}	
+
+	return string_free(s, 0);
+}
+
+/*
  * userlist_write()
  *
  * zapisuje listê kontaktów w pliku ~/.gg/userlist
@@ -155,38 +257,35 @@ int userlist_read(char *filename)
  */
 int userlist_write(char *filename)
 {
-	struct list *l;
-	char *tmp;
+	char *tmp, *contacts;
 	FILE *f;
 
-	if (!(tmp = prepare_path("")))
+	if (!(contacts = userlist_dump()))
 		return -1;
+	
+	if (!(tmp = prepare_path(""))) {
+		free(contacts);
+		return -1;
+	}
 	mkdir(tmp, 0700);
 
 	if (!filename) {
-		if (!(filename = prepare_path("userlist")))
+		if (!(filename = prepare_path("userlist"))) {
+			free(contacts);
 			return -1;
+		}
 	}
 	
-	if (!(f = fopen(filename, "w")))
+	if (!(f = fopen(filename, "w"))) {
+		free(contacts);
 		return -2;
-
+	}
 	fchmod(fileno(f), 0600);
-	
-	for (l = userlist; l; l = l->next) {
-		struct userlist *u = l->data;
-		char *groups = group_to_string(u->groups);
-
-		fprintf(f, "%s;%s;%s;%s;%s;%s;%lu\r\n", (u->first_name) ?
-			u->first_name : u->display, (u->last_name) ?
-			u->last_name : "", (u->nickname) ? u->nickname :
-			u->display, u->display, (u->mobile) ? u->mobile :
-			"", groups, u->uin);
-		free(groups);
-	}	
-
+	fputs(contacts, f);
 	fclose(f);
 	
+	free(contacts);
+
 	return 0;
 }
 
@@ -195,7 +294,8 @@ int userlist_write(char *filename)
  *
  * czy¶ci stan u¿ytkowników na li¶cie.
  */
-void userlist_clear_status(void) {
+void userlist_clear_status()
+{
         struct list *l;
 
         for (l = userlist; l; l = l->next) {
@@ -204,6 +304,17 @@ void userlist_clear_status(void) {
                 u->status = GG_STATUS_NOT_AVAIL;
         };
 };
+
+/*
+ * userlist_clear()
+ *
+ * czy¶ci listê u¿ytkowników.
+ */
+void userlist_clear()
+{
+	while (userlist)
+		userlist_remove(userlist->data);
+}
 
 /*
  * userlist_add()

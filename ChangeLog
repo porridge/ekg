@@ -11,6 +11,10 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   tekstów na pola. obs³uguje eskejpowanie, cudzys³owie itp. dziêki
   czemu dzia³aj± konstrukcje typu ,,msg "mi¶ yogi" cze¶æ'' (w)
 - nowe logowanie wiadomo¶ci, tak jak wspomnia³em na ekg-devel (w)
+- obs³uga listy kontaktów na serwerze (w)
+- komendy ,,_ul_get'' i ,,_ul_put'', bo póki co, nie mam pomys³u,
+  jak to rozwi±zaæ (w)
+- poprawki w dokumentacji. pocz±tek htmlizacji protokol.txt (w)
 
 // 2002-02-08
 

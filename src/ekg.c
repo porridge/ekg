@@ -64,6 +64,8 @@ static struct {
 	{ GG_SESSION_PASSWD, (void (*)(void*)) handle_pubdir, },
 	{ GG_SESSION_REMIND, (void (*)(void*)) handle_pubdir, },
 	{ GG_SESSION_CHANGE, (void (*)(void*)) handle_pubdir, },
+	{ GG_SESSION_USERLIST_GET, (void (*)(void*)) handle_userlist, },
+	{ GG_SESSION_USERLIST_PUT, (void (*)(void*)) handle_userlist, },
 	{ -1, NULL, }, 
 };
 
@@ -112,8 +114,6 @@ int my_getc(FILE *f)
 		
 		ret = select(maxfd + 1, &rd, &wd, NULL, &tv);
 	
-		/* XXX prawdziwy timeout */
-
 		if (!ret) {
 			/* timeouty danych sesji */
 			for (l = watches; l; l = l->next) {

@@ -673,6 +673,10 @@ void init_theme()
 	add_format("events_seq_incorrect", "%W%1%n - nieprawid³owa sekwencja\n", 1);
         add_format("config_line_incorrect", "%! Nieprawid³owa linia '%W%1%n', pomijam\n", 1);
         add_format("temporary_run_event", "%) Startujemy z akcj± %B'%1%n'\n", 1);
-	add_format("autosaved", "% Automatycznie zapisano ustawienia\n", 1);
+	add_format("autosaved", "%> Automatycznie zapisano ustawienia\n", 1);
+	add_format("userlist_put_ok", "%> Listê kontaktów zachowano na serwerze\n", 1);
+	add_format("userlist_put_error", "%! B³±d podczas wysy³ania listy kontaktów: %1\n", 1);
+	add_format("userlist_get_ok", "%) Listê kontaktów wczytano z serwera\n", 1);
+	add_format("userlist_get_error", "%! B³±d podczas pobierania listy kontaktów: %1\n", 1);
 };
 

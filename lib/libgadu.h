@@ -40,34 +40,36 @@ typedef unsigned long uin_t;
 /*
  * ogólna struktura opisuj±ca ró¿ne sesje. przydatna w klientach.
  */
+
+#define gg_common_head(x) \
+        int fd;                 /* podgl±dany deskryptor */ \
+        int check;              /* sprawdzamy zapis czy odczyt */ \
+        int state;              /* aktualny stan maszynki */ \
+        int error;              /* kod b³êdu dla GG_STATE_ERROR */ \
+	int type;		/* rodzaj sesji */ \
+	int id;			/* identyfikator */ \
+	int timeout;		/* sugerowany timeout w sekundach */ \
+	int (*callback)(x*); 	/* callback przy zmianach */ \
+	void (*destroy)(x*); 	/* funkcja niszczenia */
+
 struct gg_common {
-        int fd;                 /* podgl±dany deskryptor */
-        int check;              /* sprawdzamy zapis czy odczyt */
-        int state;              /* aktualny stan maszynki */
-        int error;              /* kod b³êdu dla GG_STATE_ERROR */
-	int type;		/* rodzaj sesji */
-	int id;			/* identyfikator */
-	int timeout;		/* sugerowany timeout w sekundach */
+	gg_common_head(struct gg_common);
 };
 
 /*
  * struktura opisuj±ca dan± sesjê. tworzona przez gg_login().
  */
 struct gg_session {
-        int fd;         	/* podgl±dany deskryptor */
-        int check;      	/* sprawdzamy zapis czy odczyt */
-        int state;      	/* aktualny stan maszynki */
-        int error;      	/* kod b³êdu dla GG_STATE_ERROR */
-	int type;		/* rodzaj sesji. == GG_SESSION_GG */
-	int id;			/* identyfikator */
-	int timeout;		/* sugerowany timeout w sekundach */
-	
+	gg_common_head(struct gg_session);
+
         int async;      	/* czy po³±czenie jest asynchroniczne */
 	int pid;        	/* pid procesu resolvera */
 	int port;       	/* port, z którym siê ³±czymy */
 	int seq;        	/* numer sekwencyjny ostatniej wiadomo¶ci */
 	int last_pong;  	/* czas otrzymania ostatniego ping/pong */
 	int last_event;		/* czas otrzymania ostatniego pakietu */
+
+	struct gg_event *event;	/* zdarzenie po ->callback() */
 
 	unsigned int server_ip;	/* adres serwera */
 	unsigned int client_ip;	/* adres klienta */
@@ -87,14 +89,8 @@ struct gg_session {
  * ogólna struktura opisuj±ca stan wszystkich operacji http.
  */
 struct gg_http {
-        int fd;                 /* podgl±dany deskryptor */
-        int check;              /* sprawdzamy zapis czy odczyt */
-        int state;              /* aktualny stan maszynki */
-        int error;              /* kod b³êdu dla GG_STATE_ERROR */
- 	int type;		/* rodzaj sesji. == GG_SESSION_HTTP */
-	int id;			/* identyfikator */
-	int timeout;		/* sugerowany timeout w sekundach */
-	
+	gg_common_head(struct gg_http);
+
         int async;              /* czy po³±czenie asynchroniczne */
 	int pid;                /* pid procesu resolvera */
 	int port;               /* port, z którym siê ³±czymy */
@@ -132,13 +128,7 @@ struct gg_file_info {
  * struktura opisuj±ca nas³uchuj±ce gniazdo po³±czeñ miêdzy klientami.
  */
 struct gg_dcc {
-        int fd;                 /* podgl±dany deskryptor */
-        int check;              /* sprawdzamy zapis czy odczyt */
-        int state;              /* aktualny stan maszynki */
-        int error;              /* kod b³êdu dla GG_STATE_ERROR */
-	int type;		/* rodzaj sesji */
-	int id;			/* identyfikator */
-	int timeout;		/* sugerowany timeout w sekundach */
+	gg_common_head(struct gg_dcc);
 
 	int active;		/* czy to my siê ³±czymy? */
 	int port;		/* port, na którym siedzi */
@@ -155,7 +145,7 @@ struct gg_dcc {
 /*
  * rodzaje sesji.
  */
-enum {
+enum gg_session_enum {
 	GG_SESSION_GG = 1,	/* po³±czenie z serwerem gg */
 	GG_SESSION_HTTP,	/* ogólna sesja http */
 	GG_SESSION_SEARCH,	/* szukanie */
@@ -167,17 +157,23 @@ enum {
 	GG_SESSION_DCC_SOCKET,	/* nas³uchuj±cy socket */
 	GG_SESSION_DCC_SEND,	/* wysy³anie pliku */
 	GG_SESSION_DCC_GET,	/* odbieranie pliku */
+	GG_SESSION_USERLIST_GET,	/* pobieranie userlisty */
+	GG_SESSION_USERLIST_PUT,	/* wysy³anie userlisty */
 	
 	GG_SESSION_USER0 = 256,	/* zdefiniowana dla u¿ytkownika */
 	GG_SESSION_USER1,	/* j.w. */
 	GG_SESSION_USER2,	/* j.w. */
 	GG_SESSION_USER3,	/* j.w. */
+	GG_SESSION_USER4,	/* j.w. */
+	GG_SESSION_USER5,	/* j.w. */
+	GG_SESSION_USER6,	/* j.w. */
+	GG_SESSION_USER7,	/* j.w. */
 };
 
 /*
  * ró¿ne stany asynchronicznej maszynki.
  */
-enum {
+enum gg_state_enum {
         /* wspólne */
         GG_STATE_IDLE = 0,		/* nie powinno wyst±piæ. */
         GG_STATE_RESOLVING,             /* wywo³a³ gethostbyname() */
@@ -227,7 +223,7 @@ enum {
 /*
  * co proces klienta powinien sprawdzaæ w deskryptorach?
  */
-enum {
+enum gg_check_enum {
 	GG_CHECK_NONE = 0,		/* nic. nie powinno wyst±piæ */
 	GG_CHECK_WRITE = 1,		/* sprawdzamy mo¿liwo¶æ zapisu */
 	GG_CHECK_READ = 2,		/* sprawdzamy mo¿liwo¶æ odczytu */
@@ -342,7 +338,8 @@ int gg_remove_notify(struct gg_session *sess, uin_t uin);
 struct gg_http *gg_http_connect(char *hostname, int port, int async, char *method, char *path, char *header);
 int gg_http_watch_fd(struct gg_http *h);
 void gg_http_stop(struct gg_http *h);
-void gg_free_http(struct gg_http *h);
+void gg_http_free(struct gg_http *h);
+#define gg_free_http gg_http_free
 
 /* 
  * SZUKANIE U¯YTKOWNIKÓW
@@ -429,22 +426,38 @@ struct gg_modify {
 
 struct gg_http *gg_register(char *email, char *password, int async);
 #define gg_register_watch_fd gg_pubdir_watch_fd
+#define gg_register_free gg_free_pubdir
 #define gg_free_register gg_free_pubdir
 
 struct gg_http *gg_remind_passwd(uin_t uin, int async);
 #define gg_remind_passwd_watch_fd gg_pubdir_watch_fd
+#define gg_remind_passwd_free gg_free_pubdir
 #define gg_free_remind_passwd gg_free_pubdir
 
 struct gg_http *gg_change_passwd(uin_t uin, char *passwd, char *newpasswd, char *newemail, int async);
 #define gg_change_passwd_watch_fd gg_pubdir_watch_fd
+#define gg_change_passwd_free gg_free_pubdir
 #define gg_free_change_passwd gg_free_pubdir
 
 struct gg_http *gg_change_pubdir(uin_t uin, char *passwd, struct gg_modify *modify, int async);
 #define gg_change_pubdir_watch_fd gg_pubdir_watch_fd
+#define gg_change_pubdir_free gg_free_pubdir
 #define gg_free_change_pubdir gg_free_pubdir
 
 int gg_pubdir_watch_fd(struct gg_http *f);
 void gg_free_pubdir(struct gg_http *f);
+
+/*
+ * FUNKCJE DOTYCZ¡CE LISTY KONTAKTÓW NA SERWERZE
+ */
+
+struct gg_http *gg_userlist_get(uin_t uin, char *password, int async);
+int gg_userlist_get_watch_fd(struct gg_http *f);
+void gg_userlist_get_free(struct gg_http *f);
+
+struct gg_http *gg_userlist_put(uin_t uin, char *password, char *contacts, int async);
+int gg_userlist_put_watch_fd(struct gg_http *f);
+void gg_userlist_put_free(struct gg_http *f);
 
 /*
  * FUNKCJE DOTYCZ¡CE KOMUNIKACJI MIÊDZY KLIENTAMI
@@ -463,6 +476,7 @@ struct gg_dcc *gg_dcc_create_socket(uin_t uin, unsigned int port);
 struct gg_event *gg_dcc_watch_fd(struct gg_dcc *d);
 
 void gg_free_dcc(struct gg_dcc *c);
+#define gg_dcc_free gg_free_dcc
 
 /*
  * je¶li chcemy sobie podebugowaæ, wystarczy ustawiæ `gg_debug_level'.
