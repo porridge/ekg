@@ -698,8 +698,10 @@ void changed_proxy(const char *var)
 
 	auth = array_make(config_proxy, "@", 0, 0, 0);
 
-	if (!auth[0] || !strcmp(auth[0], ""))
+	if (!auth[0] || !strcmp(auth[0], "")) {
+		array_free(auth);
 		return; 
+	}
 	
 	gg_proxy_enabled = 1;
 
@@ -847,6 +849,7 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 			if (!nig) {
 				printq("group_empty", gname);
 				printq("conferences_not_added", name);
+				array_free(nicks);
 				return NULL;
 			}
 		}

@@ -734,6 +734,7 @@ COMMAND(cmd_exec)
 				command = args[2];
 			} else {
 				printq("invalid_params", name);
+				array_free(args);
 				return -1;
 			}
 		} else
@@ -742,6 +743,7 @@ COMMAND(cmd_exec)
 		if (pipe(fd)) {
 			printq("exec_error", strerror(errno));
 			xfree(tg);
+			array_free(args);
 			return -1;
 		}
 
@@ -762,6 +764,7 @@ COMMAND(cmd_exec)
 		if (pid < 0) {
 			printq("exec_error", strerror(errno));
 			xfree(tg);
+			array_free(args);
 			return -1;
 		}
 	
@@ -793,9 +796,7 @@ COMMAND(cmd_exec)
 
 		process_add(pid, tmp);
 
-		if (args)
-			array_free(args);
-
+		array_free(args);
 		xfree(tmp);
 	} else {
 		for (l = children; l; l = l->next) {
@@ -858,6 +859,7 @@ COMMAND(cmd_find)
 		
 	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
 		ui_event("command", quiet, "find", NULL);
+		array_free(argv);
 		return -1;
 	}
 
@@ -872,8 +874,10 @@ COMMAND(cmd_find)
 	for (i = 0; argv[i]; i++)
 		iso_to_cp(argv[i]);
 
-	if (!(req = gg_pubdir50_new(GG_PUBDIR50_SEARCH)))
+	if (!(req = gg_pubdir50_new(GG_PUBDIR50_SEARCH))) {
+		array_free(argv);
 		return -1;
+	}
 	
 	if (argv[0] && !argv[1] && argv[0][0] != '-') {
 		uin_t uin = get_uin(params[0]);
@@ -4817,13 +4821,11 @@ COMMAND(cmd_last)
 
 	if (nick && !(uin = get_uin(nick))) {
 		printq("user_not_found", nick);
-		if (arr)
-			array_free(arr);
+		array_free(arr);
 		return -1;
 	}
 
-	if (arr)
-		array_free(arr);
+	array_free(arr);
 		
 	if (!((uin > 0) ? (count = last_count(uin)) : (count = list_count(lasts)))) {
 		if (uin) {
