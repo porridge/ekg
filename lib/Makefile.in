@@ -1,5 +1,8 @@
 # $Id$
 
+VERSION_MAJOR = 0		# increased with ABI changes
+VERSION_MINOR = 9		# increased with API changes
+
 CC = @CC@ 
 CFLAGS = @CFLAGS_LIBGADU@ -I.. -fPIC -Wall
 LIBS = @LIBS_LIBGADU@
@@ -15,7 +18,7 @@ libdir = @libdir@
 
 OBJS = common.o libgadu.o search.o pubdir.o http.o dcc.o userlist.o events.o
 
-SHARED = libgadu.so.0.9.0
+SHARED = libgadu.so.$(VERSION_MAJOR).$(VERSION_MINOR)
 STATIC = libgadu.a
 
 all:	@static@ @shared@
@@ -23,7 +26,7 @@ all:	@static@ @shared@
 #
 
 clean:
-	rm -f *.o *~ core $(STATIC) $(SHARED)
+	rm -f *.o *.a *.so *.so.* *~ core
 
 distclean:	clean
 	rm -f Makefile
@@ -41,7 +44,7 @@ $(STATIC): $(OBJS)
 shared:	$(SHARED)
 
 $(SHARED): $(OBJS)
-	$(CC) -g -shared -Wl,-soname,libgadu.so -o $(SHARED) $(OBJS) $(LIBS) -lc
+	$(CC) -g -shared -Wl,-soname=libgadu.so.$(VERSION_MAJOR) -o $(SHARED) $(OBJS) $(LIBS) -lc
 
 #
 
