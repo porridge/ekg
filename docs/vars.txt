@@ -112,9 +112,9 @@ log
 
 	okre¶la czy i w jaki sposób bêd± logowane wysy³ane i otrzymywane
 	wiadomo¶ci. dla 0, nie bêd±. dla 1, bêd± logowane w pliku, który
-	okre¶la zmienna ,,log_path'' lub ,,gg.log'' w przypadku jej braku.
-	dla 2, bêd± logowane w katalogu wskazanym przez zmienn± ,,log_path''
-	lub w aktualnym katalogu, a nazwa pliku bêdzie numerem rozmówcy.
+	okre¶la zmienna ,,log_path'' lub ,,~/.gg/history'' w przypadku
+	jej braku. dla 2, bêd± logowane w katalogu wskazanym przez zmienn±
+	,,log_path'', a nazwa pliku bêdzie numerem rozmówcy.
 
 log_path
 	typ: tekst
