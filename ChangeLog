@@ -11,6 +11,7 @@ zg³osi³ b³±d.
 - poprawione zawijanie w li¶cie kontaktów (pmb/w)
 - dodanie implementacji funkcji strlcpy/strlcat z OpenBSD. mo¿na z nich 
   wiêc korzystaæ na ka¿dym systemie (sz)
+- poprawka segfaultów i b³êdów z w³±czonym sort_windows (*/w)
 
 // 2003-02-08
 

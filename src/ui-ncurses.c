@@ -3284,6 +3284,9 @@ void window_kill(struct window *w, int quiet)
 		for (l = windows; l; l = l->next) {
 			struct window *w = l->data;
 
+			if (w->floating)
+				continue;
+
 			if (w->id > 1 && w->id > id)
 				w->id--;
 		}
@@ -3666,6 +3669,9 @@ static int ui_ncurses_event(const char *event, ...)
 
 			for (l = windows; l; l = l->next) {
 				struct window *w = l->data;
+
+				if (w->floating)
+					continue;
 				
 				if (w->id > 1)
 					w->id = id++;
