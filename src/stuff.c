@@ -148,7 +148,7 @@ char *prepare_path(char *filename)
 		home = pw->pw_dir;
 	}
 	
-	if (config_user) {
+	if (config_user != "") {
 	  snprintf(path, sizeof(path), "%s/.gg/%s/%s", home, config_user, filename);
 	} else {
 	  snprintf(path, sizeof(path), "%s/.gg/%s", home, filename);

@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <pwd.h>
 #include <sys/time.h>
 #ifndef _AIX
 #  include <string.h>
@@ -189,6 +190,8 @@ void sighup()
 int main(int argc, char **argv)
 {
 	int auto_connect = 1, i;
+	char *home = getenv("HOME");
+	struct passwd *pw; 
 	
 	config_user = "";
 	init_theme();
@@ -241,6 +244,15 @@ int main(int argc, char **argv)
 		display_debug = 1;
 			
 	read_userlist(NULL);
+		
+	if (!log_path) {
+	    if (!home) { pw = getpwuid(getuid()); home = pw->pw_dir; }
+	    if (config_user != "") {
+		log_path = gg_alloc_sprintf("%s/.gg/%s/history", home, config_user);
+	    } else {
+		log_path = gg_alloc_sprintf("%s/.gg/history", home);
+	    }
+	}
 
 	if (config_uin && config_password && auto_connect) {
 		my_printf("connecting");
@@ -294,6 +306,7 @@ int main(int argc, char **argv)
 			printf("\n");
 	}
 
+	free(log_path);	
 	return 0;
 }
 
