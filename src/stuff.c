@@ -2963,7 +2963,7 @@ int say_it(const char *str)
 		return -1;
 
 	if (speech_pid) {
-		buffer_add(BUFFER_SPEECH, NULL, str, 0);
+		buffer_add(BUFFER_SPEECH, NULL, str, 50);
 		return -2;
 	}
 
@@ -2975,15 +2975,16 @@ int say_it(const char *str)
 	if (!pid) {
 		char *tmp = saprintf("%s 2>/dev/null 1>&2", config_speech_app);
 		FILE *f = popen(tmp, "w");
+		int status = -1;
 
 		xfree(tmp);
 
 		if (f) {
 			fprintf(f, "%s.", str);
-			pclose(f);	/* dzieciak czeka na dzieciaka */
+			status = pclose(f);	/* dzieciak czeka na dzieciaka */
 		}
 
-		exit(1);
+		exit(status);
 	}
 
 	process_add(pid, "\003");

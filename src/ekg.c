@@ -487,7 +487,7 @@ void ekg_wait_for_key()
 				if (pid == speech_pid) {
 					speech_pid = 0;
 
-					if (buffer_count(BUFFER_SPEECH)) {
+					if (buffer_count(BUFFER_SPEECH) && !WEXITSTATUS(status)) {
 						char *str = buffer_pop(BUFFER_SPEECH);
 						say_it(str);
 						xfree(str);
