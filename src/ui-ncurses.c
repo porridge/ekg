@@ -1910,7 +1910,7 @@ static void update_statusbar(int commit)
 	{
 		time_t t = time(NULL);
 		struct tm *tm;
-		char tmp[16];
+		char tmp[80];
 
 		tm = localtime(&t);
 
