@@ -223,7 +223,9 @@ dcc_ip
 
 	okre¶la adres IP, który jest wysy³any serwerowi. je¶li przypisze
 	siê tej zmiennej warto¶æ ,,auto'', adres bêdzie ustalany 
-	automatycznie.
+	automatycznie. je¶li chcemy bezproblemowo ³±czyæ siê z klientami
+	z tej samej sieci LAN, dobrze jest podaæ adres IP sieci LAN zamiast
+	zewnêtrznego.
 
 dcc_dir
 	typ: tekst

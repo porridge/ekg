@@ -2536,7 +2536,7 @@ COMMAND(cmd_dcc)
 		return 0;
 	}
 	
-	if (!strncasecmp(params[0], "se", 2)) {		/* send */
+	if (!strncasecmp(params[0], "se", 2) || !strncasecmp(params[0], "rse", 3)) {		/* send, rsend */
 		struct userlist *u;
 		struct stat st;
 		int fd;
@@ -2586,7 +2586,7 @@ COMMAND(cmd_dcc)
 		t.filename = xstrdup(params[2]);
 		t.dcc = NULL;
 
-		if (u->port < 10 || (params[3] && !strcmp(params[3], "--reverse"))) {
+		if (u->port < 10 || !strncasecmp(params[0], "rse", 3)) {
 			/* nie mo¿emy siê z nim po³±czyæ, wiêc on spróbuje */
 			gg_dcc_request(sess, uin);
 		} else {
@@ -2613,7 +2613,7 @@ COMMAND(cmd_dcc)
 		return 0;
 	}
 
-	if (params[0][0] == 'v') {			/* voice */
+	if (params[0][0] == 'v' || !strncasecmp(params[0], "rvo", 3)) {			/* voice, rvoice */
 #ifdef HAVE_VOIP
 		struct userlist *u = NULL;
 		struct transfer *t, tt;
@@ -2707,7 +2707,7 @@ COMMAND(cmd_dcc)
 		tt.type = GG_SESSION_DCC_VOICE;
 		tt.protocol = u->protocol;
 
-		if (u->port < 10 || (params[2] && !strcmp(params[2], "--reverse"))) {
+		if (u->port < 10 || !strncasecmp(params[0], "rvo", 3)) {
 			/* nie mo¿emy siê z nim po³±czyæ, wiêc on spróbuje */
 			gg_dcc_request(sess, uin);
 		} else {
@@ -5195,14 +5195,16 @@ void command_init()
 	( "dcc", "duf?", cmd_dcc, 0,
 	  " <komenda> [opcje]", "obs³uga bezpo¶rednich po³±czeñ",
 	  "\n"
-	  "  send <numer/alias> <¶cie¿ka>  wysy³a podany plik\n"
-	  "  get [numer/alias/#id]         akceptuje przysy³any plik\n"
-	  "  voice <numer/alias/#id>       rozpoczyna rozmowê g³osow±\n"
-	  "  close <numer/alias/#id>       zamyka po³±czenie\n"
-	  "  list                          wy¶wietla listê po³±czeñ\n"
+	  "  [r]send <numer/alias> <¶cie¿ka>  wysy³a podany plik\n"
+	  "  get [numer/alias/#id]            akceptuje przysy³any plik\n"
+	  "  [r]voice <numer/alias/#id>       rozpoczyna rozmowê g³osow±\n"
+	  "  close <numer/alias/#id>          zamyka po³±czenie\n"
+	  "  list                             wy¶wietla listê po³±czeñ\n"
 	  "\n"
 	  "Po³±czenia bezpo¶rednie wymagaj± w³±czonej opcji %Tdcc%n. "
-	  "Dok³adny opis znajduje siê w pliku %Tdocs/dcc.txt%n");
+	  "Komendy %Trsend%n i %Trvoice%n wysy³aj± ¿±danie po³±czenia siê "
+	  "drugiego klienta z naszym i s± przydatne, gdy nie jeste¶my w stanie "
+	  "siê z nim sami po³±czyæ.");
 	  
 	command_add
 	( "del", "u?", cmd_del, 0,

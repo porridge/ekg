@@ -55,7 +55,7 @@ w takim wypadku Gadu-Gadu odrzuci po³±czenie ze wzglêdu na niezgodno¶æ
 adresów. dlatego mo¿na albo ustawiæ adres sieci lokalnej, albo u¿yæ
 do wysy³ania:
 
-	dcc send <pseudonim/numer> <nazwa_pliku> --reverse
+	dcc rsend <pseudonim/numer> <nazwa_pliku>
 
 które wy¶le do Gadu-Gadu ¿±danie po³±czenia za po¶rednictwem serwera
 Gadu-Gadu i windowsowy klient sam siê z nami po³±czy. ekg nie jest a¿

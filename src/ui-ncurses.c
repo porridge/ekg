@@ -2173,7 +2173,7 @@ static void lines_adjust()
 
 void dcc_generator(const char *text, int len)
 {
-	const char *words[] = { "close", "get", "send", "list", "voice", NULL };
+	const char *words[] = { "close", "get", "send", "list", "rsend", "rvoice", "voice", NULL };
 	int i;
 
 	for (i = 0; words[i]; i++)
