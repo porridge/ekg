@@ -1035,16 +1035,27 @@ void userlist_send()
 	char *types;
         int i, count;
 
-	count = list_count(userlist);
+	for (count = 0, l = userlist; l; l = l->next) {
+		struct userlist *u = l->data;
 
+		if (!u->display && userlist_type(u) == GG_USER_NORMAL)
+			continue;
+
+		count++;
+	}
+		
         uins = xmalloc(count * sizeof(uin_t));
 	types = xmalloc(count * sizeof(char));
 
-	for (i = 0, l = userlist; l; i++, l = l->next) {
+	for (i = 0, l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
+
+		if (!u->display && userlist_type(u) == GG_USER_NORMAL)
+			continue;
 
                 uins[i] = u->uin;
 		types[i] = userlist_type(u);
+		i++;
 	}
 
         gg_notify_ex(sess, uins, types, count);
