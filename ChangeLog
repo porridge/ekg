@@ -10,6 +10,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawki libgadu, ¿eby ignorowaæ przynêty (w)
 - poprawka reakcji na ctcp (w)
 - /status podaje adres serwera (seba/w)
+- poprawka /set (seba/w)
 
 // 2002-06-18
 

@@ -1452,10 +1452,10 @@ COMMAND(command_set)
 		}
 	} else {
 		reset_theme_cache();
-		switch (variable_set(arg, params[1], 0)) {
+		switch (variable_set(arg, (unset) ? NULL : params[1], 0)) {
 			case 0:
 				if (!in_autoexec) {
-					my_printf("variable", arg, params[1]);
+					my_printf("variable", arg, (unset) ? "(brak)" : params[1]);
 					config_changed = 1;
 					last_save = time(NULL);
 				}
