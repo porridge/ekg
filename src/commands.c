@@ -3795,8 +3795,8 @@ void command_init()
 	  "  -F, --female                 kobieta\n"
 	  "  -M, --male                   mê¿czyzna\n"
 	  "\n"
-	  "Je¶li których z parametrów nie zostanie podany, jego warto¶æ "
-	  "zostanie wyczyczona w katalogu publicznym.");
+	  "Je¶li który¶ z parametrów nie zostanie podany, jego warto¶æ "
+	  "zostanie wyczyszczona w katalogu publicznym.");
 	  
 	command_add
 	( "chat", "u?", cmd_msg, 0,
