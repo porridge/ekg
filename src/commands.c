@@ -1619,7 +1619,7 @@ COMMAND(cmd_list)
 	uin_t uin;
 
 	if (!params[0] && (uin = get_uin("$")))
-		params[0] = xstrdup(itoa(uin));
+		params[0] = itoa(uin);
 
 	if (params[0] && *params[0] != '-') {
 		char *status, *groups;
