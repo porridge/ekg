@@ -45,6 +45,7 @@
  */
 extern void rl_extend_line_buffer(int len);
 extern char **completion_matches();
+extern char *rl_filename_completion_function(const char *, int);
 
 /*
  * jaka¶ malutka lista tych, do których by³y wysy³ane wiadomo¶ci.
@@ -1261,8 +1262,11 @@ COMMAND(command_dcc)
 
 			if (gg_dcc_fill_file_info(d, params[2]) == -1) {
 				my_printf("dcc_open_error", params[2], strerror(errno));
+				gg_free_dcc(d);
 				return 0;
 			}
+
+			list_add(&watches, d, 0);
 
 			t.dcc = d;
 		}
