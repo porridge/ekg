@@ -13,6 +13,7 @@ zg³osi³ b³±d.
 - usuniêcie zapomnianych ¶mieci (lordzik/w)
 - poprawka themów wiadomo¶ci (lordzik/w)
 - poprawka segv przy opcji -f (d)
+- poprawka segfaulta przy bindowaniu w ui-readline (d) 
 
 // 2003-02-03
 
