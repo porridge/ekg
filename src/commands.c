@@ -437,7 +437,8 @@ COMMAND(cmd_status)
 {
 	struct userlist *u;
 	struct in_addr i;
-	struct tm *lce, *est;
+	struct tm *lce, *est, *now;
+	time_t n;
 	int mqc;
 	char *tmp, *priv, *r1, *r2, buf[100], buf1[100];
 
@@ -450,12 +451,15 @@ COMMAND(cmd_status)
 	} else {
 		printq("show_status_uin", itoa(config_uin));
 	}
+
+	n = time(NULL);
+	now = localtime(&n);
 	
 	lce = localtime(&last_conn_event);
-	strftime(buf, sizeof(buf), format_find((last_conn_event / 86400 == time(NULL) / 86400) ? "show_status_last_conn_event_today" : "show_status_last_conn_event"), (const struct tm*) lce);
+	strftime(buf, sizeof(buf), format_find((lce->tm_yday == now->tm_yday) ? "show_status_last_conn_event_today" : "show_status_last_conn_event"), lce);
 
 	est = localtime(&ekg_started);
-	strftime(buf1, sizeof(buf1), format_find((ekg_started / 86400 == time(NULL) / 86400) ? "show_status_ekg_started_today" : "show_status_ekg_started"), (const struct tm*) est);
+	strftime(buf1, sizeof(buf1), format_find((est->tm_yday == now->tm_yday) ? "show_status_ekg_started_today" : "show_status_ekg_started"), est);
 	
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		char *tmp = format_string(format_find("show_status_not_avail"));
@@ -4248,6 +4252,8 @@ COMMAND(cmd_last)
         list_t l;
 	uin_t uin = 0;
 	int show_sent = 0;
+	time_t n;
+	struct tm *now;
 
 	if (match_arg(params[0], 'c', "clear", 2)) {
 		if (params[1] && !(uin = get_uin(params[1]))) {
@@ -4298,6 +4304,9 @@ COMMAND(cmd_last)
 		return 0;
 	}
 
+	n = time(NULL);
+	now = localtime(&n);
+
         for (l = lasts; l; l = l->next) {
                 struct last *ll = l->data;
 		struct tm *tm, *st;
@@ -4309,7 +4318,7 @@ COMMAND(cmd_last)
 
 			if (show_sent && ll->type == 0 && !(ll->sent_time - config_time_deviation <= ll->time && ll->time <= ll->sent_time + config_time_deviation)) {
 				st = localtime(&ll->sent_time);
-				strftime(buf2, sizeof(buf2), format_find((ll->sent_time / 86400 == time(NULL) / 86400) ? "last_list_timestamp_today" : "last_list_timestamp"), st);
+				strftime(buf2, sizeof(buf2), format_find((tm->tm_yday == now->tm_yday) ? "last_list_timestamp_today" : "last_list_timestamp"), st);
 				time_str = saprintf("%s/%s", buf, buf2);
 			} else
 				time_str = xstrdup(buf);

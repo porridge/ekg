@@ -88,7 +88,8 @@ static struct handler handlers[] = {
  */
 void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 {
-	int width, next_width, i, j, mem_width = 0, tt, t = e->event.msg.time;
+	int width, next_width, i, j, mem_width = 0;
+	time_t tt, t = e->event.msg.time;
 	int separate = (e->event.msg.sender != config_uin || chat == 3);
 	int timestamp_type = 0;
 	char *mesg, *buf, *line, *next, *format = NULL, *format_first = "";
@@ -96,7 +97,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 	char *timestamp = NULL, *save, *secure_label = NULL;
 	char *line_width = NULL, timestr[100], *target, *cname;
 	char *formatmap = NULL;
-	struct tm *tm;
+	struct tm *tm, *now;
 	struct conference *c = NULL;
 
 	/* tworzymy mapê formatowanego tekstu. dla ka¿dego znaku wiadomo¶ci
@@ -179,9 +180,12 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 
 	tt = time(NULL);
 
+	now = localtime(&tt);
+	tm = localtime(&e->event.msg.time);
+
 	if (t - config_time_deviation <= tt && tt <= t + config_time_deviation)
 		timestamp_type = 2;
-	else if (tt / 86400 == t / 86400)
+	else if (now->tm_yday == tm->tm_yday)
 		timestamp_type = 1;
 	
 	switch (chat) {
@@ -246,7 +250,6 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 	if (config_last & 3 && (chat >= 0 && chat <= 2))
 	       last_add(0, e->event.msg.sender, tt, e->event.msg.time, e->event.msg.message);
 	
-	tm = localtime(&e->event.msg.time);
 	strftime(timestr, sizeof(timestr), format_find(timestamp), tm);
 
 	if (!(width = atoi(format_find(line_width))))

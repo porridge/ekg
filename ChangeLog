@@ -10,6 +10,9 @@ zg³osi³ b³±d.
 
 - poprawka duuu¿ych marginesów okna (sdas/w)
 - zmienna ,,events_delay'' dotyczy równie¿ d¼wiêków (rmrmg/w)
+- poprawki sprawdzania, którego timestampu u¿yæ w /status i wiadomo¶ciach.
+  w wyj±tkowych przypadkach (np. gdy w³±czenie/po³±czenie ekg nast±pi³o
+  kilka minut po pó³nocy) z powodu ma³ej precyzji, dochodzi³o do pomy³ek (sz)
 
 // 2003-02-09
 
