@@ -96,7 +96,7 @@ struct command commands[] = {
 	{ "connect", "", command_connect, "", "£±czy siê z serwerem", "" },
 	{ "dcc", "duf", command_dcc, " [opcje]", "Obs³uga bezpo¶rednich po³±czeñ", "  send <numer/alias> <¶cie¿ka>\n  get [numer/alias]\n  close [numer/alias/id]\n  show\n" },
 	{ "del", "u", command_del, " <numer/alias>", "Usuwa u¿ytkownika z listy kontaktów", "" },
-	{ "disconnect", "?", command_connect, "", "Roz³±cza siê z serwerem", "" },
+	{ "disconnect", "?", command_connect, " [powód]", "Roz³±cza siê z serwerem", "" },
 	{ "exec", "?", command_exec, " <polecenie>", "Uruchamia polecenie systemowe", "" },
 	{ "!", "?", command_exec, " <polecenie>", "Synonim dla %Wexec%n", "" },
 	{ "find", "u", command_find, " [opcje]", "Interfejs do katalogu publicznego", "  -u, --uin <numerek>\n  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>\n  -c, --city <miasto>\n  -b, --born <min:max>\n  -p, --phone <telefon>\n  -e, --email <e-mail>\n  -a, --active\n  -F, --female\n  -M, --male\n  --start <od>" },

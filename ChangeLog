@@ -15,6 +15,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawka w docs/api.txt zmiana libgg -> libgadu (D.Jarosz/w)
 - przymiarka do akcji ,,exec'' (w)
 - og³aszanie userlisty po ,,list --get'' (cooler/w)
+- poprawka helpa ,,disconnect'', dopisanie rizonu (cooler/w)
 
 // 2002-04-04
 
