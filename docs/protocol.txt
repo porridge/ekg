@@ -5,7 +5,8 @@
      (C) Copyright 2001 by Wojtek Kaniewski <wojtekka@irc.pl>,
                            Robert J. Wo¼ny <speedy@atman.pl>,
                            Tomasz Jarzynka <tomee@cpi.pl>,
-                           Adam Ludwikowski <adam.ludwikowski@wp.pl>
+                           Adam Ludwikowski <adam.ludwikowski@wp.pl>,
+                           Marek Kozina <klith@hybrid.art.pl>
 
 --- 0) disclaimer ---------------------------------------------------------
 
@@ -243,16 +244,16 @@ numer sekwencyjny i adresat ten sam, co przy wysy³aniu.
 
 --- 7) otrzymywanie wiadomo¶ci ---------------------------------------------
 
-zbyt wiele wyja¶nieñ chyba nie trzeba. wiadomo od kogo. nieznane pola to
-co¶ a'la numer sekwencyjny albo identyfikator okienka z rozmow± albo nowe
-dane dla setiathome. klasa wiadomo¶ci taka sama jak przy wysy³aniu:
+zbyt wiele wyja¶nieñ chyba nie trzeba. wiadomo od kogo. drugie pole to
+najprawdopodobniej jaki¶ numerek sekwencyjny. trzecie oznacza czas nadania
+wiadomo¶ci. klasa wiadomo¶ci taka sama jak przy wysy³aniu:
 
 	#define GG_RECV_MSG 0x000a
 	
 	struct gg_recv_msg {
 		int sender;
-		int dunno1;
-		int dunno2;
+		int seq;
+		int time;
 		int class;
 		char message[];
 	};
@@ -280,6 +281,8 @@ swój wk³ad w poznanie protoko³u mieli:
    badanie timeoutów,
  - Adam Ludwikowski <adam.ludwikowski@wp.pl>:
    wiele ró¿nych poprawek do tekstu, badanie wersji.
+ - Marek Kozina <klith@hybrid.art.pl>:
+   czas otrzymania wiadomo¶ci.
 
 ----------------------------------------------------------------------------
 

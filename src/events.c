@@ -60,6 +60,8 @@ void handle_msg(struct gg_event *e)
 	struct userlist *u = find_user(e->event.msg.sender, NULL);
 	int chat = ((e->event.msg.msgclass & 0x0f) == GG_CLASS_CHAT);
 	char sender[100];
+	struct tm *tm;
+	char czas[100];
 
 	if (is_ignored(e->event.msg.sender))
 		return;
@@ -73,8 +75,11 @@ void handle_msg(struct gg_event *e)
 		add_send_nick(tmp);
 	}	
 
+	tm = localtime(&e->event.msg.time);
+	strftime(czas, 100, find_format("timestamp"), tm);
+
 	cp_to_iso(e->event.msg.message);
-	my_printf((chat) ? "chat_header" : "message_header", format_user(e->event.msg.sender));
+	my_printf((chat) ? "chat_header" : "message_header", format_user(e->event.msg.sender), czas);
 
 	print_message_body(e->event.msg.message, chat);
 	my_printf((chat) ? "chat_footer" : "message_footer");
