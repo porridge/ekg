@@ -775,6 +775,10 @@ static struct window *window_new(const char *target, int new_id)
 
 	if (new_id != 0)
 		id = new_id;
+
+	/* okno z debug'iem */
+	if (id == -1)
+		id = 0;
 	
 	memset(&w, 0, sizeof(w));
 
@@ -809,7 +813,12 @@ static struct window *window_new(const char *target, int new_id)
 			array_free(argv);
 		} else {
 			w.target = xstrdup(target);
-			w.prompt = format_string(format_find("ncurses_prompt_query"), target);
+
+			if (w.id)
+				w.prompt = format_string(format_find("ncurses_prompt_query"), target);
+			else
+				w.prompt = format_string(format_find("ncurses_prompt_query"), "debug");
+
 			w.prompt_len = strlen(w.prompt);
 		}
 	} else {
@@ -858,6 +867,11 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	int count = 0, bottom = 0, prev_count;
 	char *lines, *lines_save, *line2;
 	string_t speech = NULL;
+
+	if (!strcmp(target, "__debug")) {
+		if (!window_find(target))
+			window_new("__debug", -1);
+	}
 
 	switch (config_make_window) {
 		case 1:
@@ -1375,7 +1389,7 @@ static void update_statusbar(int commit)
 	__add_format("window", 1, itoa(window_current->id));
 	__add_format("uin", config_uin, itoa(config_uin));
 	__add_format("nick", (u && u->display), u->display);
-	__add_format("query", 1, window_current->target);
+	__add_format("query", window_current->id, window_current->target);
 	__add_format("descr", 1, config_reason);
 	__add_format("mail", (config_check_mail && mail_count), itoa(mail_count));
 	{
