@@ -31,6 +31,10 @@
 #ifdef __FreeBSD__
 #  include <sys/kbio.h>			
 #endif
+#ifdef sun /* Solaris */
+#  include <sys/kbd.h>
+#  include <sys/kbio.h>
+#endif 
 #include <ctype.h>
 #include <sys/un.h>
 #include <sys/socket.h>
@@ -50,17 +54,42 @@ char sock_path[PATH_MAX] =  "";
 int blink_leds(int *flag, int *delay) 
 {
     	int s, fd;
-        
+#ifdef sun 
+	int restore_data;
+
+	if ((fd = open("/dev/kbd", O_RDONLY)) == -1)
+		return -1;
+
+	ioctl(fd, KIOCGLED, &restore_data);
+#else
 	if ((fd = open("/dev/console", O_WRONLY)) == -1)
 		fd = STDOUT_FILENO;
+#endif
 
 	for(s=0; flag[s] >= 0 && s <= MAX_ITEMS; s++) {
+#ifdef sun
+		int leds = 0;
+		/* tak.. na sunach jest to troszke inaczej */
+		if (flag[s] & 1) 
+			leds |= LED_NUM_LOCK;
+		if (flag[s] & 2) 
+			leds |= LED_SCROLL_LOCK;
+		if (flag[s] & 4) 
+			leds |= LED_CAPS_LOCK; 
+
+		ioctl(fd, KIOCSLED, &leds);
+#else
 	    	ioctl(fd, KDSETLED, flag[s]);
+#endif 
 		if (delay[s] && delay[s] <= MAX_DELAY)
 			usleep(delay[s]);
 	}
 
+#ifdef sun
+	ioctl(fd, KIOCSLED, &restore_data);
+#else
 	ioctl(fd, KDSETLED, 8);
+#endif
 	
 	if (fd != STDOUT_FILENO)
 		close(fd);
@@ -70,8 +99,9 @@ int blink_leds(int *flag, int *delay)
 
 int beeps_spk(int *tone, int *delay)
 {
+#ifndef sun /* dla Solarisa moze byc z tym ciezko... */
     	int s, fd;
-       
+
     	if ((fd = open("/dev/console", O_WRONLY)) == -1)
 		fd = STDOUT_FILENO;
 		
@@ -88,6 +118,8 @@ int beeps_spk(int *tone, int *delay)
 	
 	if (fd != STDOUT_FILENO)
 		close(fd);
+
+#endif
 
 	return 0;
 }
@@ -143,8 +175,10 @@ int main(int argc, char **argv)
 		if (data.act == ACT_BLINK_LEDS)  
 		    	blink_leds(data.value, data.delay);
 		
+#ifndef sol
 		else if (data.act == ACT_BEEPS_SPK) 
 		    	beeps_spk(data.value, data.delay);
+#endif
 	}
 	
 	exit(0);

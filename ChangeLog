@@ -11,6 +11,8 @@ zg³osi³ b³±d.
 - /list mo¿e ju¿ dodawaæ/usuwaæ z wielu grup (rodzielonych przecinkiem)
   na raz. dodatkowo, nie dodaje ju¿ u¿ytkownika kilka razy do tej samej
   grupy. kosmetyka (sz)
+- obs³uga zdarzenia ,,blink_leds'' w ,,on'' dla Solarisa (d)
+- ma³a poprawka konfliktu typów dla Solarisa (d)
 
 // 2002-12-03
 
