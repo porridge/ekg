@@ -1306,7 +1306,7 @@ COMMAND(cmd_help)
 			if (strstr(c->brief_help, "%"))
 			    	blah = format_string(c->brief_help);
 	
-			printq("help", c->name, c->params_help, blah ? blah : c->brief_help, (c->long_help && strcmp(c->long_help, "")) ? "\033[1m *\033[0m" : "");
+			printq("help", c->name, c->params_help, blah ? blah : c->brief_help, "");
 			xfree(blah);
 		}
 	}
