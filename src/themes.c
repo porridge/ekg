@@ -1168,6 +1168,9 @@ void theme_init()
 	format_add("show_status_disconnected_since", "%) Roz³±czony od: %T%1%n\n", 1);
 	format_add("show_status_last_conn_event", "%Y-%m-%d %H:%M", 1);
 	format_add("show_status_last_conn_event_today", "%H:%M", 1);
+	format_add("show_status_ekg_started_since", "%) Program dzia³a od: %T%1%n\n", 1);
+	format_add("show_status_ekg_started", "%Y-%m-%d %H:%M", 1);
+	format_add("show_status_ekg_started_today", "%H:%M", 1);
 	format_add("show_status_msg_queue", "%) Ilo¶æ wiadomo¶ci w kolejce do wys³ania: %T%1%n\n", 1);
 
 	/* aliasy */

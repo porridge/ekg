@@ -125,6 +125,7 @@ int config_display_ack = 1;
 int config_completion_notify = 1;
 int connecting = 0;
 time_t last_conn_event = 0;
+time_t ekg_started = 0;
 int config_display_notify = 1;
 char *config_theme = NULL;
 int config_status = GG_STATUS_AVAIL;

@@ -15,6 +15,7 @@ zg³osi³ b³±d.
 - poprawka kompilacji biblioteki dzielonej na OpenBSD (bartek/w)
 - poprawka obs³ugi zmiany rozmiaru terminala (perry/w)
 - je¶li terminal jest zbyt ma³y, lista kontaktów jest ukrywana (w)
+- /status pokazuje uptime klienta (FIG/w)
 	
 // 2003-02-05
 

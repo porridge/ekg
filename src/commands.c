@@ -436,9 +436,9 @@ COMMAND(cmd_status)
 {
 	struct userlist *u;
 	struct in_addr i;
-	struct tm *lce;
+	struct tm *lce, *est;
 	int mqc;
-	char *tmp, *priv, *r1, *r2, buf[100];
+	char *tmp, *priv, *r1, *r2, buf[100], buf1[100];
 
 	if (config_profile) {
 		printq("show_status_profile", config_profile);
@@ -453,10 +453,14 @@ COMMAND(cmd_status)
 	lce = localtime(&last_conn_event);
 	strftime(buf, sizeof(buf), format_find((last_conn_event / 86400 == time(NULL) / 86400) ? "show_status_last_conn_event_today" : "show_status_last_conn_event"), (const struct tm*) lce);
 
+	est = localtime(&ekg_started);
+	strftime(buf1, sizeof(buf1), format_find((ekg_started / 86400 == time(NULL) / 86400) ? "show_status_ekg_started_today" : "show_status_ekg_started"), (const struct tm*) est);
+	
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		char *tmp = format_string(format_find("show_status_not_avail"));
 
 		printq("show_status_status", tmp, "");
+		printq("show_status_ekg_started_since", buf1);
 
 		if (last_conn_event)
 			printq("show_status_disconnected_since", buf);
@@ -484,6 +488,7 @@ COMMAND(cmd_status)
 	i.s_addr = sess->server_addr;
 
 	printq("show_status_status", tmp, priv);
+	printq("show_status_ekg_started_since", buf1);
 	printq("show_status_server", inet_ntoa(i), itoa(sess->port));
 	printq("show_status_connected_since", buf);
 

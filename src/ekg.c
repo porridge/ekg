@@ -860,6 +860,8 @@ int main(int argc, char **argv)
 		{ 0, 0, 0, 0 }
 	};
 
+	ekg_started = time(NULL);
+
 #ifdef WITH_UI_READLINE
 	ui_init = ui_readline_init;
 #else
