@@ -23,7 +23,8 @@ AC_DEFUN(AC_CHECK_READLINE,[
 	     /usr/pkg/include:-L/usr/pkg/lib \
 	     /sw/include:-L/sw/lib \
 	     /cw/include:-L/cw/lib \
-	     /net/caladium/usr/people/piotr.nba/temp/pkg/include:-L/net/caladium/usr/people/piotr.nba/temp/pkg/lib; do
+	     /net/caladium/usr/people/piotr.nba/temp/pkg/include:-L/net/caladium/usr/people/piotr.nba/temp/pkg/lib \
+	     /boot/home/config/include:-L/boot/home/config/lib; do
     
       incl=`echo "$i" | sed 's/:.*//'`
       lib=`echo "$i" | sed 's/.*://'`
