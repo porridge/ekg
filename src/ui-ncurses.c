@@ -1405,8 +1405,11 @@ void contacts_changed()
 				}
 			}
 
-			if (!strncasecmp(args[i], "margin=", 7))
+			if (!strncasecmp(args[i], "margin=", 7)) {
 				contacts_margin = atoi(args[i] + 7);
+				if (contacts_margin > 10)
+					contacts_margin = 10;
+			}
 
 			if (!strcasecmp(args[i], "nomargin"))
 				contacts_margin = 0;
