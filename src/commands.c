@@ -3882,16 +3882,16 @@ COMMAND(cmd_alias_exec)
 		list_add(&m, tmp->data, strlen(tmp->data) + 1);
 	}
 	
-	for (; m; m = m->next) {
+	for (tmp = m; tmp; tmp = tmp->next) {
 		string_t str;
 
-		if (*((char *) m->data) == '/')
+		if (*((char *) tmp->data) == '/')
 			str = string_init(NULL);
 		else
 			str = string_init("/");
 
 		if (need_args) {
-			char *args[9], **arr, *tmp;
+			char *args[9], **arr, *s;
 			int i;
 
 			if (!params[0]) {
@@ -3901,7 +3901,7 @@ COMMAND(cmd_alias_exec)
 				return -1;
 			}
 
-			arr = array_make(params[0], "\t ", need_args, 1, 0);
+			arr = array_make(params[0], "\t ", need_args, 1, 1);
 
 			if (array_count(arr) < need_args) {
 				printq("aliases_not_enough_params", name);
@@ -3918,14 +3918,14 @@ COMMAND(cmd_alias_exec)
 					args[i] = NULL;
 			}
 
-			tmp = format_string((char *) m->data, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
-			string_append(str, tmp);
-			xfree(tmp);
+			s = format_string((char *) tmp->data, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
+			string_append(str, s);
+			xfree(s);
 
 			array_free(arr);
 
 		} else {
-			string_append(str, (char *) m->data);
+			string_append(str, (char *) tmp->data);
 			
 			if (params[0]) {
 				string_append(str, " ");
