@@ -570,7 +570,7 @@ static char *my_readline()
         res = readline(prompt);
         in_readline = 0;
 
-        snprintf(buff, 4096, "%s%s\n", current_prompt(), res);
+        snprintf(buff, 4096, "%s%s\n", current_prompt(), (res) ? res : "");
         window_write(curr_window, buff);
 
         return res;
