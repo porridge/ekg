@@ -4492,7 +4492,7 @@ echo "$as_me: error: You need both readline and readline-devel packages." >&2;}
    { (exit 1); exit 1; }; }
   fi
 
-  LIBS="$LIBS $READLINE_LIBS"
+  LIBS="$READLINE_LIBS $LIBS"
   CFLAGS="$CFLAGS $READLINE_INCLUDES"
 
 for ac_func in rl_set_prompt rl_filename_completion_function rl_get_screen_size rl_set_key

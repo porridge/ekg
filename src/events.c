@@ -890,7 +890,7 @@ void handle_dcc(struct gg_dcc *d)
 			if (!found) {
 				gg_debug(GG_DEBUG_MISC, "## connection from %d not found\n", d->peer_uin);
 				list_remove(&watches, d, 0);
-				gg_dcc_free(d);	/* XXX segfaultuje */
+				gg_dcc_free(d);
 			}
 			
 			break;	
@@ -1011,9 +1011,10 @@ void handle_dcc(struct gg_dcc *d)
 				voice_close();
 #endif  /* HAVE_VOIP */
 
-			list_remove(&watches, d, 0);
 			remove_transfer(d);
+			list_remove(&watches, d, 0);
 			gg_free_dcc(d);
+
 			break;
 	}
 
@@ -1048,11 +1049,11 @@ void handle_voice()
 	/* póki nie mamy po³±czenia, i tak czytamy z /dev/dsp */
 
 	if (!d) {
-		voice_record(buf, sizeof(buf), 1);	/* XXX b³êdy */
+		voice_record(buf, GG_DCC_VOICE_FRAME_LENGTH, 1);	/* XXX b³êdy */
 		return;
 	} else {
-		voice_record(buf, sizeof(buf), 0);	/* XXX b³êdy */
-		gg_dcc_voice_send(d, buf, sizeof(buf));	/* XXX b³êdy */
+		voice_record(buf, GG_DCC_VOICE_FRAME_LENGTH, 0);	/* XXX b³êdy */
+		gg_dcc_voice_send(d, buf, GG_DCC_VOICE_FRAME_LENGTH);	/* XXX b³êdy */
 	}
 #endif /* HAVE_VOIP */
 }

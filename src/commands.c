@@ -1666,12 +1666,12 @@ COMMAND(command_dcc)
 		/* sprawdzamy najpierw przychodz±ce po³±czenia */
 		
 		for (t = NULL, l = transfers; l; l = l->next) {
-			struct userlist *u;
 			struct transfer *f = l->data;
+			struct userlist *u;
 			
 			f = l->data;
 
-			if (!f->dcc || f->type != GG_SESSION_DCC_VOICE || f->dcc->state != GG_STATE_SENDING_VOICE_ACK)
+			if (!f->dcc || !f->dcc->incoming || f->type != GG_SESSION_DCC_VOICE)
 				continue;
 			
 			if (params[1][0] == '#' && atoi(params[1] + 1) == f->id) {
@@ -1679,6 +1679,7 @@ COMMAND(command_dcc)
 				break;
 			}
 
+			/* XXX segfaultuje. dlaczego? */
 			if ((u = userlist_find(t->uin, NULL))) {
 				if (!strcasecmp(params[1], itoa(u->uin)) || !strcasecmp(params[1], u->display)) {
 					t = f;
@@ -1695,10 +1696,10 @@ COMMAND(command_dcc)
 
 		/* sprawd¼, czy ju¿ nie wo³ano o rozmowê g³osow± */
 
+#if 0
 		for (l = transfers; l; l = l->next) {
 			struct transfer *t = l->data;
 
-			printf("transfer, id=%d, type=%d\n", t->id, t->type);
 			if (t->type == GG_SESSION_DCC_VOICE) {
 				my_printf("dcc_voice_running");
 				return 0;
@@ -1708,13 +1709,12 @@ COMMAND(command_dcc)
 		for (l = watches; l; l = l->next) {
 			struct gg_session *s = l->data;
 
-			printf("session, type=%d\n", s->type);
 			if (s->type == GG_SESSION_DCC_VOICE) {
 				my_printf("dcc_voice_running");
 				return 0;
 			}
 		}
-
+#endif
 		/* je¶li nie by³o, to próbujemy sami zainicjowaæ */
 
 		if (!(uin = get_uin(params[1])) || !(u = userlist_find(uin, NULL))) {
@@ -1835,8 +1835,10 @@ COMMAND(command_dcc)
 			gg_dcc_free(t->dcc);
 		}
 
+#ifdef HAVE_VOIP
 		if (t->type == GG_SESSION_DCC_VOICE)
 			voice_close();
+#endif
 
 		uin = t->uin;
 

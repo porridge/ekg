@@ -146,6 +146,7 @@ struct gg_dcc {
 				/* informacje o pliku */
 	int established;	/* po³±czenie ustanowione */
 	char *voice_buf;	/* bufor na pakiet po³±czenia g³osowego */
+	int incoming;		/* po³±czenie przychodz±ce */
 };
 
 /*

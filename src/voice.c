@@ -206,6 +206,13 @@ int voice_record(char *buf, int length, int null)
 	return 0;
 }
 
+#else /* HAVE_VOIP */
+
+int voice_open() { return -1; }
+int voice_close() { return -1; }
+int voice_play(char *buf, int length, int null) { return -1; }
+int voice_record(char *buf, int length, int null) { return -1; }
+
 #endif /* HAVE_VOIP */
 
 /*
