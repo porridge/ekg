@@ -12,7 +12,7 @@ MAKE = @MAKE@
 AR = @AR@
 INSTALL = @INSTALL@
 
-OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o voice.o ekg.o xmalloc.o ui-readline.o ../lib/libgadu.a
+OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o voice.o ekg.o xmalloc.o @ui_readline_o@ @ui_ncurses_o@ ui-batch.o ../lib/libgadu.a
 
 #
 

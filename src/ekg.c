@@ -653,9 +653,19 @@ int main(int argc, char **argv)
 	}
 
 	if (!batch_mode) {
-		ui_init();
+#ifdef WITH_UI_NCURSES
+		ui_ncurses_init();
+#else
+#  ifdef WITH_UI_READLINE
+		ui_readline_init();
+#  else
+		fprintf(stderr, "Nie wkompilowano ¿adnego intefejsu u¿ytkownika. Mo¿na uruchamiaæ tylko\npolecenia w trybie wsadowym.\n");
+		exit(1);
+#  endif
+#endif
 		print("welcome", VERSION);
-	}
+	} else
+		ui_batch_init();
 	
 	if (!config_uin || !config_password)
 		print("no_config");

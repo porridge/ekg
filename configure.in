@@ -43,6 +43,9 @@ AC_SUBST(install_ekg, "")
 AC_SUBST(clean_ekg, "")
 AC_SUBST(distclean_ekg, "")
 
+AC_SUBST(ui_readline_o, "")
+AC_SUBST(ui_ncurses_o, "")
+
 # najpierw sprawdzamy te opcje, które s± wspólne dla libgadu i ekg.
 
 AC_ARG_WITH(debug, 
@@ -66,6 +69,20 @@ LIBS_LIBGADU="$LIBS"
 
 if test -d src; then
 
+  AC_ARG_ENABLE(ui-readline,
+    [  --disable-ui-readline   Disable readline UI])
+  AC_ARG_ENABLE(ui-ncurses,
+    [  --enable-ui-ncurses     Enable ncurses UI])
+
+  if test "x$enable_ui_readline" != "xno"; then
+    AC_DEFINE(WITH_UI_READLINE)
+    ui_readline_o="ui-readline.o"
+  fi
+  if test "x$enable_ui_ncurses" = "xyes"; then
+    AC_DEFINE(WITH_UI_NCURSES)
+    ui_ncurses_o="ui-ncurses.o"
+  fi
+    
   AC_ARG_WITH(termcap, 
     [  --without-termcap       Used to force curses/ncurses])
 
@@ -76,7 +93,7 @@ if test -d src; then
     LIBS="$LIBS $TERMCAP_LIB"
   fi
 
-  if test "x$TERMCAP_LIB" = "x"; then 
+  if test "x$TERMCAP_LIB" = "x" -o "x$enable_ui_ncurses" = "xyes"; then 
     AC_CHECK_CURSES
     LIBS="$LIBS $CURSES_LIBS"
     CFLAGS="$CFLAGS $CURSES_INCLUDEDIR"

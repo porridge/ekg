@@ -37,7 +37,7 @@
 #include "xmalloc.h"
 #include "themes.h"
 #include "vars.h"
-#include "ui-readline.h"
+#include "ui.h"
 
 static int in_readline = 0, no_prompt = 0, pager_lines = -1, screen_lines = 24, screen_columns = 80;
 static char *query_nick = NULL;
@@ -472,6 +472,13 @@ static char *my_readline()
  */
 void ui_readline_init()
 {
+	ui_print = ui_readline_print;
+	ui_loop = ui_readline_loop;
+	ui_beep = ui_readline_beep;
+	ui_new_target = ui_readline_new_target;
+	ui_query = ui_readline_query;
+	ui_deinit = ui_readline_deinit;
+		
 	rl_initialize();
 	rl_getc_function = my_getc;
 	rl_readline_name = "gg";

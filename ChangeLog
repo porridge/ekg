@@ -11,6 +11,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   zepsute. w razie problemów krzyczeæ (w)
 - przygotowanie do tworzenia innych frontendów, szczegó³y w docs/ui.txt (w)
 - poprawka aliasów (MG/w)
+- doda³em parametry --enable-ui-*. oczywi¶cie nie dzia³aj±. (w)
+- dodanie ui-batch, który nic nie robi dla trybu wsadowego. (w)
+- pocz±tek ui-ncurses. na upartego da siê tego ju¿ u¿ywaæ. (w)
 
 // 2002-06-25
 

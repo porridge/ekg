@@ -17,27 +17,27 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef __UI_H
-#define __UI_H
+#include "stuff.h"
+#include "ui.h"
 
-#include "config.h"
+static void loop()
+{
+	for (;;)
+		ekg_wait_for_key();
+}
 
-void (*ui_loop)(void);
-void (*ui_print)(const char *target, const char *line);
-void (*ui_beep)(void);
-void (*ui_new_target)(const char *target);
-void (*ui_query)(const char *target);
-void (*ui_deinit)(void);
+static void nop()
+{
 
-#include "ui-batch.h"
+}
 
-#ifdef WITH_UI_READLINE
-#include "ui-readline.h"
-#endif
-
-#ifdef WITH_UI_NCURSES
-#include "ui-ncurses.h"
-#endif
-
-#endif /* __UI_H */
+void ui_batch_init()
+{
+	ui_print = nop;
+	ui_loop = loop;
+	ui_beep = nop;
+	ui_new_target = nop;
+	ui_query = nop;
+	ui_deinit = nop;
+}
 

@@ -4,10 +4,13 @@ psuæ zbyt du¿o, ¿eby dodaæ frontend w ncurses czy jakikolwiek inny. póki co,
 nie ma ¿adnego sposobu na wybór -- trzeba zmieniaæ plik src/ui.h. w ka¿dym
 razie, ekg spodziewa siê kilku funkcji:
 
-ui_init()
+ui_XXX_init()
 	inicjalizacja interfejsu u¿ytkownika. dla ui-readline bêdzie to
 	ustawienie wszystkich zmiennych. dla ui-ncurses pewnie jakie¶
-	initscr(), przygotowanie okienek itd.
+	initscr(), przygotowanie okienek itd. nale¿y przypisaæ zmiennym
+	ui_deinit, ui_print, ui_new_target, ui_loop, ui_beep, ui_query
+	adresy funkcji danego interfejsu. nawet je¶li funkcja nic nie
+	robi, musi byæ zdefiniowana. zmienne nie mog± zawieraæ NULL.
 
 ui_deinit()
 	pozamykanie wszystkiego.
