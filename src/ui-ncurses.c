@@ -2428,7 +2428,7 @@ void python_generator(const char *text, int len)
 
 void window_generator(const char *text, int len)
 {
-	const char *words[] = { "new", "kill", "move", "next", "resize", "prev", "switch", "clear", "refresh", "list", "active", NULL };
+	const char *words[] = { "new", "kill", "move", "next", "resize", "prev", "switch", "clear", "refresh", "list", "active", "last", NULL };
 	int i;
 
 	for (i = 0; words[i]; i++)
