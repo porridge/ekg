@@ -8,6 +8,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-10-18
 
 - poprawienie komendy ,,last'' dla last & 2 (d)
+- porz±dki w libgadu: poprawki kodu po³±czenia, wiêcej szczegó³ów w debugach
+  (na przyk³ad adresy struktur, ¿eby móc wykryæ operacje na niezainicjowanych
+  wska¼nikach), znacznie wiêcej komentarzy do kodu (w)
 
 // 2002-10-17
 

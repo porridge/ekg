@@ -41,7 +41,7 @@
  *  - async - po³±czenie asynchroniczne
  *
  * zaalokowana struct gg_http, któr± po¼niej nale¿y zwolniæ
- * funkcj± gg_free_search(), albo NULL je¶li wyst±pi³ b³±d.
+ * funkcj± gg_search_free(), albo NULL je¶li wyst±pi³ b³±d.
  */
 struct gg_http *gg_search(const struct gg_search_request *r, int async)
 {

@@ -2377,11 +2377,9 @@ void do_connect()
 				p.server_port = atoi(tmp + 1);
 				*tmp = 0;
 				p.server_addr = inet_addr(server);
-				gg_debug(GG_DEBUG_MISC, "-- server_addr=%s, server_port=%d\n", server, p.server_port);
 			} else {
 				p.server_port = GG_DEFAULT_PORT;
 				p.server_addr = inet_addr(server);
-				gg_debug(GG_DEBUG_MISC, "-- server_addr=%s, server_port=%d\n", server, p.server_port);
 			}
 
 			xfree(server);

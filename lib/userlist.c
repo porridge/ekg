@@ -164,7 +164,7 @@ void gg_userlist_get_free(struct gg_http *h)
 	if (!h)
 		return;
 	free(h->data);
-	gg_free_http(h);
+	gg_http_free(h);
 }
 
 /*
@@ -303,7 +303,7 @@ int gg_userlist_put_watch_fd(struct gg_http *h)
  */
 void gg_userlist_put_free(struct gg_http *h)
 {
-	gg_free_http(h);
+	gg_http_free(h);
 }
 
 /*
