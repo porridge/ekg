@@ -183,8 +183,20 @@ COMMAND(cmd_add)
 	struct userlist *u;
 	uin_t uin;
 
-	if (params[0] && !match_arg(params[0], 'f', "find", 2) && !params[1]) {
+	if (params[0] && !isdigit(params[0][0]) && !match_arg(params[0], 'f', "find", 2)) {
 		ui_event("command", quiet, "add", params[0], NULL);
+
+		if (params[1]) {
+			const char *name = params[0], *s1 = params[1], *s2 = params[2];
+			params_free = 1;
+			params = xmalloc(4 * sizeof(char*));
+			params[0] = NULL;
+			params[1] = name;
+			params[2] = saprintf("%s %s", s1, ((s2) ? s2 : ""));
+			params[3] = NULL;
+			goto modify;
+		}
+
 		return 0;
 	}
 
@@ -260,6 +272,7 @@ COMMAND(cmd_add)
 		ui_event("userlist_changed", itoa(uin), params[1], NULL);
 	}
 
+modify:
 	if (params[2])
 		cmd_modify("add", &params[1], NULL, quiet);
 

@@ -13,6 +13,7 @@ zg³osi³ b³±d.
 - poprawki sprawdzania, którego timestampu u¿yæ w /status i wiadomo¶ciach.
   w wyj±tkowych przypadkach (np. gdy w³±czenie/po³±czenie ekg nast±pi³o
   kilka minut po pó³nocy) z powodu ma³ej precyzji, dochodzi³o do pomy³ek (sz)
+- /add alias robi u¿ytek z dodatkowych opcji dotycz±cych wpisu (sz)
 - s/gg_remove_notify/gg_remove_notify_ex, ¿eby nie zostawiaæ ¶mieæi np. po
   usuniêciu z listy osoby, któr± blokujemy (sz)
 - ekg ostrzega o mo¿liwo¶ci filtrowania wiadomo¶ci przez serwer (joshua/w)
