@@ -7,6 +7,7 @@ lista rzeczy, które TRZEBA zrobiæ przed wydaniem wersji 1.0:
 
 * biblioteka:
   - uaktualniæ dokumentacjê: opis API, protoko³u,
+  - zmiana has³a nie wymaga podania adresu e-mail w 5.0.4 (wojtu¶)
 
 * klient:
   - nic szczególnego.

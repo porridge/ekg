@@ -107,6 +107,9 @@ struct gg_session {
 	char *initial_descr;	/* pocz±tkowy opis stanu klienta */
 
 	void *resolver;		/* wska¼nik na informacje resolvera */
+
+	char header_buf[8];	/* bufor na czê¶æ nag³ówka pakietu */
+	int header_left;	/* ile zosta³o */
 };
 
 /*
@@ -734,7 +737,12 @@ int gg_thread_socket(int thread_id, int socket);
 
 int gg_resolve(int *fd, int *pid, const char *hostname);
 
+#ifdef __GNUC__
+char *gg_saprintf(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
+#else
 char *gg_saprintf(const char *format, ...);
+#endif
+
 #define gg_alloc_sprintf gg_saprintf
 
 char *gg_get_line(char **ptr);

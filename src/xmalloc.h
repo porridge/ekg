@@ -32,6 +32,11 @@ void *xmalloc(size_t size);
 void xfree(void *ptr);
 void *xrealloc(void *ptr, size_t size);
 char *xstrdup(const char *s);
+
+#ifdef __GNUC__
+char *saprintf(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
+#else
 char *saprintf(const char *format, ...);
+#endif
 
 #endif /* __XMALLOC_H */

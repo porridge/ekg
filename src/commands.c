@@ -4264,15 +4264,15 @@ COMMAND(cmd_timer)
 			}
 
 			if (days)
-				tmp = saprintf("%dd %dh %dm %d.%.3d", days, hours, minutes, sec, usec);
+				tmp = saprintf("%ldd %ldh %ldm %ld.%.3ld", days, hours, minutes, sec, usec);
 			else
 				if (hours)
-					tmp = saprintf("%dh %dm %d.%.3d", hours, minutes, sec, usec);
+					tmp = saprintf("%ldh %ldm %ld.%.3ld", hours, minutes, sec, usec);
 				else
 					if (minutes)
-						tmp = saprintf("%dm %d.%.3d", minutes, sec, usec);
+						tmp = saprintf("%ldm %ld.%.3ld", minutes, sec, usec);
 					else
-						tmp = saprintf("%d.%.3d", sec, usec);
+						tmp = saprintf("%ld.%.3ld", sec, usec);
 
 			switch (t->type) {
 				case TIMER_UI:
