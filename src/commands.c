@@ -2950,91 +2950,70 @@ COMMAND(cmd_timer)
 			else
 				t_command = xstrdup(params[2]);
 
-		/* kod zapo¿yczony z date(1) */
-
-#define ATOI2(ar)	((ar)[0] - '0') * 10 + ((ar)[1] - '0'); (ar) += 2;
-#define wrong_format()	{ if (!quiet) print("invalid_params", name); return; }
-
 		if (at) {
 			struct tm *lt;
 			time_t now = time(NULL);
-			char *dot, *t, *foo = xstrdup(p), *bar;
-			int bigyear;
-			int yearset = 0;
-
-			bar = foo;
-			lt = localtime(&now);
-
-			for (t = foo, dot = NULL; *t; ++t) {
-				if (isdigit(*t))
-					continue;
-				if (*t == '.' && dot == NULL) {
-					dot = t;
-					continue;
-				}
-				wrong_format();
-			}
+			char *tmp, *foo = xstrdup(p);
+			int wrong = 0;
 
 			lt = localtime(&now);
-
 			lt->tm_isdst = -1;
 
-			if (dot != NULL) {				/* .SS */
-				*dot++ = '\0';
-
-				if (strlen(dot) != 2)
-					wrong_format();
-				lt->tm_sec = ATOI2(dot);
-				if (lt->tm_sec > 61)
-					wrong_format();
-			} else
-				lt->tm_sec = 0;
-
-			switch (strlen(foo)) {
-				case 12:				/* cc */
-					bigyear = ATOI2(foo);
-					lt->tm_year = bigyear * 100 - 1900;
-					yearset = 1;
-				case 10:				/* yy */
-					if (yearset) {
-						lt->tm_year += ATOI2(foo);
-					} else {
-						lt->tm_year = ATOI2(foo);
-						if (lt->tm_year < 69)
-							lt->tm_year += 100;
-					}
-				case 8:					/* mm */
-					lt->tm_mon = ATOI2(foo);
-					if ((lt->tm_mon > 12) || !lt->tm_mon)
-						wrong_format();
-					--lt->tm_mon;
-				case 6:					/* dd */
-					lt->tm_mday = ATOI2(foo);
-					if ((lt->tm_mday > 31) || !lt->tm_mday)
-						wrong_format();
-				case 4:					/* HH */
-					lt->tm_hour = ATOI2(foo);
-					if (lt->tm_hour > 23)
-						wrong_format();
-				case 2:					/* MM */
-					lt->tm_min = ATOI2(foo);
-					if (lt->tm_min > 59)
-						wrong_format();
-					break;
-				default:
-					wrong_format();
+			/* wyci±gamy sekundy, je¶li s± i obcinamy */
+			if ((tmp = strchr(foo, '.')) && !(wrong = (strlen(tmp) != 3))) {
+				sscanf(tmp + 1, "%2d", &lt->tm_sec);
+				tmp[0] = '\0';
 			}
 
-		xfree(bar);
+			/* pozb±d¼my siê dwukropka */
+			if ((tmp = strchr(foo, ':')) && !(wrong = (strlen(tmp) != 3))) {
+				tmp[0] = tmp[1];
+				tmp[1] = tmp[2];
+				tmp[2] = '\0';
+			}
 
-		if ((period = mktime(lt) - now) <= 0) {
-			if (!quiet)
-				print("at_back_to_past");
-			goto cleanup;
-		}
+			/* jedziemy ... */
+			if (!wrong)
+				switch (strlen(foo)) {
+					case 12:
+						sscanf(foo, "%4d%2d%2d%2d%2d", &lt->tm_year, &lt->tm_mon, &lt->tm_mday, &lt->tm_hour, &lt->tm_min);
+						lt->tm_year -= 1900;
+						lt->tm_mon -= 1;
+						break;
+					case 10:
+						sscanf(foo, "%2d%2d%2d%2d%2d", &lt->tm_year, &lt->tm_mon, &lt->tm_mday, &lt->tm_hour, &lt->tm_min);
+						lt->tm_year += 100;
+						lt->tm_mon -= 1;
+						break;
+					case 8:
+						sscanf(foo, "%2d%2d%2d%2d", &lt->tm_mon, &lt->tm_mday, &lt->tm_hour, &lt->tm_min);
+						lt->tm_mon -= 1;
+						break;
+					case 6:
+						sscanf(foo, "%2d%2d%2d", &lt->tm_mday, &lt->tm_hour, &lt->tm_min);
+						break;	
+					case 4:
+						sscanf(foo, "%2d%2d", &lt->tm_hour, &lt->tm_min);
+						break;
+					default:
+						wrong = 1;
+				}
+	
+			xfree(foo);
 
-#undef ATOI2
-#undef wrong_format()
+			/* nie ma b³êdów ? */
+			if (wrong || lt->tm_hour > 23 || lt->tm_min > 59 || lt->tm_sec > 61 || lt->tm_mday > 31 || lt->tm_mon > 12) {
+				if (!quiet)
+					print("invalid_params", name);
+				goto cleanup;
+			}
+
+			/* plany na przesz³o¶æ? */
+			if ((period = mktime(lt) - now) <= 0) {
+				if (!quiet)
+					print("at_back_to_past");
+				goto cleanup;
+			}
 
 		} else {
 
@@ -3088,6 +3067,7 @@ COMMAND(cmd_timer)
 				print((at) ? "at_added" : "timer_added", t->name);
 
 			t->at = at;
+			config_changed = 1;
 		}
 
 cleanup:
@@ -3103,9 +3083,10 @@ cleanup:
 			return;
 		}
 
-		if (!timer_remove(params[1], NULL))
+		if (!timer_remove(params[1], NULL)) {
 			print((at) ? "at_deleted" : "timer_deleted", params[1]);
-		else
+			config_changed = 1;
+		} else
 			print((at) ? "at_noexist" : "timer_noexist", params[1]);
 
 		return;
@@ -3632,7 +3613,12 @@ void command_init()
 	  "  -d, --del <numer/nazwa>             usuwa plan\n"
 	  " [-l, --list]                         wy¶wietla listê planów\n"
 	  "\n"
-	  "Czas podaje siê w formacie [[[[[[cc]yy]mm]dd]HH]MM[.SS]].");
+	  "Czas podaje siê w formacie [[[yyyy]mm]dd]HH[:]MM[.SS], gdzie "
+	  "%Tyyyy%n to rok, %Tmm%n to miesi±c, %Tdd%n to dzieñ %THH:MM%n to godzina, "
+          "a %T.SS%n to sekundy. "
+	  "Minimalny format to HH:MM (dwukropek mo¿na pomin±æ). "
+	  "Po kropce mo¿na podaæ sekundy, a przed godzin± odpowiednio: dzieñ "
+	  "miesi±ca, miesi±c, rok.");
  
 	command_add
 	( "back", "?", cmd_away, 0,
