@@ -663,6 +663,7 @@ void theme_init()
 	format_add("unknown_command", "%! Nieznane polecenie: %T%1%n\n", 1);
 	format_add("welcome", "%> %TEKG-%1%n (Eksperymentalny Klient Gadu-gadu)\n%> Program jest rozprowadzany na zasadach licencji GPL w wersji 2\n%> %RPrzed u¿yciem przeczytaj ulotkê (polecenie ,,help'' lub F1)%n\n\n", 1);
 	format_add("ekg_version", "%) EKG - Eksperymentalny Klient Gadu-Gadu (%T%1%n)\n%) libgadu-%1 (protokó³ %2, klient %3)\n", 1);
+	format_add("group_empty", "%! Grupa %T%1%n jest pusta\n", 1);
 
 	/* add, del */
 	format_add("user_added", "%> Dopisano %T%1%n do listy kontaktów\n", 1);

@@ -173,15 +173,68 @@ int python_run(const char *filename)
 
 int python_load(const char *filename)
 {
-	PyObject *mod, *init;
+	PyObject *module, *init;
 	struct module m;
+	char *name, *oldppath;
 
-	if (!(mod = PyImport_ImportModule((char*) filename))) {
-		printf("module not found\n");
+	oldppath = xstrdup(getenv("PYTHONPATH"));
+	
+	/* PyImport_ImportModule spodziewa siê nazwy modu³u, który znajduje
+	 * siê w $PYTHONPATH, wiêc ³adnie rozbijemy nazwê pliku i dodamy
+	 * jego ¶cie¿kê. */
+	if (strchr(filename, '/')) {
+		const char *p;
+		char *q;
+
+		for (p = filename + strlen(filename); p > filename && *p != '/'; p--);
+
+		q = xmalloc(p - filename + 1);
+		strncpy(q, filename, p - filename);
+		q[p - filename] = 0;
+
+		if (oldppath) {
+			char *tmp = saprintf("%s:%s", oldppath, q);
+			setenv("PYTHONPATH", tmp, 1);
+			xfree(tmp);
+		} else
+			setenv("PYTHONPATH", q, 1);
+
+		xfree(q);
+		
+		if (*p == '/')
+			p++;
+
+		name = xstrdup(p);
+	} else {
+		if (oldppath) {
+			char *tmp = saprintf("%s:.", oldppath);
+			setenv("PYTHONPATH", tmp, 1);
+			xfree(tmp);
+		} else
+			setenv("PYTHONPATH", ".", 1);
+
+		name = xstrdup(filename);
+	}
+	
+	if (strlen(name) > 3 && !strcmp(name + strlen(name) - 3, ".py"))
+		name[strlen(name) - 3] = 0;
+
+	printf("PYTHONPATH=%s\n", getenv("PYTHONPATH"));
+	printf("oname=%s\n", name);
+	chdir(getenv("PYTHONPATH"));
+	
+	if (!(module = PyImport_ImportModule(name))) {
+		print("generic", "Nie znaleziono modu³u");
+		if (oldppath)
+			setenv("PYTHONPATH", oldppath, 1);
+		else
+			unsetenv("PYTHONPATH");
+
+		xfree(name);
 		return -1;
 	}
 	
-	if ((init = PyObject_GetAttrString(mod, "init"))) {
+	if ((init = PyObject_GetAttrString(module, "init"))) {
 		PyObject *args = Py_BuildValue("()"), *result;
 
 		result = PyEval_CallObject(init, args);
@@ -193,11 +246,16 @@ int python_load(const char *filename)
 
 	memset(&m, 0, sizeof(m));
 
-	m.name = xstrdup(filename);
-	m.module = mod;
-	m.deinit = PyObject_GetAttrString(mod, "deinit");
+	m.name = xstrdup(name);
+	m.module = module;
+	m.deinit = PyObject_GetAttrString(module, "deinit");
 
 	list_add(&modules, &m, sizeof(m));
+	
+	if (oldppath)
+		setenv("PYTHONPATH", oldppath, 1);
+	else
+		unsetenv("PYTHONPATH");
 
 	return 0;
 }

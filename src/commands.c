@@ -1005,16 +1005,45 @@ COMMAND(cmd_msg)
 		return;
 	}
 
-	if (!params[0] || !params[1] || !(nicks = array_make(params[0], ",", 0, 0, 0))) {
+	if (!params[0] || !params[1]) {
 		print("not_enough_params");
 		return;
 	}
+
+	if (params[0][0] == '@') {
+		list_t l;
+		
+		nicks = NULL;
+
+		for (l = userlist; l; l = l->next) {
+			struct userlist *u = l->data;
+			list_t m;
+
+			for (m = u->groups; m; m = m->next) {
+				struct group *g = m->data;
+
+				if (!strcasecmp(params[0] + 1, g->name)) {
+					array_add(&nicks, xstrdup(u->display));
+					break;
+				}
+			}
+		}
+
+		if (!nicks) {
+			print("group_empty", params[0] + 1);
+			return;
+		}
+	} else 
+		nicks = array_make(params[0], ",", 0, 0, 0);
 
 	count = array_count(nicks);
 	msg = xstrdup(params[1]);
 	iso_to_cp(msg);
 
 	for (p = nicks; *p; p++) {
+		if (!strcmp(*p, ""))
+			continue;
+
 		if (!(uin = get_uin(*p))) {
 			print("user_not_found", *p);
 			continue;
@@ -2277,7 +2306,7 @@ void command_init()
 	  
 	command_add
 	( "chat", "u?", cmd_msg, 0,
-	  " <numer/alias> <wiadomo¶æ>", "wysy³a wiadomo¶æ w ramach rozmowy",
+	  " <numer/alias/@grupa> <wiadomo¶æ>", "wysy³a wiadomo¶æ w ramach rozmowy",
 	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub\n"
 	  "pseudonimy przecinkiem (ale bez odstêpów). W takim wypadku\n"
 	  "zostanie rozpoczêta rozmowa grupowa.");
@@ -2402,7 +2431,7 @@ void command_init()
 	  
 	command_add
 	( "msg", "u?", cmd_msg, 0,
-	  " <numer/alias> <wiadomo¶æ>", "wysy³a wiadomo¶æ",
+	  " <numer/alias/@grupa> <wiadomo¶æ>", "wysy³a wiadomo¶æ",
 	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub\n"
 	  "pseudonimy przecinkiem (ale bez odstêpów).");
 
