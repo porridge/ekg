@@ -6,11 +6,11 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
-// 2002-03-11
+// 2003-03-11
 
 - libgadu: poprawki dokumentacji (w)
 
-// 2002-03-10
+// 2003-03-10
 
 - poprawiona kompilacja ui-readline (Charvel/w)
 - dodanie /window last (cowboy/w)
