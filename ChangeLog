@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-09-05
 
 - ui-ncurses respektuje zmienn± display_color (w)
+- dodanie zmiennej display_sent (w)
 
 // 2002-09-04
 

@@ -142,6 +142,14 @@ display_notify
 	1 powoduje wy¶wietlanie wszystkich zmian, warto¶æ 2 wy¶wietla
 	tylko zmiany z niedostêpnego na dostêpny i na odwrót.
 
+display_sent
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	je¶li w³±czone, wy¶wietlane s± równie¿ wysy³ane wiadomo¶ci. nale¿y
+	zwróciæ uwagê, ¿e przy make_window = 2, wys³anie wiadomo¶ci utworzy
+	automatycznie okienko rozmowy.
+
 log
 	typ: liczba
 	domy¶lna warto¶æ: 0

@@ -22,6 +22,7 @@
 
 #include "config.h"
 #include "libgadu.h"
+#include "userlist.h"
 
 struct handler {
 	int type;
@@ -38,5 +39,7 @@ void handle_pubdir(struct gg_http *s);
 void handle_userlist(struct gg_http *s);
 
 void handle_disconnect(struct gg_event *e);
+
+void print_message(struct gg_event *e, struct userlist *u, int chat);
 
 #endif /* __EVENTS_H */

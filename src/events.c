@@ -95,6 +95,12 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 			head = "sysmsg_header";
 			foot = "sysmsg_footer";
 			break;
+		case 3:
+			format = "sent_line"; 
+			line_width = "sent_line_width";
+			head = "sent_header";
+			foot = "sent_footer";
+			break;
 	}	
 
 	tm = localtime(&e->event.msg.time);

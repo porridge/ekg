@@ -60,6 +60,7 @@ void variable_init()
 	variable_add("display_ack", VAR_INT, 1, &config_display_ack, NULL);
 	variable_add("display_color", VAR_BOOL, 1, &config_display_color, NULL);
 	variable_add("display_notify", VAR_INT, 1, &config_display_notify, NULL);
+	variable_add("display_sent", VAR_BOOL, 1, &config_display_sent, NULL);
 	variable_add("emoticons", VAR_BOOL, 1, &config_emoticons, NULL);
 	variable_add("log", VAR_INT, 1, &config_log, NULL);
 	variable_add("log_ignored", VAR_INT, 1, &config_log_ignored, NULL);

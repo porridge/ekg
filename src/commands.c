@@ -1084,6 +1084,25 @@ COMMAND(cmd_msg)
 
 	add_send_nick(params[0]);
 
+	if (config_display_sent) {
+		struct gg_event e;
+		struct userlist u;
+		
+		memset(&e, 0, sizeof(e));
+		e.type = GG_EVENT_MSG;
+		e.event.msg.sender = config_uin;
+		e.event.msg.message = xstrdup(params[1]);
+
+		memset(&u, 0, sizeof(u));
+		u.uin = 0;
+		u.display = xstrdup(params[0]);
+		
+		print_message(&e, &u, 3);
+
+		xfree(e.event.msg.message);
+		xfree(u.display);
+	}
+
 	free(msg);
 	
 	unidle();
