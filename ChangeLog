@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - lekko zmodyfikowane funkcje window_0X (d)
 - drobna poprawka od¶wie¿ania przy ,,window_switch()'' (d)
 - poprawka segfaulta przy away/back/... (rmrmg/w)
+- poprawka INADDR_NONE (Murphy/w)
 
 // 2002-07-04
 

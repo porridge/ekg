@@ -41,6 +41,7 @@
 #endif
 #include <ctype.h>
 #include "config.h"
+#include "compat.h"
 #include "libgadu.h"
 #include "stuff.h"
 #include "dynstuff.h"
