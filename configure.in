@@ -148,6 +148,12 @@ if test -d src; then
     ui_ncurses_default=yes
   fi
 
+  # je¶li nie chcemy ncurses, budujemy readline.
+  
+  if test "x$enable_ui_ncurses" = "xno" -a "x$enable_ui_readline" != "xno"; then
+    enable_ui_readline=yes
+  fi
+
   if test "x$enable_ui_readline" = "xyes"; then
     AC_DEFINE(WITH_UI_READLINE, 1, [define if you want ui-readline])
     OBJS="$OBJS ui-readline.o"
