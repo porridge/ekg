@@ -513,6 +513,8 @@ int gg_search_watch_fd(struct gg_search *f)
 		char *foo = f->data_buf;
 
 		gg_debug(GG_DEBUG_MISC, "=> ladies and gentlemen, parsing begins\n");
+		gg_debug(GG_DEBUG_MISC, "%s\n", foo);
+
 		f->count = 0;
 		f->results = NULL;
 		f->state = GG_STATE_FINISHED;
