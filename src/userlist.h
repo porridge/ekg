@@ -104,6 +104,8 @@ int group_member(struct userlist *u, const char *group);
 char *group_to_string(list_t l, int meta, int sep);
 list_t group_init(const char *groups);
 
+uin_t str_to_uin(const char *text);
+int valid_nick(const char *nick);
 uin_t get_uin(const char *text);
 const char *format_user(uin_t uin);
 

@@ -394,8 +394,6 @@ void iso_to_ascii(unsigned char *buf);
 char *strip_spaces(char *line);
 
 int find_in_uins(int uin_count, uin_t *uins, uin_t uin);
-uin_t str_to_uin(const char *text);
-int valid_nick(const char *nick);
 
 int play_sound(const char *sound_path);
 

@@ -3001,62 +3001,6 @@ int find_in_uins(int uin_count, uin_t *uins, uin_t uin)
 }
 
 /*
- * str_to_uin()
- *
- * funkcja, która zajmuje siê zamian± stringa na 
- * liczbê i sprawdzeniem, czy to prawid³owy uin.
- *
- * zwraca uin lub 0 w przypadku b³êdu.
- */
-uin_t str_to_uin(const char *text)
-{
-	char *tmp;
-	long num;
-
-	if (!text)
-		return (uin_t) 0;
-
-	errno = 0;
-	num = strtol(text, &tmp, 0);
-
-	if (*text == '\0' || *tmp != '\0')
-		return 0;
-
-	if ((errno == ERANGE || (num == LONG_MAX || num == LONG_MIN)) || num > UINT_MAX || num < 0)
-		return 0;
-
-	return (uin_t) num;
-}
-
-/*
- * valid_nick()
- *
- * sprawdza, czy nick nie zawiera znaków specjalnych,
- * co mog³oby powodowaæ problemy.
- *
- * zwraca 1 je¶li nick jest w porz±dku, w przeciwnym razie 0.
- */
-int valid_nick(const char *nick)
-{
-	int i;
-	const char *wrong[] = { "(null)", "__debug", "__status",
-				 "__current", "*", NULL };
-
-	if (!nick)
-		return 0;
-
-	for (i = 0; wrong[i]; i++) {
-		if (!strcmp(nick, wrong[i]))
-			return 0;
-	}
-
-	if (nick[0] == '@' || nick[0] == '#' || strchr(nick, ','))
-		return 0;
-
-	return 1;
-}
-
-/*
  * play_sound()
  *
  * odtwarza dzwiêk o podanej nazwie.

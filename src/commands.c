@@ -566,7 +566,8 @@ COMMAND(cmd_connect)
 		if (params && params[0] && !strcmp(params[0], "-")) {
 			xfree(tmp);
 			tmp = NULL;
-		}
+		} else if (config_keep_reason && config_reason && !tmp)
+			tmp = xstrdup(config_reason);
 
 		connecting = 0;
 
