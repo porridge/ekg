@@ -2749,15 +2749,27 @@ COMMAND(cmd_key)
 		return 0;
 	}
 
-	if (!params[0] || match_arg(params[0], 'l', "list", 2)) {
+	if (!params[0] || match_arg(params[0], 'l', "list", 2) || params[0][0] != '-') {
 		DIR *dir;
 		struct dirent *d;
-		int count = 0;
+		int count = 0, list_uin = 0;
 		const char *path = prepare_path("keys", 0);
+		const char *x = NULL;
 
 		if (!(dir = opendir(path))) {
 			printq("key_public_noexist");
 			return 0;
+		}
+
+		if (params[0] && params[0][0] != '-')
+			x = params[0];
+		else if (params[0] && match_arg(params[0], 'l', "list", 2))
+			x = params[1];
+
+		if (x && !(list_uin = get_uin(x))) {
+			printq("user_not_found", x);
+			closedir(dir);
+			return -1;
 		}
 		
 		while ((d = readdir(dir))) {
@@ -2768,6 +2780,9 @@ COMMAND(cmd_key)
 
 			if ((tmp = strstr(d->d_name, ".pem")) && !tmp[4] && !stat(name, &st) && S_ISREG(st.st_mode)) {
 				int uin = atoi(d->d_name);
+
+				if (list_uin && uin != list_uin)
+					continue;
 
 				if (uin) {
 					char *fp = sim_key_fingerprint(uin);
@@ -4620,13 +4635,13 @@ void command_init()
 
 #ifdef HAVE_OPENSSL
 	command_add
-	( "key", "?u", cmd_key, 0,
+	( "key", "uu", cmd_key, 0,
 	  " [opcje]", "zarz±dzanie kluczami dla SIM",
 	  "\n"
 	  "  -g, --generate              generuje parê kluczy u¿ytkownika\n"
 	  "  -s, --send <numer/alias>    wysy³a nasz klucz publiczny\n"
 	  "  -d, --delete <numer/alias>  usuwa klucz publiczny\n"
-	  "  [-l, --list]                wy¶wietla posiadane klucze publiczne\n");
+	  "  [-l, --list] [numer/alias]  wy¶wietla posiadane klucze publiczne\n");
 #endif
 
 	command_add
