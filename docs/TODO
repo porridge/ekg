@@ -11,6 +11,7 @@ biblioteka:
 
 klient:
 - przewijanie ekranu,
+- okienka,
 - obs³uga nicków ze spacjami,
 - proste rozpoznawanie p³ci,
 - uzupe³niæ dope³nienia,
