@@ -26,6 +26,7 @@
 #include <ctype.h>
 #include <readline/readline.h>
 #include <errno.h>
+#include <arpa/inet.h>
 #include "libgg.h"
 #include "stuff.h"
 #include "dynstuff.h"
@@ -799,6 +800,8 @@ COMMAND(command_list)
 
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
+		char __ip[16], __port[16];
+		struct in_addr in;
 
 		tmp = "list_unknown";
 		switch (u->status) {
@@ -813,7 +816,11 @@ COMMAND(command_list)
 				break;
 		}
 
-		my_printf(tmp, format_user(u->uin));
+		in.s_addr = u->ip;
+		snprintf(__ip, sizeof(__ip), "%s", inet_ntoa(in));
+		snprintf(__port, sizeof(__port), "%d", u->port);
+
+		my_printf(tmp, format_user(u->uin), __ip, __port);
 		count++;
 	}
 

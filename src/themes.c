@@ -455,8 +455,8 @@ void init_theme()
 	add_format("ignored_deleted", "%> U¿ytkownika %W%1%n usuniêto z listy ignorowanych\n", 1);
 	add_format("error_not_ignored", "%! U¿ytkownik %W%1%n nie jest ignorowany\n", 1);
 	add_format("list_empty", "%! Lista kontaktów jest pusta\n", 1);
-	add_format("list_avail", "%> %1 %Y(dostêpny)%n\n", 1);
-	add_format("list_busy", "%> %1 %G(zajêty)%n\n", 1);
+	add_format("list_avail", "%> %1 %Y(dostêpny)%n %b%2:%3%n\n", 1);
+	add_format("list_busy", "%> %1 %G(zajêty)%n %b%2:%3%n\n", 1);
 	add_format("list_not_avail", "%> %1 %r(niedostêpny)%n\n", 1);
 	add_format("list_unknown", "%> %1\n", 1);
 	add_format("saved", "%> Zapisano ustawiania\n", 1);

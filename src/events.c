@@ -131,8 +131,11 @@ void handle_notify(struct gg_event *e)
 			continue;
 		}
 
-		if ((u = find_user(n->uin, NULL)))
+		if ((u = find_user(n->uin, NULL))) {
 			u->status = n->status;
+			u->ip = n->remote_ip;
+			u->port = n->remote_port;
+		}
 		if (n->status == GG_STATUS_AVAIL) {
 			my_printf("status_avail", format_user(n->uin));
 			if (u && completion_notify)

@@ -29,6 +29,8 @@ struct userlist {
 	char *first_name, *last_name, *nickname, *comment, *mobile, *group;
 	uin_t uin;
 	int status;
+	unsigned long ip;
+	unsigned short port;
 };
 
 struct ignored {
