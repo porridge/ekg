@@ -1456,7 +1456,7 @@ void config_write_main(FILE *f, int base64)
 			strftime(buf, sizeof(buf), "%G%m%d%H%M.%S", tt);
 
 			if (t->persistent)
-				fprintf(f, "at %s */%s %s %s\n", name, itoa(t->period), buf, t->command);
+				fprintf(f, "at %s %s/%s %s\n", name, buf, itoa(t->period), t->command);
 			else
 				fprintf(f, "at %s %s %s\n", name, buf, t->command);
 		} else {
