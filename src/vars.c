@@ -40,7 +40,6 @@ struct variable variables[MAX_VARS] = {
 	{ "beep_notify", VAR_BOOL, 1, &enable_beep_notify, NULL },
 	{ "completion_notify", VAR_BOOL, 1, &completion_notify, NULL },
 	{ "dcc", VAR_BOOL, 1, &use_dcc, changed_dcc },
-	{ "dcc_ip", VAR_STR, 1, &dcc_ip, NULL },
 	{ "display_ack", VAR_INT, 1, &display_ack, NULL },
 	{ "display_color", VAR_BOOL, 1, &display_color, NULL },
 	{ "display_notify", VAR_BOOL, 1, &display_notify, NULL },

@@ -451,7 +451,6 @@ void gg_free_pubdir(struct gg_http *f);
  */
 
 int gg_dcc_port;
-char *gg_dcc_ip;
 
 int gg_dcc_request(struct gg_session *sess, uin_t uin);
 

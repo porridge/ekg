@@ -99,7 +99,6 @@ int use_proxy;
 int proxy_port;
 char *proxy_host;
 char *reg_password;
-char *dcc_ip;
 char *query_nick;
 uin_t query_uin;
 

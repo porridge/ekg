@@ -83,7 +83,6 @@ char *default_theme = NULL;
 int default_status = GG_STATUS_AVAIL;
 char *reg_password = NULL;
 int use_dcc = 0;
-char *dcc_ip = 0;
 char *query_nick = NULL;
 uin_t query_uin = 0;
 
@@ -1488,7 +1487,6 @@ void changed_theme(char *var)
  */
 void prepare_connect()
 {
-	static char buf[20];
 	struct list *l;
 
 	for (l = watches; l; l = l->next) {
@@ -1496,22 +1494,9 @@ void prepare_connect()
 		
 		if (d->type == GG_SESSION_DCC_SOCKET) {
 			gg_dcc_port = d->port;
-
-			if (!dcc_ip) {
-				struct sockaddr_in sin;
-				int sin_len = sizeof(sin);
-
-				if (!getsockname(d->fd, (struct sockaddr*) &sin, &sin_len)) {
-					strcpy(buf, inet_ntoa(sin.sin_addr));
-					gg_debug(GG_DEBUG_MISC, "// prepare_connect(): detected IP address %s\n", buf);
-					gg_dcc_ip = buf;
-				}
-			}
+			
 		}
 	}
-
-	if (dcc_ip)
-		gg_dcc_ip = dcc_ip;
 }
 
 /*
