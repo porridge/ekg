@@ -963,8 +963,12 @@ static struct window *window_new(const char *target, int new_id)
 	list_t l;
 	struct userlist *u = NULL;
 
-	if (target)
+	if (target) {
+		struct window *w = window_find(target);
+		if (w)
+			return w;
 		u = userlist_find(0, target);
+	}
 
 	if (target && *target == '*' && !u)
 		id = 100;

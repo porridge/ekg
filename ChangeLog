@@ -10,6 +10,7 @@ zg³osi³ b³±d.
 
 - poprawka przewijania okien (sz/w)
 - poprawka segfaulta przy oknach p³ywaj±cych (lordzik/w)
+- /window new nie tworzy wiêcej ni¿ jednego okna o danej nazwie (ember/sz)
 
 // 2003-02-10
 
