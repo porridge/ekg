@@ -12,6 +12,7 @@ zg³osi³ b³±d.
 - poprawki /on, aby by³o bardziej userfriendly. dodanie przekazywania
   nowego opisu w parametrach %3 i %4 (sz)
 - ,,*'' w nazwie timera i at usuwa wszystkie (ale nie timery UI) (sz)
+- dok³adniejsze sprawdzanie argumentów w kilku funkcjach (mati/w)
 
 // 2003-01-10
 

@@ -124,11 +124,12 @@ int userlist_read()
 				continue;
 			}
 
-			for (i = 0; i < 6; i++)
+			for (i = 0; i < 6; i++) {
 				if (entry[i] && !strcmp(entry[i], "(null)")) {
 					xfree(entry[i]);
 					entry[i] = NULL;
 				}
+			}
 			
 			u.first_name = xstrdup(entry[0]);
 			u.last_name = xstrdup(entry[1]);
@@ -903,8 +904,13 @@ int group_member(struct userlist *u, const char *group)
 list_t group_init(const char *names)
 {
 	list_t l = NULL;
-	char **groups = array_make(names, ",", 0, 1, 0);
+	char **groups;
 	int i;
+
+	if (!names)
+		return NULL;
+
+	groups = array_make(names, ",", 0, 1, 0);
 
 	for (i = 0; groups[i]; i++) {
 		struct group g;

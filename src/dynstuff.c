@@ -413,9 +413,12 @@ char **array_make(const char *string, const char *sep, int max, int trim, int qu
 {
 	const char *p, *q;
 	char **result = NULL;
-	int items, last = 0;
+	int items = 0, last = 0;
 
-	for (p = string, items = 0; ; ) {
+	if (!string || !sep)
+		goto failure;
+
+	for (p = string; ; ) {
 		int len = 0;
 		char *token = NULL;
 
@@ -493,6 +496,7 @@ char **array_make(const char *string, const char *sep, int max, int trim, int qu
 		p++;
 	}
 
+failure:
 	if (!items)
 		result = xcalloc(1, sizeof(char*));
 
@@ -548,6 +552,9 @@ char *array_join(char **array, const char *sep)
 {
 	string_t s = string_init(NULL);
 	int i;
+
+	if (!array)
+		return xstrdup("");
 
 	for (i = 0; array[i]; i++) {
 		if (i)
