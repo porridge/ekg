@@ -2,7 +2,7 @@
 
 /*
  *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>,
- *                     Robert J. Wo¼ny <speedy@atman.pl>
+ *                     Robert J. Wo¼ny <speedy@ziew.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -242,8 +242,14 @@ extern int gg_debug_level;
 
 void gg_debug(int level, char *format, ...);
 
-char *gg_http_proxy_host;
-int gg_http_proxy_port;
+/*
+ * Pare ma³ych zmiennych do obs³ugi "http proxy"
+ *   
+ */
+ 
+extern int gg_http_use_proxy;
+extern char *gg_http_proxy_host;
+extern int gg_http_proxy_port;
 
 /*
  * -------------------------------------------------------------------------
