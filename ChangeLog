@@ -9,6 +9,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - s/struct queue/struct msg_queue/, poniewa¿ kolidowa³o z SunOSowymi
   libcami (Murphy/w)
+- poprawka wykrywania scandir() (Murphy/w)
 
 // 2002-11-24
 

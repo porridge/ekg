@@ -150,7 +150,7 @@ dnl <ekg>
   AC_CHECK_FUNC(dirname, , [OBJS="$OBJS ../compat/dirname.o"])
 
   # na SunOSach nie ma scandir()
-  AC_CHECK_FUNC(scandir, , [OBJS="$OBJS ../compat/scandir.o"])
+  AC_CHECK_FUNCS(scandir, , [OBJS="$OBJS ../compat/scandir.o"])
 
   # sprawdzamy, czy system ma getopt_long
   AC_CHECK_FUNC(getopt_long, , [OBJS="$OBJS ../compat/getopt.o ../compat/getopt1.o"; CFLAGS="-I../compat $CFLAGS"])
