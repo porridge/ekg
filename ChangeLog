@@ -9,7 +9,6 @@ d - drg, sz - szalik, del - deletek).
 - dzia³aj±ce tab_commmand (del)
 - dodanie ,,Requires: openssl'' w libgadu.pc w razie potrzeby (krzak/w)
 
->>>>>>> 1.1323
 // 2004-03-01
 
 - literkówka w vars.txt (porridge/d)
