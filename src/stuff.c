@@ -1003,13 +1003,17 @@ void msg_queue_destroy()
  *
  * wysy³a wiadomo¶ci z kolejki.
  *
- * 0 je¶li wys³ano, 1 je¶li nast±pi³ b³±d przy wysy³aniu.
+ * 0 je¶li wys³ano, 1 je¶li nast±pi³ b³±d przy wysy³aniu, 2 je¶li
+ * kolejka pusta.
  */
 int msg_queue_flush()
 {
-	list_t l;
+	list_t l = msg_queue;
 
-	for (l = msg_queue; l; l = l->next) {
+	if (!l)
+		return 2;
+
+	for (; l; l = l->next) {
 		struct queue *m = l->data;
 		int new_msg_seq;
 

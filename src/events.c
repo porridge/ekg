@@ -760,7 +760,8 @@ void handle_success(struct gg_event *e)
 			gg_change_status_descr(sess, config_status, config_reason);
 	}
 
-	msg_queue_flush();
+	if (!msg_queue_flush())
+		print("queue_flush");
 
 	/* zapiszmy adres serwera */
 	if (config_server_save) {

@@ -1108,6 +1108,7 @@ void theme_init()
 	format_add("queue_wrong_use", "%) Komenda dzia³a tylko przy braku po³±czenia z serwerem.\n", 1);
 	format_add("queue_cleared","%) Kolejka wiadomo¶ci wyczyszczona.\n", 1);
 	format_add("queue_empty", "%) Kolejka wiadomo¶ci jest pusta.\n", 1);
+	format_add("queue_flush", "%) Wys³ano zaleg³e wiadomo¶ci z kolejki.\n", 1);
 
 	/* conference */
 	format_add("conferences_invalid", "%! Nieprawid³owy parametr\n", 1);
