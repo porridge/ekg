@@ -1518,7 +1518,7 @@ static void ui_ncurses_beep()
 void ui_ncurses_init()
 {
 	struct timer *t;
-	int background = COLOR_DEFAULT;
+	int background = COLOR_BLACK;
 
 	ui_postinit = ui_ncurses_postinit;
 	ui_print = ui_ncurses_print;
@@ -1531,7 +1531,11 @@ void ui_ncurses_init()
 	cbreak();
 	noecho();
 	nonl();
-	use_default_colors();
+
+	if (config_display_transparent) {
+		background = COLOR_DEFAULT;
+		use_default_colors();
+	}
 
 	ui_screen_width = stdscr->_maxx + 1;
 	ui_screen_height = stdscr->_maxy + 1;
@@ -1543,9 +1547,6 @@ void ui_ncurses_init()
 	keypad(input, TRUE);
 
 	start_color();
-
-	if (!config_display_transparent)
-		background = COLOR_BLACK;
 
 	init_pair(16, COLOR_BLACK, background);
 	init_pair(1, COLOR_RED, background);
