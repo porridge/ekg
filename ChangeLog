@@ -6,6 +6,10 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2002-11-27
+
+- poprawka od¶wie¿ania prompta przy activity w ui-readline (d)
+	
 // 2002-11-26
 
 - dodanie zmiennej sound_notify_file (sz)

@@ -1201,6 +1201,7 @@ static int window_write(int id, const char *line)
 #else
 		rl_expand_prompt(current_prompt());
 #endif
+		rl_redisplay();
 	}
 	
         return 0;
