@@ -129,7 +129,7 @@ struct gg_event {
                 struct {
                         uin_t sender;
 			int msgclass;
-			int time;
+			time_t time;
                         unsigned char *message;
                 } msg;
                 struct gg_notify_reply *notify;
