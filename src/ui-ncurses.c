@@ -444,7 +444,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	doupdate();
 
 	if (config_speech_app) {
-		char *tmp = saprintf("%s >2 /dev/null", config_speech_app);
+		char *tmp = saprintf("%s 2> /dev/null", config_speech_app);
 		FILE *f = popen(tmp, "w");
 
 		xfree(tmp);
