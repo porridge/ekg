@@ -1143,6 +1143,12 @@ COMMAND(cmd_modify)
 		if (match_arg(argv[i], 'd', "display", 2) && argv[i + 1]) {
 			i++;
 
+			if (!valid_nick(argv[i])) {
+				printq("invalid_nick");
+				array_free(argv);
+				return -1;
+			}
+
 			if (userlist_find(0, argv[i])) {
 				printq("user_exists", argv[i]);
 				array_free(argv);
