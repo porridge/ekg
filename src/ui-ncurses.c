@@ -1630,6 +1630,7 @@ static void update_input()
 		strcpy(lines[0], line);
 		xfree(line);
 		line = lines[0];
+		history[0] = NULL;
 		lines_start = 0;
 		lines_index = 0;
 	}
