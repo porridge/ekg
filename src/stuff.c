@@ -195,7 +195,6 @@ char *config_proxy_forwarding = NULL;
 int config_password_cp1250 = 0;
 char *config_interface = NULL;
 int config_reason_limit = 0;
-int config_fade_in = 0;
 
 char *last_search_first_name = NULL;
 char *last_search_last_name = NULL;
@@ -2121,9 +2120,9 @@ char *strip_spaces(char *line)
 {
 	char *buf;
 	
-	for (buf = line; isspace((int) *buf); buf++);
+	for (buf = line; xisspace(*buf); buf++);
 
-	while (isspace((int) line[strlen(line) - 1]))
+	while (xisspace(line[strlen(line) - 1]))
 		line[strlen(line) - 1] = 0;
 	
 	return buf;
