@@ -27,6 +27,7 @@ zg³osi³ b³±d.
 - kolorki statusów dla /find takie same jak w /list (sz)
 - /find pokazuje poprawnie niektóre (private, descr) stany (sz)
 - poprawka zjadania 100% procesora przy -c z plikiem (*/w)
+- poprawka zachowania ,,make_window 1'' (rmrmg/w)
 
 // 2003-01-13
 
