@@ -996,8 +996,8 @@ void theme_init()
 	format_add("show_status_avail_descr", "%Ydostêpny%n (%T%1%n%2)", 1);
 	format_add("show_status_busy", "%Gzajêty%n", 1);
 	format_add("show_status_busy_descr", "%Gzajêty%n (%T%1%n%2)", 1);
-	format_add("show_status_invisible", "%bniewidoczny%n", 1);
-	format_add("show_status_invisible_descr", "%bniewidoczny%n (%T%1%n%2)", 1);
+	format_add("show_status_invisible", "%cniewidoczny%n", 1);
+	format_add("show_status_invisible_descr", "%cniewidoczny%n (%T%1%n%2)", 1);
 	format_add("show_status_not_avail", "%rniedostêpny%n", 1);
 	format_add("show_status_private_on", ", tylko dla znajomych", 1);
 	format_add("show_status_private_off", "", 1);

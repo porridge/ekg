@@ -840,15 +840,16 @@ COMMAND(cmd_help)
 	list_t l;
 	
 	if (params[0]) {
+		const char *p = (params[0][0] == '/' && strlen(params[0])) ? params[0] + 1 : params[0];
 		for (l = commands; l; l = l->next) {
 			struct command *c = l->data;
 			
-			if (!strcasecmp(c->name, params[0]) && c->alias) {
-				print("help_alias", params[0]);
+			if (!strcasecmp(c->name, p) && c->alias) {
+				print("help_alias", p);
 				return;
 			}
 
-			if (!strcasecmp(c->name, params[0]) && !c->alias) {
+			if (!strcasecmp(c->name, p) && !c->alias) {
 			    	char *blah = NULL;
 
 				if (strstr(c->brief_help, "%"))
