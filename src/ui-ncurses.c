@@ -3881,7 +3881,7 @@ static int ui_ncurses_event(const char *event, ...)
 				struct userlist *u = userlist_find(0, window_current->target);
 
 				if (!u) {
-					char *tmp = saprintf("add %s %s", window_current->target, p);
+					char *tmp = saprintf("/add %s %s", window_current->target, p);
 					command_exec(window_current->target, tmp, quiet);
 					xfree(tmp);
 				} else
@@ -3926,17 +3926,17 @@ static int ui_ncurses_event(const char *event, ...)
 				int uin;
 
 				if (u && u->uin)
-					tmp = saprintf("find %d", u->uin);
+					tmp = saprintf("/find %d", u->uin);
 
 				if (c && c->name)
-					tmp = saprintf("conference --find %s", c->name);
+					tmp = saprintf("/conference --find %s", c->name);
 
 				if (!u && !c && (uin = atoi(window_current->target)))
-					tmp = saprintf("find %d", uin);
+					tmp = saprintf("/find %d", uin);
 			}
 
 			if (!tmp)
-				tmp = saprintf("find %d", config_uin);
+				tmp = saprintf("/find %d", config_uin);
 
 			command_exec(window_current->target, tmp, 0);
 
