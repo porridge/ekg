@@ -28,7 +28,7 @@ AC_DEFUN(AC_CHECK_NCURSES,[
 	
       incl=`echo "$i" | sed 's/:.*//'`
       lib=`echo "$i" | sed 's/.*://'`
-		
+
       if test -f $incl/ncurses/ncurses.h; then
         include=$incl/ncurses
       elif test -f $incl/ncurses.h; then
