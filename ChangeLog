@@ -12,6 +12,8 @@ zg³osi³ b³±d.
 - drobne porz±dki (sz)
 - sprawdzanie warto¶ci ,,contacts_size'' (sdas/w)
 - libgadu: s/fix16/gg_fix16/, s/fix32/gg_fix32/ (w)
+- pozbycie siê s³owa ,,status'' z themów. nastêpnym etapiem bêdzie pozbycie
+  siê s³owa ,,theme'' ;) (w)
 
 // 2003-02-04
 
