@@ -14,6 +14,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   siê to ró¿ni od dotychczasowej polityki (po co zwalniaæ, skoro
   i tak exit() siê tym zajmie), ale w ten sposób znacznie ³atwiej
   jest wykrywaæ leaki (w)
+- zwalnianie w ui-readline (w)
+- poprawka off-by-one w ui-readline z MAX_LINES_PER_SCREEN (w)
 
 // 2002-08-01
 

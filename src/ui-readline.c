@@ -620,6 +620,8 @@ void ui_readline_init()
  */
 static void ui_readline_deinit()
 {
+	int i;
+
 	if (config_changed) {
 		char *line;
 		const char *prompt = format_find("config_changed");
@@ -638,6 +640,9 @@ static void ui_readline_deinit()
 	}
 
 	window_free();
+
+	for (i = 0; i < send_nicks_count; i++)
+		xfree(send_nicks[i]);
 }
 
 /*
@@ -853,7 +858,7 @@ static int window_add()
         w.query_nick = NULL;
         windows_count++;
 
-        for (j = 0; j <= MAX_LINES_PER_SCREEN; j++)
+        for (j = 0; j < MAX_LINES_PER_SCREEN; j++)
                 w.buff.line[j] = NULL;
 
         list_add(&windows, &w, sizeof(w));
@@ -976,7 +981,7 @@ static int window_clear()
 {
         int j;
 
-        for (j = 0; j<=MAX_LINES_PER_SCREEN; j++)
+        for (j = 0; j < MAX_LINES_PER_SCREEN; j++)
                 win->buff.line[j] = NULL;
 
         return 0;
@@ -1107,7 +1112,7 @@ static void window_free()
 
 		xfree(w->query_nick);
 
-		for (i = 0; i <= MAX_LINES_PER_SCREEN; i++)
+		for (i = 0; i < MAX_LINES_PER_SCREEN; i++)
 			xfree(w->buff.line[i]);
 	}
 
