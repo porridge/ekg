@@ -1021,9 +1021,10 @@ int conference_participant(struct conference *c, uin_t uin)
  * 
  *  - from - kto jest nadawc± wiadomo¶ci,
  *  - recipients - tablica numerów nale¿±cych do konferencji,
- *  - count - ilo¶æ numerów.
+ *  - count - ilo¶æ numerów,
+ *  - quiet.
  */
-struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int count) 
+struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int count, int quiet) 
 {
 	int i;
 	list_t l;
@@ -1042,15 +1043,31 @@ struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int co
 		gg_debug(GG_DEBUG_MISC, "// conference_find_by_uins(): from=%d, rcpt count=%d, matched=%d, list_count(c->recipients)=%d\n", from, count, matched, list_count(c->recipients));
 
 		if (matched == list_count(c->recipients) && matched <= (from == config_uin ? count : count + 1)) {
-			if (from != config_uin && !conference_participant(c, from))
+			string_t new = string_init(NULL);
+			int comma = 0;
+
+			if (from != config_uin && !conference_participant(c, from)) {
 				list_add(&c->recipients, &from, sizeof(from));
 
-			for (i = 0; i < count; i++) {
-				if (recipients[i] != config_uin && !conference_participant(c, recipients[i]))
-					list_add(&c->recipients, &recipients[i], sizeof(recipients[0]));
+				comma++;
+				string_append(new, format_user(from));
 			}
 
-			gg_debug(GG_DEBUG_MISC, "// conference_find_by_uins(): matching #%s\n", c->name);
+			for (i = 0; i < count; i++) {
+				if (recipients[i] != config_uin && !conference_participant(c, recipients[i])) {
+					list_add(&c->recipients, &recipients[i], sizeof(recipients[0]));
+			
+					if (comma++)
+						string_append(new, ", ");
+					string_append(new, format_user(recipients[i]));
+				}
+			}
+
+			if (strcmp(new->str, "") && !c->ignore)
+				printq("conferences_joined", new->str, c->name);
+			string_free(new, 1);
+
+			gg_debug(GG_DEBUG_MISC, "// conference_find_by_uins(): matching %s\n", c->name);
 
 			return c;
 		}

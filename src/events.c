@@ -154,7 +154,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 	
 	if (e->event.msg.recipients) {
 		c = conference_find_by_uins(e->event.msg.sender, 
-			e->event.msg.recipients, e->event.msg.recipients_count);
+			e->event.msg.recipients, e->event.msg.recipients_count, 0);
 
 		if (!c) {
 			string_t tmp = string_init(NULL);
@@ -490,7 +490,7 @@ void handle_msg(struct gg_event *e)
 	if (e->event.msg.recipients_count) {
 		struct conference *c = conference_find_by_uins(
 			e->event.msg.sender, e->event.msg.recipients,
-			e->event.msg.recipients_count);
+			e->event.msg.recipients_count, 0);
 
 		if (c && c->ignore)
 			return;

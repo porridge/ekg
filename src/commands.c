@@ -4643,8 +4643,13 @@ COMMAND(cmd_conference)
 			return -1;
 		}
 
-		if (!(c = conference_find(params[1]))) {
+		if (params[1][0] != '#') {
 			printq("conferences_name_error");
+			return -1;
+		}
+
+		if (!(c = conference_find(params[1]))) {
+			printq("conferences_noexist");
 			return -1;
 		}
 
