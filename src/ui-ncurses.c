@@ -1727,6 +1727,30 @@ static int ui_ncurses_event(const char *event, ...)
 			goto cleanup;
 		}
 
+		if (!strcasecmp(command, "find")) {
+			char *tmp = NULL;
+			
+			if (window_current->target) {
+				struct userlist *u = userlist_find(0, window_current->target);
+				int uin;
+
+				if (u && u->uin)
+					tmp = saprintf("find %d", u->uin);
+
+				if (!u && (uin = atoi(window_current->target)))
+					tmp = saprintf("find %d", uin);
+			}
+
+			if (!tmp)
+				tmp = saprintf("find %d", config_uin);
+
+			command_exec(NULL, tmp);
+
+			xfree(tmp);
+
+			goto cleanup;
+		}
+
 		if (!strcasecmp(command, "query")) {
 			char *param = va_arg(ap, char*);
 

@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>,
+ *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Piotr Wysocki <wysek@linux.bydg.org>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *
@@ -388,8 +388,9 @@ void handle_msg(struct gg_event *e)
  */
 void handle_ack(struct gg_event *e)
 {
-	char *tmp;
+	struct userlist *u = userlist_find(e->event.ack.recipient, NULL);
 	int queued = (e->event.ack.status == GG_ACK_QUEUED);
+	const char *tmp, *target = (u) ? u->display : itoa(e->event.ack.recipient);
 
 	if (!e->event.ack.seq)	/* ignorujemy potwierdzenia ctcp */
 		return;
@@ -404,7 +405,7 @@ void handle_ack(struct gg_event *e)
 		return;
 
 	tmp = queued ? "ack_queued" : "ack_delivered";
-	print(tmp, format_user(e->event.ack.recipient));
+	print_window(target, 0, tmp, format_user(e->event.ack.recipient));
 }
 
 /*
@@ -646,6 +647,8 @@ void handle_success(struct gg_event *e)
  	}
 
 	hide_notavail = 1;
+
+	update_status();
 }
 
 /*
@@ -970,6 +973,7 @@ void handle_disconnect(struct gg_event *e)
 	userlist_clear_status();
 	gg_free_session(sess);
 	sess = NULL;	
+	update_status();
 	do_reconnect();
 }
 

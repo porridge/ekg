@@ -1,0 +1,297 @@
+prompt %g-%G>%g-%n
+prompt2 %c-%C>%c-%n
+error %r-%R>%r-%n
+timestamp %H:%M
+readline_prompt % 
+readline_prompt_away / 
+readline_prompt_invisible . 
+readline_prompt_query %1> 
+readline_prompt_win %1%% 
+readline_prompt_away_win %1/ 
+readline_prompt_invisible_win %1. 
+readline_prompt_query_win %2:%1> 
+readline_prompt_win_act %1 (act/%2)%% 
+readline_prompt_away_win_act %1 (act/%2)/ 
+readline_prompt_invisible_win_act %1 (act/%2). 
+readline_prompt_query_win_act %2:%1 (act/%3)> 
+readline_more -- Wci¶nij Enter by kontynuowaæ lub Ctrl-D by przerwaæ --
+known_user %T%1%n/%2
+unknown_user %T%1%n
+none %1\n
+generic %> %1\n
+debug %n%1\n
+not_enough_params %! Za ma³o parametrów. Spróbuj %Thelp %1%n\n
+invalid_uin %! Nieprawid³owy numer u¿ytkownika\n
+user_not_found %! Nie znaleziono u¿ytkownika %T%1%n\n
+not_implemented %! Tej funkcji jeszcze nie ma\n
+unknown_command %! Nieznane polecenie: %T%1%n\n
+welcome %> %TEKG-%1%n (Eksperymentalny Klient Gadu-Gadu)\n%> Program jest rozprowadzany na zasadach licencji GPL w wersji 2\n%> %RPrzed u¿yciem przeczytaj ulotkê (polecenie ,,help'' lub F1)%n\n\n
+ekg_version %) EKG - Eksperymentalny Klient Gadu-Gadu (%T%1%n)\n%) libgadu-%1 (protokó³ %2, klient %3)\n
+group_empty %! Grupa %T%1%n jest pusta\n
+user_added %> Dopisano %T%1%n do listy kontaktów\n
+user_deleted %> Usuniêto %T%1%n z listy kontaktów\n
+user_exists %! %T%1%n ju¿ istnieje w li¶cie kontaktów\n
+error_adding %! B³±d podczas dopisywania do listy kontaktów\n
+error_deleting %! B³±d podczas usuwania z listy kontaktów\n
+away %> Zmieniono stan na zajêty %c(%C%#%c)%n\n
+away_descr %> Zmieniono stan na zajêty: %T%1%n%2 %c(%C%#%c)%n\n
+back %> Zmieniono stan na dostêpny %c(%C%#%c)%n\n
+back_descr %> Zmieniono stan na dostêpny: %T%1%n%2 %c(%C%#%c)%n\n
+invisible %> Zmieniono stan na niewidoczny %c(%C%#%c)%n\n
+invisible_descr %> Zmieniono stan na niewidoczny: %T%1%n%2 %c(%C%#%c)%n\n
+private_mode_is_on %> Tryb ,,tylko dla przyjació³'' jest w³±czony\n
+private_mode_is_off %> Tryb ,,tylko dla przyjació³'' jest wy³±czony\n
+private_mode_on %> W³±czono tryb ,,tylko dla przyjació³''\n
+private_mode_off %> Wy³±czono tryb ,,tylko dla przyjació³''\n
+private_mode_invalid %! Nieprawid³owa warto¶æ\n
+descr_too_long %! D³ugo¶æ opisu przekracza limit. Ilo¶æ uciêtych znaków: %T%1%n\n
+help %> %1%2 - %3%4\n
+help_more %) %1\n
+help_alias %) %T%1%n jest aliasem i nie posiada opisu\n
+help_footer  \n%> Gwiazdka (%T*%n) oznacza, ¿e mo¿na uzyskaæ wiêcej szczegó³ów\n\n
+help_quick %> Przed u¿yciem przeczytaj ulotkê. Plik %Tdocs/ULOTKA%n zawiera krótki\n%> przewodnik po za³±czonej dokumentacji. Je¶li go nie masz, mo¿esz\n%> ¶ci±gn±æ pakiet ze strony %Thttp://dev.null.pl/ekg/%n\n
+ignored_added %> Dodano %T%1%n do listy ignorowanych\n
+ignored_deleted %> Usuniêto %1 z listy ignorowanych\n
+ignored_list %> %1\n
+ignored_list_empty %! Lista ignorowanych u¿ytkowników jest pusta\n
+error_adding_ignored %! B³±d podczas dodawania do listy ignorowanych\n
+error_not_ignored %! %1 nie jest na li¶cie ignorowanych\n
+list_empty %! Lista kontaktów jest pusta\n
+list_avail %> %1 %Y(dostêpn%@2)%n %b%3:%4%n\n
+list_avail_descr %> %1 %Y(dostêpn%@2: %n%5%Y)%n %b%3:%4%n\n
+list_busy %> %1 %G(zajêt%@2)%n %b%3:%4%n\n
+list_busy_descr %> %1 %G(zajêt%@2: %n%5%G)%n %b%3:%4%n\n
+list_not_avail %> %1 %r(niedostêpn%@2)%n\n
+list_not_avail_descr %> %1 %r(niedostêpn%@2: %n%5%r)%n\n
+list_invisible %> %1 %c(niewidoczn%@2)%n %b%3:%4%n\n
+list_unknown %> %1\n
+modify_done %> Zmieniono wpis w li¶cie kontaktów\n
+quit %> Papa\n
+quit_descr %> Papa: %T%1%n%2\n
+config_changed Zapisaæ now± konfiguracjê? (tak/nie) 
+saved %> Zapisano ustawienia\n
+error_saving %! Podczas zapisu ustawieñ wyst±pi³ b³±d\n
+message_header %g.-- %n%1 %c(%C%#%c/%2)%n %g--- -- -%n\n
+message_footer %g`----- ---- --- -- -%n\n
+message_line %g|%n %1\n
+message_line_width -8
+message_timestamp %Y-%m-%d %H:%M
+chat_header %c.-- %n%1 %c(%C%#%c/%2)%n %c--- -- -%n\n
+chat_footer %c`----- ---- --- -- -%n\n
+chat_line %c|%n %1\n
+chat_line_width -8
+chat_timestamp %Y-%m-%d %H:%M
+sent_header %b.-- %n%1 %c(%C%#%c)%n %b--- -- -%n\n
+sent_footer %b`----- ---- --- -- -%n\n
+sent_line %b|%n %1\n
+sent_line_width -8
+sent_timestamp %Y-%m-%d %H:%M
+sysmsg_header %m.-- %TWiadomo¶æ systemowa %c(%C%#%c)%m --- -- -%n\n
+sysmsg_line %m|%n %1\n
+sysmsg_line_width -8
+sysmsg_footer %m`----- ---- --- -- -%n\n	
+ack_queued %> Wiadomo¶æ do %1 zostanie dostarczona pó¼niej %c(%C%#%c)%n\n
+ack_delivered %> Wiadomo¶æ do %1 zosta³a dostarczona %c(%C%#%c)%n\n
+status_avail %> %1 jest dostêpn%@2 %c(%C%#%c)%n\n
+status_avail_descr %> %1 jest dostêpn%@2: %3 %c(%C%#%c)%n\n
+status_busy %> %1 jest zajêt%@2 %c(%C%#%c)%n\n
+status_busy_descr %> %1 jest zajêt%@2: %3 %c(%C%#%c)%n\n
+status_not_avail %> %1 jest niedostêpn%@2 %c(%C%#%c)%n\n
+status_not_avail_descr %> %1 jest niedostêpn%@2: %3 %c(%C%#%c)%n\n
+status_invisible %> %1 jest niewidoczn%@2 %c(%C%#%c)%n\n
+status_invisible_descr %> %1 jest niewidoczn%@2: %3 %c(%C%#%c)%n\n
+auto_away %> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci %c(%C%#%c)%n\n
+auto_away_descr %> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci %c(%C%#%c)%n: %T%2%n%3\n
+connecting %> £±czê siê z serwerem...\n
+conn_failed %! Po³±czenie nie uda³o siê: %1\n
+conn_failed_resolving Nie znaleziono serwera
+conn_failed_connecting Nie mo¿na po³±czyæ siê z serwerem
+conn_failed_invalid Nieprawid³owa odpowied¼ serwera
+conn_failed_disconnected Serwer zerwa³ po³±czenie
+conn_failed_password Nieprawid³owe has³o
+conn_failed_404 B³±d serwera HTTP
+conn_failed_memory Brak pamiêci
+conn_stopped %! Przerwano ³±czenie\n
+conn_timeout %! Przekroczono limit czasu operacji ³±czenia z serwerem\n
+connected %> Po³±czono %c(%C%#%c)%n\n
+disconnected %> Roz³±czono %c(%C%#%c)%n\n
+disconnected_descr %> Roz³±czono: %T%1%n%2 %c(%C%#%c)%n\n
+already_connected %! Klient jest ju¿ po³±czony. Wpisz %Treconnect%n aby po³±czyæ ponownie\n
+during_connect %! £±czenie trwa. Wpisz %Tdisconnect%n aby przerwaæ\n
+conn_broken %! Serwer zerwa³ po³±czenie %c(%C%#%c)%n\n
+not_connected %! Brak po³±czenia z serwerem. Wpisz %Tconnect%n\n
+theme_loaded %> Wczytano opis wygl±du o nazwie %T%1%n\n
+theme_default %> Ustawiono domy¶lny opis wygl±du\n
+error_loading_theme %! B³±d podczas ³adowania opisu wygl±du: %1\n
+variable %> %1 = %2\n
+variable_not_found %! Nieznana zmienna: %1\n
+variable_invalid %! Nieprawid³owa warto¶æ zmiennej\n
+no_config %! Niekompletna konfiguracja. Wpisz:\n%!   %Tset uin <numerek-gg>%n\n%!   %Tset password <has³o>%n\n%!   %Tsave%n\n%! Nastêpnie wydaj polecenie:\n%!   %Tconnect%n\n%! Je¶li nie masz swojego numerka, wpisz:\n%!   %Tregister <e-mail> <has³o>%n\n\n
+error_reading_config %! Nie mo¿na odczytaæ pliku konfiguracyjnego: %1\n
+autosaved %> Automatycznie zapisano ustawienia\n
+register %> Rejestracja poprawna. Wygrany numerek: %T%1%n\n
+register_failed %! B³±d podczas rejestracji\n
+register_pending %! Rejestracja w toku\n
+register_timeout %! Przekroczono limit czasu operacji rejestrowania\n
+registered_today %! Ju¿ zarejestrowano jeden numer. Nie nadu¿ywaj\n
+unregister %> Konto %T%1%n wykasowane.\n
+unregister_timeout %! Przekroczono limit czasu operacji usuwania konta\n
+unregister_bad_uin %! Nie poprawny UIN: %T%1%n\n
+unregister_failed %! B³±d podczas usuwania konta\n
+remind %> Has³o zosta³o wys³ane\n
+remind_failed %! B³±d podczas wysy³ania has³a\n
+remind_timeout %! Przekroczono limit czasu operacji wys³ania has³a\n
+passwd %> Has³o zosta³o zmienione\n
+passwd_failed %! B³±d podczas zmiany has³a\n
+passwd_timeout %! Przekroczono limit czasu operacji zmiany has³a\n
+change_not_enough_params %! Polecenie wymaga podania %Twszystkich%n parametrów\n
+change %> Informacje w katalogu publicznym zosta³y zmienione\n
+change_failed %! B³±d podczas zmiany informacji w katalogu publicznym\n
+change_timeout %! Przekroczono limit czasu operacji zmiany katalogu publicznego\n
+sms_error %! B³±d wysy³ania SMS\n
+sms_unknown %! %1 nie ma podanego numeru komórki\n
+sms_sent %> SMS do %T%1%n zosta³ wys³any\n
+sms_failed %! SMS do %T%1%n nie zosta³ wys³any\n
+sms_msg EKG: msg %1 %# >> %2
+sms_chat EKG: chat %1 %# >> %2
+search_failed %! Wyst±pi³ b³±d podczas szukania: %1\n
+search_timeout %! Przekroczono limit czasu operacji szukania\n
+search_not_found %! Nie znaleziono\n
+search_results_multi_active %G!%n
+search_results_multi_busy %g!%n
+search_results_multi_inactive  
+search_results_multi_unknown -
+search_results_multi_female k
+search_results_multi_male m
+search_results_multi %7 %[-10]1%K|%n%[12]3%K|%n%6%K|%n%[20]2%K|%n%[4]5%K|%n%[16]4\n
+search_results_single_active %G(aktywn%@1)%n
+search_results_single_busy %g(zajêt%@1)%n
+search_results_single_inactive %r(nieaktywn%@1)%n
+search_results_single_unknown %T-%n
+search_results_single_female %Mkobieta%n
+search_results_single_male %Cmê¿czyzna%n
+search_results_single %) Nick: %T%3%n\n%) Numerek: %T%1%n\n%) Imiê i nazwisko: %T%2%n\n%) Miejscowo¶æ: %T%4%n\n%) Rok urodzenia: %T%5%n\n%) P³eæ: %6\n
+process %> %(-5)1 %2\n
+no_processes %! Nie ma dzia³aj±cych procesów\n
+process_exit %> Proces %1 (%2) zakoñczy³ dzia³anie z wynikiem %3\n
+exec %1\n",1);	/* %1 tre¶æ, %2 pid */
+exec_error %! B³±d uruchamiania procesu: %1\n
+user_info %) Pseudonim: %T%3%n\n%) Numer: %T%7%n\n%) Stan: %8\n%) Imiê i nazwisko: %T%1 %2%n\n%) Alias: %T%4%n\n%) Numer telefonu: %T%5%n\n%) Grupy: %T%6%n\n
+user_info_avail %Ydostêpn%@1%n
+user_info_avail_descr %Ydostêpn%@1%n (%2)
+user_info_busy %Gzajêt%@1%n
+user_info_busy_descr %Gzajêt%@1%n (%2)
+user_info_not_avail %rniedostêpn%@1%n
+user_info_not_avail_descr %rniedostêpn%@1%n (%2)
+user_info_invisible %cniewidoczn%@1%n
+show_status_profile %) Profil: %T%1%n\n
+show_status_uin %) Numer: %T%1%n\n
+show_status_uin_nick %) Numer: %T%1%n (%T%2%n)\n
+show_status_status %) Aktualny stan: %T%1%2%n\n
+show_status_server %) Aktualny serwer: %T%1%n:%T%2%n\n
+show_status_avail %Ydostêpny%n
+show_status_avail_descr %Ydostêpny%n (%T%1%n%2)
+show_status_busy %Gzajêty%n
+show_status_busy_descr %Gzajêty%n (%T%1%n%2)
+show_status_invisible %bniewidoczny%n
+show_status_invisible_descr %bniewidoczny%n (%T%1%n%2)
+show_status_not_avail %rniedostêpny%n
+show_status_private_on , tylko dla znajomych
+show_status_private_off 
+aliases_invalid %! Nieprawid³owy parametr\n
+aliases_list_empty %! Brak aliasów\n
+aliases_list %> %T%1%n: %2\n
+aliases_list_next %> %3  %2\n
+aliases_add %> Utworzono alias %T%1%n\n
+aliases_append %> Dodano do aliasu %T%1%n\n
+aliases_del %) Usuniêto alias %T%1%n\n
+aliases_exist %! Alias %T%1%n ju¿ istnieje\n
+aliases_noexist %! Alias %T%1%n nie istnieje\n
+aliases_command %! %T%1%n jest wbudowan± komend±\n
+dcc_create_error %! Nie mo¿na w³±czyæ po³±czeñ bezpo¶rednich: %1\n
+dcc_error_network %! B³±d transmisji z %1\n
+dcc_error_refused %! Po³±czenie z %1 zosta³o odrzucone\n
+dcc_error_unknown %! Nieznany b³±d po³±czenia bezpo¶redniego\n
+dcc_error_handshake %! Nie mo¿na nawi±zaæ po³±czenia z %1\n
+dcc_timeout %! Przekroczono limit czasu operacji bezpo¶redniego po³±czenia\n
+dcc_unknown_command %! Nieznana opcja: %T%1%n\n
+dcc_not_supported %! Opcja %T%1%n nie jest jeszcze obs³ugiwana\n
+dcc_open_error %! Nie mo¿na otworzyæ %T%1%n: %2\n
+dcc_open_directory %! Nie mo¿na otworzyæ %T%1%n: Jest katalogiem\n
+dcc_show_pending_header %> Po³±czenia oczekuj±ce:\n
+dcc_show_pending_send %) #%1, %2, wysy³anie %T%3%n\n
+dcc_show_pending_get %) #%1, %2, odbiór %T%3%n\n
+dcc_show_pending_voice %) #%1, %2, rozmowa\n
+dcc_show_active_header %> Po³±czenia aktywne:\n
+dcc_show_active_send %) #%1, %2, wysy³anie %T%3%n\n
+dcc_show_active_get %) #%1, %2, odbiór %T%3%n\n
+dcc_show_active_voice %) #%1, %2, rozmowa\n
+dcc_show_empty %> Brak bezpo¶rednich po³±czeñ\n
+dcc_show_debug %> id=%1, type=%2, filename=%3, uin=%4, dcc=%5\n
+dcc_done_get %> Zakoñczono pobieranie pliku %T%2%n od %1\n
+dcc_done_send %> Zakoñczono wysy³anie pliku %T%2%n do %1\n
+dcc_get_offer %) %1 przesy³a plik %T%2%n o rozmiarze %T%3%n\n%) Wpisz %Tdcc get #%4%n by go odebraæ, lub %Tdcc close #%4%n by anulowaæ\n
+dcc_voice_offer %) %1 chce rozmawiaæ\n%) Wpisz %Tdcc voice #%2%n by rozpocz±æ rozmowê, lub %Tdcc close #%2%n by anulowaæ\n
+dcc_voice_unsupported %) Nie wkompilowano obs³ugi rozmów g³osowych. Przeczytaj %Tdocs/voip.txt%n\n
+dcc_voice_running %) Mo¿na prowadziæ tylko jedn± rozmowê g³osow± na raz\n
+dcc_get_not_found %! Nie znaleziono po³±czenia %T%1%n\n
+dcc_get_getting %) Rozpoczêto pobieranie pliku %T%2%n od %1\n
+dcc_get_cant_create %! Nie mo¿na utworzyæ pliku %T%1%n\n
+dcc_invalid_ip %! Nieprawid³owy adres IP\n
+query_started %) Rozpoczêto rozmowê z %T%1%n\n
+query_finished %) Zakoñczono rozmowê z %T%1%n\n
+query_exist %! Rozmowa z %T%1%n jest ju¿ prowadzona w okienku nr %T%2%n\n
+events_act_toomany_params %! Za du¿o parametrów\n
+events_seq_incorrect %! Nieprawid³owa sekwencja\n
+userlist_put_ok %) Listê kontaktów zachowano na serwerze\n
+userlist_put_error %! B³±d podczas wysy³ania listy kontaktów\n
+userlist_get_ok %) Listê kontaktów wczytano z serwera\n
+userlist_get_error %! B³±d podczas pobierania listy kontaktów\n
+quick_list %)%1\n
+quick_list_avail  %T%1%n
+quick_list_busy  %w%1%n
+quick_list_invisible  %K%1%n
+history_send > %y%2 [%3]:%n %4\n
+history_recv < %g%2 [%3]:%n %4\n
+history_error %! %1\n
+window_add %) Utworzono nowe okno\n
+window_noexist %! Wybrane okno nie istnieje\n
+window_no_windows %! Nie mo¿na zamkn±æ ostatniego okna\n
+window_del %) Zamkniêto okno\n
+windows_max %! Wyczerpano limit ilo¶ci okien\n
+window_list_query %) %1: rozmowa z %T%2%n\n
+window_list_nothing %) %1: brak rozmowy\n
+window_invalid %! Nieprawid³owy parametr\n
+window_id_query_started %) Rozmowa z %T%2%n rozpoczêta w oknie %W%1%n\n
+window_kill_status %! Nie mo¿na zamkn±æ okna statusowego\n
+bind_seq_incorrect %! Sekwencja %T%1%n jest nieprawid³owa\n 
+bind_seq_add %) Dodano sekwencjê %T%1%n\n
+bind_seq_remove %) Usuniêto sekwencjê %T%1%n\n	
+bind_invalid %! Nieprawid³owy parametr\n
+bind_seq_list %) %1: %T%2%n\n
+bind_seq_exist %! Sekwencja %T%1%n ma ju¿ przypisan± akcjê\n
+bind_seq_list_empty %! Brak przypisanych akcji\n
+timer_list %> %1, %2s, %3\n
+last_list_in %) %Y <<%n [%1] %2 %3\n
+last_list_out %) %G >>%n [%1] %2 %3\n
+last_list_empty %! Nie zalogowano ¿adnych wiadomo¶ci.\n
+last_list_empty_nick %! Nie zalogowano ¿adnych wiadomo¶ci od %W%1%n.\n
+last_list_timestamp %m-%d-%Y %H:%M
+conferences_invalid %! Nieprawid³owy parametr\n
+conferences_list_empty %! Brak konferencji\n
+conferences_list %> %T%1%n: %2\n
+conferences_list_ignored %> %T%1%n: %2 (%yingorowana%n)\n
+conferences_add %> Utworzono konferencjê %T%1%n\n
+conferences_not_added %) Nie utworzono konferencji %T%1%n\n
+conferences_del %> Usuniêto konferencjê %T%1%n\n
+conferences_exist %! Konferencja %T%1%n ju¿ istnieje\n
+conferences_noexist %! Konferencja %T%1%n nie istnieje\n
+conferences_name_error %! Nazwa konferencji powinna zaczynaæ siê od %T#%n\n
+conferences_rename %> Nazwa konferencji zmieniona: %T%1%n --> %T%2%n\n
+conferences_ignore %> Konferencja %T%1%n bêdzie ignorowana\n
+conferences_unignore %> Konferencja %T%1%n nie bêdzie ignorowana\n
+http_failed_resolving Nie znaleziono serwera
+http_failed_connecting Nie mo¿na po³±czyæ siê z serwerem
+http_failed_reading Serwer zerwa³ po³±czenie
+http_failed_writing Serwer zerwa³ po³±czenie
+http_failed_memory Brak pamiêci

@@ -1,6 +1,7 @@
-rzeczy, których nie ma. listy/mesgi/posty z listami, ¿eby dodaæ co¶
-z poni¿szej listy, albo zwi±zanego z tym bêd± albo ignorowane, albo
-zacznê byæ niemi³y. --w
+rzeczy, których nie ma, ale s± na li¶cie ,,do zrobienia'' lub pozostaj±
+pobo¿nymi ¿yczeniami, ale nie chce mi siê odpowiadaæ kolejny raz, ¿e mo¿e
+kiedy¶ bêdzie. listy/mesgi/posty z listami, ¿eby dodaæ co¶ z poni¿szej listy,
+albo zwi±zanego z tym bêd± albo ignorowane, albo zacznê byæ niemi³y. --w
 
 biblioteka:
 - komunikacja miêdzy klientami, bezpo¶rednie rozmowy,
@@ -10,12 +11,9 @@ klient:
 - uzupe³niæ dope³nienia (w tym nicki ze spacjami, lista nicków (joshua)),
 - wykrywanie niewidocznych jako opcja.
 - korzystaæ z getopt.
-- find bez parametrów szuka aktualnego rozmówcy.
-- uaktualnianie w³asnego stanu w userli¶cie,
 - zapisywanie konfiguracji do innego pliku,
-- pociête reasony w auto_away,
 - ustawianie stanu bez opisów przy w³±czynych opcjach ,,*reason*'',
-- wy¶wietlaæ potwierdzenia w oknie rozmowy (theKnight),
+- kolejka wiadomo¶ci wysy³anych podczas roz³±czenia (Murphy).
 
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,
@@ -23,8 +21,6 @@ klient:
   + zrobiæ listê kontaktów po prawej (marzenia),
 
 - przej¶æ na ui-ncurses domy¶lnie, a co za tym idzie:
-  + usun±æ timestampy z formatów,
-  + w³±czyæ domy¶lnie ,,set timestamp "%H:%M "'',
   + w³±czyæ domy¶lnie ,,set display_sent 1'',
   + w³±czyæ domy¶lnie ,,set make_window 2'',
   + w³±czyæ domy¶lnie ,,set display_ack 3'',

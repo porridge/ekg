@@ -1,4 +1,9 @@
-krótki przewodnik po dokumentacji:
+
+	  
+          "Czytanie dokumentacji mo¿e powodowaæ raka i choroby serca"
+                 minister do spraw informatyzacji i Windows [1]
+
+czyli krótki przewodnik po dokumentacji:
 
 README		opis programu. g³ówny plik dokumentacji.
 
@@ -46,5 +51,7 @@ przenosny-kod.txt
 
 gdb.txt		szybki kurs obs³ugi gdb.
 
+
+[1] autor Jacek Pop³awski, <slrnaor068.54v.jp@darkwood.somewhere>
 
 $Id$

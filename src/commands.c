@@ -372,6 +372,8 @@ COMMAND(cmd_away)
 			print("descr_too_long", itoa(strlen(reason) - GG_STATUS_DESCR_MAXSIZE));
 	}
 
+	update_status();
+
 	return;
 }
 
@@ -597,8 +599,13 @@ COMMAND(cmd_find)
 	memset(r, 0, sizeof(*r));
 
 	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
+		ui_event("command", "find", NULL);
 		r->uin = config_uin;
 		id = id * 2;
+		xfree(r);
+		xfree(query);
+		return;
+
 	} else {
 		if (argv[0] && !argv[1] && argv[0][0] == '#') { /* konferencja */
 			query = saprintf("conference --find %s", argv[0]);

@@ -232,6 +232,7 @@ void ekg_exit();
 char *log_escape(const char *str);
 char *xstrmid(const char *str, int start, int length);
 const char *http_error_string(int h);
+void update_status();
 
 int process_add(int pid, const char *name);
 int process_remove(int pid);
@@ -289,10 +290,11 @@ void emoticon_free();
 struct timer *timer_add(int period, const char *name, const char *command);
 int timer_remove(const char *name, const char *command);
 void timer_free();
-int last_add(unsigned int type, uin_t uin, time_t t, const char *msg);
+
+void last_add(unsigned int type, uin_t uin, time_t t, const char *msg);
 int last_count_get(uin_t uin);
-int last_count_del(uin_t uin);
-int last_count_add(uin_t uin);
+void last_count_del(uin_t uin);
+void last_count_add(uin_t uin);
 
 void get_line_from_pipe(struct gg_exec *);
 

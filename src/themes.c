@@ -707,18 +707,18 @@ void theme_init()
 	format_add("error_deleting", "%! B³±d podczas usuwania z listy kontaktów\n", 1);
 
 	/* zmiany stanu */
-	format_add("away", "%> Zmieniono stan na zajêty %c(%C%#%c)%n\n", 1);
-	format_add("away_descr", "%> Zmieniono stan na zajêty: %T%1%n%2 %c(%C%#%c)%n\n", 1);
-	format_add("back", "%> Zmieniono stan na dostêpny %c(%C%#%c)%n\n", 1);
-	format_add("back_descr", "%> Zmieniono stan na dostêpny: %T%1%n%2 %c(%C%#%c)%n\n", 1);
-	format_add("invisible", "%> Zmieniono stan na niewidoczny %c(%C%#%c)%n\n", 1);
-	format_add("invisible_descr", "%> Zmieniono stan na niewidoczny: %T%1%n%2 %c(%C%#%c)%n\n", 1);
+	format_add("away", "%> Zmieniono stan na zajêty\n", 1);
+	format_add("away_descr", "%> Zmieniono stan na zajêty: %T%1%n%2\n", 1);
+	format_add("back", "%> Zmieniono stan na dostêpny\n", 1);
+	format_add("back_descr", "%> Zmieniono stan na dostêpny: %T%1%n%2%n\n", 1);
+	format_add("invisible", "%> Zmieniono stan na niewidoczny\n", 1);
+	format_add("invisible_descr", "%> Zmieniono stan na niewidoczny: %T%1%n%2\n", 1);
 	format_add("private_mode_is_on", "%> Tryb ,,tylko dla przyjació³'' jest w³±czony\n", 1);
 	format_add("private_mode_is_off", "%> Tryb ,,tylko dla przyjació³'' jest wy³±czony\n", 1);
 	format_add("private_mode_on", "%> W³±czono tryb ,,tylko dla przyjació³''\n", 1);
 	format_add("private_mode_off", "%> Wy³±czono tryb ,,tylko dla przyjació³''\n", 1);
 	format_add("private_mode_invalid", "%! Nieprawid³owa warto¶æ\n", 1);
-	format_add("descr_too_long", "%! D³ugo¶æ opisu przekracza limit o %T%1%n znaków\n", 1);
+	format_add("descr_too_long", "%! D³ugo¶æ opisu przekracza limit. Ilo¶æ uciêtych znaków: %T%1%n\n", 1);
 	
 	/* pomoc */
 	format_add("help", "%> %1%2 - %3%4\n", 1);
@@ -776,21 +776,21 @@ void theme_init()
 	format_add("sysmsg_footer", "%m`----- ---- --- -- -%n\n", 1);	
 
 	/* potwierdzenia wiadomo¶ci */
-	format_add("ack_queued", "%> Wiadomo¶æ do %1 zostanie dostarczona pó¼niej %c(%C%#%c)%n\n", 1);
-	format_add("ack_delivered", "%> Wiadomo¶æ do %1 zosta³a dostarczona %c(%C%#%c)%n\n", 1);
+	format_add("ack_queued", "%> Wiadomo¶æ do %1 zostanie dostarczona pó¼niej\n", 1);
+	format_add("ack_delivered", "%> Wiadomo¶æ do %1 zosta³a dostarczona\n", 1);
 
 	/* ludzie zmieniaj± stan */
-	format_add("status_avail", "%> %1 jest dostêpn%@2 %c(%C%#%c)%n\n", 1);
-	format_add("status_avail_descr", "%> %1 jest dostêpn%@2: %3 %c(%C%#%c)%n\n", 1);
-	format_add("status_busy", "%> %1 jest zajêt%@2 %c(%C%#%c)%n\n", 1);
-	format_add("status_busy_descr", "%> %1 jest zajêt%@2: %3 %c(%C%#%c)%n\n", 1);
-	format_add("status_not_avail", "%> %1 jest niedostêpn%@2 %c(%C%#%c)%n\n", 1);
-	format_add("status_not_avail_descr", "%> %1 jest niedostêpn%@2: %3 %c(%C%#%c)%n\n", 1);
-	format_add("status_invisible", "%> %1 jest niewidoczn%@2 %c(%C%#%c)%n\n", 1);
-	format_add("status_invisible_descr", "%> %1 jest niewidoczn%@2: %3 %c(%C%#%c)%n\n", 1);
+	format_add("status_avail", "%> %1 jest dostêpn%@2\n", 1);
+	format_add("status_avail_descr", "%> %1 jest dostêpn%@2: %T%3%n\n", 1);
+	format_add("status_busy", "%> %1 jest zajêt%@2\n", 1);
+	format_add("status_busy_descr", "%> %1 jest zajêt%@2: %T%3%n\n", 1);
+	format_add("status_not_avail", "%> %1 jest niedostêpn%@2\n", 1);
+	format_add("status_not_avail_descr", "%> %1 jest niedostêpn%@2: %T%3%n\n", 1);
+	format_add("status_invisible", "%> %1 jest niewidoczn%@2\n", 1);
+	format_add("status_invisible_descr", "%> %1 jest niewidoczn%@2: %T%3%n\n", 1);
 
-	format_add("auto_away", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci %c(%C%#%c)%n\n", 1);
-	format_add("auto_away_descr", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci %c(%C%#%c)%n: %2\n", 1);
+	format_add("auto_away", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci\n", 1);
+	format_add("auto_away_descr", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci: %T%2%n%3\n", 1);
 
 	/* po³±czenie z serwerem */
 	format_add("connecting", "%> £±czê siê z serwerem...\n", 1);
@@ -804,12 +804,12 @@ void theme_init()
 	format_add("conn_failed_memory", "Brak pamiêci", 1);
 	format_add("conn_stopped", "%! Przerwano ³±czenie\n", 1);
 	format_add("conn_timeout", "%! Przekroczono limit czasu operacji ³±czenia z serwerem\n", 1);
-	format_add("connected", "%> Po³±czono %c(%C%#%c)%n\n", 1);
-	format_add("disconnected", "%> Roz³±czono %c(%C%#%c)%n\n", 1);
-	format_add("disconnected_descr", "%> Roz³±czono: %T%1%n%2 %c(%C%#%c)%n\n", 1);
+	format_add("connected", "%> Po³±czono\n", 1);
+	format_add("disconnected", "%> Roz³±czono\n", 1);
+	format_add("disconnected_descr", "%> Roz³±czono: %T%1%n%2\n", 1);
 	format_add("already_connected", "%! Klient jest ju¿ po³±czony. Wpisz %Treconnect%n aby po³±czyæ ponownie\n", 1);
 	format_add("during_connect", "%! £±czenie trwa. Wpisz %Tdisconnect%n aby przerwaæ\n", 1);
-	format_add("conn_broken", "%! Serwer zerwa³ po³±czenie %c(%C%#%c)%n\n", 1);
+	format_add("conn_broken", "%! Serwer zerwa³ po³±czenie\n", 1);
 	format_add("not_connected", "%! Brak po³±czenia z serwerem. Wpisz %Tconnect%n\n", 1);
 
 	/* obs³uga themeów */

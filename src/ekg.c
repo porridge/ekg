@@ -382,6 +382,8 @@ void ekg_wait_for_key()
 				
 				away = (reason) ? 3 : 1;
 
+				update_status();
+
 				if (reason) {
 				    	iso_to_cp(reason);
 					gg_change_status_descr(sess, GG_STATUS_BUSY_DESCR | (private_mode ? GG_STATUS_FRIENDS_MASK : 0), reason);
@@ -394,7 +396,19 @@ void ekg_wait_for_key()
 				else
 					snprintf(tmp, sizeof(tmp), "%ds", config_auto_away);
 				
-				print((reason) ? "auto_away_descr" : "auto_away", tmp, reason);
+				if (reason) {
+					char *r1, *r2;
+
+					r1 = xstrmid(reason, 0, GG_STATUS_DESCR_MAXSIZE);
+					r2 = xstrmid(reason, GG_STATUS_DESCR_MAXSIZE, -1);
+
+					print("auto_away_descr", tmp, r1, r2);
+					
+					xfree(r1);
+					xfree(r2);
+				} else
+					print("auto_away", tmp);
+
 				ui_event("my_status", "away", reason);
 				ui_event("my_status_raw", GG_STATUS_BUSY, reason);	/* XXX */
 				free(config_reason);
@@ -784,8 +798,11 @@ int main(int argc, char **argv)
 	ui_init();
 	ui_event("theme_init");
 
+	config_timestamp = xstrdup("%H:%M ");
+
 	in_autoexec = 1;
         userlist_read();
+	update_status();
 	config_read();
 	sysmsg_read();
 	emoticon_read();

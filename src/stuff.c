@@ -2408,6 +2408,8 @@ void ekg_logoff(struct gg_session *sess, const char *reason)
 		gg_change_status(sess, GG_STATUS_NOT_AVAIL);
 
 	gg_logoff(sess);
+
+	update_status();
 }
 
 char *random_line(const char *path)
@@ -2738,7 +2740,17 @@ char *log_escape(const char *str)
 	return res;
 }
 
-int last_add(unsigned int type, uin_t uin, time_t t, const char *msg)
+/*
+ * last_add()
+ *
+ * dodaje wiadomo¶æ do listy ostatnio otrzymanych.
+ * 
+ *  - type - rodzaj wiadomo¶ci,
+ *  - uin - nadawca,
+ *  - t - czas,
+ *  - msg - tre¶æ wiadomo¶ci,
+ */
+void last_add(unsigned int type, uin_t uin, time_t t, const char *msg)
 {
 	list_t l;
 	struct last ll;
@@ -2746,7 +2758,7 @@ int last_add(unsigned int type, uin_t uin, time_t t, const char *msg)
 
 	/* nic nie zapisujemy, je¿eli user sam nie wie czego chce. */
 	if (config_last_size <= 0)
-		return 0;
+		return;
 	
 	if (config_last & 2) 
 		last_count = last_count_get(uin);
@@ -2793,10 +2805,16 @@ int last_add(unsigned int type, uin_t uin, time_t t, const char *msg)
 	list_add(&lasts, &ll, sizeof(ll));
 	last_count_add(uin);
 
-	return 0;
+	return;
 }
 
-int last_count_add(uin_t uin) {
+/*
+ * last_count_add()
+ *
+ * XXX
+ */
+void last_count_add(uin_t uin)
+{
 	list_t l;
 	int add = 0;
 
@@ -2817,11 +2835,14 @@ int last_count_add(uin_t uin) {
 
 		list_add(&lasts_count, &lc, sizeof(lc));
 	}
-
-	return 0;
 }
 
-int last_count_del(uin_t uin) 
+/*
+ * last_count_del()
+ *
+ * XXX
+ */
+void last_count_del(uin_t uin) 
 {
 	list_t l;
 
@@ -2835,10 +2856,13 @@ int last_count_del(uin_t uin)
 				list_remove(&lasts_count, lc, 1);
 		}
 	}
-
-	return 0;
 }
 
+/*
+ * last_count_get()
+ *
+ * XXX
+ */
 int last_count_get(uin_t uin) 
 {
 	int last_count = 0;
@@ -2915,5 +2939,27 @@ const char *http_error_string(int h)
 	}
 
 	return "?";
+}
+
+/*
+ * update_status()
+ *
+ * uaktualnia w³asny stan w li¶cie kontaktów, je¶li dopisali¶my siebie.
+ */
+void update_status()
+{
+	int st[6] = { GG_STATUS_AVAIL, GG_STATUS_BUSY, GG_STATUS_INVISIBLE, GG_STATUS_BUSY_DESCR, GG_STATUS_AVAIL_DESCR, GG_STATUS_INVISIBLE_DESCR };
+	struct userlist *u = userlist_find(config_uin, NULL);
+
+	if (!u)
+		return;
+
+	xfree(u->descr);
+	u->descr = xstrdup(config_reason);
+	
+	if (!sess || sess->state != GG_STATE_CONNECTED)
+		u->status = (u->descr) ? GG_STATUS_NOT_AVAIL_DESCR : GG_STATUS_NOT_AVAIL;
+	else
+		u->status = st[away];
 }
 

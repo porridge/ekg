@@ -150,6 +150,13 @@ display_sent
 	zwróciæ uwagê, ¿e przy make_window = 2, wys³anie wiadomo¶ci utworzy
 	automatycznie okienko rozmowy.
 
+emoticons
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	uruchamia rozwijanie emotikonów w zdefiniowane teksty. wiêcej
+	szczegó³ów w pliku docs/emoticons.txt
+	
 enter_scrolls
 	typ: bool
 	domy¶lna warto¶æ: 0
