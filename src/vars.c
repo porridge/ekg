@@ -557,7 +557,7 @@ char *variable_digest()
 	for (l = variables; l; l = l->next) {
 		struct variable *v = l->data;
 
-		if ((v->type == VAR_INT || v->type == VAR_BOOL) && strcmp(v->name, "uin")) {
+		if ((v->type == VAR_INT || v->type == VAR_BOOL || v->type == VAR_MAP) && strcmp(v->name, "uin")) {
 			string_append(s, v->short_name);
 			string_append(s, itoa(*(int*)(v->ptr)));
 		}
@@ -631,7 +631,7 @@ int variable_undigest(const char *digest)
 
 		p += 2;
 
-		if (v->type == VAR_INT || v->type == VAR_BOOL) {
+		if (v->type == VAR_INT || v->type == VAR_BOOL || v->type == VAR_MAP) {
 			char *end;
 			int val;
 			
