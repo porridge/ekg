@@ -948,9 +948,37 @@ void handle_success(struct gg_event *e)
 		struct in_addr addr;
 
 		addr.s_addr = sess->server_addr;
-		
-		xfree(config_server);
-		config_server = xstrdup(inet_ntoa(addr));
+
+		/* przesuwamy na pierwsze miejsce */
+		if (config_server) {
+			char **servers = array_make(config_server, ",; ", 0, 1, 0);
+			char **new_servers = NULL;
+			int i;
+
+			array_add(&new_servers, inet_ntoa(addr));
+
+			for (i = 0; servers[i]; i++) {
+				char *tmp = NULL;
+				char *foo;
+
+				tmp = xstrdup(servers[i]);
+
+				/* ignorujemy port */
+				if ((foo = strchr(tmp, ':')))
+					*foo = '\0';
+					
+				if (strcmp(tmp, inet_ntoa(addr)))
+					array_add(&new_servers, servers[i]);
+
+				xfree(tmp);
+			}
+
+			xfree(config_server);
+			config_server = array_join(new_servers, ", ");
+			array_free(servers);
+			array_free(new_servers);
+		} else
+			config_server = xstrdup(inet_ntoa(addr));
 	}
 	
 	if (batch_mode && batch_line) {

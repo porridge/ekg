@@ -459,7 +459,7 @@ server_save
 	okre¶la, czy serwer ma zapamiêtywaæ serwer, z którym ostatnio uda³o
 	siê po³±czyæ. w przypadku w³±czenia tej zmiennej, zmienna ,,server''
 	bêdzie automatycznie uaktualniana, a zawarto¶æ wpisana przez
-	u¿ytkownika zapominana.
+	u¿ytkownika przesuniêta na dalsze pozycje.
 
 sms_away
 	typ: liczba

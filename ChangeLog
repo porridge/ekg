@@ -9,6 +9,7 @@ zg³osi³ b³±d.
 // 2003-01-22
 
 - poprawka zachowania przy segfault'cie (sz)
+- server_save przesuwa serwer na poczatek (*/sz)
 
 // 2003-01-21
 
