@@ -2219,6 +2219,7 @@ COMMAND(cmd_save)
 	if (!userlist_write(NULL) && !config_write(params[0])) {
 		printq("saved");
 		config_changed = 0;
+		config_last_sysmsg_changed = 0;
 	} else {
 		printq("error_saving");
 		return -1;
@@ -2422,7 +2423,7 @@ COMMAND(cmd_quit)
 
 	if (config_keep_reason)
 		config_reason = xstrdup(tmp);
-	else {
+	else if (config_uin) {
 		char **arr = NULL, *t;
 		int __config_status = config_status;
 

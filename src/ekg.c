@@ -1268,7 +1268,8 @@ void ekg_exit()
 	xfree(last_search_last_name);
 	xfree(last_search_nickname);
 
-	array_add(&vars, xstrdup("last_sysmsg"));
+	if (config_last_sysmsg_changed)
+		array_add(&vars, xstrdup("last_sysmsg"));
 
 	if (config_keep_reason) {
 		array_add(&vars, xstrdup("status"));

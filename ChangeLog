@@ -6,6 +6,12 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-03-15
+
+- kosmetyka kilku rzeczy, ¿eby nie tworzyæ nowych katalogów w ~/.gg
+  przy pomy³ce w parametrze ,,-u'' podczas startu (sz)
+- poprawka zapisywania konfiguracji z profili (pirat/sz)
+
 // 2003-03-14
 
 - kosmetyka w³asnego stanu (gozda/sz)

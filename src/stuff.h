@@ -244,6 +244,7 @@ int config_keep_reason;
 int config_last;
 int config_last_size;
 int config_last_sysmsg;
+int config_last_sysmsg_changed;
 int config_log;
 int config_log_ignored;
 char *config_log_path;

@@ -119,6 +119,7 @@ char *config_sound_mail_file = NULL;
 char *config_sound_app = NULL;
 int config_uin = 0;
 int config_last_sysmsg = 0;
+int config_last_sysmsg_changed = 0;
 char *config_password = NULL;
 int config_sms_away = 0;
 int config_sms_away_limit = 0;
@@ -2224,11 +2225,17 @@ int process_remove(int pid)
 const char *prepare_path(const char *filename, int do_mkdir)
 {
 	static char path[PATH_MAX];
-	
+
 	if (do_mkdir) {
 		if (config_profile) {
-			if (mkdir(dirname(config_dir), 0700) && errno != EEXIST)
+			char *cd = xstrdup(config_dir);
+
+			if (mkdir(dirname(cd), 0700) && errno != EEXIST) {
+				xfree(cd);
 				return NULL;
+			}
+
+			xfree(cd);
 		}
 
 		if (mkdir(config_dir, 0700) && errno != EEXIST)
