@@ -654,6 +654,23 @@ __attribute__ ((packed))
 #endif
 ;
 
+#define GG_LOGIN_EXT 0x0013
+
+struct gg_login_ext {
+	uint32_t uin;			/* twój numerek */
+	uint32_t hash;			/* hash has³a */
+	uint32_t status;		/* status na dzieñ dobry */
+	uint32_t version;		/* moja wersja klienta */
+	uint32_t local_ip;		/* mój adres ip */
+	uint16_t local_port;		/* port, na którym s³ucham */
+	uint32_t external_ip;		/* zewnêtrzny adres ip */
+	uint16_t external_port;		/* zewnêtrzny port */
+}
+#ifdef __GNUC__
+__attribute__ ((packed))
+#endif
+;
+
 #define GG_LOGIN_OK 0x0003
 
 #define GG_LOGIN_FAILED 0x0009
@@ -735,7 +752,8 @@ __attribute__ ((packed))
 #define GG_CLASS_MSG 0x0004
 #define GG_CLASS_CHAT 0x0008
 #define GG_CLASS_CTCP 0x0010
-#define GG_CLASS_EXT_MSG 0x0020 	/* EXT = extended */
+#define GG_CLASS_ACK 0x0020
+#define GG_CLASS_EXT GG_CLASS_ACK	/* kompatybilno¶æ wstecz */
 
 #define GG_MSG_MAXSIZE 2000
 
