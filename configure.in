@@ -133,17 +133,17 @@ else
 fi
 
 
-if test ! -e  config.h; then 
-    echo -n "ordering CD from http://dev.null.pl/ekg/CD $ac_c" 1>&6
-    sleep 1
-    echo -n ".$ac_c" 1>&6
-    sleep 1
-    echo -n ".$ac_c" 1>&6
-    sleep 1
-    echo -n ".$ac_c" 1>&6
-    sleep 1
-    AC_MSG_RESULT([ just kidding :)])
-fi
+#if test ! -e  config.h; then 
+#    echo -n "ordering CD from http://dev.null.pl/ekg/CD $ac_c" 1>&6
+#    sleep 1
+#    echo -n ".$ac_c" 1>&6
+#    sleep 1
+#    echo -n ".$ac_c" 1>&6
+#    sleep 1
+#    echo -n ".$ac_c" 1>&6
+#    sleep 1
+#    AC_MSG_RESULT([ just kidding :)])
+#fi
 
 AC_OUTPUT(Makefile lib/Makefile src/Makefile examples/Makefile)
 #    echo "----------------------------------------------------------------"

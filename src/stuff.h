@@ -100,6 +100,7 @@ int config_auto_reconnect;
 char *config_quit_reason;
 char *config_away_reason;
 int config_random_reason;
+int config_query_commands;
 
 char *home_dir;
 int in_readline;

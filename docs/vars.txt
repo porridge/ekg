@@ -33,7 +33,7 @@ auto_reconnect
 	ma ponowiæ próbê. je¶li równa 0, nie próbuje wiêcej.
 
 auto_save
-	typ liczba:
+	typ: liczba
 	domy¶lna warto¶æ: 0
 
 	po jakim czasie automatycznie zapisaæ ustawienia, w sekundach.
@@ -164,6 +164,13 @@ proxy_host
 	adres serwera proxy, który jest u¿ywany do po³±czeñ http (szukanie,
 	zmiana danych w katalogu publicznym itp.), gdy w³±czono opcjê
 	,,use_proxy''.
+
+query_commands
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	mo¿liwo¶æ wydawania d³ugich poleceñ podczas rozmowy z u¿ytkownikiem
+	bez poprzedzania ich znakiem '/'.
 
 quit_reason
 	typ: tekst

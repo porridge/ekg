@@ -2006,14 +2006,32 @@ int execute_line(char *line)
 	struct command *c;
 	int (*last_abbr)(char *, char **) = NULL;
 	int abbrs = 0;
+	int correct_command = 0;
 
 	if (query_nick && *line != '/') {
-		char *params[] = { query_nick, line, NULL };
+	
+		/* wykrywanie przypadkowo wpisanych poleceñ */
+		if (config_query_commands) {
+			for (c = commands; c->name; c++) {
+				int l = strlen(c->name);
+				if (l > 2 && !strncasecmp(line, c->name, l)) {
+					if (!line[l] || isspace(line[l])) {
+						correct_command = 1;
+						break;
+					}
+				}
+			}		
+		}
 
-		if (strcmp(line, ""))
-			command_msg("chat", params);
+		if (!correct_command) {
+	
+			char *params[] = { query_nick, line, NULL };
 
-		return 0;
+			if (strcmp(line, ""))
+				command_msg("chat", params);
+
+			return 0;
+		}
 	}
 	
 	send_nicks_index = 0;
