@@ -290,6 +290,13 @@ enum {
 	GG_ERROR_DCC_NET,		/* b³±d wysy³ania/odbierania */
 };
 
+struct gg_msg_format {
+	int position;
+	int length;
+	unsigned char font;
+	unsigned char color[3];
+};
+
 /*
  * struktura opisuj±ca rodzaj zdarzenia. wychodzi z gg_watch_fd() lub
  * z gg_dcc_watch_fd()
@@ -306,6 +313,9 @@ struct gg_event {
 			/* konferencyjne */
 			int recipients_count;
 			uin_t *recipients;
+			/* kolorki */
+			int formats_count;
+			struct gg_msg_format *formats;
                 } msg;
                 struct gg_notify_reply *notify;
                 struct {
@@ -533,6 +543,9 @@ char *gg_read_line(int sock, char *buf, int length);
 void gg_chomp(char *line);
 char *gg_urlencode(char *str);
 int gg_http_hash(char *format, ...);
+void *gg_recv_packet(struct gg_session *sess);
+int gg_send_packet(int sock, int type, ...);
+unsigned int gg_login_hash(unsigned char *password, unsigned int seed);
 unsigned long fix32(unsigned long x);
 unsigned short fix16(unsigned short x);
 
@@ -679,11 +692,11 @@ __attribute__ ((packed))
 #endif
 ;
 
-struct gg_send_ext_msg {
-	char flag;		
-	unsigned int length;	  
-	unsigned int position;	
-	char font;
+struct gg_msg_richtext {
+	unsigned char flag;		
+	unsigned short length;	  
+	unsigned short position;	
+	unsigned char font;
 } 
 #ifdef __GNUC__
  __attribute__ ((packed))
@@ -695,10 +708,10 @@ struct gg_send_ext_msg {
 #define GG_FONT_UNDERLINE 0x04
 #define GG_FONT_COLOR 0x08
 
-struct gg_ext_msg_color { 
-	char red;
-	char green;
-	char blue;
+struct gg_msg_richtext_color { 
+	unsigned char red;
+	unsigned char green;
+	unsigned char blue;
 } 
 #ifdef __GNUC__
  __attribute__ ((packed))
@@ -706,7 +719,7 @@ struct gg_ext_msg_color {
 ;
 
 struct gg_msg_recipients {
-	char flag;
+	unsigned char flag;
 	unsigned int count;
 }
 #ifdef __GNUC__
