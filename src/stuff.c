@@ -179,6 +179,7 @@ char *config_windows_layout = NULL;
 char *config_profile = NULL;
 int config_header_size = 0;
 int config_statusbar_size = 1;
+char *config_proxy_forwarding = NULL;
 
 struct event_label event_labels[] = {
 	{ EVENT_MSG, "msg" },
@@ -1605,6 +1606,21 @@ void do_connect()
 		}
 
 		array_free(servers);
+	}
+
+	if (config_proxy_forwarding) {
+		char *fwd = xstrdup(config_proxy_forwarding), *tmp = strchr(fwd, ':');
+
+		if (!tmp) {
+			p.external_addr = inet_addr(fwd);
+			p.external_port = gg_dcc_port;
+		} else {
+			*tmp = 0;
+			p.external_addr = inet_addr(fwd);
+			p.external_port = atoi(tmp + 1);
+		}
+
+		xfree(fwd);
 	}
 
 	if (!(sess = gg_login(&p))) {

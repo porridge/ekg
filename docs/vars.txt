@@ -414,6 +414,14 @@ proxy
 	autoryzacji, nale¿y poprzedziæ go nazw± u¿ytkownika, dwukropkiem,
 	has³em i ma³p± (np. ,,jan:tajnehas³o@serwer'')
 
+proxy_forwarding
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	adres i port (oddzielone dwukropkiem) serwera po¶rednicz±cego
+	(routera, proxy lub czego¶ innego) przekierowany na port 1550
+	naszego komputera.
+
 query_commands
 	typ: bool
 	domy¶lna warto¶æ: 1

@@ -163,6 +163,7 @@ void variable_init()
 	variable_add("make_window", "mw", VAR_INT, 1, &config_make_window, NULL, variable_map(3, 0, 0, "none", 1, 0, "usefree", 2, 0, "always"), NULL);
 	variable_add("mesg_allow", "ma", VAR_INT, 1, &config_mesg_allow, mesg_changed, variable_map(3, 0, 0, "no", 1, 0, "yes", 2, 0, "default"), NULL);
 	variable_add("proxy", "pr", VAR_STR, 1, &config_proxy, changed_proxy, NULL, NULL);
+	variable_add("proxy_forwarding", "pf", VAR_STR, 1, &config_proxy_forwarding, NULL, NULL, NULL);
 	variable_add("random_reason", "rr", VAR_MAP, 1, &config_random_reason, NULL, variable_map(5, 0, 0, "none", 1, 0, "away", 2, 0, "notavail", 4, 0, "avail", 8, 0, "invisible"), NULL);
 	variable_add("quit_reason", "qr", VAR_STR, 1, &config_quit_reason, changed_xxx_reason, NULL, NULL);
 	variable_add("query_commands", "qc", VAR_BOOL, 1, &config_query_commands, NULL, NULL, NULL);

@@ -10,6 +10,9 @@ zg³osi³ b³±d.
 
 - poprawka Alt-9 (krzyk/w)
 - uaktualnienie leon.theme (leon/w)
+- dodana zmienna ,,proxy_forwarding'', która pozwala podaæ adres i port
+  przekierowania na serwerze po¶rednicz±cym (proxy, router, nat, cokolwiek)
+  i mieæ dzia³aj±ce dcc. przyznajê, ¿e nazwa nie jest najlepsza. (fidor/w)
 
 // 2002-01-31
 
