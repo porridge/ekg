@@ -144,6 +144,8 @@ struct gg_dcc {
 	uin_t peer_uin;		/* uin drugiej strony */
 	int file_fd;		/* deskryptor pliku */
 	int offset;		/* offset w pliku */
+	int chunk_size;		/* rozmiar kawa³ka */
+	int chunk_offset;	/* offset w aktualnym kawa³ku */
 	struct gg_file_info file_info;
 				/* informacje o pliku */
 };

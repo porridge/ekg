@@ -604,7 +604,7 @@ void handle_dcc(struct gg_dcc *d)
 	struct gg_event *e;
 	struct transfer *t, tt;
 	struct list *l;
-	char buf1[16], buf2[16];
+	char buf1[16], buf2[16], *p;
 	int tmp;
 
 	if (!(e = gg_dcc_watch_fd(d))) {
@@ -687,7 +687,10 @@ void handle_dcc(struct gg_dcc *d)
 			snprintf(buf2, sizeof(buf2), "%ld", d->file_info.size);
 			t->filename = strdup(d->file_info.filename);
 
-			/* XXX parsowaæ nazwê pliku, ¿eby nie wywala³o ¶mieci */
+			for (p = d->file_info.filename; *p; p++)
+				if (*p < 32 || *p == '\\' || *p == '/')
+					*p = '_';
+
 			my_printf("dcc_get_offer", format_user(t->uin), t->filename, buf2, buf1);
 
 			break;

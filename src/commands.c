@@ -1282,6 +1282,8 @@ COMMAND(command_dcc)
 		struct transfer *t;
 		
 		for (t = NULL, l = transfers; l; l = l->next) {
+			struct userlist *u;
+			
 			t = l->data;
 
 			if (!t->dcc || t->type != GG_SESSION_DCC_GET || !t->filename)
@@ -1293,7 +1295,14 @@ COMMAND(command_dcc)
 			if (params[1][0] == '#' && atoi(params[1] + 1) == t->id)
 				break;
 
-			/* XXX po nicku */
+			if (u = find_user(t->uin, NULL)) {
+				char buf[16];
+
+				snprintf(buf, sizeof(buf), u->uin);
+
+				if (!strcasecmp(params[1], buf) || !strcasecmp(params[1], u->comment))
+					break;
+			}
 		}
 
 		if (!l || !t || !t->dcc) {
@@ -1301,9 +1310,8 @@ COMMAND(command_dcc)
 			return 0;
 		}
 
-
 		/* XXX wiêcej sprawdzania, zrzucaæ do jakiego¶ $dcc_dir */
-		if (!(t->dcc->file_fd = open(t->filename, O_WRONLY | O_CREAT))) {
+		if ((t->dcc->file_fd = open(t->filename, O_WRONLY | O_CREAT, 0600)) == -1) {
 			my_printf("dcc_get_cant_create", t->filename);
 			gg_free_dcc(t->dcc);
 			list_remove(&transfers, t, 1);
@@ -1311,7 +1319,7 @@ COMMAND(command_dcc)
 			return 0;
 		}
 		
-		my_printf("dcc_get_getting", format_user(t->uin), t->filename);	/* XXX wiêcej informacji */
+		my_printf("dcc_get_getting", format_user(t->uin), t->filename);
 		
 		list_add(&watches, t->dcc, 0);
 
