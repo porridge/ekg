@@ -517,13 +517,8 @@ COMMAND(cmd_find)
 	memset(r, 0, sizeof(*r));
 
 	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
-		/* XXX nie pasuje do nowego wygl±du UI
-		r.uin = (query_nick) ? ((strchr(query_nick, ',')) ? config_uin : get_uin(query_nick)) : config_uin;
+		r->uin = config_uin;
 		id = id * 2;
-		*/
-		free(r);
-		return;
-
 	} else {
 		if (argv[0] && !argv[1] && argv[0][0] == '#') { /* konferencja */
 			query = saprintf("conference --find %s", argv[0]);
