@@ -44,6 +44,7 @@ extern void ui_readline_init();
 #endif
 
 #ifdef WITH_UI_NCURSES
+int config_backlog_size;
 extern void ui_ncurses_init();
 #endif
 

@@ -20,6 +20,8 @@
 #ifndef __XMALLOC_H
 #define __XMALLOC_H
 
+#define xnew(t) (xcalloc(1, sizeof(t)))
+
 void ekg_oom_handler();
 
 void *xcalloc(int nmemb, int size);

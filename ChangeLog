@@ -9,6 +9,18 @@ zg³osi³ b³±d.
 // 2002-12-14
 
 - kosmetyka, ,,help /komenda'' te¿ zadzia³a (sz)
+- du¿a reorganizacja ui-ncurses. mog± wyst±piæ drobne problemy, ale stara³em
+  siê przetestowaæ wszystkie mo¿liwe dziwne sytuacje (w)
+- dodanie zmiennej backlog_size, nie bêdzie siê powiêksza³ w nieskoñczono¶æ,
+  jak to mia³o miejsce poprzednio (w)
+- dodanie pi±tego parametru liczbowego do ,,/window new'', który mówi, z
+  której strony maj± byæ umieszczone ramki. mapa bitowa: 1 - lewo, 2 - góra,
+  4 - prawo, 8 - dó³. wszystkie ramki to oczywi¶cie 15 (w)
+- ponowne zawijanie tekstu po zmianie rozmiaru okna (chocia¿by przez w³±czenie
+  lub wy³±czenie listy kontaktów). niestety nie jest jeszcze optymalne, bo
+  po wy¶wietleniu ka¿dej linii analizuje ca³y bufor od nowa, ale nie chcia³em
+  zwlekaæ z commitem. w ka¿dym razie, dziêki temu p³ywaj±ce okienka maj±
+  w koñcu sens (w)
 
 // 2002-12-13
 

@@ -178,7 +178,7 @@ COMMAND(cmd_add)
 
 	if (params[2]) {
 		params++;
-		cmd_modify("add", params);
+		cmd_modify("add", params, NULL);
 	}
 }
 
@@ -374,8 +374,8 @@ COMMAND(cmd_connect)
 		} else
 			print("no_config");
 	} else if (!strcasecmp(name, "reconnect")) {
-		cmd_connect("disconnect", NULL);
-		cmd_connect("connect", NULL);
+		cmd_connect("disconnect", NULL, NULL);
+		cmd_connect("connect", NULL, NULL);
 	} else if (sess) {
 	    	char *tmp = NULL;
 
@@ -494,6 +494,7 @@ COMMAND(cmd_exec)
 		s.id = pid;
 		s.timeout = 60;
 		s.buf = string_init(NULL);
+		s.target = xstrdup(target);
 
 		fcntl(s.fd, F_SETFL, O_NONBLOCK);
 
@@ -1007,7 +1008,7 @@ COMMAND(cmd_list)
 
 		/* list <alias> [opcje] */
 		if (params[1]) {
-			cmd_modify("list", params);
+			cmd_modify("list", params, NULL);
 			return;
 		}
 
@@ -1542,7 +1543,7 @@ COMMAND(cmd_set)
 			{
 				const char *my_params[2] = { (!unset) ? params[0] : params[0] + 1, NULL };
 
-				cmd_set("set-show", my_params);
+				cmd_set("set-show", my_params, NULL);
 				config_changed = 1;
 				last_save = time(NULL);
 				break;
@@ -2425,7 +2426,7 @@ COMMAND(cmd_query)
 	}
 		
 	if (params[0] && params[1])
-		cmd_msg("chat", (const char **)p);
+		cmd_msg("chat", (const char **)p, NULL);
 
 cleanup:
 	for (i = 0; params[i]; i++)
@@ -2554,7 +2555,7 @@ void command_exec(const char *target, const char *xline)
 			const char *params[] = { target, xline, NULL };
 
 			if (strcmp(xline, ""))
-				cmd_msg("chat", params);
+				cmd_msg("chat", params, NULL);
 
 			return;
 		}
@@ -2613,7 +2614,7 @@ void command_exec(const char *target, const char *xline)
 		int len = strlen(last_params);
 
 		par = array_make(p, " \t", len, 1, 1);
-		(last_abbr)(last_name, (const char**) par);
+		(last_abbr)(last_name, (const char**) par, target);
 		array_free(par);
 
 		xfree(line_save);

@@ -126,6 +126,7 @@ struct gg_exec {
 	gg_common_head(struct gg_exec)
 	
 	string_t buf;	/* bufor na stdout procesu */
+	char *target;	/* okno, do którego ma lecieæ wynik */
 };
 
 list_t children;

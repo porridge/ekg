@@ -21,8 +21,8 @@
 #ifndef __COMMANDS_H
 #define __COMMANDS_H
 
-typedef void command_func_t(const char *name, const char **params);
-#define COMMAND(x) void x(const char *name, const char **params)
+#define COMMAND(x) void x(const char *name, const char **params, const char *target)
+typedef COMMAND(command_func_t);
 
 struct command {
 	char *name;

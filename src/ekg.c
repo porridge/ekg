@@ -87,6 +87,9 @@ static void reaper_user3(struct gg_exec *e)
 	if (e->buf)
 		string_free(e->buf, 1);
 
+	if (e->target)
+		xfree(e->target);
+
 	xfree(e);
 }
 
@@ -198,7 +201,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 				if (c->type == GG_SESSION_USER4)
 					check_mail_update(line, 1);
 				else
-					print("exec", line, itoa(c->id));
+					print_window(c->target, 0, "exec", line, itoa(c->id));
 			} else
 				print_window("debug", 0, "debug", line);
 
@@ -215,7 +218,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 				if (c->type == GG_SESSION_USER4)
 					check_mail_update(c->buf->str, 0);
 				else
-					print("exec", c->buf->str, itoa(c->id));
+					print_window(c->target, 0, "exec", c->buf->str, itoa(c->id));
 			} else
 				print_window("debug", 0, "debug", c->buf->str);
 		}

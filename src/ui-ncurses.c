@@ -80,20 +80,49 @@ static void update_statusbar();
 static void binding_add(const char *key, const char *action, int quiet);
 static void binding_delete(const char *key, int quiet);
 
+struct screen_line {
+	int len;
+	char *str;
+	char *attr;
+	char *ts;
+	int ts_len;
+};
+
+enum window_frame_t {
+	WF_LEFT = 1,
+	WF_TOP = 2,
+	WF_RIGHT = 4,
+	WF_BOTTOM = 8,
+	WF_ALL = 15
+};
+
 struct window {
 	WINDOW *window;		/* okno okna */
+
+	int floating;		/* czy p³ywaj±ce? */
+	int frames;		/* informacje o ramkach */
+	int last_update;	/* czas ostatniego uaktualnienia */
+	
 	char *target;		/* nick query albo inna nazwa albo NULL */
-	int lines;		/* ilo¶æ linii okna */
-	int y;			/* aktualna pozycja */
-	int start;		/* od której linii zaczyna siê wy¶wietlanie */
+	
 	int id;			/* numer okna */
 	int act;		/* czy co¶ siê zmieni³o? */
 	int more;		/* pojawi³o siê co¶ poza ekranem */
+
 	char *prompt;		/* sformatowany prompt lub NULL */
 	int prompt_len;		/* d³ugo¶æ prompta lub 0 */
-	int floating;		/* czy p³ywaj±ce? */
-	int pos_x, pos_y;	/* pozycja x,y wzgledem ekranu */
-	int max_x, max_y;	/* maksymalny rozmiar okna */
+
+	int left, top;		/* pozycja (x, y) wzglêdem pocz±tku ekranu */
+	int width, height;	/* wymiary okna */
+
+	fstring_t *backlog;	/* bufor z liniami */
+	int backlog_size;	/* rozmiar backloga */
+
+	int redraw;		/* trzeba przerysowaæ przed wy¶wietleniem */
+
+	int start;		/* od której linii zaczyna siê wy¶wietlanie */
+	int lines_count;	/* ilo¶æ linii ekranowych w backlogu */
+	struct screen_line *lines;	/* linie ekranowe */
 };
 
 static WINDOW *status = NULL;		/* okno stanu */
@@ -117,6 +146,7 @@ static list_t windows = NULL;		/* lista okien */
 static struct window *window_current;	/* wska¼nik na aktualne okno */
 static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 
+int config_backlog_size = 1000;		/* maksymalny rozmiar backloga */
 int config_contacts_size = 8;		/* szeroko¶æ okna kontaktów */
 static int last_contacts_size = 0;	/* poprzedni rozmiar przed zmian± */
 int config_contacts = 0;		/* czy ma byæ okno kontaktów */
@@ -124,13 +154,16 @@ int config_contacts_descr = 0;		/* i czy maj± byæ wy¶wietlane opisy */
 struct binding *binding_map[KEY_MAX + 1];	/* mapa bindowanych klawiszy */
 struct binding *binding_map_meta[KEY_MAX + 1];	/* j.w. z altem */
 
-#define CONTACTS_SIZE ((config_contacts) ? (config_contacts_size + 3) : 0)
+static void window_kill(struct window *w, int quiet);
+static int window_backlog_split(struct window *w, int full);
+static void window_redraw(struct window *w);
+static void window_clear(struct window *w, int full);
+static void window_refresh();
+
+#define CONTACTS_SIZE ((config_contacts) ? (config_contacts_size + 2) : 0)
 
 /* rozmiar okna wy¶wietlaj±cego tekst */
-#define output_size (stdscr->_maxy - input_size)
-
-/* rozmiar okna wy¶wietlaj±cego tekst - po uwzglêdnieniu przesuniêcia */
-#define output_size2(w) (stdscr->_maxy - input_size - w->pos_y)
+#define OUTPUT_SIZE (stdscr->_maxy - input_size)
 
 /*
  * ui_debug()
@@ -144,20 +177,281 @@ struct binding *binding_map_meta[KEY_MAX + 1];	/* j.w. z altem */
 }
 
 /*
- * set_cursor()
+ * window_backlog_add()
  *
- * ustawia kursor na pocz±ktu kolejnej linii okna.
+ * dodaje do bufora okna. zak³adamy dodawanie linii ju¿ podzielonych.
+ * je¶li doda siê do backloga liniê zawieraj±c± '\n', bêdzie ¼le.
+ *
+ *  - w - wska¼nik na okno ekg
+ *  - str - linijka do dodania
+ *
+ * zwraca rozmiar dodanej linii w liniach ekranowych.
  */
-static void set_cursor(struct window *w)
+int window_backlog_add(struct window *w, fstring_t str)
 {
-	if (w->y == w->lines) {
-		/* TODO: braæ wg. w->max_y */
-		if (w->start == w->lines - output_size2(w))
-			w->start++;
-		wresize(w->window, w->y + 1, w->window->_maxx + 1);
-		w->lines++;
+	if (!w)
+		return 0;
+
+	if (w->backlog_size == config_backlog_size) {
+		fstring_t fs = w->backlog[w->backlog_size - 1];
+
+		xfree(fs->str);
+		xfree(fs->attr);
+		xfree(fs);
+
+		w->backlog_size--;
+	} else 
+		w->backlog = xrealloc(w->backlog, (w->backlog_size + 1) * sizeof(fstring_t));
+
+	memmove(&w->backlog[1], &w->backlog[0], w->backlog_size * sizeof(fstring_t));
+	w->backlog[0] = str;
+	w->backlog_size++;
+
+	return window_backlog_split(w, 0);
+}
+
+/*
+ * window_backlog_split()
+ *
+ * dzieli linie tekstu w buforze na linie ekranowe.
+ * TODO: optymalizacja, dzielenie tylko tego, co zosta³o ostatnio dodane.
+ *
+ *  - w - okno do podzielenia
+ *  - full - czy robimy pe³ne uaktualnienie?
+ *
+ * zwraca rozmiar w liniach ekranowych ostatnio dodanej linii.
+ */
+int window_backlog_split(struct window *w, int full)
+{
+	int i, res = 0, bottom = 0;
+
+	if (!w)
+		return 0;
+
+	if (full && w->start == w->lines_count - w->height)
+		bottom = 1;
+	
+	for (i = 0; i < w->lines_count; i++)
+		xfree(w->lines[i].ts);
+	w->lines_count = 0;
+	xfree(w->lines);
+	w->lines = NULL;
+
+	for (i = w->backlog_size - 1; i >= 0; i--) {
+		struct screen_line *l;
+		char *str, *attr;
+		time_t ts;
+		int j;
+
+		str = w->backlog[i]->str;
+		attr = w->backlog[i]->attr;
+		ts = w->backlog[i]->ts;
+
+		for (;;) {
+			int word = 0, width;
+
+			if (!i)
+				res++;
+
+			w->lines_count++;
+			w->lines = xrealloc(w->lines, w->lines_count * sizeof(struct screen_line));
+			l = &w->lines[w->lines_count - 1];
+
+			l->str = str;
+			l->attr = attr;
+			l->len = strlen(str);
+			l->ts = NULL;
+			l->ts_len = 0;
+
+			if (!w->floating && config_timestamp) {
+				struct tm *tm = localtime(&ts);
+				char buf[100];
+				strftime(buf, sizeof(buf), config_timestamp, tm);
+				l->ts = xstrdup(buf);
+				l->ts_len = strlen(l->ts);
+			}
+
+			width = w->width - l->ts_len;
+			if ((w->frames & WF_LEFT))
+				width -= 2;
+			if ((w->frames & WF_RIGHT))
+				width -= 2;
+
+			if (l->len < width)
+				break;
+			
+			for (j = 0, word = 0; j < l->len; j++) {
+
+				if (str[j] == ' ')
+					word = j;
+
+				if (j == width - 1) {
+					l->len = (word) ? word : (width - 1);
+					break;
+				}
+			}
+
+			str += l->len + 1;
+			attr += l->len + 1;
+
+			if (!str[0])
+				break;
+		}
 	}
-	wmove(w->window, w->y, 0);
+
+	if (bottom) {
+		w->start = w->lines_count - w->height;
+		if (w->start < 0)
+			w->start = 0;
+	}
+
+	if (full) {
+		if (window_current->id == w->id) 
+			window_redraw(w);
+		else
+			w->redraw = 1;
+	}
+
+	return res;
+}
+
+/*
+ * window_redraw()
+ *
+ * przerysowuje zawarto¶æ okienka.
+ *
+ *  - w - okno
+ */
+void window_redraw(struct window *w)
+{
+	int x, y, left = 0, top = 0, height = w->height;
+	
+	werase(w->window);
+	wattrset(w->window, COLOR_PAIR(4));
+
+	if (w->floating) {
+		if ((w->frames & WF_LEFT)) {
+			left += 2;
+
+			for (y = 0; y < w->height; y++)
+				mvwaddch(w->window, y, 0, ACS_VLINE);
+		}
+
+		if ((w->frames & WF_RIGHT)) {
+			for (y = 0; y < w->height; y++)
+				mvwaddch(w->window, y, w->width - 1, ACS_VLINE);
+		}
+			
+		if ((w->frames & WF_TOP)) {
+			top++;
+			height--;
+
+			for (x = 0; x < w->width; x++)
+				mvwaddch(w->window, 0, x, ACS_HLINE);
+		}
+
+		if ((w->frames & WF_BOTTOM)) {
+			height--;
+
+			for (x = 0; x < w->width; x++)
+				mvwaddch(w->window, w->height - 1, x, ACS_HLINE);
+		}
+
+		if ((w->frames & WF_LEFT) && (w->frames & WF_TOP))
+			mvwaddch(w->window, 0, 0, ACS_ULCORNER);
+
+		if ((w->frames & WF_RIGHT) && (w->frames & WF_TOP))
+			mvwaddch(w->window, 0, w->width - 1, ACS_URCORNER);
+
+		if ((w->frames & WF_LEFT) && (w->frames & WF_BOTTOM))
+			mvwaddch(w->window, w->height - 1, 0, ACS_LLCORNER);
+
+		if ((w->frames & WF_RIGHT) && (w->frames & WF_BOTTOM))
+			mvwaddch(w->window, w->height - 1, w->width - 1, ACS_LRCORNER);
+	}
+
+	for (y = 0; y < height && w->start + y < w->lines_count; y++) {
+		struct screen_line *l = &w->lines[w->start + y];
+
+		wattrset(w->window, A_NORMAL);
+
+		for (x = 0; l->ts && x < l->ts_len; x++)
+			mvwaddch(w->window, top + y, left + x, (unsigned char) l->ts[x]);
+
+		for (x = 0; x < l->len; x++) {
+			int attr = A_NORMAL;
+			unsigned char ch = l->str[x];
+
+			if ((l->attr[x] & 64))
+				attr |= A_BOLD;
+
+			if (!(l->attr[x] & 128)) {
+				int tmp = l->attr[x] & 7;
+
+				attr |= COLOR_PAIR((tmp) ? tmp : 16);
+			}
+
+			if (ch < 32) {
+				ch += 64;
+				attr |= A_REVERSE;
+			}
+
+			if (ch > 127 && ch < 160) {
+				ch = '?';
+				attr |= A_REVERSE;
+			}
+
+			wattrset(w->window, attr);
+
+			mvwaddch(w->window, top + y, left + x + l->ts_len, ch);
+		}
+	}
+
+	w->redraw = 0;
+}
+
+/*
+ * window_clear()
+ *
+ * czy¶ci zawarto¶æ okna.
+ */
+static void window_clear(struct window *w, int full)
+{
+	if (!full) {
+		w->start = w->lines_count;
+		w->redraw = 1;
+		return;
+	}
+
+	if (w->backlog) {
+		int i;
+
+		for (i = 0; i < w->backlog_size; i++) {
+			xfree(w->backlog[i]->str);
+			xfree(w->backlog[i]->attr);
+			xfree(w->backlog[i]);
+		}
+
+		xfree(w->backlog);
+
+		w->backlog = NULL;
+		w->backlog_size = 0;
+	}
+
+	if (w->lines) {
+		int i;
+
+		for (i = 0; i < w->lines_count; i++)
+			xfree(w->lines[i].ts);
+		
+		xfree(w->lines);
+
+		w->lines = NULL;
+		w->lines_count = 0;
+	}
+
+	w->start = 0;
+	w->redraw = 1;
 }
 
 /*
@@ -188,7 +482,7 @@ static struct window *window_find(const char *target)
 /*
  * window_floating_update()
  *
- * uaktualnia zawartosc okna o id == n
+ * uaktualnia zawarto¶æ p³ywaj±cego okna o id == n
  * lub wszystkich okienek, gdy n == 0.
  */
 static void window_floating_update(int n)
@@ -196,52 +490,33 @@ static void window_floating_update(int n)
 	list_t l;
 
 	for (l = windows; l; l = l->next) {
-		struct window *w = l->data, *old;
+		struct window *w = l->data, *tmp;
 
 		if (n && (w->id != n))
 			continue;
 
-		if (w->floating && w->prompt) {
-			werase(w->window);
-			w->y = 0;
-			old = window_current;
-			window_current = w;	/* YYY */
-			command_exec(w->target, w->prompt);
-			window_current = old;
-			/* niech bedzie na tyle male, na ile mozna: */
-			if (w->y > w->max_y)
-				w->y = w->max_y - 1;
-			wresize(w->window, w->y + 1, w->max_x + 1);
-		}
+		if (!w->floating || !w->prompt)
+			continue;
+
+		if (w->last_update == time(NULL))
+			continue;
+
+		w->last_update = time(NULL);
+
+		window_clear(w, 1);
+		tmp = window_current;
+		window_current = w;
+		command_exec(w->target, w->prompt);
+		window_current = tmp;
+
+		window_redraw(w);
 	}
 }
-
-/*
- * window_floating_refresh()
- *
- * od¶wie¿a p³ywaj±ce okienka.
- * powinno byæ wywo³ane po window_refresh()
- */
-static void window_floating_refresh()
-{
-	list_t l;
-
-	window_floating_update(0); /* chwilowo, zeby dzialalo */
-
-	for (l = windows; l; l = l->next) {
-		struct window *w = l->data;
-
-		if (w->floating)
-			wnoutrefresh(w->window);
-	}
-}
-
 
 /*
  * window_refresh()
  *
- * ncursesowo ustawia do wy¶wietlenia aktualnie wybrane okienko, a resztê
- * ucina, ¿eby siê schowa³y.
+ * wnoutrefresh()uje aktualnie wy¶wietlane okienko.
  */
 static void window_refresh()
 {
@@ -250,23 +525,31 @@ static void window_refresh()
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
 
-		if (w->floating)
+		if (w->floating || window_current->id != w->id)
 			continue;
 
-		/* TODO: braæ na podstawie max_y i max_x */
-		if (window_current->id == w->id)
-			pnoutrefresh(w->window, w->start, 0, w->pos_y, w->pos_x, output_size - 1, stdscr->_maxx - CONTACTS_SIZE + 1);
-		else
-			pnoutrefresh(w->window, 0, 0, 0, 81, 0, 0);
+		if (w->redraw)
+			window_redraw(w);
+
+		wnoutrefresh(w->window);
 	}
+
+	window_floating_update(0);	/* XXX chwilowo, ¿eby dzia³a³o */
 	
-	window_floating_refresh();
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data;
+
+		if (!w->floating)
+			continue;
+
+		touchwin(w->window);
+		wnoutrefresh(w->window);
+	}
 	
 	mvwin(status, stdscr->_maxy - input_size, 0);
 	wresize(input, input_size, input->_maxx + 1);
 	mvwin(input, stdscr->_maxy - input_size + 1, 0);
 }
-
 
 /*
  * window_switch()
@@ -280,25 +563,31 @@ static void window_switch(int id)
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
 
-		if (id == w->id) {
+		if (id != w->id)
+			continue;
 
-			if (!w->floating)
-				window_current = w;
+		if (!w->floating)
+			window_current = w;
 
-			w->act = 0;
+		w->act = 0;
+		
+		if (w->redraw)
+			window_redraw(w);
 
-			window_refresh();
+		if (w->floating)
+			window_floating_update(id);
 
-			if (w->floating)
-				window_floating_update(id);
-			if (contacts)
-				wnoutrefresh(contacts);
-			wnoutrefresh(status);
-			wnoutrefresh(input);
-			doupdate();
-			update_statusbar();
-			return;
-		}
+		touchwin(w->window);
+		window_refresh();
+
+		if (contacts)
+			wnoutrefresh(contacts);
+		wnoutrefresh(status);
+		wnoutrefresh(input);
+		doupdate();
+		update_statusbar();
+
+		break;
 	}
 }
 
@@ -327,12 +616,6 @@ static struct window *window_new(const char *target, int new_id)
 	struct window w;
 	list_t l;
 	int id = 1, done = 0;
-	int z;
-
-#if 0
-	if (target && *target == '*')
-		id = 100;	/* XXX */
-#endif
 
 	while (!done) {
 		done = 1;
@@ -358,7 +641,8 @@ static struct window *window_new(const char *target, int new_id)
 
 	if (target) {
 		if (*target == '*') {
-			char *tmp = index(target, '/'), *end = NULL;
+			char *tmp = index(target, '/');
+			char **argv;
 			
 			w.floating = 1;
 			
@@ -369,22 +653,21 @@ static struct window *window_new(const char *target, int new_id)
  			w.prompt_len = strlen(w.prompt);
 
 			tmp = w.target + 1;
-			
-			if ((z = strtoul(tmp, &end, 10)) > 0) {
-				w.pos_x = z;
-				tmp = end;
-				if ((*tmp++ == ',') && ((z = strtoul(tmp, &end, 10)) > 0)) {
-					w.pos_y = z;
-					tmp = end;
-					if ((*tmp++ == ',') && ((z = strtoul(tmp, &end, 10)) > 0)) {
-						w.max_x = z;
-						tmp = end;
-						if ((*tmp++ == ',') && ((z = strtoul(tmp, &end, 10)) > 0))
-							w.max_y = z;
-					}
-				}
-			}
 
+			argv = array_make(w.target + 1, ",", 5, 0, 0);
+
+			if (argv[0])
+				w.left = atoi(argv[0]);
+			if (argv[0] && argv[1])
+				w.top = atoi(argv[1]);
+			if (argv[0] && argv[1] && argv[2])
+				w.width = atoi(argv[2]);
+			if (argv[0] && argv[1] && argv[2] && argv[3])
+				w.height = atoi(argv[3]);
+			if (argv[0] && argv[1] && argv[2] && argv[3] && argv[4] && argv[4][0] != '/')
+				w.frames = atoi(argv[4]);
+
+			array_free(argv);
 		} else {
 			w.prompt = format_string(format_find("ncurses_prompt_query"), target);
 			w.prompt_len = strlen(w.prompt);
@@ -399,59 +682,27 @@ static struct window *window_new(const char *target, int new_id)
 	}
 
 	/* sprawdzamy wspó³rzêdne */
-	if (w.pos_x > stdscr->_maxx)
-		w.pos_x = 0;
-	if (w.pos_y > stdscr->_maxy)
-		w.pos_y = 0;
-	if (!w.max_y)
-		w.max_y = w.lines = stdscr->_maxy - 1 - w.pos_y;
- 	if (!w.max_x)
-		w.max_x = stdscr->_maxx + 1;
-	if (w.pos_x + w.max_x > stdscr->_maxx)
-		w.max_x = stdscr->_maxx - w.pos_x - 1;
-	if (w.pos_y + w.max_y > stdscr->_maxy)
-		w.max_y = stdscr->_maxy - w.pos_y - 1;
-	
- 	w.window = (w.floating) ? newwin(w.max_y, w.max_x, w.pos_y, w.pos_x) : newpad(w.max_y, w.max_x);
+	if (w.left > stdscr->_maxx)
+		w.left = 0;
+	if (w.top > stdscr->_maxy)
+		w.top = 0;
+	if (!w.height)
+		w.height = OUTPUT_SIZE;
+ 	if (!w.width)
+		w.width = stdscr->_maxx + 1 - CONTACTS_SIZE;
+	if (w.left + w.width > stdscr->_maxx + 1)
+		w.width = stdscr->_maxx + 1 - w.left;
+	if (w.top + w.height > stdscr->_maxy + 1)
+		w.height = stdscr->_maxy + 1 - w.top;
+
+#if 0
+	if (windows)
+		ui_debug("(new %d,%d,%d,%d,%d,%d)\n", w.floating, w.frames, w.left, w.top, w.width, w.height);
+#endif
+
+ 	w.window = newwin(w.height, w.width, w.top, w.left);
  
 	return list_add_sorted(&windows, &w, sizeof(w), window_new_compare);
-}
-
-/*
- * print_timestamp()
- *
- * wy¶wietla timestamp na pocz±tku linii, je¶li trzeba.
- */
-static int print_timestamp(struct window *w)
-{
-	struct tm *tm;
-	char buf[80];
-	time_t t;
-	int i, x = 0, attr, pair;
-
-	if (!config_timestamp || w->floating) {
-		set_cursor(w);
-		return 0;
-	}
-
-	t = time(NULL);
-	tm = localtime(&t);
-	strftime(buf, sizeof(buf), config_timestamp, tm);
-
-	wattr_get(w->window, &attr, &pair, NULL);
-
-	wattrset(w->window, A_NORMAL);
-
-	set_cursor(w);
-
-	for (i = 0; i < strlen(buf); i++) {
-		waddch(w->window, (unsigned char) buf[i]);
-		x++;
-	}
-
-	wattrset(w->window, COLOR_PAIR(pair) | attr);
-
-	return x;
 }
 
 /*
@@ -462,11 +713,12 @@ static int print_timestamp(struct window *w)
 static void ui_ncurses_print(const char *target, int separate, const char *line)
 {
 	struct window *w;
-	const char *p;
-	int x = 0, count = 0, attr = A_NORMAL;
-	string_t s = NULL;
+	fstring_t fs;
 	list_t l;
-	
+	int count = 0, bottom = 0;
+	char *lines, *lines_save, *line2;
+	string_t speech = NULL;
+
 	switch (config_make_window) {
 		case 1:
 			if ((w = window_find(target)))
@@ -519,103 +771,32 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	}
 
 	if (config_speech_app)
-		s = string_init(NULL);
-
-	for (p = line; *p; p++) {
-		if (*p == 27) {
-			p++;
-			if (*p == '[') {
-				char *q;
-				int a1, a2 = -1;
-				p++;
-				a1 = strtol(p, &q, 10);
-				p = q;
-				if (*p == ';') {
-					p++;
-					a2 = strtol(p, &q, 10);
-					p = q;
-				}
-				if (a2 == 30)
-					a2 += 16;
-				if (*p == 'm' && config_display_color) {
-					if (a1 == 0 && a2 == -1)
-						attr = COLOR_PAIR(7);
-					else if (a1 == 1 && a2 == -1)
-						attr = COLOR_PAIR(7) | A_BOLD;
-					else if (a2 == -1)
-						attr = COLOR_PAIR(a1 - 30);
-					else
-						attr = COLOR_PAIR(a2 - 30) | ((a1) ? A_BOLD : A_NORMAL);
-				}
-				if (*p == 'm' && !config_display_color)
-					attr = (a1 == 1) ? A_BOLD : A_NORMAL;
-			} else {
-				while (*p && ((*p >= '0' && *p <= '9') || *p == ';'))
-					p++;
-				p++;
-			}
-		} else if (*p == 10) {
-			
-			if (config_speech_app)
-				string_append_c(s, *p);
-			
-			if (!*(p + 1))
-				break;
-			w->y++;
-			
-			x = print_timestamp(w);
-			
-		} else {
-			unsigned char ch;
-
-			if (config_speech_app)
-				string_append_c(s, *p);
-		    			
-			if (!x)
-				x += print_timestamp(w);
-		     
-			wattrset(w->window, attr);
-			
-			ch = *p;
-
-			if (ch < 32) {
-				wattrset(w->window, attr ^ A_REVERSE);
-				ch += 64;
-			}
-
-			if (ch >= 128 && ch < 160) {
-				wattrset(w->window, attr ^ A_REVERSE);
-				ch = '?';
-			}
-
-			waddch(w->window, ch);
-
-			count++;
-			x++;
-			if (x == stdscr->_maxx - CONTACTS_SIZE + 1) {
-				if (*(p + 1) == 10) 
-					p++;
-				else
-					w->y++;
-				set_cursor(w);
-				x = 4;
-				wmove(w->window, w->y, x);
-			}
-		}
-	}
-
-	if (!count) {
-		print_timestamp(w);
-		set_cursor(w);
-	}
-
-	w->y++;
-
-	if (w->lines - w->start > output_size2(w))
-		w->more = 1;
+		speech = string_init(NULL);
 	
+	if (w->start == w->lines_count - w->height)
+		bottom = 1;
+
+	/* XXX wyrzuciæ dzielenie na linie z ekg */
+	lines = lines_save = xstrdup(line);
+	while ((line2 = gg_get_line(&lines))) {
+		fs = reformat_string(line2);
+		fs->ts = time(NULL);
+		if (config_speech_app) {
+			string_append(speech, fs->str);
+			string_append_c(speech, '\n');
+		}
+		count += window_backlog_add(w, fs);
+	}
+	xfree(lines_save);
+
+	if (bottom)
+		w->start = w->lines_count - w->height;
+	
+	if (w->start - w->lines_count > w->height)
+		w->more = 1;
+
 	if (!w->floating) {
-		/* gdy piszemy do p³ywaj±cego nie od¶wie¿amy */
+		window_redraw(w);
 		window_refresh();
 		if (contacts)
 			wnoutrefresh(contacts);
@@ -631,11 +812,11 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 		xfree(tmp);
 
 		if (f) {
-			fprintf(f, "%s.", s->str);
+			fprintf(f, "%s.", speech->str);
 			fclose(f);
 		}
 
-		string_free(s, 1);
+		string_free(speech, 1);
 	}
 }
 
@@ -751,6 +932,8 @@ static void update_contacts()
  */
 void contacts_rebuild()
 {
+	list_t l;
+
 	/* nie jeste¶my w ncurses */
 	if (!windows)
 		return;
@@ -765,6 +948,20 @@ void contacts_rebuild()
 
 		last_contacts_size = 0;
 
+		for (l = windows; l; l = l->next) {
+			struct window *w = l->data;
+
+			if (w->floating)
+				continue;
+
+			w->width = stdscr->_maxx + 1;
+			wresize(w->window, w->height, w->width);
+			window_backlog_split(w, 1);
+		}
+
+		window_refresh();
+		doupdate();
+
 		return;
 	}
 
@@ -776,8 +973,20 @@ void contacts_rebuild()
 	if (contacts)
 		delwin(contacts);
 	
-	contacts = newwin(output_size, config_contacts_size + 2, 0, stdscr->_maxx - config_contacts_size - 1);
+	contacts = newwin(OUTPUT_SIZE, config_contacts_size + 2, 0, stdscr->_maxx - config_contacts_size - 1);
 
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data;
+
+		if (w->floating)
+			continue;
+
+		w->width = stdscr->_maxx + 1 - CONTACTS_SIZE;
+		wresize(w->window, w->height, w->width);
+		window_backlog_split(w, 1);
+	}
+
+	window_refresh();
 	update_contacts();
 	doupdate();
 }
@@ -1162,12 +1371,12 @@ static void ui_ncurses_deinit()
 		config_windows_layout = string_free(s, 0);
 	}
 
-	for (l = windows; l; l = l->next) {
+	for (l = windows; l; ) {
 		struct window *w = l->data;
 
-		xfree(w->target);
-		xfree(w->prompt);
-		delwin(w->window);
+		l = l->next;
+
+		window_kill(w, 1);
 	}
 
 	list_destroy(windows, 1);
@@ -1639,16 +1848,32 @@ static void update_input()
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
 
-		if (input_size == 5 && w->lines - w->start == output_size2(w) + 4)
-			w->start += 4;
+		if (input_size == 5) {
+			if (w->lines_count - w->start == w->height) {
+				w->start += 4;
+				if (w->start > w->lines_count)
+					w->start = w->lines_count;
+			}
+			w->height -= 4;
+		}
 
-		if (input_size == 1 && w->lines - w->start == output_size2(w) - 4)
-			w->start -= 4;
+		if (input_size == 1) {
+			if (w->lines_count - w->start == w->height) {
+				w->start -= 4;
+				if (w->start < 0)
+					w->start = 0;
+			}
+			w->height += 4;
+		}
+
+		w->redraw = 1;
 	}
 
+	window_redraw(window_current);
+	touchwin(window_current->window);
 	window_refresh();
 	if (contacts) {
-		wresize(contacts, output_size, contacts->_maxx + 1);
+		wresize(contacts, OUTPUT_SIZE, contacts->_maxx + 1);
 		update_contacts();
 	}
 	wnoutrefresh(status);
@@ -1753,10 +1978,12 @@ static void ui_ncurses_loop()
 				}
 
 				if (ch == 13) {		/* Ctrl-Enter */
-					if (input_size == 1)
+					if (input_size == 1) {
 						input_size = 5;
-					else {
+						update_input();
+					} else {
 						string_t s = string_init("");
+						char *tmp;
 						int i;
 						
 						for (i = 0; lines[i]; i++) {
@@ -1768,14 +1995,15 @@ static void ui_ncurses_loop()
 						}
 
 						line = string_free(s, 0);
+						tmp = xstrdup(line);
 						history[0] = line;
 
-						command_exec(window_current->target, line);
-
 						input_size = 1;
+						update_input();
+
+						command_exec(window_current->target, tmp);
+						xfree(tmp);
 					}
-					
-					update_input();
 				}
 
 				if (ch == 27 && input_size == 5) {  /* Esc */
@@ -2060,22 +2288,28 @@ static void ui_ncurses_loop()
 				
 			case KEY_PPAGE:	/* Page Up */
 			case 'F' - 64:	/* Ctrl-F */
-				window_current->start -= output_size2(window_current);
+				window_current->start -= window_current->height;
 				if (window_current->start < 0)
 					window_current->start = 0;
+				window_redraw(window_current);
 
 				break;
 
 			case KEY_NPAGE:	/* Page Down */
 			case 'G' - 64:	/* Ctrl-G */
-				window_current->start += output_size2(window_current);
-				if (window_current->start > window_current->lines - output_size2(window_current))
-					window_current->start = window_current->lines - output_size2(window_current);
+				window_current->start += window_current->height;
 
-				if (window_current->start == window_current->lines - output_size2(window_current)) {
+				if (window_current->start > window_current->lines_count - window_current->height)
+					window_current->start = window_current->lines_count - window_current->height;
+
+				if (window_current->start < 0)
+					window_current->start = 0;
+
+				if (window_current->start == window_current->lines_count - window_current->height) {
 					window_current->more = 0;
 					update_statusbar();
 				}
+				window_redraw(window_current);
 
 				break;
 				
@@ -2198,9 +2432,12 @@ static void window_prev()
  *
  * usuwa podane okno.
  */
-static void window_kill(struct window *w)
+void window_kill(struct window *w, int quiet)
 {
 	int id = w->id;
+
+	if (quiet) 
+		goto cleanup;
 
 	if (id == 1 && w->target) {
 		print("query_finished", window_current->target);
@@ -2229,8 +2466,31 @@ static void window_kill(struct window *w)
 				w->id--;
 		}
 	}
+
+cleanup:
+	if (w->backlog) {
+		int i;
+
+		for (i = 0; i < w->backlog_size; i++) {
+			xfree(w->backlog[i]->str);
+			xfree(w->backlog[i]->attr);
+			xfree(w->backlog[i]);
+		}
+
+		xfree(w->backlog);
+	}
+
+	if (w->lines) {
+		int i;
+
+		for (i = 0; i < w->lines_count; i++)
+			xfree(w->lines[i].ts);
+		
+		xfree(w->lines);
+	}
 		
 	xfree(w->target);
+	xfree(w->prompt);
 	delwin(w->window);
 	list_remove(&windows, w, 1);
 }
@@ -2391,6 +2651,40 @@ static int ui_ncurses_event(const char *event, ...)
 				struct window *w = l->data;
 				
 				w->id = id++;
+			}
+		}
+
+		if (!strcasecmp(name, "timestamp")) {
+			list_t l;
+
+			for (l = windows; l; l = l->next) {
+				struct window *w = l->data;
+				
+				window_backlog_split(w, 1);
+			}
+		}
+
+		if (!strcasecmp(name, "backlog_size")) {
+			list_t l;
+
+			for (l = windows; l; l = l->next) {
+				struct window *w = l->data;
+				int i;
+				
+				if (w->backlog_size <= config_backlog_size)
+					continue;
+				
+				for (i = config_backlog_size; i < w->backlog_size; i++) {
+					xfree(w->backlog[i]->str);
+					xfree(w->backlog[i]->attr);
+					xfree(w->backlog[i]);
+				}
+
+				w->backlog_size = config_backlog_size;
+
+				w->backlog = xrealloc(w->backlog, w->backlog_size * sizeof(fstring_t));
+
+				window_backlog_split(w, 1);
 			}
 		}
 	}
@@ -2578,7 +2872,8 @@ static int ui_ncurses_event(const char *event, ...)
 					}
 				}
 
-				window_kill(w);
+				window_kill(w, 0);
+				window_switch(window_current->id);
 				goto cleanup;
 			}
 
@@ -2593,115 +2888,106 @@ static int ui_ncurses_event(const char *event, ...)
 			}
 			
 			if (!strcasecmp(p1, "move")) {
-				struct window *w = window_current;
-				char *end = NULL, *tmp = NULL;
+				struct window *w = NULL;
+				char **argv;
 				list_t l;
-				int x;
 
 				if (!p2) {
 					print("not_enough_params", "window");
 					goto cleanup;
 				}
 
-				if ((x = strtoul(p2, &end, 10)) <= 0) {
-					/* ?? */
-				}
-					
-				for (w = NULL, l = windows; l; l = l->next) {
-					struct window *ww = l->data;
+				argv = array_make(p2, " ,", 3, 0, 0);
 
-					if (ww->id == x) {
-						w = ww;
+				if (array_count(argv) < 3) {
+					print("not_enough_params", "window");
+					array_free(argv);
+					goto cleanup;
+				}
+
+				for (l = windows; l; l = l->next) {
+					struct window *v = l->data;
+
+					if (v->id == atoi(argv[0])) {
+						w = v;
 						break;
 					}
 				}
 
-				if (!end || *end != ',') {
-					/* ?? */
+				if (!w) {
+					print("window_noexist");
+					array_free(argv);
 					goto cleanup;
 				}
-					
-				tmp = end + 1;
-				end = NULL;
-				if ((x = strtoul(tmp, &end, 10)) >= 0)
-					w->pos_x = x;
-				
-				if (!end || *end != ',') {
-					/* ?? */
-					goto cleanup;
-				}
-				
-				tmp = end + 1;
-				end = NULL;
-				
-				if ((x = strtoul(tmp, &end, 10)) >= 0)
-					w->pos_y = x;
 
+				w->left = atoi(argv[1]);
+				w->top = atoi(argv[2]);
+
+				array_free(argv);
+					
+				if (w->left + w->width > stdscr->_maxx + 1)
+					w->left = stdscr->_maxx + 1 - w->width;
+				
+				if (w->top + w->height > stdscr->_maxy + 1)
+					w->top = OUTPUT_SIZE - w->height;
+				
 				if (w->floating)
-					mvwin(w->window, w->pos_y, w->pos_x);
-				else {
-					w->lines = stdscr->_maxy - 1 - w->pos_y;
-					if (w->y > w->lines) w->start = w->y - w->lines;
-					/* TODO: czyszczenie screen'a */
-				}
-				 					
+					mvwin(w->window, w->top, w->left);
+
+				touchwin(window_current->window);
+				window_refresh();
+				doupdate();
+
 				goto cleanup;
 			}
 
 			if (!strcasecmp(p1, "resize")) {
-				struct window *w = window_current;
-				char *end = NULL, *tmp = NULL;
+				struct window *w = NULL;
+				char **argv;
 				list_t l;
-				int x;
 
 				if (!p2) {
 					print("not_enough_params", "window");
 					goto cleanup;
 				}
 
-				if ((x = strtoul(p2, &end, 10)) <= 0) {
-					/* ?? */
-				}
-					
-				for (w = NULL, l = windows; l; l = l->next) {
-					struct window *ww = l->data;
+				argv = array_make(p2, " ,", 3, 0, 0);
 
-					if (ww->id == x) {
-						w = ww;
+				if (array_count(argv) < 3) {
+					print("not_enough_params", "window");
+					array_free(argv);
+					goto cleanup;
+				}
+
+				for (l = windows; l; l = l->next) {
+					struct window *v = l->data;
+
+					if (v->id == atoi(argv[0])) {
+						w = v;
 						break;
 					}
 				}
 
-				if (!end || *end != ',') {
-					/* ?? */
+				if (!w) {
+					print("window_noexist");
+					array_free(argv);
 					goto cleanup;
 				}
-					
-				tmp = end + 1;
-				end = NULL;
-				if ((x = strtoul(tmp, &end, 10)) >= 0)
-					w->max_x = x;
-				
-				if (!end || *end != ',') {
-					/* ?? */
-					goto cleanup;
-				}
-				
-				tmp = end + 1;
-				end = NULL;
-				
-				if ((x = strtoul(tmp, &end, 10)) >= 0)
-					w->max_y = x;
 
-				if (!w->floating) {
-					w->lines = w->max_y - w->pos_y;
-					if (w->y > w->lines) w->start = w->y - w->lines;
-					/* TODO: czyszczenie screen'a */
+				w->width = atoi(argv[1]);
+				w->height = atoi(argv[2]);
+
+				array_free(argv);
+					
+				if (w->floating) {
+					window_backlog_split(w, 1);
+					touchwin(window_current->window);
+					window_refresh();
+					doupdate();
 				}
-				 					
+
 				goto cleanup;
 			}
-
 			
 			if (!strcasecmp(p1, "refresh")) {
 				window_floating_update(0);
@@ -2710,16 +2996,8 @@ static int ui_ncurses_event(const char *event, ...)
 			}
 
 			if (!strcasecmp(p1, "clear")) {
-				struct window *w = window_current;
-				int count = output_size2(w) - (w->lines - w->y);
-				
-				w->lines += count;
-				w->start += count;
-				
-				wresize(w->window, w->lines, w->window->_maxx + 1);
-				wmove(w->window, w->y, 0);
+				window_clear(window_current, 0);
 
-				window_refresh();
 				if (contacts)
 					wnoutrefresh(contacts);
 				wnoutrefresh(input);

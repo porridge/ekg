@@ -28,6 +28,14 @@ struct format {
 	char *value;
 };
 
+struct fstring_s {
+	char *str;	/* znaki */
+	char *attr;	/* atrybuty */
+	int ts;		/* timestamp */
+};
+
+typedef struct fstring_s *fstring_t;
+
 list_t formats;
 
 void print(const char *theme, ...);
@@ -46,5 +54,7 @@ void theme_cache_reset();
 void theme_free();
 
 extern int automaton_color_escapes;
+
+fstring_t reformat_string(const char *str);
 
 #endif /* __THEMES_H */

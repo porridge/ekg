@@ -380,6 +380,96 @@ char *va_format_string(const char *format, va_list ap)
 }
 
 /*
+ * reformat_string()
+ *
+ * zamienia sformatowany ci±g znaków ansi na Nowy-i-Lepszy(tm).
+ *
+ *  - str - ci±g znaków,
+ * 
+ * zwraca zaalokowan± fstring_t.
+ */
+fstring_t reformat_string(const char *str)
+{
+	fstring_t res = xnew(struct fstring_s);
+	unsigned char attr = 128;
+	int i, j, len = 0;
+	
+	for (i = 0; str[i]; i++) {
+		if (str[i] == 27) {
+			if (str[i + 1] != '[')
+				continue;
+
+			while (str[i] && !isalpha(str[i]))
+				i++;
+
+			i--;
+			
+			continue;
+		}
+
+		len++;
+	}
+
+	res->str = xmalloc(len + 1);
+	res->attr = xmalloc(len + 1);
+
+	for (i = 0, j = 0; str[i]; i++) {
+		if (str[i] == 27) {
+			int tmp = 0;
+
+			if (str[i + 1] != '[')
+				continue;
+
+			i += 2;
+
+			/* obs³uguje tylko "\033[...m", tak ma byæ */
+			
+			for (; str[i]; i++) {
+				if (str[i] >= '0' && str[i] <= '9') {
+					tmp *= 10;
+					tmp += (str[i] - '0');
+				}
+
+				if (str[i] == ';' || isalpha(str[i])) {
+					if (tmp == 0)
+						attr = 128;
+
+					if (tmp == 1)
+						attr |= 64;
+
+					if (tmp >= 30 && tmp <= 37) {
+						attr &= 127;
+						attr |= (tmp - 30);
+					}
+
+					if (tmp >= 40 && tmp <= 47) {
+						attr &= 127;
+						attr |= (tmp - 40) << 3;
+					}
+
+					tmp = 0;
+				}
+
+				if (isalpha(str[i]))
+					break;
+			}
+
+			continue;
+		}
+
+		res->str[j] = str[i];
+		res->attr[j] = attr;
+
+		j++;
+	}
+
+	res->str[j] = 0;
+	res->attr[j] = 0;
+
+	return res;
+}
+
+/*
  * format_string()
  *
  * j.w. tyle ¿e nie potrzeba dawaæ mu va_list, a wystarcz± zwyk³e parametry.
@@ -451,6 +541,9 @@ void print_window(const char *target, int separate, const char *theme, ...)
 	va_list ap;
 	char *tmp;
 	
+	if (!target)
+		target = "__current";
+
 	va_start(ap, theme);
 	tmp = va_format_string(format_find(theme), ap);
 	

@@ -74,6 +74,15 @@ back_reason
         domy¶lny opis stanu dostêpnego, ustawiany przy zmianie bez podania 
 	parametru.
 
+backlog_size
+	typ: liczba
+	domy¶lna warto¶æ: 1000
+
+	ilo¶æ linii, która bêdzie zapisywana w buforze ekranu (tym, który
+	jest przewijany klawiszami Page Up i Page Down). je¶li warto¶æ
+	bêdzie mniejsza ni¿ ilo¶æ linii na ekranie, zachowanie ekg bêdzie
+	nieprzewidziane. dzia³a tylko w interfejsie ncurses.
+
 beep
 	typ: bool
 	domy¶lna warto¶æ: 1
