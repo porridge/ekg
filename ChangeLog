@@ -12,6 +12,8 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 - libgadu: uzupe³nienie sta³ych potwierdzeñ (mslusarz/w)
 - libgadu: usuniêcie kodu ustawiaj±cego gg_dcc_ip na auto w funkcji
   gg_dcc_socket_create() (mslusarz/w)
+- uzupe³nienie dokumentacji protoko³u o po³±czenia bezpo¶rednie i nowy
+  format listy kontaktów (w)
 
 // 2004-12-19
 
