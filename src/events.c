@@ -1418,7 +1418,9 @@ static int token_check(int nr, int x, int y, const char *ocr, int maxx, int maxy
 				return 0;
 		}
 	}
-  
+
+	gg_debug(GG_DEBUG_MISC, "token_check(nr=%d,x=%d,y=%d,ocr=%p,maxx=%d,maxy=%d\n", nr, x, y, ocr, maxx, maxy);
+
 	return 1;
 }
 

@@ -7,6 +7,7 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 // 2005-01-29
 
 - poprawka segfaultu przy wy¶wietlaniu tokenów (gj/w)
+- poprawka ocrowania tokenów (w)
 
 // 2005-01-26
 
