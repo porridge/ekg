@@ -88,6 +88,7 @@ struct transfer {
 	struct gg_dcc *dcc;
 	int type;
 	int id;
+	int protocol;
 };
 
 struct event {

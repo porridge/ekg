@@ -46,6 +46,7 @@ gsm voice_gsm_enc = NULL, voice_gsm_dec = NULL;
  */
 int voice_open()
 {
+	const char *pathname = "/dev/dsp";
 	struct gg_session s;
 	gsm_signal tmp;
 	int value;
@@ -53,7 +54,14 @@ int voice_open()
 	if (voice_fd != -1)
 		return -1;
 
-	if ((voice_fd = open((config_audio_device) ? config_audio_device : "/dev/dsp", O_RDWR)) == -1)
+	if (config_audio_device) {
+		pathname = config_audio_device;
+
+		if (pathname[0] == '-')
+			pathname++;
+	}
+
+	if ((voice_fd = open(pathname, O_RDWR)) == -1)
 		goto fail;
 
 	value = 8000;
@@ -158,6 +166,13 @@ int voice_play(const char *buf, int length, int null)
 	gsm_signal output[160];
 	const char *pos = buf;
 
+	/* XXX g逝pi 這rkaraund do rozm闚 g這sowych GG 5.0.5 */
+	if (length == GG_DCC_VOICE_FRAME_LENGTH_505 && *buf == 0) {
+		pos++;
+		buf++;
+		length--;
+	}
+
 	while (pos <= (buf + length - 65)) {
 		if (gsm_decode(voice_gsm_dec, (char*) pos, output))
 			return -1;
@@ -185,11 +200,19 @@ int voice_play(const char *buf, int length, int null)
  *
  * 0/-1.
  */
-int voice_record(const char *buf, int length, int null)
+int voice_record(char *buf, int length, int null)
 {
 	gsm_signal input[160];
 	const char *pos = buf;
 
+	/* XXX g逝pi 這rkaraund do rozm闚 g這sowych GG 5.0.5 */
+	if (length == GG_DCC_VOICE_FRAME_LENGTH_505) {
+		*buf = 0;
+		pos++;
+		buf++;
+		length--;
+	}
+	
 	while (pos <= (buf + length - 65)) {
 		if (read(voice_fd, input, 320) != 320)
 			return -1;

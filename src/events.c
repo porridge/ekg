@@ -734,10 +734,11 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 	if (!descr)
 		descr = xstrdup(idescr);
 	
-	/* zapamiêtaj adres i port */
+	/* zapamiêtaj adres, port i protokó³ */
 	if (n) {
 		u->port = n->remote_port;
 		u->ip.s_addr = n->remote_ip;
+		u->protocol = n->version;
 	}
 
 	/* je¶li status taki sam i ewentualnie opisy te same, ignoruj */
@@ -1536,13 +1537,15 @@ void handle_voice(struct gg_common *c)
 #ifdef HAVE_VOIP
 	list_t l;
 	struct gg_dcc *d = NULL;
-	char buf[GG_DCC_VOICE_FRAME_LENGTH];
+	char buf[GG_DCC_VOICE_FRAME_LENGTH_505];	/* d³u¿szy z buforów */
+	int length = GG_DCC_VOICE_FRAME_LENGTH;
 	
 	for (l = transfers; l; l = l->next) {
 		struct transfer *t = l->data;
 
 		if (t->type == GG_SESSION_DCC_VOICE && t->dcc && (t->dcc->state == GG_STATE_READING_VOICE_HEADER || t->dcc->state == GG_STATE_READING_VOICE_SIZE || t->dcc->state == GG_STATE_READING_VOICE_DATA)) {
 			d = t->dcc;
+			length = (t->protocol >= 0x1b) ? GG_DCC_VOICE_FRAME_LENGTH_505 : GG_DCC_VOICE_FRAME_LENGTH;
 			break;
 		}
 	}
@@ -1550,11 +1553,12 @@ void handle_voice(struct gg_common *c)
 	/* póki nie mamy po³±czenia, i tak czytamy z /dev/dsp */
 
 	if (!d) {
-		voice_record(buf, GG_DCC_VOICE_FRAME_LENGTH, 1);	/* XXX b³êdy */
+		voice_record(buf, length, 1);	/* XXX b³êdy */
 		return;
 	} else {
-		voice_record(buf, GG_DCC_VOICE_FRAME_LENGTH, 0);	/* XXX b³êdy */
-		gg_dcc_voice_send(d, buf, GG_DCC_VOICE_FRAME_LENGTH);	/* XXX b³êdy */
+		voice_record(buf, length, 0);	/* XXX b³êdy */
+		if (config_audio_device && config_audio_device[0] != '-')
+			gg_dcc_voice_send(d, buf, length);	/* XXX b³êdy */
 	}
 #endif /* HAVE_VOIP */
 }

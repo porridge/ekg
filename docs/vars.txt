@@ -28,6 +28,8 @@ audio_device
 	domy¶lna warto¶æ: /dev/dsp
 
 	urz±dzenie d¼wiêkowe, którego nale¿y u¿ywaæ przy rozmowach g³osowych.
+	je¶li poprzedzi siê je minusem ,,-'', sygna³ z wej¶cia urz±dzenia nie
+	bêdzie wysy³any podczas rozmowy g³osowej.
 
 auto_away
 	typ: liczba

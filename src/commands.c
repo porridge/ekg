@@ -2598,7 +2598,7 @@ COMMAND(cmd_dcc)
 
 	if (params[0][0] == 'v') {			/* voice */
 #ifdef HAVE_VOIP
-		struct userlist *u;
+		struct userlist *u = NULL;
 		struct transfer *t, tt;
 
 		if (!params[1]) {
@@ -2631,6 +2631,9 @@ COMMAND(cmd_dcc)
 		}
 
 		if (t) {
+			if ((u = userlist_find(t->uin, NULL)))
+				t->protocol = u->protocol;
+
 			list_add(&watches, t->dcc, 0);
 			voice_open();
 			return 0;
@@ -2685,6 +2688,7 @@ COMMAND(cmd_dcc)
 		tt.uin = uin;
 		tt.id = transfer_id();
 		tt.type = GG_SESSION_DCC_VOICE;
+		tt.protocol = u->protocol;
 
 		if (u->port < 10 || (params[2] && !strcmp(params[2], "--reverse"))) {
 			/* nie mo¿emy siê z nim po³±czyæ, wiêc on spróbuje */

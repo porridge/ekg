@@ -45,6 +45,7 @@ struct userlist {
 	char *descr;		/* opis/powód stanu */
 	struct in_addr ip;	/* adres ip */
 	unsigned short port;	/* port */
+	int protocol;		/* wersja protoko³u */
 };
 
 struct group {

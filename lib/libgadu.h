@@ -706,6 +706,7 @@ int gg_dcc_fill_file_info(struct gg_dcc *d, const char *filename);
 int gg_dcc_voice_send(struct gg_dcc *d, char *buf, int length);
 
 #define GG_DCC_VOICE_FRAME_LENGTH 195
+#define GG_DCC_VOICE_FRAME_LENGTH_505 326
 
 struct gg_dcc *gg_dcc_socket_create(uin_t uin, uint16_t port);
 #define gg_dcc_socket_free gg_free_dcc
