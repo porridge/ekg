@@ -1277,9 +1277,11 @@ void handle_pubdir(struct gg_http *h)
 		xfree(config_password);
 		config_password = reg_password;
 		reg_password = NULL;
-		xfree(config_email);
-		config_email = reg_email;
-		reg_email = NULL;
+		if (reg_email) {
+			xfree(config_email);
+			config_email = reg_email;
+			reg_email = NULL;
+		}
 	}
 
 	if (h->type == GG_SESSION_REGISTER) {
