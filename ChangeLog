@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek).
 
+// 2004-03-21
+- usuniêty b³±d przy query maj±cym utworzyæ konferencjê, np:
+ /query "Imiê Nazwisko",nick wy¶le komunikat zamiast tworzyæ konferncjê (del)
+- parê poprawek dotycz±cych wew. funkcji (del) 
+
 // 2004-03-03
 
 - poprawka TAB completition (pare b³êdów, cleanup, komentarze) (del)

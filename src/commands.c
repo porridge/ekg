@@ -9,6 +9,7 @@
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *                          Piotr Domagalski <szalik@szalik.net>
  *                          Kuba Kowalski <qbq@kofeina.net>
+ *                          Piotr Kupisiewicz <deli@rzepaknet.us>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -266,7 +267,7 @@ COMMAND(cmd_add)
 	}
 
 	if (!strcmp(params[0], "$"))
-		uin = get_uin(params[0]);	
+		uin = get_uin(params[0]);
 
 	if (!uin && !(uin = str_to_uin(params[0]))) {
 		printq("invalid_uin");
@@ -809,7 +810,7 @@ COMMAND(cmd_exec)
 			array_free(args);
 			return -1;
 		}
-	
+
 		s.fd = fd[0];
 		s.check = GG_CHECK_READ;
 		s.state = GG_STATE_READING_DATA;
@@ -2772,7 +2773,7 @@ COMMAND(cmd_dcc)
 			return -1;
 		}
 
-		uin = get_uin(params[1]);	
+		uin = get_uin(params[1]);
 
 		if (!(u = userlist_find(uin, params[1]))) {
 			printq("user_not_found", params[1]);
@@ -3045,7 +3046,7 @@ COMMAND(cmd_dcc)
 			return -1;
 		}
 
-		uin = get_uin(params[1]);		
+		uin = get_uin(params[1]);
 
 		for (l = transfers; l; l = l->next) {
 			struct transfer *tt = l->data;
@@ -3912,7 +3913,7 @@ COMMAND(cmd_remind)
 	xfree(last_tokenid);
 	last_tokenid = NULL;
 	
-	list_add(&watches, h, 0); 
+	list_add(&watches, h, 0);
 
 	return 0;
 }
@@ -3926,7 +3927,7 @@ COMMAND(cmd_query)
 	if(!params[0] || (params[0][0] == '@' && !params[0][1])) {
 		printq("invalid_params", name);
 		return -1;
-	} 
+	}
 
 	for (i = 0; params[i]; i++)
 		p[i] = xstrdup(params[i]);
@@ -3935,7 +3936,7 @@ COMMAND(cmd_query)
 
 	if (params[0] && (params[0][0] == '@' || strchr(params[0], ',')) && config_auto_conference) {
 		struct conference *c = conference_create(params[0]);
-		
+
 		if (!c) {
 			res = -1;
 			goto cleanup;
@@ -3955,7 +3956,7 @@ COMMAND(cmd_query)
 				res = -1;
 				goto cleanup;
 			}
-		
+
 			ui_event("command", quiet, "query", c->name, NULL);
 
 			xfree(p[0]);
@@ -3964,7 +3965,7 @@ COMMAND(cmd_query)
 		} else {
 
 			if (params[0]) {
-				char **tmp = array_make(params[0], ",", 0, 0, 0);
+				char **tmp = array_make(params[0], " ,", 0, 0, 1);
 				int i;
 
 				for (i = 0; tmp[i]; i++) {
@@ -3984,7 +3985,7 @@ COMMAND(cmd_query)
 					}
 
 					for (l = userlist; l; l = l->next) {
-						struct userlist *u = l->data;			
+						struct userlist *u = l->data;
 						list_t m;
 
 						for (m = u->groups; m; m = m->next) {
@@ -4006,10 +4007,10 @@ COMMAND(cmd_query)
 				array_free(tmp);
 			}
 
-			ui_event("command", quiet, "query", params[0], NULL);
+			ui_event("command", quiet, "query", strip_chars(params[0], '\"'), NULL);
 		}
 	}
-		
+
 	if (params[0] && params[1])
 		cmd_msg("chat", (const char **) p, NULL, quiet);
 
@@ -4029,7 +4030,7 @@ COMMAND(cmd_on)
 		struct userlist *u = NULL;
 		const char *t = params[2];
 		uin_t uin = 0;
-		
+
 		if (!params[1] || !params[2] || !params[3]) {
 			printq("not_enough_params", name);
 			return -1;
@@ -4160,8 +4161,8 @@ COMMAND(cmd_test_ctcp)
 
 /*
  * command_exec()
- * 
- * wykonuje polecenie zawarte w linii tekstu. 
+ *
+ * wykonuje polecenie zawarte w linii tekstu.
  *
  *  - target - w którym oknie nast±pi³o (NULL je¶li to nie query)
  *  - xline - linia tekstu.
@@ -4189,7 +4190,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 	}
 
 	if (target && *xline != '/') {
-	
+
 		/* wykrywanie przypadkowo wpisanych poleceñ */
 		if (config_query_commands) {
 			for (l = commands; l; l = l->next) {
@@ -4202,7 +4203,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 						break;
 					}
 				}
-			}		
+			}
 		}
 
 		if (!correct_command) {
@@ -4214,12 +4215,12 @@ int command_exec(const char *target, const char *xline, int quiet)
 			return 0;
 		}
 	}
-	
+
 	send_nicks_index = 0;
 
 	line = line_save = xstrdup(xline);
 	line = strip_spaces(line);
-	
+
 	if (*line == '/')
 		line++;
 
@@ -4246,7 +4247,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 		*tmp = 0;
 		p = strip_spaces(p);
 	}
-		
+
 	for (l = commands; l; l = l->next) {
 		struct command *c = l->data;
 
@@ -4254,7 +4255,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 			last_abbr = c->function;
 			last_name = c->name;
 			last_params = (c->alias) ? "?" : c->params;
-			abbrs = 1;	
+			abbrs = 1;
 			break;
 		}
 		if (!strncasecmp(c->name, cmd, strlen(cmd))) {
@@ -4272,7 +4273,15 @@ int command_exec(const char *target, const char *xline, int quiet)
 		char **par;
 		int res, len = strlen(last_params);
 
-		par = array_make(p, " \t", len, 1, 1);
+		/*
+		 * dla query potrzeba nam cudzys³owiów, natomiast
+		 * dla ca³ej reszty nie s± one potrzebne (wymaga³oby to
+		 * strippowania w wielu miejscach i zmienienia paru koncepcji
+		 */
+		if(!strcasecmp(last_name, "query")) {
+			par = array_make_quoted(p, " \t", len, 1, 1);
+		} else
+			par = array_make(p, " \t", len, 1, 1);
 
 		command_processing = 1;
 		res = (last_abbr)(last_name, (const char**) par, target, quiet);
@@ -4296,7 +4305,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 	return -1;
 }
 
-int binding_help(int a, int b)  
+int binding_help(int a, int b)
 {
 	print("help_quick");  
 

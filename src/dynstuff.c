@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "libgadu.h"
 #include "dynstuff.h"
 #include "xmalloc.h"
 
@@ -410,6 +411,7 @@ const char *itoa(long int i)
  * zaalokowan± tablicê z zaalokowanymi ci±gami znaków, któr± nale¿y
  * zwolniæ funkcj± array_free()
  */
+
 char **array_make(const char *string, const char *sep, int max, int trim, int quotes)
 {
 	const char *p, *q;
@@ -425,7 +427,7 @@ char **array_make(const char *string, const char *sep, int max, int trim, int qu
 
 		if (max && items >= max - 1)
 			last = 1;
-		
+
 		if (trim) {
 			while (*p && strchr(sep, *p))
 				p++;
@@ -434,27 +436,31 @@ char **array_make(const char *string, const char *sep, int max, int trim, int qu
 		}
 
 		if (!last && quotes && (*p == '\'' || *p == '\"')) {
-			char sep = *p;
+			char separ = *p;
+			int meet_quota;
 
-			for (q = p + 1, len = 0; *q; q++, len++) {
+			for (q = p + 1, len = 0, meet_quota = 0; *q; q++, len++) {
 				if (*q == '\\') {
 					q++;
 					if (!*q)
 						break;
-				} else if (*q == sep)
+				} else if (strchr(q, separ)) {
+					meet_quota = 1;
+				} else if (strchr(sep, *q) && meet_quota == 1)
 					break;
+
 			}
 
 			if ((token = xcalloc(1, len + 1))) {
 				char *r = token;
-			
-				for (q = p + 1; *q; q++, r++) {
+
+				for (q = p + 1, meet_quota = 0; *q; q++, r++) {
 					if (*q == '\\') {
 						q++;
-						
+
 						if (!*q)
 							break;
-						
+
 						switch (*q) {
 							case 'n':
 								*r = '\n';
@@ -468,17 +474,19 @@ char **array_make(const char *string, const char *sep, int max, int trim, int qu
 							default:
 								*r = *q;
 						}
-					} else if (*q == sep) {
+					} else if (*q == separ) {
+						r--;
+						meet_quota = 1;
+					} else if (strchr(sep, *q) && meet_quota == 1) {
 						break;
-					} else 
+					} else
 						*r = *q;
 				}
-				
+
 				*r = 0;
 			}
-			
-			p = (*q) ? q + 1 : q;
 
+			p = q;
 		} else {
 			for (q = p, len = 0; *q && (last || !strchr(sep, *q)); q++, len++);
 			token = xcalloc(1, len + 1);
@@ -486,14 +494,132 @@ char **array_make(const char *string, const char *sep, int max, int trim, int qu
 			token[len] = 0;
 			p = q;
 		}
-		
+
 		result = xrealloc(result, (items + 2) * sizeof(char*));
 		result[items] = token;
 		result[++items] = NULL;
 
 		if (!*p)
 			break;
+		p++;
+	}
 
+failure:
+	if (!items)
+		result = xcalloc(1, sizeof(char*));
+
+	return result;
+}
+
+/*
+ * array_make_quoted()
+ *
+ * tworzy tablicê tekstów z jednego, rozdzielonego podanymi znakami.
+ * ró¿nica w stosunko do array_make() polega na tym, i¿ array_make nie
+ * zapisuje znaków cudzys³owia w zwracanej tablicy
+ *
+ *  - string - tekst wej¶ciowy,
+ *  - sep - lista elementów oddzielaj±cych,
+ *  - max - maksymalna ilo¶æ elementów tablicy. je¶li równe 0, nie ma
+ *          ograniczeñ rozmiaru tablicy.
+ *  - trim - czy wiêksz± ilo¶æ elementów oddzielaj±cych traktowaæ jako
+ *           jeden (na przyk³ad spacje, tabulacja itp.)
+ *  - quotes - czy pola mog± byæ zapisywane w cudzys³owiach lub
+ *             apostrofach z escapowanymi znakami.
+ *
+ * zaalokowan± tablicê z zaalokowanymi ci±gami znaków, któr± nale¿y
+ * zwolniæ funkcj± array_free()
+ */
+char **array_make_quoted(const char *string, const char *sep, int max, int trim, int quotes)
+{
+	const char *p, *q;
+	char **result = NULL;
+	int items = 0, last = 0;
+
+	if (!string || !sep)
+		goto failure;
+
+	for (p = string; ; ) {
+		int len = 0;
+		char *token = NULL;
+
+		if (max && items >= max - 1)
+			last = 1;
+
+		if (trim) {
+			while (*p && strchr(sep, *p))
+				p++;
+			if (!*p)
+				break;
+		}
+
+		if (!last && quotes && (*p == '\'' || *p == '\"')) {
+			char separ = *p;
+			int meet_quota;
+
+			for (q = p + 1, len = 0, meet_quota = 0; *q; q++, len++) {
+				if (*q == '\\') {
+					q++;
+					if (!*q)
+						break;
+				} else if (strchr(q, separ)) {
+					meet_quota = 1;
+				} else if (strchr(sep, *q) && meet_quota == 1)
+					break;
+
+			}
+
+			if ((token = xcalloc(1, len + 1))) {
+				char *r = token;
+
+				for (q = p + 1, meet_quota = 0, *r = *p, r++; *q; q++, r++) {
+					if (*q == '\\') {
+						q++;
+
+						if (!*q)
+							break;
+
+						switch (*q) {
+							case 'n':
+								*r = '\n';
+								break;
+							case 'r':
+								*r = '\r';
+								break;
+							case 't':
+								*r = '\t';
+								break;
+							default:
+								*r = *q;
+						}
+					} else if (*q == separ) {
+						*r = *q;
+						meet_quota = 1;
+					} else if (strchr(sep, *q) && meet_quota == 1) {
+						break;
+					} else
+						*r = *q;
+				}
+
+				*r = 0;
+			}
+
+			//p = (*q) ? q + 1 : q;
+			p = q;
+		} else {
+			for (q = p, len = 0; *q && (last || !strchr(sep, *q)); q++, len++);
+			token = xcalloc(1, len + 1);
+			strncpy(token, p, len);
+			token[len] = 0;
+			p = q;
+		}
+
+		result = xrealloc(result, (items + 2) * sizeof(char*));
+		result[items] = token;
+		result[++items] = NULL;
+
+		if (!*p)
+			break;
 		p++;
 	}
 

@@ -57,6 +57,7 @@ char *string_free(string_t s, int free_string);
 /* tablice stringów */
 
 char **array_make(const char *string, const char *sep, int max, int trim, int quotes);
+char **array_make_quoted(const char *string, const char *sep, int max, int trim, int quotes);
 char *array_join(char **array, const char *sep);
 void array_add(char ***array, char *string);
 int array_count(char **array);

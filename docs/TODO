@@ -11,8 +11,6 @@ rozwi±zanie.
 * klient:
   - mo¿liwy wyciek pamiêci - parê raportów, i¿ EKG po paru dniach u¿ytkowania
     ro¶nie do ogromnych rozmiarów (pamiêciowo) (dredzik)
-  - b³±d przy query maj±cym utworzyæ konferencjê, np:
-    /query "Imiê Nazwisko",nick wy¶le komunikat zamiast tworzyæ konferncjê (del)
   - informcja o opisie w /find (scooty/w)
   - zawijanie linijek w wielolinijkowym (?)
   - wykrywanie niewidocznych jako opcja (wielu)

@@ -6,6 +6,7 @@
  *                          Pawe³ Maziarz <drg@o2.pl>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *                          Piotr Domagalski <szalik@szalik.net>
+ *                          Piotr Kupisiewicz <deli@rzepaknet.us>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -887,8 +888,8 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 		return NULL;
 	}
 
-	nicks = array_make(nicklist, " ,", 0, 1, 0);
-	
+	nicks = array_make(nicklist, " ,", 0, 1, 1);
+
 	/* grupy zamieniamy na niki */
 	for (i = 0; nicks[i]; i++) {
 		if (nicks[i][0] == '@') {
@@ -953,7 +954,7 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 		if (!strcmp(*p, ""))
 		        continue;
-
+	
 		if (!(uin = get_uin(*p))) {
 			printq("user_not_found", *p);
 			continue;
@@ -1921,21 +1922,28 @@ void iso_to_ascii(unsigned char *buf)
 	}
 }
 
+/* strip_chars()
+ * pozbywa siê podanego znaku na pocz±tku i koñcu ³ancucha
+*/
+char *strip_chars(const char *line, unsigned char what) {
+        char *buf;
+
+        for (buf = xstrdup(line); *buf == what; buf++);
+
+        if (line[strlen(line) - 1] == what)
+                buf[strlen(buf) - 1] = 0;
+
+        return buf;
+}
+
 /*
  * strip_spaces()
  *
  * pozbywa siê spacji na pocz±tku i koñcu ³añcucha.
  */
-char *strip_spaces(char *line)
+char *strip_spaces(const char *line)
 {
-	char *buf;
-	
-	for (buf = line; xisspace(*buf); buf++);
-
-	while (xisspace(line[strlen(line) - 1]))
-		line[strlen(line) - 1] = 0;
-	
-	return buf;
+	return strip_chars(line, ' ');
 }
 
 /*
