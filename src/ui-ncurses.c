@@ -40,7 +40,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <dirent.h>
-#include <libgen.h>
+#ifdef HAVE_LIBGEN_H
+#  include <libgen.h>
+#endif
 #include <ncurses.h>
 #include <signal.h>
 #ifndef _AIX

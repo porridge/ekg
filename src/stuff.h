@@ -34,6 +34,10 @@
 #include "dynstuff.h"
 #include "ioctld.h"
 
+#ifndef DIR_DELIMINATOR
+#  define DIR_DELIMINATOR '/'
+#endif
+
 enum event_t {
 	EVENT_MSG = 1,
 	EVENT_CHAT = 2,

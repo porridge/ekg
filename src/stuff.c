@@ -173,6 +173,16 @@ static struct {
 };
 
 /*
+ * basename - extract the base portion of a pathname
+ */
+#ifndef HAVE_BASENAME
+char * basename(char const *path) {
+    char * base = strrchr(path, DIR_DELIMINATOR);
+    return (base ? base + 1 : path);
+}
+#endif
+	
+/*
  * emoticon_expand()
  *
  * rozwija definicje makr (najczê¶ciej to bêd± emoticony)
