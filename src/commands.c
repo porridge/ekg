@@ -5277,6 +5277,7 @@ void command_init()
 	  "\n"
 	  "  [r]send <numer/alias> <¶cie¿ka>  wysy³a podany plik\n"
 	  "  get [numer/alias/#id]            akceptuje przysy³any plik\n"
+	  "  resume [numer/alias/#id]         wznawia pobieranie pliku\n"
 	  "  [r]voice <numer/alias/#id>       rozpoczyna rozmowê g³osow±\n"
 	  "  close <numer/alias/#id>          zamyka po³±czenie\n"
 	  "  list                             wy¶wietla listê po³±czeñ\n"

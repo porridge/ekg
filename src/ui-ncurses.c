@@ -2299,7 +2299,7 @@ void known_uin_generator(const char *text, int len)
 		struct userlist *u = l->data;
 
 		if (u->display && !strncasecmp(text, u->display, len)) {
-			array_add(&completions, (strchr(u->display, ' ')) ? saprintf("\"%s\"", u->display) : xstrdup(u->display));
+			array_add(&completions, xstrdup(u->display));
 			done = 1;
 		}
 	}
@@ -2356,7 +2356,7 @@ void ignored_uin_generator(const char *text, int len)
 				array_add(&completions, xstrdup(itoa(u->uin)));
 		} else {
 			if (u->display && !strncasecmp(text, u->display, len))
-				array_add(&completions, ((strchr(u->display, ' ')) ? saprintf("\"%s\"", u->display) : xstrdup(u->display)));
+				array_add(&completions, xstrdup(u->display));
 		}
 	}
 }
@@ -2376,7 +2376,7 @@ void blocked_uin_generator(const char *text, int len)
 				array_add(&completions, xstrdup(itoa(u->uin)));
 		} else {
 			if (u->display && !strncasecmp(text, u->display, len))
-				array_add(&completions, ((strchr(u->display, ' ')) ? saprintf("\"%s\"", u->display) : xstrdup(u->display)));
+				array_add(&completions, xstrdup(u->display));
 		}
 	}
 
@@ -2390,49 +2390,94 @@ void empty_generator(const char *text, int len)
 void file_generator(const char *text, int len)
 {
 	struct dirent **namelist = NULL;
-	const char *dname, *bname;
-	char *dirc;
+	char *dname, *tmp;
+	const char *fname;
 	int count, i;
 
-	dirc = xstrdup(text);
+	/* `dname' zawiera nazwê katalogu z koñcz±cym znakiem `/', albo
+	 * NULL, je¶li w dope³nianym tek¶cie nie ma ¶cie¿ki. */
 
-	bname = strrchr(text, '/');
+	dname = xstrdup(text);
 
-	if (bname)
-		bname++;
+	if ((tmp = strrchr(dname, '/'))) {
+		tmp++;
+		*tmp = 0;
+	} else
+		dname = NULL;
+
+	/* `fname' zawiera nazwê szukanego pliku */
+
+	fname = strrchr(text, '/');
+
+	if (fname)
+		fname++;
 	else
-		bname = text;
-				
-	dname = dirname(dirc);
+		fname = text;
 
-	if (text[len - 1] == '/') {
-		dname = text;
-		bname = text + len - 1;
-	}
+again:
+	/* zbierzmy listê plików w ¿±danym katalogu */
+	
+	count = scandir((dname) ? dname : ".", &namelist, NULL, alphasort);
 
-	count = scandir(dname, &namelist, NULL, alphasort);
+	ui_debug("dname=\"%s\", fname=\"%s\", count=%d\n", dname, fname, count);
 
 	for (i = 0; i < count; i++) {
-		char *file = namelist[i]->d_name;
+		char *name = namelist[i]->d_name, *tmp = saprintf("%s%s", (dname) ? dname : "", name);
+		struct stat st;
+		int isdir = 0;
 
-		if (!strcmp(file, ".") || !strcmp(file, "..")) {
+		if (!stat(tmp, &st))
+			isdir = S_ISDIR(st.st_mode);
+
+		xfree(tmp);
+
+		if (!strcmp(name, ".")) {
 			xfree(namelist[i]);
 			continue;
 		}
-		
-		if (!strncmp(bname, file, strlen(bname)) || *bname == '/') {
-			if (strcmp(dname, "."))
-				file = saprintf((dname[strlen(dname) - 1] == '/' ? "%s%s" : "%s/%s"), dname, file);
-			else
-				file = saprintf("%s", file);
 
-			array_add(&completions, file);
+		/* je¶li mamy `..', sprawd¼ czy katalog sk³ada siê z
+		 * `../../../' lub czego¶ takiego. */
+		
+		if (!strcmp(name, "..")) {
+			const char *p;
+			int omit = 0;
+
+			for (p = dname; p && *p; p++) {
+				if (*p != '.' && *p != '/') {
+					omit = 1;
+					break;
+				}
+			}
+
+			if (omit) {
+				xfree(namelist[i]);
+				continue;
+			}
+		}
+		
+		if (!strncmp(name, fname, strlen(fname))) {
+			name = saprintf("%s%s%s", (dname) ? dname : "", name, (isdir) ? "/" : "");
+			array_add(&completions, name);
 		}
 
 		xfree(namelist[i]);
         }
 
-	xfree(dirc);
+	/* je¶li w dope³nieniach wyl±dowa³ tylko jeden wpis i jest katalogiem
+	 * to wejd¼ do niego i szukaj jeszcze raz */
+
+	if (array_count(completions) == 1 && strlen(completions[0]) > 0 && completions[0][strlen(completions[0]) - 1] == '/') {
+		xfree(dname);
+		dname = xstrdup(completions[0]);
+		fname = "";
+		array_free(completions);
+		completions = NULL;
+
+		goto again;
+	}
+
+	xfree(dname);
 	xfree(namelist);
 }
 
@@ -2632,7 +2677,33 @@ static void complete(int *line_start, int *line_index)
 		if (params && abbrs == 1 && word < strlen(params) + 1) {
 			for (i = 0; generators[i].ch; i++) {
 				if (generators[i].ch == params[word - 1]) {
+					int j;
+
 					generators[i].generate(words[word], strlen(words[word]));
+
+					for (j = 0; completions && completions[j]; j++) {
+						string_t s;
+						const char *p;
+
+						if (!strchr(completions[j], '"') && !strchr(completions[j], '\\') && !strchr(completions[j], ' '))
+							continue;
+						
+						s = string_init("\"");
+
+						for (p = completions[j]; *p; p++) {
+							if (!strchr("\"\\", *p))
+								string_append_c(s, *p);
+							else {
+								string_append_c(s, '\\');
+								string_append_c(s, *p);
+							}
+						}
+						string_append_c(s, '\"');
+
+						xfree(completions[j]);
+						completions[j] = string_free(s, 0);
+					}
+
 					break;
 				}
 			}
