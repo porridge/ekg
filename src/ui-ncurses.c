@@ -2333,6 +2333,7 @@ static void ui_ncurses_deinit()
 
 	xfree(line);
 #ifdef WITH_ASPELL
+	delete_aspell_speller(spell_checker);
 	xfree(aspell_line);
 #endif
 	xfree(yanked);
