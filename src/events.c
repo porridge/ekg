@@ -1755,7 +1755,7 @@ void handle_search50(struct gg_event *e)
 
 #define __format(x) ((count == 1 && !all) ? "search_results_single" x : "search_results_multi" x)
 
-		switch (status) {
+		switch (status & 0x7f) {
 			case GG_STATUS_AVAIL:
 			case GG_STATUS_AVAIL_DESCR:
 				active = format_string(format_find(__format("_active")), (__firstname) ? __firstname : nickname);
