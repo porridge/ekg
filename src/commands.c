@@ -939,7 +939,7 @@ COMMAND(command_msg)
 
         put_log(uin, "<< %s %s (%s)\n%s\n", (!strcasecmp(name, "chat")) ?
                 "Rozmowa do" : "Wiadomo¶æ do", sender, full_timestamp(),
-                params[1]);
+                msg);
 
 	add_send_nick(params[0]);
 	iso_to_cp(msg);
