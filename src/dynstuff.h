@@ -40,7 +40,7 @@ int list_destroy(list_t list, int free_data);
 
 struct string {
 	char *str;
-	int size;
+	int len, size;
 };
 
 typedef struct string * string_t;

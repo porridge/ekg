@@ -842,6 +842,13 @@ void known_uin_generator(const char *text, int len)
 		if (u->display && !strncasecmp(text, u->display, len))
 			array_add(&completions, xstrdup(u->display));
 	}
+
+	for (l = conferences; l; l = l->next) {
+		struct conference *c = l->data;
+
+		if (!strncasecmp(text, c->name, len))
+			array_add(&completions, xstrdup(c->name));
+	}
 }
 
 void unknown_uin_generator(const char *text, int len)

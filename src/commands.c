@@ -519,7 +519,7 @@ COMMAND(cmd_exec)
 		int fd[2] = { 0, 0 };
 		struct gg_exec s;
 
-		if (pipe(fd) && params[0][0] != '^') {
+		if (pipe(fd)) {
 			print("exec_error", strerror(errno));
 			return;
 		}

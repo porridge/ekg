@@ -199,7 +199,7 @@ int string_append_c(string_t s, char c)
 		return -1;
 	}
 	
-	if (!s->str || strlen(s->str) + 2 > s->size) {
+	if (!s->str || s->len + 2 > s->size) {
 		new = xrealloc(s->str, s->size + 80);
 		if (!s->str)
 			*new = 0;
@@ -207,8 +207,8 @@ int string_append_c(string_t s, char c)
 		s->str = new;
 	}
 
-	s->str[strlen(s->str) + 1] = 0;
-	s->str[strlen(s->str)] = c;
+	s->str[s->len + 1] = 0;
+	s->str[s->len++] = c;
 
 	return 0;
 }
@@ -234,7 +234,7 @@ int string_append_n(string_t s, const char *str, int count)
 	if (count == -1)
 		count = strlen(str);
 
-	if (!s->str || strlen(s->str) + count + 1 > s->size) {
+	if (!s->str || s->len + count + 1 > s->size) {
 		new = xrealloc(s->str, s->size + count + 80);
 		if (!s->str)
 			*new = 0;
@@ -242,8 +242,10 @@ int string_append_n(string_t s, const char *str, int count)
 		s->str = new;
 	}
 
-	s->str[strlen(s->str) + count] = 0;
-	strncpy(s->str + strlen(s->str), str, count);
+	s->str[s->len + count] = 0;
+	strncpy(s->str + s->len, str, count);
+
+	s->len += count;
 
 	return 0;
 }
@@ -270,6 +272,7 @@ string_t string_init(const char *value)
 		value = "";
 
 	tmp->str = xstrdup(value);
+	tmp->len = strlen(value);
 	tmp->size = strlen(value) + 1;
 
 	return tmp;
