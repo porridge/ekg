@@ -50,20 +50,35 @@ list_t formats = NULL;
  */
 const char *format_find(const char *name)
 {
+	char *tmp, *name2 = NULL;
+	int hash, hash2 = 0;
 	list_t l;
-	int hash;
 
 	if (!name)
 		return "";
 
 	hash = ekg_hash(name);
+
+	if (config_theme && (tmp = strchr(config_theme, ','))) {
+		name2 = saprintf("%s,%s", name, tmp + 1);
+		hash2 = ekg_hash(name2);
+	}
 	
 	for (l = formats; l; l = l->next) {
 		struct format *f = l->data;
 
-		if (hash == f->name_hash && !strcasecmp(f->name, name))
+		if (name2 && hash2 == f->name_hash && !strcasecmp(f->name, name2)) {
+			xfree(name2);
 			return f->value;
+		}
+
+		if (hash == f->name_hash && !strcasecmp(f->name, name)) {
+			xfree(name2);
+			return f->value;
+		}
 	}
+	
+	xfree(name2);
 	
 	return "";
 }
@@ -558,12 +573,21 @@ int theme_read(const char *filename, int replace)
 		if (!filename || !(f = fopen(filename, "r")))
 			return -1;
         } else {
-		f = try_open(NULL, NULL, filename);
+		char *fn = xstrdup(filename), *tmp;
+
+		if ((tmp = strchr(fn, ',')))
+			*tmp = 0;
+		
+		f = try_open(NULL, NULL, fn);
+
 		if (!strchr(filename, '/')) {
-			f = try_open(f, prepare_path("", 0), filename);
-			f = try_open(f, prepare_path("themes", 0), filename);
-			f = try_open(f, THEMES_DIR, filename);
+			f = try_open(f, prepare_path("", 0), fn);
+			f = try_open(f, prepare_path("themes", 0), fn);
+			f = try_open(f, THEMES_DIR, fn);
 		}
+
+		xfree(fn);
+
 		if (!f)
 			return -1;
 	}

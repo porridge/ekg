@@ -1,6 +1,6 @@
 # Based on EKG theme by (sic!) -> sic@hybrid.art.pl
 # EKG theme by Arim.
-# Last modified: 29/06/2002 10:44
+# Last modified: 10/09/2002 11:52
 
 ack_delivered %) %K ack/%1 (%#)%n\n
 ack_queued %) %K ack/%1 (%#) -queued-%n\n
@@ -26,10 +26,6 @@ change %> %WZmieni³e¶ informacje w katalogu publicznym.%n\n
 change_failed %! %RB³±d podczas zmiany informacji w katalogu publicznym!%n\n
 change_not_enough_params %! %RPolecenie wymaga podania %Wwszystkich%n %Rparametrów!%n\n
 change_timeout %! %RPrzekroczono limit czasu operacji zmiany katalogu publicznego!%n\n
-chat_footer %W+------------%n\n
-chat_header %W+------------%n Chat with %W%1%n %c(%C%#%c/%2)%n %W------------%n\n
-chat_line %W|%n %1\n
-chat_line_width 72
 conn_broken %! %c%#%n %W---/%n%r*%n%W/---%n %RPo³±czenie z serwerem przerwane%n\n
 conn_failed %! %BB³±d podczas ³±czenia:%n %W%1%n\n
 conn_stopped %! %B£±czenie przerwane!%n\n
@@ -68,10 +64,6 @@ list_not_avail %Kniedostêpn%@2   %n%W<%n%R-%n%W>%n   %K%[12]1%n |%K.............
 list_not_avail %Kniedostêpn%@2   %W<%R-%W>%n   %K%[12]1%n |%K...............%n| %k%5%n\n
 list_not_avail_descr %Kniedostêpn%@2   %W<%R-%W>   %K%[12]1%n |%K...............%n| %K[%5]%n\n
 list_invisible %mniewidoczn%@2%n   %W<%n%M*%n%W>%n   %m%[12]1%n |%K...............%n|\n
-message_footer %K+------------%n\n
-message_header %K+------------%n Mesg from %W%1%n %c(%C%#%c/%2)%n %K------------%n\n
-message_line %K|%n %1\n
-message_line_width 72
 modify_done %> %WDane zmienione%n\n
 not_connected %! %RNie jeste¶ po³±czony z serwerem!%n\n
 not_enough_params %! %RZa ma³o parametrów%n\n
@@ -114,22 +106,20 @@ search_failed %! %RB³±d podczas przeszukiwania%n%W: %1%n\n
 search_not_found %! %RNie znaleziono nikogo o takich danych%n\n
 search_results_multi %W%7%[-10]1%n %K|%n %[12]3 %K|%n %6 %K|%n %[20]2 %K|%n %[4]5 %K|%n %c%[16]4%n\n
 search_results_multi_active %W<%G+%W>%n
+search_results_multi_busy %W<%c?%W>%n
 search_results_multi_female %MK%n
 search_results_multi_inactive %W<%R-%W>%n
 search_results_multi_male %BM%n
 search_results_multi_unknown ?
 search_results_single %W%7%[-10]1%n %K|%n %[12]3 %K|%n %6 %K|%n %[20]2 %K|%n %[4]5 %K|%n %c%[16]4%n\n
 search_results_single_active %W<%G+%W>%n
+search_results_single_busy %W<%c?%W>%n
 search_results_single_female %MK%n
 search_results_single_inactive %W<%R-%W>%n
 search_results_single_male %BM%n
 search_results_single_unknown ?
 search_stopped %) Nie to nie. Dalej nie szukam.\n
 search_timeout %! %RPrzekroczono limit czasu operacji szukania!%n\n
-sent_footer %M+------------%n\n
-sent_header %M+------------%n Msg sent: %W%1%n %c(%C%#%c/%2)%n %M------------%n\n
-sent_line %M|%n %1\n
-sent_line_width 72
 show_status %> %WTwój status:%n %1 %2\n%> %WJeste¶ zalogowany na serwerze %g%3%W.%n\n
 show_status_avail %W<%n%G+%n%W>%n  %gdostêpny%n
 show_status_avail_descr %W<%n%G+%n%W>%n  %gdostêpny: %1%n
@@ -183,4 +173,27 @@ userlist_put_ok %) %WListê kontaktów zachowano na serwerze.%n\n
 variable %> %K%[_20]1%n%W%2%n\n
 variable_invalid %! %Wset:%n %r[%1]%n <- z³a warto¶æ.\n
 variable_not_found %! %RNieznana zmienna%n%W:%n %K[%n%W%1%n%K]%n\n
-statusbar %c(%w%{time}%c)%w %c(%wuin%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) ( %wwin%c/%w%{window}%{?query %c:%w}%{query}%c)%w %{?activity %c(%wact%c/%w}%{activity}%{?activity %c)%w}
+statusbar %c|%w%{time}%c|%w %c(%wGG#%c%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) <%wwin%c/%w%{window}%{?query %c:%w}%{query}%c>%w %{?activity %c(%wact%c/%w}%{activity}%{?activity %c)%w}
+chat_footer %W+------------%n\n
+chat_header %W+------------%n Chat with %W%1%n %c(%C%#%c/%C%2%c)%n %W------------%n\n
+chat_line %W|%n %1\n
+chat_line_width 72
+message_footer %K+------------%n\n
+message_header %K+------------%n Mesg from %W%1%n %c(%C%#%c/%2)%n %K------------%n\n
+message_line %K|%n %1\n
+message_line_width 72
+sent_footer %M+------------%n\n
+sent_header %M+------------%n Msg sent: %W%1%n %c(%C%#%c/%2)%n %M------------%n\n
+sent_line %M|%n %1\n
+sent_line_width 72
+
+sent_line_first,irc %c%3%n %G<%n%2%G>%n %1\n
+sent_line,irc         %1\n
+sent_line_width,irc 78
+message_line_first,irc %c%3%n %G<%n%2%G>%n %1\n
+message_line,irc         %1\n
+message_line_width,irc 78
+chat_line_first,irc %c%3%n %C<%n%2%C>%n %1\n
+chat_line,irc         %1\n
+chat_line_width,irc 78
+

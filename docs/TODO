@@ -17,7 +17,9 @@ klient:
   + w³±czyæ domy¶lnie ,,set timestamp "%H:%M "'',
   + w³±czyæ domy¶lnie ,,set display_sent 1'',
   + w³±czyæ domy¶lnie ,,set make_window 2'',
-  + w³±czyæ domy¶lnie ,,set display_ack 3''.
+  + w³±czyæ domy¶lnie ,,set display_ack 3'',
+  + zmieniæ domy¶lne formaty prompt* i error na nowe,
+  + przerzuciæ statusbar do domy¶lnego themu,
 
 $Id$
 

@@ -1900,12 +1900,7 @@ COMMAND(cmd_remind)
 
 COMMAND(cmd_query)
 {
-	if (!params[0]) {
-		print("not_enough_params", name);
-		return;
-	}
-
-	if (params[0][0] == '@' || strchr(params[0], ',')) {
+	if (params[0] && (params[0][0] == '@' || strchr(params[0], ','))) {
 		struct conference *c = conference_create(params[0]);
 
 		if (!c)
