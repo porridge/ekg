@@ -764,7 +764,7 @@ int main(int argc, char **argv)
 {
 	int auto_connect = 1, new_status = 0, ui_set = 0;
 	int c = 0, set_private = 0, no_global_config = 0;
-	char *load_theme = NULL, *new_reason = NULL;
+	char *load_theme = NULL, *new_reason = NULL, *new_profile = NULL;
 #ifdef WITH_IOCTLD
 	const char *sock_path = NULL, *ioctld_path = IOCTLD_PATH;
 #endif
@@ -807,7 +807,6 @@ int main(int argc, char **argv)
 	strncpy(argv0, argv[0], sizeof(argv0) - 1);
 	argv0[sizeof(argv0) - 1] = 0;
 
-	variable_init();
 	command_init();
 
 	if (!(home_dir = getenv("HOME")))
@@ -889,7 +888,7 @@ int main(int argc, char **argv)
 				return 0;
 				break;
 			case 'u':
-				config_profile = optarg;
+				new_profile = optarg;
 				break;
 			case 'c':
 				pipe_file = optarg;
@@ -934,16 +933,20 @@ int main(int argc, char **argv)
 			ui_init = ui_batch_init;
 	}
 
-	setup_debug();
+	variable_init();
+	config_profile = new_profile;
 
 #ifdef WITH_UI_NCURSES
-	gg_debug_level = 255;
+	if (ui_init == ui_ncurses_init) {
+		setup_debug();
+		gg_debug_level = 255;
+	} else
+		gg_debug_level = 0;
 #else
 	gg_debug_level = 0;
 #endif
 
         ekg_pid = getpid();
-
 	mesg_startup = mesg_set(2);
 
 #ifdef WITH_PYTHON
@@ -1013,8 +1016,6 @@ int main(int argc, char **argv)
 		config_reason = new_reason;
 	}
 
-
-	
 	/* je¶li ma byæ theme, niech bêdzie theme */
 	if (load_theme)
 		theme_read(load_theme, 1);

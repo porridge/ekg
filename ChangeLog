@@ -8,6 +8,8 @@ zg³osi³ b³±d.
 
 // 2003-01-20
 
+- poprawki wczytywania zmiennych w wersji skompilowanej z ncurses
+  i readline jednocze¶nie (sz)
 - debug jest w³±czony na sta³e (sz)
 - F12 lub Alt-` prze³±czaj± do okna z debug (sz)
 - debug pisze do okna o numerze 0 zamiast do statusowego (*/sz)

@@ -91,7 +91,7 @@ KLAWIATURA
 
 	Up, Down		przegl±danie historii poleceñ
 	Left, Right		poruszanie siê po aktualnej linii
-        Ctrl-A, Home		id¼ pocz±tek linii
+        Ctrl-A, Home		id¼ na pocz±tek linii
 	Ctrl-B			pogrubiona czcionka
         Ctrl-D, Delete		usuñ znak pod kursorem
         Ctrl-H, Backspace	usuñ znak przed kursorem
