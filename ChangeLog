@@ -8,6 +8,11 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-10-30
 
 - poprawka wy³±czonego debugowania (Brzezi/w)
+- poprawka segfaultu po wygenerowaniu kluczy (FIG/w)
+- podanie powodu ,,-'' spowoduje jego wyczyszczenie bez wzglêdu na
+  ustawienia jakichkolwiek zmiennych zmieniaj±cych zachowanie komend
+  /away, /back, /invisible i /quit (w)
+- zmienne tekstowe s± wy¶wietlane w cudzys³owiach (w)
 - dodanie skryptu contrib/ekgh (greblus/w)
 - poprawka wysy³ania wiadomo¶ci do grup (Joshua/w)
 

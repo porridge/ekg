@@ -246,6 +246,8 @@ COMMAND(cmd_away)
 		xfree(config_reason);
 		config_reason = NULL;
 	}
+
+	/* XXX trzeba pozbyæ siê trzech identycznych bloków kodu */
 	
 	if (!strcasecmp(name, "away")) {
 	    	if (!params[0]) {
@@ -261,8 +263,13 @@ COMMAND(cmd_away)
 		if (config_keep_reason && !reason)
 			reason = config_reason;
 		
-		away = (reason) ? 3 : 1;
+		if (params[0] && !strcmp(params[0], "-")) {
+			xfree(reason);
+			reason = NULL;
+		}
 		
+		away = (reason) ? 3 : 1;
+
 		if (reason) {
 			char *r1, *r2;
 			
@@ -277,7 +284,9 @@ COMMAND(cmd_away)
 			print("away");
 
 		ui_event("my_status", "away", reason);
+		
 	} else if (!strcasecmp(name, "invisible")) {
+		
 	    	if (!params[0]) {
 		    	if (config_random_reason & 8) {
 				reason = random_line(prepare_path("quit.reasons", 0));
@@ -285,13 +294,18 @@ COMMAND(cmd_away)
 				    	reason = xstrdup(config_quit_reason);
 			} else if (config_quit_reason)
 			    	reason = xstrdup(config_quit_reason);
-		}
-		else
+		} else
 		    	reason = xstrdup(params[0]);
 		
 		if (config_keep_reason && !reason)
 			reason = config_reason;
 		
+		if (params[0] && !strcmp(params[0], "-")) {
+			xfree(reason);
+			reason = NULL;
+		}
+
+
 		away = (reason) ? 5 : 2;
 		
 		if (reason) {
@@ -308,7 +322,9 @@ COMMAND(cmd_away)
 			print("invisible");
 
 		ui_event("my_status", "invisible", reason);
+
 	} else if (!strcasecmp(name, "back")) {
+
 	    	if (!params[0]) {
 		    	if (config_random_reason & 4) {
 			    	reason = random_line(prepare_path("back.reasons", 0));
@@ -317,13 +333,17 @@ COMMAND(cmd_away)
 			}
 			else if (config_back_reason)
 			    	reason = xstrdup(config_back_reason);
-		}
-		else
+		} else
 		    	reason = xstrdup(params[0]);
 
 		if (config_keep_reason && !reason)
 			reason = config_reason;
 		
+		if (params[0] && !strcmp(params[0], "-")) {
+			xfree(reason);
+			reason = NULL;
+		}
+
 		away = (reason) ? 4 : 0;
 
 		if (reason) {
@@ -340,6 +360,7 @@ COMMAND(cmd_away)
 			print("back");
 
 		ui_event("my_status", "back", reason);
+
 	} else {
 		int tmp;
 
@@ -470,11 +491,16 @@ COMMAND(cmd_connect)
 			}
 			else if (config_quit_reason)
 			    tmp = xstrdup(config_quit_reason);
-		}
-		else
+		} else
 		    	tmp = xstrdup(params[0]);
 
+		if (params[0] && !strcmp(params[0], "-")) {
+			xfree(tmp);
+			tmp = NULL;
+		}
+
 		connecting = 0;
+
 		if (sess->state == GG_STATE_CONNECTED) {
 			if (tmp) {
 				char *r1, *r2;
@@ -1376,8 +1402,14 @@ COMMAND(cmd_set)
 					continue;
 				}
 
-				if (v->type == VAR_STR)
-					print("variable", v->name, (string) ? string : "(none)");
+				if (v->type == VAR_STR) {
+					char *tmp = (string) ? saprintf("\"%s\"", string) : "(none)";
+
+					print("variable", v->name, tmp);
+					
+					if (string)
+						xfree(tmp);
+				}
 
 				if (v->type == VAR_BOOL)
 					print("variable", v->name, (value) ? "1 (on)" : "0 (off)");
@@ -1432,7 +1464,8 @@ COMMAND(cmd_set)
 	} else {
 		theme_cache_reset();
 		switch (variable_set(arg, (unset) ? NULL : value, 0)) {
-			case 0: {
+			case 0:
+			{
 				const char *my_params[2] = { (!unset) ? params[0] : params[0] + 1, NULL };
 
 				cmd_set("set-show", my_params);
@@ -1517,6 +1550,11 @@ COMMAND(cmd_quit)
 
 	if (config_keep_reason && !tmp && config_reason)
 		tmp = xstrdup(config_reason);
+
+	if (params[0] && !strcmp(params[0], "-")) {
+		xfree(tmp);
+		tmp = NULL;
+	}
 	
 	if (!quit_message_send) {
 		if (tmp) {
@@ -1921,7 +1959,7 @@ COMMAND(cmd_test_keygen)
 	chmod(fn, 0400);
 	xfree(fn);
 
-	name = saprintf("%s/%d.pem", prepare_path("keys", 0), config_uin);
+	fn = saprintf("%s/%d.pem", prepare_path("keys", 0), config_uin);
 	SIM_RSA_WriteKey(key, fn, PUBLIC);
 	xfree(fn);
 
@@ -2911,15 +2949,19 @@ void command_init()
 	  
 	command_add
 	( "away", "?", cmd_away, 0,
-	  " [powód]", "zmienia stan na zajêty",
+	  " [powód/-]", "zmienia stan na zajêty",
 	  "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie\n"
-          "podano powodu, zostanie wylosowany z pliku %Taway.reasons%n");
-	  
+          "podano powodu, zostanie wylosowany z pliku %Taway.reasons%n.\n"
+ 	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez\n"
+	  "wzglêdu na ustawienia zmiennych.");
+ 
 	command_add
 	( "back", "?", cmd_away, 0,
-	  " [powód]", "zmienia stan na dostêpny",
+	  " [powód/-]", "zmienia stan na dostêpny",
           "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie\n"
-	  "podano powodu, zostanie wylosowany z pliku %Tback.reasons%n");
+	  "podano powodu, zostanie wylosowany z pliku %Tback.reasons%n.\n"
+	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez\n"
+	  "wzglêdu na ustawienia zmiennych.");
 	  
 	command_add
 	( "bind", "???", cmd_bind, 0,
@@ -2974,8 +3016,8 @@ void command_init()
 	  "  close [numer/alias/#id]       zamyka po³±czenie\n"
 	  " [show]                         wy¶wietla listê po³±czeñ\n"
 	  "\n"
-	  "Po³±czenia bezpo¶rednie wymagaj± w³±czonej opcji %wdcc%n.\n"
-	  "dok³adny opis znajduje siê w pliku %wdocs/dcc.txt%n");
+	  "Po³±czenia bezpo¶rednie wymagaj± w³±czonej opcji %Tdcc%n.\n"
+	  "dok³adny opis znajduje siê w pliku %Tdocs/dcc.txt%n");
 	  
 	command_add
 	( "del", "u", cmd_del, 0,
@@ -2984,7 +3026,9 @@ void command_init()
 	
 	command_add
 	( "disconnect", "?", cmd_connect, 0,
-	  " [powód]", "roz³±cza siê z serwerem",
+	  " [powód/-]", "roz³±cza siê z serwerem",
+	  "Parametry identyczne jak dla komendy %Tquit%n.\n"
+	  "\n"
 	  "Je¶li w³±czona jest opcja %Tauto_reconnect%n, po wywo³aniu\n"
 	  "tej komendy, program nadal bêdzie próbowa³ siê automatycznie\n"
 	  "³±czyæ po okre¶lonym czasie.");
@@ -3038,7 +3082,7 @@ void command_init()
 	  
 	command_add
 	( "?", "c", cmd_help, 0,
-	  " [polecenie]", "synonim dla %whelp%n",
+	  " [polecenie]", "synonim dla %Thelp%n",
 	  "");
 	 
 	command_add
@@ -3048,9 +3092,11 @@ void command_init()
 	  
 	command_add
 	( "invisible", "?", cmd_away, 0,
-	  " [powód]", "zmienia stan na niewidoczny",
+	  " [powód/-]", "zmienia stan na niewidoczny",
           "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie\n"
-	  "podano powodu, zostanie wylosowany z pliku %Tquit.reasons%n");
+	  "podano powodu, zostanie wylosowany z pliku %Tquit.reasons%n.\n"
+	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez\n"
+	  "wzglêdu na ustawienia zmiennych.");
 
 	command_add
 	( "list", "u?", cmd_list, 0,
@@ -3102,9 +3148,11 @@ void command_init()
 	  
 	command_add
 	( "quit", "?", cmd_quit, 0,
-	  " [powód]", "wychodzi z programu",
+	  " [powód/-]", "wychodzi z programu",
           "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie\n"
-	  "podano powodu, zostanie wylosowany z pliku %Tquit.reasons%n");
+	  "podano powodu, zostanie wylosowany z pliku %Tquit.reasons%n.\n"
+	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez\n"
+	  "wzglêdu na ustawienia zmiennych.");
 	  
 	command_add
 	( "reconnect", "", cmd_connect, 0,
