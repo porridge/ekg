@@ -17,6 +17,11 @@ zg³osi³ b³±d.
 - uporz±dkowanie kodu timerów, timeoutów itp. (w)
 - wyrzucenie zmiennych away i private_mode, bo tylko komplikowa³y sprawy (w)
 - ró¿ne porz±dki w kodzie (w)
+- libgadu: poprawka b³êdu w gg_get_line() wyje¿d¿aj±cego w pustych
+  liniach 1 bajt przed bufor (w)
+- optymalizacja dodawania linii do backlogu, dziêki czemu mamy O(1) i
+  ekg nie chodzi tym wolniej, im d³u¿ej dzia³a i wiêcej siedzi w 
+  backlogu (w)
 
 // 2002-01-08
 

@@ -81,17 +81,19 @@ static void binding_add(const char *key, const char *action, int quiet);
 static void binding_delete(const char *key, int quiet);
 
 struct screen_line {
-	int len;
+	int len;		/* d³ugo¶æ linii */
 	
-	char *str;
-	char *attr;
+	char *str;		/* tre¶æ */
+	char *attr;		/* atrybuty */
 	
-	char *prompt_str;
-	char *prompt_attr;
-	int prompt_len;
+	char *prompt_str;	/* tre¶æ promptu */
+	char *prompt_attr;	/* atrybuty promptu */
+	int prompt_len;		/* d³ugo¶æ promptu */
 	
-	char *ts;
-	int ts_len;
+	char *ts;		/* timestamp */
+	int ts_len;		/* d³ugo¶æ timestampu */
+
+	int backlog;		/* z której linii backlogu pochodzi? */
 };
 
 enum window_frame_t {
@@ -163,7 +165,7 @@ struct binding *binding_map[KEY_MAX + 1];	/* mapa bindowanych klawiszy */
 struct binding *binding_map_meta[KEY_MAX + 1];	/* j.w. z altem */
 
 static void window_kill(struct window *w, int quiet);
-static int window_backlog_split(struct window *w, int full);
+static int window_backlog_split(struct window *w, int full, int removed);
 static void window_redraw(struct window *w);
 static void window_clear(struct window *w, int full);
 static void window_refresh();
@@ -199,11 +201,19 @@ static void window_refresh();
  */
 int window_backlog_add(struct window *w, fstring_t str)
 {
+	int i, removed = 0;
+	
 	if (!w)
 		return 0;
 
 	if (w->backlog_size == config_backlog_size) {
 		fstring_t fs = w->backlog[w->backlog_size - 1];
+		int i;
+
+		for (i = 0; i < w->lines_count; i++) {
+			if (w->lines[i].backlog == w->backlog_size - 1)
+				removed++;
+		}
 
 		xfree(fs->str);
 		xfree(fs->attr);
@@ -217,37 +227,55 @@ int window_backlog_add(struct window *w, fstring_t str)
 	w->backlog[0] = str;
 	w->backlog_size++;
 
-	return window_backlog_split(w, 0);
+	for (i = 0; i < w->lines_count; i++)
+		w->lines[i].backlog++;
+
+	return window_backlog_split(w, 0, removed);
 }
 
 /*
  * window_backlog_split()
  *
  * dzieli linie tekstu w buforze na linie ekranowe.
- * TODO: optymalizacja, dzielenie tylko tego, co zosta³o ostatnio dodane.
  *
  *  - w - okno do podzielenia
  *  - full - czy robimy pe³ne uaktualnienie?
+ *  - removed - ile linii ekranowych z góry usuniêto?
  *
  * zwraca rozmiar w liniach ekranowych ostatnio dodanej linii.
  */
-int window_backlog_split(struct window *w, int full)
+int window_backlog_split(struct window *w, int full, int removed)
 {
 	int i, res = 0, bottom = 0;
 
 	if (!w)
 		return 0;
 
+	/* przy pe³nym przebudowaniu ilo¶ci linii nie musz± siê koniecznie
+	 * zgadzaæ, wiêc nie bêdziemy w stanie pó¼niej stwierdziæ czy jeste¶my
+	 * na koñcu na podstawie ilo¶ci linii mieszcz±cych siê na ekranie. */
 	if (full && w->start == w->lines_count - w->height)
 		bottom = 1;
 	
-	for (i = 0; i < w->lines_count; i++)
-		xfree(w->lines[i].ts);
-	w->lines_count = 0;
-	xfree(w->lines);
-	w->lines = NULL;
+	/* mamy usun±æ co¶ z góry, bo wywalono liniê z backloga. */
+	if (removed) {
+		for (i = 0; i < removed && i < w->lines_count; i++)
+			xfree(w->lines[i].ts);
+		memmove(&w->lines[0], &w->lines[removed], sizeof(struct screen_line) * (w->lines_count - removed));
+		w->lines_count -= removed;
+	}
 
-	for (i = w->backlog_size - 1; i >= 0; i--) {
+	/* je¶li robimy pe³ne przebudowanie backloga, czy¶cimy wszystko */
+	if (full) {
+		for (i = 0; i < w->lines_count; i++)
+			xfree(w->lines[i].ts);
+		w->lines_count = 0;
+		xfree(w->lines);
+		w->lines = NULL;
+	}
+
+	/* je¶li upgrade... je¶li pe³ne przebudowanie... */
+	for (i = (!full) ? 0 : (w->backlog_size - 1); i >= 0; i--) {
 		struct screen_line *l;
 		char *str, *attr;
 		int j;
@@ -272,6 +300,7 @@ int window_backlog_split(struct window *w, int full)
 			l->len = strlen(str);
 			l->ts = NULL;
 			l->ts_len = 0;
+			l->backlog = i;
 
 			l->prompt_len = w->backlog[i]->prompt_len;
 			l->prompt_str = w->backlog[i]->str;
@@ -1014,7 +1043,7 @@ void contacts_rebuild()
 
 			w->width = stdscr->_maxx + 1;
 			wresize(w->window, w->height, w->width);
-			window_backlog_split(w, 1);
+			window_backlog_split(w, 1, 0);
 		}
 
 		window_refresh();
@@ -1041,7 +1070,7 @@ void contacts_rebuild()
 
 		w->width = stdscr->_maxx + 1 - CONTACTS_SIZE;
 		wresize(w->window, w->height, w->width);
-		window_backlog_split(w, 1);
+		window_backlog_split(w, 1, 0);
 	}
 
 	window_refresh();
@@ -2716,7 +2745,7 @@ static int ui_ncurses_event(const char *event, ...)
 			for (l = windows; l; l = l->next) {
 				struct window *w = l->data;
 				
-				window_backlog_split(w, 1);
+				window_backlog_split(w, 1, 0);
 			}
 		}
 
@@ -2740,7 +2769,7 @@ static int ui_ncurses_event(const char *event, ...)
 
 				w->backlog = xrealloc(w->backlog, w->backlog_size * sizeof(fstring_t));
 
-				window_backlog_split(w, 1);
+				window_backlog_split(w, 1, 0);
 			}
 		}
 	}
@@ -3078,7 +3107,7 @@ static int ui_ncurses_event(const char *event, ...)
 					
 				if (w->floating) {
 					wresize(w->window, w->height, w->width);
-					window_backlog_split(w, 1);
+					window_backlog_split(w, 1, 0);
 					window_redraw(w);
 					touchwin(window_current->window);
 					window_refresh();
