@@ -3803,6 +3803,7 @@ int binding_toggle_contacts(int a, int b)
 COMMAND(cmd_alias_exec)
 {	
 	list_t l, tmp = NULL, m = NULL;
+	int need_args = 0;
 
 	for (l = aliases; l; l = l->next) {
 		struct alias *a = l->data;
@@ -3813,20 +3814,12 @@ COMMAND(cmd_alias_exec)
 		}
 	}
 
-	for (; tmp; tmp = tmp->next)
-		list_add(&m, tmp->data, strlen(tmp->data) + 1);
-	
-	for (; m; m = m->next) {
+	for (; tmp; tmp = tmp->next) {
 		char *p;
-		int need_args = 0;
-		string_t str;
+		int __need = 0;
 
-		if (*((char *) m->data) == '/')
-			str = string_init(NULL);
-		else
-			str = string_init("/");
+		for (p = tmp->data; *p; p++) {
 
-		for (p = m->data; *p; p++) {
 			if (*p == '\\' && p[1] == '%') {
 				p += 2;
 				continue;
@@ -3840,9 +3833,23 @@ COMMAND(cmd_alias_exec)
 			if (!*p)
 				break;
 
-			if (*p >= '1' && *p <= '9' && (*p - '0') > need_args)
-				need_args = *p - '0';
+			if (*p >= '1' && *p <= '9' && (*p - '0') > __need)
+				__need = *p - '0';
+
+			if (need_args < __need)
+				need_args = __need;
 		}
+
+		list_add(&m, tmp->data, strlen(tmp->data) + 1);
+	}
+	
+	for (; m; m = m->next) {
+		string_t str;
+
+		if (*((char *) m->data) == '/')
+			str = string_init(NULL);
+		else
+			str = string_init("/");
 
 		if (need_args) {
 			char *args[9], **arr, *tmp;
