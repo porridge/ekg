@@ -44,7 +44,7 @@ AC_DEFUN(AC_CHECK_PYTHON,[
 					AC_MSG_RESULT($incl/python$PYTHON_VERSION/Python.h)
 					PYTHON_LIBS="$lib $lib/python$PYTHON_VERSION/config -lpython$PYTHON_VERSION"
 					PYTHON_INCLUDES="-I$incl/python$PYTHON_VERSION"
-					AC_DEFINE(WITH_PYTHON)
+					AC_DEFINE(WITH_PYTHON, 1, [define if You want python])
 					have_python=true
 					break
 				fi

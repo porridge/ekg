@@ -41,7 +41,7 @@ AC_DEFUN(AC_CHECK_NCURSES,[
 	have_ncurses=true
 	ldflags_old="$LDFLAGS"
 	LDFLAGS="$CURSES_LIBS"
-	AC_DEFINE(HAVE_NCURSES)
+	AC_DEFINE(HAVE_NCURSES, 1, [define if You want ncurses])
 	AC_CHECK_LIB(ncurses, initscr,
 	  [CURSES_LIBS="$CURSES_LIBS -lncurses"],
 	  [AC_CHECK_LIB(curses, initscr,
