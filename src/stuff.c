@@ -3443,9 +3443,9 @@ void change_status(int status, const char *arg, int autom)
 	
 	xfree(config_reason);
 	config_reason = reason;
+	config_status = status;
 
 	xfree(tmp);
 
 	update_status();
 }
-

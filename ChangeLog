@@ -11,6 +11,7 @@ zg³osi³ b³±d.
 - /list mo¿e ju¿ dodawaæ/usuwaæ z wielu grup (rodzielonych przecinkiem)
   na raz. dodatkowo, nie dodaje ju¿ u¿ytkownika kilka razy do tej samej
   grupy. kosmetyka (sz)
+- po reorganizacji stanów nie zapisywa³ siê nasz aktualny stan po /save (sz)
 - obs³uga zdarzenia ,,blink_leds'' w ,,on'' dla solarisa (d)
 - ma³a poprawka konfliktu nazw dla solarisa (d)
 - dodana ¿a³osna namiastka ,,beeps_spk'' dla solarisa (d)
