@@ -1192,6 +1192,9 @@ struct list *alias_check(char *line)
 	struct list *l;
 	int i = 0;
 
+	while (*line == ' ')
+		line++;
+
 	while (line[i] != ' ' && line[i])
 		i++;
 
