@@ -654,7 +654,7 @@ void handle_dcc(struct gg_dcc *d)
 						remove_transfer(d);
 						list_remove(&watches, d, 0);
 						gg_free_dcc(d);
-						return;
+						break;
 					}
 					t->dcc = d;
 					t->type = GG_SESSION_DCC_SEND;
@@ -674,7 +674,7 @@ void handle_dcc(struct gg_dcc *d)
 			my_printf((t->dcc->type == GG_SESSION_DCC_SEND) ? "dcc_done_send" : "dcc_done_get", format_user(t->uin), t->filename);
 			
 			remove_transfer(d);
-			list_remove(&transfers, t, 0);
+			list_remove(&watches, d, 0);
 			gg_free_dcc(d);
 
 			break;
