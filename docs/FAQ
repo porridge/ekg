@@ -21,7 +21,7 @@ Q: Jak zarejestrowaæ nowego u¿ytkownika?
 A: U¿yæ polecenia ,,register <email> <has³o>''
 
 Q: Jak wys³aæ smsy?
-A: Patrz pierwsza odpowied¼.
+A: Patrz pierwsza odpowied¼. Jest opisane w dokumentacji.
 
 Q: Jak pobraæ listê u¿ytkowników z serwera lub j± tam umie¶ciæ?
 A: Odpowiednio ,,list --get'' i ,,list --put''.
@@ -32,8 +32,15 @@ A: U¿yæ polecenia ,,change''.
 Q: Jak wys³aæ lub odebraæ plik?
 A: Przeczytaæ szybki kurs z pliku ,,dcc.txt''.
 
-Q: Dlaczego PageUp nie dzia³a? Mo¿na otworzyæ osobne okienko do rozmowy?
-A: Bo nie. Nie ma takiej mo¿liwo¶ci. Nie wiadomo, czy w ogóle bêdzie.
+Q: Dlaczego PageUp nie dzia³a?
+A: Bo nie. Je¶li chcesz mieæ mo¿liwo¶æ przewijania, ale za to nieznacznie
+   mniejsz± wygodê (brak dope³niania tabem, brak kilku kombinacji klawiszy,
+   brak query, brak prompta) to mo¿esz po rozpakowaniu wpisaæ ,,./configure
+   --enable-ui-ncurses''. Je¶li siê nie skompiluje, albo nie dzia³a, nie
+   narzekaj. Ta opcja jest jeszcze ca³y czas rozwijana.
+
+Q: Mo¿na otworzyæ osobne okienko do rozmowy?
+A: Nie.
 
 Q: Kiedy bêdzie mo¿na?
 A: Gdy kto¶ z nadmiarem wolnego czasu i odpowiedni± ilo¶ci± chêci znajdzie

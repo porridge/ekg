@@ -1,9 +1,18 @@
+od 20020629 interfejs u¿ytkownika oparty na ncurses jest ju¿ u¿ywalny,
+je¶li kto¶ lubi nowo¶ci. brakuje dope³niania tabem, brakuje prompta,
+brakuje query, brakuje kilku klawiszy. i pewnie ma jeszcze masê b³êdów.
+w ka¿dym razie, mo¿na przewijaæ do góry klawiszami PageUp i PageDown (;
+
 od 20020627 ekg jest przygotowane do obs³ugi ró¿nych interfejsów u¿ytkowika.
 zrobi³em ca³kiem spor± reorganizacjê kodu, dziêki czemu nie trzeba bêdzie
-psuæ zbyt du¿o, ¿eby dodaæ frontend w ncurses czy jakikolwiek inny. ekg
-spodziewa siê paru funkcji:
+psuæ zbyt du¿o, ¿eby dodaæ frontend w ncurses czy jakikolwiek inny.
 
-ui_XXX_init()
+je¶li kto¶ chce napisaæ w³asny interfejs (chocia¿by w gtk+, chocia¿ nie
+wiem po co, skoro jest GNU Gadu -- http://gadu.gnu.pl/), musi napisaæ
+ui-costam.c, zawieraj±cy poni¿ej podane funkcje i dopisaæ parê linijek
+do ekg.c.
+
+ui_costam_init()
 	inicjalizacja interfejsu u¿ytkownika. dla ui-readline bêdzie to
 	ustawienie wszystkich zmiennych. dla ui-ncurses pewnie jakie¶
 	initscr(), przygotowanie okienek itd. nale¿y przypisaæ zmiennym
