@@ -1,10 +1,20 @@
 #!/usr/bin/perl -w
-#  ekglog.pl
+#  ekglog.pl - log formatter for EKG
+#  by Michal Miszewski <fixer@irc.pl>
 #
-#  log formatter for EKG
+#  version 0.2 (06.08.2003)
+#    + support for logged sms
+#    + some modifications of parsing hyperlinks
+#    + e-mail addresses parsing
+#    + corrected html dtd header
+#    Grzesiek Kusnierz <koniu@bezkitu.com>:
+#    + leading zero for time
+#    + fixed parsing hyperlinks
+#    Robert Osowiecki <magic.robson@rassun.art.pl>:
+#    + corrected '&' with '>' (htmlize)
 #
 #  version 0.1 (18.06.2003)
-#  by Michal Miszewski <fixer@irc.pl>
+#    first published version
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License version 2 as
@@ -12,15 +22,18 @@
 
 use Getopt::Long;
 
-$ver = 0.1;
+$ver = 0.2;
 $mynick = "Ja";
 
 sub fmttime {
   my $time = "";
-  @tm = gmtime shift;
+  my $in = shift;
+  @tm = gmtime $in if ($in ne "");
   $tm[3] = "0".$tm[3] if length($tm[3]) == 1;
   $tm[4]++;
   $tm[4] = "0".$tm[4] if length($tm[4]) == 1;
+  $tm[2] = "0".$tm[2] if length($tm[2]) == 1;
+  $tm[1] = "0".$tm[1] if length($tm[1]) == 1;
   $time = "$tm[3]-$tm[4]-".(1900 + $tm[5]) if (!$nodate);
   $time = $time." " if (!($nodate) && !($notime));
   $time = $time."$tm[2]:$tm[1]" if (!$notime);
@@ -29,14 +42,15 @@ sub fmttime {
 
 sub htmlize {
   my $ln = shift;
+  $ln =~ s/&/&amp;/g;
   $ln =~ s/\>/&gt;/g;
   $ln =~ s/\</&lt;/g;
-  $ln =~ s/&/&amp;/g;
   if ($ln =~ m/(^ +)/) {
     for (1 .. length $1) { $ln = "&nbsp;".$ln }
     $ln =~ s/ +//;
   }
-  $ln =~ s/((www\.|(https?|ftp):\/\/)(\d|\w|\/|\.|&|\?|\=|;)+)/<a href=\"$1\">$1\<\/a\>/gi;
+  $ln =~ s/((www\.|(https?|ftp|telnet|gopher):\/\/)(\_|\-|\~|\d|\w|\/|\.|&|\?|\=|;)+)/<a href=\"$1\">$1\<\/a\>/gi;
+  $ln =~ s/((\_|\-|\d|\w|\.)+\@(\_|\-|\d|\w|\.)+)/<a href=\"mailto:$1\">$1\<\/a\>/gi;
   $ln =~ s/[^\\]\\n/<br \/>/g;
   $ln =~ s/[^\\]\\r//g;
   $ln =~ s/\\([^\\])/$1/g;
@@ -77,6 +91,7 @@ print '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.o
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-2" />
+  <meta http-equiv="generator" content="ekglog.pl" />
   <title>log</title>
 ';
 print '  <style type="text/css">
@@ -121,6 +136,19 @@ while (<ARGV>) {
     } else {
       $text = htmlize $text;
       print "<dt>$time<b>$nick</b>$num</dt>\n<dd>$text</dd>\n";
+    };
+  }
+  if (m/^smssend/) {
+    @ln = split /,/, $_, 4;
+    if (m/\"/) { $text = substr $ln[3], 1, -1 } else { $text = $ln[3] };
+    $nick = $ln[1];
+    $time = fmttime($ln[2]);
+    if ($ptext) {
+      $text = txtize $text;
+      print "$time SMS -> $nick\n  $text\n\n"
+    } else {
+      $text = htmlize $text;
+      print "<dt>$time <b>SMS -&gt; $nick</b></dt>\n<dd>$text</dd>\n";
     };
   }
   if (m/^status/) {
