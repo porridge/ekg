@@ -22,6 +22,7 @@ zg³osi³ b³±d.
   osób, które dzieli³y siê pomys³ami/w)
 - obs³uga grup w li¶cie kontaktów. ustawiane zmienn± ,,contacts_groups''
   i prze³±czane klawiszem F4 (jojo/w)
+- libgadu: bufor z opisem stanu z gg_login_params jest strdup()owany (pirat/w)
 
 // 2003-02-07
 
