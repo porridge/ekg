@@ -21,6 +21,9 @@ zg³osi³ b³±d.
   samo, jak w kliencie. ze wzglêdu na sposób podawania parametrów, nie mo¿na
   jednak wyczy¶ciæ stanu przez ,,-''. je¶li bêdzie to przeszkadza³o, zawsze
   mo¿na przywróciæ stare, ale chyba bardziej k³opotliwe zachowanie ;) (sz)
+- usuniêcie zbêdnego sprawdzania pod k±tem ,,NULL'' w userlist.c. je¶li
+  komu¶ co¶ sie zepsu³o, krzyczeæ, bo trzeba wszystkie b³êdy wy³apaæ. (sz)
+- poziomy ignorowania. /help ignore (sz)
 - zbyt d³uga wysy³ana wiadomo¶æ zostanie przyciêta. niestety, nie dotyczy
   to jeszcze szyfrowanych wiadomo¶ci (w)
 - drobne poprawki kodu (w)
