@@ -1174,19 +1174,32 @@ void handle_dcc(struct gg_dcc *d)
 			break;
 			
 		case GG_EVENT_DCC_ERROR:
+		{
+			struct in_addr addr;
+			char *tmp;
+		
+			addr.s_addr = d->remote_addr;
+
+			if (d->peer_uin)
+				tmp = saprintf("%s (%s:%d)", xstrdup(format_user(d->peer_uin)), inet_ntoa(addr), d->remote_port);
+			else 
+				tmp = saprintf("%s:%d", inet_ntoa(addr), d->remote_port);
+			
 			switch (e->event.dcc_error) {
 				case GG_ERROR_DCC_HANDSHAKE:
-					print("dcc_error_handshake", format_user(d->peer_uin));
+					print("dcc_error_handshake", tmp);
 					break;
 				case GG_ERROR_DCC_NET:
-					print("dcc_error_network", format_user(d->peer_uin));
+					print("dcc_error_network", tmp);
 					break;
 				case GG_ERROR_DCC_REFUSED:
-					print("dcc_error_refused", format_user(d->peer_uin));
+					print("dcc_error_refused", tmp);
 					break;
 				default:
-					print("dcc_error_unknown", "");
+					print("dcc_error_unknown", tmp);
 			}
+
+			xfree(tmp);
 
 #ifdef HAVE_VOIP
 			if (d->type == GG_SESSION_DCC_VOICE)
@@ -1198,6 +1211,7 @@ void handle_dcc(struct gg_dcc *d)
 			gg_free_dcc(d);
 
 			break;
+		}
 	}
 
 	gg_event_free(e);

@@ -9,6 +9,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - poprawka themów ze stylami (Arim/w)
 - poprawka execa z ukrytym zakoñczeniem (sdas/w)
+- dodanie pól gg_dcc->remote_{addr,port}, podbicie wersji API (w)
+- b³êdy dcc informuj± równie¿ o adresie IP, ¿eby wiedzieæ kto nas
+  mo¿e DoSowaæ (w)
 
 // 2002-09-20
 

@@ -157,6 +157,8 @@ struct gg_dcc {
 	char *voice_buf;	/* bufor na pakiet po³±czenia g³osowego */
 	int incoming;		/* po³±czenie przychodz±ce */
 	char *chunk_buf;	/* bufor na kawa³ek danych */
+	uint32_t remote_addr;	/* adres drugiej strony */
+	uint16_t remote_port;	/* port drugiej strony */
 };
 
 /*
