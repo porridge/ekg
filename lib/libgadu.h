@@ -621,7 +621,7 @@ extern int gg_debug_level;
 void gg_debug(int level, const char *format, ...);
 #endif
 
-const char *gg_libgadu_version();
+const char *gg_libgadu_version(void);
 
 /*
  * konfiguracja http proxy.
@@ -670,7 +670,7 @@ uint32_t gg_fix32(uint32_t x);
 uint16_t gg_fix16(uint16_t x);
 #define fix32 gg_fix32
 #define fix16 gg_fix16
-char *gg_proxy_auth();
+char *gg_proxy_auth(void);
 char *gg_base64_encode(const char *buf);
 char *gg_base64_decode(const char *buf);
 
