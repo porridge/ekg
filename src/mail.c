@@ -291,7 +291,7 @@ int check_mail_maildir()
 	}
 
 	if (!pid) {	/* born to be wild */
-		int d_new = 0, new = 0, i = 0;
+		int d_new = 0, new = 0;
 		char *s = NULL;
 		struct dirent *d;
 		DIR *dir;
@@ -302,8 +302,6 @@ int check_mail_maildir()
 		for (l = mail_folders; l; l = l->next) {
 			struct mail_folder *m = l->data;
 			char *tmp = saprintf("%s/%s", m->fname, "new");
-
-			i++;
 
 			if (!(dir = opendir(tmp))) {
 				xfree(tmp);
@@ -323,7 +321,7 @@ int check_mail_maildir()
 			xfree(tmp);
 			closedir(dir);
 
-			if (i == list_count(mail_folders))
+			if (!l->next)
 				s = saprintf("%d,%d", m->fhash, d_new);
 			else
 				s = saprintf("%d,%d\n", m->fhash, d_new);
