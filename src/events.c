@@ -109,6 +109,7 @@ void handle_msg(struct gg_event *e)
 
 	
 	if (is_ignored(e->event.msg.sender)) {
+#ifdef LOG_IGNORED
 		cp_to_iso(e->event.msg.message);
 		if (u)
 			snprintf(sender, sizeof(sender), "%s/%lu", u->comment, u->uin);
@@ -117,6 +118,7 @@ void handle_msg(struct gg_event *e)
 		put_log(e->event.msg.sender, ">> ignorowana %s %s (%s)\n%s\n", (chat) ?
 		"Rozmowa od" : "Wiadomo¶æ od", sender, full_timestamp(),
 		e->event.msg.message);
+#endif
 		return;
 	};
 	
