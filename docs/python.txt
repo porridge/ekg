@@ -1,18 +1,76 @@
 // obs³uga skryptów w pythonie
 
-z braku czasu/chêci/czegokolwiek, ./configure --with-python bierze
-includy z /usr/include/python2.1 i linkuje z libpython2.1.so. je¶li
-nie odpowiada to Twojemu systemowi, popraw ./configure. aktualnie
-niewiele jeszcze dzia³a. w zasadzie to prawie nic. przyk³adowy skrypt:
+1) ./configure --with-python
+2) skrypty musz± znajdowaæ siê w ~/.gg/scripts
+3) /help python
+4) przyk³adowy skrypt:
 
-   import ekg
+	# skrypt ignoruj±cy zmiany stanu zawieraj±ce w opisie co¶, co
+	# przypomina tytu³ empetrójek.
+	#
+	# 20021215 wojtekka
+
+	import ekg
+	import re
+		
+	regulka = re.compile("^[A-Z].* - [A-Z].*")
+
+	def init():
+		ekg.printf("generic", "Za³adowano super hiper skrypciora!")
+		return 1
+		
+	def deinit():
+		ekg.printf("generic", "Ta-jest, kapitanie")
+	
+	def handle_status(uin, name, status, descr):
+		if not descr:
+			return 1
+			
+		if regulka.match(descr):
+			return 0
+		else:
+			return 1
+
+***
+
+skrypty pythonowe w ekg maj± byæ naprawdê proste w pisaniu, w przeciwieñstwie
+do skryptów perlowych w irssi, które ciê¿ko z pocz±tku zrozumieæ. jest kilka
+funkcji, które bêd± wywo³ywane przez ekg w szczególnych przypadkach:
+
+- init()
+
+  gdy skrypt jest ³adowany. je¶li ta funkcja zwróci 0, skrypt nie zostanie
+  za³adowanych.
+
+- deinit()
+
+  gdy skrypt jest usuwany z pamiêci.
+
+- handle_msg(uin, name, msgclass, text, secure)
+
+  gdy ekg otrzymuje wiadomo¶æ. uin - numer nadawcy, name - jego nazwa,
+  msgclass - klasa wiadomo¶ci, text - tre¶æ, secure - czy mamy do czynienia
+  z odszyfrowan± wiadomo¶ci±. je¶li zwróci 0, wiadomo¶æ zostanie zignorowana.
+
+- handle_status(uin, name, status, descr)
+
+  gdy kto¶ zmienia stan. nazwy parametrów powinny byæ zrozumia³e. je¶li
+  zwróci 0, wiadomo¶æ zostanie zignorowana.
+
+pó¼niej zostan± dodane funkcje dotycz±ce wszystkich zdarzeñ zwi±zanych
+z sesj± gg. zostanie te¿ dodana mo¿liwo¶æ zmiany argumentów zdarzenia,
+a nie tylko ignorowania, przez zwrócenie krotki (? ang. tuple) tej samej
+postaci, co argumenty funkcji.
+	
+***
+
+przyk³ady u¿ycia modu³u ekg w skryptach:
+
    ekg.printf("generic", "Jestem skryptem w Pythonie!")
    ekg.command("msg 123 hej!")
    ekg.disconnect()
    ekg.config.uin = 12345
    ekg.config.password = "test123"
    ekg.connect()
-
-który ³adujemy komend± ,,_run test.py''. nic wiêcej.
 
 $Id$

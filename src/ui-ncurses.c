@@ -801,7 +801,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 		}
 	}
 	
-	if (w->start - w->lines_count > w->height)
+	if (w->start < w->lines_count - w->height)
 		w->more = 1;
 
 	if (!w->floating) {

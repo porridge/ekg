@@ -2977,6 +2977,7 @@ int timer_remove(const char *name, const char *command)
 		if ((name && !strcmp(name, t->name)) || (command && !strcmp(command, t->command))) {
 			xfree(t->name);
 			xfree(t->command);
+			xfree(t->id);
 			list_remove(&timers, t, 1);
 			removed = 1;
 		}
@@ -2999,6 +3000,7 @@ void timer_free()
 		
 		xfree(t->name);
 		xfree(t->command);
+		xfree(t->id);
 	}
 
 	list_destroy(timers, 1);

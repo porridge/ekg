@@ -96,6 +96,7 @@ struct timer {
 	int ui;		/* czy obs³ugiwany przez ui */
 	char *name;	/* nazwa timera */
 	char *command;	/* komenda do wywo³ania */
+	char *id;	/* identyfikator timera */
 };
 
 struct last {

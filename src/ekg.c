@@ -51,7 +51,9 @@
 #include "vars.h"
 #include "xmalloc.h"
 #include "ui.h"
-#include "python.h"
+#ifdef WITH_PYTHON
+#  include "python.h"
+#endif
 #include "msgqueue.h"
 #include "mail.h"
 #ifdef HAVE_OPENSSL
@@ -256,7 +258,7 @@ void ekg_wait_for_key()
 			if (time(NULL) - t->started > t->period) {
 #ifdef WITH_PYTHON
 				if (t->script)
-					python_function(t->command);
+					python_function(t->command, t->id);
 				else
 #endif
 				if (t->ui)
@@ -266,6 +268,7 @@ void ekg_wait_for_key()
 
 				xfree(t->name);
 				xfree(t->command);
+				xfree(t->id);
 
 				list_remove(&timers, t, 1);
 			}
@@ -603,8 +606,10 @@ static void setup_debug()
 
 	fcntl(fd[0], F_SETFL, O_NONBLOCK);
 	fcntl(fd[1], F_SETFL, O_NONBLOCK);
+
+	dup2(fd[1], 2);
 	
-	gg_debug_file = fdopen(fd[1], "w");
+	gg_debug_file = stderr;
 	setbuf(gg_debug_file, NULL);		/* XXX leak */
 
 	list_add(&watches, &se, sizeof(se));

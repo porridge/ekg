@@ -50,7 +50,9 @@
 #include "voice.h"
 #include "xmalloc.h"
 #include "ui.h"
-#include "python.h"
+#ifdef WITH_PYTHON
+#  include "python.h"
+#endif
 #ifdef HAVE_OPENSSL
 #  include "sim.h"
 #endif
@@ -2770,21 +2772,39 @@ COMMAND(cmd_timer)
 
 #ifdef WITH_PYTHON
 
-COMMAND(cmd_test_python)
+COMMAND(cmd_python)
 {
 	if (!params[0]) {
-		print("not_enough_params", name);
+		python_list();
 		return;
 	}
 
-	if (!strcmp(name, "_load"))
-		python_load(params[0]);
+	if (!strncasecmp(params[0], "lo", 2)) {
+		python_load(params[1]);
+		return;
+	}
 
-	if (!strcmp(name, "_run"))
-		python_run(params[0]);
+	if (!strncasecmp(params[0], "u", 1)) {
+		python_unload(params[1]);
+		return;
+	}
 
-	if (!strcmp(name, "_py"))
-		python_exec(params[0]);
+	if (!strncasecmp(params[0], "r", 1)) {
+		python_run(params[1]);
+		return;
+	}
+
+	if (!strncasecmp(params[0], "e", 1)) {
+		python_exec(params[1]);
+		return;
+	}
+
+	if (!strncasecmp(params[0], "li", 2)) {
+		python_list();
+		return;
+	}
+
+	print("invalid_params", name);
 }
 
 #endif
@@ -3492,6 +3512,17 @@ void command_init()
 	  "  refresh\n"
 	  "  list");
 
+#ifdef WITH_PYTHON
+	command_add
+	( "python", "p?", cmd_python, 0,
+	  " <komenda> [opcje]", "obs³uga skryptów",
+	  "  load <skrypt>    ³aduje skrypt\n"
+	  "  unload <skrypt>  usuwa skrypt z pamiêci\n"
+	  "  run <plik>       uruchamia skrypt\n"
+	  "  exec <komenda>   uruchamia komendê\n"
+	  "  list             wy¶wietla listê za³adowanych skryptów\n");
+#endif
+
 	command_add
 	( "_add", "?", cmd_test_add, 0, "",
 	  "dodaje do listy dope³niania TABem", "");
@@ -3523,17 +3554,6 @@ void command_init()
 	command_add
 	( "_keydel", "u", cmd_test_keydel, 0, " <numer/alias>",
 	  "usuwa klucz publiczny danej osoby", "");
-#endif
-#ifdef WITH_PYTHON
-	command_add
-	( "_load", "?", cmd_test_python, 0, "", 
-	  "³aduje skrypt", "");
-	command_add
-	( "_run", "?", cmd_test_python, 0, "", 
-	  "uruchamia skrypt", "");
-	command_add
-	( "_py", "?", cmd_test_python, 0, "",
-	  "wykonuje polecenie Pythona", "");
 #endif
 }
 

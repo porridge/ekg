@@ -20,11 +20,30 @@
 #ifndef __PYTHON_H
 #define __PYTHON_H
 
+#include <Python.h>
+
+struct module {
+	char *name;			/* nazwa skryptu */
+	
+	PyObject *module;		/* obiekt modu³u */
+
+	PyObject *deinit;		/* funkcja deinicjalizacji */
+
+	PyObject *handle_msg;		/* obs³uga zdarzeñ... */
+	PyObject *handle_connect;
+	PyObject *handle_disconnect;
+	PyObject *handle_status;
+};
+
+list_t modules;
+
 int python_initialize();
 int python_finalize();
-int python_load(const char *filename);
-int python_function(const char *name);
+int python_load(const char *name);
+int python_unload(const char *name);
 int python_exec(const char *command);
 int python_run(const char *filename);
+int python_list();
+int python_function(const char *function, const char *arg);
 
 #endif /* __PYTHON_H */

@@ -25,14 +25,7 @@
 #include "commands.h"
 #include "version.h"
 #include "vars.h"
-
-struct module {
-	char *name;
-	PyObject *module;
-	PyObject *deinit;
-};
-
-list_t modules = NULL;
+#include "python.h"
 
 static PyObject* ekg_connect(PyObject *self, PyObject *args)
 {
@@ -168,9 +161,21 @@ int python_initialize()
 {
 	PyObject *ekg, *ekg_config;
 
-	setenv("PYTHONPATH", ".", 1);
+	/* PyImport_ImportModule spodziewa siê nazwy modu³u, który znajduje
+	 * siê w $PYTHONPATH, wiêc dodajemy tam katalog ~/.gg/scripts. mo¿na
+	 * to zrobiæ w bardziej elegancki sposób, ale po co komplikowaæ sobie
+	 * ¿ycie? */
+
+	if (getenv("PYTHONPATH")) {
+		char *tmp = saprintf("%s:%s", getenv("PYTHONPATH"), prepare_path("scripts", 0));
+		setenv("PYTHONPATH", tmp, 1);
+		xfree(tmp);
+	} else
+		setenv("PYTHONPATH", prepare_path("scripts", 0), 1);
 
 	Py_Initialize();
+
+	PyImport_AddModule("ekg");
 
 	if (!(ekg = Py_InitModule("ekg", ekg_methods)))
 		return -1;
@@ -183,13 +188,81 @@ int python_initialize()
 	return 0;
 }
 
+/*
+ * python_finalize()
+ *
+ * usuwa z pamiêci interpreter, zwalnia pamiêæ itd.
+ *
+ * 0/-1
+ */
 int python_finalize()
 {
+	list_t l;
+
+	for (l = modules; l; l = l->next) {
+		struct module *m = l->data;
+
+		xfree(m->name);
+
+		if (m->deinit) {
+			PyObject *res = PyObject_CallFunction(m->deinit, "()");
+			Py_XDECREF(res);
+			Py_XDECREF(m->deinit);
+		}
+	}
+	
+	list_destroy(modules, 1);
+	
 	Py_Finalize();
 
 	return 0;
 }
 
+/*
+ * python_unload()
+ *
+ * usuwa z pamiêci podany skrypt.
+ *
+ *  - name - nazwa skryptu
+ *
+ * 0/-1
+ */
+int python_unload(const char *name)
+{
+	list_t l;
+
+	for (l = modules; l; l = l->next) {
+		struct module *m = l->data;
+
+		if (strcmp(m->name, name))
+			continue;
+
+		gg_debug(GG_DEBUG_MISC, "m->deinit = %p, hmm?\n", m->deinit);
+		if (m->deinit) {
+			PyObject *res = PyObject_CallFunction(m->deinit, "()");
+			Py_XDECREF(res);
+			Py_XDECREF(m->deinit);
+		}
+
+		list_remove(&modules, m, 1);
+
+		print("generic", "Skrypt zosta³ usuniêty");
+
+		return 0;
+	}
+	
+	print("generic", "Nie znaleziono skryptu");
+	
+	return -1;
+}
+
+/*
+ * python_run()
+ *
+ * uruchamia jednorazowo skrypt pythona.
+ *
+ * 0/-1
+ */
 int python_run(const char *filename)
 {
 	FILE *f = fopen(filename, "r");
@@ -203,95 +276,101 @@ int python_run(const char *filename)
 	return 0;
 }
 
-int python_load(const char *filename)
+PyObject *python_get_func(PyObject *module, const char *name)
+{
+	PyObject *result = PyObject_GetAttrString(module, (char*) name);
+
+	if (result && !PyCallable_Check(result)) {
+		Py_XDECREF(result);
+		result = NULL;
+	}
+
+	return result;
+}
+
+/*
+ * python_load()
+ *
+ * ³aduje skrypt pythona o podanej nazwie z ~/.gg/scripts
+ *
+ *  - name - nazwa skryptu
+ *
+ * 0/-1
+ */
+int python_load(const char *name)
 {
 	PyObject *module, *init;
 	struct module m;
-	char *name, *oldppath;
+	char *name2;
 
-	oldppath = xstrdup(getenv("PYTHONPATH"));
+	if (!name)
+		return -1;
 	
-	/* PyImport_ImportModule spodziewa siê nazwy modu³u, który znajduje
-	 * siê w $PYTHONPATH, wiêc ³adnie rozbijemy nazwê pliku i dodamy
-	 * jego ¶cie¿kê. */
-	if (strchr(filename, '/')) {
-		const char *p;
-		char *q;
-
-		for (p = filename + strlen(filename); p > filename && *p != '/'; p--);
-
-		q = xmalloc(p - filename + 1);
-		strncpy(q, filename, p - filename);
-		q[p - filename] = 0;
-
-		if (oldppath) {
-			char *tmp = saprintf("%s:%s", oldppath, q);
-			setenv("PYTHONPATH", tmp, 1);
-			xfree(tmp);
-		} else
-			setenv("PYTHONPATH", q, 1);
-
-		xfree(q);
-		
-		if (*p == '/')
-			p++;
-
-		name = xstrdup(p);
-	} else {
-		if (oldppath) {
-			char *tmp = saprintf("%s:.", oldppath);
-			setenv("PYTHONPATH", tmp, 1);
-			xfree(tmp);
-		} else
-			setenv("PYTHONPATH", ".", 1);
-
-		name = xstrdup(filename);
-	}
-	
-//	if (strlen(name) > 3 && !strcmp(name + strlen(name) - 3, ".py"))
-//		name[strlen(name) - 3] = 0;
-
-	gg_debug(GG_DEBUG_MISC, "PYTHONPATH=%s\n", getenv("PYTHONPATH"));
-	gg_debug(GG_DEBUG_MISC, "name=%s\n", name);
-	chdir(getenv("PYTHONPATH"));
-	
-	if (!(module = PyImport_ImportModule(name))) {
-		print("generic", "Nie znaleziono modu³u");
-		if (oldppath)
-			setenv("PYTHONPATH", oldppath, 1);
-		else
-			unsetenv("PYTHONPATH");
-
-		xfree(name);
+	if (strchr(name, '/')) {
+		char *tmp = saprintf("Skrypt nale¿y umie¶ciæ w katalogu \033[1m%s\033[0m", prepare_path("scripts", 0));
+		print("generic", tmp);
+		xfree(tmp);
 		return -1;
 	}
-	
+
+	name2 = xstrdup(name);
+
+	if (strlen(name2) > 3 && !strcasecmp(name2 + strlen(name2) - 3, ".py"))
+		name2[strlen(name2) - 3] = 0;
+
+	module = PyImport_ImportModule(name2);
+
+	if (!module) {
+		print("generic", "Nie znaleziono skryptu");
+		PyErr_Print();
+		xfree(name2);
+		return -1;
+	}
+
 	if ((init = PyObject_GetAttrString(module, "init"))) {
-		PyObject *args = Py_BuildValue("()"), *result;
+		if (PyCallable_Check(init)) {
+			PyObject *result = PyObject_CallFunction(init, "()");
 
-		result = PyEval_CallObject(init, args);
+			if (result) {
+				int resulti = PyInt_AsLong(result);
 
-		Py_XDECREF(result);
-		Py_XDECREF(args);
+				if (!resulti) {
+					
+				}
+
+				Py_XDECREF(result);
+			}
+		}
+
 		Py_XDECREF(init);
 	}
 
 	memset(&m, 0, sizeof(m));
 
-	m.name = xstrdup(name);
+	m.name = xstrdup(name2);
 	m.module = module;
-	m.deinit = PyObject_GetAttrString(module, "deinit");
+	m.deinit = python_get_func(module, "deinit");
+	m.handle_msg = python_get_func(module, "handle_msg");
+	m.handle_connect = python_get_func(module, "handle_connect");
+	m.handle_disconnect = python_get_func(module, "handle_disconnect");
+	m.handle_status = python_get_func(module, "handle_status");
 
 	list_add(&modules, &m, sizeof(m));
 	
-	if (oldppath)
-		setenv("PYTHONPATH", oldppath, 1);
-	else
-		unsetenv("PYTHONPATH");
+	xfree(name2);
 
 	return 0;
 }
 
+/*
+ * python_exec()
+ *
+ * wykonuje polecenie pythona.
+ * 
+ *  - command - polecenie
+ * 
+ * 0/-1
+ */
 int python_exec(const char *command)
 {
 	char *tmp = saprintf("import ekg\n%s\n", command);
@@ -302,7 +381,28 @@ int python_exec(const char *command)
 	return 0;
 }
 
-int python_function(const char *name)
+/*
+ * python_list()
+ *
+ * wy¶wietla listê za³adowanych skryptów.
+ *
+ * 0/-1
+ */
+int python_list()
+{
+	list_t l;
+
+	for (l = modules; l; l = l->next) {
+		struct module *m = l->data;
+
+		print("generic", m->name);
+	}
+
+	return 0;
+}
+
+int python_function(const char *function, const char *arg)
 {
 	return -1;
 }
+

@@ -45,6 +45,9 @@
 #  include "sim.h"
 #endif
 #include "msgqueue.h"
+#ifdef WITH_PYTHON
+#  include "python.h"
+#endif
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure();
@@ -379,6 +382,30 @@ void handle_msg(struct gg_event *e)
 	int chat = ((e->event.msg.msgclass & 0x0f) == GG_CLASS_CHAT), secure = 0;
 	char *tmp;
 	
+#ifdef WITH_PYTHON
+	list_t l;
+	
+	for (l = modules; l; l = l->next) {
+		struct module *m = l->data;
+		PyObject *res;
+
+		if (!m->handle_msg)
+			continue;
+
+		res = PyObject_CallFunction(m->handle_msg, "(isisii)", e->event.msg.sender, (u) ? ((u->display) ? u->display : "") : "", e->event.msg.msgclass, e->event.msg.message, e->event.msg.time, 0);
+
+		if (!res)
+			PyErr_Print();
+
+		if (res && PyInt_Check(res) && !PyInt_AsLong(res)) {
+			Py_XDECREF(res);
+			return;
+		}
+
+		Py_XDECREF(res);
+	}
+#endif
+	
 	if (!e->event.msg.message)
 		return;
 
@@ -607,6 +634,9 @@ static void handle_common(uin_t uin, int status, const char *descr, struct gg_no
 	};
 	struct status_table *s;
 	int prev_status;
+#ifdef WITH_PYTHON
+	list_t l;
+#endif
 
 	/* je¶li ignorujemy, nie wy¶wietlaj */
 	if (ignored_check(uin))
@@ -616,6 +646,36 @@ static void handle_common(uin_t uin, int status, const char *descr, struct gg_no
 	if (!(u = userlist_find(uin, NULL)))
 		return;
 
+#ifdef WITH_PYTHON
+	for (l = modules; l; l = l->next) {
+		struct module *m = l->data;
+		PyObject *res;
+
+		if (!m->handle_status)
+			continue;
+
+		res = PyObject_CallFunction(m->handle_status, "(isis)", uin, (u) ? u->display : NULL, status, descr);
+
+		if (!res)
+			PyErr_Print();
+
+		if (res && PyInt_Check(res) && !PyInt_AsLong(res)) {
+			Py_XDECREF(res);
+			return;
+		}
+
+		if (res && PyTuple_Check(res)) {
+			char *foo1, *foo2;
+
+			if (PyArg_ParseTuple(res, "(isis)", &uin, &foo1, &status, &foo2)) {
+				PyErr_Print();
+			}
+		}
+
+		Py_XDECREF(res);
+	}
+#endif
+	
 	/* zapamiêtaj adres i port */
 	if (n) {
 		u->port = n->remote_port;
