@@ -4,10 +4,8 @@ zacznê byæ niemi³y. --w
 
 biblioteka:
 - komunikacja miêdzy klientami, w tym wysy³anie plików,
-- wysy³anie has³a na maila,
 - konferencje,
 - zmiana informacji w katalogu publicznym,
-- zmiana has³a.
 - wysy³anie userlisty na server 
 - timeouty, chocia¿ zastawiam siê, czy nie lepiej zrzuciæ ich na klienta.
 - uaktualniæ dokumentacjê.

@@ -2,6 +2,7 @@
 
 /*
  *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
+ *                     Robert J. Wo¼ny <speedy@ziew.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -56,6 +57,7 @@ int my_getc(FILE *f)
 		
 		maxfd = 0;
 
+		/* zerknij na wszystkie niezbêdne deskryptory */
 		for (l = watches; l; l = l->next) {
 			struct gg_common *w = l->data;
 
@@ -81,6 +83,58 @@ int my_getc(FILE *f)
 		ret = select(maxfd + 1, &rd, &wd, NULL, &tv);
 	
 		if (!ret) {
+			/* timeouty danych sesji */
+			for (l = watches; l; l = l->next) {
+				struct gg_session *s = l->data;
+				struct gg_common *c = l->data;
+				struct gg_http *h = l->data;
+				char *errmsg = "";
+
+				if (c->timeout == -1)
+					continue;
+
+				if (--c->timeout)
+					continue;
+				
+				switch (c->type) {
+					case GG_SESSION_GG:
+						my_printf("conn_timeout");
+						list_remove(&watches, s, 0);
+						gg_free_session(s);
+						sess = NULL;
+						do_reconnect();
+						break;
+
+					case GG_SESSION_SEARCH:
+						my_printf("search_timeout");
+						free(h->user_data);
+						list_remove(&watches, h, 0);
+						gg_free_search(h);
+						break;
+
+					case GG_SESSION_REGISTER:
+						if (!errmsg)
+							errmsg = "register_timeout";
+					case GG_SESSION_PASSWD:
+						if (!errmsg)
+							errmsg = "passwd_timeout";
+					case GG_SESSION_REMIND:
+						if (!errmsg)
+							errmsg = "remind_timeout";
+					case GG_SESSION_CHANGE:
+						if (!errmsg)
+							errmsg = "change_timeout";
+
+						my_printf(errmsg);
+						if (h->type == GG_SESSION_REGISTER) {
+							free(reg_password);
+							reg_password = NULL;
+						}
+						list_remove(&watches, h, 0);
+						gg_free_pubdir(h);
+				}
+			}
+			
 			/* timeout reconnectu */
 			if (!sess && reconnect_timer && time(NULL) - reconnect_timer >= auto_reconnect && config_uin && config_password) {
 				reconnect_timer = 0;
@@ -296,6 +350,7 @@ u¿ycie: %s [OPCJE]
 	
 	read_config(NULL);
 
+	/* okre¶lanie stanu klienta po w³±czeniu */
 	if (new_status)
 		default_status = new_status;
 
@@ -314,6 +369,7 @@ u¿ycie: %s [OPCJE]
 	if ((default_status & GG_STATUS_FRIENDS_MASK))
 		private_mode = 1;
 	
+	/* czy w³±czyæ debugowanie? */
 	if (gg_debug_level)
 		display_debug = 1;
 	if (display_debug)
@@ -338,8 +394,10 @@ u¿ycie: %s [OPCJE]
 	si.state = GG_STATE_READING_DATA;
 	si.type = GG_SESSION_USER0;
 	si.id = 0;
+	si.timeout = -1;
 	list_add(&watches, &si, sizeof(si));
 
+	/* inicjujemy readline */
 	rl_initialize();
 	rl_getc_function = my_getc;
 	rl_readline_name = "gg";
@@ -406,11 +464,9 @@ u¿ycie: %s [OPCJE]
 	sess = NULL;
 
 	if (config_changed) {
-		char *line;
+		char *line, *prompt = find_format("config_changed");
 
-		my_printf("config_changed");
-		no_prompt = 1;
-		if ((line = my_readline())) {
+		if ((line = readline(prompt))) {
 			if (!strcasecmp(line, "tak") || !strcasecmp(line, "yes") || !strcasecmp(line, "t") || !strcasecmp(line, "y")) {
 				if (!write_userlist(NULL) && !write_config(NULL))
 					my_printf("saved");
@@ -418,6 +474,7 @@ u¿ycie: %s [OPCJE]
 					my_printf("error_saving");
 
 			}
+			free(line);
 		} else
 			printf("\n");
 	}

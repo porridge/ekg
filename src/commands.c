@@ -1190,7 +1190,7 @@ COMMAND(command_test_watches)
 			default: state = "(unknown)"; break;
 		}
 		
-		snprintf(buf, sizeof(buf), "%d: type=%s, fd=%d, state=%s, check=%s, id=%d", no, type, s->fd, state, check, s->id);
+		snprintf(buf, sizeof(buf), "%d: type=%s, fd=%d, state=%s, check=%s, id=%d, timeout=%d", no, type, s->fd, state, check, s->id, s->timeout);
 		my_printf("generic", buf);
 	}
 

@@ -503,7 +503,7 @@ void init_theme()
 	add_format("list_busy", "%> %1 %G(zajêty)%n %b%2:%3%n\n", 1);
 	add_format("list_not_avail", "%> %1 %r(niedostêpny)%n\n", 1);
 	add_format("list_unknown", "%> %1\n", 1);
-	add_format("saved", "%> Zapisano ustawiania\n", 1);
+	add_format("saved", "%> Zapisano ustawienia\n", 1);
 	add_format("error_saving", "%! Podczas zapisu ustawieñ wyst±pi³ b³±d\n", 1);
 	add_format("quit", "%> Papa\n", 1);
 	add_format("message_header", "%g.-- %n%1 %c(%C%#%c/%2)%n %g--- -- -\n", 1);
@@ -527,6 +527,7 @@ void init_theme()
 	add_format("connecting", "%> £±czê siê z serwerem...\n", 1);
 	add_format("conn_failed", "%! Po³±czenie nie uda³o siê: %1\n", 1);
 	add_format("conn_stopped", "%! Przerwano ³±czenie\n", 1);
+	add_format("conn_timeout", "%! Przekroczono czas limitu operacji ³±czenia z serwerem\n", 1);
 	add_format("connected", "%> Po³±czono %c(%C%#%c)%n\n", 1);
 	add_format("disconnected", "%> Roz³±czono %c(%C%#%c)%n\n", 1);
 	add_format("theme_loaded", "%> Wczytano opis wygl±du o nazwie %W%1%n\n", 1);
@@ -542,15 +543,19 @@ void init_theme()
 	add_format("register", "%> Rejestracja poprawna: Wygrany numerek: %W%1%n\n", 1);
 	add_format("register_failed", "%! B³±d podczas rejestracji\n", 1);
 	add_format("register_pending", "%! Rejestracja w toku\n", 1);
+	add_format("register_timeout", "%! Przekroczono czas limitu operacji szukania\n", 1);
 	
 	add_format("remind", "%> Has³o zosta³o wys³ane\n", 1);
 	add_format("remind_failed", "%! B³±d podczas wysy³ania has³a\n", 1);
+	add_format("remind_timeout", "%! Przekroczono czas limitu operacji wys³ania has³a\n", 1);
 	
 	add_format("passwd", "%> Has³o zosta³o zmienione\n", 1);
 	add_format("passwd_failed", "%! B³±d podczas zmiany has³a\n", 1);
+	add_format("passwd_timeout", "%! Przekroczono czas limitu operacji zmiany has³a\n", 1);
 	
 	add_format("change", "%> Informacje w katalogu publicznym zosta³y zmienione\n", 1);
 	add_format("change_failed", "%! B³±d podczas zmiany informacji w katalogu publicznym\n", 1);
+	add_format("change_timeout", "%! Przekroczono czas limitu operacji zmiany katalogu publicznego\n", 1);
 	
 	add_format("sms_msg", "EKG: msg %1 %# >> %2", 1);
 	add_format("sms_chat", "EKG: chat %1 %# >> %2", 1);
@@ -562,6 +567,7 @@ void init_theme()
 	add_format("already_connected", "%! Klient jest ju¿ po³±czony\n", 1);
 	add_format("during_connect", "%! £±czenie trwa\n", 1);
 	add_format("search_failed", "%! Wyst±pi³ b³±d podczas szukania: %1\n", 1);
+	add_format("search_timeout", "%! Przekroczono limit czasu operacji szukania\n", 1);
 	add_format("search_not_found", "%! Nie znaleziono\n", 1);
 	add_format("unknown_command", "%! Nieznane polecenie: %W%1%n\n", 1);
 	add_format("already_searching", "%! Szukanie trwa. Poczekaj, albo u¿yj %Wfind -stop%n\n", 1);
@@ -591,7 +597,7 @@ void init_theme()
 	add_format("modify_done", "%> Zmieniono wpis w li¶cie kontaktów\n", 1);
 	add_format("user_info", "%) Imiê i nazwisko: %W%1 %2%n\n%) Pseudonim: %W%3%n\n%) Alias: %W%4%n\n%) Numer telefonu: %W%5%n\n%) Grupa: %W%6%n\n", 1);
 
-	add_format("config_changed", "%> Zapisaæ now± konfiguracjê? (tak/nie) ", 1);
+	add_format("config_changed", "Zapisaæ now± konfiguracjê? (tak/nie) ", 1);
 	add_format("config_unknown", "%! Zmiana tego ustawienia mo¿e nie odnie¶æ zamierzonego efektu\n", 1);
 
 	add_format("private_mode_is_on", "%> Tryb ,,tylko dla przyjació³'' jest w³±czony\n", 1);

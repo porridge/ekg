@@ -409,6 +409,8 @@ int gg_http_hash(char *format, ...);
 #define GG_HTTPS_PORT 443
 #define GG_HTTP_USERAGENT "Mozilla/4.7 [en] (Win98; I)"
 
+#define GG_DEFAULT_TIMEOUT 30
+
 struct gg_header {
 	unsigned long type;		/* typ pakietu */
 	unsigned long length;		/* d³ugo¶æ reszty pakietu */

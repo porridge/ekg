@@ -1,3 +1,14 @@
+// 2001-12-07
+
+- poprawka pytania o zapis konfiguracji przy wychodzeniu. bez theme'ów
+  nie trzeba siê martwiæ o z³e prompty (w)
+- dodanie timeoutów do libgg i korzystanie z nich w kliencie. ka¿da
+  sesja ma pole ,,timeout'', które biblioteka ustawia na GG_DEFAULT_TIMEOUT
+  (w tej chwili 30 sekund) przy ka¿dej operacji, lub -1 je¶li nie ma byæ
+  timeout (GG_STATE_CONNECTED). klient sam musi zadbaæ o to, ¿eby zmniejszaæ
+  warto¶æ tego pola co sekundê i zatroszczyæ siê o reakcjê w przypadku
+  zej¶cia do zera (w)
+  
 // 2001-12-06
 
 - dodana funkcja wysy³ania has³a juzerom do libgg (thrull/w)
