@@ -1067,6 +1067,9 @@ struct gg_new_status {
 	uint32_t status;			/* na jaki zmieniæ? */
 } GG_PACKED;
 
+#define GG_NOTIFY_FIRST 0x000f
+#define GG_NOTIFY_LAST 0x0010
+
 #define GG_NOTIFY 0x0010
 	
 struct gg_notify {

@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek).
 
+// 2004-05-02
+
+- libgadu: obs³uga list kontaktów wiêkszych ni¿ 409 wpisów (MAG,adrians/w)
+- uaktualnienie dokumentacji protoko³u o wiêksze listy kontaktów (w)
+
 // 2004-04-28
 
 - informacja o próbie podszycia siê pod u¿ytkownika przy po³±czeniach
