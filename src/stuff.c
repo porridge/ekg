@@ -634,13 +634,13 @@ void changed_auto_save(const char *var)
  *
  * wywo³ywane po zmianie warto¶ci zmiennej ,,aspell'' lub ,,aspell_lang'' lub ,,aspell_encoding''.
  */
+#ifdef WITH_ASPELL
 void changed_aspell(const char *var)
 {
-#ifdef WITH_ASPELL
 	/* probujemy zainicjowac jeszcze raz aspell'a */
 	spellcheck_init();
-#endif
 }
+#endif
 
 
 /*
