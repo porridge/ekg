@@ -118,10 +118,11 @@ static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 int config_contacts_size = 8;		/* szeroko¶æ okna kontaktów */
 static int last_contacts_size = 0;	/* poprzedni rozmiar przed zmian± */
 int config_contacts = 0;		/* czy ma byæ okno kontaktów */
+int config_contacts_descr = 0;		/* i czy maj± byæ wy¶wietlane opisy */
 struct binding *binding_map[KEY_MAX + 1];	/* mapa bindowanych klawiszy */
 struct binding *binding_map_meta[KEY_MAX + 1];	/* j.w. z altem */
 
-#define CONTACTS_SIZE ((config_contacts) ? (config_contacts_size + 3): 0)
+#define CONTACTS_SIZE ((config_contacts) ? (config_contacts_size + 3) : 0)
 
 /* rozmiar okna wy¶wietlaj±cego tekst */
 #define output_size (stdscr->_maxy - input_size)
@@ -649,7 +650,7 @@ static void update_contacts()
 	
 	for (l = userlist, y = 0; l && y <= contacts->_maxy; l = l->next) {
 		struct userlist *u = l->data;
-		int x;
+		int x, z;
 
 		if (!GG_S_A(u->status))
 			continue;
@@ -658,6 +659,12 @@ static void update_contacts()
 		
 		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
 			mvwaddch(contacts, y, x + 2, (unsigned char) u->display[x]);
+
+		wattrset(contacts, COLOR_PAIR(7));
+
+		if (config_contacts_descr && u->descr)
+			for (z = 0, x++; *(u->descr + z) && x < config_contacts_size; x++, z++)
+				mvwaddch(contacts, y, x + 2, (unsigned char) u->descr[z]);
 
 		if (GG_S_D(u->status)) {
 			wattrset(contacts, COLOR_PAIR(16) | A_BOLD);
@@ -669,7 +676,7 @@ static void update_contacts()
 
 	for (l = userlist; l && y <= contacts->_maxy; l = l->next) {
 		struct userlist *u = l->data;
-		int x;
+		int x, z;
 
 		if (!GG_S_B(u->status))
 			continue;
@@ -678,6 +685,13 @@ static void update_contacts()
 
 		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
 			mvwaddch(contacts, y, x + 2, (unsigned char) u->display[x]);
+
+		wattrset(contacts, COLOR_PAIR(7));
+
+		if (config_contacts_descr && u->descr)
+			for (z = 0, x++; *(u->descr + z) && x < config_contacts_size; x++, z++)
+				mvwaddch(contacts, y, x + 2, (unsigned char) u->descr[z]);
+
 
 		if (GG_S_D(u->status)) {
 			wattrset(contacts, COLOR_PAIR(16) | A_BOLD);
@@ -689,7 +703,7 @@ static void update_contacts()
 
 	for (l = userlist; l && y <= contacts->_maxy; l = l->next) {
 		struct userlist *u = l->data;
-		int x;
+		int x, z;
 
 		if (!GG_S_I(u->status))
 			continue;
@@ -698,6 +712,12 @@ static void update_contacts()
 
 		for (x = 0; *(u->display + x) && x < config_contacts_size; x++)
 			mvwaddch(contacts, y, x + 2, (unsigned char) u->display[x]);
+
+		wattrset(contacts, COLOR_PAIR(7));
+
+		if (config_contacts_descr && u->descr)
+			for (z = 0, x++; *(u->descr + z) && x < config_contacts_size; x++, z++)
+				mvwaddch(contacts, y, x + 2, (unsigned char) u->descr[z]);
 
 		if (GG_S_D(u->status)) {
 			wattrset(contacts, COLOR_PAIR(16) | A_BOLD);

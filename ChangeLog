@@ -17,6 +17,7 @@ zg³osi³ b³±d.
 - du¿a ilo¶æ wywo³añ /exec, /sms lub sprawdzanie poczty po
   pewnym czasie powodowa³o brak wolnych deskryptorów (sz)
 - poprawka dokumentacji (rmrmg/w)
+- dodanie zmiennej contacts_descr (rmrmg/w)
 
 // 2002-12-07
 

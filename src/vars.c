@@ -79,6 +79,11 @@ static int dd_color(const char *name)
 	return (config_display_color);
 }
 
+static int dd_contacts(const char *name)
+{
+	return (config_contacts);
+}
+
 /*
  * variable_init()
  *
@@ -110,8 +115,9 @@ void variable_init()
 	variable_add("completion_notify", VAR_MAP, 1, &config_completion_notify, NULL, variable_map(4, 0, 0, "none", 1, 2, "add", 2, 1, "addremove", 4, 0, "busy"), NULL);
 	variable_add("ctrld_quits", VAR_BOOL, 1, &config_ctrld_quits, NULL, NULL, NULL);
 #ifdef WITH_UI_NCURSES
-	variable_add("contacts_size", VAR_INT, 1, &config_contacts_size, contacts_rebuild, NULL, NULL);
 	variable_add("contacts", VAR_INT, 1, &config_contacts, contacts_rebuild, NULL, NULL);
+	variable_add("contacts_descr", VAR_BOOL, 1, &config_contacts_descr, contacts_rebuild, NULL, NULL);
+	variable_add("contacts_size", VAR_INT, 1, &config_contacts_size, contacts_rebuild, NULL, dd_contacts);
 #endif
 	variable_add("dcc", VAR_BOOL, 1, &config_dcc, changed_dcc, NULL, NULL);
 	variable_add("dcc_ip", VAR_STR, 1, &config_dcc_ip, changed_dcc, NULL, dd_dcc);

@@ -163,6 +163,7 @@ int config_check_mail_frequency;
 char *config_check_mail_folders;
 int config_completion_notify;
 int config_contacts;
+int config_contacts_descr;
 int config_contacts_size;
 int config_ctrld_quits;
 int config_dcc;
