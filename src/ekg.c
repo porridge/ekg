@@ -61,9 +61,6 @@
 #include "log.h"
 #include "mail.h"
 #include "msgqueue.h"
-#ifdef WITH_PYTHON
-#  include "python.h"
-#endif
 #ifdef HAVE_OPENSSL
 #  include "simlite.h"
 #endif
@@ -80,13 +77,16 @@
 #include "vars.h"
 #include "version.h"
 #include "xmalloc.h"
+#ifdef WITH_PYTHON
+#  include "python.h"
+#endif
 
 #ifndef PATH_MAX
 #  define PATH_MAX _POSIX_PATH_MAX
 #endif
 
 static pid_t ekg_pid = 0;
-static char argv0[PATH_MAX];
+static char argv0[PATH_MAX + 1];
 static int ioctld_pid = 0;
 
 time_t last_action = 0;

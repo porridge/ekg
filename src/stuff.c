@@ -2083,7 +2083,7 @@ int process_remove(int pid)
  */
 const char *prepare_path(const char *filename, int do_mkdir)
 {
-	static char path[PATH_MAX];
+	static char path[PATH_MAX + 1];
 
 	if (do_mkdir) {
 		if (config_profile) {

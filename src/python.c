@@ -24,18 +24,19 @@
 #include <sys/stat.h>
 
 #include <dirent.h>
-#include <Python.h>
 #include <string.h>
 
 #include "commands.h"
 #include "libgadu.h"
-#include "python.h"
 #include "stuff.h"
 #include "themes.h"
 #include "ui.h"
 #include "vars.h"
 #include "version.h"
 #include "xmalloc.h"
+
+#include <Python.h>
+#include "python.h"
 
 int python_handle_result = -1;
 

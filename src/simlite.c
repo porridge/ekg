@@ -78,7 +78,7 @@ static int sim_seed_prng()
  */
 int sim_key_generate(uint32_t uin)
 {
-	char path[PATH_MAX];
+	char path[PATH_MAX + 1];
 	RSA *keys = NULL;
 	int res = -1;
 	FILE *f = NULL;
@@ -144,7 +144,7 @@ cleanup:
  */
 static RSA *sim_key_read(uint32_t uin)
 {
-	char path[PATH_MAX];
+	char path[PATH_MAX + 1];
 	FILE *f;
 	RSA *key;
 

@@ -35,19 +35,12 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifdef HAVE_JPEGLIB_H
-#  include <jpeglib.h>
-#endif
-
 #include "commands.h"
 #include "emoticons.h"
 #include "events.h"
 #include "libgadu.h"
 #include "log.h"
 #include "msgqueue.h"
-#ifdef WITH_PYTHON
-#  include "python.h"
-#endif
 #ifdef HAVE_OPENSSL
 #  include "simlite.h"
 #endif
@@ -61,6 +54,12 @@
 #include "voice.h"
 #include "xmalloc.h"
 #include "token.h"
+#ifdef WITH_PYTHON
+#  include "python.h"
+#endif
+#ifdef HAVE_JPEGLIB_H
+#  include <jpeglib.h>
+#endif
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure(), handle_search50(),

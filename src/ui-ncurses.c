@@ -67,9 +67,6 @@
 #include "commands.h"
 #include "libgadu.h"
 #include "mail.h"
-#ifdef WITH_PYTHON
-#  include "python.h"
-#endif
 #ifndef HAVE_STRLCAT
 #  include "../compat/strlcat.h"
 #endif
@@ -86,6 +83,9 @@
 #include "vars.h"
 #include "version.h"
 #include "xmalloc.h"
+#ifdef WITH_PYTHON
+#  include "python.h"
+#endif
 
 /* nadpisujemy funkcjê strncasecmp() odpowiednikiem z obs³ug± polskich znaków */
 #define strncasecmp(x...) strncasecmp_pl(x)

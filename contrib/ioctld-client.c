@@ -38,9 +38,9 @@
 #  include <linux/kd.h>			 
 #endif
 
+#include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -72,7 +72,7 @@ int beeps_spk(int *tone, int *delay);
 #  define PATH_MAX _POSIX_PATH_MAX
 #endif
 
-char sock_path[PATH_MAX] = "";
+char sock_path[PATH_MAX + 1] = "";
 
 int blink_leds(int *flag, int *delay) 
 {
@@ -107,8 +107,7 @@ int blink_leds(int *flag, int *delay)
 #else
 	    	ioctl(fd, KDSETLED, flag[s]);
 	
-		if (flag[s])
-			fprintf(stderr, " %d", flag[s]);
+		fprintf(stderr, " %d/%d", flag[s], delay[s]);
 #endif 
 		if (delay[s]) {
 			if (delay[s] <= IOCTLD_MAX_DELAY)
@@ -146,7 +145,7 @@ int beeps_spk(int *tone, int *delay)
 		
 	for (s = 0; tone[s] >= 0 && s < IOCTLD_MAX_ITEMS; s++) {
 		if (tone[s])
-			fprintf(stderr, " %d", tone[s]);
+			fprintf(stderr, " %d/%d", tone[s], delay[s]);
 
 #ifdef __FreeBSD__
 		ioctl(fd, KIOCSOUND, 0);
@@ -181,27 +180,30 @@ int beeps_spk(int *tone, int *delay)
 
 int main(int argc, char **argv) 
 {
-    	int sock, port;
+    	int sock, port, ret;
 	struct sockaddr_in addr;
 	struct action_data data;
         struct hostent *h;
-        uint32_t host_addr;
+        in_addr_t host_addr, tmp_addr;
 	
 	if (argc < 2) {
 		fprintf(stderr, "U¿ycie: %s <host> [port]\n", *argv);
 		exit(1);
 	}
 
-	if ((host_addr = inet_addr(argv[1])) == INADDR_NONE) {
+	if ((tmp_addr = inet_addr(argv[1])) == INADDR_NONE) {
 		if ((h = gethostbyname(argv[1])) == NULL) {
 			fprintf(stderr, "Host %s nie znaleziony.\n", argv[1]);
 			exit(1);
 		}
-		bcopy(*h->h_addr_list, &host_addr, sizeof(uint32_t));
-	}
+
+		bcopy(*h->h_addr_list, &host_addr, sizeof(in_addr_t));
+		host_addr = ntohl(host_addr);
+	} else
+		host_addr = ntohl(tmp_addr);
 
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-		fprintf(stderr, "Nie mogê utworzyæ gniazda.\n");
+		fprintf(stderr, "Nie mogê utworzyæ gniazda: %s\n", strerror(errno));
 		exit(1);
 	}
 	
@@ -210,21 +212,23 @@ int main(int argc, char **argv)
 	else
 		port = IOCTLDNET_PORT;
 
-	addr.sin_addr.s_addr=host_addr;
-	addr.sin_port=htons(port);
-	addr.sin_family=AF_INET;
-
+	addr.sin_addr.s_addr = htonl(host_addr);
+	addr.sin_port = htons(port);
+	addr.sin_family = AF_INET;
 
 	if (connect(sock, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) == -1) {
-		fprintf(stderr, "Nie mogê po³±czyæ siê z %s:%d.\n", argv[1], port);
+		fprintf(stderr, "Nie mogê po³±czyæ siê z %s:%d (%s)\n", argv[1], port, strerror(errno));
+		close(sock);
 		exit(1);
 	}
-	
+
 	fprintf(stderr, "Po³±czono.\n");
 
 	while (1) {
-		if (read(sock, &data, sizeof(struct action_data)) < 1) {
-			perror("read");
+		if ((ret = read(sock, &data, sizeof(struct action_data))) == 0 || ret == -1) {
+			if (ret == -1)
+				perror("read()");
+			close(sock);
 			exit(1);
 		}
 		
@@ -234,6 +238,8 @@ int main(int argc, char **argv)
 		else if (data.act == ACT_BEEPS_SPK) 
 		    	beeps_spk(data.value, data.delay);
 	}
+
+	close(sock);
 	
 	exit(0);
 }

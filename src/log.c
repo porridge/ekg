@@ -265,7 +265,7 @@ static char *log_escape(const char *str)
 void put_log(uin_t uin, const char *format, ...)
 {
  	char *lp = config_log_path;
-	char path[PATH_MAX], *buf;
+	char path[PATH_MAX + 1], *buf;
 	const char *p;
 	size_t size = 0;
 	va_list ap;

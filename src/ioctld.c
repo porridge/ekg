@@ -1,3 +1,5 @@
+/* $Id$ */
+
 /*
  *  (C) Copyright 2002-2004 Pawe³ Maziarz <drg@hehe.pl>
  *                          Wojtek Kaniewski <wojtekka@irc.pl>
@@ -36,6 +38,7 @@
 #  include <linux/kd.h>
 #endif
 
+#include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <signal.h>
@@ -56,7 +59,7 @@
 #  define PATH_MAX _POSIX_PATH_MAX
 #endif
 
-char sock_path[PATH_MAX] = "";
+char sock_path[PATH_MAX + 1] = "";
 
 int blink_leds(int *flag, int *delay) 
 {
@@ -174,12 +177,13 @@ int main(int argc, char **argv)
 	addr.sun_family = AF_UNIX;
 	if (strlcpy(addr.sun_path, sock_path, sizeof(addr.sun_path)) >= sizeof(addr.sun_path))
 		exit(1);
+
 	length = sizeof(addr);
 
 	if (argv[2]) {
 		netport = atoi(argv[2]);
 	
-		if (netport < 1 || netport > 65535)
+		if (netport < 1024 || netport > 65535)
 			exit(1);
 		
 		/* niepotrzebne nam niepotrzebne uprawnienia ;) */
@@ -189,6 +193,7 @@ int main(int argc, char **argv)
 	signal(SIGQUIT, quit);
 	signal(SIGTERM, quit);
 	signal(SIGINT, quit);
+	signal(SIGHUP, quit);
 	
 	umask(0177);
 	close(STDERR_FILENO);
@@ -197,7 +202,7 @@ int main(int argc, char **argv)
 	if ((sock = socket(AF_UNIX, SOCK_DGRAM, 0)) == -1) 
 		exit(1);
 
-	if (bind(sock, (struct sockaddr *)&addr, length) == -1) 
+	if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) == -1) 
 	    	exit(2);
 
 	chown(sock_path, getuid(), -1);
@@ -212,29 +217,41 @@ int main(int argc, char **argv)
 		/* czasem sie moze przydac */
 		setsockopt(netsock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 
-		netaddr.sin_family=AF_INET;
-		netaddr.sin_port=htons(netport);
-		netaddr.sin_addr.s_addr=INADDR_ANY;
-
+		netaddr.sin_family = AF_INET;
+		netaddr.sin_port = htons(netport);
+		netaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 		/* nie rezygnujmy od razu */
 		for (i = 180; i; i--) {
 			if (bind(netsock, (struct sockaddr *)&netaddr, sizeof(struct sockaddr_in)))
-			break;
+				break;
 			sleep(1);
 		}
+
 		if (i == 0) {
 			unlink(sock_path);
+			close(netsock);
 			exit(4);
 		}
 
 		size = sizeof(netaddr);
 
-		listen(netsock, 1);
+		if (listen(netsock, 1) == -1) {
+			unlink(sock_path);
+			close(netsock);
+			exit(4);
+		}
 
 netaccept:
-		if ((rsock = accept(netsock, (struct sockaddr *)&rnetaddr, &size)) == -1)
-			goto netaccept;
+		if ((rsock = accept(netsock, (struct sockaddr *)&rnetaddr, &size)) == -1) {
+			if (errno == ECONNABORTED)
+				goto netaccept;
+			else {
+				unlink(sock_path);
+				close(netsock);
+				exit(4);
+			}
+		}
 	}
 
 	/* czytamy z lokalnego socketa... */
@@ -243,11 +260,12 @@ netaccept:
 			continue;
 
 		if (netport) {
-			if (write(rsock, &data, sizeof(data)) < 1)
+
+			if (write(rsock, &data, sizeof(data)) <= 0)
 				goto netaccept;
-		}
-		
-		else {
+
+		} else {
+
 			if (data.act == ACT_BLINK_LEDS)
 				blink_leds(data.value, data.delay);
 
@@ -255,6 +273,10 @@ netaccept:
 				beeps_spk(data.value, data.delay);
 		}
 	}
+
+	if (netport)
+		close(netsock);
+	unlink(sock_path);
 
 	exit(0);
 }

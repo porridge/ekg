@@ -682,7 +682,7 @@ int format_remove(const char *name)
  */
 static FILE *try_open(FILE *prevfd, const char *prefix, const char *filename)
 {
-	char buf[PATH_MAX];
+	char buf[PATH_MAX + 1];
 	int save_errno;
 	FILE *f;
 

@@ -52,9 +52,6 @@
 #include "libgadu.h"
 #include "log.h"
 #include "msgqueue.h"
-#ifdef WITH_PYTHON
-#  include "python.h"
-#endif
 #ifdef HAVE_OPENSSL
 #  include "simlite.h"
 #endif
@@ -72,6 +69,9 @@
 #include "voice.h"
 #include "userlist.h"
 #include "xmalloc.h"
+#ifdef WITH_PYTHON
+#  include "python.h"
+#endif
 
 COMMAND(cmd_ignore);
 COMMAND(cmd_msg);

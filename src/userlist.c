@@ -346,7 +346,7 @@ char *userlist_dump()
 int userlist_write()
 {
 	const char *filename;
-	char *contacts, tmp[PATH_MAX];
+	char *contacts, tmp[PATH_MAX + 1];
 	FILE *f;
 
 	if (!(contacts = userlist_dump()))

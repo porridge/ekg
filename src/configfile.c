@@ -422,7 +422,7 @@ void config_write_main(FILE *f, int base64)
  */
 int config_write(const char *filename)
 {
-	char tmp[PATH_MAX];
+	char tmp[PATH_MAX + 1];
 	FILE *f;
 
 	if (!filename && !(filename = prepare_path("config", 1)))
