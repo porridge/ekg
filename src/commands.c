@@ -348,7 +348,7 @@ COMMAND(cmd_status)
 		foo[5] = id;
 
 		i.s_addr = sess->server_addr;
-		print("show_status", foo[away], (private_mode) ? pr : np, inet_ntoa(i), itoa(sess->port));
+		print("show_status", foo[away], (private_mode) ? pr : np, inet_ntoa(i), itoa(sess->port), itoa(sess->uin), config_user);
 	}
 
 	free(av);

@@ -849,7 +849,7 @@ void theme_init()
 	format_add("user_info_invisible", "%cniewidoczn%@1%n", 1);
 
 	/* status */
-	format_add("show_status", "%) Aktualny stan: %1%2\n%) Aktualny serwer: %3:%4\n", 1);
+	format_add("show_status", "%) uin: %5/%6\n%) Aktualny stan: %1%2\n%) Aktualny serwer: %3:%4\n", 1);
 	format_add("show_status_avail", "%Ydostêpny%n", 1);
 	format_add("show_status_avail_descr", "%Ydostêpny%n (%1)", 1);
 	format_add("show_status_busy", "%Gzajêty%n", 1);
