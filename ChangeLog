@@ -11,6 +11,8 @@ zg³osi³ b³±d.
 - usuniêcie leak'a w /exec (sz)
 - zapisanie opcji dla /exec wielkimi literami spowoduje dodanie polecenia
   do wysy³anego wyniku. czasami siê przydaje ;> (sz)
+- dok³adne czysczenie formatów po ,,/set -theme''. problem by³ na przyk³ad
+  z wy³±czeniem tematu ircopodobnego (sz)
 
 // 2003-02-15
 

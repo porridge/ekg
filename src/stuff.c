@@ -713,6 +713,7 @@ void changed_proxy(const char *var)
 void changed_theme(const char *var)
 {
 	if (!config_theme) {
+		theme_free();
 		theme_init();
 		ui_event("theme_init");
 	} else {
