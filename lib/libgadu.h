@@ -370,7 +370,7 @@ struct gg_event {
 		struct gg_dcc *dcc_new;
 		int dcc_error;
 		struct {
-			uint8_t *data;
+			u_int8_t *data;
 			int length;
 		} dcc_voice_data;
         } event;
