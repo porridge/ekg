@@ -647,6 +647,9 @@ int format_remove(const char *name)
 {
 	list_t l;
 
+	if (!name)
+		return -1;
+
 	for (l = formats; l; l = l->next) {
 		struct format *f = l->data;
 
@@ -737,6 +740,7 @@ int theme_read(const char *filename, int replace)
 			return -1;
 	}
 
+	theme_free();
 	theme_init();
 	ui_event("theme_init");
 

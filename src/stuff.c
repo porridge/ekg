@@ -718,7 +718,6 @@ void changed_theme(const char *var)
 		ui_event("theme_init");
 	} else {
 		if (!theme_read(config_theme, 1)) {
-			theme_cache_reset();
 			if (!in_autoexec)
 				print("theme_loaded", config_theme);
 		} else
