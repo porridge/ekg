@@ -152,11 +152,8 @@ int userlist_read()
 		if (count > 7) {
 			u.email = xstrdup(entry[7]);
 			if (count > 8)
-				u.foreign = saprintf(";%s", entry[7]);
-			else
-				u.foreign = xstrdup("");
-		} else
-			u.foreign = xstrdup("");
+				u.foreign = saprintf(";%s", entry[8]);
+		}
 
 		for (i = 0; i < count; i++)
 			xfree(entry[i]);
@@ -253,11 +250,8 @@ int userlist_set(const char *contacts, int config)
 		if (count > 7) {
 			u.email = xstrdup(entry[7]);
 			if (count > 8)
-				u.foreign = saprintf(";%s", entry[7]);
-			else
-				u.foreign = xstrdup("");
-		} else
-			u.foreign = xstrdup("");
+				u.foreign = saprintf(";%s", entry[8]);
+		}
 
 		array_free(entry);
 
@@ -312,7 +306,7 @@ char *userlist_dump()
 		line = saprintf("%s;%s;%s;%s;%s;%s;%s;%s%s\r\n",
 			(u->first_name) ? u->first_name : "",
 			(u->last_name) ? u->last_name : "",
-			(u->nickname) ? u->nickname : ((u->display) ? u->display: ""),
+			(u->nickname) ? u->nickname : "",
 			(u->display) ? u->display : "",
 			(u->mobile) ? u->mobile : "",
 			groups,
@@ -445,7 +439,7 @@ void userlist_write_crash()
 			fprintf(f, "%s", g->name);
 		}
 		
-		fprintf(f, ";%s;%s%s\r\n", (u->uin) ? itoa(u->uin) : "", (u->email) ? u->email : "", u->foreign);
+		fprintf(f, ";%s;%s%s\r\n", (u->uin) ? itoa(u->uin) : "", (u->email) ? u->email : "", (u->foreign) ? u->foreign : "");
 	}	
 
 	fclose(f);

@@ -227,6 +227,11 @@ AC_ARG_WITH(pthread,
 if test "x$with_pthread" = "xyes"; then
 	ACX_PTHREAD(
 	[
+	 	dnl workaround dla pkconfiga
+		if test "x$PTHREAD_CFLAGS" = "x-pthread"; then
+			PTHREAD_LIBS="$PTHREAD_LIBS -pthread"
+		fi
+
 		LIBS="$PTHREAD_LIBS $LIBS"
 		CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
 		CFLAGS_LIBGADU="$CFLAGS_LIBGADU $PTHREAD_CFLAGS"
