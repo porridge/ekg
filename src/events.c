@@ -216,6 +216,15 @@ void handle_msg(struct gg_event *e)
 
 		free(foo);
 	}
+
+	if (e->event.msg.formats_length > 0) {
+		int i;
+		
+		gg_debug(GG_DEBUG_MISC, "[ekg received formatting info (len=%d):", e->event.msg.formats_length);
+		for (i = 0; i < e->event.msg.formats_length; i++)
+			gg_debug(GG_DEBUG_MISC, " %.2x", ((unsigned char*)e->event.msg.formats)[i]);
+		gg_debug(GG_DEBUG_MISC, "]\n");
+	}
 }
 
 /*
@@ -776,6 +785,7 @@ void handle_dcc(struct gg_dcc *d)
 		case GG_EVENT_DCC_CLIENT_ACCEPT:
 			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_CLIENT_ACCEPT\n");
 			
+#if 0
 			for (tmp = 0, l = transfers; l; l = l->next) {
 				struct transfer *t = l->data;
 
@@ -784,8 +794,11 @@ void handle_dcc(struct gg_dcc *d)
 					break;
 				}
 			}
-
+			
 			if (!tmp) {
+#endif
+
+			if (!userlist_find(d->peer_uin, NULL) || config_uin != d->uin) {
 				gg_debug(GG_DEBUG_MISC, "## unauthorized client (uin=%ld), closing connection\n", d->peer_uin);
 				list_remove(&watches, d, 0);
 				gg_free_dcc(d);
@@ -832,6 +845,7 @@ void handle_dcc(struct gg_dcc *d)
 				}
 			}
 			
+			t->type = GG_SESSION_DCC_GET;
 			t->filename = strdup(d->file_info.filename);
 
 			for (p = d->file_info.filename; *p; p++)
@@ -861,7 +875,7 @@ void handle_dcc(struct gg_dcc *d)
 		case GG_EVENT_DCC_ERROR:
 			switch (e->event.dcc_error) {
 				case GG_ERROR_DCC_HANDSHAKE:
-					my_printf("dcc_error_handshake", "");
+					my_printf("dcc_error_handshake", format_user(d->uin));
 					break;
 				default:
 					my_printf("dcc_error_unknown", "");
