@@ -12,7 +12,9 @@ klient:
 - proste rozpoznawanie p³ci,
 - uzupe³niæ dope³nienia (w tym nicki ze spacjami),
 - mo¿liwo¶æ zrobienia theme'u a'la irc,
-- kilka komend w aliasach.
+- kilka komend w aliasach,
+- parametry --check i/lub --get do sprawdzania czy jest nowa wersja,
+- osobny program ekgsearch, lub ekg --search.
 
 
 $Id$

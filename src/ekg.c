@@ -27,8 +27,8 @@
 #endif
 #include <stdlib.h>
 #include <errno.h>
-#include <readline/readline.h>
-#include <readline/history.h>
+#include <readline.h>
+#include <history.h>
 #include <stdarg.h>
 #include <time.h>
 #include <signal.h>
@@ -294,7 +294,7 @@ void sighup()
 {
 	if (sess && sess->state != GG_STATE_IDLE) {
 		my_printf("disconected");
-		gg_logoff(sess);
+		ekg_logoff(sess, NULL);
 		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
 		sess = NULL;
@@ -565,7 +565,7 @@ IOCTL_HELP
 	}
 
 	printf("\n");
-	gg_logoff(sess);
+	ekg_logoff(sess, NULL);
 	list_remove(&watches, sess, 0);
 	gg_free_session(sess);
 	sess = NULL;

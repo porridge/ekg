@@ -95,6 +95,7 @@ char *config_sound_app;
 int config_display_notify;
 int config_status;
 int config_auto_reconnect;
+char *config_quit_reason;
 
 char *home_dir;
 int in_readline;
@@ -168,5 +169,6 @@ int events_parse_seq(char *seq, struct action_data *data);
 int init_socket();
 char *get_token(char **ptr, char sep);
 char *strdup_null(char *ptr);
+void ekg_logoff(struct gg_session *sess, char *reason);
 
 #endif

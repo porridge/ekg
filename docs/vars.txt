@@ -151,6 +151,12 @@ proxy_host
 	zmiana danych w katalogu publicznym itp.), gdy w³±czono opcjê
 	,,use_proxy''.
 
+quit_reason
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	domy¶lny opis stanu niedostêpnego, ustawiany przy wychodzeniu.
+
 sms_away
 	typ: bool
 	domy¶lna warto¶æ: 0

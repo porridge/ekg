@@ -59,6 +59,7 @@ void variable_init()
 	variable_add("use_proxy", VAR_INT, 1, &gg_http_use_proxy, NULL);
 	variable_add("proxy_port", VAR_INT, 1, &gg_http_proxy_port, NULL);
 	variable_add("proxy_host", VAR_STR, 1, &gg_http_proxy_host, NULL);
+	variable_add("quit_reason", VAR_STR, 1, &config_quit_reason, NULL);
 	variable_add("sms_away", VAR_BOOL, 1, &config_sms_away, NULL);
 	variable_add("sms_max_length", VAR_INT, 1, &config_sms_max_length, NULL);
 	variable_add("sms_number", VAR_STR, 1, &config_sms_number, NULL);

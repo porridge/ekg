@@ -27,7 +27,7 @@
 #ifndef _AIX
 #  include <string.h>
 #endif
-#include <readline/readline.h>
+#include <readline.h>
 #include <stdarg.h>
 #include <errno.h>
 #include <signal.h>
@@ -95,6 +95,7 @@ struct sockaddr_un addr;
 char *busy_reason = NULL;
 char *home_dir = NULL;
 int screen_lines = 24;
+char *config_quit_reason = NULL;
 
 /*
  * my_puts()
@@ -1704,4 +1705,38 @@ char *strdup_null(char *ptr)
 {
 	return (ptr) ? strdup(ptr) : NULL;
 }
+
+/*
+ * ekg_logoff()
+ *
+ * roz³±cza siê, zmieniaj±c uprzednio stan na niedostêpny z opisem.
+ *
+ *  - sess - opis sesji,
+ *  - reason - powód, mo¿e byæ NULL.
+ *
+ * niczego nie zwraca.
+ */
+void ekg_logoff(struct gg_session *sess, char *reason)
+{
+	char *tmp = NULL;
+
+	if (!sess)
+		return;
+
+	if (reason)
+		tmp = strdup(reason);
+	else
+		if (config_quit_reason)
+			tmp = strdup(config_quit_reason);
+	
+	if (tmp) {
+		iso_to_cp(tmp);
+		gg_change_status_descr(sess, GG_STATUS_NOT_AVAIL_DESCR, tmp);
+		free(tmp);
+	} else
+		gg_change_status(sess, GG_STATUS_NOT_AVAIL);
+
+	gg_logoff(sess);
+}
+
 

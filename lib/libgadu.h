@@ -79,6 +79,7 @@ struct gg_session {
 	char *password;		/* i jego has³o. zwalniane automagicznie */
         
 	int initial_status;	/* pocz±tkowy stan klienta */
+	int status;		/* aktualny stan klienta */
 
 	char *recv_buf;		/* bufor na otrzymywane pakiety */
 	int recv_done;		/* ile ju¿ wczytano do bufora */

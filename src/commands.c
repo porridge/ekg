@@ -25,7 +25,7 @@
 #endif
 #include <stdlib.h>
 #include <ctype.h>
-#include <readline/readline.h>
+#include <readline.h>
 #include <errno.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -94,7 +94,7 @@ struct command commands[] = {
 	{ "connect", "", command_connect, "", "£±czy siê z serwerem", "" },
 	{ "dcc", "duf", command_dcc, " [opcje]", "Obs³uga bezpo¶rednich po³±czeñ", "  send <numer/alias> <¶cie¿ka>\n  get [numer/alias]\n  close [numer/alias/id]\n  show\n" },
 	{ "del", "u", command_del, " <numer/alias>", "Usuwa u¿ytkownika z listy kontaktów", "" },
-	{ "disconnect", "", command_connect, "", "Roz³±cza siê z serwerem", "" },
+	{ "disconnect", "?", command_connect, "", "Roz³±cza siê z serwerem", "" },
 	{ "exec", "?", command_exec, " <polecenie>", "Uruchamia polecenie systemowe", "" },
 	{ "!", "?", command_exec, " <polecenie>", "Synonim dla %Wexec%n", "" },
 	{ "find", "u", command_find, " [opcje]", "Interfejs do katalogu publicznego", "  -u, --uin <numerek>\n  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>\n  -c, --city <miasto>\n  -b, --born <min:max>\n  -p, --phone <telefon>\n  -e, --email <e-mail>\n  -a, --active\n  -F, --female\n  -M, --male\n  --start <od>" },
@@ -311,7 +311,7 @@ char **my_completion(char *text, int start, int end)
 	struct command *c;
 	char *params = NULL;
 	int word = 0, i, abbrs = 0;
-	CPFunction *func = empty_generator;
+	CPFunction *func = known_uin_generator;
 
 	if (start) {
 		if (!strncasecmp(rl_line_buffer, "chat ", 5) || !strncasecmp(rl_line_buffer, "/chat ", 6)) {
@@ -631,7 +631,7 @@ COMMAND(command_connect)
 			my_printf("disconnected");
 		else if (sess->state != GG_STATE_IDLE)
 			my_printf("conn_stopped");
-		gg_logoff(sess);
+		ekg_logoff(sess, params[0]);
 		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
 		userlist_clear_status();
@@ -1048,7 +1048,7 @@ COMMAND(command_ignore)
 COMMAND(command_list)
 {
 	struct list *l;
-	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, j, page_wait = 0;
+	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, j, page_wait = 0;
 	char *tmp, **argv = NULL;
 
 	if (params[0] && *params[0] != '-') {
@@ -1112,7 +1112,7 @@ COMMAND(command_list)
 		return 0;
 	}
 
-	/* list --active | --busy | --inactive [--wait] */
+	/* list --active | --busy | --inactive | --invisible [--wait] */
 	for (j = 0; params[j]; j++) {
       		if ((argv = array_make(params[j], " \t", 0, 1, 1))) {
 			int i;
@@ -1135,6 +1135,11 @@ COMMAND(command_list)
 				if (match_arg(argv[i], 'b', "busy", 2)) {
 					show_all = 0;
 					show_busy = 1;
+				}
+				
+				if (match_arg(argv[i], 'I', "invisible", 2)) {
+					show_all = 0;
+					show_invisible = 1;
 				}
 			}
 			array_free(argv);
@@ -1162,14 +1167,17 @@ COMMAND(command_list)
 			case GG_STATUS_NOT_AVAIL_DESCR:
 				tmp = "list_not_avail_descr";
 				break;
-			
+			case GG_STATUS_INVISIBLE:
+				tmp = "list_invisible";
+				break;
+				
 		}
 
 		in.s_addr = u->ip.s_addr;
 
-		if (show_all || (show_busy && (u->status == GG_STATUS_BUSY || u->status == GG_STATUS_BUSY_DESCR)) || (show_active && u->status == GG_STATUS_AVAIL) || (show_inactive && (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR))) {
+		if (show_all || (show_busy && (u->status == GG_STATUS_BUSY || u->status == GG_STATUS_BUSY_DESCR)) || (show_active && u->status == GG_STATUS_AVAIL) || (show_inactive && (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)) || (show_invisible && (u->status == GG_STATUS_INVISIBLE))) {
 			my_printf(tmp, format_user(u->uin), inet_ntoa(in), itoa(u->port), u->descr);
-			if ((++count % (screen_lines - 1)) == 0) {
+			if ((++count % (screen_lines - 1)) == 0 && page_wait) {
 				char *foo = readline("-- Wci¶nij Enter by kontynuowaæ. --");
 				free(foo);
 			}
@@ -1373,11 +1381,8 @@ COMMAND(command_sms)
 COMMAND(command_quit)
 {
 	my_printf("quit");
-	if (params[0]) {
-		iso_to_cp(params[0]);
-		gg_change_status_descr(sess, GG_STATUS_NOT_AVAIL_DESCR, params[0]);
-	}
-	gg_logoff(sess);
+
+	ekg_logoff(sess, params[0]);
 	list_remove(&watches, sess, 0);
 	gg_free_session(sess);
 	sess = NULL;

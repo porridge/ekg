@@ -265,31 +265,44 @@ void handle_notify(struct gg_event *e)
 	n = (e->type == GG_EVENT_NOTIFY) ? e->event.notify : e->event.notify_descr.notify;
 
 	while (n->uin) {
-		if (ignored_check(n->uin)) {
+		if (ignored_check(n->uin) || !(u = userlist_find(n->uin, NULL))) {
 			n++;
 			continue;
 		}
 
-		if ((u = userlist_find(n->uin, NULL))) {
-			u->status = n->status;
-			u->ip.s_addr = n->remote_ip;
-			u->port = n->remote_port;
+		if (n->status == GG_STATUS_NOT_AVAIL)
+			n->status = GG_STATUS_INVISIBLE;
+		
+		if (n->status == GG_STATUS_BUSY_DESCR) {
+			check_event(EVENT_AWAY, u->uin);
 			free(u->descr);
-			u->descr = NULL;
-		}
-		if (n->status == GG_STATUS_AVAIL) {
-			my_printf("status_avail", format_user(n->uin));
-			if (u && config_completion_notify)
-				add_send_nick(u->display);
-			if (config_beep && config_beep_notify)
-				my_puts("\007");
-		} else if (n->status == GG_STATUS_BUSY) {
-			my_printf("status_busy", format_user(n->uin));
-		} else if (n->status == GG_STATUS_BUSY_DESCR) {
 			u->descr = strdup(e->event.notify_descr.descr);
 			cp_to_iso(u->descr);
 			my_printf("status_busy_descr", format_user(n->uin), u->descr);
 		}
+
+		if (n->status == u->status && n->remote_port == u->port) {
+			n++;
+			continue;
+		}
+		
+		u->status = n->status;
+		u->port = n->remote_port;
+		u->ip.s_addr = n->remote_ip;
+		
+		if (n->status == GG_STATUS_AVAIL) {
+			check_event(EVENT_AVAIL, u->uin);
+			my_printf("status_avail", format_user(n->uin));
+			
+			if (config_completion_notify)
+				add_send_nick(u->display);
+			if (config_beep && config_beep_notify)
+				my_puts("\007");
+		} else if (n->status == GG_STATUS_BUSY) {
+			check_event(EVENT_AWAY, u->uin);
+			my_printf("status_busy", format_user(n->uin));
+		} else if (n->status == GG_STATUS_INVISIBLE) 
+			my_printf("status_invisible", format_user(n->uin));
 		
 		n++;
 	}
@@ -345,7 +358,7 @@ void handle_status(struct gg_event *e)
 		{
 		    	check_event(EVENT_AWAY, e->event.status.uin);
 			my_printf("status_busy_descr", format_user(e->event.status.uin), u->descr);
-		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL && u->status != GG_STATUS_NOT_AVAIL)
+		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL)
 		{
 		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin);
 			my_printf("status_not_avail", format_user(e->event.status.uin));
