@@ -1207,9 +1207,6 @@ COMMAND(cmd_msg)
 	if (config_auto_back == 1 && (away == 1 || away == 3))
 		change_status(GG_STATUS_AVAIL, NULL, 1);
 
-	if (!sess || sess->state != GG_STATE_CONNECTED)
-		print("not_connected_msg_queued");
-
 	nick = xstrdup(params[0]);
 
 	if ((*nick == '@' || strchr(nick, ',')) && chat) {
@@ -1385,6 +1382,9 @@ COMMAND(cmd_msg)
 	xfree(raw_msg);
 
 	add_send_nick(nick);
+
+	if (valid && (!sess || sess->state != GG_STATE_CONNECTED))
+		print("not_connected_msg_queued");
 
 	if (valid && config_display_sent) {
 		struct gg_event e;
