@@ -3287,7 +3287,8 @@ static void binding_toggle_input(const char *arg)
 				break;
 
 			string_append(s, lines[i]);
-			string_append(s, "\r\n");
+			if (lines[i + 1])
+				string_append(s, "\r\n");
 		}
 
 		line = string_free(s, 0);
