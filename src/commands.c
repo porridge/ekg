@@ -115,7 +115,7 @@ struct command commands[] = {
 	{ "register", "??", command_register, " <email> <has³o>", "Rejestruje nowy uin", "" },
 	{ "remind", "", command_remind, "", "Wysy³a has³o na skrzynkê pocztow±", "" },
 	{ "save", "", command_save, "", "Zapisuje ustawienia programu", "" },
-	{ "set", "v?", command_set, " <zmienna> <warto¶æ>", "Wy¶wietla lub zmienia ustawienia", "" },
+	{ "set", "v?", command_set, " <zmienna> <warto¶æ>", "Wy¶wietla lub zmienia ustawienia", "U¿ycie ,,set -zmienna'' czy¶ci zawarto¶æ." },
 	{ "sms", "u?", command_sms, " <numer/alias> <tre¶æ>", "Wysy³a SMSa do podanej osoby", "" },
 	{ "status", "", command_status, "", "Wy¶wietla aktualny stan", "" },
 	{ "unignore", "i", command_ignore, " <numer/alias>", "Usuwa z listy ignorowanych osób", "" },

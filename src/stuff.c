@@ -1763,7 +1763,7 @@ void changed_proxy(char *var)
 
 	gg_proxy_enabled = 1;
 	free(gg_proxy_host);
-	
+
 	if ((tmp = strchr(config_proxy, ':'))) {
 		int len = (int) tmp - (int) config_proxy;
 		
@@ -1774,7 +1774,6 @@ void changed_proxy(char *var)
 			gg_proxy_host[len] = 0;
 		}
 	} else {
-		free(gg_proxy_host);
 		gg_proxy_host = strdup(config_proxy);
 		gg_proxy_port = 8080;
 	}
