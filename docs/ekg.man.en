@@ -51,9 +51,6 @@ After connecting sets the status to "invisible".
 .BI \-p\ [\-\-private]
 After connecting change to "private mode".
 .TP
-.BI \-d\ [\-\-debug]
-Enables "debug" mode - this is a special verbose mode.
-.TP
 .BI \-v\ [\-\-version]
 Prints the client and libgadu library version.
 .TP

@@ -935,7 +935,12 @@ int main(int argc, char **argv)
 	}
 
 	setup_debug();
+
+#ifdef WITH_UI_NCURSES
 	gg_debug_level = 255;
+#else
+	gg_debug_level = 0;
+#endif
 
         ekg_pid = getpid();
 

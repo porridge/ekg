@@ -163,7 +163,6 @@ static int lines_index = 0;		/* w której linii jeste¶my? */
 static char **completions = NULL;	/* lista dope³nieñ */
 static list_t windows = NULL;		/* lista okien */
 static struct window *window_current;	/* wska¼nik na aktualne okno */
-static struct window *window_previous;	/* wska¿nik na poprzednie okno, w którym byli¶my */
 static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 
 int config_backlog_size = 1000;		/* maksymalny rozmiar backloga */
@@ -1431,7 +1430,6 @@ static void update_statusbar(int commit)
 		string_free(s, 1);
 	}
 	
-	__add_format("debug", (config_debug), "");
 	__add_format("away", GG_S_B(config_status), "");
 	__add_format("busy", GG_S_B(config_status), "");
 	__add_format("avail", GG_S_A(config_status), "");
@@ -1582,7 +1580,7 @@ void ui_ncurses_init()
 	ui_screen_width = stdscr->_maxx + 1;
 	ui_screen_height = stdscr->_maxy + 1;
 	
-	window_previous = window_current = window_new(NULL, 0);
+	window_current = window_new(NULL, 0);
 
 	status = newwin(1, stdscr->_maxx + 1, stdscr->_maxy - 1, 0);
 	input = newwin(1, stdscr->_maxx + 1, stdscr->_maxy, 0);
@@ -2312,6 +2310,9 @@ static void ui_ncurses_loop()
 				else if (ch == '0')
 					window_switch(10);
 
+				if (ch == '`')			/* Alt-` */
+					window_switch(0);
+
 				if (ch == 'k' || ch == 'K')	/* Alt-K */
 					ui_event("command", "window", "kill", NULL);
 
@@ -2672,14 +2673,7 @@ static void ui_ncurses_loop()
 				binding_toggle_contacts(0, 0);
 				break;
 				
-			case KEY_F(12):	/* F12 - debug */
-
-				if (!window_current->id) {
-					window_switch(window_previous->id);
-					break;
-				}
-
-				window_previous = window_current;
+			case KEY_F(12):	/* F12 */
 				window_switch(0);
 				break;
 				

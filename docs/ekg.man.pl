@@ -51,10 +51,6 @@ Po po³±czeniu zmienia stan na ,,niewidoczny''.
 .BI \-p\ [\-\-private]
 Po po³±czeniu w³±cza tryb ,,tylko dla przyjació³''.
 .TP
-.BI \-d\ [\-\-debug]
-W³±cza tryb ,,debug'' - jest to specjalny tryb, pokazuj±cy, co robi 
-program w danej chwili.
-.TP
 .BI \-v\ [\-\-version]
 Wy¶wietla wersjê klienta i biblioteki libgadu.
 .TP

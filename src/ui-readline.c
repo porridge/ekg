@@ -738,7 +738,7 @@ void ui_readline_init()
 	rl_set_key("\033[12~", binding_quick_list, emacs_standard_keymap);
 	rl_set_key("\033[N", binding_quick_list, emacs_standard_keymap);
 	
-	rl_set_key("\033[24~", binding_toggle_debug, emacs_standard_keymap);
+	//rl_set_key("\033[24~", binding_toggle_debug, emacs_standard_keymap);
 
 	for (c = '0'; c <= '9'; c++)
 		rl_bind_key_in_map(c, bind_handler_window, emacs_meta_keymap);

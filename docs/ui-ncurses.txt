@@ -55,8 +55,8 @@ numeru, spe³niony bêdzie warunek %{?!uin ...}. ponadto wystêpuj± równie¿:
 	%{?query_notavail ...}	rozmówca niedostêpny
 	%{?query_invisible ...}	rozmówca niewidoczny
 
-warunki mo¿na zanie¿d¿aæ, tzn. %{?query %{!?query_descr ...}} zostanie
-wy¶wietlone je¶li prowadzona jest rozmowa, ale rozmówca nie ma stanu
+warunki mo¿na zagnie¿d¿aæ, tzn. %{?query %{!?query_descr ...}} zostanie
+wy¶wietlone, je¶li prowadzona jest rozmowa, ale rozmówca nie ma stanu
 opisowego.
 
 dziêki temu mo¿na konstruowaæ kosmiczne paski stanu. ale i tak domy¶lny
@@ -67,6 +67,6 @@ pierwszeñstwo przed ,,statusbar''.
 
 mo¿liwe jest te¿ w³±czenie nag³ówka okna, tj. paska wy¶wietlanego u góry
 ekranu, nad oknami. jest on opisany formatami ,,header'', ,,header1'',
-,,header2'' itd., analogicznie do paska stanu. dostêne formaty s± identyczne.
+,,header2'' itd., analogicznie do paska stanu. dostêpne formaty s± identyczne.
 
 $Id$

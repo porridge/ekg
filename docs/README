@@ -109,7 +109,7 @@ KLAWIATURA
 	Alt-cyfra		prze³±czenie do podanego okna
 	F1			pomoc
 	F2			krótka lista dostêpnych i zajêtych
-	F12			w³±czenie lub wy³±czenie trybu debugowania
+	F12 lub Alt-`		prze³±czenie do okna debugowania
 
     Lista ta obejmuje klawisze obs³ugiwane przed interfejs readline
     i ncurses, i nie zawiera kombinacji specyficznych dla tego pierwszego.

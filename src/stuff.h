@@ -317,7 +317,6 @@ int conference_set_ignore(const char *name, int flag);
 char *base64_encode(const char *buf);
 char *base64_decode(const char *buf);
 
-void changed_debug(const char *var);
 void changed_dcc(const char *var);
 void changed_theme(const char *var);
 void changed_proxy(const char *var);

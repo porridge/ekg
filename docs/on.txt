@@ -4,6 +4,7 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 
 	zdarzenie:
 		msg, chat - wiadomo¶æ od kogo¶
+		query - nowa rozmowa z kim¶
 		avail - zmiana przez kogo¶ statusu na 'dostêpny'
 		away  -            -//-               'zajêty'
 		invisible -        -//-               'niewidoczny'

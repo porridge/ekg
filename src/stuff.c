@@ -2712,21 +2712,6 @@ char *base64_decode(const char *buf)
 	return tmp;
 }
 	
-#if 0
-/*
- * changed_debug()
- *
- * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,debug''.
- */
-void changed_debug(const char *var)
-{
-	if (config_debug)
-		gg_debug_level = 255;
-	else
-		gg_debug_level = 0;
-}
-#endif
-
 /*
  * changed_dcc()
  *

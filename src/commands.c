@@ -3131,17 +3131,6 @@ int binding_help(int a, int b)
 	return 0;
 }
 
-#if 0
-int binding_toggle_debug(int a, int b)
-{
-	config_debug = !config_debug;
-	changed_debug("debug");
-	ui_event("variable_changed", "debug", NULL);
-
-	return 0;
-}
-#endif
-
 int binding_toggle_contacts(int a, int b)
 {
 #ifdef WITH_UI_NCURSES
