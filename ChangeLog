@@ -7,6 +7,7 @@ d - drg, sz - szalik).
 // 2003-05-21
 
 - poprawka /disconnect przy auto_reconnect != 0 (scooty/w)
+- libgadu: poprawka kompilacji z GG_DEBUG_DISABLE (pikov/sz)
 
 // 2003-05-20
 

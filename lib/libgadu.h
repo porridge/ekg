@@ -752,7 +752,7 @@ extern FILE *gg_debug_file;
 #define GG_DEBUG_MISC 16
 
 #ifdef GG_DEBUG_DISABLE
-#define gg_debug(x, y...) { }
+#define gg_debug(x, y...) do { } while(0)
 #else
 void gg_debug(int level, const char *format, ...);
 #endif
