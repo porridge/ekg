@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/time.h>
 #include <pwd.h>
 #include <dirent.h>
 #include <fcntl.h>
@@ -37,7 +38,7 @@
 #include "ui.h"
 #include "xmalloc.h"
 
-int config_check_mail = 1;
+int config_check_mail = 0;
 int config_check_mail_frequency = 15;
 char *config_check_mail_folders = NULL;
 
@@ -50,7 +51,8 @@ int mail_count = 0;
  * czyni odpowiednie kroki, aby uaktualniæ licznik 
  * nowych wiadomo¶ci.
  */
-int check_mail() {
+int check_mail()
+{
 	static time_t last_check = 0;
 	char **folders = NULL;
 	
@@ -186,10 +188,12 @@ int check_mail_mbox(const char **folders)
 
 			fclose(f);
 
+#ifdef HAVE_UTIMES
 			/* przecie¿ my nic nie ruszali¶my ;> */			
 			foo[0].tv_sec = st.st_atime;
 			foo[1].tv_sec = st.st_mtime;
 			utimes(folders[i], (const struct timeval *) &foo);
+#endif
 
 			new += f_new;
 			total += f_total;

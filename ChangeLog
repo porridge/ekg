@@ -14,6 +14,7 @@ zg³osi³ b³±d.
 - /bind w ui-ncurses nie dodaje sekwencji, je¶li ju¿ istnieje (sz)
 - porz±dek musi byæ - miejscowa kosmetyka kodu/komentarzy (sz)
 - compat te¿ wymaga czyszczenia (sz)
+- lekkie porz±dki w sprawdzaniu poczty (w)
 
 // 2002-12-06
 

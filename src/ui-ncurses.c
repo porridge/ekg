@@ -783,7 +783,8 @@ static void update_statusbar()
 				waddstr(status, config_reason);
 			p += 5;
 		} else if (!strncmp(p, "mail}", 5)) {
-			waddstr(status, itoa(check_mail()));
+			if (config_check_mail && mail_count)
+				waddstr(status, itoa(check_mail()));
 			p += 4;
 		} else if (!strncmp(p, "activity}", 9)) {
 			string_t s = string_init("");
@@ -823,6 +824,9 @@ static void update_statusbar()
 			if (!strncmp(p, "debug ", 6)) {
 				matched = (config_debug);
 				p += 5;
+			} else if (!strncmp(p, "mail ", 5)) {
+				matched = (config_check_mail && mail_count);
+				p += 4;
 			} else if (!strncmp(p, "descr ", 6)) {
 				matched = (config_reason != NULL);
 				p += 5;
@@ -2036,7 +2040,9 @@ static void binding_add(const char *key, const char *action, int quiet)
 		binding_map[ch - 64] = list_add(&bindings, &b, sizeof(b));
 
 		correct = 1;
-		config_changed = 1;
+
+		if (!quiet)
+			config_changed = 1;
 	}
 
 	if (!strncasecmp(key, "alt-", 4) && strlen(key) == 5) {
