@@ -1202,7 +1202,8 @@ void handle_userlist(struct gg_http *h)
 
 		for (l = userlist; l; l = l->next) {
 			struct userlist *u = l->data;
-			gg_remove_notify_ex(sess, u->uin, userlist_type(u));
+			if (sess)
+				gg_remove_notify_ex(sess, u->uin, userlist_type(u));
 		}
 
 		cp_to_iso(h->data);

@@ -684,35 +684,33 @@ static void handle_sigsegv()
 {
 	signal(SIGSEGV, SIG_DFL);
 
-	ekg_segv_handler = 1;
-
-	ui_deinit();
-	
 	ioctld_kill();
 
 	if (old_stderr)
 		dup2(old_stderr, 2);
 
-	fprintf(stderr, "\n"
-"*** Naruszenie ochrony pamiêci ***\n"
+	fprintf(stderr, 
+"\r\n"
+"\r\n"
+"*** Naruszenie ochrony pamiêci ***\r\n"
+"\r\n"
+"Spróbujê zapisaæ ustawienia, ale nie obiecujê, ¿e cokolwiek z tego\r\n"
+"wyjdzie. Trafi± one do plików %s/config.%d\r\n"
+"oraz %s/userlist.%d\r\n"
+"\r\n"
+"Do pliku %s/debug.%d zapiszê ostatanie komunikaty\r\n"
+"z okna debugowania.\r\n"
+"\r\n"
+"Je¶li zostanie utworzony plik %s/core, spróbuj uruchomiæ\r\n"
+"polecenie:\r\n"
+"\r\n"
+"    gdb %s %s/core\r\n"
 "\n"
-"Spróbujê zapisaæ ustawienia, ale nie obiecujê, ¿e cokolwiek z tego\n"
-"wyjdzie. Trafi± one do plików %s/config.%d\n"
-"oraz %s/userlist.%d\n"
-"\n"
-"Do pliku %s/debug.%d zapiszê ostatanie komunikaty\n"
-"z okna debugowania.\n"
-"\n"
-"Je¶li zostanie utworzony plik %s/core, spróbuj uruchomiæ\n"
-"polecenie:\n"
-"\n"
-"    gdb %s %s/core\n"
-"\n"
-"zanotowaæ kilka ostatnich linii, a nastêpnie zanotowaæ wynik polecenia\n"
-",,bt''. Dziêki temu autorzy dowiedz± siê, w którym miejscu wyst±pi³ b³±d\n"
-"i najprawdopodobniej pozwoli to unikn±æ tego typu sytuacji w przysz³o¶ci.\n"
-"Wiêcej szczegó³ów w dokumentacji, w pliku ,,gdb.txt''.\n"
-"\n",
+"zanotowaæ kilka ostatnich linii, a nastêpnie zanotowaæ wynik polecenia\r\n"
+",,bt''. Dziêki temu autorzy dowiedz± siê, w którym miejscu wyst±pi³ b³±d\r\n"
+"i najprawdopodobniej pozwoli to unikn±æ tego typu sytuacji w przysz³o¶ci.\r\n"
+"Wiêcej szczegó³ów w dokumentacji, w pliku ,,gdb.txt''.\r\n"
+"\r\n",
 config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, argv0, config_dir);
 
 	config_write_crash();
@@ -891,11 +889,6 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	if (getenv("CONFIG_DIR"))
-		config_dir = saprintf("%s/%s/gg", home_dir, getenv("CONFIG_DIR"));
-	else
-		config_dir = saprintf("%s/.gg", home_dir);
-
 	signal(SIGSEGV, handle_sigsegv);
 	signal(SIGHUP, handle_sighup);
 	signal(SIGUSR1, handle_sigusr1);
@@ -1015,7 +1008,18 @@ int main(int argc, char **argv)
 			ui_init = ui_batch_init;
 	}
 
-	config_profile = new_profile;
+	if ((config_profile = new_profile))
+		tmp = saprintf("/%s", config_profile);
+	else
+		tmp = xstrdup("");
+
+	if (getenv("CONFIG_DIR"))
+		config_dir = saprintf("%s/%s/gg%s", home_dir, getenv("CONFIG_DIR"), tmp);
+	else
+		config_dir = saprintf("%s/.gg%s", home_dir, tmp);
+
+	xfree(tmp);
+	tmp = NULL;
 
 	if (!batch_mode && !ui_set && (tmp = config_read_variable("interface"))) {
 		ekg_ui_set(tmp);

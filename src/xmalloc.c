@@ -36,16 +36,17 @@ void ekg_oom_handler()
 		dup2(old_stderr, 2);
 
 	fprintf(stderr,
-"\n"
-"*** Brak pamiêci ***\n"
-"\n"
-"Próbujê zapisaæ ustawienia do pliku %s/config.%d i listê kontaktów\n"
-"do pliku %s/userlist.%d, ale nie obiecujê, ¿e cokolwiek z tego\n"
-"wyjdzie.\n"
-"\n"
-"Do pliku %s/debug.%d zapiszê ostatanie komunikaty\n"
-"z okna debugowania.\n"
-"\n", config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, (int) getpid());
+"\r\n"
+"\r\n"
+"*** Brak pamiêci ***\r\n"
+"\r\n"
+"Próbujê zapisaæ ustawienia do pliku %s/config.%d i listê kontaktów\r\n"
+"do pliku %s/userlist.%d, ale nie obiecujê, ¿e cokolwiek z tego\r\n"
+"wyjdzie.\r\n"
+"\r\n"
+"Do pliku %s/debug.%d zapiszê ostatanie komunikaty\r\n"
+"z okna debugowania.\r\n"
+"\r\n", config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, (int) getpid());
 
 	config_write_crash();
 	userlist_write_crash();

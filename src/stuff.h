@@ -309,8 +309,6 @@ int registered_today;
 int pipe_fd;
 int batch_mode;
 char *batch_line;
-int immediately_quit;
-int ekg_segv_handler;
 int ioctld_sock;
 struct color_map default_color_map[16+10];
 

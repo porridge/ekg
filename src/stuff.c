@@ -41,6 +41,11 @@
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
+#ifdef HAVE_LIBGEN_H
+#  include <libgen.h>
+#else
+#  include "../compat/dirname.h"
+#endif
 #include <limits.h>
 #include <pwd.h>
 #include <signal.h>
@@ -155,10 +160,8 @@ int config_protocol = 0;
 int pipe_fd = -1;
 int batch_mode = 0;
 char *batch_line = NULL;
-int immediately_quit = 0;
 int config_emoticons = 1;
 int config_make_window = 0;
-int ekg_segv_handler = 0;
 char *config_tab_command = NULL;
 int ioctld_sock = -1;
 int config_ctrld_quits = 1;
@@ -2218,26 +2221,19 @@ const char *prepare_path(const char *filename, int do_mkdir)
 	static char path[PATH_MAX];
 	
 	if (do_mkdir) {
-		if (mkdir(config_dir, 0700) && errno != EEXIST)
-			return NULL;
 		if (config_profile) {
-			snprintf(path, sizeof(path), "%s/%s", config_dir, config_profile);
-			if (mkdir(path, 0700) && errno != EEXIST)
+			if (mkdir(dirname(config_dir), 0700) && errno != EEXIST)
 				return NULL;
 		}
+
+		if (mkdir(config_dir, 0700) && errno != EEXIST)
+			return NULL;
 	}
 	
-	if (!filename || !*filename) {
-		if (config_profile)
-			snprintf(path, sizeof(path), "%s/%s", config_dir, config_profile);
-		else
-			snprintf(path, sizeof(path), "%s", config_dir);
-	} else {
-		if (config_profile)
-			snprintf(path, sizeof(path), "%s/%s/%s", config_dir, config_profile, filename);
-		else
-			snprintf(path, sizeof(path), "%s/%s", config_dir, filename);
-	}
+	if (!filename || !*filename)
+		snprintf(path, sizeof(path), "%s", config_dir);
+	else
+		snprintf(path, sizeof(path), "%s/%s", config_dir, filename);
 	
 	return path;
 }

@@ -375,11 +375,7 @@ void userlist_write_crash()
 	char path[PATH_MAX];
 	FILE *f;
 
-	if (config_profile)
-		snprintf(path, sizeof(path), "%s/%s", config_dir, config_profile);
-	else
-		snprintf(path, sizeof(path), "%s", config_dir);
-
+	snprintf(path, sizeof(path), "%s", config_dir);
 	chdir(path);
 	
 	snprintf(name, sizeof(name), "userlist.%d", (int) getpid());
