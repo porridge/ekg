@@ -1,0 +1,26 @@
+--8<--
+
+POST /appsvc/fmregister.asp HTTP/1.0
+Host: register.gadu-gadu.pl
+Content-Type: application/x-www-form-urlencoded
+User-Agent: Mozilla/4.7 [en] (Win98; I)
+Content-Length: 86
+Pragma: no-cache
+
+fmnumber=1315409&fmpwd=dupa123&pwd=nowehaslo&email=nowy%2Demail@irc.pl&code=1500343197
+
+--8<--
+
+HTTP/1.1 200 OK
+Server: Microsoft-IIS/5.0
+Date: Wed, 22 Aug 2001 12:12:35 GMT
+Connection: Keep-Alive
+Content-Length: 19
+Content-Type: text/html
+Set-Cookie: ASPSESSIONIDGQGQGNUC=BFCIGJMBAKIKBENLCEOLEDBH; path=/
+Cache-control: private
+
+reg_success:1315409
+
+--8<--
+

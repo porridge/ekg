@@ -1,0 +1,250 @@
+pkot@linuxnews.pl
+
+diff -Nur ekg-2001092902/commands.c ekg-2001092803/commands.c
+--- ekg-2001092902/commands.c	Sat Sep 29 00:59:48 2001
++++ ekg-2001092803/commands.c	Sat Sep 29 18:51:35 2001
+@@ -1,4 +1,4 @@
+-/* $Id$ */
++/* $Id$ */
+ 
+ /*
+  *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
+@@ -79,6 +79,7 @@
+ 	{ "exec", "?", command_exec, " <polecenie>", "Uruchamia polecenie systemowe", "" },
+ 	{ "!", "?", command_exec, " <polecenie>", "Synonim dla exec", "" },
+ 	{ "find", "u", command_find, " [opcje]", "Interfejs do katalogu publicznego", "  --uin <numerek>\n  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>\n  --city <miasto>\n  --birth <min:max>\n  --phone <telefon>\n  --email <e-mail>\n  --active\n" },
++	{ "4friends", "?", command_away, " <on/off>", "Zmienia stan na widoczny tylko dla osób z listy kontaktów", "" },
+ 	{ "help", "c", command_help, " [polecenie]", "Wy¶wietla informacjê o poleceniach", "" },
+ 	{ "?", "c", command_help, " [polecenie]", "Synonim dla help", "" },
+ 	{ "ignore", "u", command_ignore, " [numer/alias]", "Dodaje do listy ignorowanych lub j± wy¶wietla", "" },
+@@ -360,6 +361,7 @@
+ 	if (!add_user(uin, params[1])) {
+ 		my_printf("user_added", format_user(uin));
+ 		gg_add_notify(sess, uin);
++		config_changed = 1;
+ 	} else
+ 		my_printf("error_adding");
+ 
+@@ -381,6 +383,51 @@
+ 		away = 2;
+ 		gg_change_status(sess, GG_STATUS_INVISIBLE);
+ 		my_printf("invisible");
++	} else if (!strcasecmp(name, "4friends")) {
++		if (!params[0]) {
++			if (away & 4) my_printf("4friends_is_on");
++			else my_printf("4friends_is_off");
++		} else if (!strcasecmp(params[0], "on")) {
++			int lstatus;
++
++			switch (away & 3) {
++			case 0:
++				lstatus = GG_STATUS_AVAIL;
++				break;
++			case 1:
++				lstatus = GG_STATUS_BUSY;
++				break;
++			default:
++				lstatus = GG_STATUS_INVISIBLE;
++				break;
++			}
++			gg_change_status(sess, lstatus | GG_STATUS_FRIENDS_MASK);
++			away |= 4;
++			set_variable("only_friends", "on");
++			my_printf("4friends_on");
++			config_changed = 1;
++		} else if (!strcasecmp(params[0], "off")) {
++			int lstatus;
++
++			switch (away & 3) {
++			case 0:
++				lstatus = GG_STATUS_AVAIL;
++				break;
++			case 1:
++				lstatus = GG_STATUS_BUSY;
++				break;
++			default:
++				lstatus = GG_STATUS_INVISIBLE;
++				break;
++			}
++			gg_change_status(sess, lstatus);
++			if (away & 4) away -= 4;
++			set_variable("only_friends", "off");
++			my_printf("4friends_off");
++			config_changed = 1;
++		} else {
++			my_printf("error_usage");
++		}
+ 	} else {
+ 		away = 0;
+ 		gg_change_status(sess, GG_STATUS_AVAIL);
+@@ -605,6 +652,8 @@
+ 
+ 	my_printf("modify_done", argv[0]);
+ 
++	config_changed = 1;
++
+ 	return 0;
+ }
+ 
+@@ -851,16 +900,18 @@
+ 	} else {
+ 		reset_theme_cache();
+ 		switch (set_variable(params[0], params[1])) {
+-			case 0:
+-				if (!in_autoexec)
+-					my_printf("variable", params[0], params[1]);
+-				break;
+-			case -1:
+-				my_printf("variable_not_found", params[0]);
+-				break;
+-			case -2:
+-				my_printf("variable_invalid", params[0]);
+-				break;
++			case 0:
++				if (!in_autoexec) {
++					my_printf("variable", params[0], params[1]);
++					config_changed = 1;
++				}
++				break;
++			case -1:
++				my_printf("variable_not_found", params[0]);
++				break;
++			case -2:
++				my_printf("variable_invalid", params[0]);
++				break;
+ 		}
+ 	}
+ 
+diff -Nur ekg-2001092902/ekg.c ekg-2001092803/ekg.c
+--- ekg-2001092902/ekg.c	Fri Sep 28 23:47:02 2001
++++ ekg-2001092803/ekg.c	Sat Sep 29 17:56:33 2001
+@@ -1,4 +1,4 @@
+-/* $Id$ */
++/* $Id$ */
+ 
+ /*
+  *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
+@@ -239,6 +239,21 @@
+ 
+ 	printf("\n");
+ 	gg_logoff(sess);
++	if (config_changed) {
++		char *line;
++
++		my_printf("config_changed");
++		line = my_readline();
++		if (!strcasecmp(line, "tak") ||
++		    !strcasecmp(line, "t") ||
++		    !strcasecmp(line, "yes") ||
++		    !strcasecmp(line, "y")) {
++			if (!write_userlist(NULL) && !write_config(NULL))
++				my_printf("saved");
++			else
++				my_printf("error_saving");
++		}
++	}
+ 	gg_free_session(sess);
+ 
+ 	return 0;
+diff -Nur ekg-2001092902/libgg.c ekg-2001092803/libgg.c
+--- ekg-2001092902/libgg.c	Fri Sep 28 23:47:02 2001
++++ ekg-2001092803/libgg.c	Sat Sep 29 18:56:01 2001
+@@ -1,4 +1,4 @@
+-/* $Id$ */
++/* $Id$ */
+ 
+ /*
+  *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
+@@ -33,6 +33,7 @@
+ #include <pwd.h>
+ #include "endian.h"
+ #include "libgg.h"
++#include "stuff.h"
+ 
+ int gg_debug_level = 0;
+ 
+@@ -1158,7 +1159,12 @@
+ 	
+ 			l.uin = fix32(sess->uin);
+ 			l.hash = fix32(hash);
+-			l.status = fix32(GG_STATUS_AVAIL);
++			if (only_friends) {
++				l.status = fix32(GG_STATUS_AVAIL | GG_STATUS_FRIENDS_MASK);
++				away |= 4;
++			} else {
++				l.status = fix32(GG_STATUS_AVAIL);
++			}
+ 			l.dunno = fix32(0x0b);
+ 			l.local_ip = 0;
+ 			l.local_port = 0;
+diff -Nur ekg-2001092902/stuff.c ekg-2001092803/stuff.c
+--- ekg-2001092902/stuff.c	Fri Sep 28 23:47:02 2001
++++ ekg-2001092803/stuff.c	Sat Sep 29 17:47:15 2001
+@@ -1,4 +1,4 @@
+-/* $Id$ */
++/* $Id$ */
+ 
+ /*
+  *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
+@@ -57,6 +57,8 @@
+ char *sms_send_app = NULL;
+ int sms_max_length = 100;
+ int search_type = 0;
++int only_friends = 0;
++int config_changed = 0;
+ 
+ /*
+  * my_puts()
+diff -Nur ekg-2001092902/stuff.h ekg-2001092803/stuff.h
+--- ekg-2001092902/stuff.h	Fri Sep 28 23:47:02 2001
++++ ekg-2001092803/stuff.h	Sat Sep 29 17:47:33 2001
+@@ -1,4 +1,4 @@
+-/* $Id$ */
++/* $Id$ */
+ 
+ /*
+  *  (C) Copyright 2001 Wojtek Kaniewski <wojtekka@irc.pl>
+@@ -61,6 +61,8 @@
+ struct gg_search *search;
+ int search_type;
+ int no_prompt;
++int only_friends;
++int config_changed;
+ 
+ void my_puts(char *format, ...);
+ char *my_readline();
+diff -Nur ekg-2001092902/themes.c ekg-2001092803/themes.c
+--- ekg-2001092902/themes.c	Sat Sep 29 12:08:57 2001
++++ ekg-2001092803/themes.c	Sat Sep 29 18:50:05 2001
+@@ -422,6 +422,10 @@
+ 	add_format("away", "%> Zmieniono stan na zajêty %c(%C%#%c)%n\n", 1);
+ 	add_format("back", "%> Zmieniono stan na dostêpny %c(%C%#%c)%n\n", 1);
+ 	add_format("invisible", "%> Zmieniono stan na niewidoczny %c(%C%#%c)%n\n", 1);
++	add_format("4friends_on", "%> W³±czono tryb 'tylko dla przyjació³' %c(%C%#%c)%n\n", 1);
++	add_format("4friends_off", "%> Wy³±czono tryb 'tylko dla przyjació³' %c(%C%#%c)%n\n", 1);
++	add_format("4friends_is_on", "%> Tryb 'tylko dla przyjació³' jest w³±czony %c(%C%#%c)%n\n", 1);
++	add_format("4friends_is_off", "%> Tryb 'tylko dla przyjació³' jest wy³±czony %c(%C%#%c)%n\n", 1);
+ 	add_format("user_not_found", "%! Nie znaleziono u¿ytkownika %W%1%n\n", 1);
+ 	add_format("user_deleted", "%> U¿ytkownik %1 zosta³ usuniêty z listy kontaktów\n", 1);
+ 	add_format("error_deleting", "%! Wyst±pi³ b³±d podczas usuwania u¿ytkownika\n", 1);
+@@ -506,5 +510,6 @@
+ 
+ 	add_format("modify_done", "%> Zmieniono wpis w li¶cie kontaktów\n", 1);
+ 	add_format("user_info", "%) Imiê i nazwisko: %W%1 %2%n\n%) Pseudonim: %W%3%n\n%) Alias: %W%4%n\n%) Numer telefonu: %W%5%n\n%) Grupa: %W%6%n\n", 1);
++	add_format("config_changed", "%> Zapisaæ now± konfiguracjê? (tak/nie) ", 1);
+ };
+ 
+@@ -41,6 +41,7 @@
+ 	{ "sms_max_length", VAR_INT, 1, &sms_max_length },
+ 	{ "sms_number", VAR_STR, 1, &sms_number },
+ 	{ "sms_send_app", VAR_STR, 1, &sms_send_app },
++	{ "only_friends", VAR_BOOL, 1, &only_friends },
+ 
+ 	{ NULL, 0, 0, NULL }
+ };
+@@ -116,5 +117,3 @@
+ 
+ 	return 0;
+ }
+-
+-

@@ -1,0 +1,50 @@
+--8<--
+
+POST /appsvc/fmregister.asp HTTP/1.0
+Host: register.gadu-gadu.pl
+Content-Type: application/x-www-form-urlencoded
+User-Agent: Mozilla/4.7 [en] (Win98; I)
+Content-Length: 48
+Pragma: no-cache
+
+pwd=dupa123&email=wojtekka@irc.pl&code=863968097
+
+--8<--
+
+HTTP/1.1 200 OK
+Server: Microsoft-IIS/5.0
+Date: Wed, 22 Aug 2001 12:02:08 GMT
+Connection: Keep-Alive
+Content-Length: 19
+Content-Type: text/html
+Set-Cookie: ASPSESSIONIDGQGQGNUC=GELGGJMBGGEDGNGPHBGGHLEC; path=/
+Cache-control: private
+
+reg_success:1315409
+
+--8<--
+
+POST /appsvc/fmpubreg2.asp HTTP/1.0
+Host: pubdir.gadu-gadu.pl
+Content-Type: application/x-www-form-urlencoded
+User-Agent: Mozilla/4.7 [en] (Win98; I)
+Content-Length: 135
+Pragma: no-cache
+
+FmNum=1315409&Pass=dupa123&FirstName=imie&LastName=nazwisko&NickName=pseudo&Email=email&BirthYear=1900&Gender=2&City=miejscowosc&Phone=
+
+--8<--
+
+HTTP/1.1 200 OK
+Server: Microsoft-IIS/5.0
+Date: Wed, 22 Aug 2001 12:03:28 GMT
+Connection: Keep-Alive
+Content-Length: 12
+Content-Type: text/html
+Set-Cookie: ASPSESSIONIDGQGQGNUC=KEOGGJMBDKMGDIOAGEHLOIPM; path=/
+Cache-control: private
+
+reg_success:
+
+--8<--
+

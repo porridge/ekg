@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+while (<>) {
+  if (/^\s+(.*)\n/) {
+    $hex = $1;
+    $hex =~ s/\s//g;
+    $line = "";
+    $len = 0;
+    print "\t";
+    while ($hex) {
+      $chr = hex(substr($hex, 0, 2));
+      if ($chr < 32 || ($chr >= 127 && $chr <= 160)) { $chr = 46; }
+      $line .= chr($chr);
+      $len++;
+      print substr($hex, 0, 2) . " ";
+      $hex =~ s/^..//;
+    }
+    for ($x = 0; $x < (16-$len); $x++) { print "   "; }
+    print " $line\n";
+  } else {
+    print $_;
+  }
+}

@@ -1,0 +1,330 @@
+drg@go2.pl
+
+diff -c ekg-2001100201/Makefile ekg-2001100201-alias/Makefile
+*** ekg-2001100201/Makefile	Sun Oct 14 12:39:03 2001
+--- ekg-2001100201-alias/Makefile	Sun Oct 14 12:23:21 2001
+***************
+*** 1,7 ****
+  # plik wygenerowany automatyczny przez skrypt ,,configure''. nie zmieniać.
+  
+! INCLUDES = 
+! LIBS =  -ltermcap -lreadline
+  CC = gcc
+  PREFIX = /usr/local
+  NAME = ekg
+--- 1,7 ----
+  # plik wygenerowany automatyczny przez skrypt ,,configure''. nie zmieniać.
+  
+! INCLUDES =  -I/usr/freeware/include
+! LIBS =  -ltermcap -L/usr/freeware/lib32 -lreadline
+  CC = gcc
+  PREFIX = /usr/local
+  NAME = ekg
+diff -c ekg-2001100201/commands.c ekg-2001100201-alias/commands.c
+*** ekg-2001100201/commands.c	Tue Oct  2 21:40:12 2001
+--- ekg-2001100201-alias/commands.c	Sun Oct 14 11:50:16 2001
+***************
+*** 53,59 ****
+   * definicje dostępnych komend.
+   */
+  
+! int command_add(), command_away(), command_del(),
+  	command_exec(), command_help(), command_ignore(), command_list(),
+  	command_save(), command_msg(), command_quit(), command_test_send(),
+  	command_test_add(), command_theme(), command_set(), command_connect(),
+--- 53,59 ----
+   * definicje dostępnych komend.
+   */
+  
+! int command_add(), command_away(), command_del(), command_alias(),
+  	command_exec(), command_help(), command_ignore(), command_list(),
+  	command_save(), command_msg(), command_quit(), command_test_send(),
+  	command_test_add(), command_theme(), command_set(), command_connect(),
+***************
+*** 97,102 ****
+--- 97,103 ----
+  	{ "unignore", "i", command_ignore, " <numer/alias>", "Usuwa z listy ignorowanych osób", "" },
+  	{ "_send", "u?", command_test_send, "", "", "" },
+  	{ "_add", "?", command_test_add, "", "", "" },
++ 	{ "alias", "??", command_alias, " [add/del] [alias] [komenda]", "Dodaje/usuwa alias lub wyświetla listę.", "" },
+  	{ NULL, NULL, NULL, NULL, NULL }
+  };
+  
+***************
+*** 942,947 ****
+--- 943,981 ----
+  		add_send_nick(params[0]);
+  
+  	return 0;
++ }
++ 
++ COMMAND(command_alias)
++ {
++     if (!params[0]) {
++ 		struct list *l;
++                 int count = 0;
++ 
++                 for (l = alias; l; l = l->next) {
++                         struct alias *a = l->data;
++ 
++                         my_printf("aliases_list", a->alias, a->cmd);
++                         count++;
++                 }
++ 
++                 if (!count)
++                         my_printf("aliases_list_empty");
++ 
++                 return 0;
++     }
++ 
++     if (strstr(params[0], "add")) {
++                 add_alias(params[1], 0);
++                 return 0;
++     }
++ 
++     if(strstr(params[0], "del")) {
++                 del_alias(params[1]);
++                 return 0;
++     }
++ 
++     execute_line("help alias");
++     return 0;
+  }
+  
+  char *strip_spaces(char *line)
+Common subdirectories: ekg-2001100201/docs and ekg-2001100201-alias/docs
+diff -c ekg-2001100201/ekg.c ekg-2001100201-alias/ekg.c
+*** ekg-2001100201/ekg.c	Tue Oct  2 21:40:12 2001
+--- ekg-2001100201-alias/ekg.c	Sun Oct 14 12:14:04 2001
+***************
+*** 223,229 ****
+  	}
+  
+  	for (;;) {
+! 		char *line;
+  		
+  		if (!(line = my_readline()))
+  			break;
+--- 223,229 ----
+  	}
+  
+  	for (;;) {
+! 		char *line, *tmp;
+  		
+  		if (!(line = my_readline()))
+  			break;
+***************
+*** 231,238 ****
+--- 231,242 ----
+  		if (strcmp(line, ""))
+  			add_history(line);
+  
++ 		if ((tmp = is_alias(line)))
++ 		    	line = tmp;
++ 				
+  		if (execute_line(line)) {
+  			free(line);
++ 			free(tmp);
+  			break;
+  		}
+  		
+Common subdirectories: ekg-2001100201/examples and ekg-2001100201-alias/examples
+diff -c ekg-2001100201/stuff.c ekg-2001100201-alias/stuff.c
+*** ekg-2001100201/stuff.c	Tue Oct  2 21:40:13 2001
+--- ekg-2001100201-alias/stuff.c	Sun Oct 14 12:50:12 2001
+***************
+*** 245,251 ****
+  		if (!strcasecmp(buf, "ignore")) {
+  			if (atoi(foo))
+  				add_ignored(atoi(foo));
+! 		} else
+  			set_variable(buf, foo);
+  
+  		free(buf);
+--- 245,253 ----
+  		if (!strcasecmp(buf, "ignore")) {
+  			if (atoi(foo))
+  				add_ignored(atoi(foo));
+! 		} else if (!strcasecmp(buf, "alias")) {
+! 				add_alias(foo, 1);
+! 		} else	
+  			set_variable(buf, foo);
+  
+  		free(buf);
+***************
+*** 301,306 ****
+--- 303,314 ----
+  		fprintf(f, "ignore %u\n", i->uin);
+  	}
+  
++ 	for (l = alias; l; l = l->next) {
++ 	    	struct alias *a = l->data;
++ 
++ 		fprintf(f, "alias %s %s\n", a->alias, a->cmd);
++ 	}
++ 
+  	fclose(f);
+  	
+  	return 0;
+***************
+*** 941,944 ****
+--- 949,1061 ----
+  	return -1;
+  }
+  
++ /* add_alias()
++  *
++  * dopisuje alias do lsity aliasów ;)
++  *
++  * - string - linia w formacie 'alias cmd'
++  * - quiet - czy wypluwać mesgi na stdout
++  *
++  */
++ int add_alias(char *string, int quiet)
++ {
++         char  *cmd;
++         struct list *l;
++         struct alias a;
++ 
++         if (!string || !(cmd = strchr(string, ' '))) {
++                 if (!quiet)
++                         my_printf("not_enough_params");
++                         return -1;
++         }
++ 
++         *cmd++ = 0;
++ 
++         for (l = alias; l; l = l->next) {
++                 struct alias *j = l->data;
++ 
++                 if (!strcmp(string, j->alias)) {
++                         if (!quiet)
++                                 my_printf("aliases_exist" , string);
++                         return -1;
++                 }
++         }
++ 
++         a.alias = strdup(string);
++         a.cmd = strdup(cmd);
++         list_add(&alias, &a, sizeof(a));
++ 
++ 	config_changed = 1;
+  
++         if (!quiet)
++                 my_printf("aliases_add", a.alias, a.cmd);
++ 
++         return 0;
++ }
++ 
++ /*
++ * del_alias()
++ *
++ * usuwa alias z listy aliasów.
++ *
++ * - name - alias.
++ */
++ int del_alias(char *name)
++ {
++         struct list *l;
++ 
++         if (!name) {
++                 my_printf("not_enough_params");
++                 return 0;
++         }
++ 
++         for (l = alias; l; l = l->next) {
++                 struct alias *a = l->data;
++ 
++                 if (!strcmp(a->alias, name)) {
++                         my_printf("aliases_del", name);
++                         list_remove(&alias, a, 1);
++ 			config_changed = 1;
++                         return 0;
++                 }
++         }
++ 
++         my_printf("aliases_noexist", name);
++ 
++         return 0;
++ }
++ 
++ /* is_alias()
++  *
++  * sprawdza czy komenda w foo jest aliasem, jeśli tak - zwraca cmd, else - NULL
++  *
++  * - foo
++  *
++  */
++ char *is_alias(char *foo)
++ {
++         struct list *l;
++         char *param, *buf, *line=strdup(foo);
++         int param_length = 0;
++ 
++         if ((param = strchr(line, ' '))) {
++                 *param++ = 0;
++                 param_length = strlen(param);
++         }
++ 
++         for (l = alias; l; l = l->next) {
++                 struct alias *j = l->data;
++ 
++                 if (!strcmp(line, j->alias)) {
++                         buf = malloc(strlen(j->cmd) + param_length + 4);
++                         strcpy(buf, j->cmd);
++                         if (param) {
++                                 strcat(buf, " ");
++                                 strcat(buf, param);
++                         }
++                         return buf;
++                 }
++         }
++ 
++         return NULL;
++ }
+diff -c ekg-2001100201/stuff.h ekg-2001100201-alias/stuff.h
+*** ekg-2001100201/stuff.h	Tue Oct  2 21:40:13 2001
+--- ekg-2001100201-alias/stuff.h	Sun Oct 14 11:45:46 2001
+***************
+*** 40,45 ****
+--- 40,51 ----
+  	char *name;
+  };
+  
++ struct alias {
++         char *alias;
++         char *cmd;
++ };
++ 
++ struct list *alias;
+  struct list *userlist;
+  struct list *ignored;
+  struct list *children;
+***************
+*** 92,96 ****
+--- 98,105 ----
+  char *read_file(FILE *f);
+  int add_process(int pid, char *name);
+  int del_process(int pid);
++ int add_alias(char *string, int quiet);
++ int del_alias(char *name);
++ char *is_alias(char *foo);
+  
+  #endif
+diff -c ekg-2001100201/themes.c ekg-2001100201-alias/themes.c
+*** ekg-2001100201/themes.c	Tue Oct  2 21:40:15 2001
+--- ekg-2001100201-alias/themes.c	Sun Oct 14 11:49:50 2001
+***************
+*** 519,523 ****
+--- 519,529 ----
+  	add_format("user_info", "%) Imię i nazwisko: %W%1 %2%n\n%) Pseudonim: %W%3%n\n%) Alias: %W%4%n\n%) Numer telefonu: %W%5%n\n%) Grupa: %W%6%n\n", 1);
+  
+  	add_format("config_changed", "%> Zapisać nową konfigurację? (tak/nie) ", 1);
++         add_format("aliases_list_empty", "%! Brak aliasów!\n", 1);
++         add_format("aliases_list", "%> %W%1 %G-%Y %2%n\n", 1);
++         add_format("aliases_add", "%> Dodałem alias %W%1 %n-> %2.\n", 1);
++         add_format("aliases_del", "%) Usunąłem alias %W%1%n.\n", 1);
++         add_format("aliases_exist", "%! Alias %W%1%n już istnieje!\n", 1);
++         add_format("aliases_noexist", "%! Alias %W%1%n nie istnieje!\n", 1);
+  };
+  

@@ -1,0 +1,38 @@
+Date: Fri, 14 Sep 2001 15:42:34 +0200
+From: Robert J. Wozny <speedy@atm.com.pl>
+
+diff -Naur ekg-20010911/Makefile ekg-20010911.speedy/Makefile
+--- ekg-20010911/Makefile	Tue Sep 11 23:42:37 2001
++++ ekg-20010911.speedy/Makefile	Fri Sep 14 15:36:46 2001
+@@ -1,8 +1,8 @@
+ # $Id$
+ 
+-CC = gcc -Wall -O3 -I/usr/include/readline
++CC = gcc -Wall -O3 -I/usr/freeware/include
+ OBJS = libgg.o stuff.o commands.o events.o themes.o vars.o
+-LIBS = -lreadline -lncurses -lcurses
++LIBS = -L/usr/freeware/lib32 -lreadline -lcurses
+ DATE = `date +'%Y%m%d'`
+ 
+ all:	ekg
+diff -Naur ekg-20010911/libgg.c ekg-20010911.speedy/libgg.c
+--- ekg-20010911/libgg.c	Tue Sep 11 23:42:37 2001
++++ ekg-20010911.speedy/libgg.c	Fri Sep 14 15:30:51 2001
+@@ -13,10 +13,14 @@
+ #include <string.h>
+ #include <stdarg.h>
+ #include <pwd.h>
+-#if !defined(__linux__)
+-#  include <machine/endian.h>
++#if defined(__mips)
++#  include <sys/endian.h>
+ #else
+-#  include <endian.h>
++# if !defined(__linux__)
++#   include <machine/endian.h>
++# else
++#   include <endian.h>
++# endif
+ #endif
+ #include "libgg.h"
+ #include "themes.h"
