@@ -401,61 +401,14 @@ void handle_msg(struct gg_event *e)
 	struct userlist *u = userlist_find(e->event.msg.sender, NULL);
 	int chat = ((e->event.msg.msgclass & 0x0f) == GG_CLASS_CHAT), secure = 0, hide = 0;
 	char *tmp;
-	
-#ifdef WITH_PYTHON
-	cp_to_iso(e->event.msg.message);
 
-	PYTHON_HANDLE_HEADER(msg, "(isisii)", e->event.msg.sender, (u) ? u->display : "", e->event.msg.msgclass, e->event.msg.message, e->event.msg.time, 0)
-	{
-		char *b, *d;
-		int f;
-
-		PYTHON_HANDLE_RESULT("isisii", &e->event.msg.sender, &b, &e->event.msg.msgclass, &d, &e->event.msg.time, &f)
-		{
-			xfree(e->event.msg.message);
-			e->event.msg.message = xstrdup(d);
-		}
-	}
-	
-	PYTHON_HANDLE_FOOTER()
-
-	switch (python_handle_result) {
-		case 0:
-			return;
-		case 2:
-			hide = 1;
-	}
-
-	iso_to_cp(e->event.msg.message);
-#endif
-	
 	if (!e->event.msg.message)
 		return;
-
-	if (e->event.msg.recipients_count) {
-		struct conference *c = conference_find_by_uins(
-			e->event.msg.sender, e->event.msg.recipients,
-			e->event.msg.recipients_count);
-
-		if (c && c->ignore)
-			return;
-	}
-
-	if (ignored_check(e->event.msg.sender) & IGNORE_MSG) {
-		if (config_log_ignored) {
-			char *tmp;
-			cp_to_iso(e->event.msg.message);
-			tmp = log_escape(e->event.msg.message);
-			put_log(e->event.msg.sender, "%sign,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), tmp);
-			xfree(tmp);
-		}
-		return;
-	}
 
 	if ((e->event.msg.msgclass & GG_CLASS_CTCP)) {
 		list_t l;
 		int dccs = 0;
-		
+
 		gg_debug(GG_DEBUG_MISC, "// ekg: received ctcp\n");
 
 		for (l = watches; l; l = l->next) {
@@ -489,35 +442,6 @@ void handle_msg(struct gg_event *e)
 	}
 
 #ifdef HAVE_OPENSSL
-	if (config_encryption && !strncmp(e->event.msg.message, "-----BEGIN RSA PUBLIC KEY-----", 20)) {
-		char *name;
-		const char *target = (u) ? u->display : itoa(e->event.msg.sender);
-		FILE *f;
-
-		print_window(target, 0, "key_public_received", format_user(e->event.msg.sender));	
-
-		if (mkdir(prepare_path("keys", 1), 0700) && errno != EEXIST) {
-			print_window(target, 0, "key_public_write_failed", strerror(errno));
-			return;
-		}
-
-		name = saprintf("%s/%d.pem", prepare_path("keys", 0), e->event.msg.sender);
-
-		if (!(f = fopen(name, "w"))) {
-			print_window(target, 0, "key_public_write_failed", strerror(errno));
-			xfree(name);
-			return;
-		}
-		
-		fprintf(f, "%s", e->event.msg.message);
-		fclose(f);
-		xfree(name);
-
- 		SIM_KC_Free(SIM_KC_Find(e->event.msg.sender));
-
-		return;
-	}
-
 	if (config_encryption == 1) {
 		char *dec;
 		int len = strlen(e->event.msg.message);
@@ -553,11 +477,80 @@ void handle_msg(struct gg_event *e)
 			gg_debug(GG_DEBUG_MISC, "// ekg: simlite decryption failed: %s\n", sim_strerror(sim_errno));
 	}
 #endif
-	
-	cp_to_iso(e->event.msg.message);
 
-	if (!(ignored_check(e->event.msg.sender) & IGNORE_EVENTS))
-		event_check((chat) ? EVENT_CHAT : EVENT_MSG, e->event.msg.sender, e->event.msg.message);
+	cp_to_iso(e->event.msg.message);
+	
+#ifdef WITH_PYTHON
+	PYTHON_HANDLE_HEADER(msg, "(isisii)", e->event.msg.sender, (u) ? u->display : "", e->event.msg.msgclass, e->event.msg.message, e->event.msg.time, 0)
+	{
+		char *b, *d;
+		int f;
+
+		PYTHON_HANDLE_RESULT("isisii", &e->event.msg.sender, &b, &e->event.msg.msgclass, &d, &e->event.msg.time, &f)
+		{
+			xfree(e->event.msg.message);
+			e->event.msg.message = xstrdup(d);
+		}
+	}
+	
+	PYTHON_HANDLE_FOOTER()
+
+	switch (python_handle_result) {
+		case 0:
+			return;
+		case 2:
+			hide = 1;
+	}
+#endif
+	
+	if (e->event.msg.recipients_count) {
+		struct conference *c = conference_find_by_uins(
+			e->event.msg.sender, e->event.msg.recipients,
+			e->event.msg.recipients_count);
+
+		if (c && c->ignore)
+			return;
+	}
+
+	if (ignored_check(e->event.msg.sender) & IGNORE_MSG) {
+		if (config_log_ignored) {
+			char *tmp = log_escape(e->event.msg.message);
+			put_log(e->event.msg.sender, "%sign,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), tmp);
+			xfree(tmp);
+		}
+		return;
+	}
+
+#ifdef HAVE_OPENSSL
+	if (config_encryption && !strncmp(e->event.msg.message, "-----BEGIN RSA PUBLIC KEY-----", 20)) {
+		char *name;
+		const char *target = (u) ? u->display : itoa(e->event.msg.sender);
+		FILE *f;
+
+		print_window(target, 0, "key_public_received", format_user(e->event.msg.sender));	
+
+		if (mkdir(prepare_path("keys", 1), 0700) && errno != EEXIST) {
+			print_window(target, 0, "key_public_write_failed", strerror(errno));
+			return;
+		}
+
+		name = saprintf("%s/%d.pem", prepare_path("keys", 0), e->event.msg.sender);
+
+		if (!(f = fopen(name, "w"))) {
+			print_window(target, 0, "key_public_write_failed", strerror(errno));
+			xfree(name);
+			return;
+		}
+		
+		fprintf(f, "%s", e->event.msg.message);
+		fclose(f);
+		xfree(name);
+
+ 		SIM_KC_Free(SIM_KC_Find(e->event.msg.sender));
+
+		return;
+	}
+#endif
 	
 	if (e->event.msg.sender == 0) {
 		if (e->event.msg.msgclass > last_sysmsg) {
@@ -574,6 +567,9 @@ void handle_msg(struct gg_event *e)
 
 		return;
 	}
+
+	if (!(ignored_check(e->event.msg.sender) & IGNORE_EVENTS))
+		event_check((chat) ? EVENT_CHAT : EVENT_MSG, e->event.msg.sender, e->event.msg.message);
 			
 	if (u)
 		add_send_nick(u->display);
