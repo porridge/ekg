@@ -161,10 +161,10 @@ char *command_generator(char *text, int state)
 	if (!*rl_line_buffer) {
 		if (state)
 			return NULL;
-		if (!send_nicks_count)
+		if (send_nicks_count < 1)
 			return strdup((query_nick) ? "/msg" : "msg");
 		send_nicks_index = (send_nicks_count > 1) ? 1 : 0;
-		if (!(name = malloc(6 + strlen(send_nicks[0]))))
+		if (!(name = malloc(8 + strlen(send_nicks[0]))))
 			return NULL;
 		sprintf(name, (query_nick) ? "/chat %s" : "chat %s", send_nicks[0]);
 		
@@ -178,7 +178,7 @@ char *command_generator(char *text, int state)
 
 	while ((name = commands[index++].name))
 		if (!strncasecmp(text, name, len)) {
-			char *tmp = malloc(strlen(name) + 2);
+			char *tmp = malloc(strlen(name) + 3);
 			
 			if (!tmp)
 				return NULL;
