@@ -192,13 +192,13 @@ static int get_char_from_pipe(struct gg_common *c)
  */
 static void get_line_from_pipe(struct gg_exec *c)
 {
-	char buf[4096];
+	char buf[16384];
 	int ret;
 
 	if (!c)
 		return;
 
-	while ((ret = read(c->fd, buf, sizeof(buf) - 1)) != 0 && ret != -1) {
+	if ((ret = read(c->fd, buf, sizeof(buf) - 1)) != 0 && ret != -1) {
 		char *tmp, *tab;
 
 		buf[ret] = 0;

@@ -13,7 +13,6 @@ zg³osi³ b³±d.
   w przypadku braku odpowiednich modu³ów (ubanus/w)
 - keep_reason == 2 nie zapisuje stanu (Tohver/w)
 - Alt-Backspace dzia³a w ncurses (porridge/w)
-- /exec wy¶wietla dane, potem informacjê o zakoñczeniu (gozda/w)
 
 // 2003-03-29
 
