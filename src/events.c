@@ -368,6 +368,8 @@ void handle_notify(struct gg_event *e)
                                 log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
 			if (config_display_notify)
 			    	print("status_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
+			if (config_completion_notify)
+				add_send_nick(u->display);
 		}
 		
 		if (n->status == GG_STATUS_NOT_AVAIL) {
