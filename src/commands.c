@@ -3267,6 +3267,21 @@ COMMAND(cmd_test_hexmsg)
 	return 0;
 }
 
+COMMAND(cmd_test_imagereq)
+{
+	if (!params[0] || !params[1] || !params[2]) {
+		printq("not_enough_params", name);
+		return -1;
+	}
+
+	if (!sess || sess->state != GG_STATE_CONNECTED) {
+		printq("not_connected");
+		return -1;
+	}
+
+	return gg_image_request(sess, get_uin(params[0]), atoi(params[1]), strtoul(params[2], NULL, 16));
+}
+	
 COMMAND(cmd_test_resize)
 {
 	ui_resize_term = 1;
@@ -5985,6 +6000,9 @@ void command_init()
 	command_add
 	( "_descr", "?", cmd_away, 0, " <opis>",
 	  "zmienia opis bez zmiany stanu", "");
+	command_add
+	( "_imagereq", "u??", cmd_test_imagereq, 0, " <numer/alias> <rozmiar> <crc>", 
+	  "wysy³a ¿±danie wys³ania obrazka", "\nSumê kontroln± nale¿y podaæ w postaci heksadecymalnej.");
 }
 
 /*
