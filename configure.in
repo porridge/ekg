@@ -321,11 +321,14 @@ dnl   fi
     [  --enable-ioctld         Compile ioctld (Linux only)])
 
   if test "x$enable_ioctld" = "xyes"; then 
-    AC_CHECK_HEADERS(linux/kd.h, [
+    AC_CHECK_HEADERS(linux/kd.h, [have_ioctld_includes=yes], [
+      AC_CHECK_HEADERS(sys/kbio.h, [have_ioctld_includes=yes])
+    ])
+    if test "x$have_ioctld_includes" = "xyes"; then
       CFLAGS="$CFLAGS -DWITH_IOCTLD -DIOCTLD_PATH=\\\"${libexecdir}/ioctld\\\""
       ioctld="ioctld"
       install_ioctld="install-ioctld"
-    ])
+    fi
   fi
 
   # Wszystkie testy nale¿y dodawaæ POWY¯EJ testu ioctld, poniewa¿ w przypadku
