@@ -71,8 +71,6 @@
 #  define PATH_MAX _POSIX_PATH_MAX
 #endif
 
-COMMAND(cmd_exec);
-
 struct gg_session *sess = NULL;
 list_t children = NULL;
 list_t aliases = NULL;
