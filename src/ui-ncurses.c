@@ -2167,11 +2167,11 @@ static int ui_ncurses_event(const char *event, ...)
 		if (!strcasecmp(command, "bind")) {
 			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*), *p3 = va_arg(ap, char*);
 
-			if (match_arg(p1, 'a', "add", 2)) {
+			if (match_arg(p1, 'a', "add", 2) || match_arg(p1, 'a', "add-quiet", 5)) {
 				if (!p2 || !p3)
 					print("not_enough_params", "bind");
 				else
-					binding_add(p2, p3, (!strcasecmp(p1, "--add-quit")) ? 1 : 0);
+					binding_add(p2, p3, (!strcasecmp(p1, "--add-quiet")) ? 1 : 0);
 			} else if (match_arg(p1, 'd', "delete", 2)) {
 				if (!p2)
 					print("not_enough_params", "bind");

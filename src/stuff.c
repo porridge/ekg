@@ -513,6 +513,7 @@ int config_read()
 			array_free(pms);
 		} else if (!strcasecmp(buf, "bind")) {
 			char **pms = array_make(foo, " \t", 2, 1, 0);
+			gg_debug(GG_DEBUG_MISC, "bind %s %s\n", pms[0], pms[1]);
 			if (pms && pms[0] && pms[1]) 
 				ui_event("command", "bind", "--add-quiet", 
 					 pms[0], pms[1], NULL);
