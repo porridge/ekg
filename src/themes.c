@@ -404,7 +404,7 @@ fstring_t reformat_string(const char *str)
 			if (str[i + 1] != '[')
 				continue;
 
-			while (str[i] && !isalpha(str[i]))
+			while (str[i] && !isalpha_pl_PL(str[i]))
 				i++;
 
 			i--;
@@ -437,7 +437,7 @@ fstring_t reformat_string(const char *str)
 					tmp += (str[i] - '0');
 				}
 
-				if (str[i] == ';' || isalpha(str[i])) {
+				if (str[i] == ';' || isalpha_pl_PL(str[i])) {
 					if (tmp == 0) {
 						attr = 128;
 
@@ -468,7 +468,7 @@ fstring_t reformat_string(const char *str)
 					tmp = 0;
 				}
 
-				if (isalpha(str[i]))
+				if (isalpha_pl_PL(str[i]))
 					break;
 			}
 

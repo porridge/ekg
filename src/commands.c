@@ -190,7 +190,7 @@ COMMAND(cmd_add)
 	struct userlist *u;
 	uin_t uin;
 
-	if (params[0] && !isdigit(params[0][0]) && !match_arg(params[0], 'f', "find", 2)) {
+	if (params[0] && !isdigit((int) params[0][0]) && !match_arg(params[0], 'f', "find", 2)) {
 		ui_event("command", quiet, "add", params[0], NULL);
 
 		if (params[1]) {
@@ -623,11 +623,6 @@ COMMAND(cmd_del)
 		return -1;
 	}
 
-	if (!del_all && !(u = userlist_find((uin = get_uin(params[0])), NULL))) {
-		printq("user_not_found", params[0]);
-		return -1;
-	}
-
 	if (del_all) {
 		list_t l;
 
@@ -645,6 +640,11 @@ COMMAND(cmd_del)
 		command_exec(NULL, "/cleartab", 1);
 		config_changed = 1;
 		return 0;
+	}
+
+	if (!(u = userlist_find((uin = get_uin(params[0])), NULL))) {
+		printq("user_not_found", params[0]);
+		return -1;
 	}
 
 	nick = xstrdup(u->display);
@@ -1300,7 +1300,7 @@ COMMAND(cmd_help)
 	for (l = commands; l; l = l->next) {
 		struct command *c = l->data;
 
-		if (isalnum(*c->name) && !c->alias) {
+		if (isalnum((int) *c->name) && !c->alias) {
 		    	char *blah = NULL;
 
 			if (strstr(c->brief_help, "%"))
@@ -1493,11 +1493,6 @@ COMMAND(cmd_block)
 			return -1;
 		}
 
-		if (!unblock_all && !(uin = get_uin(params[0]))) {
-			printq("user_not_found", params[0]);
-			return -1;
-		}
-
 		if (unblock_all) {
 			list_t l;
 			int x = 0;
@@ -1520,6 +1515,11 @@ COMMAND(cmd_block)
 			}
 
 			return 0;
+		}
+
+		if (!(uin = get_uin(params[0]))) {
+			printq("user_not_found", params[0]);
+			return -1;
 		}
 		
 		if (!blocked_remove(uin)) {
@@ -3080,7 +3080,7 @@ COMMAND(cmd_test_debug)
 
 COMMAND(cmd_test_debug_dump)
 {
-	char *tmp = saprintf("Zapisa³em debug do pliku debug.%d", getpid());
+	char *tmp = saprintf("Zapisa³em debug do pliku debug.%d", (int) getpid());
 
 	debug_write_crash();
 	printq("generic", tmp);
@@ -3622,7 +3622,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 				int l = strlen(c->name);
 
 				if (l > 2 && !strncasecmp(xline, c->name, l)) {
-					if (!xline[l] || isspace(xline[l])) {
+					if (!xline[l] || isspace((int) xline[l])) {
 						correct_command = 1;
 						break;
 					}
@@ -3656,7 +3656,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 	for (l = commands; l; l = l->next) {
 		struct command *c = l->data;
 
-		if (!isalpha(c->name[0]) && strlen(c->name) == 1 && line[0] == c->name[0]) {
+		if (!isalpha_pl_PL(c->name[0]) && strlen(c->name) == 1 && line[0] == c->name[0]) {
 			short_cmd[0] = c->name[0];
 			cmd = short_cmd;
 			p = line + 1;
@@ -3665,7 +3665,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 
 	if (!cmd) {
 		tmp = cmd = line;
-		while (*tmp && !isspace(*tmp))
+		while (*tmp && !isspace((int) *tmp))
 			tmp++;
 		p = (*tmp) ? tmp + 1 : tmp;
 		*tmp = 0;
@@ -3898,7 +3898,7 @@ COMMAND(cmd_at)
 			return -1;
 		}
 
-		if (!strncmp(params[2], "*/", 2) || isdigit(params[2][0])) {
+		if (!strncmp(params[2], "*/", 2) || isdigit((int) params[2][0])) {
 			a_name = params[1];
 
 			if (!strcmp(a_name, "(null)")) {
@@ -3999,7 +3999,7 @@ COMMAND(cmd_at)
 				for (;;) {
 					time_t _period = 0;
 
-					if (isdigit(*freq_str))
+					if (isdigit((int) *freq_str))
 						_period = atoi(freq_str);
 					else {
 						printq("invalid_params", name);
@@ -4237,7 +4237,7 @@ COMMAND(cmd_timer)
 			return -1;
 		}
 
-		if (isdigit(params[2][0]) || !strncmp(params[2], "*/", 2)) {
+		if (isdigit((int) params[2][0]) || !strncmp(params[2], "*/", 2)) {
 			t_name = params[1];
 
 			if (!strcmp(t_name, "(null)")) {
@@ -4267,7 +4267,7 @@ COMMAND(cmd_timer)
 		for (;;) {
 			time_t _period = 0;
 
-			if (isdigit(*p))
+			if (isdigit((int) *p))
 				_period = atoi(p);
 			else {
 				printq("invalid_params", name);

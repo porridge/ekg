@@ -69,7 +69,7 @@
 #  define PATH_MAX _POSIX_PATH_MAX
 #endif
 
-static int ekg_pid = 0;
+static pid_t ekg_pid = 0;
 static char argv0[PATH_MAX];
 static int ioctld_pid = 0;
 static int mesg_startup;
@@ -723,7 +723,7 @@ static void handle_sigsegv()
 "i najprawdopodobniej pozwoli to unikn±æ tego typu sytuacji w przysz³o¶ci.\n"
 "Wiêcej szczegó³ów w dokumentacji, w pliku ,,gdb.txt''.\n"
 "\n",
-config_dir, getpid(), config_dir, getpid(), config_dir, getpid(), config_dir, argv0, config_dir);
+config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, argv0, config_dir);
 
 	config_write_crash();
 	userlist_write_crash();

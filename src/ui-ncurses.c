@@ -1048,7 +1048,7 @@ static struct window *window_new(const char *target, int new_id)
 		}
 		
 		if (*target == '*' && !u) {
-			const char *tmp = index(target, '/');
+			const char *tmp = strchr(target, '/');
 			char **argv, **arg;
 			
 			w.floating = 1;
@@ -2253,7 +2253,7 @@ void unknown_uin_generator(const char *text, int len)
 	int i;
 
 	for (i = 0; i < send_nicks_count; i++) {
-		if (send_nicks[i] && isdigit(send_nicks[i][0]) && !strncasecmp(text, send_nicks[i], len))
+		if (send_nicks[i] && isdigit((int) send_nicks[i][0]) && !strncasecmp(text, send_nicks[i], len))
 			array_add(&completions, xstrdup(send_nicks[i]));
 	}
 }
@@ -2512,7 +2512,7 @@ static void complete(int *line_start, int *line_index)
 
 	/* sprawd¼, gdzie jeste¶my */
 	for (p = line, start = line, word = -1; *p; ) {
-		while (*p && isspace(*p))
+		while (*p && isspace((int) *p))
 			p++;
 		start = (char*) p;
 		word++;
@@ -2531,7 +2531,7 @@ static void complete(int *line_start, int *line_index)
 			if (*p)
 				p++;
 		} else {
-			while (*p && !isspace(*p))
+			while (*p && !isspace((int) *p))
 				p++;
 		}
 	}
@@ -2581,7 +2581,7 @@ static void complete(int *line_start, int *line_index)
 			int len = strlen(c->name);
 			char *cmd = (line[0] == '/') ? line + 1 : line;
 
-			if (!strncasecmp(cmd, c->name, len) && isspace(cmd[len])) {
+			if (!strncasecmp(cmd, c->name, len) && isspace((int) cmd[len])) {
 				params = c->params;
 				abbrs = 1;
 				break;
@@ -2977,12 +2977,12 @@ static void binding_word_rubout(const char *arg)
 	int eaten = 0;
 
 	p = line + line_index;
-	while (isspace(*(p-1)) && p > line) {
+	while (isspace((int) *(p-1)) && p > line) {
 		p--;
 		eaten++;
 	}
 	if (p > line) {
-		while (!isspace(*(p-1)) && p > line) {
+		while (!isspace((int) *(p-1)) && p > line) {
 			p--;
 			eaten++;
 		}
@@ -3526,7 +3526,7 @@ int binding_key(struct binding *b, const char *key, int add)
 
 		if (add) {
 			binding_map_meta[ch] = list_add(&bindings, b, sizeof(struct binding));
-			if (isalpha(ch))
+			if (isalpha((int) ch))
 				binding_map_meta[tolower(ch)] = binding_map_meta[ch];
 		}
 

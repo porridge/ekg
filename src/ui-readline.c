@@ -237,7 +237,7 @@ static char *unknown_uin_generator(char *text, int state)
 	}
 
 	while (index < send_nicks_count)
-		if (isdigit(send_nicks[index++][0]))
+		if (isdigit((int) send_nicks[index++][0]))
 			if (!strncasecmp(text, send_nicks[index - 1], len))
 				return xstrdup(send_nicks[index - 1]);
 
@@ -367,10 +367,10 @@ static char **my_completion(char *text, int start, int end)
 		if (!strncasecmp(tmp, cmd, strlen(cmd)) && tmp[strlen(cmd)] == ' ') {
 			word = 0;
 			for (i = 0; i < strlen(rl_line_buffer); i++) {
-				if (isspace(rl_line_buffer[i]))
+				if (isspace((int) rl_line_buffer[i]))
 					word++;
 			}
-			if (word == 2 && isspace(rl_line_buffer[strlen(rl_line_buffer) - 1])) {
+			if (word == 2 && isspace((int) rl_line_buffer[strlen(rl_line_buffer) - 1])) {
 				if (send_nicks_count != my_send_nicks_count) {
 					my_send_nicks_count = send_nicks_count;
 					send_nicks_index = 0;
@@ -398,7 +398,7 @@ static char **my_completion(char *text, int start, int end)
 
 	if (start) {
 		for (i = 1; i <= start; i++) {
-			if (isspace(rl_line_buffer[i]) && !isspace(rl_line_buffer[i - 1]))
+			if (isspace((int) rl_line_buffer[i]) && !isspace((int) rl_line_buffer[i - 1]))
 				word++;
 		}
 		word--;
@@ -408,7 +408,7 @@ static char **my_completion(char *text, int start, int end)
 			int len = strlen(c->name);
 			char *cmd = (*rl_line_buffer == '/') ? rl_line_buffer + 1 : rl_line_buffer;
 
-			if (!strncasecmp(cmd, c->name, len) && isspace(cmd[len])) {
+			if (!strncasecmp(cmd, c->name, len) && isspace((int) cmd[len])) {
 				params = c->params;
 				abbrs = 1;
 				break;
@@ -1486,7 +1486,7 @@ static int bind_sequence(const char *seq, const char *command, int quiet)
 		return -1;
 	}
 	
-	if (!strncasecmp(seq, "Ctrl-", 5) && strlen(seq) == 6 && isalpha(seq[5])) {
+	if (!strncasecmp(seq, "Ctrl-", 5) && strlen(seq) == 6 && isalpha((int) seq[5])) {
 		int key = CTRL(toupper(seq[5]));
 
 		if (command) {

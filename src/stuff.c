@@ -1438,7 +1438,7 @@ void config_write_main(FILE *f, int base64)
 			continue;
 
 		/* posortuje, je¶li nie ma nazwy */
-		if (t->name && !isdigit(t->name[0]))
+		if (t->name && !isdigit((int) t->name[0]))
 			name = t->name;
 		else
 			name = "(null)";
@@ -1521,7 +1521,7 @@ int config_write_partly(char **vars)
 	if (!(fi = fopen(filename, "r")))
 		return -1;
 
-	newfn = saprintf("%s.%d.%ld", filename, getpid(), (long) time(NULL));
+	newfn = saprintf("%s.%d.%ld", filename, (uint32_t) getpid(), (long) time(NULL));
 
 	if (!(fo = fopen(newfn, "w"))) {
 		xfree(newfn);
@@ -2971,9 +2971,9 @@ char *strip_spaces(char *line)
 {
 	char *buf;
 	
-	for (buf = line; isspace(*buf); buf++);
+	for (buf = line; isspace((int) *buf); buf++);
 
-	while (isspace(line[strlen(line) - 1]))
+	while (isspace((int) line[strlen(line) - 1]))
 		line[strlen(line) - 1] = 0;
 	
 	return buf;

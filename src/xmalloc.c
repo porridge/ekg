@@ -43,7 +43,7 @@ void ekg_oom_handler()
 "\n"
 "Do pliku %s/debug.%d zapiszê ostatanie komunikaty\n"
 "z okna debugowania.\n"
-"\n", config_dir, getpid(), config_dir, getpid(), config_dir, getpid());
+"\n", config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, (int) getpid());
 
 	config_write_crash();
 	userlist_write_crash();
