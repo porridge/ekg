@@ -1256,7 +1256,15 @@ int run_event(char *act)
 		array_free(acts);
                 return 0;
         }
-	
+
+        if (!strncasecmp(acts[0], "beep", 4)) {
+                gg_debug(GG_DEBUG_MISC, "//   BEEP\n");
+		my_puts("\007");
+                free(action);
+                array_free(acts);
+                return 0;
+        }
+
 	gg_debug(GG_DEBUG_MISC, "//   unknown action\n");
 
 	free(action);
@@ -1413,6 +1421,16 @@ int correct_event(char *act)
                         continue;
                 }
 
+		if (!strncasecmp(acts[0], "beep", 4)) {
+		    	if (acts[1]) {
+			    	my_printf("events_act_toomany_params", acts[0]);
+				free(action);
+				array_free(acts);
+				array_free(events);
+				return 1;
+			}
+		}
+				
                 else {
                         my_printf("events_noexist");
 			free(action);

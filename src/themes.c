@@ -685,6 +685,7 @@ void init_theme()
         add_format("events_del_noexist", "%! Zdarzenie %W%1%n nie istnieje dla u¿ytkownika %G%2%n\n", 1);
         add_format("events_seq_not_found", "%! Sekwencja %W%1%n nie znaleziona.\n", 1);
         add_format("events_act_no_params", "%! %W%1%n - brak parametrów.\n", 1);        
+	add_format("events_act_toomany_params", "%! %W%1%n - za du¿o parametrów.\n", 1);
 	add_format("events_seq_incorrect", "%W%1%n - nieprawid³owa sekwencja\n", 1);
         add_format("config_line_incorrect", "%! Nieprawid³owa linia '%W%1%n', pomijam\n", 1);
         add_format("temporary_run_event", "%) Startujemy z akcj± '%B%1%n'\n", 1);
