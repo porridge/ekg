@@ -5455,13 +5455,13 @@ void command_init()
 #ifdef WITH_PYTHON
 	command_add
 	( "python", "p?", cmd_python, 0,
-	  " <komenda> [opcje]", "obs³uga skryptów",
+	  " [komenda] [opcje]", "obs³uga skryptów",
 	  "\n"
 	  "  load <skrypt>    ³aduje skrypt\n"
 	  "  unload <skrypt>  usuwa skrypt z pamiêci\n"
 	  "  run <plik>       uruchamia skrypt\n"
 	  "  exec <komenda>   uruchamia komendê\n"
-	  "  list             wy¶wietla listê za³adowanych skryptów");
+	  " [list]            wy¶wietla listê za³adowanych skryptów");
 #endif
 
 	command_add
