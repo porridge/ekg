@@ -192,13 +192,13 @@ static int get_char_from_pipe(struct gg_common *c)
  */
 static void get_line_from_pipe(struct gg_exec *c)
 {
-	char buf[1024];
+	char buf[4096];
 	int ret;
 
 	if (!c)
 		return;
 
-	if ((ret = read(c->fd, buf, sizeof(buf) - 1)) != 0 && ret != -1) {
+	while ((ret = read(c->fd, buf, sizeof(buf) - 1)) != 0 && ret != -1) {
 		char *tmp, *tab;
 
 		buf[ret] = 0;
@@ -473,43 +473,6 @@ void ekg_wait_for_key()
 			} else
 				print("error_saving");
 		}
-
-		/* przegl±danie zdech³ych dzieciaków */
-		while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
-			for (l = children; l; l = m) {
-				struct process *p = l->data;
-
-				m = l->next;
-
-				if (pid != p->pid)
-					continue;
-
-				if (pid == speech_pid) {
-					speech_pid = 0;
-
-					if (buffer_count(BUFFER_SPEECH) && !WEXITSTATUS(status)) {
-						char *str = buffer_pop(BUFFER_SPEECH);
-						say_it(str);
-						xfree(str);
-					}
-				}
-
-				switch (p->name[0]) {
-					case '\001':
-						print((!(WEXITSTATUS(status))) ? "sms_sent" : "sms_failed", p->name + 1);
-					case '\002':
-					case '\003':
-						break;
-					default:
-						print("process_exit", itoa(p->pid), p->name, itoa(WEXITSTATUS(status)));
-						break;
-				}
-
-				xfree(p->name);
-				list_remove(&children, p, 1);
-			}
-		}
-
 #ifdef WITH_WAP
 		/* co jaki¶ czas zrzuæ userlistê dla frontendu wap */
 		if (!wap_userlist_timer)
@@ -651,6 +614,43 @@ void ekg_wait_for_key()
 			
 			break;
 		}
+
+		/* przegl±danie zdech³ych dzieciaków */
+		while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
+			for (l = children; l; l = m) {
+				struct process *p = l->data;
+
+				m = l->next;
+
+				if (pid != p->pid)
+					continue;
+
+				if (pid == speech_pid) {
+					speech_pid = 0;
+
+					if (buffer_count(BUFFER_SPEECH) && !WEXITSTATUS(status)) {
+						char *str = buffer_pop(BUFFER_SPEECH);
+						say_it(str);
+						xfree(str);
+					}
+				}
+
+				switch (p->name[0]) {
+					case '\001':
+						print((!(WEXITSTATUS(status))) ? "sms_sent" : "sms_failed", p->name + 1);
+					case '\002':
+					case '\003':
+						break;
+					default:
+						print("process_exit", itoa(p->pid), p->name, itoa(WEXITSTATUS(status)));
+						break;
+				}
+
+				xfree(p->name);
+				list_remove(&children, p, 1);
+			}
+		}
+
 	}
 	
 	return;
