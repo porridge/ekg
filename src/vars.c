@@ -199,7 +199,6 @@ void variable_init()
 		variable_add("windows_layout", "wl", VAR_STR, 2, &config_windows_layout, NULL, NULL, NULL);
 	}
 #endif
-
 	variable_add("status", "st", VAR_INT, 2, &config_status, NULL, NULL, NULL);
 	variable_add("protocol", "pR", VAR_INT, 2, &config_protocol, NULL, NULL, NULL);
 	variable_add("reason", "re", VAR_STR, 2, &config_reason, NULL, NULL, NULL);
@@ -214,6 +213,9 @@ void variable_init()
  */
 void variable_set_default()
 {
+	xfree(config_timestamp);
+	xfree(config_display_color_map);
+
 	config_timestamp = xstrdup("%H:%M ");
 	config_display_color_map = xstrdup("nTgGbBrR");
 }
@@ -299,19 +301,25 @@ int variable_add(const char *name, const char *short_name, int type, int display
 	struct variable v;
 	list_t l;
 
+	if (!name || (type != VAR_FOREIGN && !short_name))
+		return -1;
+
 	if (type != VAR_FOREIGN) {
 		for (l = variables; l; l = l->next) {
 			struct variable *v = l->data;
 
 			if (!strcmp(v->short_name, short_name))
-				fprintf(stderr, "Error! Variable short name conflict:\n- short name: \"%s\"\n- existing variable: \"%s\"\n- conflicting variable: \"%s\"\n\nPress any key to continue...\n", short_name, v->name, name);
+				fprintf(stderr, "Error! Variable short name conflict:\n- short name: \"%s\"\n- existing variable: \"%s\"\n- conflicting variable: \"%s\"\n", short_name, v->name, name);
 		}
 	}
+
+	memset(&v, 0, sizeof(v));
 
 	v.name = xstrdup(name);
 	v.name_hash = ekg_hash(name);
 	v.type = type;
-	strcpy(v.short_name, short_name);
+	if (short_name)
+		strncpy(v.short_name, short_name, sizeof(v.short_name) - 1);
 	v.display = display;
 	v.ptr = ptr;
 	v.notify = notify;
@@ -350,6 +358,7 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 		case VAR_MAP:
 		{
 			const char *p = value;
+			int hex;
 
 			if (!value)
 				return -2;
@@ -409,11 +418,14 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 
 			p = value;
 				
-			if (!strncmp(p, "0x", 2))
+			if ((hex = !strncasecmp(p, "0x", 2)))
 				p += 2;
 
 			while (*p && *p != ' ') {
-				if (!isdigit(*p))
+				if (hex && !isxdigit(*p))
+					return -2;
+				
+				if (!hex && !isdigit(*p))
 					return -2;
 				p++;
 			}
@@ -581,6 +593,9 @@ int variable_undigest(const char *digest)
 {
 	const char *p = digest;
 
+	if (!digest)
+		return -1;
+
 	while (*p) {
 		struct variable *v;
 		list_t l;
@@ -588,7 +603,7 @@ int variable_undigest(const char *digest)
 		for (v = NULL, l = variables; l; l = l->next) {
 			struct variable *w = l->data;
 
-			if (w && !strncmp(p, w->short_name, 2)) {
+			if (!strncmp(p, w->short_name, 2)) {
 				v = w;
 				break;
 			}
