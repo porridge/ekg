@@ -29,6 +29,8 @@ extern "C" {
   #define INADDR_NONE 0xffffffff
 #endif
 
+#include <sys/types.h>
+
 /*
  * typ zmiennej okre¶laj±cej numerek danej osoby.
  */
