@@ -8,19 +8,24 @@ szyfrowanie to jest zgodne z http://gg.wha.la/crypt/.
 klucze s± przechowywane w katalogu ~/.gg/keys w formacie PEM. klucz
 prywatny w pliku ,,private.pem'', klucze publiczne w plikach odpowiadaj±cych
 numerowi delikwenta z rozszerzeniem ,,.pem''. aby wygenerowaæ sobie klucz
-o d³ugo¶ci 1024 wpisujemy:
+piszemy
 
-	_keygen 1024
+	key -g
 
 zostanie on zapisany na dysku. je¶li chcemy szyfrowaæ wiadomo¶ci wysy³ane
 do znajomych, musimy umie¶ciæ ich klucze publiczne w ~/.gg/keys. je¶li
 chcemy, ¿eby wiadomo¶ci wysy³ane do nas by³y szyfrowane, musimy podes³aæ
-naszym rozmówcom nasz klucz publiczny. NIE NALE¯Y NIKOMU WYSY£AÆ NIKOMU
-KLUCZA PRYWATNEGO Z PLIKU PRIVATE.PEM. 
+naszym rozmówcom nasz klucz publiczny, u¿ywaj±c polecenia ,,key''.
+NIE NALE¯Y NIKOMU WYSY£AÆ NIKOMU KLUCZA PRYWATNEGO Z PLIKU PRIVATE.PEM.
 
 by w³±czyæ szyfrowanie, nale¿y ju¿ tylko wpisaæ:
 
 	set encryption 1
+lub
+	set encryption 2
+
+warto¶æ 2 w³±czy now± obs³ugê szyfrowanych wiadomo¶ci, która nie stara siê
+oszczêdzaæ zasobów za wszelk± cenê, ale dziêki temu powinna byæ mniej zawodna.
 
 dalej wszystko bêdzie siê dzia³o automagicznie. szyfrowane wiadomo¶ci s±
 odpowiednio oznaczane -- domy¶lnie jest to ¿ó³ty tekst ,,szyfrowane'' w
@@ -30,15 +35,7 @@ ekg po otrzymaniu w wiadomo¶ci klucza publicznego (to znaczy wiadomo¶ci
 zaczynaj±cej siê od ,,-----BEGIN RSA PUBLIC KEY-----'') zapisze go jako
 klucz nadawcy. 
 
-by usun±æ klucz danej osoby, nale¿y wykonaæ polecenie:
-
-	_keydel <numer/alias>
-
-by wys³aæ do danej osoby swój klucz publiczny nale¿y wykonaæ:
-
-	_keysend <numer/alias>
-
-w przysz³o¶ci komendy zaczynaj±ce siê od ,,_key'' zostan± zgrupowane w
-jedno polecenie do zarz±dzania kluczami.
+wysy³anie w³asnego klucza oraz zarz±dzanie otrzymanymi ju¿ kluczami odbywa
+siê za pomoc± polecenia ,,key''.
 
 $Id$

@@ -15,6 +15,7 @@ zg³osi³ b³±d.
   ma³ych mo¿liwo¶ci manipulacji grupami). w ogóle to, zamiast /on
   lepiej u¿yæ o wiele lepszego python'a ;> (sz)
 - przekazywanie liczby nowych maili w zdarzeniu ,,newmail'' (sz)
+- drobne poprawki dokumentacji (sz)
 - sensowna lista kluczy publicznych (FIG/w)
 - wykrywanie p³ci w wynikach wyszukiwania (FIG/w)
 - libgadu: usuniêcie leaków w gg_pubdir50() (w)
