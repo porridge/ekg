@@ -270,6 +270,15 @@ sms_send_app
 	tre¶æ wiadomo¶ci. do tego celu nadaje siê program Miko³aja
 	Rydzewskiego ze strony http://ceti.pl/~miki/
 
+sort_windows
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	w³±czenie tej opcji spowoduje przesuwanie okien przy usuniêciu
+	którego¶ ze ¶rodka i likwidowanie luk w numeracji. na przyk³ad,
+	gdy mamy okna 1,2,3, to po usuniêciu drugiego otrzymamy 1,2
+	zamiast 1,3.
+
 sound_app
 	typ: tekst
 	domy¶lna warto¶æ: brak

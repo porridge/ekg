@@ -78,6 +78,7 @@ void variable_init()
 	variable_add("sms_max_length", VAR_INT, 1, &config_sms_max_length, NULL);
 	variable_add("sms_number", VAR_STR, 1, &config_sms_number, NULL);
 	variable_add("sms_send_app", VAR_STR, 1, &config_sms_app, NULL);
+	variable_add("sort_windows", VAR_BOOL, 1, &config_sort_windows, NULL);
 	variable_add("sound_msg_file", VAR_STR, 1, &config_sound_msg_file, NULL);
 	variable_add("sound_chat_file", VAR_STR, 1, &config_sound_chat_file, NULL);
 	variable_add("sound_sysmsg_file", VAR_STR, 1, &config_sound_sysmsg_file, NULL);

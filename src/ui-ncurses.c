@@ -161,32 +161,6 @@ static void window_refresh()
 }
 
 /*
- * window_kill()
- *
- * usuwa podane okno.
- */
-static void window_kill(struct window *w)
-{
-	if (w->id == 1) {
-		print("window_kill_status");
-		return;
-	}
-
-	if (w == window_current) {
-		struct window *newwin = windows->data;
-
-		if (newwin == w)
-			newwin = windows->next->data;
-
-		window_switch(newwin->id);
-	}
-		
-	xfree(w->target);
-	delwin(w->window);
-	list_remove(&windows, w, 1);
-}
-
-/*
  * window_switch()
  *
  * prze³±cza do podanego okna.
@@ -1232,6 +1206,40 @@ static void window_prev()
 }
 
 /*
+ * window_kill()
+ *
+ * usuwa podane okno.
+ */
+static void window_kill(struct window *w)
+{
+	int id = w->id;
+
+	if (id == 1) {
+		print("window_kill_status");
+		return;
+	}
+	
+	if (w == window_current)
+		window_prev();
+
+	if (config_sort_windows) {
+		list_t l;
+
+		for (l = windows; l; l = l->next) {
+			struct window *w = l->data;
+
+			if (w->id > id)
+				w->id--;
+		}
+	}
+		
+	xfree(w->target);
+	delwin(w->window);
+	list_remove(&windows, w, 1);
+}
+
+
+/*
  * ui_ncurses_event()
  *
  * obs³uga zdarzeñ.
@@ -1250,6 +1258,21 @@ static int ui_ncurses_event(const char *event, ...)
 	if (!strcmp(event, "refresh_time")) {
 		struct timer *t = timer_add(1, "ui-ncurses-time", "refresh_time");
 		t->ui = 1;
+	}
+
+	if (!strcmp(event, "variable_changed")) {
+		char *name = va_arg(ap, char*);
+
+		if (!strcasecmp(name, "sort_windows") && config_sort_windows) {
+			list_t l;
+			int id = 1;
+
+			for (l = windows; l; l = l->next) {
+				struct window *w = l->data;
+				
+				w->id = id++;
+			}
+		}
 	}
 
 	if (!strcmp(event, "command")) {

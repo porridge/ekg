@@ -16,6 +16,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - dodanie ,,window next'' i ,,window prev'' (w)
 - obs³uga Ctrl-L w ui-ncurses (Kooba/w)
 - w query domy¶lne dope³nianie dodaje '/' (jojo/w)
+- dodanie zmiennej sort_windows (wielu/w)
 
 // 2002-09-04
 

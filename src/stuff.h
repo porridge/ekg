@@ -154,6 +154,7 @@ int config_ctrld_quits;
 int config_save_password;
 char *config_timestamp;
 int config_display_sent;
+int config_sort_windows;
 
 char *home_dir;
 char *config_dir;
