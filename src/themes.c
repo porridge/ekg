@@ -324,7 +324,7 @@ char *va_format_string(const char *format, va_list ap)
 			}
 
 			if (*p >= '1' && *p <= '9') {
-				char *str = (args[*p - '1']) ? (char*) args[*p - '1'] : NULL;
+				char *str = (char*) args[*p - '1'];
 				int i, len;
 
 				if (!str)
