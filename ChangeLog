@@ -8,6 +8,7 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 
 - libgadu: poprawki zwracanych warto¶ci w errno w przypadku
   b³êdu (mslusarz/sz)
+- kompilacja na AMD64 i GCC 4.0 (Andreas J/sz)
 
 // 2005-03-17
 
