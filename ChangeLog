@@ -17,6 +17,9 @@ zg³osi³ b³±d.
 - dodanie opcji --offline i --online do /list (w)
 - libgadu: poprawka ³±czenia synchronicznego (sCoOtY/w)
 - usuniêcie warningów przy kompilacji przyk³adów (w)
+- libgadu: gdy gg_dcc_ip bêdzie równe 0xffffffff, adres bêdzie ustalany
+  automatycznie na podstawie getsockname() (w)
+- zmienna dcc_ip mo¿e przyj±æ warto¶æ ,,auto'' (w)
 
 // 2002-12-24
 

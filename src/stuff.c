@@ -2494,12 +2494,16 @@ void changed_dcc(const char *var)
 
 	if (!strcmp(var, "dcc_ip")) {
 		if (config_dcc_ip) {
-			if (inet_addr(config_dcc_ip) != INADDR_NONE)
-				gg_dcc_ip = inet_addr(config_dcc_ip);
-			else {
-				print("dcc_invalid_ip");
-				config_dcc_ip = NULL;
-				gg_dcc_ip = 0;
+			if (!strcasecmp(config_dcc_ip, "auto")) {
+				gg_dcc_ip = inet_addr("255.255.255.255");
+			} else {
+				if (inet_addr(config_dcc_ip) != INADDR_NONE)
+					gg_dcc_ip = inet_addr(config_dcc_ip);
+				else {
+					print("dcc_invalid_ip");
+					config_dcc_ip = NULL;
+					gg_dcc_ip = 0;
+				}
 			}
 		} else
 			gg_dcc_ip = 0;

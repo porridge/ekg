@@ -196,9 +196,9 @@ dcc_ip
 	typ: tekst
 	domy¶lna warto¶æ: brak
 
-	okre¶la adres IP, który jest wysy³any serwerowi. póki co, jest
-	wymagana do bezpo¶redniego po³±czenia, poniewa¿ ekg nie potrafi
-	wykryæ domy¶lnego adresu IP.
+	okre¶la adres IP, który jest wysy³any serwerowi. je¶li przypisze
+	siê tej zmiennej warto¶æ ,,auto'', adres bêdzie ustalany 
+	automatycznie.
 
 dcc_dir
 	typ: tekst
