@@ -64,13 +64,16 @@ if test "x$RM" = "xno"; then
     AC_MSG_ERROR([rm ])
 fi
 
-AC_PATH_PROG(MAKE, gmake, no)
-if test "x$MAKE" = "xno"; then
+AC_PATH_PROG(GMAKE, gmake, no)
+if test "x$GMAKE" = "xno"; then
     AC_PATH_PROG(MAKE, make, no)
     if test "x$MAKE" = "xno"; then
 	AC_MSG_ERROR([make ])
     fi
+else
+    MAKE=$GMAKE
 fi
+
 
 AC_PATH_PROG(AR, ar, no)
 if test "x$AR" = "xno"; then
