@@ -1176,7 +1176,7 @@ COMMAND(cmd_modify)
 			continue;
 		}
 		
-		if ((match_arg(argv[i], 'p', "phone", 2) || match_arg(argv[i], 'm', "mobile", 2)) && argv[i + 1]) {
+		if (match_arg(argv[i], 'p', "phone", 2) && argv[i + 1]) {
 			xfree(u->mobile);
 			u->mobile = xstrdup(argv[++i]);
 			modified = 1;
