@@ -477,7 +477,7 @@ struct gg_event {
         union {		/* @event */
                 struct gg_notify_reply *notify;	/* informacje o li¶cie kontaktów -- GG_EVENT_NOTIFY */
 
-		gg_failure_t failure;		/* b³±d po³±czenia -- GG_EVENT_FAILURE */
+		int failure;			/* b³±d po³±czenia -- GG_EVENT_FAILURE */
 
 		struct gg_dcc *dcc_new;		/* nowe po³±czenie bezpo¶rednie -- GG_EVENT_DCC_NEW */
 		
