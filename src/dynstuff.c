@@ -48,7 +48,7 @@ void *list_add_sorted(list_t *list, void *data, int alloc_size, int (*comparisio
 		return NULL;
 	}
 
-	new = xmalloc(sizeof(list_t));
+	new = xmalloc(sizeof(struct list));
 
 	new->data = data;
 	new->next = NULL;
@@ -263,7 +263,7 @@ int string_append(string_t s, const char *str)
  */
 string_t string_init(const char *value)
 {
-	string_t tmp = xmalloc(sizeof(string_t));
+	string_t tmp = xmalloc(sizeof(struct string));
 
 	if (!value)
 		value = "";
