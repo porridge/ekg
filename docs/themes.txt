@@ -52,7 +52,7 @@ parametr z samym pseudonimem.
 %#  timestamp (domy¶lnie GG:MM)
 
 %|  koniec promptu. je¶li ten format wystêpuje, to przy przenoszeniu do
-    nastêpnej linii, tekst przed tym formatem zostanie wy¶wietlony podownie.
+    nastêpnej linii, tekst przed tym formatem zostanie wy¶wietlony ponownie.
 
     na przyk³ad dla:
 
