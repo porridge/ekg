@@ -783,7 +783,8 @@ void variable_help(const char *name)
 
 	string_free(s, 1);
 	
-	print("help_set_footer", name);
+	if (strcmp(format_find("help_set_footer"), ""))
+		print("help_set_footer", name);
 
 	fclose(f);
 }
