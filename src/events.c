@@ -282,7 +282,7 @@ void handle_notify(struct gg_event *e)
 		in.s_addr = n->remote_ip;
 
 		/* je¶li taki sam stan i rizony takie same, to olej */
-		if (u->status == n->status && u->descr && e->type == GG_EVENT_NOTIFY_DESCR && !strcmp(u->descr, e->event.notify_descr.descr)) {
+		if (u->status == n->status && (e->type == GG_EVENT_NOTIFY || (u->descr && e->type == GG_EVENT_NOTIFY_DESCR && !strcmp(u->descr, e->event.notify_descr.descr)))) {
 			n++;
 			continue;
 		}
