@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-02-11
 
 - poprawka segfaultu w funkcjach poprawiaj±cych wynik array_make() (w)
+- poprawka ,,list'', zmiana informacji dzia³a jak trzeba (dawid@pj190/w)
 
 // 2002-02-10
 

@@ -101,7 +101,7 @@ struct command commands[] = {
 	{ "?", "c", command_help, " [polecenie]", "Synonim dla %Whelp%n", "" },
 	{ "ignore", "u", command_ignore, " [numer/alias]", "Dodaje do listy ignorowanych lub j± wy¶wietla", "" },
 	{ "invisible", "", command_away, "", "Zmienia stan na niewidoczny", "" },
-	{ "list", "u", command_list, " [alias|opcje]", "Zarz±dzanie list± kontaktów", "--active\n  --busy\n  --inactive\n\n  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n  --display <nazwa>  // wy¶wietlana nazwa\n  --phone <telefon>\n  --uin <numerek>\n  --group [+/-]<grupa>\n\n  --put\n  --get" },
+	{ "list", "u?", command_list, " [alias|opcje]", "Zarz±dzanie list± kontaktów", "--active\n  --busy\n  --inactive\n\n  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n  --display <nazwa>  // wy¶wietlana nazwa\n  --phone <telefon>\n  --uin <numerek>\n  --group [+/-]<grupa>\n\n  --put\n  --get" },
 	{ "msg", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ do podanego u¿ytkownika", "" },
         { "on", "?u?", command_on, " <zdarzenie|...> <numer/alias> <akcja>|clear", "Dodaje lub usuwa zdarzenie", "" },
 	{ "passwd", "??", command_passwd, " <has³o> <e-mail>", "Zmienia has³o i adres e-mail u¿ytkownika", "" },
