@@ -97,6 +97,10 @@ readline_prompt <%>
 readline_prompt_away <*> 
 readline_prompt_invisible <.> 
 readline_prompt_query <%1>-> 
+readline_prompt_win <%% win.%1> 
+readline_prompt_away_win <* win.%1> 
+readline_prompt_invisible_win <. win.%1> 
+readline_prompt_query_win <%1/win.%2>-> 
 register_failed %! %RB³±d podczas rejestracji%n\n
 register_pending %! %RRejestracja w toku%n\n
 register_timeout %! %RPrzekroczono limit czasu operacji rejestrowania%n\n
@@ -108,15 +112,15 @@ saved %> %WUstawienia zapisane.%n\n
 search_failed %! %RB³±d podczas przeszukiwania%n%W: %1%n\n
 search_not_found %! %RNie znaleziono nikogo o takich danych%n\n
 search_results_multi %W%7%[-10]1%n %K|%n %[12]3 %K|%n %6 %K|%n %[20]2 %K|%n %[4]5 %K|%n %c%[16]4%n\n
-search_results_multi_active %G+%n
+search_results_multi_active %W<%G+%W>%n
 search_results_multi_female %MK%n
-search_results_multi_inactive %r!%n
+search_results_multi_inactive %W<%R-%W>%n
 search_results_multi_male %BM%n
 search_results_multi_unknown brak
 search_results_single %W%7%[-10]1%n %K|%n %[12]3 %K|%n %6 %K|%n %[20]2 %K|%n %[4]5 %K|%n %c%[16]4%n\n
-search_results_single_active %G+%n
+search_results_single_active %W<%G+%W>%n
 search_results_single_female %MK%n
-search_results_single_inactive %r!%n
+search_results_single_inactive %W<%R-%W>%n
 search_results_single_male %BM%n
 search_results_single_unknown %Wbrak%n
 search_stopped %) Nie to nie. Dalej nie szukam.\n
