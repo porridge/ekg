@@ -2788,7 +2788,7 @@ COMMAND(cmd_dcc)
 				break;
 			}
 
-			if (uin && t->uin == uin) {
+			if (uin && tt->uin == uin) {
 				t = tt;
 				break;
 			}
