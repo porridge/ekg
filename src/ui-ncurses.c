@@ -2916,9 +2916,8 @@ static void ui_ncurses_loop()
 					b->function(b->arg);
 				else
 					command_exec(NULL, b->action);
-			} else if (ch < 255) {
-				if (strlen(line) >= LINE_MAXLEN - 1)
-					break;
+			} else if (ch < 255 && strlen(line) < LINE_MAXLEN - 1) {
+					
 				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
 
 				line[line_index++] = ch;

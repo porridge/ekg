@@ -1908,15 +1908,19 @@ COMMAND(cmd_msg)
 		return 0;
 	}
 
-	msg = xstrdup(params[1]);
+	if (strlen(params[1]) > 1989) {
+		printq("message_too_long");
+	}
+	
+	msg = xstrmid(params[1], 0, 1989);
 
 	/* analizê tekstu zrobimy w osobnym bloku dla porz±dku */
 	{
 		unsigned char attr = 0, last_attr = 0;
 		const unsigned char *p = params[1];
-		int msglen = 0, i;
+		int msglen = 0, i, len = strlen(msg);
 
-		for (i = 0; i < strlen(params[1]); i++, p++) {
+		for (i = 0; i < len; i++, p++) {
 			unsigned char rgb[3];
 
 			if (*p == 18) {

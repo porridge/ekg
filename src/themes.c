@@ -993,6 +993,7 @@ void theme_init()
 	/* potwierdzenia wiadomo¶ci */
 	format_add("ack_queued", "%> Wiadomo¶æ do %1 zostanie dostarczona pó¼niej\n", 1);
 	format_add("ack_delivered", "%> Wiadomo¶æ do %1 zosta³a dostarczona\n", 1);
+	format_add("message_too_long", "%! Wiadomo¶æ jest zbyt d³uga i zosta³a skrócona\n", 1);
 
 	/* ludzie zmieniaj± stan */
 	format_add("status_avail", "%> %1 jest dostêpn%@2\n", 1);
