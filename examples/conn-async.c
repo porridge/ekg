@@ -50,16 +50,19 @@ int main()
 				}
 				if (e->type == GG_EVENT_CONN_SUCCESS) {
 					printf("po³±czy³em siê\n");
+					gg_free_event(e);
 					gg_logoff(sess);
 					gg_free_session(sess);
 					return 1;
 				}
 				if (e->type == GG_EVENT_CONN_FAILED) {
 					printf("errrror\n");
+					gg_free_event(e);
 					gg_logoff(sess);
 					gg_free_session(sess);
 					return 1;
 				}
+				gg_free_event(e);
 			}
 		}
 	}
