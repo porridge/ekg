@@ -876,8 +876,7 @@ COMMAND(cmd_find)
 {
 	char **argv = NULL, *user;
 	gg_pubdir50_t req;
-	int i, j, res = 0, all = 0;
-	string_t user_str;
+	int i, res = 0, all = 0;
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		printq("not_connected");
@@ -906,16 +905,6 @@ COMMAND(cmd_find)
 		return -1;
 	}
 
-	if (params[1]) {
-		int i;
-		char **argv2 = array_make(params[1], " \t", 0, 1, 1);
-
-		for (i = 0; argv2[i]; i++)
-			array_add(&argv, xstrdup(argv2[i]));
-
-		array_free(argv2);
-	}
-
 	if (argv[0] && !argv[1] && argv[0][0] == '#') {
 		char *tmp = saprintf("/conference --find %s", argv[0]);
 		int res = command_exec(target, tmp, quiet);
@@ -924,17 +913,10 @@ COMMAND(cmd_find)
 		return res;
 	}
 
-	user_str = string_init(argv[0]);
+	user = xstrdup(argv[0]);
 
-	for (i = 1; argv[i] && argv[i][0] != '-'; i++) {
-		string_append_c(user_str, ' ');
-		string_append(user_str, argv[i]);
-	}
-
-	user = string_free(user_str, 0);
-
-	for (j = 0; argv[j]; j++)
-		iso_to_cp(argv[j]);
+	for (i = 0; argv[i]; i++)
+		iso_to_cp(argv[i]);
 
 	if (!(req = gg_pubdir50_new(GG_PUBDIR50_SEARCH))) {
 		array_free(argv);
@@ -953,6 +935,8 @@ COMMAND(cmd_find)
 		}
 
 		gg_pubdir50_add(req, GG_PUBDIR50_UIN, itoa(uin));
+
+		i = 1;
 
 	} else
 		i = 0;
@@ -5756,7 +5740,7 @@ void command_init()
 	  "");
 
 	command_add
-	( "find", "u?", cmd_find, 0,
+	( "find", "u", cmd_find, 0,
 	  " [numer|opcje]", "przeszukiwanie katalogu publicznego",
 	  "\n"
 	  "  -u, --uin <numerek>\n"
