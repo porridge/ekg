@@ -10,6 +10,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawka segfaultu przy sortowaniu okien w ui-readline (wojboj/w)
 - ignore/unignore akceptuj± konferencje (DJ/w)
 - update DJ.theme (DJ/w)
+- poprawka d³ugich linii w ui-readline (*/w)
 
 // 2002-09-17
 

@@ -494,10 +494,16 @@ static void ui_readline_print(const char *target, int separate, const char *line
 
 	/* ukryj prompt, je¶li jeste¶my w trakcie readline */
         if (in_readline) {
+		int i;
+
 		old_prompt = xstrdup(rl_prompt);
                 rl_end = 0;
 		rl_set_prompt("");
-		printf("\r\033[K");
+		rl_redisplay();
+		printf("\r");
+		for (i = 0; i < strlen(old_prompt); i++)
+			printf(" ");
+		printf("\r");
         }
 
 	printf("%s", line);
