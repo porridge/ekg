@@ -286,9 +286,12 @@ void handle_notify(struct gg_event *e)
 			continue;
 		}
 		
+		if (n->status != GG_STATUS_INVISIBLE) {
+			u->port = n->remote_port;
+			u->ip.s_addr = n->remote_ip;
+		}
+		
 		u->status = n->status;
-		u->port = n->remote_port;
-		u->ip.s_addr = n->remote_ip;
 		
 		if (n->status == GG_STATUS_AVAIL) {
 			check_event(EVENT_AVAIL, u->uin);

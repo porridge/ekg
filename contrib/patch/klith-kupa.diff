@@ -1,0 +1,47 @@
+--- events.c.old	Mon Mar 25 19:58:00 2002
++++ events.c	Mon Mar 25 19:57:48 2002
+@@ -287,7 +287,10 @@
+ 		}
+ 		
++		if (n->status != GG_STATUS_INVISIBLE) {
++			u->port = n->remote_port;
++			u->ip.s_addr = n->remote_ip;
++		}
++		
+ 		u->status = n->status;
+-		u->port = n->remote_port;
+-		u->ip.s_addr = n->remote_ip;
+ 		
+ 		if (n->status == GG_STATUS_AVAIL) {
+--- commands.c.old	Mon Mar 25 20:06:38 2002
++++ commands.c	Mon Mar 25 20:11:45 2002
+@@ -532,5 +532,5 @@
+ 		reason = params[0];
+ 		away = (reason) ? 3 : 1;
+-		my_printf("away");
++		my_printf("away", reason);
+ 	} else if (!strcasecmp(name, "invisible")) {
+ 		away = 2;
+@@ -1381,5 +1381,5 @@
+ COMMAND(command_quit)
+ {
+-	my_printf("quit");
++	my_printf("quit", params[0]);
+ 
+ 	ekg_logoff(sess, params[0]);
+--- themes.c.old	Mon Mar 25 19:58:12 2002
++++ themes.c	Mon Mar 25 20:12:35 2002
+@@ -485,5 +485,5 @@
+ 	add_format("user_added", "%> U¿ytkownik %1 zosta³ dopisany do listy kontaktów\n", 1);
+ 	add_format("error_adding", "%! Wyst±pi³ b³±d podczas dopisywania u¿ytkownika\n", 1);
+-	add_format("away", "%> Zmieniono stan na zajêty %c(%C%#%c)%n\n", 1);
++	add_format("away", "%> Zmieniono stan na zajêty %c(%C%#%c)%n %1\n", 1);
+ 	add_format("back", "%> Zmieniono stan na dostêpny %c(%C%#%c)%n\n", 1);
+ 	add_format("invisible", "%> Zmieniono stan na niewidoczny %c(%C%#%c)%n\n", 1);
+@@ -511,5 +511,5 @@
+ 	add_format("saved", "%> Zapisano ustawienia\n", 1);
+ 	add_format("error_saving", "%! Podczas zapisu ustawieñ wyst±pi³ b³±d\n", 1);
+-	add_format("quit", "%> Papa\n", 1);
++	add_format("quit", "%> Papa (%1)\n", 1);
+ 	add_format("message_header", "%g.-- %n%1 %c(%C%#%c/%2)%n %g--- -- -\n", 1);
+ 	add_format("message_footer", "%g`----- ---- --- -- -%n\n", 1);

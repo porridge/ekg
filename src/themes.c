@@ -485,6 +485,7 @@ void init_theme()
 	add_format("user_added", "%> U¿ytkownik %1 zosta³ dopisany do listy kontaktów\n", 1);
 	add_format("error_adding", "%! Wyst±pi³ b³±d podczas dopisywania u¿ytkownika\n", 1);
 	add_format("away", "%> Zmieniono stan na zajêty %c(%C%#%c)%n\n", 1);
+	add_format("away_descr", "%> Zmieniono stan na zajêty: %1 %c(%C%#%c)%n\n", 1);
 	add_format("back", "%> Zmieniono stan na dostêpny %c(%C%#%c)%n\n", 1);
 	add_format("invisible", "%> Zmieniono stan na niewidoczny %c(%C%#%c)%n\n", 1);
 	add_format("user_not_found", "%! Nie znaleziono u¿ytkownika %W%1%n\n", 1);
@@ -511,6 +512,7 @@ void init_theme()
 	add_format("saved", "%> Zapisano ustawienia\n", 1);
 	add_format("error_saving", "%! Podczas zapisu ustawieñ wyst±pi³ b³±d\n", 1);
 	add_format("quit", "%> Papa\n", 1);
+	add_format("quit_descr", "%> Papa: %1\n", 1);
 	add_format("message_header", "%g.-- %n%1 %c(%C%#%c/%2)%n %g--- -- -\n", 1);
 	add_format("message_footer", "%g`----- ---- --- -- -%n\n", 1);
 	add_format("message_line", "%g|%n %1\n", 1);
@@ -608,7 +610,13 @@ void init_theme()
 	add_format("process_exit", "%> Proces %1 (%2) zakoñczy³ dzia³anie z wynikiem %3\n", 1);
 
 	add_format("modify_done", "%> Zmieniono wpis w li¶cie kontaktów\n", 1);
-	add_format("user_info", "%) Imiê i nazwisko: %W%1 %2%n\n%) Pseudonim: %W%3%n\n%) Alias: %W%4%n\n%) Numer telefonu: %W%5%n\n%) Grupy: %W%6%n\n", 1);
+	add_format("user_info", "%) Pseudonim: %W%3%n\n%) Numer: %W%7%n\n%) Stan: %8\n%) Imiê i nazwisko: %W%1 %2%n\n%) Alias: %W%4%n\n%) Numer telefonu: %W%5%n\n%) Grupy: %W%6%n\n", 1);
+	add_format("user_info_avail", "%Ydostêpny%n", 1);
+	add_format("user_info_busy", "%Gzajêty%n", 1);
+	add_format("user_info_busy_descr", "%Gzajêty%n (%1)", 1);
+	add_format("user_info_not_avail", "%rniedostêpny%n", 1);
+	add_format("user_info_not_avail_descr", "%rniedostêpny%n (%1)", 1);
+	add_format("user_info_invisible", "%cniewidoczny%n", 1);
 
 	add_format("config_changed", "Zapisaæ now± konfiguracjê? (tak/nie) ", 1);
 	add_format("config_unknown", "%! Zmiana tego ustawienia mo¿e nie odnie¶æ zamierzonego efektu\n", 1);

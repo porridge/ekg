@@ -531,7 +531,7 @@ COMMAND(command_away)
 	if (!strcasecmp(name, "away")) {
 		reason = params[0];
 		away = (reason) ? 3 : 1;
-		my_printf("away");
+		my_printf((reason) ? "away_descr" : "away", reason);
 	} else if (!strcasecmp(name, "invisible")) {
 		away = 2;
 		my_printf("invisible");
@@ -1067,7 +1067,6 @@ COMMAND(command_list)
 
 	if (params[0] && *params[0] != '-') {
 		struct userlist *u;
-		char *groups;
 		uin_t uin;
 		
 		if (!(uin = get_uin(params[0])) || !(u = userlist_find(uin, NULL))) {
@@ -1081,11 +1080,34 @@ COMMAND(command_list)
 			return 0;
 		}
 
-		groups = group_to_string(u->groups);
+		{
+			char *status, *groups = group_to_string(u->groups);
+			
+			switch (u->status) {
+				case GG_STATUS_AVAIL:
+					status = format_string(find_format("user_info_avail"));
+					break;
+				case GG_STATUS_BUSY:
+					status = format_string(find_format("user_info_busy"));
+					break;
+				case GG_STATUS_BUSY_DESCR:
+					status = format_string(find_format("user_info_busy_descr"), u->descr);
+					break;
+				case GG_STATUS_NOT_AVAIL:
+					status = format_string(find_format("user_info_not_avail"));
+					break;
+				case GG_STATUS_NOT_AVAIL_DESCR:
+					status = format_string(find_format("user_info_not_avail_descr"), u->descr);
+					break;
+				default:
+					status = format_string(find_format("user_info_unknown"));
+			}
 		
-		my_printf("user_info", u->first_name, u->last_name, u->nickname, u->display, u->mobile, groups);
+			my_printf("user_info", u->first_name, u->last_name, u->nickname, u->display, u->mobile, groups, itoa(u->uin), status);
 		
-		free(groups);
+			free(groups);
+			free(status);
+		}
 
 		return 0;
 	}
@@ -1394,7 +1416,7 @@ COMMAND(command_sms)
 
 COMMAND(command_quit)
 {
-	my_printf("quit");
+	my_printf((params[0]) ? "quit_descr" : "quit", params[0]);
 
 	ekg_logoff(sess, params[0]);
 	list_remove(&watches, sess, 0);

@@ -1,8 +1,9 @@
-# From: Marek Kozina <klith@hybrid.art.pl>
-
 prompt %c-+-%n
 prompt2 %K-+-%n
 error %R-+-%n
+
+readline_prompt_away ! 
+readline_prompt % 
 
 known_user %1
 unknown_user %1
@@ -14,7 +15,7 @@ unknown_command %! %1%0: hê?.. dunno :/\n
 saved %> ustawienia zapisane!\n
 error_saving %! b³ad podczas zapisu konfiguracji.\n
 error_reading_config %! nie mogê odczytaæ pliku z konfiguracj±.\n
-quit %> Boom! boom! boooooom!\n
+quit %> na ryby!\n
 help %> %[10]1 -> %Y%2%w %3\n
 help_more %) %1\n
 
@@ -31,42 +32,56 @@ search_results_single_inactive %r!%n
 search_results_single_female k
 search_results_single_male m
 
-search_results_single %7 %[-10]1 %K/%n %[12]3 %K/%n %6 %K/%n %[20]2 %K/%n %[4]5
+search_results_single %7 %[-10]1 %K/%n %[12]3 %K/%n %6 %K/%n %[20]2 %K/%n %[4]5 %K/%n %[16]4\n
 
-already_searching %> trwa jedno przeszukiwanie, uzyj find -stop aby przerwac..\nsearch_falied %! zonk podczas szukania: %1\n
+already_searching %> trwa jedno przeszukiwanie, uzyj find -stop aby przerwac..\n
+search_falied %! zonk podczas szukania: %1\n
 search_not_found %! nic nie znalazlem..\n
 
 list_empty %> nikt Cie nie kocha..\n
-list_avail dla ludu!    %G*%n %[12]1 [%K%[15]2%n]\n
-list_busy zajêty       %g/%n %[12]1 [%K%[15]2%n]\n
-list_not_avail dupa         %r.%n %1\n
+list_avail %G*%n %[12]1 %G*%n %[15]2 %[-4]3 %G*%n\n
+list_busy %g/%n %[12]1 %g/%n %[15]2 %[-4]3 %g/%n\n
+list_busy_descr %g/%n %[12]1 %g/%n %[15]2 %[-4]3 %g/%n %4\n
+list_not_avail %r!%n %[12]1 %r!%n\n
+list_not_avail_descr %r!%n %[12]1 %r!%n %[15]2 %[-4]3 %r!%n %4\n
+list_invisible %c:%n %[12]1 %c:%n %[15]2 %[-4]3 %c:%n\n
 
 away %# %> status: %g/ %Wzajêty%n\n
 back %# %> status: %G* %Wdla ludu!%n\n
-invisible %# %> status: %R! %Wchowamy siê!?%n\n
+invisible %# %> status: %c: %Wchowamy siê!?%n\n
 auto_away %# %> *auto-away* po %W%1%n\n
 
 status_avail %# %> %[10]1 %G*%n %Wdla ludu!%n\n
 status_busy %# %> %[10]1 %g/ %Wzajêty%g /%n\n
+status_busy_descr %# %> %[10]1 %g/ %Wzajêty%n: %2 %g/%n\n
 status_not_avail %# %> %[10]1 %R! %Wzdech³ pies%n\n
+status_not_avail_descr %# %> %[10]1 %R! %WR.I.P.%n: %2\n
+status_invisible %# %> %[10]1 %c: %Wniewidoczny%n\n
 
 show_status %> status: %1\n
 show_status_avail %G*%n dla ludu!
 show_status_busy %g/%n zZzz
-show_status_invisible %R!%n chowamy sie :)
-show_status_not_avail %R!%n TAKA KUPA !
+show_status_busy_descr %g/%n zZzz: %1
+show_status_invisible %c*%n niewidoczny..
+show_status_not_avail %R!%n niepo³±czny
 
-message_header %b%x %1: (%#) %n\n
+message_header %b%x %1: (%#/%2) %n\n
 message_footer \n
-chat_header %> %W%1%n: (%#)%n\n
-chat_footer \n
-ack_queued %) %K ack/%1 (%#) -queued-%n\n
+message_line %1\n
+message_line_width 75
+chat_header %> %W%1%n: %c(%C%#%n/%2%c)%n\n
+chat_footer -
+chat_line %1\n
+chat_line_width 75
+
+ack_queued %) %K ack/%1 (%#) nie ma typa capish ?!%n\n
 ack_delivered %) %K ack/%1 (%#)%n\n
 
 sms_sent %> sms do %1 zosta³ wys³any.\n
-sms_failed %! sms do %1 raczej nie dotar³i :).\n
+sms_failed %! sms do %1 raczej nie dotar³ :).\n
 sms_error %! sms: b³±d podczas wysy³ania sms'a.\n
 sms_unknown %! sms: %1 <- kolo nie ma podanego numeru we wpisie.\n
+
 variable %> %[,25]1%2\n
 variable_not_found %! %Wset:%n [%1] <- dunno.\n
 variable_invalid %! %Wset:%n [%1] <- zla warto¶æ.\n
@@ -98,7 +113,8 @@ already_connected %! jeste¶ ju¿ po³±czony..\n
 offline_mode %! jeste¶ w tybie off-line!\n
 
 error_reading_config %! b³±d podcza³ czytania konf.\n
-no_config %> nieprawidlowa konfiguracja. wpisz:\n%Wset uin <numerek-gg>\n%Wset p
+no_config %> nieprawidlowa konfiguracja. wpisz:\n%Wset uin <numerek-gg>\n%Wset password <haslo>\n%Wsave\n%ynastepnie wydaj polecenie:\n%Wconnect%w\n
+
 aliases_list %> alias    %[8]1 [%K%2%n].\n
 aliases_add %> alias %W%1%n -> %2.\n
 aliases_del %> usunieto alias %W%1%n.\n
