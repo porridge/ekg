@@ -116,7 +116,6 @@ int config_sms_away_limit = 0;
 char *config_sms_number = NULL;
 char *config_sms_app = NULL;
 int config_sms_max_length = 100;
-int search_type = 0;
 int config_changed = 0;
 int config_display_ack = 3;
 int config_completion_notify = 1;
