@@ -179,11 +179,6 @@ char *va_format_string(const char *format, va_list ap)
 
 	/* liczymy ilo¶æ argumentów */
 	for (p = format; *p; p++) {
-		if (*p == '\\' && p[1] == '%') {
-			p += 2;
-			continue;
-		}
-
 		if (*p != '%')
 			continue;
 
@@ -255,14 +250,7 @@ char *va_format_string(const char *format, va_list ap)
 	p = format;
 	
 	while (*p) {
-		int escaped = 0;
-
-		if (*p == '\\' && p[1] == '%') {
-			escaped = 1;
-			p++;
-		}
-
-		if (*p == '%' && !escaped) {
+		if (*p == '%') {
 			int fill_before, fill_after, fill_soft, fill_length;
 			char fill_char;
 

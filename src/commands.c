@@ -4024,11 +4024,6 @@ COMMAND(cmd_alias_exec)
 
 		for (p = tmp->data; *p; p++) {
 
-			if (*p == '\\' && p[1] == '%') {
-				p += 2;
-				continue;
-			}
-
 			if (*p != '%')
 				continue;
 
@@ -4049,11 +4044,6 @@ COMMAND(cmd_alias_exec)
 	
 	for (tmp = m; tmp; tmp = tmp->next) {
 		string_t str;
-		char *p;
-
-		for (p = (char *) tmp->data; *p; p++)
-			if (*p == '\\' && p[1] == '%')
-				memmove(p, p + 1, strlen(tmp->data) - (size_t)(p - (char *)tmp->data));
 
 		if (*((char *) tmp->data) == '/')
 			str = string_init(NULL);
@@ -5251,9 +5241,9 @@ void command_init()
 	  "  -d, --del <alias>|*             usuwa alias\n"
 	  " [-l, --list] [alias]             wy¶wietla listê aliasów\n"
 	  "\n"
-	  "W komendzie mo¿na u¿yæ formatów od %T\\%1%n do %T\\%9%n i w "
-	  "ten sposób ustaliæ kolejno¶æ przekazywanych argumentów. Je¶li format "
-          "ma byæ dos³ownie u¿yty w aliasie, nale¿y poprzedziæ go znakiem backslasha.");
+	  "W komendzie mo¿na u¿yæ formatów od %T%%1%n do %T%%9%n i w "
+	  "ten sposób ustaliæ kolejno¶æ przekazywanych argumentów. Nale¿y "
+          "u¿yæ dwukrotnie znaku %T%%%n, je¶li format ma byæ dos³ownie u¿yty.");
 	  
 	command_add
 	( "away", "?", cmd_away, 0,
@@ -5600,15 +5590,15 @@ void command_init()
 	  "Zdarzenia mo¿na ³±czyæ ze sob± za pomoc± przecinka lub ,,%T|%n''. Jako numer/alias "
 	  "mo¿na podaæ ,,%T*%n'', dziêki czemu zdarzenie bêdzie dotyczyæ ka¿dego u¿ytkownika. "
 	  "Je¶li kto¶ posiada indywidualn± akcjê na dane zdarzenie, to tylko ona zostanie "
-	  "wykonana. Mo¿na podaæ wiêcej komend, oddzielaj±c je ¶rednikiem. W komendzie, %T\\%1%n "
+	  "wykonana. Mo¿na podaæ wiêcej komend, oddzielaj±c je ¶rednikiem. W komendzie, %T%%1%n "
 	  "zostanie zast±pione numerkiem sprawcy zdarzenia, a je¶li istnieje on na naszej "
-	  "li¶cie kontaktów, %T\\%2%n bêdzie zast±pione jego pseudonimem. Zamiast %T\\%3%n i "
-	  "%T\\%4%n wpisana bêdzie tre¶æ wiadomo¶ci, opis u¿ytkownika, ca³kowita ilo¶æ "
+	  "li¶cie kontaktów, %T%%2%n bêdzie zast±pione jego pseudonimem. Zamiast %T%%3%n i "
+	  "%T%%4%n wpisana bêdzie tre¶æ wiadomo¶ci, opis u¿ytkownika, ca³kowita ilo¶æ "
 	  "nowych wiadomo¶ci e-mail, nazwa pliku lub nazwa konferencji - w zale¿no¶ci od zdarzenia. "
-	  "Format %T\\%4%n ró¿ni siê od %T\\%3%n tym, ¿e wszystkie niebiezpieczne znaki, "
+	  "Format %T%%4%n ró¿ni siê od %T%%3%n tym, ¿e wszystkie niebiezpieczne znaki, "
 	  "które mog³yby zostaæ zinterpretowane przez shell, zostan± poprzedzone backslashem. "
-	  "U¿ywanie %T\\%3%n w przypadku komendy ,,exec'' jest %Tniebezpieczne%n i, je¶li naprawdê "
-	  "musisz wykorzystaæ tre¶æ wiadomo¶ci lub opis, u¿yj %T\"\\%4\"%n (w cudzys³owach).");
+	  "U¿ywanie %T%%3%n w przypadku komendy ,,exec'' jest %Tniebezpieczne%n i, je¶li naprawdê "
+	  "musisz wykorzystaæ tre¶æ wiadomo¶ci lub opis, u¿yj %T\"%%4\"%n (w cudzys³owach).");
 	 
 	command_add
 	( "passwd", "??", cmd_passwd, 0,

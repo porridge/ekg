@@ -7,8 +7,8 @@ d - drg, sz - szalik).
 // 2003-07-22
 
 - poprawka segfaulta przy czytaniu/pobieraniu uszkodzonej listy kontaktów (w)
-- poprawka aliasów, mo¿na u¿yæ w aliasie sekwencji %1 dos³ownie, poprzedzaj±c
-  j± backslashem (savage/sz)
+- kosmetyczne poprawki zwi±zane z dos³ownym u¿yciem znaku '%' w niektórych
+  miejscach (savage,w/sz)
 
 // 2003-07-14
 
