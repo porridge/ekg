@@ -619,7 +619,8 @@ quit_reason
 	typ: tekst
 	domy¶lna warto¶æ: brak
 
-	domy¶lny opis stanu niedostêpnego, ustawiany przy wychodzeniu.
+	domy¶lny opis stanu niewidocznego, ustawiany przy zmianie bez podania
+	parametru oraz stanu niedostêpnego, ustawiany przy wychodzeniu.
 
 random_reason
 	typ: liczba
