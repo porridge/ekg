@@ -167,10 +167,10 @@ COMMAND(cmd_add)
 	}
 
 	if ((u = userlist_find(uin, params[1]))) {
-		if (!strcmp(params[1], u->display))
+		if (!strcmp(params[1], u->display) && u->uin == uin)
 			print("user_exists", params[1]);
 		else
-			print("user_exists_other", params[1], format_user(uin));
+			print("user_exists_other", params[1], format_user(u->uin));
 
 		return;
 	}
