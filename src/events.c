@@ -551,7 +551,7 @@ void handle_msg(struct gg_event *e)
 	put_log(e->event.msg.sender, "%s,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), tmp);
 	xfree(tmp);
 
-	if (config_sms_away && !GG_S_A(config_status) && config_sms_app && config_sms_number) {
+	if (config_sms_away && GG_S_B(config_status) && config_sms_app && config_sms_number) {
 		char *foo, sender[100];
 
 		sms_away_add(e->event.msg.sender);
