@@ -10,6 +10,8 @@ zg³osi³ b³±d.
 
 - poprawka segfaulta w wielolinijkowych (seba,wojboj/w)
 - poprawka usuwania przypisanych klawiszy (seba/w)
+- sprawdzanie poczty (mbox) nie przegl±da niepotrzebnie 
+  ca³ego pliku, je¶li nie by³o w nim zmian (sz)
 
 // 2002-12-09
 
