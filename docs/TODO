@@ -4,21 +4,14 @@ z nich dostaæ bêd± albo ignorowane, albo odpowied¼ mo¿e byæ wulgarna.
 Zwykle im dana sprawa jest wy¿ej na li¶cie, tym wa¿niejsze jest jej
 rozwi±zanie.
 
-Lista rzeczy, które TRZEBA zrobiæ przed wydaniem wersji 1.0:
-
-* biblioteka:
-  - nic wa¿nego,
-
-* klient:
-  - nic wa¿nego,
-
-Pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
-
 * biblioteka:
   - komunikacja miêdzy klientami, bezpo¶rednie rozmowy,
   - czas powrotu w stanach opisowych,
 
 * klient:
+  - logowanie wysy³anych smsów w postaci:
+    smssend,<numer_telefonu>,<czas>,<wiadomo¶æ>,<nick>,<numerGG>
+    dla kompatybilno¶ci z Kadu (Chilek)
   - blokowanie od¶wie¿ania ekranu w obrêbie jednej komendy -- po co
     przewijaæ linijka po linijce w /help zamiast zablokowaæ przed i
     zwolniæ ekran po? (w)
