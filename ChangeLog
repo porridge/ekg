@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawka /exec (wojboj/w)
 - dodanie konferencji do dope³niania (DJ/w)
 - poprawka configure.in/LDFLAGS (s)
+- /msg do wielu osób nie tworzy konferencji (joshua/w)
 
 // 2002-09-22
 

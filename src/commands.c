@@ -547,7 +547,6 @@ COMMAND(cmd_exec)
 		s.id = pid;
 		s.timeout = 60;
 		s.buf = string_init(NULL);
-		s.bufpoz = 0;
 
 		list_add(&watches, &s, sizeof(s));
 		close(fd[1]);
@@ -1136,7 +1135,7 @@ COMMAND(cmd_msg)
 
 	nick = xstrdup(params[0]);
 
-	if (*nick == '@' || strchr(nick, ',')) {
+	if ((*nick == '@' || strchr(nick, ',')) && chat) {
 		struct conference *c = conference_create(nick);
 		list_t l;
 
