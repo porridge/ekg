@@ -2,6 +2,7 @@
 
 /*
  *  (C) Copyright 2001-2002 Piotr Domagalski <szalik@szalik.net>
+ *                          Pawe³ Maziarz <drg@infomex.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -43,6 +44,7 @@ int config_check_mail_frequency = 15;
 char *config_check_mail_folders = NULL;
 
 int mail_count = 0;
+int last_mail_count = 0;
 
 /*
  * check_mail()
@@ -329,3 +331,26 @@ int check_mail_maildir(const char **folders)
 
 	return 0;
 }
+
+void changed_check_mail(const char *var)
+{
+	if (config_check_mail) {
+		list_t l;
+		struct timer *t;
+
+		 for (l = timers; l; l=l->next ) {
+			 t = l->data;
+
+			 if (!strcmp(t->name, "check-mail-time")) {
+				 t->period = config_check_mail_frequency;
+				 return;
+			 }
+		 }
+		 
+		 t = timer_add(config_check_mail_frequency, "check-mail-time", "check_mail");
+		 t->ui = 1;
+	}
+
+	else 
+		timer_remove("check-mail-time", NULL);
+}			

@@ -3,6 +3,7 @@
 /*
  *  (C) Copyright 2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *                     Wojtek Bojdo³ <wojboj@htcon.pl>
+ *                     Pawe³ Maziarz <drg@infomex.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -2202,6 +2203,18 @@ static int ui_ncurses_event(const char *event, ...)
 	if (!strcmp(event, "refresh_time")) {
 		struct timer *t = timer_add(1, "ui-ncurses-time", "refresh_time");
 		t->ui = 1;
+	}
+
+        if (!strcasecmp(event, "check_mail")) {
+		int count = check_mail();
+		struct timer *t = timer_add(config_check_mail_frequency, "check-mail-time", "check_mail");
+
+		t->ui = 1;
+
+		if (count && count > last_mail_count)
+			print((count == 1) ? "new_mail_one" : "new_mail_more", itoa(count));
+
+		last_mail_count = count;
 	}
 
 	if (!strcmp(event, "variable_changed")) {

@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include "stuff.h"
+#include "mail.h"
 #include "vars.h"
 #include "config.h"
 #include "libgadu.h"
@@ -98,8 +99,8 @@ void variable_init()
 	variable_add("beep_chat", VAR_BOOL, 1, &config_beep_chat, NULL, NULL, dd_beep);
 	variable_add("beep_notify", VAR_BOOL, 1, &config_beep_notify, NULL, NULL, dd_beep);
 	variable_add("beep_mail", VAR_BOOL, 1, &config_beep_mail, NULL, NULL, dd_beep);
-	variable_add("check_mail", VAR_MAP, 1, &config_check_mail, NULL, variable_map(3, 0, 0, "no", 1, 2, "mbox", 2, 1, "maildir"), NULL);
-	variable_add("check_mail_frequency", VAR_INT, 1, &config_check_mail_frequency, NULL, NULL, dd_check_mail);
+	variable_add("check_mail", VAR_MAP, 1, &config_check_mail, changed_check_mail, variable_map(3, 0, 0, "no", 1, 2, "mbox", 2, 1, "maildir"), NULL);
+	variable_add("check_mail_frequency", VAR_INT, 1, &config_check_mail_frequency, changed_check_mail, NULL, dd_check_mail);
 	variable_add("check_mail_folders", VAR_STR, 1, &config_check_mail_folders, NULL, NULL, dd_check_mail);
 	variable_add("completion_notify", VAR_MAP, 1, &config_completion_notify, NULL, variable_map(4, 0, 0, "none", 1, 2, "add", 2, 1, "addremove", 4, 0, "busy"), NULL);
 	variable_add("ctrld_quits", VAR_BOOL, 1, &config_ctrld_quits, NULL, NULL, NULL);

@@ -39,6 +39,7 @@
 #include "themes.h"
 #include "vars.h"
 #include "ui.h"
+#include "mail.h"
 
 /* podstawny ewentualnie brakuj±ce funkcje i definicje readline */
 
@@ -1004,6 +1005,18 @@ static int ui_readline_event(const char *event, ...)
 
 			result = 1;
 		}
+	}
+
+	if (!strcasecmp(event, "check_mail")) {
+		int count = check_mail();
+		struct timer *t = timer_add(config_check_mail_frequency, "check-mail-time", "check_mail");
+
+		t->ui = 1;
+
+		if (count && count > last_mail_count)
+			print((count == 1) ? "new_mail_one" : "new_mail_more", itoa(count));
+
+		last_mail_count = count;
 	}
 
 cleanup:

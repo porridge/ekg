@@ -21,9 +21,11 @@
 #define __MAIL_H
 
 int mail_count;
+int last_mail_count;
 
 int check_mail();
 int check_mail_update(int update);
 int check_mail_mbox(const char **folders);
 int check_mail_maildir(const char **folders);
+void changed_check_mail(const char *var);
 #endif	/* __MAIL_H */
