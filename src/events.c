@@ -955,7 +955,7 @@ void handle_success(struct gg_event *e)
 			char **new_servers = NULL;
 			int i;
 
-			array_add(&new_servers, inet_ntoa(addr));
+			array_add(&new_servers, xstrdup(inet_ntoa(addr)));
 
 			for (i = 0; servers[i]; i++) {
 				char *tmp = NULL;
