@@ -754,6 +754,7 @@ void handle_userlist(struct gg_http *h)
 	print((h->data) ? format_ok : format_error);
 		
 	if (h->type == GG_SESSION_USERLIST_GET && h->data) {
+		cp_to_iso(h->data);
 		userlist_set(h->data);
 		userlist_send();
 		config_changed = 1;

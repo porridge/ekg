@@ -19,6 +19,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   wersjach i konfiguracjach ekg (w)
 - wersja statyczna libgadu jest kompilowana bez -fPIC, dzielona z -fPIC,
   przez co w najgorszym wypadku bêdzie kompilowana dwa razy (porridge/w)
+- konwersja cp->iso userlisty z serwera (a.latanski/w),
+- zamiana spacji na podkre¶lenia w userli¶cie z serwera (a.latanski/w),
 
 // 2002-07-25
 

@@ -187,7 +187,7 @@ int userlist_set(char *contacts)
 			u.descr = NULL;
 
 		} else {
-			char **entry = array_make(buf, ";", 7, 0, 0);
+			char *q, **entry = array_make(buf, ";", 7, 0, 0);
 			
 			if (!entry[0] || !entry[1] || !entry[2] || !entry[3] || !entry[4] || !entry[5] || !entry[6] || !(u.uin = strtol(entry[6], NULL, 0))) {
 				array_free(entry);
@@ -198,6 +198,9 @@ int userlist_set(char *contacts)
 			u.last_name = xstrdup(entry[1]);
 			u.nickname = xstrdup(entry[2]);
 			u.display = xstrdup(entry[3]);
+			for (q = u.display; *q; q++)
+				if (*q == ' ')
+					*q = '_';
 			u.mobile = xstrdup(entry[4]);
 			u.groups = group_init(entry[5]);
 			u.descr = NULL;
