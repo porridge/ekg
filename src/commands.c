@@ -4202,6 +4202,37 @@ void command_init()
 	  "podano powodu, zostanie wylosowany z pliku %Tback.reasons%n. "
 	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez "
 	  "wzglêdu na ustawienia zmiennych.");
+
+	command_add
+	( "beep", "", cmd_beep, 0,
+	  "", "wydaje d¼wiêk", "");
+
+#ifdef WITH_IOCTLD
+	command_add
+	( "beeps_spk", "?", cmd_beeps_spk, 0,
+	  " <sekwencja>", "wydaje d¼wiêki zgodnie z sekwencj±",
+	  "\n"
+	  "Kolejne d¼wiêki oddzielone s± przecinkami. D¼wiêk sk³ada siê "
+	  "z tonu w hercach i d³ugo¶ci trwania w mikrosekundach oddzielonej "
+	  "uko¶nikiem (%T/%n). Je¶li nie podano czasu trwania, domy¶lna "
+	  "warto¶æ to 0,1s.\n"
+	  "\n"
+	  "Zamiast sekwencji mo¿na podaæ nazwê formatu z themu.");
+
+	command_add
+	( "blink_leds", "?", cmd_blink_leds, 0,
+	  " <sekwencja>", "odtwarza sekwencjê na diodach LED",
+	  "\n"
+	  "Kombinacje diod oddzielone s± przecinkami. Je¶li po kombinacji "
+	  "wystêpuje znak uko¶nika (%T/%n), po nim podany jest czas trwania "
+	  "w mikrosekundach. Domy¶lny czas trwania to 0,1s. Kombinacja jest "
+	  "map± bitow± o nastêpuj±cych "
+	  "warto¶ciach: 1 - NumLock, 2 - ScrollLock, 4 - CapsLock. Na "
+	  "przyk³ad w³±czenie NumLock i CapsLock jednocze¶nie to 1+4 czyli "
+	  "5.\n"
+	  "\n"
+	  "Zamiast sekwencji mo¿na podaæ nazwê formatu z themu.");
+#endif
 	  
 	command_add
 	( "block", "u", cmd_block, 0,
@@ -4429,10 +4460,26 @@ void command_init()
 	  "");
 
 	command_add
+	( "play", "f", cmd_play, 0,
+	  " <plik>", "odtwarza plik d¼wiêkowy", "");
+
+	command_add
 	( "private", "", cmd_away, 0,
 	  " [on/off]", "w³±cza/wy³±cza tryb ,,tylko dla znajomych''",
 	  "");
-	  
+
+#ifdef WITH_PYTHON
+	command_add
+	( "python", "p?", cmd_python, 0,
+	  " <komenda> [opcje]", "obs³uga skryptów",
+	  "\n"
+	  "  load <skrypt>    ³aduje skrypt\n"
+	  "  unload <skrypt>  usuwa skrypt z pamiêci\n"
+	  "  run <plik>       uruchamia skrypt\n"
+	  "  exec <komenda>   uruchamia komendê\n"
+	  "  list             wy¶wietla listê za³adowanych skryptów\n");
+#endif
+
 	command_add
 	( "query", "u?", cmd_query, 0,
 	  " <numer/alias/@grupa> [wiadomo¶æ]", "w³±cza rozmowê",
@@ -4575,49 +4622,8 @@ void command_init()
           "8 - dó³), a komenda okre¶la, jakiej komendy wynik ma byæ "
 	  "wy¶wietlany regularnie w oknie.");
 
-#ifdef WITH_PYTHON
-	command_add
-	( "python", "p?", cmd_python, 0,
-	  " <komenda> [opcje]", "obs³uga skryptów",
-	  "\n"
-	  "  load <skrypt>    ³aduje skrypt\n"
-	  "  unload <skrypt>  usuwa skrypt z pamiêci\n"
-	  "  run <plik>       uruchamia skrypt\n"
-	  "  exec <komenda>   uruchamia komendê\n"
-	  "  list             wy¶wietla listê za³adowanych skryptów\n");
-#endif
 
-	command_add
-	( "beep", "", cmd_beep, 0,
-	  "", "wydaje d¼wiêk", "");
-#ifdef WITH_IOCTLD
-	command_add
-	( "beeps_spk", "?", cmd_beeps_spk, 0,
-	  " <sekwencja>", "wydaje d¼wiêki zgodnie z sekwencj±",
-	  "\n"
-	  "Kolejne d¼wiêki oddzielone s± przecinkami. D¼wiêk sk³ada siê "
-	  "z tonu w hercach i d³ugo¶ci trwania w mikrosekundach oddzielonej "
-	  "uko¶nikiem (%T/%n). Je¶li nie podano czasu trwania, domy¶lna "
-	  "warto¶æ to 0,1s.\n"
-	  "\n"
-	  "Zamiast sekwencji mo¿na podaæ nazwê formatu z themu.");
-	command_add
-	( "blink_leds", "?", cmd_blink_leds, 0,
-	  " <sekwencja>", "odtwarza sekwencjê na diodach LED",
-	  "\n"
-	  "Kombinacje diod oddzielone s± przecinkami. Je¶li po kombinacji "
-	  "wystêpuje znak uko¶nika (%T/%n), po nim podany jest czas trwania "
-	  "w mikrosekundach. Domy¶lny czas trwania to 0,1s. Kombinacja jest "
-	  "map± bitow± o nastêpuj±cych "
-	  "warto¶ciach: 1 - NumLock, 2 - ScrollLock, 4 - CapsLock. Na "
-	  "przyk³ad w³±czenie NumLock i CapsLock jednocze¶nie to 1+4 czyli "
-	  "5.\n"
-	  "\n"
-	  "Zamiast sekwencji mo¿na podaæ nazwê formatu z themu.");
-#endif
-	command_add
-	( "play", "f", cmd_play, 0,
-	  " <plik>", "odtwarza plik d¼wiêkowy", "");
+
 
 	command_add
 	( "_add", "?", cmd_test_add, 0, "",

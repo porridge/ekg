@@ -207,7 +207,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 
 		while ((tab = strchr(c->buf->str, '\t'))) {
 			*tab = ' ';
-			string_insert(c->buf, (tab - c->buf->str), "\033[\009a;");
+			string_insert(c->buf, (tab - c->buf->str), "   ");
 		}
 
 		while ((tmp = strchr(c->buf->str, '\n'))) {
