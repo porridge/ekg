@@ -101,8 +101,9 @@ int config_beep = 1;
 int config_beep_msg = 1;
 int config_beep_chat = 1;
 int config_beep_notify = 1;
-int config_display_pl_chars = 1;
 int config_beep_mail = 1;
+int config_display_pl_chars = 1;
+int config_events_delay = 3;
 char *config_sound_msg_file = NULL;
 char *config_sound_chat_file = NULL;
 char *config_sound_sysmsg_file = NULL;
@@ -199,6 +200,7 @@ struct event_label event_labels[] = {
 	{ EVENT_QUEUED, "queued" },
 	{ EVENT_NEW_MAIL, "newmail" },
 	{ EVENT_QUERY, "query" },
+	{ EVENT_BLOCKED, "blocked" },
 	{ INACTIVE_EVENT, NULL },
 	{ 0, NULL }
 };
@@ -2143,9 +2145,9 @@ int event_check(int event, uin_t uin, const char *data)
 		char *tmp = format_string(actions[i], uin_number, uin_display, ((data) ? data : ""), ((edata) ? edata : ""));
 
 		if (!i)
-			gg_debug(GG_DEBUG_MISC, "// event_check();");
+			gg_debug(GG_DEBUG_MISC, "// event_check();\n");
 
-		gg_debug(GG_DEBUG_MISC, "//    doing: %s\n", tmp);
+		gg_debug(GG_DEBUG_MISC, "//    event: %d doing: %s\n", event, tmp);
 		command_exec(NULL, tmp);
 		xfree(tmp);
 	}
@@ -3552,7 +3554,7 @@ void update_status()
 	if (!u)
 		return;
 
-	if (u->descr && config_reason && strcmp(u->descr, config_reason))
+	if ((u->descr && config_reason && strcmp(u->descr, config_reason)) || (!u->descr && config_reason) || (u->descr && !config_reason))
 		event_check(EVENT_DESCR, config_uin, u->descr);
 
 	xfree(u->descr);

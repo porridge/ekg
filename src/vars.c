@@ -148,6 +148,7 @@ void variable_init()
 	variable_add("encryption", "en", VAR_INT, 1, &config_encryption, NULL, variable_map(2, 0, 0, "none", 1, 0, "sim"), NULL);
 #endif
 	variable_add("enter_scrolls", "es", VAR_BOOL, 1, &config_enter_scrolls, NULL, NULL, NULL);
+	variable_add("events_delay", "ev", VAR_INT, 1, &config_events_delay, NULL, NULL, NULL);
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init)
 		variable_add("header_size", "hs", VAR_INT, 1, &config_header_size, header_statusbar_resize, NULL, NULL);

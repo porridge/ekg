@@ -4527,6 +4527,7 @@ void command_init()
 	  "  - avail, away, notavail - zmiana stanu na podany\n"
 	  "  - online - zmiana stanu z ,,niedostêpny'' na ,,dostêpny''\n"
 	  "  - descr - zmiana opisu\n"
+	  "  - blocked - zostali¶my zablokowani\n"
 	  "  - msg, chat - wiadomo¶æ\n"
 	  "  - query - nowa rozmowa\n"
 	  "  - delivered, queued - wiadomo¶æ dostarczona lub zakolejkowana na serwerze\n"

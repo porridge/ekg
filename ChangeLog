@@ -27,7 +27,8 @@ zg³osi³ b³±d.
 - komenda reload (stforek/sz)
 - poprawka kodowania eksportowanej listy kontaktów (Sero/sz)
 - dalsza reorganizacja zdarzeñ, ulepszenie logiki, opis w /help on 
-  i troche innych mniej powa¿nych zmian (sz)
+  i troche innych mniej powa¿nych zmian. zdarzenie ,,blocked'' (sz)
+- zmienna ,,events_delay'' (sz)
 - usuniêcie ekgsearch (sz)
 - poprawka wy¶wietlania tabów (w)
 - dodanie parametru do /save, który mówi, gdzie zapisaæ konfiguracjê (w)

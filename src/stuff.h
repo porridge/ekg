@@ -54,13 +54,14 @@ enum event_t {
 	EVENT_QUEUED = 4096,
 	EVENT_NEW_MAIL = 8192,
 	EVENT_QUERY = 16384,
+	EVENT_BLOCKED = 32768,
 
-	EVENT_ALL = 32767,	/* uaktualniaæ za ka¿d± zmian± */
+	EVENT_ALL = 65535,	/* uaktualniaæ za ka¿d± zmian± */
 
-	INACTIVE_EVENT = 32768	/* nieaktywne zdarzenie */
+	INACTIVE_EVENT = 65536	/* nieaktywne zdarzenie */
 };
 
-#define EVENT_LABELS_MAX 17	/* uaktualniæ ! */
+#define EVENT_LABELS_MAX 18	/* uaktualniæ ! */
 struct event_label event_labels[EVENT_LABELS_MAX];
 
 struct process {
@@ -229,6 +230,7 @@ char *config_email;
 int config_emoticons;
 int config_encryption;
 int config_enter_scrolls;
+int config_events_delay;
 char *config_interface;
 int config_header_size;
 int config_keep_reason;

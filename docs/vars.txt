@@ -316,6 +316,15 @@ enter_scrolls
 	je¶li w³±czone, wci¶niêcie klawisza Enter w pustej linii spowoduje
 	przesuniêcie ekranu o jedn± liniê.
 
+events_delay
+	typ: liczba
+	domy¶lna warto¶æ: 3
+
+	okre¶la, po ilu sekundach od po³±czenia z serwerem, zaczn± dzia³aæ
+	zdarzenia zwi±zane ze zmianami stanu. chodzi o to, aby nie traktowaæ
+	pierwszych informacji o statusie osób po po³±czeniu jako zmianê ich
+	stanu.
+
 header_size
 	typ: liczba
 	domy¶lna warto¶æ: 0
