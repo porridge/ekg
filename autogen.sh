@@ -8,3 +8,4 @@ aclocal -I m4
 autoheader
 autoconf
 test x$NOCONFIGURE = x && echo "Running ./configure $ARGS" && ./configure $ARGS
+
