@@ -433,7 +433,7 @@ char **array_make(const char *string, const char *sep, int max, int trim, int qu
 				break;
 		}
 
-		if ((!last || max == 1) && quotes && (*p == '\'' || *p == '\"')) {
+		if (!last && quotes && (*p == '\'' || *p == '\"')) {
 			char sep = *p;
 
 			for (q = p + 1, len = 0; *q; q++, len++) {
