@@ -3812,7 +3812,7 @@ int binding_key(struct binding *b, const char *key, int add)
 	__key("Escape", 27, 0);
 	__key("Home", KEY_HOME, KEY_FIND);
 	__key("End", KEY_END, KEY_SELECT);
-	bindings[KEY_LL] = bindings[KEY_END];
+	binding_map[KEY_LL] = binding_map[KEY_END];
 	__key("Delete", KEY_DC, 0);
 	__key("Backspace", KEY_BACKSPACE, 127);
 	__key("Tab", 9, 0);
