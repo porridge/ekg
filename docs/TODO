@@ -9,6 +9,8 @@ rozwi±zanie.
   - sniffn±æ rejestracjê konta, zmieni³a siê (Carol)
 
 * klient:
+  - mo¿liwy wyciek pamiêci - parê raportów, i¿ EKG po paru dniach u¿ytkowania
+    ro¶nie do ogromnych rozmiarów (pamiêciowo) (dredzik)
   - b³±d przy query maj±cym utworzyæ konferencjê, np:
     /query "Imiê Nazwisko",nick wy¶le komunikat zamiast tworzyæ konferncjê (del)
   - informcja o opisie w /find (scooty/w)
