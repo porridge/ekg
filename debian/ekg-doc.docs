@@ -6,7 +6,7 @@ docs/README
 docs/TODO
 docs/ULOTKA
 docs/api.txt
-ChangeLog
+changelog
 docs/dcc-protocol.txt
 docs/dcc.txt
 docs/devel-hints.txt
@@ -19,3 +19,4 @@ docs/vars.txt
 docs/emoticons.txt
 docs/emoticons.sample
 docs/voip.txt
+docs/ui.txt

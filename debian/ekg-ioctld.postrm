@@ -4,3 +4,4 @@ if [ -x /usr/bin/update-menus ]; then
 fi
 
 #DEBHELPER#
+

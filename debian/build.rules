@@ -1,0 +1,58 @@
+#!/usr/bin/make -f
+
+include debian/common.rules
+
+configure: 
+	dh_testdir
+	./configure --with-debug $(COMMONOPTS)
+
+build: configure
+	dh_testdir
+ifeq ($(BUILDLIB),yes)
+	cd lib && $(MAKE) shared static
+else
+	cd lib && $(MAKE) static
+endif
+	cd src && $(MAKE) $(ORGMAKE)
+
+install: build
+	$(install) -d $(INSDIR)
+	$(install) -d $(INSDIR)/../DEBIAN
+	$(install) -d $(INSDIR)/bin/
+	$(install) -d $(INSDIR)/share/ekg/themes/
+	$(install) -d $(INSDIR)/lib/menu/
+ifeq ($(BUILDLIB),yes)
+	$(install) -d $(LIBINSDIR)
+	$(install) -d $(LIBINSDIR)/../DEBIAN
+	$(install) -d $(LIBINSDIR)/lib/
+	$(install) -d $(LIBINSDIR)/include/
+	$(install) -d $(LIBINSDIR)/share/doc/ekg$(PACKAGE_SUFFIX)-dev/examples
+endif
+	$(install) -m 755 src/ekg $(INSDIR)/bin
+	$(install) -m 755 contrib/ekl2.sh $(INSDIR)/bin/ekl2
+	$(install) -m 644 themes/*.theme $(INSDIR)/share/ekg/themes/
+#	$(install) -m 644 debian/ekg.menu $(INSDIR)/lib/menu/ekg$(PACKAGE_SUFFIX)
+	sed "s/EKG/ekg$(PACKAGE_SUFFIX)/"<debian/ekg.menu>$(INSDIR)/lib/menu/ekg$(PACKAGE_SUFFIX)
+ifeq ($(BUILDLIB),yes)
+	$(install) -m 644 lib/libgadu.h $(LIBINSDIR)/include
+	$(install) -m 755 lib/libgadu.so.* $(LIBINSDIR)/lib
+	$(install) -m 755 lib/libgadu.a $(LIBINSDIR)/lib
+	$(install) -m 644 examples/* $(LIBINSDIR)/share/doc/ekg$(PACKAGE_SUFFIX)-dev/examples
+	ln -s libgadu.so.0.9.0 $(LIBINSDIR)/lib/libgadu.so
+	$(install) -m 644 debian/ekg-dev.shlibs debian/ekg$(PACKAGE_SUFFIX)-dev/DEBIAN/shlibs
+endif
+
+clean:
+# clean for your self.
+	$(MAKE) clean
+	rm -f src/ekg Makefile config.cache config.log config.status
+	cd lib && $(MAKE) clean
+
+binary-indep: build install
+
+binary-arch: build install
+	if [ ! -f potato-build ]; then dh_installman -pekg$(PACKAGE_SUFFIX) debian/ekg.1 debian/ekl2.1;fi
+	if [ -f potato-build ]; then dh_installmanpages -pekg$(PACKAGE_SUFFIX) debian/ekg.1 debian/ekl2.1;fi
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install configure

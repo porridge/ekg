@@ -1,0 +1,8 @@
+#!/usr/bin/make -f
+export DH_COMPAT=2
+install = /usr/bin/install
+INSDIR = `pwd`/debian/tmp/usr
+COMMONOPTS = --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --datadir=\$${prefix}/share
+
+
+

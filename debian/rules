@@ -1,88 +1,47 @@
 #!/usr/bin/make -f
-# Sample debian/rules that uses debhelper.
-# GNU copyright 1997 to 1999 by Joey Hess.
 
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
+include debian/common.rules
 
-# This is the debhelper compatability version to use.
-export DH_COMPAT=2
+BUILDTARGETS = ekg ekg-dbg ekg-ioctld
 
-install = /usr/bin/install
-INSDIR = `pwd`/debian/tmp/usr
 ISPOTATO = `apt-cache show debhelper|grep "Version: 2"`
-
-configure: configure-stamp
-configure-stamp:
+configure:
 	if [ ! -z "$(ISPOTATO)" ]; then touch potato-build;fi
 	dh_testdir
-	./configure --without-debug --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --datadir=\$${prefix}/share
+	
 
-	touch configure-stamp
-
-build: configure-stamp build-stamp
-build-stamp:
-	dh_testdir
-	$(MAKE)
-	cd lib && $(MAKE) shared static
+build: configure
 	touch build-stamp
 
-clean:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp configure-stamp
-
-	# Add here commands to clean up after the build process.
-	rm -f ekg Makefile config.cache config.log config.status
-	dh_clean
-
 install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs
 
-	$(install) -d $(INSDIR)/bin/
-	$(install) -d $(INSDIR)/lib/
-	$(install) -d $(INSDIR)/share/ekg/themes/
-	$(install) -d $(INSDIR)/share/doc/ekg-dev/examples/
-	$(install) -d $(INSDIR)/include/
-	$(install) -d $(INSDIR)/lib/menu/
-	$(install) -m 755 src/ekg $(INSDIR)/bin
-	$(install) -m 755 contrib/ekl2.sh $(INSDIR)/bin/ekl2
-	$(install) -m 444 themes/*.theme $(INSDIR)/share/ekg/themes/
-	$(install) -m 444 lib/libgadu.h $(INSDIR)/include
-	$(install) -m 755 lib/libgadu.so.* $(INSDIR)/lib
-	$(install) -m 755 lib/libgadu.a $(INSDIR)/lib
-	$(install) -m 444 examples/* $(INSDIR)/share/doc/ekg-dev/examples
-	$(install) -m 444 debian/ekg.menu $(INSDIR)/lib/menu/ekg
-	ln -s libgadu.so.0.9.0 $(INSDIR)/lib/libgadu.so
-
-# Build architecture-independent files here.
 binary-indep: build install
-# We have nothing to do by default.
 
-# Build architecture-dependent files here.
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	dh_installdocs
-	dh_movefiles
-	dh_installchangelogs -pekg debian/changelog
-	dh_installchangelogs -pekg-dev debian/changelog
-	dh_installchangelogs -pekg-doc debian/changelog
 	sed "s/\.TH\ EKG\ n/\.TH\ EKG\ 1/g"<docs/ekg.man.pl>debian/ekg.1
 	sed "s/\.TH\ EKL2\ n/\.TH\ EKL2\ 1/g"<docs/ekl2.man.pl>debian/ekl2.1
-	if [ ! -f potato-build ]; then dh_installman -pekg debian/ekg.1 debian/ekl2.1;fi
-	if [ -f potato-build ]; then dh_installmanpages -pekg;fi
-	dh_strip
+	if [ -d examples/CVS ]; then rm -fr examples/CVS;fi
+	if [ -f ChangeLog ]; then mv ChangeLog changelog;fi
+
+# build TARGET's and install files to aproperiate directories.
+	-for t in $(BUILDTARGETS);\
+	do \
+	$(MAKE) -f debian/$$t.rules binary;\
+	done
+
+# make packages
+	dh_installdocs
+#	dh_movefiles
+	dh_strip -Nekg-dbg -Nekg-dev-dbg
+	dh_installchangelogs -A
 	dh_fixperms
 	dh_compress
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
-	$(install) -m 644 debian/ekg-dev.shlibs debian/ekg-dev/DEBIAN/shlibs
 	dh_builddeb
 
 binary: binary-indep binary-arch

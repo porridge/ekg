@@ -1,27 +1,30 @@
 Source: ekg
 Section: comm
 Priority: optional
-Maintainer: Adam Kruszewski <phantom@debian.org.pl>
+Maintainer: Adam Kruszewski (Fantomik) <phantom@networkweavers.net>
 Standards-Version: 3.5.6.0
-Build-Depends: debhelper (>=2.0.86), libreadline4-dev
+Build-Depends: debhelper (>=2.0.86), libreadline4-dev, libncurses4-dev | libncurses5-dev
 
 Package: ekg
 Architecture: i386
 Depends: ${shlibs:Depends}
-Provides: gg-client
 Recommends: 
 Suggests: 
-Description: Eksperymantalny Klient G*du-G*du
- Eksperymantalny Klient G*du-G*du stworzony przez Wojtka Kaniewskiego.
+Conflicts: ekg-ioctld, ekg-dbg
+Description: An instant messenger compatible with Gadu Gadu
+ Eksperymentalny Klient Gadu-Gadu is an instant messanger
+ compatible with Gnu Gadu protocol, very popular in Poland.
 
 Package: ekg-doc
 Architecture: all
 Depends:
 Recommends: ekg
 Suggests: 
-Description: Eksperymantalny Klient G*du-G*du (Dokumentacja)
- Eksperymantalny Klient G*du-G*du stworzony przez Wojtka Kaniewskiego.
- Pakiet zawiera dokumentacje zarowno dla pakietu ekg jak i ekg-dev
+Description: An instant messenger compatible with Gadu Gadu
+ Eksperymentalny Klient Gadu-Gadu is an instant messanger
+ compatible with Gnu Gadu protocol, very popular in Poland.
+ .
+ Full documentation of EKG is included in this package.
 
 Package: ekg-dev
 Architecture: i386
@@ -29,7 +32,52 @@ Provides: libgg
 Depends: ${shlibs:Depends}
 Recommends: ekg
 Suggests: ekg-doc
-Description: Eksperymantalny Klient G*du-G*du (libgg)
- Eksperymantalny Klient G*du-G*du stworzony przez Wojtka Kaniewskiego.
- Pakiet zawiera biblioteke libgg potrzebna do kompilacji niektorych
- klientow g*du-g*du (np. Kadu)
+Description: An instant messenger compatible with Gadu Gadu
+ Eksperymentalny Klient Gadu-Gadu is an instant messanger
+ compatible with Gnu Gadu protocol, very popular in Poland.
+ .
+ This package includes libgadu, required to build some
+ Gadu-Gadu compatible instant messangers (ex. kadu)
+
+Package: ekg-ioctld
+Architecture: i386
+Depends: ${shlibs:Depends}
+Provides: ekg
+Recommends: 
+Suggests: 
+Conflicts: ekg, ekg-dbg
+Description: An instant messenger compatible with Gadu Gadu
+ Eksperymentalny Klient Gadu-Gadu is an instant messanger
+ compatible with Gnu Gadu protocol, very popular in Poland.
+ .
+ This version is build with ioctl daemon, which allows ekg
+ to control led's on your keyboard, and do other funny stuff
+ like that.
+
+Package: ekg-dbg
+Architecture: i386
+Depends: ${shlibs:Depends}
+Provides: ekg
+Recommends: 
+Suggests: 
+Conflicts: ekg, ekg-ioctld
+Description: An instant messenger compatible with Gadu Gadu
+ Eksperymentalny Klient Gadu-Gadu is an instant messanger
+ compatible with Gnu Gadu protocol, very popular in Poland.
+ .
+ This package was created for debugging purposes (without
+ strip, etc)
+
+Package: ekg-dbg-dev
+Architecture: i386
+Provides: libgg
+Depends: ${shlibs:Depends}
+Recommends: ekg
+Suggests: ekg-doc
+Description: An instant messenger compatible with Gadu Gadu
+ Eksperymentalny Klient Gadu-Gadu is an instant messanger
+ compatible with Gnu Gadu protocol, very popular in Poland.
+ .
+ This package includes libgadu, required to build some
+ Gadu-Gadu compatible instant messangers (ex. kadu)
+ This is non stripped version. (for debugging purposes)

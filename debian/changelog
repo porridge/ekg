@@ -1,6 +1,18 @@
 ekg (CVS-1) unstable; urgency=low
-  * added changelog entry for automatic snapshot building.
- -- Adam Kruszewski <phantom@debian.org.pl>  Thu, 09 May 2002 14:41:04 +0000
+  * changelog entry for automatic snapshot building.
+ -- Adam Kruszewski (Fantomik) <phantom@networkweavers.net>  Tue,  9 Jul 2002 21:56:15 +0000
+
+ekg (20020709-1) unstable; urgency=low
+  * Maintainter e-mail address changed.
+  * added ekg-ioctld (--with-ioctld), ekg-dbg and ekg-dev-dbg (for debugging
+    purposes)
+  * modified packages build scripts for simplify maintaince.
+ -- Adam Kruszewski (Fantomik) <phantom@networkweavers.net>  Tue,  9 Jul 2002 21:56:15 +0000
+
+ekg (20020708-2) unstable; urgency=low
+  * fixed problem with broken man pages (uh. i haven't escaped a dot,
+    and forgot about one :/)
+ -- Adam Kruszewski <phantom@debian.org.pl>  Tue,  9 Jul 2002 00:54:47 +0000
 
 ekg (20020708-2) unstable; urgency=low
   * fixed problem with broken man pages (uh. i haven't escaped a dot,
