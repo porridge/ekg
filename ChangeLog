@@ -10,6 +10,10 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawka statusbara (sdas/w)
 - /find bez parametrów szuka nas samych (sdas/w)
 - puste linie nie s± zapisywane w historii (sdas/w)
+- usuniêcie leaka w add_send_nick() (w)
+- usuniêcie leaka w ui-ncurses (w)
+- uconstowienie command_exec() i argumentów komend (w)
+- poprawka segfaulta przy nieudanym szukaniu (wojboj/w)
 
 // 2002-09-19
 

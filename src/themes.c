@@ -102,7 +102,7 @@ const char *format_find(const char *name)
 char *va_format_string(const char *format, va_list ap)
 {
 	static int dont_resolve = 0;
-	string_t buf;
+	string_t buf = string_init(NULL);
 	const char *p, *args[9];
 	int i, argc = 0;
 
@@ -178,9 +178,6 @@ char *va_format_string(const char *format, va_list ap)
 		dont_resolve = 0;
 	}
 	
-	if (!(buf = string_init("")))
-		return NULL;
-
 	p = format;
 	
 	while (*p) {
@@ -345,6 +342,9 @@ char *va_format_string(const char *format, va_list ap)
 
 		p++;
 	}
+
+	if (!dont_resolve && no_prompt_cache)
+		theme_cache_reset();
 
 	return string_free(buf, 0);
 }
@@ -652,10 +652,7 @@ void theme_free()
 	list_destroy(formats, 1);
 	formats = NULL;
 
-	xfree(prompt_cache);
-	xfree(prompt2_cache);
-	xfree(error_cache);
-	prompt_cache = prompt2_cache = error_cache = NULL;
+	theme_cache_reset();
 }
 
 /*

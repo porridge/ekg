@@ -54,10 +54,11 @@ COMMAND(cmd_modify);
 
 char *send_nicks[SEND_NICKS_MAX] = { NULL };
 int send_nicks_count = 0, send_nicks_index = 0;
+int quit_command = 0;
 
 list_t commands = NULL;
 
-int match_arg(char *arg, char shortopt, char *longopt, int longoptlen)
+int match_arg(const char *arg, char shortopt, const char *longopt, int longoptlen)
 {
 	if (!arg || *arg != '-')
 		return 0;
@@ -83,24 +84,23 @@ int match_arg(char *arg, char shortopt, char *longopt, int longoptlen)
  */
 void add_send_nick(const char *nick)
 {
-	int i, count = send_nicks_count, dont_add = 0;
+	int i;
 
 	for (i = 0; i < send_nicks_count; i++)
 		if (!strcmp(nick, send_nicks[i])) {
-			count = i;
-			dont_add = 1;
+			remove_send_nick(nick);
 			break;
 		}
-	
-	if (count == SEND_NICKS_MAX) {
-		free(send_nicks[SEND_NICKS_MAX - 1]);
-		count--;
+
+	if (send_nicks_count == SEND_NICKS_MAX) {
+		xfree(send_nicks[SEND_NICKS_MAX - 1]);
+		send_nicks_count--;
 	}
 
-	for (i = count; i > 0; i--)
+	for (i = send_nicks_count; i > 0; i--)
 		send_nicks[i] = send_nicks[i - 1];
 
-	if (send_nicks_count != SEND_NICKS_MAX && !dont_add)
+	if (send_nicks_count != SEND_NICKS_MAX)
 		send_nicks_count++;
 	
 	send_nicks[0] = xstrdup(nick);
@@ -473,13 +473,18 @@ COMMAND(cmd_exec)
 	int pid;
 
 	if (params[0]) {
+		char *tmp;
+
 		if (!(pid = fork())) {
 			execl("/bin/sh", "sh", "-c", (params[0][0] == '^') ? params[0] + 1 : params[0], NULL);
 			exit(1);
 		}
 		if (params[0][0] == '^')
-			params[0][0] = 2;
+			tmp = saprintf("\002%s", params[0] + 1);
+		else
+			tmp = xstrdup(params[0]);
 		process_add(pid, params[0]);
+		xfree(tmp);
 	} else {
 		for (l = children; l; l = l->next) {
 			struct process *p = l->data;
@@ -1047,7 +1052,7 @@ COMMAND(cmd_list)
 COMMAND(cmd_msg)
 {
 	struct userlist *u;
-	char **nicks = NULL, **p, *msg, *escaped;
+	char **nicks = NULL, **p, *msg, *escaped, *nick;
 	uin_t uin;
 	int count, chat = (!strcasecmp(name, "chat"));
 
@@ -1061,31 +1066,31 @@ COMMAND(cmd_msg)
 		return;
 	}
 
-	if (params[0][0] == '@' || strchr(params[0], ',')) {
-		struct conference *c = conference_create(params[0]);
+	nick = xstrdup(params[0]);
+
+	if (*nick == '@' || strchr(nick, ',')) {
+		struct conference *c = conference_create(nick);
 		list_t l;
 
-		if (!c)
-			return;
-		
-		xfree(params[0]);
-		params[0] = xstrdup(c->name);
+		xfree(nick);
+		nick = xstrdup(c->name);
 
 		for (l = c->recipients; l; l = l->next)
 			array_add(&nicks, xstrdup(itoa(*((uin_t *) (l->data)))));
-	} else if (params[0][0] == '#') {
-		struct conference *c = conference_find(params[0]);
+	} else if (*nick == '#') {
+		struct conference *c = conference_find(nick);
 		list_t l;
 
 		if (!c) {
-			print("conferences_noexist", params[0]);
+			print("conferences_noexist", nick);
+			xfree(nick);
 			return;
 		}
 
 		for (l = c->recipients; l; l = l->next)
 			array_add(&nicks, xstrdup(itoa(*((uin_t *) (l->data)))));
 	} else 
-		nicks = array_make(params[0], ",", 0, 0, 0);
+		nicks = array_make(nick, ",", 0, 0, 0);
 
 	count = array_count(nicks);
 	msg = xstrdup(params[1]);
@@ -1127,7 +1132,7 @@ COMMAND(cmd_msg)
 		xfree(uins);
 	}
 
-	add_send_nick(params[0]);
+	add_send_nick(nick);
 
 	if (config_display_sent) {
 		struct gg_event e;
@@ -1141,7 +1146,7 @@ COMMAND(cmd_msg)
 
 		memset(&u, 0, sizeof(u));
 		u.uin = 0;
-		u.display = xstrdup(params[0]);
+		u.display = xstrdup(nick);
 		
 		print_message(&e, &u, 3);
 
@@ -1149,7 +1154,8 @@ COMMAND(cmd_msg)
 		xfree(u.display);
 	}
 
-	free(msg);
+	xfree(msg);
+	xfree(nick);
 	
 	unidle();
 
@@ -1169,9 +1175,10 @@ COMMAND(cmd_save)
 
 COMMAND(cmd_set)
 {
-	list_t l;
+	const char *arg;
 	int unset = 0;
-	char *arg;
+	char *value = NULL;
+	list_t l;
 
 	if ((arg = params[0]) && *arg == '-') {
 		unset = 1;
@@ -1181,8 +1188,7 @@ COMMAND(cmd_set)
 	if (params[0] && params[1]) {
 		char **tmp = array_make(params[1], "", 0, 0, 1);
 
-		xfree(params[1]);
-		params[1] = tmp[0];
+		value = tmp[0];
 		tmp[0] = NULL;
 		array_free(tmp);
 	}
@@ -1258,9 +1264,9 @@ COMMAND(cmd_set)
 			print("variable_not_found", params[0]);
 	} else {
 		theme_cache_reset();
-		switch (variable_set(arg, (unset) ? NULL : params[1], 0)) {
+		switch (variable_set(arg, (unset) ? NULL : value, 0)) {
 			case 0: {
-				char *my_params[2] = { (!unset) ? params[0] : params[0] + 1, NULL };
+				const char *my_params[2] = { (!unset) ? params[0] : params[0] + 1, NULL };
 
 				cmd_set("set-show", my_params);
 				config_changed = 1;
@@ -1280,7 +1286,7 @@ COMMAND(cmd_set)
 COMMAND(cmd_sms)
 {
 	struct userlist *u;
-	char *number = NULL;
+	const char *number = NULL;
 
 	if (!params[1]) {
 		print("not_enough_params", name);
@@ -1354,7 +1360,11 @@ COMMAND(cmd_quit)
 
 	ui_event("disconnected");
 
-	ekg_exit();
+	/* nie wychodzimy tutaj, ¿eby command_exec() mia³o szansê zwolniæ
+	 * u¿ywan± przez siebie pamiêæ. */
+	quit_command = 1;
+
+	return;
 }
 
 COMMAND(cmd_dcc)
@@ -1948,14 +1958,9 @@ COMMAND(cmd_query)
 	if (params[0] && (params[0][0] == '@' || strchr(params[0], ','))) {
 		struct conference *c = conference_create(params[0]);
 
-		if (!c)
-			return;
-		
-		xfree(params[0]);
-		params[0] = xstrdup(c->name);
-	}
-
-	ui_event("command", "query", params[0]);
+		ui_event("command", "query", c->name);
+	} else
+		ui_event("command", "query", params[0]);
 }
 
 COMMAND(cmd_on)
@@ -2046,22 +2051,22 @@ char *strip_spaces(char *line)
  * wykonuje polecenie zawarte w linii tekstu.
  *
  *  - target - w którym oknie nast±pi³o (NULL je¶li to nie query)
- *  - line - linia tekstu.
+ *  - xline - linia tekstu.
  *
  * zmienia zawarto¶æ bufora line.
  */
-void command_exec(char *target, char *line)
+void command_exec(const char *target, const char *xline)
 {
-	char *cmd = NULL, *tmp, *p = NULL, short_cmd[2] = ".", *last_name = NULL, *last_params = NULL, *line_save = NULL;
+	char *cmd = NULL, *tmp, *p = NULL, short_cmd[2] = ".", *last_name = NULL, *last_params = NULL, *line_save = NULL, *line = NULL;
 	command_func_t *last_abbr = NULL;
 	int abbrs = 0;
 	int correct_command = 0;
 	list_t l;
 
-	if (!line)
+	if (!xline)
 		return;
 
-	if (!strcmp(line, "")) {
+	if (!strcmp(xline, "")) {
 		if (batch_mode && !batch_line) {
 			quit_message_send = 1;
 			ekg_exit();
@@ -2069,7 +2074,7 @@ void command_exec(char *target, char *line)
 		return;
 	}
 
-	if (target && *line != '/') {
+	if (target && *xline != '/') {
 	
 		/* wykrywanie przypadkowo wpisanych poleceñ */
 		if (config_query_commands) {
@@ -2077,8 +2082,8 @@ void command_exec(char *target, char *line)
 				struct command *c = l->data;
 				int l = strlen(c->name);
 
-				if (l > 2 && !strncasecmp(line, c->name, l)) {
-					if (!line[l] || isspace(line[l])) {
+				if (l > 2 && !strncasecmp(xline, c->name, l)) {
+					if (!xline[l] || isspace(xline[l])) {
 						correct_command = 1;
 						break;
 					}
@@ -2087,9 +2092,9 @@ void command_exec(char *target, char *line)
 		}
 
 		if (!correct_command) {
-			char *params[] = { target, line, NULL };
+			const char *params[] = { target, xline, NULL };
 
-			if (strcmp(line, ""))
+			if (strcmp(xline, ""))
 				cmd_msg("chat", params);
 
 			return;
@@ -2098,7 +2103,8 @@ void command_exec(char *target, char *line)
 	
 	send_nicks_index = 0;
 
-	line = line_save = xstrdup(strip_spaces(line));
+	line = line_save = xstrdup(xline);
+	line = strip_spaces(line);
 	
 	if (*line == '/')
 		line++;
@@ -2148,10 +2154,13 @@ void command_exec(char *target, char *line)
 		int len = strlen(last_params);
 
 		par = array_make(p, " \t", len, 1, 1);
-		(last_abbr)(last_name, par);
+		(last_abbr)(last_name, (const char**) par);
 		array_free(par);
 
 		xfree(line_save);
+
+		if (quit_command)
+			ekg_exit();
 
 		return;
 	}
@@ -2312,7 +2321,7 @@ COMMAND(cmd_conference)
 	if (!params[0] || match_arg(params[0], 'l', "list", 2) || params[0][0] == '#') {
 		list_t l, r;
 		int count = 0;
-		char *cname = (params[0] && params[0][0] == '#') ? params[0] : NULL;
+		const char *cname = (params[0] && params[0][0] == '#') ? params[0] : NULL;
 
 		for (l = conferences; l; l = l->next) {
 			struct conference *c = l->data;

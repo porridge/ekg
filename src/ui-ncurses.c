@@ -720,6 +720,7 @@ static void ui_ncurses_deinit()
 {
 	static int done = 0;
 	list_t l;
+	int i;
 
 	if (done)
 		return;
@@ -741,6 +742,18 @@ static void ui_ncurses_deinit()
 	delwin(status);
 	endwin();
 
+	for (i = 0; i < HISTORY_MAX; i++)
+		if (history[i] != line)
+			xfree(history[i]);
+
+	if (lines) {
+		for (i = 0; lines[i]; i++)
+			xfree(lines[i]);
+
+		xfree(lines);
+	}
+
+	xfree(line);
 	xfree(yanked);
 
 	done = 1;
@@ -1286,9 +1299,6 @@ static void ui_ncurses_loop()
 				
 			case KEY_ENTER:	/* Enter */
 			case 13:
-			{
-				char *tmp;
-
 				if (lines) {
 					int i;
 
@@ -1309,10 +1319,8 @@ static void ui_ncurses_loop()
 					break;
 				}
 				
-				tmp = xstrdup(line);
-				
-				command_exec(window_current->target, tmp);
-				xfree(tmp);
+				command_exec(window_current->target, line);
+
 				if (strcmp(line, "")) {
 					if (history[0] != line)
 						xfree(history[0]);
@@ -1325,7 +1333,6 @@ static void ui_ncurses_loop()
 				line[0] = 0;
 				line_adjust();
 				break;	
-			}
 
 			case 'U' - 64:	/* Ctrl-U */
 				xfree(yanked);

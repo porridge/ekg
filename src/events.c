@@ -695,7 +695,6 @@ void handle_search(struct gg_http *h)
 
 	if (gg_search_watch_fd(h) || h->state == GG_STATE_ERROR) {
 		print("search_failed", strerror(errno));
-		free(h->user_data);
 		list_remove(&watches, h, 0);
 		gg_search_request_free((struct gg_search_request*) h->user_data);
 		gg_search_free(h);
