@@ -1272,9 +1272,6 @@ int main(int argc, char **argv)
 	if (set_private)
 		config_status |= GG_STATUS_FRIENDS_MASK;
 
-	/* uaktualnij wszystko, co trzeba */
-	change_status(config_status, config_reason, 2);
-
 	/* je¶li ma byæ theme, niech bêdzie theme */
 	if (load_theme)
 		theme_read(load_theme, 1);
