@@ -326,7 +326,7 @@ void binding_free();
 int buffer_add(int type, const char *target, const char *line, int max_lines);
 int buffer_count(int type);
 char *buffer_flush(int type, const char *target);
-char *buffer_pop(int type);
+char *buffer_tail(int type);
 void buffer_free();
 
 void changed_backlog_size(const char *var);

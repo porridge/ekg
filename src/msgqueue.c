@@ -161,7 +161,7 @@ int msg_queue_remove_uin(uin_t uin)
 /*
  * msg_queue_free()
  *
- * pozbywa siê kolejki wiadomo¶ci.
+ * zwalnia pamiêæ po kolejce wiadomo¶ci.
  */
 void msg_queue_free()
 {

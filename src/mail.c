@@ -140,7 +140,7 @@ int check_mail_update(const char *s, int more)
  * check_mail_mbox()
  *
  * tworzy dzieciaka, który sprawdza wszystkie pliki typu
- * mbox i liczy ile jest nowych wiadomo¶ci, potem zwraca
+ * mbox i liczy, ile jest nowych wiadomo¶ci, potem zwraca
  * wynik rurk±. sprawdza tylko te pliki, które by³y
  * modyfikowane od czasu ostatniego sprawdzania.
  *
@@ -408,7 +408,7 @@ int check_mail_maildir()
 /*
  * changed_check_mail()
  *
- * wywo³ywane przy zmianie zmiennej check_mail.
+ * wywo³ywane przy zmianie zmiennej ,,check_mail''.
  */
 void changed_check_mail(const char *var)
 {
@@ -446,7 +446,7 @@ void changed_check_mail(const char *var)
 /*
  * changed_check_mail_folders()
  *
- * wywo³ywane przy zmianie check_mail_folders.
+ * wywo³ywane przy zmianie ,,check_mail_folders''.
  */
 void changed_check_mail_folders(const char *var)
 {
@@ -511,7 +511,7 @@ void changed_check_mail_folders(const char *var)
 /*
  * check_mail_free()
  * 
- * czy¶ci pamiêæ po li¶cie folderów z poczt±.
+ * zwalnia pamiêæ po li¶cie folderów z poczt±.
  */
 void check_mail_free()
 {

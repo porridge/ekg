@@ -229,7 +229,7 @@ int config_read(const char *filename)
  * czyta z pliku ~/.gg/config jedn± zmienn± nie interesuj±c siê typem,
  * znaczeniem, ani poprawno¶ci±.
  *
- *  - name - nazwa zmiennej,
+ *  - name - nazwa zmiennej.
  *
  * zaalokowany bufor z tre¶ci± zmiennej lub NULL, je¶li nie znaleziono.
  */

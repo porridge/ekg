@@ -606,7 +606,7 @@ uin_t str_to_uin(const char *text)
  * valid_nick()
  *
  * sprawdza, czy nick nie zawiera znaków specjalnych,
- * co mog³oby powodowaæ problemy.
+ * które mog³yby powodowaæ problemy.
  *
  * zwraca 1 je¶li nick jest w porz±dku, w przeciwnym razie 0.
  */

@@ -334,7 +334,7 @@ int alias_remove(const char *name, int quiet)
 /*
  * alias_free()
  *
- * usuwa pamiêæ zajêt± przez aliasy.
+ * zwalnia pamiêæ zajêt± przez aliasy.
  */
 void alias_free()
 {
@@ -541,13 +541,13 @@ int buffer_count(int type)
 }
 
 /*
- * buffer_pop()
+ * buffer_tail()
  *
- * zwraca zaalokowany ³añcuch z pocz±tku kolejki buforów
- * danego typu i usuwa ten element z kolejki. zwraca
- * NULL, gdy kolejka jest pusta.
+ * zwraca najstarszy element buforowej kolejki, który
+ * nale¿y zwolniæ. usuwa go z kolejki. zwraca NULL,
+ * gdy kolejka jest pusta.
  */
-char *buffer_pop(int type)
+char *buffer_tail(int type)
 {
 	char *str = NULL;
 	list_t l;
@@ -572,7 +572,7 @@ char *buffer_pop(int type)
 /*
  * buffer_free()
  * 
- * czy¶ci pamiêæ po buforach.
+ * zwalnia pamiêæ po buforach.
  */
 void buffer_free()
 {
@@ -739,8 +739,7 @@ void changed_theme(const char *var)
 			if (!in_autoexec)
 				print("theme_loaded", config_theme);
 		} else
-			if (!in_autoexec)
-				print("error_loading_theme", strerror(errno));
+			print("error_loading_theme", strerror(errno));
 	}
 }
 
@@ -797,7 +796,6 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 {
 	struct conference c;
 	char **nicks, **p;
-	char *buf, *tmp;
 	list_t l;
 	int i, count;
 
@@ -806,17 +804,10 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 	if (!name || !nicklist)
 		return NULL;
 
-	buf = xstrdup(nicklist);
-	tmp = buf;
-	buf = strip_spaces(buf);
-	
-	if (buf[0] == ',' || buf[strlen(buf) - 1] == ',') {
+	if (nicklist[0] == ',' || nicklist[strlen(nicklist) - 1] == ',') {
 		printq("invalid_params", "chat");
-		xfree(tmp);
 		return NULL;
 	}
-
-	xfree(tmp);
 
 	nicks = array_make(nicklist, " ,", 0, 1, 0);
 
@@ -852,16 +843,13 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 				}
 			}
 
+			xfree(gname);
+
 			if (!nig) {
 				printq("group_empty", gname);
 				printq("conferences_not_added", name);
-
-				xfree(gname);
-
 				return NULL;
 			}
-
-			xfree(gname);
 		}
 	}
 
@@ -890,7 +878,6 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 			continue;
 		}
 
-
 		list_add(&(c.recipients), &uin, sizeof(uin));
 		i++;
 	}
@@ -914,7 +901,7 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 /*
  * conference_remove()
  *
- * usuwa konferencje z listy konferencji.
+ * usuwa konferencjê z listy konferencji.
  *
  *  - name - konferencja lub NULL dla wszystkich,
  *  - quiet.
@@ -960,9 +947,9 @@ int conference_remove(const char *name, int quiet)
 /*
  * conference_create()
  *
- * tworzy nowa konferencje z wygenerowana nazwa.
+ * tworzy now± konferencjê z wygenerowan± nazw±.
  *
- *  - nicks - lista nikow tak, jak dla polecenia conference.
+ *  - nicks - lista ników tak, jak dla polecenia conference.
  */
 struct conference *conference_create(const char *nicks)
 {
@@ -1049,17 +1036,15 @@ struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int co
  */
 int conference_set_ignore(const char *name, int flag, int quiet)
 {
-	struct conference *c = NULL;
-
-	c = conference_find(name);
+	struct conference *c = conference_find(name);
 
 	if (!c) {
 		printq("conferences_noexist", name);
 		return -1;
 	}
 
-	c->ignore = flag ? 1 : 0;
-	printq(flag ? "conferences_ignore" : "conferences_unignore", name);
+	c->ignore = flag;
+	printq((flag ? "conferences_ignore" : "conferences_unignore"), name);
 
 	return 0;
 }
@@ -1104,7 +1089,7 @@ int conference_rename(const char *oldname, const char *newname, int quiet)
 /*
  * conference_free()
  *
- * usuwa pamiêæ zajêt± przez konferencje.
+ * zwalnia pamiêæ zajêt± przez konferencje.
  */
 void conference_free()
 {
@@ -1460,6 +1445,7 @@ const char *event_format(int flags)
 const char *event_format_target(const char *target)
 {
 	struct userlist *u;
+	static char buf[200];
 	uin_t uin;
 
 	if (!target)
@@ -1473,8 +1459,10 @@ const char *event_format_target(const char *target)
 
 	if (uin)
 		return format_user(uin);
-	else
-		return target;
+	else {
+		strlcpy(buf, target, sizeof(buf));
+		return buf;
+	}
 }
 
 /*
@@ -2120,7 +2108,7 @@ int sms_away_check(uin_t uin)
 /*
  * sms_away_free()
  *
- * pozbywa siê listy sms_away.
+ * zwalnia pamiêæ po li¶cie ,,sms_away''
  */
 void sms_away_free()
 {

@@ -652,8 +652,11 @@ void ekg_wait_for_key()
 				if (pid == speech_pid) {
 					speech_pid = 0;
 
+					if (!config_speech_app)
+						xfree(buffer_flush(BUFFER_SPEECH, NULL));
+
 					if (buffer_count(BUFFER_SPEECH) && !WEXITSTATUS(status)) {
-						char *str = buffer_pop(BUFFER_SPEECH);
+						char *str = buffer_tail(BUFFER_SPEECH);
 						say_it(str);
 						xfree(str);
 					}
