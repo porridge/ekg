@@ -1,0 +1,5 @@
+?package(ekg):\
+needs=text\
+section=Apps/Net\
+title="Eksperymentalny Klient Gadu Gadu"\
+command="/usr/bin/ekg"

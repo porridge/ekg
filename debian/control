@@ -1,0 +1,35 @@
+Source: ekg
+Section: comm
+Priority: optional
+Maintainer: Adam Kruszewski <phantom@debian.org.pl>
+Standards-Version: 3.5.6.0
+Build-Depends: debhelper (>=2.0.86), libreadline4-dev
+
+Package: ekg
+Architecture: i386
+Depends: ${shlibs:Depends}
+Provides: gg-client
+Recommends: 
+Suggests: 
+Description: Eksperymantalny Klient G*du-G*du
+ Eksperymantalny Klient G*du-G*du stworzony przez Wojtka Kaniewskiego.
+
+Package: ekg-doc
+Architecture: all
+Depends:
+Recommends: ekg
+Suggests: 
+Description: Eksperymantalny Klient G*du-G*du (Dokumentacja)
+ Eksperymantalny Klient G*du-G*du stworzony przez Wojtka Kaniewskiego.
+ Pakiet zawiera dokumentacje zarowno dla pakietu ekg jak i ekg-dev
+
+Package: ekg-dev
+Architecture: i386
+Provides: libgg
+Depends: ${shlibs:Depends}
+Recommends: ekg
+Suggests: ekg-doc
+Description: Eksperymantalny Klient G*du-G*du (libgg)
+ Eksperymantalny Klient G*du-G*du stworzony przez Wojtka Kaniewskiego.
+ Pakiet zawiera biblioteke libgg potrzebna do kompilacji niektorych
+ klientow g*du-g*du (np. Kadu)

@@ -1,0 +1,90 @@
+ekg (20020507-1) unstable; urgency=low
+  * synched with upstream version.
+  * fixed all lintian errors and warnings but:
+    ekg: binary-without-manpage ekl2.pl
+ -- Adam Kruszewski <phantom@debian.org.pl>  Thu, 07 May 2002 22:22:13 +0000
+
+ekg (20020501-1) unstable; urgency=low
+  * synched with upstream version.
+ -- Adam Kruszewski <phantom@debian.org.pl>  Thu, 02 May 2002 13:06:45 +0000
+
+ekg (20020318-1) unstable; urgency=low
+  * synched with upstream version.
+  * ekg-dev does not conflicts with libggi0-dev anymore.
+ -- Adam Kruszewski <phantom@debian.org.pl>  Tue, 19 Mar 2002 20:58:10 +0200
+
+ekg (20020126-1) unstable; urgency=low
+  * synched with upstream version.
+  * update-menus is now executed after install and remove.
+ -- Adam Kruszewski <phantom@debian.org.pl>  Tue, 29 Jan 2002 13:23:45 +0200
+
+ekg (20020110-1) unstable; urgency=low
+  * synched with upstream version.
+  * added conflict with libgii0-dev (which includes libgg.so :/) [thx Eyck]
+ -- Adam Kruszewski <phantom@debian.org.pl>  Mon, 15 Jan 2002 15:11:03 +0200
+
+ekg (20011219-1) unstable; urgency=low
+  * nothing but synched with new cvs version.
+ -- Adam Kruszewski (Fantomik) <phantom@linux.bydg.org>  Sun, 23 Dec 2001 00:46:21 +0200
+
+ekg (20011207-1) unstable; urgency=low
+  * new cvs version (it has segfault in /find procedure fixed)
+  * added --without-debug option to ./configure
+ -- Adam Kruszewski (Fantomik) <phantom@linux.bydg.org>  Fri,7 Dec 2001 16:48:58 +0200
+
+ekg (20011206-1) unstable; urgency=low
+  * new cvs version
+ -- Adam Kruszewski (Fantomik) <phantom@linux.bydg.org>  Thu,6 Dec 2001 23:25:12 +0200
+
+ekg (20011130-1) unstable; urgency=low
+  * new cvs version
+  * little fixes to merge source directory tree with cvs tree.
+ -- Adam Kruszewski (Fantomik) <phantom@linux.bydg.org>  Sat,1 Dec 2001  00:11:12 +0200
+
+
+ekg (20011121-2) unstable; urgency=low
+  * added debian menu for ekg.
+  * fixed some errors reported by lintian.  
+ -- Adam Kruszewski (Fantomik) <phantom@linux.bydg.org>  Sun,25 Nov 2001  14:07:57 +0200
+
+ekg (20011121-1) unstable; urgency=low
+  * New cvs snapshot of ekg debianized ;)
+  * changed location of *.theme files, now they are in /usr/share/ekg/themes
+  
+ -- Adam Kruszewski (Fantomik) <phantom@linux.bydg.org>  Sat,24 Nov 2001  10:41:23 +0200
+
+ekg (20011117-1) unstable; urgency=low
+  * New cvs snapshot of ekg debianized ;)
+  * added feeg theme by Piotr Figiel <feeg@psychodelic.org>
+    (elluin said it will be merged to orginal sources as soon as possible)
+  * Big Thanks to Grzegorz Dacka <unc@4it.pl> for giving me unrestricted
+    shell account on his potato box.
+
+ -- Adam Kruszewski (Fantomik) <phantom@linux.bydg.org>  Sun,18 Nov 2001  17:47:58 +0200
+
+ekg (20011102-2) unstable; urgency=low
+
+  * Changed package sources, now it can be compilled under potato
+    with debhelper < 3.0.0
+    Peoples I would thank to for this:
+     - Krzysztof Gajdemski <songo@vi.pl> 
+       for very usefull informations about differences in debhelper
+       3.x and older (he also builded independently potato packages)
+     - Albert Czarnecki ufo@z.stalowka.com
+       for building and testing those packages on `raw` potato
+
+ -- Adam Kruszewski (Fantomik) <phantom@linux.bydg.org>  Mon, 12 Nov 2001 23:46:12 +0200
+
+ekg (20011102-1) unstable; urgency=low
+
+  * Small changes in control file, breaking to 3 packages.
+ -- Adam Kruszewski (Fantomik) <phantom@linux.bydg.org>  Sat, 3 Nov 2001 09:11:29 +0200
+
+ekg (20011102) unstable; urgency=low
+  * Initial Release.
+
+ -- Adam Kruszewski (Fantomik) <phantom@linux.bydg.org>  Fri, 2 Nov 2001 00:12:57 +0200
+
+Local variables:
+mode: debian-changelog
+End:

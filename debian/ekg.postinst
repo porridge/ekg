@@ -1,0 +1,11 @@
+#!/bin/sh
+if [ -x /usr/bin/update-menus ]; then
+    /usr/bin/update-menus /usr/lib/menu/ekg
+fi
+if [ "$1" = "configure" ]; then
+        if [ -d /usr/doc -a ! -e /usr/doc/ekg -a -d /usr/share/doc/ekg ]; then
+                ln -sf ../share/doc/ekg /usr/doc/ekg
+        fi
+fi
+
+#DEBHELPER#

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ "$1" = "configure" ]; then
+    ldconfig /usr/lib/libgadu.so.0.9.0
+fi
+if [ -d /usr/doc -a ! -e /usr/doc/ekg-dev -a -d /usr/share/doc/ekg-dev ]; then
+     ln -sf ../share/doc/ekg-dev /usr/doc/ekg-dev
+fi
+
+#DEBHELPER#

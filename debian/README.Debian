@@ -1,0 +1,13 @@
+Those packages are absolutely unstable :> but I mean by it, that they
+are crappy (ekg it self is imho very stable now).
+
+Peoples I would thank to:
+    - Krzysztof Gajdemski <songo@vi.pl>
+        for very useful informations about differences in debhelper
+        3.x and older (he also builded independently potato packages)
+    - Albert Czarnecki <ufo@z.stalowka.com>
+        for building and testing those packages on potato.
+    - Grzegorz Dacka <unc@4it.pl>
+        for giving me unrestricted shell account on his potato box.
+
+Please send bug raports and flames to phantom@debian.org.pl

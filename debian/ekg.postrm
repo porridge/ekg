@@ -1,0 +1,10 @@
+#!/bin/sh
+if [ -x /usr/bin/update-menus ]; then
+    /usr/bin/update-menus /usr/lib/menu/ekg
+fi
+if [ \( "$1" = "upgrade" -o "$1" = "remove" \) -a -L /usr/doc/ekg ]; then
+        rm -f /usr/doc/ekg
+fi
+
+#DEBHELPER#
+
