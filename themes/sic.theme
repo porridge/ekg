@@ -1,0 +1,112 @@
+# EKG theme by (sic!) -> sic@hybrid.art.pl
+prompt %Y->%n
+prompt2 %K *%n
+error %R-!%n
+timestamp [%H:%M]
+
+known_user %1
+unknown_user %W[%n%Y%1%n%W]%n
+user_not_given %! %RMusisz podaæ u¿ytkownika%n\n
+readline_prompt -> 
+readline_prompt_away *> 
+
+not_enough_params %! %RZa ma³o parametrów%n\n
+
+unknown_command %! %RNieznane polecenie%n%Y:%n %W%0%1%n\n
+saved %> %GZapisano !%n\n
+error_saving %!%RWyst±pi³ b³ad podczas zapisu konfiguracji%n\n
+error_reading_config %!%RWyst±pi³ b³±d odczytu pliku z konfiguracj±%n\n
+quit %> %GN%n%Ca%n%Rr%n%Ba%n %W....%n\n\n
+help %> %[10]1 -> %Y%2%w %3\n
+help_more %) %1\n
+
+theme_loaded %c%#%n %> %YTheme wczytany%n %K(sic!) %n\n
+theme_default %c%#%n %> %YUstawiono domy¶lny wygl±d%n\n
+error_loading_theme %c%#%n %! %R£adowanie theme'a nie powiod³o siê%n\n
+
+user_info %> %W%4%n / %3 (%1 %2) / %5\n
+
+modify_done %> %YDane zmienione%n\n
+
+search_results_single_active %G*%n
+search_results_single_inactive %r!%n
+search_results_single_female %MK%n
+search_results_single_male %BM%n
+
+search_results_single %Y%7%n%W%[-10]1%n %K|%n %[12]3 %K|%n %6 %K|%n %[20]2 %K|%n %[4]5 %K|%n %c%[16]4%n\n
+
+already_searching %> %RPrzeszukiwanie w toku%n %YWpisz:%n %Wfind -stop%n %Yaby przerwaæ...%n\n
+search_falied %! %RB³±d podczas przeszukiwania%n%Y:%n %W%1%n\n
+search_not_found %! %RNie znaleziono nikogo o takich danych%n\n
+
+list_empty %> %YTwoja lista jest pusta%n\n
+list_avail %gdostêpny%n%K...%n   %W[%n%G+%n%W]%n   %W%[12]1%n [%K%[,-15]2%n]\n
+list_busy %czajêty%n%K.....%n   %W[%n%C?%n%W]%n   %Y%[12]1%n [%K%[,-15]2%n]\n
+list_not_avail %Kniedostêpny%n   %W[%n%R-%n%W]%n   %K%[12]1%n [%K...............%n]\n
+
+away %c%#%n %> %CWracam za chwilê ... %n\n
+back %c%#%n %> %GJestem z powrotem %n\n
+invisible %c%#%n %> %MJestem niewidzialny :)%n\n
+auto_away %c%#%n %> %CPo%n %W%1%n %Crobiê sobie przerwê%n\n
+
+status_avail %c%#%n %> %W%[12]1%n%W[%n%G+%n%W]%n   %Gdostêpny %n \n
+status_busy %c%#%n %> %W%[12]1%n%W[%n%C?%n%W]%n   %Czajêty%n\n
+status_not_avail %c%#%n %> %W%[12]1%n%W[%n%R-%n%W]%n   %Kniedostêpny%n\n
+
+show_status %> %YTwój status:   %n %W%1%n\n
+show_status_avail %W[%n%G+%n%W]%n   %Gdostêpny%n
+show_status_busy %W[%n%C?%n%W]%n   %Czajêty%n
+show_status_invisible %W[%n%M*%n%W]%n   %Mniewidoczny%n
+show_status_not_avail %W[%n%R-%n%W]%n   %Rniedostêpny%n
+
+message_header %b%x %1: (%#/%2) %n\n
+message_footer \n
+chat_header %> %W%1%n: %c(%n%#/%2%c)%n\n
+ack_queued %) %K ack/%1 (%#) -queued-%n\n
+ack_delivered %) %K ack/%1 (%#)%n\n
+
+sms_sent %> %GWys³ano sms'a do%n %W%1%n\n
+sms_failed %! %RSms do%n %W%1%n %Rnie zosta³ dostarczony%n\n
+sms_error %! %RB³±d podczas wysy³ania sms'a%n\n
+sms_unknown %! %W%1%n %Rnie ma podanego numeru we wpisie%n\n
+
+variable %> %[,25]1%c%2%n\n
+variable_not_found %! %RNieznana zmienna%n%Y:%n %K[%n%W%1%n%K]%n\n
+variable_invalid %! %Wset:%n [%1] <- zla warto¶æ.\n
+
+ignored_list %> ig: %1\n
+ignored_list_empty %> %YLista ignorów jest pusta%n\n
+ignored_added %> %YOd teraz ignorujesz%n %W%1%n\n
+ignored_deleted
+
+invalid_uin %! %RNiew³a¶ciwy numer%n %Yuin%n\n
+user_added %> %YU¿ytkownik %W%1%n %Yzosta³ dodany%n\n
+user_not_found %! %RNie ma na li¶cie u¿ytkownika %W%1%n\n
+user_deleted %> %YU¿ytkownik%n %W%1%n %Yzosta³ usuniêty%n\n
+user_exists %! %YU¿ytkownik%n %W%1%n %Yuz istnieje%n\n
+
+error_adding %! %RB³±d podczas dodawania u¿ytkownika%n\n
+error_deleting %! %RU¿ytkownika nie ma na li¶cie%n\n
+error_adding_ignored %! %RPodany wpis ju¿ istnieje%n\n
+error_not_ignored %! %RPodana osoba nie jest ignorowana%n\n
+
+conn_broken %! %c%#%n %W--/%n%r*%n%W/---%n %RPo³±czenie z serwerem przerwane\n
+connecting %> %YTrwa ³±czenie z serwerem...%n\n
+during_connect %! %Y£±czenie w toku...%n %WProszê czekaæ%n \n
+connected %c%#%n %> [%G OK %n] %Y<-%n %GPo³±czono z serwerem\n
+conn_falied %! %BB³±d podczas ³±czenia:%n %W%1%n\n
+disconnected %> %c%#%n %YRoz³±czono%n %W---| |---%n\n
+not_connected %! %RNie jeste¶ po³±czony z serwerem%n\n
+already_connected %! %RJu¿ jeste¶ po³±czony%n\n
+offline_mode %> %YJeste¶ w tybie off-line!%n\n
+
+error_reading_config %! %RB³±d podczas czytania pliku konfiguracyjnego%n\n
+no_config %! %RUwaga! Nieprawid³owa konfiguracja.%n %YZrób tak:%n %Wwpisz:%n\n%cset uin%n %Y<numerek-gg>%n\n%cset password%n %Y<haslo>%n\n%csave%n\n%cconnect%n\n
+
+aliases_list %> %W%[10]1%n %C->%n %Y%2%n.\n
+aliases_add %> %YDodano alias%n %W%1%n %C->%n %W%2%n\n
+aliases_del %> %YAlias %W%1%n %Yzosta³ usuniêty%n\n
+aliases_exist %! %RAlias %W%1%n %Rju¿ istnieje%n\n
+aliases_noexist %! %RAlias %W%1%n %Rnie istnieje%n\n
+aliases_list_empty %> %YBrak aliasów%n\n
+aliases_invalid %! %RNiew³a¶ciwy parametr%n %C(help alias ?)%n\n

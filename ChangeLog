@@ -1,3 +1,9 @@
+// 2001-11-22
+
+- GG_CLASS_OFFLINE w libgg.h i docs/protocol.txt (THRull/w)
+- sic.theme
+- update TODO/FAQ (w)
+
 // 2001-11-21
 
 - poprawka configure.in, wykrywanie rl_set_prompt() (w)
