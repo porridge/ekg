@@ -255,7 +255,7 @@ COMMAND(cmd_alias)
 
 COMMAND(cmd_away)
 {
-	int private_mask = (GG_S_F(config_status) ? GG_STATUS_FRIENDS_MASK : 0);
+	int private_mask = GG_S_F(config_status) ? GG_STATUS_FRIENDS_MASK : 0;
 
 	if (params[0] && strlen(params[0]) > GG_STATUS_DESCR_MAXSIZE)
 		print("descr_too_long", itoa(strlen(params[0]) - GG_STATUS_DESCR_MAXSIZE));
