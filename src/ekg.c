@@ -362,9 +362,6 @@ int main(int argc, char **argv)
 
 	signal(SIGSEGV, sigsegv_handler);
 
-	if (getenv("LINES"))
-		screen_lines = atoi(getenv("LINES"));
-
 	if (screen_lines < 1)
 		screen_lines = 24;
 
@@ -504,6 +501,10 @@ IOCTL_HELP
 	rl_readline_name = "gg";
 	rl_attempted_completion_function = (CPPFunction *) my_completion;
 	rl_completion_entry_function = (void*) empty_generator;
+
+	if (getenv("LINES"))
+	    	screen_lines = atoi(getenv("LINES"));
+		
 	
 	my_printf("welcome", VERSION);
 	

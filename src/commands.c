@@ -977,7 +977,7 @@ COMMAND(command_modify)
 COMMAND(command_help)
 {
 	struct command *c;
-	int width = 0, height = 24, lines = 0;
+	int width = 0, height = screen_lines, lines = 0;
 	
 	if (params[0]) {
 		for (c = commands; c->name; c++)

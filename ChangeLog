@@ -10,6 +10,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - wyrzucenie ekl.pl z Makefile.in (d)
 - dorzucenie ekl2.pl autorstwa smarkacza (smarkacz/w)
 - poprawka wczytywania sekwencji z themów przy ,,on'' (d)
+- poprawka pagera przy ,,list'' i ,,help'' (eileen/d)
 
 // 2002-03-28
 
