@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-11-03
 
 - poprawka kompilacji na systemach bez openssl (kjtd/w)
+- poprawka segfaulta przy zmianie w li¶cie kontaktów (sdas/w)
 
 // 2002-11-02
 

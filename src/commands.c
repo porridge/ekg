@@ -847,8 +847,9 @@ COMMAND(cmd_modify)
 		}
 		
 		if (match_arg(argv[i], 'd', "display", 2) && argv[i + 1]) {
+			ui_event("userlist_changed", u->display, argv[++i]);
 			xfree(u->display);
-			u->display = xstrdup(argv[++i]);
+			u->display = xstrdup(argv[i]);
 			userlist_replace(u);
 		}
 		
@@ -874,10 +875,8 @@ COMMAND(cmd_modify)
 			u->uin = strtol(argv[++i], NULL, 0);
 	}
 
-	if (strcasecmp(name, "add")) {
+	if (strcasecmp(name, "add"))
 		print("modify_done", params[0]);
-		ui_event("userlist_changed");
-	}
 
 	config_changed = 1;
 
