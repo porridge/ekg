@@ -1095,7 +1095,7 @@ int config_read(const char *filename, const char *var)
 {
 	char *buf, *foo;
 	FILE *f;
-	int good_file = 0, ret = 1, home = ((filename) ? 0 : 1);
+	int i = 0, good_file = 0, ret = 1, home = ((filename) ? 0 : 1);
 	struct stat st;
 
 	if (!filename && !(filename = prepare_path("config", 0)))
@@ -1134,6 +1134,8 @@ int config_read(const char *filename, const char *var)
 	}
 
 	while ((buf = read_file(f))) {
+		i++;
+
 		if (buf[0] == '#' || buf[0] == ';' || (buf[0] == '/' && buf[1] == '/')) {
 			xfree(buf);
 			continue;
@@ -1234,6 +1236,11 @@ int config_read(const char *filename, const char *var)
 
 		if (!ret)
 			good_file = 1;
+
+		if (!good_file && i > 100) {
+			xfree(buf);
+			break;
+		}
 
 		xfree(buf);
 	}
