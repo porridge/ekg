@@ -22,6 +22,7 @@ AC_DEFUN(AC_CHECK_READLINE,[
              /usr/freeware/include:-L/usr/freeware/lib32 \
 	     /usr/pkg/include:-L/usr/pkg/lib \
 	     /sw/include:-L/sw/lib \
+	     /cw/include:-L/sw/lib \
 	     /net/caladium/usr/people/piotr.nba/temp/pkg/include:-L/net/caladium/usr/people/piotr.nba/temp/pkg/lib; do
     
       incl=`echo "$i" | sed 's/:.*//'`
@@ -30,7 +31,7 @@ AC_DEFUN(AC_CHECK_READLINE,[
       if test -f $incl/readline/readline.h ; then
         AC_MSG_RESULT($incl/readline/readline.h)
         READLINE_LIBS="$lib -lreadline"
-        READLINE_INCLUDES="-I$incl/readline"
+        READLINE_INCLUDES="-I$incl/readline -I$incl"
         AC_DEFINE(HAVE_READLINE)
         have_readline=true
         break
