@@ -1,0 +1,25 @@
+#!/usr/bin/make -f
+
+include debian/common.rules
+
+INSDIR = `pwd`/debian/ekg-ioctld/usr
+LIBINSDIR = `pwd`/debian/ekg-dev/usr
+PACKAGE_SUFFIX= -ioctld
+BUILDLIB = no
+CONFOPTS = --without-debug --with-ioctld
+ORGMAKE = all ioctld
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp configure-stamp
+	rm -f src/ekg Makefile config.cache config.log config.status
+	dh_clean
+
+binary:
+	$(MAKE) -f debian/build.rules CONFOPTS="$(CONFOPTS)" BUILDLIB=$(BUILDLIB) INSDIR=$(INSDIR) LIBINSDIR=$(LIBINSDIR) PACKAGE_SUFFIX=$(PACKAGE_SUFFIX) ORGMAKE="$(ORGMAKE)" binary
+	$(install) -m 4755 src/ioctld $(INSDIR)/bin
+	if [ ! -f potato-build ]; then dh_installman -pekg$(PACKAGE_SUFFIX) debian/ioctld.1;fi
+	if [ -f potato-build ]; then dh_installmanpages -pekg$(PACKAGE_SUFFIX) debian/ioctld.1;fi
+	$(MAKE) -f debian/build.rules CONFOPTS="$(CONFOPTS)" BUILDLIB=$(BUILDLIB) INSDIR=$(INSDIR) LIBINSDIR=$(LIBINSDIR) PACKAGE_SUFFIX=$(PACKAGE_SUFFIX) clean
+.PHONY: binary
