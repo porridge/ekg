@@ -53,7 +53,7 @@ struct handler handlers[] = {
 void print_message_body(char *str, int chat)
 {
 	int width, i, j;
-	char *mesg, *buf, *line, *next, *prefix, *suffix;
+	char *mesg, *buf, *line, *next, *prefix, *suffix, *save;
 
 	if (!(width = atoi(find_format((chat) ? "chat_line_width" : "message_line_width"))))
 		width = 78;
@@ -61,7 +61,7 @@ void print_message_body(char *str, int chat)
 	prefix = (chat) ? "chat_line_prefix" : "message_line_prefix";
 	suffix = (chat) ? "chat_line_suffix" : "message_line_suffix";
 	
-	if (!(buf = malloc(width + 1)) || !(mesg = strdup(str))) {
+	if (!(buf = malloc(width + 1)) || !(mesg = save = strdup(str))) {
 		my_puts(str);			/* emergency ;) */
 		return;
 	}
@@ -99,6 +99,9 @@ void print_message_body(char *str, int chat)
 			my_printf(suffix);
 		}
 	}
+
+	free(buf);
+	free(save);
 }
 
 void handle_msg(struct gg_event *e)
