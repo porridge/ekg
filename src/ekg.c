@@ -545,7 +545,7 @@ void ekg_wait_for_key()
 				if (s->timeout == 0) {
 					struct userlist *u = userlist_find(s->uin, NULL);
 					char *tmp = NULL;
-					time_t tmp_seen;
+					time_t tmp_seen = 0;
 					int correct_seen = 0;
 
 					if (!u) {
@@ -557,6 +557,12 @@ void ekg_wait_for_key()
 
 					/* wymu¶ pokazanie zmiany na niedostêpny */
 					if (GG_S_NA(u->status)) {
+
+						if (config_events_delay && (time(NULL) - (last_conn_event + 15)) < config_events_delay) {
+							s->timeout = -1;
+							continue;
+						}
+
 						u->status = (GG_S_D(u->status)) ? GG_STATUS_INVISIBLE_DESCR : GG_STATUS_INVISIBLE;
 
 						if (u->last_descr)
