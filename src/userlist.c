@@ -747,11 +747,13 @@ const char *ignore_format(int level)
 
 	for (i = 0; ignore_labels[i].name; i++) {
 		if (level & ignore_labels[i].level) {
+			if (comma++) {
+				strncat(buf, ",", sizeof(buf) - 1 - strlen(buf));
+				buf[sizeof(buf) - 1] = 0;
+			}
+
 			strncat(buf, ignore_labels[i].name, sizeof(buf) - 1 - strlen(buf));
 			buf[sizeof(buf) - 1] = 0;
-
-			if (comma++)
-				strncat(buf, ",", sizeof(buf) - 1 - strlen(buf));
 		}
 	}
 
