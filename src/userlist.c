@@ -596,7 +596,7 @@ int valid_nick(const char *nick)
 {
 	int i;
 	const char *wrong[] = { "(null)", "__debug", "__status",
-				 "__current", "*", NULL };
+				 "__current", "__contacts", "*", NULL };
 
 	if (!nick)
 		return 0;

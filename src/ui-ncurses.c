@@ -1733,7 +1733,7 @@ next:
 static void update_statusbar(int commit)
 {
 	struct userlist *u = userlist_find(config_uin, NULL);
-	struct userlist *q = userlist_find(0, window_current->target);
+	struct userlist *q = userlist_find(str_to_uin(window_current->target), window_current->target);
 	struct format_data *formats = NULL;
 	int formats_count = 0, i, y;
 
@@ -2271,6 +2271,13 @@ void known_uin_generator(const char *text, int len)
 
 		if (u->display && !strncasecmp(text, u->display, len))
 			array_add(&completions, (strchr(u->display, ' ')) ? saprintf("\"%s\"", u->display) : xstrdup(u->display));
+	}
+
+	for (l = userlist; l; l = l->next) {
+		struct userlist *u = l->data;
+
+		if (!strncasecmp(text, itoa(u->uin), len))
+			array_add(&completions, xstrdup(itoa(u->uin)));
 	}
 
 	for (l = conferences; l; l = l->next) {

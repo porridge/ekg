@@ -19,6 +19,8 @@ pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
 
 * klient:
   - wykrywanie niewidocznych jako opcja (wielu),
+  - mo¿liwo¶æ automagicznego wyrównywania kolejnych linii wiadomo¶ci w tematach
+    ircopodobnych do d³ugo¶ci nazwy rozmówcy i timestampu (sz)
   - zmienna beep_*_away (rmrmg)
   - zmieniæ domy¶lne ustawienia na: display_sent 1, make_window 2,
     display_ack 3,
