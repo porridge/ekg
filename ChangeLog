@@ -9,6 +9,8 @@ d - drg, sz - szalik).
 - uaktualnienie ekg_logs (Goblin/w)
 - libgadu: poprawka zwalniania zasobów gg_session przy w±tkowanym
   resolverze (ppluciennik/w)
+- libgadu: poprawka b³êdu typu DoS. wysy³aj±c wiadomo¶æ niezakoñczon±
+  znakiem '\0', mo¿na by³o roz³±czyæ ekg (NEMO/w)
 
 // 2003-08-05
 
