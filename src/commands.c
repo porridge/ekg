@@ -5156,9 +5156,16 @@ COMMAND(cmd_last)
 					continue;
 			}
 
-			printq("invalid_params", name);
-			array_free(arr);
-			return -1;
+			if (!i && (uin = get_uin(arr[i])))
+				continue;
+			else {
+				if (i)
+					printq("invalid_params", name);
+				else
+					printq("user_not_found", arr[i]);
+				array_free(arr);
+				return -1;
+			}
 		}
 
 		array_free(arr);
@@ -5736,7 +5743,7 @@ void command_init()
 #endif
 
 	command_add
-	( "last", "?u", cmd_last, 0,
+	( "last", "uu", cmd_last, 0,
 	  " [opcje]", "wy¶wietla lub czy¶ci ostatnie wiadomo¶ci",
 	  "\n"
 	  "  -c, --clear                    czy¶ci podane wiadomo¶ci lub wszystkie\n"
