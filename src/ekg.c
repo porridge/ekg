@@ -384,12 +384,21 @@ void ekg_wait_for_key()
 			
 			switch (c->type) {
 				case GG_SESSION_GG:
-					print("conn_timeout");
-					list_remove(&watches, s, 0);
-					gg_free_session(s);
-					userlist_clear_status(0);
-					sess = NULL;
-					ekg_reconnect();
+					if (c->state == GG_STATE_CONNECTING_GG) {
+						/* w przypadku timeoutu nie
+						 * wyrzucamy po³±czenia z listy
+						 * tylko ka¿emy mu stwierdziæ
+						 * b³±d i po³±czyæ siê z
+						 * kolejnym kandydatem. */
+						handle_event((struct gg_session*) c);
+					} else {
+						print("conn_timeout");
+						list_remove(&watches, s, 0);
+						gg_free_session(s);
+						userlist_clear_status(0);
+						sess = NULL;
+						ekg_reconnect();
+					}
 					break;
 
 				case GG_SESSION_REGISTER:
