@@ -149,6 +149,12 @@ dnl <ekg>
   AC_CHECK_HEADERS(libgen.h)
   AC_CHECK_FUNC(dirname, , [OBJS="$OBJS ../compat/dirname.o"])
 
+  # na SunOSach nie ma scandir()
+  AC_CHECK_FUNC(foo_scandir, , [OBJS="$OBJS ../compat/scandir.o"])
+
+  # sprawdzamy, czy system ma getopt_long
+  AC_CHECK_FUNC(getopt_long, , [OBJS="$OBJS ../compat/getopt.o ../compat/getopt1.o"; CFLAGS="-I../compat $CFLAGS"])
+
   AC_ARG_ENABLE(ui-readline,
     [  --enable-ui-readline    Enable readline UI])
 
@@ -308,10 +314,6 @@ dnl   fi
     install_ekgwap="install-ekgwap"
     AC_DEFINE(WITH_WAP, 1, [define if you want "WAP" support])
   fi
-
-  # sprawdzamy, czy system ma getopt_long
-
-  AC_CHECK_FUNC(getopt_long, , [OBJS="$OBJS ../compat/getopt.o ../compat/getopt1.o"; CFLAGS="-I../compat $CFLAGS"])
 
   # sprawdzamy ioctld
 
