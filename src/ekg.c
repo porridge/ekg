@@ -194,9 +194,12 @@ static void get_line_from_pipe(struct gg_exec *c)
 			if (line[strlen(line) - 1] == '\r')
 				line[strlen(line) - 1] = 0;
 
-			if (c->id)
-				print("exec", line, itoa(c->id));
-			else
+			if (c->id) {
+				if (c->type == GG_SESSION_USER4)
+					check_mail_update(line);
+				else
+					print("exec", line, itoa(c->id));
+			} else
 				print_window("debug", 0, "debug", line);
 
 			new = string_init(c->buf->str + index + 1);
@@ -210,7 +213,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 		if (c->buf->len) {
 			if (c->id) {
 				if (c->type == GG_SESSION_USER4)
-					check_mail_update(atoi(c->buf->str));
+					check_mail_update(c->buf->str);
 				else
 					print("exec", c->buf->str, itoa(c->id));
 			} else

@@ -27,9 +27,11 @@
 #include "dynstuff.h"
 
 struct mail_folder {
+	int fhash;
 	char *fname;
 	time_t mtime;
 	off_t size;
+	int count;
 	int check;
 };
 
@@ -39,11 +41,12 @@ int mail_count;
 int last_mail_count;
 
 int check_mail();
-int check_mail_update();
 int check_mail_mbox();
 int check_mail_maildir();
+int check_mail_update(const char *s);
+void check_mail_free();
+
 void changed_check_mail(const char *var);
 void changed_check_mail_folders(const char *var);
-void check_mail_free();
 
 #endif	/* __MAIL_H */

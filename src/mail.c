@@ -73,13 +73,39 @@ int check_mail()
  *
  * modyfikuje liczbê nowych emaili i daje o tym znaæ.
  */
-int check_mail_update(int update)
+int check_mail_update(const char *s)
 {
-	if (update == mail_count)
-		return -1;
+	int h = 0, c = 0, new_count = 0;
+	char **buf = NULL;
+	list_t l;
+
+	if (!s)
+		return 1;
+
+	buf = array_make(s, ",", 0, 0, 0);
+
+	if (!(buf[0] && buf[1]))
+		return 1;
+
+	h = atoi(buf[0]);
+	c = atoi(buf[1]);
+
+	array_free(buf);
+
+	for (l = mail_folders; l; l = l->next) {
+		struct mail_folder *m = l->data;
+
+		if (m->fhash == h)
+			m->count = c;
+
+		new_count += m->count;
+	}
+
+	if (new_count == mail_count)
+		return 1;
 
 	last_mail_count = mail_count;
-	mail_count = update;
+	mail_count = new_count;
 
 	if (mail_count && mail_count > last_mail_count) {
 		if (config_check_mail & 4) {
@@ -118,16 +144,28 @@ int check_mail_mbox()
 		struct mail_folder *m = l->data;
 		struct stat st;
 
+		/* plik móg³ zostaæ usuniêty, uaktualnijmy */
 		if (stat(m->fname, &st) == -1) {
-			cont = 1;
+			if (m->count != 0) {
+				char *buf = saprintf("%d,%d", m->fhash, 0);
+				check_mail_update(buf);
+				xfree(buf);
+			}	
+
+			m->size = 0;
+			m->mtime = 0;
+			m->check = 0;
+
 			continue;
 		}
 
 		if ((st.st_mtime != m->mtime) || (st.st_size != m->size)) {
 			m->mtime = st.st_mtime;
 			m->size = st.st_size;
+			m->check = 1;
 			cont = 1;
-		}
+		} else
+			m->check = 0;
 	}
 
 	if (!cont || pipe(fd))
@@ -140,7 +178,7 @@ int check_mail_mbox()
 	}
 
 	if (!pid) {	/* born to be wild */
-		char *str_new = NULL, *line = NULL;
+		char *s = NULL, *line = NULL;
 		int f_new = 0, new = 0, in_header = 0;
 		FILE *f;
 		struct stat st;
@@ -151,7 +189,7 @@ int check_mail_mbox()
 		for (l = mail_folders; l; l = l->next) {
 			struct mail_folder *m = l->data;
 
-			if ((stat(m->fname, &st) == -1) || !(f = fopen(m->fname, "r")))
+			if (!m->check || (stat(m->fname, &st) == -1) || !(f = fopen(m->fname, "r")))
 				continue;
 
 			while ((line = read_file(f))) {
@@ -180,17 +218,27 @@ int check_mail_mbox()
 			utimes(m->fname, (const struct timeval *) &foo);
 #endif
 
+			s = saprintf("%d,%d\n", m->fhash, f_new);
+
+			{
+				int sent = 0, left = strlen(s);
+				char *ptr = s;
+
+				while (left > 0) {
+					sent = write(fd[1], ptr, sizeof(ptr));
+
+					left -= sent;
+					ptr += sent;
+				}
+			}
+
+			xfree(s);
+
 			new += f_new;
 			f_new = 0;
 		}
 
-		str_new = saprintf("%d", new);
-
-		write(fd[1], str_new, sizeof(str_new));
 		close(fd[1]);
-
-		xfree(str_new);
-
 		exit(0);
 	}
 
@@ -235,7 +283,7 @@ int check_mail_maildir()
 
 	if (!pid) {	/* born to be wild */
 		int d_new = 0, new = 0;
-		char *str_new = NULL;
+		char *s = NULL;
 		struct dirent *d;
 		DIR *dir;
 		list_t l;
@@ -264,17 +312,27 @@ int check_mail_maildir()
 			xfree(tmp);
 			closedir(dir);
 
+			s = saprintf("%d,%d\n", m->fhash, d_new);
+
+			{
+				int sent = 0, left = strlen(s);
+				char *ptr = s;
+
+				while (left > 0) {
+					sent = write(fd[1], ptr, sizeof(ptr));
+
+					left -= sent;
+					ptr += sent;
+				}
+			}
+
+			xfree(s);
+
 			new += d_new;
 			d_new = 0;
 		}
 
-		str_new = saprintf("%d", new);
-
-		write(fd[1], str_new, sizeof(str_new));
 		close(fd[1]);
-
-		xfree(str_new);
-
 		exit(0);
 	}
 
@@ -350,9 +408,11 @@ void changed_check_mail_folders(const char *var)
 				f[i] = buf;
 			}
 
+			foo.fhash = ekg_hash(f[i]);
 			foo.fname = f[i];
 			foo.mtime = 0;
 			foo.size = 0;
+			foo.count = 0;
 			foo.check = 1;
 
 			list_add(&mail_folders, &foo, sizeof(foo));
@@ -373,9 +433,11 @@ void changed_check_mail_folders(const char *var)
 			inbox = saprintf("%s/%s", "/var/mail", pw->pw_name);
 		}
 
+		foo.fhash = ekg_hash(inbox);
 		foo.fname = inbox;
 		foo.mtime = 0;
 		foo.size = 0;
+		foo.count = 0;
 		foo.check = 1;
 
 		list_add(&mail_folders, &foo, sizeof(foo));
@@ -383,9 +445,11 @@ void changed_check_mail_folders(const char *var)
 		if (config_check_mail & 2) {
 			char *inbox = saprintf("%s/Maildir", home_dir);
 			
+			foo.fhash = ekg_hash(inbox);
 			foo.fname = inbox;
 			foo.mtime = 0;
 			foo.size = 0;
+			foo.count = 0;
 			foo.check = 1;
 
 			list_add(&mail_folders, &foo, sizeof(foo));
