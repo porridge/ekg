@@ -1013,8 +1013,8 @@ int main(int argc, char **argv)
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
 		if (getenv("EKG_DEBUG")) {
-			gg_debug_file = fopen(getenv("EKG_DEBUG"), "w");
-			setbuf(gg_debug_file, NULL);
+			if ((gg_debug_file = fopen(getenv("EKG_DEBUG"), "w")))
+				setbuf(gg_debug_file, NULL);
 		}
 
 		if (!gg_debug_file)
