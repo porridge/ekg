@@ -950,6 +950,11 @@ int main(int argc, char **argv)
 
 	ui_screen_width = getenv("COLUMNS") ? atoi(getenv("COLUMNS")) : 80;
 	ui_screen_height = getenv("LINES") ? atoi(getenv("LINES")) : 24;
+
+#ifdef WITH_UI_NCURSES
+	config_read(NULL, "display_transparent");
+#endif
+
 	ui_init();
 	ui_event("theme_init");
 
@@ -958,10 +963,10 @@ int main(int argc, char **argv)
 
 	in_autoexec = 1;
 
-	config_read(NULL);
+	config_read(NULL, NULL);
 
 	if (!no_global_config)
-		config_read(SYSCONFDIR "/ekg.conf");
+		config_read(SYSCONFDIR "/ekg.conf", NULL);
 	
         userlist_read();
 	update_status();

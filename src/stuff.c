@@ -467,9 +467,10 @@ cleanup:
  *
  * czyta z pliku ~/.gg/config lub podanego konfiguracjê.
  *
- *  - filename.
+ *  - filename,
+ *  - var - zmienna lub NULL, je¶li wszystkie.
  */
-int config_read(const char *filename)
+int config_read(const char *filename, const char *var)
 {
 	char *buf, *foo;
 	FILE *f;
@@ -486,7 +487,7 @@ int config_read(const char *filename)
 			continue;
 		}
 
-		if (!(foo = strchr(buf, ' '))) {
+		if (!(foo = strchr(buf, ' ')) || (var && strcmp(buf, var))) {
 			xfree(buf);
 			continue;
 		}
