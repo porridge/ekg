@@ -991,8 +991,14 @@ COMMAND(command_theme)
 COMMAND(command_set)
 {
 	struct variable *v = variables;
+	int unset = 0;
 
-	if (!params[1]) {
+	if (params[0] && params[0][0] == '-') {
+		unset = 1;
+		params[0]++;
+	}
+
+	if (!params[1] && !unset) {
 		while (v->name) {
 			if ((!params[0] || !strcasecmp(params[0], v->name)) && v->display != 2) {
 				if (v->type == VAR_STR) {

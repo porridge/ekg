@@ -100,6 +100,9 @@ int set_variable(char *name, char *value)
 	if (v->type == VAR_INT) {
 		char *p = value;
 
+		if (!p)
+			return -2;
+
 		while (*p) {
 			if (*p < '0' || *p > '9')
 				return -2;
@@ -112,9 +115,12 @@ int set_variable(char *name, char *value)
 	}
 
 	if (v->type == VAR_BOOL) {
-		int tmp = on_off(value);
-
-		if (tmp == -1)
+		int tmp;
+		
+		if (!value)
+			return -2;
+		
+		if ((tmp = on_off(value)) == -1)
 			return -2;
 
 		*(int*)(v->ptr) = tmp;
@@ -122,8 +128,11 @@ int set_variable(char *name, char *value)
 	}
 
 	free(*(char**)(v->ptr));
-	if (!(*(char**)(v->ptr) = strdup(value)))
-		return -3;
+	if (value) {
+		if (!(*(char**)(v->ptr) = strdup(value)))
+			return -3;
+	} else
+		*(char**)(v->ptr) = NULL;
 
 	return 0;
 }
