@@ -467,13 +467,40 @@ static char **my_completion(char *text, int start, int end)
  * wy¶wietla dany tekst na ekranie, uwa¿aj±c na trwaj±ce w danych chwili
  * readline().
  */
-static void ui_readline_print(const char *target, int separate, const char *line)
+static void ui_readline_print(const char *target, int separate, const char *xline)
 {
         int old_end = rl_end, id = 0;
-	char *old_prompt = NULL; 
-	const char *p;
+	char *old_prompt = NULL, *line_buf = NULL;
+	const char *p, *line = NULL;
 	string_t s = NULL;
-	
+
+	if (config_timestamp) {
+		string_t s = string_init(NULL);
+		const char *p = xline;
+		char buf[80];
+		struct tm *tm;
+		time_t t;
+
+		t = time(NULL);
+		tm = localtime(&t);
+		strftime(buf, sizeof(buf), config_timestamp, tm);
+
+		string_append(s, buf);
+		
+		while (*p) {
+			if (*p == '\n' && *(p + 1)) {
+				string_append_c(s, '\n');
+				string_append(s, buf);
+			} else
+				string_append_c(s, *p);
+
+			p++;
+		}
+
+		line = line_buf = string_free(s, 0);
+	} else
+		line = xline;
+
 	if (config_speech_app) {
 		int in_esc_code = 0;
 		
@@ -503,7 +530,10 @@ static void ui_readline_print(const char *target, int separate, const char *line
 	
 	/* je¶li nie piszemy do aktualnego, to zapisz do bufora i wyjd¼ */
         if (id && id != window_current->id) {
-                window_write(id, line);
+		char *tmp = saprintf("%s%s", timestamp, line);
+                window_write(id, tmp);
+		xfree(tmp);
+
                 /* XXX trzeba jeszcze waln±æ od¶wie¿enie prompta */
                 goto done;
         }
@@ -512,7 +542,11 @@ static void ui_readline_print(const char *target, int separate, const char *line
 	if (pager_lines == -2)
 		goto done;
 
-	window_write(window_current->id, line);
+	{
+		char *tmp = saprintf("%s%s", timestamp, line);
+		window_write(window_current->id, tmp);
+		xfree(tmp);
+	}
 
 	/* ukryj prompt, je¶li jeste¶my w trakcie readline */
         if (in_readline) {
@@ -560,6 +594,9 @@ static void ui_readline_print(const char *target, int separate, const char *line
 	}
 	
 done:
+	if (line_buf)
+		xfree(line_buf);
+
 	/* say it! ;) */
 	if (config_speech_app) {
 		char *tmp = saprintf("%s 2>/dev/null", config_speech_app);

@@ -30,5 +30,15 @@ klient:
   + zmieniæ domy¶lne formaty prompt* i error na nowe,
   + przerzuciæ statusbar do domy¶lnego themu,
 
+- posty z czasu padniêtej domeny:
+  + /window next nie dzia³a je¶li jest przerwa miêdzy oknami (mateusza),
+  + uaktualnienie target w oknach po usuniêciu u¿ytkownika (Perry),
+  + /_keygen, /away opis, segfault na slacku (FIG),
+  + /ignore w query ignoruje rozmówcê (sdas),
+  + /query na ludzi ze spacj± (Brzezi),
+  + nie dzia³a pager w ui-readline (Brzezi),
+
+  
+
 $Id$
 
