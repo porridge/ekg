@@ -601,10 +601,8 @@ void buffer_free()
 void changed_backlog_size(const char *var)
 {
 #ifdef WITH_UI_NCURSES
-	int min = ui_screen_height - 1 - config_statusbar_size - config_header_size;
-
-	if (config_backlog_size < min)
-		config_backlog_size = min;
+	if (config_backlog_size < ui_screen_height)
+		config_backlog_size = ui_screen_height;
 #endif
 }
 
