@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-07-03
 
 - pocz±tek ui_event() (w)
+- poprawiony segfault w ,,dcc get #'' (Chilek/w)
 
 // 2002-07-02
 

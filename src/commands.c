@@ -1509,7 +1509,7 @@ COMMAND(command_dcc)
 				break;
 			}
 
-			if ((u = userlist_find(t->uin, NULL))) {
+			if ((u = userlist_find(tt->uin, NULL))) {
 				if (!strcasecmp(params[1], itoa(u->uin)) || !strcasecmp(params[1], u->display)) {
 					t = tt;
 					break;
