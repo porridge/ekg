@@ -360,5 +360,7 @@ int msg_queue_read()
 		xfree(fn);
 	}
 
+	closedir(dir);
+
 	return 0;
 }
