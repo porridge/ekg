@@ -7,6 +7,7 @@ d - drg, sz - szalik).
 // 2003-10-09
 
 - poprawka segfaultu w gg_free_session() z w±tkami (Chilek/w)
+
 // 2003-10-08
 
 - poprawka zapisu tokenu na dysku (porridge/w)

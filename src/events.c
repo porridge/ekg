@@ -332,9 +332,12 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 			FILE *wap;
 			char waptime[25], waptime2[10];
 			const char *waplog;
+			struct tm *waptm;
+			
+			waptm = localtime(&tt);
 
 			if (config_wap_enabled == 2) {
-				strftime(waptime2, sizeof(waptime2), "%H:%M%S", tm);
+				strftime(waptime2, sizeof(waptime2), "%H:%M%S", waptm);
 				snprintf(waptime, sizeof(waptime), "wap%7s_%d", waptime2, e->event.msg.sender);
 
 				if ((waplog = prepare_path(waptime, 1)) && (wap = fopen(waplog, "a"))) {
@@ -343,7 +346,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 				}
 
 			} else {
-				strftime(waptime2, sizeof(waptime2), "%H:%M", tm);
+				strftime(waptime2, sizeof(waptime2), "%H:%M", waptm);
 				sprintf(waptime, "wap%5s", waptime2);
 
 				if ((waplog = prepare_path(waptime, 1)) && (wap = fopen(waplog, "a"))) {
