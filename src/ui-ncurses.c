@@ -1276,7 +1276,7 @@ static int contacts_update(struct window *w)
 	window_clear(w, 1);
 
 	if (config_contacts_groups) {
-		char **groups = array_make(config_contacts_groups, ",", 0, 0, 0);
+		char **groups = array_make(config_contacts_groups, ", ", 0, 1, 0);
 		if (contacts_group_index > array_count(groups))
 			contacts_group_index = 0;
 

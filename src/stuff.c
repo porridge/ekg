@@ -275,13 +275,17 @@ int alias_add(const char *string, int quiet, int append)
 
 	for (l = commands; l; l = l->next) {
 		struct command *c = l->data;
+		char *tmp = cmd;
 
 		if (!strcasecmp(string, c->name) && !c->alias) {
 			printq("aliases_command", string);
 			return -1;
 		}
 
-		if (!strcasecmp(cmd, c->name))
+		if (*tmp == '/')
+			tmp++;
+
+		if (!strcasecmp(tmp, c->name))
 			params = xstrdup(c->params);
 	}
 
