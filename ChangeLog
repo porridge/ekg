@@ -10,6 +10,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - kolejne poprawki /exec (wojboj/w)
 - dodanie string_clear() (w)
 - poprawki debugowania (sdas/w)
+- ma³y cleanup w ekgsearch (wysek)
+- je¶li pubdir jest przeci±¿ony, ekgsearch napisze o tym (w/wysek)
 
 // 2002-09-23
 
