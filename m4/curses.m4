@@ -242,6 +242,7 @@ AC_DEFUN(AC_SEARCH_NCURSES, [
     AC_NCURSES(/usr/local/include/ncurses, curses.h, -L/usr/local/lib -lncurses, -I/usr/local/include/ncurses -DRENAMED_NCURSES, renamed ncurses on /usr/local/.../ncurses)
 
     AC_NCURSES(/usr/include/ncurses, curses.h, -lncurses, -I/usr/include/ncurses -DRENAMED_NCURSES, renamed ncurses on /usr/include/ncurses)
+    AC_NCURSES(/sw/include, ncurses.h, -L/sw/lib -lncurses, -I/sw/include, macosx)
     
     dnl
     dnl We couldn't find ncurses, try SysV curses
