@@ -783,6 +783,15 @@ speech_app
 	jej ustawienie powoduje równie¿ zmianê motywu na taki, który jest
 	³atwiejszy do wymówienia.
 
+status_window
+	typ: liczba
+	domy¶lna warto¶æ: 0
+
+	okre¶la okno, do którego kierowane s± zmiany stanu innych osób. 0 - 
+	okno rozmowy z osob±, której dotyczy zmiana (lub okno stanu, je¶li 
+	nie ma otwartego okna rozmowy z t± osob±), 1 - bie¿±ce okno, 2 - 
+	okno stanu.
+
 statusbar_size
 	typ: liczba
 	domy¶lna warto¶æ: 1

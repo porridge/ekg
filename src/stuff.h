@@ -310,6 +310,7 @@ char *config_sound_notify_file;
 char *config_sound_mail_file;
 char *config_speech_app;
 int config_status;
+int config_status_window;
 int config_statusbar_size;
 int config_statusbar_fgcolor;
 int config_statusbar_bgcolor;

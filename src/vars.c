@@ -226,6 +226,7 @@ void variable_init()
 	variable_add("sound_mail_file", "SM", VAR_STR, 1, &config_sound_mail_file, NULL, NULL, dd_sound);
 	variable_add("sound_app", "Sa", VAR_STR, 1, &config_sound_app, NULL, NULL, NULL);
 	variable_add("speech_app", "SA", VAR_STR, 1, &config_speech_app, NULL, NULL, NULL);
+	variable_add("status_window", "Sw", VAR_INT, 1, &config_status_window, NULL, variable_map(3, 0, 0, "query", 1, 2, "current", 2, 1, "status"), NULL);
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init)
 	{

@@ -1050,16 +1050,27 @@ void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_
 		/* no dobra, poka¿ */
 		if (u->display || have_unknown) {
 			char *tmp = xstrdup(descr), *p;
+			char *target, *display;
 
 			for (p = tmp; p && *p; p++) {
 				if (*p == 13 || *p == 10)
 					*p = '|';
 			}
 
-			if (have_unknown)
-				print_window(itoa(uin), 0, s->format, format_user(uin), itoa(uin), tmp);
-			else
-				print_window(u->display, 0, s->format, format_user(uin), (u->first_name) ? u->first_name : u->display, tmp);
+			if (have_unknown) {
+				target = (char *) itoa(uin);
+				display = target;
+			} else {
+				target = u->display;
+				display = (u->first_name) ? u->first_name : u->display;
+			}
+
+			if (config_status_window == 1)
+				target = "__current";
+			else if (config_status_window == 2)
+				target = "__status";
+
+			print_window(target, 0, s->format, format_user(uin), display, tmp);
 
 			xfree(tmp);
 		}

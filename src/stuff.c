@@ -186,6 +186,7 @@ int config_windows_save = 0;
 char *config_windows_layout = NULL;
 char *config_profile = NULL;
 int config_header_size = 0;
+int config_status_window = 0;
 int config_statusbar_size = 1;
 int config_statusbar_fgcolor = 7;
 int config_statusbar_bgcolor = 4;
