@@ -642,7 +642,7 @@ COMMAND(cmd_del)
 		return 0;
 	}
 
-	if (!(u = userlist_find((uin = get_uin(params[0])), NULL))) {
+	if (!(u = userlist_find((uin = get_uin(params[0])), NULL)) || !u->display) {
 		printq("user_not_found", params[0]);
 		return -1;
 	}

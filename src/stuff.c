@@ -804,6 +804,9 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 				struct userlist *u = l->data;
 				list_t m;
 
+				if (!u->display)
+					continue;
+
 				for (m = u->groups; m; m = m->next) {
 					struct group *g = m->data;
 
@@ -2328,7 +2331,7 @@ int event_check(int event, uin_t uin, const char *data)
 
 	uin_number = itoa(uin);
 
-	if ((u = userlist_find(uin, NULL)))
+	if ((u = userlist_find(uin, NULL)) && u->display)
 		uin_display = u->display;
 	else
 		uin_display = uin_number;

@@ -173,9 +173,9 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 		if (c)
 			target = xstrdup(c->name);
 		else
-			target = xstrdup((chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender)));
+			target = xstrdup((chat == 2) ? "__status" : ((u && u->display) ? u->display : itoa(e->event.msg.sender)));
 	} else
-	        target = xstrdup((chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender)));
+	        target = xstrdup((chat == 2) ? "__status" : ((u && u->display) ? u->display : itoa(e->event.msg.sender)));
 
 	cname = (c ? c->name : "");
 
@@ -481,7 +481,7 @@ void handle_msg(struct gg_event *e)
 	cp_to_iso(e->event.msg.message);
 	
 #ifdef WITH_PYTHON
-	PYTHON_HANDLE_HEADER(msg, "(isisii)", e->event.msg.sender, (u) ? u->display : "", e->event.msg.msgclass, e->event.msg.message, e->event.msg.time, 0)
+	PYTHON_HANDLE_HEADER(msg, "(isisii)", e->event.msg.sender, ((u && u->display) ? u->display : ""), e->event.msg.msgclass, e->event.msg.message, e->event.msg.time, 0)
 	{
 		char *b, *d;
 		int f;
@@ -515,7 +515,7 @@ void handle_msg(struct gg_event *e)
 	if (ignored_check(e->event.msg.sender) & IGNORE_MSG) {
 		if (config_log_ignored) {
 			char *tmp = log_escape(e->event.msg.message);
-			put_log(e->event.msg.sender, "%sign,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), tmp);
+			put_log(e->event.msg.sender, "%sign,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), tmp);
 			xfree(tmp);
 		}
 		return;
@@ -524,7 +524,7 @@ void handle_msg(struct gg_event *e)
 #ifdef HAVE_OPENSSL
 	if (config_encryption && !strncmp(e->event.msg.message, "-----BEGIN RSA PUBLIC KEY-----", 20)) {
 		char *name;
-		const char *target = (u) ? u->display : itoa(e->event.msg.sender);
+		const char *target = ((u && u->display) ? u->display : itoa(e->event.msg.sender));
 		FILE *f;
 
 		print_window(target, 0, "key_public_received", format_user(e->event.msg.sender));	
@@ -571,7 +571,7 @@ void handle_msg(struct gg_event *e)
 	if (!(ignored_check(e->event.msg.sender) & IGNORE_EVENTS))
 		event_check((chat) ? EVENT_CHAT : EVENT_MSG, e->event.msg.sender, e->event.msg.message);
 			
-	if (u)
+	if (u && u->display)
 		add_send_nick(u->display);
 	else
 		add_send_nick(itoa(e->event.msg.sender));
@@ -586,7 +586,7 @@ void handle_msg(struct gg_event *e)
 	}
 
 	tmp = log_escape(e->event.msg.message);
-	put_log(e->event.msg.sender, "%s,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), tmp);
+	put_log(e->event.msg.sender, "%s,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), tmp);
 	xfree(tmp);
 
 	if (config_sms_away && GG_S_B(config_status) && config_sms_app && config_sms_number) {
@@ -595,7 +595,7 @@ void handle_msg(struct gg_event *e)
 		sms_away_add(e->event.msg.sender);
 
 		if (sms_away_check(e->event.msg.sender)) {
-			if (u)
+			if (u && u->display)
 				snprintf(sender, sizeof(sender), "%s/%u", u->display, u->uin);
 			else
 				snprintf(sender, sizeof(sender), "%u", e->event.msg.sender);
@@ -639,7 +639,7 @@ void handle_ack(struct gg_event *e)
 {
 	struct userlist *u = userlist_find(e->event.ack.recipient, NULL);
 	int queued = (e->event.ack.status == GG_ACK_QUEUED), filtered = 0;
-	const char *tmp, *target = (u) ? u->display : itoa(e->event.ack.recipient);
+	const char *tmp, *target = ((u && u->display) ? u->display : itoa(e->event.ack.recipient));
 
 	if (!e->event.ack.seq)	/* ignorujemy potwierdzenia ctcp */
 		return;
@@ -726,7 +726,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 		if (!m->handle_status)
 			continue;
 
-		res = PyObject_CallFunction(m->handle_status, "(isis)", uin, (u) ? u->display : NULL, status, idescr);
+		res = PyObject_CallFunction(m->handle_status, "(isis)", uin, ((u && u->display) ? u->display : NULL), status, idescr);
 
 		if (!res)
 			PyErr_Print();
@@ -834,17 +834,17 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 
 		/* zaloguj */
 		if (config_log_status && !GG_S_D(s->status))
-			put_log(uin, "status,%ld,%s,%s,%s,%s\n", uin, u->display, inet_ntoa(u->ip), log_timestamp(time(NULL)), s->log);
+			put_log(uin, "status,%ld,%s,%s,%s,%s\n", uin, ((u->display) ? u->display : ""), inet_ntoa(u->ip), log_timestamp(time(NULL)), s->log);
 		if (config_log_status && GG_S_D(s->status) && descr)
-		    	put_log(uin, "status,%ld,%s,%s,%s,%s,%s\n", uin, u->display, inet_ntoa(u->ip), log_timestamp(time(NULL)), s->log, descr);
+		    	put_log(uin, "status,%ld,%s,%s,%s,%s,%s\n", uin, ((u->display) ? u->display : ""), inet_ntoa(u->ip), log_timestamp(time(NULL)), s->log, descr);
 
 		/* jak dostêpny lub zajêty, dopiszmy do taba
 		 * jak niedostêpny, usuñmy */
-		if (GG_S_A(s->status) && config_completion_notify) 
+		if (GG_S_A(s->status) && config_completion_notify && u->display) 
 			add_send_nick(u->display);
-		if (GG_S_B(s->status) && (config_completion_notify & 4))
+		if (GG_S_B(s->status) && (config_completion_notify & 4) && u->display)
 			add_send_nick(u->display);
-		if (GG_S_NA(s->status) && (config_completion_notify & 2))
+		if (GG_S_NA(s->status) && (config_completion_notify & 2) && u->display)
 			remove_send_nick(u->display);
 
 		/* wy¶wietlaæ na ekranie ? */
@@ -881,7 +881,8 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 			break;
 			
 		/* no dobra, poka¿ */
-		print_window(u->display, 0, s->format, format_user(uin), (u->first_name) ? u->first_name : u->display, descr);
+		if (u->display)
+			print_window(u->display, 0, s->format, format_user(uin), (u->first_name) ? u->first_name : u->display, descr);
 
 		break;
 	}
@@ -890,7 +891,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 		u->status = status;
 		xfree(u->descr);
 		u->descr = descr;
-		ui_event("status", u->uin, u->display, status, (ignore_status_descr) ? NULL : u->descr);
+		ui_event("status", u->uin, ((u->display) ? u->display : ""), status, (ignore_status_descr) ? NULL : u->descr);
 	 } else
 		xfree(descr);
 }
