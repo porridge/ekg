@@ -745,7 +745,8 @@ void theme_init()
 	format_add("sent_footer", "%b`----- ---- --- -- -%n\n", 1);
 	format_add("sent_line", "%b|%n %1\n", 1);
 	format_add("sent_line_width", "-8", 1);
-	format_add("sysmsg_header", "%m.-- %TWiadomo¶æ systemowa %c(%C%#%c)%n --- -- -%n\n", 1);
+	format_add("sent_timestamp", "%Y-%m-%d %H:%M", 1);
+	format_add("sysmsg_header", "%m.-- %TWiadomo¶æ systemowa %c(%C%#%c)%m --- -- -%n\n", 1);
 	format_add("sysmsg_line", "%m|%n %1\n", 1);
 	format_add("sysmsg_line_width", "-8", 1);
 	format_add("sysmsg_footer", "%m`----- ---- --- -- -%n\n", 1);	

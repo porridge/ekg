@@ -70,7 +70,7 @@ static struct handler handlers[] = {
 void print_message(struct gg_event *e, struct userlist *u, int chat)
 {
 	int width, next_width, i, j, mem_width = 0;
-	char *mesg, *buf, *line, *next, *format = NULL, *format_first = "", *next_format = NULL, *head = NULL, *foot = NULL, *save;
+	char *mesg, *buf, *line, *next, *format = NULL, *format_first = "", *next_format = NULL, *head = NULL, *foot = NULL, *timestamp = NULL, *save;
 	char *line_width = NULL, timestr[100], *target;
 	struct tm *tm;
 
@@ -111,6 +111,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 			line_width = "message_line_width";
 			head = "message_header";
 			foot = "message_footer";
+			timestamp = "message_timestamp";
 			break;		
 		case 1:
 			format = "chat_line"; 
@@ -118,6 +119,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 			line_width = "chat_line_width";
 			head = "chat_header";
 			foot = "chat_footer";
+			timestamp = "chat_timestamp";
 			break;
 		case 2:
 			format = "sysmsg_line"; 
@@ -131,6 +133,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 			line_width = "sent_line_width";
 			head = "sent_header";
 			foot = "sent_footer";
+			timestamp = "sent_timestamp";
 			break;
 	}	
 
@@ -139,7 +142,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 		       last_add(0, e->event.msg.sender, e->event.msg.time, e->event.msg.message);
 	
 	tm = localtime(&e->event.msg.time);
-	strftime(timestr, sizeof(timestr), format_find((chat) ? "chat_timestamp" : "message_timestamp"), tm);
+	strftime(timestr, sizeof(timestr), format_find(timestamp), tm);
 
 	if (!(width = atoi(format_find(line_width))))
 		width = ui_screen_width - 2;
