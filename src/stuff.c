@@ -2020,7 +2020,7 @@ int send_sms(const char *recipient, const char *message, int quiet)
 	s.state = GG_STATE_READING_DATA;
 	s.type = GG_SESSION_USER3;
 	s.id = pid;
-	s.timeout = 60;
+	s.timeout = -1;
 	s.buf = string_init(NULL);
 
 	fcntl(s.fd, F_SETFL, O_NONBLOCK);

@@ -767,7 +767,7 @@ COMMAND(cmd_exec)
 		s.state = GG_STATE_READING_DATA;
 		s.type = GG_SESSION_USER3;
 		s.id = pid;
-		s.timeout = 60;
+		s.timeout = -1;
 		if (add_commandline) {
 			char *tmp = format_string(format_find("exec_prompt"), ((command[0] == '^') ? command + 1 : command));
 			s.buf = string_init(tmp);
