@@ -116,9 +116,7 @@ struct conference {
 struct gg_exec {
 	gg_common_head(struct gg_exec)
 	
-	char *buf;	/* bufor */
-	int bufsize;	/* rozmiar bufora */
-	int bufpoz;	/* pozycja w buforze */
+	string_t buf;	/* bufor na stdout procesu */
 };
 
 list_t children;

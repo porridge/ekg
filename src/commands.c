@@ -546,12 +546,9 @@ COMMAND(cmd_exec)
 		s.type = GG_SESSION_USER3;
 		s.id = pid;
 		s.timeout = 60;
-#define BUFSIZE 1000
-		s.buf = xmalloc(BUFSIZE);
-		*s.buf = 0;
-		s.bufsize = BUFSIZE;
+		s.buf = string_init(NULL);
 		s.bufpoz = 0;
-#undef BUFSIZE
+
 		list_add(&watches, &s, sizeof(s));
 		close(fd[1]);
 		

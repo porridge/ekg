@@ -152,16 +152,15 @@ void get_line_from_pipe(struct gg_exec *c)
   		return;
 
 	if (read(c->fd, &ch, 1) > 0) {
-		if (ch != '\n' && ch != '\r') {
-			c->buf[c->bufpoz++] = ch;
-		}
-		if (ch == '\n' || (c->bufpoz >= c->bufsize)) {
-			c->buf[c->bufpoz] = 0;
-			print("exec", c->buf, itoa(c->id));
-			c->bufpoz=0;
+		if (ch != '\n' && ch != '\r')
+			string_append_c(c->buf, ch);
+		if (ch == '\n') {
+			print("exec", c->buf->str, itoa(c->id));
+			string_free(c->buf, 1);
+			c->buf = string_init(NULL);
 		}
 	} else {
-		xfree(c->buf);
+		string_free(c->buf, 1);
 		list_remove(&watches, c, 1);
 	}
 }
