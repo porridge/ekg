@@ -15,6 +15,8 @@ zg³osi³ b³±d.
   opisu protoko³u (Chilek/w)
 - dodanie komend /block i /unblock (w)
 - dodanie opcji --offline i --online do /list (w)
+- libgadu: poprawka ³±czenia synchronicznego (sCoOtY/w)
+- usuniêcie warningów przy kompilacji przyk³adów (w)
 
 // 2002-12-24
 
