@@ -558,7 +558,7 @@ void window_resize()
 		wresize(w->window, w->height, w->width);
 		mvwin(w->window, w->top, w->left);
 
-//		ui_debug("edge window id=%d resized to (%d,%d,%d,%d)\n", w->id, w->left, w->top, w->width, w->height);
+/*		ui_debug("edge window id=%d resized to (%d,%d,%d,%d)\n", w->id, w->left, w->top, w->width, w->height); */
 		
 		w->redraw = 1;
 	}
@@ -613,7 +613,10 @@ void window_resize()
 
 		mvwin(w->window, w->top, w->left);
 
-//		ui_debug("normal window id=%d resized to (%d,%d,%d,%d)\n", w->id, w->left, w->top, w->width, w->height);
+/*		ui_debug("normal window id=%d resized to (%d,%d,%d,%d)\n", w->id, w->left, w->top, w->width, w->height); */
+
+		if (w->overflow)
+			w->start = w->lines_count - w->height + w->overflow;
 
 		w->redraw = 1;
 	}
@@ -1034,29 +1037,41 @@ static struct window *window_new(const char *target, int new_id)
 		
 		if (*target == '*' && !u) {
 			const char *tmp = index(target, '/');
-			char **argv;
+			char **argv, **arg;
 			
 			w.floating = 1;
 			
 			if (!tmp)
-				tmp = target + 1;
+				tmp = "";
 				
 			w.target = xstrdup(tmp);
 
-			argv = array_make(target + 1, ",", 5, 0, 0);
+			argv = arg = array_make(target + 1, ",", 5, 0, 0);
 
-			if (argv[0])
-				w.left = atoi(argv[0]);
-			if (argv[0] && argv[1])
-				w.top = atoi(argv[1]);
-			if (argv[0] && argv[1] && argv[2])
-				w.width = atoi(argv[2]);
-			if (argv[0] && argv[1] && argv[2] && argv[3])
-				w.height = atoi(argv[3]);
-			if (argv[0] && argv[1] && argv[2] && argv[3] && argv[4] && argv[4][0] != '/')
-				w.frames = atoi(argv[4]);
+			w.width = 10;	/* domy¶lne wymiary */
+			w.height = 5;
+
+			if (*arg)
+				w.left = atoi(*arg++);
+			if (*arg)
+				w.top = atoi(*arg++);
+			if (*arg)
+				w.width = atoi(*arg++);
+			if (*arg)
+				w.height = atoi(*arg++);
+			if (*arg && *arg[0] != '/')
+				w.frames = atoi(*arg);
 
 			array_free(argv);
+
+			if (w.left > stdscr->_maxx)
+				w.left = stdscr->_maxx;
+			if (w.top > stdscr->_maxy)
+				w.top = stdscr->_maxy;
+			if (w.left + w.width > stdscr->_maxx)
+				w.width = stdscr->_maxx + 1 - w.left;
+			if (w.top + w.height > stdscr->_maxy)
+				w.height = stdscr->_maxy + 1 - w.top;
 		}
 		
 		if (!w.target) {
@@ -1824,7 +1839,7 @@ static void update_statusbar(int commit)
 		}
 
 		if (ui_ncurses_debug) {
-			char *tmp = saprintf(" lines_count=%d start=%d height=%d overflow=%d", window_current->id, window_current->lines_count, window_current->start, window_current->height, window_current->overflow);
+			char *tmp = saprintf(" lines_count=%d start=%d height=%d overflow=%d", window_current->lines_count, window_current->start, window_current->height, window_current->overflow);
 			window_printat(status, 0, y, tmp, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
 			xfree(tmp);
 		} else
