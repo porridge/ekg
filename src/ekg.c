@@ -780,7 +780,7 @@ static void setup_debug()
 	fcntl(fd[0], F_SETFL, O_NONBLOCK);
 	fcntl(fd[1], F_SETFL, O_NONBLOCK);
 	
-	old_stderr = fcntl(STDERR_FILENO, F_DUPFD);
+	old_stderr = fcntl(2, F_DUPFD);
 
 	dup2(fd[1], 2);
 	

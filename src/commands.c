@@ -376,7 +376,7 @@ COMMAND(cmd_status)
 		printq("show_status_uin", itoa(config_uin));
 	}
 	
-	lce = localtime((const time_t *) &last_conn_event);
+	lce = localtime(&last_conn_event);
 	strftime(buf, sizeof(buf), format_find((last_conn_event / 86400 == time(NULL) / 86400) ? "show_status_last_conn_event_today" : "show_status_last_conn_event"), (const struct tm*) lce);
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
@@ -3305,14 +3305,14 @@ COMMAND(cmd_timer)
 			/* wyci±gamy sekundy, je¶li s± i obcinamy */
 			if ((tmp = strchr(foo, '.')) && !(wrong = (strlen(tmp) != 3))) {
 				sscanf(tmp + 1, "%2d", &lt->tm_sec);
-				tmp[0] = '\0';
+				tmp[0] = 0;
 			}
 
 			/* pozb±d¼my siê dwukropka */
 			if ((tmp = strchr(foo, ':')) && !(wrong = (strlen(tmp) != 3))) {
 				tmp[0] = tmp[1];
 				tmp[1] = tmp[2];
-				tmp[2] = '\0';
+				tmp[2] = 0;
 			}
 
 			/* jedziemy ... */
@@ -4248,7 +4248,7 @@ void command_init()
 	  "  -O, --online               b±d¼ dostêpny dla danej osoby\n"
 	  "\n"
 	  "Dwie ostatnie opcje dzia³aj± tylko, gdy w³±czony jest tryb ,,tylko "
-	  "dla przyjació³''.\n"
+	  "dla znajomych''.\n"
 	  "\n"
 	  "Lista kontaktów na serwerze \"list [-p|-g|-c|-P|-G|-C]\":\n"
 	  "  -p, --put          umieszcza na serwerze\n"
