@@ -1059,11 +1059,6 @@ void theme_init()
 	format_add("quick_list_busy,speech", "%1 jest zajêty, ", 1);
 	format_add("quick_list_invisible", " %K%1%n", 1);
 
-	/* history, wy³±czone, póki kto¶ nie przepisze sensownie */
-	format_add("history_send", "> %y%2 [%3]:%n %4\n", 1);
-	format_add("history_recv", "< %g%2 [%3]:%n %4\n", 1);
-	format_add("history_error", "%! %1\n", 1);
-
 	/* window */
 	format_add("window_add", "%) Utworzono nowe okno\n", 1);
 	format_add("window_noexist", "%! Wybrane okno nie istnieje\n", 1);

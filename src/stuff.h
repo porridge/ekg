@@ -226,7 +226,6 @@ int send_sms(const char *recipient, const char *message, int show_result);
 char *read_file(FILE *f);
 int init_control_pipe(const char *path);
 char *random_line(const char *path);
-int print_history(uin_t uin, int no);
 void do_connect();
 int transfer_id();
 void ekg_logoff(struct gg_session *sess, const char *reason);

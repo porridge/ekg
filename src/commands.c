@@ -1508,31 +1508,6 @@ COMMAND(cmd_sms)
 		print("sms_error", strerror(errno));
 }
 
-COMMAND(cmd_history)
-{
-	uin_t uin = 0;
-	int n = 10; /* DOMYSLNA WARTOSC: 10 linii */
-	
-	if (!params[0]) {
-		print("not_enough_params", name);
-		return;
-	}
-	
-	if (params[1]) { /* sa oba parametry */
-		uin = get_uin(params[0]);
-		n = atoi(params[1]);
-	} else
-		uin = get_uin(params[0]);
-	
-	if (!uin) {
-		print("history_error", "Brak wybranego u¿ytkownika na li¶cie kontaktów");
-		return;
-	}
-
-	if (print_history(uin, n) == -1)
-		print("history_error", strerror(errno));
-}
-
 COMMAND(cmd_quit)
 {
     	char *tmp = NULL;
@@ -3072,13 +3047,6 @@ void command_init()
 	( "help", "c", cmd_help, 0,
 	  " [polecenie]", "wy¶wietla informacjê o poleceniach",
 	  "");
-
-#if 0
-	command_add
-        ( "history", "u?", cmd_history, 0,
-	  " <numer/alias> [n]", "wy¶wietla ostatnie wypowiedzi",
-	  "");
-#endif
 	  
 	command_add
 	( "?", "c", cmd_help, 0,

@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-11-02
 
 - poprawka segfaulta przy /reconnect (szalik/w)
+- usuniêcie kodu /history (w)
 
 // 2002-11-01
 
