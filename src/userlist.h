@@ -81,7 +81,7 @@ int group_remove(struct userlist *u, const char *group);
 char *group_to_string(list_t l);
 list_t group_init(const char *groups);
 
-const char *format_user(uin_t uin);
 uin_t get_uin(const char *text);
+const char *format_user(uin_t uin);
 
 #endif /* __USERLIST_H */

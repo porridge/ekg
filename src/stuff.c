@@ -970,6 +970,31 @@ int msg_encrypt(uin_t uin, char **msg)
 }
 
 /*
+ * str_to_uin()
+ *
+ * funkcja, która zajmuje siê zamian± stringa na 
+ * liczbê i sprawdzeniem, czy to prawid³owy uin.
+ *
+ * zwraca uin lub 0 w przypadku b³êdu.
+ */
+uin_t str_to_uin(const char *text)
+{
+	char *tmp;
+	long num;
+
+	errno = 0;
+	num = strtol(text, &tmp, 0);
+
+	if (*text == '\0' || *tmp != '\0')
+		return 0;
+
+	if ((errno == ERANGE || (num == LONG_MAX || num == LONG_MIN)) || num > UINT_MAX || num < 0)
+		return 0;
+
+	return (uin_t) num;
+}
+
+/*
  * find_in_uins()
  *
  * sprawdza, czy w ci±gu uin'ów znajduje siê dany uin.

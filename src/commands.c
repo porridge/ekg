@@ -158,13 +158,13 @@ COMMAND(cmd_add)
 		return;
 	}
 
-	if (userlist_find(atoi(params[0]), params[1])) {
-		print("user_exists", params[1]);
+	if (!(uin = str_to_uin(params[0]))) {
+		print("invalid_uin");
 		return;
 	}
 
-	if (!(uin = atoi(params[0]))) {
-		print("invalid_uin");
+	if (userlist_find(uin, params[1])) {
+		print("user_exists", params[1]);
 		return;
 	}
 
@@ -695,7 +695,11 @@ COMMAND(cmd_find)
 				if (match_arg(arg, 'e', "email", 2) && argv[i + 1])
 					r->email = xstrdup(argv[++i]);
 				if (match_arg(arg, 'u', "uin", 2) && argv[i + 1])
-					r->uin = strtol(argv[++i], NULL, 0);
+					if (!(r->uin = str_to_uin(argv[++i]))) {
+						print("invalid_uin");
+						array_free(argv);
+						return;
+					}
 				if (match_arg(arg, 's', "start", 2) && argv[i + 1])
 					r->start = strtol(argv[++i], NULL, 0);
 				if (match_arg(arg, 'F', "female", 2))
@@ -878,10 +882,18 @@ COMMAND(cmd_modify)
 		}
 		
 		if (match_arg(argv[i], 'u', "uin", 2) && argv[i + 1]) {
+			uin_t new_uin = str_to_uin(argv[++i]);
+
+			if (!new_uin) {
+				print("invalid_uin");
+				array_free(argv);
+				return;
+			}	
+
 			if (sess)
 				gg_remove_notify(sess, u->uin);
 			
-			u->uin = strtol(argv[++i], NULL, 0);
+			u->uin = new_uin;
 			
 			if (sess)
 				gg_add_notify(sess, u->uin);
@@ -1036,7 +1048,37 @@ COMMAND(cmd_list)
 		char *status, *groups;
 		struct userlist *u;
 		uin_t uin;
-		
+
+		if (params[0][0] == '@' && strlen(params[0]) > 1) {
+			string_t members = string_init("");
+			int count = 0;
+
+			for (l = userlist; l; l = l->next) {
+				u = l->data;
+
+				if (u->groups) {
+					char *buf = group_to_string(u->groups);
+
+					if (!strcasecmp(buf, params[0]+1)) {
+						if (count++)
+							string_append(members, ", ");
+						string_append(members, u->display);
+					}
+
+					xfree(buf);
+				}
+			}
+			
+			if (count)
+				print("group_members", params[0], members->str);
+			else
+				print("group_empty", params[0]);
+
+			string_free(members, 1);
+
+			return;
+		}
+
 		if (!(uin = get_uin(params[0])) || !(u = userlist_find(uin, NULL))) {
 			print("user_not_found", params[0]);
 			return;
@@ -3294,13 +3336,15 @@ void command_init()
 
 	command_add
 	( "list", "u?", cmd_list, 0,
-          " [alias|opcje]", "zarz±dzanie list± kontaktów",
+          " [alias|@grupa|opcje]", "zarz±dzanie list± kontaktów",
 	  "\n"
 	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i|-d]\":\n"
 	  "  -a, --active       dostêpne\n"
 	  "  -b, --busy         zajête\n"
 	  "  -i, --inactive     niedostêpne\n"
 	  "  -d, --description  osoby z opisem\n"
+	  "\n"
+	  "Wy¶wietlanie cz³onków grupy: \"list @grupa\"\n"
 	  "\n"
 	  "Zmiana wpisów listy kontaktów \"list <alias> <opcje...>\":\n"
 	  "  -f, --first <imiê>\n"

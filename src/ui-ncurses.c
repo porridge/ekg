@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2002 Wojtek Kaniewski <wojtekka@irc.pl>,
+ *  (C) Copyright 2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *                     Wojtek Bojdo³ <wojboj@htcon.pl>
  *
  *  This program is free software; you can redistribute it and/or modify

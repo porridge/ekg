@@ -186,6 +186,7 @@ int list_destroy(list_t list, int free_data)
  *
  * upewnia siê, ¿e w stringu bêdzie wystarczaj±co du¿o miejsca.
  *
+ *  - s - ci±g znaków,
  *  - count - wymagana ilo¶æ znaków (bez koñcowego '\0').
  */
 static void string_realloc(string_t s, int count)
@@ -267,7 +268,7 @@ int string_append(string_t s, const char *str)
  * wstawia tekst w podane miejsce bufora.
  *  
  *  - s - ci±g znaków,
- *  - index - miejsce, gdzie mamy wpisac (liczone od 0),
+ *  - index - miejsce, gdzie mamy wpisaæ (liczone od 0),
  *  - str - tekst do dopisania,
  *  - count - ilo¶æ znaków do dopisania (-1 znaczy, ¿e wszystkie).
  */
@@ -321,7 +322,7 @@ string_t string_init(const char *value)
  *
  * czy¶ci zawarto¶æ struktury `string'.
  *
- *  - str - ci±g znaków,
+ *  - s - ci±g znaków.
  */
 void string_clear(string_t s)
 {
@@ -575,4 +576,3 @@ void array_free(char **array)
 
 	xfree(array);
 }
-

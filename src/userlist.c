@@ -502,7 +502,7 @@ struct userlist *userlist_find(uin_t uin, const char *display)
  */
 uin_t get_uin(const char *text)
 {
-	uin_t uin = atoi(text);
+	uin_t uin = str_to_uin(text);
 	struct userlist *u;
 
 	if (!uin) {
