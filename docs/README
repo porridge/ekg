@@ -38,7 +38,7 @@ U¯YCIE
     sam± komend±, ale z ró¿nymi parametrami. ,,help'' Twoim przyjacielem.
     je¶li dana komenda ma ró¿ne opcje, pomaga ,,help <komenda>''. by
     wys³aæ kilkulinijkow± wiadomo¶æ, zamiast tre¶ci wpisz ,,\''
-    (backslash).  koñczy siê lini± z sam± kropk±.
+    (backslash). koñczy siê lini± z sam± kropk±.
 
 WYSY£ANIE SMSÓW
 
@@ -49,6 +49,15 @@ WYSY£ANIE SMSÓW
     ,,sms_send_app''. powinien przyjmowaæ numer telefonu za pierwszy
     parametr i wiadomo¶æ za drugi. ten ze strony http://ceti.pl/~miki/
     spe³nia podane wymagania.
+
+PROBLEMY
+
+    je¶li nie mo¿esz wpisywaæ polskich liter, dopisz do pliku /etc/inputrc
+    lub ~/.inputrc nastêpuj±ce linie:
+
+        set meta-flag on
+	set convert-meta off
+	set output-meta on
     
 BUGREPORTY
 
