@@ -11,6 +11,7 @@ zg³osi³ b³±d.
 - wyciszenie aliasu spowoduje wyciszenie komend w nim zawartych (sz)
 - brakuj±cy opis warto¶ci 4 zmiennej ,,completion_notify'' (sz)
 - usuwanie u¿ytkownika z dope³nieñ TABem po usuniêciu go z listy (sz)
+- poprawki w dope³nianiu utworzonej konferencji (bies/sz)
 
 // 2003-01-26
 

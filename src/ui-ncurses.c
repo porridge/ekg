@@ -1786,7 +1786,7 @@ void dcc_generator(const char *text, int len)
 
 void command_generator(const char *text, int len)
 {
-	char *slash = "", *dash = "";
+	const char *slash = "", *dash = "";
 	list_t l;
 
 	if (*text == '/') {
@@ -1817,7 +1817,7 @@ void unknown_uin_generator(const char *text, int len)
 	int i;
 
 	for (i = 0; i < send_nicks_count; i++) {
-		if (isdigit(send_nicks[i][0]) && !strncasecmp(text, send_nicks[i], len))
+		if (send_nicks[i] && isdigit(send_nicks[i][0]) && !strncasecmp(text, send_nicks[i], len))
 			array_add(&completions, xstrdup(send_nicks[i]));
 	}
 }

@@ -190,7 +190,9 @@ COMMAND(cmd_add)
 
 	if (u || userlist_add(uin, params[1])) {
 		printq("user_added", params[1]);
-		gg_add_notify_ex(sess, uin, userlist_type(u));
+		if (sess)
+			gg_add_notify_ex(sess, uin, userlist_type(u));
+		remove_send_nick(itoa(uin));	/* na wszelki wypadek, ¿eby mieæ mniej ¶mieci */
 		config_changed = 1;
 		ui_event("userlist_changed", itoa(uin), params[1]);
 	} else
@@ -538,6 +540,7 @@ COMMAND(cmd_del)
 		printq("user_deleted", tmp);
 		if (sess)
 			gg_remove_notify(sess, uin);
+		remove_send_nick(itoa(uin));
 		remove_send_nick(nick);
 		config_changed = 1;
 		ui_event("userlist_changed", nick, itoa(uin));
@@ -1661,10 +1664,11 @@ COMMAND(cmd_list)
 COMMAND(cmd_msg)
 {
 	struct userlist *u;
-	char **nicks = NULL, *nick = NULL, **p = NULL;
+	char **nicks = NULL, *nick = NULL, **p = NULL, *add_send = NULL;
 	unsigned char *msg = NULL, *raw_msg = NULL, *escaped = NULL, *format = NULL;
 	uin_t uin;
 	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0, msg_seq, formatlen = 0;
+
 
 	if (!params[0] || !params[1]) {
 		printq("not_enough_params", name);
@@ -1686,6 +1690,8 @@ COMMAND(cmd_msg)
 
 			for (l = c->recipients; l; l = l->next)
 				array_add(&nicks, xstrdup(itoa(*((uin_t *) (l->data)))));
+			
+			add_send = xstrdup(c->name);
 		}
 
 	} else if (*nick == '#') {
@@ -1700,6 +1706,8 @@ COMMAND(cmd_msg)
 
 		for (l = c->recipients; l; l = l->next)
 			array_add(&nicks, xstrdup(itoa(*((uin_t *) (l->data)))));
+
+		add_send = xstrdup(c->name);
 	} else {
 		char **tmp = array_make(nick, ",", 0, 0, 0);
 		int i;
@@ -1825,7 +1833,6 @@ COMMAND(cmd_msg)
 		}
 	}
 
-
 	if (count > 1 && chat) {
 		uin_t *uins = xmalloc(count * sizeof(uin_t));
 		int realcount = 0;
@@ -1845,7 +1852,11 @@ COMMAND(cmd_msg)
 		xfree(uins);
 	}
 
-	add_send_nick(nick);
+	if (!add_send)
+		add_send = xstrdup(nick);
+
+	add_send_nick(add_send);
+	xfree(add_send);
 
 	if (valid && (!sess || sess->state != GG_STATE_CONNECTED))
 		printq("not_connected_msg_queued");
@@ -4002,7 +4013,7 @@ int command_remove(const char *name)
  *
  * '?' - olewamy,
  * 'U' - rêcznie wpisany uin, nadawca mesgów,
- * 'u' - nazwa lub uin z kontaktów, rêcznie wpisany uin, nadawca mesgów,
+ * 'u' - nazwa lub uin z kontaktów, nazwa konferencji, rêcznie wpisany uin, nadawca mesgów,
  * 'c' - komenda,
  * 'i' - nicki z listy ignorowanych osób,
  * 'd' - komenda dcc,
