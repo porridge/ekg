@@ -615,7 +615,7 @@ static void setup_debug()
 	fcntl(fd[1], F_SETFL, O_NONBLOCK);
 	
 	gg_debug_file = fdopen(fd[1], "w");
-	setbuf(gg_debug_file, NULL);
+	setbuf(gg_debug_file, NULL);		/* XXX leak */
 
 	list_add(&watches, &se, sizeof(se));
 }

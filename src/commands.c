@@ -1180,8 +1180,8 @@ COMMAND(cmd_msg)
 
 	count = array_count(nicks);
 	msg = xstrdup(params[1]);
-	iso_to_cp(msg);
 	escaped = log_escape(msg);
+	iso_to_cp(msg);
 
 	for (p = nicks; *p; p++) {
 		if (!strcmp(*p, ""))
