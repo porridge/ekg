@@ -5,11 +5,12 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
-// 2002-09-07
+// 2002-09-08
 
 - mamo, a speedy popsul VOIP i ncurses ;P (s)
 - wymuszanie ui-readline [--enable-force-readline] (s)
 - sigh... dlaczego config.h.in sie nie robilo ? (s)
+- poprawka dope³niania tabem (jp/w)
 
 // 2002-09-07
 

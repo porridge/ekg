@@ -871,7 +871,7 @@ static void complete(int *line_start, int *line_index)
 	}
 
 	/* nietypowe dope³nienie nicków przy rozmowach */
-	if (!strcmp(line, "") || ((!strncasecmp(line, "chat ", 5) || !strncasecmp(line, "/chat ", 6))  && blanks < 3 && send_nicks_count > 0)) {
+	if (!strcmp(line, "") || ((!strncasecmp(line, "chat ", 5) || !strncasecmp(line, "/chat ", 6)) && blanks == 2 && send_nicks_count > 0) || (!strcasecmp(line, "chat ") || !strcasecmp(line, "/chat"))) {
 		if (send_nicks_count)
 			snprintf(line, sizeof(line), (window_current->target) ? "/chat %s " : "chat %s ", send_nicks[send_nicks_index++]);
 		else
