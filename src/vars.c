@@ -317,11 +317,6 @@ int variable_add(const char *name, const char *short_name, int type, int display
 				fprintf(stderr, "Error! Variable short name conflict:\n- short name: \"%s\"\n- existing variable: \"%s\"\n- conflicting variable: \"%s\"\n\nPress any key to continue...", short_name, v->name, name);
 				getchar();
 			}
-			
-			if (isdigit(short_name[0]) || isdigit(short_name[1])) {
-				fprintf(stderr, "Error! Variable short name cannot contain digits\n- short name: \"%s\"\n\nPress any key to continue...", short_name);
-				getchar();
-			}
 		}
 	}
 
