@@ -6,10 +6,12 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
-// 2002-01-19
+// 2003-01-19
 
 - poprawki kompilacji na BeOSie (w)
 - libgadu: poprawki kompilacji na BeOSie (w)
+- dodanie formatu ,,sms_conf'' przy wiadomo¶ci konferencyjnej (rmrmg/sz)
+- ,,on nasz_nick descr'' te¿ zadzia³a (krzyk/sz)
 
 // 2003-01-18
 

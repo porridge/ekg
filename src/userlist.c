@@ -308,7 +308,7 @@ int userlist_write_wap()
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
 		
-		fprintf(f, "%s:%d%s%s\n", u->display, u->status,(u->descr)?":":"" ,(u->descr)?u->descr:"");
+		fprintf(f, "%s:%d%s%s\n", u->display, u->status, (u->descr) ? ":" : "", (u->descr) ? u->descr : "");
 	}
 
 	fclose(f);

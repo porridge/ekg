@@ -3547,9 +3547,12 @@ void update_status()
 	if (!u)
 		return;
 
+	if (u->descr && config_reason && strcmp(u->descr, config_reason))
+		event_check(EVENT_DESCR, config_uin, u->descr);
+
 	xfree(u->descr);
 	u->descr = xstrdup(config_reason);
-	
+
 	if (!sess || sess->state != GG_STATE_CONNECTED)
 		u->status = (u->descr) ? GG_STATUS_NOT_AVAIL_DESCR : GG_STATUS_NOT_AVAIL;
 	else

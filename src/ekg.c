@@ -143,7 +143,7 @@ static struct {
 
 #undef EKG_HANDLER
 
-	{ -1, NULL, NULL }, 
+	{ -1, NULL, NULL }
 };
 
 /*

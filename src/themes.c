@@ -847,7 +847,6 @@ void theme_init()
 	format_add("welcome", "%> %TEKG-%1%n (Eksperymentalny Klient Gadu-Gadu)\n%> Program jest rozprowadzany na zasadach licencji GPL v2\n%> %RPrzed u¿yciem wci¶nij F1 lub wpisz ,,help''%n\n\n", 1);
 	format_add("welcome,speech", "witamy w e k g", 1);
 	format_add("ekg_version", "%) EKG - Eksperymentalny Klient Gadu-Gadu (%T%1%n)\n%) libgadu-%1 (protokó³ %2, klient %3)\n", 1);
-	format_add("group_empty", "%! Grupa %T%1%n jest pusta\n", 1);
 	format_add("secure", "%Y(szyfrowane)%n ", 1);
 
 	/* mail */
@@ -1061,6 +1060,7 @@ void theme_init()
 	format_add("sms_failed", "%! SMS do %T%1%n nie zosta³ wys³any\n", 1);
 	format_add("sms_msg", "EKG: msg %1 %# >> %2", 1);
 	format_add("sms_chat", "EKG: chat %1 %# >> %2", 1);
+	format_add("sms_conf", "EKG: conf %1 %# >> %2", 1);
 
 	/* wyszukiwanie u¿ytkowników */
 	format_add("search_failed", "%! Wyst±pi³ b³±d podczas szukania: %1\n", 1);
@@ -1106,9 +1106,11 @@ void theme_init()
 	format_add("user_info_blocked", "%mblokuj±c%@1%n", 1);
 	format_add("user_info_unknown", "%Mnieznany%n", 1);
 
+	/* grupy */
 	format_add("group_members", "%) Grupa %T%1%n: %2\n", 1);
 	format_add("group_member_already", "%! %1 nale¿y ju¿ do grupy %T%2%n\n", 1);
 	format_add("group_member_not_yet", "%! %1 nie nale¿y do grupy %T%2%n\n", 1);
+	format_add("group_empty", "%! Grupa %T%1%n jest pusta\n", 1);
 
 	/* status */
 	format_add("show_status_profile", "%) Profil: %T%1%n\n", 1);

@@ -565,7 +565,10 @@ void handle_msg(struct gg_event *e)
 			if (config_sms_max_length && strlen(e->event.msg.message) > config_sms_max_length)
 				e->event.msg.message[config_sms_max_length] = 0;
 
-			foo = format_string(format_find((chat) ? "sms_chat" : "sms_msg"), sender, e->event.msg.message);
+			if (e->event.msg.recipients_count)
+				foo = format_string(format_find("sms_conf"), sender, e->event.msg.message);
+			else
+				foo = format_string(format_find((chat) ? "sms_chat" : "sms_msg"), sender, e->event.msg.message);
 
 			/* niech nie wysy³a smsów, je¶li brakuje formatów */
 			if (strcmp(foo, ""))
