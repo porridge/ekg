@@ -14,6 +14,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - segfault przy completion_notify 2 i dope³nianiu tabem (Murphy/w)
 - usuniêcie niepotrzebnego ju¿ katalogu misc/ (w)
 - dodanie arim_irc.theme, dj.theme (Arim,dawjar/w)
+- usuniêcie niepotrzebnych includów z libgadu (m.in. <sys/time.h>) (w)
 
 // 2002-09-08
 
