@@ -575,7 +575,6 @@ COMMAND(cmd_find)
 		free(query);
 		array_free(argv);
 		gg_search_request_free(r);
-		free(r);
 		return;
 	}
 

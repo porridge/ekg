@@ -32,6 +32,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - wynik wyszukiwania nie jest ju¿ rozstrzelony co dwie linijki (w)
 - dodanie gg_search_request_free(), podbicie API (w)
 - dodanie osobnych timestampów dla czasu nadania wiadomo¶ci (Bies/w)
+- poprawka potencjalnego segfaulta w szukaniu (wysek/w)
 
 // 2002-09-10
 
