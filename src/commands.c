@@ -3225,8 +3225,8 @@ cleanup:
 COMMAND(cmd_on)
 {
 	if (match_arg(params[0], 'a', "add", 2)) {
-		int flags, i, res = -1;
-		char **arr;
+		int flags, res = -1;
+		int uin;
 
 		if (!params[1] || !params[2] || !params[3]) {
 			printq("not_enough_params", name);
@@ -3238,25 +3238,12 @@ COMMAND(cmd_on)
 			return -1;
 		}
 
-		arr = array_make(params[2], ",", 0, 1, 1);
-
-		if (!arr || !arr[0]) {
-			printq("invalid_params", name);
-			array_free(arr);
+		uin = get_uin(params[2]);
+		
+		if (!uin && strcmp(params[2], "*") && params[2][0] != '@') {
+			printq("user_not_found", params[2]);
 			return -1;
 		}
-
-		for (i = 0; arr[i]; i++) {
-			int uin = get_uin(arr[i]);
-			
-			if (!uin && strcmp(arr[i], "*") && arr[i][0] != '@' && strlen(arr[i]) > 1) {
-				printq("user_not_found", arr[i]);
-				array_free(arr);
-				return -1;
-			}
-		}
-
-		array_free(arr);
 
 		if (!(res = event_add(flags, params[2], params[3], quiet)))
 			config_changed = 1;
@@ -3284,10 +3271,7 @@ COMMAND(cmd_on)
 
 		for (l = events; l; l = l->next) {
 			struct event *ev = l->data;
-			char *tmp = event_format_targets(ev->targets);
-
-			printq((ev->flags & INACTIVE_EVENT) ? "events_list_inactive" : "events_list", event_format(abs(ev->flags)), tmp, ev->action, ev->name);
-			xfree(tmp);
+			printq((ev->flags & INACTIVE_EVENT) ? "events_list_inactive" : "events_list", event_format(abs(ev->flags)), event_format_target(ev->target), ev->action, ev->name);
 			count++;
 		}
 
@@ -4586,6 +4570,7 @@ void command_init()
 	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez "
 	  "wzglêdu na ustawienia zmiennych.");
 
+#ifdef HAVE_OPENSSL
 	command_add
 	( "key", "?u", cmd_key, 0,
 	  " [opcje]", "zarz±dzanie kluczami dla SIM",
@@ -4594,6 +4579,7 @@ void command_init()
 	  "  -s, --send <numer/alias>    wysy³a nasz klucz publiczny\n"
 	  "  -d, --delete <numer/alias>  usuwa klucz publiczny\n"
 	  "  [-l, --list]                wy¶wietla posiadane klucze publiczne\n");
+#endif
 
 	command_add
 	( "last", "uu", cmd_last, 0,
@@ -4677,7 +4663,6 @@ void command_init()
 	  "\n"
 	  "Zdarzenia mo¿na ³±czyæ ze sob± za pomoc± przecinka lub ,,|''. Jako numer/alias "
 	  "mo¿na podaæ ,,*'', dziêki czemu zdarzenie bêdzie dotyczyæ ka¿dego u¿ytkownika. "
-	  "Wiêksz± ilo¶æ u¿ytkowników lub grup nale¿y rozdzieliæ przecinkiem bez spacji.  "
 	  "Je¶li kto¶ posiada indywidualn± akcjê na dane zdarzenie, to tylko ona zostanie "
 	  "wykonana. Mo¿na podaæ wiêcej komend, oddzielaj±c je ¶rednikiem. W komendzie, %T\\%1%n "
 	  "zostanie zast±pione numerkiem sprawcy zdarzenia, a je¶li istnieje on na naszej "

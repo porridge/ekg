@@ -84,7 +84,7 @@ struct transfer {
 
 struct event {
 	char *name;	/* identyfikator */
-        char *targets;	/* rozdzielona przecinkami lista uinów, aliasów lub grup */
+        char *target;	/* uin, alias lub grupa w formie ³añcucha znaków */
         int flags;	/* flagi zdarzenia */
         char *action;	/* akcja! */
 };
@@ -360,10 +360,10 @@ int emoticon_read();
 char *emoticon_expand(const char *s);
 void emoticon_free();
 
-int event_add(int flags, const char *targets, const char *action, int quiet);
+int event_add(int flags, const char *target, const char *action, int quiet);
 int event_remove(const char *name, int quiet);
 const char *event_format(int flags);
-char *event_format_targets(const char *targets);
+const char *event_format_target(const char *target);
 int event_flags(const char *events);
 int event_check(int event, uin_t uin, const char *data);
 void event_free();

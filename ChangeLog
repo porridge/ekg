@@ -6,6 +6,15 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-02-03
+
+- poprawka kompilacji przy braku openssl'a (*/sz)
+- zapêdzi³em siê: on przyjmuje znów tylko jednego u¿ytkownika/grupê.
+  przy wiêkszej ilo¶ci trzeba by wiele rzeczy sprawdzaæ, a to tylko
+  niepotrzebnie skomplikowa³oby i tak ju¿ brzydki kod (z powodu
+  ma³ych mo¿liwo¶ci manipulacji grupami). w ogóle to, zamiast /on
+  lepiej u¿yæ o wiele lepszego python'a ;> (sz)
+
 // 2003-02-02
 
 - komenda ,,key'' do obs³ugi kluczy SIM (sz)

@@ -1283,7 +1283,7 @@ void config_write_main(FILE *f, int base64)
         for (l = events; l; l = l->next) {
                 struct event *e = l->data;
 
-                fprintf(f, "on %s %s %s\n", event_format(e->flags), e->targets, e->action);
+                fprintf(f, "on %s %s %s\n", event_format(e->flags), e->target, e->action);
         }
 
 	for (l = bindings; l; l = l->next) {
@@ -1947,28 +1947,65 @@ void emoticon_free()
  * dodaje zdarzenie do listy zdarzeñ.
  *
  *  - flags,
- *  - targets,
+ *  - target,
  *  - action,
  *  - quiet.
  *
  * 0/-1
  */
-int event_add(int flags, const char *targets, const char *action, int quiet)
+int event_add(int flags, const char *target, const char *action, int quiet)
 {
         int f;
         list_t l;
         struct event e;
+	uin_t uin;
+	struct userlist *u;
+	char **arr = NULL;
+
+	if (!target || !action)
+		return -1;
+
+	uin = str_to_uin(target);
+
+	if ((u = userlist_find(uin, target)))
+		uin = u->uin;
+
+	for (l = events; l; l = l->next) {
+		struct event *ev = l->data;
+
+		if (ev->target[0] == '@')
+			array_add(&arr, xstrdup(ev->target));
+	}
 
         for (l = events; l; l = l->next) {
                 struct event *ev = l->data;
+		int match = 0, i;
 
-                if (!strcasecmp(targets, ev->targets) && (f = ev->flags & flags) != 0) {
-			char *tmp = event_format_targets(ev->targets);
-			printq("events_exist", event_format(f), tmp);
-			xfree(tmp);
-                        return -1;
-                }
+		if (target[0] == '@') {
+			struct userlist *uu = userlist_find(str_to_uin(ev->target), ev->target);
+
+			if (uu && group_member(uu, target + 1))
+				match = 1;
+		}
+
+		for (i = 0; arr && arr[i]; i++) {
+			if (u && group_member(u, arr[i] + 1)) {
+				match = 1;
+				break;
+			}
+		}
+
+		if (!strcasecmp(ev->target, target) || !strcmp(ev->target, itoa(uin)) || (u && u->display && !strcasecmp(ev->target, u->display)))
+			match = 1;
+
+		if (match && (f = ev->flags & flags)) {
+			printq("events_exist", event_format(f), event_format_target(target));
+			array_free(arr);
+			return -1;
+		}
         }
+
+	array_free(arr);
 
 	for (f = 1; ; f++) {
 		int taken = 0;
@@ -1987,7 +2024,7 @@ int event_add(int flags, const char *targets, const char *action, int quiet)
 	}
 
 	e.name = xstrdup(itoa(f));
-        e.targets = xstrdup(targets);
+        e.target = xstrdup(target);
         e.flags = flags;
         e.action = xstrdup(action);
 
@@ -2078,44 +2115,29 @@ const char *event_format(int flags)
 }
 
 /*
- * event_format_targets()
+ * event_format_target()
  *
- * zwraca zaalokowany ³añcuch ze sformatowanymi
- * uinami, aliasami.
+ * zajmuje siê sformatowaniem uina/aliasu w ³ancuchu
+ * znaków ze zdarzenia. nie zwalniaæ.
  */
-char *event_format_targets(const char *targets)
+const char *event_format_target(const char *target)
 {
-	int i;
-	string_t ftargets;
-	char **arr;
+	struct userlist *u;
+	uin_t uin;
 
-	if (!targets)
-		return xstrdup("");
+	if (!target)
+		return "";
 
-        arr = array_make(targets, ",", 0, 1, 1);
+	uin = str_to_uin(target);
+	u = userlist_find(0, target);
 
-        if (!arr || !arr[0]) {
-                array_free(arr);
-                return xstrdup("");
-        }
+	if (u)
+		return format_user(u->uin);
 
-	ftargets = string_init(NULL);
-
-        for (i = 0; arr[i]; i++) {
-		int uin = get_uin(arr[i]);
-
-		if (i)
-			string_append(ftargets, ",");
-
-		if (!uin && (arr[i][0] == '@' || !strcmp(arr[i], "*")))
-			string_append(ftargets, arr[i]);
-		else
-                	string_append(ftargets, format_user(uin));
-        }
-
-        array_free(arr);
-
-	return string_free(ftargets, 0);
+	if (uin)
+		return format_user(uin);
+	else
+		return target;
 }
 
 /*
@@ -2164,8 +2186,8 @@ int event_check(int event, uin_t uin, const char *data)
 	const char *uin_number = NULL, *uin_display = NULL;
         char *action = NULL, **actions, *edata = NULL;
 	struct userlist *u;
-        list_t l;
 	int i;
+        list_t l;
 
 	uin_number = itoa(uin);
 
@@ -2182,30 +2204,15 @@ int event_check(int event, uin_t uin, const char *data)
 		
                 if (e->flags & event) {
 
-			if (strchr(e->targets, '*'))
+			if (!strcmp(e->target, "*"))
 				action = e->action;
 
-			if (strstr(e->targets, uin_number) || strstr(e->targets, uin_display)) {
+			if (!strcmp(e->target, uin_number) || !strcasecmp(e->target, uin_display) || (u && group_member(u, e->target + 1))) {
 				action = e->action;
 				break;
 			}
-
-			if (u) {
-				list_t l;
-
-				for (l = u->groups; l; l = l->next) {
-					struct group *g = l->data;
-
-					if (strstr(e->targets, g->name)) {
-						action = e->action;
-						goto out;
-					}
-				}
-                	}
         	}
 	}
-
-out:
 
         if (!action)
                 return -1;
