@@ -22,6 +22,9 @@
 #include <unistd.h>
 #include <ncurses.h>
 #include <signal.h>
+#ifndef _AIX
+#  include <string.h>
+#endif
 #include "config.h"
 #include "stuff.h"
 #include "commands.h"
@@ -38,6 +41,9 @@ static void ui_ncurses_query(const char *param);
 static void ui_ncurses_deinit();
 
 static WINDOW *status = NULL, *input = NULL, *output = NULL;
+#define HISTORY_MAX 1000
+char *history[HISTORY_MAX];
+int history_index = 0;
 int lines = 0, x = 0, y = 0, start = 0;
 char line[1000] = "";
 
@@ -57,6 +63,7 @@ static void set_cursor()
 static void ui_ncurses_print(const char *target, const char *line)
 {
 	const char *p;
+	int x = 0;
 
 	set_cursor();
 
@@ -93,9 +100,17 @@ static void ui_ncurses_print(const char *target, const char *line)
 			if (!*(p + 1))
 				break;
 			y++;
+			x = 0;
 			set_cursor();
-		} else
+		} else {
 			waddch(output, (unsigned char) *p);
+			x++;
+			if (x == stdscr->_maxx + 1) {
+				y++;
+				x = 0;
+				set_cursor();
+			}
+		}
 	}
 
 	y++;
@@ -154,13 +169,15 @@ void ui_ncurses_init()
 	wnoutrefresh(input);
 	doupdate();
 
-	ui_ncurses_print("__current", "\033[1m
-    *** Ten interfejs u¿ytkownika jest jeszcze w bardzo wczesnym stadium ***
-    *** rozwoju! NIE PISZ, JE¦LI JAKA¦ OPCJA NIE DZIA£A. Doskonale o tym ***
-    *** wiadomo. Po prostu cierpliwie poczekaj, a¿ zostanie napisany.    ***
+	ui_ncurses_print("__current", "\033[1m\n\
+    *** Ten interfejs u¿ytkownika jest jeszcze w bardzo wczesnym stadium ***\n\
+    *** rozwoju! NIE PISZ, JE¦LI JAKA¦ OPCJA NIE DZIA£A. Doskonale o tym ***\n\
+    *** wiadomo. Po prostu cierpliwie poczekaj, a¿ zostanie napisany.    ***\n\
 \033[0m");
 
 	signal(SIGINT, SIG_IGN);
+	
+	memset(history, 0, sizeof(history));
 }
 
 static void ui_ncurses_deinit()
@@ -173,6 +190,10 @@ static void ui_ncurses_deinit()
 
 static void ui_ncurses_loop()
 {
+	int line_start = 0, line_index = 0;
+
+	history[0] = line;
+
 	for (;;) {
 		int ch;
 
@@ -182,31 +203,82 @@ static void ui_ncurses_loop()
 			case KEY_DC:
 			case 8:
 			case 127:
-				if (strlen(line) > 0)
-					line[strlen(line) - 1] = 0;
+				if (strlen(line) > 0 && line_index > 0) {
+					memmove(line + line_index - 1, line + line_index, sizeof(line) - line_index);
+					line[sizeof(line) - 1] = 0;
+					line_index--;
+				}
 				break;
+			case 'D' - 64:
+				if (line_index < strlen(line)) {
+					memmove(line + line_index, line + line_index + 1, sizeof(line) - line_index - 1);
+					line[sizeof(line) - 1] = 0;
+				}
+				break;	
 			case KEY_ENTER:
 			case 13:
 				if (ekg_execute(NULL, line))
 					return;
+				if (history[0] != line)
+					xfree(history[0]);
+				history[0] = xstrdup(line);
+				xfree(history[HISTORY_MAX - 1]);
+				memmove(&history[1], &history[0], sizeof(history) - sizeof(history[0]));
+				history[0] = line;
+				history_index = 0;
 				line[0] = 0;
+				line_index = 0;
 				break;	
 			case 'U' - 64:
 				line[0] = 0;
+				line_index = 0;
 				break;
 			case 'L' - 64:
 				break;
 			case 9:
 				if (send_nicks_count > 0) {
 					snprintf(line, sizeof(line), "chat %s ", send_nicks[send_nicks_index++]);
+					line_start = 0;
+					line_index = strlen(line);
 					if (send_nicks_index >= send_nicks_count)
 						send_nicks_index = 0;
 				}
 				break;
 			case KEY_LEFT:
+				if (line_index > 0)
+					line_index--;
+				break;
 			case KEY_RIGHT:
+				if (line_index < strlen(line))
+					line_index++;
+				break;
+			case 'E' - 64:
+			case KEY_END:
+				line_index = strlen(line);
+				break;
+			case 'A' - 64:
+			case KEY_HOME:
+				line_index = 0;
+				break;
 			case KEY_UP:
+				if (history[history_index + 1]) {
+					if (history_index == 0)
+						history[0] = xstrdup(line);
+					history_index++;
+					strcpy(line, history[history_index]);
+					line_index = strlen(line);
+				}
+				break;
 			case KEY_DOWN:
+				if (history_index > 0) {
+					history_index--;
+					strcpy(line, history[history_index]);
+					line_index = strlen(line);
+					if (history_index == 0) {
+						xfree(history[0]);
+						history[0] = line;
+					}
+				}
 				break;
 			case KEY_PPAGE:
 				start -= output_size;
@@ -219,12 +291,16 @@ static void ui_ncurses_loop()
 					start = lines - output_size;
 				break;
 			default:
-				line[strlen(line) + 1] = 0;
-				line[strlen(line)] = ch;
+				if (strlen(line) >= sizeof(line) - 1)
+					break;
+				memmove(line + line_index + 1, line + line_index, sizeof(line) - line_index - 1);
+
+				line[line_index++] = ch;
 		}
 		pnoutrefresh(output, start, 0, 0, 0, output_size - 1, 80);
 		werase(input);
-		mvwaddstr(input, 0, 0, line);
+		mvwaddstr(input, 0, 0, line + line_start);
+		wmove(input, 0, line_index);
 		wnoutrefresh(status);
 		wnoutrefresh(input);
 		doupdate();

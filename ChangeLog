@@ -10,6 +10,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - porz±dkowanie funkcji w stuff.c (w)
 - dodawanie const do deklaracji funkcji, gdzie trzeba (w)
 - porz±dki w event_flags() i event_format() (w)
+- historia i edycja linii w ui-ncurses. jest ju¿ u¿ywalne. (w)
 
 // 2002-06-27
 
