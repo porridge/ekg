@@ -19,6 +19,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   powodowaæ b³êdów na NetBSD. wszystkie w miarê nowe wersje readline
   instaluj± siê w $prefix/include/readline/readline.h (w)
 - wys³anie wiadomo¶ci nie otwiera okienka (jojo/w)
+- poprawka helpa aliasów i debugowych komend (sdas/w)
+- przerzucenie tekstu z F1 do theme'u (thv/w)
 
 // 2002-09-19
 

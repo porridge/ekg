@@ -769,6 +769,11 @@ COMMAND(cmd_help)
 		for (l = commands; l; l = l->next) {
 			struct command *c = l->data;
 			
+			if (!strcasecmp(c->name, params[0]) && c->alias) {
+				print("help_alias", params[0]);
+				return;
+			}
+
 			if (!strcasecmp(c->name, params[0]) && !c->alias) {
 			    	char *blah = NULL;
 
@@ -813,7 +818,7 @@ COMMAND(cmd_help)
 
 	print("help_footer");
 
-	binding_help(0, 0);
+	print("help_quick");
 }
 
 COMMAND(cmd_ignore)
@@ -2223,13 +2228,7 @@ int binding_quick_list(int a, int b)
 
 int binding_help(int a, int b)
 {
-	/* XXX proszê siê nie czepiaæ tego kodu. za jaki¶ czas poprawiê. */
-
-	print("generic", "-----------------------------------------------------------------");
-	print("generic", "Przed u¿yciem przeczytaj ulotkê. Plik \033[1mdocs/ULOTKA\033[0m zawiera krótki");
-	print("generic", "przewodnik po za³±czonej dokumentacji. Je¶li go nie masz, mo¿esz");
-	print("generic", "¶ci±gn±æ pakiet ze strony \033[1mhttp://dev.null.pl/ekg/\033[0m");
-	print("generic", "-----------------------------------------------------------------");
+	print("help_quick");
 
 	return 0;
 }
@@ -2882,33 +2881,33 @@ void command_init()
 	  "");
   
 	command_add
-	( "_add", "?", cmd_test_add, 0, "", "",
-	  "Dodaje do listy dope³niania TABem");
+	( "_add", "?", cmd_test_add, 0, "",
+	  "dodaje do listy dope³niania TABem", "");
 	command_add
-	( "_fds", "", cmd_test_fds, 0, "", "",
-	  "Wy¶wietla otwarte deskryptory");
+	( "_fds", "", cmd_test_fds, 0, "", 
+	  "wy¶wietla otwarte deskryptory", "");
 	command_add
-	( "_msg", "u?", cmd_test_send, 0, "", "",
-	  "Udaje, ¿e wysy³a wiadomo¶æ");
+	( "_msg", "u?", cmd_test_send, 0, "",
+	  "udaje, ¿e wysy³a wiadomo¶æ", "");
 	command_add
-	( "_ping", "", cmd_test_ping, 0, "", "",
-	  "Wysy³a pakiet ping do serwera");
+	( "_ping", "", cmd_test_ping, 0, "", 
+	  "wysy³a pakiet ping do serwera", "");
 	command_add
-	( "_segv", "", cmd_test_segv, 0, "", "",
-	  "Wywo³uje naruszenie segmentacji pamiêci");
+	( "_segv", "", cmd_test_segv, 0, "", 
+	  "wywo³uje naruszenie segmentacji pamiêci", "");
 	command_add
-	( "_watches", "", cmd_test_watches, 0, "", "",
-	  "Wy¶wietla listê sprawdzanych deskryptorów");
+	( "_watches", "", cmd_test_watches, 0, "", 
+	  "wy¶wietla listê sprawdzanych deskryptorów", "");
 #ifdef WITH_PYTHON
 	command_add
-	( "_load", "?", cmd_test_python, 0, "", "",
-	  "£aduje skrypt");
+	( "_load", "?", cmd_test_python, 0, "", 
+	  "³aduje skrypt", "");
 	command_add
-	( "_run", "?", cmd_test_python, 0, "", "",
-	  "Uruchamia skrypt");
+	( "_run", "?", cmd_test_python, 0, "", 
+	  "uruchamia skrypt", "");
 	command_add
-	( "_py", "?", cmd_test_python, 0, "", "",
-	  "Wykonuje polecenie Pythona");
+	( "_py", "?", cmd_test_python, 0, "",
+	  "wykonuje polecenie Pythona", "");
 #endif
 }
 

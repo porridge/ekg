@@ -725,7 +725,9 @@ void theme_init()
 	/* pomoc */
 	format_add("help", "%> %1%2 - %3%4\n", 1);
 	format_add("help_more", "%) %1\n", 1);
-	format_add("help_footer", "%> Gwiazdka (%T*%n) oznacza, ¿e mo¿na uzyskaæ wiêcej szczegó³ów\n", 1);
+	format_add("help_alias", "%) %T%1%n jest aliasem i nie posiada opisu\n", 1);
+	format_add("help_footer", " \n%> Gwiazdka (%T*%n) oznacza, ¿e mo¿na uzyskaæ wiêcej szczegó³ów\n\n", 1);
+	format_add("help_quick", "%> Przed u¿yciem przeczytaj ulotkê. Plik %Tdocs/ULOTKA%n zawiera krótki\n%> przewodnik po za³±czonej dokumentacji. Je¶li go nie masz, mo¿esz\n%> ¶ci±gn±æ pakiet ze strony %Thttp://dev.null.pl/ekg/%n\n", 1);
 
 	/* ignore, unignore */
 	format_add("ignored_added", "%> Dodano %T%1%n do listy ignorowanych\n", 1);
