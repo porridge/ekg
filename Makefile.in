@@ -3,12 +3,15 @@
 INCLUDES = @CURSES_INCLUDEDIR@ @READLINE_INCLUDES@
 LIBS = @LIBS@ @CURSES_LIBS@ @READLINE_LIBS@
 CC = @CC@ 
-PREFIX = @prefix@
+prefix = @prefix@
+datadir = @datadir@
+mandir = @mandir@
 NAME = ekg
 VERSION = 0.90
 RM = @RM@
 MAKE = @MAKE@
 AR = @AR@
+install = @INSTALL@
 
 CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES)
 OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o
@@ -20,7 +23,12 @@ ekg:	$(OBJS) $(LOBJS) ekg.c
 	$(CC) $(CFLAGS) ekg.c -o $(NAME) $(OBJS) $(LOBJS) $(LIBS) 
 
 install: ekg
-	install ekg $(PREFIX)/bin
+	$(install) -m 755 ekg $(prefix)/bin
+	$(install) -m 755 docs/ekg.pl $(prefix)/bin
+	@$(install) -d $(datadir)/ekg/themes/
+	$(install) -m 644 themes/*.theme $(datadir)/ekg/themes
+	@$(install) -d $(mandir)/mann
+	$(install) -m 644 docs/ekg.man $(mandir)/mann
 
 distclean:	clean
 	$(RM) -f *~ config.log config.cache config.status config.h Makefile
