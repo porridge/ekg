@@ -10,6 +10,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - uaktualnienie docs/on.txt (jmk/w)
 - poprawka tab completion (gawrysz/w)
 - dodanie opisu protoko³u dcc w pliku docs/dcc-protocol.txt (ws/w)
+- poprawka segfaulta przy userliscie na serwerze (dyziu/w)
 
 // 2002-04-09
 
