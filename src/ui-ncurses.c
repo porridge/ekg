@@ -3115,7 +3115,6 @@ int binding_key(struct binding *b, const char *key, int add)
  */
 static void binding_add(const char *key, const char *action, int internal, int quiet)
 {
-	int correct = 0;
 	struct binding b, *c = NULL;
 	list_t l;
 	
@@ -3169,7 +3168,7 @@ static void binding_add(const char *key, const char *action, int internal, int q
 			c->internal = 0;
 		}
 
-		if (!in_autoexec && correct && !internal)
+		if (!in_autoexec)
 			config_changed = 1;
 	}
 }

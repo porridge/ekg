@@ -4150,7 +4150,7 @@ void command_init()
 
 	command_add
 	( "bind", "???", cmd_bind, 0,
-	  " <opcja> [sekwencja] [komenda]", "przypisywanie akcji klawiszom",
+	  " [opcje]", "przypisywanie akcji klawiszom",
 	  "\n"
 	  "  -a, --add <sekwencja> <komenda>  przypisuje now± sekwencjê\n"
 	  "  -d, --del <sekwencja>            usuwa podan± sekwencjê\n"

@@ -1046,13 +1046,13 @@ int main(int argc, char **argv)
 		config_read(NULL, "display_transparent");
 #endif
 
+	in_autoexec = 1;
+
 	ui_init();
 	ui_event("theme_init");
 
 	config_timestamp = xstrdup("%H:%M ");
 	config_display_color_map = xstrdup("nTgGbBrR");
-
-	in_autoexec = 1;
 
 	config_read(NULL, NULL);
 
