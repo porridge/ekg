@@ -10,6 +10,7 @@ klient:
 - uzupe³niæ dope³nienia (w tym nicki ze spacjami),
 - wykrywanie niewidocznych jako opcja.
 - korzystaæ z getopt.
+- round-robin serwerów.
 
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,
