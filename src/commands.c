@@ -73,7 +73,8 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_status(), command_register(), command_test_watches(),
 	command_remind(), command_dcc(), command_query(), command_passwd(),
 	command_test_ping(), command_on(), command_change(),
-	command_test_fds(), command_test_segv(), command_version();
+	command_test_fds(), command_test_segv(), command_version(), 
+	command_history();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -104,6 +105,7 @@ struct command commands[] = {
 	{ "!", "?", command_exec, " <polecenie>", "Synonim dla %Wexec%n", "" },
 	{ "find", "u", command_find, " [opcje]", "Interfejs do katalogu publicznego", "  -u, --uin <numerek>\n  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>\n  -c, --city <miasto>\n  -b, --born <min:max>\n  -p, --phone <telefon>\n  -e, --email <e-mail>\n  -a, --active\n  -F, --female\n  -M, --male\n  --start <od>" },
 	{ "help", "c", command_help, " [polecenie]", "Wy¶wietla informacjê o poleceniach", "" },
+	{ "history", "u?", command_history, " <numer/alias> [n]", "Wy¶wietla ostatnie n wypowiedzi w rozmowie z podan± osob±", ""},
 	{ "?", "c", command_help, " [polecenie]", "Synonim dla %Whelp%n", "" },
 	{ "ignore", "u", command_ignore, " [numer/alias]", "Dodaje do listy ignorowanych lub j± wy¶wietla", "" },
 	{ "invisible", "?", command_away, "", "Zmienia stan na niewidoczny", "" },
@@ -1489,6 +1491,43 @@ COMMAND(command_sms)
 
 	if (send_sms(number, params[1], 1) == -1)
 		my_printf("sms_error", strerror(errno));
+
+	return 0;
+}
+
+COMMAND(command_history)
+{
+	uin_t uin=0;
+	int n=10; // DOMYSLNA WARTOSC: 10 linii
+	
+	if ((!params[0])&&(!query_nick)) {
+		my_printf("not_enough_params");
+		return 0;
+	}
+	
+	if (params[1]!=NULL) { // sa oba parametry
+		uin=get_uin(params[0]);
+		n=atoi(params[1]);
+	} else { // jeden param
+		if (params[0]!=NULL) {
+			if (!query_nick) {
+				uin=get_uin(params[0]);
+			} else {
+				uin=get_uin(query_nick);
+				n=atoi(params[0]);
+			}
+		} else if (query_nick!=NULL) 
+				uin=get_uin(query_nick);
+		
+	}
+	
+	if (uin == 0) {
+		my_printf("history_error", "Brak wybranego u¿ytkownika na li¶cie kontaktów");
+		return 0;
+	}
+
+	if (print_history(uin, n) == -1)
+		my_printf("history_error", strerror(errno));
 
 	return 0;
 }

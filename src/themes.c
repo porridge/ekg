@@ -789,5 +789,9 @@ void init_theme()
 	add_format("quick_list_invisible", " %K%1%n", 1);
 	add_format("ekg_version", "%) EKG - Eksperymentalny Klient Gadu-Gadu (%W%1%n)\n", 1);
 	add_format("registered_today", "%! Ju¿ zarejestrowano jeden numer. Nie nadu¿ywaj.\n", 1);
+
+	add_format("history_send", "> %y%2 [%3]:%n %4\n", 1);
+	add_format("history_recv", "< %g%2 [%3]:%n %4\n", 1);
+	add_format("history_error", "%! %1\n", 1);
 };
 

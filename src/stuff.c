@@ -852,6 +852,120 @@ int send_sms(char *recipient, char *message, int show_result)
 }
 
 /*
+ * print_history()
+ * 
+ * wy¶wietla ostatnie n wypowiedzi w rozmowie z podan± osob±.
+ */
+
+int print_history(uin_t uin, int no)
+{
+	char *buf, *filename=config_log_path;
+	char path[PATH_MAX];
+	int f_lines_count=0;
+	int i=0;
+	char *token=NULL;
+	FILE *f;
+	
+	if (!config_log)
+		return 0;
+	
+	if (!filename) {
+		if (config_log == 2)
+			filename = ".";
+		else
+			filename = "gg.log";
+	}
+
+	if (*filename == '~')
+			snprintf(path, sizeof(path), "%s%s", home_dir, filename + 1);
+	        else
+			strncpy(path, filename, sizeof(path));
+
+	if (config_log == 2) {
+                if (mkdir(path, 0700) && errno != EEXIST)
+                        return 0;
+                snprintf(path + strlen(path), sizeof(path) - strlen(path), "/%u", uin);
+	}
+
+	if (!(f = fopen(path, "r")))
+		return 0;
+	if ( config_log == 1) { // jesli wszystko jest w jednym pliku
+		token = malloc(strlen(itoa(uin))+2);
+		strcpy(token, ",");
+		strcat(token, itoa(uin));
+		strcat(token, ",");
+	}
+	
+	while ((buf = read_file(f))) {
+		if ((config_log == 2)||((strstr(buf, token)!=NULL)))
+			f_lines_count++;
+		free(buf);
+	}
+	if ( f_lines_count == 0 ) {
+		my_printf("history_error", "Brak historii dla wybranego u¿ytkownika");
+		return 0;
+	}
+	if ( f_lines_count<no)	// mamy mniej logow, niz user sobie zyczy
+		f_lines_count=0;
+	else
+		f_lines_count-=no;
+	
+	fseek(f, 0, SEEK_SET);
+	while ((buf = read_file(f))) {
+		if ((config_log==2)||((strstr(buf, token)!=NULL)))
+			i++;
+		if ((i > f_lines_count)&&((config_log == 2)||(strstr(buf, token)!=NULL))) {
+			char *msgtype=NULL, *uin=NULL, *nick=NULL, *notsure=NULL, *ip=NULL, *msg=NULL;
+			char *time1=NULL, *time2=NULL;
+			time_t val=0;
+			msgtype = strtok(buf, ",");
+			uin = strtok(NULL, ",");
+			nick = strtok(NULL, ",");
+			notsure = strtok(NULL, ",");
+			if (strtol(notsure, NULL, 0)==0) {
+				ip = malloc(strlen(notsure));
+				strcpy(ip, notsure);
+				notsure = strtok(NULL, ",");
+			}
+			else {
+				ip = malloc(strlen("0.0.0.0"));
+				ip = "0.0.0.0";
+			}
+			val = strtol(notsure, NULL, 0);
+			time1 = malloc(256);
+			strftime(time1, 256, "%D %T", localtime(&val));
+			notsure = strtok(NULL, ",");
+			if (strtol(notsure, NULL, 0)>0) {
+				val = strtol(notsure, NULL, 0);
+				time2 = malloc(256);
+				strftime(time2, 256, "%D %T", localtime(&val));
+				strcpy(time2, notsure);
+				notsure = strtok(NULL, ",");
+			} else {
+				time2 = malloc(1);
+				time2 = 0;
+			}
+			msg = malloc(strlen(notsure));
+			msg = notsure;
+			notsure = strtok(NULL, ",");
+			while (notsure != NULL) {
+				strcat(msg, notsure);
+				notsure = strtok(NULL, ",");
+			}
+			if (strstr(msgtype, "send"))
+				my_printf("history_send", uin, nick, time1, msg, ip, time2);
+			else
+				my_printf("history_recv", uin, nick, time1, msg, ip, time2);
+		}
+		free(buf);
+	}
+	
+	free(token);
+	fclose(f);	
+	return 0;
+}
+
+/*
  * play_sound()
  *
  * odtwarza dzwiêk o podanej nazwie.

@@ -220,5 +220,6 @@ void ekg_logoff(struct gg_session *sess, char *reason);
 char *get_random_reason(char *path);
 char *emoticon_expand(char *s);
 int emoticon_read();
+int print_history(uin_t uin, int no);
 
 #endif
