@@ -30,6 +30,7 @@
 #include "libgadu.h"
 #include "dynstuff.h"
 #include "xmalloc.h"
+#include "ui.h"
 
 list_t variables = NULL;
 
@@ -190,6 +191,8 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 			if (v->notify)
 				(v->notify)(v->name);
 
+			ui_event("variable_changed", v->name);
+			
 			return 0;
 		}
 
@@ -207,6 +210,8 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 
 			if (v->notify)
 				(v->notify)(v->name);
+
+			ui_event("variable_changed", v->name);
 		
 			return 0;
 		}
@@ -230,6 +235,8 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 	
 			if (v->notify)
 				(v->notify)(v->name);
+
+			ui_event("variable_changed", v->name);
 
 			return 0;
 		}
