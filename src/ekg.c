@@ -1245,11 +1245,13 @@ int main(int argc, char **argv)
 	if (new_reason) {
 		xfree(config_reason);
 		config_reason = new_reason;
-		config_reason_first = xstrdup(config_reason);
 	}
 
 	if (set_private)
 		config_status |= GG_STATUS_FRIENDS_MASK;
+
+	/* uaktualnij wszystko, co trzeba */
+	change_status(config_status, config_reason, 2);
 
 	/* je¶li ma byæ theme, niech bêdzie theme */
 	if (load_theme)
@@ -1375,7 +1377,6 @@ void ekg_exit()
 	xfree(last_search_first_name);
 	xfree(last_search_last_name);
 	xfree(last_search_nickname);
-	xfree(config_reason_first);
 
 	if (config_last_sysmsg_changed)
 		array_add(&vars, xstrdup("last_sysmsg"));

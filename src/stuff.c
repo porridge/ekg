@@ -181,7 +181,6 @@ char *config_proxy_forwarding = NULL;
 int config_password_cp1250 = 0;
 char *config_interface = NULL;
 int config_reason_limit = 0;
-char *config_reason_first = NULL;
 char *config_dcc_limit = NULL;
 int config_ignore_unknown_sender = 0;
 #ifdef WITH_WAP
@@ -1204,13 +1203,6 @@ void ekg_connect()
 			gg_dcc_port = d->port;
 			
 		}
-	}
-
-	if (config_reason_first) {
-		/* przygotuj opis zgodnie z ustawieniami */
-		change_status(config_status, config_reason_first, 2);
-		xfree(config_reason_first);
-		config_reason_first = NULL;
 	}
 
 	memset(&p, 0, sizeof(p));

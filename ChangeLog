@@ -8,6 +8,7 @@ d - drg, sz - szalik).
 
 - /list w oknie poka¿e informacje o rozmówcy (weirdo,FIG/w)
 - poprawka wyszukiwania z --all (marcinzielona/w)
+- poprawka zachowania back_reason przy uruchamianiu ekg (a.latanski/w)
 
 // 2003-06-17
 

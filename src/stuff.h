@@ -305,7 +305,6 @@ time_t last_conn_event;
 time_t ekg_started;
 int server_index;
 int in_auto_away;
-char *config_reason_first;
 
 int use_proxy;
 int proxy_port;
