@@ -24,6 +24,7 @@ klient (ncurses):
 - konfiguracja listy obecnych (kolorki, co wy¶wietlaæ itd.)
 - mo¿liwo¶æ listy obecnych po lewej (koniu),
 - osobna historia dla ka¿dego okna (koniu),
+- poprawna reakcja na PageDown po /window clear (theKnight),
 
 - naprawienie nieszczêsnego /exec. doda³em ju¿ pole target do gg_exec,
   ale nie widzê jakiego¶ g³upiego b³êdu najwyrazniej.
