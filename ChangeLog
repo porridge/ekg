@@ -11,6 +11,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - usuniêcie zmiennych ,,proxy_*'' na rzecz jednej ,,proxy'' (w)
 - dodanie zmiennej ,,server'', opis w ,,docs/vars.txt'' (w)
 - porz±dki w cvsie. usuniêcie starych i niepotrzebnych plików (w)
+- poprawka b³êdnych statusów (wielu/w)
+- porz±dki w Makefile'ach i configure.in (w)
 
 // 2002-04-16
 

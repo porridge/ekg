@@ -66,6 +66,7 @@ struct list *events;
 struct gg_session *sess;
 
 int config_dcc;
+char *config_dcc_ip;
 int config_auto_away;
 int config_auto_save;
 time_t last_save;

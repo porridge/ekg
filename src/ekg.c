@@ -361,9 +361,9 @@ to unikn±æ tego typu b³êdów w przysz³o¶ci.\n\
 int main(int argc, char **argv)
 {
 	int auto_connect = 1, force_debug = 0, i, new_status = 0 ;
-	char *load_theme = NULL, *ioctl_daemon_path = IOCTL_DAEMON_PATH;
+	char *load_theme = NULL;
 #ifdef IOCTL
-    	char *sock_path = NULL;
+    	char *sock_path = NULL, *ioctl_daemon_path = IOCTL_DAEMON_PATH;
 #	define IOCTL_HELP "  -I, --ioctl-daemon-path [¦CIE¯KA]    ustawia ¶cie¿kê do ioctl_daemon-a\n"
 #else
 #	define IOCTL_HELP ""
@@ -432,6 +432,7 @@ IOCTL_HELP
 		}
 		if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "--theme"))
 			load_theme = argv[++i];
+#ifdef IOCTL
                 if (!strcmp(argv[i], "-I") || !strcmp(argv[i], "--ioctl-daemon-path")) {
                         if (argv[i+1]) {
                                 ioctl_daemon_path = argv[i+1];
@@ -441,6 +442,7 @@ IOCTL_HELP
                                 return 1;
                         }
                 }
+#endif
 	}
 	
         ekg_pid = getpid();

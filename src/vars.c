@@ -51,6 +51,7 @@ void variable_init()
 	variable_add("beep_notify", VAR_BOOL, 1, &config_beep_notify, NULL);
 	variable_add("completion_notify", VAR_BOOL, 1, &config_completion_notify, NULL);
 	variable_add("dcc", VAR_BOOL, 1, &config_dcc, changed_dcc);
+	variable_add("dcc_ip", VAR_STR, 1, &config_dcc_ip, changed_dcc);
 	variable_add("display_ack", VAR_INT, 1, &config_display_ack, NULL);
 	variable_add("display_color", VAR_BOOL, 1, &config_display_color, NULL);
 	variable_add("display_notify", VAR_BOOL, 1, &config_display_notify, NULL);

@@ -107,6 +107,7 @@ AC_SUBST(dioctl)
 AC_SUBST(shared)
 AC_SUBST(install_ioctl)
 AC_SUBST(install_shared)
+AC_SUBST(ioctl_cflags)
 
 AC_ARG_WITH(ioctl, 
   [  --with-ioctl  	  Compile with ioctl deamon [linux only]])
@@ -115,10 +116,12 @@ if test "x$with_ioctl" = "xyes"; then
   do_ioctl="ioctl_daemon"
   dioctl=" -DIOCTL "  
   install_ioctl="install_ioctl"
+  ioctl_cflags="-DIOCTL_DAEMON_PATH=\\\"\$(prefix)/bin/ioctl_daemon\\\""
 else
   do_ioctl=""
   dioctl=""
   install_ioctl=""
+  ioctl_cflags=""
 fi
 
 AC_ARG_WITH(shared, 

@@ -755,7 +755,6 @@ void handle_dcc(struct gg_dcc *d)
 	struct transfer *t, tt;
 	struct list *l;
 	char *p;
-	int tmp;
 
 	check_event(EVENT_DCC, d->peer_uin);
 	

@@ -91,6 +91,7 @@ char *config_theme = NULL;
 int config_status = GG_STATUS_AVAIL;
 char *reg_password = NULL;
 int config_dcc = 0;
+char *config_dcc_ip = NULL;
 char *query_nick = NULL;
 uin_t query_uin = 0;
 int sock = 0;
@@ -1246,9 +1247,7 @@ int run_event(char *act)
 	} 
 
 	if (!strncasecmp(acts[0], "exec", 4)) {
-		int pid;
-
-		gg_debug(GG_DEBUG_MISC, "//   *bzzzt*, be back later\n");		
+		gg_debug(GG_DEBUG_MISC, "//   *bzzzt*, be back later\n");
 
 #if 0
 		gg_debug(GG_DEBUG_MISC, "//   executing program\n");
@@ -1700,26 +1699,31 @@ void changed_dcc(char *var)
 	struct gg_dcc *dcc = NULL;
 	struct list *l;
 	
-	for (l = watches; l; l = l->next) {
-		struct gg_common *c = l->data;
-
-		if (c->type == GG_SESSION_DCC_SOCKET)
-			dcc = l->data;
+	if (!strcmp(var, "dcc")) {
+		for (l = watches; l; l = l->next) {
+			struct gg_common *c = l->data;
+	
+			if (c->type == GG_SESSION_DCC_SOCKET)
+				dcc = l->data;
+		}
+	
+		if (!config_dcc && dcc) {
+			list_remove(&watches, dcc, 0);
+			gg_free_dcc(dcc);
+		}
+	
+		if (config_dcc && !dcc) {
+			if (!(dcc = gg_dcc_socket_create(config_uin, 0))) {
+				my_printf("dcc_create_error", strerror(errno));
+			} else
+				list_add(&watches, dcc, 0);
+		}
 	}
 
-	if (!config_dcc && dcc) {
-		list_remove(&watches, dcc, 0);
-		gg_free_dcc(dcc);
-	}
-
-	if (config_dcc && !dcc) {
-		if (!(dcc = gg_dcc_socket_create(config_uin, 0))) {
-			my_printf("dcc_create_error", strerror(errno));
-		} else
-			list_add(&watches, dcc, 0);
-	}
+	if (!strcmp(var, "dcc_ip"))
+		gg_dcc_ip = inet_addr(config_dcc_ip);
 }
-
+	
 /*
  * changed_theme()
  *
