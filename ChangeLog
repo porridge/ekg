@@ -10,6 +10,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawki wspó³pracy z ekgwap (serek/w)
 - porz±dki w theme'ach. b³êdy po³±czenia bêd± ju¿ zawsze pokazywane
   po polsku i bêd± mówi³y co naprawdê siê sta³o. precz z errno! (w)
+- polecenie bind obs³uguje ju¿ klawisze z altem (w)
 
 // 2002-08-13
 

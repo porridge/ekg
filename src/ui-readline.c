@@ -102,7 +102,7 @@ static void window_free();
 static struct window *window_find(int id);
 static int window_find_query(const char *qnick);
 
-static int bind_sequence(char *seq, char *command, int quiet);
+static int bind_sequence(const char *seq, const char *command, int quiet);
 static int bind_seq_list();
 static int bind_handler_window(int a, int key);
 
@@ -1191,7 +1191,7 @@ static void window_free()
  *
  * szuka komendy, któr± nale¿y wykonaæ dla danego klawisza.
  */
-static char *bind_find_command(char *seq)
+static char *bind_find_command(const char *seq)
 {
 	list_t l;
 
@@ -1215,8 +1215,22 @@ static char *bind_find_command(char *seq)
  */
 static int bind_handler_ctrl(int a, int key)
 {
-	char *tmp = saprintf("ctrl-%c", 'a' + key - 1);
-	command_exec(NULL, bind_find_command(tmp));	/* XXX lito¶ci */
+	char *tmp = saprintf("Ctrl-%c", 'A' + key - 1);
+	command_exec(NULL, bind_find_command(tmp));
+	xfree(tmp);
+
+	return 0;
+}
+
+/*
+ * bind_handler_alt()
+ *
+ * obs³uguje klawisze z Altem, wywo³uj±c przypisane im akcje.
+ */
+static int bind_handler_alt(int a, int key)
+{
+	char *tmp = saprintf("Alt-%c", key);
+	command_exec(NULL, bind_find_command(tmp));
 	xfree(tmp);
 
 	return 0;
@@ -1237,56 +1251,61 @@ static int bind_handler_window(int a, int key)
 	return 0;
 }
 		
-static int bind_sequence(char *seq, char *command, int quiet)
+static int bind_sequence(const char *seq, const char *command, int quiet)
 {
-	int real_seq = 0;
-	char c = 0;
+	char *nice_seq;
 	
 	if (!seq)
-		return 1;
+		return -1;
 
 	if (command && bind_find_command(seq)) {
 		if (!quiet)
 			print("bind_seq_exist");
-		return 1;
+
+		return -1;
 	}
 	
-#if 0
-	/* ale po co sprawdzaæ? */
-	if (command && strlen(command) > 128) /* zeby nie bylo... */ {
-		if (!quiet)
-			print("bind_seq_command_too_long");
-		return 1;
-	}
-#endif
+	if (!strncasecmp(seq, "Ctrl-", 5) && strlen(seq) == 6 && isalpha(seq[5])) {
+		int key = CTRL(toupper(seq[5]));
+
+		if (command) {
+			rl_bind_key(key, bind_handler_ctrl);
+			nice_seq = xstrdup(seq);
+			nice_seq[0] = toupper(nice_seq[0]);
+			nice_seq[5] = toupper(nice_seq[5]);
+		} else
+			rl_unbind_key(key);
+
+	} else if (!strncasecmp(seq, "Alt-", 4) && strlen(seq) == 5) {
+
+		if (command) {
+			rl_bind_key_in_map(seq[4], bind_handler_alt, emacs_meta_keymap);
+			nice_seq = xstrdup(seq);
+			nice_seq[0] = toupper(nice_seq[0]);
+			nice_seq[4] = toupper(nice_seq[4]);
+		} else
+			rl_unbind_key_in_map(seq[4], emacs_meta_keymap);
 		
-	if (!strncasecmp(seq, "ctrl-", 5) && strlen(seq)==6) {
-		c = toupper(seq[5]);
-		real_seq = CTRL(c);
 	} else {
 		if (!quiet)
 			print("bind_seq_incorrect", seq);
-		return 1;
-	}
 
-	if (command)
-		rl_bind_key(real_seq, bind_handler_ctrl);
-	else
-		rl_unbind_key(real_seq);
+		return -1;
+	}
 
 	if (command) {
 		struct sequence s;
 		
-		s.seq = xstrdup(seq);
+		s.seq = nice_seq;
 		s.command = xstrdup(command);
 
 		list_add(&sequences, &s, sizeof(s));
+
 		if (!quiet) {
-			print("bind_seq_add", seq);
+			print("bind_seq_add", s.seq);
 			config_changed = 1;
 		}
-	} 
-	else {
+	} else {
 		list_t l;
 
 		for (l = sequences; l; l = l->next) {
