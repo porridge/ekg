@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - porz±dki w libgadu: poprawki kodu po³±czenia, wiêcej szczegó³ów w debugach
   (na przyk³ad adresy struktur, ¿eby móc wykryæ operacje na niezainicjowanych
   wska¼nikach), znacznie wiêcej komentarzy do kodu (w)
+- poprawka linkowania z openssl (Zwierz/w)
 
 // 2002-10-17
 

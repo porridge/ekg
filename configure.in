@@ -227,7 +227,7 @@ if test -d src; then
     AC_CHECK_LIB(ssl, RSA_new, [
       AC_CHECK_HEADERS(openssl/rsa.h, [
         AC_DEFINE(HAVE_OPENSSL, 1, [define if you have OpenSSL])
-	LDFLAGS="-lssl $LDFLAGS"
+	LDFLAGS="-lssl -lcrypto $LDFLAGS"
 	OBJS="$OBJS sim.o"
       ])
     ])
