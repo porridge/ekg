@@ -1259,6 +1259,7 @@ void theme_init()
 
 	/* po³±czenia bezpo¶rednie */
 	format_add("dcc_attack", "%! %|Program otrzyma³ zbyt wiele ¿±dañ bezpo¶rednich po³±czeñ, ostatnie od %1\n", 1);
+	format_add("dcc_spoof", "%! %|U¿ytkownik %1 poda³ serwerowi adres %T%2%n, ale po³±czy³ siê z nami z adresu %T%3%n. Mo¿liwe, ¿e kto¶ próbuje siê pod niego podszyæ. Zachowaj ostro¿no¶æ!\n", 1);
 	format_add("dcc_limit", "%! %|Przekroczono limit bezpo¶rednich po³±czeñ i dla bezpieczeñstwa zosta³y one wy³±czone. Aby je w³±czyæ ponownie, nale¿y wpisaæ polecenie %Tset dcc 1%n i po³±czyæ siê ponownie. Limit mo¿na zmieniæ za pomoc± zmiennej %Tdcc_limit%n.\n", 1);
 	format_add("dcc_create_error", "%! Nie mo¿na w³±czyæ po³±czeñ bezpo¶rednich: %1\n", 1);
 	format_add("dcc_error_network", "%! B³±d transmisji z %1\n", 1);

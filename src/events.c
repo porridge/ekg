@@ -1730,15 +1730,28 @@ void handle_dcc(struct gg_dcc *d)
 			break;
 
 		case GG_EVENT_DCC_CLIENT_ACCEPT:
+		{
+			struct userlist *u;
+			
 			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_CLIENT_ACCEPT\n");
 			
-			if (!userlist_find(d->peer_uin, NULL) || config_uin != d->uin) {
+			if (!(u = userlist_find(d->peer_uin, NULL)) || config_uin != d->uin) {
 				gg_debug(GG_DEBUG_MISC, "## unauthorized client (uin=%ld), closing connection\n", d->peer_uin);
 				list_remove(&watches, d, 0);
 				gg_free_dcc(d);
 				return;
 			}
-			break;	
+
+			if (d->remote_addr != u->ip.s_addr) {
+				char tmp[20];
+
+				snprintf(tmp, sizeof(tmp), "%s", inet_ntoa(*((struct in_addr*) &d->remote_addr)));
+				
+				print("dcc_spoof", format_user(d->uin), inet_ntoa(u->ip), tmp);
+			}
+
+			break;
+		}
 
 		case GG_EVENT_DCC_CALLBACK:
 		{
