@@ -3344,6 +3344,9 @@ cleanup:
  */
 void header_statusbar_resize()
 {
+	if (!status)
+		return;
+	
 	if (config_header_size < 0)
 		config_header_size = 0;
 
