@@ -1329,9 +1329,6 @@ void handle_dcc(struct gg_dcc *d)
 	list_t l;
 	char *p;
 
-	if (!(ignored_check(d->peer_uin) & IGNORE_EVENTS))
-		event_check(EVENT_DCC, d->peer_uin, NULL);
-
 	if (ignored_check(d->peer_uin) & IGNORE_DCC) {
 		remove_transfer(d);
 		list_remove(&watches, d, 0);
@@ -1352,6 +1349,7 @@ void handle_dcc(struct gg_dcc *d)
 	switch (e->type) {
 		case GG_EVENT_DCC_NEW:
 			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_CLIENT_NEW\n");
+
 			list_add(&watches, e->event.dcc_new, 0);
 			e->event.dcc_new = NULL;
 			break;
@@ -1438,6 +1436,9 @@ void handle_dcc(struct gg_dcc *d)
 			t->filename = xstrdup(d->file_info.filename);
 
 			print("dcc_get_offer", format_user(t->uin), t->filename, itoa(d->file_info.size), itoa(t->id));
+
+			if (!(ignored_check(t->uin) & IGNORE_EVENTS))
+				event_check(EVENT_DCC, t->uin, NULL);
 
 			break;
 			

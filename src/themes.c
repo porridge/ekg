@@ -136,7 +136,7 @@ const char *format_ansi(char ch)
 		return "\033[1;34m";
 	if (ch == 'e')
 		return "\033[44m";
-	if (ch == 'm' || ch== 'p')
+	if (ch == 'm' || ch == 'p')
 		return "\033[0;35m";
 	if (ch == 'M' || ch == 'P')
 		return "\033[1;35m";
@@ -181,7 +181,7 @@ char *va_format_string(const char *format, va_list ap)
 
 	/* liczymy ilo¶æ argumentów */
 	for (p = format; *p; p++) {
-		if (*p == '\\' && p[1] && p[1] == '%') {
+		if (*p == '\\' && p[1] == '%') {
 			p += 2;
 			continue;
 		}
@@ -259,7 +259,7 @@ char *va_format_string(const char *format, va_list ap)
 	while (*p) {
 		int escaped = 0;
 
-		if (*p == '\\' && p[1] && p[1] == '%') {
+		if (*p == '\\' && p[1] == '%') {
 			escaped = 1;
 			p++;
 		}
