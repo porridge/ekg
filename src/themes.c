@@ -487,7 +487,9 @@ void init_theme()
 	add_format("away", "%> Zmieniono stan na zajêty %c(%C%#%c)%n\n", 1);
 	add_format("away_descr", "%> Zmieniono stan na zajêty: %1 %c(%C%#%c)%n\n", 1);
 	add_format("back", "%> Zmieniono stan na dostêpny %c(%C%#%c)%n\n", 1);
+	add_format("back_descr", "%> Zmieniono stan na dostêpny: %1 %c(%C%#%c)%n\n", 1);
 	add_format("invisible", "%> Zmieniono stan na niewidoczny %c(%C%#%c)%n\n", 1);
+	add_format("invisible_descr", "%> Zmieniono stan na niewidoczny: %1 %c(%C%#%c)%n\n", 1);
 	add_format("user_not_found", "%! Nie znaleziono u¿ytkownika %W%1%n\n", 1);
 	add_format("user_deleted", "%> U¿ytkownik %1 zosta³ usuniêty z listy kontaktów\n", 1);
 	add_format("error_deleting", "%! Wyst±pi³ b³±d podczas usuwania u¿ytkownika\n", 1);
