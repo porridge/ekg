@@ -37,15 +37,14 @@ fi
 
 AC_CHECK_READLINE
 
-AC_MSG_CHECKING(rl_set_prompt)
-XXX_LIBS="$LIBS"
+SAVE_LIBS="$LIBS"
 LIBS="$LIBS $READLINE_LIBS"
-AC_TRY_LINK([#include <stdio.h>
+AC_CACHE_CHECK([for rl_set_prompt() in readline], ac_cv_has_rl_set_prompt,
+[AC_TRY_LINK([#include <stdio.h>
 #include <readline/readline.h>
 ], [rl_set_prompt();], AC_DEFINE(HAS_RL_SET_PROMPT)
-AC_MSG_RESULT(found),
-AC_MSG_RESULT(not found))
-LIBS="$XXX_LIBS"
+[ac_cv_has_rl_set_prompt=yes], [ac_cv_has_rl_set_prompt=no])])
+LIBS="$SAVE_LIBS"
 
 AC_PATH_PROG(RM, rm, no)
 if test "x$RM" = "xno"; then
