@@ -879,6 +879,23 @@ void iso_to_cp(unsigned char *buf)
 }
 
 /*
+ * strip_spaces()
+ *
+ * pozbywa siê spacji na pocz±tku i koñcu ³añcucha.
+ */
+char *strip_spaces(char *line)
+{
+	char *buf;
+	
+	for (buf = line; isspace(*buf); buf++);
+
+	while (isspace(line[strlen(line) - 1]))
+		line[strlen(line) - 1] = 0;
+	
+	return buf;
+}
+
+/*
  * unidle()
  *
  * uaktualnia licznik czasu ostatniej akcji, ¿eby przypadkiem nie zrobi³o
@@ -1390,6 +1407,7 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 {
 	struct conference c;
 	char **nicks, **p;
+	char *buf;
 	list_t l;
 	int i, count;
 
@@ -1406,6 +1424,18 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 			print("conferences_name_error");
 		return NULL;
 	}
+
+	buf = xstrdup(nicklist);
+	buf = strip_spaces(buf);
+	
+	if (buf[0] == ',' || buf[strlen(buf)-1] == ',') {
+		if (!quiet)
+			print("conferences_invalid");
+		xfree(buf);
+		return NULL;
+	}
+
+	xfree(buf);
 
 	nicks = array_make(nicklist, " ,", 0, 1, 0);
 

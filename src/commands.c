@@ -2464,18 +2464,6 @@ COMMAND(cmd_bind)
 	ui_event("command", "bind", (params) ? params[0] : NULL, (params && params[0]) ? params[1] : NULL, (params && params[1]) ? params[2] : NULL, NULL); 
 }
 
-char *strip_spaces(char *line)
-{
-	char *buf;
-	
-	for (buf = line; isspace(*buf); buf++);
-
-	while (isspace(line[strlen(line) - 1]))
-		line[strlen(line) - 1] = 0;
-	
-	return buf;
-}
-
 /*
  * command_exec()
  * 

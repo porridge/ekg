@@ -276,6 +276,7 @@ int sysmsg_write();
 
 void cp_to_iso(unsigned char *buf);
 void iso_to_cp(unsigned char *buf);
+char *strip_spaces(char *line);
 
 int alias_add(const char *string, int quiet, int append);
 int alias_remove(const char *name);
