@@ -965,7 +965,13 @@ COMMAND(command_help)
 	if (params[0]) {
 		for (c = commands; c->name; c++)
 			if (!strcasecmp(c->name, params[0])) {
-				my_printf("help", c->name, c->params_help, c->brief_help);
+			    	char *blah = NULL;
+
+				if (strstr(c->brief_help, "%"))
+				    	blah = format_string(c->brief_help);
+				
+				my_printf("help", c->name, c->params_help, blah ? blah : c->brief_help);
+				free(blah);
 				if (c->long_help && strcmp(c->long_help, "")) {
 					char *foo, *tmp, *plumk, *bar = strdup(c->long_help);
 
@@ -986,8 +992,15 @@ COMMAND(command_help)
 	}
 
 	for (c = commands; c->name; c++)
-		if (isalnum(*c->name))
-			my_printf("help", c->name, c->params_help, c->brief_help);
+		if (isalnum(*c->name)) {
+		    	char *blah = NULL;
+
+			if (strstr(c->brief_help, "%"))
+			    	blah = format_string(c->brief_help);
+	
+			my_printf("help", c->name, c->params_help, blah ? blah : c->brief_help);
+			free(blah);
+		}
 
 	return 0;
 }
