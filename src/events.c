@@ -288,7 +288,8 @@ void handle_notify(struct gg_event *e)
 		if (n->status == GG_STATUS_BUSY_DESCR) {
 			check_event(EVENT_AWAY, u->uin);
 			free(u->descr);
-			u->descr = strdup(e->event.notify_descr.descr);
+			/* XXX sprawdziæ strdup()y */
+			u->descr = (e->event.notify_descr.descr) ? strdup(e->event.notify_descr.descr) : strdup("");
 			cp_to_iso(u->descr);
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
