@@ -33,6 +33,10 @@
 #include "xmalloc.h"
 #include "ui.h"
 
+#ifndef PATH_MAX
+#  define PATH_MAX _POSIX_PATH_MAX
+#endif
+
 int automaton_color_escapes;
 
 char *prompt_cache = NULL, *prompt2_cache = NULL, *error_cache = NULL;

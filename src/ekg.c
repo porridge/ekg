@@ -56,6 +56,10 @@
 #include "sim.h"
 #endif
 
+#ifndef PATH_MAX
+#  define PATH_MAX _POSIX_PATH_MAX
+#endif
+
 time_t last_action = 0;
 int ioctld_pid = 0;
 int ekg_pid = 0;
