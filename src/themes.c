@@ -1077,10 +1077,10 @@ void theme_init()
 	format_add("search_results_multi_male", "m", 1);
 	format_add("search_results_multi", "%7 %[-7]1 %K|%n %[12]3 %K|%n %[12]2 %K|%n %[4]5 %K|%n %[12]4\n", 1);
 
-	format_add("search_results_single_active", "%Y(aktywn%@1)%n", 1);
-	format_add("search_results_single_busy", "%G(zajêt%@1)%n", 1);
-	format_add("search_results_single_inactive", "%r(nieaktywn%@1)%n", 1);
-	format_add("search_results_single_invisible", "%c(niewidoczn%@1)%n", 1);
+	format_add("search_results_single_active", "%Y(aktywny)%n", 1);
+	format_add("search_results_single_busy", "%G(zajêty)%n", 1);
+	format_add("search_results_single_inactive", "%r(nieaktywny)%n", 1);
+	format_add("search_results_single_invisible", "%c(niewidoczny)%n", 1);
 	format_add("search_results_single_unknown", "%T-%n", 1);
 	format_add("search_results_single_female", "%Mkobieta%n", 1);
 	format_add("search_results_single_male", "%Cmê¿czyzna%n", 1);
