@@ -4287,7 +4287,6 @@ static int ui_ncurses_event(const char *event, ...)
 				}
 
 				window_kill(w, 0);
-				window_switch(window_current->id);
 				goto cleanup;
 			}
 

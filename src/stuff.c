@@ -250,7 +250,7 @@ int alias_add(const char *string, int quiet, int append)
 
 				list_add(&j->commands, cmd, strlen(cmd) + 1);
 				
-				/* przy wielu komendach trudno dope³niaæ, bo wg. której? */
+				/* przy wielu komendach trudno dope³niaæ, bo wed³ug której? */
 				for (l = commands; l; l = l->next) {
 					struct command *c = l->data;
 
@@ -277,7 +277,7 @@ int alias_add(const char *string, int quiet, int append)
 			return -1;
 		}
 
-		if (!strcasecmp(tmp, c->name))
+		if (!strncasecmp(tmp, c->name, strlen(c->name)))
 			params = xstrdup(c->params);
 	}
 

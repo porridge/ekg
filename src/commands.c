@@ -4049,6 +4049,11 @@ COMMAND(cmd_alias_exec)
 	
 	for (tmp = m; tmp; tmp = tmp->next) {
 		string_t str;
+		char *p;
+
+		for (p = (char *) tmp->data; *p; p++)
+			if (*p == '\\' && p[1] == '%')
+				memmove(p, p + 1, strlen(tmp->data) - (size_t)(p - (char *)tmp->data));
 
 		if (*((char *) tmp->data) == '/')
 			str = string_init(NULL);
@@ -5247,7 +5252,8 @@ void command_init()
 	  " [-l, --list] [alias]             wy¶wietla listê aliasów\n"
 	  "\n"
 	  "W komendzie mo¿na u¿yæ formatów od %T\\%1%n do %T\\%9%n i w "
-	  "ten sposób ustaliæ kolejno¶æ przekazywanych argumentów.");
+	  "ten sposób ustaliæ kolejno¶æ przekazywanych argumentów. Je¶li format "
+          "ma byæ dos³ownie u¿yty w aliasie, nale¿y poprzedziæ go znakiem backslasha.");
 	  
 	command_add
 	( "away", "?", cmd_away, 0,
