@@ -166,28 +166,25 @@ int main(int argc, char **argv)
 		printf("program ten nie jest przeznaczony do samodzielnego wykonywania!\n");
 	    	exit(1);
 	}
-	
-	if (strlen(argv[1]) >= PATH_MAX)
-	    	exit(2);
-	
+
+	if (strlcpy(sock_path, argv[1], sizeof(sock_path)) >= sizeof(sock_path))
+		exit(1);
+
+	addr.sun_family = AF_UNIX;
+	if (strlcpy(addr.sun_path, sock_path, sizeof(addr.sun_path)) >= sizeof(addr.sun_path))
+		exit(1);
+	length = sizeof(addr);
+
 	signal(SIGQUIT, quit);
 	signal(SIGTERM, quit);
 	signal(SIGINT, quit);
 	
 	umask(0177);
-
 	close(STDERR_FILENO);
-	
-	strlcpy(sock_path, argv[1], sizeof(sock_path));
-	
 	unlink(sock_path);
 
 	if ((sock = socket(AF_UNIX, SOCK_DGRAM, 0)) == -1) 
 		exit(1);
-
-	addr.sun_family = AF_UNIX;
-	strlcpy(addr.sun_path, sock_path, sizeof(addr.sun_path));
-	length = sizeof(addr);
 
 	if (bind(sock, (struct sockaddr *)&addr, length) == -1) 
 	    	exit(2);
@@ -195,7 +192,7 @@ int main(int argc, char **argv)
 	chown(sock_path, getuid(), -1);
 
 	while (1) {
-	    	if (recvfrom(sock, &data, sizeof(data), 0, (struct sockaddr *)&addr,&length) == -1) 
+	    	if (recvfrom(sock, &data, sizeof(data), 0, (struct sockaddr *)&addr, &length) == -1) 
 		    	continue;
 		
 		if (data.act == ACT_BLINK_LEDS)  
