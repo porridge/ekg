@@ -322,15 +322,24 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 #ifdef WITH_WAP
 		if (config_wap_enabled && e->event.msg.sender != config_uin) {
 			FILE *wap;
-			char waptime[10], waptime2[10];
+			char waptime[25], waptime2[10];
 			const char *waplog;
 
-			strftime(waptime2, sizeof(waptime2), "%H:%M", tm);
+			if (config_wap_enabled == 2) {
+				strftime(waptime2, sizeof(waptime2), "%H:%M%S", tm);
+				snprintf(waptime, sizeof(waptime), "wap%7s_%d", waptime2, e->event.msg.sender);
 
-			snprintf(waptime, sizeof(waptime), "wap%5s", waptime2);
-			if ((waplog = prepare_path(waptime, 1))) {
-				if ((wap = fopen(waplog, "a"))) {
-					fprintf(wap, "%s(%s):%s\n", target, waptime2, line);
+				if ((waplog = prepare_path(waptime, 1)) && (wap = fopen(waplog, "a"))) {
+					fprintf(wap, "%s;%s\n", target, line);
+					fclose(wap);
+				}
+
+			} else {
+				strftime(waptime2, sizeof(waptime2), "%H:%M", tm);
+				sprintf(waptime, "wap%5s", waptime2);
+
+				if ((waplog = prepare_path(waptime, 1)) && (wap = fopen(waplog, "a"))) {
+					fprintf(wap,"%s(%s):%s\n", target, waptime2, line);
 					fclose(wap);
 				}
 			}

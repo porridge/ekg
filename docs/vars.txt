@@ -695,10 +695,11 @@ timestamp
 
 wap_enabled
 	typ: bool
-	domy¶lna warto¶æ: 1
+	domy¶lna warto¶æ: 2
 
 	je¶li wkompilowano obs³ugê WAP, pozawala tymczasowo wy³±czyæ tê
-	us³ugê.
+	us³ugê. warto¶æ 1 u¿ywa poprzedniego formatu zapisu do pliku
+	WAP.
 
 windows_save
 	typ: bool
