@@ -15,51 +15,28 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <sys/types.h>
 #include <stdio.h>
-#include <string.h>
-#include <limits.h>
-#include <errno.h>
 
-#ifndef PATH_MAX
-# define PATH_MAX _POSIX_PATH_MAX
-#endif
-
-char *dirname(const char *path)
+size_t strlcat(char *dst, const char *src, size_t size)
 {
-	static char buf[PATH_MAX];
-	register const char *ptr;
+	register size_t i, j;
+	size_t left, dlen;
 
-	if (!path || !*path || !strchr(path, '/')) {
-		strncpy(buf, ".", sizeof(buf) - 1);
-		buf[sizeof(buf) - 1] = 0;
-		return buf;
-	}
+	for (i = 0; i < size && dst[i]; i++)
+		continue;
 
-	for (ptr = path + strlen(path) - 1; ptr > path; ptr--)
-		if (*ptr != '/')
-			break;
+	dlen = i;
+	left = size - i;
 
-	for (; ptr > path; ptr--)
-		if (*ptr == '/')
-			break;
+	for (j = 0; left > j + 1 && src[j]; j++, i++)
+		dst[i] = src[j];
 
-	if (ptr > path) {
+	if (left)
+		dst[i] = 0;
 
-		for (; ptr > path; ptr--)
-			if (*ptr != '/')
-				break;
+	while (src[j])
+		j++;
 
-		if (ptr - path + 2 > sizeof(buf)) {
-			errno = ENAMETOOLONG;
-			return NULL;
-		}
-
-		strncat(buf, path, ptr - path + 1);
-
-	} else
-		strncat(buf, "/", sizeof(buf) - 1);
-
-	buf[sizeof(buf) - 1] = 0;
-
-	return buf;
+	return dlen + j;
 }

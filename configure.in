@@ -223,6 +223,10 @@ dnl <ekg>
   # na SunOSach nie ma scandir()
   AC_CHECK_FUNCS(scandir, , [OBJS="$OBJS ../compat/scandir.o"])
 
+  # strlcat/strlcpy wiele systemów nie posiada
+  AC_CHECK_FUNCS(strlcat, , [OBJS="$OBJS ../compat/strlcat.o"])
+  AC_CHECK_FUNCS(strlcpy, , [OBJS="$OBJS ../compat/strlcpy.o"])
+
   # utimes/utime do sprawdzania poczty
   AC_CHECK_FUNCS(utimes)
   AC_CHECK_FUNCS(utime)
