@@ -10,6 +10,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawki dokumentacji (tommy/w)
 - update arim.theme (arim/w)
 - poprawka DESTDIR (baseciq/w)
+- omijanie braku FIONBIO fcntlem (adwol/w)
 
 // 2002-07-18
 
