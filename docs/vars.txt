@@ -569,8 +569,8 @@ tab_command
 	typ: tekst
 	domy¶lna warto¶æ: "chat"
 
-	komenda, która bêdzie wstawiana w linii poleceñ z kolejn± osob±
-	z listy kontaktów po wci¶niêciu klawisza Tab.
+	komenda, która bêdzie wstawiana w linii poleceñ z kolejn±
+	dostêpn± osob± z listy kontaktów po wci¶niêciu klawisza Tab.
 
 theme
 	typ: tekst
