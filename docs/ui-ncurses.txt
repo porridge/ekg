@@ -1,6 +1,11 @@
 // ui-ncurses
 // (c) copyright 2002 wojtek kaniewski <wojtekka@irc.pl>
 
+aby wkompilowaæ ten interfejs, nale¿y wykonaæ:
+
+	./configure --enable-ui-ncurses
+	make
+
 interfejs ten ró¿ni siê nieco od readline z okienkami. g³ówn± ró¿nic± jest
 fakt, ¿e pierwsze okienko istnieje _zawsze_ i jest oknem stanu. do niego
 lec± informacje o pojawianiu siê i znikaniu ludzi. do kolejnych okien

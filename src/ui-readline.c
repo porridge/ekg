@@ -327,6 +327,7 @@ static char **my_completion(char *text, int start, int end)
 	int word = 0, i, abbrs = 0;
 	CPFunction *func = known_uin_generator;
 	list_t l;
+	static int my_send_nicks_count = 0;
 
 	if (start) {
 		char *tmp = rl_line_buffer, *cmd = (config_tab_command) ? config_tab_command : "chat";
@@ -344,6 +345,11 @@ static char **my_completion(char *text, int start, int end)
 					word++;
 			}
 			if (word == 2 && isspace(rl_line_buffer[strlen(rl_line_buffer) - 1])) {
+				if (send_nicks_count != my_send_nicks_count) {
+					my_send_nicks_count = send_nicks_count;
+					send_nicks_index = 0;
+				}
+
 				if (send_nicks_count > 0) {
 					char buf[100];
 
