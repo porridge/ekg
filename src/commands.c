@@ -6345,7 +6345,7 @@ void command_init()
 	  "wy¶wietla skrót zmiennych", "");
 	command_add
 	( "_check_conn_update", "", cmd_test_check_conn_update, 0, "",
-	  "uaktualnia stan ¶ledzonych osób", "");
+	  "sprawdza, czy osoby oznaczone jako niewidoczne nadal s± po³±czone", "");
 	command_add
 	( "_queue", "uu", cmd_queue, 0, " [opcje]",
 	  "pozwala obserwowaæ kolejkê wiadomo¶ci podczas po³±czenia", "");
