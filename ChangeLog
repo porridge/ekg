@@ -9,6 +9,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - kosmetyka (szalik/w)
 - dodana zmienna ,,display_welcome'' (seba/w)
+- libgadu: wyrzucenie wielokrotnych prób czytania z socketa. je¶li nie
+  ma danych na sockecie mimo wywo³ania funkcji, zrywamy po³±czenie, zamiast
+  wieszaæ program (*/w)
 
 // 2002-11-21
 
