@@ -521,13 +521,21 @@ unsigned short fix16(unsigned short x);
 struct gg_header {
 	unsigned long type;		/* typ pakietu */
 	unsigned long length;		/* d³ugo¶æ reszty pakietu */
-} __attribute__ ((packed));
+}
+#ifdef __GNUC__
+__attribute__ ((packed))
+#endif
+;
 
 #define GG_WELCOME 0x0001
 
 struct gg_welcome {
 	unsigned long key;		/* klucz szyfrowania has³a */
-} __attribute__ ((packed));
+}
+#ifdef __GNUC__
+__attribute__ ((packed))
+#endif
+;
 	
 #define GG_LOGIN 0x000c
 
@@ -538,7 +546,11 @@ struct gg_login {
 	unsigned long version;		/* moja wersja klienta */
 	unsigned long local_ip;		/* mój adres ip */
 	unsigned short local_port;	/* port, na którym s³ucham */
-} __attribute__ ((packed));
+}
+#ifdef __GNUC__
+__attribute__ ((packed))
+#endif
+;
 
 #define GG_LOGIN_OK 0x0003
 
@@ -555,14 +567,22 @@ struct gg_login {
 
 struct gg_new_status {
 	unsigned long status;			/* na jaki zmieniæ? */
-} __attribute__ ((packed));
+}
+#ifdef __GNUC__
+__attribute__ ((packed))
+#endif
+;
 
 #define GG_NOTIFY 0x0010
 	
 struct gg_notify {
 	uin_t uin;		/* numerek danej osoby */
 	char dunno1;		/* == 3 */
-} __attribute__ ((packed));
+}
+#ifdef __GNUC__
+__attribute__ ((packed))
+#endif
+;
 	
 #define GG_NOTIFY_REPLY 0x000c	/* tak, to samo co GG_LOGIN */
 	
@@ -573,7 +593,11 @@ struct gg_notify_reply {
 	unsigned short remote_port;	/* port, na którym s³ucha klient */
 	unsigned long version;		/* wersja klienta */
 	unsigned short dunno2;		/* znowu port? */
-} __attribute__ ((packed));
+}
+#ifdef __GNUC__
+__attribute__ ((packed))
+#endif
+;
 
 #define GG_ADD_NOTIFY 0x000d
 #define GG_REMOVE_NOTIFY 0x000e
@@ -581,14 +605,22 @@ struct gg_notify_reply {
 struct gg_add_remove {
 	uin_t uin;		/* numerek */
 	char dunno1;		/* == 3 */
-} __attribute__ ((packed));
+}
+#ifdef __GNUC__
+__attribute__ ((packed))
+#endif
+;
 
 #define GG_STATUS 0x0002
 
 struct gg_status {
 	uin_t uin;			/* numerek */
 	unsigned long status;		/* nowy stan */
-} __attribute__ ((packed));
+}
+#ifdef __GNUC__
+__attribute__ ((packed))
+#endif
+;
 	
 #define GG_SEND_MSG 0x000b
 
@@ -602,7 +634,11 @@ struct gg_send_msg {
 	unsigned long recipient;
 	unsigned long seq;
 	unsigned long msgclass;
-} __attribute__ ((packed));
+}
+#ifdef __GNUC__
+__attribute__ ((packed))
+#endif
+;
 
 #define GG_SEND_MSG_ACK 0x0005
 
@@ -613,7 +649,11 @@ struct gg_send_msg_ack {
 	unsigned long status;
 	unsigned long recipient;
 	unsigned long seq;
-} __attribute__ ((packed));
+}
+#ifdef __GNUC__
+__attribute__ ((packed))
+#endif
+;
 
 #define GG_RECV_MSG 0x000a
 	
@@ -622,7 +662,11 @@ struct gg_recv_msg {
 	unsigned long seq;
 	unsigned long time;
 	unsigned long msgclass;
-} __attribute__ ((packed));
+}
+#ifdef __GNUC__
+__attribute__ ((packed))
+#endif
+;
 
 #define GG_PING 0x0008
 	
