@@ -169,12 +169,14 @@ int my_getc(FILE *f)
 					gg_free_search(search);
 					search = NULL;
 				} else {
-					if (search->state == GG_STATE_IDLE) {
+					if (search->state == GG_STATE_ERROR) {
+						gg_debug(GG_DEBUG_MISC, "++ gg_search()... error\n");
 						my_printf("search_failed", strerror(errno));
 						gg_free_search(search);
 						search = NULL;
 					}
-					if (search->state == GG_STATE_FINISHED) {	
+					if (search->state == GG_STATE_DONE) {	
+						gg_debug(GG_DEBUG_MISC, "++ gg_search()... done\n");
 						handle_search(search);
 						gg_free_search(search);
 						search = NULL;
@@ -187,19 +189,21 @@ int my_getc(FILE *f)
 					my_printf("register_failed", strerror(errno));
 					gg_free_register(reg_req);
 					reg_req = NULL;
+					free(reg_req_password);
 				} else {
-					if (reg_req->state == GG_STATE_IDLE) {
+					if (reg_req->state == GG_STATE_ERROR) {
 						my_printf("register_failed", strerror(errno));
 						gg_free_register(reg_req);
 						reg_req = NULL;
+						free(reg_req_password);
 					}
-					if (reg_req->state == GG_STATE_FINISHED) {	
+					if (reg_req->state == GG_STATE_DONE) {	
 						handle_register(reg_req);
 						gg_free_register(reg_req);
 						reg_req = NULL;
 					}
 				}
-			}			
+			}
 		}
 	}
 	

@@ -1,3 +1,8 @@
+// 2001-12-04
+
+- kolejny rewrite http. jeszcze czeka sporo poprawek, ale kszta³t jest
+  ju¿ nadany. drobne poprawki w libgg (w)
+
 // 2001-12-03 
 
 - przygotowanie do obs³ugi http proxy (s)

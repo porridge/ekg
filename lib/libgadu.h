@@ -37,56 +37,117 @@ extern "C" {
 typedef unsigned long uin_t;
 
 /*
- * co¶tam.
+ * struktura opisuj±ca dan± sesjê. tworzona przez gg_login().
  */
 struct gg_session {
-	int state, check;
-	int fd, pid;
-	int port;
-	int seq, async;
-	int last_pong;
-
-	/* powinno byæ ,,in_addr'', ale nie chcê inkludowaæ sieci tutaj */
-	unsigned long server_ip;
-	unsigned long client_ip;
+        int fd;         	/* podgl±dany deskryptor */
+        int check;      	/* sprawdzamy zapis czy odczyt */
+        int state;      	/* aktualny stan maszynki */
+        int error;      	/* kod b³êdu dla GG_STATE_ERROR */
+	int type;		/* rodzaj sesji. == GG_SESSION_GG */
 	
-	unsigned int client_port;
+        int async;      	/* czy po³±czenie jest asynchroniczne */
+	int pid;        	/* pid procesu resolvera */
+	int port;       	/* port, z którym siê ³±czymy */
+	int seq;        	/* numer sekwencyjny ostatniej wiadomo¶ci */
+	int last_pong;  	/* czas otrzymania ostatniego ping/pong */
 
-	uin_t uin;
-	char *password;
-	int initial_status;
+	unsigned int server_ip;	/* adres serwera */
+	unsigned int client_ip;	/* adres klienta */
+	int client_port;	/* port, na którym klient s³ucha */
 
-	char *recv_buf;
-	int recv_done, recv_left;
+	uin_t uin;		/* numerek klienta */
+	char *password;		/* i jego has³o. zwalniane automagicznie */
+        
+	int initial_status;	/* pocz±tkowy stan klienta */
+
+	char *recv_buf;		/* bufor na otrzymywane pakiety */
+	int recv_done;		/* ile ju¿ wczytano do bufora */
+        int recv_left;		/* i ile jeszcze trzeba wczytaæ */
+};
+
+/*
+ * ogólna struktura opisuj±ca stan wszystkich operacji http.
+ */
+struct gg_http {
+        int fd;                 /* podgl±dany deskryptor */
+        int check;              /* sprawdzamy zapis czy odczyt */
+        int state;              /* aktualny stan maszynki */
+        int error;              /* kod b³êdu dla GG_STATE_ERROR */
+ 	int type;		/* rodzaj sesji. == GG_SESSION_HTTP */
+	
+        int async;              /* czy po³±czenie asynchroniczne */
+	int pid;                /* pid procesu resolvera */
+	int port;               /* port, z którym siê ³±czymy */
+
+        char *query;            /* bufor zapytania http */
+        char *header;           /* bufor nag³ówka */
+        int header_size;        /* rozmiar wczytanego nag³ówka */
+        char *body;             /* bufor otrzymanych informacji */
+        int body_size;          /* ilo¶æ informacji */
+
+        void *data;             /* dane danej operacji http */
+};
+
+/*
+ * ogólna struktura opisuj±ca ró¿ne sesje. przydatna w klientach.
+ */
+struct gg_common {
+        int fd;                 /* podgl±dany deskryptor */
+        int check;              /* sprawdzamy zapis czy odczyt */
+        int state;              /* aktualny stan maszynki */
+        int error;              /* kod b³êdu dla GG_STATE_ERROR */
+	int type;		/* rodzaj sesji */
+};
+
+/*
+ * rodzaje sesji.
+ */
+enum {
+	GG_SESSION_GG = 1,	/* po³±czenie z serwerem gg */
+	GG_SESSION_HTTP,	/* ogólna sesja http */
+	GG_SESSION_SEARCH,	/* szukanie */
+	GG_SESSION_REGISTER,	/* rejestrowanie */
 };
 
 /*
  * ró¿ne stany asynchronicznej maszynki.
  */
 enum {
-	GG_STATE_IDLE = 0,		/* wspólne */
-	GG_STATE_RESOLVING,
-	GG_STATE_CONNECTING_HTTP,
+        /* wspólne */
+        GG_STATE_IDLE = 0,		/* nie powinno wyst±piæ. */
+        GG_STATE_RESOLVING,             /* wywo³a³ gethostbyname() */
+	GG_STATE_CONNECTING,            /* wywo³a³ connect() */
+	GG_STATE_READING_DATA,		/* czeka na dane http */
+	GG_STATE_ERROR,			/* wyst±pi³ b³±d. kod w x->error */
 
-	GG_STATE_WRITING_HTTP,		/* gg_login */	
-	GG_STATE_CONNECTING_GG,
-	GG_STATE_WAITING_FOR_KEY,
-	GG_STATE_SENDING_KEY,
-	GG_STATE_CONNECTED,
+        /* gg_session */
+	GG_STATE_CONNECTING_GG,         /* wywo³a³ connect() */
+	GG_STATE_READING_KEY,           /* czeka na klucz */
+	GG_STATE_READING_REPLY,         /* czeka na odpowied¼ */
+	GG_STATE_CONNECTED,             /* po³±czy³ siê */
 
-	GG_STATE_READING_HEADER,	/* gg_search */
-	GG_STATE_READING_DATA,
-	GG_STATE_PARSING,
-	GG_STATE_FINISHED,
+        /* gg_http */
+	GG_STATE_READING_HEADER,	/* czeka na nag³ówek http */
+	GG_STATE_PARSING,               /* przetwarza dane */
+	GG_STATE_DONE,                  /* skoñczy³ */
 };
+
+/*
+ * dla zachowania kompatybilno¶ci wstecz. w wersji 1.0 bêdzie usuniête. oby.
+ */
+#define GG_STATE_WRITING_HTTP GG_STATE_READING_DATA
+#define GG_STATE_WAITING_FOR_KEY GG_STATE_READING_KEY
+#define GG_STATE_SENDING_KEY GG_STATE_READING_REPLY
+#define GG_STATE_FINISHED GG_STATE_DONE
 
 /*
  * co proces klienta powinien sprawdzaæ w deskryptorach?
  */
 enum {
-	GG_CHECK_NONE = 0,
-	GG_CHECK_WRITE = 1,
-	GG_CHECK_READ = 2,
+	GG_CHECK_NONE = 0,		/* nic. nie powinno wyst±piæ */
+	GG_CHECK_WRITE = 1,		/* sprawdzamy mo¿liwo¶æ zapisu */
+	GG_CHECK_READ = 2,		/* sprawdzamy mo¿liwo¶æ odczytu */
 };
 
 struct gg_session *gg_login(uin_t uin, char *password, int async);
@@ -101,13 +162,13 @@ struct gg_notify_reply {
 	unsigned long status;		/* status danej osoby */
 	unsigned long remote_ip;	/* adres ip delikwenta */
 	unsigned short remote_port;	/* port, na którym s³ucha klient */
-	unsigned long dunno1;		/* == 0x0b */
+	unsigned long version;		/* == 0x0b */
 	unsigned short dunno2;		/* znowu port? */
 } __attribute__ ((packed));
 
 struct gg_status {
-	uin_t uin;		/* numerek */
-	unsigned long status;	/* nowy stan */
+	uin_t uin;			/* numerek */
+	unsigned long status;		/* nowy stan */
 } __attribute__ ((packed));
 
 enum {
@@ -120,6 +181,9 @@ enum {
 	GG_EVENT_CONN_SUCCESS,
 };
 
+/*
+ * nied³ugo siê tego pozbêdê na rzecz sensownej obs³ugi b³êdów. --w
+ */
 enum {
 	GG_FAILURE_RESOLVING = 1,
 	GG_FAILURE_CONNECTING,
@@ -130,6 +194,22 @@ enum {
 	GG_FAILURE_404,
 };
 
+/*
+ * rodzaje b³êdów, na razie u¿ywane przez http. bez rozczulania siê nad
+ * powodami. klient powie, ¿e albo nie znalaz³ hosta, albo nie móg³ siê
+ * po³±czyæ, albo nie móg³ wys³aæ, albo nie móg³ odebrac. i tyle. jak
+ * kto¶ bêdzie chcia³, to bêdzie móg³ sprawdziæ errno. ale po co?
+ */
+enum {
+	GG_ERROR_RESOLVING = 1,
+	GG_ERROR_CONNECTING,
+	GG_ERROR_READING,
+	GG_ERROR_WRITING,
+};
+
+/*
+ * struktura opisuj±ca rodzaj zdarzenia. wychodzi z gg_watch_fd()
+ */
 struct gg_event {
         int type;
         union {
@@ -157,74 +237,94 @@ int gg_notify(struct gg_session *sess, uin_t *userlist, int count);
 int gg_add_notify(struct gg_session *sess, uin_t uin);
 int gg_remove_notify(struct gg_session *sess, uin_t uin);
 
+
 /*
- * jakie¶tam bzdurki dotycz±ce szukania userów.
+ * OBS£UGA HTTP
  */
 
-struct gg_search_result {
-	uin_t uin;
-	char *first_name;
-	char *last_name;
-	char *nickname;
-	int born;
-	int gender;
-	char *city;
-	int active;
-};
+struct gg_http *gg_http_connect(char *hostname, int port, int async, char *method, char *path, char *header);
+int gg_http_watch_fd(struct gg_http *h);
+void gg_http_stop(struct gg_http *h);
+void gg_free_http(struct gg_http *h);
 
+/* 
+ * SZUKANIE U¯YTKOWNIKÓW
+ */
+
+/*
+ * struktura opisuj±ca kryteria wyszukiwania. argument gg_search().
+ */
 struct gg_search_request {
-	/* czy ma szukaæ tylko aktywnych? */
-	int active;
+	int active;		/* czy ma szukaæ tylko aktywnych? */
+
 	/* mode 0 */
-	char *nickname, *first_name, *last_name, *city;
-	int gender, min_birth, max_birth;
+	char *nickname;		/* pseudonim */
+	char *first_name;	/* imiê */
+	char *last_name;	/* nazwisko */
+	char *city;		/* miasto */
+	int gender;		/* p³eæ */
+	int min_birth;		/* urodzony od roku... */
+	int max_birth;		/* urodzony do roku... */
+	
 	/* mode 1 */
-	char *email;
+	char *email;		/* adres e-mail */
+
 	/* mode 2 */
-	char *phone;
+	char *phone;		/* numer telefonu */
+	
 	/* mode 3 */
-	uin_t uin;
+	uin_t uin;		/* numerek */
 };
 
+/*
+ * struktura opisuj±ca rezultat wyszukiwania. pole gg_http.
+ */
 struct gg_search {
-	/* czy ju¿ zrobi³ */
-	int done;
-
-	/* po³±czenie */
-	struct gg_http *http;
-	int fd, state, error, check;
-	
-	/* wyniki */
-	int count;
-	struct gg_search_result *results;
+	int count;				/* ilo¶æ znalezionych */
+	struct gg_search_result *results;	/* tabelka z nimi */
 };
 
-#define GG_GENDER_NONE 0
-#define GG_GENDER_FEMALE 1
-#define GG_GENDER_MALE 2
-
-struct gg_search *gg_search(struct gg_search_request *r, int async);
-int gg_search_watch_fd(struct gg_search *f);
-void gg_free_search(struct gg_search *f);
-void gg_search_cancel(struct gg_search *f);
-
-struct gg_register {
-	/* czy ju¿ zrobi³ */
-	int done;
-	
-	/* otrzymany numerek, 0 je¶li siê nie powiod³o */
-	uin_t uin;
-	char *password;
-	
-	/* po³±czenie */
-	struct gg_http *http;
-	int fd, state, error, check;
+/*
+ * pojedynczy rezultat wyszukiwania.
+ */
+struct gg_search_result {
+	uin_t uin;		/* numerek */
+	char *first_name;	/* imiê */
+	char *last_name;	/* nazwisko */
+	char *nickname;		/* pseudonim */
+	int born;		/* rok urodzenia */
+	int gender;		/* p³eæ */
+	char *city;		/* miasto */
+	int active;		/* czy jest aktywny */
 };
 
-struct gg_register *gg_register(char *email, char *password, int async);
-int gg_register_watch_fd(struct gg_register *f);
-void gg_free_register(struct gg_register *f);
-void gg_register_cancel(struct gg_register *f);
+#define GG_GENDER_NONE 0	/* nie podano lub bez znaczenia */
+#define GG_GENDER_FEMALE 1	/* kobieta */
+#define GG_GENDER_MALE 2	/* mê¿czyzna */
+
+struct gg_http *gg_search(struct gg_search_request *r, int async);
+int gg_search_watch_fd(struct gg_http *f);
+void gg_free_search(struct gg_http *f);
+
+struct gg_search_request *gg_search_request_mode_0(char *nickname, char *first_name, char *last_name, char *city, int gender, int min_birth, int max_birth, int active);
+struct gg_search_request *gg_search_request_mode_1(char *email, int active);
+struct gg_search_request *gg_search_request_mode_2(char *phone, int active);
+struct gg_search_request *gg_search_request_mode_3(uin_t uin, int active);
+
+/*
+ * OPERACJE NA KATALOGU PUBLICZNYM
+ */
+
+struct gg_pubdir {
+	int success;		/* czy siê uda³o */
+	uin_t uin;		/* otrzymany numerek. 0 je¶li b³±d */
+};
+
+struct gg_http *gg_register(char *email, char *password, int async);
+void gg_free_register(struct gg_http *f);
+
+int gg_pubdir_watch_fd(struct gg_http *f);
+#define gg_register_watch_fd gg_pubdir_watch_fd
 
 /*
  * je¶li chcemy sobie podebugowaæ, wystarczy ustawiæ `gg_debug_level'.
@@ -294,7 +394,7 @@ struct gg_welcome {
 #define GG_LOGIN 0x000c
 
 struct gg_login {
-	uin_t uin;		/* twój numerek */
+	uin_t uin;			/* twój numerek */
 	unsigned long hash;		/* hash has³a */
 	unsigned long status;		/* status na dzieñ dobry */
 	unsigned long dunno;		/* == 0x0b */
@@ -392,5 +492,5 @@ struct gg_recv_msg {
  * indent-tabs-mode: notnil
  * End:
  *
- * vim: expandtab shiftwidth=8:
+ * vim: shiftwidth=8:
  */

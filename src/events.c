@@ -288,11 +288,12 @@ int handle_event()
 	return 0;
 }
 
-void handle_search(struct gg_search *s)
+void handle_search(struct gg_http *h)
 {
+	struct gg_search *s = NULL;
 	int i;
 
-	if (!s->count)
+	if (!h || !(s = h->data) || !(s->count))
 		my_printf("search_not_found");
 
 	for (i = 0; i < s->count; i++) {
@@ -338,20 +339,20 @@ void handle_search(struct gg_search *s)
 		free(name);
 		free(active);
 		free(gender);
-
 	}
 }
 
-void handle_register(struct gg_register *s)
+void handle_register(struct gg_http *h)
 {
+	struct gg_pubdir *s = NULL;
 	char uin[16];
 
-	if (!s->done || !s->uin)
+	if (!h || !(s = h->data) || !s->success || !s->uin)
 		my_printf("error_register");
 	
-	if (!config_uin && !config_password) {
+	if (!config_uin && !config_password && reg_req_password) {
 		config_uin = s->uin;
-		config_password = s->password;
+		config_password = reg_req_password;
 	}
 	
 	snprintf(uin, sizeof(uin), "%lu", s->uin);

@@ -39,8 +39,8 @@
 #include "vars.h"
 
 struct gg_session *sess = NULL;
-struct gg_search *search = NULL;
-struct gg_register *reg_req = NULL;
+struct gg_http *search = NULL;
+struct gg_http *reg_req = NULL;
 struct list *userlist = NULL;
 struct list *ignored = NULL;
 struct list *children = NULL;
@@ -75,6 +75,7 @@ int connecting = 0;
 int display_notify = 1;
 char *default_theme = NULL;
 int default_status = GG_STATUS_AVAIL;
+char *reg_req_password = NULL;
 
 /*
  * my_puts()

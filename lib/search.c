@@ -27,7 +27,6 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include "libgg.h"
-#include "http.h"
 
 /*
  * gg_search()
@@ -40,19 +39,21 @@
  *  - r - informacja o tym, czego szukamy,
  *  - async - ma byæ asynchronicznie?
  *
- * zwraca zaalokowan± strukturê `gg_search', któr± po¼niej nale¿y zwolniæ
+ * zwraca zaalokowan± strukturê `gg_http', któr± po¼niej nale¿y zwolniæ
  * funkcj± gg_free_search(), albo NULL je¶li wyst±pi³ b³±d.
  */
-struct gg_search *gg_search(struct gg_search_request *r, int async)
+struct gg_http *gg_search(struct gg_search_request *r, int async)
 {
-	struct gg_search *f;
+	struct gg_http *h;
 	char *form, *query;
 	int mode = -1, gender;
 
 	if (!r) {
-		errno = EFAULT;
+		errno = EINVAL;
 		return NULL;
 	}
+	
+	gg_debug(GG_DEBUG_MISC, "// gg_search()\n");
 
 	if (r->nickname || r->first_name || r->last_name || r->city || r->gender || r->min_birth || r->max_birth)
 		mode = 0;
@@ -158,30 +159,21 @@ struct gg_search *gg_search(struct gg_search_request *r, int async)
 
 	free(form);
 
-	if (!(f = malloc(sizeof(*f))))
-		return NULL;
-
-	memset(f, 0, sizeof(*f));
-
-	f->count = 0;
-	f->results = NULL;
-	f->done = 0;
-
-	if (!(f->http = gg_http_connect(GG_PUBDIR_HOST, GG_PUBDIR_PORT, async, "POST", "/appsvc/fmpubquery2.asp", query))) {
+	if (!(h = gg_http_connect(GG_PUBDIR_HOST, GG_PUBDIR_PORT, async, "POST", "/appsvc/fmpubquery2.asp", query))) {
 		gg_debug(GG_DEBUG_MISC, "=> search, gg_http_connect() failed mysteriously\n");
 		free(query);
-		free(f);
+		free(h);
 		return NULL;
 	}
 
+	h->type = GG_SESSION_SEARCH;
+
 	free(query);
 
-	gg_http_copy_vars(f);
-
 	if (!async)
-		gg_search_watch_fd(f);
+		gg_search_watch_fd(h);
 	
-	return f;
+	return h;
 }
 
 /*
@@ -193,90 +185,85 @@ struct gg_search *gg_search(struct gg_search_request *r, int async)
  *  - f - to co¶, co zwróci³o gg_search()
  *
  * je¶li wszystko posz³o dobrze to 0, inaczej -1. przeszukiwanie bêdzie
- * zakoñczone, je¶li f->state == GG_STATE_FINISHED. je¶li wyst±pi jaki¶
- * b³±d, to bêdzie tam GG_STATE_IDLE i odpowiedni kod b³êdu w f->error.
+ * zakoñczone, je¶li f->state == GG_STATE_DONE. je¶li wyst±pi jaki¶
+ * b³±d, to bêdzie tam GG_STATE_ERROR i odpowiedni kod b³êdu w f->error.
  */
-int gg_search_watch_fd(struct gg_search *f)
+int gg_search_watch_fd(struct gg_http *h)
 {
-	int res;
+        struct gg_search *s;
+	char *buf;
 
-	if (!f || !f->http) {
+	if (!h) {
 		errno = EINVAL;
 		return -1;
 	}
-	
-	if (f->http->state != GG_STATE_FINISHED) {
-		if ((res = gg_http_watch_fd(f->http)) == -1) {
+
+	gg_debug(GG_DEBUG_MISC, "// gg_search_watch_fd()\n");
+
+        if (h->state != GG_STATE_PARSING) {
+		if (gg_http_watch_fd(h) == -1) {
 			gg_debug(GG_DEBUG_MISC, "=> search, http failure\n");
 			return -1;
 		}
-		gg_http_copy_vars(f);
 	}
 	
-	if (f->state == GG_STATE_FINISHED) {
-		char *foo = f->http->data;
+        if (h->state != GG_STATE_PARSING)
+		return 0;
 
-		f->done = 1;
-		gg_debug(GG_DEBUG_MISC, "=> search, let's parse\n");
+	buf = h->body;
 
-		if (!gg_get_line(&foo)) {
-			gg_debug(GG_DEBUG_MISC, "=> search, can't read the first line\n");
-			return 0;
-		}
-		
-		while (1) {
-			char *tmp[8];
-			int i;
+	h->state = GG_STATE_DONE;
 
-			for (i = 0; i < 8; i++) {
-				if (!(tmp[i] = gg_get_line(&foo))) {
-					gg_debug(GG_DEBUG_MISC, "=> search, can't read line %d of this user\n", i + 1);
-					return 0;
-				}
-				gg_debug(GG_DEBUG_MISC, "=> search, line %i \"%s\"\n", i, tmp[i]);
-			}
+	gg_debug(GG_DEBUG_MISC, "=> search, let's parse\n");
 
-			if (!(f->results = realloc(f->results, (f->count + 1) * sizeof(struct gg_search_result)))) {
-				gg_debug(GG_DEBUG_MISC, "=> search, not enough memory for results (non critical)\n");
-				return 0;
-			}
+        if (!(h->data = s = malloc(sizeof(struct gg_search)))) {
+                gg_debug(GG_DEBUG_MISC, "=> search, not enough memory for results\n");
+                return -1;
+        }
 
-			f->results[f->count].active = (atoi(tmp[0]) == 2);
-			f->results[f->count].uin = (strtol(tmp[1], NULL, 0));
-			f->results[f->count].first_name = strdup(tmp[2]);
-			f->results[f->count].last_name = strdup(tmp[3]);
-			f->results[f->count].nickname = strdup(tmp[4]);
-			f->results[f->count].born = atoi(tmp[5]);
-			f->results[f->count].gender = atoi(tmp[6]);
-			f->results[f->count].city = strdup(tmp[7]);
-
-			f->count++;
-		}
-
-		gg_debug(GG_DEBUG_MISC, "=> search, done (%d entries)\n", f->count);
-
+	s->count = 0;
+	s->results = NULL;
+	
+	if (!gg_get_line(&buf)) {
+		gg_debug(GG_DEBUG_MISC, "=> search, can't read the first line\n");
 		return 0;
 	}
 
+	for (;;) {
+		char *line[8];
+		int i;
+
+		for (i = 0; i < 8; i++) {
+			if (!(line[i] = gg_get_line(&buf))) {
+				gg_debug(GG_DEBUG_MISC, "=> search, can't read line %d of this user\n", i + 1);
+				break;
+			}
+			gg_debug(GG_DEBUG_MISC, "=> search, line %i \"%s\"\n", i, line[i]);
+		}
+
+		if (!line[i])
+			break;
+
+		if (!(s->results = realloc(s->results, (s->count + 1) * sizeof(struct gg_search_result)))) {
+			gg_debug(GG_DEBUG_MISC, "=> search, not enough memory for results (non critical)\n");
+			return 0;
+		}
+
+		s->results[s->count].active = (atoi(line[0]) == 2);
+		s->results[s->count].uin = (strtol(line[1], NULL, 0));
+		s->results[s->count].first_name = strdup(line[2]);
+		s->results[s->count].last_name = strdup(line[3]);
+		s->results[s->count].nickname = strdup(line[4]);
+		s->results[s->count].born = atoi(line[5]);
+		s->results[s->count].gender = atoi(line[6]);
+		s->results[s->count].city = strdup(line[7]);
+
+		s->count++;
+	}
+
+	gg_debug(GG_DEBUG_MISC, "=> search, done (%d entries)\n", s->count);
+
 	return 0;
-}
-
-/*
- * gg_search_cancel()
- *
- * je¶li szukanie jest w trakcie, przerywa.
- *
- *  - f - to co¶, co zwróci³o gg_search().
- *
- * UWAGA! funkcja potencjalnie niebezpieczna, bo mo¿e pozwalniaæ bufory
- * i pozamykaæ sockety, kiedy co¶ siê dzieje. ale to ju¿ nie mój problem ;)
- */
-void gg_search_cancel(struct gg_search *f)
-{
-	if (!f || !f->http)
-		return;
-
-	gg_http_stop(f->http);
 }
 
 /*
@@ -288,25 +275,88 @@ void gg_search_cancel(struct gg_search *f)
  *
  * nie zwraca niczego. najwy¿ej segfaultnie ;)
  */
-void gg_free_search(struct gg_search *f)
+void gg_free_search(struct gg_http *h)
 {
+	struct gg_search *s;
 	int i;
 
-	if (!f)
+	if (!h)
 		return;
 
-	gg_free_http(f->http);
-
-	for (i = 0; i < f->count; i++) {
-		free(f->results[i].first_name);
-		free(f->results[i].last_name);
-		free(f->results[i].nickname);
-		free(f->results[i].city);
+	if ((s = h->data)) {
+		for (i = 0; i < s->count; i++) {
+			free(s->results[i].first_name);
+			free(s->results[i].last_name);
+			free(s->results[i].nickname);
+			free(s->results[i].city);
+		}
+		free(s);
 	}
 
-	free(f->results);
-	free(f);
+	gg_free_http(h);
 }
+
+/*
+ * gg_search_request_mode*()
+ *
+ * funkcje pozwalaj±ce w wygodny sposób tworzyæ struktury zawieraj±ce
+ * kryteria wyszukiwania.
+ *
+ *  - parametrów bez liku.
+ *
+ * wszystkie zwracaj± adres statycznego bufora, który mo¿na wykorzystaæ
+ * do nakarmienia funkcji gg_search().
+ */
+struct gg_search_request *gg_search_request_mode_0(char *nickname, char *first_name, char *last_name, char *city, int gender, int min_birth, int max_birth, int active)
+{
+	static struct gg_search_request r;
+
+	memset(&r, 0, sizeof(r));
+	r.nickname = nickname;
+	r.first_name = first_name;
+	r.last_name = last_name;
+	r.city = city;
+	r.gender = gender;
+	r.min_birth = min_birth;
+	r.max_birth = max_birth;
+	r.active = active;
+
+	return &r;
+}
+
+struct gg_search_request *gg_search_request_mode_1(char *email, int active)
+{
+	static struct gg_search_request r;
+
+	memset(&r, 0, sizeof(r));
+	r.email = email;
+	r.active = active;
+
+	return &r;
+}
+
+struct gg_search_request *gg_search_request_mode_2(char *phone, int active)
+{
+	static struct gg_search_request r;
+
+	memset(&r, 0, sizeof(r));
+	r.phone = phone;
+	r.active = active;
+
+	return &r;
+}
+
+struct gg_search_request *gg_search_request_mode_3(uin_t uin, int active)
+{
+	static struct gg_search_request r;
+
+	memset(&r, 0, sizeof(r));
+	r.uin = uin;
+	r.active = active;
+
+	return &r;
+}
+
 
 /*
  * Local variables:
@@ -315,5 +365,5 @@ void gg_free_search(struct gg_search *f)
  * indent-tabs-mode: notnil
  * End:
  *
- * vim: expandtab shiftwidth=8:
+ * vim: shiftwidth=8:
  */

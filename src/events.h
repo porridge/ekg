@@ -30,7 +30,7 @@ struct handler {
 int handle_event();
 void handle_msg(struct gg_event *e);
 
-void handle_search(struct gg_search *s);
-void handle_register(struct gg_register *s);
+void handle_search(struct gg_http *s);
+void handle_register(struct gg_http *s);
 
 #endif

@@ -27,26 +27,25 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include "libgg.h"
-#include "http.h"
 
 /*
  * gg_register()
  *
- * próbuje zarejestrowaæ u¿ytkownika. W TEJ CHWILI JU¯ DZIA£A, 
+ * próbuje zarejestrowaæ u¿ytkownika.
  *
  *  - email, password - informacja rejestracyjne,
  *  - async - ma byæ asynchronicznie?
  *
- * zwraca zaalokowan± strukturê `gg_register', któr± po¼niej nale¿y zwolniæ
+ * zwraca zaalokowan± strukturê `gg_http', któr± po¼niej nale¿y zwolniæ
  * funkcj± gg_free_register(), albo NULL je¶li wyst±pi³ b³±d.
  */
-struct gg_register *gg_register(char *email, char *password, int async)
+struct gg_http *gg_register(char *email, char *password, int async)
 {
-	struct gg_register *r;
+        struct gg_http *h;
 	char *__pwd, *__email, *form, *query;
 
 	if (!email | !password) {
-		errno = EFAULT;
+		errno = EINVAL;
 		return NULL;
 	}
 
@@ -57,10 +56,11 @@ struct gg_register *gg_register(char *email, char *password, int async)
 		gg_debug(GG_DEBUG_MISC, "=> register, not enough memory for form fields\n");
 		free(__pwd);
 		free(__email);
+                errno = ENOMEM;
 		return NULL;
 	}
 
-	form = gg_alloc_sprintf("pwd=%s&email=%s&code=%d", __pwd, __email,
+	form = gg_alloc_sprintf("pwd=%s&email=%s&code=%u", __pwd, __email,
 			gg_http_hash(email, password));
 
 	free(__pwd);
@@ -68,6 +68,7 @@ struct gg_register *gg_register(char *email, char *password, int async)
 
 	if (!form) {
 		gg_debug(GG_DEBUG_MISC, "=> register, not enough memory for form query\n");
+                errno = ENOMEM;
 		return NULL;
 	}
 
@@ -85,98 +86,80 @@ struct gg_register *gg_register(char *email, char *password, int async)
 
 	free(form);
 
-	if (!(r = malloc(sizeof(*r)))) {
-		free(query);
-		return NULL;
-	}
-
-	memset(r, 0, sizeof(*r));
-
-	r->done = 0;
-	r->uin = 0;
-	r->password = password;
-	
-	if (!(r->http = gg_http_connect(GG_REGISTER_HOST, GG_REGISTER_PORT, async, "POST", "/appsvc/fmregister.asp", query))) {
+	if (!(h = gg_http_connect(GG_REGISTER_HOST, GG_REGISTER_PORT, async, "POST", "/appsvc/fmregister.asp", query))) {
 		gg_debug(GG_DEBUG_MISC, "=> register, gg_http_connect() failed mysteriously\n");
 		free(query);
-		free(r);
-		return NULL;
+                return NULL;
 	}
+
+	h->type = GG_SESSION_REGISTER;
 
 	free(query);
 
-	gg_http_copy_vars(r);
-	
 	if (!async)
-		gg_register_watch_fd(r);
+		gg_pubdir_watch_fd(h);
 	
-	return r;
+	return h;
 }
 
 /*
- * gg_register_watch_fd()
+ * gg_pubdir_watch_fd()
  *
  * przy asynchronicznym zak³adaniu wypada³oby wywo³aæ t± funkcjê przy
- * jaki¶ zmianach na gg_register->fd.
+ * jaki¶ zmianach na gg_http->fd.
  *
- *  - r - to co¶, co zwróci³o gg_register()
+ *  - h - to co¶, co zwróci³a funkcja obs³ugi katalogu publicznego.
  *
- * je¶li wszystko posz³o dobrze to 0, inaczej -1. przeszukiwanie bêdzie
- * zakoñczone, je¶li r->state == GG_STATE_FINISHED. je¶li wyst±pi jaki¶
- * b³±d, to bêdzie tam GG_STATE_IDLE i odpowiedni kod b³êdu w r->error.
+ * je¶li wszystko posz³o dobrze to 0, inaczej -1. operacja bêdzie
+ * zakoñczona, je¶li h->state == GG_STATE_DONE. je¶li wyst±pi jaki¶
+ * b³±d, to bêdzie tam GG_STATE_ERROR i odpowiedni kod b³êdu w h->error.
  */
-int gg_register_watch_fd(struct gg_register *r)
+int gg_pubdir_watch_fd(struct gg_http *h)
 {
-	int res;
+	struct gg_pubdir *p;
 
-	if (!r || !r->http) {
+	if (!h) {
 		errno = EINVAL;
 		return -1;
 	}
+
+        if (h->state == GG_STATE_ERROR) {
+                gg_debug(GG_DEBUG_MISC, "=> pubdir, watch_fd issued on failed session\n");
+                errno = EINVAL;
+                return -1;
+        }
 	
-	if (r->http->state != GG_STATE_FINISHED) {
-		if ((res = gg_http_watch_fd(r->http)) == -1) {
-			gg_debug(GG_DEBUG_MISC, "=> register, http failure\n");
+	if (h->state != GG_STATE_PARSING) {
+		if (gg_http_watch_fd(h) == -1) {
+			gg_debug(GG_DEBUG_MISC, "=> pubdir, http failure\n");
+                        errno = EINVAL;
 			return -1;
 		}
-		gg_http_copy_vars(r);
 	}
+
+	if (h->state != GG_STATE_PARSING)
+                return 0;
 	
-	if (r->state == GG_STATE_FINISHED) {
-		r->done = 1;
-		gg_debug(GG_DEBUG_MISC, "=> register, let's parse...\n");
-		gg_debug(GG_DEBUG_MISC, "=> register, \"%s\"\n", r->http->data);
+        h->state = GG_STATE_DONE;
+	
+	if (!(h->data = p = malloc(sizeof(struct gg_pubdir)))) {
+		gg_debug(GG_DEBUG_MISC, "=> pubdir, not enough memory for results\n");
+		return -1;
+	}
+	p->success = 0;
+	p->uin = 0;
+	
+	gg_debug(GG_DEBUG_MISC, "=> pubdir, let's parse \"%s\"\n", h->body);
 
-		if (strncasecmp(r->http->data, "reg_success:", 12)) {
-			gg_debug(GG_DEBUG_MISC, "=> register, failed.\n");
-        		r->uin = 0;
-		} else {
-			r->uin = strtol(r->http->data + 12, NULL, 0);
-			gg_debug(GG_DEBUG_MISC, "=> register, done (uin=%ld)\n", r->uin);
-		}
-
-		return 0;
+	if (strncasecmp(h->body, "reg_success:", 12))
+		gg_debug(GG_DEBUG_MISC, "=> pubdir, error.\n");
+	else {
+		p->uin = strtol(h->body + 12, NULL, 0);
+		p->success = 1;
+		gg_debug(GG_DEBUG_MISC, "=> pubdir, success (uin=%ld)\n", p->uin);
 	}
 
 	return 0;
-}
-
-/*
- * gg_register_cancel()
- *
- * je¶li rejestracja jest w trakcie, przerywa.
- *
- *  - r - to co¶, co zwróci³o gg_register().
- *
- * UWAGA! funkcja potencjalnie niebezpieczna, bo mo¿e pozwalniaæ bufory
- * i pozamykaæ sockety, kiedy co¶ siê dzieje. ale to ju¿ nie mój problem ;)
- */
-void gg_register_cancel(struct gg_register *r)
-{
-	if (!r || !r->http)
-		return;
-
-	gg_http_stop(r->http);
 }
 
 /*
@@ -184,18 +167,17 @@ void gg_register_cancel(struct gg_register *r)
  *
  * zwalnia pamiêæ po efektach rejestracji.
  *
- *  - r - to co¶, co nie jest ju¿ nam potrzebne.
+ *  - h - to co¶, co nie jest ju¿ nam potrzebne.
  *
  * nie zwraca niczego. najwy¿ej segfaultnie.
  */
-void gg_free_register(struct gg_register *r)
+void gg_free_register(struct gg_http *h)
 {
-	if (!r)
+	if (!h)
 		return;
-
-	gg_free_http(r->http);
-
-	free(r);
+	
+	free(h->data);
+	gg_free_http(h);
 }
 
 /*
@@ -205,5 +187,5 @@ void gg_free_register(struct gg_register *r)
  * indent-tabs-mode: notnil
  * End:
  *
- * vim: expandtab shiftwidth=8:
+ * vim: shiftwidth=8:
  */

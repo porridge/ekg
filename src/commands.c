@@ -614,7 +614,7 @@ COMMAND(command_find)
 
 	if (!strncasecmp(argv[0], "--s", 3) || !strncasecmp(argv[0], "-s", 2)) {
 		if (search)
-			gg_search_cancel(search);
+			gg_http_stop(search);
 		gg_free_search(search);
 		search = NULL;
 		my_printf("search_stopped");
@@ -1127,6 +1127,8 @@ COMMAND(command_register)
 		my_printf("register_failed", strerror(errno));
 		return 0;
 	}
+
+	reg_req_password = strdup(params[1]);
 	
 	return 0;
 }

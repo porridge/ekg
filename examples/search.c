@@ -20,34 +20,23 @@ void sigchld()
 
 int main()
 {
-	struct gg_search *foo;
-	struct gg_search_request r;
+	struct gg_http *h;
+	struct gg_search *s;
+	struct gg_search_request *r = gg_search_request_mode_0(NULL, "Ania", NULL, NULL, GG_GENDER_NONE, 0, 0, 0);
 	int i;
 
 	gg_debug_level = 255;
 	
-	r.first_name = "Ania";
-	r.last_name = NULL;
-	r.nickname = NULL;
-	r.city = NULL;
-	r.min_birth = 0;
-	r.max_birth = 0;
-	r.gender = 0;
-	r.phone = NULL;
-	r.email = NULL;
-	r.uin = 0;
-	r.active = 0;
-
 #ifndef ASYNC
 
-	if (!(foo = gg_search(&r, 0)))
+	if (!(h = gg_search(r, 0)))
 		return 1;
 
 #else
 
 	signal(SIGCHLD, sigchld);
 
-	if (!(foo = gg_search(&r, 1)))
+	if (!(h = gg_search(r, 1)))
 		return 1;
 
         while (1) {
@@ -57,45 +46,47 @@ int main()
                 FD_ZERO(&wr);
                 FD_ZERO(&ex);
 
-                if ((foo->check & GG_CHECK_READ))
-                        FD_SET(foo->fd, &rd);
-                if ((foo->check & GG_CHECK_WRITE))
-                        FD_SET(foo->fd, &wr);
-                FD_SET(foo->fd, &ex);
+                if ((h->check & GG_CHECK_READ))
+                        FD_SET(h->fd, &rd);
+                if ((h->check & GG_CHECK_WRITE))
+                        FD_SET(h->fd, &wr);
+                FD_SET(h->fd, &ex);
 
-                if (select(foo->fd + 1, &rd, &wr, &ex, NULL) == -1 || FD_ISSET(foo->fd, &ex)) {
+                if (select(h->fd + 1, &rd, &wr, &ex, NULL) == -1 || FD_ISSET(h->fd, &ex)) {
 			if (errno == EINTR)
 				continue;
-			gg_free_search(foo);
+			gg_free_search(h);
 			perror("select");
 			return 1;
 		}
 
-                if (FD_ISSET(foo->fd, &rd) || FD_ISSET(foo->fd, &wr)) {
-			if (gg_search_watch_fd(foo) == -1) {
-				gg_free_search(foo);
+                if (FD_ISSET(h->fd, &rd) || FD_ISSET(h->fd, &wr)) {
+			if (gg_search_watch_fd(h) == -1) {
+				gg_free_search(h);
 				fprintf(stderr, "no b³±d jak b³±d\n");
 				return 1;
 			}
-			if (foo->state == GG_STATE_IDLE) {
-				gg_free_search(foo);
+			if (h->state == GG_STATE_ERROR) {
+				gg_free_search(h);
 				fprintf(stderr, "jaki¶tam b³±d\n");
 				return 1;
 			}
-			if (foo->state == GG_STATE_FINISHED)
+			if (h->state == GG_STATE_DONE)
 				break;
 		}
         }
 
 #endif
 
-	printf("count=%d\n", foo->count);
+	s = h->data;
+	
+	printf("count=%d\n", s->count);
 
-	for (i = 0; i < foo->count; i++) {
-		printf("%ld: %s %s (%s), %d, %s\n", foo->results[i].uin, foo->results[i].first_name, foo->results[i].last_name, foo->results[i].nickname, foo->results[i].born, foo->results[i].city);
+	for (i = 0; i < s->count; i++) {
+		printf("%ld: %s %s (%s), %d, %s\n", s->results[i].uin, s->results[i].first_name, s->results[i].last_name, s->results[i].nickname, s->results[i].born, s->results[i].city);
 	}
 
-	gg_free_search(foo);
+	gg_free_search(h);
 
 	return 0;
 }

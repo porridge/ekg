@@ -13,10 +13,10 @@ biblioteka:
 - uaktualniæ dokumentacjê.
 
 klient:
-- sensowne wy¶wietlanie mesgów (t³o, wordwrap itp),
 - przewijanie ekranu,
 - query,
-- obs³uga nicków ze spacjami.
+- obs³uga nicków ze spacjami,
+- rewrite obs³ugi socketów.
 
 
 $Id$

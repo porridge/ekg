@@ -20,7 +20,8 @@ void sigchld()
 
 int main()
 {
-	struct gg_register *foo;
+	struct gg_http *h;
+	struct gg_pubdir *p;
 	char email[100], password[100];
 
 	gg_debug_level = 255;
@@ -36,14 +37,19 @@ int main()
 
 #ifndef ASYNC
 
-	if (!(foo = gg_register(email, password, 0)))
+	if (!(h = gg_register(email, password, 0))) {
+		printf("b³±d\n");
 		return 1;
+	}
+	p = h->data;
+	printf("success=%d, uin=%ld\n", p->success, p->uin);
+	gg_free_register(h);
 
 #else
 
 	signal(SIGCHLD, sigchld);
 
-	if (!(foo = gg_register(email, password, 1)))
+	if (!(h = gg_register(email, password, 1)))
 		return 1;
 
         while (1) {
@@ -53,34 +59,35 @@ int main()
                 FD_ZERO(&wr);
                 FD_ZERO(&ex);
 
-                if ((foo->check & GG_CHECK_READ))
-                        FD_SET(foo->fd, &rd);
-                if ((foo->check & GG_CHECK_WRITE))
-                        FD_SET(foo->fd, &wr);
-                FD_SET(foo->fd, &ex);
+                if ((h->check & GG_CHECK_READ))
+                        FD_SET(h->fd, &rd);
+                if ((h->check & GG_CHECK_WRITE))
+                        FD_SET(h->fd, &wr);
+                FD_SET(h->fd, &ex);
 
-                if (select(foo->fd + 1, &rd, &wr, &ex, NULL) == -1 || FD_ISSET(foo->fd, &ex)) {
+                if (select(h->fd + 1, &rd, &wr, &ex, NULL) == -1 || FD_ISSET(h->fd, &ex)) {
 			if (errno == EINTR)
 				continue;
-			gg_free_register(foo);
+			gg_free_register(h);
 			perror("select");
 			return 1;
 		}
 
-                if (FD_ISSET(foo->fd, &rd) || FD_ISSET(foo->fd, &wr)) {
-			if (gg_register_watch_fd(foo) == -1) {
-				gg_free_register(foo);
+                if (FD_ISSET(h->fd, &rd) || FD_ISSET(h->fd, &wr)) {
+			if (gg_register_watch_fd(h) == -1) {
+				gg_free_register(h);
 				fprintf(stderr, "no b³±d jak b³±d\n");
 				return 1;
 			}
-			if (foo->state == GG_STATE_IDLE) {
-				gg_free_register(foo);
+			if (h->state == GG_STATE_ERROR) {
+				gg_free_register(h);
 				fprintf(stderr, "jaki¶tam b³±d\n");
 				return 1;
 			}
-			if (foo->state == GG_STATE_FINISHED) {
-				printf("uin=%ld\n", foo->uin);
-				gg_free_register(foo);
+			if (h->state == GG_STATE_DONE) {
+				p = h->data;
+				printf("success=%d, uin=%ld\n", p->success, p->uin);
+				gg_free_register(h);
 				break;
 			}
 		}

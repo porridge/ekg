@@ -14,7 +14,7 @@ AR = @AR@
 install = @INSTALL@
 
 CFLAGS = -DLOG_IGNORED @DFLAGS@ @CFLAGS@ $(INCLUDES) 
-OBJS = common.o libgg.o search.o register.o http.o
+OBJS = common.o libgg.o search.o pubdir.o http.o
 
 all:	static shared
 
