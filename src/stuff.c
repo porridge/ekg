@@ -2222,7 +2222,9 @@ int event_remove(int flags, uin_t uin)
 
         for (l = events; l; l = l->next) {
                 struct event *e = l->data;
-		int event_flags = e->flags & ~INACTIVE_EVENT;
+		int event_flags;
+
+		event_flags =  e->flags & ~INACTIVE_EVENT;
 
                 if (e && e->uin == uin && e->flags & flags) {
                         if ((event_flags &= ~flags) == 0) {
