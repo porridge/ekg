@@ -858,9 +858,10 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 					struct group *g = m->data;
 
 					if (!strcasecmp(gname, g->name)) {
-						if (first++)
-							array_add(&nicks, xstrdup(u->display));
-						else {
+						if (first++) {
+							if (!array_contains(nicks, u->display, 0))
+								array_add(&nicks, xstrdup(u->display));
+						} else {
 							xfree(nicks[i]);
 							nicks[i] = xstrdup(u->display);
 						}

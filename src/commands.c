@@ -3930,17 +3930,15 @@ COMMAND(cmd_query)
 		} else {
 
 			if (params[0]) {
-				if (!strchr(params[0], ',') && !get_uin(params[0])) {
-					printq("user_not_found", params[0]);
-					res = -1;
-					goto cleanup;
-				}
+				char **tmp = array_make(params[0], ",", 0, 0, 0);
+				int i;
 
-				if (strchr(params[0], ',')) {
-					char **tmp = array_make(params[0], ",", 0, 0, 0);
-					int i;
+				for (i = 0; tmp[i]; i++) {
+					int count = 0;
+					list_t l;
 
-					for (i = 0; tmp[i]; i++)
+					if (tmp[i][0] != '@') {
+
 						if (!get_uin(tmp[i])) {
 							printq("user_not_found", tmp[i]);
 							res = -1;
@@ -3948,11 +3946,32 @@ COMMAND(cmd_query)
 							goto cleanup;
 						}
 
-					array_free(tmp);
-				}
-			}
+						continue;
+					}
 
-			ui_event("command", quiet, "query", params[0], NULL);
+					for (l = userlist; l; l = l->next) {
+						struct userlist *u = l->data;			
+						list_t m;
+
+						for (m = u->groups; m; m = m->next) {
+							struct group *g = m->data;
+
+							if (!strcasecmp(g->name, tmp[i] + 1))
+								count++;
+						}
+					}
+
+					if (!count) {
+						printq("group_empty", tmp[i] + 1);
+						res = -1;
+						array_free(tmp);
+						goto cleanup;
+					}
+				}
+
+				array_free(tmp);
+				ui_event("command", quiet, "query", params[0], NULL);
+			}
 		}
 	}
 		
