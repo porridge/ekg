@@ -13,6 +13,7 @@ zg³osi³ b³±d.
   wiêc korzystaæ na ka¿dym systemie (sz)
 - poprawka segfaulta przy automatycznym reconnect'cie (acze/sz)
 - poprawka segfaultów i b³êdów z w³±czonym sort_windows (*/w)
+- dodanie zmiennej ,,fade_in'' (w)
 
 // 2003-02-08
 

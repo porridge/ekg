@@ -680,6 +680,20 @@ debug
 	na temat tego, co siê dzieje. dla zwyk³ych u¿ytkowników nieprzydatna.
 	mo¿e co najwy¿ej pomóc w przypadku dziwnych b³êdów.
 
+fade_in
+	typ: liczba, zmienna wewnêtrzna, ukryta
+
+	okre¶la prêdko¶æ rozja¶niania terminala podczas uruchomienia ekg.
+	jest warto¶ci± opó¼nienia miêdzy kolejnymi fazami rozja¶niania
+	(w sumie jest ich 16) w milisekundach. warto¶æ 0 wy³±cza rozja¶nianie
+	terminala. przyk³adowo dla warto¶ci 100, terminal bêdzie w ca³o¶ci
+	widoczny po 1,6s. nale¿y wzi±æ pod uwagê, ¿e minimalna rozdzielczo¶æ
+	to 10ms na platformie i386. dzia³a wy³±cznie na terminalu typu
+	,,linux''.
+
+	rozja¶nianie terminala jest wy³±cznie g³upim eksperymentem i
+	naprawdopodobniej bêdzie domy¶lnie wy³±czone w przysz³ych wersjach.
+	
 interface
 	typ: tekst, zmienna wewnêtrzna, ukryta
 

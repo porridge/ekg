@@ -1036,6 +1036,41 @@ int main(int argc, char **argv)
 
 	variable_init();
 
+#ifdef HAVE_USLEEP
+	if (config_fade_in && getenv("TERM") && !strcmp(getenv("TERM"), "linux") && !fork()) {
+		int i;
+
+		for (i = 0; i < 16; i++) {
+			int j;
+
+			for (j = 0; j < 16; j++) {
+				int r, g, b;
+
+				r = default_color_map[j].r * i / 16;
+				g = default_color_map[j].g * i / 16;
+				b = default_color_map[j].b * i / 16;
+
+				if (r > 255)
+					r = 255;
+				if (g > 255)
+					g = 255;
+				if (b > 255)
+					b = 255;
+
+				printf("\033]P%x%.2x%.2x%.2x", j, r, g, b);
+				fflush(stdout);
+			}
+
+			usleep(config_fade_in * 1000);
+		}
+
+		printf("\033]R");
+		fflush(stdout);
+
+		exit(0);
+	}
+#endif
+
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
 		if (getenv("EKG_DEBUG")) {

@@ -231,6 +231,9 @@ dnl <ekg>
   AC_CHECK_FUNCS(utimes)
   AC_CHECK_FUNCS(utime)
 
+  # g³upota
+  AC_CHECK_FUNCS(usleep)
+
   # sprawdzamy, czy system ma getopt_long
   AC_CHECK_FUNC(getopt_long, , [OBJS="$OBJS ../compat/getopt.o ../compat/getopt1.o"; CFLAGS="-I../compat $CFLAGS"])
 
