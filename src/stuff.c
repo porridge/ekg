@@ -1926,15 +1926,17 @@ void iso_to_ascii(unsigned char *buf)
 }
 
 /* strip_chars()
+ *
  * pozbywa siê podanego znaku na pocz±tku i koñcu ³ancucha
-*/
-char *strip_chars(const char *line, unsigned char what) {
+ *
+ */
+char *strip_chars(char *line, unsigned char what) {
         char *buf;
 
-        for (buf = xstrdup(line); *buf == what; buf++);
+        for (buf = line; *buf == what; buf++);
 
         if (line[strlen(line) - 1] == what)
-                buf[strlen(buf) - 1] = 0;
+        	line[strlen(buf) - 1] = 0;
 
         return buf;
 }
@@ -1944,7 +1946,7 @@ char *strip_chars(const char *line, unsigned char what) {
  *
  * pozbywa siê spacji na pocz±tku i koñcu ³añcucha.
  */
-char *strip_spaces(const char *line)
+char *strip_spaces(char *line)
 {
 	return strip_chars(line, ' ');
 }

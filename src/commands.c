@@ -3959,7 +3959,7 @@ COMMAND(cmd_query)
 			p[0] = xstrdup(c->name);
 
 		} else {
-
+			char *param;
 			if (params[0]) {
 				char **tmp = array_make(params[0], " ,", 0, 0, 1);
 				int i;
@@ -4002,8 +4002,9 @@ COMMAND(cmd_query)
 
 				array_free(tmp);
 			}
-
-			ui_event("command", quiet, "query", (params[0]) ? strip_chars(params[0], '\"') : NULL, NULL);
+			param = xstrdup(params[0]);
+			ui_event("command", quiet, "query", (params[0]) ? strip_chars(param, '\"') : NULL, NULL);
+			xfree(param);
 		}
 	}
 
@@ -4299,7 +4300,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 
 	if (strcmp(cmd, ""))
 		printq("unknown_command", cmd);
-
+	
 	xfree(line_save);
 
 	return -1;

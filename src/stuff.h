@@ -407,8 +407,8 @@ int msg_encrypt(uin_t uin, unsigned char **msg);
 void cp_to_iso(unsigned char *buf);
 void iso_to_cp(unsigned char *buf);
 void iso_to_ascii(unsigned char *buf);
-char *strip_chars(const char *line, unsigned char what); 
-char *strip_spaces(const char *line);
+char *strip_chars(char *line, unsigned char what); 
+char *strip_spaces(char *line);
 
 int play_sound(const char *sound_path);
 
