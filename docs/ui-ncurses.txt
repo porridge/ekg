@@ -31,11 +31,11 @@ rozszerzone informacje:
 	%{mail}		ilo¶æ nowej poczty lub pusty je¶li nie ma
 	%{query_descr}	opis stanu rozmówcy
 	%{version}	wersja ekg
-	%{url}		adres to strony ekg
+	%{url}		adres do strony ekg
 
-konstrukcje warunkowe pozwalaj± dodawaæ do pasku stanu teksty (ale ju¿
-nie rozszerzone informacje lub kolejne warunki) tylko gdy spe³niony
-zostanie okre¶lony warunek. konstrukcje te wygl±daj± nastêpuj±co:
+konstrukcje warunkowe pozwalaj± dodawaæ do pasku stanu teksty tylko,
+gdy spe³niony zostanie okre¶lony warunek. konstrukcje te wygl±daj±
+nastêpuj±co:
 
 	%{?warunek tekst}	tekst wy¶wietlony przy spe³nionym warunku
 	%{?!warunek tekst}	tekst wy¶wietlony przy niespe³nionym warunku

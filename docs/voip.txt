@@ -1,8 +1,7 @@
 // rozmowy g³osowe w ekg
 // (c) copyright 2002 wojtek kaniewski <wojtekka@irc.pl>
 
-opis dla 20020905. je¶li masz nowsz± wersjê, to pewnie nic siê nie zmieni³o.
-obowi±zuje lektura pliku ,,dcc.txt''.
+obowi±zuje lektura pliku ,,dcc.txt''
 
 lista wad:
 - dzia³a tylko na Linuksie ze sterownikami OSS,
@@ -11,11 +10,11 @@ lista wad:
 - dzia³a tylko je¶li jest zainstalowana biblioteka libgsm skompilowana
   z opcj± -DWAV49 (w PLD wystarczy zainstalowaæ pakiety libgsm oraz
   libgsm-devel),
-- wy¶wietla _duuuu¿o_ ¶mieci w trybie debugowania.
+- wy¶wietla _duuuu¿o_ ¶mieci w oknie debugowania.
 
 by rozpocz±æ rozmowê nale¿y wpisaæ:
 
-   dcc voice <pseudonim>
+   dcc voice <numer/alias>
 
 by zakoñczyæ:
 
