@@ -163,6 +163,7 @@ static int lines_index = 0;		/* w której linii jeste¶my? */
 static char **completions = NULL;	/* lista dope³nieñ */
 static list_t windows = NULL;		/* lista okien */
 static struct window *window_current;	/* wska¼nik na aktualne okno */
+static struct window *window_previous;	/* wska¿nik na poprzednie okno, w którym byli¶my */
 static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 
 int config_backlog_size = 1000;		/* maksymalny rozmiar backloga */
@@ -606,9 +607,9 @@ static void window_clear(struct window *w, int full)
 static struct window *window_find(const char *target)
 {
 	list_t l;
-	int status = ((target) ? !strcasecmp(target, "__status") : 0);
 	int current = ((target) ? !strcasecmp(target, "__current") : 0);
 	int debug = ((target) ? !strcasecmp(target, "__debug") : 0);
+	int status = ((target) ? !strcasecmp(target, "__status") : 0);
 
 	/* nie traktujemy debug jako aktualne - piszemy do statusowego */
 	if (!target || current) {
@@ -1449,7 +1450,7 @@ static void update_statusbar(int commit)
 	__add_format("version", 1, VERSION);
 
 #undef __add_format
-	
+
 	for (y = 0; y < config_header_size; y++) {
 		const char *p;
 		int x;
@@ -1557,7 +1558,6 @@ static void ui_ncurses_beep()
  */
 void ui_ncurses_init()
 {
-	struct timer *t;
 	int background = COLOR_BLACK;
 
 	ui_postinit = ui_ncurses_postinit;
@@ -1580,7 +1580,7 @@ void ui_ncurses_init()
 	ui_screen_width = stdscr->_maxx + 1;
 	ui_screen_height = stdscr->_maxy + 1;
 	
-	window_current = window_new(NULL, 0);
+	window_previous = window_current = window_new(NULL, 0);
 
 	status = newwin(1, stdscr->_maxx + 1, stdscr->_maxy - 1, 0);
 	input = newwin(1, stdscr->_maxx + 1, stdscr->_maxy, 0);
@@ -1609,11 +1609,13 @@ void ui_ncurses_init()
 	window_commit();
 
 	signal(SIGINT, SIG_IGN);
+#ifdef SIGWINCH
 	signal(SIGWINCH, winch_handler);
+#endif
 	
 	memset(history, 0, sizeof(history));
 
-	t = timer_add(1, 0, TIMER_UI, 0, "ui-ncurses-time", "refresh_time");
+	timer_add(1, 0, TIMER_UI, 0, "ui-ncurses-time", "refresh_time");
 
 	memset(binding_map, 0, sizeof(binding_map));
 	memset(binding_map_meta, 0, sizeof(binding_map_meta));
@@ -2668,8 +2670,15 @@ static void ui_ncurses_loop()
 				binding_toggle_contacts(0, 0);
 				break;
 				
-			case KEY_F(12):	/* F12 */
-				binding_toggle_debug(0, 0);
+			case KEY_F(12):	/* F12 - debug */
+
+				if (!window_current->id) {
+					window_switch(window_previous->id);
+					break;
+				}
+
+				window_previous = window_current;
+				window_switch(0);
 				break;
 				
 			default:

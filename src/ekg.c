@@ -762,7 +762,7 @@ static int ekg_ui_set(const char *name)
 
 int main(int argc, char **argv)
 {
-	int auto_connect = 1, force_debug = 0, new_status = 0, ui_set = 0;
+	int auto_connect = 1, new_status = 0, ui_set = 0;
 	int c = 0, set_private = 0, no_global_config = 0;
 	char *load_theme = NULL, *new_reason = NULL;
 #ifdef WITH_IOCTLD
@@ -854,9 +854,6 @@ int main(int argc, char **argv)
 			case 'p':
 				set_private = 1;
 			        break;
-			case 'd':
-				force_debug =1;
-				break;
 			case 'n':
 				auto_connect = 0;
 				break;
@@ -875,7 +872,6 @@ int main(int argc, char **argv)
 "  -b, --back[=OPIS]          domy¶lnie zmienia stan na ,,dostêpny''\n"
 "  -i, --invisible[=OPIS]     domy¶lnie zmienia stan na ,,niewidoczny''\n"
 "  -p, --private              domy¶lnie ustawia tryb ,,tylko dla przyjació³''\n"
-"  -d, --debug                w³±cza wy¶wietlanie dodatkowych informacji\n"
 "  -v, --version              wy¶wietla wersje programu i wychodzi\n"
 #ifdef WITH_IOCTLD
 "  -I, --ioctld-path=¦CIE¯KA  ustawia ¶cie¿kê do ioctld\n"
@@ -938,13 +934,8 @@ int main(int argc, char **argv)
 			ui_init = ui_batch_init;
 	}
 
-	/* czy w³±czyæ debugowanie? */	
 	setup_debug();
-	
-	if (force_debug || gg_debug_level || config_debug) {
-		gg_debug_level = 255;
-		config_debug = 1;
-	}
+	gg_debug_level = 255;
 
         ekg_pid = getpid();
 

@@ -195,7 +195,6 @@ void variable_init()
 #endif
 
 	variable_add("status", "st", VAR_INT, 2, &config_status, NULL, NULL, NULL);
-	variable_add("debug", "de", VAR_BOOL, 2, &config_debug, changed_debug, NULL, NULL);
 	variable_add("protocol", "pR", VAR_INT, 2, &config_protocol, NULL, NULL, NULL);
 	variable_add("reason", "re", VAR_STR, 2, &config_reason, NULL, NULL, NULL);
 }
