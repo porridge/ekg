@@ -3065,6 +3065,12 @@ COMMAND(cmd_test_segv)
 	return 0;
 }
 
+COMMAND(cmd_test_resize)
+{
+	ui_resize_term = 1;
+	return 0;
+}
+
 COMMAND(cmd_test_send)
 {
 	struct gg_event *e = xmalloc(sizeof(struct gg_event));
@@ -5641,6 +5647,9 @@ void command_init()
 	command_add
 	( "_segv", "", cmd_test_segv, 0, "", 
 	  "wywo³uje naruszenie segmentacji pamiêci", "");
+	command_add
+	( "_resize", "", cmd_test_resize, 0, "", 
+	  "dopasowuje wielko¶æ okna do rozmiarów terminala", "");
 	command_add
 	( "_ping", "", cmd_test_ping, 0, "", 
 	  "wysy³a pakiet ping do serwera", "");

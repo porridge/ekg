@@ -493,7 +493,8 @@ void ekg_wait_for_key()
 		}
 #endif
 
-		if (ui_needs_refresh)
+		/* dostali¶my sygna³, wracamy do ui */
+		if (ui_resize_term)
 			break;
 
 		/* zerknij na wszystkie niezbêdne deskryptory */

@@ -185,9 +185,6 @@ static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 static int ui_ncurses_debug = 0;	/* debugowanie */
 
 static struct termios old_tio;
-#ifdef SIGWINCH
-static int ui_resize_term = 0;
-#endif
 
 int config_backlog_size = 1000;		/* maksymalny rozmiar backloga */
 int config_display_transparent = 1;	/* czy chcemy przezroczyste t³o? */
@@ -1889,7 +1886,6 @@ static void update_statusbar(int commit)
 #ifdef SIGWINCH
 static void sigwinch_handler()
 {
-	ui_needs_refresh = 1;
 	ui_resize_term = 1;
 }
 #endif
@@ -1912,7 +1908,6 @@ static void ui_ncurses_beep()
 void ui_ncurses_init()
 {
 	int background = COLOR_BLACK;
-	struct termios tio;
 
 	ui_postinit = ui_ncurses_postinit;
 	ui_print = ui_ncurses_print;
@@ -1933,6 +1928,7 @@ void ui_ncurses_init()
 
 	ui_screen_width = stdscr->_maxx + 1;
 	ui_screen_height = stdscr->_maxy + 1;
+	ui_resize_term = 0;
 	
 #ifndef GG_DEBUG_DISABLE
 	window_new(NULL, -1);
@@ -1978,6 +1974,8 @@ void ui_ncurses_init()
 
 	/* deaktywujemy klawisze INTR, QUIT, SUSP i DSUSP */
 	if (!tcgetattr(0, &old_tio)) {
+		struct termios tio;
+
 		memcpy(&tio, &old_tio, sizeof(tio));
 		tio.c_cc[VINTR] = _POSIX_VDISABLE;
 		tio.c_cc[VQUIT] = _POSIX_VDISABLE;
@@ -1991,12 +1989,10 @@ void ui_ncurses_init()
 		tcsetattr(0, TCSADRAIN, &tio);
 	}
 
-	ui_needs_refresh = 0;
-
 #ifdef SIGWINCH
 	signal(SIGWINCH, sigwinch_handler);
 #endif
-	
+
 	memset(history, 0, sizeof(history));
 
 	timer_add(1, 1, TIMER_UI, 0, "ui-ncurses-time", "refresh_time");
@@ -3203,20 +3199,15 @@ static void ui_ncurses_loop()
 
 		ekg_wait_for_key();
 
-		if (ui_needs_refresh) {
-			ui_needs_refresh = 0;
-#ifdef SIGWINCH
-			if (ui_resize_term) {
-				ui_resize_term = 0;
+		if (ui_resize_term) {
+			ui_resize_term = 0;
+			endwin();
+			refresh();
+			keypad(input, TRUE);
+			/* wywo³a wszystko, co potrzebne */
+			header_statusbar_resize();
+			changed_backlog_size("backlog_size");
 
-				endwin();
-				refresh();
-				keypad(input, TRUE);
-				/* wywo³a wszystko, co potrzebne */
-				header_statusbar_resize();
-				changed_backlog_size("backlog_size");
-			}
-#endif
 			continue;
 		}
 

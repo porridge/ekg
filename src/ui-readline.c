@@ -60,10 +60,6 @@ int rl_bind_key_in_map(int key, void *function, void *keymap)
 }
 #endif
 
-#ifdef SIGWINCH
-static int ui_resize_term = 0;
-#endif
-
 #ifndef HAVE_RL_GET_SCREEN_SIZE
 int rl_get_screen_size(int *lines, int *columns)
 {
@@ -172,7 +168,6 @@ static void sigint_handler()
  */
 static void sigwinch_handler()
 {
-	ui_needs_refresh = 1;
 	ui_resize_term = 1;
 }
 #endif
@@ -186,20 +181,15 @@ static int my_getc(FILE *f)
 {
 	ekg_wait_for_key();
 
-	if (ui_needs_refresh) {
-		ui_needs_refresh = 0;
-#ifdef SIGWINCH
-		if (ui_resize_term) {
-			ui_resize_term = 0;
-			rl_get_screen_size(&screen_lines, &screen_columns);
-			if (screen_lines < 1)
-				screen_lines = 24;
-			if (screen_columns < 1)
-				screen_columns = 80;
-			ui_screen_width = screen_columns;
-			ui_screen_height = screen_lines;
-		}
-#endif
+	if (ui_resize_term) {
+		ui_resize_term = 0;
+		rl_get_screen_size(&screen_lines, &screen_columns);
+		if (screen_lines < 1)
+			screen_lines = 24;
+		if (screen_columns < 1)
+			screen_columns = 80;
+		ui_screen_width = screen_columns;
+		ui_screen_height = screen_lines;
 	}
 
 	return rl_getc(f);
@@ -849,8 +839,6 @@ void ui_readline_init()
 	signal(SIGINT, sigint_handler);
 	signal(SIGCONT, sigcont_handler);
 
-	ui_needs_refresh = 0;
-
 #ifdef SIGWINCH
 	signal(SIGWINCH, sigwinch_handler);
 #endif
@@ -864,6 +852,7 @@ void ui_readline_init()
 
 	ui_screen_width = screen_columns;
 	ui_screen_height = screen_lines;
+	ui_resize_term = 0;
 }
 
 /*
