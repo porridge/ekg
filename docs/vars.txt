@@ -608,8 +608,8 @@ speech_app
 	domy¶lna warto¶æ: brak
 
 	aplikacja u¿ywana do odczytywania tekstów wy¶wietlanych na ekranie.
-	jej ustawienie powoduje równie¿ zmianê wygl±du programu na taki,
-	który jest ³atwiejszy do wymówienia.
+	jej ustawienie powoduje równie¿ zmianê motywu na taki, który jest
+	³atwiejszy do wymówienia.
 
 statusbar_size
 	typ: liczba
@@ -629,7 +629,7 @@ theme
 	typ: tekst
 	domy¶lna warto¶æ: brak
 
-	zawiera nazwê pliku okre¶laj±cego wygl±d klienta (ang. theme)
+	zawiera nazwê pliku okre¶laj±cego motyw.
 
 time_deviation
 	typ: liczba

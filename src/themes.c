@@ -1079,9 +1079,9 @@ void theme_init()
 	format_add("not_connected_msg_queued", "%! Brak po³±czenia z serwerem. Wiadomo¶æ bêdzie wys³ana po po³±czeniu.%n\n", 1);
 
 	/* obs³uga themeów */
-	format_add("theme_loaded", "%> Wczytano opis wygl±du o nazwie %T%1%n\n", 1);
-	format_add("theme_default", "%> Ustawiono domy¶lny opis wygl±du\n", 1);
-	format_add("error_loading_theme", "%! B³±d podczas ³adowania opisu wygl±du: %1\n", 1);
+	format_add("theme_loaded", "%> Wczytano motyw %T%1%n\n", 1);
+	format_add("theme_default", "%> Ustawiono domy¶lny motyw\n", 1);
+	format_add("error_loading_theme", "%! B³±d podczas ³adowania motywu: %1\n", 1);
 
 	/* zmienne, konfiguracja */
 	format_add("variable", "%> %1 = %2\n", 1);

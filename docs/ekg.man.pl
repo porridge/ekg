@@ -26,7 +26,7 @@ Ta opcja pozwala na stworzenie struktury podkatalogów z oddzielnymi
 konfiguracjami.
 .TP
 .BI \-t\ theme\ [\-\-theme\ theme]
-£aduje opis wygl±du z podanego pliku.
+£aduje motyw z podanego pliku.
 .TP
 .BI \-c\ plik\ [\-\-control-pipe\ plik]
 Tworzy nazwany potok (ang. named pipe) umo¿liwiaj±cy sterowanie klientem.
