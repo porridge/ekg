@@ -303,7 +303,7 @@ int main(int argc, char **argv)
 #else
 #	define IOCTL_HELP ""
 #endif
-
+	struct list *l;
 	struct passwd *pw; 
 	struct gg_common si;
 	
@@ -523,6 +523,12 @@ IOCTL_HELP
 			printf("\n");
 	}
 
+	for (l = children; l; l = l->next) {
+		struct process *p = l->data;
+
+		kill(p->pid, SIGTERM);
+	}
+	
 	free(config_log_path);	
 	return 0;
 }
