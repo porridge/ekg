@@ -5522,6 +5522,7 @@ COMMAND(cmd_check_conn)
 {
 	uin_t uin;
 	const char *par;
+	struct userlist *u;
 
 	if (!params[0] && !target) {
 		printq("not_enough_params", name);
@@ -5538,6 +5539,29 @@ COMMAND(cmd_check_conn)
 	if (!(uin = get_uin(par))) {
 		printq("user_not_found", par);
 		return -1;
+	}
+
+	if ((u = userlist_find(uin, NULL)) && group_member(u, "spied")) {
+		list_t l;
+		int onlist;
+
+		onlist = 0;
+		for (l = spiedlist; l; l = l->next) {
+			struct spied *s = l->data;
+
+			if (u->uin == s->uin) {
+				onlist = 1;
+				break;
+			}
+		}
+
+		if (!onlist) {
+			struct spied s;
+			s.uin = u->uin;
+			s.timeout = 10;
+			list_add(&spiedlist, &s, sizeof(s));
+			gg_debug(GG_DEBUG_MISC, "// ekg: spying %d\n", s.uin);
+		}
 	}
 
 	return gg_image_request(sess, uin, 1, GG_CRC32_INVISIBLE);

@@ -913,14 +913,14 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 
 				s.uin = u->uin;
 				/* je¶li po 10 sek. nie uzyskamy odpowiedzi, tzn. ¿e jednak kto¶ jest naprawdê niedostêpny */	
-				s.timeout = time(NULL) + 10;
+				s.timeout = 10;
 				list_add(&spiedlist, &s, sizeof(s));
 
 				tmp  = saprintf("/check_conn %d", u->uin);
 				command_exec(NULL, tmp, 1);
 				xfree(tmp);
 
-				gg_debug(GG_DEBUG_MISC, "// ekg: spying: %d, timeout: %d\n", u->uin, s.timeout);
+				gg_debug(GG_DEBUG_MISC, "// ekg: spying: %d\n", u->uin);
 			}
 		}
 	}

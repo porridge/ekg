@@ -531,6 +531,7 @@ void ekg_wait_for_key()
 			list_t l;
 
 			last_spied_check = time(NULL);
+
 			for (l = spiedlist; l; ) {
 				struct spied *s = l->data;
 
