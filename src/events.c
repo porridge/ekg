@@ -259,8 +259,12 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 	if (!(width = atoi(format_find(line_width))))
 		width = ui_screen_width - 2;
 
-	if (width < 0)
+	if (width < 0) {
 		width = ui_screen_width + width;
+
+		if (config_timestamp)
+			width -= strlen(config_timestamp) - 6;
+	}
 
 	next_width = width;
 	
@@ -978,17 +982,6 @@ void handle_success(struct gg_event *e)
 	ui_event("connected");
 
 	userlist_send();
-
-	/* je¶li mieli¶my zachowany stan i/lub opis, zrób z niego u¿ytek */
-	if (config_status != GG_STATUS_AVAIL) {
-		if (!config_reason || !GG_S_D(config_status)) 
-			gg_change_status(sess, config_status);
-		else {
-			iso_to_cp(config_reason);
-			gg_change_status_descr(sess, config_status, config_reason);
-			cp_to_iso(config_reason);
-		}
-	}
 
 	if (!msg_queue_flush())
 		print("queue_flush");

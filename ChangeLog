@@ -9,6 +9,9 @@ zg³osi³ b³±d.
 // 2003-04-07
 
 - libgadu: poprawka pthreadów w libgadu.pc (jajcus/w)
+- poprawka zawijania wiadomo¶ci przy niestandardowych timestampach (mp/o)
+- ekg nie wysy³a ju¿ niepotrzebnie zmiany stanu po zalogowaniu, dziêki
+  czemu Kadu nie wykrywa niewidzialno¶ci (scooty/w)
 
 // 2003-04-06
 

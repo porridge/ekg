@@ -1857,7 +1857,7 @@ static void update_statusbar(int commit)
 		}
 
 		if (ui_ncurses_debug) {
-			char *tmp = saprintf(" lines_count=%d start=%d height=%d overflow=%d", window_current->lines_count, window_current->start, window_current->height, window_current->overflow);
+			char *tmp = saprintf(" lines_count=%d start=%d height=%d overflow=%d screen_width=%d", window_current->lines_count, window_current->start, window_current->height, window_current->overflow, ui_screen_width);
 			window_printat(status, 0, y, tmp, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
 			xfree(tmp);
 		} else
@@ -3847,6 +3847,8 @@ static int ui_ncurses_event(const char *event, ...)
 				
 				window_backlog_split(w, 1, 0);
 			}
+			
+			window_resize();
 		}
 
 		if (!strcasecmp(name, "backlog_size")) {

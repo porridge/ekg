@@ -160,7 +160,8 @@ static struct {
  */
 static int get_char_from_pipe(struct gg_common *c)
 {
-	static char buf[1024];
+	static char buf[2048];
+	static int escaped;
 	char ch;
   
 	if (!c)
@@ -174,9 +175,19 @@ static int get_char_from_pipe(struct gg_common *c)
 			buf[strlen(buf)] = ch;
 	}
 
-	if (ch == '\n' || (strlen(buf) >= sizeof(buf) - 1)) {
+	if (ch == '\n' && escaped) {	/* zamazuje \\ */
+		buf[strlen(buf) - 1] = ch;
+	}
+
+	if ((ch == '\n' && !escaped) || (strlen(buf) >= sizeof(buf) - 1)) {
 		command_exec(NULL, buf, 0);
 		memset(buf, 0, sizeof(buf));
+	}
+
+	if (ch == '\\') {
+		escaped = 1;
+	} else if (ch != '\r' && ch != '\n') {
+		escaped = 0;
 	}
 
 	return 0;
