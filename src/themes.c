@@ -996,7 +996,7 @@ void theme_init()
 	format_add("chat_line,speech", "%1\n", 1);
 	format_add("chat_footer,speech", ".", 1);
 
-	format_add("sent_header", "%b.-- %n%1 %4%b--- -- -%n\n", 1);
+	format_add("sent_header", "%b.-- %n%1 %c%4%b--- -- -%n\n", 1);
 	format_add("sent_conference_header", "%b.-- %b[%T%3%b] -- %4%n%1 %b--- -- -%n\n", 1);
 	format_add("sent_footer", "%b`----- ---- --- -- -%n\n", 1);
 	format_add("sent_line", "%b|%n %|%1%n\n", 1);

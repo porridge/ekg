@@ -90,7 +90,20 @@ dnl
 dnl  Najpierw sprawdzamy te opcje, które s± wspólne dla libgadu i ekg.
 dnl
 
-AC_C_BIGENDIAN([AC_LIBGADU_DEFINE([BIGENDIAN])])
+AC_C_BIGENDIAN
+
+AC_TRY_RUN(
+[#include "config.h"
+
+int main()
+{
+#ifdef WORDS_BIGENDIAN
+	return 0;
+#else
+	return 1;
+#endif
+}], [AC_LIBGADU_DEFINE([BIGENDIAN])])
+	
 
 AC_NEED_STDINT_H
 
