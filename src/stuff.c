@@ -179,7 +179,7 @@ char *config_log_timestamp = NULL;
 int config_server_save = 0;
 char *config_email = NULL;
 int config_time_deviation = 300;
-int config_mesg_allow = 2;
+int config_mesg = MESG_DEFAULT;
 int config_display_welcome = 1;
 int config_auto_back = 0;
 int config_display_crap = 1;
@@ -652,14 +652,16 @@ void changed_dcc(const char *var)
 }
 
 /*
- * changed_mesg_allow()
+ * changed_mesg()
  *
- * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,mesg_allow''.
+ * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,mesg''.
  */
-void changed_mesg_allow(const char *var)
+void changed_mesg(const char *var)
 {
-	if ((config_mesg_allow == 0 || config_mesg_allow == 1) && mesg_set(2) != config_mesg_allow)
-		mesg_set(config_mesg_allow);
+	if (config_mesg == MESG_DEFAULT)
+		mesg_set(mesg_startup);
+	else
+		mesg_set(config_mesg);
 }
 	
 /*
@@ -1970,35 +1972,33 @@ const char *log_timestamp(time_t t)
 /*
  * mesg_set()
  *
- * w³±cza/wy³±cza mo¿liwo¶æ pisania do naszego terminala za pomoc±
- * write/talk/wall.
+ * w³±cza/wy³±cza/sprawdza mo¿liwo¶æ pisania do naszego terminala.
  *
- * - what - 0 wy³±cza, 1 w³±cza, 2 zwraca aktualne ustawienie.
+ *  - what - MESG_ON, MESG_OFF lub MESG_CHECK
  * 
- * -1 je¶li b³ad, lub aktualny stan (0/1)
+ * -1 je¶li b³ad, lub aktualny stan MESG_ON/MESG_OFF
 */
 int mesg_set(int what)
 {
 	const char *tty;
 	struct stat s;
 
-	if (!(tty = ttyname(1)))
+	if (!(tty = ttyname(old_stderr)) || stat(tty, &s)) {
+		gg_debug(GG_DEBUG_MISC, "// mesg_set() error: %s\n", strerror(errno));
 		return -1;
-
-	if (!stat(tty, &s))
-		return -1;
-
-	switch (what) {
-		case 0:
-			chmod(tty, s.st_mode & ~S_IWGRP);
-			break;
-		case 1:
-			chmod(tty, s.st_mode | S_IWGRP);
-			break;
-		case 2:
-			return ((s.st_mode & S_IWGRP) ? 1 : 0);
 	}
 
+	switch (what) {
+		case MESG_OFF:
+			chmod(tty, s.st_mode & ~S_IWGRP);
+			break;
+		case MESG_ON:
+			chmod(tty, s.st_mode | S_IWGRP);
+			break;
+		case MESG_CHECK:
+			return ((s.st_mode & S_IWGRP) ? MESG_ON : MESG_OFF);
+	}
+	
 	return 0;
 }
 

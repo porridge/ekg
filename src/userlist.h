@@ -33,8 +33,6 @@
 #include "libgadu.h"
 #include "dynstuff.h"
 
-#define EKG_GENDER(u) (((u)->first_name) ? (u)->first_name : (u)->display)
-
 struct userlist {
 	char *first_name;	/* imiê */
 	char *last_name;	/* nazwisko */
@@ -95,7 +93,6 @@ char userlist_type(struct userlist *u);
 int ignored_add(uin_t uin, int level);
 int ignored_remove(uin_t uin);
 int ignored_check(uin_t uin);
-
 int ignore_flags(const char *str);
 const char *ignore_format(int level);
 

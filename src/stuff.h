@@ -110,7 +110,14 @@ struct binding {
 	char *default_arg;		/* domy¶lny argument */
 };
 
-enum timer_type {
+enum mesg_t {
+	MESG_CHECK = -1,
+	MESG_OFF,
+	MESG_ON,
+	MESG_DEFAULT
+};
+
+enum timer_t {
 	TIMER_SCRIPT,
 	TIMER_UI,
 	TIMER_COMMAND
@@ -155,7 +162,7 @@ struct gg_exec {
 	int quiet;	/* czy byæ cicho ? */
 };
 
-enum buffer_type {
+enum buffer_t {
 	BUFFER_DEBUG,	/* na zapisanie n ostatnich linii debug */
 	BUFFER_EXEC	/* na buforowanie tego, co wypluwa exec */
 };
@@ -191,6 +198,7 @@ char *config_profile;
 int config_changed;
 
 int old_stderr;
+int mesg_startup;
 
 char *config_audio_device;
 char *config_away_reason;
@@ -243,7 +251,7 @@ char *config_log_path;
 int config_log_status;
 char *config_log_timestamp;
 int config_make_window;
-int config_mesg_allow;
+int config_mesg;
 char *config_password;
 int config_password_cp1250;
 int config_protocol;
@@ -328,7 +336,7 @@ void buffer_free();
 
 void changed_backlog_size(const char *var);
 void changed_dcc(const char *var);
-void changed_mesg_allow(const char *var);
+void changed_mesg(const char *var);
 void changed_proxy(const char *var);
 void changed_theme(const char *var);
 void changed_uin(const char *var);

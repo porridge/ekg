@@ -28,4 +28,7 @@ int emoticon_read();
 char *emoticon_expand(const char *s);
 void emoticon_free();
 
-#endif
+int emoticon_add(const char *name, const char *value);
+int emoticon_remove(const char *name);
+
+#endif /* __EMOTICONS_H */

@@ -139,7 +139,7 @@ void variable_init()
 	variable_add("display_color", "dC", VAR_INT, 1, &config_display_color, NULL, NULL, NULL);
 	variable_add("display_color_map", "dm", VAR_STR, 1, &config_display_color_map, NULL, NULL, dd_color);
 	variable_add("display_crap", "dr", VAR_BOOL, 1, &config_display_crap, NULL, NULL, NULL);
-	variable_add("display_notify", "dn", VAR_INT, 1, &config_display_notify, NULL, variable_map(3, 0, 0, "none", 1, 0, "all", 2, 0, "significant"), NULL);
+	variable_add("display_notify", "dn", VAR_INT, 1, &config_display_notify, NULL, variable_map(3, 0, 0, "none", 1, 2, "all", 2, 1, "significant"), NULL);
 	variable_add("display_pl_chars", "dp", VAR_BOOL, 1, &config_display_pl_chars, NULL, NULL, NULL);
 	variable_add("display_sent", "ds", VAR_BOOL, 1, &config_display_sent, NULL, NULL, NULL);
 	variable_add("display_welcome", "dw", VAR_BOOL, 1, &config_display_welcome, NULL, NULL, NULL);
@@ -149,7 +149,7 @@ void variable_init()
 #endif
 	variable_add("emoticons", "eM", VAR_BOOL, 1, &config_emoticons, NULL, NULL, NULL);
 #ifdef HAVE_OPENSSL
-	variable_add("encryption", "en", VAR_INT, 1, &config_encryption, NULL, variable_map(2, 0, 0, "none", 1, 0, "sim"), NULL);
+	variable_add("encryption", "en", VAR_INT, 1, &config_encryption, NULL, variable_map(3, 0, 0, "none", 1, 2, "sim", 2, 1, "simlite"), NULL);
 #endif
 	variable_add("enter_scrolls", "es", VAR_BOOL, 1, &config_enter_scrolls, NULL, NULL, NULL);
 	variable_add("events_delay", "ev", VAR_INT, 1, &config_events_delay, NULL, NULL, NULL);
@@ -165,8 +165,8 @@ void variable_init()
 	variable_add("log_status", "lS", VAR_BOOL, 1, &config_log_status, NULL, NULL, dd_log);
 	variable_add("log_path", "lp", VAR_STR, 1, &config_log_path, NULL, NULL, dd_log);
 	variable_add("log_timestamp", "lt", VAR_STR, 1, &config_log_timestamp, NULL, NULL, dd_log);
-	variable_add("make_window", "mw", VAR_INT, 1, &config_make_window, NULL, variable_map(3, 0, 0, "none", 1, 0, "usefree", 2, 0, "always"), NULL);
-	variable_add("mesg_allow", "ma", VAR_INT, 1, &config_mesg_allow, changed_mesg_allow, variable_map(3, 0, 0, "no", 1, 0, "yes", 2, 0, "default"), NULL);
+	variable_add("make_window", "mw", VAR_INT, 1, &config_make_window, NULL, variable_map(3, 0, 0, "none", 1, 2, "usefree", 2, 1, "always"), NULL);
+	variable_add("mesg", "ma", VAR_INT, 1, &config_mesg, changed_mesg, variable_map(3, 0, 0, "no", 1, 2, "yes", 2, 1, "default"), NULL);
 	variable_add("proxy", "pr", VAR_STR, 1, &config_proxy, changed_proxy, NULL, NULL);
 	variable_add("proxy_forwarding", "pf", VAR_STR, 1, &config_proxy_forwarding, NULL, NULL, NULL);
 	variable_add("random_reason", "rr", VAR_MAP, 1, &config_random_reason, NULL, variable_map(5, 0, 0, "none", 1, 0, "away", 2, 0, "notavail", 4, 0, "avail", 8, 0, "invisible"), NULL);
@@ -439,7 +439,7 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 
 			tmp = strtol(value, NULL, 0);
 
-			if (v->map && v->type == VAR_MAP) {
+			if (v->map) {
 				int i;
 
 				for (i = 0; v->map[i].label; i++) {
