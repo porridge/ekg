@@ -826,7 +826,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 			ui_beep();
 
 		/* i muzyczk± */
-		if (config_sound_notify_file && strcmp(config_sound_notify_file, ""))
+		if (config_sound_notify_file && strcmp(config_sound_notify_file, "") && (!config_events_delay || (time(NULL) - last_conn_event) >= config_events_delay))
 			play_sound(config_sound_notify_file);
 
 		/* czy mamy wy¶wietlaæ na ekranie? */

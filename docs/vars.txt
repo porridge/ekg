@@ -340,9 +340,9 @@ events_delay
 	domy¶lna warto¶æ: 3
 
 	okre¶la, po ilu sekundach od po³±czenia z serwerem, zaczn± dzia³aæ
-	zdarzenia ,,on'' zwi±zane ze zmianami stanu. chodzi o to, aby nie
-	traktowaæ pocz±tkowych informacji o statusie osób po po³±czeniu jako
-	zmianê ich stanu.
+	zdarzenia ,,on'' i d¼wiêki zwi±zane ze zmianami stanu. chodzi o to,
+	aby nie	traktowaæ pocz±tkowych informacji o statusie osób po
+	po³±czeniu jako	zmianê ich stanu.
 
 header_size
 	typ: liczba

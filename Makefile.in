@@ -68,6 +68,15 @@ install-ekgwap:
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) -m 755 ekgwap/ekgwapd $(DESTDIR)$(bindir)
 
+install-ekl2:
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+	$(INSTALL) -m 755 contrib/ekl2.pl $(DESTDIR)$(bindir)
+	$(INSTALL) -m 755 contrib/ekl2.sh $(DESTDIR)$(bindir)
+	$(INSTALL) -d $(DESTDIR)$(mandir)/man1
+	$(INSTALL) -m 644 docs/ekl2.man.en $(DESTDIR)$(mandir)/man1/ekl2.1
+	$(INSTALL) -d $(DESTDIR)$(mandir)/pl/man1
+	$(INSTALL) -m 644 docs/ekl2.man.pl $(DESTDIR)$(mandir)/pl/man1/ekl2.1
+
 #
 
 uninstall:	@uninstall_ekg@
@@ -75,10 +84,10 @@ uninstall:	@uninstall_ekg@
 	rm -f $(DESTDIR)$(includedir)/libgadu{,-config,-stdint}.h
 
 uninstall-ekg:
-	rm -f $(DESTDIR)$(bindir)/{ekg,ekgwapd}
+	rm -f $(DESTDIR)$(bindir)/{ekg,ekgwapd,ekl2.{sh,pl}}
 	rm -f $(DESTDIR)$(libexecdir)/ioctld
 	rm -rf $(DESTDIR)$(datadir)/ekg
-	rm -f $(DESTDIR)$(mandir){/pl,}/man1/ekg.1
+	rm -f $(DESTDIR)$(mandir){/pl,}/man1/{ekg,ekl2}.1
 
 #
 
