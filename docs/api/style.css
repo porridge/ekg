@@ -3,11 +3,12 @@ BODY {
 	color: black;
 }
 
-.func {
-	font: 18pt tahoma, verdana, arial, helvetica;
+.function {
+	font: 16pt tahoma, verdana, arial, helvetica;
 	background-color: #c0d0e0;
 	border-bottom: 2px solid #8090a0;
 	border-right: 2px solid #8090a0;
+	margin-top: 2em;
 	padding: 0.2em;
 }
 
@@ -46,7 +47,6 @@ TABLE.params {
 
 .result {
 	font: normal tahoma, verdana, arial, helvetica;
-	margin-bottom: 2em;
 	margin-left: 3em;
 }
 
@@ -67,7 +67,7 @@ TABLE.params {
 }
 
 .funcgroup {
-	font: 18pt tahoma, verdana, arial, helvetica;
+	font: 14pt tahoma, verdana, arial, helvetica;
 	background-color: #c0d0e0;
 	border-bottom: 2px solid #8090a0;
 	border-right: 2px solid #8090a0;
@@ -81,4 +81,41 @@ TABLE.params {
 	margin-bottom: 2em;
 }
 
+.typedef {
+	font: 14pt tahoma, verdana, arial, helvetica;
+	background-color: #c0d0e0;
+	border-bottom: 2px solid #8090a0;
+	border-right: 2px solid #8090a0;
+	margin-top: 2em;
+	padding: 0.2em;
+}
 
+.index_typedef {
+	color: green;
+}
+
+.enum {
+	font: 14pt tahoma, verdana, arial, helvetica;
+	background-color: #c0e0d0;
+	border-bottom: 2px solid #80a090;
+	border-right: 2px solid #80a090;
+	margin-top: 2em;
+	padding: 0.2em;
+}
+
+.index_enum {
+	color: magenta;
+}
+
+.struct {
+	font: 14pt tahoma, verdana, arial, helvetica;
+	background-color: #e0c0d0;
+	border-bottom: 2px solid #a08090;
+	border-right: 2px solid #a08090;
+	margin-top: 2em;
+	padding: 0.2em;
+}
+
+.index_struct {
+	color: blue;
+}

@@ -451,51 +451,53 @@ typedef struct gg_pubdir50_s *gg_pubdir50_t;
  * z gg_dcc_watch_fd()
  */
 struct gg_event {
-	int type;	/* rodzaj zdarzenia (gg_event_t) */
-        union {
-		struct {			/* @msg odebrano wiadomo¶æ */
-                        uin_t sender;		/* numer nadawcy */
+	int type;	/* rodzaj zdarzenia -- gg_event_t */
+        union {		/* @event */
+                struct gg_notify_reply *notify;	/* informacje o li¶cie kontaktów -- GG_EVENT_NOTIFY */
+
+		int failure;			/* b³±d po³±czenia -- GG_EVENT_FAILURE */
+
+		struct gg_dcc *dcc_new;		/* nowe po³±czenie bezpo¶rednie -- GG_EVENT_DCC_NEW */
+		
+		int dcc_error;			/* b³±d po³±czenia bezpo¶redniego -- GG_EVENT_DCC_ERROR */
+
+		gg_pubdir50_t pubdir50;		/* wynik operacji zwi±zanej z katalogiem publicznym -- GG_EVENT_PUBDIR50_* */
+	
+		struct {			/* @msg odebrano wiadomo¶æ -- GG_EVENT_MSG */
+			uin_t sender;		/* numer nadawcy */
 			int msgclass;		/* klasa wiadomo¶ci */
 			time_t time;		/* czas nadania */
-                        unsigned char *message;	/* tre¶æ wiadomo¶ci */
+			unsigned char *message;	/* tre¶æ wiadomo¶ci */
 
 			int recipients_count;	/* ilo¶æ odbiorców konferencji */
 			uin_t *recipients;	/* odbiorcy konferencji */
 			
 			int formats_length;	/* d³ugo¶æ informacji o formatowaniu tekstu */
-			void *formats;		/* informacje o formatowaniu etkstu */
+			void *formats;		/* informacje o formatowaniu tekstu */
                 } msg;
 		
-                struct gg_notify_reply *notify;	/* informacje o li¶cie kontaktów */
-		
-		struct {			/* @notify_descr informacje o li¶cie kontaktów z opisami stanu */
+		struct {			/* @notify_descr informacje o li¶cie kontaktów z opisami stanu -- GG_EVENT_NOTIFY_DESCR */
 			struct gg_notify_reply *notify;	/* informacje o li¶cie kontaktów */
 			char *descr;		/* opis stanu */
 		} notify_descr;
 		
-                struct {			/* @status zmiana stanu */
+                struct {			/* @status zmiana stanu -- GG_EVENT_STATUS */
 			uin_t uin;		/* numer */
 			uint32_t status;	/* nowy stan */
 			char *descr;		/* opis stanu */
 		} status;
 		
-                struct {			/* @ack potwiedzenie wiadomo¶ci */
-                        uin_t recipient;
-                        int status;
-                        int seq;
-                } ack;
+		struct {			/* @ack potwierdzenie wiadomo¶ci -- GG_EVENT_ACK */
+			uin_t recipient;	/* numer odbiorcy */
+			int status;		/* stan dorêczenia wiadomo¶ci */
+			int seq;		/* numer sekwencyjny wiadomo¶ci */
+		} ack;
 
-		int failure;			/* b³±d po³±czenia */
-
-		struct gg_dcc *dcc_new;		/* nowe po³±czenie bezpo¶rednie */
-		int dcc_error;			/* b³±d po³±czenia bezpo¶redniego */
-		struct {			/* @dcc_voice_data otrzymano dane d¼wiêkowe */
+		struct {			/* @dcc_voice_data otrzymano dane d¼wiêkowe -- GG_EVENT_DCC_VOICE_DATA */
 			uint8_t *data;		/* dane d¼wiêkowe */
 			int length;		/* ilo¶æ danych d¼wiêkowych */
 		} dcc_voice_data;
-
-		gg_pubdir50_t pubdir50;		/* wynik operacji zwi±zanej z katalogiem publicznym */
-        } event;
+	} event;
 };
 
 struct gg_event *gg_watch_fd(struct gg_session *sess);
