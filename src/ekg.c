@@ -1078,7 +1078,9 @@ void ekg_exit()
 	python_finalize();
 #endif
 
+#ifdef HAVE_OPENSSL
 	SIM_KC_Finish();
+#endif
 
 	exit(0);
 }
