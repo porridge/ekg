@@ -485,9 +485,6 @@ int config_write_partly(char **vars)
 		if (!strchr(line, ' '))
 			goto pass;
 
-		if (!strncasecmp(line, "ignore ", 7))
-			goto pass;
-
 		if (!strncasecmp(line, "alias ", 6))
 			goto pass;
 

@@ -650,6 +650,17 @@ void changed_dcc(const char *var)
 			gg_dcc_ip = 0;
 	}
 }
+
+/*
+ * changed_mesg()
+ *
+ * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,mesg_allow''.
+ */
+void changed_mesg_allow(const char *var)
+{
+	if ((config_mesg_allow == 0 || config_mesg_allow == 1) && mesg_set(2) != config_mesg_allow)
+		mesg_set(config_mesg_allow);
+}
 	
 /*
  * changed_proxy()
@@ -1989,17 +2000,6 @@ int mesg_set(int what)
 	}
 
 	return 0;
-}
-
-/*
- * mesg_changed()
- *
- * wywo³ywane przy zmianie ustawieñ.
-*/
-void mesg_changed()
-{
-	if ((config_mesg_allow == 0 || config_mesg_allow == 1) && mesg_set(2) != config_mesg_allow)
-		mesg_set(config_mesg_allow);
 }
 
 /*

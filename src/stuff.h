@@ -328,6 +328,7 @@ void buffer_free();
 
 void changed_backlog_size(const char *var);
 void changed_dcc(const char *var);
+void changed_mesg_allow(const char *var);
 void changed_proxy(const char *var);
 void changed_theme(const char *var);
 void changed_uin(const char *var);
@@ -368,7 +369,6 @@ char *log_escape(const char *str);
 const char *log_timestamp(time_t t);
 
 int mesg_set(int what);
-void mesg_changed();
 
 int msg_encrypt(uin_t uin, unsigned char **msg);
 
