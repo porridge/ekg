@@ -2243,10 +2243,12 @@ void command_init()
 	  
 	command_add
 	( "bind", "???", cmd_bind, 0,
-	  " <opcja> [sekwencja] [komenda]", "bindowanie klawiszy",
-	  " -a, --add <sekwencja> <komenda>  binduje now± sekwencjê\n"
-	  " -d, --del <sekwencja>            usuwa podan± sekwencjê\n"
-	  " -l, --list                       wy¶wietla zabindowane sekwencje");
+	  " <opcja> [sekwencja] [komenda]", "przypisywanie akcji klawiszom",
+	  "  -a, --add <sekwencja> <komenda>  przypisuje now± sekwencjê\n"
+	  "  -d, --del <sekwencja>            usuwa podan± sekwencjê\n"
+	  "  -l, --list                       wy¶wietla przypisane sekwencje\n"
+	  "\n"
+	  "Dostêpne sekwencje to: Ctrl-<znak>");
 
 	command_add
 	( "change", "?", cmd_change, 0,
