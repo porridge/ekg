@@ -74,6 +74,9 @@ struct gg_session {
 	unsigned long client_addr;	/* adres klienta */
 	int client_port;		/* port, na którym klient s³ucha */
 
+	unsigned long external_addr;	/* adres zewnetrzny klienta */
+	int external_port;		/* port zewnetrzny klienta */
+	
 	uin_t uin;		/* numerek klienta */
 	char *password;		/* i jego has³o. zwalniane automagicznie */
         
@@ -266,6 +269,8 @@ struct gg_login_params {
 	char *client_version;		/* wersja klienta */
 	int has_audio;			/* czy ma d¼wiêk? */
 	int last_sysmsg;		/* ostatnia wiadomo¶æ systemowa */
+	unsigned long external_addr;	/* adres widziany na zewnatrz */
+	unsigned short external_port;	/* port widziany na zewnatrz */
 };
 
 struct gg_session *gg_login(const struct gg_login_params *p);

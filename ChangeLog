@@ -12,6 +12,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - drobna poprawka od¶wie¿ania przy ,,window_switch()'' (d)
 - poprawka segfaulta przy away/back/... (rmrmg/w)
 - poprawka INADDR_NONE (Murphy/w)
+- obs³uga forwardowania portów. dodatkowe pola gg_login_params:
+  external_addr, external_port (Chilek/w)
 
 // 2002-07-04
 
