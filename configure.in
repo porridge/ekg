@@ -590,6 +590,10 @@ else
 	echo " - ui-ncurses: disabled"
 fi
 
+if text "x$enable_wap" = "xyes"; then
+	echo " - rtg: enabled"
+fi
+
 echo
 
 dnl </ekg>
