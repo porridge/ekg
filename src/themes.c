@@ -824,5 +824,14 @@ void init_theme()
 	add_format("window_list_nothing", "%) Okienko nr %B%1%n - %G-%n\n", 1);
 	add_format("window_invalid", "%! Nieprawid³owy parametr.\n", 1);
 	add_format("window_id_query_started", "%) Rozmowa z %G%2%n rozpoczêta w okienku nr %B%1%n.\n", 1);
+	add_format("bind_seq_command_too_long", "%! Za d³uga komenda!\n", 1);
+	add_format("bind_seq_incorrect", "%! Sekwencja %R%1%n nieprawod³owa.\n", 1); 
+	add_format("bind_seq_add", "%) Sekwencja %G%1%n dodana.\n", 1);
+	add_format("bind_seq_remove", "%) Sekwencja %G%1%n usuniêta.\n", 1);	
+	add_format("bind_invalid", "%! Nieprawid³owy parametr.\n", 1);
+	add_format("bind_seq_list", "%) %G%1%n - '%W%2%n'\n", 1);
+	add_format("bind_not_enough_params", "%! Niewystarczaj±ca ilo¶æ argumentów.\n", 1);
+	add_format("bind_seq_exist", "%! Sekwencja %R%1%n ju¿ istnieje.\n", 1);
+	add_format("bind_seq_list_empty", "%! Brak zabindowanych sekwencji.\n", 1);
 	
 };

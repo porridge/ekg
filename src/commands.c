@@ -63,7 +63,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_remind(), command_dcc(), command_query(), command_passwd(),
 	command_test_ping(), command_on(), command_change(),
 	command_test_fds(), command_test_segv(), command_version(), 
-	command_history(), command_window(), command_echo();
+	command_history(), command_window(), command_echo(), command_bind();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -290,6 +290,12 @@ struct command commands[] = {
 	  "  clear\n"
 	  "  refresh\n"
 	  "  list" },
+
+	{ "bind", "???", command_bind,
+	  " <opcja> [sekwencja] [komenda]", "Bindowanie klawiszy",
+	  " -a, --add <sekwencja> <komenda>	binduje now± sekwencjê\n"
+	  " -d, --del <sekwencja>		usuwa podan± sekwencjê\n"
+	  " -l, --list				wy¶wietla zabindowane sekwencje"},
 	  
 	{ "_add", "?", command_test_add, "", "",
 	  "Dodaje do listy dope³niania TABem" },
@@ -2115,6 +2121,13 @@ COMMAND(command_echo)
 COMMAND(command_window)
 {
 	ui_event("command", "window", (params) ? params[0] : NULL, (params && params[0]) ? params[1] : NULL);
+
+	return 0;
+}
+
+COMMAND(command_bind)
+{
+	ui_event("command", "bind", (params) ? params[0] : NULL, (params && params[0]) ? params[1] : NULL, (params && params[1]) ? params[2] : NULL); 
 
 	return 0;
 }

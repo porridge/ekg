@@ -47,6 +47,11 @@ struct window {
         struct wbuff buff;
 };
 
+struct sequence {
+	char *seq;
+	char *command;
+};
+
 extern void ui_readline_init();
 #endif
 

@@ -46,7 +46,7 @@ static int ui_readline_event(const char *event, ...);
 static void ui_readline_deinit();
 
 static int in_readline = 0, no_prompt = 0, pager_lines = -1, screen_lines = 24, screen_columns = 80, curr_window = 1, windows_count = 0;
-struct list *windows = NULL;
+struct list *windows = NULL, *sequences = NULL;
 struct window *win;
 
 /* kod okienek napisany jest na podstawie ekg-windows nilsa */
@@ -71,6 +71,37 @@ static void window_06() { if (curr_window == 6) return; window_switch(6); }
 static void window_07() { if (curr_window == 7) return; window_switch(7); }
 static void window_08() { if (curr_window == 8) return; window_switch(8); }
 static void window_09() { if (curr_window == 9) return; window_switch(9); }
+
+static char *seq_get_command(char *seq);
+static int bind_sequence(char *seq, char *command);
+static int bind_seq_list();
+
+/* pro¶ciej siê chyba nie da... */
+int seq_execute_a() { ekg_execute(NULL, seq_get_command("ctrl-a")); return 0; }
+int seq_execute_b() { ekg_execute(NULL, seq_get_command("ctrl-b")); return 0; }
+int seq_execute_c() { ekg_execute(NULL, seq_get_command("ctrl-c")); return 0; }
+int seq_execute_d() { ekg_execute(NULL, seq_get_command("ctrl-d")); return 0; }
+int seq_execute_e() { ekg_execute(NULL, seq_get_command("ctrl-e")); return 0; }
+int seq_execute_f() { ekg_execute(NULL, seq_get_command("ctrl-f")); return 0; }
+int seq_execute_g() { ekg_execute(NULL, seq_get_command("ctrl-g")); return 0; }
+int seq_execute_h() { ekg_execute(NULL, seq_get_command("ctrl-h")); return 0; }
+int seq_execute_i() { ekg_execute(NULL, seq_get_command("ctrl-i")); return 0; }
+int seq_execute_j() { ekg_execute(NULL, seq_get_command("ctrl-j")); return 0; }
+int seq_execute_k() { ekg_execute(NULL, seq_get_command("ctrl-k")); return 0; }
+int seq_execute_l() { ekg_execute(NULL, seq_get_command("ctrl-l")); return 0; }
+int seq_execute_m() { ekg_execute(NULL, seq_get_command("ctrl-m")); return 0; }
+int seq_execute_n() { ekg_execute(NULL, seq_get_command("ctrl-n")); return 0; }
+int seq_execute_o() { ekg_execute(NULL, seq_get_command("ctrl-o")); return 0; }
+int seq_execute_p() { ekg_execute(NULL, seq_get_command("ctrl-p")); return 0; }
+int seq_execute_q() { ekg_execute(NULL, seq_get_command("ctrl-q")); return 0; }
+int seq_execute_r() { ekg_execute(NULL, seq_get_command("ctrl-r")); return 0; }
+int seq_execute_s() { ekg_execute(NULL, seq_get_command("ctrl-s")); return 0; }
+int seq_execute_t() { ekg_execute(NULL, seq_get_command("ctrl-t")); return 0; }
+int seq_execute_u() { ekg_execute(NULL, seq_get_command("ctrl-u")); return 0; }
+int seq_execute_v() { ekg_execute(NULL, seq_get_command("ctrl-v")); return 0; }
+int seq_execute_w() { ekg_execute(NULL, seq_get_command("ctrl-w")); return 0; }
+int seq_execute_y() { ekg_execute(NULL, seq_get_command("ctrl-y")); return 0; }
+int seq_execute_z() { ekg_execute(NULL, seq_get_command("ctrl-z")); return 0; }
 
 static void sigcont_handler()
 {
@@ -769,6 +800,35 @@ static int ui_readline_event(const char *event, ...)
 
 			result = 1;
 		}
+		if (!strcasecmp(command, "bind")) {
+			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*), *p3 = va_arg(ap, char*);
+			
+			if (!p1) {
+				print("bind_not_enough_params");
+				result = 1;
+				goto cleanup;
+			}
+
+			if (!strcasecmp(p1, "-a") || !strcasecmp(p1, "--add")) {
+				if (!p2 || !p3) 
+					print("bind_not_enough_params");
+				else
+					bind_sequence(p2, p3);
+			
+			} else if (!strcasecmp(p1, "-d") || !strcasecmp(p1, "--del")) {
+				if (!p2)
+					print("bind_not_enough_params");
+				else
+					bind_sequence(p2, NULL);
+			
+			} else if (!strcasecmp(p1, "-l") || !strcasecmp(p1, "--list")) {
+				bind_seq_list();
+			
+			} else
+				print ("bind_invalid");
+
+			result = 1;
+		}
 	}
 
 cleanup:
@@ -1032,5 +1092,123 @@ static int window_make_query(const char *nick)
 		return w->id;
 	}
 
+	return 0;
+}
+
+static char *seq_get_command(char *seq)
+{
+	struct list *l;
+
+	if (!seq)
+		return NULL;
+	
+	for (l = sequences; l; l = l->next) {
+		struct sequence *s = l->data;
+
+		if (s->seq && !strcasecmp(s->seq, seq))
+			return s->command;
+	}
+
+	return NULL;
+}
+		
+static int bind_sequence(char *seq, char *command)
+{
+	int real_seq = 0;
+	char c = 0;
+	
+	if (!seq)
+		return 1;
+
+	if (command && seq_get_command(seq)) {
+		print("bind_seq_exist");
+		return 1;
+	}
+	
+	if (command && strlen(command) > 128) /* zeby nie bylo... */ {
+		print("bind_seq_command_too_long");
+		return 1;
+	}
+		
+	if (!strncasecmp(seq, "ctrl-", 5) && strlen(seq)==6) {
+		c = toupper(seq[5]);
+		real_seq = CTRL(c);
+	} else {
+		print("bind_seq_incorrect", seq);
+		return 1;
+	}
+
+	switch (c) {
+		case 'A': (command) ? rl_bind_key(real_seq, seq_execute_a) : rl_unbind_key(real_seq); break;
+		case 'B': (command) ? rl_bind_key(real_seq, seq_execute_b) : rl_unbind_key(real_seq); break;
+		case 'C': (command) ? rl_bind_key(real_seq, seq_execute_c) : rl_unbind_key(real_seq); break;
+		case 'D': (command) ? rl_bind_key(real_seq, seq_execute_d) : rl_unbind_key(real_seq); break;
+		case 'E': (command) ? rl_bind_key(real_seq, seq_execute_e) : rl_unbind_key(real_seq); break;
+		case 'F': (command) ? rl_bind_key(real_seq, seq_execute_f) : rl_unbind_key(real_seq); break;
+		case 'G': (command) ? rl_bind_key(real_seq, seq_execute_g) : rl_unbind_key(real_seq); break;
+		case 'H': (command) ? rl_bind_key(real_seq, seq_execute_h) : rl_unbind_key(real_seq); break;
+		case 'I': (command) ? rl_bind_key(real_seq, seq_execute_i) : rl_unbind_key(real_seq); break;
+		case 'J': (command) ? rl_bind_key(real_seq, seq_execute_j) : rl_unbind_key(real_seq); break;
+		case 'K': (command) ? rl_bind_key(real_seq, seq_execute_k) : rl_unbind_key(real_seq); break;
+		case 'L': (command) ? rl_bind_key(real_seq, seq_execute_l) : rl_unbind_key(real_seq); break;
+		case 'M': (command) ? rl_bind_key(real_seq, seq_execute_m) : rl_unbind_key(real_seq); break;
+		case 'N': (command) ? rl_bind_key(real_seq, seq_execute_n) : rl_unbind_key(real_seq); break;
+		case 'O': (command) ? rl_bind_key(real_seq, seq_execute_o) : rl_unbind_key(real_seq); break;
+		case 'P': (command) ? rl_bind_key(real_seq, seq_execute_p) : rl_unbind_key(real_seq); break;
+		case 'Q': (command) ? rl_bind_key(real_seq, seq_execute_q) : rl_unbind_key(real_seq); break;
+		case 'R': (command) ? rl_bind_key(real_seq, seq_execute_r) : rl_unbind_key(real_seq); break;
+		case 'S': (command) ? rl_bind_key(real_seq, seq_execute_s) : rl_unbind_key(real_seq); break;
+		case 'T': (command) ? rl_bind_key(real_seq, seq_execute_t) : rl_unbind_key(real_seq); break;
+		case 'U': (command) ? rl_bind_key(real_seq, seq_execute_u) : rl_unbind_key(real_seq); break;
+		case 'V': (command) ? rl_bind_key(real_seq, seq_execute_v) : rl_unbind_key(real_seq); break;
+		case 'W': (command) ? rl_bind_key(real_seq, seq_execute_w) : rl_unbind_key(real_seq); break;
+		case 'Y': (command) ? rl_bind_key(real_seq, seq_execute_y) : rl_unbind_key(real_seq); break;
+		case 'Z': (command) ? rl_bind_key(real_seq, seq_execute_z) : rl_unbind_key(real_seq); break;
+		default: print("bind_seq_incorrect", seq); return 1;
+	}
+	
+	if (command) {
+		struct sequence s;
+		
+		s.seq = xstrdup(seq);
+		s.command = xstrdup(command);
+
+		list_add(&sequences, &s, sizeof(s));
+		print("bind_seq_add", seq);
+		config_changed = 1;
+	} 
+	else {
+		struct list *l;
+
+		for (l = sequences; l; l = l->next) {
+			struct sequence *s = l->data;
+
+			if (s->seq && !strcasecmp(s->seq, seq)) {
+				list_remove(&sequences, s, 1);
+				print("bind_seq_remove", seq);
+				config_changed = 1;
+				return 0;
+			}
+		}
+	}
+
+	return 1;
+}
+
+static int bind_seq_list() 
+{
+	struct list *l;
+	int count = 0;
+
+	for (l = sequences; l; l = l->next) {
+		struct sequence *s = l->data;
+
+		print ("bind_seq_list", s->seq, s->command);
+		count++;
+	}
+
+	if (!count)
+		print("bind_seq_list_empty");
+	
 	return 0;
 }
