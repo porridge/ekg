@@ -40,6 +40,7 @@ struct userlist {
 	char *nickname;		/* pseudonim */
 	char *display;		/* wy¶wietlania nazwa */
 	char *mobile;		/* komórka */
+	char *email;		/* adres e-mail */
 	list_t groups;		/* grupy, do których nale¿y */
 	uin_t uin;		/* numer */
 	int status;		/* aktualny stan */

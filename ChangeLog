@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-06-20
+
+- lista kontaktów obs³uguje adres e-mail (a.latanski/w)
+
 // 2003-06-18
 
 - /list w oknie poka¿e informacje o rozmówcy (weirdo,FIG/w)

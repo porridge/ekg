@@ -118,7 +118,7 @@ int userlist_read()
 			continue;
 		}
 
-		entry = array_make(buf, ";", 8, 0, 0);
+		entry = array_make(buf, ";", 9, 0, 0);
 
 		uin = entry[6];
 		if (!strncasecmp(uin, "gg:", 3))
@@ -130,7 +130,7 @@ int userlist_read()
 			continue;
 		}
 
-		for (i = 0; i < 6; i++) {
+		for (i = 0; i < count; i++) {
 			if (!strcmp(entry[i], "(null)") || !strcmp(entry[i], "")) {
 				xfree(entry[i]);
 				entry[i] = NULL;
@@ -147,9 +147,15 @@ int userlist_read()
 		u.mobile = xstrdup(entry[4]);
 		u.groups = group_init(entry[5]);
 		u.status = GG_STATUS_NOT_AVAIL;
-		if (entry[7])
-			u.foreign = saprintf(";%s", entry[7]);
-		else
+
+		/* mamy adres e-mail? */
+		if (count > 7) {
+			u.email = xstrdup(entry[7]);
+			if (count > 8)
+				u.foreign = saprintf(";%s", entry[7]);
+			else
+				u.foreign = xstrdup("");
+		} else
 			u.foreign = xstrdup("");
 
 		for (i = 0; i < count; i++)
@@ -191,7 +197,7 @@ int userlist_set(const char *contacts, int config)
 	while ((buf = gg_get_line(&cont))) {
 		struct userlist u;
 		char **entry, *uin;
-		int i;
+		int i, count;
 		
 		memset(&u, 0, sizeof(u));
 			
@@ -220,12 +226,12 @@ int userlist_set(const char *contacts, int config)
 		if (!strncasecmp(uin, "gg:", 3))
 			uin += 3;
 		
-		if (array_count(entry) < 7 || !(u.uin = atoi(uin))) {
+		if ((count = array_count(entry)) < 7 || !(u.uin = atoi(uin))) {
 			array_free(entry);
 			continue;
 		}
 
-		for (i = 0; i < 6; i++) {
+		for (i = 0; i < count; i++) {
 			if (!strcmp(entry[i], "(null)") || !strcmp(entry[i], "")) {
 				xfree(entry[i]);
 				entry[i] = NULL;
@@ -242,9 +248,15 @@ int userlist_set(const char *contacts, int config)
 		u.mobile = xstrdup(entry[4]);
 		u.groups = group_init(entry[5]);
 		u.status = GG_STATUS_NOT_AVAIL;
-		if (entry[7])
-			u.foreign = saprintf(";%s", entry[7]);
-		else
+
+		/* mamy adres e-mail? */
+		if (count > 7) {
+			u.email = xstrdup(entry[7]);
+			if (count > 8)
+				u.foreign = saprintf(";%s", entry[7]);
+			else
+				u.foreign = xstrdup("");
+		} else
 			u.foreign = xstrdup("");
 
 		array_free(entry);
@@ -297,7 +309,7 @@ char *userlist_dump()
 
 		groups = group_to_string(u->groups, 1, 0);
 		
-		line = saprintf("%s;%s;%s;%s;%s;%s;%d%s\r\n",
+		line = saprintf("%s;%s;%s;%s;%s;%s;%d;%s%s\r\n",
 			(u->first_name) ? u->first_name : "",
 			(u->last_name) ? u->last_name : "",
 			(u->nickname) ? u->nickname : ((u->display) ? u->display: ""),
@@ -305,6 +317,7 @@ char *userlist_dump()
 			(u->mobile) ? u->mobile : "",
 			groups,
 			u->uin,
+			(u->email) ? u->email : "",
 			(u->foreign) ? u->foreign : "");
 		
 		string_append(s, line);
@@ -421,7 +434,7 @@ void userlist_write_crash()
 			fprintf(f, "%s", g->name);
 		}
 		
-		fprintf(f, ";%u%s\r\n", u->uin, u->foreign);
+		fprintf(f, ";%u;%s%s\r\n", u->uin, (u->email) ? u->email : "", u->foreign);
 	}	
 
 	fclose(f);
@@ -510,6 +523,7 @@ int userlist_remove(struct userlist *u)
 	xfree(u->descr);
 	xfree(u->foreign);
 	xfree(u->last_descr);
+	xfree(u->email);
 
 	for (l = u->groups; l; l = l->next) {
 		struct group *g = l->data;

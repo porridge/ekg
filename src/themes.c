@@ -1182,6 +1182,7 @@ void theme_init()
 	format_add("user_info_header", "%K.--%n %T%1%n/%2 %K--- -- -%n\n", 1);
 	format_add("user_info_nickname", "%K| %nPseudonim: %T%1%n\n", 1);
 	format_add("user_info_name", "%K| %nImiê i nazwisko: %T%1 %2%n\n", 1);
+	format_add("user_info_email", "%K| %nE-mail: %T%1%n\n", 1);
 	format_add("user_info_status", "%K| %nStan: %T%1%n\n", 1);
 	format_add("user_info_block", "%K| %nBlokowan%@1\n", 1);
 	format_add("user_info_offline", "%K| %nNie widzi stanu\n", 1);

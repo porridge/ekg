@@ -1136,6 +1136,13 @@ COMMAND(cmd_modify)
 			continue;
 		}
 		
+		if (match_arg(argv[i], 'e', "email", 2) && argv[i + 1]) {
+			xfree(u->email);
+			u->email = xstrdup(argv[++i]);
+			modified = 1;
+			continue;
+		}
+
 		if (match_arg(argv[i], 'n', "nickname", 2) && argv[i + 1]) {
 			xfree(u->nickname);
 			u->nickname = xstrdup(argv[++i]);
@@ -1695,6 +1702,9 @@ COMMAND(cmd_list)
 			printq("user_info_name", u->first_name, "");
 		if ((!u->first_name || !strcmp(u->first_name, "")) && u->last_name && strcmp(u->last_name, ""))
 			printq("user_info_name", u->last_name, "");
+
+		if (u->email)
+			printq("user_info_email", u->email);
 
 		printq("user_info_status", status);
 
