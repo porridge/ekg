@@ -10,6 +10,7 @@ biblioteka:
   - zak³adanie kont,
   - zmiana informacji w katalogu publicznym,
   - zmiana has³a.
+- wysy³anie userlisty na server 
 
 klient:
 - sensowne wy¶wietlanie mesgów (t³o, wordwrap itp),
