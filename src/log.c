@@ -34,15 +34,15 @@
 #ifdef HAVE_ZLIB_H
 #  include <zlib.h>
 #endif
+
+#include "dynstuff.h"
+#include "log.h"
 #ifndef HAVE_STRLCAT
 #  include "../compat/strlcat.h"
 #endif
 #ifndef HAVE_STRLCPY
 #  include "../compat/strlcpy.h"
 #endif
-
-#include "dynstuff.h"
-#include "log.h"
 #include "stuff.h"
 #include "xmalloc.h"
 

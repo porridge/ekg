@@ -3075,7 +3075,7 @@ COMMAND(cmd_test_send)
 	return 0;
 }
 
-COMMAND(cmd_test_add)
+COMMAND(cmd_test_addtab)
 {
 	if (params[0])
 		add_send_nick(params[0]);
@@ -3083,7 +3083,7 @@ COMMAND(cmd_test_add)
 	return 0;
 }
 
-COMMAND(cmd_test_del)
+COMMAND(cmd_test_deltab)
 {
 	if (params[0])
 		remove_send_nick(params[0]);
@@ -3091,6 +3091,7 @@ COMMAND(cmd_test_del)
 	return 0;
 }
 
+#ifndef GG_DEBUG_DISABLE
 COMMAND(cmd_test_debug)
 {
 	if (params[0])
@@ -3109,6 +3110,7 @@ COMMAND(cmd_test_debug_dump)
 
 	return 0;
 }
+#endif
 
 COMMAND(cmd_test_watches)
 {
@@ -5584,10 +5586,10 @@ void command_init()
 
 
 	command_add
-	( "_addtab", "??", cmd_test_add, 0, "",
+	( "_addtab", "??", cmd_test_addtab, 0, "",
 	  "dodaje do listy dope³niania TABem", "");
 	command_add
-	( "_deltab", "??", cmd_test_del, 0, "",
+	( "_deltab", "??", cmd_test_deltab, 0, "",
 	  "usuwa z listy dope³niania TABem", "");
 #if 0
 	command_add
@@ -5606,12 +5608,14 @@ void command_init()
 	command_add
 	( "_watches", "", cmd_test_watches, 0, "", 
 	  "wy¶wietla listê sprawdzanych deskryptorów", "");
+#ifndef GG_DEBUG_DISABLE
 	command_add
 	( "_debug", "?", cmd_test_debug, 0, "",
 	  "wy¶wietla tekst w oknie debug", "");
 	command_add
 	( "_debug_dump", "", cmd_test_debug_dump, 0, "",
 	  "zrzuca debug do pliku", "");
+#endif
 	command_add
 	( "_vars", "", cmd_test_vars, 0, "",
 	  "wy¶wietla skrót zmiennych", "");

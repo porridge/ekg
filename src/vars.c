@@ -140,7 +140,10 @@ void variable_init()
 	variable_add("display_ack", "da", VAR_INT, 1, &config_display_ack, NULL, variable_map(4, 0, 0, "none", 1, 0, "all", 2, 0, "delivered", 3, 0, "queued"), NULL);
 	variable_add("display_color", "dC", VAR_INT, 1, &config_display_color, NULL, NULL, NULL);
 	variable_add("display_color_map", "dm", VAR_STR, 1, &config_display_color_map, NULL, NULL, dd_color);
-	variable_add("display_crap", "dr", VAR_BOOL, 1, &config_display_crap, NULL, NULL, NULL);
+#ifdef WITH_UI_NCURSES
+	if (ui_init == ui_ncurses_init)
+		variable_add("display_crap", "dr", VAR_BOOL, 1, &config_display_crap, NULL, NULL, NULL);
+#endif
 	variable_add("display_notify", "dn", VAR_INT, 1, &config_display_notify, NULL, variable_map(3, 0, 0, "none", 1, 2, "all", 2, 1, "significant"), NULL);
 	variable_add("display_pl_chars", "dp", VAR_BOOL, 1, &config_display_pl_chars, NULL, NULL, NULL);
 	variable_add("display_sent", "ds", VAR_BOOL, 1, &config_display_sent, NULL, NULL, NULL);
@@ -153,7 +156,10 @@ void variable_init()
 #ifdef HAVE_OPENSSL
 	variable_add("encryption", "en", VAR_BOOL, 1, &config_encryption, NULL, NULL, NULL);
 #endif
-	variable_add("enter_scrolls", "es", VAR_BOOL, 1, &config_enter_scrolls, NULL, NULL, NULL);
+#ifdef WITH_UI_NCURSES
+	if (ui_init == ui_ncurses_init)
+		variable_add("enter_scrolls", "es", VAR_BOOL, 1, &config_enter_scrolls, NULL, NULL, NULL);
+#endif
 	variable_add("events_delay", "ev", VAR_INT, 1, &config_events_delay, NULL, NULL, NULL);
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init)

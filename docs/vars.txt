@@ -270,7 +270,8 @@ display_crap
 
 	mówi, czy w oknie rozmowy maj± byæ wy¶wietlane komunikaty niezwi±zane
 	z rozmówc±. je¶li jest równe 0, w oknie rozmowy s± wy¶wietlane tylko
-	wiadomo¶ci i informacje o zmianie stanu rozmówcy.
+	wiadomo¶ci i informacje o zmianie stanu rozmówcy. ma znaczenie tylko
+	w interfejsie ncurses.
 
 display_notify
 	typ: liczba
@@ -332,7 +333,8 @@ enter_scrolls
 	domy¶lna warto¶æ: 0
 
 	je¶li w³±czone, wci¶niêcie klawisza Enter w pustej linii spowoduje
-	przesuniêcie ekranu o jedn± liniê.
+	przesuniêcie ekranu o jedn± liniê. ma znaczenie tylko w interfejsie
+	ncurses.
 
 events_delay
 	typ: liczba

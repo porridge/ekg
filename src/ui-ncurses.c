@@ -1943,7 +1943,9 @@ void ui_ncurses_init()
 	ui_screen_width = stdscr->_maxx + 1;
 	ui_screen_height = stdscr->_maxy + 1;
 	
+#ifndef GG_DEBUG_DISABLE
 	window_new(NULL, -1);
+#endif
 	window_current = window_new(NULL, 0);
 
 	status = newwin(1, stdscr->_maxx + 1, stdscr->_maxy - 1, 0);

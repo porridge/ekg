@@ -1042,21 +1042,22 @@ int main(int argc, char **argv)
 	variable_init();
 	variable_set_default();
 
+	gg_debug_level = 0;
+
+	if (getenv("EKG_DEBUG")) {
+		if ((gg_debug_file = fopen(getenv("EKG_DEBUG"), "w"))) {
+			setbuf(gg_debug_file, NULL);
+			gg_debug_level = 255;
+		}
+	}
+
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
-		if (getenv("EKG_DEBUG")) {
-			if ((gg_debug_file = fopen(getenv("EKG_DEBUG"), "w")))
-				setbuf(gg_debug_file, NULL);
-		}
-
 		if (!gg_debug_file)
 			gg_debug_handler = debug_handler;
 
 		gg_debug_level = 255;
-	} else
-		gg_debug_level = 0;
-#else
-	gg_debug_level = 0;
+	}
 #endif
 
         ekg_pid = getpid();
