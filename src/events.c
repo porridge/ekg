@@ -95,7 +95,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 			c = conference_create(tmp->str);
 
 			string_free(tmp, 1);
-		} 
+		}
 		
 		if (c)
 			target = xstrdup(c->name);
@@ -269,7 +269,17 @@ void handle_msg(struct gg_event *e)
 	
 	if (!e->event.msg.message)
 		return;
-	
+
+	if (e->event.msg.recipients_count) {
+		struct conference *c =
+			conference_find_by_uins(e->event.msg.sender,
+				e->event.msg.recipients,
+				e->event.msg.recipients_count);
+
+		if (c && c->ignore)
+			return;
+	}
+
 	if (ignored_check(e->event.msg.sender)) {
 		if (config_log_ignored) {
 			char *tmp;

@@ -108,6 +108,7 @@ struct last_count {
 
 struct conference {
 	char *name;
+	int ignore;
 	list_t recipients;
 };
 
@@ -248,6 +249,7 @@ struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int co
 struct conference *conference_find(const char *name);
 struct conference *conference_create(const char *nicks);
 int conference_rename(const char *oldname, const char *newname);
+int conference_set_ignore(const char *name, int flag);
 
 char *base64_encode(const char *buf);
 char *base64_decode(const char *buf);

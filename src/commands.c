@@ -505,7 +505,12 @@ COMMAND(cmd_find)
 		return;
 
 	} else {
-		if (argv[0] && !argv[1] && argv[0][0] != '-') {
+		if (argv[0] && !argv[1] && argv[0][0] == '#') { /* konferencja */
+			query = saprintf("conference --find %s", argv[0]);
+			command_exec(NULL, query);
+			xfree(query);
+			return;
+		} else if (argv[0] && !argv[1] && argv[0][0] != '-') {
 			id = id * 2;	/* single search */
 			if (!(r->uin = get_uin(params[0]))) {
 				print("user_not_found", params[0]);
@@ -1895,7 +1900,7 @@ COMMAND(cmd_remind)
 		return;
 	}
 
-	list_add(&watches, h, 0);
+	list_add(&watches, h, 0); 
 }
 
 COMMAND(cmd_query)
@@ -2297,7 +2302,7 @@ COMMAND(cmd_conference)
 				count++;
 			}
 
-			print("conferences_list", c->name, recipients->str);
+		        print(c->ignore ? "conferences_list_ignored" : "conferences_list", c->name, recipients->str);
 
 			string_free(recipients, 1);
 		}
@@ -2337,6 +2342,53 @@ COMMAND(cmd_conference)
 		}
 		
 		conference_rename(params[1], params[2]);
+
+		return;
+	}
+	
+	if (match_arg(params[0], 'i', "ignore", 2)) {
+		if (!params[1]) {
+			print("not_enough_params", name);
+			return;
+		}
+
+		conference_set_ignore(params[1], 1);
+
+		return;
+	}
+
+	if (match_arg(params[0], 'u', "unignore", 2)) {
+		if (!params[1]) {
+			print("not_enough_params", name);
+			return;
+		}
+
+		conference_set_ignore(params[1], 0);
+
+		return;
+	}
+
+	if (match_arg(params[0], 'f', "find", 2)) {
+		struct conference *c;
+		char *tmp = NULL;
+		list_t l;
+
+		if (!params[1]) {
+			print("not_enough_params", name);
+			return;
+		}
+
+		c = conference_find(params[1]);
+
+		if (c) {
+			for (l = c->recipients; l; l = l->next) {
+				tmp = saprintf("find --uin %d", *((uin_t *) (l->data)));
+				command_exec(NULL, tmp);
+				xfree(tmp);
+			}
+		} else
+			print("conferences_noexist", params[1]);
+
 
 		return;
 	}
@@ -2730,10 +2782,13 @@ void command_init()
 	command_add
 	( "conference", "???", cmd_conference, 0,
 	  " [opcje]", "zarz±dzanie konferencjami",
-	  "  -a, --add <#nazwa> <nick/uin/@grupa>  tworzy now± konferencjê\n"
-	  "  -d, --del <#nazwa>                    usuwa konferencjê\n"
-	  "  -r, --rename #<old> #<new>            zmienia nazwê konferencji\n"
-	  " [-l, --list, #<nazwa>  ]               wy¶wietla listê konferencji\n"
+	  "  -a, --add <#nazwa> <nick/uin/@grupa> tworzy now± konferencjê\n"
+	  "  -d, --del <#nazwa>                  usuwa konferencjê\n"
+	  "  -i, --ignore <#nazwa>               oznacza konferencjê jako ingorowan±\n"
+	  "  -u, --unignore <#nazwa>             oznacza konferencjê jako nieingorowan±\n"
+	  "  -r, --rename <#old> <#new>          zmienia nazwê konferencji\n"
+	  "  -f, --find <#nazwa>                 wyszukuje uczestnikow w katalogu\n"
+	  " [-l, --list, <#nazwa>  ]             wy¶wietla listê konferencji\n"
 	  "\n"
 	  "Dodaje nazwê konferencji i definiuje, kto bierze w niej udzia³.\n"
 	  "Kolejne numery, pseudonimy lub grupy mog± byc odzielone\n"

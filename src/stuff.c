@@ -1019,6 +1019,36 @@ int on_off(const char *value)
 }
 
 /*
+ * conference_set_ignore()
+ *
+ * Ustawia stan konferencji na ignorowany lub nie.
+ *
+ * - name - nazwa konferencji
+ * - flag - 1 ignorowac, 0 nie ignorowac
+ */
+int conference_set_ignore(const char *name, int flag)
+{
+	struct conference *c = NULL;
+
+	if (name[0] != '#') {
+		print("conferences_name_error");
+		return -1;
+	}
+
+	c = conference_find(name);
+
+	if (!c) {
+		print("conferences_noexist", name);
+		return -1;
+	}
+
+	c->ignore = flag ? 1 : 0;
+	print(flag ? "conferences_ignore" : "conferences_unignore", name);
+
+	return 0;
+}
+
+/*
  * conference_rename()
  *
  * zmienia nazwê instniej±cej konferencji.

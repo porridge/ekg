@@ -1646,7 +1646,10 @@ static int ui_ncurses_event(const char *event, ...)
 
 			if (w->target && !strcasecmp(w->target, oldname)) {
 				xfree(w->target);
+				xfree(w->prompt);
 				w->target = xstrdup(newname);
+				w->prompt = format_string(format_find("ncurses_prompt_query"), newname);
+				w->prompt_len = strlen(w->prompt);
 			}
 		}
 	}

@@ -16,6 +16,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   themu wpisów z nazwami zakoñczonymi przecinkiem i nazw±. póki co,
   eksperymentalne -- sposób zapisu i okre¶lania mo¿e siê zmieniæ. (Arim/w)
 - poprawka /query (Arim/w)
+- dodanie /conference --ignore, --unignore i --find (DJ/w)
 
 // 2002-09-14
 

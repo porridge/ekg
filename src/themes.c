@@ -1024,11 +1024,14 @@ void theme_init()
 	format_add("conferences_invalid", "%! Nieprawid³owy parametr\n", 1);
 	format_add("conferences_list_empty", "%! Brak konferencji\n", 1);
 	format_add("conferences_list", "%> %T%1%n: %2\n", 1);
+	format_add("conferences_list_ignored", "%> %T%1%n: %2 (%yingorowana%n)\n", 1);
 	format_add("conferences_add", "%> Utworzono konferencjê %T%1%n\n", 1);
-	format_add("conferences_not_added", "%> Nie utworzono konferencji %T%1%n\n", 1);
-	format_add("conferences_del", "%) Usuniêto konferencjê %T%1%n\n", 1);
+	format_add("conferences_not_added", "%) Nie utworzono konferencji %T%1%n\n", 1);
+	format_add("conferences_del", "%> Usuniêto konferencjê %T%1%n\n", 1);
 	format_add("conferences_exist", "%! Konferencja %T%1%n ju¿ istnieje\n", 1);
 	format_add("conferences_noexist", "%! Konferencja %T%1%n nie istnieje\n", 1);
 	format_add("conferences_name_error", "%! Nazwa konferencji powinna zaczynaæ siê od %T#%n\n", 1);
-	format_add("conferences_rename", "%! Nazwa konferencji zmieniona: %T%1%n --> %T%2%n\n", 1);
+	format_add("conferences_rename", "%> Nazwa konferencji zmieniona: %T%1%n --> %T%2%n\n", 1);
+	format_add("conferences_ignore", "%> Konferencja %T%1%n bêdzie ignorowana\n", 1);
+	format_add("conferences_unignore", "%> Konferencja %T%1%n nie bêdzie ignorowana\n", 1);
 };
