@@ -888,7 +888,7 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 	}
 
 	nicks = array_make(nicklist, " ,", 0, 1, 0);
-
+	
 	/* grupy zamieniamy na niki */
 	for (i = 0; nicks[i]; i++) {
 		if (nicks[i][0] == '@') {
@@ -922,14 +922,15 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 				}
 			}
 
-			xfree(gname);
-
 			if (!nig) {
 				printq("group_empty", gname);
 				printq("conferences_not_added", name);
+				xfree(gname);
 				array_free(nicks);
 				return NULL;
 			}
+			xfree(gname);
+
 		}
 	}
 

@@ -3923,8 +3923,10 @@ COMMAND(cmd_query)
 	int i, res = 0;
 
 	/* sprawdzamy czy wszystko jest wpisane okey */
-	if(!params[0] || (params[0][0] == '@' && !params[0][1]))
+	if(!params[0] || (params[0][0] == '@' && !params[0][1])) {
+		printq("invalid_params", name);
 		return -1;
+	} 
 
 	for (i = 0; params[i]; i++)
 		p[i] = xstrdup(params[i]);
