@@ -6,14 +6,14 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
-// 2002-01-10
+// 2003-01-10
 
 - przepisanie kodu wy¶wietlaj±cego pasek stanu od nowa. mo¿na zagnie¿d¿aæ,
   dodano nowe formaty (w)
 - nag³ówek okna mo¿na opisaæ formatami ,,header<n>'', podobnie jak pasek
   stanu (w)
 
-// 2002-01-09
+// 2003-01-09
 
 - dodanie komendy ukrytej _queue dla tych, którzy czasami chc± wiedzieæ,
   co siê dok³adnie dzieje w kolejce wiadomo¶ci (sz)
@@ -36,7 +36,7 @@ zg³osi³ b³±d.
 - mo¿liwo¶æ stworzenia nag³ówka okna zmienn± ,,header_size''. póki co,
   nie ma mo¿liwo¶ci wy¶wietlania w nim czegokolwiek (w)
 
-// 2002-01-08
+// 2003-01-08
 
 - poprawka ostrze¿eñ przy kompilacji gcc 3.x (MuchaR/w)
 - kosmetyka komunikatów o b³êdach niektórych komend (sz)
@@ -44,7 +44,7 @@ zg³osi³ b³±d.
 - poprawka themów dla bia³ych terminali (MP/w)
 - libgadu: poprawka pkgconfig (w)
 
-// 2002-01-07
+// 2003-01-07
 
 - dodanie portu do /list (sz)
 - drobne poprawki w configure.in (w)

@@ -1391,6 +1391,8 @@ static void update_statusbar(int commit)
 	__add_format("query_avail", (q && GG_S_A(q->status)), "");
 	__add_format("query_invisible", (q && GG_S_I(q->status)), "");
 	__add_format("query_notavail", (q && GG_S_NA(q->status)), "");
+	__add_format("query_ip", (q && q->ip.s_addr), inet_ntoa(q->ip));
+
 
 	__add_format("url", 1, "http://dev.null.pl/ekg/");
 	__add_format("version", 1, VERSION);

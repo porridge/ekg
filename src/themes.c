@@ -826,7 +826,7 @@ void theme_init()
 	format_add("ncurses_prompt_none", "", 1);
 	format_add("ncurses_prompt_query", "[%1] ", 1);
 	format_add("statusbar", " %c(%w%{time}%c)%w %{?uin %c(%w%{?!nick uin}%{nick}%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) }%c(%wwin%c/%w%{window}%{?query %c:%W}%{query}%c)%w%{?activity  %c(%wact%c/%w}%{activity}%{?activity %c)%w}%{?mail  %c(%wmail%c/%w}%{mail}%{?mail %c)}%{?more  %c(%Gmore%c)}%{?debug  %c(%Cdebug%c)}", 1);
-	format_add("header", " %{?query %c(%{?query_away %w}%{?query_avail %W}%{?query_invisible %K}%{?query_notavail %k}%{query}%{?query_descr %c/%w%{query_descr}}%c)}%{?!query %c(%wekg%c/%w%{version}%c) (%w%{url}%c)}", 1);
+	format_add("header", " %{?query %c(%{?query_away %w}%{?query_avail %W}%{?query_invisible %K}%{?query_notavail %k}%{query}%{?query_descr %c/%w%{query_descr}}%c) %{?query_ip (%wip%c/%w%{query_ip}%c)}}%{?!query %c(%wekg%c/%w%{version}%c) (%w%{url}%c)}", 1);
 
 	/* dla funkcji format_user() */
 	format_add("known_user", "%T%1%n/%2", 1);
