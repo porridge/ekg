@@ -1,39 +1,31 @@
 #!/usr/bin/perl
+# $Id$
 # skrypt do szukania osób w katalogu publicznym GG
 #  na podstawie opisu ekg-20020705/docs/html.txt [1]
 # (C) Piotr Wysocki, wysek@linux.bydg.org, http://wysek.thanedd.sk
-# $Id$
-
 
 # Ró¿nice miêdzy opisem [1] a moim skryptem:
 # 1) cyfra statusu: 1-niedostêpny, 2-dostêpny, 3-zajêty
-# 2) nie zawsze wystêpuje ju¿ pole NextStart w odpowiedzi
+# 2) pole NextStart w odpowiedzi wystêpuje, gdy ilo¶æ pasuj±cych rekordów > 20
+# i wynosi ono 0 :), wcze¶niej biorê poprostu jako start ostatni UIN z
+# poprzedniej listy rekordów
 
 # TODO:
-# 1) przetestowaæ, przetestowaæ, przetestowaæ
-# 2) usun±æ --raw i te inne..
+# 1) znale¶æ b³êdy, poprawiæ je :)
+# 2) testowaæ, testowaæ, testowaæ
 
 use IO::Socket;
 
 my $host = "pubdir.gadu-gadu.pl";
 my $path = "/appsvc/fmpubquery2.asp";
 
-my $mode = undef;
-my $uin = undef;
-my $first = undef;
-my $last = undef;
-my $nick = undef;
-my $city = undef;
-my $born1 = undef;
-my $born2 = undef;
-my $phone = undef;
-my $email = undef;
-my $active = undef;
-my $gender = undef;
-my $start = undef;
-my $debug = undef;
+my ($mode, $uin, $first, $last, $nick, $city, $born1) = undef;
+my ($born2, $phone, $email, $active, $gender, $start) = undef;
+my ($all, $nextstart, $lastuin) = undef;
+my $debug = undef; # to be removed
 
-usage() if ($#ARGV < 0);
+# wczytanie parametrów
+usage() unless (@ARGV);
 for ($i=0;$i<=$#ARGV;$i+=2)
 {
 	usage()
@@ -119,15 +111,27 @@ for ($i=0;$i<=$#ARGV;$i+=2)
 		$i--;
 		next;
 	}
-	if ($ARGV[$i] eq "--raw")
+	if ($ARGV[$i] eq "--debug")
 	{
-		usage() if (defined $raw);
-		$raw = 1;
+		usage() if (defined $debug);
+		$debug = 1;
+		$i--;
+		next;
+	}
+	if ($ARGV[$i] eq "--all")
+	{
+		usage() if (defined $all);
+		$all = 1;
 		$i--;
 		next;
 	}
 	usage();
 }
+
+again:
+$start = $nextstart if (defined $nextstart);
+$nextstart = undef;
+
 $sock = IO::Socket::INET->new(PeerAddr => $host,
 				PeerPort => 80,
 				Proto => "tcp")
@@ -140,26 +144,17 @@ if ($mode == 3)
 	$content .= "&start=$start" if (defined $start);
 } else
 {
-	$sex = -1 if (!defined $sex);
-	$born1 = 0 if (!defined $born1);
-	$born2 = 0 if (!defined $born2);
+	$sex = -1 unless $sex;
+	$born1 = 0 unless $born1;
+	$born2 = 0 unless $born2;
 	$mode = 0;
-	foreach $arg ($first,$last,$nick,$city,$phone,$email)
-	{
-		$arg =~ s/ /%20/g;
-	}
+	map { s/ /%20/g } $first,$last,$nick,$city,$phone,$email;
 	$content = "Mode=$mode&FirstName=$first&LastName=$last&NickName=$nick&Gender=$sex&City=$city&MinBirth=$born1&MaxBirth=$born2";
 	$content .= "&ActiveOnly=$active" if (defined $active);
 	$content .= "&start=$start" if (defined $start);
 }
 $tosend .= length($content) . "\r\nPragma: nocache\r\n\r\n" . $content;
 $sock->print($tosend);
-if (defined $raw)
-{
-	printf("Sent:\n%s\nReceived:\n",$tosend);
-	print while (<$sock>);
-	exit;
-}
 $in = <$sock>;
 if (! $in =~ /HTTP\/1\.[01] 200 OK/)
 {
@@ -184,46 +179,48 @@ for ($i=0;<$sock>;$i++)
 	s/\r\n//;
 	if (/^NextStart:[0-9]+$/)
 	{
-		print $_ . "\n" if (! /^NextStart:0$/);
+		s/^NextStart://;
+		if ($_ == 0)
+		{
+			printf("koniec danych (NextStart:0)\n") if (defined $debug);
+			exit;
+		}
+		$nextstart = $_;
+		last;
+	}
+	if (/^1$/) { $status = "n"; }
+	elsif (/^2$/) { $status = "d"; }
+	elsif (/^3$/) { $status = "z"; }
+	else { $sock->close(); exit 1; }
+	$status = $_ if (defined $debug);
+	# $ruin - received_uin, ...
+	foreach $data ($ruin,$rname,$rsurname,$rnick,$ryear,$rsex,$rcity)
+	{
+		$data = <$sock>;
+		$data =~ s/\r\n//;
+	}
+	if ($lastuin == $ruin)
+	{
+		printf("$lastuin == $ruin..\n") if (defined $debug);
 		$sock->close();
 		exit;
 	}
-	for ($_)
-	{
-		if (/^1$/) { $line = "n |"; }
-		elsif (/^2$/) { $line = "d |"; }
-		elsif (/^3$/) { $line = "z |"; }
-		else { $sock->close(); exit 1; }
-	}
-	$uin = <$sock>;
-	$uin =~ s/\r\n//;
-	$line = sprintf("%s %9d |",$line,$uin);
-	$name = <$sock>;
-	$name =~ s/\r\n//;
-	$surname = <$sock>;
-	$surname =~ s/\r\n//;
-	$line = sprintf("%s %20.20s |",$line,$name . " " . $surname);
-	$nick = <$sock>;
-	$nick =~ s/\r\n//;
-	$line = sprintf("%s %12.12s |",$line,$nick);
-	$year = <$sock>;
-	$year =~ s/\r\n//;
-	$line = sprintf("%s %4d |",$line,$year);
-	$sex = <$sock>;
-	$sex =~ s/\r\n//;
-	for ($sex)
-	{
-		if (/^1$/) { $line .= " k |"; }
-		elsif (/^2$/) { $line .= " m |"; }
-		else { $line .= "   |"; }
-	}
-	$city = <$sock>;
-	$city =~ s/\r\n//;
-	$line = sprintf("%s %15.15s",$line,$city);
-	print $line . "\n";
+	$lastuin = $ruin;
+	if ($rsex =~ /^1$/) { $rsex = "k"; }
+	elsif ($rsex =~ /^2$/) { $rsex = "m"; }
+	else { $rsex = " "; }
+	printf ("%s | %9d | %20.20s | %12.12s | %4d | %s | %15.15s\n",$status,
+		$ruin,$rname . " " . $rsurname,$rnick,$ryear,$rsex,$rcity);
 }
 $sock->close();
-printf("NextStart: %d\n",$uin) if ($i > 19);
+$nextstart = $ruin unless $nextstart;
+goto again if ($i > 19 && defined $all);
+
+if (defined $debug)
+{
+	printf("koniec danych\n") if ($i <= 19);
+	printf("brak opcji --all\n") if (! defined $all);
+}
 exit;
 
 sub usage
@@ -241,7 +238,8 @@ sub usage
 	print "\t-F, --female\n";
 	print "\t-M, --male\n";
 	print "\t-s, --start <od>\n";
-	print "\t--raw (surowe wyj¶cie bez parsowania odpowiedzi, przydatne wyskowi :P)\n";
+	print "\t--all\n";
+	print "\t--debug\n";
 	exit;
 }
 
