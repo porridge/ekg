@@ -1512,6 +1512,9 @@ COMMAND(cmd_list)
 		struct gg_http *h;
 		char *contacts = userlist_dump();
 
+		if (contacts)
+			iso_to_cp(contacts);
+
 		if (match_arg(params[0], 'P', "put-config", 5)) {
 			string_t s = string_init(contacts);
 			char *vars = variable_digest();
