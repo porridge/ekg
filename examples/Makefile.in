@@ -1,7 +1,8 @@
 # $Id$
 
 CC = @CC@
-CFLAGS = @CFLAGS@ -I.. -I../lib -I../src
+CFLAGS = @CFLAGS_LIBGADU@ @CFLAGS@ -I.. -I../lib -I../src
+LIBS = @LIBS_LIBGADU@
 MAKE = @MAKE@
 
 OBJS = ../lib/libgadu.a
@@ -9,25 +10,25 @@ OBJS = ../lib/libgadu.a
 all:	register-sync register-async conn-async send remind-async remind-sync httphash
 
 register-sync: register.c $(OBJS)
-	$(CC) $(CFLAGS) register.c -o register-sync $(OBJS)
+	$(CC) $(CFLAGS) register.c -o register-sync $(OBJS) $(LIBS)
 
 register-async: register.c $(OBJS)
-	$(CC) $(CFLAGS) register.c -o register-async -DASYNC $(OBJS)
+	$(CC) $(CFLAGS) register.c -o register-async -DASYNC $(OBJS) $(LIBS)
 
 remind-sync: remind.c $(OBJS)
-	$(CC) $(CFLAGS) remind.c -o remind-sync $(OBJS)
+	$(CC) $(CFLAGS) remind.c -o remind-sync $(OBJS) $(LIBS)
 
 remind-async: remind.c $(OBJS)
-	$(CC) $(CFLAGS) remind.c -o remind-async -DASYNC $(OBJS)
+	$(CC) $(CFLAGS) remind.c -o remind-async -DASYNC $(OBJS) $(LIBS)
 
 send:	send.c $(OBJS)
-	$(CC) $(CFLAGS) send.c -o send $(OBJS)
+	$(CC) $(CFLAGS) send.c -o send $(OBJS) $(LIBS)
 
 httphash: httphash.c $(OBJS)
-	$(CC) $(CFLAGS) httphash.c -o httphash $(OBJS)
+	$(CC) $(CFLAGS) httphash.c -o httphash $(OBJS) $(LIBS)
 
 conn-async: conn-async.c $(OBJS)
-	$(CC) $(CFLAGS) conn-async.c -o conn-async $(OBJS)
+	$(CC) $(CFLAGS) conn-async.c -o conn-async $(OBJS) $(LIBS)
 
 $(OBJS):
 	cd ../lib && $(MAKE)
