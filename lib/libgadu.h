@@ -552,6 +552,7 @@ void gg_search_request_free(struct gg_search_request *r);
 uint32_t gg_pubdir50(struct gg_session *sess, gg_pubdir50_t req);
 gg_pubdir50_t gg_pubdir50_new(int type);
 int gg_pubdir50_add(gg_pubdir50_t req, const char *field, const char *value);
+int gg_pubdir50_seq_set(gg_pubdir50_t req, uint32_t seq);
 const char *gg_pubdir50_get(gg_pubdir50_t res, int num, const char *field);
 int gg_pubdir50_type(gg_pubdir50_t res);
 int gg_pubdir50_count(gg_pubdir50_t res);

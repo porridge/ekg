@@ -16,6 +16,9 @@ zg³osi³ b³±d.
   /find w oknie z konferencj± wyszuka wszystkich uczestników (sz)
 - /bind mo¿e ju¿ przypisywaæ domy¶lne akcje klienta innym klawiszom,
   szczegó³y w ,,/bind -L'' (w)
+- libgadu: dodanie funkcji gg_pubdir50_seq_set() (mmazur/w)
+- libgadu: podbicie wersji API (w)
+- poprawka Alt-G i zapisywania bindów (sz/w)
 
 // 2003-01-28
 

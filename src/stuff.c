@@ -1232,6 +1232,9 @@ void config_write_main(FILE *f, int base64)
 	for (l = bindings; l; l = l->next) {
 		struct binding *b = l->data;
 
+		if (b->internal)
+			continue;
+
 		fprintf(f, "bind %s %s\n", b->key, b->action);
 	}
 

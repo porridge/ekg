@@ -2387,8 +2387,10 @@ static void binding_toggle_input(const char *arg)
 
 static void binding_cancel_input(const char *arg)
 {
-	input_size = 1;
-	update_input();
+	if (input_size == 5) {
+		input_size = 1;
+		update_input();
+	}
 }
 
 static void binding_backward_delete_char(const char *arg)
@@ -2698,6 +2700,18 @@ static void binding_forward_page(const char *arg)
 	window_redraw(window_current);
 }
 
+static void binding_ignore_query(const char *arg)
+{
+	char *tmp;
+	
+	if (!window_current->target)
+		return;
+	
+	tmp = saprintf("/ignore %s", window_current->target);
+	command_exec(NULL, tmp);
+	xfree(tmp);
+}
+
 static void binding_quick_list_wrapper(const char *arg)
 {
 	binding_quick_list(0, 0);
@@ -2757,12 +2771,6 @@ static void ui_ncurses_loop()
 						window_switch(ch - 106);
 					break;
 				}
-				
-				if (ch == 'g' || ch == 'G') {	/* Alt-G */
-					char *tmp = saprintf("/ignore %s", window_current->target);
-					command_exec(NULL, tmp);
-					xfree(tmp);
-				}
 			}
 		} else {
 			if ((b = binding_map[ch]) && b->action) {
@@ -2780,7 +2788,7 @@ static void ui_ncurses_loop()
 		}
 
 		/* je¶li siê co¶ zmieni³o, wygeneruj dope³nienia na nowo */
-		if (ch != 9) {
+		if (!b || (b && b->function != binding_complete)) {
 			array_free(completions);
 			completions = NULL;
 		}
@@ -2996,6 +3004,7 @@ static void binding_parse(struct binding *b, const char *action)
 	__action("complete", binding_complete);
 	__action("quick-list", binding_quick_list_wrapper);
 	__action("toggle-contacts", binding_toggle_contacts_wrapper);
+	__action("ignore-query", binding_ignore_query);
 
 #undef __action
 }
@@ -3756,7 +3765,7 @@ static void binding_default()
 	binding_add("Alt-P", "/window switch 20", 1, 1);
 	binding_add("Alt-K", "/window kill", 1, 1);
 	binding_add("Alt-N", "/window new", 1, 1);
-	binding_add("Alt-G", "/window ignore %{target}", 1, 1);
+	binding_add("Alt-G", "ignore-query", 1, 1);
 	binding_add("Alt-B", "backward-word", 1, 1);
 	binding_add("Alt-F", "forward-word", 1, 1);
 	binding_add("Alt-D", "kill-word", 1, 1);
