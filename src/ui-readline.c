@@ -547,7 +547,11 @@ void ui_readline_loop()
 			break;
 
 		if (strlen(line) > 1 && line[strlen(line) - 1] == '\\' && line[strlen(line) - 2] == ' ') {
-			struct string *s = string_init(line);
+			struct string *s = string_init(NULL);
+
+			line[strlen(line) - 1] = 0;
+
+			string_append(s, line);
 
 			free(line);
 
