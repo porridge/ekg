@@ -9,3 +9,15 @@ chat_line_width 78
 sent_line_first %3 %C<%n%2%C>%n %1\n
 sent_line       %1\n
 sent_line_width 78
+# prosty przyk³ad ircopodobnego wy¶wietlania wiadomo¶ci
+# ncurses - bez timestamp'ow ;]
+
+message_line_first,nc %G<%n%2%G>%n %1\n
+message_line,nc         %1\n
+message_line_width,nc 78
+chat_line_first,nc %C<%n%2%C>%n %1\n
+chat_line,nc         %1\n
+chat_line_width,nc 78
+sent_line_first,nc %C<%n%2%C>%n %1\n
+sent_line,nc       %1\n
+sent_line_width,nc 78
