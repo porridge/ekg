@@ -758,30 +758,45 @@ COMMAND(cmd_modify)
 		
 		if (match_arg(argv[i], 'g', "group", 2) && argv[i + 1]) {
 			char **tmp = array_make(argv[++i], ",", 0, 1, 1);
-			int x;
+			int x, off;	/* je¶li zaczyna siê od '@', pomijamy pierwszy znak */
 			
 			for (x = 0; tmp[x]; x++)
 				switch (*tmp[x]) {
 					case '-':
-						if (group_member(u, tmp[x] + 1)) {
-							group_remove(u, tmp[x] + 1);
+						off = (tmp[x][1] == '@' && strlen(tmp[x]) > 1) ? 1 : 0;
+
+						if (group_member(u, tmp[x] + 1 + off)) {
+							group_remove(u, tmp[x] + 1 + off);
 							modified = 1;
-						} else
+						} else {
 							print("group_member_not_yet", format_user(uin), tmp[x] + 1);
+							if (!modified)
+								modified = -1;
+						}
 						break;
 					case '+':
-						if (!group_member(u, tmp[x] + 1)) {
-							group_add(u, tmp[x] + 1);
+						off = (tmp[x][1] == '@' && strlen(tmp[x]) > 1) ? 1 : 0;
+
+						if (!group_member(u, tmp[x] + 1 + off)) {
+							group_add(u, tmp[x] + 1 + off);
 							modified = 1;
-						} else
+						} else {
 							print("group_member_already", format_user(uin), tmp[x] + 1);
+							if (!modified)
+								modified = -1;
+						}
 						break;
 					default:
-						if (!group_member(u, tmp[x])) {
-							group_add(u, tmp[x]);
+						off = (tmp[x][0] == '@' && strlen(tmp[x]) > 1) ? 1 : 0;
+
+						if (!group_member(u, tmp[x] + off)) {
+							group_add(u, tmp[x] + off);
 							modified = 1;
-						} else
+						} else {
 							print("group_member_already", format_user(uin), tmp[x]);
+							if (!modified)
+								modified = -1;
+						}
 				}
 
 			array_free(tmp);
@@ -808,11 +823,12 @@ COMMAND(cmd_modify)
 	}
 
 	if (strcasecmp(name, "add")) {
-		if (modified) {
+		if (modified == 1) {
 			print("modify_done", params[0]);
 			config_changed = 1;
 		} else
-			print("not_enough_params", name);
+			if (modified == 0)
+				print("not_enough_params", name);
 	} else
 		config_changed = 1;
 
@@ -974,9 +990,9 @@ COMMAND(cmd_list)
 			}
 			
 			if (count)
-				print("group_members", params[0]+1, members->str);
+				print("group_members", params[0], members->str);
 			else
-				print("group_empty", params[0]+1);
+				print("group_empty", params[0]);
 
 			string_free(members, 1);
 
@@ -1097,12 +1113,16 @@ COMMAND(cmd_list)
 			}
 
 			if (match_arg(argv[i], 'm', "member", 2)) {
-				if (j && argv[i+1])
-					show_group = xstrdup(argv[i+1]);
-				else
+				if (j && argv[i+1]) {
+					int off = (argv[i+1][0] == '@' && strlen(argv[i+1]) > 1) ? 1 : 0;
+
+					show_group = xstrdup(argv[i+1] + off);
+				} else
 					if (params[i+1]) {
 						char **tmp = array_make(params[i+1], " \t", 0, 1, 1);
- 						show_group = xstrdup(tmp[0]);
+						int off = (params[i+1][0] == '@' && strlen(params[i+1]) > 1) ? 1 : 0;
+
+ 						show_group = xstrdup(tmp[0] + off);
 						array_free(tmp);
 					}
 			}
@@ -3253,23 +3273,23 @@ void command_init()
           " [alias|@grupa|opcje]", "zarz±dzanie list± kontaktów",
 	  "\n"
 	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i|-d|-m]\":\n"
-	  "  -a, --active         dostêpne\n"
-	  "  -b, --busy           zajête\n"
-	  "  -i, --inactive       niedostêpne\n"
-	  "  -d, --description    osoby z opisem\n"
-	  "  -m, --member <grupa> osoby nale¿±ce do danej grupy\n"
+	  "  -a, --active          dostêpne\n"
+	  "  -b, --busy            zajête\n"
+	  "  -i, --inactive        niedostêpne\n"
+	  "  -d, --description     osoby z opisem\n"
+	  "  -m, --member <@grupa> osoby nale¿±ce do danej grupy\n"
 	  "\n"
 	  "Wy¶wietlanie cz³onków grupy: \"list @grupa\"\n"
 	  "\n"
 	  "Zmiana wpisów listy kontaktów \"list <alias> <opcje...>\":\n"
 	  "  -f, --first <imiê>\n"
 	  "  -l, --last <nazwisko>\n"
-	  "  -n, --nick <pseudonim>    pseudonim (nie jest u¿ywany)\n"
-	  "  -d, --display <nazwa>     wy¶wietlana nazwa\n"
+	  "  -n, --nick <pseudonim>     pseudonim (nie jest u¿ywany)\n"
+	  "  -d, --display <nazwa>      wy¶wietlana nazwa\n"
 	  "  -u, --uin <numerek>\n"
-	  "  -g, --group [+/-]<grupa>  dodaje lub usuwa z grupy\n"
-	  "                            mo¿na podaæ wiêcej grup po przecinku\n"
-	  "  -p, --phone <numer>       numer telefonu komórkowego\n"
+	  "  -g, --group [+/-]<@grupa>  dodaje lub usuwa z grupy\n"
+	  "                             mo¿na podaæ wiêcej grup po przecinku\n"
+	  "  -p, --phone <numer>        numer telefonu komórkowego\n"
 	  "\n"
 	  "Lista kontaktów na serwerze \"list [-p|-g]\":\n"
 	  "  -p, --put  umieszcza na serwerze\n"
