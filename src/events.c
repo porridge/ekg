@@ -6,6 +6,7 @@
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *                          Piotr Domagalski <szalik@szalik.net>
  *                          Adam Czerwiñski <acze@acze.net>
+ *                          Adam Wysocki <gophi@ekg.apcoh.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -580,9 +581,6 @@ void handle_msg(struct gg_event *e)
 	}
 #endif
 
-	if (!(ignored_check(e->event.msg.sender) & IGNORE_EVENTS))
-		event_check((chat) ? EVENT_CHAT : EVENT_MSG, e->event.msg.sender, e->event.msg.message);
-			
 	if (u && u->display)
 		add_send_nick(u->display);
 	else
@@ -599,6 +597,9 @@ void handle_msg(struct gg_event *e)
 
 	put_log(e->event.msg.sender, "%s,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), e->event.msg.message);
 
+	if (!(ignored_check(e->event.msg.sender) & IGNORE_EVENTS))
+		event_check((chat) ? EVENT_CHAT : EVENT_MSG, e->event.msg.sender, e->event.msg.message);
+			
 	if (config_sms_away && (GG_S_B(config_status) || (GG_S_I(config_status) && config_sms_away & 4)) && config_sms_app && config_sms_number) {
 		char *foo, sender[100];
 

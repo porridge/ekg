@@ -7,6 +7,7 @@
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *                          Piotr Domagalski <szalik@szalik.net>
  *                          Piotr Kupisiewicz <deli@rzepaknet.us>
+ *                          Adam Wysocki <gophi@ekg.apcoh.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -1469,6 +1470,8 @@ int event_add(int flags, const char *target, const char *action, int quiet)
 	if (!target || !action)
 		return -1;
 
+	target = xstrdup(target);
+
 	uin = str_to_uin(target);
 
 	if ((u = userlist_find(uin, target)))
@@ -1528,15 +1531,15 @@ int event_add(int flags, const char *target, const char *action, int quiet)
 	}
 
 	e.name = xstrdup(itoa(f));
-        e.target = xstrdup(target);
-        e.flags = flags;
-        e.action = xstrdup(action);
+	e.target = target;
+	e.flags = flags;
+	e.action = xstrdup(action);
 
-        list_add(&events, &e, sizeof(e));
+	list_add(&events, &e, sizeof(e));
 
 	printq("events_add", e.name);
 
-        return 0;
+	return 0;
 }
 
 /*
