@@ -771,12 +771,12 @@ void handle_disconnect(struct gg_event *e)
 {
 	my_printf("disconn_warning");
 
-	config_auto_reconnect = 0;
 	gg_logoff(sess);	/* a zobacz.. mo¿e siê uda ;> */
 	list_remove(&watches, sess, 0);
 	userlist_clear_status();
 	gg_free_session(sess);
 	sess = NULL;	
+	do_reconnect();
 }
 
 /*

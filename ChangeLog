@@ -10,6 +10,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawki g³osowych (s/w)
 - poprawka kolejno¶ci argumentów linkera. pomo¿e sunosom, innym nie
   zaszkodzi (w)
+- poprawka auto_reconnect (Yarko/w)
 
 // 2002-06-15
 
