@@ -1,12 +1,12 @@
 # $Id$
 
-INCLUDES = -I../ 
+INCLUDES = -I../ -I../lib/ -I../src/
 CFLAGS = @CFLAGS@ @DFLAGS@ $(INCLUDES)
 CC = @CC@
 RM = @RM@
 MAKE = @MAKE@
 
-OBJS = ../libgg.o ../libgg_search.o 
+OBJS = ../lib/libgg.o ../lib/libgg_search.o
 
 all:	$(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) search.c -o search-sync
