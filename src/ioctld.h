@@ -32,7 +32,7 @@ struct action_data {
 	int delay[IOCTLD_MAX_ITEMS];
 };
 
-enum {
+enum action_type {
 	ACT_BLINK_LEDS = 1,
 	ACT_BEEPS_SPK = 2
 };

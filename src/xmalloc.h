@@ -20,15 +20,17 @@
 #ifndef __XMALLOC_H
 #define __XMALLOC_H
 
+#include <sys/types.h>
+
 #define xnew(t) (xcalloc(1, sizeof(t)))
 #define xnew_t(t) (xcalloc(1, sizeof(*t)))
 
 void ekg_oom_handler();
 
-void *xcalloc(int nmemb, int size);
-void *xmalloc(int size);
+void *xcalloc(int nmemb, size_t size);
+void *xmalloc(size_t size);
 void xfree(void *ptr);
-void *xrealloc(void *ptr, int size);
+void *xrealloc(void *ptr, size_t size);
 char *xstrdup(const char *s);
 char *saprintf(const char *format, ...);
 

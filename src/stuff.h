@@ -30,8 +30,6 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
-#include "config.h"
 #include "libgadu.h"
 #include "dynstuff.h"
 #include "ioctld.h"
@@ -64,9 +62,16 @@ enum event_t {
 #define EVENT_LABELS_MAX 18	/* uaktualniæ ! */
 struct event_label event_labels[EVENT_LABELS_MAX];
 
+struct event_label {
+	int event;
+	char *name;
+};
+
 struct process {
 	int pid;		/* id procesu */
-	char *name;		/* nazwa. je¶li poprzedzona \2 to nie obchodzi nas w jaki sposób siê zakoñczy³o */
+	char *name;		/* nazwa. je¶li poprzedzona \2 to nie obchodzi */
+				/* nas w jaki sposób siê zakoñczy³o, \3 to samo, */
+				/* ale nie wy¶wietla na li¶cie procesów */
 };
 
 struct alias {
@@ -84,14 +89,9 @@ struct transfer {
 
 struct event {
 	char *name;	/* identyfikator */
-        char *target;	/* uin, alias lub grupa w formie ³añcucha znaków */
+        char *target;	/* uin, alias lub grupa */
         int flags;	/* flagi zdarzenia */
         char *action;	/* akcja! */
-};
-
-struct event_label {
-	int event;
-	char *name;
 };
 
 struct emoticon {

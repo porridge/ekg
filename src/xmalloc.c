@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/types.h>
 #include <stdarg.h>
 #ifndef _AIX
 #  include <string.h>
@@ -51,7 +52,7 @@ void ekg_oom_handler()
 	exit(1);
 }
 
-void *xcalloc(int nmemb, int size)
+void *xcalloc(int nmemb, size_t size)
 {
 	void *tmp = calloc(nmemb, size);
 
@@ -61,7 +62,7 @@ void *xcalloc(int nmemb, int size)
 	return tmp;
 }
 
-void *xmalloc(int size)
+void *xmalloc(size_t size)
 {
 	void *tmp = malloc(size);
 
@@ -80,7 +81,7 @@ void xfree(void *ptr)
 		free(ptr);
 }
 
-void *xrealloc(void *ptr, int size)
+void *xrealloc(void *ptr, size_t size)
 {
 	void *tmp = realloc(ptr, size);
 

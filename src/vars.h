@@ -22,7 +22,7 @@
 
 #include "dynstuff.h"
 
-enum {
+enum variable_type {
 	VAR_STR,		/* ci±g znaków */
 	VAR_INT,		/* liczba ca³kowita */
 	VAR_BOOL,		/* 0/1, tak/nie, yes/no, on/off */

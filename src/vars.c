@@ -303,10 +303,8 @@ int variable_add(const char *name, const char *short_name, int type, int display
 		for (l = variables; l; l = l->next) {
 			struct variable *v = l->data;
 
-			if (!strcmp(v->short_name, short_name)) {
+			if (!strcmp(v->short_name, short_name))
 				fprintf(stderr, "Error! Variable short name conflict:\n- short name: \"%s\"\n- existing variable: \"%s\"\n- conflicting variable: \"%s\"\n\nPress any key to continue...\n", short_name, v->name, name);
-				getchar();
-			}
 		}
 	}
 

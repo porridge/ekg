@@ -21,6 +21,8 @@
 #ifndef __COMMANDS_H
 #define __COMMANDS_H
 
+#include "dynstuff.h"
+
 #define printq(x...) { if (!quiet) { print(x); } }
 
 #define COMMAND(x) int x(const char *name, const char **params, const char *target, int quiet)

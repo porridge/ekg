@@ -22,8 +22,6 @@
 #define __MSGQUEUE_H
 
 #include <time.h>
-#include <sys/types.h>
-#include "config.h"
 #include "libgadu.h"
 #include "dynstuff.h"
 
