@@ -13,6 +13,7 @@ dnl even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 dnl PARTICULAR PURPOSE.
 
 dnl Curses detection: Munged from Midnight Commander's configure.in
+dnl slightly modified for nicer output --wojtekka
 dnl
 dnl What it does:
 dnl =============
@@ -145,7 +146,7 @@ AC_DEFUN(AC_CHECK_CURSES,[
 	  if test x$withval = xno ; then
 		search_ncurses=false
 	  elif test x$withval != xyes ; then
-		AC_NCURSES($withval/include, ncurses.h, -L$withval/lib -lncurses, -I$withval/include, "ncurses on $withval/include")
+		AC_NCURSES($withval/include, ncurses.h, -L$withval/lib -lncurses, -I$withval/include, $withval/include)
 	  fi
 	)
 
@@ -221,7 +222,7 @@ AC_DEFUN(AC_NCURSES, [
     then
         if test -f $1/$2
 	then
-	    AC_MSG_RESULT(Found ncurses on $1/$2)
+	    AC_MSG_RESULT($1/$2)
 
 	    CURSES_LIBS="$3"
 	    AC_CHECK_LIB(ncurses, initscr, , [
@@ -242,19 +243,19 @@ AC_DEFUN(AC_NCURSES, [
 ])
 
 AC_DEFUN(AC_SEARCH_NCURSES, [
-    AC_CHECKING("location of ncurses.h file")
+    AC_MSG_CHECKING(for location of ncurses.h)
 
-    AC_NCURSES(/usr/include, ncurses.h, -lncurses,, "ncurses on /usr/include")
-    AC_NCURSES(/usr/include/ncurses, ncurses.h, -lncurses, -I/usr/include/ncurses, "ncurses on /usr/include/ncurses")
-    AC_NCURSES(/usr/local/include, ncurses.h, -L/usr/local/lib -lncurses, -I/usr/local/include, "ncurses on /usr/local")
-    AC_NCURSES(/usr/pkg/include, ncurses.h, -L/usr/pkg/lib -lncurses, -I/usr/pkg/include, "ncurses on /usr/pkg")
-    AC_NCURSES(/usr/contrib/include, ncurses.h, -L/usr/contrib/lib -lncurses, -I/usr/contrib/include, "ncurses on /usr/contrib")
-    AC_NCURSES(/usr/local/include/ncurses, ncurses.h, -L/usr/local/lib -L/usr/local/lib/ncurses -lncurses, -I/usr/local/include/ncurses, "ncurses on /usr/local/include/ncurses")
-    AC_NCURSES(/usr/freeware/include/ncurses, curses.h, -L/usr/freeware/lib32 -lncurses, -I/usr/freeware/include, "ncurses on /usr/freeware")
+    AC_NCURSES(/usr/include, ncurses.h, -lncurses,, /usr/include)
+    AC_NCURSES(/usr/include/ncurses, ncurses.h, -lncurses, -I/usr/include/ncurses, /usr/include/ncurses)
+    AC_NCURSES(/usr/local/include, ncurses.h, -L/usr/local/lib -lncurses, -I/usr/local/include, /usr/local)
+    AC_NCURSES(/usr/pkg/include, ncurses.h, -L/usr/pkg/lib -lncurses, -I/usr/pkg/include, /usr/pkg)
+    AC_NCURSES(/usr/contrib/include, ncurses.h, -L/usr/contrib/lib -lncurses, -I/usr/contrib/include, /usr/contrib)
+    AC_NCURSES(/usr/local/include/ncurses, ncurses.h, -L/usr/local/lib -L/usr/local/lib/ncurses -lncurses, -I/usr/local/include/ncurses, /usr/local/include/ncurses)
+    AC_NCURSES(/usr/freeware/include/ncurses, curses.h, -L/usr/freeware/lib32 -lncurses, -I/usr/freeware/include, /usr/freeware)
     
-    AC_NCURSES(/usr/local/include/ncurses, curses.h, -L/usr/local/lib -lncurses, -I/usr/local/include/ncurses -DRENAMED_NCURSES, "renamed ncurses on /usr/local/.../ncurses")
+    AC_NCURSES(/usr/local/include/ncurses, curses.h, -L/usr/local/lib -lncurses, -I/usr/local/include/ncurses -DRENAMED_NCURSES, renamed ncurses on /usr/local/.../ncurses)
 
-    AC_NCURSES(/usr/include/ncurses, curses.h, -lncurses, -I/usr/include/ncurses -DRENAMED_NCURSES, "renamed ncurses on /usr/include/ncurses")
+    AC_NCURSES(/usr/include/ncurses, curses.h, -lncurses, -I/usr/include/ncurses -DRENAMED_NCURSES, renamed ncurses on /usr/include/ncurses)
     
     dnl
     dnl We couldn't find ncurses, try SysV curses
@@ -323,6 +324,7 @@ fi])
 
 dnl readline detection
 dnl based on curses.m4 from gnome
+dnl slightly modified for nicer output --wojtekka
 dnl
 dnl What it does:
 dnl =============
@@ -412,7 +414,7 @@ AC_DEFUN(AC_READLINE, [
     then
         if test -f $1/$2
 	then
-	    AC_MSG_RESULT(Found readline on $1/$2)
+	    AC_MSG_RESULT($1/$2)
  	    READLINE_LIBS="$3"
 	    READLINE_INCLUDES="$4"
 	    search_readline=false
@@ -423,12 +425,12 @@ AC_DEFUN(AC_READLINE, [
 ])
 
 AC_DEFUN(AC_SEARCH_READLINE, [
-    AC_CHECKING("location of readline.h file")
+    AC_MSG_CHECKING(for location of readline.h)
 
-    AC_READLINE(/usr/include, readline.h, -lreadline,, "readline on /usr/include")
-    AC_READLINE(/usr/include/readline, readline.h, -lreadline, -I/usr/include/readline, "readline on /usr/include/readline")
-    AC_READLINE(/usr/local/include, readline.h, -L/usr/local/lib -lreadline, -I/usr/local/include, "readline on /usr/local")
-    AC_READLINE(/usr/local/include/readline, readline.h, -L/usr/local/lib -L/usr/local/lib/readline -lreadline, -I/usr/local/include/readline, "readline on /usr/local/include/readline")
-    AC_READLINE(/usr/freeware/include/readline, readline.h, -L/usr/freeware/lib32 -lreadline, -I/usr/freeware/include, "readline on /usr/freeware/include/readline")
+    AC_READLINE(/usr/include, readline.h, -lreadline,, /usr/include)
+    AC_READLINE(/usr/include/readline, readline.h, -lreadline, -I/usr/include/readline, /usr/include/readline)
+    AC_READLINE(/usr/local/include, readline.h, -L/usr/local/lib -lreadline, -I/usr/local/include, /usr/local)
+    AC_READLINE(/usr/local/include/readline, readline.h, -L/usr/local/lib -L/usr/local/lib/readline -lreadline, -I/usr/local/include/readline, /usr/local/include/readline)
+    AC_READLINE(/usr/freeware/include/readline, readline.h, -L/usr/freeware/lib32 -lreadline, -I/usr/freeware/include, /usr/freeware/include/readline)
 ] ) 
 
