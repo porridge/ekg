@@ -8,6 +8,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-04-28
 
 - dok³adniejsze ifdefowanie kodu dla ioctldaemona (w)
+- s/bzero/memset/ (w)
 
 // 2002-04-27
 

@@ -1548,18 +1548,18 @@ int events_parse_seq(char *seq, struct action_data *data)
                         tmp_buff[i++] = seq[a];
                 else if (seq[a] == '/') {
                         data->value[l] = atoi(tmp_buff);
-                        bzero(tmp_buff, 16);
+                        memset(tmp_buff, 0, 16);
                         for (i = 0; isdigit(seq[++a]); i++)
                                 tmp_buff[i] = seq[a];
                         data->delay[l] = default_delay = atoi(tmp_buff);
-                        bzero(tmp_buff, 16);
+                        memset(tmp_buff, 0, 16);
                         i = 0;
                         l++;
                 }
                 else if (seq[a] == ',') {
                         data->value[l] = atoi(tmp_buff);
                         data->delay[l] = default_delay;
-                        bzero(tmp_buff, 16);
+                        memset(tmp_buff, 0, 16);
                         i = 0;
                         l++;
                 }
