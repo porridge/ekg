@@ -1,6 +1,6 @@
 # $Id$
 
-prefix = $(DESTDIR)@prefix@
+prefix = @prefix@
 datadir = @datadir@
 mandir = @mandir@
 exec_prefix = @exec_prefix@
@@ -33,18 +33,18 @@ install-ekg:	install-ekg-themes install-ekg-man install-ekgsearch
 	cd src && $(MAKE) install
 
 install-ekg-themes:
-	$(INSTALL) -d $(datadir)/ekg/themes
-	$(INSTALL) -m 644 themes/*.theme $(datadir)/ekg/themes
+	$(INSTALL) -d $(DESTDIR)$(datadir)/ekg/themes
+	$(INSTALL) -m 644 themes/*.theme $(DESTDIR)$(datadir)/ekg/themes
 
 install-ekg-man:
-	$(INSTALL) -d $(mandir)/man1
-	$(INSTALL) -m 644 docs/ekg.man.en $(mandir)/man1/ekg.1
-	$(INSTALL) -d $(mandir)/pl/man1
-	$(INSTALL) -m 644 docs/ekg.man.pl $(mandir)/pl/man1/ekg.1
+	$(INSTALL) -d $(DESTDIR)$(mandir)/man1
+	$(INSTALL) -m 644 docs/ekg.man.en $(DESTDIR)$(mandir)/man1/ekg.1
+	$(INSTALL) -d $(DESTDIR)$(mandir)/pl/man1
+	$(INSTALL) -m 644 docs/ekg.man.pl $(DESTDIR)$(mandir)/pl/man1/ekg.1
 
 install-ekgsearch:
-	$(INSTALL) -d $(bindir)
-	$(INSTALL) -m 755 contrib/ekgsearch $(bindir)
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+	$(INSTALL) -m 755 contrib/ekgsearch $(DESTDIR)$(bindir)
 
 #
 
