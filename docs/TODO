@@ -7,7 +7,7 @@ biblioteka:
 - uaktualniæ dokumentacjê,
 
 klient:
-- uzupe³niæ dope³nienia (w tym nicki ze spacjami),
+- uzupe³niæ dope³nienia (w tym nicki ze spacjami, lista nicków (joshua)),
 - wykrywanie niewidocznych jako opcja.
 - korzystaæ z getopt.
 - round-robin serwerów.
@@ -17,6 +17,8 @@ klient:
 - optymalizacja czytania z pipe'a,
 - pociête reasony w auto_away,
 - ustawianie stanu bez opisów przy w³±czynych opcjach ,,*reason*'',
+- wy¶wietlaæ potwierdzenia w oknie rozmowy (theKnight),
+- mesgi nie otwieraj± nowego okna (theKnight),
 
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,
