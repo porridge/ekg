@@ -215,6 +215,14 @@ random_reason
         opis bêdzie pobierany ze zmiennych ,,away_reason'' lub ,,quit_reason'',
         o ile nie s± puste.
 
+save_password
+	typ: bool
+	domyslna warto¶æ: 1
+
+	okre¶la czy has³o ma byæ zapisywane w pliku konfiguracyjnym. opcja
+	ta mo¿e przydaæ siê, gdy boimy siê administratora przegl±daj±cego
+	pliki u¿ytkowników.
+
 server
 	typ: tekst
 	domy¶lna warto¶æ: brak

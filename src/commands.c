@@ -369,6 +369,15 @@ COMMAND(cmd_connect)
 			print((sess->state == GG_STATE_CONNECTED) ? "already_connected" : "during_connect");
 			return;
 		}
+
+		if (params[0] && params[1]) {
+			variable_set("uin", params[0], 0);
+			variable_set("password", params[1], 0);
+		}
+
+		if (params[0] && !params[1])
+			variable_set("password", params[0], 0);
+			
                 if (config_uin && config_password) {
 			print("connecting");
 			connecting = 1;
@@ -2257,8 +2266,8 @@ void command_init()
 {
 	command_add
 	( "add", "U??", cmd_add, 0,
-	  " <numer> <alias> [opcje]", "Dodaje u¿ytkownika do listy kontaktów",
-	  "Opcje identyczne jak dla polecenia %Wlist%n (dotycz±ce wpisu)");
+	  " <numer> <alias> [opcje]", "dodaje u¿ytkownika do listy kontaktów",
+	  "Opcje identyczne jak dla polecenia %Tlist%n (dotycz±ce wpisu)");
 	  
 	command_add
 	( "alias", "??", cmd_alias, 0,
@@ -2273,15 +2282,15 @@ void command_init()
 	  
 	command_add
 	( "away", "?", cmd_away, 0,
-	  " [powód]", "Zmienia stan na zajêty",
-	  "Je¶li w³±czona jest odpowiednia opcja %Wrandom_reason%n i nie\n"
-          "podano powodu, zostanie wylosowany z pliku %Waway.reasons%n");
+	  " [powód]", "zmienia stan na zajêty",
+	  "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie\n"
+          "podano powodu, zostanie wylosowany z pliku %Taway.reasons%n");
 	  
 	command_add
 	( "back", "?", cmd_away, 0,
 	  " [powód]", "zmienia stan na dostêpny",
-          "je¶li w³±czona jest odpowiednia opcja %wrandom_reason%n i nie\n"
-	  "podano powodu, zostanie wylosowany z pliku %wback.reasons%n");
+          "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie\n"
+	  "podano powodu, zostanie wylosowany z pliku %Tback.reasons%n");
 	  
 	command_add
 	( "bind", "???", cmd_bind, 0,
@@ -2305,7 +2314,7 @@ void command_init()
 	  "  -F, --female                 kobieta\n"
 	  "  -M, --male                   mê¿czyzna\n"
 	  "\n"
-	  "nale¿y podaæ %wwszystkie%n opcje.");
+	  "Nale¿y podaæ %Twszystkie%n opcje.");
 	  
 	command_add
 	( "chat", "u?", cmd_msg, 0,
@@ -2320,9 +2329,12 @@ void command_init()
 	  "");
 	  
 	command_add
-	( "connect", "", cmd_connect, 0,
-	  "", "³±czy siê z serwerem",
-	  "");
+	( "connect", "??", cmd_connect, 0,
+	  " [[numer] has³o]", "³±czy siê z serwerem",
+	  "Je¶li podano jeden parametr, jest on traktowany jako has³o,\n"
+	  "a je¶li podano dwa, s± to kolejno numer i has³o. Dane te s±\n"
+	  "ustawiane w konfiguracji i zostan± utrwalone po wydaniu komendy\n"
+	  "%Tsave%n.");
 	  
 	command_add
 	( "dcc", "duf?", cmd_dcc, 0,
@@ -2333,7 +2345,7 @@ void command_init()
 	  "  close [numer/alias/#id]       zamyka po³±czenie\n"
 	  " [show]                         wy¶wietla listê po³±czeñ\n"
 	  "\n"
-	  "po³±czenia bezpo¶rednie wymagaj± w³±czonej opcji %wdcc%n.\n"
+	  "Po³±czenia bezpo¶rednie wymagaj± w³±czonej opcji %wdcc%n.\n"
 	  "dok³adny opis znajduje siê w pliku %wdocs/dcc.txt%n");
 	  
 	command_add
@@ -2344,7 +2356,7 @@ void command_init()
 	command_add
 	( "disconnect", "?", cmd_connect, 0,
 	  " [powód]", "roz³±cza siê z serwerem",
-	  "je¶li w³±czona jest opcja %wauto_reconnect%n, po wywo³aniu\n"
+	  "Je¶li w³±czona jest opcja %Tauto_reconnect%n, po wywo³aniu\n"
 	  "tej komendy, program nadal bêdzie próbowa³ siê automatycznie\n"
 	  "³±czyæ po okre¶lonym czasie.");
 	  
@@ -2356,11 +2368,11 @@ void command_init()
 	command_add
 	( "exec", "?", cmd_exec, 0,
 	  " <polecenie>", "uruchamia polecenie systemowe",
-	  "poprzedzenie znakiem %w^%n ukryje informacjê o zakoñczeniu.");
+	  "Poprzedzenie znakiem %T^%n ukryje informacjê o zakoñczeniu.");
 	  
 	command_add
 	( "!", "?", cmd_exec, 0,
-	  " <polecenie>", "synonim dla %wexec%n",
+	  " <polecenie>", "synonim dla %Texec%n",
 	  "");
 
 	command_add
@@ -2379,7 +2391,7 @@ void command_init()
 	  "  -M, --male              mê¿czy¼ni\n"
 	  "  --start <n>             wy¶wietla od n-tego wyniku\n"
 	  "\n"
-	  "  ze wzglêdu na organizacjê katalogu publicznego, niektórych\n"
+	  "  Ze wzglêdu na organizacjê katalogu publicznego, niektórych\n"
 	  "  opcji nie mo¿na ze sob± ³±czyæ");
 	  
 	command_add
@@ -2407,19 +2419,19 @@ void command_init()
 	command_add
 	( "invisible", "?", cmd_away, 0,
 	  " [powód]", "zmienia stan na niewidoczny",
-          "je¶li w³±czona jest odpowiednia opcja %wrandom_reason%n i nie\n"
+          "Je¶li w³±czona jest odpowiednia opcja %wrandom_reason%n i nie\n"
 	  "podano powodu, zostanie wylosowany z pliku %wquit.reasons%n");
 
 	command_add
 	( "list", "u?", cmd_list, 0,
           " [alias|opcje]", "zarz±dzanie list± kontaktów",
 	  "\n"
-	  "wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i]\":\n"
+	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i]\":\n"
 	  "  -a, --active    dostêpne\n"
 	  "  -b, --busy      zajête\n"
 	  "  -i, --inactive  niedostêpne\n"
 	  "\n"
-	  "zmiana wpisów listy kontaktów \"list <alias> <opcje...>\":\n"
+	  "Zmiana wpisów listy kontaktów \"list <alias> <opcje...>\":\n"
 	  "  -f, --first <imiê>\n"
 	  "  -l, --last <nazwisko>\n"
 	  "  -n, --nick <pseudonim>    pseudonim (nie jest u¿ywany)\n"
@@ -2428,7 +2440,7 @@ void command_init()
 	  "  -u, --uin <numerek>\n"
 	  "  -g, --group [+/-]<grupa>  dodaje lub usuwa z grupy\n"
 	  "\n"
-	  "lista kontaktów na serwerze \"list [-p|-g]\":\n"
+	  "Lista kontaktów na serwerze \"list [-p|-g]\":\n"
 	  "  -p, --put  umieszcza na serwerze\n"
 	  "  -g, --get  pobiera z serwera");
 	  
@@ -2441,7 +2453,7 @@ void command_init()
 	command_add
         ( "on", "?u?", cmd_on, 0,
 	  " <zdarzenie|...> <numer/alias> <akcja>|clear", "obs³uga zdarzeñ",
-	  "szczegó³y dotycz±ce tego polecenia w pliku %wdocs/on.txt%n");
+	  "Szczegó³y dotycz±ce tego polecenia w pliku %Tdocs/on.txt%n");
 	 
 	command_add
 	( "passwd", "??", cmd_passwd, 0,
@@ -2465,7 +2477,8 @@ void command_init()
 	  
 	command_add
 	( "reconnect", "", cmd_connect, 0,
-	  "", "roz³±cza i ³±czy ponownie", "");
+	  "", "roz³±cza i ³±czy ponownie",
+	  "");
 	  
 	command_add
 	( "register", "??", cmd_register, 0,
@@ -2480,18 +2493,18 @@ void command_init()
 	command_add
 	( "save", "", cmd_save, 0,
 	  "", "zapisuje ustawienia programu",
-	  "aktualny stan zostanie zapisany i zostanie przywrócony przy\n"
+	  "Aktualny stan zostanie zapisany i zostanie przywrócony przy\n"
 	  "nastêpnym uruchomieniu programu");
 	  
 	command_add
 	( "set", "v?", cmd_set, 0,
   	  " [-]<zmienna> [warto¶æ]", "wy¶wietla lub zmienia ustawienia",
-	  "u¿ycie ,,set -zmienna'' czy¶ci zawarto¶æ zmiennej.");
+	  "U¿ycie %Tset -zmienna%n czy¶ci zawarto¶æ zmiennej.");
 
 	command_add
 	( "sms", "u?", cmd_sms, 0,
 	  " <numer/alias> <tre¶æ>", "wysy³a smsa do podanej osoby",
-	  "polecenie wymaga zdefiniowana zmiennej %wsms_send_app%n");
+	  "Polecenie wymaga zdefiniowana zmiennej %Tsms_send_app%n");
 
 	command_add
 	( "status", "", cmd_status, 0,
@@ -2511,17 +2524,17 @@ void command_init()
 
 	command_add
 	( "unignore", "i", cmd_ignore, 0,
-	  " <numer/alias>", "Usuwa z listy ignorowanych osób",
+	  " <numer/alias>", "usuwa z listy ignorowanych osób",
 	  "");
 	  
 	command_add
 	( "version", "", cmd_version, 0,
-	  "", "Wy¶wietla wersje programu",
+	  "", "wy¶wietla wersje programu",
 	  "");
 	  
 	command_add
 	( "window", "??", cmd_window, 0,
-	  " <komenda> [numer_okna]", "Zarz±dzanie okienkami",
+	  " <komenda> [numer_okna]", "zarz±dzanie okienkami",
 	  "  new\n"
 	  "  kill [numer_okna]\n"
 	  "  next\n"

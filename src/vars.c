@@ -70,6 +70,7 @@ void variable_init()
 	variable_add("random_reason", VAR_INT, 1, &config_random_reason, NULL);
 	variable_add("quit_reason", VAR_STR, 1, &config_quit_reason, NULL);
 	variable_add("query_commands", VAR_BOOL, 1, &config_query_commands, NULL);
+	variable_add("save_password", VAR_BOOL, 1, &config_save_password, NULL);
 	variable_add("server", VAR_STR, 1, &config_server, NULL);
 	variable_add("sms_away", VAR_BOOL, 1, &config_sms_away, NULL);
 	variable_add("sms_max_length", VAR_INT, 1, &config_sms_max_length, NULL);

@@ -5,6 +5,16 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-09-03
+
+- dodanie ' do znaków escapowanych w logach, ¿eby mo¿na by³o ³atwo
+  i przyjemnie to rozbiæ przez array_make(), która ju¿ obs³uguje
+  escapowane teksty (w)
+- poprawki w helpie (w)
+- nie mo¿na utworzyæ aliasu przykrywaj±cego komendê (FIG/w)
+- dodanie zmiennej save_password (FIG/w)
+- dodanie argumentów do connect (FIG/w)
+
 // 2002-09-02
 
 - pager w bind (FIG/w)

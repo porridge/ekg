@@ -333,8 +333,17 @@ const char *itoa(long int i)
  *
  * tworzy tablicê tekstów z jednego, rozdzielonego podanymi znakami.
  *
- * zaalokowan± tablicê z zaalokowanymi ci±gami znaków lub NULL w przypadku
- * b³êdu.
+ *  - string - tekst wej¶ciowy,
+ *  - sep - lista elementów oddzielaj±cych,
+ *  - max - maksymalna ilo¶æ elementów tablicy. je¶li równe 0, nie ma
+ *          ograniczeñ rozmiaru tablicy.
+ *  - trim - czy wiêkszo¶æ ilo¶æ elementów oddzielaj±cych traktowaæ jako
+ *           jeden (na przyk³ad spacje, tabulacja itp.)
+ *  - quotes - czy pola mog± byæ zapisywane w cudzys³owiach lub
+ *             apostrofach z escapowanymi znakami.
+ *
+ * zaalokowan± tablicê z zaalokowanymi ci±gami znaków, któr± nale¿y
+ * zwolniæ funkcj± array_free()
  */
 char **array_make(const char *string, const char *sep, int max, int trim, int quotes)
 {

@@ -123,6 +123,7 @@ int ekg_segv_handler = 0;
 char *config_tab_command = NULL;
 int ioctld_sock = -1;
 int config_ctrld_quits = 1;
+int config_save_password = 1;
 
 static struct {
 	int event;
@@ -423,7 +424,8 @@ void config_write_main(FILE *f, int base64)
 			if (*(char**)(v->ptr)) {
 				if (!v->display && base64) {
 					char *tmp = base64_encode(*(char**)(v->ptr));
-					fprintf(f, "%s \001%s\n", v->name, tmp);
+					if (config_save_password)
+						fprintf(f, "%s \001%s\n", v->name, tmp);
 					free(tmp);
 				} else 	
 					fprintf(f, "%s %s\n", v->name, *(char**)(v->ptr));
@@ -950,6 +952,15 @@ int alias_add(const char *string, int quiet, int append)
 					print("aliases_append", string);
 				return 0;
 			}
+		}
+	}
+
+	for (l = commands; l; l = l->next) {
+		struct command *c = l->data;
+
+		if (!strcasecmp(string, c->name) && !c->alias) {
+			print("aliases_command", string);
+			return -1;
 		}
 	}
 
@@ -2193,7 +2204,7 @@ char *log_escape(const char *str)
 		return NULL;
 	
 	for (p = str; *p; p++) {
-		if (*p == '"' || *p == '\r' || *p == '\n' || *p == ',')
+		if (*p == '"' || *p == '\'' || *p == '\r' || *p == '\n' || *p == ',')
 			needto = 1;
 	}
 
@@ -2201,7 +2212,7 @@ char *log_escape(const char *str)
 		return xstrdup(str);
 
 	for (p = str, size = 0; *p; p++) {
-		if (*p == '"' || *p == '\r' || *p == '\n' || *p == '\\')
+		if (*p == '"' || *p == '\'' || *p == '\r' || *p == '\n' || *p == '\\')
 			size += 2;
 		else
 			size++;
@@ -2212,7 +2223,7 @@ char *log_escape(const char *str)
 	*q++ = '"';
 	
 	for (p = str; *p; p++, q++) {
-		if (*p == '\\' || *p == '"') {
+		if (*p == '\\' || *p == '"' || *p == '\'') {
 			*q++ = '\\';
 			*q = *p;
 		} else if (*p == '\n') {

@@ -870,6 +870,7 @@ void theme_init()
 	format_add("aliases_del", "%) Usuniêto alias %T%1%n\n", 1);
 	format_add("aliases_exist", "%! Alias %T%1%n ju¿ istnieje\n", 1);
 	format_add("aliases_noexist", "%! Alias %T%1%n nie istnieje\n", 1);
+	format_add("aliases_command", "%! %T%1%n jest wbudowan± komend±\n", 1);
 
 	/* po³±czenia bezpo¶rednie */
 	format_add("dcc_create_error", "%! Nie mo¿na w³±czyæ po³±czeñ bezpo¶rednich: %1\n", 1);
