@@ -154,6 +154,7 @@ COMMAND(cmd_cleartab)
 COMMAND(cmd_add)
 {
 	uin_t uin;
+	struct userlist *u;
 
 	if (!params[0] || !params[1]) {
 		print("not_enough_params", name);
@@ -165,8 +166,12 @@ COMMAND(cmd_add)
 		return;
 	}
 
-	if (userlist_find(uin, params[1])) {
-		print("user_exists", params[1]);
+	if ((u = userlist_find(uin, params[1]))) {
+		if (!strcmp(params[1], u->display))
+			print("user_exists", params[1]);
+		else
+			print("user_exists_other", params[1], format_user(uin));
+
 		return;
 	}
 
