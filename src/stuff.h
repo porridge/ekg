@@ -269,116 +269,124 @@ int immediately_quit;
 int ekg_segv_handler;
 int ioctld_sock;
 
-void unidle();
-const char *timestamp(const char *format);
-const char *prepare_path(const char *filename, int do_mkdir);
-void send_userlist();
-void do_reconnect();
-void put_log(uin_t uin, const char *format, ...);
-const char *log_timestamp(time_t t);
-int send_sms(const char *recipient, const char *message, int show_result);
-char *read_file(FILE *f);
-int init_control_pipe(const char *path);
-char *random_line(const char *path);
-void do_connect();
-int transfer_id();
-void ekg_logoff(struct gg_session *sess, const char *reason);
-void ekg_wait_for_key();
-int ekg_hash(const char *name);
-void ekg_exit();
-char *log_escape(const char *str);
-char *xstrmid(const char *str, int start, int length);
-const char *http_error_string(int h);
-void update_status();
-void update_status_myip();
-void change_status(int status, const char *arg, int autom);
-const char *ekg_status_label(int status, const char *prefix);
-
-int process_add(int pid, const char *name);
-int process_remove(int pid);
-
-int on_off(const char *value);
-int play_sound(const char *sound_path);
-
-int config_read();
-int config_write();
-int config_write_partly(char **vars);
-void config_write_crash();
-void debug_write_crash();
-
-int sysmsg_read();
-int sysmsg_write();
-
-void cp_to_iso(unsigned char *buf);
-void iso_to_cp(unsigned char *buf);
-unsigned char hide_pl(const unsigned char *c);
-char *strip_spaces(char *line);
 
 int alias_add(const char *string, int quiet, int append);
 int alias_remove(const char *name, int quiet);
 list_t alias_check(const char *foo);
 void alias_free();
 
-struct conference *conference_add(const char *string, const char *nicklist, int quiet);
-int conference_remove(const char *name);
-void conference_free();
-struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int count);
-struct conference *conference_find(const char *name);
-struct conference *conference_create(const char *nicks);
-int conference_rename(const char *oldname, const char *newname);
-int conference_set_ignore(const char *name, int flag);
-
 char *base64_encode(const char *buf);
 char *base64_decode(const char *buf);
+
+void binding_list();
+void binding_free();
 
 int buffer_add(int type, const char *line, int max_lines);
 int buffer_count(int type);
 void buffer_free();
 
 void changed_dcc(const char *var);
-void changed_theme(const char *var);
 void changed_proxy(const char *var);
+void changed_theme(const char *var);
 void changed_uin(const char *var);
 void changed_xxx_reason(const char *var);
 
-int event_add(int flags, uin_t uin, const char *action, int quiet);
-int event_remove(int flags, uin_t uin, int quiet);
-int event_flags(const char *events);
-const char *event_format(int flags);
-int event_check(int event, uin_t uin, const char *data);
-int event_correct(const char *action, int quiet);
-void event_free();
-int ioctld_socket();
+struct conference *conference_add(const char *string, const char *nicklist, int quiet);
+int conference_remove(const char *name);
+struct conference *conference_create(const char *nicks);
+struct conference *conference_find(const char *name);
+struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int count);
+int conference_set_ignore(const char *name, int flag);
+int conference_rename(const char *oldname, const char *newname);
+void conference_free();
+
+int config_read();
+int config_write();
+int config_write_partly(char **vars);
+void config_write_crash();
+void debug_write_crash();
+int sysmsg_read();
+int sysmsg_write();
+
+void do_connect();
+void do_reconnect();
+void ekg_logoff(struct gg_session *sess, const char *reason);
+
+int ekg_hash(const char *name);
 
 int emoticon_read();
 char *emoticon_expand(const char *s);
 void emoticon_free();
 
-struct timer *timer_add(time_t period, int persistent, int type, int at, const char *name, const char *command);
-int timer_remove(const char *name, int at, const char *command);
-void timer_free();
+int event_add(int flags, uin_t uin, const char *action, int quiet);
+int event_remove(int flags, uin_t uin, int quiet);
+const char *event_format(int flags);
+int event_flags(const char *events);
+int event_check(int event, uin_t uin, const char *data);
+int event_correct(const char *action, int quiet);
+void event_free();
 
 void last_add(int type, uin_t uin, time_t t, time_t st, const char *msg);
 void last_del(uin_t uin);
 int last_count(uin_t uin);
 void last_free();
 
-void sms_away_add(uin_t uin);
-int sms_away_check(uin_t uin);
-void sms_away_free();
-
-void contacts_rebuild();
+void put_log(uin_t uin, const char *format, ...);
+char *log_escape(const char *str);
+const char *log_timestamp(time_t t);
 
 int mesg_set(int what);
 void mesg_changed();
 
 int msg_encrypt(uin_t uin, unsigned char **msg);
 
+void cp_to_iso(unsigned char *buf);
+void iso_to_cp(unsigned char *buf);
+unsigned char hide_pl(const unsigned char *c);
+char *strip_spaces(char *line);
+
 int find_in_uins(int uin_count, uin_t *uins, uin_t uin);
 uin_t str_to_uin(const char *text);
 int valid_nick(const char *nick);
 
-void binding_list();
-void binding_free();
+int play_sound(const char *sound_path);
+
+int process_add(int pid, const char *name);
+int process_remove(int pid);
+
+const char *prepare_path(const char *filename, int do_mkdir);
+char *random_line(const char *path);
+char *read_file(FILE *f);
+
+int send_sms(const char *recipient, const char *message, int show_result);
+void sms_away_add(uin_t uin);
+int sms_away_check(uin_t uin);
+void sms_away_free();
+
+int ioctld_socket();
+int init_control_pipe(const char *path);
+
+const char *timestamp(const char *format);
+void unidle();
+int on_off(const char *value);
+int transfer_id();
+
+struct timer *timer_add(time_t period, int persistent, int type, int at, const char *name, const char *command);
+int timer_remove(const char *name, int at, const char *command);
+void timer_free();
+
+char *xstrmid(const char *str, int start, int length);
+const char *http_error_string(int h);
+
+void update_status();
+void update_status_myip();
+void change_status(int status, const char *arg, int autom);
+const char *ekg_status_label(int status, const char *prefix);
+
+/* funkcje poza stuff.c */
+void contacts_rebuild();
+void send_userlist();
+void ekg_wait_for_key();
+void ekg_exit();
 
 #endif /* __STUFF_H */

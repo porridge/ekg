@@ -6,6 +6,11 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-01-23
+
+- kosmetyka (sz)
+- poprawki zwi±zane z strncpy() i strncat() (sz)
+
 // 2003-01-22
 
 - poprawka zachowania przy segfault'cie (sz)

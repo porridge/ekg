@@ -212,5 +212,3 @@ int voice_record(const char *buf, int length, int null)
  *
  * vim: shiftwidth=8:
  */
-
-

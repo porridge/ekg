@@ -198,1764 +198,8 @@ static struct {
 	{ EVENT_NEW_MAIL, "new_mail" },
 	{ EVENT_QUERY, "query" },
 	{ INACTIVE_EVENT, NULL },
-	{ 0, NULL },
+	{ 0, NULL }
 };
-
-int buffer_add(int type, const char *line, int max_lines)
-{
-	struct buffer b;
-
-	b.type = type;
-	b.line = xstrdup(line);
-
-	list_add(&buffers, &b, sizeof(b));
-
-	if (max_lines && buffer_count(type) > max_lines) {
-		struct buffer *foo = buffers->data;
-
-		xfree(foo->line);
-		list_remove(&buffers, foo, 1);
-	}
-		
-	return 0;
-}
-
-int buffer_count(int type)
-{
-	list_t l;
-	int count = 0;
-
-	for (l = buffers; l; l = l->next) {
-		struct buffer *b = l->data;
-
-		if (b->type == type)
-			count++;
-	}	
-
-	return count;
-}
-
-void buffer_free()
-{
-	list_t l;
-
-	if (!buffers)
-		return;
-
-	for (l = buffers; l; l = l->next) {
-		struct buffer *b = l->data;
-
-		xfree(b->line);
-	}
-
-	list_destroy(buffers, 1);
-	buffers = NULL;
-}
-
-/*
- * emoticon_expand()
- *
- * rozwija definicje makr (najczê¶ciej bêd± to emoticony)
- *
- *  - s - string z makrami.
- *
- * zwraca zaalokowany, rozwiniêty string.
- */
-char *emoticon_expand(const char *s)
-{
-	list_t l = NULL;
-	const char *ss;
-	char *ms;
-	size_t n = 0;
-
-	for (ss = s; *ss; ss++) {
-		struct emoticon *e = NULL;
-		size_t ns = strlen(ss);
-		int ret = 1;
-
-		for (l = emoticons; l && ret; l = (ret ? l->next : l)) {
-			size_t nn;
-
-			e = l->data;
-			nn = strlen(e->name);
-			if (ns >= nn)
-				ret = strncmp(ss, e->name, nn);
-		}
-
-		if (l) {
-			e = l->data;
-			n += strlen(e->value);
-			ss += strlen(e->name) - 1;
-		} else
-			n++;
-	}
-
-	ms = xcalloc(1, n + 1);
-
-	for (ss = s; *ss; ss++) {
-		struct emoticon *e = NULL;
-		size_t ns = strlen(ss);
-		int ret = 1;
-
-		for (l = emoticons; l && ret; l = (ret ? l->next : l)) {
-			size_t n;
-
-			e = l->data;
-			n = strlen(e->name);
-			if (ns >= n)
-				ret = strncmp(ss, e->name, n);
-		}
-
-		if (l) {
-			e = l->data;
-			strcat(ms, e->value);
-			ss += strlen(e->name) - 1;
-		} else
-			ms[strlen(ms)] = *ss;
-	}
-
-	return ms;
-}
-
-/*
- * prepare_path()
- *
- * zwraca pe³n± ¶cie¿kê do podanego pliku katalogu ~/.gg/
- *
- *  - filename - nazwa pliku.
- *  - do_mkdir - czy tworzyæ katalog ~/.gg ?
- */
-const char *prepare_path(const char *filename, int do_mkdir)
-{
-	static char path[PATH_MAX];
-	
-	if (do_mkdir) {
-		if (mkdir(config_dir, 0700) && errno != EEXIST)
-			return NULL;
-		if (config_profile) {
-			snprintf(path, sizeof(path), "%s/%s", config_dir, config_profile);
-			if (mkdir(path, 0700) && errno != EEXIST)
-				return NULL;
-		}
-	}
-	
-	if (!filename || !*filename) {
-		if (config_profile)
-			snprintf(path, sizeof(path), "%s/%s", config_dir, config_profile);
-		else
-			snprintf(path, sizeof(path), "%s", config_dir);
-	} else {
-		if (config_profile)
-			snprintf(path, sizeof(path), "%s/%s/%s", config_dir, config_profile, filename);
-		else
-			snprintf(path, sizeof(path), "%s/%s", config_dir, filename);
-	}
-	
-	return path;
-}
-
-/* 
- * log_timestamp()
- *
- * zwraca timestamp logów zgodnie z ¿yczeniem u¿ytkownika. 
- *
- *  - t - czas, który mamy zamieniæ.
- *
- * zwraca na przemian jeden z dwóch statycznych buforów, wiêc w obrêbie
- * jednego wyra¿enia mo¿na wywo³aæ tê funkcjê dwukrotnie.
- */
-const char *log_timestamp(time_t t)
-{
-	static char buf[2][100];
-	struct tm *tm = localtime(&t);
-	static int i = 0;
-
-	i = i % 2;
-
-	if (config_log_timestamp) {
-		strftime(buf[i], sizeof(buf[0]), config_log_timestamp, tm);
-		return buf[i++];
-	} else
-		return itoa(t);
-}
-
-/*
- * put_log()
- *
- * wrzuca do logów informacjê od/do danego numerka. podaje siê go z tego
- * wzglêdu, ¿e gdy `log = 2', informacje lec± do $config_log_path/$uin.
- *
- *  - uin - numer delikwenta,
- *  - format... - akceptuje tylko %s, %d i %ld.
- */
-void put_log(uin_t uin, const char *format, ...)
-{
- 	char *lp = config_log_path;
-	char path[PATH_MAX], *buf;
-	const char *p;
-	int size = 0;
-	va_list ap;
-	FILE *f;
-
-	if (!config_log)
-		return;
-
-	/* oblicz d³ugo¶æ tekstu */
-	va_start(ap, format);
-	for (p = format; *p; p++) {
-		if (*p == '%') {
-			p++;
-			if (!*p)
-				break;
-			
-			if (*p == 'l') {
-				p++;
-				if (!*p)
-					break;
-			}
-			
-			if (*p == 's') {
-				char *tmp = va_arg(ap, char*);
-
-				size += strlen(tmp);
-			}
-			
-			if (*p == 'd') {
-				int tmp = va_arg(ap, int);
-
-				size += strlen(itoa(tmp));
-			}
-		} else
-			size++;
-	}
-	va_end(ap);
-
-	/* zaalokuj bufor */
-	buf = xmalloc(size + 1);
-	*buf = 0;
-
-	/* utwórz tekst z logiem */
-	va_start(ap, format);
-	for (p = format; *p; p++) {
-		if (*p == '%') {
-			p++;
-			if (!*p)
-				break;
-			if (*p == 'l') {
-				p++;
-				if (!*p)
-					break;
-			}
-
-			if (*p == 's') {
-				char *tmp = va_arg(ap, char*);
-
-				strcat(buf, tmp);
-			}
-
-			if (*p == 'd') {
-				int tmp = va_arg(ap, int);
-
-				strcat(buf, itoa(tmp));
-			}
-		} else {
-			buf[strlen(buf) + 1] = 0;
-			buf[strlen(buf)] = *p;
-		}
-	}
-
-	/* teraz skonstruuj ¶cie¿kê logów */
-
-	if (!lp)
-		lp = (config_log & 2) ? "." : "gg.log";
-
-	if (*lp == '~')
-		snprintf(path, sizeof(path), "%s%s", home_dir, lp + 1);
-	else {
-		strncpy(path, lp, sizeof(path) - 1);
-		path[sizeof(path) - 1] = '\0';
-	}
-
-	if ((config_log & 2)) {
-		if (mkdir(path, 0700) && errno != EEXIST)
-			goto cleanup;
-		snprintf(path + strlen(path), sizeof(path) - strlen(path), "/%u", uin);
-	}
-
-#ifdef HAVE_ZLIB
-	/* nawet je¶li chcemy gzipowane logi, a istnieje nieskompresowany log,
-	 * olewamy kompresjê. je¶li loga nieskompresowanego nie ma, dodajemy
-	 * rozszerzenie .gz i balujemy. */
-	if (config_log & 4) {
-		struct stat st;
-		
-		if (stat(path, &st) == -1) {
-			gzFile f;
-
-			snprintf(path + strlen(path), sizeof(path) - strlen(path), ".gz");
-
-			if (!(f = gzopen(path, "a")))
-				goto cleanup;
-
-			gzputs(f, buf);
-			gzclose(f);
-			chmod(path, 0600);
-
-			goto cleanup;
-		}
-	}
-#endif
-
-	if (!(f = fopen(path, "a")))
-		goto cleanup;
-	fputs(buf, f);
-	fclose(f);
-	chmod(path, 0600);
-
-cleanup:
-	xfree(buf);
-}
-
-/*
- * config_read()
- *
- * czyta z pliku ~/.gg/config lub podanego konfiguracjê.
- *
- *  - filename,
- *  - var - zmienna lub NULL, je¶li wszystkie.
- *
- * 0/-1
- */
-int config_read(const char *filename, const char *var)
-{
-	char *buf, *foo;
-	FILE *f;
-
-	if (!filename && !(filename = prepare_path("config", 0)))
-		return -1;
-	
-	if (!(f = fopen(filename, "r")))
-		return -1;
-
-	while ((buf = read_file(f))) {
-		if (buf[0] == '#' || buf[0] == ';' || (buf[0] == '/' && buf[1] == '/')) {
-			xfree(buf);
-			continue;
-		}
-
-		if (!(foo = strchr(buf, ' ')) || (var && strcmp(buf, var))) {
-			xfree(buf);
-			continue;
-		}
-
-		*foo++ = 0;
-
-		if (!strcasecmp(buf, "set")) {
-			char *bar;
-
-			if (!(bar = strchr(foo, ' ')))
-				variable_set(foo, NULL, 1);
-			else {
-				*bar++ = 0;
-				variable_set(foo, bar, 1);
-			}
-		} else if (!strcasecmp(buf, "ignore")) {
-			if (atoi(foo))
-				ignored_add(atoi(foo), IGNORE_ALL);
-		} else if (!strcasecmp(buf, "alias")) {
-			alias_add(foo, 1, 1);
-		} else if (!strcasecmp(buf, "on")) {
-                        int flags;
-                        uin_t uin;
-                        char **pms = array_make(foo, " \t", 3, 1, 0);
-
-                        if (pms && pms[0] && pms[1] && pms[2] && (flags = event_flags(pms[0])) && (uin = atoi(pms[1]))) {
-				if (event_correct(pms[2], 1))
-					flags |= INACTIVE_EVENT; /* nieaktywne */
-                                event_add(flags, atoi(pms[1]), pms[2], 1);
-			}
-
-			array_free(pms);
-		} else if (!strcasecmp(buf, "bind")) {
-			char **pms = array_make(foo, " \t", 2, 1, 0);
-
-			gg_debug(GG_DEBUG_MISC, "bind %s %s\n", pms[0], pms[1]);
-
-			if (pms && pms[0] && pms[1]) 
-				ui_event("command", "bind", "--add-quiet", pms[0], pms[1], NULL);
-
-			array_free(pms);
-		} else if (!strcasecmp(buf, "timer") || !strcasecmp(buf, "at")) {
-			char **p = array_make(foo, " \t", 3, 1, 0);
-			char *tmp = NULL, *period_str = NULL, *name = NULL;
-			time_t period;
-			int at = !strcasecmp(buf, "at");
-
-			if (p && p[0] && p[1] && p[2]) {
-
-				if (strcmp(p[0], "(null)"))
-					name = p[0];
-
-				if (!strncmp(p[1], "*/", 2)) {
-					period = atoi(p[1] + 2);
-					period_str = saprintf("*/%d", period);
-				} else
-					if (at)	 {
-						struct tm *t;
-
-						period = atoi(p[1]);
-						t = localtime(&period);
-						period_str = xmalloc(100);
-						strftime(period_str, 100, "%Y%m%d%H%M.%S", t);
-					} else {
-						period = atoi(p[1]) - time(NULL);
-						period_str = saprintf("%d", period);
-					}
-		
-				if (period > 0) {
-					tmp = saprintf("%s --add-quiet %s %s %s", (at) ? "at" : "timer", (name) ? name : "", period_str, p[2]);
-					command_exec(NULL, tmp);
-					xfree(tmp);
-				}
-
-				xfree(period_str);
-			}
-				array_free(p);
-                } else 
-			variable_set(buf, foo, 1);
-
-		xfree(buf);
-	}
-	
-	fclose(f);
-	
-	return 0;
-}
-
-/*
- * sysmsg_read()
- *
- *  - filename.
- *
- * 0/-1
- */
-int sysmsg_read()
-{
-	const char *filename;
-	char *buf, *foo;
-	FILE *f;
-
-	if (!(filename = prepare_path("sysmsg", 0)))
-		return -1;
-	
-	if (!(f = fopen(filename, "r")))
-		return -1;
-
-	while ((buf = read_file(f))) {
-		if (buf[0] == '#') {
-			xfree(buf);
-			continue;
-		}
-
-		if (!(foo = strchr(buf, ' '))) {
-			xfree(buf);
-			continue;
-		}
-
-		*foo++ = 0;
-		
-		if (!strcasecmp(buf, "last_sysmsg")) {
-			if (atoi(foo))
-				last_sysmsg = atoi(foo);
-		}
-		
-		xfree(buf);
-	}
-	
-	fclose(f);
-	
-	return 0;
-}
-
-/*
- * config_write_variable()
- *
- * zapisuje jedn± zmienn± do pliku konfiguracyjnego.
- *
- *  - f - otwarty plik konfiguracji,
- *  - v - wpis zmiennej,
- *  - base64 - czy wolno nam u¿ywaæ base64 i zajmowaæ pamiêæ?
- */
-void config_write_variable(FILE *f, struct variable *v, int base64)
-{
-	if (!f || !v)
-		return;
-
-	if (v->type == VAR_STR) {
-		if (*(char**)(v->ptr)) {
-			if (!v->display && base64) {
-				char *tmp = base64_encode(*(char**)(v->ptr));
-				if (config_save_password)
-					fprintf(f, "%s \001%s\n", v->name, tmp);
-				xfree(tmp);
-			} else 	
-				fprintf(f, "%s %s\n", v->name, *(char**)(v->ptr));
-		}
-	} else if (v->type == VAR_FOREIGN)
-		fprintf(f, "%s %s\n", v->name, (char*) v->ptr);
-	else
-		fprintf(f, "%s %d\n", v->name, *(int*)(v->ptr));
-}
-
-/*
- * config_write_main()
- *
- * w³a¶ciwa funkcja zapisuj±ca konfiguracjê do podanego pliku.
- *
- *  - f - plik, do którego piszemy,
- *  - base64 - czy kodowaæ ukryte pola?
- */
-void config_write_main(FILE *f, int base64)
-{
-	list_t l;
-
-	if (!f)
-		return;
-
-	for (l = variables; l; l = l->next)
-		config_write_variable(f, l->data, base64);
-
-	for (l = aliases; l; l = l->next) {
-		struct alias *a = l->data;
-		list_t m;
-
-		for (m = a->commands; m; m = m->next)
-			fprintf(f, "alias %s %s\n", a->name, (char*) m->data);
-	}
-
-        for (l = events; l; l = l->next) {
-                struct event *e = l->data;
-
-                fprintf(f, "on %s %u %s\n", event_format(e->flags), e->uin, e->action);
-        }
-
-	for (l = bindings; l; l = l->next) {
-		struct binding *b = l->data;
-
-		fprintf(f, "bind %s %s\n", b->key, b->action);
-	}
-
-	for (l = timers; l; l = l->next) {
-		struct timer *t = l->data;
-		const char *name = NULL;
-
-		if (t->type != TIMER_COMMAND)
-			continue;
-
-		if (!t->persistent && t->ends.tv_sec - time(NULL) < 5)	/* nie ma sensu zapisywaæ */
-			continue;
-
-		if (t->name && !isdigit(t->name[0]))
-			name = t->name;
-		else
-			name = "(null)";
-
-		if (t->at)
-			fprintf(f, "at %s %s %s\n", name, itoa(t->ends.tv_sec), t->command);
-		else {
-			char *foo;
-
-			if (t->persistent)
-				foo = saprintf("*/%s", itoa(t->period));
-			else
-				foo = saprintf("%s", itoa(t->ends.tv_sec));
-
-			fprintf(f, "timer %s %s %s\n", name, foo, t->command);
-
-			xfree(foo);
-		}
-	}
-
-}
-
-/*
- * config_write_crash()
- *
- * funkcja zapisuj±ca awaryjnie konfiguracjê. nie powinna alokowaæ ¿adnej
- * pamiêci.
- */
-void config_write_crash()
-{
-	char name[32];
-	char path[PATH_MAX];
-	FILE *f;
-
-	if (config_profile)
-		snprintf(path, sizeof(path), "%s/%s", config_dir, config_profile);
-	else
-		snprintf(path, sizeof(path), "%s", config_dir);
-
-	chdir(path);
-
-	snprintf(name, sizeof(name), "config.%d", getpid());
-	if (!(f = fopen(name, "w")))
-		return;
-
-	chmod(name, 0400);
-	
-	config_write_main(f, 0);
-	
-	fclose(f);
-}
-
-/*
- * config_write()
- *
- * zapisuje aktualn± konfiguracjê -- zmienne i listê ignorowanych do pliku
- * ~/.gg/config lub podanego.
- *
- * 0/-1
- */
-int config_write()
-{
-	const char *filename;
-	FILE *f;
-
-	if (!(filename = prepare_path("config", 1)))
-		return -1;
-	
-	if (!(f = fopen(filename, "w")))
-		return -1;
-	
-	fchmod(fileno(f), 0600);
-
-	config_write_main(f, 1);
-
-	fclose(f);
-	
-	return 0;
-}
-
-/*
- * config_write_partly()
- *
- * zapisuje podane zmienne, nie zmieniaj±c reszty konfiguracji.
- *  
- *  - vars - tablica z nazwami zmiennych do zapisania.
- * 
- * 0/-1.
- */
-int config_write_partly(char **vars)
-{
-	const char *filename;
-	char *newfn, *line;
-	FILE *fi, *fo;
-	int *wrote, i;
-
-	if (!vars)
-		return -1;
-
-	if (!(filename = prepare_path("config", 1)))
-		return -1;
-	
-	if (!(fi = fopen(filename, "r")))
-		return -1;
-
-	newfn = saprintf("%s.%d.%d", filename, getpid(), time(NULL));
-
-	if (!(fo = fopen(newfn, "w"))) {
-		xfree(newfn);
-		fclose(fi);
-		return -1;
-	}
-	
-	wrote = xcalloc(array_count(vars) + 1, sizeof(int));
-	
-	fchmod(fileno(fo), 0600);
-
-	while ((line = read_file(fi))) {
-		char *tmp;
-
-		if (line[0] == '#' || line[0] == ';' || (line[0] == '/' && line[1] == '/'))
-			goto pass;
-
-		if (!strchr(line, ' '))
-			goto pass;
-
-		if (!strncasecmp(line, "ignore ", 7))
-			goto pass;
-
-		if (!strncasecmp(line, "alias ", 6))
-			goto pass;
-
-		if (!strncasecmp(line, "on ", 3))
-			goto pass;
-
-		if (!strncasecmp(line, "bind ", 5))
-			goto pass;
-
-		tmp = line;
-
-		if (!strncasecmp(tmp, "set ", 4))
-			tmp += 4;
-		
-		for (i = 0; vars[i]; i++) {
-			int len = strlen(vars[i]);
-
-			if (strlen(tmp) < len + 1)
-				continue;
-
-			if (strncasecmp(tmp, vars[i], len) || tmp[len] != ' ')
-				continue;
-			
-			config_write_variable(fo, variable_find(vars[i]), 1);
-
-			wrote[i] = 1;
-			
-			xfree(line);
-			line = NULL;
-			
-			break;
-		}
-
-		if (!line)
-			continue;
-
-pass:
-		fprintf(fo, "%s\n", line);
-		xfree(line);
-	}
-
-	for (i = 0; vars[i]; i++) {
-		if (wrote[i])
-			continue;
-
-		config_write_variable(fo, variable_find(vars[i]), 1);
-	}
-
-	xfree(wrote);
-	
-	fclose(fi);
-	fclose(fo);
-	
-	rename(newfn, filename);
-
-	xfree(newfn);
-
-	return 0;
-}
-
-
-/*
- * sysmsg_write()
- *
- *  - filename.
- *
- * 0/-1
- */
-int sysmsg_write()
-{
-	const char *filename;
-	FILE *f;
-
-	if (!(filename = prepare_path("sysmsg", 1)))
-		return -1;
-	
-	if (!(f = fopen(filename, "w")))
-		return -1;
-	
-	fchmod(fileno(f), 0600);
-	
-	fprintf(f, "last_sysmsg %i\n", last_sysmsg);
-	
-	fclose(f);
-	
-	return 0;
-}
-
-void debug_write_crash()
-{
-	char name[32];
-	FILE *f;
-	char path[PATH_MAX];
-	list_t l;
-
-	if (config_profile)
-		snprintf(path, sizeof(path), "%s/%s", config_dir, config_profile);
-	else
-		snprintf(path, sizeof(path), "%s", config_dir);
-
-	chdir(path);
-
-	snprintf(name, sizeof(name), "debug.%d", getpid());
-	if (!(f = fopen(name, "w")))
-		return;
-
-	chmod(name, 0400);
-	
-	for (l = buffers; l; l = l->next) {
-		struct buffer *b = l->data;
-
-		if (b->type == BUFFER_DEBUG)
-			fprintf(f, "%s\n", b->line);
-	}
-	
-	fclose(f);
-}
-
-/*
- * cp_to_iso()
- *
- * zamienia krzaczki pisane w cp1250 na iso-8859-2, przy okazji maskuj±c
- * znaki, których nie da siê wy¶wietliæ, za wyj±tkiem \r i \n.
- *
- *  - buf.
- */
-void cp_to_iso(unsigned char *buf)
-{
-	if (!buf)
-		return;
-
-	while (*buf) {
-		if (*buf == (unsigned char)'¥') *buf = '¡';
-		if (*buf == (unsigned char)'¹') *buf = '±';
-		if (*buf == 140) *buf = '¦';
-		if (*buf == 156) *buf = '¶';
-		if (*buf == 143) *buf = '¬';
-		if (*buf == 159) *buf = '¼';
-
-                if (*buf != 13 && *buf != 10 && (*buf < 32 || (*buf > 127 && *buf < 160)))
-                        *buf = '?';
-
-		buf++;
-	}
-}
-
-/*
- * iso_to_cp()
- *
- * zamienia sensowny format kodowania polskich znaczków na bezsensowny.
- *
- *  - buf.
- */
-void iso_to_cp(unsigned char *buf)
-{
-	if (!buf)
-		return;
-
-	while (*buf) {
-		if (*buf == (unsigned char)'¡') *buf = '¥';
-		if (*buf == (unsigned char)'±') *buf = '¹';
-		if (*buf == (unsigned char)'¦') *buf = 'Œ';
-		if (*buf == (unsigned char)'¶') *buf = 'œ';
-		if (*buf == (unsigned char)'¬') *buf = '';
-		if (*buf == (unsigned char)'¼') *buf = 'Ÿ';
-		buf++;
-	}
-}
-
-/*
- * hide_pl()
- *
- * maskuje polsk± literkê w iso.
- *
- *  - c.
- */
-unsigned char hide_pl(const unsigned char *c)
-{
-	if (*c == (unsigned char)'±') return 'a';
-	if (*c == (unsigned char)'ê') return 'e';
-	if (*c == (unsigned char)'æ') return 'c';
-	if (*c == (unsigned char)'³') return 'l';
-	if (*c == (unsigned char)'ñ') return 'n';
-	if (*c == (unsigned char)'ó') return 'o';
-	if (*c == (unsigned char)'¶') return 's';
-	if (*c == (unsigned char)'¿') return 'z';
-	if (*c == (unsigned char)'¼') return 'z';
-
-	if (*c == (unsigned char)'¡') return 'A';
-	if (*c == (unsigned char)'Ê') return 'E';
-	if (*c == (unsigned char)'Æ') return 'C';
-	if (*c == (unsigned char)'£') return 'L';
-	if (*c == (unsigned char)'Ñ') return 'N';
-	if (*c == (unsigned char)'Ó') return 'O';
-	if (*c == (unsigned char)'¦') return 'S';
-	if (*c == (unsigned char)'¯') return 'Z';
-	if (*c == (unsigned char)'¬') return 'Z';
-
-	return *c;
-}
-
-/*
- * strip_spaces()
- *
- * pozbywa siê spacji na pocz±tku i koñcu ³añcucha.
- */
-char *strip_spaces(char *line)
-{
-	char *buf;
-	
-	for (buf = line; isspace(*buf); buf++);
-
-	while (isspace(line[strlen(line) - 1]))
-		line[strlen(line) - 1] = 0;
-	
-	return buf;
-}
-
-/*
- * unidle()
- *
- * uaktualnia licznik czasu ostatniej akcji, ¿eby przypadkiem nie zrobi³o
- * autoawaya, kiedy piszemy.
- */
-void unidle()
-{
-	time(&last_action);
-}
-
-/*
- * timestamp()
- *
- * zwraca statyczny buforek z ³adnie sformatowanym czasem.
- *
- *  - format.
- */
-const char *timestamp(const char *format)
-{
-	static char buf[100];
-	time_t t;
-	struct tm *tm;
-
-	time(&t);
-	tm = localtime(&t);
-	strftime(buf, sizeof(buf), format, tm);
-
-	return buf;
-}
-
-/*
- * do_reconnect()
- *
- * je¶li jest w³±czony autoreconnect, wywo³uje timer, który za podan±
- * ilo¶æ czasu spróbuje siê po³±czyæ jeszcze raz.
- */
-void do_reconnect()
-{
-	if (config_auto_reconnect && connecting)
-		reconnect_timer = time(NULL);
-}
-
-/*
- * msg_encrypt()
- * 
- * je¶li mo¿na, podmienia wiadomo¶æ na wiadomo¶æ
- * zaszyfrowan±.
- */
-int msg_encrypt(uin_t uin, unsigned char **msg)
-{
-#ifdef HAVE_OPENSSL
-	unsigned char *enc = xmalloc(4096);	/* XXX idiotyzm */
-	int len;
-		
-	if (config_encryption == 1) {
-		memset(enc, 0, 4096);
-		
-		len = SIM_Message_Encrypt(*msg, enc, strlen(*msg), uin);
-		
-		gg_debug(GG_DEBUG_MISC, "// encrypted length: %d\n", len);
-
-		if (len > 0) {
-			xfree(*msg);
-			*msg = enc;
-			gg_debug(GG_DEBUG_MISC, "// encrypted message: %s\n", enc);
-		} else
-			xfree(enc);
-
-		return len;
-	} else {
-		char *res;
-
-		res = sim_message_encrypt(*msg, uin);
-		if (res) {
-			xfree(*msg);
-			*msg = res;
-			gg_debug(GG_DEBUG_MISC, "// simlite encrypted: %s\n", res);
-			return 1;
-		}
-		return 0;
-	}
-#else
-	return 0;
-#endif
-}
-
-/*
- * str_to_uin()
- *
- * funkcja, która zajmuje siê zamian± stringa na 
- * liczbê i sprawdzeniem, czy to prawid³owy uin.
- *
- * zwraca uin lub 0 w przypadku b³êdu.
- */
-uin_t str_to_uin(const char *text)
-{
-	char *tmp;
-	long num;
-
-	errno = 0;
-	num = strtol(text, &tmp, 0);
-
-	if (*text == '\0' || *tmp != '\0')
-		return 0;
-
-	if ((errno == ERANGE || (num == LONG_MAX || num == LONG_MIN)) || num > UINT_MAX || num < 0)
-		return 0;
-
-	return (uin_t) num;
-}
-
-/*
- * find_in_uins()
- *
- * sprawdza, czy w ci±gu uin'ów znajduje siê dany uin.
- *
- * 1 je¶li znaleziono, 0 je¶li nie.
- */
-int find_in_uins(int uin_count, uin_t *uins, uin_t uin)
-{
-	int i;
-
-	for (i = 0; i < uin_count; i++)
-		if (uins[i] == uin)
-			return 1;
-
-	return 0;
-}
-
-/*
- * valid_nick()
- *
- * sprawdza, czy nick nie zawiera znaków specjalnych,
- * co mog³oby powodowaæ problemy.
- *
- * zwraca 1 je¶li nick jest w porz±dku, w przeciwnym razie 0.
- */
-int valid_nick(const char *nick)
-{
-	int i;
-	const char *wrong[] = { "(null)", "__debug", "__status",
-				 "__current", NULL };
-
-	if (!nick)
-		return 0;
-
-	for (i = 0; wrong[i]; i++) {
-		if (!strcmp(nick, wrong[i]))
-			return 0;
-	}
-
-	if (nick[0] == '@' || nick[0] == '#' || strchr(nick, ','))
-		return 0;
-
-	return 1;
-}
-
-/*
- * mesg_set()
- *
- * w³±cza/wy³±cza mo¿liwo¶æ pisania do naszego terminala za pomoc±
- * write/talk/wall.
- *
- * - what - 0 wy³±cza, 1 w³±cza, 2 zwraca aktualne ustawienie.
- * 
- * -1 je¶li b³ad, lub aktualny stan (0/1)
-*/
-int mesg_set(int what)
-{
-	const char *tty;
-	struct stat s;
-
-	if (!(tty = ttyname(1)))
-		return -1;
-
-	if (!stat(tty, &s))
-		return -1;
-
-	switch (what) {
-		case 0:
-			chmod(tty, s.st_mode & ~S_IWGRP);
-			break;
-		case 1:
-			chmod(tty, s.st_mode | S_IWGRP);
-			break;
-		case 2:
-			return ((s.st_mode & S_IWGRP) ? 1 : 0);
-	}
-
-	return 0;
-}
-
-/*
- * mesg_changed()
- *
- * wywo³ywane przy zmianie ustawieñ.
-*/
-void mesg_changed()
-{
-	if ((config_mesg_allow == 0 || config_mesg_allow == 1) && mesg_set(2) != config_mesg_allow)
-		mesg_set(config_mesg_allow);
-}
-
-/*
- * sms_away_add()
- *
- * dodaje osobê do listy delikwentów, od których wiadomo¶æ wys³ano sms'em
- * podczas naszej nieobecno¶ci. je¶li jest ju¿ na li¶cie, to zwiêksza 
- * przyporz±dkowany mu licznik.
- *
- * - uin.
- */
-void sms_away_add(uin_t uin)
-{
-	struct sms_away sa;
-	list_t l;
-
-	if (!config_sms_away_limit)
-		return;
-
-	sa.uin = uin;
-	sa.count = 1;
-
-	for (l = sms_away; l; l = l->next) {
-		struct sms_away *s = l->data;
-
-		if (s->uin == uin) {
-			s->count += 1;
-			return;
-		}
-	}
-
-	list_add(&sms_away, &sa, sizeof(sa));
-}
-
-/*
- * sms_away_check()
- *
- * sprawdza czy wiadomo¶æ od danej osoby mo¿e zostaæ przekazana
- * na sms podczas naszej nieobecno¶ci, czy te¿ mo¿e przekroczono
- * ju¿ limit.
- *
- *  - uin
- *
- * 1 je¶li tak, 0 je¶li nie.
- */
-int sms_away_check(uin_t uin)
-{
-	int x = 0;
-	list_t l;
-
-	if (!config_sms_away_limit || !sms_away)
-		return 1;
-
-	/* limit dotyczy ³±cznej liczby sms'ów */
-	if (config_sms_away == 1) {
-		for (l = sms_away; l; l = l->next) {
-			struct sms_away *s = l->data;
-
-			x += s->count;
-		}
-		
-		if (x > config_sms_away_limit)
-			return 0;
-		else
-			return 1;
-	}
-
-	/* limit dotyczy liczby sms'ów od jednej osoby */
-	for (l = sms_away; l; l = l->next) {
-		struct sms_away *s = l->data;
-
-		if (s->uin == uin) {
-			if (s->count > config_sms_away_limit)
-				return 0;
-			else 
-				return 1;
-		}
-	}
-
-	return 1;
-}
-
-/*
- * sms_away_free()
- *
- * pozbywa siê listy sms_away.
- */
-void sms_away_free()
-{
-	if (!sms_away)
-		return;
-
-	list_destroy(sms_away, 1);
-	sms_away = NULL;
-}
-
-/*
- * send_sms()
- *
- * wysy³a sms o podanej tre¶ci do podanej osoby.
- *
- * 0/-1
- */
-int send_sms(const char *recipient, const char *message, int show_result)
-{
-	int pid, fd[2] = { 0, 0 };
-	struct gg_exec s;
-	char *tmp;
-
-	if (!config_sms_app) {
-		errno = EINVAL;
-		return -1;
-	}
-
-	if (!recipient || !message) {
-		errno = EINVAL;
-		return -1;
-	}
-
-	if (pipe(fd))
-		return -1;
-		
-	if (!(pid = fork())) {
-		if (fd[1]) {
-			close(fd[0]);
-			dup2(fd[1], 2);
-			dup2(fd[1], 1);
-			close(fd[1]);
-		}	
-		execlp(config_sms_app, config_sms_app, recipient, message, (void *) NULL);
-		exit(1);
-	}
-
-	if (pid < 0) {
-		close(fd[0]);
-		close(fd[1]);
-		return -1;
-	}
-
-	memset(&s, 0, sizeof(s));
-	
-	s.fd = fd[0];
-	s.check = GG_CHECK_READ;
-	s.state = GG_STATE_READING_DATA;
-	s.type = GG_SESSION_USER3;
-	s.id = pid;
-	s.timeout = 60;
-	s.buf = string_init(NULL);
-
-	fcntl(s.fd, F_SETFL, O_NONBLOCK);
-
-	list_add(&watches, &s, sizeof(s));
-	close(fd[1]);
-	
-	tmp = saprintf((show_result) ? "\001%s" : "\002%s", recipient);
-	process_add(pid, tmp);
-	xfree(tmp);
-
-	return 0;
-}
-
-/*
- * play_sound()
- *
- * odtwarza dzwiêk o podanej nazwie.
- *
- * 0/-1
- */
-int play_sound(const char *sound_path)
-{
-	int pid;
-
-	if (!config_sound_app || !sound_path) {
-		errno = EINVAL;
-		return -1;
-	}
-
-	if ((pid = fork()) == -1)
-		return -1;
-
-	if (!pid) {
-		int i;
-
-		for (i = 0; i < 255; i++)
-			close(i);
-			
-		execlp(config_sound_app, config_sound_app, sound_path, (void *) NULL);
-		exit(1);
-	}
-
-	process_add(pid, "\002");
-
-	return 0;
-}
-
-/*
- * read_file()
- *
- * czyta i zwraca linijkê tekstu z pliku alokuj±c przy tym odpowiedni buforek.
- * usuwa znaki koñca linii.
- */
-char *read_file(FILE *f)
-{
-	char buf[1024], *res = NULL;
-
-	while (fgets(buf, sizeof(buf) - 1, f)) {
-		int first = (res) ? 0 : 1;
-		int new_size = ((res) ? strlen(res) : 0) + strlen(buf) + 1;
-
-		res = xrealloc(res, new_size);
-		if (first)
-			*res = 0;
-		strcpy(res + strlen(res), buf);
-		
-		if (strchr(buf, '\n'))
-			break;
-	}
-
-	if (res && strlen(res) > 0 && res[strlen(res) - 1] == '\n')
-		res[strlen(res) - 1] = 0;
-	if (res && strlen(res) > 0 && res[strlen(res) - 1] == '\r')
-		res[strlen(res) - 1] = 0;
-
-	return res;
-}
-
-/*
- * process_add()
- *
- * dopisuje do listy uruchomionych dzieci procesów.
- *
- *  - pid.
- *  - name.
- *
- * 0/-1
- */
-int process_add(int pid, const char *name)
-{
-	struct process p;
-
-	p.pid = pid;
-	p.name = xstrdup(name);
-	
-	return (list_add(&children, &p, sizeof(p)) ? 0 : -1);
-}
-
-/*
- * process_remove()
- *
- * usuwa proces z listy dzieciaków.
- *
- *  - pid.
- * 
- * 0/-1
- */
-int process_remove(int pid)
-{
-	list_t l;
-
-	for (l = children; l; l = l->next) {
-		struct process *p = l->data;
-
-		if (p->pid == pid) {
-			list_remove(&children, p, 1);
-			return 0;
-		}
-	}
-
-	return -1;
-}
-
-/*
- * on_off()
- *
- * zwraca 1 je¶li tekst znaczy w³±czyæ, 0 je¶li wy³±czyæ, -1 je¶li co innego.
- *
- *  - value.
- */
-int on_off(const char *value)
-{
-	if (!value)
-		return -1;
-
-	if (!strcasecmp(value, "on") || !strcasecmp(value, "true") || !strcasecmp(value, "yes") || !strcasecmp(value, "tak") || !strcmp(value, "1"))
-		return 1;
-
-	if (!strcasecmp(value, "off") || !strcasecmp(value, "false") || !strcasecmp(value, "no") || !strcasecmp(value, "nie") || !strcmp(value, "0"))
-		return 0;
-
-	return -1;
-}
-
-/*
- * conference_set_ignore()
- *
- * ustawia stan konferencji na ignorowany lub nie.
- *
- * - name - nazwa konferencji,
- * - flag - 1 ignorowaæ, 0 nie ignorowaæ.
- *
- * 0/-1
- */
-int conference_set_ignore(const char *name, int flag)
-{
-	struct conference *c = NULL;
-
-	if (name[0] != '#') {
-		print("conferences_name_error");
-		return -1;
-	}
-
-	c = conference_find(name);
-
-	if (!c) {
-		print("conferences_noexist", name);
-		return -1;
-	}
-
-	c->ignore = flag ? 1 : 0;
-	print(flag ? "conferences_ignore" : "conferences_unignore", name);
-
-	return 0;
-}
-
-/*
- * conference_rename()
- *
- * zmienia nazwê instniej±cej konferencji.
- * 
- *  - oldname - stara nazwa,
- *  - newname - nowa nazwa.
- *
- * 0/-1
- */
-int conference_rename(const char *oldname, const char *newname)
-{
-	struct conference *c;
-	
-	if (oldname[0] != '#' || newname[0] != '#') {
-		print("conferences_name_error");
-		return -1;
-	}
-	
-	if (conference_find(newname)) {
-		print("conferences_exist", newname);
-		return -1;
-	}
-
-	if (!(c = conference_find(oldname))) {
-		print("conference_noexist", oldname);
-		return -1;
-	}
-
-	xfree(c->name);
-	c->name = xstrdup(newname);
-	remove_send_nick(oldname);
-	add_send_nick(newname);
-
-	print("conferences_rename", oldname, newname);
-
-	ui_event("conference_rename", oldname, newname);
-	
-	return 0;
-}
-
-/*
- * conference_add()
- *
- * dopisuje konferencje do listy konferencji.
- *
- *  - name - nazwa konferencji,
- *  - nicklist - lista nicków, grup, czegokolwiek,
- *  - quiet - czy wypluwaæ mesgi na stdout.
- *
- * zaalokowan± struct conference lub NULL w przypadku b³êdu.
- */
-struct conference *conference_add(const char *name, const char *nicklist, int quiet)
-{
-	struct conference c;
-	char **nicks, **p;
-	char *buf;
-	list_t l;
-	int i, count;
-
-	memset(&c, 0, sizeof(c));
-
-	if (!name || !nicklist) {
-		if (!quiet)
-			print("not_enough_params", "conference");
-		return NULL;
-	}
-
-	if (name[0] != '#') {
-		if (!quiet) 
-			print("conferences_name_error");
-		return NULL;
-	}
-
-	buf = xstrdup(nicklist);
-	buf = strip_spaces(buf);
-	
-	if (buf[0] == ',' || buf[strlen(buf)-1] == ',') {
-		if (!quiet)
-			print("invalid_params", "chat");
-		xfree(buf);
-		return NULL;
-	}
-
-	xfree(buf);
-
-	nicks = array_make(nicklist, " ,", 0, 1, 0);
-
-	/* grupy zamieniamy na niki */
-	for (i = 0; nicks[i]; i++) {
-		if (nicks[i][0] == '@') {
-			char *gname = xstrdup(nicks[i] + 1);
-			int first = 0;
-			int nig = 0; /* nicks in group */
-
-		        for (l = userlist; l; l = l->next) {
-				struct userlist *u = l->data;
-				list_t m;
-
-				for (m = u->groups; m; m = m->next) {
-					struct group *g = m->data;
-
-					if (!strcasecmp(gname, g->name)) {
-						if (first++)
-							array_add(&nicks, xstrdup(u->display));
-						else {
-							xfree(nicks[i]);
-							nicks[i] = xstrdup(u->display);
-						}
-
-						nig++;
-
-						break;
-					}
-				}
-			}
-
-			if (!nig) {
-				if (!quiet) {
-					print("group_empty", gname);
-					print("conferences_not_added", name);
-				}
-
-				xfree(gname);
-
-				return NULL;
-			}
-
-			xfree(gname);
-		}
-	}
-
-	count = array_count(nicks);
-
-	for (l = conferences; l; l = l->next) {
-		struct conference *cf = l->data;
-		
-		if (!strcasecmp(name, cf->name)) {
-			if (!quiet)
-				print("conferences_exist", name);
-
-			array_free(nicks);
-
-			return NULL;
-		}
-	}
-
-	for (p = nicks, i = 0; *p; p++) {
-		uin_t uin;
-
-		if (!strcmp(*p, ""))
-		        continue;
-
-		if (!(uin = get_uin(*p))) {
-			if (!quiet)
-			        print("user_not_found", *p);
-			continue;
-		}
-
-
-		list_add(&(c.recipients), &uin, sizeof(uin));
-		i++;
-	}
-
-	array_free(nicks);
-
-	if (i != count) {
-		if (!quiet)
-			print("conferences_not_added", name);
-
-		return NULL;
-	}
-
-	if (!quiet)
-		print("conferences_add", name);
-
-	c.name = xstrdup(name);
-
-	add_send_nick(name);
-
-	return list_add(&conferences, &c, sizeof(c));
-}
-
-/*
- * conference_free()
- *
- * usuwa pamiêæ zajêt± przez konferencje.
- */
-void conference_free()
-{
-	list_t l;
-
-	for (l = conferences; l; l = l->next) {
-		struct conference *c = l->data;
-		
-		xfree(c->name);
-		list_destroy(c->recipients, 1);
-	}
-
-	list_destroy(conferences, 1);
-	conferences = NULL;
-}
-
-/*
- * conference_remove()
- *
- * usuwa konferencje z listy konferencji.
- *
- * - name - konferencja lub NULL dla wszystkich.
- *
- * 0/-1
- */
-int conference_remove(const char *name)
-{
-	list_t l;
-	int removed = 0;
-
-	for (l = conferences; l; ) {
-		struct conference *c = l->data;
-
-		l = l->next;
-
-		if (!name || !strcasecmp(c->name, name)) {
-			if (name)
-				print("conferences_del", name);
-			remove_send_nick(c->name);
-			xfree(c->name);
-			list_destroy(c->recipients, 1);
-			list_remove(&conferences, c, 1);
-			removed = 1;
-		}
-	}
-
-	if (!removed) {
-		if (name)
-			print("conferences_noexist", name);
-		else
-			print("conferences_list_empty");
-		
-		return -1;
-	}
-
-	if (removed && !name) {
-		print("conferences_del_all");
-		return 0;
-	}
-
-	return 0;
-}
-
-/*
- * conference_create()
- *
- * tworzy nowa konferencje z wygenerowana nazwa.
- *
- * - nicks - lista nikow tak, jak dla polecenia conference.
- */
-struct conference *conference_create(const char *nicks)
-{
-	struct conference *c;
-	static int count = 1;
-	char *name = saprintf("#conf%d", count++);
-
-	c = conference_add(name, nicks, 0);
-
-	xfree(name);
-
-	return c;
-}
-
-/*
- * conference_find()
- *
- * znajduje i zwraca wska¼nik do konferencji lub NULL.
- *
- *  - name - nazwa konferencji.
- */
-struct conference *conference_find(const char *name) 
-{
-	list_t l;
-
-	for (l = conferences; l; l = l->next) {
-		struct conference *c = l->data;
-
-		if (!strcmp(c->name, name))
-			return c;
-	}
-	
-	return NULL;
-}
-
-/*
- * conference_find_by_uins()
- *
- * znajduje konferencjê, do której nale¿± podane uiny. je¿eli nie znaleziono,
- * zwracany jest NULL.
- * 
- *  - from - kto jest nadawc± wiadomo¶ci,
- *  - recipients - tablica numerów nale¿±cych do konferencji,
- *  - count - ilo¶æ numerów.
- */
-struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int count) 
-{
-	int i;
-	list_t l, r;
-
-	for (l = conferences; l; l = l->next) {
-		struct conference *c = l->data;
-		int matched = 0;
-
-		for (r = c->recipients; r; r = r->next) {
-			for (i = 0; i <= count; i++) {
-				uin_t uin = (i == count) ? from : recipients[i];
-				
-				if (uin == *((uin_t *) (r->data))) {
-					matched++;
-					break;
-				}
-			}
-		}
-
-		if (matched == list_count(c->recipients) && matched == (from == config_uin ? count : count + 1))
-			return l->data;
-	}
-
-	return NULL;
-}
 
 /*
  * alias_add()
@@ -2133,6 +377,9 @@ void alias_free()
 {
 	list_t l;
 
+	if (!aliases)
+		return;
+
 	for (l = aliases; l; l = l->next) {
 		struct alias *a = l->data;
 		
@@ -2144,185 +391,1484 @@ void alias_free()
 	aliases = NULL;
 }
 
-#ifdef WITH_IOCTLD
+/*
+ * base64_encode()
+ *
+ * zapisuje ci±g znaków w base64. alokuje pamiêæ. 
+ */
+char *base64_encode(const char *buf)
+{
+	char *tmp = gg_base64_encode(buf);
+
+	if (!buf)
+		return xstrdup("");
+
+	if (!tmp)
+		ekg_oom_handler();
+
+	return tmp;
+}
 
 /*
- * ioctld_parse_seq()
+ * base64_decode()
  *
- * zamieñ string na odpowiedni± strukturê dla ioctld.
- *
- *  - seq,
- *  - data.
- *
- * 0/-1.
+ * wczytuje ci±g znaków base64, zwraca zaalokowany buforek.
  */
-int ioctld_parse_seq(const char *seq, struct action_data *data)
+char *base64_decode(const char *buf)
 {
-        char tmp_buff[16] = "";
-        int i = 0, a, l = 0, default_delay = DEFAULT_DELAY;
+	char *tmp = gg_base64_decode(buf);
 
-        if (!data || !seq || !isdigit(seq[0]))
-                return -1;
+	if (!buf)
+		return xstrdup("");
 
-        for (a = 0; a <= strlen(seq) && a < MAX_ITEMS; a++) {
-                if (i > 15)
-			return -1;
-                if (isdigit(seq[a]))
-                        tmp_buff[i++] = seq[a];
-                else if (seq[a] == '/') {
-                        data->value[l] = atoi(tmp_buff);
-                        memset(tmp_buff, 0, 16);
-                        for (i = 0; isdigit(seq[++a]); i++)
-                                tmp_buff[i] = seq[a];
-                        data->delay[l] = default_delay = atoi(tmp_buff);
-                        memset(tmp_buff, 0, 16);
-                        i = 0;
-                        l++;
-                }
-                else if (seq[a] == ',') {
-                        data->value[l] = atoi(tmp_buff);
-                        data->delay[l] = default_delay;
-                        memset(tmp_buff, 0, 16);
-                        i = 0;
-                        l++;
-                } else if (seq[a] == ' ')
-                        continue;
-                else if (seq[a] == '\0') {
-                        data->value[l] = atoi(tmp_buff);
-                        data->delay[l] = default_delay;
-                        data->value[++l] = data->delay[l] = -1;
-                } else
-			return -1;
-        }
+	if (!tmp)
+		ekg_oom_handler();
+
+	return tmp;
+}
+
+/*
+ * binding_list()
+ *
+ * wy¶wietla listê przypisanych komend.
+ */
+void binding_list() 
+{
+	list_t l;
+
+	if (!bindings)
+		print("bind_seq_list_empty");
+
+	for (l = bindings; l; l = l->next) {
+		struct binding *b = l->data;
+
+		print("bind_seq_list", b->key, b->action);
+	}
+}
+
+/*
+ * binding_free()
+ *
+ * zwalnia pamiêæ po li¶cie przypisanych klawiszy.
+ */
+void binding_free() 
+{
+	list_t l;
+
+	if (!bindings)
+		return;
+
+	for (l = bindings; l; l = l->next) {
+		struct binding *b = l->data;
+
+		xfree(b->key);
+		xfree(b->action);
+	}
+
+	list_destroy(bindings, 1);
+	bindings = NULL;
+}
+
+/*
+ * buffer_add()
+ *
+ * dodaje linijkê do danego typu bufora. je¶li max_lines > 0
+ * to pilnuje, aby w buforze by³o maksymalnie tyle linii.
+ *
+ *  - type,
+ *  - line,
+ *  - max_lines.
+ *
+ * 0/-1
+ */
+int buffer_add(int type, const char *line, int max_lines)
+{
+	struct buffer b;
+
+	if (max_lines && buffer_count(type) >= max_lines) {
+		struct buffer *foo = buffers->data;
+
+		xfree(foo->line);
+		list_remove(&buffers, foo, 1);
+	}
+
+	b.type = type;
+	b.line = xstrdup(line);
+
+	return ((list_add(&buffers, &b, sizeof(b)) ? 0 : -1));
+}
+
+/*
+ * buffer_count()
+ *
+ * zwraca liczbê linii w buforze danego typu.
+ */
+int buffer_count(int type)
+{
+	list_t l;
+	int count = 0;
+
+	for (l = buffers; l; l = l->next) {
+		struct buffer *b = l->data;
+
+		if (b->type == type)
+			count++;
+	}	
+
+	return count;
+}
+
+/*
+ * buffer_free()
+ * 
+ * czy¶ci pamiêæ po buforach.
+ */
+void buffer_free()
+{
+	list_t l;
+
+	if (!buffers)
+		return;
+
+	for (l = buffers; l; l = l->next) {
+		struct buffer *b = l->data;
+
+		xfree(b->line);
+	}
+
+	list_destroy(buffers, 1);
+	buffers = NULL;
+}
+
+/*
+ * changed_dcc()
+ *
+ * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,dcc''.
+ */
+void changed_dcc(const char *var)
+{
+	struct userlist *u = userlist_find(config_uin, NULL);
+	struct gg_dcc *dcc = NULL;
+	list_t l;
+	
+	if (!config_uin)
+		return;
+	
+	if (!strcmp(var, "dcc")) {
+		for (l = watches; l; l = l->next) {
+			struct gg_common *c = l->data;
+	
+			if (c->type == GG_SESSION_DCC_SOCKET)
+				dcc = l->data;
+		}
+	
+		if (!config_dcc && dcc) {
+			list_remove(&watches, dcc, 0);
+			gg_free_dcc(dcc);
+		}
+	
+		if (config_dcc && !dcc) {
+			if (!(dcc = gg_dcc_socket_create(config_uin, 0))) {
+				print("dcc_create_error", strerror(errno));
+			} else {
+				list_add(&watches, dcc, 0);
+			}
+		}
+
+		if (u && dcc)
+			u->port = dcc->port;
+	}
+
+	if (!strcmp(var, "dcc_ip")) {
+		if (config_dcc_ip) {
+			if (!strcasecmp(config_dcc_ip, "auto")) {
+				gg_dcc_ip = inet_addr("255.255.255.255");
+			} else {
+				if (inet_addr(config_dcc_ip) != INADDR_NONE)
+					gg_dcc_ip = inet_addr(config_dcc_ip);
+				else {
+					print("dcc_invalid_ip");
+					config_dcc_ip = NULL;
+					gg_dcc_ip = 0;
+				}
+			}
+		} else
+			gg_dcc_ip = 0;
+
+		if (u)
+			u->ip.s_addr = gg_dcc_ip;
+	}
+
+	update_status_myip();
+}
+	
+/*
+ * changed_proxy()
+ *
+ * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,proxy''.
+ */
+void changed_proxy(const char *var)
+{
+	char **auth, **userpass = NULL, **hostport = NULL;
+	
+	gg_proxy_port = 0;
+	xfree(gg_proxy_host);
+	gg_proxy_host = NULL;
+	xfree(gg_proxy_username);
+	gg_proxy_username = NULL;
+	xfree(gg_proxy_password);
+	gg_proxy_password = NULL;
+
+	if (!config_proxy)
+		return;
+
+	auth = array_make(config_proxy, "@", 0, 0, 0);
+
+	if (!auth[0] || !strcmp(auth[0], ""))
+		return; 
+	
+	gg_proxy_enabled = 1;
+
+	if (auth[0] && auth[1]) {
+		userpass = array_make(auth[0], ":", 0, 0, 0);
+		hostport = array_make(auth[1], ":", 0, 0, 0);
+	} else
+		hostport = array_make(auth[0], ":", 0, 0, 0);
+	
+	if (userpass && userpass[0] && userpass[1]) {
+		gg_proxy_username = xstrdup(userpass[0]);
+		gg_proxy_password = xstrdup(userpass[1]);
+	}
+
+	gg_proxy_host = xstrdup(hostport[0]);
+	gg_proxy_port = (hostport[1]) ? atoi(hostport[1]) : 8080;
+
+	array_free(hostport);
+	array_free(userpass);
+	array_free(auth);
+}
+
+/*
+ * changed_theme()
+ *
+ * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,theme''.
+ */
+void changed_theme(const char *var)
+{
+	if (!config_theme) {
+		theme_init();
+		ui_event("theme_init");
+	} else {
+		if (!theme_read(config_theme, 1)) {
+			theme_cache_reset();
+			if (!in_autoexec)
+				print("theme_loaded", config_theme);
+		} else
+			if (!in_autoexec)
+				print("error_loading_theme", strerror(errno));
+	}
+}
+
+/*
+ * changed_uin()
+ *
+ * funkcja wywo³ywana przy zmianie zmiennej uin.
+ */
+void changed_uin(const char *var)
+{
+	ui_event("xterm_update");
+}
+
+/*
+ * changed_xxx_reason()
+ *
+ * funkcja wywo³ywana przy zmianie domy¶lnych powodów.
+ */
+void changed_xxx_reason(const char *var)
+{
+	char *tmp = NULL;
+
+	if (!strcmp(var, "away_reason"))
+		tmp = config_away_reason;
+	if (!strcmp(var, "back_reason"))
+		tmp = config_back_reason;
+	if (!strcmp(var, "quit_reason"))
+		tmp = config_quit_reason;
+
+	if (!tmp)
+		return;
+
+	if (strlen(tmp) > GG_STATUS_DESCR_MAXSIZE)
+		print("descr_too_long", itoa(strlen(tmp) - GG_STATUS_DESCR_MAXSIZE));
+}
+
+/*
+ * conference_add()
+ *
+ * dopisuje konferencje do listy konferencji.
+ *
+ *  - name - nazwa konferencji,
+ *  - nicklist - lista nicków, grup, czegokolwiek,
+ *  - quiet - czy wypluwaæ mesgi na stdout.
+ *
+ * zaalokowan± struct conference lub NULL w przypadku b³êdu.
+ */
+struct conference *conference_add(const char *name, const char *nicklist, int quiet)
+{
+	struct conference c;
+	char **nicks, **p;
+	char *buf;
+	list_t l;
+	int i, count;
+
+	memset(&c, 0, sizeof(c));
+
+	if (!name || !nicklist) {
+		if (!quiet)
+			print("not_enough_params", "conference");
+		return NULL;
+	}
+
+	if (name[0] != '#') {
+		if (!quiet) 
+			print("conferences_name_error");
+		return NULL;
+	}
+
+	buf = xstrdup(nicklist);
+	buf = strip_spaces(buf);
+	
+	if (buf[0] == ',' || buf[strlen(buf)-1] == ',') {
+		if (!quiet)
+			print("invalid_params", "chat");
+		xfree(buf);
+		return NULL;
+	}
+
+	xfree(buf);
+
+	nicks = array_make(nicklist, " ,", 0, 1, 0);
+
+	/* grupy zamieniamy na niki */
+	for (i = 0; nicks[i]; i++) {
+		if (nicks[i][0] == '@') {
+			char *gname = xstrdup(nicks[i] + 1);
+			int first = 0;
+			int nig = 0; /* nicks in group */
+
+		        for (l = userlist; l; l = l->next) {
+				struct userlist *u = l->data;
+				list_t m;
+
+				for (m = u->groups; m; m = m->next) {
+					struct group *g = m->data;
+
+					if (!strcasecmp(gname, g->name)) {
+						if (first++)
+							array_add(&nicks, xstrdup(u->display));
+						else {
+							xfree(nicks[i]);
+							nicks[i] = xstrdup(u->display);
+						}
+
+						nig++;
+
+						break;
+					}
+				}
+			}
+
+			if (!nig) {
+				if (!quiet) {
+					print("group_empty", gname);
+					print("conferences_not_added", name);
+				}
+
+				xfree(gname);
+
+				return NULL;
+			}
+
+			xfree(gname);
+		}
+	}
+
+	count = array_count(nicks);
+
+	for (l = conferences; l; l = l->next) {
+		struct conference *cf = l->data;
+		
+		if (!strcasecmp(name, cf->name)) {
+			if (!quiet)
+				print("conferences_exist", name);
+
+			array_free(nicks);
+
+			return NULL;
+		}
+	}
+
+	for (p = nicks, i = 0; *p; p++) {
+		uin_t uin;
+
+		if (!strcmp(*p, ""))
+		        continue;
+
+		if (!(uin = get_uin(*p))) {
+			if (!quiet)
+			        print("user_not_found", *p);
+			continue;
+		}
+
+
+		list_add(&(c.recipients), &uin, sizeof(uin));
+		i++;
+	}
+
+	array_free(nicks);
+
+	if (i != count) {
+		if (!quiet)
+			print("conferences_not_added", name);
+
+		return NULL;
+	}
+
+	if (!quiet)
+		print("conferences_add", name);
+
+	c.name = xstrdup(name);
+
+	add_send_nick(name);
+
+	return list_add(&conferences, &c, sizeof(c));
+}
+
+/*
+ * conference_remove()
+ *
+ * usuwa konferencje z listy konferencji.
+ *
+ *  - name - konferencja lub NULL dla wszystkich.
+ *
+ * 0/-1
+ */
+int conference_remove(const char *name)
+{
+	list_t l;
+	int removed = 0;
+
+	for (l = conferences; l; ) {
+		struct conference *c = l->data;
+
+		l = l->next;
+
+		if (!name || !strcasecmp(c->name, name)) {
+			if (name)
+				print("conferences_del", name);
+			remove_send_nick(c->name);
+			xfree(c->name);
+			list_destroy(c->recipients, 1);
+			list_remove(&conferences, c, 1);
+			removed = 1;
+		}
+	}
+
+	if (!removed) {
+		if (name)
+			print("conferences_noexist", name);
+		else
+			print("conferences_list_empty");
+		
+		return -1;
+	}
+
+	if (removed && !name) {
+		print("conferences_del_all");
+		return 0;
+	}
 
 	return 0;
 }
 
 /*
- * ioctld_socket()
+ * conference_create()
  *
- * inicjuje gniazdo dla ioctld.
+ * tworzy nowa konferencje z wygenerowana nazwa.
  *
- *  - path - ¶cie¿ka do gniazda.
- *
- * 0/-1.
+ *  - nicks - lista nikow tak, jak dla polecenia conference.
  */
-int ioctld_socket(char *path)
+struct conference *conference_create(const char *nicks)
 {
-	struct sockaddr_un sockun;
-	int i, retry = 5, usecs = 50000;
+	struct conference *c;
+	static int count = 1;
+	char *name = saprintf("#conf%d", count++);
 
-	if (ioctld_sock != -1)
-		close(ioctld_sock);
+	c = conference_add(name, nicks, 0);
 
-	if ((ioctld_sock = socket(AF_UNIX, SOCK_DGRAM, 0)) == -1)
-		return -1;
+	xfree(name);
 
-	sockun.sun_family = AF_UNIX;
-	strcpy(sockun.sun_path, path);
+	return c;
+}
 
-	for (i = 0; i <= retry; i++) {
-		if (connect(ioctld_sock, (struct sockaddr*) &sockun, sizeof(sockun)) != -1)
-			return 0;
-		usleep(usecs);
+/*
+ * conference_find()
+ *
+ * znajduje i zwraca wska¼nik do konferencji lub NULL.
+ *
+ *  - name - nazwa konferencji.
+ */
+struct conference *conference_find(const char *name) 
+{
+	list_t l;
+
+	for (l = conferences; l; l = l->next) {
+		struct conference *c = l->data;
+
+		if (!strcmp(c->name, name))
+			return c;
+	}
+	
+	return NULL;
+}
+
+/*
+ * conference_find_by_uins()
+ *
+ * znajduje konferencjê, do której nale¿± podane uiny. je¿eli nie znaleziono,
+ * zwracany jest NULL.
+ * 
+ *  - from - kto jest nadawc± wiadomo¶ci,
+ *  - recipients - tablica numerów nale¿±cych do konferencji,
+ *  - count - ilo¶æ numerów.
+ */
+struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int count) 
+{
+	int i;
+	list_t l, r;
+
+	for (l = conferences; l; l = l->next) {
+		struct conference *c = l->data;
+		int matched = 0;
+
+		for (r = c->recipients; r; r = r->next) {
+			for (i = 0; i <= count; i++) {
+				uin_t uin = (i == count) ? from : recipients[i];
+				
+				if (uin == *((uin_t *) (r->data))) {
+					matched++;
+					break;
+				}
+			}
+		}
+
+		if (matched == list_count(c->recipients) && matched == (from == config_uin ? count : count + 1))
+			return l->data;
 	}
 
-        return -1;
+	return NULL;
 }
 
 /*
- * ioctld_send()
+ * conference_set_ignore()
  *
- * wysy³a do ioctld polecenie uruchomienia danej akcji.
+ * ustawia stan konferencji na ignorowany lub nie.
  *
- *  - seq - sekwencja danych,
- *  - act - rodzaj akcji.
+ *  - name - nazwa konferencji,
+ *  - flag - 1 ignorowaæ, 0 nie ignorowaæ.
  *
- * 0/-1.
+ * 0/-1
  */
-int ioctld_send(const char *seq, int act)
+int conference_set_ignore(const char *name, int flag)
 {
-	const char *s;
-	struct action_data data;
+	struct conference *c = NULL;
 
-	if (*seq == '$') {
-		seq++;
-		s = format_find(seq);
-		if (!strcmp(s, "")) {
-			print("events_seq_not_found", seq);
-			return -1;
-		}
-	} else
-		s = seq;
+	if (name[0] != '#') {
+		print("conferences_name_error");
+		return -1;
+	}
 
-	data.act = act;
+	c = conference_find(name);
 
-	if (ioctld_parse_seq(s, &data))
+	if (!c) {
+		print("conferences_noexist", name);
+		return -1;
+	}
+
+	c->ignore = flag ? 1 : 0;
+	print(flag ? "conferences_ignore" : "conferences_unignore", name);
+
+	return 0;
+}
+
+/*
+ * conference_rename()
+ *
+ * zmienia nazwê instniej±cej konferencji.
+ * 
+ *  - oldname - stara nazwa,
+ *  - newname - nowa nazwa.
+ *
+ * 0/-1
+ */
+int conference_rename(const char *oldname, const char *newname)
+{
+	struct conference *c;
+	
+	if (oldname[0] != '#' || newname[0] != '#') {
+		print("conferences_name_error");
+		return -1;
+	}
+	
+	if (conference_find(newname)) {
+		print("conferences_exist", newname);
+		return -1;
+	}
+
+	if (!(c = conference_find(oldname))) {
+		print("conference_noexist", oldname);
+		return -1;
+	}
+
+	xfree(c->name);
+	c->name = xstrdup(newname);
+	remove_send_nick(oldname);
+	add_send_nick(newname);
+
+	print("conferences_rename", oldname, newname);
+
+	ui_event("conference_rename", oldname, newname);
+	
+	return 0;
+}
+
+/*
+ * conference_free()
+ *
+ * usuwa pamiêæ zajêt± przez konferencje.
+ */
+void conference_free()
+{
+	list_t l;
+
+	if (!conferences)
+		return;
+
+	for (l = conferences; l; l = l->next) {
+		struct conference *c = l->data;
+		
+		xfree(c->name);
+		list_destroy(c->recipients, 1);
+	}
+
+	list_destroy(conferences, 1);
+	conferences = NULL;
+}
+
+/*
+ * config_read()
+ *
+ * czyta z pliku ~/.gg/config lub podanego konfiguracjê.
+ *
+ *  - filename,
+ *  - var - zmienna lub NULL, je¶li wszystkie.
+ *
+ * 0/-1
+ */
+int config_read(const char *filename, const char *var)
+{
+	char *buf, *foo;
+	FILE *f;
+
+	if (!filename && !(filename = prepare_path("config", 0)))
+		return -1;
+	
+	if (!(f = fopen(filename, "r")))
 		return -1;
 
-	return send(ioctld_sock, &data, sizeof(data), 0);
+	while ((buf = read_file(f))) {
+		if (buf[0] == '#' || buf[0] == ';' || (buf[0] == '/' && buf[1] == '/')) {
+			xfree(buf);
+			continue;
+		}
+
+		if (!(foo = strchr(buf, ' ')) || (var && strcmp(buf, var))) {
+			xfree(buf);
+			continue;
+		}
+
+		*foo++ = 0;
+
+		if (!strcasecmp(buf, "set")) {
+			char *bar;
+
+			if (!(bar = strchr(foo, ' ')))
+				variable_set(foo, NULL, 1);
+			else {
+				*bar++ = 0;
+				variable_set(foo, bar, 1);
+			}
+		} else if (!strcasecmp(buf, "ignore")) {
+			if (atoi(foo))
+				ignored_add(atoi(foo), IGNORE_ALL);
+		} else if (!strcasecmp(buf, "alias")) {
+			alias_add(foo, 1, 1);
+		} else if (!strcasecmp(buf, "on")) {
+                        int flags;
+                        uin_t uin;
+                        char **pms = array_make(foo, " \t", 3, 1, 0);
+
+                        if (pms && pms[0] && pms[1] && pms[2] && (flags = event_flags(pms[0])) && (uin = atoi(pms[1]))) {
+				if (event_correct(pms[2], 1))
+					flags |= INACTIVE_EVENT; /* nieaktywne */
+                                event_add(flags, atoi(pms[1]), pms[2], 1);
+			}
+
+			array_free(pms);
+		} else if (!strcasecmp(buf, "bind")) {
+			char **pms = array_make(foo, " \t", 2, 1, 0);
+
+			gg_debug(GG_DEBUG_MISC, "bind %s %s\n", pms[0], pms[1]);
+
+			if (pms && pms[0] && pms[1]) 
+				ui_event("command", "bind", "--add-quiet", pms[0], pms[1], NULL);
+
+			array_free(pms);
+		} else if (!strcasecmp(buf, "timer") || !strcasecmp(buf, "at")) {
+			char **p = array_make(foo, " \t", 3, 1, 0);
+			char *tmp = NULL, *period_str = NULL, *name = NULL;
+			time_t period;
+			int at = !strcasecmp(buf, "at");
+
+			if (p && p[0] && p[1] && p[2]) {
+
+				if (strcmp(p[0], "(null)"))
+					name = p[0];
+
+				if (!strncmp(p[1], "*/", 2)) {
+					period = atoi(p[1] + 2);
+					period_str = saprintf("*/%d", period);
+				} else
+					if (at)	 {
+						struct tm *t;
+
+						period = atoi(p[1]);
+						t = localtime(&period);
+						period_str = xmalloc(100);
+						strftime(period_str, 100, "%Y%m%d%H%M.%S", t);
+					} else {
+						period = atoi(p[1]) - time(NULL);
+						period_str = saprintf("%d", period);
+					}
+		
+				if (period > 0) {
+					tmp = saprintf("%s --add-quiet %s %s %s", (at) ? "at" : "timer", (name) ? name : "", period_str, p[2]);
+					command_exec(NULL, tmp);
+					xfree(tmp);
+				}
+
+				xfree(period_str);
+			}
+				array_free(p);
+                } else 
+			variable_set(buf, foo, 1);
+
+		xfree(buf);
+	}
+	
+	fclose(f);
+	
+	return 0;
 }
 
-#endif /* WITH_IOCTLD */
+/*
+ * config_write_variable()
+ *
+ * zapisuje jedn± zmienn± do pliku konfiguracyjnego.
+ *
+ *  - f - otwarty plik konfiguracji,
+ *  - v - wpis zmiennej,
+ *  - base64 - czy wolno nam u¿ywaæ base64 i zajmowaæ pamiêæ?
+ */
+void config_write_variable(FILE *f, struct variable *v, int base64)
+{
+	if (!f || !v)
+		return;
+
+	if (v->type == VAR_STR) {
+		if (*(char**)(v->ptr)) {
+			if (!v->display && base64) {
+				char *tmp = base64_encode(*(char**)(v->ptr));
+				if (config_save_password)
+					fprintf(f, "%s \001%s\n", v->name, tmp);
+				xfree(tmp);
+			} else 	
+				fprintf(f, "%s %s\n", v->name, *(char**)(v->ptr));
+		}
+	} else if (v->type == VAR_FOREIGN)
+		fprintf(f, "%s %s\n", v->name, (char*) v->ptr);
+	else
+		fprintf(f, "%s %d\n", v->name, *(int*)(v->ptr));
+}
 
 /*
- * event_format()
+ * config_write_main()
  *
- * zwraca ³añcuch zdarzeñ w oparciu o flagi. statyczny bufor.
+ * w³a¶ciwa funkcja zapisuj±ca konfiguracjê do podanego pliku.
  *
- *  - flags.
+ *  - f - plik, do którego piszemy,
+ *  - base64 - czy kodowaæ ukryte pola?
  */
-const char *event_format(int flags)
+void config_write_main(FILE *f, int base64)
 {
-        static char buf[200];
-	int i, first = 1;
+	list_t l;
 
-	buf[0] = 0;
+	if (!f)
+		return;
 
-	if (flags == EVENT_ALL)
-		return "*";
+	for (l = variables; l; l = l->next)
+		config_write_variable(f, l->data, base64);
 
-	for (i = 0; event_labels[i].name; i++) {
-		if ((flags & event_labels[i].event)) {
-			if (!first)
-				strncat(buf, ",", sizeof(buf) - 1 - strlen(buf));
-			strncat(buf, event_labels[i].name, sizeof(buf) - 1 - strlen(buf));
-			buf[sizeof(buf) - 1] = '\0';
-			first = 0;
+	for (l = aliases; l; l = l->next) {
+		struct alias *a = l->data;
+		list_t m;
+
+		for (m = a->commands; m; m = m->next)
+			fprintf(f, "alias %s %s\n", a->name, (char*) m->data);
+	}
+
+        for (l = events; l; l = l->next) {
+                struct event *e = l->data;
+
+                fprintf(f, "on %s %u %s\n", event_format(e->flags), e->uin, e->action);
+        }
+
+	for (l = bindings; l; l = l->next) {
+		struct binding *b = l->data;
+
+		fprintf(f, "bind %s %s\n", b->key, b->action);
+	}
+
+	for (l = timers; l; l = l->next) {
+		struct timer *t = l->data;
+		const char *name = NULL;
+
+		if (t->type != TIMER_COMMAND)
+			continue;
+
+		if (!t->persistent && t->ends.tv_sec - time(NULL) < 5)	/* nie ma sensu zapisywaæ */
+			continue;
+
+		if (t->name && !isdigit(t->name[0]))
+			name = t->name;
+		else
+			name = "(null)";
+
+		if (t->at)
+			fprintf(f, "at %s %s %s\n", name, itoa(t->ends.tv_sec), t->command);
+		else {
+			char *foo;
+
+			if (t->persistent)
+				foo = saprintf("*/%s", itoa(t->period));
+			else
+				foo = saprintf("%s", itoa(t->ends.tv_sec));
+
+			fprintf(f, "timer %s %s %s\n", name, foo, t->command);
+
+			xfree(foo);
 		}
 	}
 
-	return buf;
 }
 
 /*
- * event_flags()
+ * config_write()
  *
- * zwraca flagi na podstawie ³añcucha.
+ * zapisuje aktualn± konfiguracjê -- zmienne i listê ignorowanych do pliku
+ * ~/.gg/config lub podanego.
  *
- *  - events.
+ * 0/-1
  */
-int event_flags(const char *events)
+int config_write()
 {
-	int i, j, flags = 0;
-	char **a;
+	const char *filename;
+	FILE *f;
 
-	if (!(a = array_make(events, "|,:", 0, 1, 0)))
-		return 0;
+	if (!(filename = prepare_path("config", 1)))
+		return -1;
+	
+	if (!(f = fopen(filename, "w")))
+		return -1;
+	
+	fchmod(fileno(f), 0600);
 
-	for (j = 0; a[j]; j++) {
-		if (!strcmp(a[j], "*")) {
-			flags = EVENT_ALL;
+	config_write_main(f, 1);
+
+	fclose(f);
+	
+	return 0;
+}
+
+/*
+ * config_write_partly()
+ *
+ * zapisuje podane zmienne, nie zmieniaj±c reszty konfiguracji.
+ *  
+ *  - vars - tablica z nazwami zmiennych do zapisania.
+ * 
+ * 0/-1.
+ */
+int config_write_partly(char **vars)
+{
+	const char *filename;
+	char *newfn, *line;
+	FILE *fi, *fo;
+	int *wrote, i;
+
+	if (!vars)
+		return -1;
+
+	if (!(filename = prepare_path("config", 1)))
+		return -1;
+	
+	if (!(fi = fopen(filename, "r")))
+		return -1;
+
+	newfn = saprintf("%s.%d.%d", filename, getpid(), time(NULL));
+
+	if (!(fo = fopen(newfn, "w"))) {
+		xfree(newfn);
+		fclose(fi);
+		return -1;
+	}
+	
+	wrote = xcalloc(array_count(vars) + 1, sizeof(int));
+	
+	fchmod(fileno(fo), 0600);
+
+	while ((line = read_file(fi))) {
+		char *tmp;
+
+		if (line[0] == '#' || line[0] == ';' || (line[0] == '/' && line[1] == '/'))
+			goto pass;
+
+		if (!strchr(line, ' '))
+			goto pass;
+
+		if (!strncasecmp(line, "ignore ", 7))
+			goto pass;
+
+		if (!strncasecmp(line, "alias ", 6))
+			goto pass;
+
+		if (!strncasecmp(line, "on ", 3))
+			goto pass;
+
+		if (!strncasecmp(line, "bind ", 5))
+			goto pass;
+
+		tmp = line;
+
+		if (!strncasecmp(tmp, "set ", 4))
+			tmp += 4;
+		
+		for (i = 0; vars[i]; i++) {
+			int len = strlen(vars[i]);
+
+			if (strlen(tmp) < len + 1)
+				continue;
+
+			if (strncasecmp(tmp, vars[i], len) || tmp[len] != ' ')
+				continue;
+			
+			config_write_variable(fo, variable_find(vars[i]), 1);
+
+			wrote[i] = 1;
+			
+			xfree(line);
+			line = NULL;
+			
 			break;
 		}
-		for (i = 0; event_labels[i].name; i++)
-			if (!strcasecmp(a[j], event_labels[i].name))
-				flags |= event_labels[i].event;
+
+		if (!line)
+			continue;
+
+pass:
+		fprintf(fo, "%s\n", line);
+		xfree(line);
 	}
 
-	array_free(a);
+	for (i = 0; vars[i]; i++) {
+		if (wrote[i])
+			continue;
 
-	return flags;
+		config_write_variable(fo, variable_find(vars[i]), 1);
+	}
+
+	xfree(wrote);
+	
+	fclose(fi);
+	fclose(fo);
+	
+	rename(newfn, filename);
+
+	xfree(newfn);
+
+	return 0;
+}
+
+/*
+ * config_write_crash()
+ *
+ * funkcja zapisuj±ca awaryjnie konfiguracjê. nie powinna alokowaæ ¿adnej
+ * pamiêci.
+ */
+void config_write_crash()
+{
+	char name[32];
+	char path[PATH_MAX];
+	FILE *f;
+
+	if (config_profile)
+		snprintf(path, sizeof(path), "%s/%s", config_dir, config_profile);
+	else
+		snprintf(path, sizeof(path), "%s", config_dir);
+
+	chdir(path);
+
+	snprintf(name, sizeof(name), "config.%d", getpid());
+	if (!(f = fopen(name, "w")))
+		return;
+
+	chmod(name, 0400);
+	
+	config_write_main(f, 0);
+	
+	fclose(f);
+}
+
+/*
+ * debug_write_crash()
+ *
+ * zapisuje ostatnie linie z debug.
+ */
+void debug_write_crash()
+{
+	char name[32];
+	FILE *f;
+	char path[PATH_MAX];
+	list_t l;
+
+	if (config_profile)
+		snprintf(path, sizeof(path), "%s/%s", config_dir, config_profile);
+	else
+		snprintf(path, sizeof(path), "%s", config_dir);
+
+	chdir(path);
+
+	snprintf(name, sizeof(name), "debug.%d", getpid());
+	if (!(f = fopen(name, "w")))
+		return;
+
+	chmod(name, 0400);
+	
+	for (l = buffers; l; l = l->next) {
+		struct buffer *b = l->data;
+
+		if (b->type == BUFFER_DEBUG)
+			fprintf(f, "%s\n", b->line);
+	}
+	
+	fclose(f);
+}
+
+/*
+ * sysmsg_read()
+ *
+ * 0/-1
+ */
+int sysmsg_read()
+{
+	const char *filename;
+	char *buf, *foo;
+	FILE *f;
+
+	if (!(filename = prepare_path("sysmsg", 0)))
+		return -1;
+	
+	if (!(f = fopen(filename, "r")))
+		return -1;
+
+	while ((buf = read_file(f))) {
+		if (buf[0] == '#') {
+			xfree(buf);
+			continue;
+		}
+
+		if (!(foo = strchr(buf, ' '))) {
+			xfree(buf);
+			continue;
+		}
+
+		*foo++ = 0;
+		
+		if (!strcasecmp(buf, "last_sysmsg")) {
+			if (atoi(foo))
+				last_sysmsg = atoi(foo);
+		}
+		
+		xfree(buf);
+	}
+	
+	fclose(f);
+	
+	return 0;
+}
+
+/*
+ * sysmsg_write()
+ *
+ * 0/-1
+ */
+int sysmsg_write()
+{
+	const char *filename;
+	FILE *f;
+
+	if (!(filename = prepare_path("sysmsg", 1)))
+		return -1;
+	
+	if (!(f = fopen(filename, "w")))
+		return -1;
+	
+	fchmod(fileno(f), 0600);
+	
+	fprintf(f, "last_sysmsg %i\n", last_sysmsg);
+	
+	fclose(f);
+	
+	return 0;
+}
+
+/*
+ * do_connect()
+ *
+ * przygotowuje wszystko pod po³±czenie gg_login i ³±czy siê.
+ */
+void do_connect()
+{
+	list_t l;
+	struct gg_login_params p;
+
+	for (l = watches; l; l = l->next) {
+		struct gg_dcc *d = l->data;
+		
+		if (d->type == GG_SESSION_DCC_SOCKET) {
+			gg_dcc_port = d->port;
+			
+		}
+	}
+
+	memset(&p, 0, sizeof(p));
+
+	p.uin = config_uin;
+	p.password = config_password;
+	p.status = config_status;
+	p.status_descr = config_reason;
+	p.async = 1;
+#ifdef HAVE_VOIP
+	p.has_audio = 1;
+#endif
+	p.protocol_version = config_protocol;
+	p.last_sysmsg = last_sysmsg;
+
+	if (config_server) {
+		char *server, **servers = array_make(config_server, ",; ", 0, 1, 0);
+
+		if (server_index >= array_count(servers))
+			server_index = 0;
+
+		if ((server = xstrdup(servers[server_index++]))) {
+			char *tmp = strchr(server, ':');
+			
+			if (tmp) {
+				p.server_port = atoi(tmp + 1);
+				*tmp = 0;
+				p.server_addr = inet_addr(server);
+			} else {
+				p.server_port = GG_DEFAULT_PORT;
+				p.server_addr = inet_addr(server);
+			}
+
+			xfree(server);
+		}
+
+		array_free(servers);
+	}
+
+	if (!(sess = gg_login(&p))) {
+		print("conn_failed", format_find((errno == ENOMEM) ? "conn_failed_memory" : "conn_failed_connecting"));
+		do_reconnect();
+	} else
+		list_add(&watches, sess, 0);
+}
+
+/*
+ * do_reconnect()
+ *
+ * je¶li jest w³±czony autoreconnect, wywo³uje timer, który za podan±
+ * ilo¶æ czasu spróbuje siê po³±czyæ jeszcze raz.
+ */
+void do_reconnect()
+{
+	if (config_auto_reconnect && connecting)
+		reconnect_timer = time(NULL);
+}
+
+/*
+ * ekg_logoff()
+ *
+ * roz³±cza siê, zmieniaj±c uprzednio stan na niedostêpny z opisem.
+ *
+ *  - sess - opis sesji,
+ *  - reason - powód, mo¿e byæ NULL.
+ */
+void ekg_logoff(struct gg_session *sess, const char *reason)
+{
+	if (!sess)
+		return;
+
+	if (sess->state != GG_STATE_CONNECTED || GG_S_NA(sess->status))
+		return;
+
+	if (reason) {
+		char *tmp = xstrdup(reason);
+		iso_to_cp(tmp);
+		gg_change_status_descr(sess, GG_STATUS_NOT_AVAIL_DESCR, tmp);
+		xfree(tmp);
+	} else
+		gg_change_status(sess, GG_STATUS_NOT_AVAIL);
+
+	gg_logoff(sess);
+
+	update_status();
+
+	last_conn_event = time(NULL);
+}
+
+/*
+ * ekg_hash()
+ *
+ * liczy prosty hash z nazwy, wykorzystywany przy przeszukiwaniu list
+ * zmiennych, formatów itp.
+ *
+ *  - name - nazwa.
+ */
+int ekg_hash(const char *name)
+{
+	int hash = 0;
+
+	for (; *name; name++) {
+		hash ^= *name;
+		hash <<= 1;
+	}
+
+	return hash;
+}
+
+/*
+ * emoticon_add()
+ *
+ * dodaje dany emoticon do listy.
+ *
+ *  - name - nazwa,
+ *  - value - warto¶æ,
+ *
+ * 0/-1
+ */
+int emoticon_add(const char *name, const char *value)
+{
+	struct emoticon e;
+	list_t l;
+
+	for (l = emoticons; l; l = l->next) {
+		struct emoticon *g = l->data;
+
+		if (!strcasecmp(name, g->name)) {
+			xfree(g->value);
+			g->value = xstrdup(value);
+			return 0;
+		}
+	}
+
+	e.name = xstrdup(name);
+	e.value = xstrdup(value);
+
+	return (list_add(&emoticons, &e, sizeof(e)) ? 0 : -1);
+}
+
+/*
+ * emoticon_remove()
+ *
+ * usuwa emoticon o danej nazwie.
+ *
+ *  - name.
+ *
+ * 0/-1
+ */
+int emoticon_remove(const char *name)
+{
+	list_t l;
+
+	for (l = emoticons; l; l = l->next) {
+		struct emoticon *f = l->data;
+
+		if (!strcasecmp(f->name, name)) {
+			xfree(f->value);
+			xfree(f->name);
+			list_remove(&emoticons, f, 1);
+			return 0;
+		}
+	}
+	
+	return -1;
+}
+
+/*
+ * emoticon_read()
+ *
+ * ³aduje do listy wszystkie makra z pliku ~/.gg/emoticons
+ * format tego pliku w dokumentacji.
+ *
+ * 0/-1
+ */
+int emoticon_read()
+{
+	const char *filename;
+	char *buf, **emot;
+	FILE *f;
+
+	if (!(filename = prepare_path("emoticons", 0)))
+		return -1;
+	
+	if (!(f = fopen(filename, "r")))
+		return -1;
+
+	while ((buf = read_file(f))) {
+	
+		if (buf[0] == '#') {
+			xfree(buf);
+			continue;
+		}
+
+		emot = array_make(buf, "\t", 2, 1, 1);
+	
+		if (emot) {
+			if (emot[1])
+				emoticon_add(emot[0], emot[1]);
+			else
+				emoticon_remove(emot[0]);
+			xfree(emot[0]);
+			xfree(emot[1]);
+			xfree(emot);
+		}
+
+		xfree(buf);
+	}
+	
+	fclose(f);
+	
+	return 0;
+}
+
+/*
+ * emoticon_expand()
+ *
+ * rozwija definicje makr (najczê¶ciej bêd± to emoticony)
+ *
+ *  - s - string z makrami.
+ *
+ * zwraca zaalokowany, rozwiniêty string.
+ */
+char *emoticon_expand(const char *s)
+{
+	list_t l = NULL;
+	const char *ss;
+	char *ms;
+	size_t n = 0;
+
+	for (ss = s; *ss; ss++) {
+		struct emoticon *e = NULL;
+		size_t ns = strlen(ss);
+		int ret = 1;
+
+		for (l = emoticons; l && ret; l = (ret ? l->next : l)) {
+			size_t nn;
+
+			e = l->data;
+			nn = strlen(e->name);
+			if (ns >= nn)
+				ret = strncmp(ss, e->name, nn);
+		}
+
+		if (l) {
+			e = l->data;
+			n += strlen(e->value);
+			ss += strlen(e->name) - 1;
+		} else
+			n++;
+	}
+
+	ms = xcalloc(1, n + 1);
+
+	for (ss = s; *ss; ss++) {
+		struct emoticon *e = NULL;
+		size_t ns = strlen(ss);
+		int ret = 1;
+
+		for (l = emoticons; l && ret; l = (ret ? l->next : l)) {
+			size_t n;
+
+			e = l->data;
+			n = strlen(e->name);
+			if (ns >= n)
+				ret = strncmp(ss, e->name, n);
+		}
+
+		if (l) {
+			e = l->data;
+			strcat(ms, e->value);
+			ss += strlen(e->name) - 1;
+		} else
+			ms[strlen(ms)] = *ss;
+	}
+
+	return ms;
+}
+
+/*
+ * emoticon_free()
+ *
+ * usuwa pamiêæ zajêt± przez emoticony.
+ */
+void emoticon_free()
+{
+	list_t l;
+
+	if (!emoticons)
+		return;
+
+	for (l = emoticons; l; l = l->next) {
+		struct emoticon *e = l->data;
+
+		xfree(e->name);
+		xfree(e->value);
+	}
+
+	list_destroy(emoticons, 1);
+	emoticons = NULL;
 }
 
 /*
@@ -2411,6 +1957,66 @@ int event_remove(int flags, uin_t uin, int quiet)
         	return 1;
 	} else
 		return 0;
+}
+
+/*
+ * event_format()
+ *
+ * zwraca ³añcuch zdarzeñ w oparciu o flagi. statyczny bufor.
+ *
+ *  - flags.
+ */
+const char *event_format(int flags)
+{
+        static char buf[200];
+	int i, first = 1;
+
+	buf[0] = 0;
+
+	if (flags == EVENT_ALL)
+		return "*";
+
+	for (i = 0; event_labels[i].name; i++) {
+		if ((flags & event_labels[i].event)) {
+			if (!first)
+				strncat(buf, ",", sizeof(buf) - 1 - strlen(buf));
+			strncat(buf, event_labels[i].name, sizeof(buf) - 1 - strlen(buf));
+			buf[sizeof(buf) - 1] = '\0';
+			first = 0;
+		}
+	}
+
+	return buf;
+}
+
+/*
+ * event_flags()
+ *
+ * zwraca flagi na podstawie ³añcucha.
+ *
+ *  - events.
+ */
+int event_flags(const char *events)
+{
+	int i, j, flags = 0;
+	char **a;
+
+	if (!(a = array_make(events, "|,:", 0, 1, 0)))
+		return 0;
+
+	for (j = 0; a[j]; j++) {
+		if (!strcmp(a[j], "*")) {
+			flags = EVENT_ALL;
+			break;
+		}
+		for (i = 0; event_labels[i].name; i++)
+			if (!strcasecmp(a[j], event_labels[i].name))
+				flags |= event_labels[i].event;
+	}
+
+	array_free(a);
+
+	return flags;
 }
 
 /*
@@ -2717,6 +2323,9 @@ void event_free()
 {
 	list_t l;
 
+	if (!events)
+		return;
+
 	for (l = events; l; l = l->next) {
 		struct event *e = l->data;
 
@@ -2725,706 +2334,6 @@ void event_free()
 
 	list_destroy(events, 1);
 	events = NULL;
-}
-
-/*
- * init_control_pipe()
- *
- * inicjuje potok nazwany do zewnêtrznej kontroli ekg.
- *
- *  - pipe_file.
- *
- * zwraca deskryptor otwartego potoku lub -1.
- */
-int init_control_pipe(const char *pipe_file)
-{
-	int fd;
-	struct stat st;
-	char *err_str = NULL;
-
-	if (!pipe_file)
-		return 0;
-
-	if (!stat(pipe_file, &st) && !S_ISFIFO(st.st_mode))
-		err_str = saprintf("Plik %s nie jest potokiem. Ignorujê.\n", pipe_file);
-
-	if (mkfifo(pipe_file, 0600) < 0 && errno != EEXIST)
-		err_str = saprintf("Nie mogê stworzyæ potoku %s: %s. Ignorujê.\n", pipe_file, strerror(errno));
-
-#ifdef O_NDELAY
-	if ((fd = open(pipe_file, O_RDWR | O_NDELAY)) < 0)
-#else
-	if ((fd = open(pipe_file, O_RDWR)) < 0)
-#endif
-		err_str = saprintf("Nie mogê otworzyæ potoku %s: %s. Ignorujê.\n", pipe_file, strerror(errno));
-
-	if (err_str) {
-		print("generic_error", err_str);
-		xfree(err_str);
-		return -1;
-	}
-
-	return fd;
-}
-
-/*
- * base64_encode()
- *
- * zapisuje ci±g znaków w base64. alokuje pamiêæ. 
- */
-char *base64_encode(const char *buf)
-{
-	char *tmp = gg_base64_encode(buf);
-
-	if (!buf)
-		return xstrdup("");
-
-	if (!tmp)
-		ekg_oom_handler();
-
-	return tmp;
-}
-
-/*
- * base64_decode()
- *
- * wczytuje ci±g znaków base64, zwraca zaalokowany buforek.
- */
-char *base64_decode(const char *buf)
-{
-	char *tmp = gg_base64_decode(buf);
-
-	if (!buf)
-		return xstrdup("");
-
-	if (!tmp)
-		ekg_oom_handler();
-
-	return tmp;
-}
-	
-/*
- * changed_dcc()
- *
- * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,dcc''.
- */
-void changed_dcc(const char *var)
-{
-	struct userlist *u = userlist_find(config_uin, NULL);
-	struct gg_dcc *dcc = NULL;
-	list_t l;
-	
-	if (!config_uin)
-		return;
-	
-	if (!strcmp(var, "dcc")) {
-		for (l = watches; l; l = l->next) {
-			struct gg_common *c = l->data;
-	
-			if (c->type == GG_SESSION_DCC_SOCKET)
-				dcc = l->data;
-		}
-	
-		if (!config_dcc && dcc) {
-			list_remove(&watches, dcc, 0);
-			gg_free_dcc(dcc);
-		}
-	
-		if (config_dcc && !dcc) {
-			if (!(dcc = gg_dcc_socket_create(config_uin, 0))) {
-				print("dcc_create_error", strerror(errno));
-			} else {
-				list_add(&watches, dcc, 0);
-			}
-		}
-
-		if (u && dcc)
-			u->port = dcc->port;
-	}
-
-	if (!strcmp(var, "dcc_ip")) {
-		if (config_dcc_ip) {
-			if (!strcasecmp(config_dcc_ip, "auto")) {
-				gg_dcc_ip = inet_addr("255.255.255.255");
-			} else {
-				if (inet_addr(config_dcc_ip) != INADDR_NONE)
-					gg_dcc_ip = inet_addr(config_dcc_ip);
-				else {
-					print("dcc_invalid_ip");
-					config_dcc_ip = NULL;
-					gg_dcc_ip = 0;
-				}
-			}
-		} else
-			gg_dcc_ip = 0;
-
-		if (u)
-			u->ip.s_addr = gg_dcc_ip;
-	}
-
-	update_status_myip();
-}
-	
-/*
- * changed_theme()
- *
- * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,theme''.
- */
-void changed_theme(const char *var)
-{
-	if (!config_theme) {
-		theme_init();
-		ui_event("theme_init");
-	} else {
-		if (!theme_read(config_theme, 1)) {
-			theme_cache_reset();
-			if (!in_autoexec)
-				print("theme_loaded", config_theme);
-		} else
-			if (!in_autoexec)
-				print("error_loading_theme", strerror(errno));
-	}
-}
-
-/*
- * changed_proxy()
- *
- * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,proxy''.
- */
-void changed_proxy(const char *var)
-{
-	char **auth, **userpass = NULL, **hostport = NULL;
-	
-	gg_proxy_port = 0;
-	xfree(gg_proxy_host);
-	gg_proxy_host = NULL;
-	xfree(gg_proxy_username);
-	gg_proxy_username = NULL;
-	xfree(gg_proxy_password);
-	gg_proxy_password = NULL;
-
-	if (!config_proxy)
-		return;
-
-	auth = array_make(config_proxy, "@", 0, 0, 0);
-
-	if (!auth[0] || !strcmp(auth[0], ""))
-		return; 
-	
-	gg_proxy_enabled = 1;
-
-	if (auth[0] && auth[1]) {
-		userpass = array_make(auth[0], ":", 0, 0, 0);
-		hostport = array_make(auth[1], ":", 0, 0, 0);
-	} else
-		hostport = array_make(auth[0], ":", 0, 0, 0);
-	
-	if (userpass && userpass[0] && userpass[1]) {
-		gg_proxy_username = xstrdup(userpass[0]);
-		gg_proxy_password = xstrdup(userpass[1]);
-	}
-
-	gg_proxy_host = xstrdup(hostport[0]);
-	gg_proxy_port = (hostport[1]) ? atoi(hostport[1]) : 8080;
-
-	array_free(hostport);
-	array_free(userpass);
-	array_free(auth);
-}
-
-/*
- * changed_uin()
- *
- * funkcja wywo³ywana przy zmianie zmiennej uin.
- */
-void changed_uin(const char *var)
-{
-	ui_event("xterm_update");
-}
-
-/*
- * changed_xxx_reason()
- *
- * funkcja wywo³ywana przy zmianie domy¶lnych powodów.
- */
-void changed_xxx_reason(const char *var)
-{
-	char *tmp = NULL;
-
-	if (!strcmp(var, "away_reason"))
-		tmp = config_away_reason;
-	if (!strcmp(var, "back_reason"))
-		tmp = config_back_reason;
-	if (!strcmp(var, "quit_reason"))
-		tmp = config_quit_reason;
-
-	if (!tmp)
-		return;
-
-	if (strlen(tmp) > GG_STATUS_DESCR_MAXSIZE)
-		print("descr_too_long", itoa(strlen(tmp) - GG_STATUS_DESCR_MAXSIZE));
-}
-
-/*
- * do_connect()
- *
- * przygotowuje wszystko pod po³±czenie gg_login i ³±czy siê.
- */
-void do_connect()
-{
-	list_t l;
-	struct gg_login_params p;
-
-	for (l = watches; l; l = l->next) {
-		struct gg_dcc *d = l->data;
-		
-		if (d->type == GG_SESSION_DCC_SOCKET) {
-			gg_dcc_port = d->port;
-			
-		}
-	}
-
-	memset(&p, 0, sizeof(p));
-
-	p.uin = config_uin;
-	p.password = config_password;
-	p.status = config_status;
-	p.status_descr = config_reason;
-	p.async = 1;
-#ifdef HAVE_VOIP
-	p.has_audio = 1;
-#endif
-	p.protocol_version = config_protocol;
-	p.last_sysmsg = last_sysmsg;
-
-	if (config_server) {
-		char *server, **servers = array_make(config_server, ",; ", 0, 1, 0);
-
-		if (server_index >= array_count(servers))
-			server_index = 0;
-
-		if ((server = xstrdup(servers[server_index++]))) {
-			char *tmp = strchr(server, ':');
-			
-			if (tmp) {
-				p.server_port = atoi(tmp + 1);
-				*tmp = 0;
-				p.server_addr = inet_addr(server);
-			} else {
-				p.server_port = GG_DEFAULT_PORT;
-				p.server_addr = inet_addr(server);
-			}
-
-			xfree(server);
-		}
-
-		array_free(servers);
-	}
-
-	if (!(sess = gg_login(&p))) {
-		print("conn_failed", format_find((errno == ENOMEM) ? "conn_failed_memory" : "conn_failed_connecting"));
-		do_reconnect();
-	} else
-		list_add(&watches, sess, 0);
-}
-
-/*
- * transfer_id()
- *
- * zwraca pierwszy wolny identyfikator transferu dcc.
- */
-int transfer_id()
-{
-	list_t l;
-	int id = 1;
-
-	for (l = transfers; l; l = l->next) {
-		struct transfer *t = l->data;
-
-		if (t->id >= id)
-			id = t->id + 1;
-	}
-
-	return id;
-}
-
-/*
- * ekg_logoff()
- *
- * roz³±cza siê, zmieniaj±c uprzednio stan na niedostêpny z opisem.
- *
- *  - sess - opis sesji,
- *  - reason - powód, mo¿e byæ NULL.
- */
-void ekg_logoff(struct gg_session *sess, const char *reason)
-{
-	if (!sess)
-		return;
-
-	if (sess->state != GG_STATE_CONNECTED || GG_S_NA(sess->status))
-		return;
-
-	if (reason) {
-		char *tmp = xstrdup(reason);
-		iso_to_cp(tmp);
-		gg_change_status_descr(sess, GG_STATUS_NOT_AVAIL_DESCR, tmp);
-		xfree(tmp);
-	} else
-		gg_change_status(sess, GG_STATUS_NOT_AVAIL);
-
-	gg_logoff(sess);
-
-	update_status();
-
-	last_conn_event = time(NULL);
-}
-
-char *random_line(const char *path)
-{
-        int max = 0, item, tmp = 0;
-	char *line;
-        FILE *f;
-
-	if (!path)
-		return NULL;
-
-        if ((f = fopen(path, "r")) == NULL)
-                return NULL;
-
-        while ((line = read_file(f))) {
-		xfree(line);
-                max++;
-	}
-
-        rewind(f);
-
-        item = rand() % max;
-
-        while ((line = read_file(f))) {
-                if (tmp == item) {
-			fclose(f);
-			return line;
-		}
-		xfree(line);
-		tmp++;
-        }
-
-        fclose(f);
-        return NULL;
-}
-
-/*
- * emoticon_add()
- *
- * dodaje dany emoticon do listy.
- *
- *  - name - nazwa,
- *  - value - warto¶æ,
- *
- * 0/-1
- */
-int emoticon_add(const char *name, const char *value)
-{
-	struct emoticon e;
-	list_t l;
-
-	for (l = emoticons; l; l = l->next) {
-		struct emoticon *g = l->data;
-
-		if (!strcasecmp(name, g->name)) {
-			xfree(g->value);
-			g->value = xstrdup(value);
-			return 0;
-		}
-	}
-
-	e.name = xstrdup(name);
-	e.value = xstrdup(value);
-
-	return (list_add(&emoticons, &e, sizeof(e)) ? 0 : -1);
-}
-
-/*
- * emoticon_remove()
- *
- * usuwa emoticon o danej nazwie.
- *
- *  - name.
- *
- * 0/-1
- */
-int emoticon_remove(const char *name)
-{
-	list_t l;
-
-	for (l = emoticons; l; l = l->next) {
-		struct emoticon *f = l->data;
-
-		if (!strcasecmp(f->name, name)) {
-			xfree(f->value);
-			xfree(f->name);
-			list_remove(&emoticons, f, 1);
-			return 0;
-		}
-	}
-	
-	return -1;
-}
-
-/*
- * emoticon_read()
- *
- * ³aduje do listy wszystkie makra z pliku ~/.gg/emoticons
- * format tego pliku w dokumentacji.
- *
- * 0/-1
- */
-int emoticon_read()
-{
-	const char *filename;
-	char *buf, **emot;
-	FILE *f;
-
-	if (!(filename = prepare_path("emoticons", 0)))
-		return -1;
-	
-	if (!(f = fopen(filename, "r")))
-		return -1;
-
-	while ((buf = read_file(f))) {
-	
-		if (buf[0] == '#') {
-			xfree(buf);
-			continue;
-		}
-
-		emot = array_make(buf, "\t", 2, 1, 1);
-	
-		if (emot) {
-			if (emot[1])
-				emoticon_add(emot[0], emot[1]);
-			else
-				emoticon_remove(emot[0]);
-			xfree(emot[0]);
-			xfree(emot[1]);
-			xfree(emot);
-		}
-
-		xfree(buf);
-	}
-	
-	fclose(f);
-	
-	return 0;
-}
-
-/*
- * emoticon_free()
- *
- * usuwa pamiêæ zajêt± przez emoticony.
- */
-void emoticon_free()
-{
-	list_t l;
-
-	for (l = emoticons; l; l = l->next) {
-		struct emoticon *e = l->data;
-
-		xfree(e->name);
-		xfree(e->value);
-	}
-
-	list_destroy(emoticons, 1);
-	emoticons = NULL;
-}
-
-/*
- * ekg_hash()
- *
- * liczy prosty hash z nazwy, wykorzystywany przy przeszukiwaniu list
- * zmiennych, formatów itp.
- *
- *  - name - nazwa.
- */
-int ekg_hash(const char *name)
-{
-	int hash = 0;
-
-	for (; *name; name++) {
-		hash ^= *name;
-		hash <<= 1;
-	}
-
-	return hash;
-}
-
-/*
- * timer_add()
- *
- * dodaje timera.
- *
- *  - period - za jaki czas w sekundach ma byæ uruchomiony,
- *  - persistent - czy sta³y timer,
- *  - type - rodzaj timera,
- *  - at - zwyk³y timer czy at?
- *  - name - nazwa timera w celach identyfikacji. je¶li jest równa NULL,
- *           zostanie przyznany pierwszy numerek z brzegu.
- *  - command - komenda wywo³ywana po up³yniêciu czasu.
- *
- * zwraca zaalokowan± struct timer lub NULL.
- */
-struct timer *timer_add(time_t period, int persistent, int type, int at, const char *name, const char *command)
-{
-	struct timer t;
-	struct timeval tv;
-	struct timezone tz;
-
-	if (!name) {
-		int i;
-
-		for (i = 1; ; i++) {
-			int gotit = 0;
-			list_t l;
-
-			for (l = timers; l; l = l->next) {
-				struct timer *tt = l->data;
-
-				if (!strcmp(tt->name, itoa(i))) {
-					gotit = 1;
-					break;
-				}
-			}
-
-			if (!gotit)
-				break;
-		}
-
-		name = itoa(i);
-	}
-
-	memset(&t, 0, sizeof(t));
-
-	gettimeofday(&tv, &tz);
-	tv.tv_sec += period;
-	memcpy(&t.ends, &tv, sizeof(tv));
-	t.period = period;
-	t.name = xstrdup(name);
-	t.command = xstrdup(command);
-	t.type = type;
-	t.at = at;
-	t.persistent = persistent;
-
-	return list_add(&timers, &t, sizeof(t));
-}
-
-/*
- * timer_remove()
- *
- * usuwa timer.
- *
- *  - name - nazwa timera, mo¿e byæ NULL,
- *  - at - zwyk³y timer czy at?
- *  - command - komenda timera, mo¿e byæ NULL.
- *
- * 0/-1.
- */
-int timer_remove(const char *name, int at, const char *command)
-{
-	list_t l;
-	int removed = 0;
-
-	for (l = timers; l; ) {
-		struct timer *t = l->data;
-
-		l = l->next;
-
-		if ((at == t->at) && ((name && !strcmp(name, t->name)) || (command && !strcmp(command, t->command)))) {
-			xfree(t->name);
-			xfree(t->command);
-			xfree(t->id);
-			list_remove(&timers, t, 1);
-			removed = 1;
-		}
-	}
-
-	return (removed) ? 0 : -1;
-}
-
-/*
- * timer_free()
- *
- * zwalnia pamiêæ po timerach.
- */
-void timer_free()
-{
-	list_t l;
-
-	for (l = timers; l; l = l->next) {
-		struct timer *t = l->data;
-		
-		xfree(t->name);
-		xfree(t->command);
-		xfree(t->id);
-	}
-
-	list_destroy(timers, 1);
-	timers = NULL;
-}
-
-/*
- * log_escape()
- *
- * je¶li trzeba, eskejpuje tekst do logów.
- * 
- *  - str - tekst.
- *
- * zaalokowany bufor.
- */
-char *log_escape(const char *str)
-{
-	const char *p;
-	char *res, *q;
-	int size, needto = 0;
-
-	if (!str)
-		return NULL;
-	
-	for (p = str; *p; p++) {
-		if (*p == '"' || *p == '\'' || *p == '\r' || *p == '\n' || *p == ',')
-			needto = 1;
-	}
-
-	if (!needto)
-		return xstrdup(str);
-
-	for (p = str, size = 0; *p; p++) {
-		if (*p == '"' || *p == '\'' || *p == '\r' || *p == '\n' || *p == '\\')
-			size += 2;
-		else
-			size++;
-	}
-
-	q = res = xmalloc(size + 3);
-	
-	*q++ = '"';
-	
-	for (p = str; *p; p++, q++) {
-		if (*p == '\\' || *p == '"' || *p == '\'') {
-			*q++ = '\\';
-			*q = *p;
-		} else if (*p == '\n') {
-			*q++ = '\\';
-			*q = 'n';
-		} else if (*p == '\r') {
-			*q++ = '\\';
-			*q = 'r';
-		} else
-			*q = *p;
-	}
-	*q++ = '"';
-	*q = 0;
-
-	return res;
 }
 
 /*
@@ -3560,6 +2469,1174 @@ void last_free()
 
 	list_destroy(lasts, 1);
 	lasts = NULL;
+}
+
+/*
+ * put_log()
+ *
+ * wrzuca do logów informacjê od/do danego numerka. podaje siê go z tego
+ * wzglêdu, ¿e gdy `log = 2', informacje lec± do $config_log_path/$uin.
+ *
+ *  - uin - numer delikwenta,
+ *  - format... - akceptuje tylko %s, %d i %ld.
+ */
+void put_log(uin_t uin, const char *format, ...)
+{
+ 	char *lp = config_log_path;
+	char path[PATH_MAX], *buf;
+	const char *p;
+	int size = 0;
+	va_list ap;
+	FILE *f;
+
+	if (!config_log)
+		return;
+
+	/* oblicz d³ugo¶æ tekstu */
+	va_start(ap, format);
+	for (p = format; *p; p++) {
+		if (*p == '%') {
+			p++;
+			if (!*p)
+				break;
+			
+			if (*p == 'l') {
+				p++;
+				if (!*p)
+					break;
+			}
+			
+			if (*p == 's') {
+				char *tmp = va_arg(ap, char*);
+
+				size += strlen(tmp);
+			}
+			
+			if (*p == 'd') {
+				int tmp = va_arg(ap, int);
+
+				size += strlen(itoa(tmp));
+			}
+		} else
+			size++;
+	}
+	va_end(ap);
+
+	/* zaalokuj bufor */
+	buf = xmalloc(size + 1);
+	*buf = 0;
+
+	/* utwórz tekst z logiem */
+	va_start(ap, format);
+	for (p = format; *p; p++) {
+		if (*p == '%') {
+			p++;
+			if (!*p)
+				break;
+			if (*p == 'l') {
+				p++;
+				if (!*p)
+					break;
+			}
+
+			if (*p == 's') {
+				char *tmp = va_arg(ap, char*);
+
+				strcat(buf, tmp);
+			}
+
+			if (*p == 'd') {
+				int tmp = va_arg(ap, int);
+
+				strcat(buf, itoa(tmp));
+			}
+		} else {
+			buf[strlen(buf) + 1] = 0;
+			buf[strlen(buf)] = *p;
+		}
+	}
+
+	/* teraz skonstruuj ¶cie¿kê logów */
+
+	if (!lp)
+		lp = (config_log & 2) ? "." : "gg.log";
+
+	if (*lp == '~')
+		snprintf(path, sizeof(path), "%s%s", home_dir, lp + 1);
+	else {
+		strncpy(path, lp, sizeof(path) - 1);
+		path[sizeof(path) - 1] = 0;
+	}
+
+	if ((config_log & 2)) {
+		if (mkdir(path, 0700) && errno != EEXIST)
+			goto cleanup;
+		snprintf(path + strlen(path), sizeof(path) - strlen(path), "/%u", uin);
+	}
+
+#ifdef HAVE_ZLIB
+	/* nawet je¶li chcemy gzipowane logi, a istnieje nieskompresowany log,
+	 * olewamy kompresjê. je¶li loga nieskompresowanego nie ma, dodajemy
+	 * rozszerzenie .gz i balujemy. */
+	if (config_log & 4) {
+		struct stat st;
+		
+		if (stat(path, &st) == -1) {
+			gzFile f;
+
+			snprintf(path + strlen(path), sizeof(path) - strlen(path), ".gz");
+
+			if (!(f = gzopen(path, "a")))
+				goto cleanup;
+
+			gzputs(f, buf);
+			gzclose(f);
+			chmod(path, 0600);
+
+			goto cleanup;
+		}
+	}
+#endif
+
+	if (!(f = fopen(path, "a")))
+		goto cleanup;
+	fputs(buf, f);
+	fclose(f);
+	chmod(path, 0600);
+
+cleanup:
+	xfree(buf);
+}
+
+/*
+ * log_escape()
+ *
+ * je¶li trzeba, eskejpuje tekst do logów.
+ * 
+ *  - str - tekst.
+ *
+ * zaalokowany bufor.
+ */
+char *log_escape(const char *str)
+{
+	const char *p;
+	char *res, *q;
+	int size, needto = 0;
+
+	if (!str)
+		return NULL;
+	
+	for (p = str; *p; p++) {
+		if (*p == '"' || *p == '\'' || *p == '\r' || *p == '\n' || *p == ',')
+			needto = 1;
+	}
+
+	if (!needto)
+		return xstrdup(str);
+
+	for (p = str, size = 0; *p; p++) {
+		if (*p == '"' || *p == '\'' || *p == '\r' || *p == '\n' || *p == '\\')
+			size += 2;
+		else
+			size++;
+	}
+
+	q = res = xmalloc(size + 3);
+	
+	*q++ = '"';
+	
+	for (p = str; *p; p++, q++) {
+		if (*p == '\\' || *p == '"' || *p == '\'') {
+			*q++ = '\\';
+			*q = *p;
+		} else if (*p == '\n') {
+			*q++ = '\\';
+			*q = 'n';
+		} else if (*p == '\r') {
+			*q++ = '\\';
+			*q = 'r';
+		} else
+			*q = *p;
+	}
+	*q++ = '"';
+	*q = 0;
+
+	return res;
+}
+
+/* 
+ * log_timestamp()
+ *
+ * zwraca timestamp logów zgodnie z ¿yczeniem u¿ytkownika. 
+ *
+ *  - t - czas, który mamy zamieniæ.
+ *
+ * zwraca na przemian jeden z dwóch statycznych buforów, wiêc w obrêbie
+ * jednego wyra¿enia mo¿na wywo³aæ tê funkcjê dwukrotnie.
+ */
+const char *log_timestamp(time_t t)
+{
+	static char buf[2][100];
+	struct tm *tm = localtime(&t);
+	static int i = 0;
+
+	i = i % 2;
+
+	if (config_log_timestamp) {
+		strftime(buf[i], sizeof(buf[0]), config_log_timestamp, tm);
+		return buf[i++];
+	} else
+		return itoa(t);
+}
+
+/*
+ * mesg_set()
+ *
+ * w³±cza/wy³±cza mo¿liwo¶æ pisania do naszego terminala za pomoc±
+ * write/talk/wall.
+ *
+ * - what - 0 wy³±cza, 1 w³±cza, 2 zwraca aktualne ustawienie.
+ * 
+ * -1 je¶li b³ad, lub aktualny stan (0/1)
+*/
+int mesg_set(int what)
+{
+	const char *tty;
+	struct stat s;
+
+	if (!(tty = ttyname(1)))
+		return -1;
+
+	if (!stat(tty, &s))
+		return -1;
+
+	switch (what) {
+		case 0:
+			chmod(tty, s.st_mode & ~S_IWGRP);
+			break;
+		case 1:
+			chmod(tty, s.st_mode | S_IWGRP);
+			break;
+		case 2:
+			return ((s.st_mode & S_IWGRP) ? 1 : 0);
+	}
+
+	return 0;
+}
+
+/*
+ * mesg_changed()
+ *
+ * wywo³ywane przy zmianie ustawieñ.
+*/
+void mesg_changed()
+{
+	if ((config_mesg_allow == 0 || config_mesg_allow == 1) && mesg_set(2) != config_mesg_allow)
+		mesg_set(config_mesg_allow);
+}
+
+/*
+ * msg_encrypt()
+ * 
+ * je¶li mo¿na, podmienia wiadomo¶æ na wiadomo¶æ
+ * zaszyfrowan±.
+ */
+int msg_encrypt(uin_t uin, unsigned char **msg)
+{
+#ifdef HAVE_OPENSSL
+	unsigned char *enc = xmalloc(4096);	/* XXX idiotyzm */
+	int len;
+		
+	if (config_encryption == 1) {
+		memset(enc, 0, 4096);
+		
+		len = SIM_Message_Encrypt(*msg, enc, strlen(*msg), uin);
+		
+		gg_debug(GG_DEBUG_MISC, "// encrypted length: %d\n", len);
+
+		if (len > 0) {
+			xfree(*msg);
+			*msg = enc;
+			gg_debug(GG_DEBUG_MISC, "// encrypted message: %s\n", enc);
+		} else
+			xfree(enc);
+
+		return len;
+	} else {
+		char *res;
+
+		res = sim_message_encrypt(*msg, uin);
+		if (res) {
+			xfree(*msg);
+			*msg = res;
+			gg_debug(GG_DEBUG_MISC, "// simlite encrypted: %s\n", res);
+			return 1;
+		}
+		return 0;
+	}
+#else
+	return 0;
+#endif
+}
+
+/*
+ * cp_to_iso()
+ *
+ * zamienia krzaczki pisane w cp1250 na iso-8859-2, przy okazji maskuj±c
+ * znaki, których nie da siê wy¶wietliæ, za wyj±tkiem \r i \n.
+ *
+ *  - buf.
+ */
+void cp_to_iso(unsigned char *buf)
+{
+	if (!buf)
+		return;
+
+	while (*buf) {
+		if (*buf == (unsigned char)'¥') *buf = '¡';
+		if (*buf == (unsigned char)'¹') *buf = '±';
+		if (*buf == 140) *buf = '¦';
+		if (*buf == 156) *buf = '¶';
+		if (*buf == 143) *buf = '¬';
+		if (*buf == 159) *buf = '¼';
+
+                if (*buf != 13 && *buf != 10 && (*buf < 32 || (*buf > 127 && *buf < 160)))
+                        *buf = '?';
+
+		buf++;
+	}
+}
+
+/*
+ * iso_to_cp()
+ *
+ * zamienia sensowny format kodowania polskich znaczków na bezsensowny.
+ *
+ *  - buf.
+ */
+void iso_to_cp(unsigned char *buf)
+{
+	if (!buf)
+		return;
+
+	while (*buf) {
+		if (*buf == (unsigned char)'¡') *buf = '¥';
+		if (*buf == (unsigned char)'±') *buf = '¹';
+		if (*buf == (unsigned char)'¦') *buf = 'Œ';
+		if (*buf == (unsigned char)'¶') *buf = 'œ';
+		if (*buf == (unsigned char)'¬') *buf = '';
+		if (*buf == (unsigned char)'¼') *buf = 'Ÿ';
+		buf++;
+	}
+}
+
+/*
+ * hide_pl()
+ *
+ * maskuje polsk± literkê w iso.
+ *
+ *  - c.
+ */
+unsigned char hide_pl(const unsigned char *c)
+{
+	if (!c)
+		return 0;
+
+	if (*c == (unsigned char)'±') return 'a';
+	if (*c == (unsigned char)'ê') return 'e';
+	if (*c == (unsigned char)'æ') return 'c';
+	if (*c == (unsigned char)'³') return 'l';
+	if (*c == (unsigned char)'ñ') return 'n';
+	if (*c == (unsigned char)'ó') return 'o';
+	if (*c == (unsigned char)'¶') return 's';
+	if (*c == (unsigned char)'¿') return 'z';
+	if (*c == (unsigned char)'¼') return 'z';
+
+	if (*c == (unsigned char)'¡') return 'A';
+	if (*c == (unsigned char)'Ê') return 'E';
+	if (*c == (unsigned char)'Æ') return 'C';
+	if (*c == (unsigned char)'£') return 'L';
+	if (*c == (unsigned char)'Ñ') return 'N';
+	if (*c == (unsigned char)'Ó') return 'O';
+	if (*c == (unsigned char)'¦') return 'S';
+	if (*c == (unsigned char)'¯') return 'Z';
+	if (*c == (unsigned char)'¬') return 'Z';
+
+	return *c;
+}
+
+/*
+ * strip_spaces()
+ *
+ * pozbywa siê spacji na pocz±tku i koñcu ³añcucha.
+ */
+char *strip_spaces(char *line)
+{
+	char *buf;
+	
+	for (buf = line; isspace(*buf); buf++);
+
+	while (isspace(line[strlen(line) - 1]))
+		line[strlen(line) - 1] = 0;
+	
+	return buf;
+}
+
+/*
+ * find_in_uins()
+ *
+ * sprawdza, czy w ci±gu uin'ów znajduje siê dany uin.
+ *
+ * 1 je¶li znaleziono, 0 je¶li nie.
+ */
+int find_in_uins(int uin_count, uin_t *uins, uin_t uin)
+{
+	int i;
+
+	for (i = 0; i < uin_count; i++)
+		if (uins[i] == uin)
+			return 1;
+
+	return 0;
+}
+
+/*
+ * str_to_uin()
+ *
+ * funkcja, która zajmuje siê zamian± stringa na 
+ * liczbê i sprawdzeniem, czy to prawid³owy uin.
+ *
+ * zwraca uin lub 0 w przypadku b³êdu.
+ */
+uin_t str_to_uin(const char *text)
+{
+	char *tmp;
+	long num;
+
+	errno = 0;
+	num = strtol(text, &tmp, 0);
+
+	if (*text == '\0' || *tmp != '\0')
+		return 0;
+
+	if ((errno == ERANGE || (num == LONG_MAX || num == LONG_MIN)) || num > UINT_MAX || num < 0)
+		return 0;
+
+	return (uin_t) num;
+}
+
+/*
+ * valid_nick()
+ *
+ * sprawdza, czy nick nie zawiera znaków specjalnych,
+ * co mog³oby powodowaæ problemy.
+ *
+ * zwraca 1 je¶li nick jest w porz±dku, w przeciwnym razie 0.
+ */
+int valid_nick(const char *nick)
+{
+	int i;
+	const char *wrong[] = { "(null)", "__debug", "__status",
+				 "__current", NULL };
+
+	if (!nick)
+		return 0;
+
+	for (i = 0; wrong[i]; i++) {
+		if (!strcmp(nick, wrong[i]))
+			return 0;
+	}
+
+	if (nick[0] == '@' || nick[0] == '#' || strchr(nick, ','))
+		return 0;
+
+	return 1;
+}
+
+/*
+ * play_sound()
+ *
+ * odtwarza dzwiêk o podanej nazwie.
+ *
+ * 0/-1
+ */
+int play_sound(const char *sound_path)
+{
+	int pid;
+
+	if (!config_sound_app || !sound_path) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	if ((pid = fork()) == -1)
+		return -1;
+
+	if (!pid) {
+		int i;
+
+		for (i = 0; i < 255; i++)
+			close(i);
+			
+		execlp(config_sound_app, config_sound_app, sound_path, (void *) NULL);
+		exit(1);
+	}
+
+	process_add(pid, "\002");
+
+	return 0;
+}
+
+/*
+ * process_add()
+ *
+ * dopisuje do listy uruchomionych dzieci procesów.
+ *
+ *  - pid.
+ *  - name.
+ *
+ * 0/-1
+ */
+int process_add(int pid, const char *name)
+{
+	struct process p;
+
+	p.pid = pid;
+	p.name = xstrdup(name);
+	
+	return (list_add(&children, &p, sizeof(p)) ? 0 : -1);
+}
+
+/*
+ * process_remove()
+ *
+ * usuwa proces z listy dzieciaków.
+ *
+ *  - pid.
+ * 
+ * 0/-1
+ */
+int process_remove(int pid)
+{
+	list_t l;
+
+	for (l = children; l; l = l->next) {
+		struct process *p = l->data;
+
+		if (p->pid == pid) {
+			list_remove(&children, p, 1);
+			return 0;
+		}
+	}
+
+	return -1;
+}
+
+/*
+ * prepare_path()
+ *
+ * zwraca pe³n± ¶cie¿kê do podanego pliku katalogu ~/.gg/
+ *
+ *  - filename - nazwa pliku,
+ *  - do_mkdir - czy tworzyæ katalog ~/.gg ?
+ */
+const char *prepare_path(const char *filename, int do_mkdir)
+{
+	static char path[PATH_MAX];
+	
+	if (do_mkdir) {
+		if (mkdir(config_dir, 0700) && errno != EEXIST)
+			return NULL;
+		if (config_profile) {
+			snprintf(path, sizeof(path), "%s/%s", config_dir, config_profile);
+			if (mkdir(path, 0700) && errno != EEXIST)
+				return NULL;
+		}
+	}
+	
+	if (!filename || !*filename) {
+		if (config_profile)
+			snprintf(path, sizeof(path), "%s/%s", config_dir, config_profile);
+		else
+			snprintf(path, sizeof(path), "%s", config_dir);
+	} else {
+		if (config_profile)
+			snprintf(path, sizeof(path), "%s/%s/%s", config_dir, config_profile, filename);
+		else
+			snprintf(path, sizeof(path), "%s/%s", config_dir, filename);
+	}
+	
+	return path;
+}
+
+char *random_line(const char *path)
+{
+        int max = 0, item, tmp = 0;
+	char *line;
+        FILE *f;
+
+	if (!path)
+		return NULL;
+
+        if ((f = fopen(path, "r")) == NULL)
+                return NULL;
+
+        while ((line = read_file(f))) {
+		xfree(line);
+                max++;
+	}
+
+        rewind(f);
+
+        item = rand() % max;
+
+        while ((line = read_file(f))) {
+                if (tmp == item) {
+			fclose(f);
+			return line;
+		}
+		xfree(line);
+		tmp++;
+        }
+
+        fclose(f);
+        return NULL;
+}
+
+/*
+ * read_file()
+ *
+ * czyta i zwraca linijkê tekstu z pliku alokuj±c przy tym odpowiedni buforek.
+ * usuwa znaki koñca linii.
+ */
+char *read_file(FILE *f)
+{
+	char buf[1024], *res = NULL;
+
+	while (fgets(buf, sizeof(buf) - 1, f)) {
+		int first = (res) ? 0 : 1;
+		int new_size = ((res) ? strlen(res) : 0) + strlen(buf) + 1;
+
+		res = xrealloc(res, new_size);
+		if (first)
+			*res = 0;
+		strcpy(res + strlen(res), buf);
+		
+		if (strchr(buf, '\n'))
+			break;
+	}
+
+	if (res && strlen(res) > 0 && res[strlen(res) - 1] == '\n')
+		res[strlen(res) - 1] = 0;
+	if (res && strlen(res) > 0 && res[strlen(res) - 1] == '\r')
+		res[strlen(res) - 1] = 0;
+
+	return res;
+}
+
+/*
+ * send_sms()
+ *
+ * wysy³a sms o podanej tre¶ci do podanej osoby.
+ *
+ * 0/-1
+ */
+int send_sms(const char *recipient, const char *message, int show_result)
+{
+	int pid, fd[2] = { 0, 0 };
+	struct gg_exec s;
+	char *tmp;
+
+	if (!config_sms_app) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	if (!recipient || !message) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	if (pipe(fd))
+		return -1;
+		
+	if (!(pid = fork())) {
+		if (fd[1]) {
+			close(fd[0]);
+			dup2(fd[1], 2);
+			dup2(fd[1], 1);
+			close(fd[1]);
+		}	
+		execlp(config_sms_app, config_sms_app, recipient, message, (void *) NULL);
+		exit(1);
+	}
+
+	if (pid < 0) {
+		close(fd[0]);
+		close(fd[1]);
+		return -1;
+	}
+
+	memset(&s, 0, sizeof(s));
+	
+	s.fd = fd[0];
+	s.check = GG_CHECK_READ;
+	s.state = GG_STATE_READING_DATA;
+	s.type = GG_SESSION_USER3;
+	s.id = pid;
+	s.timeout = 60;
+	s.buf = string_init(NULL);
+
+	fcntl(s.fd, F_SETFL, O_NONBLOCK);
+
+	list_add(&watches, &s, sizeof(s));
+	close(fd[1]);
+	
+	tmp = saprintf((show_result) ? "\001%s" : "\002%s", recipient);
+	process_add(pid, tmp);
+	xfree(tmp);
+
+	return 0;
+}
+
+/*
+ * sms_away_add()
+ *
+ * dodaje osobê do listy delikwentów, od których wiadomo¶æ wys³ano sms'em
+ * podczas naszej nieobecno¶ci. je¶li jest ju¿ na li¶cie, to zwiêksza 
+ * przyporz±dkowany mu licznik.
+ *
+ *  - uin.
+ */
+void sms_away_add(uin_t uin)
+{
+	struct sms_away sa;
+	list_t l;
+
+	if (!config_sms_away_limit)
+		return;
+
+	sa.uin = uin;
+	sa.count = 1;
+
+	for (l = sms_away; l; l = l->next) {
+		struct sms_away *s = l->data;
+
+		if (s->uin == uin) {
+			s->count += 1;
+			return;
+		}
+	}
+
+	list_add(&sms_away, &sa, sizeof(sa));
+}
+
+/*
+ * sms_away_check()
+ *
+ * sprawdza czy wiadomo¶æ od danej osoby mo¿e zostaæ przekazana
+ * na sms podczas naszej nieobecno¶ci, czy te¿ mo¿e przekroczono
+ * ju¿ limit.
+ *
+ *  - uin
+ *
+ * 1 je¶li tak, 0 je¶li nie.
+ */
+int sms_away_check(uin_t uin)
+{
+	int x = 0;
+	list_t l;
+
+	if (!config_sms_away_limit || !sms_away)
+		return 1;
+
+	/* limit dotyczy ³±cznej liczby sms'ów */
+	if (config_sms_away == 1) {
+		for (l = sms_away; l; l = l->next) {
+			struct sms_away *s = l->data;
+
+			x += s->count;
+		}
+		
+		if (x > config_sms_away_limit)
+			return 0;
+		else
+			return 1;
+	}
+
+	/* limit dotyczy liczby sms'ów od jednej osoby */
+	for (l = sms_away; l; l = l->next) {
+		struct sms_away *s = l->data;
+
+		if (s->uin == uin) {
+			if (s->count > config_sms_away_limit)
+				return 0;
+			else 
+				return 1;
+		}
+	}
+
+	return 1;
+}
+
+/*
+ * sms_away_free()
+ *
+ * pozbywa siê listy sms_away.
+ */
+void sms_away_free()
+{
+	if (!sms_away)
+		return;
+
+	list_destroy(sms_away, 1);
+	sms_away = NULL;
+}
+
+#ifdef WITH_IOCTLD
+
+/*
+ * ioctld_parse_seq()
+ *
+ * zamieñ string na odpowiedni± strukturê dla ioctld.
+ *
+ *  - seq,
+ *  - data.
+ *
+ * 0/-1.
+ */
+int ioctld_parse_seq(const char *seq, struct action_data *data)
+{
+        char tmp_buff[16] = "";
+        int i = 0, a, l = 0, default_delay = DEFAULT_DELAY;
+
+        if (!data || !seq || !isdigit(seq[0]))
+                return -1;
+
+        for (a = 0; a <= strlen(seq) && a < MAX_ITEMS; a++) {
+                if (i > 15)
+			return -1;
+                if (isdigit(seq[a]))
+                        tmp_buff[i++] = seq[a];
+                else if (seq[a] == '/') {
+                        data->value[l] = atoi(tmp_buff);
+                        memset(tmp_buff, 0, 16);
+                        for (i = 0; isdigit(seq[++a]); i++)
+                                tmp_buff[i] = seq[a];
+                        data->delay[l] = default_delay = atoi(tmp_buff);
+                        memset(tmp_buff, 0, 16);
+                        i = 0;
+                        l++;
+                }
+                else if (seq[a] == ',') {
+                        data->value[l] = atoi(tmp_buff);
+                        data->delay[l] = default_delay;
+                        memset(tmp_buff, 0, 16);
+                        i = 0;
+                        l++;
+                } else if (seq[a] == ' ')
+                        continue;
+                else if (seq[a] == '\0') {
+                        data->value[l] = atoi(tmp_buff);
+                        data->delay[l] = default_delay;
+                        data->value[++l] = data->delay[l] = -1;
+                } else
+			return -1;
+        }
+
+	return 0;
+}
+
+/*
+ * ioctld_socket()
+ *
+ * inicjuje gniazdo dla ioctld.
+ *
+ *  - path - ¶cie¿ka do gniazda.
+ *
+ * 0/-1.
+ */
+int ioctld_socket(char *path)
+{
+	struct sockaddr_un sockun;
+	int i, retry = 5, usecs = 50000;
+
+	if (ioctld_sock != -1)
+		close(ioctld_sock);
+
+	if ((ioctld_sock = socket(AF_UNIX, SOCK_DGRAM, 0)) == -1)
+		return -1;
+
+	sockun.sun_family = AF_UNIX;
+	strcpy(sockun.sun_path, path);
+
+	for (i = 0; i <= retry; i++) {
+		if (connect(ioctld_sock, (struct sockaddr*) &sockun, sizeof(sockun)) != -1)
+			return 0;
+		usleep(usecs);
+	}
+
+        return -1;
+}
+
+/*
+ * ioctld_send()
+ *
+ * wysy³a do ioctld polecenie uruchomienia danej akcji.
+ *
+ *  - seq - sekwencja danych,
+ *  - act - rodzaj akcji.
+ *
+ * 0/-1.
+ */
+int ioctld_send(const char *seq, int act)
+{
+	const char *s;
+	struct action_data data;
+
+	if (*seq == '$') {
+		seq++;
+		s = format_find(seq);
+		if (!strcmp(s, "")) {
+			print("events_seq_not_found", seq);
+			return -1;
+		}
+	} else
+		s = seq;
+
+	data.act = act;
+
+	if (ioctld_parse_seq(s, &data))
+		return -1;
+
+	return send(ioctld_sock, &data, sizeof(data), 0);
+}
+
+#endif /* WITH_IOCTLD */
+
+/*
+ * init_control_pipe()
+ *
+ * inicjuje potok nazwany do zewnêtrznej kontroli ekg.
+ *
+ *  - pipe_file.
+ *
+ * zwraca deskryptor otwartego potoku lub -1.
+ */
+int init_control_pipe(const char *pipe_file)
+{
+	int fd;
+	struct stat st;
+	char *err_str = NULL;
+
+	if (!pipe_file)
+		return 0;
+
+	if (!stat(pipe_file, &st) && !S_ISFIFO(st.st_mode))
+		err_str = saprintf("Plik %s nie jest potokiem. Ignorujê.\n", pipe_file);
+
+	if (mkfifo(pipe_file, 0600) < 0 && errno != EEXIST)
+		err_str = saprintf("Nie mogê stworzyæ potoku %s: %s. Ignorujê.\n", pipe_file, strerror(errno));
+
+#ifdef O_NDELAY
+	if ((fd = open(pipe_file, O_RDWR | O_NDELAY)) < 0)
+#else
+	if ((fd = open(pipe_file, O_RDWR)) < 0)
+#endif
+		err_str = saprintf("Nie mogê otworzyæ potoku %s: %s. Ignorujê.\n", pipe_file, strerror(errno));
+
+	if (err_str) {
+		print("generic_error", err_str);
+		xfree(err_str);
+		return -1;
+	}
+
+	return fd;
+}
+
+/*
+ * timestamp()
+ *
+ * zwraca statyczny buforek z ³adnie sformatowanym czasem.
+ *
+ *  - format.
+ */
+const char *timestamp(const char *format)
+{
+	static char buf[100];
+	time_t t;
+	struct tm *tm;
+
+	time(&t);
+	tm = localtime(&t);
+	strftime(buf, sizeof(buf), format, tm);
+
+	return buf;
+}
+
+/*
+ * unidle()
+ *
+ * uaktualnia licznik czasu ostatniej akcji, ¿eby przypadkiem nie zrobi³o
+ * autoawaya, kiedy piszemy.
+ */
+void unidle()
+{
+	time(&last_action);
+}
+
+/*
+ * transfer_id()
+ *
+ * zwraca pierwszy wolny identyfikator transferu dcc.
+ */
+int transfer_id()
+{
+	list_t l;
+	int id = 1;
+
+	for (l = transfers; l; l = l->next) {
+		struct transfer *t = l->data;
+
+		if (t->id >= id)
+			id = t->id + 1;
+	}
+
+	return id;
+}
+
+/*
+ * on_off()
+ *
+ * zwraca 1 je¶li tekst znaczy w³±czyæ, 0 je¶li wy³±czyæ, -1 je¶li co innego.
+ *
+ *  - value.
+ */
+int on_off(const char *value)
+{
+	if (!value)
+		return -1;
+
+	if (!strcasecmp(value, "on") || !strcasecmp(value, "true") || !strcasecmp(value, "yes") || !strcasecmp(value, "tak") || !strcmp(value, "1"))
+		return 1;
+
+	if (!strcasecmp(value, "off") || !strcasecmp(value, "false") || !strcasecmp(value, "no") || !strcasecmp(value, "nie") || !strcmp(value, "0"))
+		return 0;
+
+	return -1;
+}
+
+/*
+ * timer_add()
+ *
+ * dodaje timera.
+ *
+ *  - period - za jaki czas w sekundach ma byæ uruchomiony,
+ *  - persistent - czy sta³y timer,
+ *  - type - rodzaj timera,
+ *  - at - zwyk³y timer czy at?
+ *  - name - nazwa timera w celach identyfikacji. je¶li jest równa NULL,
+ *           zostanie przyznany pierwszy numerek z brzegu.
+ *  - command - komenda wywo³ywana po up³yniêciu czasu.
+ *
+ * zwraca zaalokowan± struct timer lub NULL.
+ */
+struct timer *timer_add(time_t period, int persistent, int type, int at, const char *name, const char *command)
+{
+	struct timer t;
+	struct timeval tv;
+	struct timezone tz;
+
+	if (!name) {
+		int i;
+
+		for (i = 1; ; i++) {
+			int gotit = 0;
+			list_t l;
+
+			for (l = timers; l; l = l->next) {
+				struct timer *tt = l->data;
+
+				if (!strcmp(tt->name, itoa(i))) {
+					gotit = 1;
+					break;
+				}
+			}
+
+			if (!gotit)
+				break;
+		}
+
+		name = itoa(i);
+	}
+
+	memset(&t, 0, sizeof(t));
+
+	gettimeofday(&tv, &tz);
+	tv.tv_sec += period;
+	memcpy(&t.ends, &tv, sizeof(tv));
+	t.period = period;
+	t.name = xstrdup(name);
+	t.command = xstrdup(command);
+	t.type = type;
+	t.at = at;
+	t.persistent = persistent;
+
+	return list_add(&timers, &t, sizeof(t));
+}
+
+/*
+ * timer_remove()
+ *
+ * usuwa timer.
+ *
+ *  - name - nazwa timera, mo¿e byæ NULL,
+ *  - at - zwyk³y timer czy at?
+ *  - command - komenda timera, mo¿e byæ NULL.
+ *
+ * 0/-1.
+ */
+int timer_remove(const char *name, int at, const char *command)
+{
+	list_t l;
+	int removed = 0;
+
+	for (l = timers; l; ) {
+		struct timer *t = l->data;
+
+		l = l->next;
+
+		if ((at == t->at) && ((name && !strcmp(name, t->name)) || (command && !strcmp(command, t->command)))) {
+			xfree(t->name);
+			xfree(t->command);
+			xfree(t->id);
+			list_remove(&timers, t, 1);
+			removed = 1;
+		}
+	}
+
+	return (removed) ? 0 : -1;
+}
+
+/*
+ * timer_free()
+ *
+ * zwalnia pamiêæ po timerach.
+ */
+void timer_free()
+{
+	list_t l;
+
+	for (l = timers; l; l = l->next) {
+		struct timer *t = l->data;
+		
+		xfree(t->name);
+		xfree(t->command);
+		xfree(t->id);
+	}
+
+	list_destroy(timers, 1);
+	timers = NULL;
 }
 
 /* 
@@ -3830,48 +3907,6 @@ void change_status(int status, const char *arg, int autom)
 	xfree(tmp);
 
 	update_status();
-}
-
-/*
- * binding_list()
- *
- * wy¶wietla listê przypisanych komend.
- */
-void binding_list() 
-{
-	list_t l;
-
-	if (!bindings)
-		print("bind_seq_list_empty");
-
-	for (l = bindings; l; l = l->next) {
-		struct binding *b = l->data;
-
-		print("bind_seq_list", b->key, b->action);
-	}
-}
-
-/*
- * binding_free()
- *
- * zwalnia pamiêæ po li¶cie przypisanych klawiszy.
- */
-void binding_free() 
-{
-	list_t l;
-
-	if (!bindings)
-		return;
-
-	for (l = bindings; l; l = l->next) {
-		struct binding *b = l->data;
-
-		xfree(b->key);
-		xfree(b->action);
-	}
-
-	list_destroy(bindings, 1);
-	bindings = NULL;
 }
 
 /*

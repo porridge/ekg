@@ -570,7 +570,7 @@ const char *format_user(uin_t uin)
 		tmp = format_string(format_find("known_user"), u->display, itoa(uin));
 	
 	strncpy(buf, tmp, sizeof(buf) - 1);
-	buf[sizeof(buf) - 1] = '\0';
+	buf[sizeof(buf) - 1] = 0;
 	
 	xfree(tmp);
 

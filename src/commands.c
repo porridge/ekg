@@ -3709,7 +3709,7 @@ COMMAND(cmd_last)
         for (l = lasts; l; l = l->next) {
                 struct last *ll = l->data;
 		struct tm *tm, *st;
-		char buf[100], buf2[100];
+		char buf[100], buf2[100], *time_str = NULL;
 
 		if (uin == 0 || uin == ll->uin) {
 			tm = localtime(&ll->time);
@@ -3718,16 +3718,16 @@ COMMAND(cmd_last)
 			if (show_sent && ll->type == 0 && !(ll->sent_time - config_time_deviation <= ll->time && ll->time <= ll->sent_time + config_time_deviation)) {
 				st = localtime(&ll->sent_time);
 				strftime(buf2, sizeof(buf2), format_find((ll->sent_time / 86400 == time(NULL) / 86400) ? "last_list_timestamp_today" : "last_list_timestamp"), st);
-
-				strncat(buf, "/", sizeof(buf) - strlen(buf) - 1);
-				strncat(buf, buf2, sizeof(buf) - strlen(buf) - 1);
-				buf[sizeof(buf) - 1] = '\0';
-			}
+				time_str = saprintf("%s/%s", buf, buf2);
+			} else
+				time_str = xstrdup(buf);
 
 			if (config_last & 4 && ll->type == 1)
-				print("last_list_out", buf, format_user(ll->uin), ll->message);
+				print("last_list_out", time_str, format_user(ll->uin), ll->message);
 			else
-				print("last_list_in", buf, format_user(ll->uin), ll->message);
+				print("last_list_in", time_str, format_user(ll->uin), ll->message);
+
+			xfree(time_str);
 		}
         }
 }
