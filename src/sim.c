@@ -29,6 +29,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include <openssl/bio.h>
 #include <openssl/evp.h>
@@ -38,10 +39,8 @@
 #include <openssl/pem.h>
 #include <openssl/sha.h>
 
-#include "sim.h"
-
 #include "libgadu.h"
-
+#include "sim.h"
 
 /* path to key files */
 char SIM_Key_Path[255];
@@ -62,8 +61,8 @@ static int sim_seed_prng()
 	data.foo = (void *) &data;
 	data.foo2 = (void *) &rubbish;
 
-	RAND_seed((const void *) &data, sizeof(data));
-	RAND_seed((const void *) &rubbish, sizeof(rubbish));
+	RAND_seed((void *) &data, sizeof(data));
+	RAND_seed((void *) &rubbish, sizeof(rubbish));
 
 	return sizeof(data) + sizeof(rubbish);
 }

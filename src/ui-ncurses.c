@@ -38,40 +38,41 @@
  * 22:02 <@bkU> ostatnio s³ysza³em przecieki, ¿e w NASA u¿ywaj± w³a¶nie ekg.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <dirent.h>
 #include "config.h"
+
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+#include <dirent.h>
 #ifdef HAVE_LIBGEN_H
 #  include <libgen.h>
 #else
 #  include "../compat/dirname.h"
 #endif
+#include <ncurses.h>
 #ifndef HAVE_SCANDIR
 #  include "../compat/scandir.h"
 #endif
-#include <ncurses.h>
 #include <signal.h>
-#include <sys/ioctl.h>
-#ifndef _AIX
-#  include <string.h>
-#endif
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <ctype.h>
-#include "stuff.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "commands.h"
+#include "libgadu.h"
 #include "mail.h"
+#ifdef WITH_PYTHON
+#  include "python.h"
+#endif
+#include "stuff.h"
 #include "themes.h"
 #include "ui.h"
 #include "userlist.h"
 #include "vars.h"
 #include "version.h"
 #include "xmalloc.h"
-#ifdef WITH_PYTHON
-#  include "python.h"
-#endif
 
 static void ui_ncurses_loop();
 static void ui_ncurses_print(const char *target, int separate, const char *line);
@@ -1680,7 +1681,7 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 			}
 
 			for (i = 0; data && data[i].name; i++) {
-				int len, matched = (int) data[i].text;
+				int len, matched = ((data[i].text) ? 1 : 0);
 
 				if (neg)
 					matched = !matched;
@@ -2393,7 +2394,7 @@ void file_generator(const char *text, int len)
 		
 		if (!strncmp(bname, file, strlen(bname)) || *bname == '/') {
 			if (strcmp(dname, "."))
-				file = saprintf(dname[strlen(dname) - 1] == '/' ? "%s%s" : "%s/%s", dname, file);
+				file = saprintf((dname[strlen(dname) - 1] == '/' ? "%s%s" : "%s/%s"), dname, file);
 			else
 				file = saprintf("%s", file);
 
@@ -2515,7 +2516,7 @@ static void complete(int *line_start, int *line_index)
 
 	/* sprawd¼, gdzie jeste¶my */
 	for (p = line, start = line, word = -1; *p; ) {
-		while (*p && isspace((int) *p))
+		while (*p && xisspace(*p))
 			p++;
 		start = (char*) p;
 		word++;
@@ -2534,7 +2535,7 @@ static void complete(int *line_start, int *line_index)
 			if (*p)
 				p++;
 		} else {
-			while (*p && !isspace((int) *p))
+			while (*p && !xisspace(*p))
 				p++;
 		}
 	}
@@ -2584,7 +2585,7 @@ static void complete(int *line_start, int *line_index)
 			int len = strlen(c->name);
 			char *cmd = (line[0] == '/') ? line + 1 : line;
 
-			if (!strncasecmp(cmd, c->name, len) && isspace((int) cmd[len])) {
+			if (!strncasecmp(cmd, c->name, len) && xisspace(cmd[len])) {
 				params = c->params;
 				abbrs = 1;
 				break;
@@ -2980,12 +2981,12 @@ static void binding_word_rubout(const char *arg)
 	int eaten = 0;
 
 	p = line + line_index;
-	while (isspace((int) *(p-1)) && p > line) {
+	while (xisspace(*(p-1)) && p > line) {
 		p--;
 		eaten++;
 	}
 	if (p > line) {
-		while (!isspace((int) *(p-1)) && p > line) {
+		while (!xisspace(*(p-1)) && p > line) {
 			p--;
 			eaten++;
 		}
@@ -3523,14 +3524,14 @@ int binding_key(struct binding *b, const char *key, int add)
 		if (strlen(key) != 5)
 			return -1;
 	
-		ch = toupper(key[4]);
+		ch = xtoupper(key[4]);
 
 		b->key = saprintf("Alt-%c", ch);
 
 		if (add) {
 			binding_map_meta[ch] = list_add(&bindings, b, sizeof(struct binding));
 			if (xisalpha(ch))
-				binding_map_meta[tolower(ch)] = binding_map_meta[ch];
+				binding_map_meta[xtolower(ch)] = binding_map_meta[ch];
 		}
 
 		return 0;
@@ -3542,7 +3543,7 @@ int binding_key(struct binding *b, const char *key, int add)
 		if (strlen(key) != 6)
 			return -1;
 
-		ch = toupper(key[5]);
+		ch = xtoupper(key[5]);
 		b->key = saprintf("Ctrl-%c", ch);
 
 		if (add)
@@ -3551,7 +3552,7 @@ int binding_key(struct binding *b, const char *key, int add)
 		return 0;
 	}
 
-	if (toupper(key[0]) == 'F' && atoi(key + 1)) {
+	if (xtoupper(key[0]) == 'F' && atoi(key + 1)) {
 		int f = atoi(key + 1);
 
 		if (f < 1 || f > 24)

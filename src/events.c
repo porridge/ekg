@@ -20,40 +20,39 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdio.h>
-#include <unistd.h>
-#ifndef _AIX
-#  include <string.h>
-#endif
-#include <stdlib.h>
-#include <errno.h>
-#include <signal.h>
-#include <errno.h>
-#include <sys/stat.h>
+#include "config.h"
+
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "config.h"
-#include "libgadu.h"
-#include "events.h"
+
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "commands.h"
+#include "events.h"
+#include "libgadu.h"
 #include "msgqueue.h"
+#ifdef WITH_PYTHON
+#  include "python.h"
+#endif
+#ifdef HAVE_OPENSSL
+#  include "sim.h"
+#  include "simlite.h"
+#endif
+#ifndef HAVE_STRLCPY
+#  include "../compat/strlcpy.h"
+#endif
 #include "stuff.h"
 #include "themes.h"
 #include "ui.h"
 #include "userlist.h"
 #include "voice.h"
 #include "xmalloc.h"
-#ifdef HAVE_OPENSSL
-#  include "sim.h"
-#  include "simlite.h"
-#endif
-#ifdef WITH_PYTHON
-#  include "python.h"
-#endif
-#ifndef HAVE_STRLCPY
-#  include "../compat/strlcpy.h"
-#endif
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure(), handle_search50();

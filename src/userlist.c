@@ -19,36 +19,36 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include "config.h"
+
+#include <sys/types.h>
 #include <sys/stat.h>
-#include <pwd.h>
-#include <limits.h>
-#ifndef _AIX
-#  include <string.h>
-#endif
-#include <stdarg.h>
-#include <errno.h>
-#include <signal.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "config.h"
-#include "libgadu.h"
+
+#include <errno.h>
+#include <limits.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "commands.h"
 #include "dynstuff.h"
+#include "libgadu.h"
+#ifndef HAVE_STRLCAT
+#  include "../compat/strlcat.h"
+#endif
+#ifndef HAVE_STRLCPY
+#  include "../compat/strlcpy.h"
+#endif
 #include "stuff.h"
 #include "themes.h"
 #include "userlist.h"
 #include "vars.h"
 #include "xmalloc.h"
-#ifndef HAVE_STRLCPY
-#  include "../compat/strlcpy.h"
-#endif
-#ifndef HAVE_STRLCAT
-#  include "../compat/strlcat.h"
-#endif
 
 list_t userlist = NULL;
 
@@ -374,7 +374,7 @@ void userlist_write_crash()
 
 	chdir(path);
 	
-	snprintf(name, sizeof(name), "userlist.%d", getpid());
+	snprintf(name, sizeof(name), "userlist.%d", (int) getpid());
 	if (!(f = fopen(name, "w")))
 		return;
 
@@ -396,7 +396,7 @@ void userlist_write_crash()
 			if (m != u->groups)
 				fprintf(f, ",");
 
-			fprintf(f, g->name);
+			fprintf(f, "%s", g->name);
 		}
 		
 		fprintf(f, ";%u\r\n", u->uin);

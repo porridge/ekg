@@ -23,37 +23,36 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <pwd.h>
-#include <limits.h>
+#include "config.h"
+
+#include <sys/types.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
 #include <sys/time.h>
-#ifndef _AIX
-#  include <string.h>
-#endif
-#include <stdlib.h>
-#include <errno.h>
-#include <stdarg.h>
-#include <time.h>
-#include <signal.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+#include <dirent.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
-#include <libgadu.h>
-#include "config.h"
-#include "libgadu.h"
+#include <limits.h>
+#include <pwd.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+
 #include "commands.h"
 #include "events.h"
+#include "libgadu.h"
 #include "mail.h"
 #include "msgqueue.h"
-#include "stuff.h"
-#include "themes.h"
-#include "ui.h"
-#include "userlist.h"
-#include "vars.h"
-#include "version.h"
-#include "xmalloc.h"
 #ifdef WITH_PYTHON
 #  include "python.h"
 #endif
@@ -64,9 +63,24 @@
 #ifndef HAVE_STRLCPY
 #  include "../compat/strlcpy.h"
 #endif
+#include "stuff.h"
+#include "themes.h"
+#include "ui.h"
+#include "userlist.h"
+#include "vars.h"
+#include "version.h"
+#include "xmalloc.h"
 
 #ifndef PATH_MAX
-#  define PATH_MAX _POSIX_PATH_MAX
+#  ifdef _POSIX_PATH_MAX
+#    define PATH_MAX _POSIX_PATH_MAX
+#  else
+#    define PATH_MAX 255
+#  endif
+#endif
+
+#ifndef WEXITSTATUS
+#  define WEXITSTATUS(status)	((unsigned int) (status) >> 8)
 #endif
 
 static pid_t ekg_pid = 0;
@@ -1035,47 +1049,6 @@ int main(int argc, char **argv)
 
 	variable_init();
 	variable_set_default();
-
-#ifdef HAVE_USLEEP
-
-	if ((tmp = config_read_variable("fade_in"))) {
-		config_fade_in = atoi(tmp);
-		xfree(tmp);
-	}
-
-	if (config_fade_in && getenv("TERM") && !strcmp(getenv("TERM"), "linux") && !fork()) {
-		int i;
-
-		for (i = 0; i < 16; i++) {
-			int j;
-
-			for (j = 0; j < 16; j++) {
-				int r, g, b;
-
-				r = default_color_map[j].r * i / 16;
-				g = default_color_map[j].g * i / 16;
-				b = default_color_map[j].b * i / 16;
-
-				if (r > 255)
-					r = 255;
-				if (g > 255)
-					g = 255;
-				if (b > 255)
-					b = 255;
-
-				printf("\033]P%x%.2x%.2x%.2x", j, r, g, b);
-				fflush(stdout);
-			}
-
-			usleep(config_fade_in * 1000);
-		}
-
-		printf("\033]R");
-		fflush(stdout);
-
-		exit(0);
-	}
-#endif
 
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {

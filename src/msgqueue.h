@@ -21,9 +21,11 @@
 #ifndef __MSGQUEUE_H
 #define __MSGQUEUE_H
 
+#include <sys/types.h>
 #include <time.h>
-#include "libgadu.h"
+
 #include "dynstuff.h"
+#include "libgadu.h"
 
 struct msg_queue {
 	int msg_class;

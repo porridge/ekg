@@ -49,4 +49,3 @@ void ui_none_init()
 	ui_event = event;
 	ui_deinit = nop;
 }
-

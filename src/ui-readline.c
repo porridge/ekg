@@ -21,28 +21,28 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#ifndef _AIX
-#  include <string.h>
-#endif
-#include <readline.h>
-#include <history.h>
-#include <stdarg.h>
-#include <signal.h>
 #include "config.h"
-#include "userlist.h"
-#include "stuff.h"
+
+#include <history.h>
+#include <readline.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "commands.h"
-#include "xmalloc.h"
-#include "themes.h"
-#include "vars.h"
-#include "ui.h"
 #include "mail.h"
 #ifndef HAVE_STRLCPY
 #  include "../compat/strlcpy.h"
 #endif
+#include "stuff.h"
+#include "themes.h"
+#include "ui.h"
+#include "userlist.h"
+#include "vars.h"
+#include "xmalloc.h"
 
 /* podstawmy ewentualnie brakuj±ce funkcje i definicje readline */
 
@@ -367,10 +367,10 @@ static char **my_completion(char *text, int start, int end)
 		if (!strncasecmp(tmp, cmd, strlen(cmd)) && tmp[strlen(cmd)] == ' ') {
 			word = 0;
 			for (i = 0; i < strlen(rl_line_buffer); i++) {
-				if (isspace((int) rl_line_buffer[i]))
+				if (xisspace(rl_line_buffer[i]))
 					word++;
 			}
-			if (word == 2 && isspace((int) rl_line_buffer[strlen(rl_line_buffer) - 1])) {
+			if (word == 2 && xisspace(rl_line_buffer[strlen(rl_line_buffer) - 1])) {
 				if (send_nicks_count != my_send_nicks_count) {
 					my_send_nicks_count = send_nicks_count;
 					send_nicks_index = 0;
@@ -398,7 +398,7 @@ static char **my_completion(char *text, int start, int end)
 
 	if (start) {
 		for (i = 1; i <= start; i++) {
-			if (isspace((int) rl_line_buffer[i]) && !isspace((int) rl_line_buffer[i - 1]))
+			if (xisspace(rl_line_buffer[i]) && !xisspace(rl_line_buffer[i - 1]))
 				word++;
 		}
 		word--;
@@ -408,7 +408,7 @@ static char **my_completion(char *text, int start, int end)
 			int len = strlen(c->name);
 			char *cmd = (*rl_line_buffer == '/') ? rl_line_buffer + 1 : rl_line_buffer;
 
-			if (!strncasecmp(cmd, c->name, len) && isspace((int) cmd[len])) {
+			if (!strncasecmp(cmd, c->name, len) && xisspace(cmd[len])) {
 				params = c->params;
 				abbrs = 1;
 				break;
@@ -1487,13 +1487,13 @@ static int bind_sequence(const char *seq, const char *command, int quiet)
 	}
 	
 	if (!strncasecmp(seq, "Ctrl-", 5) && strlen(seq) == 6 && xisalpha(seq[5])) {
-		int key = CTRL(toupper(seq[5]));
+		int key = CTRL(xtoupper(seq[5]));
 
 		if (command) {
 			rl_bind_key(key, bind_handler_ctrl);
 			nice_seq = xstrdup(seq);
-			nice_seq[0] = toupper(nice_seq[0]);
-			nice_seq[5] = toupper(nice_seq[5]);
+			nice_seq[0] = xtoupper(nice_seq[0]);
+			nice_seq[5] = xtoupper(nice_seq[5]);
 		} else
 			rl_unbind_key(key);
 
@@ -1502,8 +1502,8 @@ static int bind_sequence(const char *seq, const char *command, int quiet)
 		if (command) {
 			rl_bind_key_in_map(seq[4], bind_handler_alt, emacs_meta_keymap);
 			nice_seq = xstrdup(seq);
-			nice_seq[0] = toupper(nice_seq[0]);
-			nice_seq[4] = toupper(nice_seq[4]);
+			nice_seq[0] = xtoupper(nice_seq[0]);
+			nice_seq[4] = xtoupper(nice_seq[4]);
 		} else
 			rl_unbind_key_in_map(seq[4], emacs_meta_keymap);
 		

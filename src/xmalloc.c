@@ -17,14 +17,14 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <sys/types.h>
+
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <stdarg.h>
-#ifndef _AIX
-#  include <string.h>
-#endif
+
 #include "stuff.h"
 #include "userlist.h"
 

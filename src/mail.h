@@ -20,8 +20,9 @@
 #ifndef __MAIL_H
 #define __MAIL_H
 
-#include <time.h>
 #include <sys/types.h>
+#include <time.h>
+
 #include "dynstuff.h"
 
 struct mail_folder {

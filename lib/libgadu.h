@@ -863,7 +863,7 @@ struct gg_pubdir50_reply {
 
 #define GG_STATUS_FRIENDS_MASK 0x8000		/* tylko dla znajomych (4.6) */
 
-#define GG_STATUS_DESCR_MAXSIZE 45
+#define GG_STATUS_DESCR_MAXSIZE 70
 
 /*
  * makra do ³atwego i szybkiego sprawdzania stanu.

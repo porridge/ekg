@@ -20,7 +20,6 @@
 
 #include <openssl/rsa.h>
 #include <stdint.h>
-#include <limits.h>
 
 extern char *sim_key_path;
 extern int sim_errno;

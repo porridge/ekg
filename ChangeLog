@@ -6,6 +6,15 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-03-07
+
+- uporz±dkowanie #include'owanych plików, dodanie potrzebnych, usuniêcie
+  zbêdnych. inne kosmetyczne zmiany. pozbycie siê warningów na
+  niektórych systemach (sz)
+- libgadu: maksymalna d³ugo¶æ opisu (GG_STATUS_DESCR_MAXSIZE) to 70
+  znaków (*/sz)
+- usuniêcie ,,fade_in'' (w/sz)
+
 // 2003-03-06
 
 - libgadu: dodanie funkcji usuwania listy kontaktów z serwera (wysek?/w)

@@ -18,25 +18,25 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <unistd.h>
-#ifndef _AIX
-#  include <string.h>
-#endif
-#include <stdarg.h>
-#include <ctype.h>
 #include "config.h"
-#include "libgadu.h"
+
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "dynstuff.h"
+#include "libgadu.h"
 #include "mail.h"
+#ifndef HAVE_STRLCPY
+#  include "../compat/strlcpy.h"
+#endif
 #include "stuff.h"
 #include "themes.h"
 #include "ui.h"
 #include "vars.h"
 #include "xmalloc.h"
-#ifndef HAVE_STRLCPY
-#  include "../compat/strlcpy.h"
-#endif
 
 list_t variables = NULL;
 
@@ -208,7 +208,6 @@ void variable_init()
 	variable_add("reason", "re", VAR_STR, 2, &config_reason, NULL, NULL, NULL);
 	variable_add("interface", "in", VAR_STR, 2, &config_interface, NULL, NULL, NULL);
 	variable_add("password_cp1250", "c1", VAR_BOOL, 2, &config_password_cp1250, NULL, NULL, NULL);
-	variable_add("fade_in", "fi", VAR_INT, 2, &config_fade_in, NULL, NULL, NULL);
 }
 
 /*

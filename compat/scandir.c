@@ -16,12 +16,11 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <dirent.h>
-#ifndef _AIX
-#  include <string.h>
-#endif
 #include <errno.h>
+#include <dirent.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 static struct dirent foo;
 #define __DIRENT_SIZE(d)	\

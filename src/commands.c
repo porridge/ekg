@@ -23,27 +23,43 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdio.h>
-#include <unistd.h>
-#ifndef _AIX
-#  include <string.h>
-#endif
-#include <stdlib.h>
-#include <ctype.h>
-#include <errno.h>
-#include <sys/socket.h>
+#include "config.h"
+
+#include <sys/types.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
-#include <dirent.h>
-#include <fcntl.h>
+#include <sys/time.h>
+#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <sys/ioctl.h>
-#include "config.h"
-#include "libgadu.h"
+
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+
 #include "commands.h"
 #include "dynstuff.h"
 #include "events.h"
+#include "libgadu.h"
 #include "msgqueue.h"
+#ifdef WITH_PYTHON
+#  include "python.h"
+#endif
+#ifdef HAVE_OPENSSL
+#  include "sim.h"
+#  include "simlite.h"
+#endif
+#ifndef HAVE_STRLCAT
+#  include "../compat/strlcat.h"
+#endif
+#ifndef HAVE_STRLCPY
+#  include "../compat/strlcpy.h"
+#endif
 #include "stuff.h"
 #include "themes.h"
 #include "ui.h"
@@ -52,19 +68,6 @@
 #include "voice.h"
 #include "userlist.h"
 #include "xmalloc.h"
-#ifdef WITH_PYTHON
-#  include "python.h"
-#endif
-#ifdef HAVE_OPENSSL
-#  include "sim.h"
-#  include "simlite.h"
-#endif
-#ifndef HAVE_STRLCPY
-#  include "../compat/strlcpy.h"
-#endif
-#ifndef HAVE_STRLCAT
-#  include "../compat/strlcat.h"
-#endif
 
 COMMAND(cmd_msg);
 COMMAND(cmd_modify);
@@ -416,7 +419,7 @@ COMMAND(cmd_away)
 		int tmp;
 
 		if (!params[0]) {
-			printq(GG_S_F(config_status) ? "private_mode_is_on" : "private_mode_is_off");
+			printq((GG_S_F(config_status) ? "private_mode_is_on" : "private_mode_is_off"));
 			return 0;
 		}
 		
@@ -431,7 +434,7 @@ COMMAND(cmd_away)
 		}
 
 		printq((tmp) ? "private_mode_on" : "private_mode_off");
-		ui_event("my_status", "private", (tmp) ? "on" : "off", NULL);
+		ui_event("my_status", "private", ((tmp) ? "on" : "off"), NULL);
 
 		config_status = GG_S(config_status);
 		config_status |= ((tmp) ? GG_STATUS_FRIENDS_MASK : 0);
@@ -1300,7 +1303,7 @@ COMMAND(cmd_help)
 	for (l = commands; l; l = l->next) {
 		struct command *c = l->data;
 
-		if (isalnum((int) *c->name) && !c->alias) {
+		if (xisalnum(*c->name) && !c->alias) {
 		    	char *blah = NULL;
 
 			if (strstr(c->brief_help, "%"))
@@ -2843,6 +2846,9 @@ COMMAND(cmd_key)
 		char *tmp, *tmp2;
 		struct stat st;
 
+		if (!config_uin)
+			return -1;
+
 		if (mkdir(prepare_path("keys", 1), 0700) && errno != EEXIST) {
 			printq("key_generating_error", strerror(errno));
 			return -1;
@@ -3626,7 +3632,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 				int l = strlen(c->name);
 
 				if (l > 2 && !strncasecmp(xline, c->name, l)) {
-					if (!xline[l] || isspace((int) xline[l])) {
+					if (!xline[l] || xisspace(xline[l])) {
 						correct_command = 1;
 						break;
 					}
@@ -3669,7 +3675,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 
 	if (!cmd) {
 		tmp = cmd = line;
-		while (*tmp && !isspace((int) *tmp))
+		while (*tmp && !xisspace(*tmp))
 			tmp++;
 		p = (*tmp) ? tmp + 1 : tmp;
 		*tmp = 0;
@@ -4024,7 +4030,7 @@ COMMAND(cmd_at)
 					freq_str += strlen(itoa(_period));
 
 					if (strlen(freq_str)) {
-						switch (tolower(*freq_str++)) {
+						switch (xtolower(*freq_str++)) {
 							case 'd':
 								_period *= 86400;
 								break;
@@ -4292,7 +4298,7 @@ COMMAND(cmd_timer)
 			p += strlen(itoa(_period));
 
 			if (strlen(p)) {
-				switch (tolower(*p++)) {
+				switch (xtolower(*p++)) {
 					case 'd':
 						_period *= 86400;
 						break;

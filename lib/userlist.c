@@ -17,15 +17,14 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <errno.h>
-#ifndef _AIX
-#  include <string.h>
-#endif
-#include <stdarg.h>
 #include <ctype.h>
+#include <errno.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "libgadu.h"
 
 /*
@@ -77,7 +76,7 @@ struct gg_http *gg_userlist_get(uin_t uin, const char *passwd, int async)
                 "Pragma: no-cache\r\n"
                 "\r\n"
                 "%s",
-                strlen(form), form);
+                (int) strlen(form), form);
 
 	free(form);
 
@@ -219,7 +218,7 @@ struct gg_http *gg_userlist_put(uin_t uin, const char *passwd, const char *conta
                 "Pragma: no-cache\r\n"
                 "\r\n"
                 "%s",
-                strlen(form), form);
+                (int) strlen(form), form);
 
 	free(form);
 
@@ -354,7 +353,7 @@ struct gg_http *gg_userlist_remove(uin_t uin, const char *passwd, int async)
                 "Pragma: no-cache\r\n"
                 "\r\n"
                 "%s",
-                strlen(form), form);
+                (int) strlen(form), form);
 
 	free(form);
 

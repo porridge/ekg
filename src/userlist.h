@@ -21,11 +21,15 @@
 #ifndef __USERLIST_H
 #define __USERLIST_H
 
-#include <stdio.h>
-#include <time.h>
+#include "config.h"
+
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include "config.h"
+
+#include <stdio.h>
+#include <time.h>
+
 #include "libgadu.h"
 #include "dynstuff.h"
 

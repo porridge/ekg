@@ -18,12 +18,11 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
-#ifndef _AIX
-#  include <string.h>
-#endif
+#include <string.h>
+
 #include "dynstuff.h"
 #include "xmalloc.h"
 

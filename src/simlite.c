@@ -22,8 +22,10 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include <openssl/bio.h>
 #include <openssl/evp.h>
@@ -33,9 +35,16 @@
 #include <openssl/pem.h>
 #include <openssl/sha.h>
 
+#include "libgadu.h"
 #include "simlite.h"
 
-#include "libgadu.h"
+#ifndef PATH_MAX
+#  ifdef _POSIX_PATH_MAX
+#    define PATH_MAX _POSIX_PATH_MAX
+#  else
+#    define PATH_MAX 255
+#  endif
+#endif
 
 char *sim_key_path = NULL;
 int sim_errno = 0;
@@ -56,8 +65,8 @@ static int sim_seed_prng()
 	data.foo = (void *) &data;
 	data.foo2 = (void *) &rubbish;
 
-	RAND_seed((const void *) &data, sizeof(data));
-	RAND_seed((const void *) &rubbish, sizeof(rubbish));
+	RAND_seed((void *) &data, sizeof(data));
+	RAND_seed((void *) &rubbish, sizeof(rubbish));
 
 	return sizeof(data) + sizeof(rubbish);
 }
@@ -186,8 +195,10 @@ char *sim_key_fingerprint(uint32_t uin)
 	else
 		size = i2d_RSAPrivateKey(key, NULL);
 
-	if (!(newbuf = buf = malloc(size)))
+	if (!(newbuf = buf = malloc(size))) {
+		sim_errno = SIM_ERROR_MEMORY;
 		goto cleanup;
+	}
 
 	if (uin)
 		size = i2d_RSAPublicKey(key, &newbuf);
@@ -200,8 +211,10 @@ char *sim_key_fingerprint(uint32_t uin)
 
 	free(buf);
 
-	if (!(result = malloc(md_len * 3)))
+	if (!(result = malloc(md_len * 3))) {
+		sim_errno = SIM_ERROR_MEMORY;
 		goto cleanup;
+	}
 
 	for (i = 0; i < md_len; i++)
 		sprintf(result + i * 3, (i != md_len - 1) ? "%.2x:" : "%.2x", md_value[i]);

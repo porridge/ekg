@@ -14,4 +14,4 @@ typedef unsigned long uint32_t;
 typedef unsigned short uint16_t;
 typedef unsigned char uint8_t;
 
-#endif  
+#endif /* COMPAT_STDINT_H */

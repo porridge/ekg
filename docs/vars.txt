@@ -675,20 +675,6 @@ reason
 	jest usuwana przy ka¿dej zmianie stanu lub wyj¶ciu z klienta,
 	chyba ¿e w³±czona jest zmienna ,,keep_reason''.
 
-fade_in
-	typ: liczba, zmienna wewnêtrzna, ukryta
-
-	okre¶la prêdko¶æ rozja¶niania terminala podczas uruchomienia ekg.
-	jest warto¶ci± opó¼nienia miêdzy kolejnymi fazami rozja¶niania
-	(w sumie jest ich 16) w milisekundach. warto¶æ 0 wy³±cza rozja¶nianie
-	terminala. przyk³adowo dla warto¶ci 100, terminal bêdzie w ca³o¶ci
-	widoczny po 1,6s. nale¿y wzi±æ pod uwagê, ¿e minimalna rozdzielczo¶æ
-	to 10ms na platformie i386. dzia³a wy³±cznie na terminalu typu
-	,,linux''.
-
-	terminal po wyj¶ciu z programu bêdzie posiada³ standardow± paletê
-	kolorów, niezale¿nie od wcze¶niejszych ustawieñ.
-
 interface
 	typ: tekst, zmienna wewnêtrzna, ukryta
 

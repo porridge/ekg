@@ -239,31 +239,29 @@ dnl <ekg>
 
 # i zaczynamy wykrywaæ ¶mieci dla ekg
 
-  # na wszelki wypadek
-  AC_FUNC_SETVBUF_REVERSED
-
   # dirname - get rid of libgen
   AC_CHECK_HEADERS(libgen.h)
   AC_CHECK_FUNC(dirname, , [OBJS="$OBJS ../compat/dirname.o"])
 
+  # sprawdzamy, czy system ma getopt_long
+  AC_CHECK_FUNC(getopt_long, , [OBJS="$OBJS ../compat/getopt.o ../compat/getopt1.o"; CFLAGS="-I../compat $CFLAGS"])
+
   # na SunOSach nie ma scandir()
   AC_CHECK_FUNCS(scandir, , [OBJS="$OBJS ../compat/scandir.o"])
 
+  # setenv dla pythona
   AC_CHECK_FUNCS(setenv)
+
+  # na wszelki wypadek sprawd¼my
+  AC_FUNC_SETVBUF_REVERSED
 
   # strlcat/strlcpy wiele systemów nie posiada
   AC_CHECK_FUNCS(strlcat, , [OBJS="$OBJS ../compat/strlcat.o"])
   AC_CHECK_FUNCS(strlcpy, , [OBJS="$OBJS ../compat/strlcpy.o"])
 
   # utimes/utime do sprawdzania poczty
-  AC_CHECK_FUNCS(utimes)
   AC_CHECK_FUNCS(utime)
-
-  # g³upota
-  AC_CHECK_FUNCS(usleep)
-
-  # sprawdzamy, czy system ma getopt_long
-  AC_CHECK_FUNC(getopt_long, , [OBJS="$OBJS ../compat/getopt.o ../compat/getopt1.o"; CFLAGS="-I../compat $CFLAGS"])
+  AC_CHECK_FUNCS(utimes)
 
   AC_ARG_ENABLE(ui-readline,
     [  --enable-ui-readline    Enable readline UI])

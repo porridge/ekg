@@ -24,14 +24,17 @@
 #ifndef __STUFF_H
 #define __STUFF_H
 
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+#include <ctype.h>
 #include <stdio.h>
 #include <time.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <netinet/in.h>
-#include "libgadu.h"
+
 #include "dynstuff.h"
+#include "libgadu.h"
 #include "ioctld.h"
 
 #define DEBUG_MAX_LINES	50	/* ile linii z debug zrzucaæ do pliku */
@@ -419,9 +422,15 @@ char *xstrmid(const char *str, int start, int length);
 const char *http_error_string(int h);
 char color_map(unsigned char r, unsigned char g, unsigned char b);
 char *strcasestr(const char *haystack, const char *needle);
-int xisdigit(unsigned char c);
-int xisxdigit(unsigned char c);
-int xisalpha(unsigned char c);
+
+/* makra, dziêki którym pozbywamy siê warning'ów */
+#define xisdigit(c)	isdigit((int) c)
+#define xisxdigit(c)	isxdigit((int) c)
+#define xisalpha(c)	isalpha((int) c)
+#define xisalnum(c)	isalnum((int) c)
+#define xisspace(c)	isspace((int) c)
+#define xtolower(c)	tolower((int) c)
+#define xtoupper(c)	toupper((int) c)
 
 struct timer *timer_add(time_t period, int persistent, int type, int at, const char *name, const char *command);
 int timer_remove(const char *name, int at, const char *command);

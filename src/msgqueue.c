@@ -2,7 +2,7 @@
 
 /*
  *  (C) Copyright 2001-2002 Piotr Domagalski <szalik@szalik.net>
- *                          Wojtek Kaniewski <wojtekka@dev.null.pl>
+ *                          Wojtek Kaniewski <wojtekka@irc.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -19,19 +19,20 @@
  */
 
 #include "config.h"
+
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <fcntl.h>
-#ifndef _AIX
-#  include <string.h>
-#endif
-#include <errno.h>
-#include "compat.h"
+
 #include "dynstuff.h"
+#include "libgadu.h"
 #include "msgqueue.h"
 #include "stuff.h"
 #include "xmalloc.h"

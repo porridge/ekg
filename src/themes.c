@@ -17,16 +17,15 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include "config.h"
+
+#include <limits.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
-#ifndef _AIX
-#  include <string.h>
-#endif
-#include <stdarg.h>
-#include <limits.h>
-#include <ctype.h>
-#include "config.h"
+
 #include "dynstuff.h"
 #include "stuff.h"
 #include "themes.h"
@@ -34,7 +33,11 @@
 #include "ui.h"
 
 #ifndef PATH_MAX
-#  define PATH_MAX _POSIX_PATH_MAX
+#  ifdef _POSIX_PATH_MAX
+#    define PATH_MAX _POSIX_PATH_MAX
+#  else
+#    define PATH_MAX 255
+#  endif
 #endif
 
 char *prompt_cache = NULL, *prompt2_cache = NULL, *error_cache = NULL;

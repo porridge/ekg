@@ -19,15 +19,11 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
+#include <sys/types.h>
 #include <sys/ioctl.h>
-#ifdef __linux__
-#  include <linux/cdrom.h>		  
-#  include <linux/kd.h>			 
-#endif
+#include <sys/stat.h>
+#include <sys/un.h>
+#include <sys/socket.h>
 #ifdef __FreeBSD__
 #  include <sys/kbio.h>			
 #endif
@@ -35,21 +31,30 @@
 #  include <sys/kbd.h>
 #  include <sys/kbio.h>
 #endif 
-#include <ctype.h>
-#include <sys/un.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
+#ifdef __linux__
+#  include <linux/cdrom.h>		  
+#  include <linux/kd.h>			 
+#endif
+
+#include <fcntl.h>
 #include <limits.h>
 #include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "ioctld.h"
 
 #ifndef PATH_MAX
-#  define PATH_MAX _POSIX_PATH_MAX
+#  ifdef _POSIX_PATH_MAX
+#    define PATH_MAX _POSIX_PATH_MAX
+#  else
+#    define PATH_MAX 255
+#  endif
 #endif
 
-char sock_path[PATH_MAX] =  "";
+char sock_path[PATH_MAX] = "";
 
 int blink_leds(int *flag, int *delay) 
 {
@@ -147,7 +152,7 @@ int main(int argc, char **argv)
 	struct action_data data;
 	
 	if (argc != 2) {
-		printf("program ten nie jest przeznaczony do samodzielnego wykonywania! \n");
+		printf("program ten nie jest przeznaczony do samodzielnego wykonywania!\n");
 	    	exit(1);
 	}
 	

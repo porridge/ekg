@@ -50,4 +50,3 @@ void ui_batch_init()
 	ui_event = event;
 	ui_deinit = nop;
 }
-

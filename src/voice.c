@@ -17,14 +17,17 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include "config.h"
+
+#include <sys/ioctl.h>
+#include <linux/soundcard.h>
+
+#include <fcntl.h>
+#include <gsm.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <linux/soundcard.h>
-#include <gsm.h>
-#include "config.h"
+
 #include "libgadu.h"
 #include "voice.h"
 #include "stuff.h"

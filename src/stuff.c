@@ -27,20 +27,9 @@
  */
 
 #include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/stat.h>
+
 #include <sys/types.h>
-#include <fcntl.h>
-#include <pwd.h>
-#include <limits.h>
-#ifndef _AIX
-#  include <string.h>
-#endif
-#include <stdarg.h>
-#include <errno.h>
-#include <signal.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -48,33 +37,50 @@
 #  include <sys/un.h>
 #  include "ioctld.h"
 #endif
+
 #include <ctype.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <pwd.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include "commands.h"
+#include "compat.h"
+#include "dynstuff.h"
+#include "libgadu.h"
 #ifdef HAVE_OPENSSL
 #  include "sim.h"
 #  include "simlite.h"
 #endif
-#ifdef HAVE_ZLIB_H
-#  include <zlib.h>
+#ifndef HAVE_STRLCAT
+#  include "../compat/strlcat.h"
 #endif
-#include "compat.h"
-#include "libgadu.h"
-#include "commands.h"
-#include "dynstuff.h"
+#ifndef HAVE_STRLCPY
+#  include "../compat/strlcpy.h"
+#endif
 #include "stuff.h"
 #include "themes.h"
 #include "ui.h"
 #include "userlist.h"
 #include "vars.h"
 #include "xmalloc.h"
-#ifndef HAVE_STRLCPY
-#  include "../compat/strlcpy.h"
-#endif
-#ifndef HAVE_STRLCAT
-#  include "../compat/strlcat.h"
+
+#ifdef HAVE_ZLIB_H
+#  include <zlib.h>
 #endif
 
 #ifndef PATH_MAX
-#  define PATH_MAX _POSIX_PATH_MAX
+#  ifdef _POSIX_PATH_MAX
+#    define PATH_MAX _POSIX_PATH_MAX
+#  else
+#    define PATH_MAX 255
+#  endif
 #endif
 
 struct gg_session *sess = NULL;
@@ -1519,7 +1525,7 @@ int config_write_partly(char **vars)
 	if (!(fi = fopen(filename, "r")))
 		return -1;
 
-	newfn = saprintf("%s.%d.%ld", filename, (uint32_t) getpid(), (long) time(NULL));
+	newfn = saprintf("%s.%d.%ld", filename, (int) getpid(), (long) time(NULL));
 
 	if (!(fo = fopen(newfn, "w"))) {
 		xfree(newfn);
@@ -1622,7 +1628,7 @@ void config_write_crash()
 
 	chdir(path);
 
-	snprintf(name, sizeof(name), "config.%d", getpid());
+	snprintf(name, sizeof(name), "config.%d", (int) getpid());
 	if (!(f = fopen(name, "w")))
 		return;
 
@@ -1652,7 +1658,7 @@ void debug_write_crash()
 
 	chdir(path);
 
-	snprintf(name, sizeof(name), "debug.%d", getpid());
+	snprintf(name, sizeof(name), "debug.%d", (int) getpid());
 	if (!(f = fopen(name, "w")))
 		return;
 
@@ -3217,7 +3223,7 @@ int send_sms(const char *recipient, const char *message, int quiet)
 	list_add(&watches, &s, sizeof(s));
 	close(fd[1]);
 	
-	tmp = saprintf((quiet) ? "\002%s" : "\001%s", recipient);
+	tmp = saprintf(((quiet) ? "\002%s" : "\001%s"), recipient);
 	process_add(pid, tmp);
 	xfree(tmp);
 
@@ -4133,22 +4139,4 @@ char *strcasestr(const char *haystack, const char *needle)
 	}
 
 	return NULL;
-}
-
-/*
- * xis*()
- *
- * to samo, co funkcje z ctype, ale bez g³upich
- * warningów.
- */
-int xisdigit(unsigned char c) {
-	return isdigit((int) c);
-}
-
-int xisxdigit(unsigned char c) {
-	return isxdigit((int) c);
-}
-
-int xisalpha(unsigned char c) {
-	return isalpha((int) c);
 }

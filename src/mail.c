@@ -19,25 +19,23 @@
  */
 
 #include "config.h"
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#ifndef HAVE_UTIMES
-#   ifdef HAVE_UTIME
-#      include <utime.h>
-#   endif
+#if !defined(HAVE_UTIMES) && defined(HAVE_UTIME)
+#  include <utime.h>
 #endif
-#include <sys/time.h>
-#include <pwd.h>
-#include <dirent.h>
-#include <fcntl.h>
-#ifndef _AIX
-#  include <string.h>
-#endif
-#include <errno.h>
-#include "compat.h"
+
 #include "dynstuff.h"
 #include "mail.h"
 #include "stuff.h"
@@ -241,7 +239,7 @@ int check_mail_mbox()
 				utimes(m->fname, foo);
 			}
 
-#elif defined (HAVE_UTIME)
+#elif defined(HAVE_UTIME)
 			{
 				struct utimbuf foo;
 

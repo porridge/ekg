@@ -19,10 +19,18 @@
  */
 
 #include "config.h"
-#include <Python.h>
+
 #include <sys/types.h>
+
 #include <dirent.h>
+#ifdef WITH_UI_NCURSES
+#  include <ncurses.h>
+#endif
+#include <Python.h>
+#include <string.h>
+
 #include "commands.h"
+#include "libgadu.h"
 #include "python.h"
 #include "stuff.h"
 #include "themes.h"
@@ -30,9 +38,6 @@
 #include "vars.h"
 #include "version.h"
 #include "xmalloc.h"
-#ifdef WITH_UI_NCURSES
-#  include <ncurses.h>
-#endif
 
 int python_handle_result = -1;
 
