@@ -282,7 +282,7 @@ char *ignored_uin_generator(char *text, int state)
 
 char *dcc_generator(char *text, int state)
 {
-	char *commands[] = { "close", "get", "send", "show", NULL };
+	char *commands[] = { "close", "get", "send", "show", "voice", NULL };
 	static int len, i;
 
 	if (!state) {

@@ -1954,7 +1954,11 @@ void do_connect()
 	p.password = config_password;
 	p.status = config_status;
 	p.async = 1;
+#ifdef HAVE_VOIP
+	p.client_version = ((config_protocol) ? config_protocol : GG_DEFAULT_CLIENT_VERSION) | 0x40000000;
+#else
 	p.client_version = config_protocol;
+#endif
 
 	if (config_server) {
 		char *tmp = strchr(config_server, ':'), *foo = strdup(config_server);
