@@ -122,6 +122,7 @@ int immediately_quit = 0;
 int config_emoticons = 1;
 int config_make_window = 0;
 int ekg_segv_handler = 0;
+char *config_tab_command = NULL;
 
 static struct {
 	int event;
@@ -220,16 +221,12 @@ const char *prepare_path(const char *filename, int do_mkdir)
 	static char path[PATH_MAX];
 	
 	if (do_mkdir) {
-		if (mkdir(config_dir, 0700) && errno != EEXIST) {
-			snprintf(path, sizeof(path), filename);
-			return path;
-		}
+		if (mkdir(config_dir, 0700) && errno != EEXIST)
+			return NULL;
 		if (config_user && *config_user) {
 			snprintf(path, sizeof(path), "%s/%s", config_dir, config_user);
-			if (mkdir(path, 0700) && errno != EEXIST) {
-				snprintf(path, sizeof(path), filename);
-				return path;
-			}
+			if (mkdir(path, 0700) && errno != EEXIST)
+				return NULL;
 		}
 	}
 	

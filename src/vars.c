@@ -78,6 +78,7 @@ void variable_init()
 	variable_add("sound_chat_file", VAR_STR, 1, &config_sound_chat_file, NULL);
 	variable_add("sound_sysmsg_file", VAR_STR, 1, &config_sound_sysmsg_file, NULL);
 	variable_add("sound_app", VAR_STR, 1, &config_sound_app, NULL);
+	variable_add("tab_command", VAR_STR, 1, &config_tab_command, NULL);
 	variable_add("theme", VAR_STR, 1, &config_theme, changed_theme);
 
 	variable_add("status", VAR_INT, 2, &config_status, NULL);

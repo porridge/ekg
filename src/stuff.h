@@ -142,6 +142,7 @@ int config_protocol;
 int config_emoticons;
 int config_make_window;
 char *config_reason;
+char *config_tab_command;
 
 char *home_dir;
 char *config_dir;

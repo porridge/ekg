@@ -170,10 +170,10 @@ static char *command_generator(char *text, int state)
 		if (state)
 			return NULL;
 		if (send_nicks_count < 1)
-			return xstrdup((window_current->query_nick) ? "/msg" : "msg");
+			return saprintf((window_current->query_nick) ? "/%s" : "%s", (config_tab_command) ? config_tab_command : "msg");
 		send_nicks_index = (send_nicks_count > 1) ? 1 : 0;
 
-		return saprintf((window_current->query_nick) ? "/chat %s" : "chat %s", send_nicks[0]);
+		return saprintf((window_current->query_nick) ? "/%s %s" : "%s %s", (config_tab_command) ? config_tab_command : "chat", send_nicks[0]);
 	}
 
 	if (!state) {
@@ -322,7 +322,15 @@ static char **my_completion(char *text, int start, int end)
 	list_t l;
 
 	if (start) {
-		if (!strncasecmp(rl_line_buffer, "chat ", 5) || !strncasecmp(rl_line_buffer, "/chat ", 6)) {
+		char *tmp = rl_line_buffer, *cmd = (config_tab_command) ? config_tab_command : "chat";
+		int slash = 0;
+
+		if (*tmp == '/') {
+			slash = 1;
+			tmp++;
+		}
+
+		if (!strncasecmp(tmp, cmd, strlen(cmd)) && tmp[strlen(cmd)] == ' ') {
 			word = 0;
 			for (i = 0; i < strlen(rl_line_buffer); i++) {
 				if (isspace(rl_line_buffer[i]))
@@ -332,7 +340,7 @@ static char **my_completion(char *text, int start, int end)
 				if (send_nicks_count > 0) {
 					char buf[100];
 
-					snprintf(buf, sizeof(buf), "chat %s ", send_nicks[send_nicks_index++]);
+					snprintf(buf, sizeof(buf), "%s%s %s ", (slash) ? "/" : "", cmd, send_nicks[send_nicks_index++]);
 					rl_extend_line_buffer(strlen(buf));
 					strcpy(rl_line_buffer, buf);
 					rl_end = strlen(buf);
