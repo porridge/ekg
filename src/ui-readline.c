@@ -434,7 +434,7 @@ static char **my_completion(char *text, int start, int end)
 static void ui_readline_print(const char *target, const char *line)
 {
         int old_end = rl_end, i, id = 0;
-	char *old_prompt = "";
+	char *old_prompt = NULL;
 	
 	/* znajd¼ odpowiednie okienko i ewentualnie je utwórz */
 	if (target)
@@ -1262,7 +1262,7 @@ static int bind_sequence(const char *seq, const char *command, int quiet)
 
 	if (command && bind_find_command(seq)) {
 		if (!quiet)
-			print("bind_seq_exist");
+			print("bind_seq_exist", seq);
 
 		return -1;
 	}

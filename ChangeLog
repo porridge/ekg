@@ -18,6 +18,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   u¿ywalnym. jak zwykle, prosimy zapi±æ pasy, spodziewamy siê nieznacznych
   turbulencji (w)
 - poprawka ui-readline, by unikn±æ potencjalnego segfaulta (adwol/w)
+- segfault przy podwójnym bindowanie (booyas/w)
 
 // 2002-08-15
 
