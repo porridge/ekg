@@ -634,7 +634,7 @@ void init_theme()
 	add_format("register", "%> Rejestracja poprawna. Wygrany numerek: %W%1%n\n", 1);
 	add_format("register_failed", "%! B³±d podczas rejestracji\n", 1);
 	add_format("register_pending", "%! Rejestracja w toku\n", 1);
-	add_format("register_timeout", "%! Przekroczono limit czasu operacji szukania\n", 1);
+	add_format("register_timeout", "%! Przekroczono limit czasu operacji rejestrowania\n", 1);
 	
 	add_format("remind", "%> Has³o zosta³o wys³ane\n", 1);
 	add_format("remind_failed", "%! B³±d podczas wysy³ania has³a\n", 1);
