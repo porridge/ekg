@@ -293,6 +293,7 @@ int python_finalize()
 	}
 	
 	list_destroy(modules, 1);
+	modules = NULL;
 	
 	Py_Finalize();
 
@@ -330,6 +331,16 @@ int python_unload(const char *name, int quiet)
 			Py_XDECREF(res);
 			Py_XDECREF(m->deinit);
 		}
+
+		Py_XDECREF(m->handle_msg);
+		Py_XDECREF(m->handle_connect);
+		Py_XDECREF(m->handle_disconnect);
+		Py_XDECREF(m->handle_status);
+		Py_XDECREF(m->handle_redraw_header);
+		Py_XDECREF(m->handle_redraw_statusbar);
+		Py_XDECREF(m->handle_keypress);
+		Py_XDECREF(m->handle_command_line);
+		Py_XDECREF(m->module);
 
 		list_remove(&modules, m, 1);
 

@@ -4593,11 +4593,17 @@ COMMAND(cmd_python)
 	if (!strncasecmp(params[0], "u", 1))
 		return python_unload(params[1], quiet);
 
-	if (!strncasecmp(params[0], "r", 1))
+	if (!strncasecmp(params[0], "ru", 2))
 		return python_run(params[1], quiet);
 
 	if (!strncasecmp(params[0], "e", 1))
 		return python_exec(params[1]);
+
+	if (!strncasecmp(params[0], "re", 2)) {
+		python_finalize();
+		python_initialize();
+		return 0;
+	}
 
 	printq("invalid_params", name);
 
