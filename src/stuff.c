@@ -979,6 +979,37 @@ int msg_queue_remove(int msg_seq)
 }
 
 /*
+ * msg_queue_remove_uin()
+ *
+ * usuwa wiadomo¶æ z kolejki wiadomo¶ci dla danego
+ * u¿ytkownika.
+ *
+ * - uin
+ *
+ * 0 je¶li usuniêto, 1 je¶li nie ma takiej wiadomo¶ci.
+ */
+int msg_queue_remove_uin(uin_t uin)
+{
+	list_t l;
+	int x = 0;
+
+	for (l = msg_queue; l; l = l->next) {
+		struct queue *m = l->data;
+
+		if (*(m->uins) == uin) {	/* XXX konferencje */
+			xfree(m->uins);
+			xfree(m->msg);
+			xfree(m->raw_msg);
+
+			list_remove(&msg_queue, m, 1);
+			x++;
+		}
+	}
+
+	return (x) ? 0 : 1;
+}
+
+/*
  * msg_queue_destroy()
  *
  * pozbywa siê kolejki wiadomo¶ci.
@@ -1040,6 +1071,29 @@ int msg_queue_flush()
 int msg_queue_count()
 {
 	return list_count(msg_queue);
+}
+
+/*
+ * msg_queue_count_uin()
+ *
+ * zwraca liczbê wiadomo¶ci w kolejce dla danego
+ * u¿ytkownika.
+ *
+ * - uin
+ */
+int msg_queue_count_uin(uin_t uin)
+{
+	list_t l;
+	int count = 0;
+
+	for (l = msg_queue; l; l = l->next) {
+		struct queue *m = l->data;
+
+		if (*(m->uins) == uin)	/* XXX konferencje */
+			count++;
+	}
+
+	return count;
 }
 
 /*

@@ -71,7 +71,7 @@ if test "x$enable_debug" = "xno"; then
   strip_ioctld="strip-ioctld"
   strip_libgadu_so="strip-libgadu-so"
 else
-  CFLAGS="$CFLAGS -g -ggdb" 
+  CFLAGS="$CFLAGS -g" 
 fi
 
 dnl sparc libs...

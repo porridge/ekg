@@ -1216,13 +1216,13 @@ COMMAND(cmd_msg)
 	uin_t uin;
 	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0, msg_seq;
 
-	if (!sess || sess->state != GG_STATE_CONNECTED)
-		print("not_connected_msg_queued");
-
 	if (!params[0] || !params[1]) {
 		print("not_enough_params", name);
 		return;
 	}
+
+	if (!sess || sess->state != GG_STATE_CONNECTED)
+		print("not_connected_msg_queued");
 
 	nick = xstrdup(params[0]);
 
@@ -1230,11 +1230,14 @@ COMMAND(cmd_msg)
 		struct conference *c = conference_create(nick);
 		list_t l;
 
-		xfree(nick);
-		nick = xstrdup(c->name);
+		if (c) {
+			xfree(nick);
+			nick = xstrdup(c->name);
 
-		for (l = c->recipients; l; l = l->next)
-			array_add(&nicks, xstrdup(itoa(*((uin_t *) (l->data)))));
+			for (l = c->recipients; l; l = l->next)
+				array_add(&nicks, xstrdup(itoa(*((uin_t *) (l->data)))));
+		}
+
 	} else if (*nick == '#') {
 		struct conference *c = conference_find(nick);
 		list_t l;
@@ -2824,11 +2827,15 @@ COMMAND(cmd_last)
 {
         list_t l;
 	uin_t uin = 0;
-	int count = 0, last_count;
 
 	if (match_arg(params[0], 'c', "clear", 2)) {
-		if (params[1] && (!(uin = get_uin(params[1])))) {
+		if (params[1] && !(uin = get_uin(params[1]))) {
 			print("user_not_found", params[1]);
+			return;
+		}
+
+		if ((uin && !last_count_get(uin)) || !list_count(lasts)) {
+			(uin) ? print("last_list_empty_nick", format_user(uin)) : print("last_list_empty");
 			return;
 		}
 
@@ -2842,13 +2849,13 @@ COMMAND(cmd_last)
 		return;
 	}		
 
-	if (params[0] && (!(uin = get_uin(params[0])))) {
+	if (params[0] && !(uin = get_uin(params[0]))) {
 		print("user_not_found", params[0]);
 		return;
 	}  
 		
-	if (!(last_count = (uin > 0) ? last_count_get(uin) : list_count(lasts))) {
-		print("last_list_empty");
+	if (!((uin > 0) ? last_count_get(uin) : list_count(lasts))) {
+		(uin) ? print("last_list_empty_nick", format_user(uin)) : print("last_list_empty");
 		return;
 	}
 
@@ -2864,31 +2871,50 @@ COMMAND(cmd_last)
 				print("last_list_out", buf, format_user(ll->uin), ll->message);
 			else
 				print("last_list_in", buf, format_user(ll->uin), ll->message);
-			count++;
 		}
         }
-
-	if (count == 0 && params[0]) 
-		print("last_list_empty_nick", params[0]);
-
 }
 
 COMMAND(cmd_queue)
 {
 	list_t l;
-	int count = 0;
+	uin_t uin = 0;
 	char *tmp = NULL;
 
 	if (sess && sess->state == GG_STATE_CONNECTED) {
 		print("queue_wrong_use");
-		
 		return;
 	}
 
 	if (match_arg(params[0], 'c', "clear", 2)) {
-		msg_queue_destroy();
-		print("queue_cleared");
+		if (params[1] && !(uin = get_uin(params[1]))) {
+			print("user_not_found", params[1]);
+			return;
+		}
 
+		if ((uin && !msg_queue_count_uin(uin)) || !msg_queue_count()) {
+			(uin) ? print("queue_empty_uin", format_user(uin)) : print("queue_empty");
+			return;
+		}
+
+		if (uin) {
+			msg_queue_remove_uin(uin);
+			print("queue_clear_uin", format_user(uin));
+		} else {
+			msg_queue_destroy();
+			print("queue_clear");
+		}
+
+		return;
+	}		
+
+	if (params[0] && !(uin = get_uin(params[0]))) {
+		print("user_not_found", params[0]);
+		return;
+	}  
+		
+	if ((uin && !msg_queue_count_uin(uin)) || !msg_queue_count()) {
+		(uin) ? print("queue_empty_uin", format_user(uin)) : print("queue_empty");
 		return;
 	}
 
@@ -2897,23 +2923,21 @@ COMMAND(cmd_queue)
 		struct tm *tm;
 		char buf[100];
 
-		tm = localtime(&m->time);
-		strftime(buf, sizeof(buf), format_find("queue_list_timestamp"), tm);
+		if (!uin || *(m->uins) == uin) {	/* XXX konferencje */
+			tm = localtime(&m->time);
+			strftime(buf, sizeof(buf), format_find("queue_list_timestamp"), tm);
 
-		if (m->raw_msg)
-			tmp = xstrdup(m->raw_msg);
-		else {
-			tmp = xstrdup(m->msg);
-			cp_to_iso(tmp);
+			if (m->raw_msg)
+				tmp = xstrdup(m->raw_msg);
+			else {
+				tmp = xstrdup(m->msg);
+				cp_to_iso(tmp);
+			}
+
+			print("queue_list_message", buf, format_user(*(m->uins)), tmp);	/* XXX konferencje */
+			xfree(tmp);
 		}
-
-		print("queue_list_message", buf, format_user(*(m->uins)), tmp);	/* XXX w przypadku konferencji wy¶wietla tylko pierwszy uin */
-		xfree(tmp);
-		count++;
 	}
-
-	if (count == 0) 
-		print("queue_empty");
 }
 
 /*
@@ -3172,6 +3196,13 @@ void command_init()
 	  "wzglêdu na ustawienia zmiennych.");
 
 	command_add
+	( "last", "uu", cmd_last, 0,
+	  " [opcje]", "wy¶wietla lub czy¶ci ostatnie wiadomo¶ci",
+	  " [numer/alias]             wy¶wietla ostatnie wiadomo¶ci\n"
+	  " -c, --clear [numer/alias] czy¶ci wiadomo¶ci od/do numer/alias lub wszystkie\n"
+	  );
+
+	command_add
 	( "list", "u?", cmd_list, 0,
           " [alias|opcje]", "zarz±dzanie list± kontaktów",
 	  "\n"
@@ -3221,9 +3252,10 @@ void command_init()
 	  "");
 
 	command_add
-	( "queue", "?", cmd_queue, 0,
-	  " [opcje]", "wy¶wietl lub wyczy¶æ wiadomo¶ci do wys³ania po po³±czeniu",
-	  " -c, --clear czy¶ci kolejkê wiadomo¶ci\n"
+	( "queue", "uu", cmd_queue, 0,
+	  " [opcje]", "wy¶wietla lub czy¶ci wiadomo¶ci do wys³ania po po³±czeniu",
+	  " [numer/alias]             wy¶wietla kolejkê wiadomo¶ci\n"
+	  " -c, --clear [numer/alias] usuwa wiadomo¶ci dla numer/alias lub wszystkie\n"
 	  "Mo¿na u¿yæ tylko wtedy, gdy nie jeste¶my po³±czeni.\n"
 	  );
 	  
@@ -3327,13 +3359,6 @@ void command_init()
 	  "  refresh\n"
 	  "  list");
 
-	command_add
-	( "last", "uu", cmd_last, 0,
-	  " [opcje]", "wy¶wietl lub wyczy¶æ ostatnie wiadomo¶ci",
-	  " [numer/alias]             wy¶wietla ostatnio otrzymane wiadomo¶ci\n"
-	  " -c, --clear [numer/alias] czy¶ci wiadomo¶ci od numer/alias lub wszystkie\n"
-	  );
-  
 	command_add
 	( "_add", "?", cmd_test_add, 0, "",
 	  "dodaje do listy dope³niania TABem", "");
