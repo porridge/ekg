@@ -947,7 +947,7 @@ void contacts_rebuild()
 	if (!windows)
 		return;
 	
-	ui_screen_width = stdscr->_maxx + 1 - CONTACTS_SIZE;
+	ui_screen_width = stdscr->_maxx - CONTACTS_SIZE;
 
 	if (!config_contacts) {
 		if (contacts)
@@ -3049,7 +3049,8 @@ static int ui_ncurses_event(const char *event, ...)
 
 			if (!strcasecmp(p1, "clear")) {
 				window_clear(window_current, 0);
-
+				
+				window_refresh();
 				if (contacts)
 					wnoutrefresh(contacts);
 				wnoutrefresh(input);
