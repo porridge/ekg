@@ -103,6 +103,12 @@ ctrld_quits
 	okre¶la, czy wci¶niêcie Ctrl-D w ostatnim okienku, nie bêd±c
 	w trybie rozmowy klient na zakoñczyæ dzia³anie.
 
+ctxwin_size
+	typ: liczba
+	domy¶lna warto¶æ: 10
+	
+	okre¶la wielko¶æ okienka z "dostêpnymi osobami"
+
 dcc
 	typ: bool
 	domy¶lna warto¶æ: 0

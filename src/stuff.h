@@ -169,6 +169,7 @@ int config_keep_reason;
 int config_last;
 int config_last_size;
 int config_log;
+int config_ctxwin_size;
 int config_log_ignored;
 char *config_log_path;
 int config_log_status;
