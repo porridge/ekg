@@ -14,7 +14,7 @@ AR = @AR@
 install = @INSTALL@
 
 CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) 
-OBJS = common.o libgg.o http.o search.o
+OBJS = common.o libgg.o http.o search.o register.o
 
 all:	static shared
 

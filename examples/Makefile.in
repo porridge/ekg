@@ -6,11 +6,13 @@ CC = @CC@
 RM = @RM@
 MAKE = @MAKE@
 
-OBJS = ../lib/libgg.o ../lib/common.o ../lib/search.o ../lib/http.o
+OBJS = ../lib/libgg.o ../lib/common.o ../lib/search.o ../lib/http.o ../lib/register.o
 
 all:	$(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) search.c -o search-sync
 	$(CC) $(CFLAGS) $(OBJS) -DASYNC search.c -o search-async
+	$(CC) $(CFLAGS) $(OBJS) register.c -o register-sync
+	$(CC) $(CFLAGS) $(OBJS) -DASYNC register.c -o register-async
 	$(CC) $(CFLAGS) $(OBJS) send.c -o send
 	$(CC) $(CFLAGS) $(OBJS) conn-async.c -o conn-async
 

@@ -205,6 +205,23 @@ int gg_search_watch_fd(struct gg_search *f);
 void gg_free_search(struct gg_search *f);
 void gg_search_cancel(struct gg_search *f);
 
+struct gg_register {
+	/* czy ju¿ zrobi³ */
+	int done;
+	
+	/* otrzymany numerek, 0 je¶li siê nie powiod³o */
+	uin_t uin;
+
+	/* po³±czenie */
+	struct gg_http *http;
+	int fd, state, error, check;
+};
+
+struct gg_register *gg_register(char *email, char *password, int async);
+int gg_register_watch_fd(struct gg_register *f);
+void gg_free_register(struct gg_register *f);
+void gg_register_cancel(struct gg_register *f);
+
 /*
  * je¶li chcemy sobie podebugowaæ, wystarczy ustawiæ `gg_debug_level'.
  * niestety w miarê przybywania wpisów `gg_debug(...)' nie chcia³o mi
@@ -238,11 +255,14 @@ int gg_connect(void *addr, int port, int async);
 void gg_read_line(int sock, char *buf, int length);
 void gg_chomp(char *line);
 char *gg_urlencode(char *str);
+unsigned long gg_http_hash(char *email, char *password);
 
 #define GG_APPMSG_HOST "appmsg.gadu-gadu.pl"
 #define GG_APPMSG_PORT 80
 #define GG_PUBDIR_HOST "pubdir.gadu-gadu.pl"
 #define GG_PUBDIR_PORT 80
+#define GG_REGISTER_HOST "register.gadu-gadu.pl"
+#define GG_REGISTER_PORT 80
 #define GG_DEFAULT_PORT 8074
 #define GG_HTTPS_PORT 443
 #define GG_HTTP_USERAGENT "Mozilla/4.7 [en] (Win98; I)"

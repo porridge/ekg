@@ -29,14 +29,6 @@
 #include "libgg.h"
 #include "http.h"
 
-#define GG_SEARCH_COPY \
-{ \
-	f->fd = f->http->fd; \
-	f->check = f->http->check; \
-	f->state = f->http->state; \
-	f->error = f->http->error; \
-}
-
 /*
  * gg_search()
  *
@@ -158,7 +150,7 @@ struct gg_search *gg_search(struct gg_search_request *r, int async)
 		"POST /appsvc/fmpubquery2.asp HTTP/1.0\r\n"
 		"Host: " GG_PUBDIR_HOST "\r\n"
 		"Content-Type: application/x-www-form-urlencoded\r\n"
-		"User-Agent: Mozilla/4.7 [en] (Win98; I)\r\n"
+		"User-Agent: " GG_HTTP_USERAGENT "\r\n"
 		"Content-Length: %d\r\n"
 		"Pragma: no-cache\r\n"
 		"\r\n"
@@ -185,8 +177,8 @@ struct gg_search *gg_search(struct gg_search_request *r, int async)
 
 	free(query);
 
-	GG_SEARCH_COPY;
-	
+	gg_http_copy_vars(f);
+
 	if (!async)
 		gg_search_watch_fd(f);
 	
@@ -219,7 +211,7 @@ int gg_search_watch_fd(struct gg_search *f)
 			gg_debug(GG_DEBUG_MISC, "=> search, http failure\n");
 			return -1;
 		}
-		GG_SEARCH_COPY;
+		gg_http_copy_vars(f);
 	}
 	
 	if (f->state == GG_STATE_FINISHED) {
@@ -316,4 +308,3 @@ void gg_free_search(struct gg_search *f)
 	free(f->results);
 	free(f);
 }
-

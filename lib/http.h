@@ -31,4 +31,12 @@ int gg_http_watch_fd(struct gg_http *h);
 void gg_http_stop(struct gg_http *h);
 void gg_free_http(struct gg_http *h);
 
+#define gg_http_copy_vars(x) \
+{ \
+	x->fd = x->http->fd; \
+	x->check = x->http->check; \
+	x->state = x->http->state; \
+	x->error = x->http->error; \
+}
+				
 #endif /* __GG_HTTP_H */
