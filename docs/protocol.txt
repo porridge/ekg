@@ -8,7 +8,8 @@
                            Adam Ludwikowski <adam.ludwikowski@wp.pl>,
                            Marek Kozina <klith@hybrid.art.pl>,
 			   Rafa³ Florek <raf@regionet.regionet.pl>,
-			   Igor Popik <igipop@wsfiz.edu.pl>
+			   Igor Popik <igipop@wsfiz.edu.pl>,
+                           Ajron <ajron@wp.pl>
 
 --- 0) disclaimer ---------------------------------------------------------
 
@@ -174,12 +175,15 @@ struktur gg_notify_reply:
 		short dunno1;		/* znowu port? */
 	};
 
-je¶li klient nie obs³uguje po³±czeñ miêdzy klientami (np. g*du-g*du 3.x)
-zamiast adresu ip jest 0, zamiast portu mo¿e byæ 0, 1, 2... niewa¿ne ;)
-port mo¿e przyjmowaæ warto¶æ 1, je¶li klient znajduje siê za jakim¶
-firewallem lub innym urz±dzeniem robi±cym NAT. w ka¿dym razie, je¶li kto¶
-siê pojawi w trakcie pracy, równie¿ zostanie przys³any ten pakiet.
-proste? proste :)
+wiêkszo¶æ pól powinna byæ zrozumia³a. remote_port poza zwyk³ym portem
+mo¿e przyjmowaæ równie¿ poni¿sze warto¶ci:
+
+        0 - klient nie obs³uguje bezpo¶rednich po³±czeñ,
+	1 - klient jest za NAT,
+	2 - klient nie ma nas w swojej li¶cie kontaktów.
+
+zdarzaj± siê te¿ inne ,,nietypowe'' warto¶ci, ale ich znaczenie nie jest
+jeszcze do koñca znane.
 
 ¿eby dodaæ kogo¶ do listy w trakcie pracy, trzeba wys³aæ ni¿ej opisany
 pakiet. jego format jest identyczny jak przy GG_NOTIFY.
@@ -311,6 +315,8 @@ swój wk³ad w poznanie protoko³u mieli:
    konferencje,
  - Igor Popik <igipop@wsfiz.edu.pl>:
    klasy wiadomo¶ci przy odbieraniu zakolejkowanej.
+ - Ajron <ajron@wp.pl>:
+   informacje o remote_port.
 
 ----------------------------------------------------------------------------
 
