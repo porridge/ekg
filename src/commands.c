@@ -5463,49 +5463,42 @@ COMMAND(cmd_queue)
 
 		return 0;
 	}
-
-        for (l = msg_queue; l; ) {
-                struct msg_queue *m = l->data;
-		struct tm *tm;
-		char *fu = NULL;
-		char buf[100];
-
-		l = l->next;
-
-		if (!uin || find_in_uins(m->uin_count, m->uins, uin)) {
-
-			if (clear) {
-				msg_queue_remove(m->msg_seq);
-			} else {
-				tm = localtime(&m->time);
-				strftime(buf, sizeof(buf), format_find("queue_list_timestamp"), tm);
-
-				if (m->uin_count > 1) {
-					string_t s = string_init(format_user(*(m->uins)));
-					int i;
-
-					for (i = 1; i < m->uin_count; i++) {
-						string_append(s, ",");
-						string_append(s, format_user(m->uins[i]));
-					}
-					
-					fu = string_free(s, 0);
-				} else
-					fu = xstrdup(format_user(*(m->uins)));
-					
-				printq("queue_list_message", buf, fu, m->msg);
-
-				xfree(fu);
-			}
-		}
-	}
-
+	
 	if (clear) {
-		if (uin)
-			printq("queue_clear_uin");
-		else
+		if (uin) {
+			msg_queue_remove_uin(uin);
+			printq("queue_clear_uin", format_user(uin));
+		} else {
+			msg_queue_free();
 			printq("queue_clear");
-	}
+		}
+	} else 
+		for (l = msg_queue; l; l = l->next) {
+			struct msg_queue *m = l->data;
+			struct tm *tm;
+			char *fu = NULL;
+			char buf[100];
+
+			tm = localtime(&m->time);
+			strftime(buf, sizeof(buf), format_find("queue_list_timestamp"), tm);
+
+			if (m->uin_count > 1) {
+				string_t s = string_init(format_user(*(m->uins)));
+				int i;
+
+				for (i = 1; i < m->uin_count; i++) {
+					string_append(s, ",");
+					string_append(s, format_user(m->uins[i]));
+				}
+				
+				fu = string_free(s, 0);
+			} else
+				fu = xstrdup(format_user(*(m->uins)));
+				
+			printq("queue_list_message", buf, fu, m->msg);
+
+			xfree(fu);
+		}
 
 	return 0;
 }
