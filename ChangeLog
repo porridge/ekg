@@ -14,6 +14,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - dodanie lib/compat.h, który bêdzie zawiera³ wszystkie dziwne deklaracje
   dla dziwnych systemów (s/w)
 - dodanie makra GG_PACKED, które przydaje siê przy definicji struktur (w)
+- dodane okienka do ui-readline (d)
 
 // 2002-07-03
 

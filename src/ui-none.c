@@ -47,5 +47,6 @@ void ui_none_init()
 	ui_beep = nop;
 	ui_event = event;
 	ui_deinit = nop;
+	ui_window = nop;
 }
 

@@ -48,6 +48,11 @@ char line[1000] = "";
 
 #define output_size (stdscr->_maxy - 1)
 
+static void nop()
+{
+
+}
+
 static void set_cursor()
 {
 	if (y == lines) {
@@ -132,6 +137,7 @@ void ui_ncurses_init()
 	ui_beep = ui_ncurses_beep;
 	ui_event = ui_ncurses_event;
 	ui_deinit = ui_ncurses_deinit;
+	ui_windows = nop;
 		
 	initscr();
 	cbreak();

@@ -554,6 +554,10 @@ void init_theme()
 	add_format("readline_prompt_away", "/ ", 1);
 	add_format("readline_prompt_invisible", ". ", 1);
 	add_format("readline_prompt_query", "%1> ", 1);
+	add_format("readline_prompt_win", "[%1%%] ", 1);
+	add_format("readline_prompt_away_win", "[%1/] ", 1);
+	add_format("readline_prompt_invisible_win", "[%1.] ", 1);
+	add_format("readline_prompt_query_win", "[%2] %1> ", 1);
 	add_format("readline_more", "-- wci¶nij enter by kontynuowaæ --", 1);
 
 	add_format("known_user", "%W%1%n/%2", 1);
@@ -809,5 +813,13 @@ void init_theme()
 	add_format("history_send", "> %y%2 [%3]:%n %4\n", 1);
 	add_format("history_recv", "< %g%2 [%3]:%n %4\n", 1);
 	add_format("history_error", "%! %1\n", 1);
+	add_format("window_add", "%) Okienko dodane.\n", 1);
+	add_format("window_noexist", "%! Podane okienko nie istnieje.\n", 1);
+	add_format("window_no_windows", "%! To jest ostatnie okno.\n", 1);
+	add_format("window_del", "%) Okienko usuniête.\n", 1);
+	add_format("windows_max", "%! Maksymalna ilo¶æ okien wyczerpana.\n", 1);
+	add_format("window_not_enough_params", "%! Niewystarczaj±ca ilo¶æ argumentów.\n", 1);
+	add_format("window_invalid", "%! Nieprawid³owy parametr.\n", 1);
+	
 };
 

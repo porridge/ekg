@@ -63,7 +63,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_remind(), command_dcc(), command_query(), command_passwd(),
 	command_test_ping(), command_on(), command_change(),
 	command_test_fds(), command_test_segv(), command_version(), 
-	command_history();
+	command_history(), command_window();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -114,6 +114,7 @@ struct command commands[] = {
 	{ "status", "", command_status, "", "Wy¶wietla aktualny stan", "" },
 	{ "unignore", "i", command_ignore, " <numer/alias>", "Usuwa z listy ignorowanych osób", "" },
 	{ "version", "", command_version, "", "Wy¶wietla wersje programu", "" },
+	{ "window", "??", command_window, " <komenda> [numer_okna]", "Zarz±dzanie okienkami", "  new\n  kill [numer_okna]\n  next\n  prev\n  switch numer_okna\n  clear\n  refresh\n" },
 	{ "_add", "?", command_test_add, "", "", "" },
 	{ "_fds", "", command_test_fds, "", "", "" },
 	{ "_msg", "u?", command_test_send, "", "", "" },
@@ -1917,6 +1918,13 @@ COMMAND(command_on)
         config_changed = 1;
 
         return 0;
+}
+
+COMMAND(command_window)
+{
+	ui_window(params);
+
+	return 0;
 }
 
 char *strip_spaces(char *line)
