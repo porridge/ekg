@@ -8,6 +8,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-02-08
 
 - dopisane externy do zmiennych w libgadu.h (tomee/w)
+- dopisana nowa funkcja hashowania has³a. nie dzia³a. pó¼niej sprawdzê
+  (ajron/w)
 
 // 2002-02-07
 
