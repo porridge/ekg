@@ -6,6 +6,11 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-01-26
+
+- list alias -o/-O dzia³aj± wy³±cznie w trybie ,,tylko dla znajomych''.
+  ,,help list'' o tym wspomina (sz)
+
 // 2003-01-25
 
 - przy w³±czonym auto_back nie wraca ze stanu ,,zajêty'', je¶li
