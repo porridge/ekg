@@ -348,7 +348,7 @@ void contacts_rebuild();
 int mesg_set(int what);
 void mesg_changed();
 
-int msg_encrypt(uin_t uin, char **msg);
+int msg_encrypt(uin_t uin, unsigned char **msg);
 
 int find_in_uins(int uin_count, uin_t *uins, uin_t uin);
 uin_t str_to_uin(const char *text);

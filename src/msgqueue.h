@@ -34,12 +34,14 @@ struct msg_queue {
 	uin_t *uins;
 	int secure;
 	time_t time;
-	char *msg;
+	unsigned char *msg;
+	unsigned char *format;
+	int formatlen;
 };
 
 list_t msg_queue;
 
-int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const char *msg, int secure);
+int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const unsigned char *msg, int secure, const unsigned char *format, int formatlen);
 int msg_queue_remove(int msg_seq);
 int msg_queue_remove_uin(uin_t uin);
 void msg_queue_free();

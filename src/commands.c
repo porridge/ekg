@@ -1387,7 +1387,8 @@ fail:
 COMMAND(cmd_msg)
 {
 	struct userlist *u;
-	char **nicks = NULL, **p, *msg = NULL, *escaped, *nick, *raw_msg = NULL, *format = NULL;
+	char **nicks = NULL, *nick = NULL, **p = NULL;
+	unsigned char *msg = NULL, *raw_msg = NULL, *escaped = NULL, *format = NULL;
 	uin_t uin;
 	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0, msg_seq, formatlen = 0;
 
@@ -1511,9 +1512,10 @@ COMMAND(cmd_msg)
 		}
 	}
 
-	raw_msg = xstrdup(params[1]);
+	raw_msg = xstrdup(msg);
 	escaped = log_escape(msg);
 	iso_to_cp(msg);
+
 	count = array_count(nicks);
 
 #ifdef HAVE_OPENSSL
@@ -1543,13 +1545,11 @@ COMMAND(cmd_msg)
 			else
 				msg_seq = -1;
 
-			msg_queue_add((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, msg_seq, 1, &uin, raw_msg, secure);
-
+			msg_queue_add((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, msg_seq, 1, &uin, raw_msg, secure, format, formatlen);
 			valid++;
 		}
 	}
 
-	xfree(escaped);
 
 	if (count > 1 && chat) {
 		uin_t *uins = xmalloc(count * sizeof(uin_t));
@@ -1564,14 +1564,11 @@ COMMAND(cmd_msg)
 		else
 			msg_seq = -1;
 
-		msg_queue_add((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, msg_seq, count, uins, raw_msg, 0);
-
+		msg_queue_add((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, msg_seq, count, uins, raw_msg, 0, format, formatlen);
 		valid++;
 
 		xfree(uins);
 	}
-
-	xfree(raw_msg);
 
 	add_send_nick(nick);
 
@@ -1599,11 +1596,14 @@ COMMAND(cmd_msg)
 	}
 
 	xfree(msg);
+	xfree(raw_msg);
+	xfree(escaped);
+	xfree(format);
 	xfree(nick);
-	
-	unidle();
 
 	array_free(nicks);
+
+	unidle();
 }
 
 COMMAND(cmd_save)

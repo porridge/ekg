@@ -950,10 +950,10 @@ void do_reconnect()
  * je¶li mo¿na, podmienia wiadomo¶æ na wiadomo¶æ
  * zaszyfrowan±.
  */
-int msg_encrypt(uin_t uin, char **msg)
+int msg_encrypt(uin_t uin, unsigned char **msg)
 {
 #ifdef HAVE_OPENSSL
-	char *enc = xmalloc(4096);	/* XXX idiotyzm */
+	unsigned char *enc = xmalloc(4096);	/* XXX idiotyzm */
 	int len;
 		
 	memset(enc, 0, 4096);

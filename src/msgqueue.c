@@ -43,20 +43,22 @@ list_t msg_queue = NULL;
  *
  * dodaje wiadomo¶æ do kolejki wiadomo¶ci.
  * 
- * msg_class - typ wiadomo¶ci,
- * msg_seq - numer sekwencyjny,
- * uin_count - ilo¶æ adresatów,
- * uins - adresaci wiadomo¶ci,
- * msg - wiadomo¶æ,
- * secure - czy ma byæ zaszyfrowana.
+ *  - msg_class - typ wiadomo¶ci,
+ *  - msg_seq - numer sekwencyjny,
+ *  - uin_count - ilo¶æ adresatów,
+ *  - uins - adresaci wiadomo¶ci,
+ *  - msg - wiadomo¶æ,
+ *  - secure - czy ma byæ zaszyfrowana,
+ *  - format - formatowanie wiadomo¶ci,
+ *  - formatlen - d³ugo¶æ informacji o formatowaniu.
  *
  * 0 je¶li siê uda³o, -1 je¶li b³±d.
  */
-int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const char *msg, int secure)
+int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const unsigned char *msg, int secure, const unsigned char *format, int formatlen)
 {
 	struct msg_queue m;
 
-	if (uin_count == 1 && *uins == config_uin)	/* nie dostaniemy potwierdzenia, je¶li wy¶lemy wiadomo¶æ do siebie */
+	if (uin_count == 1 && uins[0] == config_uin)	/* nie dostaniemy potwierdzenia, je¶li wy¶lemy wiadomo¶æ do siebie */
 		return -1;
 
 	m.msg_class = msg_class;
@@ -67,6 +69,9 @@ int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const 
 	m.msg = xstrdup(msg);
 	m.secure = secure;
 	m.time = time(NULL);
+	m.format = xmalloc(formatlen * sizeof(unsigned char));
+	memmove(m.format, format, formatlen * sizeof(unsigned char));
+	m.formatlen = formatlen;
 
 	return (list_add(&msg_queue, &m, sizeof(m)) != NULL) ? 0 : -1;
 }
@@ -76,7 +81,7 @@ int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const 
  *
  * usuwa wiadomo¶æ z kolejki wiadomo¶ci.
  *
- * msg_seq - numer sekwencyjny wiadomo¶ci.
+ *  - msg_seq - numer sekwencyjny wiadomo¶ci.
  *
  * 0 je¶li usuniêto, 1 je¶li nie ma takiej wiadomo¶ci.
  */
@@ -90,6 +95,7 @@ int msg_queue_remove(int msg_seq)
 		if (m->msg_seq == msg_seq) {
 			xfree(m->uins);
 			xfree(m->msg);
+			xfree(m->format);
 
 			list_remove(&msg_queue, m, 1);
 
@@ -106,7 +112,7 @@ int msg_queue_remove(int msg_seq)
  * usuwa wiadomo¶æ z kolejki wiadomo¶ci dla danego
  * u¿ytkownika.
  *
- * - uin.
+ *  - uin.
  *
  * 0 je¶li usuniêto, 1 je¶li nie ma takiej wiadomo¶ci.
  */
@@ -121,6 +127,7 @@ int msg_queue_remove_uin(uin_t uin)
 		if (find_in_uins(m->uin_count, m->uins, uin)) {
 			xfree(m->uins);
 			xfree(m->msg);
+			xfree(m->format);
 
 			list_remove(&msg_queue, m, 1);
 			x = 1;
@@ -144,6 +151,7 @@ void msg_queue_free()
 
 		xfree(m->uins);
 		xfree(m->msg);
+		xfree(m->format);
 	}
 
 	list_destroy(msg_queue, 1);
@@ -168,16 +176,16 @@ int msg_queue_flush()
 	for (; l; l = l->next) {
 		struct msg_queue *m = l->data;
 		int new_seq;
-		char *tmp = xstrdup(m->msg);
+		unsigned char *tmp = xstrdup(m->msg);
 
 		iso_to_cp(tmp);
 
 		if (m->uin_count == 1) {
 			if (m->secure)
 				msg_encrypt(*(m->uins), &tmp);
-			new_seq = gg_send_message(sess, m->msg_class, *(m->uins), tmp);
+			new_seq = gg_send_message_richtext(sess, m->msg_class, *(m->uins), tmp, m->format, m->formatlen);
 		} else
-			new_seq = gg_send_message_confer(sess, m->msg_class, m->uin_count, m->uins, tmp);
+			new_seq = gg_send_message_confer_richtext(sess, m->msg_class, m->uin_count, m->uins, tmp, m->format, m->formatlen);
 
 		xfree(tmp);
 
@@ -333,6 +341,7 @@ int msg_queue_read()
 		if (!m.time || !m.msg_seq || !m.msg_class) {
 			fclose(f);
 			xfree(fn);
+			xfree(m.uins);
 			continue;
 		}
 
