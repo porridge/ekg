@@ -17,6 +17,9 @@ zg³osi³ b³±d.
 - dodanie zmiennej ,,dcc_limit'' okre¶laj±cej limit po³±czeñ w danym
   przedziale czasu. domy¶lna warto¶æ to 30 po³±czeñ na 30 sekund. potem
   zostaje wy³±czone dcc, ¿eby ekg nie da³o siê ubiæ (w)
+- dodanie Alt-A -> /window active. jednolinijkowe patche, które komu¶
+  mog± pomóc, a nie szkodz±, chyba nie powinny czekaæ miesiêcy na wydanie
+  1.0 (gozda/w)
 
 // 2003-04-08
 

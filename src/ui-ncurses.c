@@ -4431,6 +4431,7 @@ static void binding_default()
 	binding_add("Alt-P", "/window switch 20", 1, 1);
 	binding_add("Alt-K", "/window kill", 1, 1);
 	binding_add("Alt-N", "/window new", 1, 1);
+	binding_add("Alt-A", "/window active", 1, 1);
 	binding_add("Alt-G", "ignore-query", 1, 1);
 	binding_add("Alt-B", "backward-word", 1, 1);
 	binding_add("Alt-F", "forward-word", 1, 1);
