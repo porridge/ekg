@@ -884,21 +884,22 @@ COMMAND(cmd_find)
 		return -1;
 	}
 	
-	if (argv[0] && !argv[1] && argv[0][0] != '-') {
-		uin_t uin = get_uin(params[0]);
+	if (argv[0] && argv[0][0] != '-') {
+		uin_t uin = get_uin(argv[0]);
 
 		if (!uin) {
-			printq("user_not_found", params[0]);
+			printq("user_not_found", argv[0]);
 			array_free(argv);
 			return -1;
 		}
 
 		gg_pubdir50_add(req, GG_PUBDIR50_UIN, itoa(uin));
 
-		goto search;
-	}
+		i = 1;
+	} else
+		i = 0;
 
-	for (i = 0; argv[i]; i++) {
+	for (; argv[i]; i++) {
 		char *arg = argv[i];
 				
 		if (match_arg(arg, 'f', "first", 2) && argv[i + 1]) {
@@ -922,7 +923,7 @@ COMMAND(cmd_find)
 		}
 
 		if (match_arg(arg, 'u', "uin", 2) && argv[i + 1]) {
-			gg_pubdir50_add(req, GG_PUBDIR50_UIN, argv[++i]);
+			gg_pubdir50_add(req, GG_PUBDIR50_UIN, itoa(get_uin(argv[++i])));
 			continue;
 		}
 		
@@ -969,7 +970,6 @@ COMMAND(cmd_find)
 		return -1;
 	}
 
-search:
 	if (!gg_pubdir50(sess, req)) {
 		printq("search_failed", http_error_string(0));
 		res = -1;
@@ -5266,7 +5266,7 @@ void command_init()
 
 	command_add
 	( "find", "u", cmd_find, 0,
-	  " [opcje]", "przeszukiwanie katalogu publicznego",
+	  " [numer|opcje]", "przeszukiwanie katalogu publicznego",
 	  "\n"
 	  "  -u, --uin <numerek>\n"
 	  "  -f, --first <imiê>\n"
