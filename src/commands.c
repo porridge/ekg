@@ -1724,13 +1724,9 @@ COMMAND(cmd_list)
 		} else
 			contacts = xstrdup("");
 			
-		if (!contacts) {
-			printq("userlist_clear_error", strerror(ENOMEM));
-			return -1;
-		}
-		
 		if (!(h = gg_userlist_put(config_uin, config_password, contacts, 1))) {
 			printq("userlist_clear_error", strerror(errno));
+			xfree(contacts);
 			return -1;
 		}
 
@@ -1751,8 +1747,7 @@ COMMAND(cmd_list)
 		struct gg_http *h;
 		char *contacts = userlist_dump();
 
-		if (contacts)
-			iso_to_cp(contacts);
+		iso_to_cp(contacts);
 
 		if (match_arg(params[0], 'P', "put-config", 5)) {
 			string_t s = string_init(contacts);
@@ -1792,13 +1787,9 @@ COMMAND(cmd_list)
 			contacts = string_free(s, 0);
 		}
 		
-		if (!contacts) {
-			printq("userlist_put_error", strerror(ENOMEM));
-			return -1;
-		}
-		
 		if (!(h = gg_userlist_put(config_uin, config_password, contacts, 1))) {
 			printq("userlist_put_error", strerror(errno));
+			xfree(contacts);
 			return -1;
 		}
 
