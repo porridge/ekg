@@ -75,7 +75,7 @@ static int userlist_compare(void *data1, void *data2)
 	struct userlist *a = data1, *b = data2;
 	
 	if (!a || !a->display || !b || !b->display)
-		return 0;
+		return 1;
 
 	return strcasecmp(a->display, b->display);
 }

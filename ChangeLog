@@ -21,6 +21,7 @@ zg³osi³ b³±d.
 - zmienna ,,display_pl_chars'' dzia³a te¿ w nag³ówku i pasku stanu (sz/w)
 - usuniêcie informacji o zmiennej ,,debug'' (sCoOtY/w)
 - poprawka segfaulta przy zbyt du¿ym rozmiarze listy kontaktów (salvador/w)
+- poprawka sortowania userlisty (leon,fidor/w)
 
 // 2003-02-09
 
