@@ -673,13 +673,6 @@ reason
 	okre¶la opis stanu klienta po uruchomieniu i pierwszym po³±czeniu.
 	zachowywana przy poleceniu ,,save''.
 
-debug
-	typ: bool, zmienna wewnêtrzna, ukryta
-
-	okre¶la czy klient i biblioteka maj± wy¶wietlaæ dodatkowe informacje
-	na temat tego, co siê dzieje. dla zwyk³ych u¿ytkowników nieprzydatna.
-	mo¿e co najwy¿ej pomóc w przypadku dziwnych b³êdów.
-
 fade_in
 	typ: liczba, zmienna wewnêtrzna, ukryta
 

@@ -18,6 +18,7 @@ zg³osi³ b³±d.
 - ekg ostrzega o mo¿liwo¶ci filtrowania wiadomo¶ci przez serwer (joshua/w)
 - informacja dla nowych u¿ytkowników o konieczno¶ci podania adresu e-mail (w)
 - zmienna ,,display_pl_chars'' dzia³a te¿ w nag³ówku i pasku stanu (sz/w)
+- usuniêcie informacji o zmiennej ,,debug'' (sCoOtY/w)
 
 // 2003-02-09
 

@@ -219,7 +219,6 @@ int config_ctrld_quits;
 int config_dcc;
 char *config_dcc_ip;
 char *config_dcc_dir;
-int config_debug;
 int config_display_ack;
 int config_display_color;
 char *config_display_color_map;
