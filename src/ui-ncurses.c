@@ -956,7 +956,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 			for (l = windows; l; l = l->next) {
 				struct window *w = l->data;
 
-				if (separate && !w->target && w->id && w->id != 1) {
+				if (separate && !w->target && w->id > 1) {
 					w->target = xstrdup(target);
 					xfree(w->prompt);
 					w->prompt = format_string(format_find("ncurses_prompt_query"), target);

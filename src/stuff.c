@@ -1710,7 +1710,7 @@ int ekg_hash(const char *name)
  * dodaje dany emoticon do listy.
  *
  *  - name - nazwa,
- *  - value - warto¶æ,
+ *  - value - warto¶æ.
  *
  * 0/-1
  */
@@ -1718,6 +1718,9 @@ int emoticon_add(const char *name, const char *value)
 {
 	struct emoticon e;
 	list_t l;
+
+	if (!name || !value)
+		return -1;
 
 	for (l = emoticons; l; l = l->next) {
 		struct emoticon *g = l->data;
@@ -1791,16 +1794,10 @@ int emoticon_read()
 
 		emot = array_make(buf, "\t", 2, 1, 1);
 	
-		if (emot) {
-			if (emot[1])
-				emoticon_add(emot[0], emot[1]);
-			else
-				emoticon_remove(emot[0]);
-			xfree(emot[0]);
-			xfree(emot[1]);
-			xfree(emot);
-		}
+		if (array_count(emot) == 2)
+			emoticon_add(emot[0], emot[1]);
 
+		array_free(emot);
 		xfree(buf);
 	}
 	
