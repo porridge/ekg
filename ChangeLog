@@ -9,6 +9,7 @@ zg³osi³ b³±d.
 // 2003-02-12
 
 - skrypt autorun/__init__.py nie jest ³adowany (rmrmg/w)
+- poprawka segfaulta przy ,,python unload'' bez parametrów (rmrmg/w)
 
 // 2003-02-11
 

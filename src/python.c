@@ -284,6 +284,11 @@ int python_unload(const char *name)
 {
 	list_t l;
 
+	if (!name) {
+		print("generic", "Nie podano nazwy skryptu");
+		return -1;
+	}
+
 	for (l = modules; l; l = l->next) {
 		struct module *m = l->data;
 
