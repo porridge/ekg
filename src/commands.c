@@ -1200,7 +1200,7 @@ COMMAND(cmd_set)
 		theme_cache_reset();
 		switch (variable_set(arg, (unset) ? NULL : params[1], 0)) {
 			case 0: {
-				char *my_params[2] = { params[0], NULL };
+				char *my_params[2] = { (!unset) ? params[0] : params[0] + 1, NULL };
 
 				cmd_set("set-show", my_params);
 				config_changed = 1;

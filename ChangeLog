@@ -23,6 +23,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - je¶li podczas ./configure-owania bêdzie w katalogu plik .enable-ui-ncurses,
   to zostanie wkompilowane. mam do¶æ zapominania o tej opcji (w)
 - regeneracja configure po zmianach configure.in, m4/* i acheader.h (w)
+- poprawka b³êdu przy usuwaniu zmiennych (speedy/w)
 
 // 2002-09-10
 
