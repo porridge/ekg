@@ -5,6 +5,14 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-08-25
+
+- dodanie funkcji gg_libgadu_version() zwracaj±cej wersjê biblioteki
+  i makro GG_LIBGADU_VERSION, które podaje wersjê inkludów (w)
+- ekg -v zwraca wersjê ekg i libgadu ze szczegó³ami (niepamiêtamkto/w)
+- podbicie wersji api (w)
+- poprawki voip (Chilek/w)
+
 // 2002-08-23
 
 - \n po zamkniêciu query (theKnight/w)

@@ -580,6 +580,8 @@ extern int gg_debug_level;
 void gg_debug(int level, const char *format, ...);
 #endif
 
+const char *gg_libgadu_version();
+
 /*
  * konfiguracja http proxy.
  */
@@ -635,6 +637,7 @@ uint16_t gg_fix16(uint16_t x);
 #define GG_DEFAULT_PROTOCOL_VERSION 0x18
 #define GG_DEFAULT_TIMEOUT 30
 #define GG_HAS_AUDIO_MASK 0x40000000
+#define GG_LIBGADU_VERSION "CVS"
 
 #define GG_DEFAULT_DCC_PORT 1550
 

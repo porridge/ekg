@@ -602,7 +602,7 @@ int main(int argc, char **argv)
 		if ((!strcmp(argv[i], "-t") || !strcmp(argv[i], "--theme")) && argv[i + 1])
 			load_theme = argv[++i];
 		if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version")) {
-		    	printf("EKG - Eksperymentalny Klient Gadu-Gadu (%s)\n", VERSION);
+		    	printf("ekg-%s\nlibgadu-%s (headers %s, protocol 0x%.2x, client \"%s\")\n", VERSION, gg_libgadu_version(), GG_LIBGADU_VERSION, GG_DEFAULT_PROTOCOL_VERSION, GG_DEFAULT_CLIENT_VERSION);
 			return 0;
 		}
 #ifdef WITH_IOCTLD

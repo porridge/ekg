@@ -43,7 +43,7 @@ gsm voice_gsm_enc = NULL, voice_gsm_dec = NULL;
  * otwiera urz±dzenie d¼wiêkowe, inicjalizuje koder gsm, dopisuje do
  * list przegl±danych deskryptorów.
  *
- * je¶li siê powiedzie 0, je¶li b³±d to -1.
+ * 0/-1.
  */
 int voice_open()
 {
@@ -152,14 +152,14 @@ void voice_close()
  *  - length - d³ugo¶æ bufora,
  *  - null - je¶li 1, dekoduje, ale nie odtwarza,
  *
- * je¶li siê uda³o 0, je¶li nie -1.
+ * 0/-1.
  */
 int voice_play(const char *buf, int length, int null)
 {
 	gsm_signal output[160];
 	const char *pos = buf;
 
-	while (pos <= (buf + length - 55)) {
+	while (pos <= (buf + length - 65)) {
 		if (gsm_decode(voice_gsm_dec, (char*) pos, output))
 			return -1;
 		if (!null && write(voice_fd, output, 320) != 320)
@@ -184,14 +184,14 @@ int voice_play(const char *buf, int length, int null)
  *  - length - d³ugo¶æ bufora,
  *  - null - je¶li 1, nie koduje,
  *
- * je¶li siê uda³o 0, je¶li nie -1.
+ * 0/-1.
  */
 int voice_record(const char *buf, int length, int null)
 {
 	gsm_signal input[160];
 	const char *pos = buf;
 
-	while (pos <= (buf + length - 55)) {
+	while (pos <= (buf + length - 65)) {
 		if (read(voice_fd, input, 320) != 320)
 			return -1;
 		if (!null)
