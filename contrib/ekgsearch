@@ -11,8 +11,8 @@
 # poprzedniej listy rekordów
 
 # TODO:
-# 1) znale¶æ b³êdy, poprawiæ je :)
-# 2) testowaæ, testowaæ, testowaæ
+# - doj¶æ do tego, jakie cyfry statusu co oznaczaj± (nie mam pewno¶ci)
+# - u¿yæ modu³u Net::HTTP (?)
 
 use IO::Socket;
 
@@ -154,6 +154,7 @@ if ($mode == 3)
 	$content .= "&start=$start" if (defined $start);
 }
 $tosend .= length($content) . "\r\nPragma: nocache\r\n\r\n" . $content;
+$tosend =~ tr/¡±¦¶¬¼/\xa5\xb9\x8c\x9c\x8f\x9f/; # cp_to_iso
 $sock->print($tosend);
 $in = <$sock>;
 if (! $in =~ /HTTP\/1\.[01] 200 OK/)
@@ -198,6 +199,7 @@ for ($i=0;<$sock>;$i++)
 	{
 		$data = <$sock>;
 		$data =~ s/\r\n//;
+		$data =~ tr/\xa5\xb9\x8c\x9c\x8f\x9f/¡±¦¶¬¼/; # iso_to_cp
 	}
 	if ($lastuin == $ruin)
 	{
