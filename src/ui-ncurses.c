@@ -2783,6 +2783,7 @@ void window_kill(struct window *w, int quiet)
 		window_current->target = NULL;
 		window_current->prompt = NULL;
 		window_current->prompt_len = 0;
+		return;
 	}
 	
 	if (id == 1) {
