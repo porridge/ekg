@@ -195,11 +195,11 @@ dnl
 AC_ARG_WITH(c99-vsnprintf,
   [  --with-c99-vsnprintf    Target system has C99-compatible vsnprintf()])
 
-if test "x$with_c99_vsnprintf" = "yes"; then
+if test "x$with_c99_vsnprintf" = "xyes"; then
 	AC_LIBGADU_DEFINE([HAVE_C99_VSNPRINTF])
 fi
 
-if test "x$with_c99_printf" = "x"; then
+if test "x$with_c99_vsnprintf" = "x"; then
 	AC_MSG_CHECKING([for C99-compatible vsnprintf()])
 	AC_TRY_RUN(
 	[
