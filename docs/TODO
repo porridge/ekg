@@ -16,6 +16,7 @@ klient:
 - zapisywanie konfiguracji do innego pliku,
 - optymalizacja czytania z pipe'a,
 - pociête reasony w auto_away,
+- ustawianie stanu bez opisów przy w³±czynych opcjach ,,*reason*'',
 
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,
