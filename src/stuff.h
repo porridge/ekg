@@ -70,7 +70,7 @@ char *sms_send_app;
 int sms_max_length;
 struct gg_search *search;
 int search_type;
-struct gg_register *reg;
+struct gg_register *reg_req;
 int no_prompt;
 int config_changed;
 int display_ack;

@@ -1123,7 +1123,7 @@ COMMAND(command_register)
 		return 0;
 	}
 	
-	if (!(reg = gg_register(params[0], params[1], 1))) {
+	if (!(reg_req = gg_register(params[0], params[1], 1))) {
 		my_printf("register_failed", strerror(errno));
 		return 0;
 	}
