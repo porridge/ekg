@@ -2898,7 +2898,7 @@ echo "$as_me: error: You need both readline and readline-devel packages." >&2;}
     LIBS="$READLINE_LIBS $LIBS"
     CFLAGS="$CFLAGS $READLINE_INCLUDES"
 
-for ac_func in rl_set_prompt rl_filename_completion_function rl_get_screen_size rl_set_key
+for ac_func in rl_set_prompt rl_filename_completion_function rl_get_screen_size rl_set_key rl_bind_key_in_map
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
 echo "$as_me:2904: checking for $ac_func" >&5

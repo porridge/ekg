@@ -10,6 +10,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - lista funkcji w docs/api/ref.html (w)
 - dodanie informacji do help bind (Murphy/w)
 - poprawienie kilku themeów (w)
+- poprawki w okienkach (w)
+- poprawka segfaultu w status (FIG/w)
 
 // 2002-08-11
 

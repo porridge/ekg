@@ -39,6 +39,46 @@
 #include "vars.h"
 #include "ui.h"
 
+/* podstawny ewentualnie brakuj±ce funkcje i definicje readline */
+
+extern void rl_extend_line_buffer(int len);
+extern char **completion_matches();
+
+#ifndef HAVE_RL_BIND_KEY_IN_MAP
+int rl_bind_key_in_map(int key, void *function, void *keymap)
+{
+	return -1;
+}
+#endif
+
+#ifndef HAVE_RL_GET_SCREEN_SIZE
+int rl_get_screen_size(int *columns, int *lines)
+{
+	*columns = 80;
+	*lines = 24;
+	return 0;
+}
+#endif
+
+#ifndef HAVE_RL_FILENAME_COMPLETION_FUNCTION
+void *rl_filename_completion_function = NULL;
+#endif
+
+#ifndef HAVE_RL_SET_PROMPT
+int rl_set_prompt(const char *foo)
+{
+	return -1;
+}
+#endif
+
+#ifndef HAVE_RL_SET_KEY
+int rl_set_key(const char *key, void *function, void *keymap)
+{
+	return -1;
+}
+#endif
+
+/* deklaracje funkcji interfejsu */
 static void ui_readline_loop();
 static void ui_readline_print(const char *target, const char *line);
 static void ui_readline_beep();
@@ -51,66 +91,37 @@ struct window *window_current = NULL;
 
 /* kod okienek napisany jest na podstawie ekg-windows nilsa */
 static struct window *window_add();
-static int window_del(int id);
+static int window_remove(int id);
 static int window_switch(int id);
 static int window_refresh();
 static int window_write(int id, const char *line);
 static void window_clear();
-/* static int window_sort(); */
-static int window_query_id(const char *qnick);
 static void window_list();
 static int window_make_query(const char *nick);
 static void window_free();
 static struct window *window_find(int id);
+static int window_find_query(const char *qnick);
 
-/* a jak ju¿ przy okienkach jeste¶my... */
-static void window_01() { window_switch(1); }
-static void window_02() { window_switch(2); }
-static void window_03() { window_switch(3); }
-static void window_04() { window_switch(4); } 
-static void window_05() { window_switch(5); }
-static void window_06() { window_switch(6); }
-static void window_07() { window_switch(7); }
-static void window_08() { window_switch(8); }
-static void window_09() { window_switch(9); }
-
-static char *seq_get_command(char *seq);
 static int bind_sequence(char *seq, char *command, int quiet);
 static int bind_seq_list();
+static int bind_handler_window(int a, int key);
 
-/* pro¶ciej siê chyba nie da... */
-int seq_execute_a() { command_exec(NULL, seq_get_command("ctrl-a")); return 0; }
-int seq_execute_b() { command_exec(NULL, seq_get_command("ctrl-b")); return 0; }
-int seq_execute_c() { command_exec(NULL, seq_get_command("ctrl-c")); return 0; }
-int seq_execute_d() { command_exec(NULL, seq_get_command("ctrl-d")); return 0; }
-int seq_execute_e() { command_exec(NULL, seq_get_command("ctrl-e")); return 0; }
-int seq_execute_f() { command_exec(NULL, seq_get_command("ctrl-f")); return 0; }
-int seq_execute_g() { command_exec(NULL, seq_get_command("ctrl-g")); return 0; }
-int seq_execute_h() { command_exec(NULL, seq_get_command("ctrl-h")); return 0; }
-int seq_execute_i() { command_exec(NULL, seq_get_command("ctrl-i")); return 0; }
-int seq_execute_j() { command_exec(NULL, seq_get_command("ctrl-j")); return 0; }
-int seq_execute_k() { command_exec(NULL, seq_get_command("ctrl-k")); return 0; }
-int seq_execute_l() { command_exec(NULL, seq_get_command("ctrl-l")); return 0; }
-int seq_execute_m() { command_exec(NULL, seq_get_command("ctrl-m")); return 0; }
-int seq_execute_n() { command_exec(NULL, seq_get_command("ctrl-n")); return 0; }
-int seq_execute_o() { command_exec(NULL, seq_get_command("ctrl-o")); return 0; }
-int seq_execute_p() { command_exec(NULL, seq_get_command("ctrl-p")); return 0; }
-int seq_execute_q() { command_exec(NULL, seq_get_command("ctrl-q")); return 0; }
-int seq_execute_r() { command_exec(NULL, seq_get_command("ctrl-r")); return 0; }
-int seq_execute_s() { command_exec(NULL, seq_get_command("ctrl-s")); return 0; }
-int seq_execute_t() { command_exec(NULL, seq_get_command("ctrl-t")); return 0; }
-int seq_execute_u() { command_exec(NULL, seq_get_command("ctrl-u")); return 0; }
-int seq_execute_v() { command_exec(NULL, seq_get_command("ctrl-v")); return 0; }
-int seq_execute_w() { command_exec(NULL, seq_get_command("ctrl-w")); return 0; }
-int seq_execute_y() { command_exec(NULL, seq_get_command("ctrl-y")); return 0; }
-int seq_execute_z() { command_exec(NULL, seq_get_command("ctrl-z")); return 0; }
-
+/*
+ * sigcont_handler()
+ *
+ * os³uguje powrót z t³a poleceniem ,,fg'', ¿eby od¶wie¿yæ ekran.
+ */
 static void sigcont_handler()
 {
 	rl_forced_update_display();
 	signal(SIGCONT, sigcont_handler);
 }
 
+/*
+ * sigint_handler()
+ *
+ * obs³uguje wci¶niêcie Ctrl-C.
+ */
 static void sigint_handler()
 {
 	rl_delete_text(0, rl_end);
@@ -120,11 +131,14 @@ static void sigint_handler()
 	signal(SIGINT, sigint_handler);
 }
 
+/*
+ * sigwinch_handler()
+ *
+ * obs³uguje zmianê rozmiaru okna.
+ */
 static void sigwinch_handler()
 {
-#ifdef HAVE_RL_GET_SCREEN_SIZE
 	rl_get_screen_size(&screen_lines, &screen_columns);
-#endif
 #ifdef SIGWINCH
 	signal(SIGWINCH, sigwinch_handler);
 #endif
@@ -140,12 +154,6 @@ static int my_getc(FILE *f)
 	ekg_wait_for_key();
 	return rl_getc(f);
 }
-
-/*
- * g³upie readline z wersji na wersjê ma inne include'y, grr.
- */
-extern void rl_extend_line_buffer(int len);
-extern char **completion_matches();
 
 static char *command_generator(char *text, int state)
 {
@@ -396,9 +404,7 @@ static char **my_completion(char *text, int start, int end)
 						func = dcc_generator;
 						break;
 					case 'f':
-#ifdef HAVE_RL_FILENAME_COMPLETION_FUNCTION
 						func = rl_filename_completion_function;
-#endif
 						break;
 				}
 			}
@@ -422,8 +428,9 @@ static void ui_readline_print(const char *target, const char *line)
         int old_end = rl_end, i, id = 0;
 	char *old_prompt = rl_prompt;
 	
+	/* znajd¼ odpowiednie okienko i ewentualnie je utwórz */
 	if (target)
-		id = window_query_id(target);
+		id = window_find_query(target);
 
 	if (config_make_window > 0 && !id && strncmp(target, "__", 2))
 		id = window_make_query(target);
@@ -435,21 +442,24 @@ static void ui_readline_print(const char *target, const char *line)
                 return;
         }
 
-	if (pager_lines != -2) {
-		window_write(window_current->id, line);
+	/* je¶li mamy ukrywaæ wszystko, wychodzimy */
+	if (pager_lines == -2)
+		return;
 
-	        if (in_readline) {
-	                rl_end = 0;
-	                rl_prompt = "";
-	                rl_redisplay();
-	                printf("\r");
-	                for (i = 0; i < strlen(old_prompt); i++)
-	                        printf(" ");
-	                printf("\r");
-	        }
+	window_write(window_current->id, line);
 
-		printf("%s", line);
-	}
+	/* ukryj prompt, je¶li jeste¶my w trakcie readline */
+        if (in_readline) {
+                rl_end = 0;
+                rl_prompt = "";
+                rl_redisplay();
+                printf("\r");
+                for (i = 0; i < strlen(old_prompt); i++)
+                        printf(" ");
+                printf("\r");
+        }
+
+	printf("%s", line);
 
 	if (pager_lines >= 0) {
 		const char *p;
@@ -463,9 +473,7 @@ static void ui_readline_print(const char *target, const char *line)
 			const char *prompt = format_find("readline_more");
 			
 			in_readline = 1;
-#ifdef HAVE_RL_SET_PROMPT
 		        rl_set_prompt(prompt);
-#endif				
 			pager_lines = -1;
 			tmp = readline(prompt);
 			in_readline = 0;
@@ -480,6 +488,7 @@ static void ui_readline_print(const char *target, const char *line)
 		}
 	}
 	
+	/* je¶li jeste¶my w readline, poka¿ z powrotem prompt */
         if (in_readline) {
                 rl_end = old_end;
                 rl_prompt = old_prompt;
@@ -487,6 +496,11 @@ static void ui_readline_print(const char *target, const char *line)
         }
 }
 
+/*
+ * ui_readline_beep()
+ *
+ * wydaje d¼wiêk na konsoli.
+ */
 static void ui_readline_beep()
 {
 	printf("\a");
@@ -500,13 +514,13 @@ static void ui_readline_beep()
  */
 static const char *current_prompt()
 {
-	static char buf[80];	/* g³upio strdup()owaæ wszystko */
+	static char buf[80];
 	const char *prompt = buf;
 	int count = list_count(windows);
 	char *tmp;
 
         if (window_current->query_nick) {
-		if (count > 1)
+		if (count > 1 || window_current->id != 1)
 			tmp = format_string(format_find("readline_prompt_query_win"), window_current->query_nick, itoa(window_current->id));
 		else
 			tmp = format_string(format_find("readline_prompt_query"), window_current->query_nick, NULL);
@@ -525,7 +539,7 @@ static const char *current_prompt()
 			format_nowin = "readline_prompt_invisible";
 		}
 		
-		if (count > 1) {
+		if (count > 1 || window_current->id != 1) {
 			tmp = format_string(format_find(format_win), itoa(window_current->id));
 			strncpy(buf, tmp, sizeof(buf) - 1);
 			xfree(tmp);
@@ -553,9 +567,7 @@ static char *my_readline()
         char *res, *tmp;
 
         in_readline = 1;
-#ifdef HAVE_RL_SET_PROMPT
 	rl_set_prompt(prompt);
-#endif
         res = readline(prompt);
         in_readline = 0;
 
@@ -573,6 +585,8 @@ static char *my_readline()
  */
 void ui_readline_init()
 {
+	char c;
+
         window_current = window_add();
         window_refresh();
 
@@ -587,30 +601,20 @@ void ui_readline_init()
 	rl_readline_name = "gg";
 	rl_attempted_completion_function = (CPPFunction *) my_completion;
 	rl_completion_entry_function = (void*) empty_generator;
-#ifdef HAVE_RL_SET_KEY
-	rl_set_key("\033[[A", binding_help, rl_get_keymap());
-	rl_set_key("\033OP", binding_help, rl_get_keymap());
-	rl_set_key("\033[11~", binding_help, rl_get_keymap());
-	rl_set_key("\033[M", binding_help, rl_get_keymap());
-	rl_set_key("\033[[B", binding_quick_list, rl_get_keymap());
-	rl_set_key("\033OQ", binding_quick_list, rl_get_keymap());
-	rl_set_key("\033[12~", binding_quick_list, rl_get_keymap());
-	rl_set_key("\033[N", binding_quick_list, rl_get_keymap());
-	
-	rl_set_key("\033[24~", binding_toggle_debug, rl_get_keymap());
-#endif
 
-/*#ifdef HAVE_RL_GENERIC_BIND*/
-        rl_generic_bind(ISFUNC, "1", (char *)window_01, emacs_meta_keymap);
-        rl_generic_bind(ISFUNC, "2", (char *)window_02, emacs_meta_keymap);
-        rl_generic_bind(ISFUNC, "3", (char *)window_03, emacs_meta_keymap);
-        rl_generic_bind(ISFUNC, "4", (char *)window_04, emacs_meta_keymap);
-        rl_generic_bind(ISFUNC, "5", (char *)window_05, emacs_meta_keymap);
-        rl_generic_bind(ISFUNC, "6", (char *)window_06, emacs_meta_keymap);
-        rl_generic_bind(ISFUNC, "7", (char *)window_07, emacs_meta_keymap);
-        rl_generic_bind(ISFUNC, "8", (char *)window_08, emacs_meta_keymap);
-        rl_generic_bind(ISFUNC, "9", (char *)window_09, emacs_meta_keymap);
-/*#endif*/
+	rl_set_key("\033[[A", binding_help, emacs_standard_keymap);
+	rl_set_key("\033OP", binding_help, emacs_standard_keymap);
+	rl_set_key("\033[11~", binding_help, emacs_standard_keymap);
+	rl_set_key("\033[M", binding_help, emacs_standard_keymap);
+	rl_set_key("\033[[B", binding_quick_list, emacs_standard_keymap);
+	rl_set_key("\033OQ", binding_quick_list, emacs_standard_keymap);
+	rl_set_key("\033[12~", binding_quick_list, emacs_standard_keymap);
+	rl_set_key("\033[N", binding_quick_list, emacs_standard_keymap);
+	
+	rl_set_key("\033[24~", binding_toggle_debug, emacs_standard_keymap);
+
+	for (c = '0'; c <= '9'; c++)
+		rl_bind_key_in_map(c, bind_handler_window, emacs_meta_keymap);
 	
 	signal(SIGINT, sigint_handler);
 	signal(SIGCONT, sigcont_handler);
@@ -673,13 +677,15 @@ static void ui_readline_loop()
 	for (;;) {
 		char *line = my_readline();
 
+		/* je¶li wci¶niêto Ctrl-D i jeste¶my w query, wyjd¼my */
 		if (!line && window_current->query_nick) {
 			ui_event("command", "query", NULL);
 			continue;
 		}
 
+		/* je¶li wci¶niêto Ctrl-D, to zamknij okienko */
 		if (!line && list_count(windows) > 1) {
-			window_del(window_current->id);
+			window_remove(window_current->id);
 			continue;
 		}
 
@@ -696,6 +702,7 @@ static void ui_readline_loop()
 			free(line);
 
 			no_prompt = 1;
+			rl_bind_key(9, rl_insert);
 
 			while ((line = my_readline())) {
 				if (!strcmp(line, ".")) {
@@ -706,6 +713,8 @@ static void ui_readline_loop()
 				string_append(s, "\r\n");
 				free(line);
 			}
+
+			rl_bind_key(9, rl_complete);
 
 			no_prompt = 0;
 
@@ -718,7 +727,8 @@ static void ui_readline_loop()
 			line = string_free(s, 0);
 		}
 		
-		if (*line != '\0')
+		/* je¶li linia nie jest pusta, dopisz do historii */
+		if (*line)
 			add_history(line);
 		
 		pager_lines = 0;
@@ -742,6 +752,11 @@ static void ui_readline_loop()
 
 }
 
+/*
+ * ui_readline_event()
+ *
+ * obs³uga zdarzeñ wysy³anych z ekg do interfejsu.
+ */
 static int ui_readline_event(const char *event, ...)
 {
 	va_list ap;
@@ -761,7 +776,7 @@ static int ui_readline_event(const char *event, ...)
 			if (param) {
 				int id;
 
-				if ((id = window_query_id(param))) {
+				if ((id = window_find_query(param))) {
 					print("query_exist", param, itoa(id));
 					return 1;
 				}
@@ -799,7 +814,7 @@ static int ui_readline_event(const char *event, ...)
 		        } else if (!strcasecmp(p1, "kill")) {
 		                int id = (p2) ? atoi(p2) : window_current->id;
 
-				window_del(id);
+				window_remove(id);
 				
 		        } else if (!strcasecmp(p1, "switch")) {
 		                if (!p2)
@@ -822,6 +837,7 @@ static int ui_readline_event(const char *event, ...)
 
 			result = 1;
 		}
+
 		if (!strcasecmp(command, "bind")) {
 			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*), *p3 = va_arg(ap, char*);
 			
@@ -907,11 +923,11 @@ static struct window *window_add()
 }
 
 /*
- * window_del()
+ * window_remove()
  *
  * usuwa okno o podanym numerze.
  */
-static int window_del(int id)
+static int window_remove(int id)
 {
 	struct window *w;
 	int i;
@@ -976,33 +992,6 @@ static int window_switch(int id)
 	rl_initialize();
 
 	return 0;
-
-#if 0
-        list_t l, tmp = windows;
-
-        for (l = windows; l; l = l->next) {
-                struct window *w = l->data;
-
-                if (w->id == id) {
-                        windows = l;
-                        win = l->data;
-                        window_refresh();
-                        curr_window = id;
-                        window_refresh();
-                        windows = tmp;
-#ifdef HAVE_RL_SET_PROMPT
-			rl_set_prompt(current_prompt());
-#else /*#elif HAVE_RL_EXPAND_PROMPT*/
-			rl_expand_prompt(current_prompt());
-#endif
-			rl_initialize(); /* reinitialize rl's internal state */
-                        return 0;
-                }
-        }
-        print("window_noexist");
-
-        return 1;
-#endif
 }
 
 /*
@@ -1071,41 +1060,13 @@ static void window_clear()
 	}
 }
 
-#if 0
-static int window_sort()
-{
-        list_t l;
-        int id = 1, new_id = 0;
-	struct window *new_win = NULL;
-
-        for (l = windows; l; l = l->next) {
-                struct window *w = l->data;
-
-		if (w->id == curr_window) {
-			new_win = w;
-			new_id = id;
-		}
-
-                w->id = id++;
-        }
-
-	if (new_id && new_win) {
-		curr_window = new_id;
-		win = new_win;
-		window_refresh();
-	}
-        
-	return 0;
-}
-#endif
-
 /*
- * window_query_id()
+ * window_find_query()
  *
  * znajduje id okna, w którym prowadzona jest rozmowa z dan± osob±. je¶li
  * nie ma takiego, zwraca zero.
  */
-static int window_query_id(const char *nick)
+static int window_find_query(const char *nick)
 {
         list_t l;
 
@@ -1217,7 +1178,12 @@ static void window_free()
 	windows = NULL;
 }
 
-static char *seq_get_command(char *seq)
+/*
+ * bind_find_command()
+ *
+ * szuka komendy, któr± nale¿y wykonaæ dla danego klawisza.
+ */
+static char *bind_find_command(char *seq)
 {
 	list_t l;
 
@@ -1233,6 +1199,35 @@ static char *seq_get_command(char *seq)
 
 	return NULL;
 }
+
+/*
+ * bind_handler_ctrl()
+ *
+ * obs³uguje klawisze Ctrl-A do Ctrl-Z, wywo³uj±c przypisane im akcje.
+ */
+static int bind_handler_ctrl(int a, int key)
+{
+	char *tmp = saprintf("ctrl-%c", 'a' + key - 1);
+	command_exec(NULL, bind_find_command(tmp));	/* XXX lito¶ci */
+	xfree(tmp);
+
+	return 0;
+}
+
+/*
+ * bind_handler_window()
+ *
+ * osb³uguje klawisze Alt-1 do Alt-0, zmieniaj±c okna na odpowiednie.
+ */
+static int bind_handler_window(int a, int key)
+{
+	if (key > '0' && key <= '9')
+		window_switch(key - '0');
+	else
+		window_switch(10);
+
+	return 0;
+}
 		
 static int bind_sequence(char *seq, char *command, int quiet)
 {
@@ -1242,7 +1237,7 @@ static int bind_sequence(char *seq, char *command, int quiet)
 	if (!seq)
 		return 1;
 
-	if (command && seq_get_command(seq)) {
+	if (command && bind_find_command(seq)) {
 		if (!quiet)
 			print("bind_seq_exist");
 		return 1;
@@ -1263,37 +1258,11 @@ static int bind_sequence(char *seq, char *command, int quiet)
 		return 1;
 	}
 
-	switch (c) {
-		case 'A': (command) ? rl_bind_key(real_seq, seq_execute_a) : rl_unbind_key(real_seq); break;
-		case 'B': (command) ? rl_bind_key(real_seq, seq_execute_b) : rl_unbind_key(real_seq); break;
-		case 'C': (command) ? rl_bind_key(real_seq, seq_execute_c) : rl_unbind_key(real_seq); break;
-		case 'D': (command) ? rl_bind_key(real_seq, seq_execute_d) : rl_unbind_key(real_seq); break;
-		case 'E': (command) ? rl_bind_key(real_seq, seq_execute_e) : rl_unbind_key(real_seq); break;
-		case 'F': (command) ? rl_bind_key(real_seq, seq_execute_f) : rl_unbind_key(real_seq); break;
-		case 'G': (command) ? rl_bind_key(real_seq, seq_execute_g) : rl_unbind_key(real_seq); break;
-		case 'H': (command) ? rl_bind_key(real_seq, seq_execute_h) : rl_unbind_key(real_seq); break;
-		case 'I': (command) ? rl_bind_key(real_seq, seq_execute_i) : rl_unbind_key(real_seq); break;
-		case 'J': (command) ? rl_bind_key(real_seq, seq_execute_j) : rl_unbind_key(real_seq); break;
-		case 'K': (command) ? rl_bind_key(real_seq, seq_execute_k) : rl_unbind_key(real_seq); break;
-		case 'L': (command) ? rl_bind_key(real_seq, seq_execute_l) : rl_unbind_key(real_seq); break;
-		case 'M': (command) ? rl_bind_key(real_seq, seq_execute_m) : rl_unbind_key(real_seq); break;
-		case 'N': (command) ? rl_bind_key(real_seq, seq_execute_n) : rl_unbind_key(real_seq); break;
-		case 'O': (command) ? rl_bind_key(real_seq, seq_execute_o) : rl_unbind_key(real_seq); break;
-		case 'P': (command) ? rl_bind_key(real_seq, seq_execute_p) : rl_unbind_key(real_seq); break;
-		case 'Q': (command) ? rl_bind_key(real_seq, seq_execute_q) : rl_unbind_key(real_seq); break;
-		case 'R': (command) ? rl_bind_key(real_seq, seq_execute_r) : rl_unbind_key(real_seq); break;
-		case 'S': (command) ? rl_bind_key(real_seq, seq_execute_s) : rl_unbind_key(real_seq); break;
-		case 'T': (command) ? rl_bind_key(real_seq, seq_execute_t) : rl_unbind_key(real_seq); break;
-		case 'U': (command) ? rl_bind_key(real_seq, seq_execute_u) : rl_unbind_key(real_seq); break;
-		case 'V': (command) ? rl_bind_key(real_seq, seq_execute_v) : rl_unbind_key(real_seq); break;
-		case 'W': (command) ? rl_bind_key(real_seq, seq_execute_w) : rl_unbind_key(real_seq); break;
-		case 'Y': (command) ? rl_bind_key(real_seq, seq_execute_y) : rl_unbind_key(real_seq); break;
-		case 'Z': (command) ? rl_bind_key(real_seq, seq_execute_z) : rl_unbind_key(real_seq); break;
-		default: if (!quiet)
-				 print("bind_seq_incorrect", seq); 
-			 return 1;
-	}
-	
+	if (command)
+		rl_bind_key(real_seq, bind_handler_ctrl);
+	else
+		rl_unbind_key(real_seq);
+
 	if (command) {
 		struct sequence s;
 		
@@ -1326,6 +1295,11 @@ static int bind_sequence(char *seq, char *command, int quiet)
 	return 1;
 }
 
+/*
+ * bind_seq_list()
+ *
+ * wy¶wietla listê przypisanych komend.
+ */
 static int bind_seq_list() 
 {
 	list_t l;

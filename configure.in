@@ -166,7 +166,7 @@ if test -d src; then
     LIBS="$READLINE_LIBS $LIBS"
     CFLAGS="$CFLAGS $READLINE_INCLUDES"
 
-    AC_CHECK_FUNCS([rl_set_prompt rl_filename_completion_function rl_get_screen_size rl_set_key])
+    AC_CHECK_FUNCS([rl_set_prompt rl_filename_completion_function rl_get_screen_size rl_set_key rl_bind_key_in_map])
   fi
 
   AC_ARG_WITH(libgsm,
