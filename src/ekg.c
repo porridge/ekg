@@ -407,7 +407,7 @@ void ekg_wait_for_key()
 
 		/* timeout autoawaya */
 		if (config_auto_away && GG_S_A(config_status) && time(NULL) - last_action > config_auto_away && sess->state == GG_STATE_CONNECTED)
-			change_status(GG_STATUS_BUSY | (GG_S_F(config_status) ? GG_STATUS_FRIENDS_MASK : 0), NULL, config_auto_away);
+			change_status(GG_STATUS_BUSY, NULL, config_auto_away);
 
 		/* auto save */
 		if (config_auto_save && config_changed && time(NULL) - last_save > config_auto_save) {
@@ -556,7 +556,7 @@ void ekg_wait_for_key()
 
 			if (c->type == GG_SESSION_USER0) {
 				if (config_auto_back == 2 && GG_S_B(config_status))
-					change_status(GG_STATUS_AVAIL | (GG_S_F(config_status) ? GG_STATUS_FRIENDS_MASK : 0), NULL, 1);
+					change_status(GG_STATUS_AVAIL, NULL, 1);
 
 				if (config_auto_back == 2)
 					unidle();
