@@ -38,6 +38,7 @@
 #include <sys/wait.h>
 #include <sys/socket.h>
 #include <fcntl.h>
+#include <getopt.h>
 #include <libgadu.h>
 #include "config.h"
 #include "libgadu.h"
@@ -621,14 +622,32 @@ static void setup_debug()
 	
 int main(int argc, char **argv)
 {
-	int auto_connect = 1, force_debug = 0, i, new_status = 0, ui_set = 0;
-	char *load_theme = NULL;
+	int auto_connect = 1, force_debug = 0, new_status = 0, ui_set = 0;
+	int c = 0, set_private = 0;
+	char *load_theme = NULL, *new_reason = NULL;
 #ifdef WITH_IOCTLD
 	const char *sock_path = NULL, *ioctld_path = IOCTLD_PATH;
 #endif
 	struct passwd *pw; 
 	struct gg_common si;
 	void (*ui_init)();
+	struct option ekg_options[] = {
+		{ "back", optional_argument, 0, 'b' },
+		{ "away", optional_argument, 0, 'a' },
+		{ "invisible", optional_argument, 0, 'i' },
+		{ "private", no_argument, 0, 'p' },
+		{ "debug", no_argument, 0, 'd' },
+		{ "no-auto", no_argument, 0, 'n' },
+		{ "control-pipe", no_argument, 0, 'c' },
+		{ "frontend", required_argument, 0, 'f' },
+		{ "help", no_argument, 0, 'h' },
+		{ "ioctld-path", required_argument, 0, 'I' },
+		{ "no-pipe", no_argument, 0, 'o' },
+		{ "theme", required_argument, 0, 't' },
+		{ "user", required_argument, 0, 'u' },
+		{ "version", no_argument, 0, 'v' },
+		{ 0, 0, 0, 0 }
+	};
 
 #ifdef WITH_UI_NCURSES
 	ui_init = ui_ncurses_init;
@@ -674,25 +693,50 @@ int main(int argc, char **argv)
 
 	config_user = "";
 
-	for (i = 1; i < argc && *argv[i] == '-'; i++) {
-		if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
-			printf(""
+	while ((c = getopt_long(argc, argv, "b::a::i::pdncf:hI:ot:u:v", ekg_options, NULL)) != -1) {
+		switch (c) {
+			case 'b':
+				new_status = GG_STATUS_AVAIL;
+				xfree(new_reason);
+				new_reason = xstrdup(optarg);
+			        break;
+			case 'a':
+				new_status = GG_STATUS_BUSY;
+				xfree(new_reason);
+				new_reason = xstrdup(optarg);
+			        break;
+			case 'i':
+				new_status = GG_STATUS_INVISIBLE;
+				xfree(new_reason);
+				new_reason = xstrdup(optarg);
+			        break;
+			case 'p':
+				set_private = 1;
+			        break;
+			case 'd':
+				force_debug =1;
+				break;
+			case 'n':
+				auto_connect = 0;
+				break;
+			case 'h':
+				printf(""
 "u¿ycie: %s [OPCJE] [KOMENDY]\n"
-"  -u, --user [NAZWA]   korzysta z profilu u¿ytkownika o podanej nazwie\n"
-"  -t, --theme [PLIK]   ³aduje opis wygl±du z podanego pliku\n"
-"  -c, --control-pipe [PLIK]	potok nazwany sterowania\n"
-"  -n, --no-auto        nie ³±czy siê automatycznie z serwerem\n"
-"  -a, --away           po po³±czeniu zmienia stan na ,,zajêty''\n"
-"  -b, --back           po po³±czeniu zmienia stan na ,,dostêpny''\n"
-"  -i, --invisible      po po³±czeniu zmienia stan na ,,niewidoczny''\n"
-"  -p, --private        po po³±czeniu zmienia stan na ,,tylko dla przyjació³''\n"
-"  -d, --debug          w³±cza wy¶wietlanie dodatkowych informacji\n"
-"  -v, --version        wy¶wietla wersje programu i wychodzi\n"
+"  -u, --user=NAZWA           korzysta z profilu u¿ytkownika o podanej nazwie\n"
+"  -t, --theme=PLIK           ³aduje opis wygl±du z podanego pliku\n"
+"  -c, --control-pipe=PLIK    potok nazwany sterowania\n"
+"  -n, --no-auto              nie ³±czy siê automatycznie z serwerem\n"
+"  -a, --away[=OPIS]          domy¶lnie zmienia stan na ,,zajêty''\n"
+"  -b, --back[=OPIS]          domy¶lnie zmienia stan na ,,dostêpny''\n"
+"  -i, --invisible[=OPIS]     domy¶lnie zmienia stan na ,,niewidoczny''\n"
+"  -p, --private              domy¶lnie ustawia tryb ,,tylko dla przyjació³''\n"
+"  -d, --debug                w³±cza wy¶wietlanie dodatkowych informacji\n"
+"  -v, --version              wy¶wietla wersje programu i wychodzi\n"
 #ifdef WITH_IOCTLD
-"  -I, --ioctld-path [¦CIE¯KA]    ustawia ¶cie¿kê do ioctld\n"
+"  -I, --ioctld-path=¦CIE¯KA  ustawia ¶cie¿kê do ioctld\n"
 #endif
-"  -f, --frontend [NAZWA]         wybiera jeden z dostêpnych interfejsów\n"
-"                                 (none, batch"
+"  -f, --frontend=NAZWA       wybiera jeden z dostêpnych interfejsów\n"
+"                             (none, batch"
 #ifdef WITH_UI_READLINE
 ", readline"
 #endif
@@ -701,90 +745,68 @@ int main(int argc, char **argv)
 #endif
 ")\n"
 "\n", argv[0]);
-			return 0;	
-		}
-		if (!strcmp(argv[i], "-b") || !strcmp(argv[i], "--back"))
-			new_status = GG_STATUS_AVAIL;
-		if (!strcmp(argv[i], "-a") || !strcmp(argv[i], "--away"))
-			new_status = GG_STATUS_BUSY;
-		if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--invisible"))
-			new_status = GG_STATUS_INVISIBLE;
-		if (!strcmp(argv[i], "-p") || !strcmp(argv[i], "--private"))
-			new_status |= GG_STATUS_FRIENDS_MASK;
-		if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--debug"))
-			force_debug = 1;
-		if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "--no-auto"))
-			auto_connect = 0;
-		if (!strcmp(argv[i], "-u") || !strcmp(argv[i], "--user")){ 
-			if (argv[i+1]) { 
-				config_user = argv[i+1];
-				i++;
-			} else {
-				fprintf(stderr, "Nie podano nazwy u¿ytkownika.\n");
-		   		return 1;
-			}
-		}
-		if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--control-pipe")) {
-			if (argv[i + 1]) {
-				pipe_file = argv[i + 1];
-				i++;
-			} else {
-				fprintf(stderr, "Nie podano nazwy potoku kontrolneg\n");
-				return 1;
-			}
-		}
-		if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--no-pipe"))
-			pipe_file = NULL;
-		if ((!strcmp(argv[i], "-t") || !strcmp(argv[i], "--theme")) && argv[i + 1])
-			load_theme = argv[++i];
-		if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version")) {
-		    	printf("ekg-%s\nlibgadu-%s (headers %s, protocol 0x%.2x, client \"%s\")\n", VERSION, gg_libgadu_version(), GG_LIBGADU_VERSION, GG_DEFAULT_PROTOCOL_VERSION, GG_DEFAULT_CLIENT_VERSION);
-			return 0;
-		}
+				return 0;
+				break;
+			case 'u':
+				config_user = optarg;
+				break;
+			case 'c':
+				pipe_file = optarg;
+				break;
+			case 'o':
+				pipe_file = NULL;
+				break;
+			case 't':
+				load_theme = optarg;
+				break;
+			case 'v':
+			    	printf("ekg-%s\nlibgadu-%s (headers %s, protocol 0x%.2x, client \"%s\")\n", VERSION, gg_libgadu_version(), GG_LIBGADU_VERSION, GG_DEFAULT_PROTOCOL_VERSION, GG_DEFAULT_CLIENT_VERSION);
+				return 0;
 #ifdef WITH_IOCTLD
-                if (!strcmp(argv[i], "-I") || !strcmp(argv[i], "--ioctld-path")) {
-                        if (argv[i + 1]) {
-                                ioctld_path = argv[i + 1];
-                                i++;
-                        } else {
-                                fprintf(stderr, "Nie podano ¶cie¿ki do ioctld.\n");
-                                return 1;
-                        }
-                }
+			csae 'I':
+				ioctld_path = optarg;
+			break;
 #endif
-		if (!strcmp(argv[i], "-f") || !strcmp(argv[i], "--frontend")) {
-			ui_set = 1;
-			if (!argv[i + 1]) {
-				fprintf(stderr, "Nie podano nazwy interfejsu.\n");
-				return 1;
-			}
-			if (!strcasecmp(argv[i + 1], "none"))
-				ui_init = ui_none_init;
-			else if (!strcasecmp(argv[i + 1], "batch"))
-				ui_init = ui_batch_init;
+			case 'f':
+				ui_set = 1;
+
+				if (!strcasecmp(optarg, "nonde"))
+					ui_init = ui_none_init;
+				else if (!strcasecmp(optarg, "batch"))
+					ui_init = ui_batch_init;
 #ifdef WITH_UI_READLINE
-			else if (!strcasecmp(argv[i + 1], "readline"))
-				ui_init = ui_readline_init;
+				else if (!strcasecmp(optarg, "readline"))
+					ui_init = ui_readline_init;
 #endif
 #ifdef WITH_UI_NCURSES
-			else if (!strcasecmp(argv[i + 1], "ncurses"))
-				ui_init = ui_ncurses_init;
+				else if (!strcasecmp(optarg, "ncurses"))
+					ui_init = ui_ncurses_init;
 #endif
-			else {
-				fprintf(stderr, "Nieznany interfejs %s.\n", argv[i + 1]);
+				else {
+					fprintf(stderr, "Nieznany interfejs %s.\n", optarg);
+					return 1;
+				}
+				break;
+			case '?':
+				/* obs³ugiwane przez getopt */
+				fprintf(stdout, "Aby uzyskaæ wiêcej informacji uruchom program z opcj± --help.\n");
 				return 1;
-			}
-			i++;
+			default:
+				break;
 		}
 	}
 
-	if (i < argc && *argv[i] != '-') {
-		batch_line = prepare_batch_line(argc, argv, i);
+	if (set_private)
+		new_status |= GG_STATUS_FRIENDS_MASK;
+
+	if (optind < argc) {
+		batch_line = prepare_batch_line(argc, argv, optind);
 		batch_mode = 1;
+		
 		if (!ui_set)
 			ui_init = ui_batch_init;
 	}
-	
+
         ekg_pid = getpid();
 
 #ifdef WITH_PYTHON
@@ -833,6 +855,11 @@ int main(int argc, char **argv)
 	/* okre¶lanie stanu klienta po w³±czeniu */
 	if (new_status)
 		config_status = new_status;
+
+	if (new_reason) {
+		xfree(config_reason);
+		config_reason = new_reason;
+	}
 
 	switch (config_status & ~GG_STATUS_FRIENDS_MASK) {
 		case GG_STATUS_AVAIL:

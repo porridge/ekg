@@ -273,6 +273,13 @@ dnl   fi
     ])
   fi
 
+  # sprawdzamy, czy system ma getopt_long
+
+  AC_SUBST(getopt_o)
+  AC_CHECK_FUNC(getopt_long, , [getopt_o="../compat/getopt.o ../compat/getopt1.o"; CFLAGS="-I../compat $CFLAGS"])
+  
+  # ustawiamy opcje
+
   libgadu_a="../lib/libgadu.a"
   lgadu=""
   if test "x$enable_static" = "xno" -o "x$enable_dynamic" = "xyes"; then 
