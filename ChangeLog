@@ -5,12 +5,13 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-05-07
+
+- uaktualnienie ,,docs/vars.txt'' (d)
+
 // 2002-05-06
 
 - poprawka autosave (baseciq/w)
-
-// 2002-05-06
-
 - dodana komenda ,,version'' (d)
 - ekg --version (d)
 - drobna poprawka w ,,docs/on.txt'' (d)

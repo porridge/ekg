@@ -180,12 +180,15 @@ random_reason
 	typ: liczba
 	domy¶lna warto¶æ: 0
 
-	okre¶la czy przy zmianie stanu na zajêty lub niedostêpny ma byæ 
-	losowany opis (z ~/.gg/quit.reasons lub ~/.gg/away.reasons).
-	dla 0 nie jest losowany, dla 1 losowany jest opis dotycz±cy stanu
-	zajêty, dla 2 niedostêpny, dla 3 i ten i ten. je¿eli z jakich¶
-	przyczyn nie powiedzie siê odczyt, opis bêdzie pobierany ze zmiennych
-	,,away_reason'' lub ,,quit_reason'', o ile nie s± puste.
+	okre¶la czy przy zmianie stanu ma byæ losowany opis (z 
+        ~/.gg/quit.reasons dla komend quit, disconnect, invisible, 
+        ~/.gg/away.reasons dla away i ~/.gg/back.reasons dla back). dla 0 nie 
+        jest losowany, dla 1 losowany jest opis dotycz±cy stanu	zajêty, dla 2 
+        niedostêpny, dla 4 dostêpny, dla 8 niewidoczny. warto¶ci te mo¿na ze 
+        sob± ³±czyæ, np. 11 bêdzie dotyczyæ stanów niedostêpny, zajêty oraz
+        niewidoczny. je¿eli z jakich¶ przyczyn nie powiedzie siê odczyt,
+        opis bêdzie pobierany ze zmiennych ,,away_reason'' lub ,,quit_reason'',
+        o ile nie s± puste.
 
 server
 	typ: tekst
