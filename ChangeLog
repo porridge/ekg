@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawka reakcji na ctcp (w)
 - /status podaje adres serwera (seba/w)
 - poprawka /set (seba/w)
+- wielokomendowe aliasy. kolejn± komendê dodaje siê przez ,,alias -A'' (w)
 
 // 2002-06-18
 

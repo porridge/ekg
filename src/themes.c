@@ -717,8 +717,10 @@ void init_theme()
 
 	add_format("aliases_invalid", "%! Nieprawid³owy parametr\n", 1);
 	add_format("aliases_list_empty", "%! Brak aliasów\n", 1);
-	add_format("aliases_list", "%> %W%1 %G-%Y %2%n\n", 1);
-	add_format("aliases_add", "%> Dodano alias %W%1 %n-> %2\n", 1);
+	add_format("aliases_list", "%> %W%1%n: %2\n", 1);
+	add_format("aliases_list_next", "%> %3  %2\n", 1);
+	add_format("aliases_add", "%> Utworzono alias %W%1%n\n", 1);
+	add_format("aliases_append", "%> Dodano do aliasu %W%1%n\n", 1);
 	add_format("aliases_del", "%) Usuniêto alias %W%1%n\n", 1);
 	add_format("aliases_exist", "%! Alias %W%1%n ju¿ istnieje\n", 1);
 	add_format("aliases_noexist", "%! Alias %W%1%n nie istnieje\n", 1);

@@ -441,7 +441,7 @@ int config_read(char *filename)
 			if (atoi(foo))
 				ignored_add(atoi(foo));
 		} else if (!strcasecmp(buf, "alias")) {
-			add_alias(foo, 1);
+			alias_add(foo, 1, 1);
 		} else if (!strcasecmp(buf, "on")) {
                         int flags;
                         uin_t uin;
@@ -541,8 +541,10 @@ void config_write_main(FILE *f, int base64)
 
 	for (l = aliases; l; l = l->next) {
 		struct alias *a = l->data;
+		struct list *m;
 
-		fprintf(f, "alias %s %s\n", a->alias, a->cmd);
+		for (m = a->commands; m; m = m->next)
+			fprintf(f, "alias %s %s\n", a->name, (char*) m->data);
 	}
 
         for (l = events; l; l = l->next) {
@@ -1096,14 +1098,14 @@ int on_off(char *value)
 }
 
 /*
- * add_alias()
+ * alias_add()
  *
  * dopisuje alias do listy aliasów.
  *
  * - string - linia w formacie 'alias cmd'
- * - quiet - czy wypluwaæ mesgi na stdout
+ * - quiet - czy wypluwaæ mesgi na stdout.
  */
-int add_alias(char *string, int quiet)
+int alias_add(char *string, int quiet, int append)
 {
 	char *cmd;
 	struct list *l;
@@ -1120,31 +1122,39 @@ int add_alias(char *string, int quiet)
 	for (l = aliases; l; l = l->next) {
 		struct alias *j = l->data;
 
-		if (!strcmp(string, j->alias)) {
-			if (!quiet)
-				my_printf("aliases_exist", string);
-			return -1;
+		if (!strcasecmp(string, j->name)) {
+			if (!append) {
+				if (!quiet)
+					my_printf("aliases_exist", string);
+				return -1;
+			} else {
+				list_add(&j->commands, cmd, strlen(cmd) + 1);
+				if (!quiet)
+					my_printf("aliases_append", string);
+				return 0;
+			}	
 		}
 	}
 
-	a.alias = strdup(string);
-	a.cmd = strdup(cmd);
+	a.name = strdup(string);
+	a.commands = NULL;
+	list_add(&a.commands, cmd, strlen(cmd) + 1);
 	list_add(&aliases, &a, sizeof(a));
 
 	if (!quiet)
-		my_printf("aliases_add", a.alias, a.cmd);
+		my_printf("aliases_add", a.name);
 
 	return 0;
 }
 
 /*
- * del_alias()
+ * alias_remove()
  *
  * usuwa alias z listy aliasów.
  *
  * - name - alias.
  */
-int del_alias(char *name)
+int alias_remove(char *name)
 {
 	struct list *l;
 
@@ -1156,8 +1166,9 @@ int del_alias(char *name)
 	for (l = aliases; l; l = l->next) {
 		struct alias *a = l->data;
 
-		if (!strcmp(a->alias, name)) {
+		if (!strcmp(a->name, name)) {
 			my_printf("aliases_del", name);
+			list_destroy(a->commands, 1);
 			list_remove(&aliases, a, 1);
 			return 0;
 		}
@@ -1169,32 +1180,27 @@ int del_alias(char *name)
 }
 
 /*
- * is_alias()
+ * alias_check()
  *
- * sprawdza czy komenda w foo jest aliasem, je¶li tak - zwraca cmd,
- * w przeciwnym razie NULL.
+ * sprawdza czy komenda w foo jest aliasem, je¶li tak - zwraca listê
+ * komend, innaczej NULL.
  *
- * - foo
+ *  - line - linia z komend±.
  */
-char *is_alias(char *foo)
+struct list *alias_check(char *line)
 {
 	struct list *l;
-	char *param = NULL, *line = strdup(foo);
+	int i = 0;
 
-	if ((param = strchr(line, ' ')))
-		*param++ = 0;
+	while (line[i] != ' ' && line[i])
+		i++;
 
 	for (l = aliases; l; l = l->next) {
 		struct alias *j = l->data;
 
-		if (!strcmp(line, j->alias)) {
-			char *tmp = saprintf("%s %s", j->cmd, (param) ? param : "");
-			free(line);
-			return tmp;
-		}
+		if (!strncmp(line, j->name, i) && (line[i] == ' ' || !line[i]))
+			return j->commands;
 	}
-
-	free(line);
 
 	return NULL;
 }

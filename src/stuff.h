@@ -57,8 +57,8 @@ struct process {
 };
 
 struct alias {
-	char *alias;
-	char *cmd;
+	char *name;
+	struct list *commands;		/* commands->data to (char*) */
 };
 
 struct transfer {
@@ -188,9 +188,9 @@ char *read_file(FILE *f);
 int add_process(int pid, char *name);
 int del_process(int pid);
 int on_off(char *value);
-int add_alias(char *string, int quiet);
-int del_alias(char *name);
-char *is_alias(char *foo);
+int alias_add(char *string, int quiet, int append);
+int alias_remove(char *name);
+struct list *alias_check(char *foo);
 int play_sound(char *sound_path);
 
 char *base64_encode(char *buf);

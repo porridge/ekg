@@ -91,7 +91,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 
 struct command commands[] = {
 	{ "add", "U??", command_add, " <numer> <alias> [opcje]", "Dodaje u¿ytkownika do listy kontaktów", "Opcje identyczne jak dla polecenia %Wlist%n (dotycz±ce wpisu)" },
-	{ "alias", "??", command_alias, " [opcje]", "Zarz±dzanie aliasami", "  -a, --add <alias> <komenda>\n  -d, --del <alias>\n  [-l, --list]\n" },
+	{ "alias", "??", command_alias, " [opcje]", "Zarz±dzanie aliasami", "  -a, --add <alias> <komenda>\n  -A, --append <alias> <komenda>\n  -d, --del <alias>\n  [-l, --list]\n" },
 	{ "away", "?", command_away, " [powód]", "Zmienia stan na zajêty", "" },
 	{ "back", "?", command_away, "", "Zmienia stan na dostêpny", "" },
 	{ "change", "?", command_change, " <opcje>", "Zmienia informacje w katalogu publicznym", "  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>\n  -e, --email <adres>\n  -b, --born <rok urodzenia>\n  -c, --city <miasto>\n  -F, --female  \n  -M, --male" },
@@ -492,9 +492,21 @@ COMMAND(command_alias)
 
 		for (l = aliases; l; l = l->next) {
 			struct alias *a = l->data;
+			struct list *m;
+			int first = 1, i;
+			char *tmp = calloc(strlen(a->name) + 1, 1);
+			
+			for (i = 0; i < strlen(a->name); i++)
+				strcat(tmp, " ");
 
-			my_printf("aliases_list", a->alias, a->cmd);
-			count++;
+			for (m = a->commands; m; m = m->next) {
+
+				my_printf((first) ? "aliases_list" : "aliases_list_next", a->name, (char*) m->data, tmp);
+				first = 0;
+				count++;
+			}
+
+			free(tmp);
 		}
 
 		if (!count)
@@ -504,14 +516,21 @@ COMMAND(command_alias)
 	}
 
 	if (match_arg(params[0], 'a', "add", 2)) {
-		if (!add_alias(params[1], 0))
+		if (!alias_add(params[1], 0, 0))
+			config_changed = 1;
+
+		return 0;
+	}
+
+	if (match_arg(params[0], 'A', "append", 2)) {
+		if (!alias_add(params[1], 0, 1))
 			config_changed = 1;
 
 		return 0;
 	}
 
 	if (match_arg(params[0], 'd', "del", 2)) {
-		if (!del_alias(params[1]))
+		if (!alias_remove(params[1]))
 			config_changed = 1;
 
 		return 0;
