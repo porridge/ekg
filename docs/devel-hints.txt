@@ -47,7 +47,7 @@ parê wymagañ i wskazówek dla developerów:
    ani mojego czasu, tylko po prostu wklej orygina³ i poprawion± wersjê do
    tre¶ci listu.
 
-nikt nie bêdzie siê zachowywaæ jak jaki¶ Linus, i wrzucaæ do ¼róde³ tylko
+nikt nie bêdzie siê zachowywaæ tak, ¿e bêdzie wrzucaæ do ¼róde³ tylko
 to, co mu siê podoba, albo tylko patche ludzi, z którymi piwo pija. byle
 tylko by³y zachowane pewne zasady i nie by³o po miesi±cu ba³aganu w kodzie.
 oczywi¶cie wszystkie zmiany bêd± przegl±dane i w razie czego autor dostanie
