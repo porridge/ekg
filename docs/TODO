@@ -4,16 +4,13 @@ zacznê byæ niemi³y. --w
 
 biblioteka:
 - komunikacja miêdzy klientami, bezpo¶rednie rozmowy,
-- konferencje,
 - uaktualniæ dokumentacjê,
 
 klient:
 - uzupe³niæ dope³nienia (w tym nicki ze spacjami),
 - mo¿liwo¶æ zrobienia theme'u a'la irc,
 - lastlog, awaylog.
-- escapowanie tre¶ci mesgów.
 - wykrywanie niewidocznych jako opcja.
-- aliasy w query.
 - wyczyszczenie history.
 
 $Id$

@@ -16,9 +16,9 @@ ui_costam_init()
 	inicjalizacja interfejsu u¿ytkownika. dla ui-readline bêdzie to
 	ustawienie wszystkich zmiennych. dla ui-ncurses pewnie jakie¶
 	initscr(), przygotowanie okienek itd. nale¿y przypisaæ zmiennym
-	ui_deinit, ui_print, ui_new_target, ui_loop, ui_beep, ui_query
-	adresy funkcji danego interfejsu. nawet je¶li funkcja nic nie
-	robi, musi byæ zdefiniowana. zmienne nie mog± zawieraæ NULL.
+	ui_deinit, ui_print, ui_event, ui_loop, ui_beep adresy funkcji
+	danego interfejsu. nawet je¶li funkcja nic nie robi, musi byæ
+	zdefiniowana. zmiennym tym NIE WOLNO przypisaæ warto¶ci NULL.
 
 ui_deinit()
 	pozamykanie wszystkiego.

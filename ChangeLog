@@ -11,7 +11,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - dodanie komendy echo (w)
 - dodanie akcji zdarzeñ ,,exec'' (w)
 - poprawka zdarzeñ z wieloma akcjami (w)
-- dodanie %4 w zdarzeniach, które zawiera eskejpowan± tre¶æ wiadomo¶ci.
+- dodanie %4 w zdarzeniach, które zawiera eskejpowan± tre¶æ wiadomo¶ci (w)
+- poprawki dokumentacji. dodanie gdb.txt, przenosny-kod.txt (w)
 
 // 2002-07-19
 

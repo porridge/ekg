@@ -35,6 +35,7 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
                       g³o¶niczku. tony s± oddzielane przecinkami, odstêpy czasu,
                       tak jak przy blink_leds wystêpujê po znaku '/'.
 		command [komenda] - wywo³uje komendê klienta
+		exec [komenda] - wywo³uje polecenie systemowe
 
 		dodatkowo przy blink_leds i beeps_spk, je¿eli sekwencja zacznie
 		siê od znaku '$', bêdzie ona poszukiwana w themes (przyk³adem
@@ -47,12 +48,13 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 		zdarzenia. %2 jest jego pseudonimem, je¶li figuruje w naszej
 		li¶cie kontaktów, lub numerkiem w przeciwnym razie. %3
 		wystêpuje tylko przy wiadomo¶ciach i zawiera jej tre¶æ.
-		nale¿y uwa¿aæ przy wykonywaniu ,,command exec'' z tre¶ci±
-		wiadomo¶ci, poniewa¿ wiadomo¶æ zawieraj±ca ,,; rm -rf ~''
-		mo¿e sporo zepsuæ.
+		%4 jest tym samym co %3, lecz wszystkie niebezpieczne znaki,
+		które mog³yby zostaæ zinterpretowane przez shella zostaj±
+		poprzedzone backslashem. dlatego chc±c wkleiæ tre¶æ wiadomo¶ci
+		do akcji ,,exec'' nale¿y u¿yæ %4.
 
 akcje blink_leds oraz beeps_spk musz± mieæ dostêp do /dev/console, wiêc
-uruchamiany jest specjalny daemon (ioctl_daemon) z prawami roota. po wyj¶ciu 
+uruchamiany jest specjalny daemon (ioctld) z prawami roota. po wyj¶ciu 
 z ekg, daemon ten jest zabijany. aby je w³±czyæ, nale¿y uruchomiæ skrypt
 configure z parametrem --with-ioctld.
 

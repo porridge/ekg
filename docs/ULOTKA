@@ -39,4 +39,11 @@ dcc.txt		opis wykorzystania bezpo¶rednich po³±czeñ do przesy³ania
 
 devel-hints.txt	wskazówki dla tych, którzy chc± co¶ poprawiæ w ekg/libgadu.
 
+przenosny-kod.txt
+		kilka wskazówek na temat pisania kodu przeno¶nego miêdzy
+		ró¿nymi uniksami.
+
+gdb.txt		szybki kurs obs³ugi gdb.
+
+
 $Id$
