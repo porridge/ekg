@@ -12,6 +12,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - update ,,docs/vars.txt'' (d)
 - poprawka od¶wie¿ania prompta w okienkach (d)
 - poprawka obcinania chat_headera (arim/d)
+- poprawka ,,query_finished'' z themes.c (d)
+- s/Okienku/Okienko/g w themes.c (grzelo/d)
 
 // 2002-07-07
 
