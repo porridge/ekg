@@ -101,6 +101,7 @@ int config_beep = 1;
 int config_beep_msg = 1;
 int config_beep_chat = 1;
 int config_beep_notify = 1;
+int config_beep_mail = 1;
 char *config_sound_msg_file = NULL;
 char *config_sound_chat_file = NULL;
 char *config_sound_sysmsg_file = NULL;

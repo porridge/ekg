@@ -53,6 +53,7 @@
 #include "ui.h"
 #include "python.h"
 #include "msgqueue.h"
+#include "mail.h"
 #ifdef HAVE_OPENSSL
 #  include "sim.h"
 #endif
@@ -129,6 +130,7 @@ static struct {
 	{ GG_SESSION_USER1, NULL, (VV) reaper_user },
 	{ GG_SESSION_USER2, (VV) handle_voice, (VV) reaper_user },
 	{ GG_SESSION_USER3, (VV) get_line_from_pipe, (VV) reaper_user3 },
+	{ GG_SESSION_USER4, (VV) get_line_from_pipe, (VV) reaper_user3 },
 	{ -1, NULL, NULL }, 
 };
 
@@ -206,9 +208,16 @@ static void get_line_from_pipe(struct gg_exec *c)
 
 	if ((ret == -1 && errno != EAGAIN) || ret == 0) {
 		if (c->buf->len) {
-			if (c->id)
-				print("exec", c->buf->str, itoa(c->id));
-			else
+			if (c->id) {
+				switch (c->type) {
+					case GG_SESSION_USER3:
+						print("exec", c->buf->str, itoa(c->id));
+						break;
+					case GG_SESSION_USER4:
+						check_mail_update(atoi(c->buf->str));
+						break;
+				}
+			} else
 				print_window("debug", 0, "debug", c->buf->str);
 		}
 		string_free(c->buf, 1);

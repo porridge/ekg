@@ -64,7 +64,7 @@
 #include "vars.h"
 #include "ui.h"
 #include "version.h"
-#define COLOR_DEFAULT (-2)
+#include "mail.h"
 
 static void ui_ncurses_loop();
 static void ui_ncurses_print(const char *target, int separate, const char *line);
@@ -782,6 +782,9 @@ static void update_statusbar()
 			if (config_reason)
 				waddstr(status, config_reason);
 			p += 5;
+		} else if (!strncmp(p, "mail}", 5)) {
+			waddstr(status, itoa(check_mail()));
+			p += 4;
 		} else if (!strncmp(p, "activity}", 9)) {
 			string_t s = string_init("");
 			int first = 1;
