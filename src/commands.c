@@ -566,35 +566,38 @@ COMMAND(cmd_connect)
 			return -1;
 		}
 	} else if (!strcasecmp(name, "reconnect")) {
-		cmd_connect("disconnect", NULL, NULL, quiet);
+		cmd_connect("__disconnect", NULL, NULL, quiet);
 		cmd_connect("connect", NULL, NULL, quiet);
 	} else if (sess) {
 	    	char *tmp = NULL;
 
-		if (!params || !params[0]) {
-		    	if (config_random_reason & 2) {
-				tmp = random_line(prepare_path("quit.reasons", 0));
-				if (!tmp && config_quit_reason)
+		if (!strcasecmp(name, "disconnect")) {
+			if (!params || !params[0]) {
+				if (config_random_reason & 2) {
+					tmp = random_line(prepare_path("quit.reasons", 0));
+					if (!tmp && config_quit_reason)
+						tmp = xstrdup(config_quit_reason);
+				} else if (config_quit_reason)
 					tmp = xstrdup(config_quit_reason);
-			} else if (config_quit_reason)
-				tmp = xstrdup(config_quit_reason);
+			} else
+				tmp = xstrdup(params[0]);
+
+			if (config_keep_reason && config_reason && !tmp)
+				tmp = xstrdup(config_reason);
+
+			xfree(config_reason);
+			config_reason = NULL;
+
+			if (params && params[0] && !strcmp(params[0], "-")) {
+				xfree(tmp);
+				tmp = NULL;
+				config_status = ekg_hide_descr_status(config_status);
+			}
+
+			if (config_keep_reason)
+				config_reason = xstrdup(tmp);
 		} else
-		    	tmp = xstrdup(params[0]);
-
-		if (config_keep_reason && config_reason && !tmp)
 			tmp = xstrdup(config_reason);
-
-		xfree(config_reason);
-		config_reason = NULL;
-
-		if (params && params[0] && !strcmp(params[0], "-")) {
-			xfree(tmp);
-			tmp = NULL;
-			config_status = ekg_hide_descr_status(config_status);
-		}
-
-		if (config_keep_reason)
-			config_reason = xstrdup(tmp);
 
 		connecting = 0;
 

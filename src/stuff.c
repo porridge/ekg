@@ -1130,10 +1130,12 @@ void ekg_connect()
 		}
 	}
 
-	/* przygotuj opis zgodnie z ustawieniami */
-	change_status(config_status, config_reason_first, 2);
-	xfree(config_reason_first);
-	config_reason_first = NULL;
+	if (config_reason_first) {
+		/* przygotuj opis zgodnie z ustawieniami */
+		change_status(config_status, config_reason_first, 2);
+		xfree(config_reason_first);
+		config_reason_first = NULL;
+	}
 
 	memset(&p, 0, sizeof(p));
 

@@ -1659,9 +1659,7 @@ void handle_search50(struct gg_event *e)
 
 #define __format(x) ((count == 1) ? "search_results_single" x : "search_results_multi" x)
 
-#define GG_SEARCH_FRIENDS_MASK	0x0080
-
-		switch (status & ~GG_SEARCH_FRIENDS_MASK) {
+		switch (status) {
 			case GG_STATUS_AVAIL:
 			case GG_STATUS_AVAIL_DESCR:
 				active = format_string(format_find(__format("_active")), (__firstname) ? __firstname : nickname);
@@ -1681,8 +1679,6 @@ void handle_search50(struct gg_event *e)
 		gender = format_string(format_find(__format("_unknown")));
 		
 		print(__format(""), uin, name, nickname, city, birthyear, gender, active);
-
-#undef GG_SEARCH_FRIENDS_MASK
 
 #undef __format
 
