@@ -463,9 +463,9 @@ void init_theme()
 	add_format("saved", "%> Zapisano ustawiania\n", 1);
 	add_format("error_saving", "%! Podczas zapisu ustawieñ wyst±pi³ b³±d\n", 1);
 	add_format("quit", "%> Papa\n", 1);
-	add_format("message_header", "%) Wiadomo¶æ od %1 %c(%C%#%c/%3)%n\n", 1);
+	add_format("message_header", "%) Wiadomo¶æ od %1 %c(%C%#%c/%2)%n\n", 1);
 	add_format("message_footer", "%n", 1);
-	add_format("chat_header", "%) Rozmowa z %1 %c(%C%#%c/%3)%n\n", 1);
+	add_format("chat_header", "%) Rozmowa z %1 %c(%C%#%c/%2)%n\n", 1);
 	add_format("chat_footer", "%n", 1);
 	add_format("ack_queued", "%> Wiadomo¶æ do %1 zostanie dostarczona pó¼niej %c(%C%#%c)%n\n", 1);
 	add_format("ack_delivered", "%> Wiadomo¶æ do %1 zosta³a dostarczona %c(%C%#%c)%n\n", 1);
