@@ -1214,11 +1214,11 @@ void theme_init()
 	/* szybka lista kontaktów pod F2 */
 	format_add("quick_list", "%)%1\n", 1);
 	format_add("quick_list,speech", "lista kontaktów: ", 1);
-	format_add("quick_list_avail", " %T%1%n", 1);
+	format_add("quick_list_avail", " %Y%1%n", 1);
 	format_add("quick_list_avail,speech", "%1 jest dostêpny, ", 1);
-	format_add("quick_list_busy", " %w%1%n", 1);
+	format_add("quick_list_busy", " %G%1%n", 1);
 	format_add("quick_list_busy,speech", "%1 jest zajêty, ", 1);
-	format_add("quick_list_invisible", " %K%1%n", 1);
+	format_add("quick_list_invisible", " %c%1%n", 1);
 
 	/* window */
 	format_add("window_add", "%) Utworzono nowe okno\n", 1);
