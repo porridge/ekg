@@ -4602,6 +4602,7 @@ COMMAND(cmd_python)
 	if (!strncasecmp(params[0], "re", 2)) {
 		python_finalize();
 		python_initialize();
+		python_autorun();
 		return 0;
 	}
 
