@@ -414,6 +414,9 @@ COMMAND(cmd_away)
 			return -1;
 	}
 
+	if (!strcasecmp(name, "_status"))
+		change_status(config_status, params[0], 0);
+
 	if (!strcasecmp(name, "away"))
 		change_status(GG_STATUS_BUSY, params[0], 0);
 

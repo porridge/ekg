@@ -93,7 +93,7 @@ dnl
 AC_C_BIGENDIAN
 
 AC_TRY_RUN(
-[#include "config.h"
+[#include "confdefs.h"
 
 int main()
 {
