@@ -29,6 +29,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - porzadki w zmiennych -- wszystkie funkcje variable_* (w)
 - porzadki w konfiguracji -- wszystkie zmienne config_* (w)
 - zabija dzieciaki przy wyj¶ciu, typu wavplay/mpg123/resolver (w)
+- poprawki w dokumentacji (w)
 
 // 2002-02-03
 

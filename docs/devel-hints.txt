@@ -1,18 +1,7 @@
-[ Date: Mon, 3 Dec 2001 22:40:02 +0100 (CET)          ]
-[ From: Wojtek Kaniewski <wojtekka@amba.bydg.pdi.net> ]
-[ To: ekg-devel@list.ziew.org                         ]
-[ Subject: [ekg-devel] ziew, wskazówki jakie¶.        ]
-
-hej,
-
-nie by³o mnie od pi±tku, dopiero przed chwil± wróci³em. dajcie mi jaki¶
-czas na och³oniêcie, na przeczytanie wszystkiego. jutro wieczorem
-najpó¼niej postaram siê do szystkiego ustosunkowaæ.
-
-anyway, parê rzeczy sobie przemy¶la³em...
+parê wskazówek dla developerów:
 
 1) jak co¶ poprawiacie/dodajecie, zachowujcie jaki¶tam ,,coding style''.
-   g³upio siê patrzy na kod, w którym czê¶æ ma styl K&R z wciêciami
+   g³upio siê patrzy na ¼ród³o, w którym czê¶æ ma styl K&R z wciêciami
    tabami, a czê¶æ ma nie wiadomo jaki, z wciêciami 2/3 spacje na zmianê.
 
 2) dopisujcie siê do copyrightów na pocz±tku pliku.
@@ -29,12 +18,14 @@ anyway, parê rzeczy sobie przemy¶la³em...
    s/gg_login/gg_login_ex/, dodaæ parametry i napisaæ gg_login(), która
    bêdzie wrapperem i dopisze brakuj±ce parametry.
 
+5) tworz±c wiêkszy kawa³ek/modu³/plik przeznaczony do jakiej¶ konkretnej
+   funkcji, starajcie siê nazywaæ funkcje i zmienne tak, by by³o wiadomo,
+   do czego s³u¿±. przyk³ad: funkcje dotycz±ce list zaczynaj± siê list_*,
+   funkcje dotycz±ce userlisty to userlist_*, konfiguracja to config_*.
+
 i broñ Bo¿e nie mam zamiaru siê zachowywaæ jak jaki¶ Linus, i wrzucaæ do
 ¼róde³ tylko to, co mi siê podoba, albo tylko patche ludzi, z którymi piwo
 pijam. byle tylko by³y zachowane pewne zasady i nie by³o po miesi±cu
 burdelu w kodzie. oczywi¶cie bêdê przegl±daæ _wszystkie_ zmiany i w razie
 czego bêdê krzyczeæ ;)
-
-pozdr,
-w.
-      
+     

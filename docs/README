@@ -24,8 +24,10 @@ INSTALACJA
     ekg powie, jak go skonfigurowaæ.
 
     ekg powinien dzia³aæ na wiêkszo¶ci systemów un*xowych, jak Linux,
-    *BSD, SunOS, IRIX itp. Je¶li uda Ci siê skompilowaæ go na jakim¶
-    egzotycznym systemie lub rzadko spotykanej architekturze, daj znaæ.
+    *BSD, SunOS, IRIX itp. lecz czasami przy dodawaniu nowych funkcji
+    nie sposób sprawdziæ ich zachowania na wszystkich popularnych
+    systemach. W takim wypadku przydatne s± informacje o b³êdach z
+    dok³adnym wskazaniem systemu i architektury.
 
     Program korzysta z biblioteki readline, wiêc odpowiednie pakiety
     zawieraj±ce j±, oraz pliki nag³ówkowe, powinny byæ zainstalowane.
