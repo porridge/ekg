@@ -1903,6 +1903,7 @@ static void winch_handler()
 
 	endwin();
 	refresh();
+	keypad(input, TRUE);
 
 	window_resize();
 	window_commit();
