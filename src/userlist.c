@@ -83,9 +83,10 @@ static int userlist_compare(void *data1, void *data2)
 /*
  * userlist_read()
  *
- * wczytuje listê kontaktów z pliku ~/.gg/userlist. mo¿e ona byæ w postaci
- * linii ,,<numerek> <opis>'' lub w postaci eksportu tekstowego listy
- * kontaktów windzianego klienta.
+ * wczytuje listê kontaktów z pliku ~/.gg/userlist w postaci eksportu
+ * tekstowego listy kontaktów windzianego klienta.
+ *
+ * 0/-1
  */
 int userlist_read()
 {
