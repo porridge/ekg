@@ -5057,10 +5057,10 @@ void command_init()
 	( "add", "U??", cmd_add, 0,
 	  " [numer] [alias] [opcje]", "dodaje u¿ytkownika do listy kontaktów",
 	  "\n"
-	  "  -f, --find [alias]  Dodanie do listy kontaktów u¿ytkownika ostatnio\n"
-	  "                      znalezionego w katalogu publicznym. Nale¿y podaæ\n"
-	  "                      alias, je¶li nie znaleziono pseudonimu.\n"
+	  "  -f, --find [alias]  dodaje ostatnio wyszukan± osobê\n"
 	  "\n"
+	  "W przypadku opcji %T--find%n alias jest wymagany, je¶li w ostatnim "
+	  "wyszukiwaniu nie znaleziono pseudonimu. "
 	  "Pozosta³e opcje identyczne jak dla polecenia %Tlist%n (dotycz±ce "
 	  "wpisu). W oknie rozmowy z kim¶ spoza naszej listy kontaktów jako "
 	  "parametr mo¿na podaæ sam alias.");
