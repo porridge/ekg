@@ -16,6 +16,13 @@ password
 	has³o u¿ytkownika. niezbêdne do po³±czenia z serwerem. automatycznie
 	ustawiane po udanej rejestracji, gdy wcze¶niej by³o puste.
 
+email
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	adres e-mail u¿ytkownika. niezbêdny do zmiany has³a. automatycznie
+	ustawiany po udanej rejestracji, gdy wcze¶niej by³ pusty.
+
 audio_device
 	typ: tekst
 	domy¶lna warto¶æ: /dev/dsp

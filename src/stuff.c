@@ -118,6 +118,7 @@ int config_display_notify = 1;
 char *config_theme = NULL;
 int config_status = GG_STATUS_AVAIL;
 char *reg_password = NULL;
+char *reg_email = NULL;
 int config_dcc = 0;
 char *config_dcc_ip = NULL;
 char *config_dcc_dir = NULL;
@@ -157,6 +158,7 @@ char *config_speech_app = NULL;
 int config_encryption = 0;
 char *config_log_timestamp = NULL;
 int config_server_save = 0;
+char *config_email = NULL;
 
 static struct {
 	int event;

@@ -16,6 +16,10 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   ./configure --with-pthread (adrians/w)
 - kosmetyka wygl±du w³asnego stanu (szalik/w)
 - poprawki dokumentacji (mati/w)
+- libgadu: gg_change_passwd2() jest dostosowane do zmian w protokole (w)
+- dodana zmienna ,,email'' przechowuj±ca adres e-mail u¿ytkownia, w celu
+  pó¼niejszej zmiany has³a. drugi parametr nie jest ju¿ obowi±zkowy
+  w /passwd (w)
 
 // 2002-11-17
 

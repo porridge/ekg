@@ -966,8 +966,12 @@ void handle_pubdir(struct gg_http *h)
 	}
 
 	if (h->type == GG_SESSION_PASSWD) {
+		xfree(config_password);
 		config_password = reg_password;
 		reg_password = NULL;
+		xfree(config_email);
+		config_email = reg_email;
+		reg_email = NULL;
 	}
 
 	if (h->type == GG_SESSION_REGISTER) {
@@ -976,10 +980,14 @@ void handle_pubdir(struct gg_http *h)
 			goto fail;
 		}
 		
-		if (!config_uin && !config_password && reg_password) {
+		if (!config_uin && !config_password && reg_password && !config_email && reg_email) {
 			config_uin = s->uin;
+			
 			config_password = reg_password;
 			reg_password = NULL;
+
+			config_email = reg_email;
+			reg_email = NULL;
 		}
 
 		registered_today = 1;
@@ -1007,6 +1015,8 @@ fail:
 	if (h->type == GG_SESSION_REGISTER || h->type == GG_SESSION_PASSWD) {
 		xfree(reg_password);
 		reg_password = NULL;
+		xfree(reg_email);
+		reg_email = NULL;
 	}
 	gg_free_pubdir(h);
 }

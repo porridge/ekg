@@ -44,6 +44,7 @@ void variable_init()
 {
 	variable_add("uin", VAR_INT, 1, &config_uin, changed_uin, NULL);
 	variable_add("password", VAR_STR, 0, &config_password, NULL, NULL);
+	variable_add("email", VAR_STR, 1, &config_email, NULL, NULL);
 
 #ifdef HAVE_VOIP
 	variable_add("audio_device", VAR_STR, 1, &config_audio_device, NULL, NULL);

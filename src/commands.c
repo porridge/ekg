@@ -2253,6 +2253,7 @@ COMMAND(cmd_register)
 		list_add(&watches, h, 0);
 
 		reg_password = xstrdup(params[1]);
+		reg_email = xstrdup(params[0]);
 	} else {
 		uin_t uin = 0;
 		const char *pwd = NULL;
@@ -2283,12 +2284,12 @@ COMMAND(cmd_passwd)
 {
 	struct gg_http *h;
 	
-	if (!params[0] || !params[1]) {
+	if (!params[0] || (!params[1] && !config_email)) {
 		print("not_enough_params", name);
 		return;
 	}
 
-	if (!(h = gg_change_passwd(config_uin, config_password, params[0], params[1], 1))) {
+	if (!(h = gg_change_passwd2(config_uin, (config_password) ? config_password : "", params[0], (config_email) ? config_email : "", (params[1]) ? params[1] : config_email, 1))) {
 		print("passwd_failed", strerror(errno));
 		return;
 	}
@@ -2296,6 +2297,7 @@ COMMAND(cmd_passwd)
 	list_add(&watches, h, 0);
 
 	reg_password = xstrdup(params[0]);
+	reg_email = xstrdup((params[1]) ? params[1] : config_email);
 }
 
 COMMAND(cmd_remind)
@@ -3152,7 +3154,7 @@ void command_init()
 	 
 	command_add
 	( "passwd", "??", cmd_passwd, 0,
-	  " <has這> <e-mail>", "zmienia has這 i adres e-mail u篡tkownika",
+	  " <has這> [e-mail]", "zmienia has這 i adres e-mail u篡tkownika",
 	  "");
 
 	command_add

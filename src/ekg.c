@@ -344,9 +344,11 @@ void ekg_wait_for_key()
 							errmsg = "change_timeout";
 
 						print(errmsg);
-						if (h->type == GG_SESSION_REGISTER) {
+						if (h->type == GG_SESSION_REGISTER || h->type == GG_SESSION_PASSWD) {
 							xfree(reg_password);
 							reg_password = NULL;
+							xfree(reg_email);
+							reg_email = NULL;
 						}
 						list_remove(&watches, h, 0);
 						gg_free_pubdir(h);
