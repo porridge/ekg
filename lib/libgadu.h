@@ -32,10 +32,6 @@ extern "C" {
 
 typedef uint32_t uin_t;
 
-#ifdef sun
-#  define INADDR_NONE   ((in_addr_t) 0xffffffff)
-#endif
-
 /*
  * ogólna struktura opisuj±ca ró¿ne sesje. przydatna w klientach.
  */
@@ -624,24 +620,22 @@ unsigned short fix16(unsigned short x);
 
 #define GG_DEFAULT_DCC_PORT 1550
 
+#ifdef __GNUC__
+#define GG_PACKED __attribute__ ((packed))
+#else
+#define GG_PACKED
+#endif
+
 struct gg_header {
 	uint32_t type;			/* typ pakietu */
 	uint32_t length;		/* d³ugo¶æ reszty pakietu */
-}
-#ifdef __GNUC__
-__attribute__ ((packed))
-#endif
-;
+} GG_PACKED;
 
 #define GG_WELCOME 0x0001
 
 struct gg_welcome {
 	uint32_t key;			/* klucz szyfrowania has³a */
-}
-#ifdef __GNUC__
-__attribute__ ((packed))
-#endif
-;
+} GG_PACKED;
 	
 #define GG_LOGIN 0x000c
 
@@ -652,11 +646,7 @@ struct gg_login {
 	uint32_t version;		/* moja wersja klienta */
 	uint32_t local_ip;		/* mój adres ip */
 	uint16_t local_port;		/* port, na którym s³ucham */
-}
-#ifdef __GNUC__
-__attribute__ ((packed))
-#endif
-;
+} GG_PACKED;
 
 #define GG_LOGIN_EXT 0x0013
 
@@ -669,11 +659,7 @@ struct gg_login_ext {
 	uint16_t local_port;		/* port, na którym s³ucham */
 	uint32_t external_ip;		/* zewnêtrzny adres ip */
 	uint16_t external_port;		/* zewnêtrzny port */
-}
-#ifdef __GNUC__
-__attribute__ ((packed))
-#endif
-;
+} GG_PACKED;
 
 #define GG_LOGIN_OK 0x0003
 
@@ -694,22 +680,14 @@ __attribute__ ((packed))
 
 struct gg_new_status {
 	uint32_t status;			/* na jaki zmieniæ? */
-}
-#ifdef __GNUC__
-__attribute__ ((packed))
-#endif
-;
+} GG_PACKED;
 
 #define GG_NOTIFY 0x0010
 	
 struct gg_notify {
 	uint32_t uin;				/* numerek danej osoby */
 	uint8_t dunno1;			/* == 3 */
-}
-#ifdef __GNUC__
-__attribute__ ((packed))
-#endif
-;
+} GG_PACKED;
 	
 #define GG_NOTIFY_REPLY 0x000c	/* tak, to samo co GG_LOGIN */
 	
@@ -720,34 +698,22 @@ struct gg_notify_reply {
 	uint16_t remote_port;	/* port, na którym s³ucha klient */
 	uint32_t version;		/* wersja klienta */
 	uint16_t dunno2;		/* znowu port? */
-}
-#ifdef __GNUC__
-__attribute__ ((packed))
-#endif
-;
+} GG_PACKED;
 
 #define GG_ADD_NOTIFY 0x000d
 #define GG_REMOVE_NOTIFY 0x000e
 	
 struct gg_add_remove {
 	uint32_t uin;			/* numerek */
-	uint8_t dunno1;		/* == 3 */
-}
-#ifdef __GNUC__
-__attribute__ ((packed))
-#endif
-;
+	uint8_t dunno1;			/* == 3 */
+} GG_PACKED;
 
 #define GG_STATUS 0x0002
 
 struct gg_status {
 	uint32_t uin;			/* numerek */
 	uint32_t status;		/* nowy stan */
-}
-#ifdef __GNUC__
-__attribute__ ((packed))
-#endif
-;
+} GG_PACKED;
 	
 #define GG_SEND_MSG 0x000b
 
@@ -765,29 +731,17 @@ struct gg_send_msg {
 	uint32_t recipient;
 	uint32_t seq;
 	uint32_t msgclass;
-}
-#ifdef __GNUC__
-__attribute__ ((packed))
-#endif
-;
+} GG_PACKED;
 
 struct gg_msg_richtext {
 	uint8_t flag;		
 	uint16_t length;	  
-} 
-#ifdef __GNUC__
- __attribute__ ((packed))
-#endif 
-;
+} GG_PACKED;
 
 struct gg_msg_richtext_format {
 	uint16_t position;
 	uint8_t font;	  
-} 
-#ifdef __GNUC__
- __attribute__ ((packed))
-#endif 
-;
+} GG_PACKED;
 
 #define GG_FONT_BOLD 0x01
 #define GG_FONT_ITALIC 0x02
@@ -798,20 +752,12 @@ struct gg_msg_richtext_color {
 	uint8_t red;
 	uint8_t green;
 	uint8_t blue;
-} 
-#ifdef __GNUC__
- __attribute__ ((packed))
-#endif 
-;
+} GG_PACKED;
 
 struct gg_msg_recipients {
 	uint8_t flag;
 	uint32_t count;
-}
-#ifdef __GNUC__
- __attribute__ ((packed))
-#endif
-;
+} GG_PACKED;
 
 #define GG_SEND_MSG_ACK 0x0005
 
@@ -823,11 +769,7 @@ struct gg_send_msg_ack {
 	uint32_t status;
 	uint32_t recipient;
 	uint32_t seq;
-}
-#ifdef __GNUC__
-__attribute__ ((packed))
-#endif
-;
+} GG_PACKED;
 
 #define GG_RECV_MSG 0x000a
 	
@@ -836,11 +778,7 @@ struct gg_recv_msg {
 	uint32_t seq;
 	uint32_t time;
 	uint32_t msgclass;
-}
-#ifdef __GNUC__
-__attribute__ ((packed))
-#endif
-;
+} GG_PACKED;
 
 #define GG_PING 0x0008
 	
@@ -854,17 +792,17 @@ __attribute__ ((packed))
 
 struct gg_dcc_tiny_packet {
 	uint8_t type;		/* rodzaj pakietu */
-};
+} GG_PACKED;
 
 struct gg_dcc_small_packet {
 	uint32_t type;		/* rodzaj pakietu */
-};
+} GG_PACKED;
 
 struct gg_dcc_big_packet {
 	uint32_t type;		/* rodzaj pakietu */
 	uint32_t dunno1;		/* niewiadoma */
 	uint32_t dunno2;		/* niewiadoma */
-};
+} GG_PACKED;
 
 /*
  * póki co, nie znamy dok³adnie protoko³u. nie wiemy, co czemu odpowiada.

@@ -11,6 +11,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - update opisu protoko³u: GG_CLASS_ACK (acc/w)
 - update opisu protoko³u: GG_LOGIN_EXT (pm,ajron/w)
 - poprawka beepania w ui-readline (ghunt/w)
+- dodanie lib/compat.h, który bêdzie zawiera³ wszystkie dziwne deklaracje
+  dla dziwnych systemów (s/w)
+- dodanie makra GG_PACKED, które przydaje siê przy definicji struktur (w)
 
 // 2002-07-03
 
