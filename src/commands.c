@@ -3856,15 +3856,12 @@ void command_init()
 	  "  -n, --nick <pseudonim>\n"
 	  "  -c, --city <miasto>\n"
 	  "  -b, --born <min:max>    zakres roku urodzenia\n"
-	  "  -e, --email <e-mail>\n"
 	  "  -a, --active            tylko dostêpni\n"
 	  "  -F, --female            kobiety\n"
 	  "  -M, --male              mê¿czy¼ni\n"
-	  "  --start <n>             wy¶wietla od n-tego wyniku\n"
-	  "  -A, --all               wy¶wietla wszystkich\n"
-	  "\n"
-	  "Ze wzglêdu na organizacjê katalogu publicznego, niektórych "
-	  "opcji nie mo¿na ze sob± ³±czyæ");
+	  "  -s, --start <n>         wy¶wietla od n-tego numeru\n"
+/*	  "  -A, --all               wy¶wietla wszystkich\n" */
+	  );
 	  
 	command_add
 	( "help", "cv", cmd_help, 0,

@@ -21,6 +21,7 @@ zg³osi³ b³±d.
 - lekka poprawka themów wyszukiwania, ze wzglêdu na brak informacji o p³ci
   w wynikach (w)
 - poprawka zale¿no¶ci w Makefile'ach (FIG/w)
+- poprawka b³êdu autoconfa w m4/stdint.m4 (Brzezi/w)
 
 // 2003-01-10
 
