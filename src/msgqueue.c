@@ -356,7 +356,7 @@ int msg_queue_read()
 		if (m.formatlen) {
 			m.format = xcalloc(m.formatlen, sizeof(unsigned char));
 
-			for (i =0; i < m.formatlen; i++)
+			for (i = 0; i < m.formatlen; i++)
 				fscanf(f, "%c", &m.format[i]);
 
 			fscanf(f, "%*c");
