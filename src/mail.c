@@ -457,29 +457,6 @@ void changed_check_mail_folders(const char *var)
 	check_mail_free();
 	memset(&foo, 0, sizeof(foo));
 
-	if (config_check_mail_folders) {
-		char **f = NULL;
-		int i;
-		
-		f = array_make(config_check_mail_folders, ", ", 0, 1, 1);
-
-		for (i = 0; f[i]; i++) {
-			if (f[i][0] != '/') {
-				char *buf = saprintf("%s/%s", home_dir, f[i]);
-				xfree(f[i]);
-				f[i] = buf;
-			}
-
-			foo.fhash = ekg_hash(f[i]);
-			foo.fname = f[i];
-			foo.check = 1;
-
-			list_add(&mail_folders, &foo, sizeof(foo));
-		}
-
-		xfree(f);
-	}
-
 	if (config_check_mail & 1) {
 		char *inbox = xstrdup(getenv("MAIL"));
 
@@ -507,6 +484,29 @@ void changed_check_mail_folders(const char *var)
 
 			list_add(&mail_folders, &foo, sizeof(foo));
 		}
+	}
+
+	if (config_check_mail_folders) {
+		char **f = NULL;
+		int i;
+		
+		f = array_make(config_check_mail_folders, ", ", 0, 1, 1);
+
+		for (i = 0; f[i]; i++) {
+			if (f[i][0] != '/') {
+				char *buf = saprintf("%s/%s", home_dir, f[i]);
+				xfree(f[i]);
+				f[i] = buf;
+			}
+
+			foo.fhash = ekg_hash(f[i]);
+			foo.fname = f[i];
+			foo.check = 1;
+
+			list_add(&mail_folders, &foo, sizeof(foo));
+		}
+
+		xfree(f);
 	}
 }
 
