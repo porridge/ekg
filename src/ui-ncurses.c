@@ -2420,7 +2420,7 @@ again:
 	
 	count = scandir((dname) ? dname : ".", &namelist, NULL, alphasort);
 
-	ui_debug("dname=\"%s\", fname=\"%s\", count=%d\n", dname, fname, count);
+	ui_debug("dname=\"%s\", fname=\"%s\", count=%d\n", (dname) ? dname : "(null)", (fname) ? fname : "(null)", count);
 
 	for (i = 0; i < count; i++) {
 		char *name = namelist[i]->d_name, *tmp = saprintf("%s%s", (dname) ? dname : "", name);
