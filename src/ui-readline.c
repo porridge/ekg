@@ -600,6 +600,7 @@ static void ui_readline_print(const char *target, int separate, const char *xlin
 		tm = localtime(&t);
 		strftime(buf, sizeof(buf), config_timestamp, tm);
 
+		string_append(s, "\033[0m");
 		string_append(s, buf);
 		
 		while (*p) {
