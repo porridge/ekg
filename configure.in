@@ -48,7 +48,6 @@ AC_SUBST(lgadu, "")
 AC_SUBST(static, "static")
 AC_SUBST(install_static, "install-static")
 
-dnl <ekg>
 AC_SUBST(ekg, "")
 AC_SUBST(install_ekg, "")
 AC_SUBST(clean_ekg, "")
@@ -57,7 +56,6 @@ AC_SUBST(uninstall_ekg, "")
 
 AC_SUBST(make_ekgwap, "")
 AC_SUBST(install_ekgwap, "")
-dnl </ekg>
 
 AC_SUBST(OBJS, "")
 
