@@ -739,6 +739,9 @@ void changed_dcc(const char *var)
 			}
 		}
 	}
+
+	if (sess && sess->state == GG_STATE_CONNECTED)
+		print("dcc_must_reconnect");
 	
 	update_status_myip();
 }
