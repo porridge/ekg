@@ -9,6 +9,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - zmienna ,,query_commands'' (robson/w)
 - usuniêcie ,,ordering cd'' -- b³êdy na starszych solarisach (M.Przadlo/w)
+- update readme w zakresie wysy³ania bugreportów (w)
+- poprawka segfaultu przy b³êdach w pubdir (robson/w)
 
 // 2002-04-12
 

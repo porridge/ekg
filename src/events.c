@@ -596,22 +596,15 @@ void handle_pubdir(struct gg_http *h)
 
 	if (gg_pubdir_watch_fd(h) || h->state == GG_STATE_ERROR) {
 		my_printf(bad, strerror(errno));
-		list_remove(&watches, h, 0);
-		if (h->type == GG_SESSION_REGISTER) {
-			free(reg_password);
-			reg_password = NULL;
-		}
-		gg_free_pubdir(h);
-		
-		return;
+		goto fail;
 	}
 	
 	if (h->state != GG_STATE_DONE)
 		return;
 
 	if (!(s = h->data) || !s->success) {
-		my_printf(bad);
-		return;
+		my_printf(bad, strerror(errno));
+		goto fail;
 	}
 
 	if (h->type == GG_SESSION_PASSWD) {
@@ -622,7 +615,7 @@ void handle_pubdir(struct gg_http *h)
 	if (h->type == GG_SESSION_REGISTER) {
 		if (!s->uin) {
 			my_printf(bad);
-			return;
+			goto fail;
 		}
 		
 		if (!config_uin && !config_password && reg_password) {
@@ -634,6 +627,7 @@ void handle_pubdir(struct gg_http *h)
 	
 	my_printf(good, itoa(s->uin));
 
+fail:
 	list_remove(&watches, h, 0);
 	if (h->type == GG_SESSION_REGISTER || h->type == GG_SESSION_PASSWD) {
 		free(reg_password);

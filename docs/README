@@ -93,7 +93,11 @@ BUGREPORTY
     jaka dystrybucja, jaka wersja. Je¶li b³±d jest powtarzalny i zwi±zany
     z sieci±, prosi³bym o to, co wyrzuca ekg uruchomione z opcj± ,,-d''.
     Je¶li segfaultuje i zrzuca core, prosi³bym o podes³anie tego, co
-    poka¿e ,,gdb ekg core'', a nastêpnie ,,bt''.
+    poka¿e ,,gdb ekg core'' (g³ównie chodzi o liniê, w której wyst±pi³
+    b³±d), a nastêpnie ,,bt''. Informacjê o b³êdzie proszê przesy³aæ
+    na listê ekg-users (szczegó³y ni¿ej), poniewa¿ w ten sposób dostan±
+    j± inni developerowie. Dziêki temu jest szansa, ¿e zostanie poprawione
+    wcze¶niej.
 
 ¬RÓD£A
 

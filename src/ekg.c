@@ -353,7 +353,7 @@ Próbujê zapisaæ ustawienia do pliku ~/.gg/config.%d i listê kontaktów\n\
 do pliku ~/.gg/userlist.%d, ale nie obiecujê, ¿e cokolwiek z tego\n\
 wyjdzie.\n\
 \n\
-Je¶li zostanie utworzy plik ~/.gg/core, spróbuj uruchomiæ program ,,gdb''\n\
+Je¶li zostanie utworzony plik ~/.gg/core, spróbuj uruchomiæ program ,,gdb''\n\
 zgodnie z instrukcjami zawartymi w pliku README. Dziêki temu autorzy\n\
 dowiedz± siê, w którym miejscu wyst±pi³ b³±d i najprawdopodobniej pozwoli\n\
 to unikn±æ tego typu b³êdów w przysz³o¶ci.\n\
