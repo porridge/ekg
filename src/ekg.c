@@ -781,8 +781,7 @@ static void setup_debug()
 
 	dup2(fd[1], 2);
 	
-	if (!gg_debug_file)
-		gg_debug_file = stderr;
+	gg_debug_file = stderr;
 
 	setbuf(gg_debug_file, NULL);		/* XXX leak */
 
@@ -1012,7 +1011,8 @@ int main(int argc, char **argv)
 
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
-		setup_debug();
+		if (!gg_debug_file)
+			setup_debug();
 		gg_debug_level = 255;
 	} else
 		gg_debug_level = 0;
