@@ -511,6 +511,23 @@ const struct gg_search_request *gg_search_request_mode_3(uin_t uin, int active, 
 void gg_search_request_free(struct gg_search_request *r);
 
 /*
+ * funkcje wyszukiwania dla GG 5.0.
+ */
+struct gg_search_s {
+	int count;
+};
+
+typedef struct gg_search_s *gg_search_t;
+
+int gg_search50(struct gg_session *sess, gg_search_t req);
+gg_search_t gg_search50_new();
+int gg_search50_add(gg_search_t *req, const char *field, const char *value);
+const char *gg_search50_get(gg_search_t res, int num, const char *field);
+int gg_search50_count(gg_search_t res);
+uin_t gg_search50_next(gg_search_t res);
+void gg_search50_free(gg_search_t s);
+
+/*
  * operacje na katalogu publicznym.
  */
 struct gg_pubdir {

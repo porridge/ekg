@@ -1919,7 +1919,7 @@ static void complete(int *line_start, int *line_index)
 			if (strlen(completions[i]) + 2 > maxlen)
 				maxlen = strlen(completions[i]) + 2;
 
-		cols = (stdscr->_maxx - 5) / maxlen;
+		cols = (window_current->width - 6) / maxlen;
 		if (cols == 0)
 			cols = 1;
 
