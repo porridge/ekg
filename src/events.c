@@ -514,7 +514,7 @@ void handle_msg(struct gg_event *e)
 			return;
 	}
 
-	if (config_ignore_unknown_sender || ignored_check(e->event.msg.sender) & IGNORE_MSG) {
+	if ((!u && config_ignore_unknown_sender) || ignored_check(e->event.msg.sender) & IGNORE_MSG) {
 		if (config_log_ignored)
 			put_log(e->event.msg.sender, "%sign,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), e->event.msg.message);
 
