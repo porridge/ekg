@@ -5,6 +5,11 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-03-07
+
+- poprawka desciptor-leaka. nie powinno wywalaæ ju¿ ,,too many open files''
+  gdy serwer le¿y i libgadu stara siê ³±czyæ w kó³ko. (w)
+
 // 2002-03-06
 
 - nowo¶ci w docs/protocol.*, powody nieobecno¶ci (adaml/w)

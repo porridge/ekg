@@ -67,7 +67,8 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_sms(), command_find(), command_modify(), command_cleartab(),
 	command_status(), command_register(), command_test_watches(),
 	command_remind(), command_dcc(), command_query(), command_passwd(),
-	command_test_ping(), command_on(), command_change();
+	command_test_ping(), command_on(), command_change(),
+	command_test_fds();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -121,6 +122,7 @@ struct command commands[] = {
 	{ "_add", "?", command_test_add, "", "", "" },
 	{ "_watches", "", command_test_watches, "", "", "" },
 	{ "_ping", "", command_test_ping, "", "", "" },
+	{ "_fds", "", command_test_fds, "", "", "" },
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 
@@ -1603,6 +1605,70 @@ COMMAND(command_test_watches)
 		my_printf("generic", buf);
 	}
 
+	return 0;
+}
+
+COMMAND(command_test_fds)
+{
+#if 0
+	struct stat st;
+	char buf[1000];
+	int i;
+	
+	for (i = 0; i < 2048; i++) {
+		if (fstat(i, &st) == -1)
+			continue;
+
+		sprintf(buf, "%d: ", i);
+
+		if (S_ISREG(st.st_mode))
+			sprintf(buf + strlen(buf), "file, inode %lu, size %lu", st.st_ino, st.st_size);
+
+		if (S_ISSOCK(st.st_mode)) {
+			struct sockaddr sa;
+			struct sockaddr_un *sun = (struct sockaddr_un*) &sa;
+			struct sockaddr_in *sin = (struct sockaddr_in*) &sa;
+			int sa_len = sizeof(sa);
+			
+			if (getpeername(i, &sa, &sa_len) == -1) {
+				strcat(buf, "socket, not connected");
+			} else {
+				switch (sa.sa_family) {
+					case AF_UNIX:
+						strcat(buf, "socket, unix, ");
+						strcat(buf, sun->sun_path);
+						break;
+					case AF_INET:
+						strcat(buf, "socket, inet, ");
+						strcat(buf, inet_ntoa(sin->sin_addr));
+						strcat(buf, ":");
+						strcat(buf, itoa(ntohs(sin->sin_port)));
+						break;
+					default:
+						strcat(buf, "socket, ");
+						strcat(buf, itoa(sa.sa_family));
+				}
+			}
+		}
+		
+		if (S_ISDIR(st.st_mode))
+			strcat(buf, "directory");
+		
+		if (S_ISCHR(st.st_mode))
+			strcat(buf, "char");
+
+		if (S_ISBLK(st.st_mode))
+			strcat(buf, "block");
+
+		if (S_ISFIFO(st.st_mode))
+			strcat(buf, "fifo");
+
+		if (S_ISLNK(st.st_mode))
+			strcat(buf, "symlink");
+
+		my_printf("generic", buf);
+	}
+#endif
 	return 0;
 }
 
