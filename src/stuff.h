@@ -219,6 +219,8 @@ char *config_theme;
 int config_time_deviation;
 char *config_timestamp;
 int config_uin;
+char *config_windows_layout;
+int config_windows_save;
 
 char *home_dir;
 char *config_dir;

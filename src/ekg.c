@@ -634,6 +634,11 @@ static int ekg_ui_set(const char *name)
 	return 0;
 }
 
+void ui_dummy_print(const char *target, int separate, const char *line)
+{
+
+}
+
 int main(int argc, char **argv)
 {
 	int auto_connect = 1, force_debug = 0, new_status = 0, ui_set = 0;
@@ -822,6 +827,9 @@ int main(int argc, char **argv)
 
 	theme_init();
 
+	ui_none_init(); /* na wypadek, gdyby co¶ mia³o siê pokazaæ */
+	config_read();
+
 	ui_screen_width = getenv("COLUMNS") ? atoi(getenv("COLUMNS")) : 80;
 	ui_screen_height = getenv("LINES") ? atoi(getenv("LINES")) : 24;
 	ui_init();
@@ -833,7 +841,6 @@ int main(int argc, char **argv)
 	in_autoexec = 1;
         userlist_read();
 	update_status();
-	config_read();
 	sysmsg_read();
 	emoticon_read();
 	msg_queue_read();
@@ -994,6 +1001,9 @@ void ekg_exit()
 
 	if (config_server_save)
 		array_add(&vars, xstrdup("server"));
+
+	if (config_windows_save)
+		array_add(&vars, xstrdup("windows_layout"));
 
 	if (vars) {
 		config_write_partly(vars);

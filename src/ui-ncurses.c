@@ -319,17 +319,19 @@ static int window_new_compare(void *data1, void *data2)
 /*
  * window_new()
  *
- * tworzy nowe okno o podanej nazwie.
+ * tworzy nowe okno o podanej nazwie i id.
  */
-static struct window *window_new(const char *target)
+static struct window *window_new(const char *target, int new_id)
 {
 	struct window w;
 	list_t l;
 	int id = 1, done = 0;
 	int z;
 
+#if 0
 	if (target && *target == '*')
 		id = 100;	/* XXX */
+#endif
 
 	while (!done) {
 		done = 1;
@@ -344,6 +346,9 @@ static struct window *window_new(const char *target)
 			}
 		}
 	}
+
+	if (new_id != 0)
+		id = new_id;
 	
 	memset(&w, 0, sizeof(w));
 
@@ -489,7 +494,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 				if (!separate)
 					w = windows->data;
 				else {
-					w = window_new(target);
+					w = window_new(target, 0);
 					print("window_id_query_started", itoa(w->id), target);
 					print_window(target, 1, "query_started", target);
 					print_window(target, 1, "query_started_window", target);
@@ -1033,7 +1038,24 @@ void ui_ncurses_init()
 	ui_screen_width = stdscr->_maxx + 1;
 	ui_screen_height = stdscr->_maxy + 1;
 	
-	window_current = window_new(NULL);
+	if (config_windows_save && config_windows_layout) {
+		char **targets = array_make(config_windows_layout, "|", 0, 0, 0);
+		int i;
+
+		for (i = 0; targets[i]; i++) {
+			if (!strcmp(targets[i], "-"))
+				continue;
+			window_new((strcmp(targets[i], "")) ? targets[i] : NULL, i + 1);
+		}
+
+		array_free(targets);
+	}
+
+	if (!windows)
+		window_new(NULL, 0);
+
+	window_current = windows->data;
+
 	status = newwin(1, stdscr->_maxx + 1, stdscr->_maxy - 1, 0);
 	input = newwin(1, stdscr->_maxx + 1, stdscr->_maxy, 0);
 	keypad(input, TRUE);
@@ -1072,6 +1094,8 @@ void ui_ncurses_init()
 
 	memset(binding_map, 0, sizeof(binding_map));
 	memset(binding_map_meta, 0, sizeof(binding_map_meta));
+
+	contacts_rebuild();
 }
 
 /*
@@ -1087,6 +1111,41 @@ static void ui_ncurses_deinit()
 
 	if (done)
 		return;
+
+	if (config_windows_save) {
+		string_t s = string_init(NULL);
+		int maxid = 0, i;
+		
+		xfree(config_windows_layout);
+
+		for (l = windows; l; l = l->next) {
+			struct window *w = l->data;
+
+			if (w->id > maxid)
+				maxid = w->id;
+		}
+
+		for (i = 1; i <= maxid; i++) {
+			const char *target = "-";
+			
+			for (l = windows; l; l = l->next) {
+				struct window *w = l->data;
+
+				if (w->id == i) {
+					target = w->target;
+					break;
+				}
+			}
+
+			if (target)
+				string_append(s, target);
+
+			if (i < maxid)
+				string_append_c(s, '|');
+		}
+
+		config_windows_layout = string_free(s, 0);
+	}
 
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
@@ -2404,7 +2463,7 @@ static int ui_ncurses_event(const char *event, ...)
 				}
 
 				if (config_make_window == 2) {
-					w = window_new(param);
+					w = window_new(param, 0);
 					window_switch(w->id);
 				}
 
@@ -2452,7 +2511,7 @@ static int ui_ncurses_event(const char *event, ...)
 			}
 
 			if (!strcasecmp(p1, "new")) {
-				struct window *w = window_new(p2);
+				struct window *w = window_new(p2, 0);
 				if (!w->floating)
 					window_switch(w->id);
 				goto cleanup;

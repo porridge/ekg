@@ -167,6 +167,10 @@ void variable_init()
 	variable_add("theme", VAR_STR, 1, &config_theme, changed_theme, NULL, NULL);
 	variable_add("time_deviation", VAR_INT, 1, &config_time_deviation, NULL, NULL, NULL);
 	variable_add("timestamp", VAR_STR, 1, &config_timestamp, NULL, NULL, NULL);
+#ifdef WITH_UI_NCURSES
+	variable_add("windows_save", VAR_BOOL, 1, &config_windows_save, NULL, NULL, NULL);
+	variable_add("windows_layout", VAR_STR, 2, &config_windows_layout, NULL, NULL, NULL);
+#endif
 
 	variable_add("status", VAR_INT, 2, &config_status, NULL, NULL, NULL);
 	variable_add("debug", VAR_BOOL, 2, &config_debug, changed_debug, NULL, NULL);

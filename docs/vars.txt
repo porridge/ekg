@@ -554,6 +554,14 @@ timestamp
 	pocz±tku ka¿dej linii. dok³adny opis formatu zawiera strona
 	manuala strftime(3).
 
+windows_save
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	okre¶la, czy ustawienie okienek ma byæ zachowywane przy kolejnym
+	uruchomieniu programu.
+
+
 
 status
 	typ: liczba, zmienna wewnêtrzna, ukryta
@@ -581,6 +589,13 @@ protocol
 	okre¶la wersjê klienta, któr± przedstawia siê ekg. mo¿e byæ u¿ywana
 	do udawania nowszego klienta, gdy biblioteka jeszcze jej nie zna.
 	zmienna ta nie powinna byæ u¿ywana przez zwyk³ych u¿ytkowników.
+
+windows_layout
+	typ: tekst, zmienna wewnêtrzna, ukryta
+
+	zawiera informacje o okienkach. wpis ka¿dego okna jest rozdzielony
+	znakiem ,,|''. je¶li okno nie ma przypisanej rozmowy, wpis jest
+	pusty. je¶li okno nie istnieje, wpis zawiera ,,-''.
 
 
 $Id$

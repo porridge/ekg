@@ -173,6 +173,8 @@ int config_display_welcome = 1;
 int config_auto_back = 0;
 int config_display_crap = 1;
 char *config_display_color_map = NULL;
+int config_windows_save = 0;
+char *config_windows_layout = NULL;
 
 static struct {
 	int event;
