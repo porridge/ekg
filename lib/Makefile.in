@@ -13,7 +13,7 @@ MAKE = @MAKE@
 AR = @AR@
 install = @INSTALL@
 
-CFLAGS = -DLOG_IGNORED @DFLAGS@ @CFLAGS@ $(INCLUDES) 
+CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) 
 OBJS = common.o libgg.o search.o pubdir.o http.o
 
 all:	static shared
