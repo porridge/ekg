@@ -102,6 +102,7 @@ struct last {
 	unsigned int type;	/* 0 - przychodz±ca, 1 - wychodz±ca */
 	uin_t uin;		/* od kogo, lub do kogo przy wysy³anych */
 	time_t time;		/* czas */
+	time_t sent_time;	/* czas wys³ania wiadomo¶ci przychodz±cej */
 	unsigned char *message;	/* wiadomo¶æ */
 };
 
@@ -318,7 +319,7 @@ int timer_remove(const char *name, const char *command);
 void timer_free();
 
 void last_del(uin_t uin);
-void last_add(unsigned int type, uin_t uin, time_t t, const char *msg);
+void last_add(unsigned int type, uin_t uin, time_t t, time_t st, const char *msg);
 int last_count_get(uin_t uin);
 void last_count_del(uin_t uin);
 void last_count_add(uin_t uin);

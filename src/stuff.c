@@ -3038,9 +3038,10 @@ void last_del(uin_t uin)
  *  - type - rodzaj wiadomo¶ci,
  *  - uin - nadawca,
  *  - t - czas,
+ *  - st - czas nadania,
  *  - msg - tre¶æ wiadomo¶ci,
  */
-void last_add(unsigned int type, uin_t uin, time_t t, const char *msg)
+void last_add(unsigned int type, uin_t uin, time_t t, time_t st, const char *msg)
 {
 	list_t l;
 	struct last ll;
@@ -3090,6 +3091,7 @@ void last_add(unsigned int type, uin_t uin, time_t t, const char *msg)
 	ll.type = type;
 	ll.uin = uin;
 	ll.time = t;
+	ll.sent_time = st;
 	ll.message = xstrdup(msg);
 	
 	list_add(&lasts, &ll, sizeof(ll));

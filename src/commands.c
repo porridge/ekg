@@ -1311,7 +1311,7 @@ COMMAND(cmd_msg)
 		put_log(uin, "%s,%ld,%s,%s,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", log_timestamp(time(NULL)), escaped);
 
 		if (config_last & 4)
-			last_add(1, uin, time(NULL), raw_msg);
+			last_add(1, uin, time(NULL), 0, raw_msg);
 
 		if (!chat || count == 1) {
 			if (sess)
@@ -2839,6 +2839,7 @@ COMMAND(cmd_last)
 {
         list_t l;
 	uin_t uin = 0;
+	int show_sent = 0;
 
 	if (match_arg(params[0], 'c', "clear", 2)) {
 		if (params[1] && !(uin = get_uin(params[1]))) {
@@ -2861,10 +2862,18 @@ COMMAND(cmd_last)
 		return;
 	}		
 
-	if (params[0] && !(uin = get_uin(params[0]))) {
+	if (match_arg(params[0], 's', "stime", 2)) {
+		show_sent = 1;
+
+		if (params[1] && !(uin = get_uin(params[1]))) {
+			print("user_not_found", params[1]);
+			return;
+		}
+	} else
+		if (params[0] && !(uin = get_uin(params[0]))) {
 		print("user_not_found", params[0]);
 		return;
-	}  
+		}
 		
 	if (!((uin > 0) ? last_count_get(uin) : list_count(lasts))) {
 		(uin) ? print("last_list_empty_nick", format_user(uin)) : print("last_list_empty");
@@ -2873,12 +2882,22 @@ COMMAND(cmd_last)
 
         for (l = lasts; l; l = l->next) {
                 struct last *ll = l->data;
-		struct tm *tm;
-		char buf[100];
+		struct tm *tm, *st;
+		time_t t = time(NULL);
+		char buf[100], buf2[100];
 
 		if (uin == 0 || uin == ll->uin) {
 			tm = localtime(&ll->time);
 			strftime(buf, sizeof(buf), format_find("last_list_timestamp"), tm);
+
+			if (show_sent && ll->type == 0 && !(ll->sent_time - config_time_deviation <= t && t <= ll->sent_time + config_time_deviation)) {
+				st = localtime(&ll->sent_time);
+				strftime(buf2, sizeof(buf2), format_find((ll->sent_time / 86400 == time(NULL) / 86400) ? "last_list_timestamp_today" : "last_list_timestamp"), st);
+
+				strlcat(buf, "/", sizeof(buf));
+				strlcat(buf, buf2, sizeof(buf));
+			}
+
 			if (config_last & 4 && ll->type == 1)
 				print("last_list_out", buf, format_user(ll->uin), ll->message);
 			else
@@ -3219,7 +3238,10 @@ void command_init()
 	( "last", "uu", cmd_last, 0,
 	  " [opcje]", "wy¶wietla lub czy¶ci ostatnie wiadomo¶ci",
 	  " [numer/alias]             wy¶wietla ostatnie wiadomo¶ci\n"
+	  " -s, --stime [numer/alias] wy¶wietla czas wys³ania wiadomo¶ci przychodz±cych\n"
 	  " -c, --clear [numer/alias] czy¶ci wiadomo¶ci od/do numer/alias lub wszystkie\n"
+	  "W przypadku opcji %T-s%n lub %T--stime%n czas wy¶wietlany jest ,,inteligentnie''\n"
+	  "zgodnie ze zmienn± %Ttime_deviation.%n"
 	  );
 
 	command_add
