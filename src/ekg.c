@@ -233,7 +233,10 @@ int main(int argc, char **argv)
 	my_printf("welcome", VERSION);
 	
 	read_config(NULL);
-
+	
+	if (default_theme) 
+		read_theme(default_theme, 1);
+	
 	if (!config_uin || !config_password)
 		my_printf("no_config");
 

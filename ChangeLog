@@ -1,8 +1,9 @@
 // 2001-11-19 
 
 - wiecej instalowania... (i/drake)
-- przygotowania do base64, theme'y bêd± szukane w /usr/share/ekg/themes,
+- przygotowania do base64, theme'y bêd± szukane w $(datadir)/ekg/themes,
   ~/.gg i ~/.gg/themes (w).
+- nowa zmienna "theme" ... - ustala "defaultowy" theme po odpaleniu ekg (s)
 
 // 2001-11-18
 
