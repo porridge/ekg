@@ -1436,6 +1436,7 @@ COMMAND(command_set)
 				if (!in_autoexec) {
 					my_printf("variable", arg, params[1]);
 					config_changed = 1;
+					last_save = time(NULL);
 				}
 				break;
 			case -1:
