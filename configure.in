@@ -327,6 +327,7 @@ dnl <ekg>
       AC_CHECK_HEADERS(zlib.h, [
         AC_DEFINE(HAVE_ZLIB, 1, [define if you want compressed logs])
 	LDFLAGS="-lz $LDFLAGS"
+	have_zlib=yes
       ])
     ])
   fi
@@ -446,6 +447,12 @@ else
   echo " - python: disabled"
 fi
 
+if test "x$have_zlib" = "xyes"; then
+  echo " - zlib: enabled"
+else
+  echo " - zlib: disabled"
+fi
+
 if test "x$ui_readline_enabled" = "xyes"; then
   if test "x$ui_readline_default" = "xyes"; then
     echo " - ui-readline: enabled (default)"
@@ -465,5 +472,7 @@ if test "x$ui_ncurses_enabled" = "xyes"; then
 else
   echo " - ui-ncurses: disabled"
 fi
+
+echo
 
 dnl </ekg>
