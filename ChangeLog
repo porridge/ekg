@@ -9,6 +9,7 @@ d - drg, sz - szalik).
 - przepisanie wykrywania ncurses, ¿eby dzia³a³o dobrze przy crosskompilacji.
   u¿ywa teraz AC_CHECK_HEADERS, zamiast sprawdzania obecno¶ci plików
   (pliszka/w)
+- poprawka tematu ostatniej obecno¶ci (rmrmg/w)
 
 // 2003-06-23
 

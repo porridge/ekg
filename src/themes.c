@@ -1191,7 +1191,7 @@ void theme_init()
 	format_add("user_info_ip", "%K| %nAdres: %T%1%n\n", 1);
 	format_add("user_info_mobile", "%K| %nTelefon: %T%1%n\n", 1);
 	format_add("user_info_groups", "%K| %nGrupy: %T%1%n\n", 1);
-	format_add("user_info_never_seen", "%K| %nNigdy nie widziano\n", 1);
+	format_add("user_info_never_seen", "%K| %nNie widziano podczas tej sesji\n", 1);
 	format_add("user_info_last_seen", "%K| %nOstatnio widziano: %T%1%n\n", 1);
 	format_add("user_info_last_seen_time", "%Y-%m-%d %H:%M", 1);
 	format_add("user_info_last_descr","%K| %nOstatni opis: %T%1%n\n", 1);
