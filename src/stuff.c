@@ -1889,7 +1889,7 @@ void do_connect()
 	}
 
 	if (!(sess = gg_login(&p))) {
-		print("conn_failed", strerror(errno));
+		print("conn_failed", format_find("conn_failed_memory"));
 		do_reconnect();
 	} else
 		list_add(&watches, sess, 0);

@@ -117,10 +117,11 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 #ifdef WITH_WAP
 		{
 			FILE *wap;
-			char *waplog, waptime[10];
+			char waptime[10];
+			const char *waplog;
 
 			sprintf(waptime, "wap%5s", timestr);
-			if (waplog = prepare_path(waptime, 1)) {
+			if ((waplog = prepare_path(waptime, 1))) {
 				if ((wap = fopen(waplog, "a"))) {
 					fprintf(wap,"%s(%s):%s\n", target, timestr, line);
 					fclose(wap);
@@ -542,7 +543,30 @@ void handle_status(struct gg_event *e)
  */
 void handle_failure(struct gg_event *e)
 {
-	print("conn_failed", strerror(errno));
+	struct { int type; char *str; } reason[] = {
+		{ GG_FAILURE_RESOLVING, "conn_failed_resolving" },
+		{ GG_FAILURE_CONNECTING, "conn_failed_connecting" },
+		{ GG_FAILURE_INVALID, "conn_failed_invalid" },
+		{ GG_FAILURE_READING, "conn_failed_disconnected" },
+		{ GG_FAILURE_WRITING, "conn_failed_disconnected" },
+		{ GG_FAILURE_PASSWORD, "conn_failed_password" },
+		{ GG_FAILURE_404, "conn_failed_404" },
+		{ 0, NULL },
+	};
+
+	char *tmp = NULL;
+	int i;
+
+	for (i = 0; reason[i].type; i++) {
+		if (reason[i].type == e->event.failure) {
+			tmp = format_string(format_find(reason[i].str));
+			break;
+		}
+	}
+
+	print("conn_failed", (tmp) ? tmp : "?");
+	xfree(tmp);
+
 	list_remove(&watches, sess, 0);
 	gg_logoff(sess);
 	gg_free_session(sess);
@@ -597,7 +621,7 @@ void handle_event(struct gg_session *s)
 	struct handler *h;
 
 	if (!(e = gg_watch_fd(sess))) {
-		print("conn_broken", strerror(errno));
+		print("conn_broken");
 		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
 		sess = NULL;
@@ -821,7 +845,7 @@ void handle_userlist(struct gg_http *h)
  */
 void handle_disconnect(struct gg_event *e)
 {
-	print("disconn_warning");
+	print("conn_broken");
 	ui_event("disconnected");
 
 	gg_logoff(sess);	/* a zobacz.. mo¿e siê uda ;> */

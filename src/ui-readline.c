@@ -805,7 +805,7 @@ static int ui_readline_event(const char *event, ...)
 			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*);
 
 			if (!p1) {
-		                print("window_not_enough_params");
+		                print("not_enough_params");
 				result = 1;
 				goto cleanup;
 		        }
@@ -850,7 +850,7 @@ static int ui_readline_event(const char *event, ...)
 			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*), *p3 = va_arg(ap, char*);
 			
 			if (!p1) {
-				print("bind_not_enough_params");
+				print("not_enough_params");
 				result = 1;
 				goto cleanup;
 			}
@@ -1251,11 +1251,14 @@ static int bind_sequence(char *seq, char *command, int quiet)
 		return 1;
 	}
 	
+#if 0
+	/* ale po co sprawdzaæ? */
 	if (command && strlen(command) > 128) /* zeby nie bylo... */ {
 		if (!quiet)
 			print("bind_seq_command_too_long");
 		return 1;
 	}
+#endif
 		
 	if (!strncasecmp(seq, "ctrl-", 5) && strlen(seq)==6) {
 		c = toupper(seq[5]);
