@@ -1142,7 +1142,7 @@ int alias_add(char *string, int quiet, int append)
 	list_add(&aliases, &a, sizeof(a));
 
 	if (!quiet)
-		my_printf("aliases_add", a.name);
+		my_printf("aliases_add", a.name, "");
 
 	return 0;
 }
