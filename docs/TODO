@@ -2,6 +2,8 @@ rzeczy, których nie ma. listy/mesgi/posty z listami, ¿eby dodaæ co¶
 z poni¿szej listy, albo zwi±zanego z tym bêd± albo ignorowane, albo
 zacznê byæ niemi³y. --w
 
+- s/LIBS/LDFLAGS/ w configure.in,
+
 biblioteka:
 - komunikacja miêdzy klientami, bezpo¶rednie rozmowy,
 - uaktualniæ dokumentacjê,
