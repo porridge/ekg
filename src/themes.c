@@ -537,10 +537,20 @@ void init_theme()
 	add_format("variable_not_found", "%! Nieznana zmienna: %1\n", 1);
 	add_format("variable_invalid", "%! Nieprawid這wa warto嗆 zmiennej\n", 1);
 	add_format("not_implemented", "%! Tej funkcji jeszcze nie ma\n", 1);
-	add_format("no_config", "%! Niekompletna konfiguracja. Wpisz:\n%!   %Wset uin <numerek-gg>%n\n%!   %Wset password <has這>%n\n%!   %Wsave%n\n%! Nast瘼nie wydaj polecenie:\n%!   %Wconnect%n\n\n", 1);
+	add_format("no_config", "%! Niekompletna konfiguracja. Wpisz:\n%!   %Wset uin <numerek-gg>%n\n%!   %Wset password <has這>%n\n%!   %Wsave%n\n%! Nast瘼nie wydaj polecenie:\n%!   %Wconnect%n\n%! Je郵i nie masz swojego numerka, wpisz:\n%!   %Wregister <e-mail> <has這>%n\n\n", 1);
+	
 	add_format("register", "%> Rejestracja poprawna: Wygrany numerek: %W%1%n\n", 1);
 	add_format("register_failed", "%! B陰d podczas rejestracji\n", 1);
 	add_format("register_pending", "%! Rejestracja w toku\n", 1);
+	
+	add_format("remind", "%> Has這 zosta這 wys豉ne\n", 1);
+	add_format("remind_failed", "%! B陰d podczas wysy豉nia has豉\n", 1);
+	
+	add_format("passwd", "%> Has這 zosta這 zmienione\n", 1);
+	add_format("passwd_failed", "%! B陰d podczas zmiany has豉\n", 1);
+	
+	add_format("change", "%> Informacje w katalogu publicznym zosta造 zmienione\n", 1);
+	add_format("change_failed", "%! B陰d podczas zmiany informacji w katalogu publicznym\n", 1);
 	
 	add_format("sms_msg", "EKG: msg %1 %# >> %2", 1);
 	add_format("sms_chat", "EKG: chat %1 %# >> %2", 1);
