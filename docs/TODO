@@ -11,9 +11,9 @@ klient:
 - wykrywanie niewidocznych jako opcja.
 - korzystaæ z getopt.
 - round-robin serwerów.
-- find bez paremtrów szuka aktualnego rozmówcy.
+- find bez parametrów szuka aktualnego rozmówcy.
 - uaktualnianie w³asnego stanu w userli¶cie,
-- poprawiæ /exec, ¿eby by³o wielobie¿ne.
+- zapisywanie konfiguracji do innego pliku,
 
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,

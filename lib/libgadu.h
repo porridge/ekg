@@ -713,7 +713,7 @@ struct gg_login_ext {
 
 #define GG_STATUS_FRIENDS_MASK 0x8000		/* tylko dla znajomych (4.6) */
 
-#define GG_STATUS_DESCR_MAXSIZE 40
+#define GG_STATUS_DESCR_MAXSIZE 45
 
 /*
  * makra do szybkiego sprawdzania stanu. ich znaczenie powinno byæ jasne.

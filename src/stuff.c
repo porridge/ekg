@@ -2291,7 +2291,7 @@ void changed_xxx_reason(const char *var)
 		return;
 
 	if (strlen(tmp) > GG_STATUS_DESCR_MAXSIZE)
-		print("descr_too_long", itoa(GG_STATUS_DESCR_MAXSIZE));
+		print("descr_too_long", itoa(strlen(tmp) - GG_STATUS_DESCR_MAXSIZE));
 }
 
 /*
@@ -2882,3 +2882,29 @@ char *xstrmid(const char *str, int start, int length)
 
 	return res;
 }
+
+/*
+ * http_error_string()
+ *
+ * zwraca tekst opisuj±cy powód b³êdu us³ug po http.
+ *
+ *  - h - warto¶æ gg_http->error lub 0, gdy funkcja zwróci³a NULL.
+ */
+const char *http_error_string(int h)
+{
+	switch (h) {
+		case 0:
+			return format_find((errno == ENOMEM) ? "http_failed_memory" : "http_failed_connecting");
+		case GG_ERROR_RESOLVING:
+			return format_find("http_failed_resolving");
+		case GG_ERROR_CONNECTING:
+			return format_find("http_failed_connecting");
+		case GG_ERROR_READING:
+			return format_find("http_failed_reading");
+		case GG_ERROR_WRITING:
+			return format_find("http_failed_writing");
+	}
+
+	return "?";
+}
+	

@@ -113,6 +113,14 @@ struct conference {
 	list_t recipients;
 };
 
+struct gg_exec {
+	gg_common_head(struct gg_exec)
+	
+	char *buf;	/* bufor */
+	int bufsize;	/* rozmiar bufora */
+	int bufpoz;	/* pozycja w buforze */
+};
+
 list_t children;
 list_t aliases;
 list_t watches;
@@ -223,6 +231,7 @@ int ekg_hash(const char *name);
 void ekg_exit();
 char *log_escape(const char *str);
 char *xstrmid(const char *str, int start, int length);
+const char *http_error_string(int h);
 
 int process_add(int pid, const char *name);
 int process_remove(int pid);
@@ -284,5 +293,7 @@ int last_add(unsigned int type, uin_t uin, time_t t, const char *msg);
 int last_count_get(uin_t uin);
 int last_count_del(uin_t uin);
 int last_count_add(uin_t uin);
+
+void get_line_from_pipe(struct gg_exec *);
 
 #endif /* __STUFF_H */

@@ -102,7 +102,7 @@ static struct {
 	{ GG_SESSION_USER0, NULL, (VV) reaper_user },
 	{ GG_SESSION_USER1, NULL, (VV) reaper_user },
 	{ GG_SESSION_USER2, (VV) handle_voice, (VV) reaper_user },
-	{ GG_SESSION_USER3, NULL, (VV) reaper_user },
+	{ GG_SESSION_USER3, (VV) get_line_from_pipe, (VV) reaper_user },
 	{ -1, NULL, NULL }, 
 };
 
@@ -144,9 +144,8 @@ void get_char_from_pipe(struct gg_common *c)
  *
  * - c - struktura steruj±ca przechowuj±ca m.in. deskryptor potoku.
  */
-void get_line_from_pipe(struct gg_common *c)
+void get_line_from_pipe(struct gg_exec *c)
 {
-	static char buf[PIPE_MSG_MAX_BUF_LEN + 1];
 	char ch;
   
 	if (!c)
@@ -154,14 +153,15 @@ void get_line_from_pipe(struct gg_common *c)
 
 	if (read(c->fd, &ch, 1) > 0) {
 		if (ch != '\n' && ch != '\r') {
-			if (strlen(buf) < PIPE_MSG_MAX_BUF_LEN)
-				buf[strlen(buf)] = ch;
+			c->buf[c->bufpoz++] = ch;
 		}
-		if (ch == '\n' || (strlen(buf) >= PIPE_MSG_MAX_BUF_LEN)) {
-			print("exec", buf, itoa(c->id));
-			memset(buf, 0, PIPE_MSG_MAX_BUF_LEN + 1);
+		if (ch == '\n' || (c->bufpoz >= c->bufsize)) {
+			c->buf[c->bufpoz] = 0;
+			print("exec", c->buf, itoa(c->id));
+			c->bufpoz=0;
 		}
 	} else {
+		xfree(c->buf);
 		list_remove(&watches, c, 1);
 	}
 }
@@ -421,11 +421,6 @@ void ekg_wait_for_key()
 
 				if (c->type == GG_SESSION_USER2) {
 					handle_voice();
-					break;
-				}
-				
-				if (c->type == GG_SESSION_USER3) {
-					get_line_from_pipe(c);
 					break;
 				}
 

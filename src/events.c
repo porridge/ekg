@@ -696,7 +696,7 @@ void handle_search(struct gg_http *h)
 	int i;
 
 	if (gg_search_watch_fd(h) || h->state == GG_STATE_ERROR) {
-		print("search_failed", strerror(errno));
+		print("search_failed", http_error_string((h) ? h->state : 0));
 		list_remove(&watches, h, 0);
 		gg_search_request_free((struct gg_search_request*) h->user_data);
 		gg_search_free(h);
@@ -774,7 +774,6 @@ void handle_search(struct gg_http *h)
 
 	r = (void*) h->user_data;
 
-	gg_debug(GG_DEBUG_MISC, "s->count = %d, start = 0x%.8x\n", s->count, r->start);
 	if (s->count > 19 && (r->start & 0x80000000L)) {
 		struct gg_http *h2;
 		list_t l;
@@ -796,7 +795,7 @@ void handle_search(struct gg_http *h)
 		}
 		if (!(h2 = gg_search(r, 1)))
 		{
-			print("search_failed", strerror(errno));
+			print("search_failed", http_error_string(0));
 			gg_search_request_free(r);
 			return;
 		}

@@ -255,7 +255,20 @@ COMMAND(cmd_away)
 			reason = config_reason;
 		
 		away = (reason) ? 3 : 1;
-		print((reason) ? "away_descr" : "away", reason);
+		
+		if (reason) {
+			char *r1, *r2;
+			
+			r1 = xstrmid(reason, 0, GG_STATUS_DESCR_MAXSIZE);
+			r2 = xstrmid(reason, GG_STATUS_DESCR_MAXSIZE, -1);
+			
+			print("away_descr", r1, r2);
+
+			xfree(r1);
+			xfree(r2);
+		} else
+			print("away");
+
 		ui_event("my_status", "away", reason);
 	} else if (!strcasecmp(name, "invisible")) {
 	    	if (!params[0]) {
@@ -273,7 +286,20 @@ COMMAND(cmd_away)
 			reason = config_reason;
 		
 		away = (reason) ? 5 : 2;
-		print((reason) ? "invisible_descr" : "invisible", reason);
+		
+		if (reason) {
+			char *r1, *r2;
+			
+			r1 = xstrmid(reason, 0, GG_STATUS_DESCR_MAXSIZE);
+			r2 = xstrmid(reason, GG_STATUS_DESCR_MAXSIZE, -1);
+			
+			print("invisible_descr", r1, r2);
+
+			xfree(r1);
+			xfree(r2);
+		} else
+			print("invisible");
+
 		ui_event("my_status", "invisible", reason);
 	} else if (!strcasecmp(name, "back")) {
 	    	if (!params[0]) {
@@ -292,7 +318,20 @@ COMMAND(cmd_away)
 			reason = config_reason;
 		
 		away = (reason) ? 4 : 0;
-		print((reason) ? "back_descr" : "back", reason);
+
+		if (reason) {
+			char *r1, *r2;
+			
+			r1 = xstrmid(reason, 0, GG_STATUS_DESCR_MAXSIZE);
+			r2 = xstrmid(reason, GG_STATUS_DESCR_MAXSIZE, -1);
+			
+			print("back_descr", r1, r2);
+
+			xfree(r1);
+			xfree(r2);
+		} else
+			print("back");
+
 		ui_event("my_status", "back", reason);
 	} else {
 		int tmp;
@@ -329,7 +368,7 @@ COMMAND(cmd_away)
 	if (reason) {
 		config_reason = reason;
 		if (strlen(reason) > GG_STATUS_DESCR_MAXSIZE)
-			print("descr_too_long", itoa(GG_STATUS_DESCR_MAXSIZE));
+			print("descr_too_long", itoa(strlen(reason) - GG_STATUS_DESCR_MAXSIZE));
 	}
 
 	return;
@@ -478,7 +517,7 @@ COMMAND(cmd_exec)
 	if (params[0]) {
 		char *tmp;
 		int fd[2] = { 0, 0 };
-		struct gg_session s;
+		struct gg_exec s;
 
 		if (pipe(fd) && params[0][0] != '^') {
 			print("exec_error", strerror(errno));
@@ -507,6 +546,12 @@ COMMAND(cmd_exec)
 		s.type = GG_SESSION_USER3;
 		s.id = pid;
 		s.timeout = 60;
+#define BUFSIZE 1000
+		s.buf = xmalloc(BUFSIZE);
+		*s.buf = 0;
+		s.bufsize = BUFSIZE;
+		s.bufpoz = 0;
+#undef BUFSIZE
 		list_add(&watches, &s, sizeof(s));
 		close(fd[1]);
 		
@@ -627,7 +672,7 @@ COMMAND(cmd_find)
 	iso_to_cp(r->email);
 
 	if (!(h = gg_search(r, 1))) {
-		print("search_failed", strerror(errno));
+		print("search_failed", http_error_string(0));
 		free(query);
 		array_free(argv);
 		gg_search_request_free(r);

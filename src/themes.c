@@ -707,17 +707,17 @@ void theme_init()
 
 	/* zmiany stanu */
 	format_add("away", "%> Zmieniono stan na zajêty %c(%C%#%c)%n\n", 1);
-	format_add("away_descr", "%> Zmieniono stan na zajêty: %1 %c(%C%#%c)%n\n", 1);
+	format_add("away_descr", "%> Zmieniono stan na zajêty: %T%1%n%2 %c(%C%#%c)%n\n", 1);
 	format_add("back", "%> Zmieniono stan na dostêpny %c(%C%#%c)%n\n", 1);
-	format_add("back_descr", "%> Zmieniono stan na dostêpny: %1 %c(%C%#%c)%n\n", 1);
+	format_add("back_descr", "%> Zmieniono stan na dostêpny: %T%1%n%2 %c(%C%#%c)%n\n", 1);
 	format_add("invisible", "%> Zmieniono stan na niewidoczny %c(%C%#%c)%n\n", 1);
-	format_add("invisible_descr", "%> Zmieniono stan na niewidoczny: %1 %c(%C%#%c)%n\n", 1);
+	format_add("invisible_descr", "%> Zmieniono stan na niewidoczny: %T%1%n%2 %c(%C%#%c)%n\n", 1);
 	format_add("private_mode_is_on", "%> Tryb ,,tylko dla przyjació³'' jest w³±czony\n", 1);
 	format_add("private_mode_is_off", "%> Tryb ,,tylko dla przyjació³'' jest wy³±czony\n", 1);
 	format_add("private_mode_on", "%> W³±czono tryb ,,tylko dla przyjació³''\n", 1);
 	format_add("private_mode_off", "%> Wy³±czono tryb ,,tylko dla przyjació³''\n", 1);
 	format_add("private_mode_invalid", "%! Nieprawid³owa warto¶æ\n", 1);
-	format_add("descr_too_long", "%! Opis jest zbyt d³ugi. Widoczne bêdzie tylko pierwsze %1 znaków\n", 1);
+	format_add("descr_too_long", "%! D³ugo¶æ opisu przekracza limit o %T%1%n znaków\n", 1);
 	
 	/* pomoc */
 	format_add("help", "%> %1%2 - %3%4\n", 1);
@@ -748,7 +748,7 @@ void theme_init()
 
 	/* ¿egnamy siê, zapisujemy konfiguracjê */
 	format_add("quit", "%> Papa\n", 1);
-	format_add("quit_descr", "%> Papa: %1\n", 1);
+	format_add("quit_descr", "%> Papa: %T%1%n%2\n", 1);
 	format_add("config_changed", "Zapisaæ now± konfiguracjê? (tak/nie) ", 1);
 	format_add("saved", "%> Zapisano ustawienia\n", 1);
 	format_add("error_saving", "%! Podczas zapisu ustawieñ wyst±pi³ b³±d\n", 1);
@@ -805,7 +805,7 @@ void theme_init()
 	format_add("conn_timeout", "%! Przekroczono limit czasu operacji ³±czenia z serwerem\n", 1);
 	format_add("connected", "%> Po³±czono %c(%C%#%c)%n\n", 1);
 	format_add("disconnected", "%> Roz³±czono %c(%C%#%c)%n\n", 1);
-	format_add("disconnected_descr", "%> Roz³±czono: %1 %c(%C%#%c)%n\n", 1);
+	format_add("disconnected_descr", "%> Roz³±czono: %T%1%n%2 %c(%C%#%c)%n\n", 1);
 	format_add("already_connected", "%! Klient jest ju¿ po³±czony. Wpisz %Treconnect%n aby po³±czyæ ponownie\n", 1);
 	format_add("during_connect", "%! £±czenie trwa. Wpisz %Tdisconnect%n aby przerwaæ\n", 1);
 	format_add("conn_broken", "%! Serwer zerwa³ po³±czenie %c(%C%#%c)%n\n", 1);
@@ -1045,4 +1045,11 @@ void theme_init()
 	format_add("conferences_rename", "%> Nazwa konferencji zmieniona: %T%1%n --> %T%2%n\n", 1);
 	format_add("conferences_ignore", "%> Konferencja %T%1%n bêdzie ignorowana\n", 1);
 	format_add("conferences_unignore", "%> Konferencja %T%1%n nie bêdzie ignorowana\n", 1);
+	
+	/* wspólne dla us³ug http */
+	format_add("http_failed_resolving", "Nie znaleziono serwera", 1);
+	format_add("http_failed_connecting", "Nie mo¿na po³±czyæ siê z serwerem", 1);
+	format_add("http_failed_reading", "Serwer zerwa³ po³±czenie", 1);
+	format_add("http_failed_writing", "Serwer zerwa³ po³±czenie", 1);
+	format_add("http_failed_memory", "Brak pamiêci", 1);
 };
