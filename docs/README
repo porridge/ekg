@@ -64,7 +64,7 @@ WYSY£ANIE SMSÓW
     ekg korzysta z zewnêtrznego programu do wysy³ania smsów. Nie ma
     najmniejszego sensu dublowania tej funkcji, skoro i tak wiêkszo¶æ
     ma ju¿ zainstalowane odpowiednie skrypty/programy/cokolwiek.
-    Rystarczy podaæ ¶cie¿kê do takiego programu w zmiennej
+    Wystarczy podaæ ¶cie¿kê do takiego programu w zmiennej
     ,,sms_send_app''. Powinien przyjmowaæ numer telefonu za pierwszy
     parametr i wiadomo¶æ za drugi. Ten ze strony http://ceti.pl/~miki/
     spe³nia podane wymagania.

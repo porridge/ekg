@@ -11,6 +11,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - wywalenie komendy ,,info'' (w)
 - poprawka command_set() i variable_find() (eileen/w)
 - poprawka zachowania ,,find'' (dawid@jarosz.one.pl/w)
+- poprawki dokumentacji, w miarê kompletny opis api dcc (w)
 
 // 2002-02-16
 
