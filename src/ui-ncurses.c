@@ -2137,9 +2137,6 @@ static void binding_add(const char *key, const char *action, int quiet)
 		binding_map[ch - 64] = list_add(&bindings, &b, sizeof(b));
 
 		correct = 1;
-
-		if (!quiet)
-			config_changed = 1;
 	}
 
 	if (!strncasecmp(key, "alt-", 4) && strlen(key) == 5) {
@@ -2163,11 +2160,13 @@ static void binding_add(const char *key, const char *action, int quiet)
 			binding_map_meta[tolower(ch)] = binding_map_meta[(unsigned char) ch];
 
 		correct = 1;
-		config_changed = 1;
 	}
 
-	if (!quiet)
+	if (!quiet) {
 		print((correct) ? "bind_seq_add" : "bind_seq_incorrect", b.key);
+		if (correct)
+			config_changed = 1;
+	}
 }
 
 /*
