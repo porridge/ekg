@@ -5866,8 +5866,9 @@ void command_init()
 	  "Je¶li osoba nale¿y do grupy %Tspied%n, to w miarê mo¿liwo¶ci jej stan jest "
 	  "¶ledzony na bie¿±co, jednak ze wzglêdu na ró¿ne zachowanie oryginalnego klienta, nale¿y co "
 	  "pewien czas dokonywaæ rêcznego sprawdzania czy nasza wiedza o stanie niewidocznym danej osoby "
-	  "jest wci±¿ aktualna. Nale¿y wiêc dodaæ timery, które np. co 60 sekund wywo³aj± polecnie "
-	  "%Tcheck_conn -u%n, a np. co kilka minut polecenie %Tcheck_conn -s%n (rzadziej potrzebne). "
+	  "jest wci±¿ aktualna. Nale¿y wiêc dodaæ timer, który np. co 60 sekund wywo³a polecnie "
+	  "%Tcheck_conn -u%n. Mo¿na te¿ okresowo, ale dosyæ rzadko (wysy³a duzo niepotrzebnych wiadomo¶ci), "
+	  "wykonywaæ polecenie %Tcheck_conn -s%n, aby poprawiæ skuteczno¶æ wykrywania niewidocznych. "
 	  "Pamiêtaj, podgl±danie innych osób jest nieetyczne...");
           
 	command_add
