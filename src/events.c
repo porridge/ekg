@@ -776,11 +776,6 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 		return;
 	}
 	
-	if (GG_S_D(status) && (u->status == status) && u->descr && descr && !strcmp(u->descr, descr)) {
-		xfree(descr);
-		return;
-	}
-
 	/* je¶li stan z opisem, a opisu brak, wpisz pusty tekst */
 	if (GG_S_D(status) && !descr)
 		descr = xstrdup("");
@@ -792,6 +787,11 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 			*tmp = ' ';
 
 		cp_to_iso(descr);
+	}
+
+	if (GG_S_D(status) && (u->status == status) && u->descr && !strcmp(u->descr, descr)) {
+		xfree(descr);
+		return;
 	}
 
 	prev_status = u->status;

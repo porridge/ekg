@@ -14,6 +14,7 @@ zg³osi³ b³±d.
 - poziom ignorowania ,,notify'' (sz)
 - mniej ra¿±cy w oczy theme dla nazwy grupy w li¶cie kontaktów (sz)
 - ,,stderr'' wêdruje do aktualnego okna (w/sz)
+- poprawka powtórzeñ zmiany stanu, gdy w opisie by³y polskie literki (sz)
 - zabezpieczenie przed zalewem po³±czeñ dcc (segfault/w)
 - libgadu: wype³nianie wszystkich pól file_info przy wysy³aniu pliku (Chile/w)
 
