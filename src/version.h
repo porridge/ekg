@@ -22,4 +22,6 @@
 
 #define VERSION "CVS"
 
+#define COMPILE_TIME	__DATE__ " " __TIME__
+
 #endif /* __VERSION_H */

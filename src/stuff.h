@@ -36,7 +36,7 @@
 #include "dynstuff.h"
 #include "ioctld.h"
 
-#define DEBUG_MAX_LINES	"50"	/* ile linii z debug zrzucaæ do pliku */
+#define DEBUG_MAX_LINES	50	/* ile linii z debug zrzucaæ do pliku */
 
 enum event_t {
 	EVENT_MSG = 1,
@@ -295,6 +295,8 @@ void changed_proxy(const char *var);
 void changed_theme(const char *var);
 void changed_uin(const char *var);
 void changed_xxx_reason(const char *var);
+
+const char *compile_time();
 
 struct conference *conference_add(const char *string, const char *nicklist, int quiet);
 int conference_remove(const char *name, int quiet);

@@ -11,6 +11,10 @@ zg³osi³ b³±d.
 - dope³nianie blokowanych w /unblock (sz)
 - poprawki dope³niania uinów nieznanych osób (perry/sz)
 - poprawki readline (sz)
+- ma³y g³upi bajer: version pokazuje czas kompilacji (sz)
+- usuniêcie pewnego niejasnego zachowania. przy ,,private on''
+  ignorowanie powodowa³o, ¿e ignorowana osoba przestawa³a widzieæ
+  nasz status - od tego jest jednak funkcja blokowania (pmb/sz)
 
 // 2003-01-24
 

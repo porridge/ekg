@@ -846,7 +846,7 @@ void theme_init()
 	format_add("unknown_command", "%! Nieznane polecenie: %T%1%n\n", 1);
 	format_add("welcome", "%> %TEKG-%1%n (Eksperymentalny Klient Gadu-Gadu)\n%> Program jest rozprowadzany na zasadach licencji GPL v2\n%> %RPrzed u¿yciem wci¶nij F1 lub wpisz ,,help''%n\n\n", 1);
 	format_add("welcome,speech", "witamy w e k g", 1);
-	format_add("ekg_version", "%) EKG - Eksperymentalny Klient Gadu-Gadu (%T%1%n)\n%) libgadu-%1 (protokó³ %2, klient %3)\n", 1);
+	format_add("ekg_version", "%) EKG - Eksperymentalny Klient Gadu-Gadu (%T%1%n)\n%) libgadu-%1 (protokó³ %2, klient %3)\n%) Skompilowano: %4\n", 1);
 	format_add("secure", "%Y(szyfrowane)%n ", 1);
 
 	/* mail */

@@ -80,7 +80,6 @@ static int get_char_from_pipe(struct gg_common *c);
 extern FILE *gg_debug_file;
 
 int old_stderr = 0;
-static int debug_max_lines;
 
 /*
  * usuwanie sesji GG_SESSION_USERx. wystarczy zwolniæ.
@@ -235,7 +234,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 					}
 				}
 			} else {
-				buffer_add(BUFFER_DEBUG, NULL, line, debug_max_lines);
+				buffer_add(BUFFER_DEBUG, NULL, line, DEBUG_MAX_LINES);
 				print_window("__debug", 0, "debug", line);
 			}
 
@@ -269,7 +268,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 					}
 				}
 			} else {
-				buffer_add(BUFFER_DEBUG, NULL, c->buf->str, debug_max_lines);
+				buffer_add(BUFFER_DEBUG, NULL, c->buf->str, DEBUG_MAX_LINES);
 				print_window("__debug", 0, "debug", c->buf->str);
 			}
 		}
@@ -963,7 +962,7 @@ int main(int argc, char **argv)
 				load_theme = optarg;
 				break;
 			case 'v':
-			    	printf("ekg-%s\nlibgadu-%s (headers %s, protocol 0x%.2x, client \"%s\")\n", VERSION, gg_libgadu_version(), GG_LIBGADU_VERSION, GG_DEFAULT_PROTOCOL_VERSION, GG_DEFAULT_CLIENT_VERSION);
+			    	printf("ekg-%s\nlibgadu-%s (headers %s, protocol 0x%.2x, client \"%s\")\nCompile time: %s\n", VERSION, gg_libgadu_version(), GG_LIBGADU_VERSION, GG_DEFAULT_PROTOCOL_VERSION, GG_DEFAULT_CLIENT_VERSION, compile_time());
 				return 0;
 #ifdef WITH_IOCTLD
 			case 'I':
@@ -1006,23 +1005,22 @@ int main(int argc, char **argv)
 
 	}
 
-	if (getenv("EKG_DEBUG")) {
-		gg_debug_file = fopen(getenv("EKG_DEBUG"), "w");
-		setbuf(gg_debug_file, NULL);
-	}
-
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
+		if (getenv("EKG_DEBUG")) {
+			gg_debug_file = fopen(getenv("EKG_DEBUG"), "w");
+			setbuf(gg_debug_file, NULL);
+		}
+
 		if (!gg_debug_file)
 			setup_debug();
+
 		gg_debug_level = 255;
 	} else
 		gg_debug_level = 0;
 #else
 	gg_debug_level = 0;
 #endif
-
-	debug_max_lines = atoi(DEBUG_MAX_LINES);
 
         ekg_pid = getpid();
 	mesg_startup = mesg_set(2);

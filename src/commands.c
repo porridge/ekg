@@ -1157,15 +1157,8 @@ COMMAND(cmd_ignore)
 		}
 		
 		if (!ignored_add(uin, IGNORE_ALL)) {
-			struct userlist *u = userlist_find(uin, NULL);
-
 			printq("ignored_added", params[0]);
-
-			if (u && sess) {
-				gg_remove_notify(sess, uin);
-				userlist_clear_status(uin);
-			}
-
+			userlist_clear_status(uin);
 			config_changed = 1;
 		}
 
@@ -2471,7 +2464,7 @@ COMMAND(cmd_version)
 	char buf[10];
 
 	snprintf(buf, sizeof(buf), "0x%.2x", GG_DEFAULT_PROTOCOL_VERSION);
-    	printq("ekg_version", VERSION, buf, GG_DEFAULT_CLIENT_VERSION);
+    	printq("ekg_version", VERSION, buf, GG_DEFAULT_CLIENT_VERSION, compile_time());
 
 	return 0;
 }
@@ -2623,7 +2616,7 @@ COMMAND(cmd_test_add)
 
 COMMAND(cmd_test_debug_dump)
 {
-	char *tmp = saprintf("Zapisa³em " DEBUG_MAX_LINES " linii z debug do pliku debug.%d", getpid());
+	char *tmp = saprintf("Zapisa³em debug do pliku debug.%d", getpid());
 
 	debug_write_crash();
 	printq("generic", tmp);
@@ -4459,7 +4452,7 @@ void command_init()
 	  "wy¶wietla tekst", "");
 	command_add
 	( "_debug_dump", "", cmd_test_debug_dump, 0, "",
-	  "zapisuje do pliku ostatnie " DEBUG_MAX_LINES " linii z debug", "");
+	  "zrzuca debug do pliku", "");
 	command_add
 	( "_vars", "", cmd_test_vars, 0, "",
 	  "wy¶wietla skrót zmiennych", "");
