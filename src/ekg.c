@@ -62,7 +62,7 @@
 #  include "simlite.h"
 #endif
 #ifndef HAVE_STRLCPY
-#   include "../compat/strlcpy.h"
+#  include "../compat/strlcpy.h"
 #endif
 
 #ifndef PATH_MAX

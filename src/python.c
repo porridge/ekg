@@ -1,8 +1,8 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2002 Wojtek Kaniewski <wojtekka@irc.pl>
- *                     Robert J. Wo¼ny <speedy@ziew.org>
+ *  (C) Copyright 2002-2003 Wojtek Kaniewski <wojtekka@irc.pl>
+ *                          Robert J. Wo¼ny <speedy@ziew.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -21,14 +21,14 @@
 #include <Python.h>
 #include <sys/types.h>
 #include <dirent.h>
-#include "xmalloc.h"
+#include "commands.h"
+#include "python.h"
 #include "stuff.h"
 #include "themes.h"
-#include "commands.h"
-#include "version.h"
-#include "vars.h"
-#include "python.h"
 #include "ui.h"
+#include "vars.h"
+#include "version.h"
+#include "xmalloc.h"
 #ifdef WITH_UI_NCURSES
 #  include <ncurses.h>
 #endif

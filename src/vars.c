@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -245,7 +245,7 @@ struct variable *variable_find(const char *name)
 	for (l = variables; l; l = l->next) {
 		struct variable *v = l->data;
 
-		if (v->name && v->name_hash == hash && !strcasecmp(v->name, name))
+		if (v->name_hash == hash && !strcasecmp(v->name, name))
 			return v;
 	}
 

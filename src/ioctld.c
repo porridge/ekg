@@ -1,9 +1,9 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2002  Pawe³ Maziarz <drg@infomex.pl>
- *			Wojtek Kaniewski <wojtekka@irc.pl>
- *			Robert J. Wozny <speedy@ziew.org>
+ *  (C) Copyright 2002 Pawe³ Maziarz <drg@infomex.pl>
+ *                     Wojtek Kaniewski <wojtekka@irc.pl>
+ *                     Robert J. Wo¼ny <speedy@ziew.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
