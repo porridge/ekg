@@ -411,3 +411,7 @@ int python_function(const char *function, const char *arg)
 	return -1;
 }
 
+int python_autorun()
+{
+	return -1;
+}

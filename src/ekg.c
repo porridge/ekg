@@ -974,6 +974,10 @@ int main(int argc, char **argv)
 
 	changed_dcc("dcc");
 
+#ifdef WITH_PYTHON
+	python_autorun();
+#endif
+
 	if (config_uin && config_password && auto_connect) {
 		print("connecting");
 		connecting = 1;
