@@ -3,7 +3,7 @@
 /*
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
- *                          Pawe³ Maziarz <drg@go2.pl>
+ *                          Pawe³ Maziarz <drg@infomex.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -42,6 +42,7 @@
 #include "themes.h"
 #include "vars.h"
 #include "userlist.h"
+#include "version.h"
 
 /*
  * g³upie readline z wersji na wersjê ma inne include'y, grr.
@@ -70,7 +71,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_status(), command_register(), command_test_watches(),
 	command_remind(), command_dcc(), command_query(), command_passwd(),
 	command_test_ping(), command_on(), command_change(),
-	command_test_fds(), command_test_segv();
+	command_test_fds(), command_test_segv(), command_version();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -119,6 +120,7 @@ struct command commands[] = {
 	{ "sms", "u?", command_sms, " <numer/alias> <tre¶æ>", "Wysy³a SMSa do podanej osoby", "" },
 	{ "status", "", command_status, "", "Wy¶wietla aktualny stan", "" },
 	{ "unignore", "i", command_ignore, " <numer/alias>", "Usuwa z listy ignorowanych osób", "" },
+	{ "version", "", command_version, "", "Wy¶wietla wersje programu", "" },
 	{ "_add", "?", command_test_add, "", "", "" },
 	{ "_fds", "", command_test_fds, "", "", "" },
 	{ "_msg", "u?", command_test_send, "", "", "" },
@@ -1667,6 +1669,13 @@ COMMAND(command_dcc)
 
 	my_printf("dcc_unknown_command", params[0]);
 	
+	return 0;
+}
+
+COMMAND(command_version) 
+{
+    	my_printf("ekg_version", VERSION);
+
 	return 0;
 }
 

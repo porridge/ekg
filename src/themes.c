@@ -743,5 +743,6 @@ void init_theme()
 	add_format("quick_list_avail", " %W%1%n", 1);
 	add_format("quick_list_busy", " %w%1%n", 1);
 	add_format("quick_list_invisible", " %K%1%n", 1);
+	add_format("ekg_version", "%)EKG - Eksperymentalny Klient Gadu-Gadu (%W%1%n)\n", 1);
 };
 

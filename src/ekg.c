@@ -399,6 +399,7 @@ int main(int argc, char **argv)
 "  -i, --invisible      po po³±czeniu zmienia stan na ,,niewidoczny''\n"
 "  -p, --private        po po³±czeniu zmienia stan na ,,tylko dla przyjació³''\n"
 "  -d, --debug          w³±cza wy¶wietlanie dodatkowych informacji\n"
+"  -v, --version        wy¶wietla wersje programu i wychodzi\n"
 IOCTL_HELP
 "\n", argv[0]);
 			return 0;	
@@ -426,6 +427,10 @@ IOCTL_HELP
 		}
 		if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "--theme"))
 			load_theme = argv[++i];
+		if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version")) {
+		    	printf("EKG - Eksperymentalny Klient Gadu-Gadu (%s)\n", VERSION);
+			return 0;
+		}
 #ifdef IOCTL
                 if (!strcmp(argv[i], "-I") || !strcmp(argv[i], "--ioctl-daemon-path")) {
                         if (argv[i+1]) {

@@ -53,7 +53,7 @@ przyk³ady:
 	on msg drg blink_leds 1, 4, 2, 7/20000, 7, 7, 7
 	on avail|away drg beeps_spk 1000, 900, 800; blink_leds 7, 5, 1
 	on drg clear
-	on * disconnect kupa msg dupa nic z tego; blink_leds 7
+	on disconnect kupa msg dupa nic z tego; blink_leds 7
 	on chat * blink_leds 4, 1, 2
 	on * * blink_leds $blah.led
 	on msg|chat * msg %1 nie ma mnie. zostaw wiadomo¶æ.
