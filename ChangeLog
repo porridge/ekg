@@ -9,6 +9,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - poprawki ,,last'' (joshua,szalik/d)
 - poprawka szyfrowania (w)
+- poprawka segfaulta w dope³nianiu plików (salvador/w)
 
 // 2002-11-18
 

@@ -1075,7 +1075,7 @@ void empty_generator(const char *text, int len)
 
 void file_generator(const char *text, int len)
 {
-	struct dirent **namelist;
+	struct dirent **namelist = NULL;
 	const char *dname, *bname;
 	char *dirc, *basec;
 	int count, i;
