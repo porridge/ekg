@@ -6,6 +6,10 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-03-26
+
+- poprawka wpisywania kolorów (pmb/w)
+
 // 2003-03-25
 
 - zmiana nazw ukrytych poleceñ z _add/_del na _addtab/_deltab (sz)

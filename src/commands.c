@@ -2035,80 +2035,95 @@ COMMAND(cmd_msg)
 	/* analizê tekstu zrobimy w osobnym bloku dla porz±dku */
 	{
 		unsigned char attr = 0, last_attr = 0;
-		const unsigned char *p = params[1];
-		int msglen = 0, i, len = strlen(msg);
+		const unsigned char *p = params[1], *end = p + strlen(p);
+		int msglen = 0;
+		unsigned char rgb[3], last_rgb[3];
 
-		for (i = 0; i < len; i++, p++) {
-			unsigned char rgb[3];
+		for (p = params[1]; p < end; ) {
+			if (*p == 18) {		/* Ctrl-R */
+				p++;
 
-			if (*p == 18) {
-				if (!(attr & GG_FONT_COLOR)) {
-					int num = atoi(p + 1);
+				if (xisdigit(*p)) {
+					int num = atoi(p);
 					
 					if (num < 0 || num > 15)
 						num = 0;
 
 					p++;
 
-					if (xisdigit(*p)) {
+					if (xisdigit(*p))
 						p++;
-						i++;
-					}
-
-					if (xisdigit(*p)) {
-						p++;
-						i++;
-					}
 
 					rgb[0] = default_color_map[num].r;
 					rgb[1] = default_color_map[num].g;
 					rgb[2] = default_color_map[num].b;
-				}
 
-				attr ^= GG_FONT_COLOR;
+					attr |= GG_FONT_COLOR;
+				} else
+					attr &= ~GG_FONT_COLOR;
+
+				continue;
 			}
 
-			if (*p == 2)
+			if (*p == 2) {		/* Ctrl-B */
 				attr ^= GG_FONT_BOLD;
-			if (*p == 20)
+				p++;
+				continue;
+			}
+
+			if (*p == 20) {		/* Ctrl-T */
 				attr ^= GG_FONT_ITALIC;
-			if (*p == 31)
+				p++;
+				continue;
+			}
+
+			if (*p == 31) {		/* Ctrl-_ */
 				attr ^= GG_FONT_UNDERLINE;
+				p++;
+				continue;
+			}
 
-			if (*p >= 32 || *p == 13 || *p == 10 || *p == 9) {
-				if (attr != last_attr) {
-					int color = 0;
+			if (*p < 32 && *p != 13 && *p != 10 && *p != 9) {
+				p++;
+				continue;
+			}
 
-					if (!format) {
-						format = xmalloc(3);
-						format[0] = 2;
-						formatlen = 3;
-					}
+			if (attr != last_attr || ((attr & GG_FONT_COLOR) && memcmp(last_rgb, rgb, sizeof(rgb)))) {
+				int color = 0;
 
-					if ((attr & GG_FONT_COLOR))
-						color = 1;
+				memcpy(last_rgb, rgb, sizeof(rgb));
 
-					if ((last_attr & GG_FONT_COLOR) && !(attr & GG_FONT_COLOR)) {
-						color = 1;
-						memset(rgb, 0, 3);
-					}
-
-					format = xrealloc(format, formatlen + ((color) ? 6 : 3));
-					format[formatlen] = (msglen & 255);
-					format[formatlen + 1] = ((msglen >> 8) & 255);
-					format[formatlen + 2] = attr | ((color) ? GG_FONT_COLOR : 0);
-
-					if (color) {
-						memcpy(format + formatlen + 3, rgb, 3);
-						formatlen += 6;
-					} else
-						formatlen += 3;
-
-					last_attr = attr;
+				if (!format) {
+					format = xmalloc(3);
+					format[0] = 2;
+					formatlen = 3;
 				}
 
-				msg[msglen++] = *p;
+				if ((attr & GG_FONT_COLOR))
+					color = 1;
+
+				if ((last_attr & GG_FONT_COLOR) && !(attr & GG_FONT_COLOR)) {
+					color = 1;
+					memset(rgb, 0, 3);
+				}
+
+				format = xrealloc(format, formatlen + ((color) ? 6 : 3));
+				format[formatlen] = (msglen & 255);
+				format[formatlen + 1] = ((msglen >> 8) & 255);
+				format[formatlen + 2] = attr | ((color) ? GG_FONT_COLOR : 0);
+
+				if (color) {
+					memcpy(format + formatlen + 3, rgb, 3);
+					formatlen += 6;
+				} else
+					formatlen += 3;
+
+				last_attr = attr;
 			}
+
+			msg[msglen++] = *p;
+			
+			p++;
 		}
 
 		msg[msglen] = 0;
