@@ -24,10 +24,11 @@ emoticons.txt	opis pliku z list± emotikonów.
 themes.txt	opis dotycz±cy zmiany wygl±du klienta. przydatny dla tych,
 		którzy lubi± bawiæ siê w kolorki.
 
-protocol.txt, dcc-protocol.txt
+protocol.html, dcc-protocol.txt, http.txt
 		opis protoko³u u¿ywanego przez klienty Gadu-Gadu przy
-		po³±czeniach z serwerem oraz protoko³u bezpo¶rednich
-		po³±czeñ miêdzy klientami. niestety nie s± kompletne.
+		po³±czeniach z serwerem, protoko³u bezpo¶rednich
+		po³±czeñ miêdzy klientami oraz us³ug HTTP. niestety nie
+		s± kompletne.
 
 api.txt		krótki opis api biblioteki libgadu. powinien wystarczyæ
 		na pocz±tek. reszty niestety trzeba szukaæ w ¼ród³ach
