@@ -1152,10 +1152,22 @@ int find_in_uins(int uin_count, uin_t *uins, uin_t uin)
  */
 int valid_nick(const char *nick)
 {
-	if (nick && (nick[0] == '@' || nick[0] == '#' || strchr(nick, ',') || !strcmp(nick, "(null)")))
+	int i;
+	const char *wrong[] = { "(null)", "__debug", "__status",
+				 "__current", NULL };
+
+	if (!nick)
 		return 0;
-	else
-		return 1;
+
+	for (i = 0; wrong[i]; i++) {
+		if (!strcmp(nick, wrong[i]))
+			return 0;
+	}
+
+	if (nick[0] == '@' || nick[0] == '#' || strchr(nick, ','))
+		return 0;
+
+	return 1;
 }
 
 /*

@@ -216,7 +216,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 				else
 					print_window(c->target, 0, "exec", line, itoa(c->id));
 			} else
-				print_window("debug", 0, "debug", line);
+				print_window("__debug", 0, "debug", line);
 
 			new = string_init(c->buf->str + index + 1);
 			string_free(c->buf, 1);
@@ -233,7 +233,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 				else
 					print_window(c->target, 0, "exec", c->buf->str, itoa(c->id));
 			} else
-				print_window("debug", 0, "debug", c->buf->str);
+				print_window("__debug", 0, "debug", c->buf->str);
 		}
 		close(c->fd);
 		xfree(c->target);
