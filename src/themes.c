@@ -1049,7 +1049,7 @@ void theme_init()
 	format_add("passwd_timeout", "%! Przekroczono limit czasu operacji zmiany has³a\n", 1);
 	
 	/* zmiana informacji w katalogu publicznym */
-	format_add("change_not_enough_params", "%! Polecenie wymaga podania %Twszystkich%n parametrów\n", 1);
+	format_add("change_not_enough_params", "%! Nie podano wszystkich wymaganych parametrów\n", 1);
 	format_add("change", "%> Informacje w katalogu publicznym zosta³y zmienione\n", 1);
 	format_add("change_failed", "%! B³±d podczas zmiany informacji w katalogu publicznym: %1\n", 1);
 	format_add("change_timeout", "%! Przekroczono limit czasu operacji zmiany katalogu publicznego\n", 1);

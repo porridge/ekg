@@ -816,12 +816,20 @@ COMMAND(cmd_change)
 			r->gender = GG_GENDER_MALE;
 	}
 
-	if (!r->first_name || !r->last_name || !r->nickname || !r->email || !r->city || !r->born) {
-		print("change_not_enough_params");
-		gg_change_info_request_free(r);
-		array_free(argv);
-		return;
-	}
+	if (!r->first_name)
+		r->first_name = xstrdup("");
+
+	if (!r->last_name)
+		r->last_name = xstrdup("");
+
+	if (!r->nickname)
+		r->nickname = xstrdup("");
+
+	if (!r->email)
+		r->email = xstrdup("");
+
+	if (!r->city)
+		r->city = xstrdup("");
 
 	if ((h = gg_change_info(config_uin, config_password, r, 1)))
 		list_add(&watches, h, 0);
@@ -3782,7 +3790,8 @@ void command_init()
 	  "  -F, --female                 kobieta\n"
 	  "  -M, --male                   mê¿czyzna\n"
 	  "\n"
-	  "Nale¿y podaæ %Twszystkie%n opcje, z wyj±tkiem -F lub -M.");
+	  "Je¶li których z parametrów nie zostanie podany, jego warto¶æ "
+	  "zostanie wyczyczona w katalogu publicznym.");
 	  
 	command_add
 	( "chat", "u?", cmd_msg, 0,

@@ -1769,15 +1769,28 @@ void command_generator(const char *text, int len)
 	}
 }
 
+/*
+ * XXX nie obs³uguje eskejpowania znaków, dope³nia tylko pierwszy wyraz.
+ */
 void known_uin_generator(const char *text, int len)
 {
+	int escaped = 0;
 	list_t l;
 
+	if (text[0] == '"') {
+		escaped = 1;
+		text++;
+		len--;
+
+		if (len > 0 && text[len - 1] == '"')
+			len--;
+	}
+       	       
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
 
 		if (u->display && !strncasecmp(text, u->display, len))
-			array_add(&completions, xstrdup(u->display));
+			array_add(&completions, (escaped || strchr(u->display, ' ')) ? saprintf("\"%s\"", u->display) : xstrdup(u->display));
 	}
 
 	for (l = conferences; l; l = l->next) {

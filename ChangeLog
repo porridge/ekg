@@ -10,10 +10,14 @@ zg³osi³ b³±d.
 
 - poprawione zachowanie zmiennych ui-ncurses przy w³±czonym ui-readline
   (kbns/w)
+- prowizoryczne dope³nianie nicków ze spacj± w ¶rodku. dzia³a tylko w
+  obrêbie pierwszego wyrazu (pirat/w)
 - kosmetyka /list, nie wy¶wietla w³asnego IP przy braku po³aczenia (sz)
 - kosmetyka /conference, nazwa przy tworzeniu konferencji jest opcjonalna,
   mo¿na usuwaæ od razu wszystkie konferencje (sz)
 - poprawka mo¿liwego segfaulta przy /timer -d * (sz)
+- libgadu: poprawione wysy³anie roku urodzenia w gg_change_info() (Chilek/w)
+- /change nie wymaga ju¿ wszystkich parametrów (w)
 
 // 2003-01-13
 
