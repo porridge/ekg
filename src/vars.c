@@ -674,7 +674,7 @@ int variable_undigest(const char *digest)
 				p += len + 1;
 			}
 
-			gg_debug(GG_DEBUG_MISC, "// setting variable %s = \"%s\"\n", v->name, val);
+			gg_debug(GG_DEBUG_MISC, "// setting variable %s = \"%s\"\n", v->name, ((val) ? val : "(null)"));
 
 			variable_set(v->name, val, 0);
 			
