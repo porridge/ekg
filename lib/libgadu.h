@@ -1,10 +1,10 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>,
- *                          Robert J. Wo¼ny <speedy@ziew.org>,
- *                          Arkadiusz Mi¶kiewicz <misiek@pld.org.pl>,
- *                          Tomasz Chiliñski <chilek@chilan.com>,
+ *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *                          Robert J. Wo¼ny <speedy@ziew.org>
+ *                          Arkadiusz Mi¶kiewicz <misiek@pld.org.pl>
+ *                          Tomasz Chiliñski <chilek@chilan.com>
  *                          Piotr Wysocki <wysek@linux.bydg.org>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *

@@ -93,7 +93,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 	struct conference *c = NULL;
 
 	/* tworzymy mapê formatowanego tekstu. dla ka¿dego znaku wiadomo¶ci
-	 * zapisujemy jeden znak koloru z docs/themes.txt lub 0 je¶li nie
+	 * zapisujemy jeden znak koloru z docs/themes.txt lub \0 je¶li nie
 	 * trzeba niczego zmieniaæ. */
 
 	if (e->event.msg.formats && e->event.msg.formats_length) {
