@@ -169,7 +169,8 @@ contacts
 
 	okre¶la, czy okienko z list± obecnych ma byæ wy¶wietlone z prawej
 	strony ekranu. je¶li jest równe 2, informacje o zmianie stanu nie
-	s± wy¶wietlane. dzia³a tylko w interfejsie ncurses.
+	s± wy¶wietlane, ignoruj±c warto¶æ zmiennej ,,display_notify''.
+	dzia³a tylko w interfejsie ncurses.
 
 contacts_descr
 	typ: bool
@@ -250,7 +251,9 @@ display_notify
 
 	warto¶æ 0 powoduje ignorowanie zmian stanu znajomych, warto¶æ
 	1 powoduje wy¶wietlanie wszystkich zmian, warto¶æ 2 wy¶wietla
-	tylko zmiany z niedostêpnego na dostêpny i na odwrót.
+	tylko zmiany z niedostêpnego na dostêpny i na odwrót. w interfejse
+	ncurses wiêkszy priorytet ma zmienna ,,contacts'', która przy
+	warto¶ci 2 ukrywa zmiany stanu.
 
 display_pl_chars
 	typ: bool

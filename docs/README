@@ -132,7 +132,7 @@ KLAWIATURA
 	Ctrl-Enter		przej¶cie do trybu wielolinijkowego
 	Ctrl-P			poprzednie okno
         Ctrl-N			kolejne okno
-	F3			w³±cza lub wy³±cza listê kontaktów z prawej
+	F3			w³±cza lub wy³±cza listê kontaktów [1]
 
     Po wej¶ciu do trybu wielolinijkowego poruszamy siê za pomoc± kursorów
     i zatwierdzamy ponownym wci¶niêciem Ctrl-Enter. By anulowaæ wciskamy
@@ -141,6 +141,11 @@ KLAWIATURA
 
     Dodatkowo, okre¶lonym kombinacjom klawiszy mo¿na przypisaæ ró¿ne
     komendy za pomoc± polecenia ,,bind''.
+
+    [1] Klawisz F3 zmienia warto¶æ zmiennej ,,contacts''. Je¶li warto¶æ tej
+        zmiennej by³a równa 0, wci¶niêcie klawisza zmienia jej warto¶æ na 2.
+	Je¶li by³a równa 1, kolejne wci¶niêcia F3 bêd± zmienia³y warto¶æ
+	z 1 na 0 i z 0 na 1. 
 
 GDZIE SZUKAÆ POMOCY
 
