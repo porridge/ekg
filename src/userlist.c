@@ -336,6 +336,7 @@ int userlist_add(uin_t uin, char *display)
 	u.mobile = NULL;
 	u.groups = NULL;
 	u.display = strdup(display);
+	u.descr = NULL;
 
 	list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);
 	

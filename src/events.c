@@ -327,7 +327,7 @@ void handle_status(struct gg_event *e)
 		{
 		    	check_event(EVENT_AWAY, e->event.status.uin);
 			my_printf("status_busy", format_user(e->event.status.uin));
-		} else if (e->event.status.status == GG_STATUS_BUSY_DESCR && u->status != GG_STATUS_BUSY_DESCR) 
+		} else if (e->event.status.status == GG_STATUS_BUSY_DESCR)
 		{
 		    	check_event(EVENT_AWAY, e->event.status.uin);
 			u->descr = strdup(e->event.status.descr);
@@ -336,7 +336,7 @@ void handle_status(struct gg_event *e)
 		{
 		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin);
 			my_printf("status_not_avail", format_user(e->event.status.uin));
-		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL_DESCR && u->status != GG_STATUS_NOT_AVAIL_DESCR)
+		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL_DESCR)
 		{
 		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin);
 			u->descr = strdup(e->event.status.descr);
