@@ -5457,7 +5457,7 @@ COMMAND(cmd_queue)
 
 	if (!count) {
 		if (uin) {
-			printq("queue_empty_uin");
+			printq("queue_empty_uin", format_user(uin));
 			return -1;
 		} else
 			printq("queue_empty");

@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2004-12-01
+
+- poprawienie segfaulta przy /queue -u user (zigi/g)
+
 // 2004-11-30
 
 - drobna poprawka w /help unregister (zigi/g)
