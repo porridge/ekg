@@ -62,6 +62,9 @@
 #ifdef HAVE_OPENSSL
 #  include "simlite.h"
 #endif
+#ifndef HAVE_STRLCAT
+#  include "../compat/strlcat.h"
+#endif
 #ifndef HAVE_STRLCPY
 #  include "../compat/strlcpy.h"
 #endif

@@ -68,6 +68,12 @@
 #ifdef WITH_PYTHON
 #  include "python.h"
 #endif
+#ifndef HAVE_STRLCAT
+#  include "../compat/strlcat.h"
+#endif
+#ifndef HAVE_STRLCPY
+#  include "../compat/strlcpy.h"
+#endif
 #include "stuff.h"
 #include "themes.h"
 #include "ui.h"
