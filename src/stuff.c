@@ -1103,7 +1103,7 @@ int config_read(const char *filename, const char *var)
 		return -1;
 
 	if (stat(filename, &st) || !S_ISREG(st.st_mode)) {
-		errno = EINVAL;
+		errno = EISDIR;	/* XXX */
 		fclose(f);
 		return -1;
 	}
@@ -1231,6 +1231,9 @@ int config_read(const char *filename, const char *var)
 				array_free(p);
                 } else {
 			int wrong = variable_set(buf, foo, 1);
+
+			if (wrong)
+				gg_debug(GG_DEBUG_MISC, "\tunknown variable %s %s\n", buf, foo);
 
 			if (wrong && !home && !in_autoexec && !var) {
 				xfree(buf);

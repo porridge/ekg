@@ -3154,8 +3154,13 @@ COMMAND(cmd_reload)
 
 	if (config_read(filename, NULL)) {
 		printq("error_reading_config", strerror(errno));
+		filename = NULL;
 		res = -1;
+		if (errno != EINVAL)
+			return res;
 	}
+
+	printq("config_read_success", ((filename) ? filename : prepare_path("config", 0)));
 
 	config_changed = 0;
 	update_status();
@@ -3624,9 +3629,14 @@ COMMAND(cmd_timer)
 			return -1;
 		}
 
-		/* podano nazwê timera/at, a wiêc czas jest nastêpnym parametrem */
-		if (isalpha_pl_PL(*p) && strcmp(p, "(null)")) {
+		if (isalpha_pl_PL(*p) || isdigit(params[2][0]) || !strncmp(params[2], "*/", 2)) {
 			t_name = xstrdup(p);
+
+			if (!strcmp(t_name, "(null)")) {
+				printq("invalid_params", name);
+				res = -1;
+				goto cleanup;
+			}
 
 			for (l = timers; l; l = l->next) {
 				t = l->data;
