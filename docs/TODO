@@ -19,6 +19,7 @@ klient:
 - mo¿liwo¶æ bindowania akcji klienta (end-of-line, yank-buffer itp.)
   nie tylko komend,
 - taby w stderr,
+- auto_back wracaj±ce z away tylko, je¶li by³ z auto_awaya (Tohver)
 
 klient (ncurses):
 - reakcja na zmianê rozmiaru terminala,
