@@ -758,6 +758,8 @@ COMMAND(cmd_help)
 
 	print("help_footer");
 
+	binding_help(0, 0);
+
 	return 0;
 }
 

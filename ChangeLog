@@ -22,6 +22,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - rewrite du¿ej czê¶ci kodu okienek. ju¿ wolê posiedzieæ, zrozumieæ co
   robi która funkcja, ni¿ czytaæ codziennie na ekg-users kolejne porcje
   core'ów. przy okazji Ctrl-D w okienku zamyka je. (w)
+- informacja o ulotce jest ju¿ wy¶wietlana w /help (FIG/w)
 
 // 2002-08-06
 
