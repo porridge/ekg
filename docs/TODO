@@ -9,6 +9,8 @@ rozwi±zanie.
   - sniffn±æ rejestracjê konta, zmieni³a siê (Carol)
 
 * klient:
+  - b³±d przy query maj±cym utworzyæ konferencjê, np:
+    /query "Imiê Nazwisko",nick wy¶le komunikat zamiast tworzyæ konferncjê (del)
   - informcja o opisie w /find (scooty/w)
   - zawijanie linijek w wielolinijkowym (?)
   - wykrywanie niewidocznych jako opcja (wielu)
