@@ -1266,7 +1266,7 @@ static int window_find_query(const char *nick)
         for (l = windows; l; l = l->next) {
                 struct window *w = l->data;
 
-		if (w->query_nick && !strcmp(w->query_nick, nick))
+		if (w->query_nick && !strcasecmp(w->query_nick, nick))
 			return w->id;
         }
 
