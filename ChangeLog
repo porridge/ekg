@@ -13,7 +13,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - instalacja libgadu.h, polskich manów, ekgsearch (w)
 - przepisanie readline.m4 od zera. teraz siê zacznie narzekanie na mnie
   na ekg-users (w)
-- dodanie opcji --all i --debug, usuniêcie opcji --raw (wysek)
+- dodanie opcji --all i --debug, usuniêcie opcji --raw w ekgsearch (wysek)
 
 // 2002-07-11
 
