@@ -86,6 +86,9 @@
 #include "version.h"
 #include "xmalloc.h"
 
+/* nadpisujemy funkcjê strncasecmp() odpowiednikiem z obs³ug± polskich znaków */
+#define strncasecmp(x...) strncasecmp_pl(x)
+
 static void ui_ncurses_loop();
 static void ui_ncurses_print(const char *target, int separate, const char *line);
 static void ui_ncurses_beep();
@@ -238,14 +241,68 @@ static char *aspell_line;
 #endif
 
 
-/* 
- * zamienia du¿e znaki na ma³e
+/*
+ * zamienia podany znak na ma³y je¶li to mo¿liwe
+ * obs³uguje polskie znaki
  */
- 
-static void str_tolower(char *text) {
-	int i;
-	for(i=0; i <= strlen(text); i++)
-    	    text[i] = tolower(text[i]);
+static int tolower_pl(const unsigned char c) {
+        switch(c) {
+                case 161: // ¡
+                        return 177;
+                case 198: // Æ
+                        return 230;
+                case 202: // Ê
+                        return 234;
+                case 163: // £
+                        return 179;
+                case 209: // Ñ
+                        return 241;
+                case 211: // Ó
+                        return 243;
+                case 166: // ¦
+                        return 182;
+                case 175: // ¯
+                        return 191;
+                case 172: // ¬
+                        return 188;
+                default: //reszta
+                        return tolower(c);
+        }
+}
+
+/*
+ * porównuje dwa ci±gi o okre¶lonej przez n d³ugo¶ci
+ * dzia³a analogicznie do strncasecmp()
+ * obs³uguje polskie znaki
+ */
+
+int strncasecmp_pl(const char *s1, const char *s2, size_t n) {
+        int i;
+
+        if(!strcmp(s1, "") || !strcmp(s2, "")) 
+                return -4;
+        if(strlen(s1) < n || strlen(s2) < n)
+                return -3;
+        for(i=0; i <= strlen(s1) && i < n; i++)
+                if(tolower_pl(s1[i]) != tolower_pl(s2[i]))
+                        return -1;
+        return 0;
+}
+
+/*
+ * zamienia wszystkie znaki ci±gu na ma³e
+ * zwraca ci±g po zmianach
+ */
+static char *str_tolower(const char *text) {
+        int i;
+        char *tmp;
+
+        tmp = xmalloc(strlen(text) + 1);
+
+        for(i=0; i <= strlen(text); i++)
+                tmp[i] = tolower_pl(text[i]);
+        tmp[i] = '\0';
+        return tmp;
 }
 
 
@@ -281,7 +338,7 @@ int contacts_size()
  */
 int isalpha_pl(unsigned char c)
 {
-/*    gg_debug(GG_DEBUG_MISC, "c: %d\n", c); */
+/*  gg_debug(GG_DEBUG_MISC, "c: %d\n", c); */
     if(isalpha(c)) // normalne znaki
         return 1;
     else if(c == 177 || c == 230 || c == 234 || c == 179 || c == 241 || c == 243 || c == 182 || c == 191 || c == 188) /* polskie literki */
@@ -2898,8 +2955,7 @@ static void complete(int *line_start, int *line_index)
 			line[0] = '\0';		
 			for(i = 0; i < array_count(words); i++) {
 				if(i == word) {
-					str_tolower(completions[0]);
-					strncat(line, completions[0], common);
+					strncat(line, str_tolower(completions[0]), common);
 					strcat(line, "");
 					*line_index = strlen(line);
 				}
