@@ -18,6 +18,7 @@ klient:
 - wielolinijkowe komendy do historii.
 - lastlog, awaylog.
 - tryb nieinteraktywny przez jakie¶ --exec albo co¶ takiego.
+- escapowanie tre¶ci mesgów.
 
 
 $Id$

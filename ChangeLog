@@ -15,6 +15,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - porz±dki w Makefile'ach i configure.in (w)
 - update faq (w)
 - zmiana w api, parametry gg_login() (w)
+- poprawka _msg (seba/w)
+- poprawka kodu proxy, ju¿ dzia³a jak trzeba (w)
 
 // 2002-04-16
 

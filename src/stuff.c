@@ -1770,7 +1770,7 @@ void changed_proxy(char *var)
 		gg_proxy_host = malloc(len + 1);
 		if (gg_proxy_host) {
 			strncpy(gg_proxy_host, config_proxy, len);
-			gg_proxy_host[len - 1] = 0;
+			gg_proxy_host[len] = 0;
 		}
 	} else {
 		free(gg_proxy_host);

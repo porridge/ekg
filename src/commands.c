@@ -1668,7 +1668,10 @@ COMMAND(command_test_ping)
 COMMAND(command_test_send)
 {
 	struct gg_event *e = malloc(sizeof(struct gg_event));
-	
+
+	if (!params[0] || !params[1])
+		return 0;
+
 	e->type = GG_EVENT_MSG;
 	e->event.msg.sender = get_uin(params[0]);
 	e->event.msg.message = strdup(params[1]);
