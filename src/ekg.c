@@ -259,7 +259,7 @@ void ekg_wait_for_key()
 
 			gettimeofday(&tv, &tz);
 
-			if (tv.tv_sec >= t->ends.tv_sec && tv.tv_usec >= t->ends.tv_usec) {
+			if (tv.tv_sec > t->ends.tv_sec || (tv.tv_sec == t->ends.tv_sec && tv.tv_usec >= t->ends.tv_usec)) {
 				switch (t->type) {
 					case TIMER_SCRIPT:
 #ifdef WITH_PYTHON
