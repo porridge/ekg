@@ -1,8 +1,9 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
+ *                          Adam Wysocki <gophi@ekg.apcoh.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -569,6 +570,8 @@ char **array_make_quoted(const char *string, const char *sep, int max, int trim,
 					break;
 
 			}
+
+			len++;
 
 			if ((token = xcalloc(1, len + 1))) {
 				char *r = token;
