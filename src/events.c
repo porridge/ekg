@@ -1547,7 +1547,7 @@ void handle_token(struct gg_http *h)
 			int i;
 
 			for (i = 0; i < j.output_height; i++)
-				print("token_body", token[i * (j.output_width + 1)]);
+				print("token_body", &token[i * (j.output_width + 1)]);
 		} else {
 			print("token_ocr", tmp);
 			xfree(tmp);
