@@ -179,6 +179,7 @@ static int lines_index = 0;		/* w której linii jeste¶my? */
 static char **completions = NULL;	/* lista dope³nieñ */
 static list_t windows = NULL;		/* lista okien */
 static struct window *window_current;	/* wska¼nik na aktualne okno */
+static int window_last_id = -1;		/* numer ostatnio wybranego okna */
 static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 static int ui_ncurses_debug = 0;	/* debugowanie */
 
@@ -927,6 +928,8 @@ static void window_switch(int id)
 
 		if (id != w->id || w->floating)
 			continue;
+
+		window_last_id = w->id;
 
 		window_current = w;
 
@@ -4089,6 +4092,11 @@ static int ui_ncurses_event(const char *event, ...)
 				window_switch(atoi(p2));
 				goto cleanup;
 			}			
+
+			if (!strcasecmp(p1, "last")) {
+				window_switch(window_last_id);
+				goto cleanup;
+			}
 			
 			if (!strcasecmp(p1, "kill")) {
 				struct window *w = window_current;

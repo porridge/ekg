@@ -23,14 +23,15 @@
 
 #include "config.h"
 
-#include <history.h>
-#include <readline.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include <history.h>
+#include <readline.h>
 
 #include "commands.h"
 #include "mail.h"
