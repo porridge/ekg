@@ -188,6 +188,7 @@ int config_keep_reason;
 int config_enter_scrolls;
 char *config_audio_device;
 char *config_speech_app;
+int config_encryption;
 
 char *home_dir;
 char *config_dir;

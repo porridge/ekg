@@ -41,6 +41,6 @@ void handle_userlist(struct gg_http *s);
 
 void handle_disconnect(struct gg_event *e);
 
-void print_message(struct gg_event *e, struct userlist *u, int chat);
+void print_message(struct gg_event *e, struct userlist *u, int chat, int secure);
 
 #endif /* __EVENTS_H */

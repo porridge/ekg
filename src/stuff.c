@@ -146,6 +146,7 @@ int config_enter_scrolls = 0;
 int server_index = 0;
 char *config_audio_device = NULL;
 char *config_speech_app = NULL;
+int config_encryption = 0;
 
 static struct {
 	int event;

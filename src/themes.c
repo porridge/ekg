@@ -722,6 +722,7 @@ void theme_init()
 	format_add("welcome,speech", "witamy w e k g", 1);
 	format_add("ekg_version", "%) EKG - Eksperymentalny Klient Gadu-Gadu (%T%1%n)\n%) libgadu-%1 (protokó³ %2, klient %3)\n", 1);
 	format_add("group_empty", "%! Grupa %T%1%n jest pusta\n", 1);
+	format_add("secure", "%Y(szyfrowane)%n ", 1);
 
 	/* add, del */
 	format_add("user_added", "%> Dopisano %T%1%n do listy kontaktów\n", 1);
@@ -779,8 +780,8 @@ void theme_init()
 	format_add("error_saving", "%! Podczas zapisu ustawieñ wyst±pi³ b³±d\n", 1);
 
 	/* przychodz±ce wiadomo¶ci */
-	format_add("message_header", "%g.-- %n%1 %c(%C%#%c/%2)%n %g--- -- -%n\n", 1);
-	format_add("message_conference_header", "%g.-- %g[%T%3%g] -- %n%1 %c(%C%#%c/%2)%n %g--- -- -%n\n", 1);
+	format_add("message_header", "%g.-- %n%1 %c(%C%#%c/%2) %4%g--- -- -%n\n", 1);
+	format_add("message_conference_header", "%g.-- %g[%T%3%g] -- %n%1 %c(%C%#%c/%2) %4%g--- -- -%n\n", 1);
 	format_add("message_footer", "%g`----- ---- --- -- -%n\n", 1);
 	format_add("message_line", "%g|%n %1\n", 1);
 	format_add("message_line_width", "-8", 1);
@@ -791,8 +792,8 @@ void theme_init()
 	format_add("message_line,speech", "%1\n", 1);
 	format_add("message_footer,speech", ".", 1);
 
-	format_add("chat_header", "%c.-- %n%1 %c(%C%#%c/%2)%n %c--- -- -%n\n", 1);
-	format_add("chat_conference_header", "%c.-- %c[%T%3%c] -- %n%1 %c(%C%#%c/%2)%n %c--- -- -%n\n", 1);
+	format_add("chat_header", "%c.-- %n%1 %c(%C%#%c/%2) %4%c--- -- -%n\n", 1);
+	format_add("chat_conference_header", "%c.-- %c[%T%3%c] -- %n%1 %c(%C%#%c/%2) %4%c--- -- -%n\n", 1);
 	format_add("chat_footer", "%c`----- ---- --- -- -%n\n", 1);
 	format_add("chat_line", "%c|%n %1\n", 1);
 	format_add("chat_line_width", "-8", 1);
@@ -803,8 +804,8 @@ void theme_init()
 	format_add("chat_line,speech", "%1\n", 1);
 	format_add("chat_footer,speech", ".", 1);
 
-	format_add("sent_header", "%b.-- %n%1 %c(%C%#%c)%n %b--- -- -%n\n", 1);
-	format_add("sent_conference_header", "%b.-- %b[%T%3%b] -- %n%1 %c(%C%#%c)%n %b--- -- -%n\n", 1);
+	format_add("sent_header", "%b.-- %n%1 %c(%C%#%c) %4%b--- -- -%n\n", 1);
+	format_add("sent_conference_header", "%b.-- %b[%T%3%b] -- %4%n%1 %c(%C%#%c)%n %b--- -- -%n\n", 1);
 	format_add("sent_footer", "%b`----- ---- --- -- -%n\n", 1);
 	format_add("sent_line", "%b|%n %1\n", 1);
 	format_add("sent_line_width", "-8", 1);

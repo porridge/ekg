@@ -21,13 +21,10 @@
 #define __SIM_SIM_H__
 
 #include <openssl/rsa.h>
+#include <stdint.h>
 
 #define PUBLIC 0
 #define PRIVATE 1
-
-typedef unsigned char uint8;
-typedef unsigned short int uint16;
-typedef unsigned int uint32;
 
 /* Secure Internet Messaging */
 
@@ -62,8 +59,8 @@ typedef struct SIM_Message_t {
 
     unsigned char *init;	/* plays role of IV (len = SIM_SYMMETRIC_BLOCKSIZE) */
 
-    uint16 magicnumber;
-    uint8 flags;
+    uint16_t magicnumber;
+    uint8_t flags;
 
     char *message;
 } SIM_Message;
@@ -79,7 +76,7 @@ if (flags & SIM_SIGNED) {
  */
 
 typedef struct SIM_KC_s {
-    uint32 uin;
+    uint32_t uin;
     unsigned char *key;		/* symmetric key (len = SIM_SYMMETRIC_KEYSIZE) */
     unsigned char *rkey;	/* rsa encrypted symmetric key (len = SIM_RSA_KEYSIZE) */
     RSA *pubkey;
@@ -173,7 +170,7 @@ int SIM_Symmetric_Decrypt(unsigned char *inbuf, unsigned char *outbuf,
  * (Message) Transform UIN to path & file name
  */
 
-int SIM_Message_uin2keyfile(uint32 uin, char *file);
+int SIM_Message_uin2keyfile(uint32_t uin, char *file);
 
 /*
  * (Message) Build path & file name of private key
@@ -186,14 +183,14 @@ int SIM_Message_private2keyfile(char *file);
  */
 
 int SIM_Message_Encrypt(unsigned char *in, unsigned char *out, int inlen,
-			uint32 uin);
+			uint32_t uin);
 
 /*
  * (Message) Decrypt message
  */
 
 int SIM_Message_Decrypt(unsigned char *in, unsigned char *out, int inlen,
-                        uint32 uin);
+                        uint32_t uin);
 
 /*
  * (KeyCache) create item
@@ -235,12 +232,12 @@ int SIM_KC_Add(SIM_KC * a);
  * (KeyCache) find item by 'uin'
  */
 
-SIM_KC *SIM_KC_Find(uint32 uin);
+SIM_KC *SIM_KC_Find(uint32_t uin);
 
 /*
  * (KeyCache) find item by 'uin' and delete it
  */
 
-int SIM_KC_Delete(uint32 uin);
+int SIM_KC_Delete(uint32_t uin);
 
 #endif				/* #ifndef __SIM_SIM_H__ */

@@ -162,6 +162,15 @@ emoticons
 
 	uruchamia rozwijanie emotikonów w zdefiniowane teksty. wiêcej
 	szczegó³ów w pliku docs/emoticons.txt
+
+encryption
+	typ: liczba
+	domy¶lna warto¶æ: 0
+
+	wybiera rodzaj szyfrowania wiadomo¶ci. je¶li w systemie jest
+	zainstalowana biblioteka OpenSSL mo¿liwe jest u¿ywanie SIM
+	(warto¶æ 1). opis tego szyfrowania znajduje siê na stronie
+	http://gg.wha.la/ggcrypt/.
 	
 enter_scrolls
 	typ: bool

@@ -1,6 +1,6 @@
 /*
  *
- *    (C) Copyright 2002 Michal J. Kubski
+ *    (C) Copyright 2002 Michal J. Kubski, Wojtek Kaniewski
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License Version
@@ -15,6 +15,12 @@
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
+ *
+ *  2002-10-17 wojtekka:
+ *   - usuniêcie ostrze¿eñ o niezainicjowanych zmiennych,
+ *   - poprawienei SIM_Message_Decrypt, ¿eby informowa³o o nieszyfrowanej
+ *     wiadomo¶ci zwracan± warto¶ci±, nie doklejanym tekstem.
+ *  
  */
 
 #include <stdio.h>
@@ -153,7 +159,7 @@ int SIM_RSA_Decrypt(unsigned char *inbuf, unsigned char *outbuf, int inlen,
 RSA *SIM_RSA_ReadKey(const char *file, int type)
 {
     FILE *fp = fopen(file, "r");
-    RSA *rsa;
+    RSA *rsa = NULL;
 
     if (!fp)
 	return NULL;
@@ -185,7 +191,7 @@ RSA *SIM_RSA_ReadKey(const char *file, int type)
 int SIM_RSA_WriteKey(RSA * rsa, const char *file, int type)
 {
     FILE *fp = fopen(file, "w");
-    int ret;
+    int ret = 0;
 
     if (!fp)
 	return 1;
@@ -355,7 +361,7 @@ RSA *SIM_Message_PrivateKey;
  *
  */
 
-int SIM_Message_uin2keyfile(uint32 uin, char *file)
+int SIM_Message_uin2keyfile(uint32_t uin, char *file)
 {
     return sprintf(file, "%s%d.pem", SIM_Key_Path, uin);
 }
@@ -378,7 +384,7 @@ int SIM_Message_private2keyfile(char *file)
  */
 
 int SIM_Message_Encrypt(unsigned char *in, unsigned char *out, int inlen,
-			uint32 uin)
+			uint32_t uin)
 {
     SIM_Message msg;
     char *fname;
@@ -474,14 +480,14 @@ int SIM_Message_Encrypt(unsigned char *in, unsigned char *out, int inlen,
  */
 
 int SIM_Message_Decrypt(unsigned char *in, unsigned char *out, int inlen,
-                        uint32 uin)
+                        uint32_t uin)
 {
     SIM_Message msg;
     SIM_KC *item;
     
     char *fname;
     unsigned char *iv;
-    int klen, a, len, x, y;
+    int klen, a, len, x = 0, y;
 
     unsigned char *buf;
     unsigned char *buf2;
@@ -492,15 +498,12 @@ int SIM_Message_Decrypt(unsigned char *in, unsigned char *out, int inlen,
 	SIM_Message_private2keyfile(fname);
 	SIM_Message_PrivateKey = SIM_RSA_ReadKey(fname, PRIVATE);
 
-	if (!SIM_Message_PrivateKey) {
+	if (!SIM_Message_PrivateKey)
 #if 0
 	    fprintf(stderr, "Error: can't load private key from: %s\n",
 		    fname);
 #endif
-            memcpy(out, SIM_Not_Encrypted, strlen(SIM_Not_Encrypted));
-	    memcpy(out + strlen(SIM_Not_Encrypted), in, inlen);
-	    return inlen + strlen(SIM_Not_Encrypted);
-	}
+	    return -1;
 
 	OPENSSL_free(fname);
     }
@@ -547,11 +550,8 @@ int SIM_Message_Decrypt(unsigned char *in, unsigned char *out, int inlen,
         x = SIM_RSA_Decrypt(buf, key, SIM_RSA_KEYSIZE, SIM_Message_PrivateKey);
     }
     
-    if (x != SIM_SYMMETRIC_KEYSIZE) {
-            memcpy(out, SIM_Not_Encrypted, strlen(SIM_Not_Encrypted));
-	    memcpy(out + strlen(SIM_Not_Encrypted), in, inlen);
-	    return inlen + strlen(SIM_Not_Encrypted);
-    }
+    if (x != SIM_SYMMETRIC_KEYSIZE)
+	    return -2;
 
     buf2 = (unsigned char *) OPENSSL_malloc(8192);
     iv = (unsigned char *) OPENSSL_malloc(SIM_SYMMETRIC_BLOCKSIZE);
@@ -566,11 +566,8 @@ int SIM_Message_Decrypt(unsigned char *in, unsigned char *out, int inlen,
     klen = SIM_SYMMETRIC_BLOCKSIZE;
     memcpy(&msg.magicnumber, &buf2[klen], (a = sizeof(msg.magicnumber)));
     klen += a;
-    if (msg.magicnumber != SIM_MAGICNUMBER_V1) {
-            memcpy(out, SIM_Not_Encrypted, strlen(SIM_Not_Encrypted));
-	    memcpy(out + strlen(SIM_Not_Encrypted), in, inlen);
-	    return inlen + strlen(SIM_Not_Encrypted);
-    }
+    if (msg.magicnumber != SIM_MAGICNUMBER_V1)
+	    return -3;
     memcpy(&msg.flags, &buf2[klen], (a = sizeof(msg.flags)));
     klen += a;
 
@@ -722,7 +719,7 @@ int SIM_KC_Add(SIM_KC * a)
  *
  */
 
-SIM_KC *SIM_KC_Find(uint32 uin)
+SIM_KC *SIM_KC_Find(uint32_t uin)
 {
     SIM_KC *cur;
 
@@ -744,7 +741,7 @@ SIM_KC *SIM_KC_Find(uint32 uin)
  *
  */
 
-int SIM_KC_Delete(uint32 uin)
+int SIM_KC_Delete(uint32_t uin)
 {
     SIM_KC *cur;
     SIM_KC *prev, *next;

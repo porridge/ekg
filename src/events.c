@@ -38,6 +38,9 @@
 #include "voice.h"
 #include "xmalloc.h"
 #include "ui.h"
+#ifdef HAVE_OPENSSL
+#include "sim.h"
+#endif
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure();
@@ -62,21 +65,27 @@ static struct handler handlers[] = {
  * funkcja ³adnie formatuje tre¶æ wiadomo¶ci, zawija linijki, wy¶wietla
  * kolorowe ramki i takie tam.
  *
- *  - e - zdarzenie wiadomo¶ci,
- *  - u - wpis u¿ytkownika w userli¶cie,
+ *  - e - zdarzenie wiadomo¶ci
+ *  - u - wpis u¿ytkownika w userli¶cie
  *  - chat - rodzaj wiadomo¶ci (0 - msg, 1 - chat, 2 - sysmsg)
+ *  - secure - czy wiadomo¶æ jest bezpieczna
  *
  * nie zwraca niczego. efekt widaæ na ekranie.
  */
-void print_message(struct gg_event *e, struct userlist *u, int chat)
+void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 {
 	int width, next_width, i, j, mem_width = 0;
-	char *mesg, *buf, *line, *next, *format = NULL, *format_first = "", *next_format = NULL, *head = NULL, *foot = NULL, *timestamp = NULL, *save;
+	char *mesg, *buf, *line, *next, *format = NULL, *format_first = "";
+	char *next_format = NULL, *head = NULL, *foot = NULL;
+	char *timestamp = NULL, *save, *secure_label = NULL;
 	char *line_width = NULL, timestr[100], *target, *cname;
 	int separate = (e->event.msg.sender != config_uin || chat == 3);
 	struct tm *tm;
 	struct conference *c = NULL;
 
+	if (secure)
+		secure_label = format_string(format_find("secure"));
+		
 	if (e->event.msg.recipients) {
 		c = conference_find_by_uins(e->event.msg.sender, 
 			e->event.msg.recipients, e->event.msg.recipients_count);
@@ -158,7 +167,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 	next_width = width;
 	
 	if (!strcmp(format_find(format_first), "")) {
-		print_window(target, separate, head, format_user(e->event.msg.sender), timestr, cname);
+		print_window(target, separate, head, format_user(e->event.msg.sender), timestr, cname, (secure) ? secure_label : "");
 		next_format = format;
 		mem_width = width + 1;
 	} else {
@@ -250,6 +259,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 
 	xfree(buf);
 	xfree(save);
+	xfree(secure_label);
 
 	if (!strcmp(format_find(format_first), ""))
 		print_window(target, separate, foot);
@@ -269,7 +279,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 void handle_msg(struct gg_event *e)
 {
 	struct userlist *u = userlist_find(e->event.msg.sender, NULL);
-	int chat = ((e->event.msg.msgclass & 0x0f) == GG_CLASS_CHAT);
+	int chat = ((e->event.msg.msgclass & 0x0f) == GG_CLASS_CHAT), secure = 0;
 	char *tmp;
 	
 	if (!e->event.msg.message)
@@ -312,6 +322,23 @@ void handle_msg(struct gg_event *e)
 
 		return;
 	}
+
+#ifdef HAVE_OPENSSL
+	if (config_encryption == 1) {
+		char *dec;
+		int len = strlen(e->event.msg.message);
+
+		dec = xmalloc(len);
+		memset(dec, 0, len);
+		
+		len = SIM_Message_Decrypt(e->event.msg.message, dec, len, e->event.msg.sender);
+
+		if (len > 0) {
+			strcpy(e->event.msg.message, dec);
+			secure = 1;
+		}
+	}
+#endif
 	
 	cp_to_iso(e->event.msg.message);
 
@@ -319,7 +346,7 @@ void handle_msg(struct gg_event *e)
 	
 	if (e->event.msg.sender == 0) {
 		if (e->event.msg.msgclass > last_sysmsg) {
-			print_message(e, u, 2);
+			print_message(e, u, 2, 0);
 
 			if (config_beep)
 				ui_beep();
@@ -337,7 +364,7 @@ void handle_msg(struct gg_event *e)
 	else
 		add_send_nick(itoa(e->event.msg.sender));
 
-	print_message(e, u, chat);
+	print_message(e, u, chat, secure);
 
 	if (config_beep && ((chat) ? config_beep_chat : config_beep_msg))
 		ui_beep();

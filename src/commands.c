@@ -50,6 +50,9 @@
 #include "xmalloc.h"
 #include "ui.h"
 #include "python.h"
+#ifdef HAVE_OPENSSL
+#include "sim.h"
+#endif
 
 COMMAND(cmd_modify);
 
@@ -1148,9 +1151,9 @@ COMMAND(cmd_list)
 COMMAND(cmd_msg)
 {
 	struct userlist *u;
-	char **nicks = NULL, **p, *msg, *escaped, *nick;
+	char **nicks = NULL, **p, *msg = NULL, *escaped, *nick;
 	uin_t uin;
-	int count, valid = 0, chat = (!strcasecmp(name, "chat"));
+	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0;
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		print("not_connected");
@@ -1188,10 +1191,31 @@ COMMAND(cmd_msg)
 	} else 
 		nicks = array_make(nick, ",", 0, 0, 0);
 
-	count = array_count(nicks);
 	msg = xstrdup(params[1]);
 	escaped = log_escape(msg);
 	iso_to_cp(msg);
+	count = array_count(nicks);
+
+#ifdef HAVE_OPENSSL
+	if (config_encryption == 1 && array_count(nicks) == 1 && (uin = get_uin(nicks[0]))) {
+		char *enc = xmalloc(4096);	/* XXX idiotyzm */
+		int len;
+		
+		memset(enc, 0, 4096);
+		
+		len = SIM_Message_Encrypt(msg, enc, strlen(msg), uin);
+		
+		gg_debug(GG_DEBUG_MISC, "// encrypted length: %d\n", len);
+
+		if (len > 0) {
+			xfree(msg);
+			msg = enc;
+			secure = 1;
+		}
+
+		gg_debug(GG_DEBUG_MISC, "// encrypted message: %s\n", enc);
+	}
+#endif
 
 	for (p = nicks; *p; p++) {
 		if (!strcmp(*p, ""))
@@ -1248,7 +1272,7 @@ COMMAND(cmd_msg)
 		u.uin = 0;
 		u.display = xstrdup(nick);
 		
-		print_message(&e, &u, (chat) ? 3 : 4);
+		print_message(&e, &u, (chat) ? 3 : 4, secure);
 
 		xfree(e.event.msg.message);
 		xfree(u.display);
@@ -1826,6 +1850,37 @@ COMMAND(cmd_version)
 	snprintf(buf, sizeof(buf), "0x%.2x", GG_DEFAULT_PROTOCOL_VERSION);
     	print("ekg_version", VERSION, buf, GG_DEFAULT_CLIENT_VERSION);
 }
+
+#ifdef HAVE_OPENSSL
+COMMAND(cmd_test_keygen)
+{
+	RSA *key;
+	char *fn;
+	
+	if (!params[0]) {
+		print("not_enough_params", name);
+		return;
+	}
+
+	key = SIM_RSA_GenKey(atoi(params[0]));
+
+	if (!key) {
+		print("generic", "Nie uda³o siê wygenerowaæ klucza");
+		return;
+	}
+
+	fn = saprintf("%s/private.pem", prepare_path("keys", 1));
+	SIM_RSA_WriteKey(key, fn, PRIVATE);
+	chmod(fn, 0400);
+	xfree(fn);
+
+	name = saprintf("%s/%d.pem", prepare_path("keys", 1), config_uin);
+	SIM_RSA_WriteKey(key, fn, PUBLIC);
+	xfree(fn);
+
+	print("generic", "Wygenerowano i zapisano klucze");
+}
+#endif
 
 COMMAND(cmd_test_debug)
 {
@@ -3055,6 +3110,11 @@ void command_init()
 	command_add
 	( "_debug", "", cmd_test_debug, 0, "",
 	  "wy¶wietla tekst", "");
+#ifdef HAVE_OPENSSL
+	command_add
+	( "_keygen", "<ilo¶æ-bitów>", cmd_test_keygen, 0, "",
+	  "generuje parê kluczy", "");
+#endif
 #ifdef WITH_PYTHON
 	command_add
 	( "_load", "?", cmd_test_python, 0, "", 

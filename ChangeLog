@@ -11,6 +11,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   odbierania nag³ówka (w)
 - poprawka pagera w ui-readline (w)
 - /find bez parametrów dzia³a ju¿ w ui-readline (w)
+- je¶li mamy zainstalowane OpenSSL, mo¿emy u¿ywaæ szyfrowania SIM.
+  szczegó³y w docs/sim.txt (w)
 
 // 2002-10-16
 

@@ -52,6 +52,9 @@
 #include "xmalloc.h"
 #include "ui.h"
 #include "python.h"
+#ifdef HAVE_OPENSSL
+#include "sim.h"
+#endif
 
 time_t last_action = 0;
 int ioctld_pid = 0;
@@ -943,7 +946,13 @@ int main(int argc, char **argv)
 		else
 			config_log_path = saprintf("%s/history", config_dir);
 	}
-	
+
+#ifdef HAVE_OPENSSL
+	SIM_KC_Init();
+	strncpy(SIM_Key_Path, prepare_path("keys/", 0), sizeof(SIM_Key_Path));
+	strcpy(SIM_Not_Encrypted, "\001sim-unencrypted\001");
+#endif
+
 	changed_dcc("dcc");
 
 	if (config_uin && config_password && auto_connect) {

@@ -218,6 +218,21 @@ if test -d src; then
     CFLAGS="$CFLAGS $PYTHON_INCLUDES"
   fi
 
+  # sprawdzamy openssl
+
+  AC_ARG_WITH(openssl,
+    [  --without-openssl       Compile without OpenSSL])
+
+  if test "x$with_openssl" != "xno"; then
+    AC_CHECK_LIB(ssl, RSA_new, [
+      AC_CHECK_HEADERS(openssl/rsa.h, [
+        AC_DEFINE(HAVE_OPENSSL, 1, [define if you have OpenSSL])
+	LDFLAGS="-lssl $LDFLAGS"
+	OBJS="$OBJS sim.o"
+      ])
+    ])
+  fi
+
   # sprawdzamy libz.so, <zlib.h>
   
   AC_ARG_WITH(zlib,

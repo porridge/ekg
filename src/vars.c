@@ -67,6 +67,9 @@ void variable_init()
 	variable_add("display_notify", VAR_INT, 1, &config_display_notify, NULL, variable_map(3, 0, 0, "none", 1, 0, "all", 2, 0, "significant"));
 	variable_add("display_sent", VAR_BOOL, 1, &config_display_sent, NULL, NULL);
 	variable_add("emoticons", VAR_BOOL, 1, &config_emoticons, NULL, NULL);
+#ifdef HAVE_OPENSSL
+	variable_add("encryption", VAR_INT, 1, &config_encryption, NULL, variable_map(2, 0, 0, "none", 1, 0, "sim"));
+#endif
 	variable_add("enter_scrolls", VAR_BOOL, 1, &config_enter_scrolls, NULL, NULL);
 	variable_add("keep_reason", VAR_BOOL, 1, &config_keep_reason, NULL, NULL);
 	variable_add("last", VAR_MAP, 1, &config_last, NULL, variable_map(4, 0, 0, "none", 1, 2, "all", 2, 1, "separate", 4, 0, "sent"));
