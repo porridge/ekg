@@ -12,6 +12,7 @@ zg³osi³ b³±d.
   interfejsu (a.latanski/w)
 - kosmetyka (sz)
 - poprawki zwi±zane z strncpy() i strncat() (sz)
+- poprawka kodowania argumentów /find (zuko_wski/w)
 
 // 2003-01-22
 

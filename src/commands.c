@@ -598,125 +598,6 @@ COMMAND(cmd_exec)
 	}
 }
 
-#if 0
-COMMAND(cmd_find)
-{
-	struct gg_search_request *r;
-	struct gg_http *h;
-	list_t l;
-	char **argv = NULL;
-	int i, id = 1;
-
-	/* wybieramy sobie identyfikator sercza */
-	for (l = watches; l; l = l->next) {
-		struct gg_http *h = l->data;
-
-		if (h->type != GG_SESSION_SEARCH)
-			continue;
-
-		if (h->id / 2 >= id)
-			id = h->id / 2 + 1;
-	}
-	
-	r = xcalloc(1, sizeof(*r));
-
-	if (!params[0] || !(argv = array_make(params[0], " \t", 0, 1, 1)) || !argv[0]) {
-		xfree(r);
-		ui_event("command", "find", NULL);
-		return;
-
-	} else {
-		if (argv[0] && !argv[1] && argv[0][0] == '#') { /* konferencja */
-			char *tmp = saprintf("conference --find %s", argv[0]);
-			command_exec(NULL, tmp);
-			xfree(tmp);
-			xfree(r);
-			array_free(argv);
-			return;
-		} else if (argv[0] && !argv[1] && argv[0][0] != '-') {
-			id = id * 2;	/* single search */
-			if (!(r->uin = get_uin(params[0]))) {
-				print("user_not_found", params[0]);
-				xfree(r);
-				array_free(argv);
-				return;
-			}
-		} else {
-			id = id * 2 + 1;	/* multiple search */
-			for (i = 0; argv[i]; i++) {
-				char *arg = argv[i];
-				
-				if (match_arg(arg, 'f', "first", 2) && argv[i + 1])
-					r->first_name = xstrdup(argv[++i]);
-				if (match_arg(arg, 'l', "last", 2) && argv[i + 1])
-					r->last_name = xstrdup(argv[++i]);
-				if (match_arg(arg, 'n', "nickname", 2) && argv[i + 1])
-					r->nickname = xstrdup(argv[++i]);
-				if (match_arg(arg, 'c', "city", 2) && argv[i + 1])
-					r->city = xstrdup(argv[++i]);
-				if (match_arg(arg, 'e', "email", 2) && argv[i + 1])
-					r->email = xstrdup(argv[++i]);
-				if (match_arg(arg, 'u', "uin", 2) && argv[i + 1])
-					if (!(r->uin = str_to_uin(argv[++i]))) {
-						print("invalid_uin");
-						gg_search_request_free(r);
-						array_free(argv);
-						return;
-					}
-				if (match_arg(arg, 's', "start", 2) && argv[i + 1])
-					r->start = strtol(argv[++i], NULL, 0);
-				if (match_arg(arg, 'F', "female", 2))
-					r->gender = GG_GENDER_FEMALE;
-				if (match_arg(arg, 'M', "male", 2))
-					r->gender = GG_GENDER_MALE;
-				if (match_arg(arg, 'a', "active", 2))
-					r->active = 1;
-				if (match_arg(arg, 'b', "born", 2) && argv[i + 1]) {
-					char *foo = strchr(argv[++i], ':');
-		
-					if (!foo) {
-						r->min_birth = atoi(argv[i]);
-						r->max_birth = atoi(argv[i]);
-					} else {
-						*foo = 0;
-						r->min_birth = atoi(argv[i]);
-						r->max_birth = atoi(++foo);
-					}
-					if (r->min_birth < 100)
-						r->min_birth += 1900;
-					if (r->max_birth < 100)
-						r->max_birth += 1900;
-				}
-				if (match_arg(arg, 'A', "all", 3))
-					r->start |= 0x80000000L;
-			}
-		}
-	}
-
-	iso_to_cp(r->first_name);
-	iso_to_cp(r->last_name);
-	iso_to_cp(r->nickname);
-	iso_to_cp(r->city);
-	iso_to_cp(r->email);
-
-	if (!(h = gg_search(r, 1))) {
-		print("search_failed", http_error_string(0));
-		array_free(argv);
-		gg_search_request_free(r);
-		return;
-	}
-
-	h->id = id;
-	h->user_data = (char*) r;
-
-	list_add(&watches, h, 0);
-	
-	array_free(argv);
-
-	return;
-}
-#endif
-
 COMMAND(cmd_find)
 {
 	char **argv = NULL;
@@ -732,6 +613,9 @@ COMMAND(cmd_find)
 		ui_event("command", "find", NULL);
 		return;
 	}
+
+	for (i = 0; argv[i]; i++)
+		iso_to_cp(argv[i]);
 
 	if (argv[0] && !argv[1] && argv[0][0] == '#') { /* konferencja */
 		char *tmp = saprintf("conference --find %s", argv[0]);
