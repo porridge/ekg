@@ -48,6 +48,9 @@ struct gg_session {
 
 	/* powinno byæ ,,in_addr'', ale nie chcê inkludowaæ sieci tutaj */
 	unsigned long server_ip;
+	unsigned long client_ip;
+	
+	unsigned int client_port;
 
 	uin_t uin;
 	char *password;
