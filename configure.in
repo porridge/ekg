@@ -12,6 +12,17 @@ AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 
 AC_SUBST(DFLAGS)
+AC_SUBST(LOG_IGN)
+
+AC_ARG_WITH(log_ign, 
+  [  --without-log_ign 	  Compile without logging ignored ])
+
+if test "x$with_log_ign" = "xno"; then 
+  LOG_IGN=""
+else   
+  LOG_IGN=" -DLOG_IGNORED"
+fi
+
 AC_ARG_WITH(debug, 
   [  --without-debug  	  Compile without debug [-Wall, -ggdb]])
 

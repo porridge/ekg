@@ -13,7 +13,7 @@ MAKE = @MAKE@
 AR = @AR@
 install = @INSTALL@
 
-CFLAGS = -DLOG_IGNORED @DFLAGS@ @CFLAGS@ $(INCLUDES) -DTHEMES_DIR=\"$(datadir)/ekg/themes\"
+CFLAGS = @LOG_IGN@ @DFLAGS@ @CFLAGS@ $(INCLUDES) -DTHEMES_DIR=\"$(datadir)/ekg/themes\"
 OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o
 LOBJS = ../lib/libgg.a
 
