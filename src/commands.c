@@ -662,7 +662,7 @@ COMMAND(cmd_exec)
 	int pid;
 
 	if (params[0]) {
-		char **args = NULL, *tmp, *tg = xstrdup(target);
+		char **args = NULL, *tmp, *tg = NULL;
 		int fd[2] = { 0, 0 }, buf = 0, msg = 0;
 		const char *command = NULL;
 		struct gg_exec s;
@@ -732,7 +732,7 @@ COMMAND(cmd_exec)
 		s.id = pid;
 		s.timeout = 60;
 		s.buf = string_init(NULL);
-		s.target = xstrdup(tg);
+		s.target = ((tg) ? tg : xstrdup(target));
 		s.msg = msg;
 		s.quiet = quiet;
 
@@ -752,7 +752,6 @@ COMMAND(cmd_exec)
 			array_free(args);
 
 		xfree(tmp);
-		xfree(tg);
 	} else {
 		for (l = children; l; l = l->next) {
 			struct process *p = l->data;
