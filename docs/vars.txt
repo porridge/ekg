@@ -1,0 +1,233 @@
+// ma³y opis dostêpnych zmiennych
+// (c) copyright 2001 by wojtek kaniewski <wojtekka@irc.pl>
+// $Id$
+
+uin
+	typ: liczba
+	domy¶lna warto¶æ: brak
+
+	okre¶la numer GG, z którego ma korzystaæ klient. niezbêdna do
+	po³±czenia z serwerem. automatycznie ustawiana po udanej
+	rejestracji, gdy wcze¶niej by³a pusta.
+
+password
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	has³o u¿ytkownika. niezbêdne do po³±czenia z serwerem. automatycznie
+	ustawiane po udanej rejestracji, gdy wcze¶niej by³o puste.
+
+auto_away
+	typ: liczba
+	domy¶lna warto¶æ: 600
+
+	warto¶æ okre¶laj±ca, po jakim czasie stan u¿ytkownika zostanie
+	zmieniony na ,,zajêty''. podaje siê w sekundach. je¶li równa 0,
+	nie bêdzie automatycznej zmiany.
+
+auto_reconnect
+	typ: liczba
+	domy¶lna warto¶æ: 10
+
+	w przypadku nieudanego po³±czenia, okre¶la po ilu sekundach program
+	ma ponowiæ próbê. je¶li równa 0, nie próbuje wiêcej.
+
+beep
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	okre¶la, czy klient ma beepaæ w ró¿nych sytuacjach. wy³±czenie tej
+	opcji spowoduje, ¿e w przypadku ¿adnych zdarzeñ zwi±zanych z GG nie
+	bêdzie podnosiæ alarmu. niestety nie obejmuje to zdarzeñ zwi±zanych
+	z wprowadzanym tekstem i przy tab-completion mo¿e siê to przytrafiæ.
+
+beep_msg
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	czy beepaæ przy nadchodz±cych wiadomo¶ciach. wy³±czenie ,,beep''
+	wy³±cza równie¿ t± opcjê.
+
+beep_chat
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	czy beepaæ przy rozmowach. wy³±czenie ,,beep'' wy³±cza róznie¿ t±
+	opcjê.
+
+beep_notify
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	czy beepaæ przy zmianie stanu którego¶ ze znajomych. wy³±czenie
+	,,beep'' wy³±cza róznie¿ t± opcjê.
+
+completion_notify
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	okre¶la, czy po pojawieniu siê którego¶ ze znajomych jego nick
+	ma byæ dopisywany do listy dope³niania klawiszem Tab.
+
+dcc
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	w³±cza lub wy³±cza bezpo¶rednie po³±czenia miêdzy klientami. zmiana
+	tej opcji wymaga ponownego po³±czenia z serwerem, by przes³aæ nowy
+	adres IP, lub jego brak.
+
+dcc_ip
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	okre¶la adres IP, który jest wysy³any serwerowi. póki co, jest
+	wymagana do bezpo¶redniego po³±czenia, poniewa¿ ekg nie potrafi
+	wykryæ doy¶lnego adresu IP.
+
+display_ack
+	typ: liczba
+	domy¶lna warto¶æ: 1
+
+	okre¶la, czy i które powiadomienia o wys³aniu wiadomo¶ci maj±
+	byæ wy¶wietlane. 0 - ¿adne, 1 - wszystkie, 2 - tylko kiedy wiadomo¶æ
+	dotar³a	do adresata, 3 - tylko kiedy adresat jest niedostêpny i
+	wiadomo¶æ zosta³a zachowania na serwerze.
+
+display_color
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	warto¶æ 0 wy³±cza wy¶wietlanie kolorów, warto¶æ 1 w³±cza.
+
+display_notify
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	okre¶la, czy zmiany stanu znajomych maj± byæ wy¶wietlane.
+
+log
+	typ: liczba
+	domy¶lna warto¶æ: 0
+
+	okre¶la czy i w jaki sposób bêd± logowane wysy³ane i otrzymywane
+	wiadomo¶ci. dla 0, nie bêd±. dla 1, bêd± logowane w pliku, który
+	okre¶la zmienna ,,log_path'' lub ,,gg.log'' w przypadku jej braku.
+	dla 2, bêd± logowane w katalogu wskazanym przez zmienn± ,,log_path''
+	lub w aktualnym katalogu, a nazwa pliku bêdzie numerem rozmówcy.
+
+log_path
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	¶cie¿ka, gdzie bêd± zachowywane wysy³ane i otrzymane wiadomo¶ci.
+
+proxy_port
+	typ: liczba
+	domy¶lna warto¶æ: 0
+
+	port serwera proxy, który jest u¿ywany do po³±czeñ http (szukanie,
+	zmiana danych w katalogu publicznym itp.), gdy w³±czono opcjê
+	,,use_proxy''.
+
+proxy_host
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	adres serwera proxy, który jest u¿ywany do po³±czeñ http (szukanie,
+	zmiana danych w katalogu publicznym itp.), gdy w³±czono opcjê
+	,,use_proxy''.
+
+sms_away
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	w³±czenie tej opcji powoduje wysy³anie otrzymanych wiadomo¶ci na
+	telefon komórkowy podczas nieobecno¶ci (stan ,,zajêty''). wymaga
+	zdefiniowania zmiennych ,,sms_number'' i ,,sms_send_app''.
+
+sms_max_length
+	typ: liczba
+	domy¶lna warto¶æ: 100
+
+	maksymalna d³ugo¶æ przekazywanych wiadomo¶ci. powy¿ej tego limitu
+	wiadomo¶æ zostanie uciêta.
+
+sms_number
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	numer telefonu komórkowego, na który maj± byæ wysy³ane wiadomo¶ci
+	podczas nieobecno¶ci.
+
+sms_send_app
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	pe³na ¶cie¿ka do programu wysy³aj±cego SMSy. program musi za
+	pierwszy parametr przyjmowaæ numer odbiorcy, za drugi parametr
+	tre¶æ wiadomo¶ci. do tego celu nadaje siê program Miko³aja
+	Rydzewskiego ze strony http://ceti.pl/~miki/
+
+sound_app
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	pe³na ¶cie¿ka do programu odtwarzaj±cego pliki zdefiniowane w
+	zmiennych ,,sound_{msg,chat,sysmsg}_file''. program musi braæ
+	za pierwszy (i jedyny) parametr nazwê pliku. wavplay i mpg123
+	doskonale siê nadaj±.
+
+sound_msg_file
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	plik d¼wiêkowy odtwarzany po otrzymaniu wiadomo¶ci.
+
+sound_chat_file
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	plik d¼wiêkowy odtwarzany w czasie rozmowy.
+
+sound_sysmsg_file
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	plik d¼wiêkowy odtwarzany po otrzymaniu wiadomo¶ci systemowej.
+
+theme
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	zawiera nazwê pliku okre¶laj±cego wygl±d klienta (ang. theme)
+	{ "theme", VAR_STR, 1, &default_theme, changed_theme },
+
+use_proxy
+	typ: liczba
+	domy¶lna warto¶æ: 0
+
+	okre¶la, czy do po³±czeñ http ma byæ u¿ywany serwer proxy
+	zdefiniowany wcze¶niej w zmiennych ,,proxy_host'' i ,,proxy_port''.
+
+
+default_status
+	typ: liczba, zmienna wewnêtrzna, ukryta
+
+	okre¶la stan klienta (zajêty/niewidoczny/tylko dla przyjació³)
+	po uruchomieniu i pierwszym po³±czeniu. zachowywana przy poleceniu
+	,,save''.
+
+bold_font
+	typ: tekst, zmienna wewnêtrzna, ukryta
+
+	dla zachowania zgodno¶ci z GNU Gadu autorstwa Igora Popika.
+
+debug
+	typ: bool, zmienna wewnêtrzna, ukryta
+
+	okre¶la czy klient i biblioteka maj± wy¶wietlaæ dodatkowe informacje
+	na temat tego, co siê dzieje. dla zwyk³ych u¿ytkowników nieprzydatna.
+	mo¿e co najwy¿ej pomóc w przypadku dziwnych b³êdów.
+
+

@@ -1299,10 +1299,22 @@ COMMAND(command_dcc)
 			my_printf("dcc_get_not_found", (params[1]) ? params[1] : "");
 			return 0;
 		}
+
+
+		/* XXX wiêcej sprawdzania, zrzucaæ do jakiego¶ $dcc_dir */
+		if (!(t->dcc->file_fd = open(t->filename, O_WRONLY | O_CREAT))) {
+			my_printf("dcc_get_cant_create", t->filename);
+			gg_free_dcc(t->dcc);
+			list_remove(&transfers, t, 1);
+			
+			return 0;
+		}
 		
 		my_printf("dcc_get_getting", format_user(t->uin), t->filename);	/* XXX wiêcej informacji */
 		
 		list_add(&watches, t->dcc, 0);
+
+		return 0;
 	}
 	
 	if (!strncasecmp(params[0], "c", 1)) {		/* close */
