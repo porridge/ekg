@@ -4827,11 +4827,11 @@ COMMAND(cmd_queue)
 		}
 
 		if ((uin && !msg_queue_count_uin(uin)) || !msg_queue_count()) {
-			if (uin) {
+			if (uin)
 				printq("queue_empty_uin", format_user(uin));
-			} else {
+			else
 				printq("queue_empty");
-			}
+
 			return 0;
 		}
 
@@ -4852,11 +4852,11 @@ COMMAND(cmd_queue)
 	}  
 		
 	if ((uin && !msg_queue_count_uin(uin)) || !msg_queue_count()) {
-		if (uin) {
+		if (uin)
 			printq("queue_empty_uin", format_user(uin));
-		} else {
+		else
 			printq("queue_empty");
-		}
+
 		return 0;
 	}
 
