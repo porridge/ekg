@@ -371,6 +371,8 @@ u¿ycie: %s [OPCJE]
 		if (default_theme)
 			read_theme(default_theme, 1);
 	
+	reset_theme_cache();
+		
 	signal(SIGCONT, sigcont);
 	signal(SIGHUP, sighup);
 	signal(SIGALRM, SIG_IGN);

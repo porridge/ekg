@@ -94,7 +94,7 @@ char *va_format_string(char *format, va_list ap)
 	}
 	if (!timestamp_cache)
 		timestamp_cache = find_format("timestamp");
-
+	
 	if (!(buf = string_init("")))
 		return NULL;
 
@@ -293,6 +293,7 @@ inline void reset_theme_cache()
 	
 	prompt_cache = prompt2_cache = error_cache = NULL;
 	readline_prompt = readline_prompt_away = NULL;
+	timestamp_cache = NULL;
 }
 
 /*
