@@ -379,6 +379,25 @@ static char *window_generator(char *text, int state)
 	return NULL;
 }
 
+static char *python_generator(char *text, int state)
+{
+	char *commands[] = { "load", "unload", "run", "exec", "list", NULL };
+	static int len, i;
+
+	if (!state) {
+		i = 0;
+		len = strlen(text);
+	}
+
+	while (commands[i]) {
+		if (!strncasecmp(text, commands[i], len))
+			return xstrdup(commands[i++]);
+		i++;
+	}
+
+	return NULL;
+}
+
 static char *empty_generator(char *text, int state)
 {
 	return NULL;
@@ -504,6 +523,9 @@ static char **my_completion(char *text, int start, int end)
 						break;
 					case 'f':
 						func = rl_filename_completion_function;
+						break;
+					case 'p':
+						func = python_generator;
 						break;
 					case 'w':
 						func = window_generator;
@@ -991,6 +1013,7 @@ static int ui_readline_event(const char *event, ...)
 				printq("query_started", param);
 				xfree(window_current->query_nick);
 				window_current->query_nick = xstrdup(param);
+
 			} else {
 				if (!quiet)
 					printf("\n");	/* XXX brzydkie */
@@ -1397,6 +1420,9 @@ static int window_make_query(const char *nick)
 #endif									
 				} else
 					print("window_id_query_started", itoa(w->id), nick);
+
+				if (!(ignored_check(get_uin(nick)) & IGNORE_EVENTS))
+					event_check(EVENT_QUERY, get_uin(nick), nick);
 				
 				return w->id;
 			}
@@ -1412,6 +1438,9 @@ static int window_make_query(const char *nick)
 		w->query_nick = xstrdup(nick);
 		
 		print("window_id_query_started", itoa(w->id), nick);
+
+		if (!(ignored_check(get_uin(nick)) & IGNORE_EVENTS))
+			event_check(EVENT_QUERY, get_uin(nick), nick);
 			
 		return w->id;
 	}
