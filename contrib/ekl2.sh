@@ -1,135 +1,221 @@
-#!/bin/bash
+#!/bin/sh
 
 # historia:
 # v1 (7.03.2002) grywalny skrypt, spelniajacy jako tako swoja funkcje
-#	powstal w oczekiwaniu na pewna osobe na gg
+#       powstal w oczekiwaniu na pewna osobe na gg
 # v1.1 (8.03.2002) poprawa drukowania nietypowych znakow, np. {}%*#$
-#	po wyslaniu ascii-rozyczki przez gg, w logach wyraznie wymagala ona naprawy
+#       po wyslaniu ascii-rozyczki przez gg, w logach wyraznie wymagala ona naprawy
 # v1.2 (9.03.2002) poprawa wydajnosci. skrypt jest juz w miare szybki
 # v1.3 (28.05.2002) obsluga trybow logowania 1 i 2, paprawka dotyczaca ip
+#       obsluga wiadomosci wielolinijkowych
+# 1.4 (11.2002) kompletnie od nowa napisany skrypt, z kilkoma bajerkami
 
+_ver=1.4
 
-######
-
-if [ $# -lt 1 ]; then
-	echo "$0: nie mo¿na znale¼æ pliku logów. U¿yj: $0 -h"
-	exit
+if [ $# -eq 0 ]; then
+	echo "co chcesz ze mn± zrobiæ? (u¿yj '$0 -h')";
+	exit;
 fi
 
-color="true"	# defaultowo kolory s± w³±czone, by to zmienic usun ta linie, lub uzyj -n
-ggsender="$USER" # domyslny naglowek dla wychodzacych odpowiedzi (czyli twoich)
-ggftimeformat="%D %T" # domyslny format wyswietlania daty, zgodny z date(1)
-ggtimenow=`date +%s` # aktualny czas w sekundach. wartosc potrzebna tylko w jednym miejscu, 
-		     #ale poprawia wydajnosc skryptu
-ggmaxtstamplimit=10 # maksymalny odstep czasu miedzy wypowiedziami w trybie -t
-ggdir="$HOME/.gg"
+# colors
+Cn=$'\x1B[0;38m';
+Cr=$'\x1B[0;31m'; # red
+Cg=$'\x1B[0;32m'; # green
+Ct=$'\x1B[0;33m'; # cyan
+Cy=$'\x1B[0;36m'; # yellow
 
+# logs dir
+dir="$HOME/.gg/history";
+# log file fields regexps
+fmr="\([a-z]*recv\)";	# message sent/received. chat/msg ignored
+fms="\([a-z]*send\)";	# message sent/received. chat/msg ignored
+fuin="\([0-9]*\)"; # uin number
+fnick="\([^,]*\)"; # uin number
+fdate="\([0-9]\{10\}\)"; # uin number
+msg="\"\?\(.*[^\"]\)\"\?"; # message
 
-###### parametry linii polecen
+_getnick () {
+	while read n; do
+	if [ -d "$dir" ]; then
+		buf="`sed -n "/$n/s/;.*//p" "$dir/../userlist"`";
+	else
+		buf="`sed -n "/${n:-^$}/s/;.*//p" "$(dirname $dir)/userlist"`";
+	fi
+	echo -e "${n}\t${buf}";
+	done < /dev/stdin
+}
+
+sessprint=1	# internal, shitty code
+
+# replacing to human readable
+# hmr: \1 - sent/recv, \2 - uin, \3 - nick, \4 - send date, \5 - recv date, \6 - message
+# hms: no recv date, \5 - message
 
 while [ $# -gt 0 ]; do
-        case $1 in
-		-h) 
-		        echo "U¿yj: $0 [-d format] [-h] [-l] [-m name] [-n] [-s date] [-t] [-v] log_file"
-			echo -e "\t-d format\tformat wy¶wietlania daty, zobacz date(1)"
-		        echo -e "\t-h\t\tpomoc, któr± teraz widzisz"
-			echo -e "\t-L\t\tlista dostêpnych logów z katalogu $ggdir/history"
-			echo -e "\t-l\t\tlista sesji w wybranym logu"
-		        echo -e "\t-m name\t\tdomy¶lnie \$USER"
-		        echo -e "\t-n\t\tbez kolorów"
-			echo -e "\t-s date\t\tstart date; czas, odk±d zacz±æ drukownie historii"
-		        echo -e "\t-t\t\tzachowaj odstêpy czasowe miêdzy wypowiedziami (symulacja rozmowy)"
-		        echo -e "\t-v\t\tversion"
-			exit
+	case $1 in
+		--location )
+			dir="$2";
+			shift;
 		;;
-		-t) keeptime="yes";;
-		-d) ggftimeformat="$2"; shift;;
-		-s) ggsdate="$2"; shift;;
-		-L) 
-			if [ -f "$ggdir/history" ]; then
-				for i in `sed "s/^[a-z]*,\([0-9]*\),.*/\1/;/[^0-9]/d;/^$/d" "$ggdir/history" | sort | uniq`; do
-					echo "$i "`sed "/$i/!d;s/;.*//;q" "${ggdir}/userlist"`
-				done
+		-n | --nocolor )
+			unset Cn Cr Cg Ct Cy
+		;;
+		-l | --sessions )
+			sess="yes";
+			if [ "${2:0:1}" == "+" ]; then
+                                sessnum="${2:1}";
+                                shift;
+                        fi
+			if [ "${2:0:1}" == "+" ]; then
+				sessint="${2:1}";
+				shift;
 			else
-				for i in `ls "$ggdir/history/"`; do
-					echo "$i "`sed "/$i/!d;s/;.*//;q" "${ggdir}/userlist"`
-				done
+				sessint="60";
 			fi
-			exit
+			sessint="`expr $sessint \* 60`";
+			sessprint=0;
 		;;
-		-l) gglist="yes"; ggdlimit=10800 ;;
-		-m) ggsender="$2"; shift;;
-		-n) unset color;;
-		-v) 
-			echo "ekl2.sh version 1.2, for ekg >20020302"
-			echo "Covered by GNU GPL, Copyright (c) 2002 Triteno <tri10o@bsod.org>"
-			exit
+		-L | --List )
+			list="yes";
 		;;
-		*)
-			name=`sed "/^$1;/!d;s/.*;\([0-9]*\)/\1/;s/[^0-9]//;q" "$HOME/.gg/userlist"`
-			uin="$1"
-			dafcknfile="$HOME/.gg/history/$name"
-			if [ -f "$HOME/.gg/history" ]; then	# set log 1
-				gglog="$HOME/.gg/history";
-			else
-				if [ -f "$1" ]; then			# set log 2
-					gglog="$1";
-					elif [ -f "$ggdir/history/$1" ]; then
-						gglog="$ggdir/history/$1"; 
-						elif [ -f "$dafcknfile" ]; then
-							gglog="$dafcknfile";
-							else
-				        			echo "$0: log_file doesnt exists!"
-				        			exit 1
-				fi
-			fi
+		-h | --help )
+cat <<END
+Sk³adnia: $0 [OPCJE] [¬RÓD£O]
+Wy¶wietla logi ekg
+
+-d 	--dateformat +FORMAT	format wy¶wietlania daty, zobacz date(1)
+	--location	miejsce sk³adowania logów, 
+			domy¶lnie ~/.gg/history
+-h	--help		pomoc
+-l	--sessions [+num] [+ods]	wy¶wietl listê sesji
+			nieobowi±zkowy parametr num to numer
+			sesji, która ma zostaæ wy¶wietlona
+			ods to odstêp miêdzy rozmowami, w minutach
+			(domy¶lnie: 60)
+-L 	--List		lista dostêpnych logów
+-n	--nocolor	brak kolorów
+-sh 	--short		szybka, uproszczona forma
+-v	--version	informacja o wersji
+¬RÓD£O			numer gg, nick lub nazwa pliku z logami
+
+Raporty o b³êdach: ekg-users@list.ziew.org lub tri10o@bsod.org
+END
+			exit;
+		;;
+		-d | --dateformat ) # date format
+			dateformat="+$2";
+			shift;
+		;;
+		-sh | --short ) # short mode
+			hmr="${Ct}\3${Cn} \6";
+			hms="${Cy}-->${Cn} \5";
+			mode=0;
+		;;
+		-v | --version )
+cat <<END
+ekl2.sh $_ver
+triteno <tri10o@bsod.org>
+END
+			exit;
+;;
+		* ) # file name
+			fle="$1";
 		;;
 	esac
-        shift
+	shift
 done
 
-IFS=$'\n'
-for i in `cat "$gglog" | grep ",$uin,"`; do
-	gglasttime=$ggtime;
-	gg_4=`echo "$i" | cut -f 4 -d "," `
-	if [ -z "`echo "$gg_4" | sed "/[0-9]*\..*/d"`" ]; then
-		ggtime=`echo "$i" | cut -f 5 -d "," `;
-		ggip="(ip: $gg_4)";
+# logs location, setting fle variable
+if [ ! -d "$dir" ]; then
+	if [ -f "$dir" -a "`basename $dir`" != "history" ]; then
+		fle="$dir"; # if someone will set exact file
 	else
-		ggtime=$gg_4;
-	fi
-	[ -z $gglasttime ] && gglasttime=0
-
-
-	if [ ! -z $gglist ] && [ ! -z $gglasttime ]; then
-		[ `expr $ggtime - $gglasttime` -lt $ggdlimit ] && continue
-		ggftime=`date --date "$(expr $ggtime - $ggtimenow)sec" +"$ggftimeformat"`
-		echo "Sesja GG z: $ggftime $ggip"
-	fi
-
-	if [ ! -z "$ggsdate" ]; then
-		ggsdatesec=`date --date "$ggsdate" +%s`
-		if [ $ggtime -lt $ggsdatesec ]; then continue; fi
-	fi
-	
-	ggway=`echo "$i" | cut -f 1 -d "," `
-	gguid=`echo "$i" | cut -f 3 -d "," `
-        if [ "$gguid" == "" ]; then gguid="uin`echo $i | cut -f 2 -d "," `"; fi
-	if [ "$ggway" == "chatrecv" ] || [ "$ggway" == "msgrecv" ] ; then ggway="${color:+\x1B[0;32m}"; 
-				     else ggway="${color:+\x1B[0;33m}"; 
-					  gguid=$ggsender
-	fi
-	
-	if [ ! -z $keeptime ] && [ ! -z $gglasttime ]; then
-		ggwaittime=`expr $ggtime - $gglasttime`
-		if [ $ggwaittime -gt "$ggmaxtstamplimit" ]; then
-			ggwaittime=$ggmaxtstamplimit
+		if [ -f "$dir" -a "`basename $dir`" == "history" ]; then # occurs, when log variable is set to 1
+			printonlynick="$fle";
+			fle="$dir/history";
+		else
+			echo "katalog $dir nie istnieje, u¿yj parametru --location aby bezpo¶rednio okre¶liæ miejsce przechowywania logów."; 
+			exit 1; 
 		fi
-		sleep "$ggwaittime";
 	fi
+fi
 
-	ggftime=`date --date "$(expr "$ggtime" - "$ggtimenow")sec" +"$ggftimeformat"` # UWAGA! linijka 99 taka sama!
-	ggmsg=`echo "$i" | sed 's/.*,[0123456789]*,//'`
-	echo -e "${ggway}${gguid} [${ggftime}]: ${color:+\x1B[0;38m}\c"
-	printf "%s\n" "${ggmsg}"
-done 2>/dev/null
+if [ ! -f "$fle" -a -z "$list" ]; then
+	list="hidden_yes";
+fi
+
+_userslist() {
+if [ -d "$dir" ]; then
+	# dir jest katalogiem
+	ls "$dir" | _getnick
+else 
+	if [ -f "$dir" ]; then
+		# dir jest plikiem zbiorczym
+		sed -n "/^\([^,]*\),${fuin},${fnick},${fdate},/s/^\([^,]*\),${fuin},.*/\2/p" "$dir" | sort | uniq | _getnick;
+	fi
+fi
+exit;
+}
+
+if [ "${list}" == "yes" ]; then
+	_userslist;
+fi
+
+if [ "${list}" == "hidden_yes" ]; then
+	if [ -d "$dir" ]; then
+		fle="$dir/`_userslist | grep "$fle" | cut -f 1`";
+	else
+		fle="$dir";
+	fi
+	if [ ! -f "$fle" ]; then
+		echo -e "Nie mogê okre¶liæ pliku z logami. Upewnij siê,\n¿e podajesz w³a¶ciw± nazwê pliku/nick/numerek osoby";
+		exit 1;
+	fi
+fi
+
+	# default mode
+if [ -z ${hmr} ]; then
+	hmr="\4 \3 ${Ct} \6";
+	hms="\4 - ${Cy} \5";
+	dateformat="+%H:%M %d.%m.%Y"; # see date(1)
+	mode=1;
+fi
+
+disccount=0;
+
+_outputclass() {
+case $1 in
+	0 )
+	cat -
+	;;
+	1 )
+	if [ -z "${Cn}" ]; then # check if we can display colors
+		flds="date nick msg";
+	else 
+		flds="date nick clr msg";
+	fi
+	while read $flds; do
+		if [ "$sess" == "yes" ]; then
+			[ -z "$lastdate" ] && lastdate="$date";
+			if [ "`expr $date - $lastdate`" -gt "$sessint" ]; then
+				let disccount++;
+				if [ ! -z "$sessnum" -a "$sessnum" -eq "$disccount" ]||[ -z "$sessnum" ]; then
+					echo -e "$disccount.\tRozmowa z `date --date "01/01/1970 ${date}sec" "${dateformat}"`. Zaczêta przez $nick.";
+				fi
+				[ "$sessnum" == "$disccount" ] &&  sessprint=1 || sessprint=0
+			fi 2>/dev/null
+			lastdate="$date";
+		fi
+		if [ "$sessprint" -eq 1 ]; then
+	     		echo "${clr}.--`date --date "01/01/1970 ${date}sec" "${dateformat}"`- ${nick} ---- - -   - ";
+			echo "|${Cn} $msg";
+			echo "${clr}'--------${Cn}";
+		fi
+	done < /dev/stdin
+	;;
+esac
+}
+
+( sed -n "/,${printonlynick:-.*},/{
+       /^$fmr/ s/^${fmr},${fuin},${fnick},${fdate},${fdate},${msg}$/${hmr}/;
+       /^$fms/ s/^${fms},${fuin},${fnick},${fdate},${msg}$/${hms}/;p;}" "$fle" ) | _outputclass $mode
