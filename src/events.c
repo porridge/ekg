@@ -602,6 +602,7 @@ void handle_dcc(struct gg_dcc *d)
 	struct gg_event *e;
 	struct transfer *t;
 	struct list *l;
+	char buf1[16], buf2[16];
 	int tmp;
 
 	if (!(e = gg_dcc_watch_fd(d))) {
@@ -662,7 +663,26 @@ void handle_dcc(struct gg_dcc *d)
 				}
 			}
 			break;
+			
+		case GG_EVENT_DCC_NEED_FILE_ACK:
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_NEED_FILE_INFO\n");
+			/* ¿eby nie sprawdza³o, póki luser nie odpowie */
+			list_remove(&watches, d, 0);
 
+			if (!(t = find_transfer(d))) {
+				gg_free_dcc(d);
+				break;
+			}
+			
+			snprintf(buf1, sizeof(buf1), "%d", t->id);
+			snprintf(buf2, sizeof(buf2), "%ld", d->file_info.size);
+			t->filename = strdup(d->file_info.filename);
+
+			/* XXX parsowaæ nazwê pliku, ¿eby nie wywala³o ¶mieci */
+			my_printf("dcc_get_offer", format_user(t->uin), t->filename, buf2, buf1);
+
+			break;
+			
 		case GG_EVENT_DCC_DONE:
 			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_DONE\n");
 

@@ -1,3 +1,8 @@
+// 2001-12-12
+
+- poprawka segfaultu przy timeoutach (w)
+- poprawka b³êdu searcha na systemach innych ni¿ mój (charvel/w)
+
 // 2001-12-09 
 
 - poprawka configure gdzie make nie jest <gnu> make (s)

@@ -241,7 +241,7 @@ int gg_search_watch_fd(struct gg_http *h)
 			gg_debug(GG_DEBUG_MISC, "=> search, line %i \"%s\"\n", i, line[i]);
 		}
 
-		if (!line[i])
+		if (i < 8)
 			break;
 
 		if (!(s->results = realloc(s->results, (s->count + 1) * sizeof(struct gg_search_result)))) {

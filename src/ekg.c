@@ -172,6 +172,7 @@ int my_getc(FILE *f)
 						gg_free_dcc(d);
 						break;
 				}
+				break;
 			}
 			
 			/* timeout reconnectu */

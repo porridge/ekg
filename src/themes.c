@@ -531,7 +531,7 @@ void init_theme()
 	add_format("connecting", "%> £±czê siê z serwerem...\n", 1);
 	add_format("conn_failed", "%! Po³±czenie nie uda³o siê: %1\n", 1);
 	add_format("conn_stopped", "%! Przerwano ³±czenie\n", 1);
-	add_format("conn_timeout", "%! Przekroczono czas limitu operacji ³±czenia z serwerem\n", 1);
+	add_format("conn_timeout", "%! Przekroczono limit czasu operacji ³±czenia z serwerem\n", 1);
 	add_format("connected", "%> Po³±czono %c(%C%#%c)%n\n", 1);
 	add_format("disconnected", "%> Roz³±czono %c(%C%#%c)%n\n", 1);
 	add_format("theme_loaded", "%> Wczytano opis wygl±du o nazwie %W%1%n\n", 1);
@@ -547,19 +547,19 @@ void init_theme()
 	add_format("register", "%> Rejestracja poprawna: Wygrany numerek: %W%1%n\n", 1);
 	add_format("register_failed", "%! B³±d podczas rejestracji\n", 1);
 	add_format("register_pending", "%! Rejestracja w toku\n", 1);
-	add_format("register_timeout", "%! Przekroczono czas limitu operacji szukania\n", 1);
+	add_format("register_timeout", "%! Przekroczono limit czasu operacji szukania\n", 1);
 	
 	add_format("remind", "%> Has³o zosta³o wys³ane\n", 1);
 	add_format("remind_failed", "%! B³±d podczas wysy³ania has³a\n", 1);
-	add_format("remind_timeout", "%! Przekroczono czas limitu operacji wys³ania has³a\n", 1);
+	add_format("remind_timeout", "%! Przekroczono limit czasu operacji wys³ania has³a\n", 1);
 	
 	add_format("passwd", "%> Has³o zosta³o zmienione\n", 1);
 	add_format("passwd_failed", "%! B³±d podczas zmiany has³a\n", 1);
-	add_format("passwd_timeout", "%! Przekroczono czas limitu operacji zmiany has³a\n", 1);
+	add_format("passwd_timeout", "%! Przekroczono limit czasu operacji zmiany has³a\n", 1);
 	
 	add_format("change", "%> Informacje w katalogu publicznym zosta³y zmienione\n", 1);
 	add_format("change_failed", "%! B³±d podczas zmiany informacji w katalogu publicznym\n", 1);
-	add_format("change_timeout", "%! Przekroczono czas limitu operacji zmiany katalogu publicznego\n", 1);
+	add_format("change_timeout", "%! Przekroczono limit czasu operacji zmiany katalogu publicznego\n", 1);
 	
 	add_format("sms_msg", "EKG: msg %1 %# >> %2", 1);
 	add_format("sms_chat", "EKG: chat %1 %# >> %2", 1);
@@ -645,6 +645,7 @@ void init_theme()
 	
 	add_format("dcc_done_get", "%> Zakoñczono pobieranie pliku %W%2%n od %1\n", 1);
 	add_format("dcc_done_send", "%> Zakoñczono wysy³anie pliku %W%2%n do %1\n", 1);
+	add_format("dcc_get_offer", "%) %1 przesy³a plik %W%2%n o rozmiarze %W%3%n\n%) Wpisz %Wdcc get #%4%n\n", 1);
 	
 };
 

@@ -201,9 +201,12 @@ enum {
 	GG_STATE_READING_REQUEST,	/* czeka na komendê */
 	GG_STATE_SENDING_REQUEST,	/* wysy³a komendê */
 	GG_STATE_SENDING_FILE_INFO,	/* wysy³a informacje o pliku */
+	GG_STATE_READING_PRE_FILE_INFO,	/* czeka na pakiet przed file_info */
 	GG_STATE_READING_FILE_INFO,	/* czeka na informacje o pliku */
+	GG_STATE_SENDING_FILE_ACK,	/* wysy³a potwierdzenie pliku */
 	GG_STATE_READING_FILE_ACK,	/* czeka na potwierdzenie pliku */
 	GG_STATE_SENDING_FILE_HEADER,	/* wysy³a nag³ówek pliku */
+	GG_STATE_READING_FILE_HEADER,	/* czeka na nag³ówek */
 	GG_STATE_GETTING_FILE,		/* odbiera plik */
 	GG_STATE_SENDING_FILE,		/* wysy³a plik */
 };
@@ -249,6 +252,7 @@ enum {
 	GG_EVENT_DCC_DONE,		/* skoñczy³ */
 	GG_EVENT_DCC_CLIENT_ACCEPT,	/* moment akceptacji klienta */
 	GG_EVENT_DCC_NEED_FILE_INFO,	/* trzeba wype³niæ file_info */
+	GG_EVENT_DCC_NEED_FILE_ACK,	/* czeka na potwierdzenie */
 };
 
 /*
