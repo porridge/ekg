@@ -137,7 +137,7 @@ KLAWIATURA
     terminal, mo¿na u¿ywaæ Alt-Enter lub wcisn±æ Esc i zaraz po nim Enter.
 
     Dodatkowo, okre¶lonym kombinacjom klawiszy mo¿na przypisaæ ró¿ne
-    komendy za pomoc± polecenia ,,bind''.
+    komendy za pomoc± polecenia ,,bind'' (niedostêpne jeszcze w ncurses).
 
 GDZIE SZUKAÆ POMOCY
 
@@ -256,19 +256,19 @@ ZG£ASZANIE B£ÊDÓW
 LISTA DYSKUSYJNA
 
     Istnieje lista dyskusyjna dla u¿ytkowników EKG o adresie 
-    ekg-users@list.ziew.org. Aby siê zapisaæ nale¿y wej¶æ na 
-    strone o adresie:
+    ekg-users@list.ziew.org. Aby siê zapisaæ, nale¿y wej¶æ na 
+    stronê o adresie:
 	    
 	http://list.ziew.org/mailman/listinfo/ekg-users
 	
-    oraz postêpowac wed³ug instrukcji tam zawartych.
+    oraz postêpowaæ wed³ug instrukcji tam zawartych.
     
 AUTORZY
 
     Wymienione osoby mia³y mniejszy lub wiêkszy wp³yw na rozwój biblioteki
     i klienta. Niektórzy pisali kod, pomagali analizowaæ protokó³, testowali
     na ró¿nych systemach, inni podsy³ali patche i bugreporty. Je¶li kto¶
-    zosta³ pominiêty, niech da znaæ. W ka¿dym razie za to, jak wygl±da ekg
+    zosta³ pominiêty, niech da znaæ. W ka¿dym razie za to, jak wygl±da ekg,
     odpowiedzialni s± (w porz±dku alfabetycznym):
 
 	Marek Antoniak <kfazi@kfazi.polnet.trzepak.pl>
