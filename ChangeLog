@@ -10,7 +10,7 @@ zg³osi³ b³±d.
 
 - poprawka reakcji na zmianê rozmiaru terminala (sz)
 - poprawka segfaulta przy wyj¶ciu z ekg z za³adowanym
-  skryptem pythona, który pisze co¶ w deinit() (embe-ml/sz)
+  skryptem pythona, który pisze co¶ w deinit() (embe/sz)
 
 // 2003-04-02
 
