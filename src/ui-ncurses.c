@@ -909,8 +909,8 @@ void empty_generator(const char *text, int len)
 void file_generator(const char *text, int len)
 {
 	struct dirent **namelist;
-	char *dirc, *basec, *file;
 	const char *dname, *bname;
+	char *dirc, *basec;
 	int count, i;
 
 	dirc = xstrdup(text);
@@ -929,10 +929,19 @@ void file_generator(const char *text, int len)
 	count = scandir(dname, &namelist, NULL, alphasort);
 
 	for (i = 0; i < count; i++) {
-		file = namelist[i]->d_name;
+		char *file = namelist[i]->d_name;
 
+		if (!strcmp(file, ".") || !strcmp(file, "..")) {
+			xfree(namelist[i]);
+			continue;
+		}
+		
 		if (!strncmp(bname, file, strlen(bname)) || *bname == '/') {
-			file = saprintf(dname[strlen(dname) - 1] == '/' ? "%s%s" : "%s/%s", dname, file);
+			if (strcmp(dname, "."))
+				file = saprintf(dname[strlen(dname) - 1] == '/' ? "%s%s" : "%s/%s", dname, file);
+			else
+				file = saprintf("%s", file);
+
 			array_add(&completions, file);
 		}
 
@@ -1752,6 +1761,31 @@ static int ui_ncurses_event(const char *event, ...)
 				w->prompt_len = strlen(w->prompt);
 			}
 		}
+	}
+
+	if (!strcmp(event, "userlist_changed")) {
+		list_t l;
+
+		for (l = windows; l; l = l->next) {
+			struct window *w = l->data;
+			struct userlist *u;
+			int uin;
+
+			if (!w->target || !(uin = atoi(w->target)))
+				continue;
+
+			if (!(u = userlist_find(uin, NULL)) || !u->display)
+				continue;
+
+			xfree(w->target);
+			w->target = xstrdup(u->display);
+
+			xfree(w->prompt);
+			w->prompt = format_string(format_find("ncurses_prompt_query"), w->target);
+			w->prompt_len = strlen(w->prompt);
+		}
+
+		goto cleanup;
 	}
 
 	if (!strcmp(event, "command")) {

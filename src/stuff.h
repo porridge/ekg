@@ -34,9 +34,6 @@
 #include "dynstuff.h"
 #include "ioctld.h"
 
-/* malutki aliasik, ¿eby nie rzucaæ d³ugimi nazwami wszêdzie */
-#define saprintf gg_saprintf
-
 enum event_t {
 	EVENT_MSG = 1,
 	EVENT_CHAT = 2,

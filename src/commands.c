@@ -88,7 +88,7 @@ void add_send_nick(const char *nick)
 	int i;
 
 	for (i = 0; i < send_nicks_count; i++)
-		if (!strcmp(nick, send_nicks[i])) {
+		if (send_nicks[i] && !strcmp(nick, send_nicks[i])) {
 			remove_send_nick(nick);
 			break;
 		}
@@ -123,7 +123,9 @@ void remove_send_nick(const char *nick)
 			for (j = i + 1; j < send_nicks_count; j++)
 				send_nicks[j - 1] = send_nicks[j];
 
-			send_nicks[--send_nicks_count] = NULL;
+			send_nicks_count--;
+
+			send_nicks[send_nicks_count] = NULL;
 
 			break;
 		}
@@ -165,6 +167,7 @@ COMMAND(cmd_add)
 		print("user_added", params[1]);
 		gg_add_notify(sess, uin);
 		config_changed = 1;
+		ui_event("userlist_changed");
 	} else
 		print("error_adding");
 
@@ -506,9 +509,10 @@ COMMAND(cmd_del)
 		print("user_deleted", tmp);
 		gg_remove_notify(sess, uin);
 		config_changed = 1;
+		ui_event("userlist_changed");
 	} else
 		print("error_deleting");
-
+	
 	return;
 }
 
@@ -826,8 +830,10 @@ COMMAND(cmd_modify)
 			u->uin = strtol(argv[++i], NULL, 0);
 	}
 
-	if (strcasecmp(name, "add"))
+	if (strcasecmp(name, "add")) {
 		print("modify_done", params[0]);
+		ui_event("userlist_changed");
+	}
 
 	config_changed = 1;
 
@@ -1002,7 +1008,10 @@ COMMAND(cmd_list)
 				status = format_string(format_find("user_info_not_avail_descr"), (u->first_name) ? u->first_name : u->display, u->descr);
 				break;
 			case GG_STATUS_INVISIBLE:
-				status = format_string(format_find("user_info_invisble"), (u->first_name) ? u->first_name : u->display);
+				status = format_string(format_find("user_info_invisible"), (u->first_name) ? u->first_name : u->display);
+				break;
+			case GG_STATUS_INVISIBLE_DESCR:
+				status = format_string(format_find("user_info_invisible_descr"), (u->first_name) ? u->first_name : u->display, u->descr);
 				break;
 			default:
 				status = format_string(format_find("user_info_unknown"), (u->first_name) ? u->first_name : u->display);

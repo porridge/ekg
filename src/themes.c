@@ -904,6 +904,7 @@ void theme_init()
 	format_add("user_info_not_avail", "%rniedostêpn%@1%n", 1);
 	format_add("user_info_not_avail_descr", "%rniedostêpn%@1%n (%2)", 1);
 	format_add("user_info_invisible", "%cniewidoczn%@1%n", 1);
+	format_add("user_info_invisible_descr", "%cniewidoczn%@1%n (%2)", 1);
 
 	/* status */
 	format_add("show_status_profile", "%) Profil: %T%1%n\n", 1);

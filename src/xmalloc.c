@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdarg.h>
 #ifndef _AIX
 #  include <string.h>
 #endif
@@ -92,4 +93,21 @@ char *xstrdup(const char *s)
 	return tmp;
 }
 
+/* nie jest w nag³ówkach, ¿eby <libgadu.h> nie wymaga³o <stdarg.h> */
+extern char *gg_vsaprintf(const char *format, va_list ap);
+
+char *saprintf(const char *format, ...)
+{
+	va_list ap;
+	char *res;
+	
+	va_start(ap, format);
+	res = gg_vsaprintf(format, ap);
+	va_end(ap);
+
+	if (!res)
+		oom_handler();
+	
+	return res;
+}
 

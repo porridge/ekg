@@ -15,6 +15,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - porz±dki z ui_event() (malekith/w)
 - porz±dki w configure.in i Makefile.in (w)
 - proste dope³nianie plików w ui-ncurses (DJ/w)
+- poprawka wy¶wietlanie w³asnego stanu niewidocznego (w)
+- dodanie u¿ytkownika powoduje uaktualnienie nazwy okienka (w)
+- po wielu latach w koñcu saprintf() nie zwraca NULL (w)
 
 // 2002-10-02
 
