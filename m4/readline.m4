@@ -108,6 +108,6 @@ AC_DEFUN(AC_SEARCH_READLINE, [
     AC_READLINE(/usr/local/include, readline.h, -L/usr/local/lib -lreadline, -I/usr/local/include, /usr/local)
     AC_READLINE(/usr/local/include/readline, readline.h, -L/usr/local/lib -L/usr/local/lib/readline -lreadline, -I/usr/local/include/readline, /usr/local/include/readline)
     AC_READLINE(/usr/freeware/include/readline, readline.h, -L/usr/freeware/lib32 -lreadline, -I/usr/freeware/include, /usr/freeware/include/readline)
-    AC_READLINE(/sw/include/readline, readline.h, -L/sw/lib -lreadline, -I/sw/include, /sw/include/readline)
+    AC_READLINE(/sw/include/readline, readline.h, -L/sw/lib -lreadline, -I/sw/include/readline, /sw/include/readline)
 ] ) 
 
