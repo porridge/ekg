@@ -39,6 +39,13 @@
 #include "vars.h"
 #include "ui.h"
 
+static void ui_readline_loop();
+static void ui_readline_print(const char *target, const char *line);
+static void ui_readline_beep();
+static void ui_readline_new_target(const char *target);
+static void ui_readline_query(const char *param);
+static void ui_readline_deinit();
+
 static int in_readline = 0, no_prompt = 0, pager_lines = -1, screen_lines = 24, screen_columns = 80;
 static char *query_nick = NULL;
 

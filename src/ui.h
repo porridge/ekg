@@ -29,14 +29,14 @@ void (*ui_new_target)(const char *target);
 void (*ui_query)(const char *target);
 void (*ui_deinit)(void);
 
-#include "ui-batch.h"
+extern void ui_batch_init();
 
 #ifdef WITH_UI_READLINE
-#include "ui-readline.h"
+extern void ui_readline_init();
 #endif
 
 #ifdef WITH_UI_NCURSES
-#include "ui-ncurses.h"
+extern void ui_ncurses_init();
 #endif
 
 #endif /* __UI_H */

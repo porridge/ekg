@@ -30,16 +30,24 @@
 #include "vars.h"
 #include "ui.h"
 
+static void ui_ncurses_loop();
+static void ui_ncurses_print(const char *target, const char *line);
+static void ui_ncurses_beep();
+static void ui_ncurses_new_target(const char *target);
+static void ui_ncurses_query(const char *param);
+static void ui_ncurses_deinit();
+
 static WINDOW *status = NULL, *input = NULL, *output = NULL;
 int lines = 0, x = 0, y = 0, start = 0;
 char line[1000] = "";
 
+#define output_size (stdscr->_maxy - 1)
+
 static void foo()
 {
-	char *tmp = saprintf(" y=%d, lines=%d, start=%d                                                       ", y, lines, start);
+	char *tmp = saprintf("y=%d, lines=%d, start=%d           ", y, lines, start);
 	wattrset(status, COLOR_PAIR(8));
-	werase(status);
-	mvwaddstr(status, 0, 0, tmp);
+	mvwaddstr(status, 0, 38, tmp);
 	free(tmp);
 	wnoutrefresh(status);
 	doupdate();
@@ -48,7 +56,7 @@ static void foo()
 static void set_cursor()
 {
 	if (y == lines) {
-		if (start == lines - 23)
+		if (start == lines - output_size)
 			start++;
 		wresize(output, y + 1, 80);
 		lines++;
@@ -151,7 +159,7 @@ void ui_ncurses_init()
 	wattrset(status, COLOR_PAIR(8) | A_BOLD);
 	mvwaddstr(status, 0, 0, " ekg XP");
 	wattrset(status, COLOR_PAIR(8));
-	waddstr(status, " :: http://dev.null.pl/ekg/ :: Przed u¿yciem przeczytaj ulotkê!          ");
+	waddstr(status, " :: http://dev.null.pl/ekg/ ::                                           ");
 	
 	wnoutrefresh(output);
 	wnoutrefresh(status);
@@ -182,6 +190,7 @@ static void ui_ncurses_loop()
 			case KEY_BACKSPACE:
 			case KEY_DC:
 			case 8:
+			case 127:
 				if (strlen(line) > 0)
 					line[strlen(line) - 1] = 0;
 				break;
@@ -194,20 +203,22 @@ static void ui_ncurses_loop()
 			case 'U' - 64:
 				line[0] = 0;
 				break;
+			case 'L' - 64:
+				break;
 			case KEY_LEFT:
 			case KEY_RIGHT:
 			case KEY_UP:
 			case KEY_DOWN:
 				break;
 			case KEY_PPAGE:
-				start -= 23;
+				start -= output_size;
 				if (start < 0)
 					start = 0;
 				break;
 			case KEY_NPAGE:
-				start += 23;
-				if (start > lines - 23)
-					start = lines - 23;
+				start += output_size;
+				if (start > lines - output_size)
+					start = lines - output_size;
 				break;
 			default:
 				line[strlen(line) + 1] = 0;
