@@ -3039,7 +3039,6 @@ COMMAND(cmd_timer)
 
 		for (;;) {
 			time_t tmp_t = 0;
-			int get_out = 0;
 
 			if (isdigit(*p))
 				tmp_t = atoi(p);
@@ -3067,12 +3066,11 @@ COMMAND(cmd_timer)
 						print("invalid_params", name);
 						return;
 				}
-			} else
-				get_out = 1;
+			}
 
 			t += tmp_t;
 			
-			if (get_out || *p == '\0')
+			if (*p == '\0')
 				break;
 		}
 
