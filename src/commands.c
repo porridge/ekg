@@ -624,7 +624,7 @@ COMMAND(cmd_del)
 		}
 
 		printq("user_cleared_list");
-		command_exec(NULL, "cleartab", 0);
+		command_exec(NULL, "cleartab", 1);
 		config_changed = 1;
 		return 0;
 	}
