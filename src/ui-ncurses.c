@@ -43,16 +43,6 @@ char line[1000] = "";
 
 #define output_size (stdscr->_maxy - 1)
 
-static void foo()
-{
-	char *tmp = saprintf("y=%d, lines=%d, start=%d           ", y, lines, start);
-	wattrset(status, COLOR_PAIR(8));
-	mvwaddstr(status, 0, 38, tmp);
-	free(tmp);
-	wnoutrefresh(status);
-	doupdate();
-}
-
 static void set_cursor()
 {
 	if (y == lines) {
@@ -62,7 +52,6 @@ static void set_cursor()
 		lines++;
 	}
 	wmove(output, y, 0);
-	foo();		
 }
 
 static void ui_ncurses_print(const char *target, const char *line)
@@ -111,7 +100,8 @@ static void ui_ncurses_print(const char *target, const char *line)
 
 	y++;
 		
-	pnoutrefresh(output, start, 0, 0, 0, lines - 1, 80);
+	pnoutrefresh(output, start, 0, 0, 0, output_size - 1, 80);
+	wnoutrefresh(status);
 	wnoutrefresh(input);
 	doupdate();
 }
@@ -134,8 +124,6 @@ void ui_ncurses_init()
 	cbreak();
 	noecho();
 	nonl();
-	intrflush(stdscr, FALSE);
-	keypad(stdscr, TRUE);
 
 	lines = stdscr->_maxy - 1;
 
@@ -224,10 +212,10 @@ static void ui_ncurses_loop()
 				line[strlen(line) + 1] = 0;
 				line[strlen(line)] = ch;
 		}
-		foo();
-		prefresh(output, start, 0, 0, 0, lines - 1, 80);
+		pnoutrefresh(output, start, 0, 0, 0, output_size - 1, 80);
 		werase(input);
 		mvwaddstr(input, 0, 0, line);
+		wnoutrefresh(status);
 		wnoutrefresh(input);
 		doupdate();
 	}
