@@ -24,6 +24,9 @@
 #define __GG_LIBGADU_H
 
 #ifdef __cplusplus
+#ifdef _WIN32
+#pragma pack(push, 1)
+#endif
 extern "C" {
 #endif
 
@@ -581,6 +584,7 @@ void gg_debug(int level, const char *format, ...);
 extern int gg_proxy_enabled;
 extern char *gg_proxy_host;
 extern int gg_proxy_port;
+extern int gg_proxy_http_only;
 
 /*
  * -------------------------------------------------------------------------
@@ -595,6 +599,9 @@ int gg_resolve(int *fd, int *pid, const char *hostname);
 char *gg_saprintf(const char *format, ...);
 #define gg_alloc_sprintf gg_saprintf
 char *gg_get_line(char **ptr);
+#ifdef _WIN32
+int gg_thread_socket(int thread_id, int socket);
+#endif
 int gg_connect(void *addr, int port, int async);
 struct hostent *gg_gethostbyname(const char *hostname);
 char *gg_read_line(int sock, char *buf, int length);
@@ -841,6 +848,9 @@ struct gg_dcc_big_packet {
 
 #ifdef __cplusplus
 }
+#ifdef _WIN32
+#pragma pack(pop)
+#endif
 #endif
 
 #endif /* __GG_LIBGADU_H */

@@ -50,7 +50,7 @@ struct list *windows = NULL;
 struct window *win;
 
 /* kod okienek napisany jest na podstawie ekg-windows nilsa */
-static int window_add();
+static struct window *window_add();
 static int window_del(int id);
 static int window_switch(int id);
 static int window_refresh();
@@ -795,8 +795,7 @@ static int ui_readline_event(const char *event, ...)
 		        }
 
 		        if (!strcasecmp(p1, "new")) {
-		                if (!window_add())
-		                        print("window_add");
+		                window_add();
  
 			} else if (!strcasecmp(p1, "next")) {
 		                window_switch(curr_window + 1);
@@ -867,14 +866,14 @@ cleanup:
 	return result;
 }
 
-static int window_add()
+static struct window *window_add()
 {
         int j;
         struct window w;
 
         if (windows_count > MAX_WINDOWS) {
                 print("windows_max");
-                return 1;
+                return NULL;
         }
 
         w.id = windows_count + 1;
@@ -886,9 +885,7 @@ static int window_add()
 
 	w.buff.last = 0;
 
-        list_add(&windows, &w, sizeof(w));
-
-        return 0;
+        return list_add(&windows, &w, sizeof(w));
 }
 
 static int window_del(int id)
@@ -951,18 +948,18 @@ static int window_switch(int id)
 
 static int window_refresh()
 {
-        int j = 0;
+        int j;
 
         printf("\033[H\033[J"); /* blah */
 
         for (j = win->buff.last; j < MAX_LINES_PER_SCREEN; j++) {
                 if (win->buff.line[j])
-                        printf("%s", win->buff.line[j]);
+                        printf("%d:%s", j, win->buff.line[j]);
         }
 
         for (j=0; j < win->buff.last; j++) {
                 if (win->buff.line[j])
-                        printf("%s", win->buff.line[j]);
+                        printf("%d:%s", j, win->buff.line[j]);
         }
 
         return 0;
@@ -975,7 +972,7 @@ static int window_write(int id, const char *line)
         struct window *w = NULL;
 
         if (!line)
-                return(1);
+                return 1;
 
         if (id == curr_window)
                 w = win;
@@ -986,17 +983,18 @@ static int window_write(int id, const char *line)
                                 break;
                 }
 
+	if (!w)
+		w = win;
+
         j = w->buff.last;
         if (w->buff.line[j])
                 xfree(w->buff.line[j]);
 
-        w->buff.line[j] = (char*)xmalloc(strlen(line)+2);
-
-        snprintf(w->buff.line[j], strlen(line)+2, "%s", line);
+        w->buff.line[j] = xstrdup(line);
 
         w->buff.last++;
 
-        if(w->buff.last == MAX_LINES_PER_SCREEN - 1)
+        if(w->buff.last >= MAX_LINES_PER_SCREEN - 1)
                 w->buff.last = 0;
 
         return 0;
@@ -1006,8 +1004,10 @@ static int window_clear()
 {
         int j;
 
-        for (j = 0; j < MAX_LINES_PER_SCREEN; j++)
+        for (j = 0; j < MAX_LINES_PER_SCREEN; j++) {
+		xfree(win->buff.line[j]);
                 win->buff.line[j] = NULL;
+	}
 
         return 0;
 }
@@ -1080,14 +1080,8 @@ static int window_make_query(const char *nick)
 #else /*#elif HAVE_RL_EXPAND_PROMPT*/
 					rl_expand_prompt(current_prompt());
 #endif									
-				}
-
-				else {
-					char id[4];
-
-					snprintf(id, 4, "%d", w->id);
-					print("window_id_query_started", id, nick);
-				}
+				} else
+					print("window_id_query_started", itoa(w->id), nick);
 				
 				return w->id;
 			}
@@ -1095,14 +1089,10 @@ static int window_make_query(const char *nick)
 	}
 	
 	if (config_make_window == 1 || config_make_window == 2) {
-		struct list *l;
-		struct window *w = NULL;
+		struct window *w;
 
-		if (window_add()) 
+		if (!(w = window_add()))
 			return 0;
-
-		for (l = windows; l; l = l->next)
-			w = (struct window*)l->data;
 		
 		w->query_nick = xstrdup(nick);
 		
@@ -1113,14 +1103,9 @@ static int window_make_query(const char *nick)
 #else /*#elif HAVE_RL_EXPAND_PROMPT*/
 			rl_expand_prompt(current_prompt());
 #endif								
-		}
+		} else
+			print("window_id_query_started", itoa(w->id), nick);
 			
-		else {
-			char id[4];
-
-			snprintf(id, 4, "%d", w->id);
-			print("window_id_query_started", id, nick);
-		}
 		return w->id;
 	}
 
