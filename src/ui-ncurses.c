@@ -92,6 +92,7 @@ struct window {
 	int prompt_len;		/* d³ugo¶æ prompta lub 0 */
 	int floating;		/* czy p³ywaj±ce? */
 	int pos_x, pos_y;	/* pozycja x,y wzgledem ekranu */
+	int max_x, max_y;	/* maksymalny rozmiar okna */
 };
 
 static WINDOW *status = NULL;		/* okno stanu */
@@ -149,6 +150,7 @@ struct binding *binding_map_meta[KEY_MAX + 1];	/* j.w. z altem */
 static void set_cursor(struct window *w)
 {
 	if (w->y == w->lines) {
+		/* TODO: braæ wg. w->max_y */
 		if (w->start == w->lines - output_size2(w))
 			w->start++;
 		wresize(w->window, w->y + 1, w->window->_maxx + 1);
@@ -206,7 +208,9 @@ static void window_floating_update(int n)
 			command_exec(w->target, w->prompt);
 			window_current = old;
 			/* niech bedzie na tyle male, na ile mozna: */
-			wresize(w->window, w->y + 1, w->window->_maxx + 1);
+			if (w->y > w->max_y)
+				w->y = w->max_y - 1;
+			wresize(w->window, w->y + 1, w->max_x + 1);
 		}
 	}
 }
@@ -248,6 +252,7 @@ static void window_refresh()
 		if (w->floating)
 			continue;
 
+		/* TODO: braæ na podstawie max_y i max_x */
 		if (window_current->id == w->id)
 			pnoutrefresh(w->window, w->start, 0, w->pos_y, w->pos_x, output_size - 1, stdscr->_maxx - CONTACTS_SIZE + 1);
 		else
@@ -321,7 +326,7 @@ static struct window *window_new(const char *target)
 	struct window w;
 	list_t l;
 	int id = 1, done = 0;
-	int maxx = 10, maxy = 10, z;
+	int z;
 
 	if (target && *target == '*')
 		id = 100;	/* XXX */
@@ -366,10 +371,10 @@ static struct window *window_new(const char *target)
 					w.pos_y = z;
 					tmp = end;
 					if ((*tmp++ == ',') && ((z = strtoul(tmp, &end, 10)) > 0)) {
-						maxx = z;
+						w.max_x = z;
 						tmp = end;
 						if ((*tmp++ == ',') && ((z = strtoul(tmp, &end, 10)) > 0))
-							maxy = z;
+							w.max_y = z;
 					}
 				}
 			}
@@ -392,13 +397,16 @@ static struct window *window_new(const char *target)
 		w.pos_x = 0;
 	if (w.pos_y > stdscr->_maxy)
 		w.pos_y = 0;
-	if (w.pos_x + maxx > stdscr->_maxx)
-		maxx = stdscr->_maxx - w.pos_x - 1;
-	if (w.pos_y + maxy > stdscr->_maxy)
-		maxy = stdscr->_maxy - w.pos_y - 1;
+	if (!w.max_y)
+		w.max_y = w.lines = stdscr->_maxy - 1 - w.pos_y;
+ 	if (!w.max_x)
+		w.max_x = stdscr->_maxx + 1;
+	if (w.pos_x + w.max_x > stdscr->_maxx)
+		w.max_x = stdscr->_maxx - w.pos_x - 1;
+	if (w.pos_y + w.max_y > stdscr->_maxy)
+		w.max_y = stdscr->_maxy - w.pos_y - 1;
 	
- 	w.lines = stdscr->_maxy - 1 - w.pos_y;
-	w.window = (w.floating) ? newwin(maxy,maxx,w.pos_y,w.pos_x) : newpad(w.lines, stdscr->_maxx + 1);
+ 	w.window = (w.floating) ? newwin(w.max_y, w.max_x, w.pos_y, w.pos_x) : newpad(w.max_y, w.max_x);
  
 	return list_add_sorted(&windows, &w, sizeof(w), window_new_compare);
 }
@@ -1312,7 +1320,7 @@ void file_generator(const char *text, int len)
 
 void window_generator(const char *text, int len)
 {
-	char *words[] = { "new", "kill", "move", "next", "prev", "switch", "clear", "refresh", "list", NULL };
+	char *words[] = { "new", "kill", "move", "next", "prev", "resize", "switch", "clear", "refresh", "list", NULL };
 	int i;
 
 	for (i = 0; words[i]; i++)
@@ -2549,6 +2557,61 @@ static int ui_ncurses_event(const char *event, ...)
 				 					
 				goto cleanup;
 			}
+
+			if (!strcasecmp(p1, "resize")) {
+				struct window *w = window_current;
+				char *end = NULL, *tmp = NULL;
+				list_t l;
+				int x;
+
+				if (!p2) {
+					print("not_enough_params", "window");
+					goto cleanup;
+				}
+
+				if ((x = strtoul(p2, &end, 10)) <= 0) {
+					/* ?? */
+				}
+					
+				for (w = NULL, l = windows; l; l = l->next) {
+					struct window *ww = l->data;
+
+					if (ww->id == x) {
+						w = ww;
+						break;
+					}
+				}
+
+				if (!end || *end != ',') {
+					/* ?? */
+					goto cleanup;
+				}
+					
+				tmp = end + 1;
+				end = NULL;
+				if ((x = strtoul(tmp, &end, 10)) >= 0)
+					w->max_x = x;
+				
+				if (!end || *end != ',') {
+					/* ?? */
+					goto cleanup;
+				}
+				
+				tmp = end + 1;
+				end = NULL;
+				
+				if ((x = strtoul(tmp, &end, 10)) >= 0)
+					w->max_y = x;
+
+				if (!w->floating) {
+					w->lines = w->max_y - w->pos_y;
+					if (w->y > w->lines) w->start = w->y - w->lines;
+					/* TODO: czyszczenie screen'a */
+				}
+				 					
+				goto cleanup;
+			}
+
 			
 			if (!strcasecmp(p1, "refresh")) {
 				window_floating_update(0);
