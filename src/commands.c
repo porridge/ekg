@@ -456,9 +456,9 @@ COMMAND(cmd_status)
 {
 	struct userlist *u;
 	struct in_addr i;
-	struct tm *lce, *est, *now;
+	struct tm *t;
 	time_t n;
-	int mqc;
+	int mqc, now_days;
 	char *tmp, *priv, *r1, *r2, buf[100], buf1[100];
 
 	if (config_profile) {
@@ -472,13 +472,14 @@ COMMAND(cmd_status)
 	}
 
 	n = time(NULL);
-	now = localtime(&n);
+	t = localtime(&n);
+	now_days = t->tm_yday;
 	
-	lce = localtime(&last_conn_event);
-	strftime(buf, sizeof(buf), format_find((lce->tm_yday == now->tm_yday) ? "show_status_last_conn_event_today" : "show_status_last_conn_event"), lce);
+	t = localtime(&last_conn_event);
+	strftime(buf, sizeof(buf), format_find((t->tm_yday == now_days) ? "show_status_last_conn_event_today" : "show_status_last_conn_event"), t);
 
-	est = localtime(&ekg_started);
-	strftime(buf1, sizeof(buf1), format_find((est->tm_yday == now->tm_yday) ? "show_status_ekg_started_today" : "show_status_ekg_started"), est);
+	t = localtime(&ekg_started);
+	strftime(buf1, sizeof(buf1), format_find((t->tm_yday == now_days) ? "show_status_ekg_started_today" : "show_status_ekg_started"), t);
 	
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		char *tmp = format_string(format_find("show_status_not_avail"));

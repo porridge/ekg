@@ -97,7 +97,8 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 	char *timestamp = NULL, *save, *secure_label = NULL;
 	char *line_width = NULL, timestr[100], *target, *cname;
 	char *formatmap = NULL;
-	struct tm *tm, *now;
+	struct tm *tm;
+	int now_days;
 	struct conference *c = NULL;
 
 	/* tworzymy mapê formatowanego tekstu. dla ka¿dego znaku wiadomo¶ci
@@ -179,13 +180,14 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 	cname = (c ? c->name : "");
 
 	tt = time(NULL);
+	tm = localtime(&tt);
+	now_days = tm->tm_yday;
 
-	now = localtime(&tt);
 	tm = localtime(&e->event.msg.time);
 
 	if (t - config_time_deviation <= tt && tt <= t + config_time_deviation)
 		timestamp_type = 2;
-	else if (now->tm_yday == tm->tm_yday)
+	else if (now_days == tm->tm_yday)
 		timestamp_type = 1;
 	
 	switch (chat) {
