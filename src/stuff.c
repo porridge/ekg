@@ -1610,7 +1610,10 @@ int correct_event(char *act)
 {
         int y = 0, i;
         char *cmd = NULL, *arg = NULL, *action = strdup(act), *evs[10];
+
+#ifdef IOCTL
         struct action_data test;
+#endif // IOCTL
 
         if (!strncasecmp(action, "clear",  5))
                 return 0;
@@ -1634,6 +1637,7 @@ int correct_event(char *act)
                 } else
                         cmd = evs[i];
 
+#ifdef IOCTL
                 if (!strncasecmp(cmd, "blink_leds", 10) || !strncasecmp(cmd, "beeps_spk", 9)) {
                         if (arg == NULL) {
                                 my_printf("events_act_no_params", cmd);
@@ -1657,7 +1661,9 @@ int correct_event(char *act)
                         continue;
                 }
 
-                else if (!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
+                else 
+#endif // IOCTL		
+		if (!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
                         if (arg == NULL) {
                                 my_printf("events_act_no_params", cmd);
                                 return 1;
