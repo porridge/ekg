@@ -68,17 +68,17 @@ struct gg_session {
 
 	struct gg_event *event;	/* zdarzenie po ->callback() */
 
-	unsigned long proxy_addr;	/* adres proxy, keszowany */
-	int proxy_port;			/* port proxy */
+	uint32_t proxy_addr;	/* adres proxy, keszowany */
+	uint16_t proxy_port;	/* port proxy */
 
-	unsigned long hub_addr;		/* adres huba po resolvniêciu */
-	unsigned long server_addr;	/* adres serwera, od huba */
+	uint32_t hub_addr;	/* adres huba po resolvniêciu */
+	uint32_t server_addr;	/* adres serwera, od huba */
 
-	unsigned long client_addr;	/* adres klienta */
-	int client_port;		/* port, na którym klient s³ucha */
+	uint32_t client_addr;	/* adres klienta */
+	uint16_t client_port;	/* port, na którym klient s³ucha */
 
-	unsigned long external_addr;	/* adres zewnetrzny klienta */
-	int external_port;		/* port zewnetrzny klienta */
+	uint32_t external_addr;	/* adres zewnetrzny klienta */
+	uint16_t external_port;	/* port zewnetrzny klienta */
 	
 	uin_t uin;		/* numerek klienta */
 	char *password;		/* i jego has³o. zwalniane automagicznie */
@@ -264,16 +264,16 @@ struct gg_login_params {
 	int async;			/* asynchroniczne sockety? */
 	int status;			/* pocz±tkowy status klienta */
 	char *status_descr;		/* opis statusu XXX */
-	unsigned long server_addr;	/* adres serwera gg */
-	unsigned short server_port;	/* port serwera gg */
-	unsigned long client_addr;	/* adres dcc klienta */
-	unsigned short client_port;	/* port dcc klienta */
+	uint32_t server_addr;		/* adres serwera gg */
+	uint16_t server_port;		/* port serwera gg */
+	uint32_t client_addr;		/* adres dcc klienta */
+	uint16_t client_port;		/* port dcc klienta */
 	int protocol_version;		/* wersja protoko³u */
 	char *client_version;		/* wersja klienta */
 	int has_audio;			/* czy ma d¼wiêk? */
 	int last_sysmsg;		/* ostatnia wiadomo¶æ systemowa */
-	unsigned long external_addr;	/* adres widziany na zewnatrz */
-	unsigned short external_port;	/* port widziany na zewnatrz */
+	uint32_t external_addr;		/* adres widziany na zewnatrz */
+	uint16_t external_port;		/* port widziany na zewnatrz */
 };
 
 struct gg_session *gg_login(const struct gg_login_params *p);
@@ -368,7 +368,7 @@ struct gg_event {
 		} notify_descr;
                 struct {
 			uin_t uin;
-			unsigned long status;
+			uint32_t status;
 			char *descr;
 		} status;
                 struct {
@@ -389,7 +389,8 @@ struct gg_event {
 };
 
 struct gg_event *gg_watch_fd(struct gg_session *sess);
-void gg_free_event(struct gg_event *e);
+void gg_event_free(struct gg_event *e);
+#define gg_free_event gg_event_free
 
 /*
  * funkcje obs³ugi listy kontaktów.
@@ -540,16 +541,16 @@ extern unsigned long gg_dcc_ip;
 
 int gg_dcc_request(struct gg_session *sess, uin_t uin);
 
-struct gg_dcc *gg_dcc_send_file(unsigned long ip, unsigned short port, uin_t my_uin, uin_t peer_uin);
-struct gg_dcc *gg_dcc_get_file(unsigned long ip, unsigned short port, uin_t my_uin, uin_t peer_uin);
-struct gg_dcc *gg_dcc_voice_chat(unsigned long ip, unsigned short port, uin_t my_uin, uin_t peer_uin);
+struct gg_dcc *gg_dcc_send_file(uint32_t ip, uint16_t port, uin_t my_uin, uin_t peer_uin);
+struct gg_dcc *gg_dcc_get_file(uint32_t ip, uint16_t port, uin_t my_uin, uin_t peer_uin);
+struct gg_dcc *gg_dcc_voice_chat(uint32_t ip, uint16_t port, uin_t my_uin, uin_t peer_uin);
 void gg_dcc_set_type(struct gg_dcc *d, int type);
 int gg_dcc_fill_file_info(struct gg_dcc *d, const char *filename);
 int gg_dcc_voice_send(struct gg_dcc *d, char *buf, int length);
 
 #define GG_DCC_VOICE_FRAME_LENGTH 195
 
-struct gg_dcc *gg_dcc_socket_create(uin_t uin, unsigned int port);
+struct gg_dcc *gg_dcc_socket_create(uin_t uin, uint16_t port);
 #define gg_dcc_socket_free gg_free_dcc
 #define gg_dcc_socket_watch_fd gg_dcc_watch_fd
 

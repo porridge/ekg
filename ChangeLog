@@ -21,6 +21,12 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawienie potencjalnego b³êdu w ui-readline (w)
 - literówki w komentarzach (w)
 - docs/api z prostym skryptem generuj±cym dokumentacjê (w)
+- zamiana ,,unsigned long'' na ,,uint32_t'' i ,,unsigned short'' na
+  ,,uint16_t'' w libgadu (w)
+- podbicie wersji ABI. na maszynach, gdzie nie ma wyrównywania
+  do 4 bajtów mog± byæ problemy z okazji zmian rozmiarów zmiennych (w)
+- s/gg_free_event/gg_event_free/ plus #define dla kompatybilno¶ci wstecz (w)
+- s/gg_free_search/gg_search_free/ (w)
 
 // 2002-08-05
 

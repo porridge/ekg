@@ -48,3 +48,14 @@ TABLE.params {
 	margin-left: 3em;
 }
 
+.ctype {
+	color: green;
+}
+
+.cdirective {
+	color: magenta;
+}
+
+.structlink {
+	color: blue;
+}
