@@ -7,7 +7,7 @@ PREFIX = @prefix@
 NAME = ekg
 VERSION = 0.90
 RM = @RM@
-
+MAKE = @MAKE@
 
 CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES)
 OBJS = libgg.o libgg_search.o stuff.o commands.o events.o themes.o vars.o dynstuff.o
@@ -22,9 +22,11 @@ install: ekg
 
 distclean:	clean
 	$(RM) -f *~ config.log config.cache config.status config.h Makefile
+	$(MAKE) -C examples distclean
 
 clean:
 	$(RM) -f *.o ekg search core libgg.so*
+	$(MAKE) -C examples clean 
 
 shared:
 	$(CC) -fPIC -g -c libgg.c -o libgg.o

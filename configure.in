@@ -41,10 +41,15 @@ if test "x$RM" = "xno"; then
     AC_MSG_ERROR([rm ])
 fi
 
+AC_PATH_PROG(MAKE, make, no)
+if test "x$MAKE" = "xno"; then
+    AC_MSG_ERROR([make ])
+fi
+
 AC_C_BIGENDIAN
 
 AC_CHECK_LIB(nsl, t_accept, LIBS="$LIBS -lnsl")
 AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
 
 
-AC_OUTPUT(Makefile)
+AC_OUTPUT(Makefile examples/Makefile)

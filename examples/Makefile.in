@@ -1,0 +1,22 @@
+# $Id$
+
+INCLUDES = -I../ 
+CFLAGS = @CFLAGS@ @DFLAGS@ $(INCLUDES)
+CC = @CC@
+RM = @RM@
+MAKE = @MAKE@
+
+OBJS = ../libgg.o ../libgg_search.o 
+
+all:	$(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) search.c -o search-sync
+	$(CC) $(CFLAGS) $(OBJS) -DASYNC search.c -o search-async
+	$(CC) $(CFLAGS) $(OBJS) send.c -o send
+	$(CC) $(CFLAGS) $(OBJS) conn-async.c -o conn-async
+
+clean: 	
+	$(RM) -f *~ *.o search-sync search-async send conn-async
+
+distclean: clean
+	$(RM) Makefile
+    
