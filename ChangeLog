@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-06-30
+
+- nie wywraca siê, gdy dostanie wiadomo¶æ graficzn± (sz)
+
 // 2003-06-29
 
 - ekgbot w contrib/scripts/ (sznik/w)

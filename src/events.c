@@ -126,8 +126,14 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 		for (i = 0; i < e->event.msg.formats_length; ) {
 			int pos = p[i] + p[i + 1] * 256;
 
+			if (pos > strlen(e->event.msg.message)) {
+				xfree(formatmap);
+				formatmap = NULL;
+				break;
+			}
+
 			if ((p[i + 2] & GG_FONT_COLOR)) {
-				formatmap[pos] = color_map(p[i + 3], p[i + 4], p[i + 5]);				
+				formatmap[pos] = color_map(p[i + 3], p[i + 4], p[i + 5]);
 				if (formatmap[pos] == 'k')
 					formatmap[pos] = 'n';
 			}
@@ -142,7 +148,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 		 * nowej linii i odstêpy. dziêki temu oszczêdzamy sobie
 		 * mieszania ni¿ej w kodzie. */
 
-		for (i = 0; i < strlen(e->event.msg.message); i++) {
+		for (i = 0; formatmap && i < strlen(e->event.msg.message); i++) {
 			if (formatmap[i])
 				last_attr = formatmap[i];
 
