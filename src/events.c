@@ -638,7 +638,7 @@ void handle_event(struct gg_session *s)
 		if (h->type == e->type)
 			(h->handler)(e);
 
-	gg_free_event(e);
+	gg_event_free(e);
 }
 
 /*
@@ -1104,7 +1104,7 @@ void handle_dcc(struct gg_dcc *d)
 			break;
 	}
 
-	gg_free_event(e);
+	gg_event_free(e);
 	
 	return;
 }

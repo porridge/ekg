@@ -1,0 +1,7 @@
+zbiór inkludów, które nale¿y dodaæ do ¶cie¿ki przeszukiwania, by libgadu mog³a
+siê bez problemów skompilowaæ za pomoc± Borland C++ Buildera, bez konieczno¶ci
+posiadania ¶rodowiska GNU. wad± jest brak asynchronicznych w±tków, ale nie ma
+przeszkód, by je pu¶ciæ w osobnym w±tku.
+
+spora czê¶æ kodu jest autorstwa Hao <hao@astercity.net>
+

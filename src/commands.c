@@ -1540,7 +1540,10 @@ COMMAND(cmd_dcc)
 
 COMMAND(cmd_version) 
 {
-    	print("ekg_version", VERSION);
+	char buf[10];
+
+	snprintf(buf, sizeof(buf), "0x%.2x", sess->protocol_version);
+    	print("ekg_version", VERSION, buf, GG_DEFAULT_CLIENT_VERSION);
 
 	return 0;
 }

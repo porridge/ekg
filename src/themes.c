@@ -801,7 +801,7 @@ void theme_init()
 	format_add("private_mode_off", "%> Wy³±czono tryb ,,tylko dla przyjació³''\n", 1);
 	format_add("private_mode_invalid", "%! Nieprawid³owa warto¶æ\n", 1);
 	
-	format_add("show_status", "%) Aktualny stan: %1%2\n%) Aktualny serwer: %3\n", 1);
+	format_add("show_status", "%) Aktualny stan: %1%2\n%) Aktualny serwer: %3:%4\n", 1);
 	format_add("show_status_avail", "%Ydostêpny%n", 1);
 	format_add("show_status_avail_descr", "%Ydostêpny%n (%1)", 1);
 	format_add("show_status_busy", "%Gzajêty%n", 1);
@@ -889,7 +889,7 @@ void theme_init()
 	format_add("quick_list_avail", " %W%1%n", 1);
 	format_add("quick_list_busy", " %w%1%n", 1);
 	format_add("quick_list_invisible", " %K%1%n", 1);
-	format_add("ekg_version", "%) EKG - Eksperymentalny Klient Gadu-Gadu (%W%1%n)\n", 1);
+	format_add("ekg_version", "%) EKG - Eksperymentalny Klient Gadu-Gadu (%W%1%n)\n%) libgadu-%1 (protokó³ %2, klient %3)\n", 1);
 	format_add("registered_today", "%! Ju¿ zarejestrowano jeden numer. Nie nadu¿ywaj.\n", 1);
 
 	format_add("history_send", "> %y%2 [%3]:%n %4\n", 1);
