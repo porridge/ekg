@@ -4688,7 +4688,8 @@ COMMAND(cmd_last)
 {
         list_t l;
 	uin_t uin = 0;
-	int show_sent = 0;
+	int show_sent = 0, last_n = 0, count = 0, i;
+	const char *nick = params[0];
 	time_t n;
 	struct tm *now;
 
@@ -4720,18 +4721,32 @@ COMMAND(cmd_last)
 
 	if (match_arg(params[0], 's', "stime", 2)) {
 		show_sent = 1;
+		nick = params[1];
+	}
 
-		if (params[1] && !(uin = get_uin(params[1]))) {
-			printq("user_not_found", params[1]);
-			return -1;
+	if (match_arg(params[0], 'n', "number", 2)) {
+		const char *tmp;
+		nick = params[1];
+
+		if ((tmp = params[1])) {
+			last_n = atoi(params[1]);
+			nick = NULL;
+
+			while (*tmp)
+				if (isalpha_pl_PL(*tmp)) {
+					nick = tmp;
+					break;
+				} else
+					tmp++;
 		}
-	} else
-		if (params[0] && !(uin = get_uin(params[0]))) {
-			printq("user_not_found", params[0]);
-			return -1;
-		}
+	}
+
+	if (nick && !(uin = get_uin(nick))) {
+		printq("user_not_found", nick);
+		return -1;
+	}
 		
-	if (!((uin > 0) ? last_count(uin) : list_count(lasts))) {
+	if (!((uin > 0) ? (count = last_count(uin)) : (count = list_count(lasts)))) {
 		if (uin) {
 			printq("last_list_empty_nick", format_user(uin));
 			return -1;
@@ -4744,12 +4759,16 @@ COMMAND(cmd_last)
 	n = time(NULL);
 	now = localtime(&n);
 
-        for (l = lasts; l; l = l->next) {
+        for (i = 0, l = lasts; l; l = l->next, i++) {
                 struct last *ll = l->data;
 		struct tm *tm, *st;
 		char buf[100], buf2[100], *time_str = NULL;
 
 		if (uin == 0 || uin == ll->uin) {
+
+			if (last_n && i < (count - last_n))
+				continue;
+
 			tm = localtime(&ll->time);
 			strftime(buf, sizeof(buf), format_find("last_list_timestamp"), tm);
 
@@ -5230,6 +5249,7 @@ void command_init()
 	  "\n"
 	  "  -s, --stime [numer/alias]  wy¶wietla czas wys³ania wiadomo¶ci\n"
 	  "  -c, --clear [numer/alias]  czy¶ci podane wiadomo¶ci lub wszystkie\n"
+	  "  -n, --number <n>           wy¶wietla %Tn%n ostatnich wiadomo¶ci\n"
 	  "  [numer/alias]              wy¶wietla ostatnie wiadomo¶ci\n"
 	  "\n"
 	  "W przypadku opcji %T--stime%n czas wy¶wietlany jest "
