@@ -119,21 +119,27 @@ int check_mail_mbox()
 		struct stat st;
 
 		if (stat(m->fname, &st) == -1) {
-			m->check = 0;
+			cont = 1;
 			continue;
 		}
 
 		if ((st.st_mtime != m->mtime) || (st.st_size != m->size)) {
 			m->mtime = st.st_mtime;
 			m->size = st.st_size;
-			m->check = 1;
 			cont = 1;
-		} else
-			m->check = 0;
+		}
 	}
 
 	if (!cont || pipe(fd))
 		return 1;
+
+	/* XXX */
+	for (l = mail_folders; l; l = l->next) {
+		struct mail_folder *m = l->data;
+		m->check = 1;
+	}
+
+	gg_debug(GG_DEBUG_MISC, "go ahead!\n");
 
  	if ((pid = fork()) < 0) {
 		close(fd[0]);
@@ -153,7 +159,7 @@ int check_mail_mbox()
 		for (l = mail_folders; l; l = l->next) {
 			struct mail_folder *m = l->data;
 
-			if (!m->check || (stat(m->fname, &st) == -1) || !(f = fopen(m->fname, "r")))
+			if ((stat(m->fname, &st) == -1) || !(f = fopen(m->fname, "r")))
 				continue;
 
 			while ((line = read_file(f))) {
@@ -339,7 +345,6 @@ void changed_check_mail_folders(const char *var)
 	check_mail_free();
 
 	if (config_check_mail_folders) {
-		struct stat st;
 		char **f = NULL;
 		int i;
 		
@@ -352,9 +357,6 @@ void changed_check_mail_folders(const char *var)
 				xfree(f[i]);
 				f[i] = buf;
 			}
-
-			if (stat(f[i], &st) == -1)
-				continue;
 
 			foo.fname = f[i];
 			foo.mtime = 0;
