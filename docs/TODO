@@ -15,6 +15,7 @@ rozwi±zanie.
   - blokowanie od¶wie¿ania ekranu w obrêbie jednej komendy -- po co
     przewijaæ linijka po linijce w /help zamiast zablokowaæ przed i
     zwolniæ ekran po? (w)
+  - informcja o opisie w /find (scooty/w)
   - Ctrl-W powinno wrzucaæ do yankbuffera (w)
   - dope³nianie w ¶rodku linii (sz)
   - wykrywanie niewidocznych jako opcja (wielu)
