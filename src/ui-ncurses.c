@@ -2265,18 +2265,21 @@ void unknown_uin_generator(const char *text, int len)
 void known_uin_generator(const char *text, int len)
 {
 	list_t l;
+	int done = 0;
 
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
 
-		if (u->display && !strncasecmp(text, u->display, len))
+		if (u->display && !strncasecmp(text, u->display, len)) {
 			array_add(&completions, (strchr(u->display, ' ')) ? saprintf("\"%s\"", u->display) : xstrdup(u->display));
+			done = 1;
+		}
 	}
 
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
 
-		if (!strncasecmp(text, itoa(u->uin), len))
+		if (!done && !strncasecmp(text, itoa(u->uin), len))
 			array_add(&completions, xstrdup(itoa(u->uin)));
 	}
 
