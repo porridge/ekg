@@ -12,6 +12,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - libgadu: dodanie funkcji gg_base64_encode() i gg_base64_decode() (w)
 - libgadu: obs³uga autoryzacji proxy (adrians,leszek/w)
 - usuniêcie leaka przy debugowaniu (w)
+- poprawka zawijania wiadomo¶ci przy oknie kontaktów (Zwierz/w)
 
 // 2002-11-15
 

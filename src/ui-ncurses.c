@@ -525,6 +525,8 @@ static void update_contacts()
  */
 void contacts_rebuild()
 {
+	ui_screen_width = stdscr->_maxx + 1 - CONTACTS_SIZE;
+
 	if (!config_contacts) {
 		if (contacts)
 			delwin(contacts);
@@ -532,7 +534,7 @@ void contacts_rebuild()
 		contacts = NULL;
 
 		last_contacts_size = 0;
-		
+
 		return;
 	}
 
