@@ -1224,7 +1224,7 @@ void theme_init()
 	format_add("window_list_query", "%) %1: rozmowa z %T%2%n\n", 1);
 	format_add("window_list_nothing", "%) %1: brak rozmowy\n", 1);
 	format_add("window_list_floating", "%) %1: p³ywaj±ce %4x%5 w %2,%3 %T%6%n\n", 1);
-	format_add("window_id_query_started", "%) Rozmowa z %T%2%n rozpoczêta w oknie %W%1%n\n", 1);
+	format_add("window_id_query_started", "%) Rozmowa z %T%2%n rozpoczêta w oknie %T%1%n\n", 1);
 	format_add("window_kill_status", "%! Nie mo¿na zamkn±æ okna statusowego\n", 1);
 
 	/* bind */
@@ -1246,20 +1246,20 @@ void theme_init()
 	format_add("last_list_in", "%) %Y <<%n [%1] %2 %3\n", 1);
 	format_add("last_list_out", "%) %G >>%n [%1] %2 %3\n", 1);
 	format_add("last_list_empty", "%! Nie zalogowano ¿adnych wiadomo¶ci\n", 1);
-	format_add("last_list_empty_nick", "%! Nie zalogowano ¿adnych wiadomo¶ci od/do %W%1%n\n", 1);
+	format_add("last_list_empty_nick", "%! Nie zalogowano ¿adnych wiadomo¶ci od/do %T%1%n\n", 1);
 	format_add("last_list_timestamp", "%m-%d-%Y %H:%M", 1);
 	format_add("last_list_timestamp_today", "%H:%M", 1);
-	format_add("last_clear_uin", "%) Wiadomo¶ci od/do %W%1%n wyczyszczone\n", 1);
+	format_add("last_clear_uin", "%) Wiadomo¶ci od/do %T%1%n wyczyszczone\n", 1);
 	format_add("last_clear", "%) Wszystkie wiadomo¶ci wyczyszczone\n", 1);
 
 	/* queue */
 	format_add("queue_list_timestamp", "%m-%d-%Y %H:%M", 1);
 	format_add("queue_list_message", "%) %G >>%n [%1] %2 %3\n", 1);
 	format_add("queue_clear","%) Kolejka wiadomo¶ci wyczyszczona\n", 1);
-	format_add("queue_clear_uin","%) Kolejka wiadomo¶ci wyczyszczona dla %W%1%n\n", 1);
+	format_add("queue_clear_uin","%) Kolejka wiadomo¶ci wyczyszczona dla %T%1%n\n", 1);
 	format_add("queue_wrong_use", "%! Komenda dzia³a tylko przy braku po³±czenia z serwerem\n", 1);
 	format_add("queue_empty", "%! Kolejka wiadomo¶ci jest pusta\n", 1);
-	format_add("queue_empty_uin", "%! Brak wiadomo¶ci w kolejce dla %W%1%n\n", 1);
+	format_add("queue_empty_uin", "%! Brak wiadomo¶ci w kolejce dla %T%1%n\n", 1);
 	format_add("queue_flush", "%) Wys³ano zaleg³e wiadomo¶ci z kolejki\n", 1);
 
 	/* conference */

@@ -11,6 +11,8 @@ zg³osi³ b³±d.
 - poprawka ostrze¿eñ przy kompilacji gcc 3.x (MuchaR/w)
 - kosmetyka komunikatów o b³êdach niektórych komend (sz)
 - rozszerzenie mo¿liwo¶ci /timer (sz)
+- poprawka themów dla bia³ych terminali (MP/w)
+- libgadu: poprawka pkgconfig (w)
 
 // 2002-01-07
 
