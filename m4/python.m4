@@ -26,32 +26,30 @@ AC_DEFUN(AC_CHECK_PYTHON,[
 		
 		if test "$PYTHON" != ""; then 
 			PYTHON_VERSION=`$PYTHON -c "import sys; print sys.version[[0:3]]"`
-			echo Found Python version $PYTHON_VERSION
+			PYTHON_PREFIX=`$PYTHON -c "import sys; print sys.prefix"`
+			echo Found Python version $PYTHON_VERSION [$PYTHON_PREFIX]
 		fi
 
 		AC_MSG_CHECKING(for Python.h)
 		
+		PYTHON_EXEC_PREFIX=`$PYTHON -c "import sys; print sys.exec_prefix"`
+		
 		if test "$PYTHON_VERSION" != ""; then 
-			for i in $with_arg \
-				/usr/include:-L/usr/lib \
-				/usr/local/include:-L/usr/local/lib \
-				/usr/freeware/include:-L/usr/freeware/lib32 \
-				/usr/pkg/include:-L/usr/pkg/lib \
-				/sw/include:-L/sw/lib \
-				/cw/include:-L/cw/lib; do
-				
-				incl=`echo "$i" | sed 's/:.*//'`
-				lib=`echo "$i" | sed 's/.*://'`
-				
-				if test -f $incl/python$PYTHON_VERSION/Python.h ; then 
-					AC_MSG_RESULT($incl/python$PYTHON_VERSION/Python.h)
-					PYTHON_LIBS="$lib $lib/python$PYTHON_VERSION/config -lpython$PYTHON_VERSION"
-					PYTHON_INCLUDES="-I$incl/python$PYTHON_VERSION"
-					AC_DEFINE(WITH_PYTHON, 1, [define if You want python])
-					have_python=true
-					break
-				fi
-			done
+		    if test -f $PYTHON_PREFIX/include/python$PYTHON_VERSION/Python.h ; then 
+			AC_MSG_RESULT($PYTHON_PREFIX/include/python$PYTHON_VERSION/Python.h)
+			PY_LIB_LOC="-L$PYTHON_EXEC_PREFIX/lib/python$PYTHON_VERSION/config"
+			PY_CFLAGS="-I$PYTHON_PREFIX/include/python$PYTHON_VERSION"
+			PY_MAKEFILE="$PYTHON_EXEC_PREFIX/lib/python$PYTHON_VERSION/config/Makefile"
+
+			PY_LOCALMODLIBS=`sed -n -e 's/^LOCALMODLIBS=\(.*\)/\1/p' $PY_MAKEFILE`
+			PY_BASEMODLIBS=`sed -n -e 's/^BASEMODLIBS=\(.*\)/\1/p' $PY_MAKEFILE`
+			PY_OTHER_LIBS=`sed -n -e 's/^LIBS=\(.*\)/\1/p' $PY_MAKEFILE`
+
+			PYTHON_LIBS="-L$PYTHON_EXEC_PREFIX/lib $PY_LIB_LOC -lpython$PYTHON_VERSION $PY_LOCALMODLIBS $PY_BASEMODLIBS $PY_OTHER_LIBS"
+			PYTHON_INCLUDES="$PY_CFLAGS"
+			AC_DEFINE(WITH_PYTHON, 1, [define if You want python])
+			have_python=true
+		    fi
 		fi
 
 		if test "x$have_python" != "xtrue"; then 

@@ -77,10 +77,9 @@ else
   CFLAGS="$CFLAGS -ggdb" 
 fi
 
+dnl sparc libs...
 AC_CHECK_LIB(nsl, t_accept, LIBS="$LIBS -lnsl")
 AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
-AC_CHECK_LIB(util, openpty, LIBS="$LIBS -lutil")
-AC_CHECK_LIB(m, floor, LIBS="$LIBS -lm")
 
 # zachowujemy opcje dla libgadu
 
