@@ -53,8 +53,8 @@ struct handler handlers[] = {
 void print_message_body(char *str, int chat)
 {
 	int width, i, j;
-	char *mesg, *buf, *line, *next, *format, *save;
-	char *line_width; 
+	char *mesg, *buf, *line, *next, *format = NULL, *save;
+	char *line_width = NULL; 
 	
 	switch (chat) {
 		case 0:
