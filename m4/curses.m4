@@ -1,4 +1,5 @@
 dnl Curses detection: Munged from Midnight Commander's configure.in
+dnl slightly modified for nicer output --wojtekka
 dnl
 dnl What it does:
 dnl =============
@@ -131,7 +132,7 @@ AC_DEFUN(AC_CHECK_CURSES,[
 	  if test x$withval = xno ; then
 		search_ncurses=false
 	  elif test x$withval != xyes ; then
-		AC_NCURSES($withval/include, ncurses.h, -L$withval/lib -lncurses, -I$withval/include, "ncurses on $withval/include")
+		AC_NCURSES($withval/include, ncurses.h, -L$withval/lib -lncurses, -I$withval/include, $withval/include)
 	  fi
 	)
 
@@ -207,7 +208,7 @@ AC_DEFUN(AC_NCURSES, [
     then
         if test -f $1/$2
 	then
-	    AC_MSG_RESULT(Found ncurses on $1/$2)
+	    AC_MSG_RESULT($1/$2)
 
 	    CURSES_LIBS="$3"
 	    AC_CHECK_LIB(ncurses, initscr, , [
@@ -228,19 +229,19 @@ AC_DEFUN(AC_NCURSES, [
 ])
 
 AC_DEFUN(AC_SEARCH_NCURSES, [
-    AC_CHECKING("location of ncurses.h file")
+    AC_MSG_CHECKING(for location of ncurses.h)
 
-    AC_NCURSES(/usr/include, ncurses.h, -lncurses,, "ncurses on /usr/include")
-    AC_NCURSES(/usr/include/ncurses, ncurses.h, -lncurses, -I/usr/include/ncurses, "ncurses on /usr/include/ncurses")
-    AC_NCURSES(/usr/local/include, ncurses.h, -L/usr/local/lib -lncurses, -I/usr/local/include, "ncurses on /usr/local")
-    AC_NCURSES(/usr/pkg/include, ncurses.h, -L/usr/pkg/lib -lncurses, -I/usr/pkg/include, "ncurses on /usr/pkg")
-    AC_NCURSES(/usr/contrib/include, ncurses.h, -L/usr/contrib/lib -lncurses, -I/usr/contrib/include, "ncurses on /usr/contrib")
-    AC_NCURSES(/usr/local/include/ncurses, ncurses.h, -L/usr/local/lib -L/usr/local/lib/ncurses -lncurses, -I/usr/local/include/ncurses, "ncurses on /usr/local/include/ncurses")
-    AC_NCURSES(/usr/freeware/include/ncurses, curses.h, -L/usr/freeware/lib32 -lncurses, -I/usr/freeware/include, "ncurses on /usr/freeware")
+    AC_NCURSES(/usr/include, ncurses.h, -lncurses,, /usr/include)
+    AC_NCURSES(/usr/include/ncurses, ncurses.h, -lncurses, -I/usr/include/ncurses, /usr/include/ncurses)
+    AC_NCURSES(/usr/local/include, ncurses.h, -L/usr/local/lib -lncurses, -I/usr/local/include, /usr/local)
+    AC_NCURSES(/usr/pkg/include, ncurses.h, -L/usr/pkg/lib -lncurses, -I/usr/pkg/include, /usr/pkg)
+    AC_NCURSES(/usr/contrib/include, ncurses.h, -L/usr/contrib/lib -lncurses, -I/usr/contrib/include, /usr/contrib)
+    AC_NCURSES(/usr/local/include/ncurses, ncurses.h, -L/usr/local/lib -L/usr/local/lib/ncurses -lncurses, -I/usr/local/include/ncurses, /usr/local/include/ncurses)
+    AC_NCURSES(/usr/freeware/include/ncurses, curses.h, -L/usr/freeware/lib32 -lncurses, -I/usr/freeware/include, /usr/freeware)
     
-    AC_NCURSES(/usr/local/include/ncurses, curses.h, -L/usr/local/lib -lncurses, -I/usr/local/include/ncurses -DRENAMED_NCURSES, "renamed ncurses on /usr/local/.../ncurses")
+    AC_NCURSES(/usr/local/include/ncurses, curses.h, -L/usr/local/lib -lncurses, -I/usr/local/include/ncurses -DRENAMED_NCURSES, renamed ncurses on /usr/local/.../ncurses)
 
-    AC_NCURSES(/usr/include/ncurses, curses.h, -lncurses, -I/usr/include/ncurses -DRENAMED_NCURSES, "renamed ncurses on /usr/include/ncurses")
+    AC_NCURSES(/usr/include/ncurses, curses.h, -lncurses, -I/usr/include/ncurses -DRENAMED_NCURSES, renamed ncurses on /usr/include/ncurses)
     
     dnl
     dnl We couldn't find ncurses, try SysV curses
@@ -293,3 +294,16 @@ USE_NCURSES
     fi
 ])
 
+
+# Define a conditional.
+
+AC_DEFUN(AM_CONDITIONAL,
+[AC_SUBST($1_TRUE)
+AC_SUBST($1_FALSE)
+if $2; then
+  $1_TRUE=
+  $1_FALSE='#'
+else
+  $1_TRUE='#'
+  $1_FALSE=
+fi])

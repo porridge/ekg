@@ -1,5 +1,6 @@
 dnl readline detection
 dnl based on curses.m4 from gnome
+dnl slightly modified for nicer output --wojtekka
 dnl
 dnl What it does:
 dnl =============
@@ -89,7 +90,7 @@ AC_DEFUN(AC_READLINE, [
     then
         if test -f $1/$2
 	then
-	    AC_MSG_RESULT(Found readline on $1/$2)
+	    AC_MSG_RESULT($1/$2)
  	    READLINE_LIBS="$3"
 	    READLINE_INCLUDES="$4"
 	    search_readline=false
@@ -100,11 +101,12 @@ AC_DEFUN(AC_READLINE, [
 ])
 
 AC_DEFUN(AC_SEARCH_READLINE, [
-    AC_CHECKING("location of readline.h file")
+    AC_MSG_CHECKING(for location of readline.h)
 
-    AC_READLINE(/usr/include, readline.h, -lreadline,, "readline on /usr/include")
-    AC_READLINE(/usr/include/readline, readline.h, -lreadline, -I/usr/include/readline, "readline on /usr/include/readline")
-    AC_READLINE(/usr/local/include, readline.h, -L/usr/local/lib -lreadline, -I/usr/local/include, "readline on /usr/local")
-    AC_READLINE(/usr/local/include/readline, readline.h, -L/usr/local/lib -L/usr/local/lib/readline -lreadline, -I/usr/local/include/readline, "readline on /usr/local/include/readline")
-    AC_READLINE(/usr/freeware/include/readline, readline.h, -L/usr/freeware/lib32 -lreadline, -I/usr/freeware/include, "readline on /usr/freeware/include/readline")
+    AC_READLINE(/usr/include, readline.h, -lreadline,, /usr/include)
+    AC_READLINE(/usr/include/readline, readline.h, -lreadline, -I/usr/include/readline, /usr/include/readline)
+    AC_READLINE(/usr/local/include, readline.h, -L/usr/local/lib -lreadline, -I/usr/local/include, /usr/local)
+    AC_READLINE(/usr/local/include/readline, readline.h, -L/usr/local/lib -L/usr/local/lib/readline -lreadline, -I/usr/local/include/readline, /usr/local/include/readline)
+    AC_READLINE(/usr/freeware/include/readline, readline.h, -L/usr/freeware/lib32 -lreadline, -I/usr/freeware/include, /usr/freeware/include/readline)
 ] ) 
+
