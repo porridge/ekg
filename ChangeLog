@@ -8,7 +8,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-10-03
 
 - s/csae/case/ przy WITH_IOCTLD (d)
-	
+- wy¶wietlanie wyniku wysy³ania smsów (wojboj/w)
+
 // 2002-10-02
 
 - wy¶wietla potwierdzenia w oknie rozmowy (theKnight/w)

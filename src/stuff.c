@@ -747,8 +747,9 @@ void do_reconnect()
  */
 int send_sms(const char *recipient, const char *message, int show_result)
 {
-	int pid;
-	char buf[50];
+	int pid, fd[2] = { 0, 0 };
+	struct gg_exec s;
+	char *tmp;
 
 	if (!config_sms_app) {
 		errno = EINVAL;
@@ -760,25 +761,42 @@ int send_sms(const char *recipient, const char *message, int show_result)
 		return -1;
 	}
 
-	if ((pid = fork()) == -1)
+	if (pipe(fd))
 		return -1;
-
-	if (!pid) {
-		int i;
-
-		for (i = 0; i < 255; i++)
-			close(i);
-			
+		
+	if (!(pid = fork())) {
+		if (fd[1]) {
+			close(fd[0]);
+			dup2(fd[1], 2);
+			dup2(fd[1], 1);
+			close(fd[1]);
+		}	
 		execlp(config_sms_app, config_sms_app, recipient, message, NULL);
 		exit(1);
 	}
 
-	if (show_result)
-		snprintf(buf, sizeof(buf), "\001%s", recipient);
-	else
-		strcpy(buf, "\002");
+	if (pid < 0) {
+		close(fd[0]);
+		close(fd[1]);
+		return -1;
+	}
+	
+	s.fd = fd[0];
+	s.check = GG_CHECK_READ;
+	s.state = GG_STATE_READING_DATA;
+	s.type = GG_SESSION_USER3;
+	s.id = pid;
+	s.timeout = 60;
+	s.buf = string_init(NULL);
 
-	process_add(pid, buf);
+	fcntl(s.fd, F_SETFL, O_NONBLOCK);
+
+	list_add(&watches, &s, sizeof(s));
+	close(fd[1]);
+	
+	tmp = saprintf((show_result) ? "\001%s" : "\002%s", recipient);
+	process_add(pid, tmp);
+	xfree(tmp);
 
 	return 0;
 }
