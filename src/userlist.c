@@ -297,7 +297,7 @@ char *userlist_dump()
 			(u->mobile) ? u->mobile : "",
 			groups,
 			u->uin,
-			u->foreign);
+			(u->foreign) ? u->foreign : "");
 		
 		string_append(s, line);
 
