@@ -126,6 +126,9 @@ struct binding *binding_map_meta[KEY_MAX + 1];	/* j.w. z altem */
 /* rozmiar okna wy¶wietlaj±cego tekst */
 #define output_size (stdscr->_maxy - input_size)
 
+/* rozmiar okna wy¶wietlaj±cego tekst - po uwzglêdnieniu przesuniêcia */
+#define output_size2(w) (stdscr->_maxy - input_size - w->pos_y)
+
 /*
  * ui_debug()
  *
@@ -145,7 +148,7 @@ struct binding *binding_map_meta[KEY_MAX + 1];	/* j.w. z altem */
 static void set_cursor(struct window *w)
 {
 	if (w->y == w->lines) {
-		if (w->start == w->lines - output_size)
+		if (w->start == w->lines - output_size2(w))
 			w->start++;
 		wresize(w->window, w->y + 1, w->window->_maxx + 1);
 		w->lines++;
@@ -319,7 +322,8 @@ static struct window *window_new(const char *target)
 	int id = 1, done = 0;
 	int maxx = 10, maxy = 10, z;
 
-	if ((target)&&(*target == '*')) id = 100;	/* XXX */
+	if (target && *target == '*')
+		id = 100;	/* XXX */
 
 	while (!done) {
 		done = 1;
@@ -339,6 +343,7 @@ static struct window *window_new(const char *target)
 
 	w.id = id;
 	w.target = xstrdup(target);
+
 	if (target) {
 		if (*target == '*') {
 			char *tmp = index(target, '/'), *end = NULL;
@@ -591,7 +596,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 
 	w->y++;
 
-	if (w->lines - w->start > output_size)
+	if (w->lines - w->start > output_size2(w))
 		w->more = 1;
 	
 	if (!w->floating) {
@@ -1076,14 +1081,19 @@ static void ui_ncurses_deinit()
 	endwin();
 
 	for (i = 0; i < HISTORY_MAX; i++)
-		if (history[i] != line)
+		if (history[i] != line) {
 			xfree(history[i]);
+			history[i] = NULL;
+		}
 
 	if (lines) {
-		for (i = 0; lines[i]; i++)
+		for (i = 0; lines[i]; i++) {
 			xfree(lines[i]);
+			lines[i] = NULL;
+		}
 
 		xfree(lines);
+		lines = NULL;
 	}
 
 	xfree(line);
@@ -1525,17 +1535,18 @@ static void update_input()
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
 
-		if (input_size == 5 && w->lines - w->start == output_size + 4)
+		if (input_size == 5 && w->lines - w->start == output_size2(w) + 4)
 			w->start += 4;
 
-		if (input_size == 1 && w->lines - w->start == output_size - 4)
+		if (input_size == 1 && w->lines - w->start == output_size2(w) - 4)
 			w->start -= 4;
 	}
 
-
 	window_refresh();
-	if (contacts)
-		wnoutrefresh(contacts);
+	if (contacts) {
+		wresize(contacts, output_size, contacts->_maxx + 1);
+		update_contacts();
+	}
 	wnoutrefresh(status);
 	wnoutrefresh(input);
 	doupdate();
@@ -1652,9 +1663,10 @@ static void ui_ncurses_loop()
 							string_append(s, "\r\n");
 						}
 
-						command_exec(window_current->target, s->str);
+						line = string_free(s, 0);
+						history[0] = line;
 
-						string_free(s, 1);
+						command_exec(window_current->target, line);
 
 						input_size = 1;
 					}
@@ -1933,7 +1945,7 @@ static void ui_ncurses_loop()
 				
 			case KEY_PPAGE:	/* Page Up */
 			case 'F' - 64:	/* Ctrl-F */
-				window_current->start -= output_size;
+				window_current->start -= output_size2(window_current);
 				if (window_current->start < 0)
 					window_current->start = 0;
 
@@ -1941,11 +1953,11 @@ static void ui_ncurses_loop()
 
 			case KEY_NPAGE:	/* Page Down */
 			case 'G' - 64:	/* Ctrl-G */
-				window_current->start += output_size;
-				if (window_current->start > window_current->lines - output_size)
-					window_current->start = window_current->lines - output_size;
+				window_current->start += output_size2(window_current);
+				if (window_current->start > window_current->lines - output_size2(window_current))
+					window_current->start = window_current->lines - output_size2(window_current);
 
-				if (window_current->start == window_current->lines - output_size) {
+				if (window_current->start == window_current->lines - output_size2(window_current)) {
 					window_current->more = 0;
 					update_statusbar();
 				}
@@ -2510,6 +2522,8 @@ static int ui_ncurses_event(const char *event, ...)
 				if (w->floating)
 					mvwin(w->window, w->pos_y, w->pos_x);
 				else {
+					w->lines = stdscr->_maxy - 1 - w->pos_y;
+					if (w->y > w->lines) w->start = w->y - w->lines;
 					/* TODO: czyszczenie screen'a */
 				}
 				 					
@@ -2524,7 +2538,7 @@ static int ui_ncurses_event(const char *event, ...)
 
 			if (!strcasecmp(p1, "clear")) {
 				struct window *w = window_current;
-				int count = output_size - (w->lines - w->y);
+				int count = output_size2(w) - (w->lines - w->y);
 				
 				w->lines += count;
 				w->start += count;
