@@ -210,10 +210,18 @@ char *prepare_path(char *filename)
 		home = pw->pw_dir;
 	}
 	
-	if (config_user != "") {
-	  snprintf(path, sizeof(path), "%s/.gg/%s/%s", home, config_user, filename);
+	if (filename == "") {
+		if (config_user != "") {
+			snprintf(path, sizeof(path), "%s/.gg/%s", home, config_user);
+		} else {
+			snprintf(path, sizeof(path), "%s/.gg", home);
+		}
 	} else {
-	  snprintf(path, sizeof(path), "%s/.gg/%s", home, filename);
+		if (config_user != "") {
+			snprintf(path, sizeof(path), "%s/.gg/%s/%s", home, config_user, filename);
+		} else {
+			snprintf(path, sizeof(path), "%s/.gg/%s", home, filename);
+		}
 	}
 	
 	return path;
@@ -417,6 +425,7 @@ int config_write(char *filename)
 
 	if (!(tmp = prepare_path("")))
 		return -1;
+    	
 	mkdir(tmp, 0700);
 
 	if (!filename) {
