@@ -331,6 +331,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 void ekg_wait_for_key()
 {
 	static time_t last_ping = 0;
+	static time_t last_spied_check = 0;
 	struct timeval tv;
 	list_t l, m;
 	fd_set rd, wd;
@@ -524,6 +525,37 @@ void ekg_wait_for_key()
 			} else
 				print("error_saving");
 		}
+
+		/* co sekundê sprawd¼ timeouty podgl±danych osób */
+		if (time(NULL) != last_spied_check) {
+			list_t l;
+
+			last_spied_check = time(NULL);
+			for (l = spiedlist; l; ) {
+				struct spied *s = l->data;
+
+				l = l->next;
+
+				s->timeout--;
+
+				if (s->timeout <= 0) {
+					struct userlist *u = userlist_find(s->uin, NULL);
+
+					gg_debug(GG_DEBUG_MISC, "// ekg: spying %d timeout\n", s->uin);
+			
+					if (u && group_member(u, "spied"))
+						if (GG_S_I(u->status)) {
+							if (GG_S_D(u->status))
+								u->status = GG_STATUS_NOT_AVAIL_DESCR;
+							else
+								u->status = GG_STATUS_NOT_AVAIL;
+						}
+
+					list_remove(&spiedlist, s, 1);
+				}	
+			}
+		}
+
 #ifdef WITH_WAP
 		/* co jaki¶ czas zrzuæ userlistê dla frontendu wap */
 		if (!wap_userlist_timer)

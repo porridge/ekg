@@ -784,8 +784,8 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 
 	if (first_time) {
 		first_time = 0;
-		memset (ucache, 0, sizeof(ucache));
-		memset (seencache, 0, sizeof(seencache));
+		memset(ucache, 0, sizeof(ucache));
+		memset(seencache, 0, sizeof(seencache));
 	}
 
 	/* nie pokazujemy nieznajomych, chyba ze display_notify & 4 */
@@ -887,6 +887,42 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 	if (__USER_QUITING) {
 		u->last_ip.s_addr = u->ip.s_addr;
 		u->last_port = u->port;
+	}
+
+	/* je¶li kto¶ odchodzi albo dostajemy powiadomienie, ¿e go nie ma (i go nie by³o)... */
+	if (__USER_QUITING || GG_S_NA(status)) {
+
+		/* ... i je¶li go podgl±damy, to sprawd¼my czy siê nie ukrywa */
+		if (group_member(u, "spied")) {
+			int onlist;
+			list_t l;
+
+			onlist = 0;
+			for (l = spiedlist; l; l = l->next) {
+				struct spied *s = l->data;
+
+				if (s->uin == u->uin) {
+					onlist = 1;
+					break;
+				}
+			}
+
+			if (!onlist) {
+				char *tmp;
+				struct spied s;
+
+				s.uin = u->uin;
+				/* je¶li po 10 sek. nie uzyskamy odpowiedzi, tzn. ¿e jednak kto¶ jest naprawdê niedostêpny */	
+				s.timeout = time(NULL) + 10;
+				list_add(&spiedlist, &s, sizeof(s));
+
+				tmp  = saprintf("/check_conn %d", u->uin);
+				command_exec(NULL, tmp, 1);
+				xfree(tmp);
+
+				gg_debug(GG_DEBUG_MISC, "// ekg: spying: %d, timeout: %d\n", u->uin, s.timeout);
+			}
+		}
 	}
 
 	if (ip)
@@ -1681,7 +1717,7 @@ void handle_disconnect(struct gg_event *e)
 	ui_event("disconnected");
 
 	addr.s_addr = sess->server_addr;
-	event_check(EVENT_DISCONNECTED, 0, inet_ntoa(addr));
+	event_check(EVENT_CONNECTIONLOST, 0, inet_ntoa(addr));
 
 	gg_logoff(sess);	/* a zobacz.. mo¿e siê uda ;> */
 	list_remove(&watches, sess, 0);
@@ -2262,7 +2298,26 @@ void handle_image_reply(struct gg_event *e)
 
 	u = userlist_find(e->event.image_reply.sender, NULL);
 
-	if (e->event.image_request.crc32 == GG_CRC32_INVISIBLE) {
+	if (u && group_member(u, "spied")) {
+		list_t l;
+
+		for (l = spiedlist; l; l = l->next) {
+			struct spied *s = l->data;
+
+			if (s->uin == u->uin) {
+				list_remove(&spiedlist, s, 1);
+				break;
+			}
+		}
+
+		if (GG_S_NA(u->status)) {
+			if (GG_S_D(u->status))
+				u->status = GG_STATUS_INVISIBLE_DESCR;
+			else
+				u->status = GG_STATUS_INVISIBLE;
+		}
+
+	} else if (e->event.image_request.crc32 == GG_CRC32_INVISIBLE) {
 		if (u)
 			print("user_is_connected", format_user(e->event.image_reply.sender), (u->first_name) ? u->first_name : u->display); 
 		else

@@ -174,6 +174,8 @@ COMMAND(cmd_cleartab)
 		send_nicks_count = 0;
 		send_nicks_index = 0;
 
+		printq("tab_cleared");
+
 		return 0;
 	}
 
@@ -189,6 +191,8 @@ COMMAND(cmd_cleartab)
 
 			remove_send_nick(send_nicks[i]);
 		}
+
+		printq("tab_cleared");
 
 		return 0;
 	}
@@ -5790,8 +5794,13 @@ void command_init()
 	  "u¿ywa innego klienta, to mo¿e mu siê pojawiæ pusta wiadomo¶æ (np. TLEN, ekg2). "
 	  "Dziêki tej funkcji "
 	  "mo¿na sprawdziæ czy osoba, któr± widzimy jako niedostêpna jest "
-	  "niewidoczna. Je¿eli brak aliasu jako parametr sprawdzana jest osoba, "
-	  "z któr± rozmowa znajdujê siê w aktualnym okienku.");
+	  "niewidoczna. Je¿eli brak aliasu jako parametr, sprawdzana jest osoba, "
+	  "z któr± rozmowa znajdujê siê w aktualnym okienku.\n"
+	  "Je¶li osoba nale¿y do grupy %Tspied%n, to w miarê mo¿liwo¶ci jej stan jest "
+	  "¶ledzony na bie¿±co i u¿ywanie komendy %Tcheck_conn%n jest zbêdne - jej u¿ycie "
+	  "spowoduje jedynie ,,upewnienie siê'', ¿e dana osob± jest niewidoczna. Je¶li oka¿e "
+	  "siê, ¿e jest jednak rzeczywi¶cie niedostêpna, to jej stan uaktualni siê z 10 sekundowym "
+	  "opó¼nieniem.");
           
 	command_add
 	( "cleartab", "?", cmd_cleartab, 0,
@@ -6004,7 +6013,7 @@ void command_init()
 	  " [-l, --list] [numer]         wy¶wietla listê zdarzeñ\n"
 	  "\n"
 	  "Dostêpne zdarzenia to:\n"
-	  "  - avail, away, notavail - zmiana stanu na podany (bez przypadku ,,online'')\n"
+	  "  - avail, away, notavail, invisible - zmiana stanu na podany (bez przypadku ,,online'')\n"
 	  "  - online - zmiana stanu z ,,niedostêpny'' na ,,dostêpny''\n"
 	  "  - descr - zmiana opisu\n"
 	  "  - blocked - zostali¶my zablokowani\n"
@@ -6017,9 +6026,10 @@ void command_init()
 	  "  - sigusr1, sigusr2 - otrzymanie przez ekg danego sygna³u\n"
 	  "  - newmail - otrzymanie nowej wiadomo¶ci e-mail\n"
 	  "  - connected - uda³o siê po³±czyæ z serwerem\n"
-	  "  - disconnected - po³±czenie zosta³o zerwane\n" 
+	  "  - disconnected - serwer nas roz³±czy³\n" 
+	  "  - connectionlost - utracono po³±czenie z serwerem\n" 
 	  "\n"
-	  "W przypadku sigusr, newmail, connected oraz disconnected nale¿y podaæ ,,%T*%n'' "
+	  "W przypadku sigusr, newmail, connected, disconnected oraz connectionlost nale¿y podaæ ,,%T*%n'' "
 	  "jako sprawcê zdarzenia.\n"
 	  "\n"
 	  "  - * - wszystkie zdarzenia\n"
@@ -6030,7 +6040,7 @@ void command_init()
 	  "wykonana. Mo¿na podaæ wiêcej komend, oddzielaj±c je ¶rednikiem. W komendzie, %T%%1%n "
 	  "zostanie zast±pione numerkiem sprawcy zdarzenia, a je¶li istnieje on na naszej "
 	  "li¶cie kontaktów, %T%%2%n bêdzie zast±pione jego pseudonimem. Zamiast %T%%3%n i "
-	  "%T%%4%n wpisana bêdzie tre¶æ wiadomo¶ci, opis u¿ytkownika, ca³kowita ilo¶æ "
+	  "%T%%4%n wpisana bêdzie tre¶æ wiadomo¶ci, opis u¿ytkownika, ca³kowita liczba "
 	  "nowych wiadomo¶ci e-mail, nazwa pliku, konferencji lub adres serwera - w zale¿no¶ci od zdarzenia. "
 	  "Format %T%%4%n ró¿ni siê od %T%%3%n tym, ¿e wszystkie niebiezpieczne znaki, "
 	  "które mog³yby zostaæ zinterpretowane przez shell, zostan± poprzedzone backslashem. "

@@ -957,6 +957,8 @@ void theme_init()
 	format_add("modify_online", "%> %1 bêdzie widzieæ nasz stan\n", 1);
 	format_add("modify_done", "%> Zmieniono wpis w li¶cie kontaktów\n", 1);
 
+	format_add("tab_cleared", "%> Wyczyszczono listê nicków do dope³nienia", 1);
+
 	/* lista kontaktów z boku ekranu */
 	format_add("contacts_header", "", 1);
 	format_add("contacts_header_group", "%K %1%n", 1);

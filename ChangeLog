@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-02-15
+
+- zdarzenia ,,connectionlost'' oraz ,,disconnected'' (reef/sz)
+- ³atwiejsze wykrywanie niewidocznych, patrz /help check_conn (sz)
+
 // 2005-02-01
 
 - poprawienie segfaulta podczas /query z 10 znakowym nickiem ze spacj± 
@@ -38,7 +43,7 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 
 // 2005-01-19
 
-- dodanie zdarzeñ ,,connected'' i ,,disconnected'' (LANO/s)
+- dodanie zdarzeñ ,,connected'' i ,,disconnected'' (LANO/sz)
 
 // 2005-01-12
 

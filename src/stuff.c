@@ -92,6 +92,7 @@ list_t conferences = NULL;
 list_t sms_away = NULL;
 list_t buffers = NULL;
 list_t searches = NULL;
+list_t spiedlist = NULL;
 
 int command_processing = 0;
 int in_autoexec = 0;
@@ -235,6 +236,7 @@ struct event_label event_labels[EVENT_LABELS_COUNT + 2] = {
 	{ EVENT_DCCFINISH, "dccfinish" },
 	{ EVENT_CONNECTED, "connected" },
 	{ EVENT_DISCONNECTED, "disconnected" },
+	{ EVENT_CONNECTIONLOST, "connectionlost" },
 
 	{ INACTIVE_EVENT, NULL },
 	{ 0, NULL }

@@ -64,12 +64,13 @@ enum event_t {
 	EVENT_DCCFINISH = TOGGLE_BIT(18),
 	EVENT_CONNECTED = TOGGLE_BIT(19),
 	EVENT_DISCONNECTED = TOGGLE_BIT(20),
+	EVENT_CONNECTIONLOST = TOGGLE_BIT(21),
 
-	EVENT_ALL = TOGGLE_BIT(21) - 1,
-	INACTIVE_EVENT = TOGGLE_BIT(21)
+	EVENT_ALL = TOGGLE_BIT(22) - 1,
+	INACTIVE_EVENT = TOGGLE_BIT(22)
 };
 
-#define EVENT_LABELS_COUNT 20	/* uaktualniæ ! */
+#define EVENT_LABELS_COUNT 21	/* uaktualniæ ! */
 struct event_label event_labels[EVENT_LABELS_COUNT + 2];
 
 struct event_label {
@@ -143,6 +144,11 @@ struct timer {
 	char *id;
 };
 
+struct spied {
+	uin_t uin;
+	time_t timeout;
+};
+
 struct sms_away {
 	uin_t uin;
 	int count;
@@ -192,6 +198,7 @@ list_t conferences;
 list_t sms_away;
 list_t buffers;
 list_t searches;
+list_t spiedlist;
 
 struct gg_session *sess;
 
