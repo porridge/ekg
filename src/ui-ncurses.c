@@ -803,6 +803,7 @@ static void window_clear(struct window *w, int full)
 
 	w->start = 0;
 	w->redraw = 1;
+	w->more = 0;
 }
 
 /*
@@ -4472,8 +4473,8 @@ static int ui_ncurses_event(const char *event, ...)
 
 			if (!strcasecmp(p1, "clear")) {
 				window_clear(window_current, 0);
-				
 				window_commit();
+				window_current->more = 0;
 
 				goto cleanup;
 			}
