@@ -1070,6 +1070,7 @@ void theme_init()
 	/* 1 uin, 2 name, 3 nick, 4 city, 5 born, 6 gender, 7 active */
 	format_add("search_results_multi_active", "%Y<>%n", 1);
 	format_add("search_results_multi_busy", "%y<>%n", 1);
+	format_add("search_results_multi_invisible", "%K<>%n", 1);
 	format_add("search_results_multi_inactive", "  ", 1);
 	format_add("search_results_multi_unknown", "-", 1);
 	format_add("search_results_multi_female", "k", 1);
@@ -1079,10 +1080,11 @@ void theme_init()
 	format_add("search_results_single_active", "%G(aktywn%@1)%n", 1);
 	format_add("search_results_single_busy", "%g(zajêt%@1)%n", 1);
 	format_add("search_results_single_inactive", "%r(nieaktywn%@1)%n", 1);
+	format_add("search_results_single_invisible", "%K(niewidoczn%@1)%n", 1);
 	format_add("search_results_single_unknown", "%T-%n", 1);
 	format_add("search_results_single_female", "%Mkobieta%n", 1);
 	format_add("search_results_single_male", "%Cmê¿czyzna%n", 1);
-	format_add("search_results_single", "%) Pseudonim: %T%3%n\n%) Numerek: %T%1%n\n%) Imiê i nazwisko: %T%2%n\n%) Miejscowo¶æ: %T%4%n\n%) Rok urodzenia: %T%5%n\n", 1);
+	format_add("search_results_single", "%) Pseudonim: %T%3%n\n%) Numerek: %T%1%n %7\n%) Imiê i nazwisko: %T%2%n\n%) Miejscowo¶æ: %T%4%n\n%) Rok urodzenia: %T%5%n\n", 1);
 
 	/* exec */
 	format_add("process", "%> %(-5)1 %2\n", 1);

@@ -23,6 +23,8 @@ zg³osi³ b³±d.
 - poprawka opcji --private przy uruchomieniu (sz)
 - libgadu: poprawione wysy³anie roku urodzenia w gg_change_info() (Chilek/w)
 - /change nie wymaga ju¿ wszystkich parametrów (w)
+- /find pokazuje stan niewidoczny (gozda/w)
+- poprawka zjadania 100% procesora przy -c z plikiem (*/w)
 
 // 2003-01-13
 

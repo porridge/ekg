@@ -1673,6 +1673,9 @@ void handle_search50(struct gg_event *e)
 			case GG_STATUS_BUSY:
 				active = format_string(format_find(__format("_busy")), nickname);
 				break;
+			case GG_STATUS_INVISIBLE:
+				active = format_string(format_find(__format("_invisible")), nickname);
+				break;
 			default:
 				active = format_string(format_find(__format("_inactive")), nickname);
 		}

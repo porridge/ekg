@@ -74,7 +74,7 @@ time_t last_action = 0;
 char *pipe_file = NULL;
 
 static void get_line_from_pipe(struct gg_exec *c);
-static void get_char_from_pipe(struct gg_common *c);
+static int get_char_from_pipe(struct gg_common *c);
 
 extern FILE *gg_debug_file;
 
@@ -153,25 +153,30 @@ static struct {
  * bufor wykonuje go tak jakby tekst w buforze wpisany by³ z terminala.
  *
  * - c - struktura steruj±ca przechowuj±ca m.in. deskryptor potoku.
+ *
+ * 0/-1
  */
-static void get_char_from_pipe(struct gg_common *c)
+static int get_char_from_pipe(struct gg_common *c)
 {
 	static char buf[1024];
 	char ch;
   
 	if (!c)
-  		return;
+  		return -1;
 
-	if (read(c->fd, &ch, 1) > 0) {
-		if (ch != '\n' && ch != '\r') {
-			if (strlen(buf) < sizeof(buf) - 1)
-				buf[strlen(buf)] = ch;
-		}
-		if (ch == '\n' || (strlen(buf) >= sizeof(buf) - 1)) {
-			command_exec(NULL, buf);
-			memset(buf, 0, sizeof(buf));
-		}
+	if (read(c->fd, &ch, 1) != -1)
+		return -1;
+	
+	if (ch != '\n' && ch != '\r') {
+		if (strlen(buf) < sizeof(buf) - 1)
+			buf[strlen(buf)] = ch;
 	}
+	if (ch == '\n' || (strlen(buf) >= sizeof(buf) - 1)) {
+		command_exec(NULL, buf);
+		memset(buf, 0, sizeof(buf));
+	}
+
+	return 0;
 }
 
 /*
@@ -556,6 +561,14 @@ void ekg_wait_for_key()
 					unidle();
 
 				return;
+			}
+
+			/* obs³ugujemy poza list± handlerów, poniewa¿ mo¿e
+			 * zwróciæ b³±d w przypadku b³êdu. wtedy grzecznie
+			 * usuwamy z listy deskryptorów. */
+			if (c->type == GG_SESSION_USER1) {
+				if (get_char_from_pipe(c))
+					list_remove(&watches, c, 1);
 			}
 
 			for (i = 0; handlers[i].type != -1; i++)
