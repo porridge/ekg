@@ -128,3 +128,18 @@ z obs³ug± platform innych ni¿ te, na których pracuj± autorzy (pomy¶leæ,
 ¿e jeszcze 2 lata uwa¿a³em autoconfa za z³o wcielone. pod postaci± 
 software'u.)
 
+// 2003-04-17 12:53
+
+mo¿e jednak zrobiæ bloga? (; w ka¿dym razie dla testów wydzieli³em libgadu ze
+¼róde³ ekg, przerobi³em do automake i libtoola. faktycznie, pisania mniej, ale
+rozmiar wszystkich narzêdzi, które autogen.sh pakuje do katalogu mnie
+przerasta. tarball z Makefile.am, configure.in i autogen.sh zajmuje 80kB, a po
+wygenerowaniu wszystkiego 320kB. trochê to chore. je¶li ekg mia³oby mieæ dla
+ka¿dego plugina tyle ¶mieci, to ja chyba podziêkujê. innym wyj¶ciem by³oby
+rozprowadzanie tarballi bez tego wszystkiego i wymaganie od ludzi posiadania
+pe³nego ¶rodowiska: gcc, binutils, make, autoconf, automake, libtool. ludzie,
+którzy maj± wszystko nie musieliby ¶ci±gaæ niepotrzebnie kilka razy wiêkszego
+tarballa. co najwy¿ej mo¿naby tworzyæ osobny ekg-current-foobar.tar.gz, który
+mia³by wszystko, ale go nie archiwizowaæ. w sumie to mo¿liwe, od kiedy na
+dev.null.pl stoi PLD.
+
