@@ -26,7 +26,7 @@ AC_ARG_WITH(debug,
   [  --without-debug  	  Compile without debug [-Wall, -ggdb]])
 
 if test "x$with_debug" = "xno"; then 
-  CFLAGS="$CFLAGS"
+  CFLAGS="$CFLAGS -DGG_DEBUG_DISABLE"
 else
   CFLAGS="$CFLAGS -ggdb" 
 fi

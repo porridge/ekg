@@ -536,7 +536,11 @@ extern int gg_debug_level;
 #define GG_DEBUG_FUNCTION 8
 #define GG_DEBUG_MISC 16
 
+#ifdef GG_DEBUG_DISABLE
+#define gg_debug(x, y...) {}
+#else
 void gg_debug(int level, const char *format, ...);
+#endif
 
 /*
  * konfiguracja http proxy.
