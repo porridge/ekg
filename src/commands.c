@@ -4740,8 +4740,8 @@ COMMAND(cmd_last)
 			nick = NULL;
 
 			while (*tmp)
-				if (isalpha_pl_PL(*tmp)) {
-					nick = tmp;
+				if (*tmp == ' ') {
+					nick = ++tmp;
 					break;
 				} else
 					tmp++;
