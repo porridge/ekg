@@ -1,5 +1,30 @@
+Najczê¶ciej zadawane pytania.
 
+Q: ...
+A: Najpierw przeczytaj README, potem TODO.
 
+Q: Sk±d ¶ci±gn±æ?
+A: http://dev.null.pl/
+
+Q: ./configure wyrzuca b³êdy. Co robiæ?
+A: Naprawdopodobniej nie masz narzêdzi i pakietów potrzebnych do
+   skompilowania EKG. Upewnij siê, ¿e masz zainstalowany kompilator
+   C, narzêdzia takie jak make, install, bibliotekê readline i
+   odpowiednie pliki nag³ówkowe.
+ 
+Q: Jak zarejestrowaæ nowego u¿ytkownika?
+A: Póki co, nie da siê. Trzeba u¿yæ oryginalnego klienta (dzia³a pod wine,
+   vmware i pod Windows).
+
+Q: Jak wys³aæ plik, zmieniæ has³o, informacje w katalogu publicznym?
+A: j.w.
+
+Q: Dlaczego PageUp nie dzia³a?
+A: Bo nie. Nie ma takiej mo¿liwo¶ci. Nie wiadomo, czy w ogóle bêdzie.
+
+Q: Kiedy bêdzie mo¿na?
+A: Gdy kto¶ z nadmiarem wolnego czasu i odpowiedni± ilo¶ci± chêci znajdzie
+   sposób na zrobienie tego.
 
 
 // $Id$
