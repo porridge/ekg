@@ -32,10 +32,11 @@ INSTALACJA
     Je¶li mamy uprawnienia administratora na danej maszynie, wywo³ujemy
     ,,./configure'', potem ,,make'' i z prawami roota ,,make install''.
     Je¶li chcemy zainstalowaæ program w katalogu domowym, do polecenia
-    configure dodajemy parametr ,,--prefix=$HOME/ekg''. Po zainstalowaniu 
-    w ten sposób, program gotowy do uruchomienia bêdzie znajdowa³ siê w
-    katalogu ekg/bin w katalogu domowym. Je¶li chcemy mieæ mo¿liwo¶æ
-    u¿ywania poleceñ ,,beeps_spk'' i ,,blink_leds'', s³u¿±cych m.in do
+    configure dodajemy parametry ,,--prefix=$HOME/ekg
+    --mandir=$HOME/ekg/share/man''. Po zainstalowaniu w ten sposób,
+    program gotowy do uruchomienia bêdzie znajdowa³ siê w katalogu
+    ekg/bin w katalogu domowym. Je¶li chcemy mieæ mo¿liwo¶æ u¿ywania
+    poleceñ ,,beeps_spk'' i ,,blink_leds'', s³u¿±cych m.in do
     manipulowania diodami LED na klawiaturze, nale¿y u¿yæ parametru
     ,,--enable-ioctld''.
 
