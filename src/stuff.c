@@ -1376,8 +1376,8 @@ char *decode_base64(char *buf)
 {
 	char *res, *save, *end, *foo, val;
 	int index = 0;
-
-	if (!(save = res = malloc((strlen(buf) / 4 + 1) * 3 + 2))) {
+	
+	if (!(save = res = calloc(1, (strlen(buf) / 4 + 1) * 3 + 2))) {
 		gg_debug(GG_DEBUG_MISC, "// decode_base64() not enough memory\n");
 		return NULL;
 	}
