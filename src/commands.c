@@ -3744,7 +3744,7 @@ COMMAND(cmd_at)
 			return -1;
 		}
 
-		if (isdigit(params[2][0]) || !strncmp(params[2], "*/", 2)) {
+		if (!strncmp(params[2], "*/", 2) || (strncmp(params[1], "*/", 2) && params[2] && isdigit(params[2][0]))) {
 			a_name = params[1];
 
 			if (!strcmp(a_name, "(null)")) {
@@ -3963,7 +3963,7 @@ COMMAND(cmd_at)
 			struct timer *t = l->data;
 			struct timeval tv;
 			struct tm *at_time;
-			char *tmp, *tmp2 = NULL;
+			char *tmp, *tmp2;
 			const char *type_str;
 			time_t sec, minutes = 0, hours = 0, days = 0;
 
@@ -3996,15 +3996,15 @@ COMMAND(cmd_at)
 				}
 
 				if (days)
-					tmp2 = saprintf("every: %dd %dh %dm %ds", days, hours, minutes, sec);
+					tmp2 = saprintf("every %dd %dh %dm %ds", days, hours, minutes, sec);
 				else
 					if (hours)
-						tmp2 = saprintf("every: %dh %dm %ds", hours, minutes, sec);
+						tmp2 = saprintf("every %dh %dm %ds", hours, minutes, sec);
 					else
 						if (minutes)
-							tmp2 = saprintf("every: %dm %ds", minutes, sec);
+							tmp2 = saprintf("every %dm %ds", minutes, sec);
 						else
-							tmp2 = saprintf("every: %ds", sec);
+							tmp2 = saprintf("every %ds", sec);
 			} else
 				tmp2 = xstrdup("");
 
