@@ -66,7 +66,7 @@ int command_add(), command_away(), command_del(), command_alias(),
 	command_sms(), command_find(), command_modify(), command_cleartab(),
 	command_status(), command_register(), command_test_watches(),
 	command_remind(), command_dcc(), command_query(), command_passwd(),
-	command_test_ping();
+	command_test_ping(), command_on();
 
 /*
  * drugi parametr definiuje ilo¶æ oraz rodzaje parametrów (tym samym
@@ -103,6 +103,7 @@ struct command commands[] = {
 	{ "list", "", command_list, " [opcje]", "Wy¶wietla listê kontaktów", "  --active\n  --busy\n  --inactive\n" },
 	{ "msg", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ do podanego u¿ytkownika", "" },
 	{ "modify", "u?", command_modify, " <alias> [opcje]", "Zmienia informacje w li¶cie kontaktów", "  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>  // tylko informacja\n  --alias <alias>  // nazwa w li¶cie kontaktów\n  --phone <telefon>\n  --uin <numerek>\n  \n  --group <grupa>" },
+        { "on", "?u?", command_on, " <zdarzenie|...> <numer/alias> <akcja>|clear", "Dodaje lub usuwa zdarzenie", "" },
 	{ "passwd", "??", command_passwd, " <has³o> <e-mail>", "Zmienia has³o i adres e-mail u¿ytkownika", "" },
 	{ "private", "", command_away, " [on/off]", "W³±cza/wy³±cza tryb ,,tylko dla przyjació³''", "" },
 	{ "query", "u", command_query, " <numer/alias>", "W³±cza rozmowê z dan± osob±", "" },
@@ -1518,6 +1519,62 @@ COMMAND(command_query)
 	my_printf("query_started", format_user(uin));
 
 	return 0;
+}
+
+COMMAND(command_on)
+{
+        int flags;
+        uin_t uin;
+
+        if (!params[0] || !strncasecmp(params[0], "-l", 2)) {
+                struct list *l;
+                int count = 0;
+
+                for (l = events; l; l = l->next) {
+                        struct event *ev = l->data;
+
+                        my_printf("events_list", format_events(ev->flags), (ev->uin == 1) ? "*" : format_user(ev->uin), ev->action);
+                        count++;
+                }
+
+                if (!count)
+                        my_printf("events_list_empty");
+
+                return 0;
+        }
+
+        if (!params[1] || !params[2]) {
+                my_printf("not_enough_params");
+                return 0;
+        }
+
+        if (!(flags = get_flags(params[0]))) {
+                my_printf("events_incorrect");
+                return 0;
+        }
+
+        if (*params[1] == '*')
+                uin = 1;
+        else
+                uin = get_uin(params[1]);
+
+        if (!uin) {
+                my_printf("invalid_uin");
+                return 0;
+        }
+
+        if (!strncasecmp(params[2], "clear", 5)) {
+                del_event(flags, uin);
+                config_changed = 1;
+                return 0;
+        }
+
+        if (correct_event(params[2]))
+                return 0;
+
+        add_event(flags, uin, params[2]);
+        config_changed = 1;
+        return 0;
 }
 
 char *strip_spaces(char *line)

@@ -42,6 +42,8 @@
 #include "version.h"
 
 time_t last_action = 0;
+int ioctl_daemon_pid = 0;
+int ekg_pid = 0;
 
 /*
  * struktura zawieraj±ca adresy funkcji obs³uguj±cych ró¿ne sesje
@@ -283,10 +285,16 @@ void sighup()
 	signal(SIGHUP, sighup);
 }
 
+void kill_ioctl_daemon()
+{
+        if (ioctl_daemon_pid > 0 && ekg_pid == getpid())
+                kill(ioctl_daemon_pid, SIGINT);
+}
+
 int main(int argc, char **argv)
 {
 	int auto_connect = 1, force_debug = 0, i, new_status = 0 ;
-	char *home = getenv("HOME"), *load_theme = NULL;
+	char *home = getenv("HOME"), *load_theme = NULL, *sock_path = NULL, *ioctl_daemon_path = IOCTL_DAEMON_PATH;
 	struct passwd *pw; 
 	struct gg_common si;
 	
@@ -304,6 +312,7 @@ int main(int argc, char **argv)
 "  -i, --invisible      po po³±czeniu zmienia stan na ,,niewidoczny''\n"
 "  -p, --private        po po³±czeniu zmienia stan na ,,tylko dla przyjació³''\n"
 "  -d, --debug          w³±cza wy¶wietlanie dodatkowych informacji\n"
+"  -I, --ioctl-daemon-path [¦CIE¯KA]    ustawia ¶cie¿kê do ioctl_daemon-a\n"
 "\n", argv[0]);
 			return 0;	
 		}
@@ -330,11 +339,32 @@ int main(int argc, char **argv)
 		}
 		if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "--theme"))
 			load_theme = argv[++i];
+                if (!strcmp(argv[i], "-I") || !strcmp(argv[i], "--ioctl-daemon-path")) {
+                        if (argv[i+1]) {
+                                ioctl_daemon_path = argv[i+1];
+                                i++;
+                        } else {
+                                fprintf(stderr, "Nie podano ¶cie¿ki do ioctl_daemon-a.\n");
+                                return 1;
+                        }
+                }
 	}
 	
+        ekg_pid = getpid();
+
+        read_userlist(NULL);
 	read_config(NULL);
 	read_sysmsg(NULL);
-	
+
+        sock_path = prepare_path(".socket");
+
+        if(!(ioctl_daemon_pid = fork()))
+            execl(ioctl_daemon_path, "ioctl_daemon", sock_path, NULL);
+
+        init_socket(sock_path);
+
+        atexit(kill_ioctl_daemon);
+
 	/* okre¶lanie stanu klienta po w³±czeniu */
 	if (new_status)
 		default_status = new_status;
@@ -401,8 +431,6 @@ int main(int argc, char **argv)
 	if (!config_uin || !config_password)
 		my_printf("no_config");
 
-	read_userlist(NULL);
-		
 	if (!log_path) {
 	    if (!home) { pw = getpwuid(getuid()); home = pw->pw_dir; }
 	    if (config_user != "") {

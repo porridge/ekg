@@ -657,5 +657,21 @@ void init_theme()
 
 	add_format("query_started", "%) Rozpoczêto rozmowê z %1. Aby zakoñczyæ, wci¶nij Ctrl-D\n", 1);
 	add_format("query_finished", "\n%) Zakoñczono rozmowê z %1\n", 1);
+
+        add_format("events_list_empty", "%! Brak zdarzeñ\n", 1);
+        add_format("events_list", "%> on %G%1 %W%2 %B%3%n\n", 1);
+        add_format("events_incorrect", "%! Nieprawid³owo zdefiniowane zdarzenie.\n", 1);
+        add_format("events_add", "%> 'on %G%1 %W%2 %Y%3'%n - zdarzenie dodane.\n", 1);
+        add_format("events_exist", "%! Zdarzenie %1 istnieje dla %2.\n", 1);
+        add_format("events_del", "%> on %G%1 %W%2 %Y%3'%n - zdarzenie usuniête.\n", 1);
+        add_format("events_del_flags", "%> Flagi %G%1%n usuniête.\n", 1);
+        add_format("events_add_flags", "%> Flagi %G%1%n dodane.\n", 1);
+        add_format("events_noexist", "%! Niezidentyfikowane zdarzenie.\n", 1);
+        add_format("events_del_noexist", "%! Zdarzenie %W%1%n nie istnieje dla u¿ytkownika %G%2%n\n", 1);
+        add_format("events_seq_not_found", "%! Sekwencja %W%1%n nie znaleziona.\n", 1);
+        add_format("events_act_no_params", "%! %W%1%n - brak parametrów.\n", 1);        add_format("events_seq_incorrect", "%W%1%n - nieprawid³owa sekwencja\n", 1);
+        add_format("config_line_incorrect", "%! Nieprawid³owa linia '%W%1%n', pomijam\n", 1);
+        add_format("temporary_run_event", "%) startujemy z ackj± %B'%1%n'\n", 1);
+        add_format("blah.led", "1, 2, 4, 1, 2, 4, 1, 2, 4", 1);
 };
 

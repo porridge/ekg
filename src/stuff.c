@@ -33,6 +33,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sys/un.h>
 #include "config.h"
 #include "libgadu.h"
 #include "stuff.h"
@@ -48,6 +49,7 @@ struct list *children = NULL;
 struct list *aliases = NULL;
 struct list *watches = NULL;
 struct list *transfers = NULL;
+struct list *events = NULL;
 int in_readline = 0;
 int no_prompt = 0;
 int away = 0;
@@ -85,6 +87,9 @@ char *reg_password = NULL;
 int use_dcc = 0;
 char *query_nick = NULL;
 uin_t query_uin = 0;
+int sock = 0;
+int length = 0;
+struct sockaddr_un addr;
 
 /*
  * my_puts()
@@ -321,7 +326,16 @@ int read_config(char *filename)
 				add_ignored(atoi(foo));
 		} else if (!strcasecmp(buf, "alias")) {
 			add_alias(foo, 1);
-		} else
+		} else if (!strcasecmp(buf, "on")) {
+                        int flags;
+                        uin_t uin;
+                        char **pms = split_params(foo, 3);
+                        if ((flags = get_flags(pms[0])) && (uin = atoi(pms[1]))
+&& !correct_event(pms[2]))
+                                add_event(get_flags(pms[0]), atoi(pms[1]), strdup(pms[2]));
+                        else
+                            my_printf("config_line_incorrect");
+                } else
 			set_variable(buf, foo);
 
 		free(buf);
@@ -431,6 +445,12 @@ int write_config(char *filename)
 
 		fprintf(f, "alias %s %s\n", a->alias, a->cmd);
 	}
+
+        for (l = events; l; l = l->next) {
+                struct event *e = l->data;
+
+                fprintf(f, "on %s %lu %s\n", format_events(e->flags), e->uin, e->action);
+        }
 
 	fclose(f);
 	
@@ -1319,6 +1339,422 @@ char *is_alias(char *foo)
 	free(line);
 
 	return NULL;
+}
+
+/*
+ * format_events()
+ *
+ * zwraca ³añcuch zdarzeñ w oparciu o flagi.
+ *
+ * - flags
+ */
+char *format_events(int flags)
+{
+        char buff[64] = "";
+
+        if (flags & EVENT_MSG) strcat(buff, *buff ? "|msg" : "msg");
+        if (flags & EVENT_CHAT) strcat(buff, *buff ? "|chat" : "chat");
+        if (flags & EVENT_AVAIL) strcat(buff, *buff ? "|avail" : "avail");
+        if (flags & EVENT_NOT_AVAIL) strcat(buff, *buff ? "|disconnect" : "disconnect");
+        if (flags & EVENT_AWAY) strcat(buff, *buff ? "|away" : "away");
+        if (flags & EVENT_DCC) strcat(buff, *buff ? "|dcc" : "dcc");
+        if (strlen(buff) > 33) strcpy(buff, "*");
+
+        return strdup(buff);
+}
+
+/*
+ * get_flags()
+ *
+ * zwraca flagi na podstawie ³añcucha.
+ *
+ * - events
+ */
+int get_flags(char *events)
+{
+        int flags = 0;
+
+        if(!strncasecmp(events, "*", 1)) return EVENT_MSG|EVENT_CHAT|EVENT_AVAIL|EVENT_NOT_AVAIL|EVENT_AWAY|EVENT_DCC;
+        if (strstr(events, "msg") || strstr(events, "MSG")) flags |= EVENT_MSG;
+        if (strstr(events, "chat") || strstr(events, "CHAT")) flags |= EVENT_CHAT;
+        if (strstr(events, "avail") || strstr(events, "AVAIL")) flags |= EVENT_AVAIL;
+        if (strstr(events, "disconnect") || strstr(events, "disconnect")) flags
+|= EVENT_NOT_AVAIL;
+        if (strstr(events, "away") || strstr(events, "AWAY")) flags |= EVENT_AWAY;
+        if (strstr(events, "dcc") || strstr(events, "DCC")) flags |= EVENT_DCC;
+
+        return flags;
+}
+
+/*
+ * add_event()
+ *
+ * Dodaje zdarzenie do listy zdarzeñ.
+ *
+ * - flags
+ * - uin
+ * - action
+ */
+int add_event(int flags, uin_t uin, char *action)
+{
+        int f;
+        struct list *l;
+        struct event e;
+
+        for (l = events; l; l = l->next) {
+                struct event *ev = l->data;
+
+                if (ev->uin == uin && (f = ev->flags & flags) != 0) {
+                        my_printf("events_exist", format_events(f), (uin ==1) ?
+"*"  : format_user(uin));
+                        return -1;
+                }
+        }
+
+        e.uin = uin;
+        e.flags = flags;
+        e.action = action;
+
+        list_add(&events, &e, sizeof(e));
+
+        my_printf("events_add", format_events(flags), (uin ==1) ? "*"  : format_user(uin), action);
+
+        return 0;
+}
+
+/*
+ * del_event()
+ *
+ * usuwa zdarzenie z listy zdarzeñ.
+ *
+ * - flags
+ * - uin
+ */
+int del_event(int flags, uin_t uin)
+{
+        struct list *l;
+
+        for (l = events; l; l = l->next) {
+                struct event *e = l->data;
+
+                if (e->uin == uin && e->flags & flags) {
+                        if ((e->flags &=~ flags) == 0) {
+                                my_printf("events_del", format_events(flags), (uin ==1) ? "*"  : format_user(uin), e->action);
+                                list_remove(&events, e, 1);
+                                return 0;
+                        }
+                        else {
+                                my_printf("events_del_flags", format_events(flags));
+                                list_remove(&events, e, 0);
+                                list_add_sorted(&events, e, 0, NULL);
+                                return 0;
+                        }
+                }
+        }
+
+        my_printf("events_del_noexist", format_events(flags), (uin ==1) ? "3"  : format_user(uin));
+
+        return 1;
+}
+
+/*
+ * check_event()
+ *
+ * sprawdza i ewentualnie uruchamia akcjê na podane zdarzenie.
+ *
+ * - event
+ * - uin
+ */
+int check_event(int event, uin_t uin)
+{
+        char *evt_ptr = NULL, *evs[10];
+        struct list *l;
+        int y = 0, i;
+
+        for (l = events; l; l = l->next) {
+                struct event *e = l->data;
+
+                if (e->flags & event) {
+                        if (e->uin == uin) {
+                                evt_ptr = strdup(e->action);
+                                break;
+                        }
+                        else if (e->uin == 1)
+                                evt_ptr = strdup(e->action);
+                }
+        }
+
+        if (evt_ptr == NULL)
+                return 1;
+
+        if (strchr(evt_ptr, ';')) {
+                evs[y] = strtok(evt_ptr, ";");
+                while ((evs[++y] = strtok(NULL, ";"))) {
+                        if (y >= 10) break;
+                }
+        }
+        else
+                return run_event(evt_ptr);
+
+        for (i = 0; i < y; i++) {
+                if (!evs[i]) continue;
+                while (*evs[i] == ' ') evs[i]++;
+                run_event(evs[i]);
+        }
+
+        return 0;
+}
+
+/*
+ * run_event()
+ *
+ * wykonuje dan± akcjê.
+ *
+ * - action
+ */
+int run_event(char *act)
+{
+        uin_t uin;
+        char *cmd = NULL, *arg = NULL, *data = NULL, *action = strdup(act);
+
+        if(strstr(action, " ")) {
+                cmd = strtok(action, " ");
+                arg = strtok(NULL, "");
+        }
+        else
+                cmd = action;
+
+        if (!strncasecmp(cmd, "blink_leds", 4))
+                return send_event(strdup(arg), ACT_BLINK_LEDS);
+
+        else if(!strncasecmp(cmd, "beeps_spk", 4))
+                return send_event(strdup(arg), ACT_BEEPS_SPK);
+
+        else if(!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
+                struct userlist *u;
+                char sender[50];
+
+                if (!strstr(arg, " "))
+                        return 1;
+
+                strtok(arg, " ");
+                data = strtok(NULL, "");
+
+                if (!(uin = get_uin(arg)))
+                        return 1;
+
+                if ((u = find_user(uin, NULL)))
+                        snprintf(sender, sizeof(sender), "%s/%lu", u->comment, u->uin);
+                else
+                        snprintf(sender, strlen(sender), "%s", arg);
+
+                put_log(uin, "<<* %s %s (%s)\n%s\n", (!strcasecmp(cmd, "chat"))
+? "Rozmowa do" : "Wiadomo¶æ do", sender, full_timestamp(), data);
+
+                iso_to_cp(data);
+                gg_send_message(sess, (!strcasecmp(cmd, "msg")) ? GG_CLASS_MSG : GG_CLASS_CHAT, uin, data);
+
+                return 0;
+        }
+
+        else
+                my_printf("temporary_run_event", action);
+
+        return 0;
+}
+
+/*
+ * send_event()
+ *
+ * wysy³a do ioctl_daemon'a polecenie uruchomienia akcji z ioctl.
+ *
+ * - seq
+ * - act
+*/
+int send_event(char *seq, int act)
+{
+        char *s;
+        struct action_data data;
+
+        if (*seq == '$') {
+                seq++;
+                s = find_format(seq);
+                if (!strcmp(s, "")) {
+                        my_printf("events_seq_not_found", seq);
+                        return 1;
+                }
+        } else
+                s = seq;
+
+        data.act = act;
+
+        if (events_parse_seq(s, &data))
+                return 1;
+
+        sendto(sock, &data, sizeof(data), 0,(struct sockaddr *)&addr, length);
+
+        return 0;
+}
+
+/* correct_event()
+ *
+ * sprawdza czy akcja na zdarzenie jest poprawna.
+ *
+ * - act
+*/
+int correct_event(char *act)
+{
+        int y = 0, i;
+        char *cmd = NULL, *arg = NULL, *action = strdup(act), *evs[10];
+        struct action_data test;
+
+        if (!strncasecmp(action, "clear",  5))
+                return 0;
+
+        evs[y] = strtok(action, ";");
+        while ((evs[++y] = strtok(NULL, ";")))
+                if (y >= 10) break;
+
+        for (i = 0; i < y; i++) {
+
+                if (!evs[i]) {
+                        y--;
+                        continue;
+                }
+
+                while (*evs[i] == ' ') evs[i]++;
+
+                if (strstr(evs[i], " ")) {
+                        cmd = strtok(evs[i], " ");
+                        arg = strtok(NULL, "");
+                } else
+                        cmd = evs[i];
+
+                if (!strncasecmp(cmd, "blink_leds", 10) || !strncasecmp(cmd, "beeps_spk", 9)) {
+                        if (arg == NULL) {
+                                my_printf("events_act_no_params", cmd);
+                                return 1;
+                        }
+
+                        if (*arg == '$') {
+                                arg++;
+                                if (!strcmp(find_format(arg), "")) {
+                                        my_printf("events_seq_not_found", arg);
+                                        return 1;
+                                }
+                                continue;
+                        }
+
+                        if (events_parse_seq(arg, &test)) {
+                                my_printf("events_seq_incorrect", arg);
+                                return 1;
+                        }
+
+                        continue;
+                }
+
+                else if (!strncasecmp(cmd, "chat", 4) || !strncasecmp(cmd, "msg", 3)) {
+                        if (arg == NULL) {
+                                my_printf("events_act_no_params", cmd);
+                                return 1;
+                        }
+
+                        if (!strstr(arg, " ")) {
+                                my_printf("events_act_no_params", cmd);
+                                return 1;
+                        }
+
+                        strtok(arg, " ");
+
+                        if (!get_uin(arg)) {
+                                my_printf("user_not_found", arg);
+                                return 1;
+                        }
+
+                        continue;
+                }
+
+                else {
+                        my_printf("events_noexist");
+                        return 1;
+                }
+        }
+
+        if (y == 0) {
+                my_printf("events_noexist");
+                return 1;
+        }
+
+        return 0;
+}
+
+/*
+ * events_parse_seq()
+ *
+ * zamieñ string na odpowiedni± strukturê, zwraca >0 w przypadku b³êdu.
+ *
+ * seq
+ * data
+ */
+int events_parse_seq(char *seq, struct action_data *data)
+{
+        char tmp_buff[16] = "";
+        int i = 0, a, l = 0, default_delay = 10000;
+
+        if (!seq || !isdigit(seq[0]))
+                return 1;
+
+        for (a = 0; a <= strlen(seq) && a < MAX_ITEMS; a++) {
+                if (i > 15 ) return 2;
+                if (isdigit(seq[a]))
+                        tmp_buff[i++] = seq[a];
+                else if (seq[a] == '/') {
+                        data->value[l] = atoi(tmp_buff);
+                        bzero(tmp_buff, 16);
+                        for (i = 0; isdigit(seq[++a]); i++)
+                                tmp_buff[i] = seq[a];
+                        data->delay[l] = default_delay = atoi(tmp_buff);
+                        bzero(tmp_buff, 16);
+                        i = 0;
+                        l++;
+                }
+                else if (seq[a] == ',') {
+                        data->value[l] = atoi(tmp_buff);
+                        data->delay[l] = default_delay;
+                        bzero(tmp_buff, 16);
+                        i = 0;
+                        l++;
+                }
+                else if (seq[a] == ' ')
+                        continue;
+                else if (seq[a] == '\0') {
+                        data->value[l] = atoi(tmp_buff);
+                        data->delay[l] = default_delay;
+                        data->value[++l] = data->delay[l] = -1;
+                }
+                else return 3;
+        }
+        return 0;
+}
+
+/*
+ * init_socket()
+ *
+ * inicjuje gniazdo oraz strukturê addr dla ioctl_daemon'a.
+ *
+ * - sock_path
+*/
+int init_socket(char *sock_path)
+{
+        sock = socket(AF_UNIX, SOCK_DGRAM, 0);
+
+        if (sock < 0) perror("socket");
+
+        addr.sun_family = AF_UNIX;
+        strcpy(addr.sun_path, sock_path);
+        length = sizeof(addr);
+
+        return 0;
 }
 
 static char base64_set[] =

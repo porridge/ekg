@@ -23,8 +23,15 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/un.h>
 #include "libgadu.h"
 #include "dynstuff.h"
+#include "ioctl_daemon.h"
+
+enum { EVENT_MSG = 1, EVENT_CHAT = 2, EVENT_AVAIL = 4, EVENT_NOT_AVAIL = 8, EVENT_AWAY = 16, EVENT_DCC = 32 };
 
 struct userlist {
 	char *first_name, *last_name, *nickname, *comment, *mobile, *group;
@@ -56,12 +63,19 @@ struct transfer {
 	int id;
 };
 
+struct event {
+        uin_t uin;
+        int flags;
+        char *action;
+};
+
 struct list *userlist;
 struct list *ignored;
 struct list *children;
 struct list *aliases;
 struct list *watches;
 struct list *transfers;
+struct list *events;
 int ignored_count;
 int in_readline, away, in_autoexec, auto_reconnect, reconnect_timer;
 int use_dcc;
@@ -101,7 +115,9 @@ char *proxy_host;
 char *reg_password;
 char *query_nick;
 uin_t query_uin;
-
+int sock;
+int length;
+struct sockaddr_un addr;
 
 void my_puts(char *format, ...);
 char *my_readline();
@@ -148,5 +164,14 @@ void changed_dcc(char *var);
 void changed_theme(char *var);
 void prepare_connect();
 int transfer_id();
-
+int add_event(int flags, uin_t uin, char *action);
+int del_event(int flags, uin_t uin);
+int get_flags(char *events);
+char *format_events(int flags);
+int check_event(int event, uin_t uin);
+int run_event(char *action);
+int send_event(char *seq, int act);
+int correct_event(char *action);
+int events_parse_seq(char *seq, struct action_data *data);
+int init_socket();
 #endif

@@ -153,6 +153,8 @@ void handle_msg(struct gg_event *e)
 		}
 		return;
 	};
+
+	check_event((chat) ? EVENT_CHAT : EVENT_MSG, e->event.msg.sender);
 	
 	if (e->event.msg.sender == 0) {
 		if (e->event.msg.msgclass > last_sysmsg) {
@@ -304,15 +306,21 @@ void handle_status(struct gg_event *e)
 
 	if (display_notify) {
 		if (e->event.status.status == GG_STATUS_AVAIL && u->status != GG_STATUS_AVAIL) {
+		    	check_event(EVENT_AVAIL, e->event.status.uin);
 			if (u && completion_notify)
 				add_send_nick(u->comment);
 			my_printf("status_avail", format_user(e->event.status.uin));
 			if (enable_beep && enable_beep_notify)
 				my_puts("\007");
-		} else if (e->event.status.status == GG_STATUS_BUSY && u->status != GG_STATUS_BUSY)
+		} else if (e->event.status.status == GG_STATUS_BUSY && u->status != GG_STATUS_BUSY) 
+		{
+		    	check_event(EVENT_AWAY, e->event.status.uin);
 			my_printf("status_busy", format_user(e->event.status.uin));
-		else if (e->event.status.status == GG_STATUS_NOT_AVAIL && u->status != GG_STATUS_NOT_AVAIL)
+		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL && u->status != GG_STATUS_NOT_AVAIL)
+		{
+		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin);
 			my_printf("status_not_avail", format_user(e->event.status.uin));
+		}
 	}
 	
 	u->status = e->event.status.status;
@@ -625,6 +633,8 @@ void handle_dcc(struct gg_dcc *d)
 	char *p;
 	int tmp;
 
+	check_event(EVENT_DCC, d->peer_uin);
+	
 	if (!(e = gg_dcc_watch_fd(d))) {
 		my_printf("dcc_error", strerror(errno));
 		if (d->type != GG_SESSION_DCC_SOCKET) {

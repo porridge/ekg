@@ -7,32 +7,38 @@ prefix = @prefix@
 datadir = @datadir@
 mandir = @mandir@
 NAME = ekg
+IOCTL_DAEMON_NAME = ioctl_daemon
 VERSION = 0.90
 RM = @RM@
 MAKE = @MAKE@
 AR = @AR@
 install = @INSTALL@
 
-CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -DTHEMES_DIR=\"$(datadir)/ekg/themes\"
+CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -DTHEMES_DIR=\"$(datadir)/ekg/themes\" -DIOCTL_DAEMON_PATH=\"$(prefix)/bin/ioctl_daemon\"
 OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o
 LOBJS = ../lib/libgadu.a
 
-all:	ekg
+all:	ekg ioctl_daemon
 
 ekg:	$(OBJS) $(LOBJS) ekg.c
 	$(CC) $(CFLAGS) ekg.c -o $(NAME) $(OBJS) $(LOBJS) $(LIBS) 
 
-install: ekg
+ioctl_daemon:	ioctl_daemon.c
+	$(CC) ioctl_daemon.c -o $(IOCTL_DAEMON_NAME)
+
+install: ekg 
 	$(install) -m 755 ekg $(prefix)/bin
 	$(install) -m 755 docs/ekl.pl $(prefix)/bin
 	@$(install) -d $(datadir)/ekg/themes/
 	$(install) -m 644 themes/*.theme $(datadir)/ekg/themes
 	@$(install) -d $(mandir)/mann
 	$(install) -m 644 docs/ekg.man $(mandir)/mann
+	$(install) -m 4755 ioctl_daemon $(prefix)/bin
+
 
 distclean:	clean
 	$(RM) -f *~ Makefile
 
 clean:
-	$(RM) -f *.o ekg search core 
+	$(RM) -f *.o ekg ioctl_daemon search core 
 

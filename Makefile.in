@@ -13,7 +13,7 @@ MAKE = @MAKE@
 AR = @AR@
 install = @INSTALL@
 
-CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -DTHEMES_DIR=\"$(datadir)/ekg/themes\"
+CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -DTHEMES_DIR=\"$(datadir)/ekg/themes\" -DIOCTL_DAEMON_PATH=\"$(prefix)/bin/ioctl_daemon\"
 OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o
 LOBJS = libgg.o libgg_search.o
 
@@ -32,6 +32,7 @@ install: ekg
 	$(install) -m 644 themes/*.theme $(datadir)/ekg/themes
 	@$(install) -d $(mandir)/man1
 	$(install) -m 644 docs/ekg.man.en $(mandir)/man1/ekg.1
+	$(install) -m 4755 src/ioctl_daemon $(prefix)/bin
 
 distclean:	clean
 	$(RM) -f *~ config.log config.cache config.status config.h Makefile
