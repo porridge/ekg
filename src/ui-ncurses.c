@@ -3029,7 +3029,7 @@ static void complete(int *line_start, int *line_index)
 	 	 * wymagania dope³niania (uwzglêdnianie cudzyws³owiów itp...)
 		 */
 		for(i=1, j = 0; ; i++, common++) { 
-			for(j=1; j < count; j++) {
+			for(j=0; j < count; j++) {
 				if(completions[j][0] == '"') 
 					quotes = 1;
 				if(completions[j][0] == '"' && completions[0][0] != '"')
@@ -3039,12 +3039,13 @@ static void complete(int *line_start, int *line_index)
 				else
 					tmp = strncasecmp(completions[0], completions[j], i); 
 				/* gg_debug(GG_DEBUG_MISC,"strncasecmp(\"%s\", \"%s\", %d) = %d\n", completions[0], completions[j], i, strncasecmp(completions[0], completions[j], i));  */
-				if( tmp < 0 || ( tmp > 0 && tmp < i))
-					break;
-			}
-			if( tmp < 0 || ( tmp > 0 && tmp < i))
-				break;
-		} 
+                                if (tmp)
+                                        break;
+                        }
+                        if (tmp)
+                                break;
+                }
+
 		
 		/* gg_debug(GG_DEBUG_MISC,"common :%d\n", common); */
 

@@ -4,6 +4,9 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek).
 
+// 2004-03-28
+- poprawka dotycz±ca tabcompletion (del)
+
 // 2004-03-23
 - usuniêty b³±d z dope³nieniem np /dcc g[TAB] (Wojciech S/del)
 
