@@ -581,6 +581,7 @@ COMMAND(cmd_exec)
 
 				if (strcmp(args[1], "%")) {
 					if (!(uin = get_uin(args[1]))) {
+						printq("user_not_found", args[1]);
 						array_free(args);
 						return -1;
 					}
