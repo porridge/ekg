@@ -1198,8 +1198,8 @@ static int contacts_update(struct window *w)
 		{ GG_STATUS_AVAIL, GG_STATUS_AVAIL_DESCR, "contacts_avail", "contacts_avail_descr", "contacts_avail_descr_full", "contacts_avail_header", "contacts_avail_footer" },
 		{ GG_STATUS_BUSY, GG_STATUS_BUSY_DESCR, "contacts_busy", "contacts_busy_descr", "contacts_busy_descr_full", "contacts_busy_header", "contacts_busy_footer" },
 		{ GG_STATUS_INVISIBLE, GG_STATUS_INVISIBLE_DESCR, "contacts_invisible", "contacts_invisible_descr", "contacts_invisible_descr_full", "contacts_invisible_header", "contacts_invisible_footer" },
-		{ GG_STATUS_NOT_AVAIL, GG_STATUS_NOT_AVAIL_DESCR, "contacts_not_avail", "contacts_not_avail_descr", "contacts_not_avail_descr_full", "contacts_not_avail_header", "contacts_not_avail_footer" },
 		{ GG_STATUS_BLOCKED, -1, "contacts_blocking", "contacts_blocking", "contacts_blocking", "contacts_blocking_header", "contacts_blocking_footer" },
+		{ GG_STATUS_NOT_AVAIL, GG_STATUS_NOT_AVAIL_DESCR, "contacts_not_avail", "contacts_not_avail_descr", "contacts_not_avail_descr_full", "contacts_not_avail_header", "contacts_not_avail_footer" },
 	};
 	const char *header = NULL, *footer = NULL, *group = NULL;
 	int j;
@@ -1229,6 +1229,8 @@ static int contacts_update(struct window *w)
 
 		if (contacts_group_index > 0) {
 			group = groups[contacts_group_index - 1];
+			if (*group == '@')
+				group++;
 			header = format_find("contacts_header_group");
 			footer = format_find("contacts_footer_group");
 		}
