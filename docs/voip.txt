@@ -9,7 +9,7 @@ lista wad:
   czêstotliwo¶æ próbkowania 8000Hz i 16-bitow± rozdzielczo¶æ,
 - dzia³a tylko je¶li jest zainstalowana biblioteka libgsm skompilowana
   z opcj± -DWAV49 (w PLD wystarczy zainstalowaæ pakiety libgsm oraz
-  libgsm-devel),
+  libgsm-devel), 
 - wy¶wietla _duuuu¿o_ ¶mieci w oknie debugowania.
 
 by rozpocz±æ rozmowê nale¿y wpisaæ:
