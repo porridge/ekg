@@ -1250,6 +1250,81 @@ int config_read(const char *filename, const char *var)
 }
 
 /*
+ * config_read_variable()
+ *
+ * czyta z pliku ~/.gg/config jedn± zmienn± nie interesuj±c siê typem,
+ * znaczeniem, ani poprawno¶ci±.
+ *
+ *  - name - nazwa zmiennej,
+ *
+ * zaalokowany bufor z tre¶ci± zmiennej lub NULL, je¶li nie znaleziono.
+ */
+char *config_read_variable(const char *name)
+{
+	const char *filename;
+	char *line;
+	FILE *f;
+
+	if (!name)
+		return NULL;
+	
+	if (!(filename = prepare_path("config", 0)))
+		return NULL;
+
+	if (!(f = fopen(filename, "r")))
+		return NULL;
+
+	gg_debug(GG_DEBUG_MISC, "// config_read_variable(\"%s\");\n", name);
+
+	while ((line = read_file(f))) {
+		char *tmp;
+
+		if (line[0] == '#' || line[0] == ';' || (line[0] == '/' && line[1] == '/')) {
+			xfree(line);
+			continue;
+		}
+
+		if (!(tmp = strchr(line, ' '))) {
+			xfree(line);
+			continue;
+		}
+
+		*tmp++ = 0;
+
+		if (!strcasecmp(tmp, name)) {
+			char *result = xstrdup(tmp);
+
+			xfree(line);
+			fclose(f);
+
+			return result;
+		}
+
+		if (!strcasecmp(line, "set")) {
+			char *foo;
+
+			if ((foo = strchr(tmp, ' '))) {
+				char *result;
+
+				*foo++ = 0;
+				result = xstrdup(foo);
+
+				xfree(line);
+				fclose(f);
+
+				return result;
+			}
+		}
+		
+		xfree(line);
+	}
+	
+	fclose(f);
+
+	return NULL;
+}
+
+/*
  * config_write_variable()
  *
  * zapisuje jedn± zmienn± do pliku konfiguracyjnego.

@@ -1018,16 +1018,21 @@ int main(int argc, char **argv)
 			ui_init = ui_batch_init;
 	}
 
-	variable_init();
-
 	config_profile = new_profile;
 
 	if (!ui_set) {
-		config_read(NULL, "interface");
+		char *tmp;
+
+		if ((tmp = config_read_variable("interface"))) {
+			xfree(config_interface);
+			config_interface = tmp;
+		}
+				
 		if (config_interface && strcmp(config_interface, ""))
 			ekg_ui_set(config_interface);
-
 	}
+
+	variable_init();
 
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
