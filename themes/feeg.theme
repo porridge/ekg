@@ -1,26 +1,133 @@
-# From: From: Piotr Figiel <feeg@psychodelic.org>
-
 # feeg theme
 # dla ekg (by wojtekka), trochê po angielsku, prompty s± zrobione dla
-# konsoli ze znaczkami iso02. zawiera escape-kody (dla rl i czasu)
+# konsoli ze znaczkami iso02. zawiera escape-kody (dla rl)
 # quit w klimacie ADOMA (rogue-like) :> (rogalik do ¶ci±gniêcia z adom.de)
+
+# kontakt z autorem themika: feeg@psychodelic.org
 
 prompt %K÷%w-%K÷%n
 prompt2 %K÷%W=%K÷%n
 error %K×%rx%K×%n
 
-timestamp %n%H%K[5m:[0m%n%M
+timestamp %H%M
 
-readline_prompt [30;1m> 
-readline_prompt_away [30;1m[Zzz]> 
+readline_prompt [30;1m> [0m
+readline_prompt_away [30;1m[Zzz]> [0m
 
 known_user %Y%1%n%
 unknown_user %W%1%n
 
-list_avail %> %G  [online]%n %[-30]1 [%K%2%n]\n
-list_busy %> %Y    [busy]%n %[-30]1 [%K%2%n]\n
-list_not_avail %> %K [offline]%n %[-30]1 [%Kn/a%n]\n
-quit \n%G ...\n..%B@%G..%n May thy wisdom be omnipresent!\n %G...%n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n%n
+list_avail %>   [%Gonline%n] %[-30]1 [%K%2%n]\n
+list_busy %>     [%Ybusy%n] %[-30]1 [%K%2%n]\n
+list_not_avail %>  [%Koffline%n] %[-30]1 [%Kn/a%n]\n
+quit \n%Kc-you%n soon :-)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n%n
 
 theme_loaded %> %Kfeeg%w.theme\n%> welcome to the machine.\n
+
+#komunikaty:
+
+message_header %) [%#]: msg < %1\n
+chat_header %) [%#]: chat < %1\n
+
+ack_queued %> [%#]: delivering delayed for %1\n
+ack_delivered %> [%#]: message for %1 has been delivered\n
+
+status_avail %) %1 is [%Gonline%n]\n
+status_busy %) %1 is [%Ybusy%n]\n
+status_not_avail %) %1 has %Klogged out%n.\n
+
+conn_broken %! [%#]: %Kconnection%n lost!\n
+conn_failed %! %Kconnection%n failed\n%! system said: %1\n
+saved %> %Kconfiguration%n saved\n
+
+error_saving %! saving %Kfailed%n (error?)\n
+not_enough_params %! wrong number of %Karguments%n\n
+invalid_uin %! invalid %Kuin%n\n
+
+offline_mode %! you're in %Koffline%n mode\n
+connecting %> trying to %Kconnect%n...\n
+connected %> %Wconnected%n\n
+disconnected %> %Kdisconnected%n\n
+error_loading_theme %! theme not loaded (good for us, %Khuhuhuuh%n)\n%! system said: %1\n
+variable_not_found %! unknown %Kvariable%n\n
+variable_invalid %! you've entered %Kinvalid%n value\n
+not_implemented %! not (yet) implemented\n
+no_config %! %Kekg%n seems to be %Kunconfigured%n try to enter:\n%)   set uin <you'r GG#>\n%)   set password <password>\n%)   save\n%) to %Wconnect%n enter: %Wconnect%n\n
+
+
+user_added %> %Kuser%n %1 added\n
+error_adding %! %Kuser%n %Wnot%n added (error ocurred)\n
+user_deleted %> %Kbye%n bye, %1...\n
+user_not_found %! %Kuser%n not found\n
+error_deleting %! %Kuser%n %Wnot%n deleted (error ocurred)\n
+user_exists %! %Kuser%n %1 already exists\n
+help %n%[-10]1 - %K%2%n %3\n
+help_more        %1\n
+
+away %> [%#]: %Kyou're%n now [%Ybusy%n]\n
+back %> %Kwelcome%n back!\n
+invisible %> [%#]: %Kyou're%n now [%Kinvisible%n]\n
+
+not_connected %! sorry, you're %Knot connected%n\n%> use %Kconnect%n to log in.\n
+
+aliases_invalid %! invalid %Kalias%n\n
+aliases_list_empty %! no %Kaliases%n found\n
+aliases_list %> %[-20]1 %W==%n %K%2%n\n
+aliases_add %) new %Kalias%n %1 %W==%n %K%2%n\n
+aliases_del %) removed %Kalias%n %1\n
+aliases_exist %! %Kalias%n already exists\n
+aliases_noexist %1 no such %Kalias%n found\n
+
+show_status %) [%#]: %Kyou're%n %1%2\n
+show_status_avail [%Gonline%n]
+show_status_busy [%Ybusy%n]
+show_status_invisible [%Kinvisible%n]
+show_status_not_avail [%Koffline%n]
+show_status_private_on [%Bfriends only%n]
+
+config_changed $> do %Kyou%n want to %Kkeep%n this configuration [tak/nie] ?
+config_unknown %! unknown %Kconfiguration%n changes has been found, results may vary\n
+
+private_mode_is_on %> _%Kfriends only%n_ mode on\n
+private_mode_is_off %> _%Kfriends only%n_ mode off\n
+private_mode_on %> _%Kfriends only%n_ turned to %Won%n\n
+private_mode_off %> _%Kfriends only%n_ turned to %Woff%n\n
+private_mode_invalid %> try: %Khelp private%n\n
+
+ignored_list %> %[_-41]1\n
+ignored_list_empty %> nobody's %Kignored%n\n
+ignored_added %> user %1 has been %Kadded%n to ignore list\n
+ignored_deleted %> user %1 has been %Kremoved%n from ignore list\n
+error_not_ignored %! user %1 hasn't been %Kadded%n to ignore list (error?)\n
+
+unknown_command %! %1: %Kcommand%n not found\n
+already_connected %! you're %Kalready%n connected\n
+during_connect %! connecting in %Kprogess%n, please wait\n
+
+sms_error %! error ocurred while trying to send sms\n
+sms_unknown %! %1's mobile phone number is uknown\n
+sms_sent %) [%#] %Ksms%n sent\n
+sms_failed %! sending %Ksms%n to %1 was unsuccessfull\n
+
+
+search_failed %! error ocurred while %Ksearching%n\n
+search_not_found %! %Ksorry%n, no matches\n
+already_searching %! searching in progess, be patient! (or stop with %Kfind -stop%n)\n
+
+search_results_multi_female %MF%n
+search_results_multi_male M
+
+search_results_single_active [%Gavailable%n]
+search_results_single_inactive [%Kunavailable%n]
+search_results_single_female %Mfemale%n
+search_results_single_male male
+search_results_single %) nick: %3\n%) uin: %1\n%) name: %2\n%) city: %4\n%) birth date: %5\n%) gender: %6\n
+
+no_processes %! no active %Kprocesses%n\n
+process_exit %) process %1 (%2) %Kreturned%n %3\n
+modify_done %> userlist %Kmodified%n\n
+user_info %) name%K...%n %1 %2\n%) nick%K...%n %3\n%) alias%K...%n %4\n%) phone number%K...%n %5\n%) group%K...%n %6\n
+  
+
+
 
