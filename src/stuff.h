@@ -80,6 +80,7 @@ int read_config(char *filename);
 int read_userlist(char *filename);
 int write_config(char *filename);
 int write_userlist(char *filename);
+void clear_userlist(void);
 int add_user(uin_t uin, char *comment);
 int del_user(uin_t uin);
 struct userlist *find_user(uin_t uin, char *comment);

@@ -195,6 +195,7 @@ int handle_event()
 	if (!(e = gg_watch_fd(sess))) {
 		my_printf("conn_broken", strerror(errno));
 		gg_free_session(sess);
+		clear_userlist();
 		sess = NULL;
 		do_reconnect();
 

@@ -485,6 +485,23 @@ int write_userlist(char *filename)
 }
 
 /*
+ *
+ * clear_userlist()
+ *
+ * czysci tablice userlist
+ *
+ */
+
+void clear_userlist(void) {
+        struct list *l;
+
+        for (l = userlist; l; l = l->next) {
+                struct userlist *u = l->data;
+                u->status = GG_STATUS_NOT_AVAIL;
+        };
+};
+
+/*
  * add_user()
  *
  * dodaje u¿ytkownika do listy.
