@@ -31,12 +31,12 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include "log.h"
 #ifdef HAVE_ZLIB_H
 #  include <zlib.h>
 #endif
 
 #include "dynstuff.h"
-#include "log.h"
 #ifndef HAVE_STRLCAT
 #  include "../compat/strlcat.h"
 #endif

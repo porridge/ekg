@@ -27,6 +27,7 @@
 #include <sys/types.h>
 #include <time.h>
 
+#include "dynstuff.h"
 #include "libgadu.h"
 
 struct last {
