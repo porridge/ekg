@@ -347,7 +347,7 @@ void handle_msg(struct gg_event *e)
 	put_log(e->event.msg.sender, "%s,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, tmp);
 	xfree(tmp);
 
-	if (away && config_sms_away && config_sms_app && config_sms_number) {
+	if (away && away != 4 && config_sms_away && config_sms_app && config_sms_number) {
 		char *foo, sender[100];
 
 		if (u)
