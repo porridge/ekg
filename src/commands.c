@@ -1778,6 +1778,20 @@ COMMAND(cmd_msg)
 		int msglen = 0, i;
 
 		for (i = 0; i < strlen(params[1]); i++, p++) {
+			unsigned char rgb[3];
+
+			if (*p == 3) {
+				if (!(attr & GG_FONT_COLOR)) {
+					int num = atoi(p + 1);
+					if (num < 0 || num > 15)
+						num = 0;
+					rgb[0] = default_color_map[num].r;
+					rgb[1] = default_color_map[num].g;
+					rgb[2] = default_color_map[num].b;
+				}
+				attr ^= GG_FONT_COLOR;
+			}
+
 			if (*p == 2)
 				attr ^= GG_FONT_BOLD;
 			if (*p == 20)
@@ -1797,7 +1811,12 @@ COMMAND(cmd_msg)
 					format[formatlen] = (msglen & 255);
 					format[formatlen + 1] = ((msglen >> 8) & 255);
 					format[formatlen + 2] = attr;
-					formatlen += 3;
+
+					if ((attr & GG_FONT_COLOR)) {
+						memcpy(format + formatlen + 3, rgb, sizeof(rgb));
+						formatlen += 6;
+					} else
+						formatlen += 3;
 
 					last_attr = attr;
 				}

@@ -113,10 +113,10 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 			int pos = p[i] + p[i + 1] * 256;
 
 			if ((p[i + 2] & GG_FONT_COLOR)) {
-				/* XXX mapowanie kolorów */
-			}
-
-			if ((p[i + 2] & 7) || !p[i + 2])
+				formatmap[pos] = color_map(p[i + 3], p[i + 4], p[i + 5]);				
+				if (formatmap[pos] == 'k')
+					formatmap[pos] = 'n';
+			} else if ((p[i + 2] & 7) || !p[i + 2])
 				formatmap[pos] = attrmap[p[i + 2] & 7];
 
 			i += (p[i + 2] & GG_FONT_COLOR) ? 6 : 3;
@@ -1322,7 +1322,7 @@ void handle_userlist(struct gg_http *h)
  */
 void handle_disconnect(struct gg_event *e)
 {
-	print("conn_broken");
+	print("conn_disconnected");
 	ui_event("disconnected");
 
 	gg_logoff(sess);	/* a zobacz.. mo¿e siê uda ;> */
@@ -1332,7 +1332,6 @@ void handle_disconnect(struct gg_event *e)
 	userlist_clear_status(0);
 	update_status();
 	last_conn_event = time(NULL);
-	do_reconnect();
 }
 
 /*

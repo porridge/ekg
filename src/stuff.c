@@ -3803,3 +3803,55 @@ const char *ekg_status_label(int status, const char *prefix)
 
 	return buf;
 }
+
+struct color_map default_color_map[16] = {
+	{ 'k', 0, 0, 0 },
+	{ 'r', 168, 0, 0, },
+	{ 'g', 0, 168, 0, },
+	{ 'y', 168, 168, 0, },
+	{ 'b', 0, 0, 168, },
+	{ 'm', 168, 0, 168, },
+	{ 'c', 0, 168, 168, },
+	{ 'w', 168, 168, 168, },
+	{ 'K', 96, 96, 96 },
+	{ 'R', 255, 0, 0, },
+	{ 'G', 0, 255, 0, },
+	{ 'Y', 255, 255, 0, },
+	{ 'B', 0, 0, 255, },
+	{ 'M', 255, 0, 255, },
+	{ 'C', 0, 255, 255, },
+	{ 'W', 255, 255, 255, }
+};
+
+/*
+ * color_map()
+ *
+ * funkcja zwracaj±ca kod koloru z domy¶lnej 16-kolorowej palety terminali
+ * ansi odpadaj±cemu podanym warto¶ciom RGB.
+ */
+char color_map(unsigned char r, unsigned char g, unsigned char b)
+{
+	unsigned long mindist = 255 * 255 * 255;
+	struct color_map *map = default_color_map;
+	char ch = 0;
+	int i;
+
+	fprintf(stderr, "color=%.2x%.2x%.2x\n", r, g, b);
+
+#define __sq(x) ((x)*(x))
+	for (i = 0; i < 16; i++) {
+		unsigned long dist = __sq(r - map[i].r) + __sq(g - map[i].g) + __sq(b - map[i].b);
+
+		fprintf(stderr, "%d(%c)=%.2x%.2x%.2x, dist=%ld\n", i, map[i].color, map[i].r, map[i].g, map[i].b, dist);
+
+		if (dist < mindist) {
+			ch = map[i].color;
+			mindist = dist;
+		}
+	}
+#undef __sq
+
+	fprintf(stderr, "mindist=%ld, color=%c\n", mindist, ch);
+
+	return ch;	
+}

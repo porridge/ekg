@@ -167,6 +167,11 @@ struct buffer {
 	char *line;
 };
 
+struct color_map {
+	int color;
+	unsigned char r, g, b;
+};
+
 list_t children;
 list_t aliases;
 list_t watches;
@@ -295,7 +300,7 @@ char *batch_line;
 int immediately_quit;
 int ekg_segv_handler;
 int ioctld_sock;
-
+struct color_map default_color_map[16];
 
 int alias_add(const char *string, int quiet, int append);
 int alias_remove(const char *name, int quiet);
@@ -399,13 +404,13 @@ const char *timestamp(const char *format);
 void unidle();
 int on_off(const char *value);
 int transfer_id();
+char *xstrmid(const char *str, int start, int length);
+const char *http_error_string(int h);
+char color_map(unsigned char r, unsigned char g, unsigned char b);
 
 struct timer *timer_add(time_t period, int persistent, int type, int at, const char *name, const char *command);
 int timer_remove(const char *name, int at, const char *command);
 void timer_free();
-
-char *xstrmid(const char *str, int start, int length);
-const char *http_error_string(int h);
 
 void update_status();
 void update_status_myip();

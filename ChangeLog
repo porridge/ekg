@@ -28,6 +28,8 @@ zg³osi³ b³±d.
 - poprawka kodowania eksportowanej listy kontaktów (Sero/sz)
 - poprawka wy¶wietlania tabów (w)
 - dodanie parametru do /save, który mówi, gdzie zapisaæ konfiguracjê (w)
+- po uruchomieniu drugiej sesji ekg nie bêdzie próbowa³o siê ³±czyæ
+  ponownie (fidor/w)
 
 // 2002-01-31
 
