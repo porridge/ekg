@@ -3970,8 +3970,9 @@ COMMAND(cmd_query)
 				}
 
 				array_free(tmp);
-				ui_event("command", quiet, "query", params[0], NULL);
 			}
+
+			ui_event("command", quiet, "query", params[0], NULL);
 		}
 	}
 		
