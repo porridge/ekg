@@ -56,7 +56,7 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 akcje blink_leds oraz beeps_spk musz± mieæ dostêp do /dev/console, wiêc
 uruchamiany jest specjalny daemon (ioctld) z prawami roota. po wyj¶ciu 
 z ekg, daemon ten jest zabijany. aby je w³±czyæ, nale¿y uruchomiæ skrypt
-configure z parametrem --with-ioctld.
+configure z parametrem --enable-ioctld.
 
 przyk³ady:
 	on msg drg blink_leds 1, 4, 2, 7/20000, 7, 7, 7
