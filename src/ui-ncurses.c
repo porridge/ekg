@@ -3445,6 +3445,13 @@ static void ui_ncurses_loop()
 				/* obs³uga Ctrl-F1 - Ctrl-F12 na FreeBSD */
 				if (ch == '[') {
 					ch = wgetch(input);
+
+					if (ch == '4' && wgetch(input) == '~' && binding_map[KEY_END])
+						binding_map[KEY_END]->function(NULL);
+
+					if (ch == '1' && wgetch(input) == '~' && binding_map[KEY_HOME])
+						binding_map[KEY_HOME]->function(NULL);
+
 					if (ch >= 107 && ch <= 118)
 						window_switch(ch - 106);
 				}
