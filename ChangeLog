@@ -5,6 +5,11 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-03-30
+
+- poprawka helpa ,,list'', bo zaczynaj± mnie denerowaæ listy o -g (w)
+- uaktualnienie ekgnv.sh (jojo/w)
+
 // 2002-03-29
 
 - wyrzucenie ekl.pl z Makefile.in (d)
