@@ -1345,6 +1345,12 @@ void contacts_changed()
 	struct window *w = NULL;
 	list_t l;
 
+	if (config_contacts_size < 0)
+		config_contacts_size = 0;
+
+	if (config_contacts_size > 1000)
+		config_contacts_size = 1000;
+	
 	contacts_margin = 1;
 	contacts_edge = WF_RIGHT;
 	contacts_frame = WF_LEFT;
@@ -1409,6 +1415,8 @@ void contacts_changed()
 				contacts_margin = atoi(args[i] + 7);
 				if (contacts_margin > 10)
 					contacts_margin = 10;
+				if (contacts_margin < 0)
+					contacts_margin = 0;
 			}
 
 			if (!strcasecmp(args[i], "nomargin"))
@@ -1436,7 +1444,8 @@ void contacts_changed()
 				contacts_order[4] = -1;
 				
 				for (j = 0; args[i][j + 6] && j < 5; j++)
-					contacts_order[j] = args[i][j + 6] - '0';	
+					if (args[i][j + 6] >= '0' && args[i][j + 6] <= '4')
+						contacts_order[j] = args[i][j + 6] - '0';	
 			}
 		}
 
