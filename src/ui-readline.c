@@ -435,19 +435,21 @@ static void ui_readline_print(const char *target, const char *line)
                 return;
         }
 
-	window_write(curr_window, line);
+	if (pager_lines != -2) {
+		window_write(curr_window, line);
 
-        if (in_readline) {
-                rl_end = 0;
-                rl_prompt = "";
-                rl_redisplay();
-                printf("\r");
-                for (i = 0; i < strlen(old_prompt); i++)
-                        printf(" ");
-                printf("\r");
-        }
+	        if (in_readline) {
+	                rl_end = 0;
+	                rl_prompt = "";
+	                rl_redisplay();
+	                printf("\r");
+	                for (i = 0; i < strlen(old_prompt); i++)
+	                        printf(" ");
+	                printf("\r");
+	        }
 
-	printf("%s", line);
+		printf("%s", line);
+	}
 
 	if (pager_lines >= 0) {
 		const char *p;
