@@ -1005,7 +1005,17 @@ void handle_success(struct gg_event *e)
 		addr.s_addr = sess->server_addr;
 		
 		xfree(config_server);
-		config_server = xstrdup(inet_ntoa(addr));
+#ifdef __GG_LIBGADU_HAVE_OPENSSL
+		if (sess->ssl)
+			config_server = saprintf("tls:%s:%d", inet_ntoa(addr), sess->port);
+		else
+#endif
+		{
+			if (sess->port != GG_DEFAULT_PORT)
+				config_server = saprintf("%s:%d", inet_ntoa(addr), sess->port);
+			else
+				config_server = xstrdup(inet_ntoa(addr));
+		}
 	}
 	
 	if (batch_mode && batch_line) {

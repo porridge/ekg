@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-05-16
+
+- libgadu: gg_session->port jest prawid³owo wype³niane (w)
+- poprawka server_save dla po³±czeñ TLS (perry/w)
+
 // 2003-05-15
 
 - libgadu: obs³uga po³±czeñ szyfrowanych TLSv1. wystarczy podaæ konkretny
