@@ -172,6 +172,7 @@ int config_mesg_allow = 2;
 int config_display_welcome = 1;
 int config_auto_back = 0;
 int config_display_crap = 1;
+char *config_display_color_map = NULL;
 
 static struct {
 	int event;
@@ -519,6 +520,7 @@ int config_read()
 			if (pms && pms[0] && pms[1]) 
 				ui_event("command", "bind", "--add-quiet", 
 					 pms[0], pms[1], NULL);
+			array_free(pms);
                 } else 
 			variable_set(buf, foo, 1);
 
@@ -3471,4 +3473,27 @@ void binding_list()
 
 		print("bind_seq_list", b->key, b->action);
 	}
+}
+
+/*
+ * binding_free()
+ *
+ * zwalnia pamiêæ po li¶cie przypisanych klawiszy.
+ */
+void binding_free() 
+{
+	list_t l;
+
+	if (!bindings)
+		return;
+
+	for (l = bindings; l; l = l->next) {
+		struct binding *b = l->data;
+
+		xfree(b->key);
+		xfree(b->action);
+	}
+
+	list_destroy(bindings, 1);
+	bindings = NULL;
 }

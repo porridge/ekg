@@ -831,6 +831,7 @@ int main(int argc, char **argv)
 	ui_event("theme_init");
 
 	config_timestamp = xstrdup("%H:%M ");
+	config_display_color_map = xstrdup("nTgGbBrR");
 
 	in_autoexec = 1;
         userlist_read();
@@ -1045,6 +1046,7 @@ void ekg_exit()
 	emoticon_free();
 	command_free();
 	timer_free();
+	binding_free();
 
 	xfree(home_dir);
 

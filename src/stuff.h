@@ -171,6 +171,7 @@ char *config_dcc_dir;
 int config_debug;
 int config_display_ack;
 int config_display_color;
+char *config_display_color_map;
 int config_display_crap;
 int config_display_notify;
 int config_display_sent;
@@ -347,5 +348,6 @@ int find_in_uins(int uin_count, uin_t *uins, uin_t uin);
 uin_t str_to_uin(const char *text);
 
 void binding_list();
+void binding_free();
 
 #endif /* __STUFF_H */

@@ -100,6 +100,71 @@ const char *format_find(const char *name)
 }
 
 /*
+ * format_ansi()
+ *
+ * zwraca sekwencjê ansi odpowiadaj±c± danemu kolorkowi z thememów ekg.
+ */
+const char *format_ansi(char ch)
+{
+	if (ch == 'k')
+		return "\033[0;30m";
+	if (ch == 'K')
+		return "\033[1;30m";
+	if (ch == 'l')
+		return "\033[40m";
+	if (ch == 'r')
+		return "\033[0;31m";
+	if (ch == 'R')
+		return "\033[1;31m";
+	if (ch == 's')
+		return "\033[41m";
+	if (ch == 'g')
+		return "\033[0;32m";
+	if (ch == 'G')
+		return "\033[1;32m";
+	if (ch == 'h')
+		return "\033[42m";
+	if (ch == 'y')
+		return "\033[0;33m";
+	if (ch == 'Y')
+		return "\033[1;33m";
+	if (ch == 'z')
+		return "\033[43m";
+	if (ch == 'b')
+		return "\033[0;34m";
+	if (ch == 'B')
+		return "\033[1;34m";
+	if (ch == 'e')
+		return "\033[44m";
+	if (ch == 'm' || ch== 'p')
+		return "\033[0;35m";
+	if (ch == 'M' || ch == 'P')
+		return "\033[1;35m";
+	if (ch == 'q')
+		return "\033[45m";
+	if (ch == 'c')
+		return "\033[0;36m";
+	if (ch == 'C')
+		return "\033[1;36m";
+	if (ch == 'd')
+		return "\033[46m";
+	if (ch == 'w')
+		return "\033[0;37m";
+	if (ch == 'W')
+		return "\033[1;37m";
+	if (ch == 'x')
+		return "\033[47m";
+	if (ch == 'i')
+		return "\033[5m";
+	if (ch == 'n')
+		return "\033[0m";
+	if (ch == 'T')
+		return "\033[1m";
+
+	return "";
+}
+
+/*
  * isalpha_pl_PL()
  * 
  * makro udaj±ce isalpha() z LC_CTYPE="pl_PL". niestety ncurses co¶ psuje
@@ -217,60 +282,7 @@ char *va_format_string(const char *format, va_list ap)
 				string_append_c(buf, '\033');
 				string_append_c(buf, *p);
 			} else if (config_display_color) {
-				if (*p == 'k')
-					string_append(buf, "\033[0;30m");
-				if (*p == 'K')
-					string_append(buf, "\033[1;30m");
-				if (*p == 'l')
-					string_append(buf, "\033[40m");
-				if (*p == 'r')
-					string_append(buf, "\033[0;31m");
-				if (*p == 'R')
-					string_append(buf, "\033[1;31m");
-				if (*p == 's')
-					string_append(buf, "\033[41m");
-				if (*p == 'g')
-					string_append(buf, "\033[0;32m");
-				if (*p == 'G')
-					string_append(buf, "\033[1;32m");
-				if (*p == 'h')
-					string_append(buf, "\033[42m");
-				if (*p == 'y')
-					string_append(buf, "\033[0;33m");
-				if (*p == 'Y')
-					string_append(buf, "\033[1;33m");
-				if (*p == 'z')
-					string_append(buf, "\033[43m");
-				if (*p == 'b')
-					string_append(buf, "\033[0;34m");
-				if (*p == 'B')
-					string_append(buf, "\033[1;34m");
-				if (*p == 'e')
-					string_append(buf, "\033[44m");
-				if (*p == 'm' || *p == 'p')
-					string_append(buf, "\033[0;35m");
-				if (*p == 'M' || *p == 'P')
-					string_append(buf, "\033[1;35m");
-				if (*p == 'q')
-					string_append(buf, "\033[45m");
-				if (*p == 'c')
-					string_append(buf, "\033[0;36m");
-				if (*p == 'C')
-					string_append(buf, "\033[1;36m");
-				if (*p == 'd')
-					string_append(buf, "\033[46m");
-				if (*p == 'w')
-					string_append(buf, "\033[0;37m");
-				if (*p == 'W')
-					string_append(buf, "\033[1;37m");
-				if (*p == 'x')
-					string_append(buf, "\033[47m");
-				if (*p == 'i')
-					string_append(buf, "\033[5m");
-				if (*p == 'n')
-					string_append(buf, "\033[0m");
-		                if (*p == 'T')
-					string_append(buf, "\033[1m");
+				string_append(buf, format_ansi(*p));
 			}
 
 			if (*p == '@') {

@@ -24,6 +24,8 @@ zg³osi³ b³±d.
   gg_send_message_confer_richtext(). paskudnie to wygl±da, ale ABI
   trzeba zachowaæ (w)
 - libgadu: podbicie wersji API (w)
+- wy¶wietlanie pogrubionych, pochy³ych i podkre¶lonych czcionek (w)
+- dodanie zmiennej display_color_map (w)
 
 // 2002-12-06
 

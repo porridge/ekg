@@ -203,6 +203,22 @@ display_color
 
 	warto¶æ 0 wy³±cza wy¶wietlanie kolorów, warto¶æ 1 w³±cza.
 
+display_color_map
+	typ: tekst
+	domy¶lna warto¶æ: "nTgGbBrR"
+
+	okre¶la jakie kolory bêd± przypisane ró¿nym atrybutom tekstu.
+	musi zawieraæ 8 znaków zgodnych ze spisem z pliku docs/themes.txt.
+	ka¿dy z nich okre¶la kolejno kolor dla:
+	- brak atrybutów,
+	- pogrubony,
+	- pochy³y,
+	- pochy³y+pogrubiony,
+	- podkre¶lony,
+	- podkre¶lony+pogrubiony,
+	- podkre¶lony+pochy³y,
+	- podkre¶lony+pochy³y+pogrubiony.
+
 display_crap
 	typ: bool
 	domy¶lna warto¶æ: 1
@@ -523,7 +539,7 @@ time_deviation
 
 timestamp
 	typ: tekst
-	domy¶lna warto¶æ: brak
+	domy¶lna warto¶æ: "%H:%M "
 
 	w interfejsie ncurses okre¶la format czasu wy¶wietlanego na
 	pocz±tku ka¿dej linii. dok³adny opis formatu zawiera strona

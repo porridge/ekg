@@ -85,12 +85,54 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 	char *next_format = NULL, *head = NULL, *foot = NULL;
 	char *timestamp = NULL, *save, *secure_label = NULL;
 	char *line_width = NULL, timestr[100], *target, *cname;
+	char *formatmap = NULL;
 	struct tm *tm;
 	struct conference *c = NULL;
 
+	/* tworzymy mapê formatowanego tekstu. dla ka¿dego znaku wiadomo¶ci
+	 * zapisujemy jeden znak koloru z docs/themes.txt lub 0 je¶li nie
+	 * trzeba niczego zmieniaæ. */
+
+	if (e->event.msg.formats && e->event.msg.formats_length) {
+		unsigned char *p = e->event.msg.formats;
+		char last_attr = 0, *attrmap;
+
+		if (config_display_color_map && strlen(config_display_color_map) == 8)
+			attrmap = config_display_color_map;
+		else
+			attrmap = "nTgGbBrR";
+
+		formatmap = xcalloc(1, strlen(e->event.msg.message));
+		
+		for (i = 0; i < e->event.msg.formats_length; ) {
+			int pos = p[i] + p[i + 1] * 256;
+
+			if ((p[i + 2] & GG_FONT_COLOR)) {
+				/* XXX mapowanie kolorów */
+			}
+
+			if ((p[i + 2] & 7))
+				formatmap[pos] = attrmap[p[i + 2] & 7];
+
+			i += (p[i + 2] & GG_FONT_COLOR) ? 6 : 3;
+		}
+
+		/* teraz powtarzamy formaty tam, gdzie jest przej¶cie do
+		 * nowej linii. dziêki temu oszczêdzamy sobie mieszania
+		 * ni¿ej w kodzie. */
+
+		for (i = 0; i < strlen(e->event.msg.message); i++) {
+			if (formatmap[i])
+				last_attr = formatmap[i];
+
+			if (i > 0 && e->event.msg.message[i - 1] == '\n')
+				formatmap[i] = last_attr;
+		}
+	}
+
 	if (secure)
 		secure_label = format_string(format_find("secure"));
-		
+	
 	if (e->event.msg.recipients) {
 		c = conference_find_by_uins(e->event.msg.sender, 
 			e->event.msg.recipients, e->event.msg.recipients_count);
@@ -239,10 +281,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 			mesg[i] = ' ';
 	
 	while ((line = gg_get_line(&mesg))) {
-		char *new_line = NULL;
-
-		if (config_emoticons && (new_line = emoticon_expand(line)))
-			line = new_line;
+		int buf_offset;
 
 #ifdef WITH_WAP
 		{
@@ -263,6 +302,8 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 #endif
 
 		for (; strlen(line); line = next) {
+			char *emotted = NULL, *formatted;
+
 			if (strlen(line) <= width) {
 				strcpy(buf, line);
 				next = line + strlen(line);
@@ -282,20 +323,40 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 				while (*next == ' ')
 					next++;
 			}
+			
+			buf_offset = (int) (line - save);
 
-			print_window(target, separate, format, buf, format_user(e->event.msg.sender), timestr, cname);
+			if (formatmap) {
+				string_t s = string_init("");
+				int i;
+
+				for (i = 0; i < strlen(buf); i++) {
+					if (formatmap[buf_offset + i])
+						string_append(s, format_ansi(formatmap[buf_offset + i]));
+
+					string_append_c(s, buf[i]);
+				}
+				formatted = string_free(s, 0);
+			} else
+				formatted = xstrdup(buf);
+
+			if (config_emoticons)
+				emotted = emoticon_expand(formatted);
+
+			print_window(target, separate, format, (emotted) ? emotted : formatted , format_user(e->event.msg.sender), timestr, cname);
 
 			width = next_width;
 			format = next_format;
-		}
 
-		if (new_line)
-			xfree(new_line);
+			xfree(emotted);
+			xfree(formatted);
+		}
 	}
 
 	xfree(buf);
 	xfree(save);
 	xfree(secure_label);
+	xfree(formatmap);
 
 	if (!strcmp(format_find(format_first), ""))
 		print_window(target, separate, foot);
@@ -398,11 +459,11 @@ void handle_msg(struct gg_event *e)
 		}
 
 		if (len == -1)
-			gg_debug(GG_DEBUG_MISC, "// private key not found\n");
+			gg_debug(GG_DEBUG_MISC, "// ekg: private key not found\n");
 		if (len == -2)
-			gg_debug(GG_DEBUG_MISC, "// rsa decryption failed\n");
+			gg_debug(GG_DEBUG_MISC, "// ekg: rsa decryption failed\n");
 		if (len == -3)
-			gg_debug(GG_DEBUG_MISC, "// magic number mismatch\n");
+			gg_debug(GG_DEBUG_MISC, "// ekg: magic number mismatch\n");
 	}
 #endif
 	
@@ -468,10 +529,10 @@ void handle_msg(struct gg_event *e)
 	if (e->event.msg.formats_length > 0) {
 		int i;
 		
-		gg_debug(GG_DEBUG_MISC, "[ekg received formatting info (len=%d):", e->event.msg.formats_length);
+		gg_debug(GG_DEBUG_MISC, "// ekg: received formatting info (len=%d):", e->event.msg.formats_length);
 		for (i = 0; i < e->event.msg.formats_length; i++)
 			gg_debug(GG_DEBUG_MISC, " %.2x", ((unsigned char*)e->event.msg.formats)[i]);
-		gg_debug(GG_DEBUG_MISC, "]\n");
+		gg_debug(GG_DEBUG_MISC, "\n");
 	}
 }
 

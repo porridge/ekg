@@ -74,6 +74,11 @@ static int dd_log(const char *name)
 	return (config_log);
 }
 
+static int dd_color(const char *name)
+{
+	return (config_display_color);
+}
+
 /*
  * variable_init()
  *
@@ -113,6 +118,7 @@ void variable_init()
 	variable_add("dcc_dir", VAR_STR, 1, &config_dcc_dir, NULL, NULL, dd_dcc);
 	variable_add("display_ack", VAR_INT, 1, &config_display_ack, NULL, variable_map(4, 0, 0, "none", 1, 0, "all", 2, 0, "delivered", 3, 0, "queued"), NULL);
 	variable_add("display_color", VAR_BOOL, 1, &config_display_color, NULL, NULL, NULL);
+	variable_add("display_color_map", VAR_STR, 1, &config_display_color_map, NULL, NULL, dd_color);
 	variable_add("display_crap", VAR_BOOL, 1, &config_display_crap, NULL, NULL, NULL);
 	variable_add("display_notify", VAR_INT, 1, &config_display_notify, NULL, variable_map(3, 0, 0, "none", 1, 0, "all", 2, 0, "significant"), NULL);
 	variable_add("display_welcome", VAR_BOOL, 1, &config_display_welcome, NULL, NULL, NULL);
