@@ -41,16 +41,19 @@ int blink_leds(int *flag, int *delay)
 {
     	int s, fd;
         
-	fd = open("/dev/console", O_WRONLY);
+	if ((fd = open("/dev/console", O_WRONLY)) == -1)
+		fd = STDOUT_FILENO;
 
-	for(s=0; flag[s] >= 0; s++) {
+	for(s=0; flag[s] >= 0 && s <= MAX_ITEMS; s++) {
 	    	ioctl(fd, KDSETLED, flag[s]);
-		usleep(delay[s]);
+		if (delay[s] && delay[s] <= MAX_DELAY)
+			usleep(delay[s]);
 	}
 
 	ioctl(fd, KDSETLED, 8);
 	
-	close(fd);
+	if (fd != STDOUT_FILENO)
+		close(fd);
 	
 	return 0;
 }
@@ -59,16 +62,19 @@ int beeps_spk(int *tone, int *delay)
 {
     	int s, fd;
        
-    	fd = open("/dev/console", O_WRONLY);
+    	if ((fd = open("/dev/console", O_WRONLY)) == -1)
+		fd = STDOUT_FILENO;
 		
-	for(s=0; tone[s] >= 0; s++) {
+	for(s=0; tone[s] >= 0 && s <= MAX_ITEMS; s++) {
 	    	ioctl(fd, KIOCSOUND, tone[s]);
-		usleep(delay[s]);
+		if (delay[s] && delay[s] <= MAX_DELAY)
+			usleep(delay[s]);
 	}
 
 	ioctl(fd, KIOCSOUND, 0);
 	
-	close(fd);
+	if (fd != STDOUT_FILENO)
+		close(fd);
 
 	return 0;
 }
@@ -99,8 +105,7 @@ int main(int argc, char **argv)
 	
 	umask(0177);
 
-	close(1); 
-	close(2);
+	close(STDERR_FILENO);
 	
 	strcpy(sock_path, argv[1]);
 	

@@ -46,6 +46,7 @@
 #include <arpa/inet.h>
 #ifdef WITH_IOCTLD
 #  include <sys/un.h>
+#  include "ioctld.h"
 #endif
 #include <ctype.h>
 #ifdef HAVE_OPENSSL
@@ -1796,7 +1797,7 @@ void alias_free()
 int ioctld_parse_seq(const char *seq, struct action_data *data)
 {
         char tmp_buff[16] = "";
-        int i = 0, a, l = 0, default_delay = 10000;
+        int i = 0, a, l = 0, default_delay = DEFAULT_DELAY;
 
         if (!data || !seq || !isdigit(seq[0]))
                 return -1;

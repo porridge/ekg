@@ -22,8 +22,9 @@
 #ifndef __IOCTLD_H
 #define __IOCTLD_H
 
-#define MAX_ITEMS 100
-#define DEFAULT_DELAY 100000
+#define MAX_ITEMS 	50
+#define MAX_DELAY 	2000000
+#define DEFAULT_DELAY 	100000
 
 struct action_data {
 	int act;
