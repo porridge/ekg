@@ -211,6 +211,7 @@ int config_auto_reconnect;
 int config_auto_save;
 #ifdef WITH_ASPELL
 int config_aspell;
+char *config_aspell_allowed;
 char *config_aspell_lang;
 char *config_aspell_encoding;
 #endif
@@ -360,7 +361,9 @@ char *buffer_tail(int type);
 void buffer_free();
 
 void changed_auto_save(const char *var);
+#ifdef WITH_ASPELL
 void changed_aspell(const char *var);
+#endif
 void changed_backlog_size(const char *var);
 void changed_dcc(const char *var);
 void changed_local_ip(const char *var);
