@@ -6,6 +6,10 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2002-12-27
+
+- dodanie zdarzenia ,,new_mail'' do ,,on'' (scooty/sz)
+
 // 2002-12-26
 
 - ekg pokazuje ju¿, ¿e kto¶ nas ,,zablokowa³'' (w)

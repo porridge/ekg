@@ -193,6 +193,7 @@ static struct {
 	{ EVENT_SIGUSR2, "sigusr2" },
 	{ EVENT_DELIVERED, "delivered" },
 	{ EVENT_QUEUED, "queued" },
+	{ EVENT_NEW_MAIL, "new_mail" },
 	{ INACTIVE_EVENT, NULL },
 	{ 0, NULL },
 };
@@ -2198,7 +2199,8 @@ fail:
  * sprawdza i ewentualnie uruchamia akcjê na podane zdarzenie.
  *
  * - event,
- * - uin.
+ * - uin,
+ * - data.
  */
 int event_check(int event, uin_t uin, const char *data)
 {
@@ -2248,6 +2250,7 @@ int event_check(int event, uin_t uin, const char *data)
 				*q++ = '\\';
 			*q = *p;
 		}
+
 		*q = 0;
 	}
 
@@ -2271,7 +2274,7 @@ int event_check(int event, uin_t uin, const char *data)
  *
  * sprawdza czy akcja na zdarzenie jest poprawna.
  *
- * - act.
+ * - action.
  */
 int event_correct(const char *action)
 {

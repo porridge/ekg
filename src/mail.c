@@ -121,6 +121,8 @@ int check_mail_update(const char *s, int more)
 
 		if (config_beep && config_beep_mail)
 			ui_beep();
+
+		event_check(EVENT_NEW_MAIL, 1, NULL);
 	}
 
 	return 0;

@@ -49,10 +49,11 @@ enum event_t {
 	EVENT_SIGUSR2 = 1024,
 	EVENT_DELIVERED = 2048,
 	EVENT_QUEUED = 4096,
+	EVENT_NEW_MAIL = 8192,
 
-	EVENT_ALL = 8191,	/* uaktualniaæ za ka¿d± zmian± */
+	EVENT_ALL = 16383,	/* uaktualniaæ za ka¿d± zmian± */
 
-	INACTIVE_EVENT = 8192, /* nieaktywne zdarzenie */
+	INACTIVE_EVENT = 32768, /* nieaktywne zdarzenie */
 };
 
 struct process {
