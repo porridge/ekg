@@ -28,6 +28,6 @@ z serwerami gg.
 .TP
 .BI \-u "\ " username
 Zezwala na uruchomienie ekg z innym \"u¿ytkownikiem\". 
-Standardowo konfiguracja ekg znajduje sie w katalogu ~/ekg - Ta 
+Standardowo konfiguracja ekg znajduje sie w katalogu ~/.gg - Ta 
 opcja pozwala na stworzenie struktury podkatalogów z oddzielnymi 
 konfiguracjami.
