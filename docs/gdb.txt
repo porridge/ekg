@@ -40,5 +40,4 @@ a sam b³±d wystêpuje pó¼niej, chocia¿by przy wywo³ywaniu funkcji
 alokacji pamiêci. w takich przypadkach zlokalizowanie b³êdu jest znacznie
 trudniejsze.
 
-
 $Id$

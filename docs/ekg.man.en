@@ -1,45 +1,57 @@
-.TH EKG n "31 october 2001" 
+.TH EKG n "11 november 2002" 
 .SH NAME
 ekg \- A Gadu-Gadu compatible client.
 .SH SYNTAX
 .B ekg [
 .BI options
 .B ]
+.B [
+.BI commands
+.B ]
 
 .SH SUMMARY
 .B ekg
-This is experimental Gadu-Gadu client.
+This is an experimental Gadu-Gadu client.
 
 .SH OPTIONS
 .TP
-.BI \-d\ [\-\-debug]
-Enables "debug" mode - this is special verbose mode.
+.BI \-h\ [\-\-help]
+Shows command line options.
+.TP
+.BI \-u\ username\ [\-\-user\ username]
+Starts ekg with other \"user\". 
+By default config files are stored in ~/.gg (if there is a non-empty
+$CONFIG_DIR environment variable, ~/$CONFIG_DIR/gg/ is used instead);
+this option gives
+ability to create subdirectories structure with other setups.
+.TP
+.BI \-t\ theme\ [\-\-theme\ theme]
+Loads theme from the specified file.
+.TP
+.BI \-c\ file\ [\-\-control-pipe\ file]
+Creates a named pipe that can be used to control the client.
 .TP
 .BI \-n\ [\-\-no-auto]
 Don't connect automagically. After starting program won't automatically 
 connect to the gg servers. 
 .TP
-.BI \-u\ username\ [\-\-user\ username]
-Starts ekg with other \"user\". 
-By default config files are stored in ~/.gg (if there is non-empty
-$CONFIG_DIR environment variable, ~/$CONFIG_DIR/gg/ is being used
-instead); this option gives 
-ability to create subdirectories structure with other setups.
+.BI \-a\ [\-\-away[=description]]
+After connecting sets the status to "away".
 .TP
-.BI \-t\ theme\ [\-\-theme\ theme]
-loads theme from specified file
+.BI \-b\ [\-\-back[=description]]
+After connecting sets the status to "back".
 .TP
-.BI \-a\ [\-\-away]
-after connect goes away
-.TP
-.BI \-b\ [\-\-back]
-after connect goes back
-.TP
-.BI \-i\ [\-\-invisible]
-after connect goes invisible
+.BI \-i\ [\-\-invisible[=description]]
+After connecting sets the status to "invisible".
 .TP
 .BI \-p\ [\-\-private]
-after connect changes to private
+After connecting change to "private mode".
+.TP
+.BI \-d\ [\-\-debug]
+Enables "debug" mode - this is a special verbose mode.
+.TP
+.BI \-v\ [\-\-version]
+Prints the client and libgadu library version.
 .TP
 .BI \-f\ name\ [\-\-frontend\ name]
-selects given user interface
+Selects given user interface.

@@ -41,5 +41,4 @@ by wys³aæ do danej osoby swój klucz publiczny nale¿y wykonaæ:
 w przysz³o¶ci komendy zaczynaj±ce siê od ,,_key'' zostan± zgrupowane w
 jedno polecenie do zarz±dzania kluczami.
 
-
 $Id$

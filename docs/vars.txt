@@ -315,7 +315,7 @@ sms_away
 	telefon komórkowy podczas nieobecno¶ci (stan ,,zajêty''). wymaga
 	zdefiniowania zmiennych ,,sms_number'' i ,,sms_send_app''.
 
-	je¿eli warto¶ci± jest 1, to zmienna ''sms_away_limit'' (je¶li ró¿na
+	je¿eli warto¶ci± jest 1, to zmienna ,,sms_away_limit'' (je¶li ró¿na
 	od 0) dotyczyæ bêdzie ³±cznej liczby wiadomo¶ci wys³anych na telefon
 	komórkowy. warto¶æ 2, z kolei, wskazuje na to, ¿e limit dotyczy
 	ilo¶ci wiadomo¶ci od ka¿dej osoby.
@@ -443,5 +443,6 @@ protocol
 	okre¶la wersjê klienta, któr± przedstawia siê ekg. mo¿e byæ u¿ywana
 	do udawania nowszego klienta, gdy biblioteka jeszcze jej nie zna.
 	zmienna ta nie powinna byæ u¿ywana przez zwyk³ych u¿ytkowników.
+
 
 $Id$

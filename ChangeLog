@@ -12,6 +12,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - zmiana domy¶lnego wygl±du statusu w ncurses. zamiast ,,uin'' jest w³asny
   nick, je¶li jest zdefiniowany w li¶cie kontaktów (FIG/w)
 - dodanie serwera w docs/FAQ (szalik/w)
+- drobne poprawki dokumentacji (szalik/w)
 
 // 2002-11-11
 

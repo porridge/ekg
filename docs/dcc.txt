@@ -255,6 +255,4 @@ wtedy:
 
 dalej tak samo, jak przy zwyk³ym odbieraniu pliku.
 
-
-
 $Id$

@@ -23,5 +23,4 @@ by zakoñczyæ:
 
 gdzie <#numer> to numer po³±czenia wy¶wietlony przez polecenie ,,dcc show''. 
 
-
 $Id$
