@@ -558,7 +558,7 @@ IOCTLD_HELP
 		}
 		if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--no-pipe"))
 			pipe_file = NULL;
-		if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "--theme"))
+		if ((!strcmp(argv[i], "-t") || !strcmp(argv[i], "--theme")) && argv[i + 1])
 			load_theme = argv[++i];
 		if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version")) {
 		    	printf("EKG - Eksperymentalny Klient Gadu-Gadu (%s)\n", VERSION);
