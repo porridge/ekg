@@ -40,7 +40,15 @@ U¯YCIE
     sam± komend±, ale z ró¿nymi parametrami. ,,help'' Twoim przyjacielem.
     je¶li dana komenda ma ró¿ne opcje, pomaga ,,help <komenda>''. by
     wys³aæ kilkulinijkow± wiadomo¶æ, zamiast tre¶ci wpisz ,,\''
-    (backslash). koñczy siê lini± z sam± kropk±.
+    (backslash). koñczy siê lini± z sam± kropk±. nie mo¿na przesy³aæ
+    plików, ani nawi±zywaæ bezpo¶rednich po³±czeñ.
+
+    dobra rada numer jeden: zanim zaczniesz narzekaæ, ¿e czego¶ nie ma,
+    przeczytaj plik TODO.
+
+    dobra rada numer dwa: zanim zaczniesz narzekaæ, ¿e czego¶ nie ma,
+    poszukaj w pliku ChangeLog. nie ma ¿adnej oficjalnej dokumentacji
+    z list± komend, zmiennych, skrótami klawiszowymi itp.
 
 WYSY£ANIE SMSÓW
 
@@ -113,5 +121,6 @@ PODZIÊKOWANIA
     Pawe³ Maziarz (drg@go2.pl)
     Piotr Figiel (feeg@psychodelic.org)
     Rafa³ Florek (raf@regionet.regionet.pl)
-    
+
+
 $Id$

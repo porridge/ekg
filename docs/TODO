@@ -1,14 +1,20 @@
+rzeczy, których nie ma. listy/mesgi/posty z listami, ¿eby dodaæ co¶
+z poni¿szej listy, albo zwi±zanego z tym bêd± albo ignorowane, albo
+zacznê byæ niemi³y. --w
 
 biblioteka:
-+ ctcp
-! zak³adanie kont
-- wysy³anie has³a na maila // vaxior
+- komunikacja miêdzy klientami, w tym wysy³anie plików,
+- wysy³anie has³a na maila,
+- konferencje,
+- znalezienie algorytmu na liczenie hashy http, przez bêdzie mo¿liwe:
+  - zak³adanie kont,
+  - zmiana informacji w katalogu publicznym,
+  - zmiana has³a.
 
 klient:
-- sensowne wy¶wietlanie mesgów (t³o, wordwrap itp)
-- historia / przewijanie ekranu // jack
-+ query // jack
-+ cofanie ekranu
+- sensowne wy¶wietlanie mesgów (t³o, wordwrap itp),
+- przewijanie ekranu,
+- query.
 
 
 $Id$
