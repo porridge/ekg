@@ -1153,8 +1153,8 @@ struct gg_recv_msg {
 
 #define GG_USERLIST_REQUEST 0x0016
 
-#define GG_USERLIST_PUT 0x01
-#define GG_USERLIST_PUT_MORE 0x00
+#define GG_USERLIST_PUT 0x00
+#define GG_USERLIST_PUT_MORE 0x01
 #define GG_USERLIST_GET 0x02
 
 struct gg_userlist_request {

@@ -112,7 +112,13 @@ AC_CHECK_LIB(nsl, t_accept, LIBS="$LIBS -lnsl")
 AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
 
 dnl BeOS
-AC_CHECK_LIB(bind, __inet_addr, LIBS="$LIBS -lbind")
+
+AC_ARG_WITH(bind,
+  [  --without-bind          Disable linking with libbind when found])
+
+if test "x$with_bind" != "xno"; then
+	AC_CHECK_LIB(bind, __inet_addr, LIBS="$LIBS -lbind")
+fi
 
 dnl threadsafe
 AC_CHECK_FUNCS([gethostbyname_r], [AC_LIBGADU_DEFINE([HAVE_GETHOSTBYNAME_R])])

@@ -4,6 +4,15 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-10-05
+
+- libgadu: poprawka wysy³ania listy kontaktów na serwer (Chilek/w)
+
+// 2003-10-04
+
+- mo¿liwo¶æ wy³±czenia linkowania z libbind, mimo ¿e jest zainstalowane
+  (arekm/w)
+
 // 2003-10-03
 
 - libgadu: poprawka kodowania adresów e-mail w urlach (Chilek/w)
