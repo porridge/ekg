@@ -2932,8 +2932,27 @@ static int ui_ncurses_event(const char *event, ...)
 					goto cleanup;
 				}
 
-				w->left = atoi(argv[1]);
-				w->top = atoi(argv[2]);
+				switch (argv[1][0]) {
+					case '-':
+						w->left += atoi(argv[1]);
+						break;
+					case '+':
+						w->left += atoi(argv[1] + 1);
+						break;
+					default:
+						w->left = atoi(argv[1]);
+				}
+
+				switch (argv[2][0]) {
+					case '-':
+						w->top += atoi(argv[2]);
+						break;
+					case '+':
+						w->top += atoi(argv[2] + 1);
+						break;
+					default:
+						w->top = atoi(argv[2]);
+				}
 
 				array_free(argv);
 					
@@ -2986,13 +3005,34 @@ static int ui_ncurses_event(const char *event, ...)
 					goto cleanup;
 				}
 
-				w->width = atoi(argv[1]);
-				w->height = atoi(argv[2]);
+				switch (argv[1][0]) {
+					case '-':
+						w->width += atoi(argv[1]);
+						break;
+					case '+':
+						w->width += atoi(argv[1] + 1);
+						break;
+					default:
+						w->width = atoi(argv[1]);
+				}
+
+				switch (argv[2][0]) {
+					case '-':
+						w->height += atoi(argv[2]);
+						break;
+					case '+':
+						w->height += atoi(argv[2] + 1);
+						break;
+					default:
+						w->height = atoi(argv[2]);
+				}
 
 				array_free(argv);
 					
 				if (w->floating) {
+					wresize(w->window, w->height, w->width);
 					window_backlog_split(w, 1);
+					window_redraw(w);
 					touchwin(window_current->window);
 					window_refresh();
 					doupdate();
