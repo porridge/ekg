@@ -15,8 +15,9 @@ klient:
 - kolejka wiadomo¶ci wysy³anych podczas roz³±czenia (Murphy).
 - dodaæ mo¿liwo¶æ ustawienia powodu przy wywo³ywaniu ekg (jojo),
 - poprawiæ getopt(), ¿eby rozumia³ ,,--back "powód"'',
-- dodaæ ,,list --add'',
+- dodaæ ,,list --add'', które dopisuje informacje do listy kontaktów,
 - sensowna obs³uga kluczy dla SIM,
+- zapisywanie opisu i stanu bez /save, ¿eby keep_reason mia³o wiêkszy sens,
 
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,
