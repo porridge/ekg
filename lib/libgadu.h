@@ -242,6 +242,9 @@ extern int gg_debug_level;
 
 void gg_debug(int level, char *format, ...);
 
+char *gg_http_proxy_host;
+int gg_http_proxy_port;
+
 /*
  * -------------------------------------------------------------------------
  * poni¿ej znajduj± siê wewnêtrzne sprawy biblioteki. zwyk³y klient nie

@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include "stuff.h"
 #include "vars.h"
+#include "libgg.h"
 
 struct variable variables[MAX_VARS] = {
 	{ "uin", VAR_INT, 1, &config_uin },
@@ -43,6 +44,8 @@ struct variable variables[MAX_VARS] = {
 	{ "display_notify", VAR_BOOL, 1, &display_notify },
 	{ "log", VAR_INT, 1, &log },
 	{ "log_path", VAR_STR, 1, &log_path },
+	{ "proxy_port", VAR_INT, 1, &gg_http_proxy_port },
+	{ "proxy_host", VAR_STR, 1, &gg_http_proxy_host },
 	{ "sms_away", VAR_BOOL, 1, &sms_away },
 	{ "sms_max_length", VAR_INT, 1, &sms_max_length },
 	{ "sms_number", VAR_STR, 1, &sms_number },
@@ -52,8 +55,6 @@ struct variable variables[MAX_VARS] = {
 	{ "sound_app", VAR_STR, 1, &sound_app },
 	{ "theme", VAR_STR, 1, &default_theme },
 	{ "use_proxy", VAR_INT, 1, &use_proxy },
-	{ "proxy_port", VAR_INT, 1, &proxy_port },
-	{ "proxy_host", VAR_STR, 1, &proxy_host },
 
 	{ "default_status", VAR_INT, 2, &default_status },
 	{ "bold_font", VAR_STR, 2, &bold_font },	/* GNU Gadu */

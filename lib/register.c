@@ -74,7 +74,6 @@ struct gg_register *gg_register(char *email, char *password, int async)
 	gg_debug(GG_DEBUG_MISC, "=> register, %s\n", form);
 
 	query = gg_alloc_sprintf(
-		"POST /appsvc/fmregister.asp HTTP/1.0\r\n"
 		"Host: " GG_REGISTER_HOST "\r\n"
 		"Content-Type: application/x-www-form-urlencoded\r\n"
 		"User-Agent: " GG_HTTP_USERAGENT "\r\n"
@@ -97,7 +96,7 @@ struct gg_register *gg_register(char *email, char *password, int async)
 	r->uin = 0;
 	r->password = password;
 	
-	if (!(r->http = gg_http_connect(GG_REGISTER_HOST, GG_REGISTER_PORT, async, query))) {
+	if (!(r->http = gg_http_connect(GG_REGISTER_HOST, GG_REGISTER_PORT, async, "POST", "/appsvc/fmregister.asp", query))) {
 		gg_debug(GG_DEBUG_MISC, "=> register, gg_http_connect() failed mysteriously\n");
 		free(query);
 		free(r);

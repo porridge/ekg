@@ -147,7 +147,6 @@ struct gg_search *gg_search(struct gg_search_request *r, int async)
 	gg_debug(GG_DEBUG_MISC, "=> search, %s\n", form);
 
 	query = gg_alloc_sprintf(
-		"POST /appsvc/fmpubquery2.asp HTTP/1.0\r\n"
 		"Host: " GG_PUBDIR_HOST "\r\n"
 		"Content-Type: application/x-www-form-urlencoded\r\n"
 		"User-Agent: " GG_HTTP_USERAGENT "\r\n"
@@ -168,7 +167,7 @@ struct gg_search *gg_search(struct gg_search_request *r, int async)
 	f->results = NULL;
 	f->done = 0;
 
-	if (!(f->http = gg_http_connect(GG_PUBDIR_HOST, GG_PUBDIR_PORT, async, query))) {
+	if (!(f->http = gg_http_connect(GG_PUBDIR_HOST, GG_PUBDIR_PORT, async, "POST", "/appsvc/fmpubquery2.asp", query))) {
 		gg_debug(GG_DEBUG_MISC, "=> search, gg_http_connect() failed mysteriously\n");
 		free(query);
 		free(f);

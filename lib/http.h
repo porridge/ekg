@@ -26,7 +26,7 @@ struct gg_http {
 	int header_size, data_size;
 };
 
-struct gg_http *gg_http_connect(char *hostname, int port, int async, char *query);
+struct gg_http *gg_http_connect(char *hostname, int port, int async, char *method, char *path, char *header);
 int gg_http_watch_fd(struct gg_http *h);
 void gg_http_stop(struct gg_http *h);
 void gg_free_http(struct gg_http *h);

@@ -10,6 +10,7 @@ biblioteka:
 - zmiana has³a.
 - wysy³anie userlisty na server 
 - timeouty, chocia¿ zastawiam siê, czy nie lepiej zrzuciæ ich na klienta.
+- uaktualniæ dokumentacjê.
 
 klient:
 - sensowne wy¶wietlanie mesgów (t³o, wordwrap itp),
