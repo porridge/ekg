@@ -58,6 +58,13 @@ static char **completions = NULL;	/* lista dope³nieñ */
 
 #define output_size (stdscr->_maxy - 1)
 
+#define ui_debug(x...) { \
+	char *ui_debug_tmp = saprintf(x); \
+	ui_ncurses_print(NULL, ui_debug_tmp); \
+	xfree(ui_debug_tmp); \
+}
+
+
 static void set_cursor()
 {
 	if (y == lines) {
@@ -76,6 +83,22 @@ static void ui_ncurses_print(const char *target, const char *line)
 
 	set_cursor();
 
+	if (config_timestamp) {
+		time_t t;
+		struct tm *tm;
+		char buf[80];
+		int i;
+
+		t = time(NULL);
+		tm = localtime(&t);
+		strftime(buf, sizeof(buf), config_timestamp, tm);
+
+		for (i = 0; i < strlen(buf); i++) {
+			waddch(output, buf[i]);
+			x++;
+		}
+	}
+
 	for (p = line; *p; p++) {
 		if (*p == 27) {
 			p++;
@@ -90,6 +113,8 @@ static void ui_ncurses_print(const char *target, const char *line)
 					a2 = strtol(p, &q, 10);
 					p = q;
 				}
+				if (a2 == 30)
+					a2 += 16;
 				if (*p == 'm') {
 					if (a1 == 0 && a2 == -1)
 						wattrset(output, COLOR_PAIR(7));
@@ -299,7 +324,7 @@ void ui_ncurses_init()
 	keypad(input, TRUE);
 
 	start_color();
-	init_pair(0, COLOR_BLACK, COLOR_BLACK);
+	init_pair(16, COLOR_BLACK, COLOR_BLACK);
 	init_pair(1, COLOR_RED, COLOR_BLACK);
 	init_pair(2, COLOR_GREEN, COLOR_BLACK);
 	init_pair(3, COLOR_YELLOW, COLOR_BLACK);
@@ -318,6 +343,10 @@ void ui_ncurses_init()
 	init_pair(15, COLOR_WHITE, COLOR_BLUE);
 	
 	format_add("statusbar", " %c(%w%{time}%c)%w %c(%wuin%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) %c(%wekg%c/%w" VERSION "%c)%w", 1);
+	format_add("no_prompt_cache", "", 1);
+	format_add("prompt", "%K:%g:%G:%n", 1);
+	format_add("prompt2", "%K:%c:%C:%n", 1);
+	format_add("error", "%K:%r:%R:%n", 1);
 
 	wnoutrefresh(output);
 	wnoutrefresh(status);
@@ -352,12 +381,6 @@ static void ui_ncurses_deinit()
 		line_start = 0; \
 	else \
 		line_start = strlen(line) - strlen(line) % 70; \
-}
-
-#define ui_debug(x...) { \
-	char *ui_debug_tmp = saprintf(x); \
-	ui_ncurses_print(NULL, ui_debug_tmp); \
-	xfree(ui_debug_tmp); \
 }
 
 void dcc_generator(const char *text, int len)
@@ -681,8 +704,11 @@ static void ui_ncurses_loop()
 				}
 				break;	
 			case KEY_ENTER:
-			case 13:
-				command_exec(NULL, line);
+			case 13: {
+				char *tmp = xstrdup(line);
+				
+				command_exec(NULL, tmp);
+				xfree(tmp);
 				if (history[0] != line)
 					xfree(history[0]);
 				history[0] = xstrdup(line);
@@ -693,6 +719,7 @@ static void ui_ncurses_loop()
 				line[0] = 0;
 				adjust();
 				break;	
+			}
 			case 'U' - 64:
 				xfree(yanked);
 				yanked = strdup(line);

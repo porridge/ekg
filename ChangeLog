@@ -8,6 +8,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 // 2002-09-04
 
 - ³adniejszy, dresiarski status w ui-ncurses (w)
+- ³adniejsze, dresiarskie prompty w ui-ncurses (w)
+- pocz±tek timestampów _przed_ lini± (w)
 
 // 2002-09-03
 

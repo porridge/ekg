@@ -152,6 +152,7 @@ char *config_reason;
 char *config_tab_command;
 int config_ctrld_quits;
 int config_save_password;
+char *config_timestamp;
 
 char *home_dir;
 char *config_dir;

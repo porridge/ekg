@@ -124,6 +124,7 @@ char *config_tab_command = NULL;
 int ioctld_sock = -1;
 int config_ctrld_quits = 1;
 int config_save_password = 1;
+char *config_timestamp = NULL;
 
 static struct {
 	int event;

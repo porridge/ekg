@@ -660,9 +660,8 @@ int main(int argc, char **argv)
 	python_initialize();
 #endif
 
-	ui_init();
-
 	theme_init();
+	ui_init();
 
 	in_autoexec = 1;
         userlist_read();
