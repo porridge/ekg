@@ -10,14 +10,6 @@
 12:42 <drake> niech je takze instaluje automatycznie
 
 
-22:14 <Undzio6> otoz jak wcisne tab, to wybiera on osobe ktora ostatnio zrobila
-                jakies zdarzenie - np pojawila sie na liscie.
-22:14 <Undzio6> lepsze byloby chyba gdyby wpierw wybieral osoby do ktorych cos
-                odpisuje
-22:15 <Undzio6> teraz jak z kims sobie gadam to gdy ktos inny zmieni swoj status
-                i ja tego nie zauwaze to wiadomosc leci do tego kogos
-
-
 11:59 <ascent-> Zwalnianko pustej zmiennej jest w vars.c
 11:59 <ascent-> 114 linia czy jakos tak
 11:59 <ascent-> wczoraj se troche podebugowalem ;]
@@ -30,3 +22,10 @@ Mateusz Adamowski <mateusza@staszic.waw.pl>
 > 5. ekg nie obsluguje rozmowy z wieloma osobami na raz, a jest to fajna
 > funkcja
 
+From: Piotr Figiel <feeg@psychodelic.org>
+> 4) oddzielne d¼wiêki dla ró¿nych userów (jak w icq)
+>
+> 5) mog³aby siê pokazaæ komenda do listowania themów, swoj± drog± themy
+>    powinny byæ w oddzielnym podkatalogu np. w ~/.gg/themes bo lekki syf
+>    jest.
+      
