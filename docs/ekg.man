@@ -1,0 +1,31 @@
+.TH EKG 1 "31 pa¼dziernik 2001" 
+.SH NAZWA
+ekg \- Eksperymentalny Klient Gadu-Gadu
+.SH SK£ADNIA
+.B ekg 
+[
+.BI \-dn 
+] [
+.BI \-u 
+.IR username
+]
+
+.SH OPIS
+.B ekg
+Jest to eksperymentalny klient gadu-gadu.
+
+.SH OPCJE
+.TP
+.BI \-d 
+W³±cza tryb "debug" - jest to specialny tryb pokazuj±cy co robi 
+program w danej chwili.
+.TP
+.BI \-n 
+Nie ³±cz siê automagicznie. Po uruchomieniu nie ³±czy siê automatycznie 
+z serwerami gg. 
+.TP
+.BI \-u "\ " username
+Zezwala na uruchomienie gg z innym \"u¿ytkownikiem\". 
+Standardowo konfiguracja ekg znajduje sie w katalogu ~/ekg - Ta 
+opcja pozwala na stworzenie struktury podkatalogow z oddzielnymi 
+konfiguracjami.
