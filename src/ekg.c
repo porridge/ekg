@@ -422,6 +422,8 @@ IOCTL_HELP
 	
         ekg_pid = getpid();
 
+	init_theme();
+
         userlist_read(NULL);
 	config_read(NULL);
 	read_sysmsg(NULL);
@@ -472,7 +474,6 @@ IOCTL_HELP
 	if (config_debug)
 		gg_debug_level = 255;
 	
-	init_theme();
 	if (load_theme)
 		read_theme(load_theme, 1);
 	else

@@ -1964,7 +1964,7 @@ COMMAND(command_on)
         if (correct_event(params[2]))
                 return 0;
 
-        add_event(flags, uin, params[2]);
+        add_event(flags, uin, params[2], 0);
         config_changed = 1;
         return 0;
 }

@@ -161,7 +161,7 @@ void changed_dcc(char *var);
 void changed_theme(char *var);
 void prepare_connect();
 int transfer_id();
-int add_event(int flags, uin_t uin, char *action);
+int add_event(int flags, uin_t uin, char *action, int quiet);
 int del_event(int flags, uin_t uin);
 int get_flags(char *events);
 char *format_events(int flags);

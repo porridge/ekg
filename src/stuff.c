@@ -345,9 +345,7 @@ int config_read(char *filename)
                         uin_t uin;
                         char **pms = array_make(foo, " \t", 3, 1, 0);
                         if (pms && pms[0] && pms[1] && pms[2] && (flags = get_flags(pms[0])) && (uin = atoi(pms[1])) && !correct_event(pms[2]))
-                                add_event(get_flags(pms[0]), atoi(pms[1]), strdup(pms[2]));
-                        else
-                            my_printf("config_line_incorrect");
+                                add_event(get_flags(pms[0]), atoi(pms[1]), strdup(pms[2]), 1);
 			array_free(pms);
                 } else
 			variable_set(buf, foo, 1);
@@ -1064,8 +1062,9 @@ int get_flags(char *events)
  * - flags
  * - uin
  * - action
+ * - quiet  
  */
-int add_event(int flags, uin_t uin, char *action)
+int add_event(int flags, uin_t uin, char *action, int quiet)
 {
         int f;
         struct list *l;
@@ -1075,7 +1074,8 @@ int add_event(int flags, uin_t uin, char *action)
                 struct event *ev = l->data;
 
                 if (ev->uin == uin && (f = ev->flags & flags) != 0) {
-                        my_printf("events_exist", format_events(f), (uin == 1) ? "*"  : format_user(uin));
+		    	if (!quiet)
+			    	my_printf("events_exist", format_events(f), (uin == 1) ? "*"  : format_user(uin));
                         return -1;
                 }
         }
@@ -1086,7 +1086,8 @@ int add_event(int flags, uin_t uin, char *action)
 
         list_add(&events, &e, sizeof(e));
 
-        my_printf("events_add", format_events(flags), (uin == 1) ? "*"  : format_user(uin), action);
+	if (!quiet)
+	    	my_printf("events_add", format_events(flags), (uin == 1) ? "*"  : format_user(uin), action);
 
         return 0;
 }
@@ -1357,14 +1358,17 @@ int correct_event(char *act)
                         }
 
                         if (*acts[1] == '$') {
-                                acts[1]++;
-                                if (!strcmp(find_format(acts[1]), "")) {
-                                        my_printf("events_seq_not_found", acts[1]);
+			    	char *blah = strdup(acts[1]+1);
+				
+                                if (!strcmp(find_format(blah), "")) {
+                                        my_printf("events_seq_not_found", blah);
+					free(blah);
 					free(action);
 					array_free(acts);
 					array_free(events);
                                         return 1;
                                 }
+				free(blah);
 				array_free(acts);
                                 continue;
                         }
