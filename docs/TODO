@@ -16,6 +16,7 @@ klient:
 - kolejka wiadomo¶ci wysy³anych podczas roz³±czenia (Murphy).
 - dodaæ mo¿liwo¶æ ustawienia powodu przy wywo³ywaniu ekg (jojo),
 - poprawiæ getopt(), ¿eby rozumia³ ,,--back "powód"'',
+- dodaæ ,,list --add'',
 
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,

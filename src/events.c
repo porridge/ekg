@@ -744,7 +744,7 @@ void handle_search(struct gg_http *h)
 			else if (s->results[i].gender == GG_GENDER_MALE)
 				gender_format = format_find("search_results_single_male");
 			else
-				gender_format = format_find("search_results_single_male");
+				gender_format = format_find("search_results_single_unknown");
 		} else {
 			switch (s->results[i].active) {
 				case GG_STATUS_AVAIL:
