@@ -4,6 +4,7 @@
  *  (C) Copyright 2002-2003 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Wojtek Bojdo³ <wojboj@htcon.pl>
  *                          Pawe³ Maziarz <drg@infomex.pl>
+ *			    Piotr Kupisiewicz <deli@rzepaknet.us>
  *
  *  Aspell support added by Piotr 'Deletek' Kupisiewicz <deli@rzepaknet.us>
  *
@@ -2716,6 +2717,20 @@ static struct {
  * complete()
  *
  * funkcja obs³uguj±ca dope³nianie klawiszem tab.
+ * 
+ * Dzia³anie:
+ * - Wprowadzona linia dzielona jest na wyrazy (uwzglêdniaj±c przecinki i znaki cudzyslowia)
+ * - nastêpnie znaki separacji znajduj±ce siê miêdzy tymi wyrazami wrzucane s± do tablicy separators
+ * - dalej sprawdzane jest za pomoc± zmiennej word_current (okre¶laj±cej aktualny wyraz bez uwzglêdnienia
+ *   przecinków - po to, aby wiedzieæ czy w przypadku np funkcji /query ma byæ szukane dope³nienie 
+ * - zmienna word odpowiada za aktualny wyraz (*z* uwzglêdnieniem przecinków)
+ * - words - tablica zawieraj± wszystkie wyrazy
+ * - gdy jest to mo¿liwe szukane jest dope³nienie 
+ * - gdy dope³nieñ jest wiêcej ni¿ jedno (count > 1) wy¶wietlamy tylko "wspóln±" czê¶æ wszystkich dope³nieñ
+ *   np ,,que'' w przypadku funkcji /query i /queue 
+ * - gdy dope³nienie jest tylko jedno wy¶wietlamy owo dope³nienie 
+ * - przy wy¶wietlaniu dope³nienia ca³a linijka konstruowana jest od nowa, poniewa¿ nie wiadomo w którym miejscu
+ *   podany wyraz ma zostañ "wsadzony", st±d konieczna jest tablica separatorów, tablica wszystkich wyrazów itd ...
  */
 static void complete(int *line_start, int *line_index)
 {
@@ -2807,8 +2822,7 @@ static void complete(int *line_start, int *line_index)
 		if(line[i] == '"')  {
 			for(j = 0, i++; i < strlen(line) && line[i] != '"'; j++, i++)
 				start[j] = line[i];
-		}
-		else {
+		} else {
 			for(j = 0; i < strlen(line) && !xisspace(line[i]) && line[i] != ','; j++, i++) 
 				start[j] = line[i];
 		}
@@ -2832,8 +2846,7 @@ static void complete(int *line_start, int *line_index)
 			for(i++; i < strlen(line) && line[i] != '"'; i++);
 			if(i < strlen(line)) 
 				separators[j] = line[i + 1];
-		}
-		else {
+		} else {
 			for(; i < strlen(line) && !xisspace(line[i]) && line[i] != ','; i++);
 			separators[j] = line[i];
 		}
@@ -2981,12 +2994,10 @@ problem:
 						strncat(line, completions[0] + 2, strlen(completions[0]) - 2 - 1 );
 					else
 						strncat(line, completions[0] + 1, strlen(completions[0]) - 1);
-				}
-				else
+				} else
 			    		strcat(line, completions[0]);
 				*line_index = strlen(line) + 1;
-			}
-			else {
+			} else {
 				if(strchr(words[i], ' '))
 					strcat(line, saprintf("\"%s\"", words[i]));
 				else
@@ -3042,19 +3053,22 @@ problem:
 				if(i == word) {
 					if(quotes == 1 && completions[0][0] != '"') 
 						strcat(line, "\"");
+						
 					if(completions[0][0] == '"')
 						common++;
+						
 					if(completions[0][common - 1] == '"')
 						common--;
+						
 					strncat(line, str_tolower(completions[0]), common);
 					*line_index = strlen(line);
-				}
-				else {
+				} else {
 					if(strrchr(words[i], ' '))
 						strcat(line, saprintf("\"%s\"", words[i]));
 					else
 						strcat(line, words[i]);
 				}
+				
 				if(separators[i]) {
 					strcat(line, saprintf("%c", separators[i]));
 				}
