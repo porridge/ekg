@@ -106,7 +106,7 @@ static struct window *window_current;	/* wska¼nik na aktualne okno */
 static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 
 int config_contacts_size = 8;		/* szeroko¶æ okna kontaktów */
-static int last_contacts_size = 8;	/* poprzedni rozmiar przed zmian± */
+static int last_contacts_size = 0;	/* poprzedni rozmiar przed zmian± */
 int config_contacts = 0;		/* czy ma byæ okno kontaktów */
 
 #define CONTACTS_SIZE ((config_contacts) ? (config_contacts_size + 3): 0)
@@ -275,7 +275,7 @@ static struct window *window_new(const char *target)
 		}
 	}
 	w.lines = stdscr->_maxy - 1;
-	w.window = newpad(w.lines, stdscr->_maxx - CONTACTS_SIZE + 1);
+	w.window = newpad(w.lines, stdscr->_maxx + 1);
 
 	return list_add_sorted(&windows, &w, sizeof(w), window_new_compare);
 }
