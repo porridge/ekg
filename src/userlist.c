@@ -570,7 +570,7 @@ struct userlist *userlist_find(uin_t uin, const char *display)
 /*
  * userlist_find_mobile()
  *
- * znajduje u¿ytkownika do którego nale¿y podany numer telefonu.
+ * znajduje u¿ytkownika, do którego nale¿y podany numer telefonu.
  *
  * - mobile.
  */
@@ -659,7 +659,7 @@ int valid_nick(const char *nick)
 		return 0;
 
 	for (i = 0; wrong[i]; i++) {
-		if (!strcmp(nick, wrong[i]))
+		if (!strcasecmp(nick, wrong[i]))
 			return 0;
 	}
 
