@@ -71,6 +71,13 @@ EINVAL to niew³a¶ciwie parametry, ENOMEM brak pamiêci, a reszta
 mo¿liwych b³êdów to te zwi±zane z socketami, typu EADDRINUSE gdy nie
 mo¿e wolnego portu znale¼æ.
 
+teraz wypada³oby ustawiæ zmienn± ,,gg_dcc_port'' i po³±czyæ siê z
+serwerem GG, ¿eby og³osiæ swoje namiary. og³aszany adres IP bêdzie
+brany z po³±czenia z serwerem.
+
+	gg_dcc_port = socket->port;
+	po³±cz_siê_z_serwerem();
+
 w ka¿dym razie, gdy pojawi siê co¶ na deskryptorze, wywo³ujemy:
 
 	struct gg_event *event = gg_dcc_watch_fd(socket);
