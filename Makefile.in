@@ -8,14 +8,15 @@ NAME = ekg
 VERSION = 0.90
 RM = @RM@
 MAKE = @MAKE@
+AR = @AR@
 
 CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES)
-OBJS = libgg.o libgg_search.o stuff.o commands.o events.o themes.o vars.o dynstuff.o
+OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o
 
 all:	ekg
 
-ekg:	$(OBJS) ekg.c
-	$(CC) $(CFLAGS) ekg.c -o $(NAME) $(OBJS) $(LIBS)
+ekg:	static $(OBJS) ekg.c
+	$(CC) $(CFLAGS) ekg.c -o $(NAME) $(OBJS) $(LIBS) libgg.a
 
 install: ekg
 	install ekg $(PREFIX)/bin
@@ -25,7 +26,7 @@ distclean:	clean
 	(cd examples; $(MAKE) distclean)
 
 clean:
-	$(RM) -f *.o ekg search core libgg.so*
+	$(RM) -f *.o ekg search core libgg.so* libgg.a
 	(cd examples; $(MAKE) clean) 
 
 shared:
@@ -33,3 +34,7 @@ shared:
 	$(CC) -fPIC -g -c libgg_search.c -o libgg_search.o
 	$(CC) -g -shared -Wl,-soname,libgg.so -o libgg.so.0.9.0 libgg.o libgg_search.o -lc
 
+static:	
+	$(CC) $(CFLAGS) -g -c libgg.c -o libgg.o
+	$(CC) $(CFLAGS) -g -c libgg_search.c -o libgg_search.o
+	$(AR) r libgg.a libgg.o libgg_search.o 

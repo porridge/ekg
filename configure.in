@@ -46,6 +46,11 @@ if test "x$MAKE" = "xno"; then
     AC_MSG_ERROR([make ])
 fi
 
+AC_PATH_PROG(AR, ar, no)
+if test "x$AR" = "xno"; then
+    AC_MSG_ERROR([ar ])
+fi
+
 AC_C_BIGENDIAN
 
 AC_CHECK_LIB(nsl, t_accept, LIBS="$LIBS -lnsl")
