@@ -50,8 +50,7 @@ U¯YCIE
     sam± komend±, ale z ró¿nymi parametrami. ,,help'' Twoim przyjacielem.
     je¶li dana komenda ma ró¿ne opcje, pomaga ,,help <komenda>''. By
     wys³aæ kilkulinijkow± wiadomo¶æ, zamiast tre¶ci wpisz ,,\''
-    (backslash). Koñczy siê lini± z sam± kropk±, anuluje Ctrl-D. Nie
-    mo¿na przesy³aæ plików, ani nawi±zywaæ bezpo¶rednich po³±czeñ.
+    (backslash). Koñczy siê lini± z sam± kropk±, anuluje Ctrl-D. 
 
     Je¶li dana komenda przyjmuje ,,--parametr'' mo¿na u¿yæ równie¿
     skrótu ,,-p'', je¶li nie powoduje to niejednoznaczno¶ci. Uwaga!

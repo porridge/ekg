@@ -28,12 +28,7 @@ extern "C" {
 #endif
 
 #include <sys/types.h>
-#include <netdb.h>
 #include <stdint.h>
-
-#if defined(sun) && !defined(INADDR_NONE)
-#define INADDR_NONE 0xffffffff
-#endif
 
 typedef uint32_t uin_t;
 

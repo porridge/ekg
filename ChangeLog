@@ -14,6 +14,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
   patcha (w)
 - poprawki configure.in (w)
 - poprawka b³êdów przy --without-debug (cooler/w)
+- dalsze poprawki configure.in (w)
 
 // 2002-06-14
 

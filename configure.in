@@ -23,7 +23,7 @@ if test "x$AR" = "xno"; then
   AC_MSG_ERROR([ar ])
 fi
 
-AC_CHECK_TYPES([int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t])
+AC_NEED_STDINT_H
 AC_C_BIGENDIAN
 
 AC_SUBST(CFLAGS_LIBGADU)
@@ -94,9 +94,14 @@ if test -d src; then
 
   AC_CHECK_FUNCS([rl_set_prompt rl_filename_completion_function rl_get_screen_size rl_set_key])
 
-  AC_CHECK_LIB(gsm, gsm_decode, [
-    AC_CHECK_HEADERS([gsm.h linux/soundcard.h])
-    LIBS="$LIBS -lgsm"])
+  AC_ARG_WITH(libgsm,
+    [  --without-libgsm        Compile without GSM support])
+
+  if test "x$with_libgsm" != "xno"; then
+    AC_CHECK_LIB(gsm, gsm_decode, [
+      AC_CHECK_HEADERS([gsm.h linux/soundcard.h])
+      LIBS="$LIBS -lgsm"])
+  fi
  
   AC_ARG_WITH(ioctld,
     [  --with-ioctld           Compile with ioctld (Linux only)])
