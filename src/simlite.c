@@ -50,7 +50,7 @@ int sim_errno = 0;
  */
 static int sim_seed_prng()
 {
-	char rubbish[512];
+	char rubbish[1024];
 	struct {
 		time_t time;
 		void * foo;
@@ -59,10 +59,10 @@ static int sim_seed_prng()
 
 	data.time = time(NULL);
 	data.foo = (void *) &data;
-	data.foo2 = (void *) &rubbish;
+	data.foo2 = (void *) rubbish;
 
 	RAND_seed((void *) &data, sizeof(data));
-	RAND_seed((void *) &rubbish, sizeof(rubbish));
+	RAND_seed((void *) rubbish, sizeof(rubbish));
 
 	return sizeof(data) + sizeof(rubbish);
 }
