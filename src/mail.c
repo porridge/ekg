@@ -270,6 +270,8 @@ int check_mail_mbox()
 		exit(0);
 	}
 
+	memset(&x, 0, sizeof(x));
+
 	x.fd = fd[0];
 	x.check = GG_CHECK_READ;
 	x.state = GG_STATE_READING_DATA;
@@ -277,7 +279,6 @@ int check_mail_mbox()
 	x.id = pid;
 	x.timeout = 60;
 	x.buf = string_init(NULL);
-	x.target = NULL;
 
 	fcntl(x.fd, F_SETFL, O_NONBLOCK);
 
@@ -368,6 +369,8 @@ int check_mail_maildir()
 		exit(0);
 	}
 
+	memset(&x, 0, sizeof(x));
+
 	x.fd = fd[0];
 	x.check = GG_CHECK_READ;
 	x.state = GG_STATE_READING_DATA;
@@ -375,7 +378,6 @@ int check_mail_maildir()
 	x.id = pid;
 	x.timeout = 60;
 	x.buf = string_init(NULL);
-	x.target = NULL;
 
 	fcntl(x.fd, F_SETFL, O_NONBLOCK);
 

@@ -1254,6 +1254,8 @@ int send_sms(const char *recipient, const char *message, int show_result)
 		close(fd[1]);
 		return -1;
 	}
+
+	memset(&s, 0, sizeof(s));
 	
 	s.fd = fd[0];
 	s.check = GG_CHECK_READ;
@@ -1262,7 +1264,6 @@ int send_sms(const char *recipient, const char *message, int show_result)
 	s.id = pid;
 	s.timeout = 60;
 	s.buf = string_init(NULL);
-	s.target = NULL;
 
 	fcntl(s.fd, F_SETFL, O_NONBLOCK);
 

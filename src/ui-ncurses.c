@@ -822,7 +822,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	
 	prev_count = w->lines_count;
 	
-	/* XXX wyrzuciæ dzielenie na linie z ekg */
+	/* XXX wyrzuciæ dzielenie na linie z ui do ekg */
 	lines = lines_save = xstrdup(line);
 	while ((line2 = gg_get_line(&lines))) {
 		fs = reformat_string(line2);

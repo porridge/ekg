@@ -201,7 +201,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 			char *line = xstrmid(c->buf->str, 0, index);
 			string_t new;
 			
-			if (line[strlen(line) - 1] == '\r')
+			if (strlen(line) > 1 && line[strlen(line) - 1] == '\r')
 				line[strlen(line) - 1] = 0;
 
 			if (c->id) {
@@ -701,7 +701,6 @@ static void setup_debug()
 	se.id = 0;
 	se.timeout = -1;
 	se.buf = string_init(NULL);
-	se.target = NULL;
 
 	fcntl(fd[0], F_SETFL, O_NONBLOCK);
 	fcntl(fd[1], F_SETFL, O_NONBLOCK);
