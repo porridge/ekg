@@ -39,11 +39,14 @@ AC_DEFUN(AC_CHECK_NCURSES,[
 	CURSES_LIBS="$lib"
 	CURSES_INCLUDES="-I$include"
 	have_ncurses=true
+	ldflags_old="$LDFLAGS"
+	LDFLAGS="$CURSES_LIBS"
 	AC_DEFINE(HAVE_NCURSES)
 	AC_CHECK_LIB(ncurses, initscr,
 	  [CURSES_LIBS="$CURSES_LIBS -lncurses"],
 	  [AC_CHECK_LIB(curses, initscr,
 	    [CURSES_LIBS="$CURSES_LIBS -lcurses"])])
+	LDFLAGS="$ldflags_old"
 	break
       fi
     done
