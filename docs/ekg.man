@@ -14,12 +14,12 @@ ekg \- Eksperymentalny Klient Gadu-Gadu
 
 .SH OPIS
 .B ekg
-Jest to eksperymentalny klient gadu-gadu.
+Jest to eksperymentalny klient Gadu-Gadu.
 
 .SH OPCJE
 .TP
 .BI \-d 
-W³±cza tryb "debug" - jest to specialny tryb pokazuj±cy co robi 
+W³±cza tryb "debug" - jest to specialny tryb, pokazuj±cy, co robi 
 program w danej chwili.
 .TP
 .BI \-n 
@@ -27,7 +27,7 @@ Nie ³±cz siê automagicznie. Po uruchomieniu nie ³±czy siê automatycznie
 z serwerami gg. 
 .TP
 .BI \-u "\ " username
-Zezwala na uruchomienie gg z innym \"u¿ytkownikiem\". 
+Zezwala na uruchomienie ekg z innym \"u¿ytkownikiem\". 
 Standardowo konfiguracja ekg znajduje sie w katalogu ~/ekg - Ta 
-opcja pozwala na stworzenie struktury podkatalogow z oddzielnymi 
+opcja pozwala na stworzenie struktury podkatalogów z oddzielnymi 
 konfiguracjami.

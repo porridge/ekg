@@ -1,9 +1,13 @@
+// 2001-11-15
+
+- poprawki dokumentacji (shasta).
+
 // 2001-11-11 
 
 - make shared/static + jakis tam spec dla rpm'a... (speedy)
 - poprawiona dokumentacja [ja chce wpisywac polskie krzaki i nie wiem jak] 
   (wojtekka)
-- logowanie wielolinijowych wiadomosci (wojtekka)
+- logowanie wielolinijkowych wiadomosci (wojtekka)
 - poprawiony segfault na bsd w pewnych warunkach (smarkacz/wojtekka)
 
 // 2001-11-04 
