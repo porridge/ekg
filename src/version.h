@@ -20,6 +20,6 @@
 #ifndef __VERSION_H
 #define __VERSION_H
 
-#define VERSION "2001102601"
+#define VERSION "CVS"
 
 #endif
