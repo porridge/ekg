@@ -2139,7 +2139,7 @@ int ekg_execute(char *target, char *line)
 			p++;
 			
 		for (; l && !res; l = l->next) {
-			char *tmp = saprintf("%s%s", (char*) l->data, p);
+			char *tmp = saprintf("/%s%s", (char*) l->data, p);
 			res = old_execute(target, tmp);
 			free(tmp);
 		}
