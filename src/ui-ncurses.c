@@ -886,7 +886,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 		switch (config_make_window) {
 			case 1:
 				if ((w = window_find(target)))
-					break;
+					goto crap;
 
 				if (!separate)
 					w = window_find("__status");
@@ -918,6 +918,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 					}
 				}
 
+crap:
 				if (!config_display_crap && target && !strcmp(target, "__current"))
 					w = window_find("__status");
 				
