@@ -526,7 +526,7 @@ int theme_read(const char *filename, int replace)
 
                 if (!(value = strchr(buf, ' '))) {
 			free(buf);
-                        continue;
+			continue;
 		}
 
 		*value++ = 0;

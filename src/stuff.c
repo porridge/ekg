@@ -344,7 +344,7 @@ int config_read()
                         uin_t uin;
                         char **pms = array_make(foo, " \t", 3, 1, 0);
                         if (pms && pms[0] && pms[1] && pms[2] && (flags = event_flags(pms[0])) && (uin = atoi(pms[1])) && !event_correct(pms[2]))
-                                event_add(event_flags(pms[0]), atoi(pms[1]), xstrdup(pms[2]), 1);
+                                event_add(event_flags(pms[0]), atoi(pms[1]), pms[2], 1);
 			array_free(pms);
 		} else if (!strcasecmp(buf, "bind")) {
 			char **pms = array_make(foo, " \t", 2, 1, 0);
@@ -395,7 +395,8 @@ int sysmsg_read()
 			if (atoi(foo))
 				last_sysmsg = atoi(foo);
 		}
-		free(buf);
+		
+		xfree(buf);
 	}
 	
 	fclose(f);
@@ -2028,6 +2029,8 @@ int emoticon_read()
 			free(emot[1]);
 			free(emot);
 		}
+
+		xfree(buf);
 	}
 	
 	fclose(f);
