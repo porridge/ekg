@@ -96,7 +96,7 @@ struct command commands[] = {
 	{ "disconnect", "", command_connect, "", "Roz³±cza siê z serwerem", "" },
 	{ "exec", "?", command_exec, " <polecenie>", "Uruchamia polecenie systemowe", "" },
 	{ "!", "?", command_exec, " <polecenie>", "Synonim dla %Wexec%n", "" },
-	{ "find", "u", command_find, " [opcje]", "Interfejs do katalogu publicznego", "  --uin <numerek>\n  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>\n  --city <miasto>\n  --birth <min:max>\n  --phone <telefon>\n  --email <e-mail>\n  --active\n  --female\n  --male\n" },
+	{ "find", "u", command_find, " [opcje]", "Interfejs do katalogu publicznego", "  --uin <numerek>\n  --first <imiê>\n  --last <nazwisko>\n  --nick <pseudonim>\n  --city <miasto>\n  --birth <min:max>\n  --phone <telefon>\n  --email <e-mail>\n  --active\n  --female\n  --male\n  --start <od>" },
 /*	{ "info", "u", command_find, " <numer/alias>", "Interfejs do katalogu publicznego", "" }, */
 	{ "help", "c", command_help, " [polecenie]", "Wy¶wietla informacjê o poleceniach", "" },
 	{ "?", "c", command_help, " [polecenie]", "Synonim dla %Whelp%n", "" },
@@ -716,6 +716,8 @@ COMMAND(command_find)
 				r.email = argv[++i];
 			if (!strncmp(arg, "-u", 2) && argv[i + 1])
 				r.uin = strtol(argv[++i], NULL, 0);
+			if (!strncmp(arg, "-s", 2) && argv[i + 1])
+				r.start = strtol(argv[++i], NULL, 0);
 			if (!strncmp(arg, "-fe", 3))
 				r.gender = GG_GENDER_FEMALE;
 			if (!strncmp(arg, "-m", 2))

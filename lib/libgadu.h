@@ -362,6 +362,7 @@ void gg_http_free(struct gg_http *h);
  */
 struct gg_search_request {
 	int active;		/* czy ma szukaæ tylko aktywnych? */
+	int start;		/* od którego wyniku pokazywaæ? */
 
 	/* mode 0 */
 	char *nickname;		/* pseudonim */
@@ -412,10 +413,10 @@ struct gg_http *gg_search(struct gg_search_request *r, int async);
 int gg_search_watch_fd(struct gg_http *f);
 void gg_free_search(struct gg_http *f);
 
-struct gg_search_request *gg_search_request_mode_0(char *nickname, char *first_name, char *last_name, char *city, int gender, int min_birth, int max_birth, int active);
-struct gg_search_request *gg_search_request_mode_1(char *email, int active);
-struct gg_search_request *gg_search_request_mode_2(char *phone, int active);
-struct gg_search_request *gg_search_request_mode_3(uin_t uin, int active);
+struct gg_search_request *gg_search_request_mode_0(char *nickname, char *first_name, char *last_name, char *city, int gender, int min_birth, int max_birth, int active, int start);
+struct gg_search_request *gg_search_request_mode_1(char *email, int active, int start);
+struct gg_search_request *gg_search_request_mode_2(char *phone, int active, int start);
+struct gg_search_request *gg_search_request_mode_3(uin_t uin, int active, int start);
 
 /*
  * OPERACJE NA KATALOGU PUBLICZNYM

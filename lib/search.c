@@ -47,6 +47,7 @@ struct gg_http *gg_search(struct gg_search_request *r, int async)
 	struct gg_http *h;
 	char *form, *query;
 	int mode = -1, gender;
+	char __suffix[100];		/* XXX g³upio wygl±da */
 
 	if (!r) {
 		errno = EINVAL;
@@ -55,6 +56,11 @@ struct gg_http *gg_search(struct gg_search_request *r, int async)
 	
 	gg_debug(GG_DEBUG_MISC, "// gg_search()\n");
 
+	strcpy(__suffix, (r->active) ? "&ActiveOnly=" : "");
+
+	if (r->start)
+		sprintf(__suffix + strlen(__suffix), "&Start=%d", r->start);
+		
 	if (r->nickname || r->first_name || r->last_name || r->city || r->gender || r->min_birth || r->max_birth)
 		mode = 0;
 
@@ -106,7 +112,7 @@ struct gg_http *gg_search(struct gg_search_request *r, int async)
 			return NULL;
 		}
 
-		form = gg_alloc_sprintf("Mode=0&FirstName=%s&LastName=%s&Gender=%d&NickName=%s&City=%s&MinBirth=%d&MaxBirth=%d%s", __first_name, __last_name, gender, __nickname, __city, r->min_birth, r->max_birth, (r->active) ? "&ActiveOnly=" : "");
+		form = gg_alloc_sprintf("Mode=0&FirstName=%s&LastName=%s&Gender=%d&NickName=%s&City=%s&MinBirth=%d&MaxBirth=%d%s", __first_name, __last_name, gender, __nickname, __city, r->min_birth, r->max_birth, __suffix);
 
 		free(__first_name);
 		free(__last_name);
@@ -121,7 +127,7 @@ struct gg_http *gg_search(struct gg_search_request *r, int async)
 			return NULL;
 		}
 
-		form = gg_alloc_sprintf("Mode=1&Email=%s%s", __email, (r->active) ? "&ActiveOnly=" : "");
+		form = gg_alloc_sprintf("Mode=1&Email=%s%s", __email, __suffix);
 
 		free(__email);
 
@@ -133,12 +139,12 @@ struct gg_http *gg_search(struct gg_search_request *r, int async)
 			return NULL;
 		}
 
-		form = gg_alloc_sprintf("Mode=2&MobilePhone=%s%s", __phone, (r->active) ? "&ActiveOnly=" : "");
+		form = gg_alloc_sprintf("Mode=2&MobilePhone=%s%s", __phone, __suffix);
 
 		free(__phone);
 
 	} else
-		form = gg_alloc_sprintf("Mode=3&UserId=%u%s", r->uin, (r->active) ? "&ActiveOnly=" : "");
+		form = gg_alloc_sprintf("Mode=3&UserId=%u%s", r->uin, __suffix);
 
 	if (!form) {
 		gg_debug(GG_DEBUG_MISC, "=> search, not enough memory for form query\n");
@@ -307,7 +313,7 @@ void gg_free_search(struct gg_http *h)
  * wszystkie zwracaj± adres statycznego bufora, który mo¿na wykorzystaæ
  * do nakarmienia funkcji gg_search().
  */
-struct gg_search_request *gg_search_request_mode_0(char *nickname, char *first_name, char *last_name, char *city, int gender, int min_birth, int max_birth, int active)
+struct gg_search_request *gg_search_request_mode_0(char *nickname, char *first_name, char *last_name, char *city, int gender, int min_birth, int max_birth, int active, int start)
 {
 	static struct gg_search_request r;
 
@@ -320,39 +326,43 @@ struct gg_search_request *gg_search_request_mode_0(char *nickname, char *first_n
 	r.min_birth = min_birth;
 	r.max_birth = max_birth;
 	r.active = active;
+	r.start = start;
 
 	return &r;
 }
 
-struct gg_search_request *gg_search_request_mode_1(char *email, int active)
+struct gg_search_request *gg_search_request_mode_1(char *email, int active, int start)
 {
 	static struct gg_search_request r;
 
 	memset(&r, 0, sizeof(r));
 	r.email = email;
 	r.active = active;
+	r.start = start;
 
 	return &r;
 }
 
-struct gg_search_request *gg_search_request_mode_2(char *phone, int active)
+struct gg_search_request *gg_search_request_mode_2(char *phone, int active, int start)
 {
 	static struct gg_search_request r;
 
 	memset(&r, 0, sizeof(r));
 	r.phone = phone;
 	r.active = active;
+	r.start = start;
 
 	return &r;
 }
 
-struct gg_search_request *gg_search_request_mode_3(uin_t uin, int active)
+struct gg_search_request *gg_search_request_mode_3(uin_t uin, int active, int start)
 {
 	static struct gg_search_request r;
 
 	memset(&r, 0, sizeof(r));
 	r.uin = uin;
 	r.active = active;
+	r.start = start;
 
 	return &r;
 }
