@@ -128,7 +128,8 @@ check_mail
 	o tym na pasku statusu. warto¶æ 1 odpowiada sprawdzaniu skrzynki typu
 	mbox, a warto¶æ 2 skrzynki typu Maildir. dodadanie warto¶ci 4 oznacza,
 	¿e oprócz informowania na pasku statusu, bêdziemy otrzymywaæ krótk±
-	informacjê o nadej¶ciu poczty w aktualnym oknie.
+	informacjê o nadej¶ciu poczty w aktualnym oknie. wszystkie dostêpne
+	warto¶ci to: 0, 1, 2, 5, 6.
 
 check_mail_frequency
 	typ: liczba
@@ -155,7 +156,8 @@ completion_notify
 	ma byæ dopisywany do listy dope³niania klawiszem Tab. je¶li jest
 	równa 2, jest równie¿ usuwany po przej¶ciu w stan niedostêpny.
 	dodanie warto¶ci 4 spowoduje, ¿e dopisywani bêd± tak¿e ci, którzy
-	pojawi± siê na li¶cie ze statusem ,,zajêty''.
+	pojawi± siê na li¶cie ze statusem ,,zajêty''. wszystkie dostêpne
+	warto¶ci to: 0, 1, 2, 5, 6.
 
 ctrld_quits
 	typ: bool
@@ -353,7 +355,7 @@ log
 	wkompilowan± obs³ugê skompresowanych logów, dodanie warto¶ci 4
 	wymusi kompresjê logów. nie bêdzie ona dzia³a³a, je¶li istnieje
 	ju¿ nieskompresowany log. nale¿y go wcze¶niej skompresowaæ
-	poleceniem gzip.
+	poleceniem gzip. wszystkie dostêpne warto¶ci to: 0, 1, 2, 5, 6.
 
 log_ignored 
 	typ: liczba
