@@ -38,7 +38,7 @@
 /* malutki aliasik, ¿eby nie rzucaæ d³ugimi nazwami wszêdzie */
 #define saprintf gg_alloc_sprintf
 
-enum {
+enum event_t {
 	EVENT_MSG = 1,
 	EVENT_CHAT = 2,
 	EVENT_AVAIL = 4,
@@ -48,7 +48,9 @@ enum {
 	EVENT_INVISIBLE = 64,
 	EVENT_EXEC = 128,
 	EVENT_SIGUSR1 = 256,
-	EVENT_SIGUSR2 = 512
+	EVENT_SIGUSR2 = 512,
+
+	EVENT_ALL = 1023,	/* uaktualniaæ za ka¿d± zmian± */
 };
 
 struct process {
@@ -159,59 +161,62 @@ int batch_mode;
 char *batch_line;
 int immediately_quit;
 
-int config_read(char *filename);
-int config_write(char *filename);
-void config_write_crash();
-
-int read_sysmsg(char *filename);
-int write_sysmsg(char *filename);
-void cp_to_iso(unsigned char *buf);
-void iso_to_cp(unsigned char *buf);
 void unidle();
 const char *timestamp(const char *format);
-char *prepare_path(char *filename);
-void parse_autoexec(char *filename);
+const char *prepare_path(const char *filename, int do_mkdir);
 void send_userlist();
 void do_reconnect();
-void put_log(uin_t uin, char *format, ...);
-char *full_timestamp();
-int send_sms(char *recipient, char *message, int show_result);
+void log(uin_t uin, const char *format, ...);
+int send_sms(const char *recipient, const char *message, int show_result);
 char *read_file(FILE *f);
-int add_process(int pid, char *name);
-int del_process(int pid);
-int on_off(char *value);
-int alias_add(char *string, int quiet, int append);
-int alias_remove(char *name);
-struct list *alias_check(const char *foo);
-int play_sound(char *sound_path);
-
-char *base64_encode(char *buf);
-char *base64_decode(char *buf);
-
-void changed_debug(char *var);
-void changed_dcc(char *var);
-void changed_theme(char *var);
-void changed_proxy(char *var);
+int init_control_pipe(const char *path);
+char *random_line(const char *path);
+int print_history(uin_t uin, int no);
 void do_connect();
 int transfer_id();
-int add_event(int flags, uin_t uin, char *action, int quiet);
-int del_event(int flags, uin_t uin);
-int get_flags(char *events);
-char *format_events(int flags);
-int check_event(int event, uin_t uin, const char *data);
-int run_event(char *action);
-int send_event(char *seq, int act);
-int correct_event(char *action);
-int events_parse_seq(char *seq, struct action_data *data);
-int init_socket();
-int init_control_pipe(char *path);
-char *get_token(char **ptr, char sep);
-char *strdup_null(char *ptr);
 void ekg_logoff(struct gg_session *sess, const char *reason);
-char *get_random_reason(char *path);
-char *emoticon_expand(char *s);
-int emoticon_read();
-int print_history(uin_t uin, int no);
 void ekg_wait_for_key();
 
-#endif
+int process_add(int pid, const char *name);
+int process_remove(int pid);
+
+int on_off(const char *value);
+int play_sound(const char *sound_path);
+
+int config_read();
+int config_write();
+void config_write_crash();
+
+int sysmsg_read();
+int sysmsg_write();
+
+void cp_to_iso(unsigned char *buf);
+void iso_to_cp(unsigned char *buf);
+
+int alias_add(const char *string, int quiet, int append);
+int alias_remove(const char *name);
+struct list *alias_check(const char *foo);
+
+char *base64_encode(const char *buf);
+char *base64_decode(const char *buf);
+
+void changed_debug(const char *var);
+void changed_dcc(const char *var);
+void changed_theme(const char *var);
+void changed_proxy(const char *var);
+
+int event_add(int flags, uin_t uin, const char *action, int quiet);
+int event_remove(int flags, uin_t uin);
+int event_flags(const char *events);
+const char *event_format(int flags);
+int event_check(int event, uin_t uin, const char *data);
+int event_run(const char *action);
+int event_send(const char *seq, int act);
+int event_correct(const char *action);
+int event_parse_seq(const char *seq, struct action_data *data);
+int init_socket();
+
+int emoticon_read();
+char *emoticon_expand(const char *s);
+
+#endif /* __STUFF_H */

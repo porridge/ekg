@@ -359,11 +359,7 @@ void print_window(const char *target, const char *theme, ...)
  *
  * usuwa cache'owane prompty. przydaje siê przy zmianie theme'u.
  */
-#ifdef __GNUC__
-inline void reset_theme_cache()
-#else
 void reset_theme_cache()
-#endif
 {
 	free(prompt_cache);
 	free(prompt2_cache);
@@ -382,10 +378,10 @@ void reset_theme_cache()
  *  - value - warto¶æ,
  *  - replace - je¶li znajdzie, to zostawia (=0) lub zamienia (=1).
  */
-int add_format(char *name, char *value, int replace)
+int add_format(const char *name, const char *value, int replace)
 {
 	struct format f;
-	struct list *l;
+	list_t l;
 
 	if (!strcasecmp(name, "no_prompt_cache")) {
 		no_prompt_cache = 1;
@@ -419,9 +415,9 @@ int add_format(char *name, char *value, int replace)
  *
  *  - name.
  */
-int del_format(char *name)
+int del_format(const char *name)
 {
-	struct list *l;
+	list_t l;
 
 	for (l = formats; l; l = l->next) {
 		struct format *f = l->data;
@@ -483,11 +479,12 @@ static FILE *try_open(FILE *prevfd, const char *prefix, const char *filename)
  */
 int read_theme(const char *filename, int replace)
 {
-        char *buf, *tmp;
+	const char *tmp;
+        char *buf;
         FILE *f = NULL;
 
         if (!filename) {
-                filename = prepare_path("default.theme");
+                filename = prepare_path("default.theme", 0);
 		if (!filename || !(f = fopen(filename, "r")))
 			return -1;
         } else {
@@ -495,9 +492,9 @@ int read_theme(const char *filename, int replace)
 			f = try_open(NULL, NULL, filename);
 		else {
 			f = try_open(NULL, THEMES_DIR, filename);
-			tmp = prepare_path("");
+			tmp = prepare_path("", 0);
 			f = try_open(f, tmp, filename);
-			tmp = prepare_path("themes");
+			tmp = prepare_path("themes", 0);
 			f = try_open(f, tmp, filename);
 		}
 		if (!f)

@@ -20,19 +20,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
+#ifndef _AIX
+#  include <string.h>
+#endif
 #include "stuff.h"
 #include "userlist.h"
 
 static void oom_handler()
 {
-	fprintf(stderr, "\n\
+	fprintf(stderr, "
 *** Brak pamiêci ***
-\n\
-Próbujê zapisaæ ustawienia do pliku %s/config.%d i listê kontaktów\n\
-do pliku %s/userlist.%d, ale nie obiecujê, ¿e cokolwiek z tego\n\
-wyjdzie.\n\
-\n", config_dir, getpid(), config_dir, getpid());
+
+Próbujê zapisaæ ustawienia do pliku %s/config.%d i listê kontaktów
+do pliku %s/userlist.%d, ale nie obiecujê, ¿e cokolwiek z tego
+wyjdzie.
+
+", config_dir, getpid(), config_dir, getpid());
 
 	config_write_crash();
 	userlist_write_crash();

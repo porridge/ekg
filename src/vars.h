@@ -32,14 +32,14 @@ struct variable {
 	int type;		/* rodzaj */
 	int display;		/* 0 bez warto¶ci, 1 pokazuje, 2 w ogóle */
 	void *ptr;		/* wska¼nik do zmiennej */
-	void (*notify)(char*);	/* funkcja wywo³ywana przy zmianie */
+	void (*notify)(const char*);	/* funkcja wywo³ywana przy zmianie */
 };
 
 struct list *variables;
 
 void variable_init();
-struct variable *variable_find(char *name);
-int variable_add(char *name, int type, int display, void *ptr, void (*notify)(char *name));
-int variable_set(char *name, char *value, int allow_foreign);
+struct variable *variable_find(const char *name);
+int variable_add(const char *name, int type, int display, void *ptr, void (*notify)(const char *name));
+int variable_set(const char *name, const char *value, int allow_foreign);
 
-#endif
+#endif /* __VARS_H */

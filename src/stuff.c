@@ -37,8 +37,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #ifdef WITH_IOCTLD
-#include <sys/un.h>
-#endif /* WITH_IOCTLD */
+#  include <sys/un.h>
+#endif
 #include <ctype.h>
 #include "config.h"
 #include "libgadu.h"
@@ -100,7 +100,7 @@ int sock = 0;
 int length = 0;
 #ifdef WITH_IOCTLD
 struct sockaddr_un addr;
-#endif /* WITH_IOCTLD */
+#endif 
 char *busy_reason = NULL;
 char *home_dir = NULL;
 char *config_quit_reason = NULL;
@@ -119,6 +119,23 @@ char *batch_line = NULL;
 int immediately_quit = 0;
 int config_emoticons = 1;
 
+static struct {
+	int event;
+	char *name;
+} event_labels[] = {
+	{ EVENT_MSG, "msg" },
+	{ EVENT_CHAT, "chat" },
+	{ EVENT_AVAIL, "avail" },
+	{ EVENT_NOT_AVAIL, "disconnect" },
+	{ EVENT_AWAY, "away" },
+	{ EVENT_DCC, "dcc" },
+	{ EVENT_INVISIBLE, "invisible" },
+	{ EVENT_EXEC, "exec" },
+	{ EVENT_SIGUSR1, "sigusr1" },
+	{ EVENT_SIGUSR2, "sigusr2" },
+	{ 0, NULL },
+};
+
 /*
  * emoticon_expand()
  *
@@ -126,12 +143,13 @@ int config_emoticons = 1;
  *
  * - s - string z makrami
  *
- * zwraca zaalokowany, rozwiniety string, NULL je¶li siê nie powiod³o.
+ * zwraca zaalokowany, rozwiniety string.
  */
-char *emoticon_expand(char *s)
+char *emoticon_expand(const char *s)
 {
 	struct list *l = NULL;
-	char *ms, *ss;
+	const char *ss;
+	char *ms;
 	size_t n = 0;
 
 	for (ss = s; *ss; ss++) {
@@ -191,10 +209,21 @@ char *emoticon_expand(char *s)
  * zwraca pe³n± ¶cie¿kê do podanego pliku katalogu ~/.gg/
  *
  *  - filename - nazwa pliku.
+ *  - do_mkdir - czy tworzyæ katalog ~/.gg ?
  */
-char *prepare_path(char *filename)
+const char *prepare_path(const char *filename, int do_mkdir)
 {
 	static char path[PATH_MAX];
+	
+	if (do_mkdir) {
+		if (mkdir(config_dir, 0700) && errno != EEXIST)
+			return NULL;
+		if (config_user && *config_user) {
+			snprintf(path, sizeof(path), "%s/%s", config_dir, config_user);
+			if (mkdir(path, 0700) && errno != EEXIST)
+				return NULL;
+		}
+	}
 	
 	if (!filename || !*filename) {
 		if (config_user && *config_user)
@@ -212,7 +241,7 @@ char *prepare_path(char *filename)
 }
 
 /*
- * put_log()
+ * log()
  *
  * wrzuca do logów informacjê od/do danego numerka. podaje siê go z tego
  * wzglêdu, ¿e gdy `log = 2', informacje lec± do $config_log_path/$uin.
@@ -220,7 +249,7 @@ char *prepare_path(char *filename)
  * - uin,
  * - format...
  */
-void put_log(uin_t uin, char *format, ...)
+void log(uin_t uin, const char *format, ...)
 {
  	char *lp = config_log_path;
 	char path[PATH_MAX];
@@ -261,22 +290,6 @@ void put_log(uin_t uin, char *format, ...)
 }
 
 /*
- * full_timestamp()
- *
- * zwraca statyczny bufor z pe³n± reprezentacj± czasu. pewnie bêdzie ona
- * zgodna z aktualnym ustawieniem locali. przydaje siê do logów.
- */
-char *full_timestamp()
-{
-	time_t t = time(NULL);
-	char *foo = ctime(&t);
-
-	foo[strlen(foo) - 1] = 0;
-
-	return foo;
-}
-
-/*
  * config_read()
  *
  * czyta z pliku ~/.gg/config lub podanego konfiguracjê i listê ignorowanych
@@ -284,15 +297,14 @@ char *full_timestamp()
  *
  *  - filename.
  */
-int config_read(char *filename)
+int config_read()
 {
+	const char *filename;
 	char *buf, *foo;
 	FILE *f;
 
-	if (!filename) {
-		if (!(filename = prepare_path("config")))
-			return -1;
-	}
+	if (!(filename = prepare_path("config", 0)))
+		return -1;
 	
 	if (!(f = fopen(filename, "r")))
 		return -1;
@@ -328,8 +340,8 @@ int config_read(char *filename)
                         int flags;
                         uin_t uin;
                         char **pms = array_make(foo, " \t", 3, 1, 0);
-                        if (pms && pms[0] && pms[1] && pms[2] && (flags = get_flags(pms[0])) && (uin = atoi(pms[1])) && !correct_event(pms[2]))
-                                add_event(get_flags(pms[0]), atoi(pms[1]), xstrdup(pms[2]), 1);
+                        if (pms && pms[0] && pms[1] && pms[2] && (flags = event_flags(pms[0])) && (uin = atoi(pms[1])) && !event_correct(pms[2]))
+                                event_add(event_flags(pms[0]), atoi(pms[1]), xstrdup(pms[2]), 1);
 			array_free(pms);
                 } else
 			variable_set(buf, foo, 1);
@@ -343,19 +355,18 @@ int config_read(char *filename)
 }
 
 /*
- * read_sysmsg()
+ * sysmsg_read()
  *
  *  - filename.
  */
-int read_sysmsg(char *filename)
+int sysmsg_read()
 {
+	const char *filename;
 	char *buf, *foo;
 	FILE *f;
 
-	if (!filename) {
-		if (!(filename = prepare_path("sysmsg")))
-			return -1;
-	}
+	if (!(filename = prepare_path("sysmsg", 0)))
+		return -1;
 	
 	if (!(f = fopen(filename, "r")))
 		return -1;
@@ -432,7 +443,7 @@ void config_write_main(FILE *f, int base64)
         for (l = events; l; l = l->next) {
                 struct event *e = l->data;
 
-                fprintf(f, "on %s %u %s\n", format_events(e->flags), e->uin, e->action);
+                fprintf(f, "on %s %u %s\n", event_format(e->flags), e->uin, e->action);
         }
 }
 
@@ -467,21 +478,13 @@ void config_write_crash()
  *  - filename.
  *  - base64 - czy kodowaæ zmienne?
  */
-int config_write(char *filename)
+int config_write()
 {
-	char *tmp;
+	const char *filename;
 	FILE *f;
 
-	if (!(tmp = prepare_path("")))
+	if (!(filename = prepare_path("config", 1)))
 		return -1;
-    	
-	if (mkdir(tmp, 0700) && errno != EEXIST)
-		return -1;
-
-	if (!filename) {
-		if (!(filename = prepare_path("config")))
-			return -1;
-	}
 	
 	if (!(f = fopen(filename, "w")))
 		return -1;
@@ -496,25 +499,17 @@ int config_write(char *filename)
 }
 
 /*
- * write_sysmsg()
+ * sysmsg_write()
  *
  *  - filename.
  */
-int write_sysmsg(char *filename)
+int sysmsg_write()
 {
-	char *tmp;
+	const char *filename;
 	FILE *f;
 
-	if (!(tmp = prepare_path("")))
+	if (!(filename = prepare_path("sysmsg", 1)))
 		return -1;
-
-	if (mkdir(tmp, 0700) && errno != EEXIST)
-		return -1;
-
-	if (!filename) {
-		if (!(filename = prepare_path("sysmsg")))
-			return -1;
-	}
 	
 	if (!(f = fopen(filename, "w")))
 		return -1;
@@ -526,34 +521,6 @@ int write_sysmsg(char *filename)
 	fclose(f);
 	
 	return 0;
-}
-
-/*
- * get_token()
- *
- * zwraca kolejny token oddzielany podanym znakiem. niszczy wej¶ciowy
- * ci±g znaków. bo po co on komu?
- *
- *  - ptr - gdzie ma zapisywaæ aktualn± pozycjê w ci±gu,
- *  - sep - znak oddzielaj±cy tokeny.
- */
-char *get_token(char **ptr, char sep)
-{
-	char *foo, *res;
-
-	if (!ptr || !sep || !*ptr || !**ptr)
-		return NULL;
-
-	res = *ptr;
-
-	if (!(foo = strchr(*ptr, sep)))
-		*ptr += strlen(*ptr);
-	else {
-		*ptr = foo + 1;
-		*foo = 0;
-	}
-
-	return res;
 }
 
 /*
@@ -639,48 +606,6 @@ const char *timestamp(const char *format)
 }
 
 /*
- * parse_autoexec()
- *
- * wykonuje po kolei wszystkie komendy z pliku ~/.gg/autoexec.
- *
- *  - filename.
- */
-void parse_autoexec(char *filename)
-{
-	char *buf;
-	FILE *f;
-
-	if (!filename) {
-		if (!(filename = prepare_path("autoexec")))
-			return;
-	}
-	
-	if (!(f = fopen(filename, "r")))
-		return;
-	
-	in_autoexec = 1;
-	
-	while ((buf = read_file(f))) {
-		if (buf[0] == '#') {
-			free(buf);
-			continue;
-		}
-
-		if (ekg_execute(NULL, buf)) {
-			fclose(f);
-			free(buf);
-			exit(0);
-		}
-
-		free(buf);
-	}
-
-	in_autoexec = 0;
-	
-	fclose(f);
-}
-
-/*
  * do_reconnect()
  *
  * je¶li jest w³±czony autoreconnect, wywo³uje timer, który za podan±
@@ -697,7 +622,7 @@ void do_reconnect()
  *
  * wysy³a sms o podanej tre¶ci do podanej osoby.
  */
-int send_sms(char *recipient, char *message, int show_result)
+int send_sms(const char *recipient, const char *message, int show_result)
 {
 	int pid;
 	char buf[50];
@@ -730,7 +655,7 @@ int send_sms(char *recipient, char *message, int show_result)
 	else
 		strcpy(buf, "\002");
 
-	add_process(pid, buf);
+	process_add(pid, buf);
 
 	return 0;
 }
@@ -854,7 +779,7 @@ int print_history(uin_t uin, int no)
  *
  * odtwarza dzwiêk o podanej nazwie.
  */
-int play_sound(char *sound_path)
+int play_sound(const char *sound_path)
 {
 	int pid;
 
@@ -876,7 +801,7 @@ int play_sound(char *sound_path)
 		exit(1);
 	}
 
-	add_process(pid, "\002");
+	process_add(pid, "\002");
 
 	return 0;
 }
@@ -912,13 +837,14 @@ char *read_file(FILE *f)
 }
 
 /*
- * add_process()
+ * process_add()
  *
  * dopisuje do listy uruchomionych dzieci procesów.
  *
  *  - pid.
+ *  - name.
  */
-int add_process(int pid, char *name)
+int process_add(int pid, const char *name)
 {
 	struct process p;
 
@@ -930,13 +856,13 @@ int add_process(int pid, char *name)
 }
 
 /*
- * del_process()
+ * process_remove()
  *
  * usuwa proces z listy dzieciaków.
  *
  *  - pid.
  */
-int del_process(int pid)
+int process_remove(int pid)
 {
 	struct list *l;
 
@@ -959,7 +885,7 @@ int del_process(int pid)
  *
  *  - value.
  */
-int on_off(char *value)
+int on_off(const char *value)
 {
 	if (!value)
 		return -1;
@@ -981,7 +907,7 @@ int on_off(char *value)
  * - string - linia w formacie 'alias cmd'
  * - quiet - czy wypluwaæ mesgi na stdout.
  */
-int alias_add(char *string, int quiet, int append)
+int alias_add(const char *string, int quiet, int append)
 {
 	char *cmd;
 	struct list *l;
@@ -1030,7 +956,7 @@ int alias_add(char *string, int quiet, int append)
  *
  * - name - alias.
  */
-int alias_remove(char *name)
+int alias_remove(const char *name)
 {
 	struct list *l;
 
@@ -1056,7 +982,7 @@ int alias_remove(char *name)
 }
 
 /*
- * Alias_check()
+ * alias_check()
  *
  * sprawdza czy komenda w foo jest aliasem, je¶li tak - zwraca listê
  * komend, innaczej NULL.
@@ -1085,84 +1011,64 @@ struct list *alias_check(const char *line)
 }
 
 /*
- * format_events()
+ * event_format()
  *
  * zwraca ³añcuch zdarzeñ w oparciu o flagi. statyczny bufor.
  *
- *  - flags
- * 
+ *  - flags.
  */
-char *format_events(int flags)
+const char *event_format(int flags)
 {
-        static char buff[64];
+        static char buf[100];
+	int i, first = 1;
 
-	buff[0] = 0;
+	buf[0] = 0;
 
-        if (flags & EVENT_MSG)
-		strcat(buff, *buff ? "|msg" : "msg");
-        if (flags & EVENT_CHAT)
-		strcat(buff, *buff ? "|chat" : "chat");
-        if (flags & EVENT_AVAIL)
-		strcat(buff, *buff ? "|avail" : "avail");
-	if (flags & EVENT_INVISIBLE)
-	    	strcat(buff, *buff ? "|invisible" : "invisible");
-        if (flags & EVENT_NOT_AVAIL)
-		strcat(buff, *buff ? "|disconnect" : "disconnect");
-        if (flags & EVENT_AWAY)
-		strcat(buff, *buff ? "|away" : "away");
-        if (flags & EVENT_DCC)
-		strcat(buff, *buff ? "|dcc" : "dcc");
-        if (flags & EVENT_EXEC)
-		strcat(buff, *buff ? "|exec" : "exec");
-        if (flags & EVENT_SIGUSR1)
-		strcat(buff, *buff ? "|sigusr1" : "sigusr1");
-        if (flags & EVENT_SIGUSR2)
-		strcat(buff, *buff ? "|sigusr2" : "sigusr2");
-        if (strlen(buff) > 37)
-		strcpy(buff, "*");
+	if (flags == EVENT_ALL)
+		return "*";
 
-        return buff;
+	for (i = 0; event_labels[i].event; i++) {
+		if ((flags & event_labels[i].event)) {
+			if (!first)
+				strcat(buf, ",");
+			strcat(buf, event_labels[i].name);
+			first = 0;
+		}
+	}
+
+	return buf;
 }
 
 /*
- * get_flags()
+ * event_flags()
  *
  * zwraca flagi na podstawie ³añcucha.
  *
  * - events
  */
-int get_flags(char *events)
+int event_flags(const char *events)
 {
-        int flags = 0;
+	int i, j, flags = 0;
+	char **a;
 
-        if (!strncasecmp(events, "*", 1))
-		return EVENT_MSG|EVENT_CHAT|EVENT_AVAIL|EVENT_NOT_AVAIL|EVENT_AWAY|EVENT_DCC|EVENT_INVISIBLE;
-        if (strstr(events, "msg") || strstr(events, "MSG"))
-		flags |= EVENT_MSG;
-        if (strstr(events, "chat") || strstr(events, "CHAT"))
-		flags |= EVENT_CHAT;
-        if (strstr(events, "avail") || strstr(events, "AVAIL"))
-		flags |= EVENT_AVAIL;
-        if (strstr(events, "disconnect") || strstr(events, "disconnect"))
-		flags |= EVENT_NOT_AVAIL;
-        if (strstr(events, "away") || strstr(events, "AWAY"))
-		flags |= EVENT_AWAY;
-        if (strstr(events, "dcc") || strstr(events, "DCC"))
-		flags |= EVENT_DCC;
-        if (strstr(events, "exec") || strstr(events, "EXEC"))
-		flags |= EVENT_DCC;
-	if (strstr(events, "invisible") || strstr(events, "INVISIBLE"))
-	    	flags |= EVENT_INVISIBLE;
-	if (strstr(events, "sigusr1") || strstr(events, "SIGUSR1"))
-	    	flags |= EVENT_SIGUSR1;
-	if (strstr(events, "sigusr2") || strstr(events, "SIGUSR2"))
-	    	flags |= EVENT_SIGUSR2;
+	if (!(a = array_make(events, "|,:", 0, 1, 0)))
+		return 0;
+
+	for (j = 0; a[j]; j++) {
+		if (!strcmp(a[j], "*"))
+			flags |= EVENT_ALL;
+		for (i = 0; event_labels[i].event; i++)
+			if (!strcasecmp(a[j], event_labels[i].name))
+				flags |= event_labels[i].event;
+	}
+
+	array_free(a);
 
         return flags;
 }
 
 /*
- * add_event()
+ * event_add()
  *
  * Dodaje zdarzenie do listy zdarzeñ.
  *
@@ -1171,7 +1077,7 @@ int get_flags(char *events)
  * - action
  * - quiet  
  */
-int add_event(int flags, uin_t uin, char *action, int quiet)
+int event_add(int flags, uin_t uin, const char *action, int quiet)
 {
         int f;
         struct list *l;
@@ -1182,7 +1088,7 @@ int add_event(int flags, uin_t uin, char *action, int quiet)
 
                 if (ev->uin == uin && (f = ev->flags & flags) != 0) {
 		    	if (!quiet)
-			    	print("events_exist", format_events(f), (uin == 1) ? "*"  : format_user(uin));
+			    	print("events_exist", event_format(f), (uin == 1) ? "*" : format_user(uin));
                         return -1;
                 }
         }
@@ -1194,20 +1100,20 @@ int add_event(int flags, uin_t uin, char *action, int quiet)
         list_add(&events, &e, sizeof(e));
 
 	if (!quiet)
-	    	print("events_add", format_events(flags), (uin == 1) ? "*"  : format_user(uin), action);
+	    	print("events_add", event_format(flags), (uin == 1) ? "*"  : format_user(uin), action);
 
         return 0;
 }
 
 /*
- * del_event()
+ * event_remove()
  *
  * usuwa zdarzenie z listy zdarzeñ.
  *
  * - flags
  * - uin
  */
-int del_event(int flags, uin_t uin)
+int event_remove(int flags, uin_t uin)
 {
         struct list *l;
 
@@ -1216,12 +1122,12 @@ int del_event(int flags, uin_t uin)
 
                 if (e && e->uin == uin && e->flags & flags) {
                         if ((e->flags &= ~flags) == 0) {
-                                print("events_del", format_events(flags), (uin == 1) ? "*" : format_user(uin), e->action);
+                                print("events_del", event_format(flags), (uin == 1) ? "*" : format_user(uin), e->action);
 				free(e->action);
                                 list_remove(&events, e, 1);
                                 return 0;
                         } else {
-                                print("events_del_flags", format_events(flags));
+                                print("events_del_flags", event_format(flags));
                                 list_remove(&events, e, 0);
                                 list_add_sorted(&events, e, 0, NULL);
                                 return 0;
@@ -1229,22 +1135,23 @@ int del_event(int flags, uin_t uin)
                 }
         }
 
-        print("events_del_noexist", format_events(flags), (uin == 1) ? "3"  : format_user(uin));
+        print("events_del_noexist", event_format(flags), (uin == 1) ? "3"  : format_user(uin));
 
         return 1;
 }
 
 /*
- * check_event()
+ * event_check()
  *
  * sprawdza i ewentualnie uruchamia akcjê na podane zdarzenie.
  *
  * - event
  * - uin
  */
-int check_event(int event, uin_t uin, const char *data)
+int event_check(int event, uin_t uin, const char *data)
 {
-        char *evt_ptr = NULL, *uin_number = NULL, *uin_display = NULL;
+	const char *uin_number = NULL, *uin_display = NULL;
+        char *evt_ptr = NULL;
 	struct userlist *u;
         struct list *l;
 
@@ -1272,7 +1179,7 @@ int check_event(int event, uin_t uin, const char *data)
 		
                 while (events[i]) {
 			char *tmp = format_string(events[i], uin_number, uin_display, (data) ? data : "");
-			run_event(tmp);
+			event_run(tmp);
 			free(tmp);
 			i++;
 		}
@@ -1280,7 +1187,7 @@ int check_event(int event, uin_t uin, const char *data)
 		array_free(events);
         } else {
 		char *tmp = format_string(evt_ptr, uin_number, uin_display, (data) ? data : "");
-		run_event(tmp);
+		event_run(tmp);
 		free(tmp);
 	}
 
@@ -1290,13 +1197,13 @@ int check_event(int event, uin_t uin, const char *data)
 }
 
 /*
- * run_event()
+ * event_run()
  *
  * wykonuje dan± akcjê.
  *
- * - action
+ * - act.
  */
-int run_event(char *act)
+int event_run(const char *act)
 {
         uin_t uin;
         char *action, *ptr, **acts;
@@ -1304,7 +1211,7 @@ int run_event(char *act)
 	int res;
 #endif /* WITH_IOCTLD */
 
-	gg_debug(GG_DEBUG_MISC, "// run_event(\"%s\");\n", act);
+	gg_debug(GG_DEBUG_MISC, "// event_run(\"%s\");\n", act);
 
 	action = xstrdup(act);
 	
@@ -1321,7 +1228,7 @@ int run_event(char *act)
 #ifdef WITH_IOCTLD
         if (!strncasecmp(acts[0], "blink_leds", 10)) {
 		gg_debug(GG_DEBUG_MISC, "//   blinking leds\n");
-		res = send_event(acts[1], ACT_BLINK_LEDS);
+		res = event_send(acts[1], ACT_BLINK_LEDS);
 		free(action);
 		array_free(acts);
                 return res;
@@ -1329,7 +1236,7 @@ int run_event(char *act)
 
         if (!strncasecmp(acts[0], "beeps_spk", 9)) {
 		gg_debug(GG_DEBUG_MISC, "//   beeping speaker\n");
-		res = send_event(acts[1], ACT_BEEPS_SPK);
+		res = event_send(acts[1], ACT_BEEPS_SPK);
 		free(action);
 		array_free(acts);
 		return res;
@@ -1351,7 +1258,7 @@ int run_event(char *act)
                         execl("/bin/sh", "sh", "-c", acts[1], NULL);
                         exit(1);
                 }
-                add_process(pid, "\002");
+                process_add(pid, "\002");
 #endif
 		goto cleanup;
 	} 
@@ -1383,7 +1290,7 @@ int run_event(char *act)
 
 		u = userlist_find(uin, NULL);
 
-                put_log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), data);
+                log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), data);
 
                 iso_to_cp(data);
                 gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, data);
@@ -1411,47 +1318,47 @@ fail:
 
 #ifdef WITH_IOCTLD
 /*
- * send_event()
+ * event_send()
  *
  * wysy³a do ioctld polecenie uruchomienia akcji z ioctl.
  *
  * - seq
  * - act
 */
-int send_event(char *seq, int act)
+int event_send(const char *seq, int act)
 {
-        char *s;
-        struct action_data data;
+	const char *s;
+	struct action_data data;
 
-        if (*seq == '$') {
-                seq++;
-                s = find_format(seq);
-                if (!strcmp(s, "")) {
-                        print("events_seq_not_found", seq);
-                        return 1;
-                }
-        } else
-                s = seq;
+	if (*seq == '$') {
+		seq++;
+		s = find_format(seq);
+		if (!strcmp(s, "")) {
+			print("events_seq_not_found", seq);
+			return 1;
+		}
+	} else
+		s = seq;
 
-        data.act = act;
+	data.act = act;
 
-        if (events_parse_seq(s, &data))
-                return 1;
+	if (event_parse_seq(s, &data))
+		return 1;
 
-        sendto(sock, &data, sizeof(data), 0,(struct sockaddr *)&addr, length);
+	sendto(sock, &data, sizeof(data), 0,(struct sockaddr *)&addr, length);
 
-        return 0;
+	return 0;
 }
 #endif /* WITH_IOCTLD */
 
 /*
- * correct_event()
+ * event_correct()
  *
  * sprawdza czy akcja na zdarzenie jest poprawna.
  *
  * - act
  */
-int correct_event(char *act)
+int event_correct(const char *act)
 {
         char *action, *ev, **events;
 	int a = 0;
@@ -1505,7 +1412,7 @@ int correct_event(char *act)
                                 continue;
                         }
 
-                        if (events_parse_seq(acts[1], &test)) {
+                        if (event_parse_seq(acts[1], &test)) {
                                 print("events_seq_incorrect", acts[1]);
 				free(action);
 				array_free(acts);
@@ -1614,14 +1521,16 @@ int correct_event(char *act)
 }
 
 /*
- * events_parse_seq()
+ * event_parse_seq()
  *
- * zamieñ string na odpowiedni± strukturê, zwraca >0 w przypadku b³êdu.
+ * zamieñ string na odpowiedni± strukturê.
  *
- * seq
- * data
+ *  - seq.
+ *  - data.
+ *
+ * je¶li w porz±dku 0, je¶li nie w porz±dku > 0.
  */
-int events_parse_seq(char *seq, struct action_data *data)
+int event_parse_seq(const char *seq, struct action_data *data)
 {
         char tmp_buff[16] = "";
         int i = 0, a, l = 0, default_delay = 10000;
@@ -1650,17 +1559,17 @@ int events_parse_seq(char *seq, struct action_data *data)
                         memset(tmp_buff, 0, 16);
                         i = 0;
                         l++;
-                }
-                else if (seq[a] == ' ')
+                } else if (seq[a] == ' ')
                         continue;
                 else if (seq[a] == '\0') {
                         data->value[l] = atoi(tmp_buff);
                         data->delay[l] = default_delay;
                         data->value[++l] = data->delay[l] = -1;
-                }
-                else return 3;
+                } else
+			return 3;
         }
-        return 0;
+
+	return 0;
 }
 
 /*
@@ -1672,7 +1581,7 @@ int events_parse_seq(char *seq, struct action_data *data)
  *
  * zwraca deskryptor otwartego potoku lub warto¶æ b³êdu
  */
-int init_control_pipe(char *pipe_file)
+int init_control_pipe(const char *pipe_file)
 {
 	int fd;
 
@@ -1721,7 +1630,7 @@ static char base64_charset[] =
  *
  * zapisuje ci±g znaków w base64. alokuje pamiêæ. 
  */
-char *base64_encode(char *buf)
+char *base64_encode(const char *buf)
 {
 	char *out, *res;
 	int i = 0, j = 0, k = 0, len = strlen(buf);
@@ -1761,9 +1670,10 @@ char *base64_encode(char *buf)
  *
  * wczytuje ci±g znaków base64, zwraca zaalokowany buforek.
  */
-char *base64_decode(char *buf)
+char *base64_decode(const char *buf)
 {
-	char *res, *save, *end, *foo, val;
+	char *res, *save, *foo, val;
+	const char *end;
 	int index = 0;
 	
 	save = res = xcalloc(1, (strlen(buf) / 4 + 1) * 3 + 2);
@@ -1778,7 +1688,7 @@ char *base64_decode(char *buf)
 		if (!(foo = strchr(base64_charset, *buf)))
 			foo = base64_charset;
 		val = (int)foo - (int)base64_charset;
-		*buf = 0;
+/*		*buf = 0;	XXX kto mi powie po co to by³o dostaje piwo */
 		buf++;
 		switch (index) {
 			case 0:
@@ -1810,7 +1720,7 @@ char *base64_decode(char *buf)
  *
  * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,debug''.
  */
-void changed_debug(char *var)
+void changed_debug(const char *var)
 {
 	if (config_debug)
 		gg_debug_level = 255;
@@ -1823,7 +1733,7 @@ void changed_debug(char *var)
  *
  * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,dcc''.
  */
-void changed_dcc(char *var)
+void changed_dcc(const char *var)
 {
 	struct gg_dcc *dcc = NULL;
 	struct list *l;
@@ -1869,7 +1779,7 @@ void changed_dcc(char *var)
  *
  * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,theme''.
  */
-void changed_theme(char *var)
+void changed_theme(const char *var)
 {
 	if (!config_theme) {
 		init_theme();
@@ -1890,7 +1800,7 @@ void changed_theme(char *var)
  *
  * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,proxy''.
  */
-void changed_proxy(char *var)
+void changed_proxy(const char *var)
 {
 	char *tmp;
 	
@@ -2024,39 +1934,34 @@ void ekg_logoff(struct gg_session *sess, const char *reason)
 	gg_logoff(sess);
 }
 
-char *get_random_reason(char *path)
+char *random_line(const char *path)
 {
-        int max = 0, embryo, item, fd, tmp = 0;
-        char buf[256];
+        int max = 0, item, tmp = 0;
+	char *line;
         FILE *f;
+
+	if (!path)
+		return NULL;
 
         if ((f = fopen(path, "r")) == NULL)
                 return NULL;
 
-        while (fgets(buf, sizeof(buf) - 1, f))
+        while ((line = read_file(f))) {
+		xfree(line);
                 max++;
+	}
 
         rewind(f);
 
-        if((fd = open("/dev/urandom", O_RDONLY)) > 0) {
-                read(fd, &embryo, sizeof(embryo));
-                close(fd);
-        }
-        else
-                embryo=(int)time(NULL);
+        item = rand() % max;
 
-        srand(embryo);
-
-        item = (rand()%max) + 1;
-
-        while (fgets(buf, sizeof(buf) - 1, f)) {
-                tmp++;
+        while ((line = read_file(f))) {
                 if (tmp == item) {
-                        fclose(f);
-                        if (buf[strlen(buf) - 1] == '\n')
-                                buf[strlen(buf) - 1] = '\0';
-			return xstrdup(buf);
-                }
+			fclose(f);
+			return line;
+		}
+		xfree(line);
+		tmp++;
         }
 
         fclose(f);
@@ -2127,10 +2032,14 @@ int emoticon_remove(char *name)
  */
 int emoticon_read()
 {
+	const char *filename;
 	char *buf, **emot;
 	FILE *f;
 
-	if (!(f = fopen(prepare_path("emoticons"), "r")))
+	if (!(filename = prepare_path("emoticons", 0)))
+		return -1;
+	
+	if (!(f = fopen(filename, "r")))
 		return -1;
 
 	while ((buf = read_file(f))) {

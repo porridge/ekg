@@ -55,15 +55,15 @@ struct group {
 struct list *userlist;
 struct list *ignored;
 
-int userlist_read(char *filename);
-int userlist_write(char *filename);
+int userlist_read();
+int userlist_write();
 void userlist_write_crash();
 void userlist_clear_status(void);
-int userlist_add(uin_t uin, char *display);
+int userlist_add(uin_t uin, const char *display);
 int userlist_remove(struct userlist *u);
 int userlist_replace(struct userlist *u);
 void userlist_send();
-struct userlist *userlist_find(uin_t uin, char *display);
+struct userlist *userlist_find(uin_t uin, const char *display);
 char *userlist_dump();
 void userlist_clear();
 int userlist_set(char *contacts);
@@ -72,12 +72,12 @@ int ignored_add(uin_t uin);
 int ignored_remove(uin_t uin);
 int ignored_check(uin_t uin);
 
-int group_add(struct userlist *u, char *group);
-int group_remove(struct userlist *u, char *group);
+int group_add(struct userlist *u, const char *group);
+int group_remove(struct userlist *u, const char *group);
 char *group_to_string(struct list *l);
-struct list *group_init(char *groups);
+struct list *group_init(const char *groups);
 
-char *format_user(uin_t uin);
-uin_t get_uin(char *text);
+const char *format_user(uin_t uin);
+uin_t get_uin(const char *text);
 
-#endif
+#endif /* __USERLIST_H */

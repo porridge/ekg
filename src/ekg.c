@@ -94,7 +94,7 @@ int get_char_from_pipe(struct gg_common *c)
   		return 0;
 
 	if (read(c->fd, &ch, 1) > 0) {
-		if (ch != '\n') {
+		if (ch != '\n' && ch != '\r') {
 			if (strlen(buf) < PIPE_MSG_MAX_BUF_LEN)
 				buf[strlen(buf)] = ch;
 		}
@@ -234,9 +234,7 @@ void ekg_wait_for_key()
 				char tmp[16], *reason = NULL;
 
 				if (config_random_reason & 1) {
-				    	char *path = prepare_path("away.reasons");
-
-					reason = get_random_reason(path);
+					reason = random_line(prepare_path("away.reasons", 0));
 					if (!reason && config_away_reason)
 					    	reason = xstrdup(config_away_reason);
 				}
@@ -345,13 +343,13 @@ void ekg_wait_for_key()
 
 void sigusr1_handler()
 {
-	check_event(EVENT_SIGUSR1, 1, "SIGUSR1");
+	event_check(EVENT_SIGUSR1, 1, "SIGUSR1");
 	signal(SIGUSR1, sigusr1_handler);
 }
 
 void sigusr2_handler()
 {
-	check_event(EVENT_SIGUSR2, 1, "SIGUSR2");
+	event_check(EVENT_SIGUSR2, 1, "SIGUSR2");
 	signal(SIGUSR1, sigusr2_handler);
 }
 
@@ -439,7 +437,7 @@ int main(int argc, char **argv)
 	char *load_theme = NULL;
 	char *pipe_file = NULL;
 #ifdef WITH_IOCTLD
-    	char *sock_path = NULL, *ioctld_path = IOCTLD_PATH;
+	const char *sock_path = NULL, *ioctld_path = IOCTLD_PATH;
 #endif
 	struct list *l;
 	struct passwd *pw; 
@@ -455,6 +453,8 @@ int main(int argc, char **argv)
 	ui_init = ui_stdout_init;
 #  endif
 #endif
+
+	srand(time(NULL));
 
 	variable_init();
 
@@ -600,24 +600,24 @@ int main(int argc, char **argv)
 	init_theme();
 
 	in_autoexec = 1;
-        userlist_read(NULL);
-	config_read(NULL);
-	read_sysmsg(NULL);
+        userlist_read();
+	config_read();
+	sysmsg_read();
 	emoticon_read();
 	in_autoexec = 0;
 
 #ifdef WITH_IOCTLD
 	if (!batch_mode) {
-	        sock_path = prepare_path(".socket");
+		sock_path = prepare_path(".socket", 1);
 	
-	        if (!(ioctld_pid = fork())) {
+		if (!(ioctld_pid = fork())) {
 			execl(ioctld_path, "ioctld", sock_path, NULL);
 			exit(0);
 		}
 	
 		init_socket(sock_path);
 	
-	        atexit(kill_ioctld);
+		atexit(kill_ioctld);
 	}
 #endif /* WITH_IOCTLD */
 

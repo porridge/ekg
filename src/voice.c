@@ -154,18 +154,18 @@ void voice_close()
  *
  * je¶li siê uda³o 0, je¶li nie -1.
  */
-int voice_play(char *buf, int length, int null)
+int voice_play(const char *buf, int length, int null)
 {
 	gsm_signal output[160];
-	char *pos = buf;
+	const char *pos = buf;
 
 	while (pos <= (buf + length - 55)) {
-		if (gsm_decode(voice_gsm_dec, pos, output))
+		if (gsm_decode(voice_gsm_dec, (char*) pos, output))
 			return -1;
 		if (!null && write(voice_fd, output, 320) != 320)
 			return -1;
 		pos += 33;
-		if (gsm_decode(voice_gsm_dec, pos, output))
+		if (gsm_decode(voice_gsm_dec, (char*) pos, output))
 			return -1;
 		if (!null && write(voice_fd, output, 320) != 320)
 			return -1;
@@ -186,21 +186,21 @@ int voice_play(char *buf, int length, int null)
  *
  * je¶li siê uda³o 0, je¶li nie -1.
  */
-int voice_record(char *buf, int length, int null)
+int voice_record(const char *buf, int length, int null)
 {
 	gsm_signal input[160];
-	char *pos = buf;
+	const char *pos = buf;
 
 	while (pos <= (buf + length - 55)) {
 		if (read(voice_fd, input, 320) != 320)
 			return -1;
 		if (!null)
-			gsm_encode(voice_gsm_enc, input, pos);
+			gsm_encode(voice_gsm_enc, input, (char*) pos);
 		pos += 32;
 		if (read(voice_fd, input, 320) != 320)
 			return -1;
 		if (!null)
-			gsm_encode(voice_gsm_enc, input, pos);
+			gsm_encode(voice_gsm_enc, input, (char*) pos);
 		pos += 33;
 	}
 
@@ -211,8 +211,8 @@ int voice_record(char *buf, int length, int null)
 
 int voice_open() { return -1; }
 int voice_close() { return -1; }
-int voice_play(char *buf, int length, int null) { return -1; }
-int voice_record(char *buf, int length, int null) { return -1; }
+int voice_play(const char *buf, int length, int null) { return -1; }
+int voice_record(const char *buf, int length, int null) { return -1; }
 
 #endif /* HAVE_VOIP */
 

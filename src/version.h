@@ -22,4 +22,4 @@
 
 #define VERSION "CVS"
 
-#endif
+#endif /* __VERSION_H */

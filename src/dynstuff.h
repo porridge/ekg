@@ -27,8 +27,7 @@ struct list {
 	struct list *next;
 };
 
-typedef struct list * List;
-
+typedef struct list * list_t;
 void *list_add(struct list **list, void *data, int alloc_size);
 void *list_add_sorted(struct list **list, void *data, int alloc_size, int (*comparision)(void *, void *));
 int list_remove(struct list **list, void *data, int free_data);
@@ -42,12 +41,12 @@ struct string {
 	int size;
 };
 
-typedef struct string * String;
+typedef struct string * string_t;
 
 struct string *string_init(const char *str);
 int string_append(struct string *s, const char *str);
 int string_append_n(struct string *s, const char *str, int count);
-int string_append_c(struct string *s, const char ch);
+int string_append_c(struct string *s, char ch);
 char *string_free(struct string *s, int free_string);
 
 /* tablice stringów */
@@ -57,6 +56,6 @@ void array_free(char **array);
 
 /* rozszerzenia libców */
 
-char *itoa(long int i);
+const char *itoa(long int i);
 
-#endif
+#endif /* __DYNSTUFF_H */

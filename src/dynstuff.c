@@ -314,7 +314,7 @@ char *string_free(struct string *s, int free_string)
  *
  * zwraca adres do bufora, którego _NIE_NALE¯Y_ zwalniaæ.
  */
-char *itoa(long int i)
+const char *itoa(long int i)
 {
 	static char bufs[10][16];
 	static int index = 0;

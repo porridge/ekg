@@ -34,12 +34,12 @@ void print_status(const char *theme, ...);
 const char *find_format(const char *name);
 char *format_string(const char *format, ...);
 
-int add_format(char *name, char *value, int replace);
-int del_format(char *name);
+int add_format(const char *name, const char *value, int replace);
+int del_format(const char *name);
 
 void init_theme();
 void reset_theme_cache();
 
 int read_theme(const char *filename, int replace);
 
-#endif
+#endif /* __THEMES_H */

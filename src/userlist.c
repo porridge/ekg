@@ -71,18 +71,15 @@ static int userlist_compare(void *data1, void *data2)
  * wczytuje listê kontaktów z pliku ~/.gg/userlist. mo¿e ona byæ w postaci
  * linii ,,<numerek> <opis>'' lub w postaci eksportu tekstowego listy
  * kontaktów windzianego klienta.
- *
- *  - filename.
  */
-int userlist_read(char *filename)
+int userlist_read()
 {
+	const char *filename;
 	char *buf;
 	FILE *f;
 
-	if (!filename) {
-		if (!(filename = prepare_path("userlist")))
-			return -1;
-	}
+	if (!(filename = prepare_path("userlist", 0)))
+		return -1;
 	
 	if (!(f = fopen(filename, "r")))
 		return -1;
@@ -160,7 +157,7 @@ int userlist_set(char *contacts)
 
 	userlist_clear();
 
-	/* XXX argh! */
+	/* XXX argh! zmieniæ na nie ruszaj±ce ,,contacts'' */
 	
 	while ((buf = gg_get_line(&contacts))) {
 		struct userlist u;
@@ -257,30 +254,19 @@ char *userlist_dump()
  * userlist_write()
  *
  * zapisuje listê kontaktów w pliku ~/.gg/userlist
- *
- *  - filename.
  */
-int userlist_write(char *filename)
+int userlist_write()
 {
-	char *tmp, *contacts;
+	const char *filename;
+	char *contacts;
 	FILE *f;
 
 	if (!(contacts = userlist_dump()))
 		return -1;
 	
-	if (!(tmp = prepare_path(""))) {
+	if (!(filename = prepare_path("userlist", 1))) {
 		free(contacts);
 		return -1;
-	}
-
-	if (mkdir(tmp, 0700) && errno != EEXIST)
-		return -1;
-
-	if (!filename) {
-		if (!(filename = prepare_path("userlist"))) {
-			free(contacts);
-			return -1;
-		}
 	}
 	
 	if (!(f = fopen(filename, "w"))) {
@@ -374,7 +360,7 @@ void userlist_clear()
  *  - uin,
  *  - display.
  */
-int userlist_add(uin_t uin, char *display)
+int userlist_add(uin_t uin, const char *display)
 {
 	struct userlist u;
 
@@ -457,7 +443,7 @@ int userlist_replace(struct userlist *u)
  *  - uin,
  *  - display.
  */
-struct userlist *userlist_find(uin_t uin, char *display)
+struct userlist *userlist_find(uin_t uin, const char *display)
 {
 	struct list *l;
 
@@ -482,7 +468,7 @@ struct userlist *userlist_find(uin_t uin, char *display)
  *
  *  - text.
  */
-uin_t get_uin(char *text)
+uin_t get_uin(const char *text)
 {
 	uin_t uin = atoi(text);
 	struct userlist *u;
@@ -505,7 +491,7 @@ uin_t get_uin(char *text)
  *
  *  - uin - numerek danej osoby.
  */
-char *format_user(uin_t uin)
+const char *format_user(uin_t uin)
 {
 	struct userlist *u = userlist_find(uin, NULL);
 	static char buf[100], *tmp;
@@ -646,7 +632,7 @@ static int group_compare(void *data1, void *data2)
  *
  * zwraca 0 je¶li siê uda³o, inaczej -1.
  */
-int group_add(struct userlist *u, char *group)
+int group_add(struct userlist *u, const char *group)
 {
 	struct group g;
 	
@@ -667,7 +653,7 @@ int group_add(struct userlist *u, char *group)
  *
  * zwraca 0 je¶li siê uda³o, inaczej -1.
  */
-int group_remove(struct userlist *u, char *group)
+int group_remove(struct userlist *u, const char *group)
 {
 	struct list *l;
 
@@ -695,24 +681,26 @@ int group_remove(struct userlist *u, char *group)
  * group_init()
  *
  * inicjuje listê grup u¿ytkownika na podstawie danego ci±gu znaków,
- * w którym kolejne nazwy grup s± rozdzielone przecinkiem. NISZCZY
- * DANE WEJ¦CIOWE!
+ * w którym kolejne nazwy grup s± rozdzielone przecinkiem.
  * 
  *  - named - nazwy grup.
  *
  * zwraca listê `struct group' je¶li siê uda³o, inaczej NULL.
  */
-struct list *group_init(char *names)
+struct list *group_init(const char *names)
 {
 	struct list *l = NULL;
-	char *token;
+	char **groups = array_make(names, ",", 0, 1, 0);
+	int i;
 
-	while ((token = get_token(&names, ','))) {
+	for (i = 0; groups[i]; i++) {
 		struct group g;
 
-		g.name = xstrdup(token);
+		g.name = xstrdup(groups[i]);
 		list_add_sorted(&l, &g, sizeof(g), group_compare);
 	}
+	
+	array_free(groups);
 	
 	return l;
 }

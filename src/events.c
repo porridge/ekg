@@ -69,7 +69,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat)
 	int width, i, j;
 	char *mesg, *buf, *line, *next, *format = NULL, *head = NULL, *foot = NULL, *save;
 	char *line_width = NULL, timestr[100];
-	char *target = (chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender));
+	const char *target = (chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender));
 	struct tm *tm;
 	
 	switch (chat) {
@@ -169,7 +169,7 @@ void handle_msg(struct gg_event *e)
 		if (config_log_ignored) {
 			cp_to_iso(e->event.msg.message);
 			/* XXX eskejpowanie */
-			put_log(e->event.msg.sender, "%sign,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgsend", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, e->event.msg.message);
+			log(e->event.msg.sender, "%sign,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgsend", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, e->event.msg.message);
 		}
 		return;
 	};
@@ -193,7 +193,7 @@ void handle_msg(struct gg_event *e)
 	
 	cp_to_iso(e->event.msg.message);
 
-	check_event((chat) ? EVENT_CHAT : EVENT_MSG, e->event.msg.sender, e->event.msg.message);
+	event_check((chat) ? EVENT_CHAT : EVENT_MSG, e->event.msg.sender, e->event.msg.message);
 	
 	if (e->event.msg.sender == 0) {
 		if (e->event.msg.msgclass > last_sysmsg) {
@@ -204,7 +204,7 @@ void handle_msg(struct gg_event *e)
 		    
 			play_sound(config_sound_sysmsg_file);
 			last_sysmsg = e->event.msg.msgclass;
-			write_sysmsg(NULL);
+			sysmsg_write();
 		}
 
 		return;
@@ -223,7 +223,7 @@ void handle_msg(struct gg_event *e)
 	play_sound((chat) ? config_sound_chat_file : config_sound_msg_file);
 
 	/* XXX eskejpowanie */
-	put_log(e->event.msg.sender, "%s,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, e->event.msg.message);
+	log(e->event.msg.sender, "%s,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, e->event.msg.message);
 
 	if (away && config_sms_away && config_sms_app && config_sms_number) {
 		char *foo, sender[100];
@@ -330,27 +330,27 @@ void handle_notify(struct gg_event *e)
 		}
 		
 		if (n->status == GG_STATUS_BUSY) {
-			check_event(EVENT_AWAY, u->uin, NULL);
+			event_check(EVENT_AWAY, u->uin, NULL);
                         if (config_log_status)
-                                put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away");
+                                log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away");
 			if (config_display_notify)
 			    	print("status_busy", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
 		}
 
 		if (n->status == GG_STATUS_BUSY_DESCR) {
-			check_event(EVENT_AWAY, u->uin, NULL);
+			event_check(EVENT_AWAY, u->uin, NULL);
 			u->descr = (e->event.notify_descr.descr) ? xstrdup(e->event.notify_descr.descr) : xstrdup("");
 			cp_to_iso(u->descr);
                         if (config_log_status)
-                                put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
+                                log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
 			if (config_display_notify)
 			    	print("status_busy_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		}
 
 		if (n->status == GG_STATUS_AVAIL) {
-			check_event(EVENT_AVAIL, u->uin, NULL);
+			event_check(EVENT_AVAIL, u->uin, NULL);
 		    	if (config_log_status)
-			    	put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail");
+			    	log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail");
 			if (config_display_notify)
 			    	print("status_avail", format_user(u->uin), (u->first_name) ? u->first_name : u->display);
 			
@@ -361,29 +361,29 @@ void handle_notify(struct gg_event *e)
 		}
 
 		if (n->status == GG_STATUS_AVAIL_DESCR) {
-			check_event(EVENT_AVAIL, u->uin, NULL);
+			event_check(EVENT_AVAIL, u->uin, NULL);
 			u->descr = (e->event.notify_descr.descr) ? xstrdup(e->event.notify_descr.descr) : xstrdup("");
 			cp_to_iso(u->descr);
                         if (config_log_status)
-                                put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
+                                log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
 			if (config_display_notify)
 			    	print("status_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		}
 		
 		if (n->status == GG_STATUS_NOT_AVAIL) {
-			check_event(EVENT_NOT_AVAIL, u->uin, NULL);
+			event_check(EVENT_NOT_AVAIL, u->uin, NULL);
                         if (config_log_status)
-                                put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail");
+                                log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail");
 			if (config_display_notify)
 			    	print("status_not_avail", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
 		}
 
 		if (n->status == GG_STATUS_NOT_AVAIL_DESCR) {
-			check_event(EVENT_NOT_AVAIL, u->uin, NULL);
+			event_check(EVENT_NOT_AVAIL, u->uin, NULL);
 			u->descr = (e->event.notify_descr.descr) ? xstrdup(e->event.notify_descr.descr) : xstrdup("");
 			cp_to_iso(u->descr);
                         if (config_log_status)
-                                put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail", u->descr);
+                                log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail", u->descr);
 			if (config_display_notify)
 			    	print("status_not_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		}
@@ -437,8 +437,8 @@ void handle_status(struct gg_event *e)
 	if (config_display_notify) {
 		if (e->event.status.status == GG_STATUS_AVAIL && u->status != GG_STATUS_AVAIL) {
                         if (config_log_status)
-			    	put_log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "avail");
-		    	check_event(EVENT_AVAIL, e->event.status.uin, NULL);
+			    	log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "avail");
+		    	event_check(EVENT_AVAIL, e->event.status.uin, NULL);
 			if (config_completion_notify)
 				add_send_nick(u->display);
 			print("status_avail", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
@@ -446,8 +446,8 @@ void handle_status(struct gg_event *e)
 				ui_beep();
 		} else if (e->event.status.status == GG_STATUS_AVAIL_DESCR) {
                         if (config_log_status)
-			    	put_log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
-		    	check_event(EVENT_AVAIL, e->event.status.uin, NULL);
+			    	log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
+		    	event_check(EVENT_AVAIL, e->event.status.uin, NULL);
 			if (config_completion_notify)
 				add_send_nick(u->display);
 			print("status_avail_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
@@ -456,26 +456,26 @@ void handle_status(struct gg_event *e)
 		} else if (e->event.status.status == GG_STATUS_BUSY && u->status != GG_STATUS_BUSY) 
 		{
                         if (config_log_status)
-			    	put_log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "away");
-		    	check_event(EVENT_AWAY, e->event.status.uin, NULL);
+			    	log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "away");
+		    	event_check(EVENT_AWAY, e->event.status.uin, NULL);
 			print("status_busy", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
 		} else if (e->event.status.status == GG_STATUS_BUSY_DESCR)
 		{
                         if (config_log_status)
-                                put_log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
-		    	check_event(EVENT_AWAY, e->event.status.uin, NULL);
+                                log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
+		    	event_check(EVENT_AWAY, e->event.status.uin, NULL);
 			print("status_busy_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL)
 		{
                         if (config_log_status)
-			    	put_log(e->event.status.uin, "status,%ld,%s,%ld,%s\n", e->event.status.uin, u->display, time(NULL), "notavail");
-		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin, NULL);
+			    	log(e->event.status.uin, "status,%ld,%s,%ld,%s\n", e->event.status.uin, u->display, time(NULL), "notavail");
+		    	event_check(EVENT_NOT_AVAIL, e->event.status.uin, NULL);
 			print("status_not_avail", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
 		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL_DESCR)
 		{
                         if (config_log_status)
-			    	put_log(e->event.status.uin, "status,%ld,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, time(NULL), "notavail", u->descr);
-		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin, NULL);
+			    	log(e->event.status.uin, "status,%ld,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, time(NULL), "notavail", u->descr);
+		    	event_check(EVENT_NOT_AVAIL, e->event.status.uin, NULL);
 			print("status_not_avail_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		}
 	}
@@ -837,7 +837,7 @@ void handle_dcc(struct gg_dcc *d)
 	struct list *l;
 	char *p;
 
-	check_event(EVENT_DCC, d->peer_uin, NULL);
+	event_check(EVENT_DCC, d->peer_uin, NULL);
 	
 	if (!(e = gg_dcc_watch_fd(d))) {
 		print("dcc_error", strerror(errno));

@@ -39,4 +39,4 @@ void handle_userlist(struct gg_http *s);
 
 void handle_disconnect(struct gg_event *e);
 
-#endif
+#endif /* __EVENTS_H */

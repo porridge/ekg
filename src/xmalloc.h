@@ -26,4 +26,4 @@ void xfree(void *ptr);
 void *xrealloc(void *ptr, int size);
 char *xstrdup(const char *s);
 
-#endif
+#endif /* __XMALLOC_H */

@@ -91,7 +91,7 @@ void variable_init()
  *
  * - name.
  */
-struct variable *variable_find(char *name)
+struct variable *variable_find(const char *name)
 {
 	struct list *l;
 
@@ -121,7 +121,7 @@ struct variable *variable_find(char *name)
  *
  * zwraca 0 je¶li siê uda³o, je¶li nie to -1.
  */
-int variable_add(char *name, int type, int display, void *ptr, void (*notify)(char*))
+int variable_add(const char *name, int type, int display, void *ptr, void (*notify)(const char*))
 {
 	struct variable v;
 
@@ -145,7 +145,7 @@ int variable_add(char *name, int type, int display, void *ptr, void (*notify)(ch
  *  - value,
  *  - allow_foreign - czy ma pozwalaæ dopisywaæ obce zmienne.
  */
-int variable_set(char *name, char *value, int allow_foreign)
+int variable_set(const char *name, const char *value, int allow_foreign)
 {
 	struct variable *v = variable_find(name);
 
@@ -160,7 +160,7 @@ int variable_set(char *name, char *value, int allow_foreign)
 	switch (v->type) {
 		case VAR_INT:
 		{
-			char *p = value;
+			const char *p = value;
 
 			if (!value)
 				return -2;

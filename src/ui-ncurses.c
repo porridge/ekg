@@ -165,6 +165,9 @@ void ui_ncurses_init()
 
 static void ui_ncurses_deinit()
 {
+	werase(input);
+	wnoutrefresh(input);
+	doupdate();
 	endwin();
 }
 
@@ -197,7 +200,7 @@ static void ui_ncurses_loop()
 				if (send_nicks_count > 0) {
 					snprintf(line, sizeof(line), "chat %s ", send_nicks[send_nicks_index++]);
 					if (send_nicks_index >= send_nicks_count)
-						send_nicks_count = 0;
+						send_nicks_index = 0;
 				}
 				break;
 			case KEY_LEFT:

@@ -284,13 +284,10 @@ COMMAND(command_away)
 	if (!strcasecmp(name, "away")) {
 	    	if (!params[0]) {
 		    	if (config_random_reason & 1) {
-			    	char *path = prepare_path("away.reasons");
-
-				reason = get_random_reason(path);
+				reason = random_line(prepare_path("away.reasons", 0));
 				if (!reason && config_away_reason)
 				    	reason = xstrdup(config_away_reason);
-			}
-			else if (config_away_reason)
+			} else if (config_away_reason)
 			    	reason = xstrdup(config_away_reason);
 		}
 		else
@@ -301,13 +298,10 @@ COMMAND(command_away)
 	} else if (!strcasecmp(name, "invisible")) {
 	    	if (!params[0]) {
 		    	if (config_random_reason & 8) {
-			    	char *path = prepare_path("quit.reasons");
-
-				reason = get_random_reason(path);
+				reason = random_line(prepare_path("quit.reasons", 0));
 				if (!reason && config_quit_reason)
 				    	reason = xstrdup(config_quit_reason);
-			}
-			else if (config_quit_reason)
+			} else if (config_quit_reason)
 			    	reason = xstrdup(config_quit_reason);
 		}
 		else
@@ -318,9 +312,7 @@ COMMAND(command_away)
 	} else if (!strcasecmp(name, "back")) {
 	    	if (!params[0]) {
 		    	if (config_random_reason & 4) {
-			    	char *path = prepare_path("back.reasons");
-
-				reason = get_random_reason(path);
+			    	reason = random_line(prepare_path("back.reasons", 0));
 				if (!reason && config_back_reason)
 				    	reason = xstrdup(config_back_reason);
 			}
@@ -432,11 +424,9 @@ COMMAND(command_connect)
 
 		if (!params || !params[0]) {
 		    	if (config_random_reason & 2) {
-			    	char *path = prepare_path("quit.reasons");
-
-				tmp = get_random_reason(path);
+				tmp = random_line(prepare_path("quit.reasons", 0));
 				if (!tmp && config_quit_reason)
-				    	tmp = xstrdup(config_quit_reason);
+					tmp = xstrdup(config_quit_reason);
 			}
 			else if (config_quit_reason)
 			    tmp = xstrdup(config_quit_reason);
@@ -465,7 +455,7 @@ COMMAND(command_del)
 {
 	struct userlist *u;
 	uin_t uin;
-	char *tmp;
+	const char *tmp;
 
 	if (!params[0]) {
 		print("not_enough_params");
@@ -499,7 +489,7 @@ COMMAND(command_exec)
 			execl("/bin/sh", "sh", "-c", params[0], NULL);
 			exit(1);
 		}
-		add_process(pid, params[0]);
+		process_add(pid, params[0]);
 	} else {
 		for (l = children; l; l = l->next) {
 			struct process *p = l->data;
@@ -1075,7 +1065,7 @@ COMMAND(command_msg)
 		
 	        u = userlist_find(uin, NULL);
 
-		put_log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), params[1]);
+		log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), params[1]);
 
 		gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
 	}
@@ -1237,9 +1227,7 @@ COMMAND(command_quit)
 
 	if (!params[0]) {
 	    	if (config_random_reason & 2) {
-		    	char *path = prepare_path("quit.reasons");
-
-			tmp = get_random_reason(path);
+			tmp = random_line(prepare_path("quit.reasons", 0));
 			if (!tmp && config_quit_reason)
 			    	tmp = xstrdup(config_quit_reason);
 		}
@@ -1879,7 +1867,7 @@ COMMAND(command_on)
                 for (l = events; l; l = l->next) {
                         struct event *ev = l->data;
 
-                        print("events_list", format_events(ev->flags), (ev->uin == 1) ? "*" : format_user(ev->uin), ev->action);
+                        print("events_list", event_format(ev->flags), (ev->uin == 1) ? "*" : format_user(ev->uin), ev->action);
                         count++;
                 }
 
@@ -1894,7 +1882,7 @@ COMMAND(command_on)
                 return 0;
         }
 
-        if (!(flags = get_flags(params[0]))) {
+        if (!(flags = event_flags(params[0]))) {
                 print("events_incorrect");
                 return 0;
         }
@@ -1910,16 +1898,17 @@ COMMAND(command_on)
         }
 
         if (!strncasecmp(params[2], "clear", 5)) {
-                del_event(flags, uin);
+                event_remove(flags, uin);
                 config_changed = 1;
                 return 0;
         }
 
-        if (correct_event(params[2]))
+        if (event_correct(params[2]))
                 return 0;
 
-        add_event(flags, uin, params[2], 0);
+	event_add(flags, uin, params[2], 0);
         config_changed = 1;
+
         return 0;
 }
 
@@ -2038,13 +2027,13 @@ int old_execute(char *target, char *line)
  */
 int binding_quick_list(int a, int b)
 {
-	String list = string_init(NULL);
-	List l;
+	string_t list = string_init(NULL);
+	list_t l;
 
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
-		char *tmp;
 		const char *format = NULL;
+		char *tmp;
 		
 		switch (u->status) {
 			case GG_STATUS_AVAIL:

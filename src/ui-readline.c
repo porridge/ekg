@@ -574,6 +574,8 @@ void ui_readline_loop()
 			line = string_free(s, 0);
 		}
 
+		add_history(line);
+		
 		pager_lines = 0;
 		
 		if (ekg_execute(query_nick, line)) {
