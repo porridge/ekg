@@ -201,7 +201,7 @@ int variable_add(const char *name, int type, int display, void *ptr, void (*noti
 	v.notify = notify;
 	v.map = map;
 
-	return (list_add(&variables, &v, sizeof(v)) != NULL);
+	return (list_add(&variables, &v, sizeof(v)) != NULL) ? 0 : -1;
 }
 
 /*

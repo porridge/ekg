@@ -1022,8 +1022,7 @@ COMMAND(cmd_ignore)
 COMMAND(cmd_list)
 {
 	list_t l;
-	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, j, p;
-	int show_descr=0;
+	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, show_descr = 0, j, p;
 	char *tmp, **argv = NULL;
 
 	if (params[0] && *params[0] != '-') {
@@ -1117,7 +1116,7 @@ COMMAND(cmd_list)
 		return;
 	}
 
-	/* list --active | --busy | --inactive | --invisible */
+	/* list --active | --busy | --inactive | --invisible | --description */
 	for (j = 0; params[j]; j++) {
 		int i;
 
@@ -3129,7 +3128,7 @@ void command_init()
 	( "list", "u?", cmd_list, 0,
           " [alias|opcje]", "zarz±dzanie list± kontaktów",
 	  "\n"
-	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i]\":\n"
+	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i|-d]\":\n"
 	  "  -a, --active       dostêpne\n"
 	  "  -b, --busy         zajête\n"
 	  "  -i, --inactive     niedostêpne\n"
