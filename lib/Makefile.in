@@ -38,7 +38,7 @@ clean:
 	rm -f *.o *.lo *.a *.so *.so.* *~ core .depend
 
 distclean:	clean
-	rm -f Makefile libgadu-config.h libgadu.pc
+	rm -f Makefile libgadu-config.h libgadu-stdint.h libgadu.pc
 
 #
 
@@ -75,6 +75,7 @@ install-common:
 	$(INSTALL) -d $(DESTDIR)$(includedir)
 	$(INSTALL) -m 644 libgadu.h $(DESTDIR)$(includedir)
 	$(INSTALL) -m 644 libgadu-config.h $(DESTDIR)$(includedir)
+	if test -f libgadu-stdint.h; then $(INSTALL) -m 644 libgadu-stdint.h $(DESTDIR)$(includedir); fi
 	$(INSTALL) -d $(DESTDIR)$(libdir)
 	$(INSTALL) -d $(DESTDIR)$(libdir)/pkgconfig
 	$(INSTALL) -m 644 libgadu.pc $(DESTDIR)$(libdir)/pkgconfig

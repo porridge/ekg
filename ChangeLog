@@ -17,6 +17,8 @@ zg³osi³ b³±d.
 - kosmetyka opisów niektórych komend w /help (sz)
 - mo¿na wyciszyæ za pomoc± ^ komendê ,,exec'' (sz)
 - poprawki komendy ,,exec'', ¿eby nie psu³a escapowania (w)
+- libgadu: zapisywanie wykrytych includów z uintXX_t do libgadu-config.h
+  (adrians/w)
 
 // 2003-01-27
 

@@ -80,6 +80,14 @@ AC_TRY_RUN([
   mv -f lib/libgadu-config.h- lib/libgadu-config.h
 ])
 
+if test "x$STDINT_H" = "x"; then
+  cp stdint.h lib/libgadu-stdint.h
+  STDINT_H=libgadu-stdint.h 
+fi
+
+sed "s/#include <stdint.h>/#include <$STDINT_H>/" < lib/libgadu-config.h > lib/libgadu-config.h-
+mv -f lib/libgadu-config.h- lib/libgadu-config.h
+
 # najpierw sprawdzamy te opcje, które s± wspólne dla libgadu i ekg.
 
 AC_ARG_ENABLE(debug, 

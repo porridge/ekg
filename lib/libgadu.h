@@ -34,7 +34,6 @@ extern "C" {
 
 #include <libgadu-config.h>
 #include <sys/types.h>
-#include <stdint.h>
 
 /*
  * uin_t
