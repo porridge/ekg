@@ -679,7 +679,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 	struct status_table *s;
 	int prev_status, hide = 0;
 	int ignore_status, ignore_status_descr, ignore_events, ignore_notify;
-	char *descr = NULL;
+	unsigned char *descr = NULL;
 #ifdef WITH_PYTHON
 	list_t l;
 #endif
@@ -717,7 +717,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 		}
 
 		if (res && PyTuple_Check(res)) {
-			char *newnick, *newdescr;
+			unsigned char *newnick, *newdescr;
 
 			if (PyArg_ParseTuple(res, "isis", &uin, &newnick, &status, &newdescr)) {
 				descr = xstrdup(newdescr);
@@ -756,7 +756,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 		descr = xstrdup("");
 
 	if (descr) {
-		char *tmp;
+		unsigned char *tmp;
 
 		for (tmp = descr; *tmp; tmp++) {
 			if (*tmp == 13 || *tmp == 10 || *tmp == 9)
