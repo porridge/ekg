@@ -1776,7 +1776,7 @@ static void update_statusbar(int commit)
 	__add_format("window", window_current->id, itoa(window_current->id));
 	__add_format("uin", config_uin, itoa(config_uin));
 	__add_format("nick", (u && u->display), u->display);
-	__add_format("query", window_current->id, window_current->target);
+	__add_format("query", window_current->target, window_current->target);
 	__add_format("descr", 1, config_reason);
 	__add_format("mail", (config_check_mail && mail_count), itoa(mail_count));
 	{
@@ -1811,7 +1811,7 @@ static void update_statusbar(int commit)
 	__add_format("notavail", (!sess || sess->state != GG_STATE_CONNECTED), "");
 	__add_format("more", (window_current->more), "");
 
-	__add_format("query_descr", (q), q->descr);
+	__add_format("query_descr", (q && GG_S_D(q->status)), q->descr);
 	__add_format("query_away", (q && GG_S_B(q->status)), "");
 	__add_format("query_busy", (q && GG_S_B(q->status)), "");
 	__add_format("query_avail", (q && GG_S_A(q->status)), "");
@@ -3885,24 +3885,6 @@ static int ui_ncurses_event(const char *event, ...)
 		int quiet = va_arg(ap, int);
 		char *command = va_arg(ap, char*);
 
-		if (!strcasecmp(command, "add")) {
-			char *p = va_arg(ap, char *);
-
-			if (window_current->target && window_current->id > 1) {
-				struct userlist *u = userlist_find(0, window_current->target);
-
-				if (!u) {
-					char *tmp = saprintf("/add %s %s", window_current->target, p);
-					command_exec(window_current->target, tmp, quiet);
-					xfree(tmp);
-				} else
-					printq("user_exists", format_user(u->uin));
-			} else
-				printq("not_enough_params", "add");
-
-			goto cleanup;
-		}
-
 		if (!strcasecmp(command, "bind")) {
 			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*), *p3 = va_arg(ap, char*);
 
@@ -3961,8 +3943,6 @@ static int ui_ncurses_event(const char *event, ...)
 
 			if (window_current->target)
 				*param = get_uin(window_current->target);
-			else
-				*param = 0;
 
 			goto cleanup;
 		}

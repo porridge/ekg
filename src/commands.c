@@ -197,24 +197,22 @@ COMMAND(cmd_cleartab)
 COMMAND(cmd_add)
 {
 	int params_free = 0, result = 0;
-	struct userlist *u;
+	struct userlist *u = NULL;
 	uin_t uin = 0;
 
-	if (params[0] && !xisdigit(params[0][0]) && !match_arg(params[0], 'f', "find", 2)) {
-		ui_event("command", quiet, "add", params[0], NULL);
+	ui_event("command", quiet, "query-current", &uin, NULL);
 
-		if (params[1]) {
-			const char *name = params[0], *s1 = params[1], *s2 = params[2];
-			params_free = 1;
-			params = xmalloc(4 * sizeof(char *));
-			params[0] = NULL;
-			params[1] = name;
+	if (params[0] && strcmp(params[0], "$") && uin && !userlist_find(uin, NULL)) {
+		const char *name = params[0], *s1 = params[1], *s2 = params[2];
+		params_free = 1;
+		params = xmalloc(4 * sizeof(char *));
+		params[0] = itoa(uin);
+		params[1] = name;
+		if (s1)
 			params[2] = saprintf("%s %s", s1, ((s2) ? s2 : ""));
-			params[3] = NULL;
-			goto modify;
-		}
-
-		return 0;
+		else
+			params[2] = NULL;
+		params[3] = NULL;
 	}
 
 	if (params[0] && match_arg(params[0], 'f', "find", 2)) {
@@ -254,7 +252,7 @@ COMMAND(cmd_add)
 	}
 
 	if (!strcmp(params[0], "$"))
-		uin = get_uin(params[0]);
+		uin = get_uin(params[0]);	
 
 	if (!uin && !(uin = str_to_uin(params[0]))) {
 		printq("invalid_uin");
@@ -292,7 +290,6 @@ COMMAND(cmd_add)
 		ui_event("userlist_changed", itoa(uin), params[1], NULL);
 	}
 
-modify:
 	if (params[2])
 		cmd_modify("add", &params[1], NULL, quiet);
 
@@ -3481,6 +3478,7 @@ COMMAND(cmd_on)
 		int flags, res;
 		struct userlist *u = NULL;
 		const char *t = params[2];
+		uin_t uin = 0;
 		
 		if (!params[1] || !params[2] || !params[3]) {
 			printq("not_enough_params", name);
@@ -3492,13 +3490,17 @@ COMMAND(cmd_on)
 			return -1;
 		}
 
-		if (!(u = userlist_find(get_uin(params[2]), NULL)) && strcmp(params[2], "*") && params[2][0] != '@') {
+		if (!(uin = get_uin(params[2])) && strcmp(params[2], "*") && params[2][0] != '@') {
 			printq("user_not_found", params[2]);
 			return -1;
 		}
 
-		if (u)
-			t = ((u->display) ? u->display : itoa(u->uin));
+		if (uin) {
+			if ((u = userlist_find(uin, NULL)) && u->display)
+				t = u->display;
+			else
+				t = itoa(uin);
+		}
 
 		if (!(res = event_add(flags, t, params[3], quiet)))
 			config_changed = 1;

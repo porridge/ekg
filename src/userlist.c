@@ -711,8 +711,10 @@ int ignored_remove(uin_t uin)
 		list_remove(&u->groups, g, 1);
 	}
 
-	if (!u->display && !u->groups)
+	if (!u->display && !u->groups) {
 		userlist_remove(u);
+		return 0;
+	}
 
 	if (sess && (level & IGNORE_STATUS || level & IGNORE_STATUS_DESCR)) {
 		gg_remove_notify_ex(sess, u->uin, userlist_type(u));
