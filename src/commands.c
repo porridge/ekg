@@ -5516,23 +5516,8 @@ COMMAND(cmd_queue)
  * jest po³±czony */
 COMMAND(cmd_check_conn)
 {
-	#define SIZE 20
 	uin_t uin;
 	const char *par;
-
-	struct gg_msg_richtext_format_img {
-		struct gg_msg_richtext rt;
-		struct gg_msg_richtext_format f;
-		struct gg_msg_richtext_image image;
-	} msg;
-
-	msg.rt.flag = 2;
-	msg.rt.length = 13;
-	msg.f.position = 0;
-	msg.f.font = 0x80;
-	msg.image.unknown1 = 0x0109;
-	msg.image.size = SIZE;
-	msg.image.crc32 = GG_CRC32_INVISIBLE; 
 
 	if (!params[0] && !target) {
 		printq("not_enough_params", name);
@@ -5551,12 +5536,7 @@ COMMAND(cmd_check_conn)
 		return -1;
 	}
 
-	if (gg_send_message_richtext(sess, GG_CLASS_MSG, uin , "", (const char *) &msg, sizeof(msg)) == -1) {
-		gg_debug(GG_DEBUG_MISC,"-- check_conn - shits happens\n");
-		return -1;
-	}
-
-	return 0;
+	return gg_image_request(sess, uin, 1, GG_CRC32_INVISIBLE);
 }
 
 /*
@@ -5804,14 +5784,13 @@ void command_init()
 	command_add
 	( "check_conn", "u?", cmd_check_conn, 0,
 	  " <numer/alias>", "sprawdza czy podany u¿ytkownik jest po³±czony z serwerem",
-	  "EKSPERYMENTALNE! Sprawdza czy podana osoba jest po³±czona. Klient tej osoby "
+	  "EKSPERYMENTALNE! Sprawdza, czy podana osoba jest po³±czona. Klient tej osoby "
 	  "musi obs³ugiwaæ obrazki. Przetestowane na GG 6.0 dla Windows. W przypadku "
-	  "klienta TLEN, kadu, ekg i ekg2 komenda nie dzia³a prawid³owo (osobie "
+	  "klienta TLEN, kadu, ekg i ekg2 komenda nie dzia³a prawid³owo (osobie, "
 	  "któr± sprawdzamy pojawia siê pusta wiadomo¶æ). Dziêki tej funkcji "
 	  "mo¿na sprawdziæ czy osoba, któr± widzimy jako niedostêpna jest "
 	  "niewidoczna. Je¿eli brak aliasu jako parametr sprawdzana jest osoba, "
-	  "z któr± rozmowa znajdujê siê w aktualnym okienku ");
- 
+	  "z któr± rozmowa znajdujê siê w aktualnym okienku.");
           
 	command_add
 	( "cleartab", "?", cmd_cleartab, 0,
@@ -6061,7 +6040,7 @@ void command_init()
 	( "passwd", "??", cmd_passwd, 0,
 	  " <has³o> <token>", "zmienia has³o u¿ytkownika",
 	  "\n"
-	  "Przed rejestracj± nale¿y pobraæ token komend± %Ttoken%n. Niezbêdne "
+	  "Przed zmian± has³a nale¿y pobraæ token komend± %Ttoken%n. Niezbêdne "
 	  "jest ustawienie zmiennej %Temail%n.");
 
 	command_add
