@@ -333,11 +333,10 @@ int alias_remove(const char *name, int quiet)
 	}
 
 	if (!removed) {
-		if (name) {
+		if (name)
 			printq("aliases_noexist", name);
-		} else {
+		else
 			printq("aliases_list_empty");
-		}
 
 		return -1;
 	}
@@ -931,11 +930,10 @@ int conference_remove(const char *name, int quiet)
 	}
 
 	if (!removed) {
-		if (name) {
+		if (name)
 			printq("conferences_noexist", name);
-		} else {
+		else
 			printq("conferences_list_empty");
-		}
 		
 		return -1;
 	}
@@ -1395,11 +1393,10 @@ int event_remove(const char *name, int quiet)
 	}
 
 	if (!removed) {
-		if (remove_all) {
+		if (remove_all)
 			printq("events_list_empty");
-		} else {
+		else
         		printq("events_del_noexist", name);
-		}
 
         	return -1;
 	} else {

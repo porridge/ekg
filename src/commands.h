@@ -23,7 +23,7 @@
 
 #include "dynstuff.h"
 
-#define printq(x...) { if (!quiet) { print(x); } }
+#define printq(x...) do { if (!quiet) { print(x); } } while(0)
 
 #define COMMAND(x) int x(const char *name, const char **params, const char *target, int quiet)
 typedef COMMAND(command_func_t);

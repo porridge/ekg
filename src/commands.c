@@ -443,7 +443,7 @@ COMMAND(cmd_away)
 			return 0;
 		}
 
-		printq((tmp) ? "private_mode_on" : "private_mode_off");
+		printq(((tmp) ? "private_mode_on" : "private_mode_off"));
 		ui_event("my_status", "private", ((tmp) ? "on" : "off"), NULL);
 
 		config_status = GG_S(config_status);
@@ -475,15 +475,13 @@ COMMAND(cmd_status)
 	int mqc, now_days;
 	char *tmp, *priv, *r1, *r2, buf[100], buf1[100];
 
-	if (config_profile) {
+	if (config_profile)
 		printq("show_status_profile", config_profile);
-	}
 
-	if ((u = userlist_find(config_uin, NULL)) && u->display) {
+	if ((u = userlist_find(config_uin, NULL)) && u->display)
 		printq("show_status_uin_nick", itoa(config_uin), u->display);
-	} else {
+	else
 		printq("show_status_uin", itoa(config_uin));
-	}
 
 	n = time(NULL);
 	t = localtime(&n);
@@ -1576,11 +1574,12 @@ COMMAND(cmd_list)
 			}
 			
 			__group = saprintf("%s%s", (invert) ? "!" : "", group + 1);
-			if (count) {
+
+			if (count)
 				printq("group_members", __group, members->str);
-			} else {
+			else
 				printq("group_empty", __group);
-			}
+
 			xfree(__group);
 
 			string_free(members, 1);
@@ -2013,9 +2012,8 @@ COMMAND(cmd_msg)
 	}
 
 	/* XXX dla szyfrowanych */
-	if (strlen(params[1]) > 1989) {
+	if (strlen(params[1]) > 1989)
 		printq("message_too_long");
-	}
 	
 	msg = xstrmid(params[1], 0, 1989);
 
@@ -2948,11 +2946,10 @@ COMMAND(cmd_key)
 
 		tmp = saprintf("%s/%d.pem", prepare_path("keys", 0), uin);
 		
-		if (unlink(tmp)) {
+		if (unlink(tmp))
 			printq("key_public_not_found", format_user(uin));
-		} else {
+		else
 			printq("key_public_deleted", format_user(uin));
-		}
 		
 		xfree(tmp);
 
@@ -4116,17 +4113,16 @@ COMMAND(cmd_at)
 			ret = timer_remove(params[1], 1, NULL);
 		
 		if (!ret) {
-			if (del_all) {
+			if (del_all)
 				printq("at_deleted_all");
-			} else {
+			else
 				printq("at_deleted", params[1]);
-			}
 			
 			config_changed = 1;
 		} else {
-			if (del_all) {
+			if (del_all)
 				printq("at_empty");
-			} else {
+			else {
 				printq("at_noexist", params[1]);
 				return -1;
 			}
@@ -4361,17 +4357,16 @@ COMMAND(cmd_timer)
 			ret = timer_remove(params[1], 0, NULL);
 		
 		if (!ret) {
-			if (del_all) {
+			if (del_all)
 				printq("timer_deleted_all");
-			} else {
+			else
 				printq("timer_deleted", params[1]);
-			}
 
 			config_changed = 1;
 		} else {
-			if (del_all) {
+			if (del_all)
 				printq("timer_empty");
-			} else {
+			else {
 				printq("timer_noexist", params[1]);
 				return -1;	
 			}

@@ -3907,14 +3907,14 @@ static int ui_ncurses_event(const char *event, ...)
 			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*), *p3 = va_arg(ap, char*);
 
 			if (match_arg(p1, 'a', "add", 2)) {
-				if (!p2 || !p3) {
+				if (!p2 || !p3)
 					printq("not_enough_params", "bind");
-				} else
+				else
 					binding_add(p2, p3, 0, quiet);
 			} else if (match_arg(p1, 'd', "delete", 2)) {
-				if (!p2) {
+				if (!p2)
 					printq("not_enough_params", "bind");
-				} else
+				else
 					binding_delete(p2, quiet);
 			} else if (match_arg(p1, 'L', "list-default", 5)) {
 				binding_list(quiet, p2, 1);
