@@ -1266,10 +1266,18 @@ void handle_userlist(struct gg_http *h)
 	print((h->data) ? format_ok : format_error);
 		
 	if (h->type == GG_SESSION_USERLIST_GET && h->data) {
+		list_t l;
+
+		for (l = userlist; l; l = l->next) {
+			struct userlist *u = l->data;
+			gg_remove_notify(sess, u->uin);
+		}
+
 		cp_to_iso(h->data);
 		userlist_set(h->data, (h->user_data) ? 1 : 0);
 		userlist_send();
 		config_changed = 1;
+		update_status();
 	}
 
 	list_remove(&watches, h, 0);
