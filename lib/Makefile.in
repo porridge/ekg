@@ -9,27 +9,49 @@ AR = @AR@
 INSTALL = @INSTALL@
 RANLIB = @RANLIB@
 
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+libdir = @libdir@
+
 OBJS = common.o libgadu.o search.o pubdir.o http.o dcc.o userlist.o events.o
 
 SHARED = libgadu.so.0.9.0
 STATIC = libgadu.a
 
-all:	static @shared@
+all:	@static@ @shared@
 
-distclean:	clean
-	rm -f *~ Makefile
+#
 
 clean:
-	rm -f *.o libgadu.so* libgadu.a
+	rm -f *.o *~ core $(STATIC) $(SHARED)
 
-shared:	$(SHARED)
+distclean:	clean
+	rm -f Makefile
 
-$(SHARED):	$(OBJS)
-	$(CC) -g -shared -Wl,-soname,libgadu.so -o $(SHARED) $(OBJS) $(LIBS) -lc
+#
 
 static: $(STATIC)
 
-libgadu.a:	$(OBJS)
+$(STATIC): $(OBJS)
 	$(AR) r $(STATIC) $(OBJS) 
 	$(RANLIB) $(STATIC)
 
+#
+
+shared:	$(SHARED)
+
+$(SHARED): $(OBJS)
+	$(CC) -g -shared -Wl,-soname,libgadu.so -o $(SHARED) $(OBJS) $(LIBS) -lc
+
+#
+
+install: @install_shared@ @install_static@
+
+install-shared:
+	$(INSTALL) -d $(libdir)
+	$(INSTALL) -m 755 $(SHARED) $(libdir)
+
+install-static:
+	$(INSTALL) -d $(libdir)
+	$(INSTALL) -m 755 $(STATIC) $(libdir)
+	

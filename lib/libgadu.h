@@ -511,6 +511,7 @@ extern unsigned long gg_dcc_ip;
 int gg_dcc_request(struct gg_session *sess, uin_t uin);
 
 struct gg_dcc *gg_dcc_send_file(unsigned long ip, unsigned short port, uin_t my_uin, uin_t peer_uin);
+struct gg_dcc *gg_dcc_get_file(unsigned long ip, unsigned short port, uin_t my_uin, uin_t peer_uin);
 int gg_dcc_fill_file_info(struct gg_dcc *d, const char *filename);
 
 struct gg_dcc *gg_dcc_socket_create(uin_t uin, unsigned int port);

@@ -60,7 +60,7 @@ dnl	CFLAGS=${CFLAGS--O}
 	AC_SUBST(READLINE_INCLUDES)
 
 	AC_ARG_WITH(readline,
-	  [  --with-readline[=dir]   Compile with readline/locate base dir],
+	  [[  --with-readline[=dir]   Compile with readline/locate base dir]],
 	  if test "x$withval" = "xno" ; then
 		search_readline=false
 	  elif test "x$withval" != "xyes" ; then

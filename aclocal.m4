@@ -133,7 +133,7 @@ AC_DEFUN(AC_CHECK_CURSES,[
 	])
 
 	AC_ARG_WITH(vcurses,
-	  [  --with-vcurses[=incdir] Used to force SysV curses],
+	  [[  --with-vcurses[=incdir] Used to force SysV curses]],
 	  if test x$withval != xyes; then
 		CURSES_INCLUDEDIR="-I$withval"
 	  fi
@@ -141,7 +141,7 @@ AC_DEFUN(AC_CHECK_CURSES,[
 	)
 
 	AC_ARG_WITH(ncurses,
-	  [  --with-ncurses[=dir]    Compile with ncurses/locate base dir],
+	  [[  --with-ncurses[=dir]    Compile with ncurses/locate base dir]],
 	  if test x$withval = xno ; then
 		search_ncurses=false
 	  elif test x$withval != xyes ; then
@@ -384,7 +384,7 @@ dnl	CFLAGS=${CFLAGS--O}
 	AC_SUBST(READLINE_INCLUDES)
 
 	AC_ARG_WITH(readline,
-	  [  --with-readline[=dir]   Compile with readline/locate base dir],
+	  [[  --with-readline[=dir]   Compile with readline/locate base dir]],
 	  if test "x$withval" = "xno" ; then
 		search_readline=false
 	  elif test "x$withval" != "xyes" ; then
