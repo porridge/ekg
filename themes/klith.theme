@@ -39,12 +39,12 @@ search_falied %! zonk podczas szukania: %1\n
 search_not_found %! nic nie znalazlem..\n
 
 list_empty %> nikt Cie nie kocha..\n
-list_avail %G*%n %[12]1 %G*%n %[15]3 %[-4]4 %G*%n\n
-list_busy %g/%n %[12]1 %g/%n %[15]3 %[-4]4 %g/%n\n
-list_busy_descr %g/%n %[12]1 %g/%n %[15]3 %[-4]4 %g/%n %5\n
+list_avail %G*%n %[12]1 %G*%n %[15]2 %[-4]3 %G*%n\n
+list_busy %g/%n %[12]1 %g/%n %[15]2 %[-4]3 %g/%n\n
+list_busy_descr %g/%n %[12]1 %g/%n %[15]2 %[-4]3 %g/%n %4\n
 list_not_avail %r!%n %[12]1 %r!%n\n
-list_not_avail_descr %r!%n %[12]1 %r!%n %[15]3 %[-4]4 %r!%n %5\n
-list_invisible %c:%n %[12]1 %c:%n %[15]3 %[-4]4 %c:%n\n
+list_not_avail_descr %r!%n %[12]1 %r!%n %[15]2 %[-4]3 %r!%n %4\n
+list_invisible %c:%n %[12]1 %c:%n %[15]2 %[-4]3 %c:%n\n
 
 away %# %> status: %g/ %Wzajêty%n\n
 back %# %> status: %G* %Wdla ludu!%n\n
@@ -52,11 +52,12 @@ invisible %# %> status: %c: %Wchowamy siê!?%n\n
 auto_away %# %> *auto-away* po %W%1%n\n
 
 status_avail %# %> %[10]1 %G*%n %Wdla ludu!%n\n
-status_busy %# %> %[10]1 %g/ %Wzajêty%g /%n\n
-status_busy_descr %# %> %[10]1 %g/ %Wzajêty%n: %2 %g/%n\n
+status_avail_descr %# %> %[10]1 %G*%n %Wdla ludu%n: %3\n
+status_busy %# %> %[10]1 %g/ %Wzajêt%@2%g /%n\n
+status_busy_descr %# %> %[10]1 %g/ %Wzajêt%@2%n: %3 %g/%n\n
 status_not_avail %# %> %[10]1 %R! %Wzdech³ pies%n\n
-status_not_avail_descr %# %> %[10]1 %R! %WR.I.P.%n: %2\n
-status_invisible %# %> %[10]1 %c: %Wniewidoczny%n\n
+status_not_avail_descr %# %> %[10]1 %R! %WR.I.P.%n: %3\n
+status_invisible %# %> %[10]1 %c: %Wniewidoczn%@2%n\n
 
 show_status %> status: %1\n
 show_status_avail %G*%n dla ludu!
