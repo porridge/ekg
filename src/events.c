@@ -916,7 +916,7 @@ static void handle_common(uin_t uin, int status, const char *idescr, int dtime, 
 				s.timeout = 10;
 				list_add(&spiedlist, &s, sizeof(s));
 
-				tmp  = saprintf("/check_conn %d", u->uin);
+				tmp = saprintf("/check_conn %d", u->uin);
 				command_exec(NULL, tmp, 1);
 				xfree(tmp);
 
@@ -1233,6 +1233,7 @@ void handle_failure(struct gg_event *e)
 void handle_success(struct gg_event *e)
 {
 	struct in_addr addr;
+	list_t l;
 
 	if (config_reason && GG_S_D(config_status)) {
 		char *r1, *r2;
@@ -1281,7 +1282,6 @@ void handle_success(struct gg_event *e)
 	/* ustawiamy swój status */
 	change_status(config_status, config_reason, 2);
 
-
 	update_status();
 	update_status_myip();
 
@@ -1289,6 +1289,16 @@ void handle_success(struct gg_event *e)
 
 	addr.s_addr = sess->server_addr;
 	event_check(EVENT_CONNECTED, 0, inet_ntoa(addr));
+
+	for (l = userlist; l; l = l->next) {
+		struct userlist *u = l->data;
+
+		if (group_member(u, "spied")) {
+			char *tmp = saprintf("/check_conn %d", u->uin);
+			command_exec(NULL, tmp, 1);
+			xfree(tmp);
+		}
+	}
 }
 
 /*

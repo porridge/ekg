@@ -5841,8 +5841,10 @@ void command_init()
 	  "\n"
 	  "Je¶li osoba nale¿y do grupy %Tspied%n, to w miarê mo¿liwo¶ci jej stan jest "
 	  "¶ledzony na bie¿±co. Aby w pe³ni umo¿liwiæ takie ¶ledzenie, nale¿y dodaæ timer, "
-	  "który np. co 30 sekund wywo³a polecenie %T_check_conn_update%n. Pamiêtaj, podgl±danie "
-	  "innych osób jest nieetyczne...");
+	  "który np. co 30 sekund wywo³a polecenie %T_check_conn_update%n. W przeciwnym razie, "
+	  "osoby wykryte jako niewidoczne, mog± mieæ nadal ustawiony taki stan na li¶cie kontaktów mimo, "
+	  "¿e w rzeczywisto¶ci przesz³y do stanu %Tniedostêpny%n. "
+	  "Pamiêtaj, podgl±danie innych osób jest nieetyczne...");
           
 	command_add
 	( "cleartab", "?", cmd_cleartab, 0,
