@@ -1132,11 +1132,6 @@ void sms_away_add(uin_t uin)
 	sa.uin = uin;
 	sa.count = 1;
 
-	if (!sms_away) {
-		list_add(&sms_away, &sa, sizeof(sa));
-		return;
-	}
-
 	for (l = sms_away; l; l = l->next) {
 		struct sms_away *s = l->data;
 
