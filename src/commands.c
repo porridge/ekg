@@ -5896,7 +5896,14 @@ void command_init()
 	  "pewien czas dokonywaæ rêcznego sprawdzania czy nasza wiedza o stanie niewidocznym danej osoby "
 	  "jest wci±¿ aktualna. Nale¿y wiêc dodaæ timer, który np. co 60 sekund wywo³a polecnie "
 	  "%Tcheck_conn -u%n. Mo¿na te¿ okresowo "
-	  "wykonywaæ polecenie %Tcheck_conn -s%n, aby poprawiæ skuteczno¶æ wykrywania niewidocznych. "
+	  "wykonywaæ polecenie %Tcheck_conn -s%n, aby poprawiæ skuteczno¶æ wykrywania niewidocznych.\n"
+	  "\n"
+	  "Opcja "
+	  "%T-s%n zak³ada, ¿e serwer prawid³owo zakolejkuje wiadomo¶æ dla u¿ytkownika niedostêpnego i nie wysy³a "
+	  "wiêcej ni¿ jednej wiadomo¶ci testuj±cej w czasiê sesji po³±czenia z serwerem - czasami, ze wzglêdu na "
+	  "ró¿ne warunki (awarie serwerów, itp.) taka wiadomo¶æ przepada i danej osoby nie wykryjemy jako niewidocznej; "
+	  "nale¿y wtedy po³±czyæ siê ponownie z serwerem lub sprawdziæ dan± osobê rêcznie za pomoc± %Tcheck_conn%n. Takie "
+	  "zachowanie ma na celu unikniêcie zape³nienia skrzynek na zakolejkowane wiadomo¶ci ¶ledzonym u¿ytkownikom. "
 	  "Pamiêtaj, podgl±danie innych osób jest nieetyczne...");
           
 	command_add
