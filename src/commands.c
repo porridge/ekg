@@ -1022,7 +1022,7 @@ COMMAND(cmd_ignore)
 COMMAND(cmd_list)
 {
 	list_t l;
-	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, j;
+	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, j, p;
 	char *tmp, **argv = NULL;
 
 	if (params[0] && *params[0] != '-') {
@@ -1173,13 +1173,29 @@ COMMAND(cmd_list)
 			case GG_STATUS_INVISIBLE:
 				tmp = "list_invisible";
 				break;
-				
 		}
 
 		in.s_addr = u->ip.s_addr;
+		p = u->port;
+
+		if (u->uin == config_uin) {
+			if (!config_dcc || !config_dcc_ip) {
+				in.s_addr = inet_addr("0.0.0.0");
+				p = 0;
+			}
+
+			switch (config_status) {
+				case GG_STATUS_INVISIBLE:
+					tmp = "list_invisible";
+					break;
+				case GG_STATUS_INVISIBLE_DESCR:
+					tmp = "list_invisible_descr";
+					break;
+			}
+		}
 
 		if (show_all || (show_busy && (u->status == GG_STATUS_BUSY || u->status == GG_STATUS_BUSY_DESCR)) || (show_active && (u->status == GG_STATUS_AVAIL || u->status == GG_STATUS_AVAIL_DESCR)) || (show_inactive && (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)) || (show_invisible && (u->status == GG_STATUS_INVISIBLE))) {
-			print(tmp, format_user(u->uin), (u->first_name) ? u->first_name : u->display, inet_ntoa(in), itoa(u->port), u->descr);
+			print(tmp, format_user(u->uin), (u->first_name) ? u->first_name : u->display, inet_ntoa(in), itoa(p), u->descr);
 			count++;
 		}
 	}

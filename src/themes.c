@@ -778,6 +778,7 @@ void theme_init()
 	format_add("list_not_avail", "%> %1 %r(niedostêpn%@2)%n\n", 1);
 	format_add("list_not_avail_descr", "%> %1 %r(niedostêpn%@2: %n%5%r)%n\n", 1);
 	format_add("list_invisible", "%> %1 %c(niewidoczn%@2)%n %b%3:%4%n\n", 1);
+	format_add("list_invisible_descr", "%> %1 %c(niewidoczn%@2: %n%5%c)%n %b%3:%4%n\n", 1);
 	format_add("list_unknown", "%> %1\n", 1);
 	format_add("modify_done", "%> Zmieniono wpis w li¶cie kontaktów\n", 1);
 
