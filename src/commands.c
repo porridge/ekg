@@ -2886,14 +2886,13 @@ COMMAND(cmd_last)
         for (l = lasts; l; l = l->next) {
                 struct last *ll = l->data;
 		struct tm *tm, *st;
-		time_t t = time(NULL);
 		char buf[100], buf2[100];
 
 		if (uin == 0 || uin == ll->uin) {
 			tm = localtime(&ll->time);
 			strftime(buf, sizeof(buf), format_find("last_list_timestamp"), tm);
 
-			if (show_sent && ll->type == 0 && !(ll->sent_time - config_time_deviation <= t && t <= ll->sent_time + config_time_deviation)) {
+			if (show_sent && ll->type == 0 && !(ll->sent_time - config_time_deviation <= ll->time && ll->time <= ll->sent_time + config_time_deviation)) {
 				st = localtime(&ll->sent_time);
 				strftime(buf2, sizeof(buf2), format_find((ll->sent_time / 86400 == time(NULL) / 86400) ? "last_list_timestamp_today" : "last_list_timestamp"), st);
 
