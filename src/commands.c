@@ -3922,6 +3922,10 @@ COMMAND(cmd_query)
 	char **p = xcalloc(3, sizeof(char*));
 	int i, res = 0;
 
+	/* sprawdzamy czy wszystko jest wpisane okey */
+	if(!params[0] || (params[0][0] == '@' && !params[0][1]))
+		return -1;
+
 	for (i = 0; params[i]; i++)
 		p[i] = xstrdup(params[i]);
 
@@ -4251,7 +4255,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 			abbrs = 1;	
 			break;
 		}
-		if (!strncasecmp(c->name, cmd, strlen(cmd) + 1)) {
+		if (!strncasecmp(c->name, cmd, strlen(cmd))) {
 			abbrs++;
 			last_abbr = c->function;
 			last_name = c->name;
