@@ -12,6 +12,8 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawki niewidzialnych (klith/w)
 - pokazywane opisy przy ,,away'' i ,,quit'' (klith/w)
 - pager przy ,,help'' (wojboj/w)
+- zdarzenie ,,invisible'' dla komendy ,,on'' (d)
+- uaktualnienie docs/on.txt (d)
 
 // 2002-03-25
 
@@ -244,7 +246,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - dodana komenda ,,on'' (d)
 - dodany docs/on.txt (d)
-- dodany ioctl_daemon
+- dodany ioctl_daemon (d)
 - poprawka docs/ekl.pl (d)
 
 // 2002-01-29

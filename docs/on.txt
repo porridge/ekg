@@ -6,6 +6,7 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 		msg, chat - wiadomo¶æi od kogo¶;
 		avail - zmiana przez kogo¶ statusu na 'dostêpny';
 		away  -            -//-               'zajêty';
+		invisible -        -//-               'niewidoczny';
 		disconnect -       -//-	              'niedostêpny';
 		dcc - otrzymanie od kogo¶ dcc;
 		* - wszystkie zdadrzenia;

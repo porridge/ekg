@@ -3,6 +3,7 @@
 /*
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
+ *                          Pawe³ Maziarz <drg@o2.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -1005,6 +1006,8 @@ char *format_events(int flags)
 		strcat(buff, *buff ? "|chat" : "chat");
         if (flags & EVENT_AVAIL)
 		strcat(buff, *buff ? "|avail" : "avail");
+	if (flags & EVENT_INVISIBLE)
+	    	strcat(buff, *buff ? "|invisible" : "invisible");
         if (flags & EVENT_NOT_AVAIL)
 		strcat(buff, *buff ? "|disconnect" : "disconnect");
         if (flags & EVENT_AWAY)
@@ -1029,7 +1032,7 @@ int get_flags(char *events)
         int flags = 0;
 
         if (!strncasecmp(events, "*", 1))
-		return EVENT_MSG|EVENT_CHAT|EVENT_AVAIL|EVENT_NOT_AVAIL|EVENT_AWAY|EVENT_DCC;
+		return EVENT_MSG|EVENT_CHAT|EVENT_AVAIL|EVENT_NOT_AVAIL|EVENT_AWAY|EVENT_DCC|EVENT_INVISIBLE;
         if (strstr(events, "msg") || strstr(events, "MSG"))
 		flags |= EVENT_MSG;
         if (strstr(events, "chat") || strstr(events, "CHAT"))
@@ -1042,6 +1045,8 @@ int get_flags(char *events)
 		flags |= EVENT_AWAY;
         if (strstr(events, "dcc") || strstr(events, "DCC"))
 		flags |= EVENT_DCC;
+	if (strstr(events, "invisible") || strstr(events, "INVISIBLE"))
+	    	flags |= EVENT_INVISIBLE;
 
         return flags;
 }

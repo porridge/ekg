@@ -304,8 +304,10 @@ void handle_notify(struct gg_event *e)
 		} else if (n->status == GG_STATUS_BUSY) {
 			check_event(EVENT_AWAY, u->uin);
 			my_printf("status_busy", format_user(n->uin));
-		} else if (n->status == GG_STATUS_INVISIBLE) 
+		} else if (n->status == GG_STATUS_INVISIBLE) {
+		   	check_event(EVENT_INVISIBLE, u->uin); 
 			my_printf("status_invisible", format_user(n->uin));
+		}
 		
 		n++;
 	}
