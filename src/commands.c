@@ -1018,7 +1018,7 @@ COMMAND(cmd_msg)
 	struct userlist *u;
 	char **nicks, **p, *msg;
 	uin_t uin;
-	int chat = (!strcasecmp(name, "chat"));
+	int count, chat = (!strcasecmp(name, "chat"));
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		print("not_connected");
@@ -1030,6 +1030,7 @@ COMMAND(cmd_msg)
 		return 0;
 	}
 
+	count = array_count(nicks);
 	msg = xstrdup(params[1]);
 	iso_to_cp(msg);
 
@@ -1043,7 +1044,21 @@ COMMAND(cmd_msg)
 
 		log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), params[1]);
 
-		gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
+		if (!chat || count == 1)
+			gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
+	}
+
+	if (count > 1 && chat) {
+		uin_t *uins = xmalloc(count * sizeof(uin_t));
+		int realcount = 0;
+
+		for (p = nicks; *p; p++)
+			if ((uin = get_uin(*p)))
+				uins[realcount++] = uin;
+	
+		gg_send_message_confer(sess, GG_CLASS_CHAT, realcount, uins, msg);
+
+		xfree(uins);
 	}
 
 	add_send_nick(params[0]);
@@ -2297,7 +2312,9 @@ void command_init()
 	command_add
 	( "chat", "u?", cmd_msg, 0,
 	  " <numer/alias> <wiadomo¶æ>", "wysy³a wiadomo¶æ w ramach rozmowy",
-	  "");
+	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub\n"
+	  "pseudonimy przecinkiem (ale bez odstêpów). W takim wypadku\n"
+	  "zostanie rozpoczêta rozmowa grupowa.");
 	  
 	command_add
 	( "cleartab", "", cmd_cleartab, 0,
@@ -2420,7 +2437,8 @@ void command_init()
 	command_add
 	( "msg", "u?", cmd_msg, 0,
 	  " <numer/alias> <wiadomo¶æ>", "wysy³a wiadomo¶æ",
-	  "");
+	  "Mo¿na podaæ wiêksz± ilo¶æ odbiorców oddzielaj±c ich numery lub\n"
+	  "pseudonimy przecinkiem (ale bez odstêpów).");
 
 	command_add
         ( "on", "?u?", cmd_on, 0,
