@@ -23,7 +23,7 @@ AC_DEFUN(AC_CHECK_NCURSES,[
 		/usr/contrib/include:-L/usr/contrib/lib \
 		/usr/freeware/include:-L/usr/freeware/lib32 \
     		/sw/include:-L/sw/lib \
-    		/cw/include:-L/sw/lib; do
+    		/cw/include:-L/cw/lib; do
 	
       incl=`echo "$i" | sed 's/:.*//'`
       lib=`echo "$i" | sed 's/.*://'`

@@ -35,7 +35,7 @@ AC_DEFUN(AC_CHECK_PYTHON,[
 				/usr/freeware/include:-L/usr/freeware/lib32 \
 				/usr/pkg/include:-L/usr/pkg/lib \
 				/sw/include:-L/sw/lib \
-				/cw/include:-L/sw/lib; do
+				/cw/include:-L/cw/lib; do
 				
 				incl=`echo "$i" | sed 's/:.*//'`
 				lib=`echo "$i" | sed 's/.*://'`

@@ -10,6 +10,7 @@ libexecdir = @libexecdir@
 CC = @CC@ 
 CFLAGS = -I.. -I../lib @CFLAGS@ -Wall -DTHEMES_DIR=\"${datadir}/ekg/themes\"
 LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
 
 MAKE = @MAKE@
 AR = @AR@
@@ -23,7 +24,7 @@ OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o voice.o
 all:	ekg @ioctld@
 
 ekg:	$(OBJS)
-	$(CC) $(CFLAGS) -o ekg $(OBJS) -L../lib $(LDFLAGS) @lgadu@
+	$(CC) $(CFLAGS) -o ekg $(OBJS) -L../lib $(LDFLAGS) $(LIBS) @lgadu@
 
 ioctld:	ioctld.c
 	$(CC) $(CFLAGS) ioctld.c -o ioctld
