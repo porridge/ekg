@@ -6,7 +6,8 @@
                            Robert J. Wo¼ny <speedy@atman.pl>,
                            Tomasz Jarzynka <tomee@cpi.pl>,
                            Adam Ludwikowski <adam.ludwikowski@wp.pl>,
-                           Marek Kozina <klith@hybrid.art.pl>
+                           Marek Kozina <klith@hybrid.art.pl>,
+			   Rafa³ Florek <raf@regionet.regionet.pl>
 
 --- 0) disclaimer ---------------------------------------------------------
 
@@ -223,7 +224,21 @@ okienku czy jako kolejna linijka w okienku rozmowy. wygl±da na to,
 klienty wysy³aj± 0x04, czasem 0x24 -- widocznie 0x20 to te¿ jaka¶
 flaga). oryginalny klient wysy³aj±c wiadomo¶æ do kilku u¿ytkowników,
 wysy³a po prostu kilka takich samych pakietów z ró¿nymi numerkami
-odbiorców. nie ma osobnego pakietu do tego.
+odbiorców. nie ma osobnego pakietu do tego. natomiast je¶li chodzi
+o ,,konferencyjnê'' do pakietu doklejana jest za ,,char message[];''
+nastêpuj±ca struktura:
+	
+	struct gg_send_recipients {
+		char flag;		/* == 1 */
+		int count;		/* ilo¶æ odbiorców */
+		int recipients[];	/* tablica odbiorców */
+	};
+
+na przyk³ad, by wys³aæ do trzech ludzi, nale¿y wys³aæ pakiet:
+
+	- -- --- --+--+--+--+--+--+--+-----------+-----------+
+          tre¶æ    |\0|\1|    0x02   |    uin1   |   uin2    |
+	- -- -- ---+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
 
 serwer po otrzymaniu wiadomo¶ci odsy³a informacjê o tym. przy okazji
 mówi, czy wiadomo¶æ dotar³a do odbiorcy (status == GG_ACK_DELIVERED),
@@ -280,9 +295,11 @@ swój wk³ad w poznanie protoko³u mieli:
  - Tomasz Jarzynka <tomee@cpi.pl>:
    badanie timeoutów,
  - Adam Ludwikowski <adam.ludwikowski@wp.pl>:
-   wiele ró¿nych poprawek do tekstu, badanie wersji.
+   wiele ró¿nych poprawek do tekstu, badanie wersji,
  - Marek Kozina <klith@hybrid.art.pl>:
-   czas otrzymania wiadomo¶ci.
+   czas otrzymania wiadomo¶ci,
+ - Rafa³ Florek <raf@regionet.regionet.pl>:
+   konferencje.
 
 ----------------------------------------------------------------------------
 

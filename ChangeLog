@@ -14,6 +14,7 @@
 - bugfixy ,,find'', poprawnie akceptuje --male, --female, --active,
   dodana p³eæ do helpa (w)
 - jest zmienna ,,display_notify'' (w)
+- uaktualnione docs/protocol.txt, konferencje (w)
 - popsucie 10 innych rzeczy (w)
 
 // 2001-11-19 
