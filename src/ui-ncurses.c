@@ -1395,7 +1395,7 @@ static void update_statusbar(int commit)
 		__add_format("time", 1, tmp);
 	}
 
-	__add_format("window", 1, itoa(window_current->id));
+	__add_format("window", window_current->id, itoa(window_current->id));
 	__add_format("uin", config_uin, itoa(config_uin));
 	__add_format("nick", (u && u->display), u->display);
 	__add_format("query", window_current->id, window_current->target);
@@ -1425,6 +1425,7 @@ static void update_statusbar(int commit)
 		string_free(s, 1);
 	}
 	
+	__add_format("debug", (!window_current->id), "");
 	__add_format("away", GG_S_B(config_status), "");
 	__add_format("busy", GG_S_B(config_status), "");
 	__add_format("avail", GG_S_A(config_status), "");
