@@ -15,6 +15,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - dodana zmienna keep_reason (jojo/w)
 - format statusbara %{nick} i %{?nick ...} (FIG/w)
 - ³adniejszy /status (FIG/w)
+- poprawka /set i nieistniej±cych zmiennych (sdas/w)
 
 // 2002-09-18
 

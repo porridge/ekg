@@ -1193,6 +1193,8 @@ COMMAND(cmd_set)
 	}
 
 	if ((!params[0] || !params[1]) && !unset) {
+		int displayed = 0;
+
 		for (l = variables; l; l = l->next) {
 			struct variable *v = l->data;
 			
@@ -1202,6 +1204,7 @@ COMMAND(cmd_set)
 
 				if (!v->display) {
 					print("variable", v->name, "(...)");
+					displayed = 1;
 					continue;
 				}
 
@@ -1251,8 +1254,13 @@ COMMAND(cmd_set)
 
 					string_free(s, 1);
 				}
+
+				displayed = 1;
 			}
 		}
+
+		if (!displayed && params[0])
+			print("variable_not_found", params[0]);
 	} else {
 		theme_cache_reset();
 		switch (variable_set(arg, (unset) ? NULL : params[1], 0)) {
