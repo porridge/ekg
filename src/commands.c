@@ -2031,7 +2031,6 @@ COMMAND(cmd_msg)
 		return 0;
 	}
 
-	/* XXX dla szyfrowanych */
 	if (strlen(params[1]) > 1989)
 		printq("message_too_long");
 	
@@ -3043,19 +3042,12 @@ COMMAND(cmd_key)
 }
 #endif
 
+#if 0
 COMMAND(cmd_test_segv)
 {
 	char *foo = NULL;
 
 	*foo = 'A';
-
-	return 0;
-}
-
-COMMAND(cmd_test_ping)
-{
-	if (sess)
-		gg_ping(sess);
 
 	return 0;
 }
@@ -3079,6 +3071,7 @@ COMMAND(cmd_test_send)
 
 	return 0;
 }
+#endif
 
 COMMAND(cmd_test_addtab)
 {
@@ -3116,6 +3109,14 @@ COMMAND(cmd_test_debug_dump)
 	return 0;
 }
 #endif
+
+COMMAND(cmd_test_ping)
+{
+	if (sess)
+		gg_ping(sess);
+
+	return 0;
+}
 
 COMMAND(cmd_test_watches)
 {
@@ -3165,11 +3166,13 @@ COMMAND(cmd_test_watches)
 			case GG_STATE_READING_DATA: state = "READING_DATA"; break;
 			case GG_STATE_ERROR: state = "ERROR"; break;
 			/* gg_session */	     
+			case GG_STATE_CONNECTING_HUB: state = "CONNECTING_HUB"; break;
 			case GG_STATE_CONNECTING_GG: state = "CONNECTING_GG"; break;
 			case GG_STATE_READING_KEY: state = "READING_KEY"; break;
 			case GG_STATE_READING_REPLY: state = "READING_REPLY"; break;
 			case GG_STATE_CONNECTED: state = "CONNECTED"; break;
 			/* gg_http */
+			case GG_STATE_SENDING_QUERY: state = "SENDING_QUERY"; break;
 			case GG_STATE_READING_HEADER: state = "READING_HEADER"; break;
 			case GG_STATE_PARSING: state = "PARSING"; break;
 			case GG_STATE_DONE: state = "DONE"; break;
@@ -3178,14 +3181,26 @@ COMMAND(cmd_test_watches)
 			case GG_STATE_READING_UIN_1: state = "READING_UIN_1"; break;
 			case GG_STATE_READING_UIN_2: state = "READING_UIN_2"; break;
 			case GG_STATE_SENDING_ACK: state = "SENDING_ACK"; break;
-			case GG_STATE_SENDING_REQUEST: state = "SENDING_REQUEST"; break;
-			case GG_STATE_READING_REQUEST: state = "READING_REQUEST"; break;
-			case GG_STATE_SENDING_FILE_INFO: state = "SENDING_FILE_INFO"; break;
 			case GG_STATE_READING_ACK: state = "READING_ACK"; break;
+			case GG_STATE_READING_REQUEST: state = "READING_REQUEST"; break;
+			case GG_STATE_SENDING_REQUEST: state = "SENDING_REQUEST"; break;
+			case GG_STATE_SENDING_FILE_INFO: state = "SENDING_FILE_INFO"; break;
+			case GG_STATE_READING_PRE_FILE_INFO: state = "READING_PRE_FILE_INFO"; break;
+			case GG_STATE_READING_FILE_INFO: state = "READING_FILE_INFO"; break;
+			case GG_STATE_SENDING_FILE_ACK: state = "SENDING_FILE_ACK"; break;
 			case GG_STATE_READING_FILE_ACK: state = "READING_FILE_ACK"; break;
 			case GG_STATE_SENDING_FILE_HEADER: state = "SENDING_FILE_HEADER"; break;
+			case GG_STATE_READING_FILE_HEADER: state = "READING_FILE_HEADER"; break;
 			case GG_STATE_GETTING_FILE: state = "SENDING_GETTING_FILE"; break;
 			case GG_STATE_SENDING_FILE: state = "SENDING_SENDING_FILE"; break;
+			case GG_STATE_READING_VOICE_ACK: state = "READING_VOICE_ACK"; break;
+			case GG_STATE_READING_VOICE_HEADER: state = "READING_VOICE_HEADER"; break;
+			case GG_STATE_READING_VOICE_SIZE: state = "READING_VOICE_SIZE"; break;
+			case GG_STATE_READING_VOICE_DATA: state = "READING_VOICE_DATA"; break;
+			case GG_STATE_SENDING_VOICE_ACK: state = "SENDING_VOICE_ACK"; break;
+			case GG_STATE_SENDING_VOICE_REQUEST: state = "SENDING_VOICE_REQUEST"; break;
+			case GG_STATE_READING_TYPE: state = "READING_TYPE"; break;
+
 			default: state = "(unknown)"; break;
 		}
 
@@ -3200,9 +3215,9 @@ COMMAND(cmd_test_watches)
 	return 0;
 }
 
+#if 0
 COMMAND(cmd_test_fds)
 {
-#if 0
 	struct stat st;
 	char buf[1000];
 	int i;
@@ -3260,9 +3275,9 @@ COMMAND(cmd_test_fds)
 
 		printq("generic", buf);
 	}
-#endif
 	return 0;
 }
+#endif
 
 COMMAND(cmd_beep)
 {
@@ -3272,7 +3287,6 @@ COMMAND(cmd_beep)
 }
 
 #ifdef WITH_IOCTLD
-
 COMMAND(cmd_beeps_spk)
 {
 	if (!params[0]) {
@@ -3292,7 +3306,6 @@ COMMAND(cmd_blink_leds)
 
 	return ((ioctld_send(params[0], ACT_BLINK_LEDS, quiet) == -1) ? -1 : 0);
 }
-
 #endif
 
 COMMAND(cmd_play)
@@ -4273,9 +4286,8 @@ COMMAND(cmd_at)
 			if (a_name) {
 				printq("at_noexist", a_name);
 				return -1;
-			} else {
+			} else
 				printq("at_empty");
-			}
 		}
 
 		return 0;
@@ -4520,7 +4532,6 @@ COMMAND(cmd_timer)
 }
 
 #ifdef WITH_PYTHON
-
 COMMAND(cmd_python)
 {
 	if (!params[0]) {
@@ -4557,7 +4568,6 @@ COMMAND(cmd_python)
 
 	return -1;
 }
-
 #endif
 
 COMMAND(cmd_conference) 
@@ -4609,9 +4619,8 @@ COMMAND(cmd_conference)
 			if (params[0] && params[0][0] == '#') {
 				printq("conferences_noexist", params[0]);
 				return -1;
-			} else {
+			} else
 				printq("conferences_list_empty");
-			}
 		}
 
 		return 0;
@@ -5642,7 +5651,7 @@ void command_init()
 	  "pozwala obserwowaæ kolejkê wiadomo¶ci podczas po³±czenia", "");
 	command_add
 	( "_ctcp", "u", cmd_test_ctcp, 0, " <numer/alias>",
-	"wysy³a ¿±danie bezpo¶redniego po³±czenia", "");
+	  "wysy³a ¿±danie bezpo¶redniego po³±czenia", "");
 	command_add
 	( "_descr", "?", cmd_away, 0, " <opis>",
 	  "zmienia opis bez zmiany stanu", "");
