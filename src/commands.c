@@ -103,7 +103,7 @@ struct command commands[] = {
 	{ "?", "c", command_help, " [polecenie]", "Synonim dla %Whelp%n", "" },
 	{ "ignore", "u", command_ignore, " [numer/alias]", "Dodaje do listy ignorowanych lub j± wy¶wietla", "" },
 	{ "invisible", "", command_away, "", "Zmienia stan na niewidoczny", "" },
-	{ "list", "u?", command_list, " [alias|opcje]", "Zarz±dzanie list± kontaktów", "  -a, --active\n  -b, --busy\n  -i, --inactive\n\n  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>  // tylko informacja\n  -d, --display <nazwa>  // wy¶wietlana nazwa\n  -p, --phone <telefon>\n  -u, --uin <numerek>\n  -g, --group [+/-]<grupa>\n\n  -p, --put\n  -g, --get" },
+	{ "list", "u?", command_list, " [alias|opcje]", "Zarz±dzanie list± kontaktów", "  -a, --active\n  -b, --busy\n  -i, --inactive\n  -w, --wait\n\n  -f, --first <imiê>\n  -l, --last <nazwisko>\n  -n, --nick <pseudonim>  // tylko informacja\n  -d, --display <nazwa>  // wy¶wietlana nazwa\n  -p, --phone <telefon>\n  -u, --uin <numerek>\n  -g, --group [+/-]<grupa>\n\n  -p, --put\n  -g, --get" },
 	{ "msg", "u?", command_msg, " <numer/alias> <wiadomo¶æ>", "Wysy³a wiadomo¶æ do podanego u¿ytkownika", "" },
         { "on", "?u?", command_on, " <zdarzenie|...> <numer/alias> <akcja>|clear", "Dodaje lub usuwa zdarzenie", "" },
 	{ "passwd", "??", command_passwd, " <has³o> <e-mail>", "Zmienia has³o i adres e-mail u¿ytkownika", "" },
@@ -1046,7 +1046,7 @@ COMMAND(command_ignore)
 COMMAND(command_list)
 {
 	struct list *l;
-	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, j;
+	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, j, page_wait = 0;
 	char *tmp, **argv = NULL;
 
 	if (params[0] && *params[0] != '-') {
@@ -1110,21 +1110,26 @@ COMMAND(command_list)
 		return 0;
 	}
 
-	/* list --active | --busy | --inactive */
+	/* list --active | --busy | --inactive [--wait] */
 	for (j = 0; params[j]; j++) {
       		if ((argv = array_make(params[j], " \t", 0, 1, 1))) {
 			int i;
 
 	 		for (i = 0; argv[i]; i++) {
 				
+				if (match_arg(argv[i], 'w', "wait"))
+					page_wait = 1;
+				
 				if (match_arg(argv[i], 'a', "active")) {
 					show_all = 0;
 					show_active = 1;
 				}
+				
 				if (match_arg(argv[i], 'i', "inactive") || match_arg(argv[i], 'n', "notavail")) {
 					show_all = 0;
 					show_inactive = 1;
 				}
+				
 				if (match_arg(argv[i], 'b', "busy")) {
 					show_all = 0;
 					show_busy = 1;
@@ -1162,7 +1167,10 @@ COMMAND(command_list)
 
 		if (show_all || (show_busy && (u->status == GG_STATUS_BUSY || u->status == GG_STATUS_BUSY_DESCR)) || (show_active && u->status == GG_STATUS_AVAIL) || (show_inactive && (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR))) {
 			my_printf(tmp, format_user(u->uin), inet_ntoa(in), itoa(u->port), u->descr);
-			count++;
+			if ((++count % (screen_lines - 1)) == 0) {
+				char *foo = readline("-- Wci¶nij Enter by kontynuowaæ. --");
+				free(foo);
+			}
 		}
 	}
 

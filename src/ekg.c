@@ -362,6 +362,12 @@ int main(int argc, char **argv)
 
 	signal(SIGSEGV, sigsegv_handler);
 
+	if (getenv("LINES"))
+		screen_lines = atoi(getenv("LINES"));
+
+	if (screen_lines < 1)
+		screen_lines = 24;
+
 	config_user = "";
 
 	for (i = 1; i < argc; i++) {
@@ -443,6 +449,10 @@ IOCTL_HELP
 			break;
 		case GG_STATUS_BUSY:
 			away = 1;
+			break;
+		case GG_STATUS_BUSY_DESCR:
+			away = 1;
+			config_status = (config_status & GG_STATUS_FRIENDS_MASK) | GG_STATUS_BUSY;
 			break;
 		case GG_STATUS_INVISIBLE:
 			away = 2;

@@ -117,6 +117,7 @@ int sock;
 int length;
 struct sockaddr_un addr;
 char *busy_reason;
+int screen_lines;
 
 int config_read(char *filename);
 int config_write(char *filename);

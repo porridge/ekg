@@ -94,6 +94,7 @@ int length = 0;
 struct sockaddr_un addr;
 char *busy_reason = NULL;
 char *home_dir = NULL;
+int screen_lines = 24;
 
 /*
  * my_puts()
