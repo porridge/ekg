@@ -747,7 +747,8 @@ void init_theme()
 	add_format("dcc_get_not_found", "%! Nie znaleziono po³±czenia %W%1%n\n", 1);
 	add_format("dcc_get_getting", "%) Rozpoczêto pobieranie pliku %W%2%n od %1\n", 1);
 	add_format("dcc_get_cant_create", "%! Nie mo¿na utworzyæ pliku %W%1%n\n", 1);
-	
+	add_format("dcc_invalid_ip", "%! Nieprawid³owe IP\n", 1);
+
 
 	add_format("query_started", "%) Rozpoczêto rozmowê z %W%1%n. Aby zakoñczyæ, wci¶nij Ctrl-D\n", 1);
 	add_format("query_finished", "\n%) Zakoñczono rozmowê z %W%1%n\n", 1);
