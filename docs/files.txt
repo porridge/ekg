@@ -13,7 +13,7 @@ Spis tre¶ci:
 Lista kontaktów z pliku ,,userlist'' jest tego samego formatu co eksportowana
 z windowsowego klienta:
 
-    imiê;nazwisko;pseudonim;wy¶wietlana_nazwa;telefon;grupy;opis;numer
+    imiê;nazwisko;pseudonim;wy¶wietlana_nazwa;telefon;grupy;numer;email
 
 ekg mo¿e dopisaæ u¿ytkownika do kilku metagrup:
 
