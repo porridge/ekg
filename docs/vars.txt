@@ -273,7 +273,7 @@ log_timestamp
 	UTC. dok³adny opis formatu zawiera strona manuala strftime(3).
 
 make_window
-	typ: int
+	typ: liczba
 	domy¶lna warto¶æ: 0
 
 	okre¶la czy bêd± tworzone nowe okienka dla przychodz±cych wiadomo¶ci
@@ -283,7 +283,7 @@ make_window
 	nowe okienko.
 
 mesg_allow
-	typ: int
+	typ: liczba
 	domy¶lna warto¶æ: 2
 
 	ustala, czy zezwalamy na wysy³anie do nas komunikatów za pomoc± write,
