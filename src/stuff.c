@@ -1002,7 +1002,7 @@ struct list *alias_check(const char *line)
 	while (line[i] != ' ' && line[i])
 		i++;
 
-	if (!line[i])
+	if (!i)
 		return NULL;
 
 	for (l = aliases; l; l = l->next) {
