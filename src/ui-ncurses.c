@@ -47,6 +47,9 @@
 #else
 #  include "../compat/dirname.h"
 #endif
+#ifndef HAVE_SCANDIR
+#  include "../compat/scandir.h"
+#endif
 #include <ncurses.h>
 #include <signal.h>
 #ifndef _AIX
