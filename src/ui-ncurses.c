@@ -2178,6 +2178,9 @@ static void ui_ncurses_deinit()
 	xfree(line);
 	xfree(yanked);
 
+	if (getenv("TERM") && !strncmp(getenv("TERM"), "xterm", 5))
+		write(1, "\033]2;\007", 5);
+
 	done = 1;
 }
 
@@ -3912,13 +3915,11 @@ static int ui_ncurses_event(const char *event, ...)
 	if (!event)
 		return 0;
 
-#if 0
 	if (!strcmp(event, "xterm_update") && getenv("TERM") && !strncmp(getenv("TERM"), "xterm", 5)) {
-		char *tmp = saprintf("\033]0;EKG (%d)\007", config_uin);
-		tputs(tmp, 1, putchar);
+		char *tmp = saprintf("\033]2;ekg (%d)\007", config_uin);
+		write(1, tmp, strlen(tmp));
 		xfree(tmp);
 	}
-#endif
 
 	if (!strcasecmp(event, "refresh_time"))
 		goto cleanup;
