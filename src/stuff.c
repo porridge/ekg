@@ -211,7 +211,7 @@ struct event_label event_labels[EVENT_LABELS_MAX] = {
 	{ EVENT_SIGUSR2, "sigusr2" },
 	{ EVENT_DELIVERED, "delivered" },
 	{ EVENT_QUEUED, "queued" },
-	{ EVENT_NEW_MAIL, "newmail" },
+	{ EVENT_NEWMAIL, "newmail" },
 	{ EVENT_QUERY, "query" },
 	{ EVENT_BLOCKED, "blocked" },
 	{ INACTIVE_EVENT, NULL },
