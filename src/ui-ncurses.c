@@ -3296,7 +3296,7 @@ static void window_next()
 			next = l->next->data;
 	}
 
-	if (!next)
+	if (!next || next->floating)
 		next = window_find("__status");
 
 	window_switch(next->id);
@@ -3313,9 +3313,13 @@ static void window_prev()
 		prev = l->data;
 	}
 
-	if (!prev->id && window_current->id == 1)
-		for (l = windows; l; l = l->next)
-			prev = l->data;
+	if ((!prev->id && window_current->id == 1) || prev->floating)
+		for (l = windows; l; l = l->next) {
+			struct window *w = l->data;
+
+			if (!w->floating)
+				prev = l->data;
+		}
 
 	window_switch(prev->id);
 }
