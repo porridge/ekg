@@ -1375,8 +1375,6 @@ COMMAND(command_msg)
 	} else
 		msg = params[1];
 
-	iso_to_cp(msg);
-
 	for (p = nicks; *p; p++) {
 		if (!(uin = get_uin(*p))) {
 			my_printf("user_not_found", *p);
@@ -1387,7 +1385,9 @@ COMMAND(command_msg)
 
 		put_log(uin, "%s,%ld,%s,%ld,%s\n", (chat) ? "chatsend" : "msgsend", uin, (u) ? u->display : "", time(NULL), msg);
 
+		iso_to_cp(msg);
 		gg_send_message(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, msg);
+		cp_to_iso(msg);		/* XXX paskudny workaround */
 	}
 
 	if (!query_nick || strcasecmp(query_nick, params[0]))
