@@ -94,14 +94,14 @@ AC_SUBST(do_ioctl)
 AC_SUBST(dioctl)
 
 AC_ARG_WITH(ioctl, 
-  [  --without-ioctl  	  Compile without ioctl deamon [linux specific]])
+  [  --with-ioctl  	  Compile with ioctl deamon [linux only]])
 
-if test "x$with_ioctl" = "xno"; then 
-  do_ioctl=""
-  dioctl=""
-else
+if test "x$with_ioctl" = "xyes"; then 
   do_ioctl="ioctl_daemon"
   dioctl=" -DIOCTL "  
+else
+  do_ioctl=""
+  dioctl=""
 fi
 
 
