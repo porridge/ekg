@@ -1132,7 +1132,8 @@ COMMAND(cmd_list)
 {
 	list_t l;
 	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_inactive = 0, show_invisible = 0, show_descr = 0, show_blocked = 0, show_offline = 0, j, p;
-	char *tmp, **argv = NULL, *show_group = NULL, *ip_str;
+	char **argv = NULL, *show_group = NULL, *ip_str;
+	const char *tmp;
 
 	if (params[0] && *params[0] != '-') {
 		char *status, *groups;
@@ -1345,45 +1346,12 @@ COMMAND(cmd_list)
 		if (!u->display)
 			continue;
 
-		tmp = "list_unknown";
-		switch (u->status) {
-			case GG_STATUS_AVAIL:
-				tmp = "list_avail";
-				break;
-			case GG_STATUS_AVAIL_DESCR:
-				tmp = "list_avail_descr";
-				break;
-			case GG_STATUS_NOT_AVAIL:
-				tmp = "list_not_avail";
-				break;
-			case GG_STATUS_BUSY:
-				tmp = "list_busy";
-				break;
-			case GG_STATUS_BUSY_DESCR:
-				tmp = "list_busy_descr";
-				break;
-			case GG_STATUS_NOT_AVAIL_DESCR:
-				tmp = "list_not_avail_descr";
-				break;
-			case GG_STATUS_INVISIBLE:
-				tmp = "list_invisible";
-				break;
-			case GG_STATUS_BLOCKED:
-				tmp = "list_blocked";
-				break;
-		}
+		tmp = ekg_status_label(u->status, "list_");
 
 		in.s_addr = u->ip.s_addr;
 
 		if (u->uin == config_uin && sess && sess->state == GG_STATE_CONNECTED)
-			switch (config_status) {
-				case GG_STATUS_INVISIBLE:
-					tmp = "list_invisible";
-					break;
-				case GG_STATUS_INVISIBLE_DESCR:
-					tmp = "list_invisible_descr";
-					break;
-			}
+			tmp = ekg_status_label(config_status, "list_");
 
 		show = show_all;
 
@@ -2598,28 +2566,15 @@ COMMAND(cmd_remind)
 	list_add(&watches, h, 0); 
 }
 
-static int count_params(const char **params) {
-	int count = 0;
-
-	if (!params)
-		return 0;
-
-	while (*params) {
-		count++;
-		params++;
-	}
-
-	return count;
-}
-
 COMMAND(cmd_query)
 {
-	/* XXX potrzebujemy kopii params, aby móc modyfikowaæ parametry */
-	char **p = xmalloc(count_params(params) * sizeof(char *));
+	char **p = xmalloc(sizeof(params));
 	int i;
 
 	for (i = 0; params[i]; i++)
 		p[i] = xstrdup(params[i]);
+
+	p[i + 1] = NULL;
 
 	if (params[0] && (params[0][0] == '@' || strchr(params[0], ','))) {
 		struct conference *c = conference_create(params[0]);
@@ -2657,10 +2612,10 @@ COMMAND(cmd_query)
 	}
 		
 	if (params[0] && params[1])
-		cmd_msg("chat", (const char **)p, NULL);
+		cmd_msg("chat", (const char **) p, NULL);
 
 cleanup:
-	for (i = 0; params[i]; i++)
+	for (i = 0; p[i]; i++)
 		xfree(p[i]);
 
 	xfree(p);

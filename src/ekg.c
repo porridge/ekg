@@ -496,7 +496,7 @@ void ekg_wait_for_key()
 
 			usec = (t->ends.tv_sec - tv2.tv_sec) * 1000000 + (t->ends.tv_usec - tv2.tv_usec);
 
-			/* je¶li wiêcej ni¿ sekunda to nie ma znacznia */
+			/* je¶li wiêcej ni¿ sekunda, to nie ma znacznia */
 			
 			if (usec >= 1000000)
 				continue;
@@ -539,7 +539,8 @@ void ekg_wait_for_key()
 			continue;
 		}
 
-		/* przejrzyj desktyptory */
+		/* przejrzyj deskryptory */
+
 		for (l = watches; l; l = l->next) {
 			struct gg_common *c = l->data;
 			int i;
@@ -908,7 +909,7 @@ int main(int argc, char **argv)
 				break;
 			case '?':
 				/* obs³ugiwane przez getopt */
-				fprintf(stdout, "Aby uzyskaæ wiêcej informacji uruchom program z opcj± --help.\n");
+				fprintf(stdout, "Aby uzyskaæ wiêcej informacji, uruchom program z opcj± --help.\n");
 				return 1;
 			default:
 				break;
