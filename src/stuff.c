@@ -30,6 +30,9 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <signal.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include "config.h"
 #include "libgg.h"
 #include "stuff.h"
@@ -405,8 +408,14 @@ int write_config(char *filename)
 
 	while (v->name) {
 		if (v->type == VAR_STR) {
-			if (*(char**)(v->ptr))
-				fprintf(f, "%s %s\n", v->name, *(char**)(v->ptr));
+			if (*(char**)(v->ptr)) {
+				if (!v->display) {
+					char *tmp = encode_base64(*(char**)(v->ptr));
+					fprintf(f, "%s \001%s\n", v->name, tmp);
+					free(tmp);
+				} else 	
+					fprintf(f, "%s %s\n", v->name, *(char**)(v->ptr));
+			}
 		} else
 			fprintf(f, "%s %d\n", v->name, *(int*)(v->ptr));
 		v++;
@@ -1325,7 +1334,40 @@ static char base64_set[] =
  */
 char *encode_base64(char *buf)
 {
-	return strdup(buf);	/* fix me, baby. */
+	char *out, *res;
+	int i = 0, j = 0, k = 0, len = strlen(buf);
+	
+	if (!(res = out = malloc((len / 3 + 1) * 4 + 2))) {
+		gg_debug(GG_DEBUG_MISC, "// encode_base64() not enough memory\n");
+		return NULL;
+	}
+	
+	while (j <= len) {
+		switch (i % 4) {
+			case 0:
+				k = (buf[j] & 252) >> 2;
+				break;
+			case 1:
+				k = ((buf[j] & 3) << 4) | ((buf[++j] & 240) >> 4);
+				break;
+			case 2:
+				k = ((buf[j] & 15) << 2) | ((buf[++j] & 192) >> 6);
+				break;
+			case 3:
+				k = buf[j++] & 63;
+				break;
+		}
+		*out++ = base64_set[k];
+		i++;
+	}
+
+	if (i % 4)
+		for (j = 0; j < 4 - (i % 4); j++, out++)
+			*out = '=';
+	
+	*out = 0;
+	
+	return res;
 }
 
 /*
@@ -1338,8 +1380,10 @@ char *decode_base64(char *buf)
 	char *res, *save, *end, *foo, val;
 	int index = 0;
 
-	if (!(save = res = strdup(buf)))  /* ¿re wiêcej pamiêci, whatever. */
+	if (!(save = res = malloc((strlen(buf) / 4 + 1) * 3 + 2))) {
+		gg_debug(GG_DEBUG_MISC, "// decode_base64() not enough memory\n");
 		return NULL;
+	}
 
 	end = buf + strlen(buf);
 
@@ -1369,14 +1413,15 @@ char *decode_base64(char *buf)
 				*res++ |= val;
 				break;
 		}
-		/* gcc 3.x */
 		index++;
-		index = index % 4;
+		index %= 4;
 	}
 	*res = 0;
-	return res;
+	
+	return save;
 }
 
+	
 /*
  * changed_debug()
  *
@@ -1445,13 +1490,26 @@ void changed_theme(char *var)
  */
 void prepare_connect()
 {
+	static char buf[20];
 	struct list *l;
 
 	for (l = watches; l; l = l->next) {
 		struct gg_dcc *d = l->data;
 		
-		if (d->type == GG_SESSION_DCC_SOCKET)
+		if (d->type == GG_SESSION_DCC_SOCKET) {
 			gg_dcc_port = d->port;
+
+			if (!dcc_ip) {
+				struct sockaddr_in sin;
+				int sin_len = sizeof(sin);
+
+				if (!getsockname(d->fd, (struct sockaddr*) &sin, &sin_len)) {
+					strcpy(buf, inet_ntoa(sin.sin_addr));
+					gg_debug(GG_DEBUG_MISC, "// prepare_connect(): detected IP address %s\n", buf);
+					gg_dcc_ip = buf;
+				}
+			}
+		}
 	}
 
 	if (dcc_ip)

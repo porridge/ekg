@@ -20,7 +20,7 @@ A: Klient jeszcze nie rozró¿nia cudzys³owiów, ani '\ ' w parametrach
 Q: Jak zarejestrowaæ nowego u¿ytkownika?
 A: Uzyæ polecenia "register <email> <haslo>"
 
-Q: Jak wys³aæ plik, zmieniæ has³o, informacje w katalogu publicznym?
+Q: Jak wys³aæ plik, informacje w katalogu publicznym?
 A: Póki co, nie da siê. Trzeba u¿yæ oryginalnego klienta (dzia³a pod wine,
    vmware i pod Windows).
 

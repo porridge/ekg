@@ -143,7 +143,7 @@ int set_variable(char *name, char *value)
 
 	free(*(char**)(v->ptr));
 	if (value) {
-		if (!(*(char**)(v->ptr) = strdup(value)))
+		if (!(*(char**)(v->ptr) = (*value == 1) ? decode_base64(value + 1) : strdup(value)))
 			return -3;
 	} else
 		*(char**)(v->ptr) = NULL;

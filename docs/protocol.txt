@@ -213,6 +213,7 @@ przejd¼my do sedna sprawy ;)
 	#define GG_CLASS_QUEUED 0x0001	/* tylko przy odbieraniu */
 	#define GG_CLASS_MSG 0x0004
 	#define GG_CLASS_CHAT 0x0008
+	#define GG_CLASS_CTCP 0x0010	/* dla klienta GG */
 	#define GG_CLASS_UNKNOWN_1 0x0020
 
 	struct gg_send_msg {
@@ -230,7 +231,7 @@ okienku czy jako kolejna linijka w okienku rozmowy. wygl±da na to,
 ¿e to jaka¶ bitmapa, wiêc najlepiej olaæ inne bity ni¿ 0x0e. (czasem
 klienty wysy³aj± 0x04, czasem 0x24 -- widocznie 0x20 to te¿ jaka¶
 flaga). je¶li odbiorca bêdzie niedostêpny podczas wysy³ania wiadomo¶ci,
-odbierze j± z zaznaczonym bitem GG_CLASS_QUEUED. Wiadomo¶æ nie powinna
+odbierze j± z zaznaczonym bitem GG_CLASS_QUEUED. wiadomo¶æ nie powinna
 przekraczaæ 2000 znaków.
 
 oryginalny klient wysy³aj±c wiadomo¶æ do kilku u¿ytkowników, wysy³a po
@@ -252,12 +253,15 @@ na przyk³ad, by wys³aæ do trzech ludzi, nale¿y wys³aæ pakiet:
 
 serwer po otrzymaniu wiadomo¶ci odsy³a informacjê o tym. przy okazji
 mówi, czy wiadomo¶æ dotar³a do odbiorcy (status == GG_ACK_DELIVERED),
-czy mo¿e jest offline i zosta³a zakolejkowana (GG_ACK_QUEUED):
+czy mo¿e jest offline i zosta³a zakolejkowana (GG_ACK_QUEUED). je¶li
+by³a wysy³ana wiadomo¶æ do wiadomo¶ci klienta (GG_MSG_CLASS_CTCP),
+przy nieobecno¶ci odbiorcy, zostanie zwrócone GG_ACK_NOT_DELIVERED.
 
 	#define GG_SEND_MSG_ACK 0x0005
 	
 	#define GG_ACK_DELIVERED 0x0002
 	#define GG_ACK_QUEUED 0x0003
+	#define GG_ACK_NOT_DELIVERED 0x0006
 
 	struct gg_send_msg_ack {
 		int status;
@@ -325,7 +329,7 @@ swój wk³ad w poznanie protoko³u mieli:
  - Igor Popik <igipop@wsfiz.edu.pl>:
    klasy wiadomo¶ci przy odbieraniu zakolejkowanej.
  - Rafa³ Cyran <ajron@wp.pl>:
-   informacje o remote_port.
+   informacje o remote_port, rodzaje potwierdzeñ przy ctcp.
 
 ----------------------------------------------------------------------------
 

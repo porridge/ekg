@@ -5,6 +5,16 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm).
 ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'', ,,i/nick''
 oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2001-12-18
+
+- encode_base64() i decode_base64() ju¿ dzia³aj± (w)
+- has³a s± zapisywane w base64. s± poprzedzane znakiem '\001', by odró¿niæ
+  je od hase³ zapisanych plaintextem. to nie jest ¿adne zabezpieczenie,
+  wiêc mo¿na sobie darowaæ posty na bugtraq, ¿e z³amano szyfrowanie hase³
+  w konfigach ekg. to ma chroniæ przed osobami postronnymi, zapamiêtaniem
+  has³a po zerkniêciu do pliku itd. od razu mówiê, ¿e mo¿na je odkodowaæ
+  przez ,,echo haslo | mimencode -u'' (w)
+
 // 2001-12-17
 
 - gg_send_packet() o zmiennej ilo¶ci parametrów (a)

@@ -663,6 +663,7 @@ struct gg_msg_recipients {
 
 #define GG_ACK_DELIVERED 0x0002
 #define GG_ACK_QUEUED 0x0003
+#define GG_ACK_NOT_DELIVERED 0x0006
 	
 struct gg_send_msg_ack {
 	unsigned long status;
