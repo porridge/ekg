@@ -12,6 +12,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - dodanie xmalloc.[ch], zmiana wszystkich alokacji w ekg na funkcje x*().
   niestety libgadu nie mo¿e byæ zale¿ne od tego, wiêc tam nadal bêdzie
   zabawa w sprawdzanie wszystkiego (w)
+- uaktualnienie helpów /back i /invisible (gophi/w)
 
 // 2002-06-21
 
