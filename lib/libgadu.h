@@ -637,6 +637,8 @@ __attribute__ ((packed))
 #define GG_CLASS_CHAT 0x0008
 #define GG_CLASS_CTCP 0x0010
 
+#define GG_MSG_MAXSIZE 2000
+
 struct gg_send_msg {
 	unsigned long recipient;
 	unsigned long seq;
