@@ -663,14 +663,20 @@ COMMAND(cmd_exec)
 
 	if (params[0]) {
 		char **args = NULL, *tmp, *tg = NULL;
-		int fd[2] = { 0, 0 }, buf = 0, msg = 0;
+		int fd[2] = { 0, 0 }, buf = 0, msg = 0, add_commandline = 0;
 		const char *command = NULL;
 		struct gg_exec s;
 
 		if (params[0][0] == '-') {
+			int big_match = 0;
 			args = array_make(params[0], " \t", 3, 1, 1);
 
-			if (match_arg(args[0], 'm', "msg", 2) || (buf = match_arg(args[0], 'b', "bmsg", 2))) {
+			if (match_arg(args[0], 'M', "MSG", 2) || (buf = match_arg(args[0], 'B', "BMSG", 2))) {
+				add_commandline = 1;
+				big_match = 1;
+			}
+
+			if (big_match || match_arg(args[0], 'm', "msg", 2) || (buf = match_arg(args[0], 'b', "bmsg", 2))) {
 				struct userlist *u;
 				int uin;
 
@@ -731,7 +737,12 @@ COMMAND(cmd_exec)
 		s.type = GG_SESSION_USER3;
 		s.id = pid;
 		s.timeout = 60;
-		s.buf = string_init(NULL);
+		if (add_commandline) {
+			char *tmp = saprintf("$ %s\n", ((command[0] == '^') ? command + 1 : command));
+			s.buf = string_init(tmp);
+			xfree(tmp);
+		} else
+			s.buf = string_init(NULL);
 		s.target = ((tg) ? tg : xstrdup(target));
 		s.msg = msg;
 		s.quiet = quiet;
@@ -4990,8 +5001,10 @@ void command_init()
 	  "\n"
 	  "Poprzedzenie polecenia znakiem ,,%T^%n'' ukryje informacjê o "
 	  "zakoñczeniu. Je¶li jako alias podamy ,,%T$%n'', wynik bêdzie "
-	  "wys³any do rozmówcy z aktualnego okna. Ze wzglêdu na budowê "
-	  "klienta, numery i aliasy %Tnie bêd±%n dope³niane Tabem.");
+	  "wys³any do rozmówcy z aktualnego okna. Zapisanie opcji wielkimi "
+	  "literami (np. %T-B%n) spowoduje umieszczenia polecenia w pierwszej "
+	  "linii wysy³anego wyniku. Ze wzglêdu na budowê klienta, numery i "
+	  "aliasy %Tnie bêd±%n dope³niane Tabem.");
 	  
 	command_add
 	( "!", "?", cmd_exec, 0,
