@@ -5,6 +5,12 @@ pierwsz± liter± nicka jest ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto zg³osi³ b³±d.
 
+// 2002-01-12
+
+- co¶ mi siê dziwnie zapêtli³o i rzuca³o ,,header recv() = -1'' ca³y
+  czas, co nie powinno siê zdarzyæ, ale na wszelki wypadek dorzuci³em
+  ograniczenie do 10 prób recv()owania. (w)
+
 // 2002-01-05
 
 - tak siedzia³em i w pld stwierdzi³em angielski manual. doda³em go 
