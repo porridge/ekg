@@ -411,6 +411,14 @@ fstring_t reformat_string(const char *str)
 			continue;
 		}
 
+		if (str[i] == 9) {
+			len += (8 - (len % 8));
+			continue;
+		}
+
+		if (str[i] == 13)
+			continue;
+
 		len++;
 	}
 
@@ -469,6 +477,20 @@ fstring_t reformat_string(const char *str)
 
 				if (isalpha_pl_PL(str[i]))
 					break;
+			}
+
+			continue;
+		}
+
+		if (str[i] == 13)
+			continue;
+
+		if (str[i] == 9) {
+			int k = 0, l = 8 - (j % 8);
+
+			for (k = 0; k < l; j++, k++) {
+				res->str[j] = ' ';
+				res->attr[j] = attr;
 			}
 
 			continue;

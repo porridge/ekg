@@ -1321,24 +1321,6 @@ void ekg_exit()
 	if (pipe_file)
 		unlink(pipe_file);
 	
-	msg_queue_free();
-	alias_free();
-	conference_free();
-	userlist_free();
-	theme_free();
-	variable_free();
-	event_free();
-	emoticon_free();
-	sms_away_free();
-	check_mail_free();
-	command_free();
-	timer_free();
-	binding_free();
-	last_free();
-	buffer_free();
-
-	xfree(home_dir);
-
 #ifdef HAVE_OPENSSL
 	xfree(sim_key_path);
 #endif
@@ -1356,6 +1338,24 @@ void ekg_exit()
 	}
 
 	list_destroy(watches, 0);
+
+	msg_queue_free();
+	alias_free();
+	conference_free();
+	userlist_free();
+	theme_free();
+	variable_free();
+	event_free();
+	emoticon_free();
+	sms_away_free();
+	check_mail_free();
+	command_free();
+	timer_free();
+	binding_free();
+	last_free();
+	buffer_free();
+
+	xfree(home_dir);
 
 	xfree(gg_proxy_host);
 	xfree(gg_proxy_username);

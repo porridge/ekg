@@ -109,7 +109,7 @@ int userlist_read()
 	while ((buf = read_file(f))) {
 		struct userlist u;
 		char **entry;
-		int i;
+		int i, count;
 		
 		memset(&u, 0, sizeof(u));
 			
@@ -120,7 +120,7 @@ int userlist_read()
 
 		entry = array_make(buf, ";", 7, 0, 0);
 
-		if (array_count(entry) < 7 || !(u.uin = atoi(entry[6]))) {
+		if ((count = array_count(entry)) < 7 || !(u.uin = atoi(entry[6]))) {
 			array_free(entry);
 			xfree(buf);
 			continue;
@@ -144,7 +144,10 @@ int userlist_read()
 		u.groups = group_init(entry[5]);
 		u.status = GG_STATUS_NOT_AVAIL;
 
-		array_free(entry);
+		for (i = 0; i < count; i++)
+			xfree(entry[i]);
+
+		xfree(entry);
 		xfree(buf);
 
 		list_add_sorted(&userlist, &u, sizeof(u), userlist_compare);

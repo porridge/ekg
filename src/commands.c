@@ -2416,6 +2416,7 @@ COMMAND(cmd_quit)
 	config_reason = NULL;
 
 	if (params[0] && !strcmp(params[0], "-")) {
+		xfree(tmp);
 		tmp = NULL;
 		config_status = ekg_hide_descr_status(config_status);
 	}
@@ -2432,7 +2433,7 @@ COMMAND(cmd_quit)
 
 		if ((t = config_read_variable("status"))) {
 			config_status = ekg_hide_descr_status(atoi(t));
-			array_add(&arr, xstrdup("status"));	
+			array_add(&arr, xstrdup("status"));
 			xfree(t);
 		}
 
@@ -2461,6 +2462,8 @@ COMMAND(cmd_quit)
 	}
 
 	ekg_logoff(sess, tmp);
+
+	xfree(tmp);
 
 	ui_event("disconnected", NULL);
 
