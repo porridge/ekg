@@ -355,7 +355,7 @@ events_delay
 
 	okre¶la, po ilu sekundach od po³±czenia z serwerem zaczn± dzia³aæ
 	zdarzenia ,,on'', d¼wiêki zwi±zane ze zmianami stanu i bêd± wy¶wietlane
-	informacje o niedostêpno¶ci osób chodzi o to, aby nie traktowaæ
+	informacje o niedostêpno¶ci osób. Chodzi o to, aby nie traktowaæ
 	pocz±tkowych informacji o stanie osób po po³±czeniu jako zmianê
 	ich stanu.
 
