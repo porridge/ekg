@@ -557,7 +557,7 @@ COMMAND(cmd_exec)
 		char *tmp;
 		int fd[2] = { 0, 0 }, buf = 0, msg = 0;
 		struct gg_exec s;
-		char *p = NULL, *tg = NULL;
+		char *p = NULL, *tg = xstrdup(target);
 
 		if (pipe(fd)) {
 			printq("exec_error", strerror(errno));
@@ -573,17 +573,20 @@ COMMAND(cmd_exec)
 				return -1;
 			}
 
-			if (!(uin = get_uin(params[1]))) {
-				printq("user_not_found", params[1]);
-				return -1;
+			if (strcmp(params[1], "%")) {
+				if (!(uin = get_uin(params[1]))) {
+					printq("user_not_found", params[1]);
+					return -1;
+				}
+
+				if ((u = userlist_find(uin, NULL)))
+					tg = xstrdup(u->display);
+				else
+					tg = xstrdup(itoa(uin));
 			}
 
-			if ((u = userlist_find(uin, NULL)))
-				tg = xstrdup(u->display);
-			else
-				tg = xstrdup(itoa(uin));
-
 			msg = (buf) ? 2 : 1;
+
 			p = array_join((char **) params + 2, " ");
 		} else
 			p = array_join((char **) params, " ");
@@ -2619,7 +2622,7 @@ COMMAND(cmd_test_add)
 
 COMMAND(cmd_test_debug_dump)
 {
-	char *tmp = saprintf("Zrzuci³em debug do pliku debug.%d", getpid());
+	char *tmp = saprintf("Zapisa³em " DEBUG_MAX_LINES " linii z debug do pliku debug.%d", getpid());
 
 	debug_write_crash();
 	printq("generic", tmp);
@@ -4157,7 +4160,8 @@ void command_init()
 	  "\n"
 	  "Poprzedzenie polecenia znakiem %T^%n ukryje informacjê o zakoñczeniu. "
 	  "W przypadku opcji %T--bmsg%n wynik jest buforowany, dziêki czemu zostanie "
-	  "wys³any w ca³o¶ci w jednej wiadomo¶ci.");
+	  "wys³any w ca³o¶ci w jednej wiadomo¶ci. Je¶li jako alias podamy %T%%%n, "
+	  "wynik bêdzie wys³any do rozmówcy z aktualnego okna.");
 	  
 	command_add
 	( "!", "?", cmd_exec, 0,
