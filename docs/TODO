@@ -14,6 +14,8 @@ klient:
 - find bez parametrów szuka aktualnego rozmówcy.
 - uaktualnianie w³asnego stanu w userli¶cie,
 - zapisywanie konfiguracji do innego pliku,
+- optymalizacja czytania z pipe'a,
+- pociête reasony w auto_away,
 
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,

@@ -160,6 +160,8 @@ void get_line_from_pipe(struct gg_exec *c)
 			c->buf = string_init(NULL);
 		}
 	} else {
+		if (c->buf->len)
+			print("exec", c->buf->str, itoa(c->id));
 		string_free(c->buf, 1);
 		list_remove(&watches, c, 1);
 	}

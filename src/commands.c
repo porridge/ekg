@@ -1421,7 +1421,19 @@ COMMAND(cmd_quit)
 		tmp = xstrdup(config_reason);
 	
 	if (!quit_message_send) {
-		print((tmp) ? "quit_descr" : "quit", tmp);
+		if (tmp) {
+			char *r1, *r2;
+
+			r1 = xstrmid(tmp, 0, GG_STATUS_DESCR_MAXSIZE);
+			r2 = xstrmid(tmp, GG_STATUS_DESCR_MAXSIZE, -1);
+
+			print("quit_descr", r1, r2);
+
+			xfree(r1);
+			xfree(r2);
+		} else
+			print("quit");
+
 		quit_message_send = 1;
 	}
 
