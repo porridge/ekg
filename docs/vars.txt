@@ -286,6 +286,12 @@ dcc_limit
 	wyczerpaniu zasobów klienta. zwykle po ponownym w³±czeniu
 	bezpo¶rednich po³±czeñ nale¿y po³±czyæ siê ponownie z serwerem.
 
+dcc_port
+	typ: liczba
+	domy¶lna warto¶æ: 1550
+
+	port, na którym ekg bêdzie oczekiwaæ na po³±czenia bezpo¶rednie.
+
 display_ack
 	typ: liczba
 	domy¶lna warto¶æ: 3

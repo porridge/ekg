@@ -141,6 +141,7 @@ char *reg_email = NULL;
 int config_dcc = 0;
 char *config_dcc_ip = NULL;
 char *config_dcc_dir = NULL;
+int config_dcc_port = GG_DEFAULT_DCC_PORT;
 char *config_reason = NULL;
 char *home_dir = NULL;
 char *config_quit_reason = NULL;
@@ -691,7 +692,7 @@ void changed_dcc(const char *var)
 		}
 	
 		if (config_dcc && !dcc) {
-			if (!(dcc = gg_dcc_socket_create(config_uin, 0))) {
+			if (!(dcc = gg_dcc_socket_create(config_uin, config_dcc_port))) {
 				print("dcc_create_error", strerror(errno));
 			} else {
 				list_add(&watches, dcc, 0);
@@ -716,6 +717,30 @@ void changed_dcc(const char *var)
 		} else
 			gg_dcc_ip = 0;
 	}
+
+	if (!strcmp(var, "dcc_port")) {
+		for (l = watches; l; l = l->next) {
+			struct gg_common *c = l->data;
+	
+			if (c->type == GG_SESSION_DCC_SOCKET)
+				dcc = l->data;
+		}
+		
+		if (config_dcc && dcc && (dcc->port != config_dcc_port)) {
+			list_remove(&watches, dcc, 0);
+			gg_free_dcc(dcc);
+			gg_dcc_ip = 0;
+			gg_dcc_port = 0;
+		
+			if (!(dcc = gg_dcc_socket_create(config_uin, config_dcc_port))) {
+				print("dcc_create_error", strerror(errno));
+			} else {
+				list_add(&watches, dcc, 0);
+			}
+		}
+	}
+	
+	update_status_myip();
 }
 
 /*
@@ -2771,7 +2796,7 @@ void update_status_myip()
 	if (!sess || sess->state != GG_STATE_CONNECTED)
 		goto fail;
 	
-	if (config_dcc && config_dcc_ip) {
+	if (config_dcc && config_dcc_ip && config_dcc_port) {
 		list_t l;
 
 		if (strcmp(config_dcc_ip, "auto"))

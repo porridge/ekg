@@ -233,6 +233,7 @@ int config_dcc;
 char *config_dcc_ip;
 char *config_dcc_dir;
 char *config_dcc_limit;
+int config_dcc_port;
 int config_display_ack;
 int config_display_color;
 char *config_display_color_map;

@@ -149,6 +149,7 @@ void variable_init()
 	variable_add("dcc_ip", "di", VAR_STR, 1, &config_dcc_ip, changed_dcc, NULL, dd_dcc);
 	variable_add("dcc_dir", "dd", VAR_STR, 1, &config_dcc_dir, NULL, NULL, dd_dcc);
 	variable_add("dcc_limit", "dl", VAR_STR, 1, &config_dcc_limit, NULL, NULL, dd_dcc);
+	variable_add("dcc_port", "dP", VAR_INT, 1, &config_dcc_port, changed_dcc, NULL, dd_dcc);
 	variable_add("display_ack", "da", VAR_INT, 1, &config_display_ack, NULL, variable_map(4, 0, 0, "none", 1, 0, "all", 2, 0, "delivered", 3, 0, "queued"), NULL);
 	variable_add("display_color", "dC", VAR_INT, 1, &config_display_color, NULL, NULL, NULL);
 	variable_add("display_color_map", "dm", VAR_STR, 1, &config_display_color_map, NULL, NULL, dd_color);
