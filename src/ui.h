@@ -50,7 +50,7 @@ extern void ui_readline_init();
 
 WINDOW *header, *status;
 
-int print_statusbar(WINDOW *w, int x, int y, const char *format, void *data_);
+int window_printat(WINDOW *w, int x, int y, const char *format, void *data_, int fgcolor, int bold, int bgcolor, int status);
 int config_backlog_size;
 extern void ui_ncurses_init();
 extern void header_statusbar_resize();

@@ -29,6 +29,9 @@
 #include "vars.h"
 #include "python.h"
 #include "ui.h"
+#ifdef WITH_UI_NCURSES
+#  include <ncurses.h>
+#endif
 
 int python_handle_result = -1;
 
@@ -102,7 +105,7 @@ static PyObject* ekg_print_header(PyObject *self, PyObject *args)
 		return NULL;
 
 #ifdef WITH_UI_NCURSES
-	print_statusbar(header, x, y, text, NULL);
+	window_printat(header, x, y, text, NULL, COLOR_WHITE, 0, COLOR_BLUE, 1);
 #endif
 
 	return Py_BuildValue("");
@@ -117,8 +120,33 @@ static PyObject* ekg_print_statusbar(PyObject *self, PyObject *args)
 		return NULL;
 
 #ifdef WITH_UI_NCURSES
-	print_statusbar(status, x, y, text, NULL);
+	window_printat(status, x, y, text, NULL, COLOR_WHITE, 0, COLOR_BLUE, 1);
 #endif
+
+	return Py_BuildValue("");
+}
+
+static PyObject* ekg_window_printat(PyObject *self, PyObject *args)
+{
+	char *target = NULL, *text = NULL;
+	int id, x, y;
+
+	if (PyArg_ParseTuple(args, "siis", &target, &x, &y, &text)) {
+		ui_event("printat", target, 0, x, y, text);
+		return Py_BuildValue("");
+	}
+
+	if (PyArg_ParseTuple(args, "iiis", &id, &x, &y, &text)) {
+		ui_event("printat", NULL, id, x, y, text);
+		return Py_BuildValue("");
+	}
+
+	return NULL;
+}
+
+static PyObject* ekg_window_commit(PyObject *self, PyObject *args)
+{
+	ui_event("commit");
 
 	return Py_BuildValue("");
 }
@@ -130,6 +158,8 @@ static PyMethodDef ekg_methods[] = {
 	{ "command", ekg_command, METH_VARARGS, "" },
 	{ "print_header", ekg_print_header, METH_VARARGS, "" },
 	{ "print_statusbar", ekg_print_statusbar, METH_VARARGS, "" },
+	{ "window_printat", ekg_window_printat, METH_VARARGS, "" },
+	{ "window_commit", ekg_window_commit, METH_VARARGS, "" },
 	{ NULL, NULL, 0, NULL }
 };
 

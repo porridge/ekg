@@ -112,6 +112,7 @@ struct window {
 	WINDOW *window;		/* okno okna */
 
 	int floating;		/* czy p³ywaj±ce? */
+	int doodle;		/* czy do gryzmolenia? */
 	int frames;		/* informacje o ramkach */
 	int last_update;	/* czas ostatniego uaktualnienia */
 	
@@ -469,6 +470,11 @@ void window_redraw(struct window *w)
 {
 	int x, y, left = 0, top = 0, height = w->height;
 	
+	if (w->doodle) {
+		w->redraw = 0;
+		return;
+	}
+
 	werase(w->window);
 	wattrset(w->window, color_pair(COLOR_BLUE, 0, COLOR_BLACK));
 
@@ -827,7 +833,10 @@ static struct window *window_new(const char *target, int new_id)
 	w.top = config_header_size;
 
 	if (target) {
-		if (*target == '*') {
+		if (*target == '+') {
+			w.doodle = 1;
+			w.target = xstrdup(target + 1);
+		} else if (*target == '*') {
 			const char *tmp = index(target, '/');
 			char **argv;
 			
@@ -886,7 +895,39 @@ static struct window *window_new(const char *target, int new_id)
 #endif
 
  	w.window = newwin(w.height, w.width, w.top, w.left);
- 
+
+#if 0
+	if (w.doodle) {
+		int i;
+
+		w.lines = xmalloc(w.height * sizeof(struct screen_line));
+		w.lines_count = w.height;
+
+		for (i = 0; i < w.height; i++) {
+			int j;
+
+			w.lines[i].len = w.width;
+			w.lines[i].str = xmalloc(w.width + 1);
+			w.lines[i].attr = xmalloc(w.width + 1);
+
+			for (j = 0; j < w.width; j++) {
+				w.lines[i].str[j] = 'X';
+				w.lines[i].attr[j] = 128;
+			}
+
+			w.lines[i].str[j] = 0;
+			w.lines[i].attr[j] = 0;
+		}
+
+		w.lines[2].str[10] = 'd';
+		w.lines[2].str[11] = 'o';
+		w.lines[2].str[12] = 'o';
+		w.lines[2].str[13] = 'd';
+		w.lines[2].str[14] = 'l';
+		w.lines[2].str[15] = 'e';
+ 	}
+#endif
+
 	return list_add_sorted(&windows, &w, sizeof(w), window_new_compare);
 }
 
@@ -957,6 +998,9 @@ crap:
 		w->act = 1;
 		update_statusbar(0);
 	}
+
+//	if (w->doodle);
+//		return;
 
 	if (config_speech_app)
 		speech = string_init(NULL);
@@ -1220,28 +1264,32 @@ static void update_header(int commit)
 }
 		
 /*
- * print_statusbar()
+ * window_printat()
  *
- * wy¶wietla pasek stanu zgodnie z podany formatem i danymi.
+ * wy¶wietla dany tekst w danym miejscu okna.
  *
  *  - w - okno ncurses, do którego piszemy
  *  - x, y - wspó³rzêdne, od których zaczynamy
  *  - format - co mamy wy¶wietliæ
  *  - data - dane do podstawienia w formatach
+ *  - fgcolor - domy¶lny kolor tekstu
+ *  - bold - domy¶lne pogrubienie
+ *  - bgcolor - domy¶lny kolor t³a
+ *  - status - czy to pasek stanu albo nag³ówek okna?
  *
  * zwraca ilo¶æ dopisanych znaków.
  */
-int print_statusbar(WINDOW *w, int x, int y, const char *format, void *data_)
+int window_printat(WINDOW *w, int x, int y, const char *format, void *data_, int fgcolor, int bold, int bgcolor, int status)
 {
-	int orig_x = x, bgcolor = COLOR_BLUE, fgcolor = COLOR_WHITE, bold = 0;
+	int orig_x = x;
 	int backup_display_color = config_display_color;
 	const char *p = format;
 	struct format_data *data = data_;
 
-	if (config_display_color == 2)
+	if (status && config_display_color == 2)
 		config_display_color = 0;
 	
-	if (x == 0) {
+	if (status && x == 0) {
 		int i;
 
 		wattrset(w, color_pair(fgcolor, 0, bgcolor));
@@ -1354,7 +1402,7 @@ int print_statusbar(WINDOW *w, int x, int y, const char *format, void *data_)
 					p += len + 1;
 
 					if (matched)
-						x += print_statusbar(w, x, y, p, data);
+						x += window_printat(w, x, y, p, data, fgcolor, bold, bgcolor, status);
 					goto next;
 				}
 			}
@@ -1494,7 +1542,7 @@ static void update_statusbar(int commit)
 			xfree(tmp);
 		}
 
-		print_statusbar(header, 0, y, p, formats);
+		window_printat(header, 0, y, p, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
 	}
 
 	for (y = 0; y < config_statusbar_size; y++) {
@@ -1511,7 +1559,7 @@ static void update_statusbar(int commit)
 			xfree(tmp);
 		}
 
-		print_statusbar(status, 0, y, p, formats);
+		window_printat(status, 0, y, p, formats, COLOR_WHITE, 0, COLOR_BLUE, 1);
 	}
 
 	for (i = 0; formats[i].name; i++)
@@ -3289,6 +3337,35 @@ static int ui_ncurses_event(const char *event, ...)
 
         if (!strcasecmp(event, "check_mail"))
 		check_mail();
+
+	if (!strcasecmp(event, "commit"))
+		window_commit();
+		
+	if (!strcasecmp(event, "printat")) {
+		char *target = va_arg(ap, char*);
+		int id = va_arg(ap, int), x = va_arg(ap, int), y = va_arg(ap, int);
+		char *text = va_arg(ap, char*);
+		struct window *w = NULL;
+
+		if (target)
+			w = window_find(target);
+
+		if (id) {
+			list_t l;
+
+			for (l = windows; l; l = l->next) {
+				struct window *v = l->data;
+
+				if (v->id == id) {
+					w = v;
+					break;
+				}
+			}
+		}
+
+		if (w && text)
+			window_printat(w->window, x, y, text, NULL, COLOR_WHITE, 0, COLOR_BLACK, 0);
+	}
 
 	if (!strcmp(event, "variable_changed")) {
 		char *name = va_arg(ap, char*);

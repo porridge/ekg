@@ -11,6 +11,13 @@ zg³osi³ b³±d.
 - drobna reorganizacja kolorów w ui-ncurses (w)
 - zmienna ,,display_color = 2'' wy¶wietla kolory wszêdzie oprócz pasku
   stanu i nag³ówka okna (Charvel/w)
+- nowy rodzaj okna ,,w->doodle = 1'' przeznaczony dla skryptów pythonowy.
+  mog± rysowaæ po nim co tylko chc±, gdzie tylko chc± i jak tylko chc±.
+  wszystko dziêki funkcjom ekg.window_printat() i ekg.window_commit().
+  nie ma przewijania, nie ma bajerów. po dodaniu kilku mi³ych funkcji do
+  obs³ugi okien z pythona bêdzie mo¿na tworzyæ okna dialogowe. a z tego
+  wzglêdu, ¿e skrypty pythona maj± dostêp do zmiennych... hmm, kto napisze
+  Kreator Konfiguracji EKG? :> (w)
 
 // 2003-01-30
 
