@@ -3242,12 +3242,16 @@ static int ui_ncurses_event(const char *event, ...)
 			
 			if (window_current->target) {
 				struct userlist *u = userlist_find(0, window_current->target);
+				struct conference *c = conference_find(window_current->target);
 				int uin;
 
 				if (u && u->uin)
 					tmp = saprintf("find %d", u->uin);
 
-				if (!u && (uin = atoi(window_current->target)))
+				if (c && c->name)
+					tmp = saprintf("conference --find %s", c->name);
+
+				if (!u && !c && (uin = atoi(window_current->target)))
 					tmp = saprintf("find %d", uin);
 			}
 

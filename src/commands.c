@@ -3714,9 +3714,13 @@ COMMAND(cmd_conference)
 			return -1;
 		}
 
-		if (params[2])
-			conference_add(params[1], params[2], quiet);
-		else
+		if (params[2]) {
+			if (params[2][0] != '#') {
+				printq("conferences_name_error");
+				return -1;
+			} else
+				conference_add(params[1], params[2], quiet);
+		} else
 			conference_create(params[1]);
 
 		return 0;
@@ -3730,8 +3734,14 @@ COMMAND(cmd_conference)
 
 		if (!strcmp(params[1], "*"))
 			conference_remove(NULL, quiet);
-		else
+		else {
+			if (params[1][0] != '#') {
+				printq("conferences_name_error");
+				return -1;
+			}
+
 			conference_remove(params[1], quiet);
+		}
 
 		return 0;
 	}
@@ -3741,7 +3751,12 @@ COMMAND(cmd_conference)
 			printq("not_enough_params", name);
 			return -1;
 		}
-		
+
+		if (params[1][0] != '#' || params[2][0] != '#') {
+			printq("conferences_name_error");
+			return -1;
+		}
+
 		conference_rename(params[1], params[2], quiet);
 
 		return 0;
@@ -3753,6 +3768,11 @@ COMMAND(cmd_conference)
 			return -1;
 		}
 
+		if (params[1][0] != '#') {
+			printq("conferences_name_error");
+			return -1;
+		}
+
 		conference_set_ignore(params[1], 1, quiet);
 
 		return 0;
@@ -3761,6 +3781,11 @@ COMMAND(cmd_conference)
 	if (match_arg(params[0], 'u', "unignore", 2)) {
 		if (!params[1]) {
 			printq("not_enough_params", name);
+			return -1;
+		}
+
+		if (params[1][0] != '#') {
+			printq("conferences_name_error");
 			return -1;
 		}
 
@@ -3776,6 +3801,11 @@ COMMAND(cmd_conference)
 
 		if (!params[1]) {
 			printq("not_enough_params", name);
+			return -1;
+		}
+
+		if (params[1][0] != '#') {
+			printq("conferences_name_error");
 			return -1;
 		}
 

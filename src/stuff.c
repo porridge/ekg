@@ -300,8 +300,8 @@ int alias_remove(const char *name, int quiet)
 		l = l->next;
 
 		if (!name || !strcasecmp(a->name, name)) {
-			if (name && !quiet)
-				print("aliases_del", name);
+			if (name)
+				printq("aliases_del", name);
 			command_remove(a->name);
 			xfree(a->name);
 			list_destroy(a->commands, 1);
@@ -311,19 +311,17 @@ int alias_remove(const char *name, int quiet)
 	}
 
 	if (!removed) {
-		if (quiet)
-			return -1;
-
-		if (name)
-			print("aliases_noexist", name);
-		else
-			print("aliases_list_empty");
+		if (name) {
+			printq("aliases_noexist", name);
+		} else {
+			printq("aliases_list_empty");
+		}
 
 		return -1;
 	}
 
-	if (removed && !name && !quiet)
-		print("aliases_del_all");
+	if (removed && !name)
+		printq("aliases_del_all");
 
 	return 0;
 }
@@ -726,20 +724,13 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 	memset(&c, 0, sizeof(c));
 
-	if (!name || !nicklist) {
-		printq("not_enough_params", "conference");
+	if (!name || !nicklist)
 		return NULL;
-	}
-
-	if (name[0] != '#') {
-		printq("conferences_name_error");
-		return NULL;
-	}
 
 	buf = xstrdup(nicklist);
 	buf = strip_spaces(buf);
 	
-	if (buf[0] == ',' || buf[strlen(buf)-1] == ',') {
+	if (buf[0] == ',' || buf[strlen(buf) - 1] == ',') {
 		printq("invalid_params", "chat");
 		xfree(buf);
 		return NULL;
@@ -825,7 +816,6 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 	if (i != count) {
 		printq("conferences_not_added", name);
-
 		return NULL;
 	}
 
@@ -859,8 +849,8 @@ int conference_remove(const char *name, int quiet)
 		l = l->next;
 
 		if (!name || !strcasecmp(c->name, name)) {
-			if (name && !quiet)
-				print("conferences_del", name);
+			if (name)
+				printq("conferences_del", name);
 			remove_send_nick(c->name);
 			xfree(c->name);
 			list_destroy(c->recipients, 1);
@@ -870,21 +860,17 @@ int conference_remove(const char *name, int quiet)
 	}
 
 	if (!removed) {
-		if (quiet)
-			return -1;
-			
-		if (name)
-			print("conferences_noexist", name);
-		else
-			print("conferences_list_empty");
+		if (name) {
+			printq("conferences_noexist", name);
+		} else {
+			printq("conferences_list_empty");
+		}
 		
 		return -1;
 	}
 
-	if (removed && !name && !quiet) {
-		print("conferences_del_all");
-		return 0;
-	}
+	if (removed && !name)
+		printq("conferences_del_all");
 
 	return 0;
 }
@@ -900,9 +886,10 @@ struct conference *conference_create(const char *nicks)
 {
 	struct conference *c;
 	static int count = 1;
-	char *name = saprintf("#conf%d", count++);
+	char *name = saprintf("#conf%d", count);
 
-	c = conference_add(name, nicks, 0);
+	if ((c = conference_add(name, nicks, 0)))
+		count++;
 
 	xfree(name);
 
@@ -982,11 +969,6 @@ int conference_set_ignore(const char *name, int flag, int quiet)
 {
 	struct conference *c = NULL;
 
-	if (name[0] != '#') {
-		printq("conferences_name_error");
-		return -1;
-	}
-
 	c = conference_find(name);
 
 	if (!c) {
@@ -1014,11 +996,6 @@ int conference_set_ignore(const char *name, int flag, int quiet)
 int conference_rename(const char *oldname, const char *newname, int quiet)
 {
 	struct conference *c;
-	
-	if (oldname[0] != '#' || newname[0] != '#') {
-		printq("conferences_name_error");
-		return -1;
-	}
 	
 	if (conference_find(newname)) {
 		printq("conferences_exist", newname);
