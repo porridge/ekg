@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2004-12-19
+
+- uzupe³nienie dokumentacji protoko³u o tokenu (w)
+
 // 2004-12-15
 
 - usuniêcie malutkiego wycieku zasobów, je¶li korzystamy z w±tkowego
