@@ -187,8 +187,8 @@ int voice_play(const char *buf, int length, int null)
 		gg_debug(GG_DEBUG_MISC, "// gsm_decode(%p, %p, %p);\n", voice_gsm_dec, pos, output);
 		if (gsm_decode(voice_gsm_dec, (char*) pos, output))
 			return -1;
-		if (!null)
-			write(voice_fd, output, 320);
+		if (!null && write(voice_fd, output, 320) == -1)
+			return 0;
 		pos += 32;
 	}
 
@@ -235,13 +235,9 @@ int voice_record(char *buf, int length, int null)
 
 		pos += 32;
 
+		memset(input, 0, 320);
+
 		res = read(voice_fd, input, 320);
-
-		if (res > 0 && res < 320)
-			return 0;
-
-		if (res <= 0)
-			return -1;
 
 		if (!null)
 			gsm_encode(voice_gsm_enc, input, (char*) pos);

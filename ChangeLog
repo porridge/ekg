@@ -4,6 +4,14 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-10-17
+
+- libgadu: dodanie funkcji gg_image_reply() (w)
+- libgadu: drobne poprawki kodu (w)
+- dodanie komend testowych /_imagemsg (wysy³a wiadomo¶æ zawieraj±c± tylko
+  obrazek), /_imagereq (wysy³a ¿±danie obrazka), /_imagesend (wysy³a
+  obrazek) (w)
+
 // 2003-10-15
 
 - libgadu: poprawka api odbierania obrazków (w)

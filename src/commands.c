@@ -3291,7 +3291,93 @@ COMMAND(cmd_test_imagereq)
 
 	return gg_image_request(sess, get_uin(params[0]), atoi(params[1]), strtoul(params[2], NULL, 16));
 }
+
+COMMAND(cmd_test_imagesend)
+{
+	int fd, size, res;
+	char *image;
+
+	if (!params[0] || !params[1]) {
+		printq("not_enough_params", name);
+		return -1;
+	}
+
+	if (!sess || sess->state != GG_STATE_CONNECTED) {
+		printq("not_connected");
+		return -1;
+	}
+
+	if ((fd = open(params[1], O_RDONLY)) == -1) {
+		printq("generic_error", strerror(errno));
+		return -1;
+	}
+
+	size = lseek(fd, 0, SEEK_END);
+	lseek(fd, 0, SEEK_SET);
+
+	image = xmalloc(size);
+
+	if (read(fd, image, size) < size) {
+		printq("generic_error", strerror(errno));
+		return -1;
+	}
 	
+	close(fd);
+
+	res = gg_image_reply(sess, get_uin(params[0]), params[1], image, size);
+
+	xfree(image);
+
+	return res;
+}
+
+COMMAND(cmd_test_imagemsg)
+{
+	char *image, *message = "", format[16] = { 0x02, 0x0d, 0x00, 0x00, 0x00, 0x80, 0x09, 0x01, 0, 0, 0, 0, 0, 0, 0, 0 };
+	uint32_t tmp;
+	int fd, size;
+
+	if (!params[0] || !params[1]) {
+		printq("not_enough_params", name);
+		return -1;
+	}
+
+	if (!sess || sess->state != GG_STATE_CONNECTED) {
+		printq("not_connected");
+		return -1;
+	}
+
+	if ((fd = open(params[1], O_RDONLY)) == -1) {
+		printq("generic_error", strerror(errno));
+		return -1;
+	}
+
+	gg_debug(GG_DEBUG_MISC, "// sizeof(off_t) = %d\n", sizeof(off_t));
+	size = lseek(fd, 0, SEEK_END);
+	lseek(fd, 0, SEEK_SET);
+
+	image = xmalloc(size);
+
+	if (read(fd, image, size) < size) {
+		printq("generic_error", strerror(errno));
+		close(fd);
+		xfree(image);
+		return -1;
+	}
+
+	close(fd);
+
+	tmp = gg_crc32(0, image, size);
+	gg_debug(GG_DEBUG_MISC, "// crc32 = 0x%.8x, size = %d\n", tmp, size);
+	memcpy(format + 12, &tmp, 4);
+	tmp = gg_fix32(size);
+	memcpy(format + 8, &tmp, 4);
+	
+	xfree(image);
+
+	return gg_send_message_richtext(sess, GG_CLASS_CHAT, get_uin(params[0]), message, format, sizeof(format));
+}
+
 COMMAND(cmd_test_resize)
 {
 	ui_resize_term = 1;
@@ -6013,6 +6099,12 @@ void command_init()
 	command_add
 	( "_imagereq", "u??", cmd_test_imagereq, 0, " <numer/alias> <rozmiar> <crc>", 
 	  "wysy³a ¿±danie wys³ania obrazka", "\nSumê kontroln± nale¿y podaæ w postaci heksadecymalnej.");
+	command_add
+	( "_imagemsg", "u?", cmd_test_imagemsg, 0, " <numer/alias> <plik>", 
+	  "wysy³a wiadomo¶æ zawieraj±c± wy³±cznie obrazek", "");
+	command_add
+	( "_imagesend", "u?", cmd_test_imagesend, 0, " <numer/alias> <plik>",
+	  "wysy³a odpowied¼ z obrazkiem", "");
 }
 
 /*
