@@ -5428,7 +5428,7 @@ void command_init()
 	( "save", "?", cmd_save, 0,
 	  " [plik]", "zapisuje ustawienia programu",
 	  "\n"
-	  "Aktualny stan zostanie zapisany i zostanie przywrócony przy "
+	  "Aktualny stan zostanie zapisany i bêdzie przywrócony przy "
 	  "nastêpnym uruchomieniu programu. Mo¿na podaæ plik, do którego "
 	  "ma byæ zapisana konfiguracja.");
 	  
