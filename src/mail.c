@@ -277,6 +277,7 @@ int check_mail_mbox()
 	x.id = pid;
 	x.timeout = 60;
 	x.buf = string_init(NULL);
+	x.target = NULL;
 
 	fcntl(x.fd, F_SETFL, O_NONBLOCK);
 
@@ -374,6 +375,7 @@ int check_mail_maildir()
 	x.id = pid;
 	x.timeout = 60;
 	x.buf = string_init(NULL);
+	x.target = NULL;
 
 	fcntl(x.fd, F_SETFL, O_NONBLOCK);
 
