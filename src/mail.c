@@ -164,7 +164,10 @@ int check_mail_mbox()
 				xfree(buf);
 			}	
 
-			memset(m, 0, sizeof(m));
+			m->mtime = 0;
+			m->size = 0;  
+			m->check = 0;  
+			m->count = 0;
 
 			continue;
 		}
