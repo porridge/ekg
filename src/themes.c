@@ -28,6 +28,7 @@
 #include "stuff.h"
 #include "dynstuff.h"
 #include "themes.h"
+#include "config.h"
 
 char *prompt_cache = NULL, *prompt2_cache = NULL, *error_cache = NULL, *timestamp_cache = NULL;
 char *readline_prompt = NULL, *readline_prompt_away = NULL;
@@ -355,6 +356,42 @@ int del_format(char *name)
 }
 
 /*
+ * try_open() // funkcja wewnêtrzna
+ *
+ * próbuje otworzyæ plik, je¶li jeszcze nie jest otwarty.
+ *
+ *  - prevfd - deskryptor z poprzedniego wywo³ania,
+ *  - prefix - ¶cie¿ka,
+ *  - filename - nazwa pliku.
+ */
+static FILE *try_open(FILE *prevfd, char *prefix, char *filename)
+{
+	char buf[PATH_MAX];
+	FILE *f;
+
+	if (prevfd)
+		return prevfd;
+
+	if (prefix)
+		snprintf(buf, sizeof(buf) - 1, "%s/%s", prefix, filename);
+	else
+		snprintf(buf, sizeof(buf) - 1, "%s", filename);
+
+	if ((f = fopen(buf, "r")))
+		return f;
+
+	if (prefix)
+		snprintf(buf, sizeof(buf) - 1, "%s/%s.theme", prefix, filename);
+	else
+		snprintf(buf, sizeof(buf) - 1, "%s.theme", filename);
+
+	if ((f = fopen(buf, "r")))
+		return f;
+
+	return NULL;
+}
+
+/*
  * read_theme()
  *
  * wczytuje opis wygl±du z podanego pliku. 
@@ -363,21 +400,25 @@ int del_format(char *name)
  */
 int read_theme(char *filename, int replace)
 {
-        char *buf, buf2[PATH_MAX];
-        FILE *f;
+        char *buf, *tmp;
+        FILE *f = NULL;
 
         if (!filename) {
-                if (!(filename = prepare_path("default.theme")))
-                        return -1;
+                filename = prepare_path("default.theme");
+		if (!filename || !(f = fopen(filename, "r")))
+			return -1;
         } else {
-		if (!strchr(filename, '/'))
-			filename = prepare_path(filename);
-	}
-
-        if (!(f = fopen(filename, "r"))) {
-		snprintf(buf2, sizeof(buf2) - 1, "%s.theme", filename);
-		if (!(f = fopen(buf2, "r")))
-	                return -1;
+		if (strchr(filename, '/'))
+			f = try_open(NULL, NULL, filename);
+		else {
+			f = try_open(NULL, THEMES_DIR, filename);
+			tmp = prepare_path("");
+			f = try_open(f, tmp, filename);
+			tmp = prepare_path("themes");
+			f = try_open(f, tmp, filename);
+		}
+		if (!f)
+			return -1;
 	}
 
         while ((buf = read_file(f))) {
