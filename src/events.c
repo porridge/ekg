@@ -59,7 +59,7 @@ static struct handler handlers[] = {
  *
  * nie zwraca niczego. efekt widaæ na ekranie.
  */
-void print_message_body(char *str, int chat)
+void print_message_body(const char *str, int chat)
 {
 	int width, i, j;
 	char *mesg, *buf, *line, *next, *format = NULL, *save;
@@ -84,7 +84,7 @@ void print_message_body(char *str, int chat)
 		width = 78;
 	
 	if (!(buf = malloc(width + 1)) || !(mesg = save = strdup(str))) {
-		my_puts(str);			/* emergency ;) */
+		my_puts("%s", str);		/* emergency ;) */
 		return;
 	}
 
@@ -93,13 +93,12 @@ void print_message_body(char *str, int chat)
 			mesg[i] = ' ';
 	
 	while ((line = gg_get_line(&mesg))) {
-		char *new_line;
+		char *new_line = NULL;
 
+		if (config_emoticons && (new_line = emoticon_expand(line)))
+			line = new_line;
+		
 		for (; strlen(line); line = next) {
-			
-			if (config_emoticons && (new_line = emoticon_expand(line)))
-				line = new_line;
-			
 			if (strlen(line) <= width) {
 				strcpy(buf, line);
 				next = line + strlen(line);
@@ -122,7 +121,8 @@ void print_message_body(char *str, int chat)
 
 			my_printf(format, buf);
 		}
-		if (config_emoticons)
+
+		if (new_line)
 			free(new_line);
 	}
 

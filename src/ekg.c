@@ -456,7 +456,7 @@ int main(int argc, char **argv)
 	char *pipe_file = NULL;
 #ifdef WITH_IOCTLD
     	char *sock_path = NULL, *ioctl_daemon_path = IOCTLD_PATH;
-#	define IOCTLD_HELP "  -I, --ioctl-daemon-path [¦CIE¯KA]    ustawia ¶cie¿kê do ioctl_daemon-a\n"
+#	define IOCTLD_HELP "  -I, --ioctld-path [¦CIE¯KA]    ustawia ¶cie¿kê do ioctl_daemon-a\n"
 #else
 #	define IOCTLD_HELP ""
 #endif
@@ -549,7 +549,7 @@ IOCTLD_HELP
 			return 0;
 		}
 #ifdef WITH_IOCTLD
-                if (!strcmp(argv[i], "-I") || !strcmp(argv[i], "--ioctl-daemon-path")) {
+                if (!strcmp(argv[i], "-I") || !strcmp(argv[i], "--ioctld-path")) {
                         if (argv[i+1]) {
                                 ioctl_daemon_path = argv[i+1];
                                 i++;
