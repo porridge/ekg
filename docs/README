@@ -61,7 +61,7 @@ U¯YCIE
 
     Jest na tyle intuicyjne, ¿e nie powinno sprawiæ problemów (wszyscy
     betatesterzy poradzili sobie bez jakiejkolwiek dokumentacji).
-    Interfejs jest podobny do ircii. Dope³nianie tabem jest dostêpne w
+    Interfejs jest wzorowany na irssi. Dope³nianie tabem jest dostêpne w
     wiêkszo¶ci komend. Komendy mo¿na wywo³ywaæ skrótami, o ile s± one
     jednoznaczne. Wysy³anie wiadomo¶ci komend± ,,msg'', rozmowa komend±
     ,,chat''. Informacje o ludziach ,,find <numer/nick>''. Szukanie t±
@@ -81,7 +81,7 @@ U¯YCIE
     uruchomiæ ekg z parametrem ,,-c'' i ¶cie¿k± potoku. Ze wzglêdu na
     specyfikê potoków, wyniki poleceñ wysy³ane bêd± na terminal na którym
     jest uruchomione ekg (tak jak normalnie). Pisaæ do potoku mo¿na tak
-    jak do normalnego pliku (choæby zwyk³ym echem).
+    jak do normalnego pliku (choæby poleceniem echo).
 
     Je¶li w linii poleceñ shella podasz po nazwie programu i parametrach
     zaczynaj±cych siê od my¶lnika co¶ jeszcze, to zostanie to zinterpretowane
@@ -229,6 +229,9 @@ SYNTEZA MOWY
     Wad± aktualnej implementacji jest fakt blokowania ca³ego programu
     podczas wymawiania tekstu.
 
+    Program ,,powiedz'' mo¿na pobraæ z
+    http://cvs.pld.org.pl/SOURCES/powiedz_0.2.tgz
+
 ZNANE PROBLEMY
 
     Je¶li nie mo¿esz wpisywaæ polskich liter w interfejsie readline,
@@ -285,10 +288,10 @@ ZG£ASZANIE B£ÊDÓW
     gdzie <pid> to numer procesu ekg (uzyskasz go poleceniem ,,ps x'')
     i wy¶lij ostatnie 20 linii.
 
-    Informacjê o b³êdzie nale¿y przesy³aæ na listê ekg-users (szczegó³y
-    ni¿ej), poniewa¿ w ten sposób dostan± j± (prawie) wszyscy autorzy
-    kodu. Mo¿liwe te¿, ¿e który¶ z u¿ytkowników natkn±³ siê na to samo
-    i wie, jak sobie z tym poradziæ.
+    Informacjê o b³êdzie nale¿y przesy³aæ na listê ekg-users (nie trzeba
+    siê na ni± zapisywaæ, szczegó³y ni¿ej), poniewa¿ w ten sposób dostan±
+    j± (prawie) wszyscy autorzy kodu. Mo¿liwe te¿, ¿e który¶ z u¿ytkowników
+    natkn±³ siê na to samo i wie, jak sobie z tym poradziæ.
 
 ¬RÓD£A
 
