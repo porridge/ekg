@@ -2306,7 +2306,7 @@ void known_uin_generator(const char *text, int len)
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
 
-		if (u->display && !strncasecmp(text, u->display, len)) {
+		if (u->display && u->uin && !strncasecmp(text, u->display, len)) {
 			array_add(&completions, xstrdup(u->display));
 			done = 1;
 		}
@@ -2315,7 +2315,7 @@ void known_uin_generator(const char *text, int len)
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
 
-		if (!done && !strncasecmp(text, itoa(u->uin), len))
+		if (!done && u->uin && !strncasecmp(text, itoa(u->uin), len))
 			array_add(&completions, xstrdup(itoa(u->uin)));
 	}
 
