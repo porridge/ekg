@@ -10,6 +10,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawki w komentarzach libgadu, by w przysz³o¶ci móc w ³atwy sposób
   przerobiæ je skryptem na zgrabne ,,api reference'' (w)
 - przygotowanie gg_gethostbyname() pod wielobie¿no¶æ (w)
+- poprawka p³ci w /list (neeo/w)
 
 // 2002-06-08
 

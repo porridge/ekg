@@ -578,7 +578,7 @@ void init_theme()
 	add_format("list_busy", "%> %1 %G(zajêt%@2)%n %b%3:%4%n\n", 1);
 	add_format("list_busy_descr", "%> %1 %G(zajêt%@2: %n%5%G)%n %b%3:%4%n\n", 1);
 	add_format("list_not_avail", "%> %1 %r(niedostêpn%@2)%n\n", 1);
-	add_format("list_not_avail_descr", "%> %1 %r(niedostêpn%@1: %n%5%r)%n\n", 1);
+	add_format("list_not_avail_descr", "%> %1 %r(niedostêpn%@2: %n%5%r)%n\n", 1);
 	add_format("list_invisible", "%> %1 %c(niewidoczn%@2)%n %b%3:%4%n\n", 1);
 	add_format("list_unknown", "%> %1\n", 1);
 	add_format("saved", "%> Zapisano ustawienia\n", 1);
