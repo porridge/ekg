@@ -45,12 +45,15 @@ static PyObject* ekg_connect(PyObject *self, PyObject *args)
 
 static PyObject* ekg_disconnect(PyObject *self, PyObject *args)
 {
-	char *reason = NULL;
+	char *reason = NULL, *tmp;
 
 	if (!PyArg_ParseTuple(args, "|s", &reason))
 		return NULL;
 
-	command_exec(NULL, "disconnect", reason, 0);
+	tmp = saprintf("disconnect %s", ((reason) ? reason : ""));
+
+	command_exec(NULL, tmp, 0);
+	xfree(tmp);
 
 	return Py_BuildValue("");
 }
