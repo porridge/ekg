@@ -247,6 +247,7 @@ void conference_free();
 struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int count);
 struct conference *conference_find(const char *name);
 struct conference *conference_create(const char *nicks);
+int conference_rename(const char *oldname, const char *newname);
 
 char *base64_encode(const char *buf);
 char *base64_decode(const char *buf);

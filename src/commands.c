@@ -1102,6 +1102,7 @@ COMMAND(cmd_msg)
 		e.type = GG_EVENT_MSG;
 		e.event.msg.sender = config_uin;
 		e.event.msg.message = xstrdup(params[1]);
+		e.event.msg.time = time(NULL);
 
 		memset(&u, 0, sizeof(u));
 		u.uin = 0;
@@ -2259,9 +2260,10 @@ COMMAND(cmd_test_python)
 
 COMMAND(cmd_conference) 
 {
-	if (!params[0] || match_arg(params[0], 'l', "list", 2)) {
+	if (!params[0] || match_arg(params[0], 'l', "list", 2) || params[0][0] == '#') {
 		list_t l, r;
 		int count = 0;
+		char *cname = (params[0] && params[0][0] == '#') ? params[0] : NULL;
 
 		for (l = conferences; l; l = l->next) {
 			struct conference *c = l->data;
@@ -2270,6 +2272,9 @@ COMMAND(cmd_conference)
 			int first = 0;
 
 			recipients = string_init(NULL);
+
+			if (cname && strcmp(cname, c->name))
+				continue;
 			
 			for (r = c->recipients; r; r = r->next) {
 				uin_t uin = *((uin_t *) (r->data));
@@ -2317,6 +2322,17 @@ COMMAND(cmd_conference)
 		}
 
 		conference_remove(params[1]);
+
+		return;
+	}
+
+	if (match_arg(params[0], 'r', "rename", 2)) {
+		if (!params[1] || !params[2]) {
+			print("not_enough_params", name);
+			return;
+		}
+		
+		conference_rename(params[1], params[2]);
 
 		return;
 	}
@@ -2712,7 +2728,8 @@ void command_init()
 	  " [opcje]", "zarz±dzanie konferencjami",
 	  "  -a, --add <#nazwa> <nick/uin/@grupa>  tworzy now± konferencjê\n"
 	  "  -d, --del <#nazwa>                    usuwa konferencjê\n"
-	  " [-l, --list]                           wy¶wietla listê konferencji\n"
+	  "  -r, --rename #<old> #<new>            zmienia nazwê konferencji\n"
+	  " [-l, --list, #<nazwa>  ]               wy¶wietla listê konferencji\n"
 	  "\n"
 	  "Dodaje nazwê konferencji i definiuje, kto bierze w niej udzia³.\n"
 	  "Kolejne numery, pseudonimy lub grupy mog± byc odzielone\n"

@@ -1019,6 +1019,45 @@ int on_off(const char *value)
 }
 
 /*
+ * conference_rename()
+ *
+ * zmienia nazwê instniej±cej konferencji.
+ * 
+ *  - oldname - stara nazwa
+ *  - newname - nowa nazwa
+ */
+int conference_rename(const char *oldname, const char *newname)
+{
+	struct conference *c;
+	
+	if (oldname[0] != '#' || newname[0] != '#') {
+		print("conferences_name_error");
+		return -1;
+	}
+	
+	if (conference_find(newname)) {
+		print("conferences_exist", newname);
+		return -1;
+	}
+
+	if (!(c = conference_find(oldname))) {
+		print("conference_noexist", oldname);
+		return -1;
+	}
+
+	xfree(c->name);
+	c->name = xstrdup(newname);
+	remove_send_nick(oldname);
+	add_send_nick(newname);
+
+	print("conferences_rename", oldname, newname);
+
+	ui_event("conference_rename", oldname, newname);
+	
+	return 0;
+}
+
+/*
  * conference_add()
  *
  * dopisuje konferencje do listy konferencji.
@@ -1141,6 +1180,8 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 	c.name = xstrdup(name);
 
+	add_send_nick(name);
+
 	return list_add(&conferences, &c, sizeof(c));
 }
 
@@ -1188,6 +1229,8 @@ int conference_remove(const char *name)
 			xfree(c->name);
 			list_destroy(c->recipients, 1);
 			list_remove(&conferences, c, 1);
+			remove_send_nick(name);
+
 			return 0;
 		}
 	}

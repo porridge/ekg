@@ -1005,4 +1005,5 @@ void theme_init()
 	format_add("conferences_exist", "%! Konferencja %T%1%n ju¿ istnieje\n", 1);
 	format_add("conferences_noexist", "%! Konferencja %T%1%n nie istnieje\n", 1);
 	format_add("conferences_name_error", "%! Nazwa konferencji powinna zaczynaæ siê od %T#%n\n", 1);
+	format_add("conferences_rename", "%! Nazwa konferencji zmieniona: %T%1%n --> %T%2%n\n", 1);
 };

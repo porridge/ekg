@@ -1597,8 +1597,6 @@ static int ui_ncurses_event(const char *event, ...)
 
 	va_start(ap, event);
 
-	update_statusbar();
-
 	if (!event)
 		return 0;
 
@@ -1618,6 +1616,20 @@ static int ui_ncurses_event(const char *event, ...)
 				struct window *w = l->data;
 				
 				w->id = id++;
+			}
+		}
+	}
+
+	if (!strcmp(event, "conference_rename")) {
+		char *oldname = va_arg(ap, char*), *newname = va_arg(ap, char*);
+		list_t l;
+
+		for (l = windows; l; l = l->next) {
+			struct window *w = l->data;
+
+			if (w->target && !strcasecmp(w->target, oldname)) {
+				xfree(w->target);
+				w->target = xstrdup(newname);
 			}
 		}
 	}
@@ -1770,6 +1782,8 @@ static int ui_ncurses_event(const char *event, ...)
 
 cleanup:
 	va_end(ap);
+
+	update_statusbar();
 	
 	return 0;
 }

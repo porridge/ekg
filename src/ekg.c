@@ -679,8 +679,6 @@ int main(int argc, char **argv)
 	ui_screen_height = getenv("LINES") ? atoi(getenv("LINES")) : 24;
 	ui_init();
 
-	print("generic", saprintf("%dx%d\n", ui_screen_width, ui_screen_height));
-
 	in_autoexec = 1;
         userlist_read();
 	config_read();
