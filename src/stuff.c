@@ -83,6 +83,7 @@ list_t timers = NULL;
 list_t lasts = NULL;
 list_t conferences = NULL;
 list_t sms_away = NULL;
+list_t buffers = NULL;
 
 int in_autoexec = 0;
 int config_auto_reconnect = 10;
@@ -199,6 +200,57 @@ static struct {
 	{ INACTIVE_EVENT, NULL },
 	{ 0, NULL },
 };
+
+int buffer_add(int type, const char *line, int max_lines)
+{
+	struct buffer b;
+
+	b.type = type;
+	b.line = xstrdup(line);
+
+	list_add(&buffers, &b, sizeof(b));
+
+	if (max_lines && buffer_count(type) > max_lines) {
+		struct buffer *foo = buffers->data;
+
+		xfree(foo->line);
+		list_remove(&buffers, foo, 1);
+	}
+		
+	return 0;
+}
+
+int buffer_count(int type)
+{
+	list_t l;
+	int count = 0;
+
+	for (l = buffers; l; l = l->next) {
+		struct buffer *b = l->data;
+
+		if (b->type == type)
+			count++;
+	}	
+
+	return count;
+}
+
+void buffer_free()
+{
+	list_t l;
+
+	if (!buffers)
+		return;
+
+	for (l = buffers; l; l = l->next) {
+		struct buffer *b = l->data;
+
+		xfree(b->line);
+	}
+
+	list_destroy(buffers, 1);
+	buffers = NULL;
+}
 
 /*
  * emoticon_expand()
@@ -733,9 +785,15 @@ void config_write_main(FILE *f, int base64)
 void config_write_crash()
 {
 	char name[32];
+	char path[PATH_MAX];
 	FILE *f;
 
-	chdir(config_dir);
+	if (config_profile)
+		snprintf(path, sizeof(path), "%s/%s", config_dir, config_profile);
+	else
+		snprintf(path, sizeof(path), "%s", config_dir);
+
+	chdir(path);
 
 	snprintf(name, sizeof(name), "config.%d", getpid());
 	if (!(f = fopen(name, "w")))
@@ -911,6 +969,36 @@ int sysmsg_write()
 	fclose(f);
 	
 	return 0;
+}
+
+void debug_write_crash()
+{
+	char name[32];
+	FILE *f;
+	char path[PATH_MAX];
+	list_t l;
+
+	if (config_profile)
+		snprintf(path, sizeof(path), "%s/%s", config_dir, config_profile);
+	else
+		snprintf(path, sizeof(path), "%s", config_dir);
+
+	chdir(path);
+
+	snprintf(name, sizeof(name), "debug.%d", getpid());
+	if (!(f = fopen(name, "w")))
+		return;
+
+	chmod(name, 0400);
+	
+	for (l = buffers; l; l = l->next) {
+		struct buffer *b = l->data;
+
+		if (b->type == BUFFER_DEBUG)
+			fprintf(f, "%s\n", b->line);
+	}
+	
+	fclose(f);
 }
 
 /*

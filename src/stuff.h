@@ -135,6 +135,16 @@ struct gg_exec {
 	char *target;	/* okno, do którego ma lecieæ wynik */
 };
 
+enum buffer_type {
+	BUFFER_DEBUG,	/* na zapisanie n ostatnich linii debug */
+	BUFFER_EXEC	/* na buforowanie tego, co wypluwa exec */
+};
+
+struct buffer {
+	int type;
+	char *line;
+};
+
 list_t children;
 list_t aliases;
 list_t watches;
@@ -146,6 +156,7 @@ list_t timers;
 list_t lasts;
 list_t conferences;
 list_t sms_away;
+list_t buffers;
 struct gg_session *sess;
 
 time_t last_save;
@@ -291,6 +302,7 @@ int config_read();
 int config_write();
 int config_write_partly(char **vars);
 void config_write_crash();
+void debug_write_crash();
 
 int sysmsg_read();
 int sysmsg_write();
@@ -316,6 +328,10 @@ int conference_set_ignore(const char *name, int flag);
 
 char *base64_encode(const char *buf);
 char *base64_decode(const char *buf);
+
+int buffer_add(int type, const char *line, int max_lines);
+int buffer_count(int type);
+void buffer_free();
 
 void changed_dcc(const char *var);
 void changed_theme(const char *var);

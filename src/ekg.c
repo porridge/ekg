@@ -215,8 +215,10 @@ static void get_line_from_pipe(struct gg_exec *c)
 					check_mail_update(line, 1);
 				else
 					print_window(c->target, 0, "exec", line, itoa(c->id));
-			} else
+			} else {
+				buffer_add(BUFFER_DEBUG, line, 50);
 				print_window("__debug", 0, "debug", line);
+			}
 
 			new = string_init(c->buf->str + index + 1);
 			string_free(c->buf, 1);
@@ -232,8 +234,10 @@ static void get_line_from_pipe(struct gg_exec *c)
 					check_mail_update(c->buf->str, 0);
 				else
 					print_window(c->target, 0, "exec", c->buf->str, itoa(c->id));
-			} else
+			} else {
+				buffer_add(BUFFER_DEBUG, c->buf->str, 50);
 				print_window("__debug", 0, "debug", c->buf->str);
+			}
 		}
 		close(c->fd);
 		xfree(c->target);
@@ -658,6 +662,7 @@ config_dir, getpid(), config_dir, getpid(), config_dir, argv0, config_dir);
 
 	config_write_crash();
 	userlist_write_crash();
+	debug_write_crash();
 
 	raise(SIGSEGV);			/* niech zrzuci core */
 }
@@ -1174,6 +1179,7 @@ void ekg_exit()
 	timer_free();
 	binding_free();
 	last_free();
+	buffer_free();
 
 	xfree(home_dir);
 
