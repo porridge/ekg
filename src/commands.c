@@ -1288,7 +1288,7 @@ COMMAND(cmd_list)
 
 		p = u->port;
 		
-		if (GG_S_A(u->status) || GG_S_B(u->status))
+		if (u->uin == config_uin || GG_S_A(u->status) || GG_S_B(u->status))
 			in.s_addr = u->ip.s_addr;
 		else {
 			in.s_addr = inet_addr("0.0.0.0");
