@@ -1038,7 +1038,7 @@ static int ui_readline_event(const char *event, ...)
 					window_list();
 			} else if (!strcasecmp(p1, "last")) {
 				if (window_last_id != -1)
-					window_switch(window_last_id, 0);
+					window_switch(window_last_id, quiet);
 			} else if (!strcasecmp(p1, "active")) {
 				list_t l;
 
@@ -1046,7 +1046,7 @@ static int ui_readline_event(const char *event, ...)
 					struct window *w = l->data;
 
 					if (w->act)
-						window_switch(w->id, 0);
+						window_switch(w->id, quiet);
 				}
 
 		        } else if (!strcasecmp(p1, "new")) {
