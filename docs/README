@@ -29,6 +29,14 @@ INSTALACJA
     *BSD, SunOS, IRIX itp. je¶li uda Ci siê skompilowaæ go na jakim¶
     egzotycznym systemie lub rzadko spotykanej architekturze, daj znaæ.
 
+    program korzysta z biblioteki readline, wiêc odpowiednie pakiety
+    zawieraj±ce j±, oraz pliki nag³ówkowe, powinny byæ zainstalowane.
+    readline zwykle polega te¿ na innych bibliotekach do obs³ugi
+    terminala, jak np. libtermcap czy ncurses. oczywi¶cie niezbêdny
+    jest te¿ zestaw narzêdzi do kompilacji programów napisanych w
+    jêzyki C -- kompilator, preprocesor, linker, pliki nag³ówkowe,
+    biblioteki systemowe itd.
+
 U¯YCIE
 
     jest na tyle intuicyjne, ¿e nie powinno sprawiæ problemów (wszyscy
