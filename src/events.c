@@ -451,7 +451,26 @@ void handle_msg(struct gg_event *e)
 	}
 
 	if ((e->event.msg.msgclass & GG_CLASS_CTCP)) {
+		list_t l;
+		int dccs = 0;
+		
 		gg_debug(GG_DEBUG_MISC, "// ekg: received ctcp\n");
+
+		for (l = watches; l; l = l->next) {
+			struct gg_dcc *d = l->data;
+
+			if (d->type == GG_SESSION_DCC)
+				dccs++;
+		}
+
+		if (dccs > 50) {
+			char *tmp = saprintf("/ignore %d", e->event.msg.sender);
+			print_status("dcc_attack", format_user(e->event.msg.sender));
+			command_exec(NULL, tmp, 0);
+			xfree(tmp);
+
+			return;
+		}
 
 		if (config_dcc && u) {
 			struct gg_dcc *d;
