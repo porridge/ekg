@@ -1946,8 +1946,19 @@ static void ui_ncurses_loop()
 			case 9:		/* Tab */
 				if (!lines)
 					complete(&line_start, &line_index);
+				else {
+					int i, count = 8 - (line_index % 8);
 
-				/* XXX tab w wielolinijkowym */
+					if (strlen(line) + count >= LINE_MAXLEN - 1)
+						break;
+
+					memmove(line + line_index + count, line + line_index, LINE_MAXLEN - line_index - count);
+
+					for (i = line_index; i < line_index + count; i++)
+						line[i] = ' ';
+
+					line_index += count;
+				}
 
 				break;
 				
@@ -2117,8 +2128,11 @@ static void ui_ncurses_loop()
 
 				if (!lines[lines_start + i])
 					break;
-				for (j = 0, p = lines[lines_start + i] + line_start; *p && j < input->_maxx + 1; p++, j++)
-					print_char(input, i, j, *p);
+
+				p = lines[lines_start + i];
+
+				for (j = 0; j + line_start < strlen(p) && j < input->_maxx + 1; j++)
+					print_char(input, i, j, p[j + line_start]);
 			}
 
 			wmove(input, lines_index - lines_start, line_index - line_start);
