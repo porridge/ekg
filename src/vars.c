@@ -207,7 +207,7 @@ void variable_init()
 	variable_add("protocol", "pR", VAR_INT, 2, &config_protocol, NULL, NULL, NULL);
 	variable_add("reason", "re", VAR_STR, 2, &config_reason, NULL, NULL, NULL);
 	variable_add("interface", "in", VAR_STR, 2, &config_interface, NULL, NULL, NULL);
-	variable_add("password_cp1250", "c1", VAR_BOOL, 2, &config_password_cp1250, NULL, NULL, NULL);
+	variable_add("password_cp1250", "cp", VAR_BOOL, 2, &config_password_cp1250, NULL, NULL, NULL);
 	variable_add("fade_in", "fi", VAR_INT, 2, &config_fade_in, NULL, NULL, NULL);
 }
 
@@ -315,6 +315,11 @@ int variable_add(const char *name, const char *short_name, int type, int display
 
 			if (!strcmp(v->short_name, short_name)) {
 				fprintf(stderr, "Error! Variable short name conflict:\n- short name: \"%s\"\n- existing variable: \"%s\"\n- conflicting variable: \"%s\"\n\nPress any key to continue...", short_name, v->name, name);
+				getchar();
+			}
+			
+			if (isdigit(short_name[0]) || isdigit(short_name[1])) {
+				fprintf(stderr, "Error! Variable short name cannot contain digits\n- short name: \"%s\"\n\nPress any key to continue...", short_name);
 				getchar();
 			}
 		}
