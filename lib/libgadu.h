@@ -563,7 +563,7 @@ extern int gg_debug_level;
 #define GG_DEBUG_MISC 16
 
 #ifdef GG_DEBUG_DISABLE
-#define gg_debug(x, y...) {}
+#define gg_debug(x, y...) { }
 #else
 void gg_debug(int level, const char *format, ...);
 #endif
