@@ -21,7 +21,9 @@ connect to the gg servers.
 .TP
 .BI \-u "\ " username\ [\-\-user\ username]
 Starts ekg with other \"user\". 
-By default config files are stored in ~/.gg; this option gives 
+By default config files are stored in ~/.gg (if there is non-empty
+$CONFIG_DIR environment variable, ~/$CONFIG_DIR/gg/ is being used
+instead); this option gives 
 ability to create subdirectories structure with other setups.
 .TP
 .BI \-t\ theme\ [\-\-theme\ theme]

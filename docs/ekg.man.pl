@@ -22,8 +22,9 @@ z serwerami gg.
 .TP
 .BI \-u "\ " username\ [\-\-user\ username]
 Zezwala na uruchomienie ekg z innym \"u¿ytkownikiem\". 
-Standardowo konfiguracja ekg znajduje sie w katalogu ~/.gg - Ta 
-opcja pozwala na stworzenie struktury podkatalogów z oddzielnymi 
+Standardowo konfiguracja ekg znajduje sie w katalogu ~/.gg (chyba, ¿e
+zdefiniowana jest zmienna ¶rodowiskowa $CONFGI_DIR - wtedy w ~/$CONFIG_DIR/gg/)
+Ta opcja pozwala na stworzenie struktury podkatalogów z oddzielnymi
 konfiguracjami.
 .TP
 .BI \-t\ theme\ [\-\-theme\ theme]
