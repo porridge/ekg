@@ -1639,6 +1639,12 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 					fgcolor = COLOR_WHITE;
 					bold = 0;
 					break;
+				case '|':
+					while (x <= w->_maxx) {
+						waddch(w, ' ');
+						x++;
+					}
+					break;
 			}
 			p++;
 

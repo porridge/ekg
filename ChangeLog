@@ -9,6 +9,7 @@ d - drg, sz - szalik).
 - poprawka dope³niania /python (rmrmg/w)
 - poprawka zapisu plików konfiguracyjnych (porridge/w)
 - libgadu: poprawne zwalnianie pamiêci w sytuacjach kryzysowych (scooty/w)
+- dodanie %| do tematu pasku stanu, który dope³nia do koñca linii (ptar/w)
 
 // 2003-06-24
 

@@ -78,6 +78,9 @@ parametr z samym pseudonimem.
 	| ::: na kilka linii      |
 	`-------------------------'
 
+%|  w pasku stanu lub nag³ówku okna dope³nia do koñca linii. przydatne, gdy
+    zmieniamy kolor t³a, poniewa¿ domy¶lnym kolorem jest niebieski.
+
 * * *
 
 dwa specjalne formaty ,,known_user'' i ,,unknown_user'' okre¶laj±, jak
