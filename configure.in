@@ -252,9 +252,6 @@ dnl <ekg>
   # setenv dla pythona
   AC_CHECK_FUNCS(setenv)
 
-  # na wszelki wypadek sprawd¼my
-  AC_FUNC_SETVBUF_REVERSED
-
   # strlcat/strlcpy wiele systemów nie posiada
   AC_CHECK_FUNCS(strlcat, , [OBJS="$OBJS ../compat/strlcat.o"])
   AC_CHECK_FUNCS(strlcpy, , [OBJS="$OBJS ../compat/strlcpy.o"])
