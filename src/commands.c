@@ -3803,16 +3803,19 @@ int binding_toggle_contacts(int a, int b)
 
 COMMAND(cmd_alias_exec)
 {	
-	list_t l, m = NULL;
+	list_t l, tmp = NULL, m = NULL;
 
 	for (l = aliases; l; l = l->next) {
 		struct alias *a = l->data;
 
 		if (!strcasecmp(name, a->name)) {
-			m = a->commands;
+			tmp = a->commands;
 			break;
 		}
 	}
+
+	for (; tmp; tmp = tmp->next)
+		list_add(&m, tmp->data, strlen(tmp->data) + 1);
 	
 	for (; m; m = m->next) {
 		char *p;
@@ -3849,6 +3852,7 @@ COMMAND(cmd_alias_exec)
 			if (!params[0]) {
 				printq("aliases_not_enough_params", name);
 				string_free(str, 1);
+				list_destroy(m, 1);
 				return -1;
 			}
 
@@ -3858,6 +3862,7 @@ COMMAND(cmd_alias_exec)
 				printq("aliases_not_enough_params", name);
 				string_free(str, 1);
 				array_free(arr);
+				list_destroy(m, 1);
 				return -1;
 			}
 
@@ -3886,7 +3891,9 @@ COMMAND(cmd_alias_exec)
 		command_exec(target, str->str, quiet);
 		string_free(str, 1);
 	}
-
+	
+	list_destroy(m, 1);
+		
 	return 0;
 }
 

@@ -223,7 +223,7 @@ cleanup:
  */
 const char *sim_strerror(int error)
 {
-	char *result = "Unknown error";
+	const char *result = "Unknown error";
 	
 	switch (error) {
 		case SIM_ERROR_SUCCESS:
