@@ -173,6 +173,15 @@ beep_mail
 	czy beepaæ przy nadej¶ciu nowej poczty. wy³±czenie ,,beep'' wy³±cza
 	równie¿ tê opcjê.
 
+beep_title
+	typ: liczba
+	domy¶lna warto¶æ: 0
+
+	czy informacjê o beepaniu umie¶ciæ równie¿ w pasku tytu³owym? dzia³a
+	tylko w interfejsie ncurses na terminalu xterm. warto¶æ 1 w³±cza
+	informowanie w pasku, warto¶æ 2 w³±cza informowanie w pasku i wy³±cza
+	zwyk³y sygna³ d¼wiêkowy.
+
 check_mail
 	typ: liczba
 	domy¶lna warto¶æ: 0

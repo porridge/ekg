@@ -132,6 +132,10 @@ void variable_init()
 	variable_add("beep_chat", "bc", VAR_BOOL, 1, &config_beep_chat, NULL, NULL, dd_beep);
 	variable_add("beep_notify", "bn", VAR_BOOL, 1, &config_beep_notify, NULL, NULL, dd_beep);
 	variable_add("beep_mail", "bM", VAR_BOOL, 1, &config_beep_mail, NULL, NULL, dd_beep);
+#ifdef WITH_UI_NCURSES
+	if (ui_init == ui_ncurses_init)
+		variable_add("beep_title", "bt", VAR_INT, 1, &config_beep_title, NULL, NULL, NULL);
+#endif
 	variable_add("check_mail", "cm", VAR_MAP, 1, &config_check_mail, changed_check_mail, variable_map(4, 0, 0, "no", 1, 2, "mbox", 2, 1, "maildir", 4, 0, "notify"), NULL);
 	variable_add("check_mail_frequency", "cf", VAR_INT, 1, &config_check_mail_frequency, changed_check_mail, NULL, dd_check_mail);
 	variable_add("check_mail_folders", "cF", VAR_STR, 1, &config_check_mail_folders, changed_check_mail_folders, NULL, dd_check_mail);

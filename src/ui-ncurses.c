@@ -199,6 +199,7 @@ static int window_last_id = -1;		/* numer ostatnio wybranego okna */
 static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 static int ui_ncurses_debug = 0;	/* debugowanie */
 static int ui_ncurses_inited = 0;	/* czy zainicjowano? */
+static int ui_ncurses_beeping = 0;	/* czy my w³asnie beepamy? */
 
 static struct termios old_tio;
 
@@ -209,6 +210,7 @@ int config_contacts_size = 9;		/* szeroko¶æ okna kontaktów */
 int config_contacts = 2;		/* czy ma byæ okno kontaktów */
 char *config_contacts_options = NULL;	/* opcje listy kontaktów */
 char *config_contacts_groups = NULL;	/* grupy listy kontaktów */
+int config_beep_title = 0;		/* czy beepamy w pasku tytu³owym? */
 
 static int contacts_margin = 1;
 static int contacts_edge = WF_RIGHT;
@@ -2060,7 +2062,19 @@ static void sigwinch_handler()
  */
 static void ui_ncurses_beep()
 {
-	beep();
+	switch (config_beep_title) {
+		case 0:
+			beep();
+			break;
+
+		case 1:
+			beep();
+
+		case 2:
+			ui_ncurses_beeping = 1;
+			ui_event("xterm_update");
+			break;
+	}
 }
 
 #ifdef WITH_ASPELL
@@ -3215,6 +3229,11 @@ int ekg_getch(int meta)
 	if (python_handle_result == 0 || python_handle_result == 2)
 		ch = -2;
 #endif
+
+	if (ui_ncurses_beeping) {
+		ui_ncurses_beeping = 0;
+		ui_event("xterm_update");
+	}
 
 	return ch;
 }
@@ -4411,7 +4430,7 @@ static int ui_ncurses_event(const char *event, ...)
 		return 0;
 
 	if (!strcmp(event, "xterm_update") && getenv("TERM") && !strncmp(getenv("TERM"), "xterm", 5) && !getenv("EKG_NO_TITLE")) {
-		char *tmp = saprintf("\033]2;ekg (%d)\007", config_uin);
+		char *tmp = saprintf("\033]2;ekg (%d)%s\007", config_uin, ui_ncurses_beeping ? " BEEP!" : "");
 		write(1, tmp, strlen(tmp));
 		xfree(tmp);
 	}

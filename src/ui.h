@@ -61,6 +61,7 @@ WINDOW *header, *status;
 int window_printat(WINDOW *w, int x, int y, const char *format, void *data_, int fgcolor, int bold, int bgcolor, int status);
 int config_backlog_overlap;
 int config_backlog_size;
+int config_beep_title;
 extern void ui_ncurses_init();
 extern void header_statusbar_resize();
 
