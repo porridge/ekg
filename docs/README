@@ -226,9 +226,6 @@ SYNTEZA MOWY
 	set display_sent 0
 	set display_ack 3
 
-    Wad± aktualnej implementacji jest fakt blokowania ca³ego programu
-    podczas wymawiania tekstu.
-
     Program ,,powiedz'' mo¿na pobraæ z
     http://cvs.pld.org.pl/SOURCES/powiedz_0.2.tgz
 

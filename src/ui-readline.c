@@ -602,16 +602,7 @@ done:
 
 	/* say it! ;) */
 	if (config_speech_app) {
-		char *tmp = saprintf("%s 2>/dev/null", config_speech_app);
-		FILE *f = popen(tmp, "w");
-		
-		xfree(tmp);
-
-		if (f) {
-			fprintf(f, "%s.", s->str);
-			fclose(f);
-		}
-
+		say_it(s->str);
 		string_free(s, 1);
 	}
 }

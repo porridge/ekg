@@ -3275,12 +3275,27 @@ COMMAND(cmd_blink_leds)
 
 COMMAND(cmd_play)
 {
-	if (!params[0]) {
+	if (!params[0] || !config_sound_app) {
 		printq("not_enough_params", name);
 		return -1;
 	}
 
 	return play_sound(params[0]);
+}
+
+COMMAND(cmd_say)
+{
+	if (!params[0] || !config_speech_app) {
+		printq("not_enough_params", name);
+		return -1;
+	}
+
+	if (match_arg(params[0], 'c', "clear", 2)) {
+		xfree(buffer_flush(BUFFER_SPEECH, NULL));
+		return 0;
+	}
+
+	return say_it(params[0]);
 }
 
 COMMAND(cmd_register)
@@ -5258,7 +5273,7 @@ void command_init()
 	  "  -g, --generate              generuje parê kluczy u¿ytkownika\n"
 	  "  -s, --send <numer/alias>    wysy³a nasz klucz publiczny\n"
 	  "  -d, --delete <numer/alias>  usuwa klucz publiczny\n"
-	  "  [-l, --list] [numer/alias]  wy¶wietla posiadane klucze publiczne\n");
+	  "  [-l, --list] [numer/alias]  wy¶wietla posiadane klucze publiczne");
 #endif
 
 	command_add
@@ -5382,7 +5397,7 @@ void command_init()
 	  "  unload <skrypt>  usuwa skrypt z pamiêci\n"
 	  "  run <plik>       uruchamia skrypt\n"
 	  "  exec <komenda>   uruchamia komendê\n"
-	  "  list             wy¶wietla listê za³adowanych skryptów\n");
+	  "  list             wy¶wietla listê za³adowanych skryptów");
 #endif
 
 	command_add
@@ -5431,7 +5446,7 @@ void command_init()
 	( "remind", "", cmd_remind, 0,
 	  "", "wysy³a has³o na skrzynkê pocztow±",
 	  "");
-	  
+
 	command_add
 	( "save", "?", cmd_save, 0,
 	  " [plik]", "zapisuje ustawienia programu",
@@ -5439,6 +5454,14 @@ void command_init()
 	  "Aktualny stan zostanie zapisany i bêdzie przywrócony przy "
 	  "nastêpnym uruchomieniu programu. Mo¿na podaæ plik, do którego "
 	  "ma byæ zapisana konfiguracja.");
+
+	command_add
+	( "say", "?", cmd_say, 0,
+	  " [tekst]", "wymawia tekst",
+	  "\n"
+	  "  -c, --clear  usuwa z bufora tekst do wymówienia\n"
+	  "\n"
+	  "Polecenie wymaga zdefiniowana zmiennej %Tspeech_app%n");
 	  
 	command_add
 	( "set", "v?", cmd_set, 0,
@@ -5532,7 +5555,7 @@ void command_init()
 	  "  next                 prze³±cza do nastêpnego okna\n"
 	  "  prev                 prze³±cza do poprzedniego okna\n"
 	  "  switch <numer_okna>  prze³±cza do podanego okna\n"
-	  "  refresh              od¶wie¿a aktualne okno\n");
+	  "  refresh              od¶wie¿a aktualne okno");
 /*
 	  "\n"
 	  "Argumenty dla %Tnew%n to %T*x,y,w,h[,f],/komenda%n, gdzie %Tx%n i "
@@ -5546,27 +5569,25 @@ void command_init()
 
 
 	command_add
-	( "_add", "??", cmd_test_add, 0, "",
+	( "_addtab", "??", cmd_test_add, 0, "",
 	  "dodaje do listy dope³niania TABem", "");
 	command_add
-	( "_del", "??", cmd_test_del, 0, "",
+	( "_deltab", "??", cmd_test_del, 0, "",
 	  "usuwa z listy dope³niania TABem", "");
 #if 0
 	command_add
 	( "_fds", "", cmd_test_fds, 0, "", 
 	  "wy¶wietla otwarte deskryptory", "");
-#endif
 	command_add
 	( "_msg", "u?", cmd_test_send, 0, "",
 	  "udaje, ¿e wysy³a wiadomo¶æ", "");
 	command_add
-	( "_ping", "", cmd_test_ping, 0, "", 
-	  "wysy³a pakiet ping do serwera", "");
-#if 0
-	command_add
 	( "_segv", "", cmd_test_segv, 0, "", 
 	  "wywo³uje naruszenie segmentacji pamiêci", "");
 #endif
+	command_add
+	( "_ping", "", cmd_test_ping, 0, "", 
+	  "wysy³a pakiet ping do serwera", "");
 	command_add
 	( "_watches", "", cmd_test_watches, 0, "", 
 	  "wy¶wietla listê sprawdzanych deskryptorów", "");
@@ -5582,9 +5603,6 @@ void command_init()
 	command_add
 	( "_queue", "uu", cmd_queue, 0, " [opcje]",
 	  "pozwala obserwowaæ kolejkê wiadomo¶ci podczas po³±czenia", "");
-	command_add
-	( "_ctcp", "u", cmd_test_ctcp, 0, " <numer/alias>",
-	  "wysy³a ¿±danie bezpo¶redniego po³±czenia", "");
 	command_add
 	( "_descr", "?", cmd_away, 0, " <opis>",
 	  "zmienia opis bez zmiany stanu", "");

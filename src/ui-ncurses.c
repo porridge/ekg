@@ -1239,19 +1239,10 @@ crap:
 		window_commit();
 	}
 
-	if (config_speech_app) {
-		char *tmp = saprintf("%s 2> /dev/null", config_speech_app);
-		FILE *f = popen(tmp, "w");
+	if (config_speech_app && !w->floating && w->id)
+		say_it(speech->str);
 
-		xfree(tmp);
-
-		if (f) {
-			fprintf(f, "%s.", speech->str);
-			fclose(f);
-		}
-
-		string_free(speech, 1);
-	}
+	string_free(speech, 1);
 }
 
 /*

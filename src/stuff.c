@@ -541,6 +541,35 @@ int buffer_count(int type)
 }
 
 /*
+ * buffer_pop()
+ *
+ * zwraca zaalokowany ³añcuch z pocz±tku kolejki buforów
+ * danego typy i usuwa ten element z kolejki. zwraca
+ * NULL, gdy kolejka jest pusta.
+ */
+char *buffer_pop(int type)
+{
+	char *str = NULL;
+	list_t l;
+
+	for (l = buffers; l; l = l->next) {
+		struct buffer *b = l->data;
+
+		if (type != b->type)
+			continue;
+		
+		str = xstrdup(b->line);
+
+		xfree(b->target);
+		list_remove(&buffers, b, 1);
+
+		break;
+	}
+
+	return str;
+}
+
+/*
  * buffer_free()
  * 
  * czy¶ci pamiêæ po buforach.
@@ -2916,4 +2945,47 @@ char *strcasestr(const char *haystack, const char *needle)
 	}
 
 	return NULL;
+}
+
+/*
+ * say_it()
+ *
+ * zajmuje siê wypowiadaniem tekstu, uwa¿aj±c na ju¿ dzia³aj±cy
+ * syntezator w tle.
+ *
+ * 0/-1/-2. -2 w przypadku, gdy dodano do bufora.
+ */
+int say_it(const char *str)
+{
+	pid_t pid;
+
+	if (!config_speech_app || !str || !strcmp(str, ""))
+		return -1;
+
+	if (speech_pid) {
+		buffer_add(BUFFER_SPEECH, NULL, str, 0);
+		return -2;
+	}
+
+	if ((pid = fork()) < 0)
+		return -1;
+
+	speech_pid = pid;
+
+	if (!pid) {
+		char *tmp = saprintf("%s 2>/dev/null 1>&2", config_speech_app);
+		FILE *f = popen(tmp, "w");
+
+		xfree(tmp);
+
+		if (f) {
+			fprintf(f, "%s.", str);
+			pclose(f);	/* dzieciak czeka na dzieciaka */
+		}
+
+		exit(1);
+	}
+
+	process_add(pid, "\003");
+	return 0;
 }

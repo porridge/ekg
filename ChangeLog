@@ -6,6 +6,14 @@ d - drg, sz - szalik). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane
 przez ,,nick'', ,,i/nick'' oznacza czyj¶ pomys³, ,,b/nick'' mówi, kto
 zg³osi³ b³±d.
 
+// 2003-03-25
+
+- zmiana nazw ukrytych poleceñ z _add/_del na _addtab/_deltab (sz)
+- poprawki wymawiania tekstu. nie blokuje, nie gubi tekstu,
+  buforuje, gdy nie mo¿e wypowiedzieæ w danej chwili. dodanie
+  g³upiego polecenia /say, g³ownie dla opcji ,,--clear''. w ogóle,
+  kto¶ tego u¿ywa? (sz)
+
 // 2003-03-24
 
 - kosmetyka komunikatów o b³êdach przy /ignore i /block (sz)

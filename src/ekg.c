@@ -84,6 +84,8 @@ static int ioctld_pid = 0;
 time_t last_action = 0;
 char *pipe_file = NULL;
 
+pid_t speech_pid = 0;
+
 static void get_line_from_pipe(struct gg_exec *c);
 static int get_char_from_pipe(struct gg_common *c);
 
@@ -481,6 +483,16 @@ void ekg_wait_for_key()
 
 				if (pid != p->pid)
 					continue;
+
+				if (pid == speech_pid) {
+					speech_pid = 0;
+
+					if (buffer_count(BUFFER_SPEECH)) {
+						char *str = buffer_pop(BUFFER_SPEECH);
+						say_it(str);
+						xfree(str);
+					}
+				}
 
 				switch (p->name[0]) {
 					case '\001':

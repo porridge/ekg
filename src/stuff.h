@@ -157,7 +157,8 @@ struct gg_exec {
 
 enum buffer_t {
 	BUFFER_DEBUG,	/* na zapisanie n ostatnich linii debug */
-	BUFFER_EXEC	/* na buforowanie tego, co wypluwa exec */
+	BUFFER_EXEC,	/* na buforowanie tego, co wypluwa exec */
+	BUFFER_SPEECH	/* na wymawiany tekst */
 };
 
 struct buffer {
@@ -188,6 +189,8 @@ struct gg_session *sess;
 time_t last_save;
 char *config_profile;
 int config_changed;
+
+pid_t speech_pid;
 
 int old_stderr;
 int mesg_startup;
@@ -322,6 +325,7 @@ void binding_free();
 int buffer_add(int type, const char *target, const char *line, int max_lines);
 int buffer_count(int type);
 char *buffer_flush(int type, const char *target);
+char *buffer_pop(int type);
 void buffer_free();
 
 void changed_backlog_size(const char *var);
@@ -390,6 +394,7 @@ char *xstrmid(const char *str, int start, int length);
 const char *http_error_string(int h);
 char color_map(unsigned char r, unsigned char g, unsigned char b);
 char *strcasestr(const char *haystack, const char *needle);
+int say_it(const char *str);
 
 /* makra, dziêki którym pozbywamy siê warning'ów */
 #define xisxdigit(c) isxdigit((int) (unsigned char) c)
