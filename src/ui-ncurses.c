@@ -879,58 +879,53 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	char *lines, *lines_save, *line2;
 	string_t speech = NULL;
 
-	if (target && !strcmp(target, "__debug")) {
-		if (!(w = window_find(target)))
-			w = window_new("__debug", -1);
-	} else {
-		switch (config_make_window) {
-			case 1:
-				if ((w = window_find(target)))
-					goto crap;
+	switch (config_make_window) {
+		case 1:
+			if ((w = window_find(target)))
+				goto crap;
 
+			if (!separate)
+				w = window_find("__status");
+
+			for (l = windows; l; l = l->next) {
+				struct window *w = l->data;
+
+				if (separate && !w->target && w->id != 1) {
+					w->target = xstrdup(target);
+					xfree(w->prompt);
+					w->prompt = format_string(format_find("ncurses_prompt_query"), target);
+					w->prompt_len = strlen(w->prompt);
+					print("window_id_query_started", itoa(w->id), target);
+					print_window(target, 1, "query_started", target);
+					print_window(target, 1, "query_started_window", target);
+					event_check(EVENT_QUERY, get_uin(target), target);
+					break;
+				}
+			}
+
+		case 2:
+			if (!(w = window_find(target))) {
 				if (!separate)
 					w = window_find("__status");
-
-				for (l = windows; l; l = l->next) {
-					struct window *w = l->data;
-
-					if (separate && !w->target && w->id != 1) {
-						w->target = xstrdup(target);
-						xfree(w->prompt);
-						w->prompt = format_string(format_find("ncurses_prompt_query"), target);
-						w->prompt_len = strlen(w->prompt);
-						print("window_id_query_started", itoa(w->id), target);
-						print_window(target, 1, "query_started", target);
-						print_window(target, 1, "query_started_window", target);
-						event_check(EVENT_QUERY, get_uin(target), target);
-						break;
-					}
+				else {
+					w = window_new(target, 0);
+					print("window_id_query_started", itoa(w->id), target);
+					print_window(target, 1, "query_started", target);
+					print_window(target, 1, "query_started_window", target);
+					event_check(EVENT_QUERY, get_uin(target), target);
 				}
-
-			case 2:
-				if (!(w = window_find(target))) {
-					if (!separate)
-						w = window_find("__status");
-					else {
-						w = window_new(target, 0);
-						print("window_id_query_started", itoa(w->id), target);
-						print_window(target, 1, "query_started", target);
-						print_window(target, 1, "query_started_window", target);
-						event_check(EVENT_QUERY, get_uin(target), target);
-					}
-				}
+			}
 
 crap:
-				if (!config_display_crap && target && !strcmp(target, "__current"))
-					w = window_find("__status");
-				
-				break;
-				
-			default:
-				/* je¶li nie ma okna, rzuæ do statusowego. */
-				if (!(w = window_find(target)))
-					w = window_find("__status");
-		}
+			if (!config_display_crap && target && !strcmp(target, "__current"))
+				w = window_find("__status");
+			
+			break;
+			
+		default:
+			/* je¶li nie ma okna, rzuæ do statusowego. */
+			if (!(w = window_find(target)))
+				w = window_find("__status");
 	}
 
 	if (w != window_current && !w->floating) {
@@ -1581,6 +1576,7 @@ void ui_ncurses_init()
 	ui_screen_height = stdscr->_maxy + 1;
 	
 	window_current = window_new(NULL, 0);
+	window_new("__debug", -1);
 
 	status = newwin(1, stdscr->_maxx + 1, stdscr->_maxy - 1, 0);
 	input = newwin(1, stdscr->_maxx + 1, stdscr->_maxy, 0);
@@ -2796,6 +2792,9 @@ void window_kill(struct window *w, int quiet)
 		print("window_kill_status");
 		return;
 	}
+
+	if (id == 0)
+		return;
 	
 	if (w == window_current)
 		window_prev();
