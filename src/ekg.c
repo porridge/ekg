@@ -206,7 +206,7 @@ static void get_line_from_pipe(struct gg_exec *c)
 		string_append(c->buf, buf);
 
 		/* Tab --> 4 x space */
-		while ((tab = strchr(c->buf->str, 9))) {
+		while ((tab = strchr(c->buf->str, '\t'))) {
 			*tab = ' ';
 			string_insert_n(c->buf, (tab - c->buf->str), "   ", 3);
 		}
