@@ -180,13 +180,17 @@ static char *command_generator(char *text, int state)
 	}
 
 	if (!*rl_line_buffer) {
+		char *nick, *ret;
 		if (state)
 			return NULL;
 		if (send_nicks_count < 1)
 			return saprintf((window_current->query_nick) ? "/%s" : "%s", (config_tab_command) ? config_tab_command : "msg");
 		send_nicks_index = (send_nicks_count > 1) ? 1 : 0;
 
-		return saprintf((window_current->query_nick) ? "/%s %s" : "%s %s", (config_tab_command) ? config_tab_command : "chat", send_nicks[0]);
+		nick = ((strchr(send_nicks[0], ' ')) ? saprintf("\"%s\"", send_nicks[0]) : xstrdup(send_nicks[0])); 
+		ret = saprintf((window_current->query_nick) ? "/%s %s" : "%s %s", (config_tab_command) ? config_tab_command : "chat", nick);
+		xfree(nick);
+		return ret;
 	}
 
 	if (!state) {
@@ -222,7 +226,7 @@ static char *known_uin_generator(char *text, int state)
 		l = l->next;
 
 		if (u->display && !strncasecmp(text, u->display, len))
-			return xstrdup(u->display);
+			return ((strchr(u->display, ' ')) ? saprintf("\"%s\"", u->display) : xstrdup(u->display));
 	}
 
 	return NULL;
@@ -298,7 +302,37 @@ static char *ignored_uin_generator(char *text, int state)
 				return xstrdup(itoa(u->uin));
 		} else {
 			if (u->display && !strncasecmp(text, u->display, len))
-				return xstrdup(u->display);
+				return ((strchr(u->display, ' ')) ? saprintf("\"%s\"", u->display) : xstrdup(u->display));
+		}
+	}
+
+	return NULL;
+}
+
+static char *blocked_uin_generator(char *text, int state)
+{
+	static list_t l;
+	static int len;
+
+	if (!state) {
+		l = userlist;
+		len = strlen(text);
+	}
+
+	while (l) {
+		struct userlist *u = l->data;
+
+		l = l->next;
+
+		if (!group_member(u, "__blocked"))
+			continue;
+
+		if (!u->display) {
+			if (!strncasecmp(text, itoa(u->uin), len))
+				return xstrdup(itoa(u->uin));
+		} else {
+			if (u->display && !strncasecmp(text, u->display, len))
+				return ((strchr(u->display, ' ')) ? saprintf("\"%s\"", u->display) : xstrdup(u->display));
 		}
 	}
 
@@ -307,7 +341,7 @@ static char *ignored_uin_generator(char *text, int state)
 
 static char *dcc_generator(char *text, int state)
 {
-	char *commands[] = { "close", "get", "send", "show", "voice", NULL };
+	char *commands[] = { "close", "get", "send", "list", "voice", NULL };
 	static int len, i;
 
 	if (!state) {
@@ -366,9 +400,13 @@ static char **my_completion(char *text, int start, int end)
 		}
 
 		if (!strncasecmp(tmp, cmd, strlen(cmd)) && tmp[strlen(cmd)] == ' ') {
+			int in_quote = 0;
 			word = 0;
 			for (i = 0; i < strlen(rl_line_buffer); i++) {
-				if (xisspace(rl_line_buffer[i]))
+				if (rl_line_buffer[i] == '"')
+					in_quote = !in_quote;
+
+				if (xisspace(rl_line_buffer[i]) && !in_quote)
 					word++;
 			}
 			if (word == 2 && xisspace(rl_line_buffer[strlen(rl_line_buffer) - 1])) {
@@ -378,9 +416,12 @@ static char **my_completion(char *text, int start, int end)
 				}
 
 				if (send_nicks_count > 0) {
-					char buf[100];
+					char buf[100], *tmp;
 
-					snprintf(buf, sizeof(buf), "%s%s %s ", (slash) ? "/" : "", cmd, send_nicks[send_nicks_index++]);
+					tmp = ((strchr(send_nicks[send_nicks_index], ' ')) ? saprintf("\"%s\"", send_nicks[send_nicks_index]) : xstrdup(send_nicks[send_nicks_index]));
+					snprintf(buf, sizeof(buf), "%s%s %s ", (slash) ? "/" : "", cmd, tmp);
+					xfree(tmp);
+					send_nicks_index++;
 					rl_extend_line_buffer(strlen(buf));
 					strcpy(rl_line_buffer, buf);
 					rl_end = strlen(buf);
@@ -398,8 +439,13 @@ static char **my_completion(char *text, int start, int end)
 	}
 
 	if (start) {
+		int in_quote = 0;
+
 		for (i = 1; i <= start; i++) {
-			if (xisspace(rl_line_buffer[i]) && !xisspace(rl_line_buffer[i - 1]))
+			if (rl_line_buffer[i] == '"')
+				in_quote = !in_quote;
+
+			if (xisspace(rl_line_buffer[i]) && !xisspace(rl_line_buffer[i - 1]) && !in_quote)
 				word++;
 		}
 		word--;
@@ -444,6 +490,9 @@ static char **my_completion(char *text, int start, int end)
 						break;
 					case 'i':
 						func = ignored_uin_generator;
+						break;
+					case 'b':
+						func = blocked_uin_generator;
 						break;
 					case 'v':
 						func = variable_generator;

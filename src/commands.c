@@ -1124,9 +1124,11 @@ COMMAND(cmd_modify)
 			}
 			
 			ui_event("userlist_changed", ((u->display) ? u->display : itoa(u->uin)), argv[i], NULL);
+			remove_send_nick(u->display);
 			xfree(u->display);
 			u->display = xstrdup(argv[i]);
 			userlist_replace(u);
+			add_send_nick(u->display);
 			modified = 1;
 		}
 		
