@@ -19,7 +19,6 @@ klient:
 
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,
-  + naprawiæ debugowanie,
   + dodaæ /bind,
   + zrobiæ listê kontaktów po prawej (marzenia),
 

@@ -157,7 +157,7 @@ void get_char_from_pipe(struct gg_common *c)
  */
 void get_line_from_pipe(struct gg_exec *c)
 {
-	char ch;
+	char ch, buf[1024];
   
 	if (!c)
   		return;
