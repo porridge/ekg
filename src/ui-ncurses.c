@@ -109,7 +109,7 @@ static int input_size = 1;		/* rozmiar okna wpisywania tekstu */
 
 int config_ctxwin_size = 10;		/* szerokosc okna kontaktow */
 static int last_ctxwin_size = 10;	/* poprzedni rozmiar przed zmiana */
-int config_ctxwin_enabled = 0;		/* czy ma byc okno kontaktow */
+int config_ctxwin_enabled = 1;		/* czy ma byc okno kontaktow */
 
 /* rozmiar okna wy¶wietlaj±cego tekst */
 #define output_size (stdscr->_maxy - input_size)
@@ -424,7 +424,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 				break;
 			w->y++;
 			
-			if (strcasecmp(target,"__ctx"))
+			if ((!target)||(strcasecmp(target,"__ctx")))
 				x = print_timestamp(w);
 			
 		} else {
@@ -432,13 +432,9 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 			if (config_speech_app)
 				string_append_c(s, *p);
 		    			
-			if (!x) {
-			    if (target) {
-				if (strcasecmp(target,"__ctx"))
-				    x += print_timestamp(w);
-			    } else
+			if ((!x)&&((!target)||(strcasecmp(target,"__ctx"))))
 				x += print_timestamp(w);
-		     	};
+		     
 			waddch(w->window, (unsigned char) *p);
 			count++;
 			x++;
@@ -454,7 +450,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 		}
 	}
 
-	if ((!count)&&(strcasecmp(target,"__ctx"))) {
+	if ((!count)&&((!target)|| (strcasecmp(target,"__ctx")))) {
 		print_timestamp(w);
 		set_cursor(w);
 	}
@@ -499,6 +495,8 @@ static void update_ctxlist()
 	//char *tmp;
 		
 	if (!ctx.window) return;
+	
+	werase(ctx.window);
 	wmove(ctx.window, 0, 1);
 	waddstr(ctx.window, "Obecni:");
 
