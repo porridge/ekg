@@ -497,7 +497,7 @@ void userlist_clear_status(uin_t uin)
 void userlist_clear()
 {
 	while (userlist)
-		userlist_remove(userlist->data);
+		userlist_remove(userlist->data, 1);
 }
 
 /*
@@ -526,14 +526,49 @@ struct userlist *userlist_add(uin_t uin, const char *display)
  *
  * usuwa danego u¿ytkownika z listy kontaktów.
  *
- *  - u.
+ *  - u
+ *  - full - pe³ne usuwanie? w przeciwnym wypadku zostawi u¿ytkowników
+ *           ignorowanych i blokowanych,
  */
-int userlist_remove(struct userlist *u)
+int userlist_remove(struct userlist *u, int full)
 {
+	int metagroups = 0;
 	list_t l;
 
 	if (!u)
 		return -1;
+
+	for (l = u->groups; l; l = l->next) {
+		struct group *g = l->data;
+
+		if (!strncmp(g->name, "__", 2))
+			metagroups = 1;
+	}
+
+	if (!full && (group_member(u, "__blocked") || ignored_check(u->uin))) {
+		xfree(u->first_name); u->first_name = NULL;
+		xfree(u->last_name); u->last_name = NULL;
+		xfree(u->nickname); u->nickname = NULL;
+		xfree(u->display); u->display = NULL;
+		xfree(u->mobile); u->mobile = NULL;
+		xfree(u->descr); u->descr = NULL;
+		xfree(u->foreign); u->foreign = NULL;
+		xfree(u->last_descr); u->last_descr = NULL;
+		xfree(u->email); u->email = NULL;
+
+		for (l = u->groups; l; ) {
+			struct group *g = l->data;
+
+			l = l->next;
+
+			if (strncmp(g->name, "__", 2)) {
+				xfree(g->name);
+				list_remove(&u->groups, g, 1);
+			}
+		}
+
+		return 0;
+	}
 	
 	xfree(u->first_name);
 	xfree(u->last_name);
@@ -790,7 +825,7 @@ int ignored_remove(uin_t uin)
 	}
 
 	if (!u->display && !u->groups) {
-		userlist_remove(u);
+		userlist_remove(u, 1);
 		return 0;
 	}
 
@@ -955,7 +990,7 @@ int blocked_remove(uin_t uin)
 	}
 
 	if (!u->display && !u->groups)
-		userlist_remove(u);
+		userlist_remove(u, 1);
 	else
 		gg_add_notify_ex(sess, u->uin, userlist_type(u));
 

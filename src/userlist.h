@@ -89,7 +89,7 @@ int userlist_write_wap();
 void userlist_write_crash();
 void userlist_clear_status(uin_t uin);
 struct userlist *userlist_add(uin_t uin, const char *display);
-int userlist_remove(struct userlist *u);
+int userlist_remove(struct userlist *u, int full);
 int userlist_replace(struct userlist *u);
 void userlist_send();
 struct userlist *userlist_find(uin_t uin, const char *display);

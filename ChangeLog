@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2004-01-13
+
+- usuniêcie u¿ytkownika nie usuwa go z listy ignorowanych i blokowanych
+  (perry/w)
+
 // 2004-01-12
 
 - kod b³êdu GG_FAILURE_NEED_EMAIL jest zwracany w stanie

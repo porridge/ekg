@@ -696,7 +696,7 @@ COMMAND(cmd_del)
 			uin = u->uin;
 			nick = xstrdup(u->display);
 
-			if (!userlist_remove(u))
+			if (!userlist_remove(u, 0))
 				ui_event("userlist_changed", nick, itoa(uin), NULL);
 
 			xfree(nick);
@@ -718,7 +718,7 @@ COMMAND(cmd_del)
 
 	type = userlist_type(u);
 
-	if (!userlist_remove(u)) {
+	if (!userlist_remove(u, 0)) {
 		printq("user_deleted", tmp);
 		if (sess)
 			gg_remove_notify_ex(sess, uin, type);
@@ -1275,7 +1275,7 @@ COMMAND(cmd_modify)
 						array_free(arr);
 					}
 
-					userlist_remove(existing);
+					userlist_remove(existing, 0);
 				}
 			}
 
