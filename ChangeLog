@@ -7,8 +7,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 // 2002-02-16
 
-- rewrite kodu parsuj±cego odebrane wiadomo¶ci, dodanie obs³ugi formatów,
-  które umieszczone s± w event.msg.formats (w)
+- rewrite kodu parsuj±cego odebrane wiadomo¶ci (w)
 
 // 2002-02-15
 
