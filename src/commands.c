@@ -1403,12 +1403,18 @@ COMMAND(cmd_list)
 		printq("user_info_header", u->display, itoa(u->uin));
 		if (u->nickname && strcmp(u->nickname, u->display)) 
 			printq("user_info_nickname", u->nickname);
-		if (u->first_name || u->last_name)
+
+		if (u->first_name && strcmp(u->first_name, "") && u->last_name && u->last_name && strcmp(u->last_name, ""))
 			printq("user_info_name", u->first_name, u->last_name);
+		if (u->first_name && strcmp(u->first_name, "") && (!u->last_name || !strcmp(u->last_name, "")))
+			printq("user_info_name", u->first_name, "");
+		if ((!u->first_name || !strcmp(u->first_name, "")) && u->last_name && strcmp(u->last_name, ""))
+			printq("user_info_name", u->last_name, "");
+
 		printq("user_info_status", status);
 		if (u->ip.s_addr)
 			printq("user_info_ip", ip_str);
-		if (u->mobile)
+		if (u->mobile && strcmp(u->mobile, ""))
 			printq("user_info_mobile", u->mobile);
 		if (strcmp(groups, ""))
 			printq("user_info_groups", groups);

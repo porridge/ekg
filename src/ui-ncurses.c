@@ -2128,6 +2128,7 @@ static void complete(int *line_start, int *line_index)
 {
 	char *start = line, *cmd, **words;
 	int i, count, word;
+	const char *p;
 
 	/* nie obs³ugujemy dope³niania w ¶rodku tekstu */
 	if (*line_index != strlen(line))
@@ -2179,11 +2180,42 @@ static void complete(int *line_start, int *line_index)
 		return;
 	}
 
-	/* podziel, sprawd¼, gdzie jeste¶my */
+	/* podziel */
 	words = array_make(line, " \t", 0, 1, 1);
 	if (strlen(line) > 1 && line[strlen(line) - 1] == ' ')
 		array_add(&words, xstrdup(""));
-	word = array_count(words) - 1;
+
+	/* sprawd¼, gdzie jeste¶my */
+	for (p = line, start = line, word = -1; *p; ) {
+		while (*p && isspace(*p))
+			p++;
+		start = (char*) p;
+		word++;
+		if (!*p)
+			break;
+		if (*p == '"') {
+			p++;
+			while (*p && *p != '"') {
+				if (*p == '\\') {
+					p++;
+					if (!*p)
+						break;
+				}
+				p++;
+			}
+			if (*p)
+				p++;
+		} else {
+			while (*p && !isspace(*p))
+				p++;
+		}
+	}
+
+	if (word == -1)
+		word = 0;
+	
+	fprintf(stderr, "word = %d\n", word);
+	fprintf(stderr, "start = \"%s\"\n", start);
 	
 	/* nietypowe dope³nienie nicków przy rozmowach */
 	cmd = saprintf("/%s ", (config_tab_command) ? config_tab_command : "chat");
@@ -2218,13 +2250,6 @@ static void complete(int *line_start, int *line_index)
 		char *params = NULL;
 		int abbrs = 0, i;
 		list_t l;
-
-		for (start = line, i = 0; i < word; i++) {
-			while (!isspace(*start) && *start)
-				start++;
-			while (isspace(*start))
-				start++;
-		}
 
 		for (l = commands; l; l = l->next) {
 			struct command *c = l->data;
