@@ -186,7 +186,7 @@ int list_destroy(list_t list, int free_data)
  *
  * upewnia siê, ¿e w stringu bêdzie wystarczaj±co du¿o miejsca.
  *
- *  - n - wymagana ilo¶æ znaków (bez koñcowego '\0').
+ *  - count - wymagana ilo¶æ znaków (bez koñcowego '\0').
  */
 static void string_realloc(string_t s, int count)
 {

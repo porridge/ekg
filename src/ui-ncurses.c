@@ -1,8 +1,8 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2002 Wojtek Kaniewski <wojtekka@irc.pl>
- *                     Wojtek Bojdo/l   <wojboj@htcon.pl>
+ *  (C) Copyright 2002 Wojtek Kaniewski <wojtekka@irc.pl>,
+ *                     Wojtek Bojdo³ <wojboj@htcon.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -86,7 +86,7 @@ struct window {
 
 static WINDOW *status = NULL;		/* okno stanu */
 static WINDOW *input = NULL;		/* okno wpisywania tekstu */
-static WINDOW *contacts = NULL;		/* okno kontaktow */
+static WINDOW *contacts = NULL;		/* okno kontaktów */
 
 #define HISTORY_MAX 1000		/* maksymalna ilo¶æ wpisów historii */
 static char *history[HISTORY_MAX];	/* zapamiêtane linie */
@@ -441,7 +441,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 				else
 					w->y++;
 				set_cursor(w);
-x = 4;
+				x = 4;
 				wmove(w->window, w->y, x);
 			}
 		}
