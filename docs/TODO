@@ -9,9 +9,6 @@ rozwi±zanie.
   - czas powrotu w stanach opisowych,
 
 * klient:
-  - logowanie wysy³anych smsów w postaci:
-    smssend,<numer_telefonu>,<czas>,<wiadomo¶æ>,<nick>,<numerGG>
-    dla kompatybilno¶ci z Kadu (Chilek)
   - blokowanie od¶wie¿ania ekranu w obrêbie jednej komendy -- po co
     przewijaæ linijka po linijce w /help zamiast zablokowaæ przed i
     zwolniæ ekran po? (w)

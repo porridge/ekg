@@ -560,6 +560,27 @@ struct userlist *userlist_find(uin_t uin, const char *display)
 }
 
 /*
+ * userlist_find_mobile()
+ *
+ * znajduje u¿ytkownika do którego nale¿y podany numer telefonu.
+ *
+ * - mobile.
+ */
+struct userlist *userlist_find_mobile(const char *mobile)
+{
+	list_t l;
+
+	for (l = userlist; l; l = l->next) {
+		struct userlist *u = l->data;
+
+		if (mobile && u->mobile && !strcasecmp(u->mobile, mobile))
+			return u;
+	}
+
+	return NULL;
+}
+
+/*
  * userlist_type()
  *
  * zwraca rodzaj u¿ytkownika dla funkcji gg_*_notify_ex().

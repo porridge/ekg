@@ -2437,13 +2437,24 @@ COMMAND(cmd_sms)
 			return -1;
 		}
 		number = u->mobile;
-	} else
+	} else {
 		number = params[0];
+		u = userlist_find_mobile(number);
+	}
 
 	if (send_sms(number, params[1], quiet) == -1) {
 		printq("sms_error", strerror(errno));
 		return -1;
 	}
+
+	if (u) {
+		if ((config_log & 2)) {
+			put_log(u->uin, "smssend,%s,%s,%s\n", number, log_timestamp(time(NULL)), params[1]);
+		} else
+			put_log(u->uin, "smssend,%s,%s,%s,%s,%ld\n", number, log_timestamp(time(NULL)), params[1],
+										    u->display ? u->display : "", u->uin);
+	} else
+		put_log(0, "smssend,%s,%s,%s\n", number, log_timestamp(time(NULL)), params[1]);
 
 	return 0;
 }

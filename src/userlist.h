@@ -87,6 +87,7 @@ int userlist_remove(struct userlist *u);
 int userlist_replace(struct userlist *u);
 void userlist_send();
 struct userlist *userlist_find(uin_t uin, const char *display);
+struct userlist *userlist_find_mobile(const char *mobile);
 char *userlist_dump();
 void userlist_clear();
 #define userlist_free userlist_clear

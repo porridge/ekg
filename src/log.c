@@ -359,7 +359,11 @@ void put_log(uin_t uin, const char *format, ...)
 	if ((config_log & 2)) {
 		if (mkdir(path, 0700) && errno != EEXIST)
 			goto cleanup;
-		snprintf(path + strlen(path), sizeof(path) - strlen(path), "/%u", uin);
+
+		if (uin)
+			snprintf(path + strlen(path), sizeof(path) - strlen(path), "/%u", uin);
+		else
+			snprintf(path + strlen(path), sizeof(path) - strlen(path), "/sms");
 	}
 
 #ifdef HAVE_ZLIB
