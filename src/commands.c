@@ -4012,7 +4012,7 @@ COMMAND(cmd_query)
 	}
 
 	if (params[0] && params[1]) {
-		char *tmp = saprintf("chat %s %s", p[0], p[1]);
+		char *tmp = saprintf("/chat %s %s", p[0], p[1]);
 		/* cmd_msg("chat", (const char **) p, NULL, quiet); */
 		command_exec(target, tmp, quiet);
 		xfree(tmp);

@@ -4,8 +4,9 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek).
 
-// 2004-04-05
+// 2004-04-06
 - poprawka tabcompletion dla nazw plików (Brzezi/del)
+- poprawka problemu z 'query odbiorca wiadomosc' (Sydney/del)
 
 // 2004-04-05
 - poprawka b³êdu z ustawianiem opisu i stanu przy ³±czeniu (nik/del)
