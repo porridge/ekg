@@ -13,6 +13,7 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawione wykrywanie p³ci w list (gawrysz/w)
 - s/ioctl_daemon/ioctld/ (w)
 - poprawka rizonów przy reconnecie (gawrysz/w)
+- poprawka pagera i autosave'a (wielu/w)
 
 // 2002-05-16
 

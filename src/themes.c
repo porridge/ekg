@@ -313,10 +313,12 @@ void my_printf(char *theme, ...)
 
 		if (my_printf_lines > screen_lines - 2) {
 			char *tmp, *prompt = find_format("readline_more");
+			
 			in_readline = 1;
 #ifdef HAVE_RL_SET_PROMPT
 		        rl_set_prompt(prompt);
 #endif				
+			my_printf_lines = -1;
 			tmp = readline(prompt);
 			in_readline = 0;
 			free(tmp);
