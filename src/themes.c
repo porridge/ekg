@@ -1254,6 +1254,7 @@ void theme_init()
 	format_add("dcc_show_active_get", "%) #%1, %2, odbiór %T%3%n, %T%4b%n z %T%5b%n (%6%%)\n", 1);
 	format_add("dcc_show_active_voice", "%) #%1, %2, rozmowa\n", 1);
 	format_add("dcc_show_empty", "%! Brak bezpo¶rednich po³±czeñ\n", 1);
+	format_add("dcc_receiving_already", "%! Plik %T%1%n od u¿ytkownika %2 jest ju¿ pobierany\n", 1);
 
 	format_add("dcc_done_get", "%> Zakoñczono pobieranie pliku %T%2%n od %1\n", 1);
 	format_add("dcc_done_send", "%> Zakoñczono wysy³anie pliku %T%2%n do %1\n", 1);

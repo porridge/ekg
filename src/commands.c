@@ -2490,14 +2490,16 @@ COMMAND(cmd_dcc)
 	uin_t uin;
 
 	if (!params[0] || !strncasecmp(params[0], "li", 2)) {	/* list */
-		int empty = 1;
+		int empty = 1, passed = 0;
 
 		for (l = transfers; l; l = l->next) {
 			struct transfer *t = l->data;
 
 			if (!t->dcc || !t->dcc->established) {
 				empty = 0;
-				printq("dcc_show_pending_header");
+				if (!passed)
+					printq("dcc_show_pending_header");
+				passed++;
 
 				switch (t->type) {
 					case GG_SESSION_DCC_SEND:
@@ -2517,7 +2519,9 @@ COMMAND(cmd_dcc)
 
 			if (t->dcc && t->dcc->established) {
 				empty = 0;
-				printq("dcc_show_active_header");
+				if (!passed)
+					printq("dcc_show_active_header");
+				passed++;
 
 				switch (t->type) {
 					case GG_SESSION_DCC_SEND:
@@ -2765,6 +2769,16 @@ COMMAND(cmd_dcc)
 		if (!t || !t->dcc) {
 			printq("dcc_not_found", (params[1]) ? params[1] : "");
 			return -1;
+		}
+
+		for (l = watches; l; l = l->next) {
+			struct gg_common *c = l->data;
+			struct gg_dcc *d = l->data;
+
+			if (c->type == GG_SESSION_DCC_GET && t->dcc == d) {
+				printq("dcc_receiving_already", t->filename, format_user(t->uin));
+				return -1;
+			}
 		}
 
 		if (config_dcc_dir) 

@@ -10,6 +10,7 @@ zg³osi³ b³±d.
 
 - libgadu: wywo³anie gg_watch_fd() w stanie GG_STATE_CONNECTING_GG
   i z session->timeout == 0 spowoduje po³±czenie z kolejnym portem (Ron_K/w)
+- poprawka b³êdów przy wielokrotnym ,,/dcc get'' (ubanus/sz)
 
 // 2003-03-30
 
