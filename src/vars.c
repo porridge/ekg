@@ -105,6 +105,7 @@ void variable_init()
 	variable_add("speech_app", VAR_STR, 1, &config_speech_app, NULL, NULL);
 	variable_add("tab_command", VAR_STR, 1, &config_tab_command, NULL, NULL);
 	variable_add("theme", VAR_STR, 1, &config_theme, changed_theme, NULL);
+	variable_add("time_deviation", VAR_INT, 1, &config_time_deviation, NULL, NULL);
 	variable_add("timestamp", VAR_STR, 1, &config_timestamp, NULL, NULL);
 
 	variable_add("status", VAR_INT, 2, &config_status, NULL, NULL);

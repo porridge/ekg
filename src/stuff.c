@@ -159,6 +159,7 @@ int config_encryption = 0;
 char *config_log_timestamp = NULL;
 int config_server_save = 0;
 char *config_email = NULL;
+int config_time_deviation = 300;
 
 static struct {
 	int event;

@@ -77,12 +77,13 @@ static struct handler handlers[] = {
  */
 void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 {
-	int width, next_width, i, j, mem_width = 0;
+	int width, next_width, i, j, mem_width = 0, tt, t = e->event.msg.time;
+	int separate = (e->event.msg.sender != config_uin || chat == 3);
+	int timestamp_type = 0;
 	char *mesg, *buf, *line, *next, *format = NULL, *format_first = "";
 	char *next_format = NULL, *head = NULL, *foot = NULL;
 	char *timestamp = NULL, *save, *secure_label = NULL;
 	char *line_width = NULL, timestr[100], *target, *cname;
-	int separate = (e->event.msg.sender != config_uin || chat == 3);
 	struct tm *tm;
 	struct conference *c = NULL;
 
@@ -119,6 +120,13 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 	} else
 	        target = xstrdup((chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender)));
 	cname = (c ? c->name : "");
+
+	tt = time(NULL);
+
+	if (t - config_time_deviation <= tt && tt <= t + config_time_deviation)
+		timestamp_type = 2;
+	else if (tt / 86400 == t / 86400)
+		timestamp_type = 1;
 	
 	switch (chat) {
 		case 0:
@@ -127,22 +135,39 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 			line_width = "message_line_width";
 			head = (c) ? "message_conference_header" : "message_header";
 			foot = "message_footer";
-			timestamp = "message_timestamp";
-			break;		
+
+			if (timestamp_type == 1)
+				timestamp = "message_timestamp_today";
+			else if (timestamp_type == 2)
+				timestamp = "message_timestamp_now";
+			else
+				timestamp = "message_timestamp";
+			
+			break;
+			
 		case 1:
 			format = "chat_line"; 
 			format_first = (c) ? "chat_conference_line_first" : "chat_line_first";
 			line_width = "chat_line_width";
 			head = (c) ? "chat_conference_header" : "chat_header";
 			foot = "chat_footer";
-			timestamp = "chat_timestamp";
+			
+			if (timestamp_type == 1)
+				timestamp = "chat_timestamp_today";
+			else if (timestamp_type == 2)
+				timestamp = "chat_timestamp_now";
+			else
+				timestamp = "chat_timestamp";
+
 			break;
+			
 		case 2:
 			format = "sysmsg_line"; 
 			line_width = "sysmsg_line_width";
 			head = "sysmsg_header";
 			foot = "sysmsg_footer";
 			break;
+			
 		case 3:
 		case 4:
 			format = "sent_line"; 
@@ -150,13 +175,20 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 			line_width = "sent_line_width";
 			head = (c) ? "sent_conference_header" : "sent_header";
 			foot = "sent_footer";
-			timestamp = "sent_timestamp";
+			
+			if (timestamp_type == 1)
+				timestamp = "sent_timestamp_today";
+			else if (timestamp_type == 2)
+				timestamp = "sent_timestamp_now";
+			else
+				timestamp = "sent_timestamp";
+
 			break;
 	}	
 
 	/* je¿eli chcemy, dodajemy do bufora ,,last'' wiadomo¶æ... */
 	if (config_last & 3 && (chat >= 0 && chat <= 2))
-		       last_add(0, e->event.msg.sender, time(NULL), e->event.msg.message);
+	       last_add(0, e->event.msg.sender, tt, e->event.msg.message);
 	
 	tm = localtime(&e->event.msg.time);
 	strftime(timestr, sizeof(timestr), format_find(timestamp), tm);

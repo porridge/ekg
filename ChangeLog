@@ -11,6 +11,12 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 - poprawka szyfrowania (w)
 - poprawka segfaulta w dope³nianiu plików (salvador/w)
 - przezroczyste t³o na kolorowych terminalach (greblus/w)
+- dodanie zmiennej ,,time_deviation'' (w)
+- usuniêcie timestampów z wychodz±cych wiadomo¶ci (w)
+- inteligentne timestampy w przychodz±cych. je¶li wiadomo¶æ zosta³a
+  nadana +/- time_deviation, nie wy¶wietla go. je¶li wys³ana tego samego
+  dnia, wy¶wietla tylko godzinê. je¶li wys³ana wcze¶niej, wy¶wietla datê
+  i godzinê (w)
 
 // 2002-11-18
 

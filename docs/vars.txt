@@ -439,6 +439,16 @@ theme
 
 	zawiera nazwê pliku okre¶laj±cego wygl±d klienta (ang. theme)
 
+time_deviation
+	typ: liczba
+	domy¶lna warto¶æ: 300
+
+	okre¶la zakres rozbie¿no¶ci czasu odbieranych wzglêdem czasu
+	systemowego w sekundach, który jest traktowany jako chwila
+	aktualna. ma to wp³yw na wy¶wietlanie timestampów przy odbieranych
+	wiadomo¶ciach. je¶li czas odebranej wiadomo¶ci mie¶ci siê w +/-
+	podanego zakresu, timestamp nie jest wy¶wietlany.
+
 timestamp
 	typ: tekst
 	domy¶lna warto¶æ: brak

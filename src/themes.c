@@ -790,38 +790,42 @@ void theme_init()
 	format_add("error_saving", "%! Podczas zapisu ustawieñ wyst±pi³ b³±d\n", 1);
 
 	/* przychodz±ce wiadomo¶ci */
-	format_add("message_header", "%g.-- %n%1 %c(%C%#%c/%2) %4%g--- -- -%n\n", 1);
-	format_add("message_conference_header", "%g.-- %g[%T%3%g] -- %n%1 %c(%C%#%c/%2) %4%g--- -- -%n\n", 1);
+	format_add("message_header", "%g.-- %n%1 %c%2%4%g--- -- -%n\n", 1);
+	format_add("message_conference_header", "%g.-- %g[%T%3%g] -- %n%1 %c%2%4%g--- -- -%n\n", 1);
 	format_add("message_footer", "%g`----- ---- --- -- -%n\n", 1);
 	format_add("message_line", "%g|%n %1\n", 1);
 	format_add("message_line_width", "-8", 1);
-	format_add("message_timestamp", "%Y-%m-%d %H:%M", 1);
+	format_add("message_timestamp", "(%Y-%m-%d %H:%M) ", 1);
+	format_add("message_timestamp_today", "(%H:%M) ", 1);
+	format_add("message_timestamp_now", "", 1);
 
 	format_add("message_header,speech", "wiadomo¶æ od %1: ", 1);
 	format_add("message_conference_header,speech", "wiadomo¶æ od %1 w konferencji %3: ", 1);
 	format_add("message_line,speech", "%1\n", 1);
 	format_add("message_footer,speech", ".", 1);
 
-	format_add("chat_header", "%c.-- %n%1 %c(%C%#%c/%2) %4%c--- -- -%n\n", 1);
-	format_add("chat_conference_header", "%c.-- %c[%T%3%c] -- %n%1 %c(%C%#%c/%2) %4%c--- -- -%n\n", 1);
+	format_add("chat_header", "%c.-- %n%1 %c%2%4%c--- -- -%n\n", 1);
+	format_add("chat_conference_header", "%c.-- %c[%T%3%c] -- %n%1 %c%2%4%c--- -- -%n\n", 1);
 	format_add("chat_footer", "%c`----- ---- --- -- -%n\n", 1);
 	format_add("chat_line", "%c|%n %1\n", 1);
 	format_add("chat_line_width", "-8", 1);
-	format_add("chat_timestamp", "%Y-%m-%d %H:%M", 1);
+	format_add("chat_timestamp", "(%Y-%m-%d %H:%M) ", 1);
+	format_add("chat_timestamp_today", "(%H:%M) ", 1);
+	format_add("chat_timestamp_now", "", 1);
 
 	format_add("chat_header,speech", "wiadomo¶æ od %1: ", 1);
 	format_add("chat_conference_header,speech", "wiadomo¶æ od %1 w konferencji %3: ", 1);
 	format_add("chat_line,speech", "%1\n", 1);
 	format_add("chat_footer,speech", ".", 1);
 
-	format_add("sent_header", "%b.-- %n%1 %c(%C%#%c) %4%b--- -- -%n\n", 1);
-	format_add("sent_conference_header", "%b.-- %b[%T%3%b] -- %4%n%1 %c(%C%#%c)%n %b--- -- -%n\n", 1);
+	format_add("sent_header", "%b.-- %n%1 %4%b--- -- -%n\n", 1);
+	format_add("sent_conference_header", "%b.-- %b[%T%3%b] -- %4%n%1 %b--- -- -%n\n", 1);
 	format_add("sent_footer", "%b`----- ---- --- -- -%n\n", 1);
 	format_add("sent_line", "%b|%n %1\n", 1);
 	format_add("sent_line_width", "-8", 1);
-	format_add("sent_timestamp", "%Y-%m-%d %H:%M", 1);
+	format_add("sent_timestamp", "%H:%M", 1);
 
-	format_add("sysmsg_header", "%m.-- %TWiadomo¶æ systemowa %c(%C%#%c)%m --- -- -%n\n", 1);
+	format_add("sysmsg_header", "%m.-- %TWiadomo¶æ systemowa%m --- -- -%n\n", 1);
 	format_add("sysmsg_line", "%m|%n %1\n", 1);
 	format_add("sysmsg_line_width", "-8", 1);
 	format_add("sysmsg_footer", "%m`----- ---- --- -- -%n\n", 1);	

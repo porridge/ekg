@@ -203,6 +203,7 @@ char *config_speech_app;
 int config_status;
 char *config_tab_command;
 char *config_theme;
+int config_time_deviation;
 char *config_timestamp;
 int config_uin;
 
