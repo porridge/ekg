@@ -5,6 +5,7 @@ datadir = @datadir@
 mandir = @mandir@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
+libexecdir = @libexecdir@
 
 CC = @CC@ 
 CFLAGS = @CFLAGS@ -I.. -I../lib -Wall -DTHEMES_DIR=\"${datadir}/ekg/themes\"
@@ -36,8 +37,8 @@ install-ekg:	@strip_ekg@
 	$(INSTALL) -m 755 ekg $(DESTDIR)$(bindir)
 
 install-ioctld:	@strip_ioctld@
-	$(INSTALL) -d $(DESTDIR)$(bindir)
-	$(INSTALL) -m 755 ioctld $(DESTDIR)$(bindir)
+	$(INSTALL) -d $(DESTDIR)$(libexecdir)
+	$(INSTALL) -m 755 ioctld $(DESTDIR)$(libexecdir)
 
 strip-ekg:
 	$(STRIP) ekg

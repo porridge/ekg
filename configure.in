@@ -181,7 +181,7 @@ if test -d src; then
     [  --enable-ioctld         Compile ioctld (Linux only, autodetected)])
 
   if test "x$enable_ioctld" = "xyes" -o "x$have_linux_kd_h" = "xyes" -a "x$enable_ioctld" != "xno"; then 
-    CFLAGS="$CFLAGS -DWITH_IOCTLD -DIOCTLD_PATH=\\\"${bindir}/ioctld\\\""
+    CFLAGS="$CFLAGS -DWITH_IOCTLD -DIOCTLD_PATH=\\\"${libexecdir}/ioctld\\\""
     ioctld="ioctld"
     install_ioctld="install-ioctld"
   fi
