@@ -1651,7 +1651,7 @@ COMMAND(cmd_list)
 		char *status, *groups;
 		const char *group = params[0];
 		struct userlist *u;
-		int invert = 0;
+		int invert = 0, i;
 		
 		/* list !@grupa */
 		if (group[0] == '!' && group[1] == '@') {
@@ -1703,6 +1703,10 @@ COMMAND(cmd_list)
 			return cmd_modify("list", params, NULL, quiet);
 
 		status = format_string(format_find(ekg_status_label(u->status, "user_info_")), (u->first_name) ? u->first_name : u->display, u->descr);
+		
+		for (i = 0; i < strlen(status); i++)
+			if (status[i] == 10)
+				status[i] = '|';
 
 		groups = group_to_string(u->groups, 0, 1);
 
