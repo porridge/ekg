@@ -15,6 +15,7 @@ zg³osi³ b³±d.
 - libgadu: dodanie nowego API do obs³ugi katalogu publicznego w stylu
   GG 5.0. przyk³adowe API gg_search50*() zosta³o zachowanie, póki co,
   i jest zgodne na poziomie ABI, ale bêdzie usuniête (Chilek/w)
+- update arim.theme (Arim/w)
 
 // 2003-01-14
 
