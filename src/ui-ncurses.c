@@ -2664,15 +2664,15 @@ static struct {
  */
 static void complete(int *line_start, int *line_index)
 {
-	char *start, *cmd, **words;
+	char *start, *cmd, **words, *separators;
 	int i, count, word, j;
 
-        /* jeli linia jest pusta: return */
-        if (!strcmp(line, ""))
-    		return;
-
-        start = xmalloc(strlen(line) + 1);
-
+	/* je¶li linia jest pusta: return */
+	if (!strcmp(line, "")) 
+		return;
+	    
+	start = xmalloc(strlen(line) + 1);
+	
 	/* je¶li uzbierano ju¿ co¶ */
 	if (completions) {
 		int maxlen = 0, cols, rows;
@@ -2693,7 +2693,7 @@ static void complete(int *line_start, int *line_index)
 		for (i = 0; i < rows; i++) {
 			int j;
 
-			strlcpy(tmp, "", cols * maxlen + 2);
+			strcpy(tmp, "");
 
 			for (j = 0; j < cols; j++) {
 				int cell = j * rows + i;
@@ -2701,16 +2701,15 @@ static void complete(int *line_start, int *line_index)
 				if (cell < array_count(completions)) {
 					int k;
 
-					strlcat(tmp, completions[cell], cols * maxlen + 2); 
+					strcat(tmp, completions[cell]); 
 
 					for (k = 0; k < maxlen - strlen(completions[cell]); k++)
-						strlcat(tmp, " ", cols * maxlen + 2);
+						strcat(tmp, " ");
 				}
 			}
 
 			if (strcmp(tmp, "")) {
-				strlcat(tmp, "\n", cols * maxlen + 2);
-				ui_ncurses_print(NULL, 0, tmp);
+				print("none", tmp);
 			}
 		}
 
@@ -2720,22 +2719,38 @@ static void complete(int *line_start, int *line_index)
 	}
 
 	/* podziel */
-	words = array_make(line, " \t", 0, 1, 1);
+	words = array_make(line, " ,\t", 0, 1, 1);
+
 	if (strlen(line) > 1 && line[strlen(line) - 1] == ' ')
 		array_add(&words, xstrdup(""));
+		
 
-        /* sprawd¼, gdzie jeste¶my */
-        for (word = 0, i = 0; i < strlen(line); word++, i++) {
-        	for(j = 0; i < strlen(line) && !xisspace(line[i]); j++, i++) 
-            		start[j] = line[i];
-        	start[j] = '\0';
-        	if(i >= *line_index)
+	separators = xmalloc(array_count(words));
+		
+	/* sprawd¼, gdzie jeste¶my */
+	for (word = 0, i = 0; i < strlen(line); i++, word++) {
+		for(j = 0; i < strlen(line) && !xisspace(line[i]) && line[i] != ','; j++, i++) 
+				start[j] = line[i];
+		for(i++; i < strlen(line) && (xisspace(line[i]) || line[i] == ','); i++);
+		start[j] = '\0';
+		if(i >= strlen(line))
+	    		break;
+		i--;
+                if(i >= *line_index)
             		break;
-        }
 
-	
-/*	gg_debug(GG_DEBUG_MISC, "word = %d\n", word);
-	gg_debug(GG_DEBUG_MISC, "start = \"%s\"\n", start); */
+	}
+
+	/* dodajemy separatory */
+	for(i = 0, j = 0; i < strlen(line); i++, j++)  {
+		for(; i < strlen(line) && !xisspace(line[i]) && line[i] != ','; i++) ;
+			separators[j] = line[i];
+		for(i++; i < strlen(line) && (xisspace(line[i]) || line[i] == ','); i++);
+		i--;
+	}
+
+/*	debug("word = %d\n", word);
+	debug("start = \"%s\"\n", start);   */
 	
 	/* nietypowe dope³nienie nicków przy rozmowach */
 	cmd = saprintf("/%s ", (config_tab_command) ? config_tab_command : "chat");
@@ -2758,6 +2773,7 @@ static void complete(int *line_start, int *line_index)
 		array_free(words);
 		completions = NULL;
 		xfree(start);
+		xfree(separators);
 		return;
 	}
 
@@ -2770,6 +2786,7 @@ static void complete(int *line_start, int *line_index)
 		char *params = NULL;
 		int abbrs = 0, i;
 		list_t l;
+		char **blocks;
 
 		for (l = commands; l; l = l->next) {
 			struct command *c = l->data;
@@ -2791,23 +2808,26 @@ static void complete(int *line_start, int *line_index)
 				if (params && abbrs == 1)
 					break;
 		}
+		
 
-		if (params && abbrs == 1 && word < strlen(params) + 1) {
+		blocks = array_make(line, " \t", 0, 1, 1);
+
+		if (strlen(line) > 1 && line[strlen(line) - 1] == ' ')
+			array_add(&blocks, xstrdup(""));
+
+		if ((params && abbrs == 1 && word < strlen(params) + 1 )|| (strchr(params, 'u') && array_count(blocks) == strlen(strchr(params, 'u')))) {
+			
 			for (i = 0; generators[i].ch; i++) {
-				if (generators[i].ch == params[word - 1]) {
+			
+				if (generators[i].ch == params[word - 1] || strchr(params, 'u')) {
 					int j;
 
+					
 					generators[i].generate(words[word], strlen(words[word]));
 
 					for (j = 0; completions && completions[j]; j++) {
 						string_t s;
 						const char *p;
-
-						/* opisu nie cytujemy */
-						if (completions[j][0] == '\001') {
-							memmove(completions[j], completions[j] + 1, strlen(completions[j]) + 1);
-							continue;
-						}
 
 						if (!strchr(completions[j], '"') && !strchr(completions[j], '\\') && !strchr(completions[j], ' '))
 							continue;
@@ -2827,67 +2847,77 @@ static void complete(int *line_start, int *line_index)
 						xfree(completions[j]);
 						completions[j] = string_free(s, 0);
 					}
-
 					break;
 				}
-			}
+			} 
 		}
+		
+		array_free(blocks);
 	}
 
 	count = array_count(completions);
 
 	if (count == 1) {
-              line[0] = '\0';
-                for(i = 0; i < array_count(words); i++) {
-                        if(i == word)
-                        {
-                                strcat(line, completions[0]);
-                                *line_index = strlen(line) + 1;
-                        }
-                        else
-                        	strcat(line, words[i]);
-                        strcat(line, " ");
-                }
+
+		line[0] = '\0';		
+		for(i = 0; i < array_count(words); i++) {
+			if(i == word) {
+				strcat(line, completions[0]);
+				*line_index = strlen(line) + 1;
+			}
+			else
+				strcat(line, words[i]);
+			if(i == array_count(words) - 1 && line[strlen(line) - 1] != ' ')
+				strcat(line, " ");
+			else if (line[strlen(line) - 1] != ' ') {
+				char tmp[2];
+				tmp[0] = separators[i];
+				tmp[1] = '\0';
+				strcat(line, tmp);
+			}
+		}
 		array_free(completions);
 		completions = NULL;
 	}
 
-        if (count > 1) {
-                int common = 0;
+	if (count > 1) {
+		int common = 0;
+		
+		for(i=1, j = 0;i < 10; i++, common++) { 
+			for(j=1; j < count; j++) {
+				if(strncasecmp(completions[0], completions[j], i) < 0)
+					break;
+			}
+			if(j < count && strncasecmp(completions[0], completions[j], i) < 0)
+				break;
 
-                for(i=1, j = 0;i < 10; i++, common++) {
-                        for(j=1; j < count; j++) {
-                                /* debug("strncasecmp(%s, completions[%d]: %s, %d) = %d\n", completions[0], j, completions[j], i, strncasecmp(completions[0], completions[j], i)); */
-
-                                if(strncasecmp(completions[0], completions[j], i) < 0)
-                                        break;
-                        }
-                        if(j < count && strncasecmp(completions[0], completions[j], i) < 0)
-                                break;
-
-                }
-
-/*              debug("comon: %d\n", common); */
-
-                if (strlen(line) + common < LINE_MAXLEN) {
-                        line[0] = '\0';
-                        for(i = 0; i < array_count(words); i++) {
-                                if(i == word) {
-                                        str_tolower(completions[0]);
-                                        strncat(line, completions[0], common);
-                                        strcat(line, "");
-                                        *line_index = strlen(line);
-                                }
-                                else
-                                        strcat(line, words[i]);\
-                                if(i != array_count(words) - 1)
-                                        strcat(line, " ");
-                        }
-                }
-        }
+		}
+		
+		if (strlen(line) + common < LINE_MAXLEN) {
+		
+			line[0] = '\0';		
+			for(i = 0; i < array_count(words); i++) {
+				if(i == word) {
+					str_tolower(completions[0]);
+					strncat(line, completions[0], common);
+					strcat(line, "");
+					*line_index = strlen(line);
+				}
+				else
+					strcat(line, words[i]);\
+				if(i != array_count(words) - 1) {
+					char tmp[2];
+					tmp[0] = separators[i];
+					tmp[1] = '\0';
+					strcat(line, tmp);
+				}
+			}
+		}
+	}
 
 	array_free(words);
 	xfree(start);
+	xfree(separators);
 	return;
 }
 
