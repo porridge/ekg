@@ -1237,25 +1237,36 @@ void theme_init()
 	format_add("bind_seq_exist", "%! Sekwencja %T%1%n ma ju¿ przypisan± akcjê\n", 1);
 	format_add("bind_seq_list_empty", "%! Brak przypisanych akcji\n", 1);
 
+	/* at */
+	format_add("at_list", "%> %1, %2, %3 %K(%4)%n\n", 1);
+	format_add("at_added", "%> Utworzono plan %T%1%n\n", 1);
+	format_add("at_deleted", "%> Usuniêto plan %T%1%n\n", 1);
+	format_add("at_exist", "%! Plan %T%1%n ju¿ istnieje\n", 1);
+	format_add("at_noexist", "%! Plan %T%1%n nie istnieje\n", 1);
+	format_add("at_empty", "%! Brak planów\n", 1);
+	format_add("at_timestamp", "%d-%m-%Y %H:%M", 1);
+	format_add("at_back_to_past", "%! Gdyby mo¿na by³o cofn±æ czas...\n", 1);
+
 	/* timer */
 	format_add("timer_list", "%> %1, %2s, %3 %K(%4)%n %T%5%n\n", 1);
 	format_add("timer_added", "%> Utworzono timer %T%1%n\n", 1);
 	format_add("timer_deleted", "%> Usuniêto timer %T%1%n\n", 1);
 	format_add("timer_exist", "%! Timer %T%1%n ju¿ istnieje\n", 1);
 	format_add("timer_noexist", "%! Timer %T%1%n nie istnieje\n", 1);
+	format_add("timer_empty", "%! Brak timerów\n", 1);
 
 	/* last */
 	format_add("last_list_in", "%) %Y <<%n [%1] %2 %3\n", 1);
 	format_add("last_list_out", "%) %G >>%n [%1] %2 %3\n", 1);
 	format_add("last_list_empty", "%! Nie zalogowano ¿adnych wiadomo¶ci\n", 1);
 	format_add("last_list_empty_nick", "%! Nie zalogowano ¿adnych wiadomo¶ci dla %T%1%n\n", 1);
-	format_add("last_list_timestamp", "%m-%d-%Y %H:%M", 1);
+	format_add("last_list_timestamp", "%d-%m-%Y %H:%M", 1);
 	format_add("last_list_timestamp_today", "%H:%M", 1);
 	format_add("last_clear_uin", "%) Wiadomo¶ci dla %T%1%n wyczyszczone\n", 1);
 	format_add("last_clear", "%) Wszystkie wiadomo¶ci wyczyszczone\n", 1);
 
 	/* queue */
-	format_add("queue_list_timestamp", "%m-%d-%Y %H:%M", 1);
+	format_add("queue_list_timestamp", "%d-%m-%Y %H:%M", 1);
 	format_add("queue_list_message", "%) %G >>%n [%1] %2 %3\n", 1);
 	format_add("queue_clear","%) Kolejka wiadomo¶ci wyczyszczona\n", 1);
 	format_add("queue_clear_uin","%) Kolejka wiadomo¶ci wyczyszczona dla %T%1%n\n", 1);

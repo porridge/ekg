@@ -468,7 +468,7 @@ cleanup:
  *
  * czyta z pliku ~/.gg/config lub podanego konfiguracjê.
  *
- *  - filename,
+ *  - filename.
  */
 int config_read(const char *filename)
 {
@@ -525,6 +525,44 @@ int config_read(const char *filename)
 				ui_event("command", "bind", "--add-quiet", 
 					 pms[0], pms[1], NULL);
 			array_free(pms);
+		} else if (!strcasecmp(buf, "timer") || !strcasecmp(buf, "at")) {
+			char **p = array_make(foo, " \t", 0, 1, 0);
+			char *tmp = NULL, *period_str = NULL, *rest = NULL, *name = NULL;
+			time_t period;
+			int at = !strcasecmp(buf, "at");
+
+			if (p && p[0] && p[1] && p[2]) {
+
+				if (strcmp(p[0], "(null)"))
+					name = p[0];
+
+				if (!strncmp(p[1], "*/", 2)) {
+					period = atoi(p[1] + 2);
+					period_str = saprintf("*/%d", period);
+				} else
+					if (at)	 {
+						struct tm *t;
+
+						period = atoi(p[1]);
+						t = localtime(&period);
+						period_str = xmalloc(100);
+						strftime(period_str, 100, "%Y%m%d%H%M.%S", t);
+					} else {
+						period = atoi(p[1]) - time(NULL);
+						period_str = saprintf("%d", period);
+					}
+		
+				if (period > 0) {
+					rest = array_join(p + 2, " ");
+					tmp = saprintf("%s --add-quiet %s %s %s", (at) ? "at" : "timer", (name) ? name : "", period_str, rest);
+					command_exec(NULL, tmp);
+					xfree(tmp);
+					xfree(rest);
+				}
+
+				xfree(period_str);
+			}
+				array_free(p);
                 } else 
 			variable_set(buf, foo, 1);
 
@@ -645,6 +683,37 @@ void config_write_main(FILE *f, int base64)
 		struct binding *b = l->data;
 
 		fprintf(f, "bind %s %s\n", b->key, b->action);
+	}
+
+	for (l = timers; l; l = l->next) {
+		struct timer *t = l->data;
+		char *name = NULL;
+
+		if (t->type != TIMER_COMMAND)
+			continue;
+
+		if (!t->persistent && t->ends.tv_sec - time(NULL) < 5)	/* nie ma sensu zapisywaæ */
+			continue;
+
+		if (t->name && !isdigit(t->name[0]))
+			name = t->name;
+		else
+			name = "(null)";
+
+		if (t->at)
+			fprintf(f, "at %s %s %s\n", name, itoa(t->ends.tv_sec), t->command);
+		else {
+			char *foo;
+
+			if (t->persistent)
+				foo = saprintf("*/%s", itoa(t->period));
+			else
+				foo = saprintf("%s", itoa(t->ends.tv_sec));
+
+			fprintf(f, "timer %s %s %s\n", name, foo, t->command);
+
+			xfree(foo);
+		}
 	}
 
 }
@@ -1092,7 +1161,7 @@ int valid_nick(const char *nick)
 */
 int mesg_set(int what)
 {
-	char *tty;
+	const char *tty;
 	struct stat s;
 
 	if ((tty = ttyname(1)) == NULL)
@@ -3032,6 +3101,7 @@ struct timer *timer_add(time_t period, int persistent, int type, const char *nam
 	}
 
 	memset(&t, 0, sizeof(t));
+
 	gettimeofday(&tv, &tz);
 	tv.tv_sec += period;
 	memcpy(&t.ends, &tv, sizeof(tv));
@@ -3244,6 +3314,10 @@ void last_del(uin_t uin)
 
 /*
  * last_count()
+ *
+ * zwraca ilo¶æ wiadomo¶ci w last dla danej osoby.
+ *
+ * - uin.
  */
 int last_count(uin_t uin)
 {
@@ -3276,7 +3350,6 @@ void last_free()
 		struct last *ll = l->data;
 		
 		xfree(ll->message);
-		list_remove(&lasts, ll, 1);
 	}
 
 	list_destroy(lasts, 1);

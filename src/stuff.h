@@ -102,6 +102,7 @@ struct timer {
 	int period;		/* ile sekund ma trwaæ czekanie */
 	int persistent;		/* czy ma byæ na zawsze? */
 	int type;		/* rodzaj timera */
+	int at;			/* at czy zwyk³y timer ? */
 	char *name;		/* nazwa timera */
 	char *command;		/* komenda do wywo³ania */
 	char *id;		/* identyfikator timera */

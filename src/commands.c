@@ -2914,29 +2914,31 @@ COMMAND(cmd_alias_exec)
 COMMAND(cmd_timer)
 {
 	list_t l;
+	int quiet = 0, count = 0;
+	int at = !strcasecmp(name, "at");
 
-	if (match_arg(params[0], 'a', "add", 2)) {
-		const char *p = params[1], *t_name = NULL;
-		char *t_command;
+	if (match_arg(params[0], 'a', "add", 2) || (quiet = match_arg(params[0], 'a', "add-quiet", 5))) {
+		const char *p = params[1];
+		char *t_command = NULL, *t_name = NULL;
 		time_t period = 0;
 		struct timer *t;
 		int persistent = 0;
 
-		if (!params[1] || !params[2]) {
+		if ((!params[1] || !params[2]) && !quiet) {
 			print("not_enough_params", name);
 			return;
 		}
 
-		/* timer --add name ... */
-		if (isalpha_pl_PL(*p)) {
-			t_name = p;
+		/* podano nazwê timera/at, a wiêc czas jest nastêpnym parametrem */
+		if (isalpha_pl_PL(*p) && strcmp(p, "(null)")) {
+			t_name = xstrdup(p);
 
 			for (l = timers; l; l = l->next) {
 				t = l->data;
 
 				if (t->name && !strcasecmp(t->name, t_name)) {
-					print("timer_exist", t_name);
-					return;
+					print((at) ? "at_exist" : "timer_exist", t_name);
+					goto cleanup;
 				}
 			}
 
@@ -2948,51 +2950,148 @@ COMMAND(cmd_timer)
 			else
 				t_command = xstrdup(params[2]);
 
-		if (!strncmp(p, "*/", 2)) {
-			p += 2;
-			persistent = 1;
-		}
+		/* kod zapo¿yczony z date(1) */
 
-		for (;;) {
-			time_t _period = 0;
+#define ATOI2(ar)	((ar)[0] - '0') * 10 + ((ar)[1] - '0'); (ar) += 2;
+#define wrong_format()	{ if (!quiet) print("invalid_params", name); return; }
 
-			if (isdigit(*p))
-				_period = atoi(p);
-			else {
-				print("invalid_params", name);
-				return;
-			}
+		if (at) {
+			struct tm *lt;
+			time_t now = time(NULL);
+			char *dot, *t, *foo = xstrdup(p), *bar;
+			int bigyear;
+			int yearset = 0;
 
-			p += strlen(itoa(_period));
+			bar = foo;
+			lt = localtime(&now);
 
-			if (strlen(p)) {
-				switch (*p++) {
-					case 'd':
-						_period *= 86400;
-						break;
-					case 'h':
-						_period *= 3600;
-						break;
-					case 'm':
-						_period *= 60;
-						break;
-					case 's':
-						break;
-					default:
-						print("invalid_params", name);
-						return;
+			for (t = foo, dot = NULL; *t; ++t) {
+				if (isdigit(*t))
+					continue;
+				if (*t == '.' && dot == NULL) {
+					dot = t;
+					continue;
 				}
+				wrong_format();
 			}
 
-			period += _period;
-			
-			if (*p == '\0')
-				break;
+			lt = localtime(&now);
+
+			lt->tm_isdst = -1;
+
+			if (dot != NULL) {				/* .SS */
+				*dot++ = '\0';
+
+				if (strlen(dot) != 2)
+					wrong_format();
+				lt->tm_sec = ATOI2(dot);
+				if (lt->tm_sec > 61)
+					wrong_format();
+			} else
+				lt->tm_sec = 0;
+
+			switch (strlen(foo)) {
+				case 12:				/* cc */
+					bigyear = ATOI2(foo);
+					lt->tm_year = bigyear * 100 - 1900;
+					yearset = 1;
+				case 10:				/* yy */
+					if (yearset) {
+						lt->tm_year += ATOI2(foo);
+					} else {
+						lt->tm_year = ATOI2(foo);
+						if (lt->tm_year < 69)
+							lt->tm_year += 100;
+					}
+				case 8:					/* mm */
+					lt->tm_mon = ATOI2(foo);
+					if ((lt->tm_mon > 12) || !lt->tm_mon)
+						wrong_format();
+					--lt->tm_mon;
+				case 6:					/* dd */
+					lt->tm_mday = ATOI2(foo);
+					if ((lt->tm_mday > 31) || !lt->tm_mday)
+						wrong_format();
+				case 4:					/* HH */
+					lt->tm_hour = ATOI2(foo);
+					if (lt->tm_hour > 23)
+						wrong_format();
+				case 2:					/* MM */
+					lt->tm_min = ATOI2(foo);
+					if (lt->tm_min > 59)
+						wrong_format();
+					break;
+				default:
+					wrong_format();
+			}
+
+		xfree(bar);
+
+		if ((period = mktime(lt) - now) <= 0) {
+			if (!quiet)
+				print("at_back_to_past");
+			goto cleanup;
 		}
 
-		if ((t = timer_add(period, persistent, TIMER_COMMAND, t_name, t_command)))
-			print("timer_added", t->name);
+#undef ATOI2
+#undef wrong_format()
 
+		} else {
+
+			if (!strncmp(p, "*/", 2)) {
+				p += 2;
+				persistent = 1;
+			}
+
+			for (;;) {
+				time_t _period = 0;
+
+				if (isdigit(*p))
+					_period = atoi(p);
+				else {
+					if (!quiet)
+						print("invalid_params", name);
+					goto cleanup;
+				}
+
+				p += strlen(itoa(_period));
+
+				if (strlen(p)) {
+					switch (*p++) {
+						case 'd':
+							_period *= 86400;
+							break;
+						case 'h':
+							_period *= 3600;
+							break;
+						case 'm':
+							_period *= 60;
+							break;
+						case 's':
+							break;
+						default:
+							if (!quiet)
+								print("invalid_params", name);
+							goto cleanup;
+					}
+				}
+
+				period += _period;
+				
+				if (*p == '\0')
+					break;
+			}
+		}
+
+		if ((t = timer_add(period, persistent, TIMER_COMMAND, t_name, t_command))) {
+			if (!quiet)
+				print((at) ? "at_added" : "timer_added", t->name);
+
+			t->at = at;
+		}
+
+cleanup:
+		xfree(t_name);
 		xfree(t_command);
 
 		return;
@@ -3005,9 +3104,9 @@ COMMAND(cmd_timer)
 		}
 
 		if (!timer_remove(params[1], NULL))
-			print("timer_deleted", params[1]);
+			print((at) ? "at_deleted" : "timer_deleted", params[1]);
 		else
-			print("timer_noexist", params[1]);
+			print((at) ? "at_noexist" : "timer_noexist", params[1]);
 
 		return;
 	}
@@ -3015,46 +3114,58 @@ COMMAND(cmd_timer)
 	for (l = timers; l; l = l->next) {
 		struct timer *t = l->data;
 		struct timeval tv;
-		struct timezone tz;
 		char *tmp;
 		const char *type_str;
 		int usec, sec, minutes = 0, hours = 0, days = 0;
 
-		gettimeofday(&tv, &tz);
+		if (at != t->at)
+			continue;
 
-		if (t->ends.tv_usec < tv.tv_usec) {
-			sec = t->ends.tv_sec - tv.tv_sec - 1;
-			usec = (t->ends.tv_usec - tv.tv_usec + 1000000) / 1000;
+		count++;
+
+		gettimeofday(&tv, NULL);
+
+		if (at) {
+			struct tm *foo = localtime((time_t *) &t->ends.tv_sec);
+
+			tmp = xmalloc(100);
+			strftime(tmp, 100, format_find("at_timestamp"), foo);
+
 		} else {
-			sec = t->ends.tv_sec - tv.tv_sec;
-			usec = (t->ends.tv_usec - tv.tv_usec) / 1000;
-		}
+			if (t->ends.tv_usec < tv.tv_usec) {
+				sec = t->ends.tv_sec - tv.tv_sec - 1;
+				usec = (t->ends.tv_usec - tv.tv_usec + 1000000) / 1000;
+			} else {
+				sec = t->ends.tv_sec - tv.tv_sec;
+				usec = (t->ends.tv_usec - tv.tv_usec) / 1000;
+			}
 
-		if (sec > 86400) {
-			days = sec / 86400;
-			sec -= days * 86400;
-		}
+			if (sec > 86400) {
+				days = sec / 86400;
+				sec -= days * 86400;
+			}
 
-		if (sec > 3600) {
-			hours = sec / 3600;
-			sec -= hours * 3600;
-		}
-	
-		if (sec > 60) {
-			minutes = sec / 60;
-			sec -= minutes * 60;
-		}
+			if (sec > 3600) {
+				hours = sec / 3600;
+				sec -= hours * 3600;
+			}
+		
+			if (sec > 60) {
+				minutes = sec / 60;
+				sec -= minutes * 60;
+			}
 
-		if (days)
-			tmp = saprintf("%dd %dh %dm %d.%.3d", days, hours, minutes, sec, usec);
-		else
-			if (hours)
-				tmp = saprintf("%dh %dm %d.%.3d", hours, minutes, sec, usec);
+			if (days)
+				tmp = saprintf("%dd %dh %dm %d.%.3d", days, hours, minutes, sec, usec);
 			else
-				if (minutes)
-					tmp = saprintf("%dm %d.%.3d", minutes, sec, usec);
+				if (hours)
+					tmp = saprintf("%dh %dm %d.%.3d", hours, minutes, sec, usec);
 				else
-					tmp = saprintf("%d.%.3d", sec, usec);
+					if (minutes)
+						tmp = saprintf("%dm %d.%.3d", minutes, sec, usec);
+					else
+						tmp = saprintf("%d.%.3d", sec, usec);
+		}
 
 		switch (t->type) {
 			case TIMER_UI:
@@ -3070,10 +3181,16 @@ COMMAND(cmd_timer)
 				type_str = "unknown";
 		}
 		
-		print("timer_list", t->name, tmp, t->command, type_str, (t->persistent) ? "*" : "");
+		if (at)
+			print("at_list", t->name, tmp, t->command, type_str);
+		else
+			print("timer_list", t->name, tmp, t->command, type_str, (t->persistent) ? "*" : "");
 
 		xfree(tmp);
 	}
+
+		if (!count)
+			print((at) ? "at_empty" : "timer_empty");
 }
 
 #ifdef WITH_PYTHON
@@ -3491,7 +3608,7 @@ void command_init()
 	  
 	command_add
 	( "alias", "??", cmd_alias, 0,
-	  " [opcje]", "Zarz±dzanie aliasami",
+	  " [opcje]", "zarz±dzanie aliasami",
 	  "\n"
 	  "  -a, --add <alias> <komenda>     dodaje alias\n"
           "  -A, --append <alias> <komenda>  dodaje komendê do aliasu\n"
@@ -3506,6 +3623,16 @@ void command_init()
           "podano powodu, zostanie wylosowany z pliku %Taway.reasons%n. "
  	  "Podanie %T-%n zamiast powodu spowoduje wyczyszczenie bez "
 	  "wzglêdu na ustawienia zmiennych.");
+
+	command_add
+	( "at", "????", cmd_timer, 0,
+	  " [opcje]", "planuje wykonanie komend",
+	  "\n"
+	  "  -a, --add [nazwa] <czas> <komenda>  tworzy nowy plan\n"
+	  "  -d, --del <numer/nazwa>             usuwa plan\n"
+	  " [-l, --list]                         wy¶wietla listê planów\n"
+	  "\n"
+	  "Czas podaje siê w formacie [[[[[[cc]yy]mm]dd]HH]MM[.SS]].");
  
 	command_add
 	( "back", "?", cmd_away, 0,
@@ -3667,7 +3794,7 @@ void command_init()
 	  "  [numer/alias]             wy¶wietla ostatnie wiadomo¶ci\n"
 	  "  -s, --stime [numer/alias] wy¶wietla czas wys³ania wiadomo¶ci\n"
 	  "  -c, --clear [numer/alias] czy¶ci podane wiadomo¶ci lub wszystkie\n"
-	  "W przypadku opcji %T-s%n lub %T--stime%n czas wy¶wietlany jest "
+	  "W przypadku opcji %T--stime%n czas wy¶wietlany jest "
 	  ",,inteligentnie'' zgodnie ze zmienn± %Ttime_deviation.%n");
 
 	command_add
@@ -3828,7 +3955,7 @@ void command_init()
 	  "oznaczaj±cych dni, godziny, minuty, sekundy, np. 5h20m. Timer po "
 	  "jednorazowym uruchomieniu jest usuwany, chyba ¿e czas poprzedzimy "
 	  "wyra¿eniem ,,*/''. Wtedy timer bêdzie uruchamiany w zadanych odstêpach "
-	  "czasu (na li¶cie jest on oznaczony gwiazdk±).");
+	  "czasu, a na li¶cie bêdzie oznaczony gwiazdk±.");
 
 	command_add
 	( "unignore", "i", cmd_ignore, 0,
