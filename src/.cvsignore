@@ -3,3 +3,4 @@ ekg
 ioctld
 *.orig
 *.rej
+.DS_Store
