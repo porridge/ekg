@@ -18,7 +18,7 @@ po ponownym po³±czeniu mo¿emy korzystaæ z dobrodziejstw bezpo¶rednich
 po³±czeñ. je¶li kto¶ spróbuje co¶ do nas wys³aæ, pojawi siê:
 
 	->- kto¶/123 przesy³a plik zdjecie.jpg o rozmiarze 129117
-	->- Wpisz dcc get #1 by go odebraæ, lub dcc close #1 by anulowaæ
+	->- Wpisz dcc get #1, by go odebraæ, lub dcc close #1, by anulowaæ
 
 wystarczy zastosowaæ siê do podanych wskazówek. je¶li chcemy wys³aæ
 komu¶ plik, wpisujemy:

@@ -566,18 +566,17 @@ COMMAND(cmd_connect)
 		if (config_keep_reason && config_reason && !tmp)
 			tmp = xstrdup(config_reason);
 
-		if (config_keep_reason) {
-			xfree(config_reason);
-			config_reason = xstrdup(tmp);
-		}
+		xfree(config_reason);
+		config_reason = NULL;
 
 		if (params && params[0] && !strcmp(params[0], "-")) {
-			xfree(config_reason);
-			config_reason = NULL;
 			xfree(tmp);
 			tmp = NULL;
 			config_status = ekg_hide_descr_status(config_status);
 		}
+
+		if (config_keep_reason)
+			config_reason = xstrdup(tmp);
 
 		connecting = 0;
 
@@ -1626,10 +1625,6 @@ COMMAND(cmd_list)
 			printq("user_info_groups", groups);
 		printq("user_info_footer", u->display, itoa(u->uin));
 		
-#if 0
-		printq("user_info", (u->nickname) ? u->nickname : u->display, itoa(u->uin), status, ip_str, u->first_name, u->last_name, u->display, u->mobile, groups);
-#endif
-		
 		xfree(ip_str);
 		xfree(groups);
 		xfree(status);
@@ -2373,20 +2368,38 @@ COMMAND(cmd_quit)
 	} else
 	    	tmp = xstrdup(params[0]);
 
-	if (config_keep_reason && !tmp && config_reason)
+	if (!tmp && config_keep_reason && config_reason)
 		tmp = xstrdup(config_reason);
 
-	if (config_keep_reason) {
-		xfree(config_reason);
-		config_reason = xstrdup(tmp);
-	}
+	xfree(config_reason);
+	config_reason = NULL;
 
 	if (params[0] && !strcmp(params[0], "-")) {
-		xfree(config_reason);
-		config_reason = NULL;
-		xfree(tmp);
 		tmp = NULL;
 		config_status = ekg_hide_descr_status(config_status);
+	}
+
+	if (config_keep_reason)
+		config_reason = xstrdup(tmp);
+	else {
+		char **arr = NULL, *tmp;
+		int __config_status = config_status;
+
+		/* ka¿± nie zapisywaæ opisu, wiêc przy kolejnym
+		   uruchomieniu ma on byæ pusty. musimy w tym
+		   miejscu to poprawiæ */
+
+		if ((tmp = config_read_variable("status"))) {
+			config_status = ekg_hide_descr_status(atoi(tmp));
+			array_add(&arr, xstrdup("status"));	
+			xfree(tmp);
+		}
+
+		array_add(&arr, xstrdup("reason"));
+		config_write_partly(arr);
+		array_free(arr);
+
+		config_status = __config_status;
 	}
 	
 	if (!quit_message_send) {
@@ -2408,12 +2421,6 @@ COMMAND(cmd_quit)
 
 	ekg_logoff(sess, tmp);
 
-	if (tmp) {
-		xfree(config_reason);
-		config_reason = tmp;
-		tmp = NULL;
-	}
-		
 	ui_event("disconnected", NULL);
 
 	/* nie wychodzimy tutaj, ¿eby command_exec() mia³o szansê zwolniæ

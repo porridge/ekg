@@ -10,6 +10,8 @@ zg³osi³ b³±d.
 
 - poprawka segfault'a przy braku niektórych zmiennych w pliku
   konfiguracyjnym (a.latanski/sz)
+- ma³a poprawka /quit, ¿eby zachowywa³o siê _dok³adnie_ tak jak komendy
+  zmiany stanu, w zale¿no¶ci od zmiennej ,,keep_reason'' (sz)
 
 // 2003-02-19
 
