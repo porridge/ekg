@@ -78,31 +78,31 @@ static int bind_sequence(char *seq, char *command, int quiet);
 static int bind_seq_list();
 
 /* pro¶ciej siê chyba nie da... */
-int seq_execute_a() { ekg_execute(NULL, seq_get_command("ctrl-a")); return 0; }
-int seq_execute_b() { ekg_execute(NULL, seq_get_command("ctrl-b")); return 0; }
-int seq_execute_c() { ekg_execute(NULL, seq_get_command("ctrl-c")); return 0; }
-int seq_execute_d() { ekg_execute(NULL, seq_get_command("ctrl-d")); return 0; }
-int seq_execute_e() { ekg_execute(NULL, seq_get_command("ctrl-e")); return 0; }
-int seq_execute_f() { ekg_execute(NULL, seq_get_command("ctrl-f")); return 0; }
-int seq_execute_g() { ekg_execute(NULL, seq_get_command("ctrl-g")); return 0; }
-int seq_execute_h() { ekg_execute(NULL, seq_get_command("ctrl-h")); return 0; }
-int seq_execute_i() { ekg_execute(NULL, seq_get_command("ctrl-i")); return 0; }
-int seq_execute_j() { ekg_execute(NULL, seq_get_command("ctrl-j")); return 0; }
-int seq_execute_k() { ekg_execute(NULL, seq_get_command("ctrl-k")); return 0; }
-int seq_execute_l() { ekg_execute(NULL, seq_get_command("ctrl-l")); return 0; }
-int seq_execute_m() { ekg_execute(NULL, seq_get_command("ctrl-m")); return 0; }
-int seq_execute_n() { ekg_execute(NULL, seq_get_command("ctrl-n")); return 0; }
-int seq_execute_o() { ekg_execute(NULL, seq_get_command("ctrl-o")); return 0; }
-int seq_execute_p() { ekg_execute(NULL, seq_get_command("ctrl-p")); return 0; }
-int seq_execute_q() { ekg_execute(NULL, seq_get_command("ctrl-q")); return 0; }
-int seq_execute_r() { ekg_execute(NULL, seq_get_command("ctrl-r")); return 0; }
-int seq_execute_s() { ekg_execute(NULL, seq_get_command("ctrl-s")); return 0; }
-int seq_execute_t() { ekg_execute(NULL, seq_get_command("ctrl-t")); return 0; }
-int seq_execute_u() { ekg_execute(NULL, seq_get_command("ctrl-u")); return 0; }
-int seq_execute_v() { ekg_execute(NULL, seq_get_command("ctrl-v")); return 0; }
-int seq_execute_w() { ekg_execute(NULL, seq_get_command("ctrl-w")); return 0; }
-int seq_execute_y() { ekg_execute(NULL, seq_get_command("ctrl-y")); return 0; }
-int seq_execute_z() { ekg_execute(NULL, seq_get_command("ctrl-z")); return 0; }
+int seq_execute_a() { command_exec(NULL, seq_get_command("ctrl-a")); return 0; }
+int seq_execute_b() { command_exec(NULL, seq_get_command("ctrl-b")); return 0; }
+int seq_execute_c() { command_exec(NULL, seq_get_command("ctrl-c")); return 0; }
+int seq_execute_d() { command_exec(NULL, seq_get_command("ctrl-d")); return 0; }
+int seq_execute_e() { command_exec(NULL, seq_get_command("ctrl-e")); return 0; }
+int seq_execute_f() { command_exec(NULL, seq_get_command("ctrl-f")); return 0; }
+int seq_execute_g() { command_exec(NULL, seq_get_command("ctrl-g")); return 0; }
+int seq_execute_h() { command_exec(NULL, seq_get_command("ctrl-h")); return 0; }
+int seq_execute_i() { command_exec(NULL, seq_get_command("ctrl-i")); return 0; }
+int seq_execute_j() { command_exec(NULL, seq_get_command("ctrl-j")); return 0; }
+int seq_execute_k() { command_exec(NULL, seq_get_command("ctrl-k")); return 0; }
+int seq_execute_l() { command_exec(NULL, seq_get_command("ctrl-l")); return 0; }
+int seq_execute_m() { command_exec(NULL, seq_get_command("ctrl-m")); return 0; }
+int seq_execute_n() { command_exec(NULL, seq_get_command("ctrl-n")); return 0; }
+int seq_execute_o() { command_exec(NULL, seq_get_command("ctrl-o")); return 0; }
+int seq_execute_p() { command_exec(NULL, seq_get_command("ctrl-p")); return 0; }
+int seq_execute_q() { command_exec(NULL, seq_get_command("ctrl-q")); return 0; }
+int seq_execute_r() { command_exec(NULL, seq_get_command("ctrl-r")); return 0; }
+int seq_execute_s() { command_exec(NULL, seq_get_command("ctrl-s")); return 0; }
+int seq_execute_t() { command_exec(NULL, seq_get_command("ctrl-t")); return 0; }
+int seq_execute_u() { command_exec(NULL, seq_get_command("ctrl-u")); return 0; }
+int seq_execute_v() { command_exec(NULL, seq_get_command("ctrl-v")); return 0; }
+int seq_execute_w() { command_exec(NULL, seq_get_command("ctrl-w")); return 0; }
+int seq_execute_y() { command_exec(NULL, seq_get_command("ctrl-y")); return 0; }
+int seq_execute_z() { command_exec(NULL, seq_get_command("ctrl-z")); return 0; }
 
 static void sigcont_handler()
 {
@@ -148,9 +148,9 @@ extern char **completion_matches();
 
 static char *command_generator(char *text, int state)
 {
-	static int index = 0, len;
+	static int len;
+	static list_t l;
 	int slash = 0;
-	char *name;
 
 	if (*text == '/') {
 		slash = 1;
@@ -168,13 +168,18 @@ static char *command_generator(char *text, int state)
 	}
 
 	if (!state) {
-		index = 0;
+		l = commands;
 		len = strlen(text);
 	}
 
-	while ((name = commands[index++].name))
-		if (!strncasecmp(text, name, len))
-			return (win->query_nick) ? saprintf("/%s", name) : xstrdup(name);
+	for (; l; l = l->next) {
+		struct command *c = l->data;
+
+		if (!strncasecmp(text, c->name, len)) {
+			l = l->next;
+			return (win->query_nick) ? saprintf("/%s", c->name) : xstrdup(c->name);
+		}
+	}
 
 	return NULL;
 }
@@ -302,10 +307,10 @@ static char *empty_generator(char *text, int state)
 
 static char **my_completion(char *text, int start, int end)
 {
-	struct command *c;
 	char *params = NULL;
 	int word = 0, i, abbrs = 0;
 	CPFunction *func = known_uin_generator;
+	list_t l;
 
 	if (start) {
 		if (!strncasecmp(rl_line_buffer, "chat ", 5) || !strncasecmp(rl_line_buffer, "/chat ", 6)) {
@@ -342,7 +347,8 @@ static char **my_completion(char *text, int start, int end)
 		}
 		word--;
 
-		for (c = commands; c->name; c++) {
+		for (l = commands; l; l = l->next) {
+			struct command *c = l->data;
 			int len = strlen(c->name);
 			char *cmd = (*rl_line_buffer == '/') ? rl_line_buffer + 1 : rl_line_buffer;
 
@@ -717,7 +723,7 @@ static void ui_readline_loop()
 		
 		pager_lines = 0;
 		
-		if (ekg_execute(win->query_nick, line)) {
+		if (command_exec(win->query_nick, line)) {
 			xfree(line);
 			break;
 		}

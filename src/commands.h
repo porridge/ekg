@@ -20,14 +20,26 @@
 #ifndef __COMMANDS_H
 #define __COMMANDS_H
 
+typedef int command_func_t(const char *name, char **params);
+#define COMMAND(x) int x(const char *name, char **params)
+
 struct command {
 	char *name;
 	char *params;
-	int (*function)(char *name, char **params);
+	command_func_t *function;
 	char *params_help;
 	char *brief_help;
 	char *long_help;
 };
+
+list_t commands;
+
+int command_add(const char *name, const char *params, command_func_t function, const char *params_help, const char *brief_help, const char *long_help);
+void command_init();
+void command_free();
+int command_exec(char *target, char *line);
+
+COMMAND(cmd_alias_exec);
 
 /*
  * jaka¶ malutka lista tych, do których by³y wysy³ane wiadomo¶ci.
@@ -36,11 +48,6 @@ struct command {
 
 char *send_nicks[SEND_NICKS_MAX];
 int send_nicks_count, send_nicks_index;
-extern struct command commands[];
-
-#define COMMAND(x) int x(char *name, char **params)
-
-int ekg_execute(char *target, char *line);
 
 void add_send_nick(const char *nick);
 

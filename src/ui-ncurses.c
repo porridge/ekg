@@ -237,7 +237,7 @@ static void ui_ncurses_loop()
 				break;	
 			case KEY_ENTER:
 			case 13:
-				if (ekg_execute(NULL, line))
+				if (command_exec(NULL, line))
 					return;
 				if (history[0] != line)
 					xfree(history[0]);

@@ -603,7 +603,7 @@ void handle_success(struct gg_event *e)
 	}
 
 	if (batch_mode && batch_line) {
- 		ekg_execute(NULL, batch_line);
+ 		command_exec(NULL, batch_line);
  		free(batch_line);
  		batch_line = NULL;
  	}

@@ -1305,7 +1305,7 @@ int event_run(const char *act)
 		
 		if (tmp) {
 			gg_debug(GG_DEBUG_MISC, "//   executing program\n");
-			ekg_execute(NULL, tmp);
+			command_exec(NULL, tmp);
 			xfree(tmp);
 		} else
 			gg_debug(GG_DEBUG_MISC, "//   not enough memory\n");
@@ -1315,7 +1315,7 @@ int event_run(const char *act)
 
 	if (!strcasecmp(acts[0], "command")) {
 		gg_debug(GG_DEBUG_MISC, "//   executing command\n");
-		ekg_execute(NULL, action + 8);
+		command_exec(NULL, action + 8);
 		goto cleanup;
 	} 
 

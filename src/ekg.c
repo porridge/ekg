@@ -116,7 +116,7 @@ int get_char_from_pipe(struct gg_common *c)
 				buf[strlen(buf)] = ch;
 		}
 		if (ch == '\n' || (strlen(buf) >= PIPE_MSG_MAX_BUF_LEN)) {
-			ret = ekg_execute(NULL, buf);
+			ret = command_exec(NULL, buf);
 			memset(buf, 0, PIPE_MSG_MAX_BUF_LEN + 1);
 		}
 	}
@@ -482,6 +482,7 @@ int main(int argc, char **argv)
 	argv0[sizeof(argv0) - 1] = 0;
 
 	variable_init();
+	command_init();
 
 	if (!(home_dir = getenv("HOME")))
 		if ((pw = getpwuid(getuid())))
@@ -776,6 +777,7 @@ int main(int argc, char **argv)
 	variable_free();
 	event_free();
 	emoticon_free();
+	command_free();
 
 	xfree(home_dir);
 
