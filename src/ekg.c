@@ -114,6 +114,12 @@ int my_getc(FILE *f)
 		
 		ret = select(maxfd + 1, &rd, &wd, NULL, &tv);
 	
+		if (ret == -1) {
+			if (errno != EINTR)
+				perror("select()");
+			continue;
+		}
+
 		if (!ret) {
 			/* timeouty danych sesji */
 			for (l = watches; l; l = l->next) {
