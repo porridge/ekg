@@ -287,6 +287,11 @@ void handle_search(struct gg_search *s)
 		char uin[16], born[16], *active, *gender, *name;
 
 		snprintf(uin, sizeof(uin), "%lu", s->results[i].uin);
+		
+		cp_to_iso(s->results[i].first_name);
+		cp_to_iso(s->results[i].last_name);
+		cp_to_iso(s->results[i].nickname);
+		cp_to_iso(s->results[i].city);
 
 		name = gg_alloc_sprintf("%s %s", s->results[i].first_name, s->results[i].last_name);
 
@@ -315,11 +320,6 @@ void handle_search(struct gg_search *s)
 
 		active = format_string(active);
 		gender = format_string(gender);
-
-		cp_to_iso(s->results[i].first_name);
-		cp_to_iso(s->results[i].last_name);
-		cp_to_iso(s->results[i].nickname);
-		cp_to_iso(s->results[i].city);
 
 		my_printf((search_type == 1) ? "search_results_single" : "search_results_multi", uin, (name) ? name : "", s->results[i].nickname, s->results[i].city, born, gender, active);
 
