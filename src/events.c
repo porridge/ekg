@@ -1107,6 +1107,7 @@ void handle_event(struct gg_session *s)
 	if (!(e = gg_watch_fd(sess))) {
 		print("conn_broken");
 		list_remove(&watches, sess, 0);
+		gg_logoff(sess);
 		gg_free_session(sess);
 		sess = NULL;
 		userlist_clear_status(0);

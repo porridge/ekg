@@ -8,6 +8,7 @@ d - drg, sz - szalik).
 
 - poprawka zapisywania plików konfiguracyjnych (porridge/w)
 - poprawka wykrywania niestandardowych instalacji openssl (zawirek,adrians/w)
+- poprawne zamykanie deskryptora w niektórych sytuacjach (mirqus/sz)
 
 // 2003-06-30
 

@@ -409,6 +409,7 @@ void ekg_wait_for_key()
 					} else {
 						print("conn_timeout");
 						list_remove(&watches, s, 0);
+						gg_logoff(s);
 						gg_free_session(s);
 						userlist_clear_status(0);
 						sess = NULL;
