@@ -14,7 +14,7 @@ AR = @AR@
 install = @INSTALL@
 
 CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) 
-OBJS = libgg.o libgg_search.o
+OBJS = common.o libgg.o http.o search.o
 
 all:	static shared
 
@@ -24,9 +24,10 @@ distclean:	clean
 clean:
 	$(RM) -f *.o libgg.so* libgg.a
 
-shared:
-	$(CC) $(CFLAGS) -fPIC -c libgg.c -o libgg.o
-	$(CC) $(CFLAGS) -fPIC -c libgg_search.c -o libgg_search.o
+shared:	$(OBJS)
+#	$(CC) $(CFLAGS) -fPIC -c libgg.c -o libgg.o
+#	$(CC) $(CFLAGS) -fPIC -c search.c -o search.o
+#	$(CC) $(CFLAGS) -fPIC -c common.c -o common.o
 	$(CC) -g -shared -Wl,-soname,libgg.so -o libgg.so.0.9.0 $(OBJS) -lc
 
 static:	$(OBJS)

@@ -18,8 +18,8 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef __LIBGG_H
-#define __LIBGG_H
+#ifndef __GG_LIBGG_H
+#define __GG_LIBGG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -124,6 +124,7 @@ enum {
 	GG_FAILURE_READING,
 	GG_FAILURE_WRITING,
 	GG_FAILURE_PASSWORD,
+	GG_FAILURE_404,
 };
 
 struct gg_event {
@@ -183,13 +184,13 @@ struct gg_search_request {
 };
 
 struct gg_search {
-	struct gg_search_request request;
+	/* czy ju¿ zrobi³ */
+	int done;
 
-	/* bzdurki */
-	int mode, fd, async, state, check, error, pid;
-	char *header_buf, *data_buf;
-	int header_size, data_size;
-
+	/* po³±czenie */
+	struct gg_http *http;
+	int fd, state, error, check;
+	
 	/* wyniki */
 	int count;
 	struct gg_search_result *results;
@@ -230,9 +231,12 @@ void gg_debug(int level, char *format, ...);
  */
 
 int gg_resolve(int *fd, int *pid, char *hostname);
-int gg_connect(void *addr, int port, int async);
+void gg_debug(int level, char *format, ...);
 char *gg_alloc_sprintf(char *format, ...);
 char *gg_get_line(char **ptr);
+int gg_connect(void *addr, int port, int async);
+void gg_read_line(int sock, char *buf, int length);
+void gg_chomp(char *line);
 char *gg_urlencode(char *str);
 
 #define GG_APPMSG_HOST "appmsg.gadu-gadu.pl"
@@ -346,4 +350,4 @@ struct gg_recv_msg {
 }
 #endif
 
-#endif
+#endif /* __GG_LIBGG_H */

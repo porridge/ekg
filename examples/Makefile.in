@@ -6,7 +6,7 @@ CC = @CC@
 RM = @RM@
 MAKE = @MAKE@
 
-OBJS = ../lib/libgg.o ../lib/libgg_search.o
+OBJS = ../lib/libgg.o ../lib/common.o ../lib/search.o ../lib/http.o
 
 all:	$(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) search.c -o search-sync

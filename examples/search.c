@@ -92,7 +92,7 @@ int main()
 	printf("count=%d\n", foo->count);
 
 	for (i = 0; i < foo->count; i++) {
-		printf("%d: %s %s (%s), %d, %s\n", foo->results[i].uin, foo->results[i].first_name, foo->results[i].last_name, foo->results[i].nickname, foo->results[i].born, foo->results[i].city);
+		printf("%ld: %s %s (%s), %d, %s\n", foo->results[i].uin, foo->results[i].first_name, foo->results[i].last_name, foo->results[i].nickname, foo->results[i].born, foo->results[i].city);
 	}
 
 	gg_free_search(foo);
