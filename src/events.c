@@ -396,6 +396,8 @@ void handle_ack(struct gg_event *e)
 	if (!e->event.ack.seq)	/* ignorujemy potwierdzenia ctcp */
 		return;
 
+	event_check((queued) ? EVENT_QUEUED : EVENT_DELIVERED, e->event.ack.recipient, NULL);
+
 	if (!config_display_ack)
 		return;
 

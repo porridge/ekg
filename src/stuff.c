@@ -161,6 +161,8 @@ static struct {
 	{ EVENT_EXEC, "exec" },
 	{ EVENT_SIGUSR1, "sigusr1" },
 	{ EVENT_SIGUSR2, "sigusr2" },
+	{ EVENT_DELIVERED, "delivered" },
+	{ EVENT_QUEUED, "queued" },
 	{ 0, NULL },
 };
 

@@ -10,6 +10,7 @@ on [zdarzenie] [user] [akcja]; [akcja1]; [...]
 		disconnect -       -//-	              'niedostêpny';
 		dcc - otrzymanie od kogo¶ dcc;
 		sigusr1, sigusr2 - otrzymanie podanego sygna³u;
+		delivered, queued - wiadomo¶æ dostarczona lub zakolejkowana;
 		* - wszystkie zdarzenia;
 	zdarzenia mo¿na ³±czyæ ze sob± operatorem '|'.
 

@@ -45,8 +45,10 @@ enum event_t {
 	EVENT_EXEC = 128,
 	EVENT_SIGUSR1 = 256,
 	EVENT_SIGUSR2 = 512,
+	EVENT_DELIVERED = 1024,
+	EVENT_QUEUED = 2048,
 
-	EVENT_ALL = 1023,	/* uaktualniaæ za ka¿d± zmian± */
+	EVENT_ALL = 4095,	/* uaktualniaæ za ka¿d± zmian± */
 };
 
 struct process {

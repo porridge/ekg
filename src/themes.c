@@ -1025,7 +1025,7 @@ void theme_init()
         format_add("events_del", "%> Usuniêto zdarzenie\n", 1);
         format_add("events_del_flags", "%> Flagi %G%1%n usuniête\n", 1);
         format_add("events_add_flags", "%> Flagi %G%1%n dodane\n", 1);
-        format_add("events_noexist", "%! Niezidentyfikowane zdarzenie\n", 1);
+        format_add("events_noexist", "%! Nieznane zdarzenie\n", 1);
         format_add("events_del_noexist", "%! Zdarzenie %T%1%n nie istnieje dla u¿ytkownika %G%2%n\n", 1);
         format_add("events_seq_not_found", "%! Sekwencja %T%1%n nie znaleziona\n", 1);
         format_add("events_act_no_params", "%! Brak parametrów\n", 1);
