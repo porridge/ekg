@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-05-10
+
+- poprawka obs³ugi polskich liter w /find (FIG/sz)
+
 // 2003-05-05
 
 - niedostêpno¶æ osób nie bêdzie wy¶wietlana przez ,,events_delay'' sekund

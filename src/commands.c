@@ -838,7 +838,7 @@ COMMAND(cmd_exec)
 
 COMMAND(cmd_find)
 {
-	char **argv = NULL;
+	char **argv = NULL, *user;
 	gg_pubdir50_t req;
 	int i, res = 0, all = 0;
 
@@ -877,20 +877,24 @@ COMMAND(cmd_find)
 		return res;
 	}
 
+	user = xstrdup(argv[0]);
+
 	for (i = 0; argv[i]; i++)
 		iso_to_cp(argv[i]);
 
 	if (!(req = gg_pubdir50_new(GG_PUBDIR50_SEARCH))) {
 		array_free(argv);
+		xfree(user);
 		return -1;
 	}
 	
 	if (argv[0] && argv[0][0] != '-') {
-		uin_t uin = get_uin(argv[0]);
+		uin_t uin = get_uin(user);
 
 		if (!uin) {
-			printq("user_not_found", argv[0]);
+			printq("user_not_found", user);
 			array_free(argv);
+			xfree(user);
 			return -1;
 		}
 
@@ -899,6 +903,8 @@ COMMAND(cmd_find)
 		i = 1;
 	} else
 		i = 0;
+
+	xfree(user);
 
 	for (; argv[i]; i++) {
 		char *arg = argv[i];
