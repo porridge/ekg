@@ -850,9 +850,9 @@ static void handle_common(uin_t uin, int status, const char *idescr, struct gg_n
 
 		/* czy ukrywaæ niedostêpnych */
 		if (hide_notavail) {
-			if (GG_S_NA(s->status))
+			if (GG_S_NA(s->status) && GG_S_NA(u->status))
 				break;
-			else
+			else if (time(NULL) - last_conn_event >= config_events_delay)
 				hide_notavail = 0;
 		}
 

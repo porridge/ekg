@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-05-05
+
+- niedostêpno¶æ osób nie bêdzie wy¶wietlana przez ,,events_delay'' sekund
+  od po³±czenia (lordzik/w)
+
 // 2003-05-01
 
 - po utracie terminala koñczy pracê (tokugawa/w)
