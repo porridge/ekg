@@ -418,7 +418,7 @@ static void ui_readline_print(const char *target, const char *line)
 			if (*p == '\n')
 				pager_lines++;
 
-		if (pager_lines > screen_lines - 2) {
+		if (pager_lines >= screen_lines - 2) {
 			char *tmp;
 			const char *prompt = find_format("readline_more");
 			
