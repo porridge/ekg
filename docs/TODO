@@ -10,10 +10,11 @@ biblioteka:
 klient:
 - uzupe³niæ dope³nienia (w tym nicki ze spacjami, lista nicków (joshua)),
 - wykrywanie niewidocznych jako opcja.
-- korzystaæ z getopt.
+- korzystaæ z getopt,
 - zapisywanie konfiguracji do innego pliku,
 - ustawianie stanu bez opisów przy w³±czynych opcjach ,,*reason*'',
 - kolejka wiadomo¶ci wysy³anych podczas roz³±czenia (Murphy).
+- dodaæ mo¿liwo¶æ ustawienia powodu przy wywo³ywaniu ekg (jojo),
 
 - dokoñczyæ ui-ncurses:
   + reakcja na zmianê rozmiaru terminala,
