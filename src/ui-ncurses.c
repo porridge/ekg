@@ -1203,11 +1203,13 @@ crap:
 	}
 	xfree(lines_save);
 
-	w->overflow -= count;
+	if (w->overflow) {
+		w->overflow -= count;
 
-	if (w->overflow < 0) {
-		bottom = 1;
-		w->overflow = 0;
+		if (w->overflow < 0) {
+			bottom = 1;
+			w->overflow = 0;
+		}
 	}
 
 	if (bottom)
