@@ -9,6 +9,9 @@ d - drg). ,,p/nick'' oznacza patch lub ¼ród³o podes³ane przez ,,nick'',
 
 - ju¿ nie dodaje ,,obcych zmiennych'' przy /set (w)
 - auto_save, domy¶lnie wy³±czona (cry/w)
+- poprawki MacOSX'owe - teraz powinno sie komplikowac [z fink'iem] (s)
+- biblioteka dzielona bedzie komplikowana dopiero po wybraniu 
+  opcji --with-shared przy configure (s)
 
 // 2002-02-06
 

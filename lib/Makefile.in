@@ -12,6 +12,7 @@ RM = @RM@
 MAKE = @MAKE@
 AR = @AR@
 install = @INSTALL@
+RANLIB = @RANLIB@
 
 CFLAGS = @DFLAGS@ @CFLAGS@ $(INCLUDES) -fPIC
 OBJS = common.o libgadu.o search.o pubdir.o http.o dcc.o
@@ -19,7 +20,7 @@ OBJS = common.o libgadu.o search.o pubdir.o http.o dcc.o
 SHARED = libgadu.so.0.9.0
 STATIC = libgadu.a
 
-all:	static shared
+all:	static @shared@
 
 distclean:	clean
 	$(RM) -f *~ Makefile
@@ -36,3 +37,5 @@ static: $(STATIC)
 
 libgadu.a:	$(OBJS)
 	$(AR) r $(STATIC) $(OBJS) 
+	$(RANLIB) $(STATIC)
+

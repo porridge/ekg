@@ -10,6 +10,7 @@ AC_CONFIG_HEADER(config.h)
 AC_PROG_CC
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
+AC_PROG_RANLIB
 
 AC_SUBST(DFLAGS)
 
@@ -92,6 +93,7 @@ AC_CHECK_LIB(socket, socket, LIBS="$LIBS -lsocket")
 
 AC_SUBST(do_ioctl)
 AC_SUBST(dioctl)
+AC_SUBST(shared)
 
 AC_ARG_WITH(ioctl, 
   [  --with-ioctl  	  Compile with ioctl deamon [linux only]])
@@ -102,6 +104,15 @@ if test "x$with_ioctl" = "xyes"; then
 else
   do_ioctl=""
   dioctl=""
+fi
+
+AC_ARG_WITH(shared, 
+  [  --with-shared  	  Compile shared version of libgadu])
+
+if test "x$with_shared" = "xyes"; then 
+  shared="shared"
+else
+  shared="" 
 fi
 
 
