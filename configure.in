@@ -124,6 +124,9 @@ fi
 dnl threadsafe
 AC_CHECK_FUNCS([gethostbyname_r], [AC_LIBGADU_DEFINE([HAVE_GETHOSTBYNAME_R])])
 
+dnl inet_pton
+AC_CHECK_FUNCS(inet_pton)
+
 AC_MSG_CHECKING([for va_copy])
 AC_TRY_LINK([#include <stdarg.h>], [va_list a, b; va_copy(a, b);], 
 [
