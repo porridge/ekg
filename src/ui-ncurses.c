@@ -431,9 +431,14 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 			
 			if (config_speech_app)
 				string_append_c(s, *p);
-			
-			if ((!x)&&(strcasecmp(target,"__ctx")))
+		    			
+			if (!x)
+			    if (target) {
+				if (strcasecmp(target,"__ctx"))
+				    x += print_timestamp(w);
+			    } else
 				x += print_timestamp(w);
+		     
 			waddch(w->window, (unsigned char) *p);
 			count++;
 			x++;
