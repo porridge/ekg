@@ -726,5 +726,3 @@ void handle_dcc(struct gg_dcc *d)
 	return;
 }
 
-#if 0
-#endif

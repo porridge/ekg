@@ -380,6 +380,7 @@ u¿ycie: %s [OPCJE]
 	signal(SIGCONT, sigcont);
 	signal(SIGHUP, sighup);
 	signal(SIGALRM, SIG_IGN);
+	signal(SIGPIPE, SIG_IGN);
 
 	time(&last_action);
 
