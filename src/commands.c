@@ -114,7 +114,7 @@ struct command commands[] = {
 	{ "status", "", command_status, "", "Wy¶wietla aktualny stan", "" },
 	{ "unignore", "i", command_ignore, " <numer/alias>", "Usuwa z listy ignorowanych osób", "" },
 	{ "version", "", command_version, "", "Wy¶wietla wersje programu", "" },
-	{ "window", "??", command_window, " <komenda> [numer_okna]", "Zarz±dzanie okienkami", "  new\n  kill [numer_okna]\n  next\n  prev\n  switch numer_okna\n  clear\n  refresh\n" },
+	{ "window", "??", command_window, " <komenda> [numer_okna]", "Zarz±dzanie okienkami", "  new\n  kill [numer_okna]\n  next\n  prev\n  switch numer_okna\n  clear\n  refresh\n  list\n" },
 	{ "_add", "?", command_test_add, "", "", "" },
 	{ "_fds", "", command_test_fds, "", "", "" },
 	{ "_msg", "u?", command_test_send, "", "", "" },

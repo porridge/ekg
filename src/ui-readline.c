@@ -58,6 +58,7 @@ static int window_write(int id, const char *line);
 static int window_clear();
 static int windows_sort();
 static int window_query_id(const char *qnick);
+static void window_list();
 
 /* a jak ju¿ przy okienkach jeste¶my... */
 static void window_01() { if (curr_window == 1) return; window_switch(1); }
@@ -755,6 +756,9 @@ static int ui_readline_event(const char *event, ...)
 			} else if (!strcasecmp(p1, "clear")) {
 		                window_clear();
 
+			} else if (!strcasecmp(p1, "list")) {
+				window_list();
+				
 			} else
 				print("window_invalid");
 
@@ -944,3 +948,18 @@ static int window_query_id(const char *qnick)
         return -2;
 }
 
+static void window_list()
+{
+	struct list *l;
+
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data;
+		char id[4];
+
+		snprintf(id, 4, "%d", w->id);
+		if (w->query_nick)
+			print("window_list_query", id, w->query_nick);
+		else
+			print("window_list_nothing", id);
+	}
+}		

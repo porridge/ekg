@@ -820,6 +820,8 @@ void init_theme()
 	add_format("window_del", "%) Okienko usuniête.\n", 1);
 	add_format("windows_max", "%! Maksymalna ilo¶æ okien wyczerpana.\n", 1);
 	add_format("window_not_enough_params", "%! Niewystarczaj±ca ilo¶æ argumentów.\n", 1);
+	add_format("window_list_query", "%) Okienku nr %B%1%n - %Gquery %2%n\n", 1);
+	add_format("window_list_nothing", "%) Okienko nr %B%1%n - %G-%n\n", 1);
 	add_format("window_invalid", "%! Nieprawid³owy parametr.\n", 1);
 	
 };
