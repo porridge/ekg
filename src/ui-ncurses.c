@@ -427,7 +427,7 @@ int window_backlog_split(struct window *w, int full, int removed)
 			
 			for (j = 0, word = 0; j < l->len; j++) {
 
-				if (str[j] == ' ')
+				if (str[j] == ' ' && !w->nowrap)
 					word = j + 1;
 
 				if (j == width) {
@@ -1227,7 +1227,8 @@ static int contacts_update(struct window *w)
 		{ GG_STATUS_BLOCKED, -1, "contacts_blocking", "contacts_blocking", "contacts_blocking", "contacts_blocking_header", "contacts_blocking_footer" },
 		{ GG_STATUS_NOT_AVAIL, GG_STATUS_NOT_AVAIL_DESCR, "contacts_not_avail", "contacts_not_avail_descr", "contacts_not_avail_descr_full", "contacts_not_avail_header", "contacts_not_avail_footer" },
 	};
-	const char *header = NULL, *footer = NULL, *group = NULL;
+	const char *header = NULL, *footer = NULL;
+	char *group = NULL;
 	int j;
 		
 	if (!w) {
@@ -1257,9 +1258,12 @@ static int contacts_update(struct window *w)
 			group = groups[contacts_group_index - 1];
 			if (*group == '@')
 				group++;
+			group = xstrdup(group);
 			header = format_find("contacts_header_group");
 			footer = format_find("contacts_footer_group");
 		}
+
+		array_free(groups);
 	}
 
 	if (!header || !footer) {
@@ -1316,6 +1320,8 @@ static int contacts_update(struct window *w)
 
 	if (strcmp(footer, "")) 
 		window_backlog_add(w, reformat_string(format_string(footer, group)));
+
+	xfree(group);
 
 	w->redraw = 1;
 
