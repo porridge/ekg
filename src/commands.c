@@ -1837,7 +1837,7 @@ COMMAND(cmd_sms)
 	const char *number = NULL;
 	uin_t uin;
 
-	if (!params[1]) {
+	if (!params[0] || !params[1]) {
 		print("not_enough_params", name);
 		return;
 	}
