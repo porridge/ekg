@@ -136,7 +136,7 @@ int check_mail_update(const char *s, int more)
  */
 int check_mail_mbox()
 {
-	int fd[2], pid, cont = 0;
+	int fd[2], pid, cont = 0, to_check = 0;
 	struct gg_exec x;
 	list_t l;
 
@@ -163,6 +163,7 @@ int check_mail_mbox()
 			m->mtime = st.st_mtime;
 			m->size = st.st_size;
 			m->check = 1;
+			to_check++;
 			cont = 1;
 		} else
 			m->check = 0;
@@ -189,9 +190,12 @@ int check_mail_mbox()
 		for (l = mail_folders; l; l = l->next) {
 			struct mail_folder *m = l->data;
 
+			if (!m->check)
+				continue;
+
 			i++;
 
-			if (!m->check || (stat(m->fname, &st) == -1) || !(f = fopen(m->fname, "r")))
+			if ((stat(m->fname, &st) == -1) || !(f = fopen(m->fname, "r")))
 				continue;
 
 			while ((line = read_file(f))) {
@@ -220,7 +224,7 @@ int check_mail_mbox()
 			utimes(m->fname, (const struct timeval *) &foo);
 #endif
 
-			if (i == list_count(mail_folders))
+			if (i == to_check)
 				s = saprintf("%d,%d", m->fhash, f_new);
 			else
 				s = saprintf("%d,%d\n", m->fhash, f_new);
@@ -298,6 +302,7 @@ int check_mail_maildir()
 		for (l = mail_folders; l; l = l->next) {
 			struct mail_folder *m = l->data;
 			char *tmp = saprintf("%s/%s", m->fname, "new");
+
 			i++;
 
 			if (!(dir = opendir(tmp))) {
