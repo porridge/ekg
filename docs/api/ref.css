@@ -52,6 +52,10 @@ TABLE.params {
 	color: green;
 }
 
+.ggtype {
+	color: blue;
+}
+
 .cdirective {
 	color: magenta;
 }
@@ -59,3 +63,19 @@ TABLE.params {
 .structlink {
 	color: blue;
 }
+
+.funcgroup {
+	font: 18pt tahoma, verdana, arial, helvetica;
+	background-color: #c0d0e0;
+	border-bottom: 1px solid black;
+	padding: 0.2em;
+	margin-bottom: 0.2em;
+}
+
+.indexdecl {
+	font: normal 12pt courier, courier new, monospaced;
+/*	margin-left: 3em; */
+	margin-bottom: 2em;
+}
+
+
