@@ -71,6 +71,7 @@
 #include "userlist.h"
 #include "xmalloc.h"
 
+COMMAND(cmd_ignore);
 COMMAND(cmd_msg);
 COMMAND(cmd_modify);
 
@@ -1398,6 +1399,31 @@ COMMAND(cmd_help)
 	return 0;
 }
 
+int ignore_group_wrapper(const char *name, const char *group, const char *level, const char *target, int quiet)
+{
+	list_t l;
+	int ret = 0, any = 0;
+
+	for (l = userlist; l; l = l->next) {
+		struct userlist *u = l->data;
+
+		if (group_member(u, group + 1)) {
+			const char *params[] = { u->display, level, NULL };
+
+			any = 1;
+
+			if (cmd_ignore(name, params, target, quiet))
+				ret = 1;
+		}
+	}
+
+	if (!any)
+		printq("group_empty", group);
+
+	return ret;
+
+}
+
 COMMAND(cmd_ignore)
 {
 	char *tmp;
@@ -1441,6 +1467,9 @@ COMMAND(cmd_ignore)
 			xfree(tmp);
 			return res;
 		}
+
+		if (params[0][0] == '@')
+			return ignore_group_wrapper(name, params[0], params[1], target, quiet);
 
 		if ((flags = ignored_check(get_uin(params[0]))))
 			modified = 1;
@@ -1491,6 +1520,9 @@ COMMAND(cmd_ignore)
 			xfree(tmp);
 			return res;
 		}
+
+		if (params[0][0] == '@')
+			return ignore_group_wrapper(name, params[0], params[1], target, quiet);
 		
 		if (!unignore_all && !(uin = get_uin(params[0]))) {
 			printq("user_not_found", params[0]);
@@ -3954,12 +3986,27 @@ COMMAND(cmd_on)
 	}
 
 	if (match_arg(params[0], 'd', "del", 2)) {
-
 		if (!params[1]) {
 			printq("not_enough_params", name);
 			return -1;
 		}
 
+		if (params[2]) {
+			list_t l;
+
+			for (l = events; l; l = l->next) {
+				struct event *e = l->data;
+
+				if (!strcasecmp(params[2], e->target) && event_flags(params[1]) == e->flags) {
+					if (!event_remove(e->name, quiet)) {
+						config_changed = 1;
+						return 0;
+					} else
+						return -1;
+				}
+			}
+		}
+			
 		if (!event_remove(params[1], quiet)) {
 			config_changed = 1;
 			return 0;
@@ -5722,7 +5769,7 @@ void command_init()
 	 
 	command_add
 	( "ignore", "uI", cmd_ignore, 0,
-	  " [numer/alias] [poziom]", "dodaje do listy ignorowanych",
+	  " [numer/alias/@grupa] [poziom]", "dodaje do listy ignorowanych",
 	  "\n"
 	  "Dostêpne poziomy ignorowania:\n"
 	  "  - status - ca³kowicie ignoruje stan\n"
@@ -5829,6 +5876,7 @@ void command_init()
 	  "\n"
 	  "  -a, --add <zdarzenie> <numer/alias/@grupa> <komenda>  dodaje zdarzenie\n"
 	  "  -d, --del <numer>|*         usuwa zdarzenie o podanym numerze\n"
+	  "				 mo¿na podaæ te¿ zdarzenie oraz u¿ytkownika\n"
 	  " [-l, --list] [numer]         wy¶wietla listê zdarzeñ\n"
 	  "\n"
 	  "Dostêpne zdarzenia to:\n"
@@ -5841,6 +5889,7 @@ void command_init()
           "  - conference - nowa konferencja\n"
 	  "  - delivered, queued - wiadomo¶æ dostarczona lub zakolejkowana na serwerze\n"
 	  "  - dcc - kto¶ przysy³a nam plik\n"
+	  "  - dccfinish - odebrano plik\n"
 	  "  - sigusr1, sigusr2 - otrzymanie przez ekg danego sygna³u\n"
 	  "  - newmail - otrzymanie nowej wiadomo¶ci e-mail\n"
 	  "\n"
@@ -6031,7 +6080,7 @@ void command_init()
 
 	command_add
 	( "unignore", "i?", cmd_ignore, 0,
-	  " <numer/alias>|*", "usuwa z listy ignorowanych osób",
+	  " <numer/alias/@grupa>|*", "usuwa z listy ignorowanych osób",
 	  "");
 	  
 	command_add

@@ -1874,6 +1874,8 @@ void handle_dcc(struct gg_dcc *d)
 				break;
 			}
 
+			event_check(EVENT_DCCFINISH, t->uin, t->filename);
+
 			print((t->dcc->type == GG_SESSION_DCC_SEND) ? "dcc_done_send" : "dcc_done_get", format_user(t->uin), t->filename);
 			
 			remove_transfer(d);

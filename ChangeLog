@@ -4,6 +4,12 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-11-19
+
+- prosta obs³uga grup w ignore/unignore (sz)
+- zdarzenie dccfinish. mo¿liwo¶æ usuwania nie tylko ze wzglêdu na numer
+  zdarzenia (struthio/sz)
+
 // 2003-11-14
 
 - libgadu: podbicie wersji ABI (porridge/w)

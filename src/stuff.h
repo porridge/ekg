@@ -59,12 +59,13 @@ enum event_t {
 	EVENT_QUEUED = TOGGLE_BIT(15),
 	EVENT_NEWMAIL = TOGGLE_BIT(16),
 	EVENT_BLOCKED = TOGGLE_BIT(17),
+	EVENT_DCCFINISH = TOGGLE_BIT(18),
 
-	EVENT_ALL = TOGGLE_BIT(18) - 1,
-	INACTIVE_EVENT = TOGGLE_BIT(18)
+	EVENT_ALL = TOGGLE_BIT(19) - 1,
+	INACTIVE_EVENT = TOGGLE_BIT(19)
 };
 
-#define EVENT_LABELS_COUNT 17	/* uaktualniæ ! */
+#define EVENT_LABELS_COUNT 18	/* uaktualniæ ! */
 struct event_label event_labels[EVENT_LABELS_COUNT + 2];
 
 struct event_label {
