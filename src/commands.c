@@ -4584,7 +4584,7 @@ void command_init()
 	  
 	command_add
 	( "del", "u", cmd_del, 0,
-	  " <numer/alias>|*", "usuwa u¿ytkownika z listy kontaktów lub czy¶ci listê",
+	  " <numer/alias>|*", "usuwa u¿ytkownika z listy kontaktów",
 	  "");
 	
 	command_add
@@ -4833,7 +4833,7 @@ void command_init()
 
 	command_add
 	( "reload", "f", cmd_reload, 0,
-	  " [plik]", "wczytuje ponownie plik konfiguracyjny u¿ytkownika lub podany",
+	  " [plik]", "wczytuje plik konfiguracyjny u¿ytkownika lub podany",
 	  "");
 	  
 	command_add
