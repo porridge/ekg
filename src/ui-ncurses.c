@@ -3972,14 +3972,28 @@ static int ui_ncurses_event(const char *event, ...)
 					goto cleanup;
 				}
 
-				if (config_make_window == 2) {
-					w = window_new(param, 0);
+				if (config_make_window == 1) {
+					list_t l;
+
+					for (l = windows; l; l = l->next) {
+						struct window *v = l->data;
+	
+						if (v->id < 2 || v->floating || v->target)
+							continue;
+
+						w = v;
+						break;
+					}
+
+					if (!w)
+						w = window_new(param, 0);
+
 					window_switch(w->id);
 				}
 
-				if (!quiet) {
-					print_window(param, 0, "query_started", param);
-					print_window(param, 0, "query_started_window", param);
+				if (config_make_window == 2) {
+					w = window_new(param, 0);
+					window_switch(w->id);
 				}
 
 				xfree(window_current->target);
@@ -3987,6 +4001,11 @@ static int ui_ncurses_event(const char *event, ...)
 				window_current->target = xstrdup(param);
 				window_current->prompt = format_string(format_find("ncurses_prompt_query"), param);
 				window_current->prompt_len = strlen(window_current->prompt);
+
+				if (!quiet) {
+					print_window(param, 0, "query_started", param);
+					print_window(param, 0, "query_started_window", param);
+				}
 			} else {
 				const char *f = format_find("ncurses_prompt_none");
 

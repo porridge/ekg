@@ -294,7 +294,8 @@ display_sent
 
 	je¶li w³±czone, wy¶wietlane s± równie¿ wysy³ane wiadomo¶ci. nale¿y
 	zwróciæ uwagê, ¿e przy make_window = 2, wys³anie wiadomo¶ci utworzy
-	automatycznie okienko rozmowy.
+	automatycznie okienko rozmowy, a przy make_window = 1 tylko wtedy,
+	gdy nie bêdzie ¿adnych wolnych okienek.
 
 display_welcome
 	typ: bool
@@ -422,11 +423,10 @@ make_window
 	typ: liczba
 	domy¶lna warto¶æ: 0
 
-	okre¶la czy bêd± tworzone nowe okienka dla przychodz±cych wiadomo¶ci
-	od nowych rozmówców. dla 1 bêdzie wykorzystane do nowego query pierwsze
-	wolne okno (na którym z nikim jeszcze siê nie rozmawia), lub tworzone
-	nowe w przypadku braku wolnych. dla 2 bezwarunkowo utworzone zostanie 
-	nowe okienko.
+	okre¶la czy bêd± tworzone nowe okienka dla nowych rozmów. dla 1 bêdzie
+	wykorzystane do nowego query pierwsze wolne okno (na którym z nikim
+	jeszcze siê nie rozmawia), lub tworzone nowe w przypadku braku wolnych.
+	dla 2 bezwarunkowo utworzone zostanie nowe okno.
 
 mesg_allow
 	typ: liczba

@@ -10,7 +10,10 @@ lista rzeczy, które TRZEBA zrobiæ przed wydaniem wersji 1.0:
   - zmiana has³a nie wymaga podania adresu e-mail w 5.0.4 (wojtu¶)
 
 * klient:
-  - nic szczególnego.
+  - ,,zmiana rozmiaru okna - zacinka strza³ek'' (ekg-users)
+  - ,,inaczej'' dzia³aj±ce 'more' (ekg-users)
+  - ucinanie za d³ugich szyfrowanych wiadomo¶ci
+  - niewidoczne w 1.0, albo uporz±dkowane i dobrze dzia³aj±ce p³ywaj±ce
 
 pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
 
@@ -21,6 +24,7 @@ pobo¿ne ¿yczenia, czyli sprawy, którymi mo¿na zaj±æ siê pó¼niej:
   - wykrywanie niewidocznych jako opcja (wielu),
   - mo¿liwo¶æ automagicznego wyrównywania kolejnych linii wiadomo¶ci w tematach
     ircopodobnych do d³ugo¶ci nazwy rozmówcy i timestampu (sz)
+  - dope³nianie w ¶rodku linii (sz)
   - zmienna beep_*_away (rmrmg)
   - zmieniæ domy¶lne ustawienia na: display_sent 1, make_window 2,
     display_ack 3,
