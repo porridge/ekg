@@ -29,8 +29,6 @@
 #endif
 #include <stdlib.h>
 #include <errno.h>
-#include <readline.h>
-#include <history.h>
 #include <stdarg.h>
 #include <time.h>
 #include <signal.h>
@@ -46,6 +44,7 @@
 #include "userlist.h"
 #include "vars.h"
 #include "xmalloc.h"
+#include "ui.h"
 
 time_t last_action = 0;
 int ioctl_daemon_pid = 0;
@@ -100,7 +99,7 @@ int get_char_from_pipe(struct gg_common *c)
 				buf[strlen(buf)] = ch;
 		}
 		if (ch == '\n' || (strlen(buf) >= PIPE_MSG_MAX_BUF_LEN)) {
-			ret = execute_line(buf);
+			ret = ekg_execute(NULL, buf);
 			memset(buf, 0, PIPE_MSG_MAX_BUF_LEN + 1);
 		}
 	}
@@ -108,17 +107,12 @@ int get_char_from_pipe(struct gg_common *c)
 }
 
 /*
- * my_getc()
+ * ekg_wait_for_key()
  *
- * funkcja wywo³ywana przez readline() do odczytania znaku. my przy okazji
- * bêdziemy sprawdzaæ, czy co¶ siê nie zmieni³o na innych deskryptorach,
- * by móc obs³ugiwaæ ruch podczas wprowadzania danych z klawiatury.
- *
- *  - f - plik, z którego czytamy. readline() podaje stdin.
- *
- * zwraca wczytany znak, przy okazji wykonuj±c, co trzeba.
+ * funkcja wywo³ywana przez interfejsy u¿ytkownika do przetwarzania danych
+ * z sieci, gdy czeka siê na reakcjê u¿ytkownika.
  */
-int my_getc(FILE *f)
+void ekg_wait_for_key()
 {
 	static time_t last_ping = 0;
 	struct timeval tv;
@@ -172,7 +166,7 @@ int my_getc(FILE *f)
 				
 				switch (c->type) {
 					case GG_SESSION_GG:
-						my_printf("conn_timeout");
+						print("conn_timeout");
 						list_remove(&watches, s, 0);
 						gg_free_session(s);
 						sess = NULL;
@@ -180,7 +174,7 @@ int my_getc(FILE *f)
 						break;
 
 					case GG_SESSION_SEARCH:
-						my_printf("search_timeout");
+						print("search_timeout");
 						free(h->user_data);
 						list_remove(&watches, h, 0);
 						gg_free_search(h);
@@ -199,7 +193,7 @@ int my_getc(FILE *f)
 						if (!errmsg)
 							errmsg = "change_timeout";
 
-						my_printf(errmsg);
+						print(errmsg);
 						if (h->type == GG_SESSION_REGISTER) {
 							free(reg_password);
 							reg_password = NULL;
@@ -212,7 +206,7 @@ int my_getc(FILE *f)
 					case GG_SESSION_DCC_GET:
 					case GG_SESSION_DCC_SEND:
 						/* XXX informowaæ który */
-						my_printf("dcc_timeout");
+						print("dcc_timeout");
 						list_remove(&watches, d, 0);
 						gg_free_dcc(d);
 						break;
@@ -223,7 +217,7 @@ int my_getc(FILE *f)
 			/* timeout reconnectu */
 			if (!sess && reconnect_timer && time(NULL) - reconnect_timer >= config_auto_reconnect && config_uin && config_password) {
 				reconnect_timer = 0;
-				my_printf("connecting");
+				print("connecting");
 				connecting = 1;
 				do_connect();
 			}
@@ -250,7 +244,6 @@ int my_getc(FILE *f)
 				    	reason = xstrdup(config_away_reason);
 				
 				away = (reason) ? 3 : 1;
-				reset_prompt();
 
 				if (reason) {
 				    	iso_to_cp(reason);
@@ -264,7 +257,7 @@ int my_getc(FILE *f)
 				else
 					snprintf(tmp, sizeof(tmp), "%ds", config_auto_away);
 				
-				my_printf((reason) ? "auto_away_descr" : "auto_away", tmp, reason);
+				print((reason) ? "auto_away_descr" : "auto_away", tmp, reason);
 				free(busy_reason);
 				busy_reason = reason;
 			}
@@ -276,9 +269,9 @@ int my_getc(FILE *f)
 
 				if (!userlist_write(NULL) && !config_write(NULL)) {
 					config_changed = 0;
-					my_printf("autosaved");
+					print("autosaved");
 				} else
-					my_printf("error_saving");
+					print("error_saving");
 			}
 
 			/* przegl±danie zdech³ych dzieciaków */
@@ -292,11 +285,11 @@ int my_getc(FILE *f)
 						continue;
 
 					if (p->name[0] == '\001') {
-						my_printf((!(WEXITSTATUS(status))) ? "sms_sent" : "sms_failed", p->name + 1);
+						print((!(WEXITSTATUS(status))) ? "sms_sent" : "sms_failed", p->name + 1);
 					} else if (p->name[0] == '\002') {
 						// do nothing
 					} else {	
-						my_printf("process_exit", itoa(p->pid), p->name, itoa(WEXITSTATUS(status)));
+						print("process_exit", itoa(p->pid), p->name, itoa(WEXITSTATUS(status)));
 					}
 
 					free(p->name);
@@ -315,12 +308,12 @@ int my_getc(FILE *f)
 					continue;
 
 				if (c->type == GG_SESSION_USER0) 
-					return rl_getc(f);
+					return;
 
 				if (c->type == GG_SESSION_USER1) {
 					if (get_char_from_pipe(c)) {
 						immediately_quit = 1;
-						return '\n';
+						return;
 					}
 					break;
 				}
@@ -347,7 +340,7 @@ int my_getc(FILE *f)
 		}
 	}
 	
-	return -1;
+	return;
 }
 
 void sigusr1_handler()
@@ -362,16 +355,10 @@ void sigusr2_handler()
 	signal(SIGUSR1, sigusr2_handler);
 }
 
-void sigcont_handler()
-{
-	rl_forced_update_display();
-	signal(SIGCONT, sigcont_handler);
-}
-
 void sighup_handler()
 {
 	if (sess && sess->state != GG_STATE_IDLE) {
-		my_printf("disconected");
+		print("disconected");
 		ekg_logoff(sess, NULL);
 		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
@@ -410,22 +397,6 @@ to unikn±æ tego typu b³êdów w przysz³o¶ci.\n\
 	userlist_write_crash();
 
 	raise(SIGSEGV);			/* niech zrzuci core */
-}
-
-void sigwinch_handler()
-{
-#ifdef HAVE_RL_GET_SCREEN_SIZE
-	rl_get_screen_size(&screen_lines, &screen_columns);
-#endif
-}
-
-void sigint_handler()
-{
-	rl_delete_text(0, rl_end);
-	rl_point = rl_end = 0;
-	putchar('\n');
-	rl_forced_update_display();
-	signal(SIGINT, sigint_handler);
 }
 
 /*
@@ -467,9 +438,6 @@ int main(int argc, char **argv)
 	char *pipe_file = NULL;
 #ifdef WITH_IOCTLD
     	char *sock_path = NULL, *ioctl_daemon_path = IOCTLD_PATH;
-#	define IOCTLD_HELP "  -I, --ioctld-path [¦CIE¯KA]    ustawia ¶cie¿kê do ioctl_daemon-a\n"
-#else
-#	define IOCTLD_HELP ""
 #endif
 	struct list *l;
 	struct passwd *pw; 
@@ -495,16 +463,11 @@ int main(int argc, char **argv)
 	    config_dir = saprintf("%s/.gg", home_dir);
 
 	signal(SIGSEGV, sigsegv_handler);
-	signal(SIGCONT, sigcont_handler);
 	signal(SIGHUP, sighup_handler);
-	signal(SIGINT, sigint_handler);
 	signal(SIGUSR1, sigusr1_handler);
 	signal(SIGUSR2, sigusr2_handler);
 	signal(SIGALRM, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
-
-	if (screen_lines < 1)
-		screen_lines = 24;
 
 	config_user = "";
 
@@ -522,7 +485,9 @@ int main(int argc, char **argv)
 "  -p, --private        po po³±czeniu zmienia stan na ,,tylko dla przyjació³''\n"
 "  -d, --debug          w³±cza wy¶wietlanie dodatkowych informacji\n"
 "  -v, --version        wy¶wietla wersje programu i wychodzi\n"
-IOCTLD_HELP
+#ifdef WITH_IOCTLD
+"  -I, --ioctld-path [¦CIE¯KA]    ustawia ¶cie¿kê do ioctld\n"
+#endif
 "\n", argv[0]);
 			return 0;	
 		}
@@ -609,7 +574,7 @@ IOCTLD_HELP
 	
 	        atexit(kill_ioctl_daemon);
 	}
-#endif // WITH_IOCTLD
+#endif /* WITH_IOCTLD */
 
 	if (!batch_mode && pipe_file)
 		pipe_fd = init_control_pipe(pipe_file);
@@ -687,37 +652,13 @@ IOCTLD_HELP
 		list_add(&watches, &si, sizeof(si));
 	}
 
-	/* inicjujemy readline */
-	rl_initialize();
-	rl_getc_function = my_getc;
-	rl_readline_name = "gg";
-	rl_attempted_completion_function = (CPPFunction *) my_completion;
-	rl_completion_entry_function = (void*) empty_generator;
-#ifdef HAVE_RL_SET_KEY
-	rl_set_key("\033[[A", binding_help, rl_get_keymap());
-	rl_set_key("\033OP", binding_help, rl_get_keymap());
-	rl_set_key("\033[11~", binding_help, rl_get_keymap());
-	rl_set_key("\033[M", binding_help, rl_get_keymap());
-	rl_set_key("\033[[B", binding_quick_list, rl_get_keymap());
-	rl_set_key("\033OQ", binding_quick_list, rl_get_keymap());
-	rl_set_key("\033[12~", binding_quick_list, rl_get_keymap());
-	rl_set_key("\033[N", binding_quick_list, rl_get_keymap());
-	
-	rl_set_key("\033[24~", binding_toggle_debug, rl_get_keymap());
-#endif
-	
-#ifdef HAVE_RL_GET_SCREEN_SIZE
-#  ifdef SIGWINCH
-	signal(SIGWINCH, sigwinch_handler);
-#  endif
-	rl_get_screen_size(&screen_lines, &screen_columns);
-#endif
-	
-	if (!batch_mode)
-		my_printf("welcome", VERSION);
+	if (!batch_mode) {
+		ui_init();
+		print("welcome", VERSION);
+	}
 	
 	if (!config_uin || !config_password)
-		my_printf("no_config");
+		print("no_config");
 
 	if (!config_log_path) {
 		if (config_user != "")
@@ -729,7 +670,7 @@ IOCTLD_HELP
 	changed_dcc("dcc");
 
 	if (config_uin && config_password && auto_connect) {
-		my_printf("connecting");
+		print("connecting");
 		connecting = 1;
 		do_connect();
 	}
@@ -737,89 +678,14 @@ IOCTLD_HELP
 	if (config_auto_save)
 		last_save = time(NULL);
 	
-	for (;;) {
-		char *line;
-		
-		if (!(line = my_readline())) {
-			if (query_nick) {
-				my_printf("query_finished", query_nick);
-				free(query_nick);
-				query_nick = NULL;
-				continue;
-			} else
-				break;
-		}
-
-		if (strcmp(line, ""))
-			add_history(line);
-		else {
-			if (batch_mode && !batch_line) {
-				quit_message_send = 1;
-				break;
-			}
-			free(line);
-			continue;
-		}
-		my_printf_lines = 0;
-
-		if (!query_nick && (l = alias_check(line))) {
-			char *p = line;
-			int quit = 0;
-
-			while (*p != ' ' && *p)
-				p++;
-			
-			for (; l && !quit; l = l->next) {
-				char *tmp = saprintf("%s%s", (char*) l->data, p);
-				if (tmp)
-					if (execute_line(tmp)) 
-						quit = 1;
-				
-				free(tmp);
-			}
-			if (quit) {
-				free(line);
-				break;
-			}
-		} else {
-			if (execute_line(line)) {
-				free(line);
-				break;
-			}
-		}
-		
-		my_printf_lines = -1;
-		
-		free(line);
-	}
-
-	if (!batch_mode && !quit_message_send) {
-		putchar('\n');
-		my_printf("quit");
-		putchar('\n');
-		quit_message_send = 1;
-	}
+	ui_loop();
 
 	ekg_logoff(sess, NULL);
 	list_remove(&watches, sess, 0);
 	gg_free_session(sess);
 	sess = NULL;
 
-	if (config_changed) {
-		char *line, *prompt = find_format("config_changed");
-
-		if ((line = readline(prompt))) {
-			if (!strcasecmp(line, "tak") || !strcasecmp(line, "yes") || !strcasecmp(line, "t") || !strcasecmp(line, "y")) {
-				if (!userlist_write(NULL) && !config_write(NULL))
-					my_printf("saved");
-				else
-					my_printf("error_saving");
-
-			}
-			free(line);
-		} else
-			printf("\n");
-	}
+	ui_deinit();
 
 	for (l = children; l; l = l->next) {
 		struct process *p = l->data;

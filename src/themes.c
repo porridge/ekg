@@ -25,15 +25,16 @@
 #endif
 #include <stdarg.h>
 #include <limits.h>
-#include <readline.h>
+#include <ctype.h>
 #include "stuff.h"
 #include "dynstuff.h"
 #include "themes.h"
 #include "config.h"
 #include "xmalloc.h"
+#include "ui.h"
 
-char *prompt_cache = NULL, *prompt2_cache = NULL, *error_cache = NULL, *timestamp_cache = NULL;
-char *readline_prompt = NULL, *readline_prompt_away = NULL, *readline_prompt_invisible = NULL;
+char *prompt_cache = NULL, *prompt2_cache = NULL, *error_cache = NULL;
+const char *timestamp_cache = NULL;
 
 int no_prompt_cache = 0;
 
@@ -47,7 +48,7 @@ struct list *formats = NULL;
  *
  *  - name.
  */
-char *find_format(char *name)
+const char *find_format(const char *name)
 {
 	struct list *l;
 	
@@ -69,11 +70,11 @@ char *find_format(char *name)
  *  - format - warto¶æ, nie nazwa formatu,
  *  - ap - argumenty.
  */
-char *va_format_string(char *format, va_list ap)
+char *va_format_string(const char *format, va_list ap)
 {
 	static int dont_resolve = 0;
 	struct string *buf;
-	char *p, *args[9];
+	const char *p, *args[9];
 	int i;
 	// void **args = (void**) ap;
 
@@ -210,6 +211,8 @@ char *va_format_string(char *format, va_list ap)
 			fill_soft = 1;
 
 			if (*p == '[' || *p == '(') {
+				char *q;
+
 				fill_soft = (*p == '(');
 
 				p++;
@@ -226,7 +229,8 @@ char *va_format_string(char *format, va_list ap)
 					p++;
 				}
 
-				fill_length = strtol(p, &p, 0);
+				fill_length = strtol(p, &q, 0);
+				p = q;
 				if (fill_length > 0)
 					fill_after = 1;
 				else {
@@ -280,7 +284,7 @@ char *va_format_string(char *format, va_list ap)
  *
  *  - format... - j.w.,
  */
-char *format_string(char *format, ...)
+char *format_string(const char *format, ...)
 {
 	va_list ap;
 	char *tmp;
@@ -293,47 +297,58 @@ char *format_string(char *format, ...)
 }
 
 /*
- * my_printf()
+ * print()
  *
  * drukuje na stdout tekst, bior±c pod uwagê nazwê, nie warto¶æ formatu.
  * parametry takie jak zdefiniowano. pierwszy to %1, drugi to %2.
  */
-void my_printf(char *theme, ...)
+void print(const char *theme, ...)
 {
 	va_list ap;
-	char *tmp, *p;
+	char *tmp;
 	
 	va_start(ap, theme);
 	tmp = va_format_string(find_format(theme), ap);
 	
-	if (my_printf_lines != -2)
-		my_puts("%s", (tmp) ? tmp : "");
+	ui_print("__current", (tmp) ? tmp : "");
+	
+	free(tmp);
+	va_end(ap);
+}
 
-	if (my_printf_lines >= 0) {
-		for (p = tmp; *p; p++)
-			if (*p == '\n')
-				my_printf_lines++;
+/*
+ * print_status()
+ *
+ * wy¶wietla tekst w oknie statusu.
+ */
+void print_status(const char *theme, ...)
+{
+	va_list ap;
+	char *tmp;
+	
+	va_start(ap, theme);
+	tmp = va_format_string(find_format(theme), ap);
+	
+	ui_print("__status", (tmp) ? tmp : "");
+	
+	free(tmp);
+	va_end(ap);
+}
 
-		if (my_printf_lines > screen_lines - 2) {
-			char *tmp, *prompt = find_format("readline_more");
-			
-			in_readline = 1;
-#ifdef HAVE_RL_SET_PROMPT
-		        rl_set_prompt(prompt);
-#endif				
-			my_printf_lines = -1;
-			tmp = readline(prompt);
-			in_readline = 0;
-			if (tmp) {
-				free(tmp);
-				my_printf_lines = 0;
-			} else {
-				printf("\n");
-				my_printf_lines = -2;
-			}
-			printf("\033[A\033[K");		/* XXX */
-		}
-	}
+/*
+ * print_window()
+ *
+ * wy¶wietla tekst w podanym oknie.
+ */
+void print_window(const char *target, const char *theme, ...)
+{
+	va_list ap;
+	char *tmp;
+	
+	va_start(ap, theme);
+	tmp = va_format_string(find_format(theme), ap);
+	
+	ui_print(target, (tmp) ? tmp : "");
 	
 	free(tmp);
 	va_end(ap);
@@ -355,7 +370,6 @@ void reset_theme_cache()
 	free(error_cache);
 	
 	prompt_cache = prompt2_cache = error_cache = NULL;
-	readline_prompt = readline_prompt_away = readline_prompt_invisible = NULL;
 	timestamp_cache = NULL;
 }
 
@@ -433,7 +447,7 @@ int del_format(char *name)
  *  - prefix - ¶cie¿ka,
  *  - filename - nazwa pliku.
  */
-static FILE *try_open(FILE *prevfd, char *prefix, char *filename)
+static FILE *try_open(FILE *prevfd, const char *prefix, const char *filename)
 {
 	char buf[PATH_MAX];
 	FILE *f;
@@ -467,7 +481,7 @@ static FILE *try_open(FILE *prevfd, char *prefix, char *filename)
  *
  *  - filename.
  */
-int read_theme(char *filename, int replace)
+int read_theme(const char *filename, int replace)
 {
         char *buf, *tmp;
         FILE *f = NULL;

@@ -221,7 +221,7 @@ int string_append_c(struct string *s, char c)
  *  - str - tekst do dopisania,
  *  - count - ile znaków tego tekstu dopisaæ? (-1 znaczy, ¿e ca³y).
  */
-int string_append_n(struct string *s, char *str, int count)
+int string_append_n(struct string *s, const char *str, int count)
 {
 	char *new;
 
@@ -247,7 +247,7 @@ int string_append_n(struct string *s, char *str, int count)
 	return 0;
 }
 
-int string_append(struct string *s, char *str)
+int string_append(struct string *s, const char *str)
 {
 	return string_append_n(s, str, -1);
 }
@@ -261,7 +261,7 @@ int string_append(struct string *s, char *str)
  *
  * zwraca zaalokowan± strukturê `string'.
  */
-struct string *string_init(char *value)
+struct string *string_init(const char *value)
 {
 	struct string *tmp = xmalloc(sizeof(struct string));
 

@@ -44,10 +44,10 @@ struct string {
 
 typedef struct string * String;
 
-struct string *string_init(char *str);
-int string_append(struct string *s, char *str);
-int string_append_n(struct string *s, char *str, int count);
-int string_append_c(struct string *s, char ch);
+struct string *string_init(const char *str);
+int string_append(struct string *s, const char *str);
+int string_append_n(struct string *s, const char *str, int count);
+int string_append_c(struct string *s, const char ch);
 char *string_free(struct string *s, int free_string);
 
 /* tablice stringów */

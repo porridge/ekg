@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2002 Wojtek Kaniewski <wojtekka@irc.pl>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -17,29 +17,16 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef __THEMES_H
-#define __THEMES_H
+#ifndef __UI_READLINE_H
+#define __UI_READLINE_H
 
-struct format {
-	char *name;
-	char *value;
-};
+void ui_readline_init();
+void ui_readline_loop();
+void ui_readline_print(const char *target, const char *line);
+void ui_readline_beep();
+void ui_readline_new_target(const char *target);
+void ui_readline_query(const char *param);
+void ui_readline_deinit();
 
-struct list *formats;
+#endif /* __UI_READLINE_H */
 
-void print(const char *theme, ...);
-void print_window(const char *target, const char *theme, ...);
-void print_status(const char *theme, ...);
-
-const char *find_format(const char *name);
-char *format_string(const char *format, ...);
-
-int add_format(char *name, char *value, int replace);
-int del_format(char *name);
-
-void init_theme();
-void reset_theme_cache();
-
-int read_theme(const char *filename, int replace);
-
-#endif

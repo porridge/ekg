@@ -134,13 +134,11 @@ int config_emoticons;
 
 char *home_dir;
 char *config_dir;
-int in_readline;
 int away;
 int in_autoexec;
 int reconnect_timer;
 time_t last_action;
 int last_sysmsg;
-int no_prompt;
 int private_mode;
 int connecting;
 
@@ -148,16 +146,12 @@ int use_proxy;
 int proxy_port;
 char *proxy_host;
 char *reg_password;
-char *query_nick;
 int sock;
 int length;
 #ifdef WITH_IOCTLD
 struct sockaddr_un addr;
 #endif /* WITH_IOCTLD */
 char *busy_reason;
-int screen_lines;
-int screen_columns;
-int my_printf_lines;
 int quit_message_send;
 int registered_today;
 int pipe_fd;
@@ -169,14 +163,12 @@ int config_read(char *filename);
 int config_write(char *filename);
 void config_write_crash();
 
-void my_puts(char *format, ...);
-char *my_readline();
 int read_sysmsg(char *filename);
 int write_sysmsg(char *filename);
 void cp_to_iso(unsigned char *buf);
 void iso_to_cp(unsigned char *buf);
 void unidle();
-char *timestamp(char *format);
+const char *timestamp(const char *format);
 char *prepare_path(char *filename);
 void parse_autoexec(char *filename);
 void send_userlist();
@@ -196,7 +188,6 @@ int play_sound(char *sound_path);
 char *base64_encode(char *buf);
 char *base64_decode(char *buf);
 
-void reset_prompt();
 void changed_debug(char *var);
 void changed_dcc(char *var);
 void changed_theme(char *var);
@@ -221,5 +212,6 @@ char *get_random_reason(char *path);
 char *emoticon_expand(char *s);
 int emoticon_read();
 int print_history(uin_t uin, int no);
+void ekg_wait_for_key();
 
 #endif

@@ -29,14 +29,20 @@ struct command {
 	char *long_help;
 };
 
+/*
+ * jaka¶ malutka lista tych, do których by³y wysy³ane wiadomo¶ci.
+ */
+#define SEND_NICKS_MAX 100
+
+char *send_nicks[SEND_NICKS_MAX];
+int send_nicks_count, send_nicks_index;
+extern struct command commands[];
+
 #define COMMAND(x) int x(char *name, char **params)
 
-int execute_line(char *line);
+int ekg_execute(char *target, char *line);
 
 void add_send_nick(char *nick);
-
-char **my_completion(char *text, int start, int end);
-char *empty_generator(char *text, int state);
 
 int binding_quick_list(int a, int b);
 int binding_help(int a, int b);

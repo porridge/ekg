@@ -1,0 +1,44 @@
+od 20020627 ekg jest przygotowane do obs³ugi ró¿nych interfejsów u¿ytkowika.
+zrobi³em ca³kiem spor± reorganizacjê kodu, dziêki czemu nie trzeba bêdzie
+psuæ zbyt du¿o, ¿eby dodaæ frontend w ncurses czy jakikolwiek inny. póki co,
+nie ma ¿adnego sposobu na wybór -- trzeba zmieniaæ plik src/ui.h. w ka¿dym
+razie, ekg spodziewa siê kilku funkcji:
+
+ui_init()
+	inicjalizacja interfejsu u¿ytkownika. dla ui-readline bêdzie to
+	ustawienie wszystkich zmiennych. dla ui-ncurses pewnie jakie¶
+	initscr(), przygotowanie okienek itd.
+
+ui_deinit()
+	pozamykanie wszystkiego.
+
+ui_print(const char *target, const char *line)
+	wy¶wietlenie tekstu ,,line'' w oknie ,,target''. póki co, obs³ugi
+	okien nie ma, ale kod jest przygotowany tak, ¿e wiadomo¶ci s± ju¿
+	wysy³ane w odpowiednie miejsce. przewidziano te¿ dwa specjalne
+	okna -- ,,__status'' dla pierwszego okna statusowego oraz
+	,,__current'' dla aktualnego. do pierwszego powinny byæ wysy³ane
+	informacje dotycz±ce stanu po³±czenia itd, itd, do aktualnego
+	wszystko to, co jest zwi±zane z komendami wywo³ywanymi przez
+	u¿ytkownika.
+
+ui_beep()
+	d¼wiêk. niestety to, jak go wytworzyæ zale¿y od interfejsu. przy
+	u¿yciu ncurses zwyk³e putchar('\a') nie zadzia³a.
+
+ui_new_target(const char *target)
+	je¶li dany frontend obs³uguje okienka, powinien utworzyæ nowe okno
+	dla ,,target''.
+
+ui_query(const char *param)
+	wywo³ywana, gdy u¿ytkownik wykona polecenie ,,query''.
+
+ui_loop()
+	g³ówna pêtla interfejsu, wywo³ywana zaraz po w³±czeniu klienta.
+	powinna wywo³aæ ekg_wait_for_key() przed wywo³aniem funkcji
+	czytaj±cej z klawiatury, by w przerwach móc obs³ugiwaæ po³±czenia
+	sieciowe. gdy u¿ytkownik wyda jak±¶ komendê, powinna wywo³aæ
+	ekg_execute(). je¶li ekg_execute() zwróci 1, funkcja powinna siê
+	zakoñczyæ.
+
+// $Id$

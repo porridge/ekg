@@ -35,6 +35,7 @@
 #include "userlist.h"
 #include "voice.h"
 #include "xmalloc.h"
+#include "ui.h"
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure();
@@ -52,42 +53,56 @@ static struct handler handlers[] = {
 };
 
 /*
- * print_message_body()
+ * print_message()
  *
  * funkcja ³adnie formatuje tre¶æ wiadomo¶ci, zawija linijki, wy¶wietla
  * kolorowe ramki i takie tam.
  *
- *  - str - tre¶æ,
+ *  - e - zdarzenie wiadomo¶ci,
+ *  - u - wpis u¿ytkownika w userli¶cie,
  *  - chat - rodzaj wiadomo¶ci (0 - msg, 1 - chat, 2 - sysmsg)
  *
  * nie zwraca niczego. efekt widaæ na ekranie.
  */
-void print_message_body(const char *str, int chat)
+void print_message(struct gg_event *e, struct userlist *u, int chat)
 {
 	int width, i, j;
-	char *mesg, *buf, *line, *next, *format = NULL, *save;
-	char *line_width = NULL; 
+	char *mesg, *buf, *line, *next, *format = NULL, *head = NULL, *foot = NULL, *save;
+	char *line_width = NULL, timestr[100];
+	char *target = (chat == 2) ? "__status" : ((u) ? u->display : itoa(e->event.msg.sender));
+	struct tm *tm;
 	
 	switch (chat) {
 		case 0:
 		    format = "message_line";
 		    line_width = "message_line_width";
+		    head = "message_header";
+		    foot = "message_footer";
 		    break;		
 		case 1:
 		    format = "chat_line"; 
 		    line_width = "chat_line_width";
+		    head = "chat_header";
+		    foot = "chat_footer";
 		    break;
 		case 2:
 		    format = "sysmsg_line"; 
 		    line_width = "sysmsg_line_width";
+		    head = "sysmsg_header";
+		    foot = "sysmsg_footer";
 		    break;
 	}	
+
+	tm = localtime(&e->event.msg.time);
+	strftime(timestr, sizeof(timestr), find_format("timestamp"), tm);
+
+	print_window(target, head, format_user(e->event.msg.sender), timestr);
 
 	if (!(width = atoi(find_format(line_width))))
 		width = 78;
 	
 	buf = xmalloc(width + 1);
-	mesg = save = xstrdup(str);
+	mesg = save = xstrdup(e->event.msg.message);
 
 	for (i = 0; i < strlen(mesg); i++)	/* XXX ³adniejsze taby */
 		if (mesg[i] == '\t')
@@ -120,7 +135,7 @@ void print_message_body(const char *str, int chat)
 					next++;
 			}
 
-			my_printf(format, buf);
+			print_window(target, format, buf);
 		}
 
 		if (new_line)
@@ -129,6 +144,8 @@ void print_message_body(const char *str, int chat)
 
 	free(buf);
 	free(save);
+
+	print_window(target, foot);
 }
 
 /*
@@ -144,9 +161,6 @@ void handle_msg(struct gg_event *e)
 {
 	struct userlist *u = userlist_find(e->event.msg.sender, NULL);
 	int chat = ((e->event.msg.msgclass & 0x0f) == GG_CLASS_CHAT);
-	char sender[100];
-	struct tm *tm;
-	char czas[100];
 	
 	if (!e->event.msg.message)
 		return;
@@ -154,10 +168,6 @@ void handle_msg(struct gg_event *e)
 	if (ignored_check(e->event.msg.sender)) {
 		if (config_log_ignored) {
 			cp_to_iso(e->event.msg.message);
-			if (u)
-				snprintf(sender, sizeof(sender), "%s/%u", u->display, u->uin);
-			else
-				snprintf(sender, sizeof(sender), "%u", e->event.msg.sender);
 			/* XXX eskejpowanie */
 			put_log(e->event.msg.sender, "%sign,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgsend", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, e->event.msg.message);
 		}
@@ -171,7 +181,7 @@ void handle_msg(struct gg_event *e)
 			struct gg_dcc *d;
 
                         if (!(d = gg_dcc_get_file(u->ip.s_addr, u->port, config_uin, e->event.msg.sender))) {
-				my_printf("dcc_error", strerror(errno));
+				print_status("dcc_error", strerror(errno));
 				return;
 			}
 
@@ -187,48 +197,41 @@ void handle_msg(struct gg_event *e)
 	
 	if (e->event.msg.sender == 0) {
 		if (e->event.msg.msgclass > last_sysmsg) {
-		    my_printf("sysmsg_header");
-		    print_message_body(e->event.msg.message, 2);
-		    my_printf("sysmsg_footer");
+			print_message(e, u, 2);
 
-		    if (config_beep)
-			    my_puts("\007");
-		    play_sound(config_sound_sysmsg_file);
-		    last_sysmsg = e->event.msg.msgclass;
-		    write_sysmsg(NULL);
-		};
+			if (config_beep)
+				ui_beep();
+		    
+			play_sound(config_sound_sysmsg_file);
+			last_sysmsg = e->event.msg.msgclass;
+			write_sysmsg(NULL);
+		}
+
 		return;
 	};
 			
-	if (u) {
-		if (!query_nick || strcasecmp(query_nick, u->display))
-			add_send_nick(u->display);
-	} else
+	if (u)
+		add_send_nick(u->display);
+	else
 		add_send_nick(itoa(e->event.msg.sender));
 
-	tm = localtime(&e->event.msg.time);
-	strftime(czas, 100, find_format("timestamp"), tm);
-
-	my_printf((chat) ? "chat_header" : "message_header", format_user(e->event.msg.sender), czas);
-
-	print_message_body(e->event.msg.message, chat);
-	my_printf((chat) ? "chat_footer" : "message_footer");
+	print_message(e, u, chat);
 
 	if (config_beep && ((chat) ? config_beep_chat : config_beep_msg))
-		my_puts("\007");
+		ui_beep();
 
 	play_sound((chat) ? config_sound_chat_file : config_sound_msg_file);
-
-	if (u)
-		snprintf(sender, sizeof(sender), "%s/%u", u->display, u->uin);
-	else
-		snprintf(sender, sizeof(sender), "%u", e->event.msg.sender);
 
 	/* XXX eskejpowanie */
 	put_log(e->event.msg.sender, "%s,%ld,%s,%ld,%ld,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, (u) ? u->display : "", time(NULL), e->event.msg.time, e->event.msg.message);
 
 	if (away && config_sms_away && config_sms_app && config_sms_number) {
-		char *foo;
+		char *foo, sender[100];
+
+		if (u)
+			snprintf(sender, sizeof(sender), "%s/%u", u->display, u->uin);
+		else
+			snprintf(sender, sizeof(sender), "%u", e->event.msg.sender);
 
 		if (strlen(e->event.msg.message) > config_sms_max_length)
 			e->event.msg.message[config_sms_max_length] = 0;
@@ -279,7 +282,7 @@ void handle_ack(struct gg_event *e)
 		return;
 
 	tmp = queued ? "ack_queued" : "ack_delivered";
-	my_printf(tmp, format_user(e->event.ack.recipient));
+	print(tmp, format_user(e->event.ack.recipient));
 }
 
 /*
@@ -331,7 +334,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away");
 			if (config_display_notify)
-			    	my_printf("status_busy", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
+			    	print("status_busy", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
 		}
 
 		if (n->status == GG_STATUS_BUSY_DESCR) {
@@ -341,7 +344,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
 			if (config_display_notify)
-			    	my_printf("status_busy_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
+			    	print("status_busy_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		}
 
 		if (n->status == GG_STATUS_AVAIL) {
@@ -349,12 +352,12 @@ void handle_notify(struct gg_event *e)
 		    	if (config_log_status)
 			    	put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail");
 			if (config_display_notify)
-			    	my_printf("status_avail", format_user(u->uin), (u->first_name) ? u->first_name : u->display);
+			    	print("status_avail", format_user(u->uin), (u->first_name) ? u->first_name : u->display);
 			
 			if (config_completion_notify)
 				add_send_nick(u->display);
 			if (config_beep && config_beep_notify)
-				my_puts("\007");
+				ui_beep();
 		}
 
 		if (n->status == GG_STATUS_AVAIL_DESCR) {
@@ -364,7 +367,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
 			if (config_display_notify)
-			    	my_printf("status_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
+			    	print("status_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		}
 		
 		if (n->status == GG_STATUS_NOT_AVAIL) {
@@ -372,7 +375,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail");
 			if (config_display_notify)
-			    	my_printf("status_not_avail", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
+			    	print("status_not_avail", format_user(n->uin), (u->first_name) ? u->first_name : u->display);
 		}
 
 		if (n->status == GG_STATUS_NOT_AVAIL_DESCR) {
@@ -382,7 +385,7 @@ void handle_notify(struct gg_event *e)
                         if (config_log_status)
                                 put_log(n->uin, "status,%ld,%s,%s,%ld,%s (%s)\n", n->uin, u->display, inet_ntoa(in), time(NULL), "notavail", u->descr);
 			if (config_display_notify)
-			    	my_printf("status_not_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
+			    	print("status_not_avail_descr", format_user(n->uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		}
 
 		n++;
@@ -438,42 +441,42 @@ void handle_status(struct gg_event *e)
 		    	check_event(EVENT_AVAIL, e->event.status.uin, NULL);
 			if (config_completion_notify)
 				add_send_nick(u->display);
-			my_printf("status_avail", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
+			print("status_avail", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
 			if (config_beep && config_beep_notify)
-				my_puts("\007");
+				ui_beep();
 		} else if (e->event.status.status == GG_STATUS_AVAIL_DESCR) {
                         if (config_log_status)
 			    	put_log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "avail", u->descr);
 		    	check_event(EVENT_AVAIL, e->event.status.uin, NULL);
 			if (config_completion_notify)
 				add_send_nick(u->display);
-			my_printf("status_avail_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
+			print("status_avail_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
 			if (config_beep && config_beep_notify)
-				my_puts("\007");
+				ui_beep();
 		} else if (e->event.status.status == GG_STATUS_BUSY && u->status != GG_STATUS_BUSY) 
 		{
                         if (config_log_status)
 			    	put_log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "away");
 		    	check_event(EVENT_AWAY, e->event.status.uin, NULL);
-			my_printf("status_busy", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
+			print("status_busy", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
 		} else if (e->event.status.status == GG_STATUS_BUSY_DESCR)
 		{
                         if (config_log_status)
                                 put_log(e->event.status.uin, "status,%ld,%s,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, inet_ntoa(in), time(NULL), "away", u->descr);
 		    	check_event(EVENT_AWAY, e->event.status.uin, NULL);
-			my_printf("status_busy_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
+			print("status_busy_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL)
 		{
                         if (config_log_status)
 			    	put_log(e->event.status.uin, "status,%ld,%s,%ld,%s\n", e->event.status.uin, u->display, time(NULL), "notavail");
 		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin, NULL);
-			my_printf("status_not_avail", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
+			print("status_not_avail", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display);
 		} else if (e->event.status.status == GG_STATUS_NOT_AVAIL_DESCR)
 		{
                         if (config_log_status)
 			    	put_log(e->event.status.uin, "status,%ld,%s,%ld,%s (%s)\n", e->event.status.uin, u->display, time(NULL), "notavail", u->descr);
 		    	check_event(EVENT_NOT_AVAIL, e->event.status.uin, NULL);
-			my_printf("status_not_avail_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
+			print("status_not_avail_descr", format_user(e->event.status.uin), (u->first_name) ? u->first_name : u->display, u->descr);
 		}
 	}
 	
@@ -491,7 +494,7 @@ void handle_status(struct gg_event *e)
  */
 void handle_failure(struct gg_event *e)
 {
-	my_printf("conn_failed", strerror(errno));
+	print("conn_failed", strerror(errno));
 	list_remove(&watches, sess, 0);
 	gg_logoff(sess);
 	gg_free_session(sess);
@@ -511,7 +514,7 @@ void handle_failure(struct gg_event *e)
  */
 void handle_success(struct gg_event *e)
 {
-	my_printf("connected");
+	print("connected");
 	userlist_send();
 
 	if (away || private_mode) {
@@ -522,7 +525,7 @@ void handle_success(struct gg_event *e)
 	}
 
 	if (batch_mode && batch_line) {
- 		execute_line(batch_line);
+ 		ekg_execute(NULL, batch_line);
  		free(batch_line);
  	}
 	
@@ -544,7 +547,7 @@ void handle_event(struct gg_session *s)
 	struct handler *h;
 
 	if (!(e = gg_watch_fd(sess))) {
-		my_printf("conn_broken", strerror(errno));
+		print("conn_broken", strerror(errno));
 		list_remove(&watches, sess, 0);
 		gg_free_session(sess);
 		sess = NULL;
@@ -575,7 +578,7 @@ void handle_search(struct gg_http *h)
 	int i;
 
 	if (gg_search_watch_fd(h) || h->state == GG_STATE_ERROR) {
-		my_printf("search_failed", strerror(errno));
+		print("search_failed", strerror(errno));
 		free(h->user_data);
 		list_remove(&watches, h, 0);
 		gg_free_search(h);
@@ -588,10 +591,11 @@ void handle_search(struct gg_http *h)
 	gg_debug(GG_DEBUG_MISC, "++ gg_search()... done\n");
 
 	if (!h || !(s = h->data) || !(s->count))
-		my_printf("search_not_found");
+		print("search_not_found");
 
 	for (i = 0; i < s->count; i++) {
-		char *active, *gender, *name;
+		const char *active_format, *gender_format;
+		char *name, *active, *gender;
 
 		cp_to_iso(s->results[i].first_name);
 		cp_to_iso(s->results[i].last_name);
@@ -601,27 +605,27 @@ void handle_search(struct gg_http *h)
 		name = saprintf("%s %s", s->results[i].first_name, s->results[i].last_name);
 
 		if (!(h->id & 1)) {
-			active = find_format((s->results[i].active) ? "search_results_single_active" : "search_results_single_inactive");
+			active_format = find_format((s->results[i].active) ? "search_results_single_active" : "search_results_single_inactive");
 			if (s->results[i].gender == GG_GENDER_FEMALE)
-				gender = find_format("search_results_single_female");
+				gender_format = find_format("search_results_single_female");
 			else if (s->results[i].gender == GG_GENDER_MALE)
-				gender = find_format("search_results_single_male");
+				gender_format = find_format("search_results_single_male");
 			else
-				gender = find_format("search_results_single_male");
+				gender_format = find_format("search_results_single_male");
 		} else {
-			active = find_format((s->results[i].active) ? "search_results_multi_active" : "search_results_multi_inactive");
+			active_format = find_format((s->results[i].active) ? "search_results_multi_active" : "search_results_multi_inactive");
 			if (s->results[i].gender == GG_GENDER_FEMALE)
-				gender = find_format("search_results_multi_female");
+				gender_format = find_format("search_results_multi_female");
 			else if (s->results[i].gender == GG_GENDER_MALE)
-				gender = find_format("search_results_multi_male");
+				gender_format = find_format("search_results_multi_male");
 			else
-				gender = find_format("search_results_multi_unknown");
+				gender_format = find_format("search_results_multi_unknown");
 		}
 
-		active = format_string(active, s->results[i].nickname);
-		gender = format_string(gender);
+		active = format_string(active_format, s->results[i].nickname);
+		gender = format_string(gender_format);
 
-		my_printf((h->id & 1) ? "search_results_multi" : "search_results_single", itoa(s->results[i].uin), (name) ? name : "", s->results[i].nickname, s->results[i].city, (s->results[i].born) ? itoa(s->results[i].born) : "-", gender, active);
+		print((h->id & 1) ? "search_results_multi" : "search_results_single", itoa(s->results[i].uin), (name) ? name : "", s->results[i].nickname, s->results[i].city, (s->results[i].born) ? itoa(s->results[i].born) : "-", gender, active);
 
 		free(name);
 		free(active);
@@ -670,7 +674,7 @@ void handle_pubdir(struct gg_http *h)
 	}
 
 	if (gg_pubdir_watch_fd(h) || h->state == GG_STATE_ERROR) {
-		my_printf(bad, strerror(errno));
+		print(bad, strerror(errno));
 		goto fail;
 	}
 	
@@ -678,7 +682,7 @@ void handle_pubdir(struct gg_http *h)
 		return;
 
 	if (!(s = h->data) || !s->success) {
-		my_printf(bad, strerror(errno));
+		print(bad, strerror(errno));
 		goto fail;
 	}
 
@@ -689,7 +693,7 @@ void handle_pubdir(struct gg_http *h)
 
 	if (h->type == GG_SESSION_REGISTER) {
 		if (!s->uin) {
-			my_printf(bad);
+			print(bad);
 			goto fail;
 		}
 		
@@ -702,7 +706,7 @@ void handle_pubdir(struct gg_http *h)
 		registered_today = 1;
 	}
 	
-	my_printf(good, itoa(s->uin));
+	print(good, itoa(s->uin));
 
 fail:
 	list_remove(&watches, h, 0);
@@ -733,7 +737,7 @@ void handle_userlist(struct gg_http *h)
 	format_error = (h->type == GG_SESSION_USERLIST_GET) ? "userlist_get_error" : "userlist_put_error";
 
 	if (h->callback(h) || h->state == GG_STATE_ERROR) {
-		my_printf(format_error, strerror(errno));
+		print(format_error, strerror(errno));
 		list_remove(&watches, h, 0);
 		h->destroy(h);
 		return;
@@ -742,7 +746,7 @@ void handle_userlist(struct gg_http *h)
 	if (h->state != GG_STATE_DONE)
 		return;
 
-	my_printf((h->data) ? format_ok : format_error);
+	print((h->data) ? format_ok : format_error);
 		
 	if (h->type == GG_SESSION_USERLIST_GET && h->data) {
 		userlist_set(h->data);
@@ -765,7 +769,7 @@ void handle_userlist(struct gg_http *h)
  */
 void handle_disconnect(struct gg_event *e)
 {
-	my_printf("disconn_warning");
+	print("disconn_warning");
 
 	gg_logoff(sess);	/* a zobacz.. mo¿e siê uda ;> */
 	list_remove(&watches, sess, 0);
@@ -836,7 +840,7 @@ void handle_dcc(struct gg_dcc *d)
 	check_event(EVENT_DCC, d->peer_uin, NULL);
 	
 	if (!(e = gg_dcc_watch_fd(d))) {
-		my_printf("dcc_error", strerror(errno));
+		print("dcc_error", strerror(errno));
 		if (d->type != GG_SESSION_DCC_SOCKET) {
 			remove_transfer(d);
 			list_remove(&watches, d, 0);
@@ -901,7 +905,7 @@ void handle_dcc(struct gg_dcc *d)
 				if (t->dcc == d) {
 					if (gg_dcc_fill_file_info(d, t->filename) == -1) {
 						gg_debug(GG_DEBUG_MISC, "## gg_dcc_fill_file_info() failed (%s)\n", strerror(errno));
-						my_printf("dcc_open_error", t->filename);
+						print("dcc_open_error", t->filename);
 						remove_transfer(d);
 						list_remove(&watches, d, 0);
 						gg_free_dcc(d);
@@ -936,7 +940,7 @@ void handle_dcc(struct gg_dcc *d)
 				if (*p < 32 || *p == '\\' || *p == '/')
 					*p = '_';
 
-			my_printf("dcc_get_offer", format_user(t->uin), t->filename, itoa(d->file_info.size), itoa(t->id));
+			print("dcc_get_offer", format_user(t->uin), t->filename, itoa(d->file_info.size), itoa(t->id));
 
 			break;
 			
@@ -960,7 +964,7 @@ void handle_dcc(struct gg_dcc *d)
 			
 			t->type = GG_SESSION_DCC_VOICE;
 
-			my_printf("dcc_voice_offer", format_user(t->uin), itoa(t->id));
+			print("dcc_voice_offer", format_user(t->uin), itoa(t->id));
 #else
 			list_remove(&watches, d, 0);
 			remove_transfer(d);
@@ -985,7 +989,7 @@ void handle_dcc(struct gg_dcc *d)
 				break;
 			}
 
-			my_printf((t->dcc->type == GG_SESSION_DCC_SEND) ? "dcc_done_send" : "dcc_done_get", format_user(t->uin), t->filename);
+			print((t->dcc->type == GG_SESSION_DCC_SEND) ? "dcc_done_send" : "dcc_done_get", format_user(t->uin), t->filename);
 			
 			remove_transfer(d);
 			list_remove(&watches, d, 0);
@@ -996,16 +1000,16 @@ void handle_dcc(struct gg_dcc *d)
 		case GG_EVENT_DCC_ERROR:
 			switch (e->event.dcc_error) {
 				case GG_ERROR_DCC_HANDSHAKE:
-					my_printf("dcc_error_handshake", format_user(d->peer_uin));
+					print("dcc_error_handshake", format_user(d->peer_uin));
 					break;
 				case GG_ERROR_DCC_NET:
-					my_printf("dcc_error_network", format_user(d->peer_uin));
+					print("dcc_error_network", format_user(d->peer_uin));
 					break;
 				case GG_ERROR_DCC_REFUSED:
-					my_printf("dcc_error_refused", format_user(d->peer_uin));
+					print("dcc_error_refused", format_user(d->peer_uin));
 					break;
 				default:
-					my_printf("dcc_error_unknown", "");
+					print("dcc_error_unknown", "");
 			}
 
 #ifdef HAVE_VOIP

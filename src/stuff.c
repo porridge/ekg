@@ -30,7 +30,6 @@
 #ifndef _AIX
 #  include <string.h>
 #endif
-#include <readline.h>
 #include <stdarg.h>
 #include <errno.h>
 #include <signal.h>
@@ -40,6 +39,7 @@
 #ifdef WITH_IOCTLD
 #include <sys/un.h>
 #endif /* WITH_IOCTLD */
+#include <ctype.h>
 #include "config.h"
 #include "libgadu.h"
 #include "stuff.h"
@@ -49,6 +49,7 @@
 #include "vars.h"
 #include "userlist.h"
 #include "xmalloc.h"
+#include "ui.h"
 
 struct gg_session *sess = NULL;
 struct list *children = NULL;
@@ -58,8 +59,6 @@ struct list *transfers = NULL;
 struct list *events = NULL;
 struct list *emoticons = NULL;
 
-int in_readline = 0;
-int no_prompt = 0;
 int away = 0;
 int in_autoexec = 0;
 int config_auto_reconnect = 10;
@@ -97,7 +96,6 @@ char *reg_password = NULL;
 int config_dcc = 0;
 char *config_dcc_ip = NULL;
 char *config_dcc_dir = NULL;
-char *query_nick = NULL;
 int sock = 0;
 int length = 0;
 #ifdef WITH_IOCTLD
@@ -105,8 +103,6 @@ struct sockaddr_un addr;
 #endif /* WITH_IOCTLD */
 char *busy_reason = NULL;
 char *home_dir = NULL;
-int screen_lines = 24;
-int screen_columns = 80;
 char *config_quit_reason = NULL;
 char *config_away_reason = NULL;
 char *config_back_reason = NULL;
@@ -114,7 +110,6 @@ int config_random_reason = 0;
 int config_query_commands = 0;
 char *config_proxy = NULL;
 char *config_server = NULL;
-int my_printf_lines = -1;
 int quit_message_send = 0;
 int registered_today = 0;
 int config_protocol = 0;
@@ -123,82 +118,6 @@ int batch_mode = 0;
 char *batch_line = NULL;
 int immediately_quit = 0;
 int config_emoticons = 1;
-
-/*
- * my_puts()
- *
- * wy¶wietla dany tekst na ekranie, uwa¿aj±c na trwaj±ce w danych chwili
- * readline().
- */
-void my_puts(char *format, ...)
-{
-        int old_end = rl_end, i;
-	char *old_prompt = rl_prompt;
-        va_list ap;
-
-        if (in_readline) {
-                rl_end = 0;
-                rl_prompt = "";
-                rl_redisplay();
-                printf("\r");
-                for (i = 0; i < strlen(old_prompt); i++)
-                        printf(" ");
-                printf("\r");
-        }
-
-        va_start(ap, format);
-        vprintf(format, ap);
-        va_end(ap);
-
-        if (in_readline) {
-                rl_end = old_end;
-                rl_prompt = old_prompt;
-		rl_forced_update_display();
-        }
-}
-
-/*
- * current_prompt() // funkcja wewnêtrzna
- *
- * zwraca wska¼nik aktualnego prompta. statyczny bufor, nie zwalniaæ.
- */
-static char *current_prompt()
-{
-	static char buf[80];	/* g³upio strdup()owaæ wszystko */
-	char *prompt;
-	
-	if (query_nick) {
-		if ((prompt = format_string(find_format("readline_prompt_query"), query_nick, NULL))) {
-			strncpy(buf, prompt, sizeof(buf)-1);
-			prompt = buf;
-		}
-	} else {
-		if (!readline_prompt)
-			readline_prompt = find_format("readline_prompt");
-		if (!readline_prompt_away)
-			readline_prompt_away = find_format("readline_prompt_away");
-		if (!readline_prompt_invisible)
-			readline_prompt_invisible = find_format("readline_prompt_invisible");
-
-		switch (away) {
-			case 1:
-			case 3:
-				prompt = readline_prompt_away;
-				break;
-			case 2:
-			case 5:
-				prompt = readline_prompt_invisible;
-				break;
-			default:
-				prompt = readline_prompt;
-		}
-	}
-
-	if (no_prompt || !prompt || batch_mode)
-		prompt = "";
-
-	return prompt;
-}
 
 /*
  * emoticon_expand()
@@ -264,41 +183,6 @@ char *emoticon_expand(char *s)
 	}
 
 	return ms;
-}
-
-/*
- * my_readline()
- *
- * malutki wrapper na readline(), który przygotowuje odpowiedniego prompta
- * w zale¿no¶ci od tego, czy jeste¶my zajêci czy nie i informuje resztê
- * programu, ¿e jeste¶my w trakcie czytania linii i je¶li chc± wy¶wietlaæ,
- * powinny najpierw sprz±tn±æ.
- */
-char *my_readline()
-{
-        char *res, *prompt = current_prompt();
-
-        in_readline = 1;
-#ifdef HAVE_RL_SET_PROMPT
-	rl_set_prompt(prompt);
-#endif
-        res = readline(prompt);
-        in_readline = 0;
-
-        return res;
-}
-
-/*
- * reset_prompt()
- *
- * dostosowuje prompt aktualnego my_readline() do awaya.
- */
-void reset_prompt()
-{
-#ifdef HAVE_RL_SET_PROMPT
-	rl_set_prompt(current_prompt());
-	rl_redisplay();
-#endif
 }
 
 /*
@@ -741,7 +625,7 @@ void unidle()
  *
  *  - format.
  */
-char *timestamp(char *format)
+const char *timestamp(const char *format)
 {
 	static char buf[100];
 	time_t t;
@@ -782,7 +666,7 @@ void parse_autoexec(char *filename)
 			continue;
 		}
 
-		if (execute_line(buf)) {
+		if (ekg_execute(NULL, buf)) {
 			fclose(f);
 			free(buf);
 			exit(0);
@@ -900,7 +784,7 @@ int print_history(uin_t uin, int no)
 	}
 
 	if (!f_lines_count) {
-		my_printf("history_error", "Brak historii dla wybranego u¿ytkownika");
+		print("history_error", "Brak historii dla wybranego u¿ytkownika");
 		return 0;
 	}
 
@@ -952,9 +836,9 @@ int print_history(uin_t uin, int no)
 			}
 			
 			if (strstr(msgtype, "send"))
-				my_printf("history_send", uin, nick, time1, msg, ip, time2);
+				print("history_send", uin, nick, time1, msg, ip, time2);
 			else
-				my_printf("history_recv", uin, nick, time1, msg, ip, time2);
+				print("history_recv", uin, nick, time1, msg, ip, time2);
 		}
 		free(buf);
 	}
@@ -1105,7 +989,7 @@ int alias_add(char *string, int quiet, int append)
 
 	if (!string || !(cmd = strchr(string, ' '))) {
 		if (!quiet)
-			my_printf("not_enough_params");
+			print("not_enough_params");
 		return -1;
 	}
 
@@ -1117,12 +1001,12 @@ int alias_add(char *string, int quiet, int append)
 		if (!strcasecmp(string, j->name)) {
 			if (!append) {
 				if (!quiet)
-					my_printf("aliases_exist", string);
+					print("aliases_exist", string);
 				return -1;
 			} else {
 				list_add(&j->commands, cmd, strlen(cmd) + 1);
 				if (!quiet)
-					my_printf("aliases_append", string);
+					print("aliases_append", string);
 				return 0;
 			}	
 		}
@@ -1134,7 +1018,7 @@ int alias_add(char *string, int quiet, int append)
 	list_add(&aliases, &a, sizeof(a));
 
 	if (!quiet)
-		my_printf("aliases_add", a.name, "");
+		print("aliases_add", a.name, "");
 
 	return 0;
 }
@@ -1151,7 +1035,7 @@ int alias_remove(char *name)
 	struct list *l;
 
 	if (!name) {
-		my_printf("not_enough_params");
+		print("not_enough_params");
 		return -1;
 	}
 
@@ -1159,14 +1043,14 @@ int alias_remove(char *name)
 		struct alias *a = l->data;
 
 		if (!strcmp(a->name, name)) {
-			my_printf("aliases_del", name);
+			print("aliases_del", name);
 			list_destroy(a->commands, 1);
 			list_remove(&aliases, a, 1);
 			return 0;
 		}
 	}
 
-	my_printf("aliases_noexist", name);
+	print("aliases_noexist", name);
 
 	return -1;
 }
@@ -1193,7 +1077,7 @@ struct list *alias_check(char *line)
 	for (l = aliases; l; l = l->next) {
 		struct alias *j = l->data;
 
-		if (!strncmp(line, j->name, i) && (line[i] == ' ' || !line[i]))
+		if (!strncmp(line, j->name, i) && (line[i] == ' '))
 			return j->commands;
 	}
 
@@ -1298,7 +1182,7 @@ int add_event(int flags, uin_t uin, char *action, int quiet)
 
                 if (ev->uin == uin && (f = ev->flags & flags) != 0) {
 		    	if (!quiet)
-			    	my_printf("events_exist", format_events(f), (uin == 1) ? "*"  : format_user(uin));
+			    	print("events_exist", format_events(f), (uin == 1) ? "*"  : format_user(uin));
                         return -1;
                 }
         }
@@ -1310,7 +1194,7 @@ int add_event(int flags, uin_t uin, char *action, int quiet)
         list_add(&events, &e, sizeof(e));
 
 	if (!quiet)
-	    	my_printf("events_add", format_events(flags), (uin == 1) ? "*"  : format_user(uin), action);
+	    	print("events_add", format_events(flags), (uin == 1) ? "*"  : format_user(uin), action);
 
         return 0;
 }
@@ -1332,12 +1216,12 @@ int del_event(int flags, uin_t uin)
 
                 if (e && e->uin == uin && e->flags & flags) {
                         if ((e->flags &= ~flags) == 0) {
-                                my_printf("events_del", format_events(flags), (uin == 1) ? "*" : format_user(uin), e->action);
+                                print("events_del", format_events(flags), (uin == 1) ? "*" : format_user(uin), e->action);
 				free(e->action);
                                 list_remove(&events, e, 1);
                                 return 0;
                         } else {
-                                my_printf("events_del_flags", format_events(flags));
+                                print("events_del_flags", format_events(flags));
                                 list_remove(&events, e, 0);
                                 list_add_sorted(&events, e, 0, NULL);
                                 return 0;
@@ -1345,7 +1229,7 @@ int del_event(int flags, uin_t uin)
                 }
         }
 
-        my_printf("events_del_noexist", format_events(flags), (uin == 1) ? "3"  : format_user(uin));
+        print("events_del_noexist", format_events(flags), (uin == 1) ? "3"  : format_user(uin));
 
         return 1;
 }
@@ -1474,7 +1358,7 @@ int run_event(char *act)
 
 	if (!strncasecmp(acts[0], "command", 7)) {
 		gg_debug(GG_DEBUG_MISC, "//   executing program\n");
-		execute_line(action + 8);
+		ekg_execute(NULL, action + 8);
 		goto cleanup;
 	} 
 
@@ -1508,7 +1392,7 @@ int run_event(char *act)
 
         if (!strncasecmp(acts[0], "beep", 4)) {
                 gg_debug(GG_DEBUG_MISC, "//   BEEP\n");
-		my_puts("\007");
+		ui_beep();
 		goto cleanup;
         }
 
@@ -1543,7 +1427,7 @@ int send_event(char *seq, int act)
                 seq++;
                 s = find_format(seq);
                 if (!strcmp(s, "")) {
-                        my_printf("events_seq_not_found", seq);
+                        print("events_seq_not_found", seq);
                         return 1;
                 }
         } else
@@ -1598,7 +1482,7 @@ int correct_event(char *act)
 #ifdef WITH_IOCTLD
                 if (!strncasecmp(acts[0], "blink_leds", 10) || !strncasecmp(acts[0], "beeps_spk", 9)) {
                         if (acts[1] == NULL) {
-                                my_printf("events_act_no_params", acts[0]);
+                                print("events_act_no_params", acts[0]);
 				free(action);
 				array_free(acts);
 				array_free(events);
@@ -1609,7 +1493,7 @@ int correct_event(char *act)
 			    	char *blah = xstrdup(acts[1]+1);
 				
                                 if (!strcmp(find_format(blah), "")) {
-                                        my_printf("events_seq_not_found", blah);
+                                        print("events_seq_not_found", blah);
 					free(blah);
 					free(action);
 					array_free(acts);
@@ -1622,7 +1506,7 @@ int correct_event(char *act)
                         }
 
                         if (events_parse_seq(acts[1], &test)) {
-                                my_printf("events_seq_incorrect", acts[1]);
+                                print("events_seq_incorrect", acts[1]);
 				free(action);
 				array_free(acts);
 				array_free(events);
@@ -1638,7 +1522,7 @@ int correct_event(char *act)
 
 		if (!strncasecmp(acts[0], "play", 4)) {
 			if (!acts[1]) {
-				my_printf("events_act_no_params", acts[0]);
+				print("events_act_no_params", acts[0]);
 				free(action);
 				array_free(acts);
 				array_free(events);
@@ -1647,7 +1531,7 @@ int correct_event(char *act)
 		} 
 		else if (!strncasecmp(acts[0], "exec", 4)) {
 			if (!acts[1]) {
-				my_printf("events_act_no_params", acts[0]);
+				print("events_act_no_params", acts[0]);
 				free(action);
 				array_free(acts);
 				array_free(events);
@@ -1656,7 +1540,7 @@ int correct_event(char *act)
 		} 
 		else if (!strncasecmp(acts[0], "command", 7)) {
 			if (!acts[1]) {
-				my_printf("events_act_no_params", acts[0]);
+				print("events_act_no_params", acts[0]);
 				free(action);
 				array_free(acts);
 				array_free(events);
@@ -1665,7 +1549,7 @@ int correct_event(char *act)
 		} 
 		else if (!strncasecmp(acts[0], "chat", 4) || !strncasecmp(acts[0], "msg", 3)) {
                         if (!acts[1]) {
-                                my_printf("events_act_no_params", acts[0]);
+                                print("events_act_no_params", acts[0]);
 				free(action);
 				array_free(acts);
 				array_free(events);
@@ -1673,7 +1557,7 @@ int correct_event(char *act)
                         }
 
                         if (!strchr(acts[1], ' ')) {
-                                my_printf("events_act_no_params", acts[0]);
+                                print("events_act_no_params", acts[0]);
 				free(action);
 				array_free(acts);
 				array_free(events);
@@ -1690,7 +1574,7 @@ int correct_event(char *act)
 // zdarzenia i mo¿e to byæ te¿ %1 lub %2.
 
                         if (!get_uin(acts[1])) {
-                                my_printf("user_not_found", acts[1]);
+                                print("user_not_found", acts[1]);
 				free(action);
 				array_free(acts);
 				array_free(events);
@@ -1704,7 +1588,7 @@ int correct_event(char *act)
 
 		else if (!strncasecmp(acts[0], "beep", 4)) {
 		    	if (acts[1]) {
-			    	my_printf("events_act_toomany_params", acts[0]);
+			    	print("events_act_toomany_params", acts[0]);
 				free(action);
 				array_free(acts);
 				array_free(events);
@@ -1713,7 +1597,7 @@ int correct_event(char *act)
 		}
 				
                 else {
-                        my_printf("events_noexist");
+                        print("events_noexist");
 			free(action);
 			array_free(acts);
 			array_free(events);
@@ -1959,7 +1843,7 @@ void changed_dcc(char *var)
 	
 		if (config_dcc && !dcc) {
 			if (!(dcc = gg_dcc_socket_create(config_uin, 0))) {
-				my_printf("dcc_create_error", strerror(errno));
+				print("dcc_create_error", strerror(errno));
 			} else
 				list_add(&watches, dcc, 0);
 		}
@@ -1970,7 +1854,7 @@ void changed_dcc(char *var)
 			if (inet_addr(config_dcc_ip) != INADDR_NONE)
 				gg_dcc_ip = inet_addr(config_dcc_ip);
 			else {
-				my_printf("dcc_invalid_ip");
+				print("dcc_invalid_ip");
 				config_dcc_ip = NULL;
 				gg_dcc_ip = 0;
 			}
@@ -1994,10 +1878,10 @@ void changed_theme(char *var)
 		if (!read_theme(config_theme, 1)) {
 			reset_theme_cache();
 			if (!in_autoexec)
-				my_printf("theme_loaded", config_theme);
+				print("theme_loaded", config_theme);
 		} else
 			if (!in_autoexec)
-				my_printf("error_loading_theme", strerror(errno));
+				print("error_loading_theme", strerror(errno));
 	}
 }
 
@@ -2085,7 +1969,7 @@ void do_connect()
 	}
 
 	if (!(sess = gg_login(&p))) {
-		my_printf("conn_failed", strerror(errno));
+		print("conn_failed", strerror(errno));
 		do_reconnect();
 	} else
 		list_add(&watches, sess, 0);
