@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik).
 
+// 2003-07-02
+
+- informacja o b³êdach przy logowaniu (*/w)
+
 // 2003-07-01
 
 - poprawka zapisywania plików konfiguracyjnych (porridge/w)

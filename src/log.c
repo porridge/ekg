@@ -44,6 +44,7 @@
 #  include "../compat/strlcpy.h"
 #endif
 #include "stuff.h"
+#include "themes.h"
 #include "xmalloc.h"
 
 #ifndef PATH_MAX
@@ -379,10 +380,16 @@ void put_log(uin_t uin, const char *format, ...)
 			snprintf(path + strlen(path), sizeof(path) - strlen(path), ".gz");
 
 			if (!(f = gzopen(path, "a")))
-				goto cleanup;
+				goto fail;
 
-			gzputs(f, buf);
-			gzclose(f);
+			if (gzputs(f, buf) == -1) {
+				gzclose(f);
+				goto fail;
+			}
+
+			if (gzclose(f) != Z_OK)
+				goto fail;
+
 			chmod(path, 0600);
 
 			goto cleanup;
@@ -391,13 +398,20 @@ void put_log(uin_t uin, const char *format, ...)
 #endif
 
 	if (!(f = fopen(path, "a")))
-		goto cleanup;
+		goto fail;
 	fputs(buf, f);
-	fclose(f);
+	if (fclose(f) != 0)
+		goto fail;
 	chmod(path, 0600);
 
 cleanup:
 	xfree(buf);
+	return;
+
+fail:
+	xfree(buf);
+	print("log_failed", strerror(errno));
+	return;
 }
 
 /* 

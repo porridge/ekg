@@ -4028,7 +4028,7 @@ static int ui_ncurses_event(const char *event, ...)
 		for (l = windows; l; l = l->next) {
 			struct window *w = l->data;
 
-			if (!w->target || strcasecmp(w->target, p1))
+			if (!w->target || !p1 || strcasecmp(w->target, p1))
 				continue;
 
 			xfree(w->target);
