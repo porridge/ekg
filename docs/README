@@ -93,7 +93,7 @@ KLAWIATURA
 	Up, Down		przegl±danie historii poleceñ
 	Left, Right		poruszanie siê po aktualnej linii
         Ctrl-A, Home		id¼ na pocz±tek linii
-	Ctrl-B			pogrubiona czcionka
+	Ctrl-B			pogrubiona czcionka [3]
         Ctrl-D, Delete		usuñ znak pod kursorem
         Ctrl-H, Backspace	usuñ znak przed kursorem
         Ctrl-I, Tab		dope³nianie
@@ -101,12 +101,13 @@ KLAWIATURA
         Ctrl-M, Enter		zatwierdzenie linii
         Ctrl-Q			odblokowanie terminala
         Ctrl-S			zablokowanie terminala
-	Ctrl-T			pochy³a czcionka
+	Ctrl-T			pochy³a czcionka [3]
+	Ctrl-V			pozwala wpisaæ dowolny znak [2]
         Ctrl-U			usuniêcie aktualnej linii
         Ctrl-W			usuniêcie s³owa przed kursorem
         Ctrl-Y			wklejenie ostatnio usuniêtego bloku
         Ctrl-Z			przeniesienie programu w t³o
-	Ctrl-_			podkre¶lona czcionka
+	Ctrl-_			podkre¶lona czcionka [3]
 	Alt-cyfra		prze³±czenie do podanego okna
 	F1			pomoc
 	F2			krótka lista dostêpnych i zajêtych
@@ -148,6 +149,13 @@ KLAWIATURA
         zmiennej by³a równa 0, wci¶niêcie klawisza zmienia jej warto¶æ na 2.
 	Je¶li by³a równa 1, kolejne wci¶niêcia F3 bêd± zmienia³y warto¶æ
 	z 1 na 0 i z 0 na 1. 
+
+    [2] Po wci¶niêciu Ctrl-V nale¿y wcisn±æ klawisz, który chcemy wkleiæ.
+        Dziêki temu mo¿liwe jest wpisanie znaków typu Escape, Ctrl-L czy
+	Ctrl-U.
+
+    [3] W miejscu wci¶niêcia klawisza pojawi siê znak oznaczaj±cy kod
+        klawisza w negatywie.
 
 GDZIE SZUKAÆ POMOCY
 

@@ -19,6 +19,7 @@ zg³osi³ b³±d.
 - poprawki komendy ,,exec'', ¿eby nie psu³a escapowania (w)
 - libgadu: zapisywanie wykrytych includów z uintXX_t do libgadu-config.h
   (adrians/w)
+- dodanie klawisza Ctrl-V (w)
 
 // 2003-01-27
 

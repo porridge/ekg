@@ -2290,6 +2290,43 @@ void print_char(WINDOW *w, int y, int x, unsigned char ch)
 	wattrset(w, A_NORMAL);
 }
 
+/* 
+ * ekg_getch()
+ *
+ * czeka na wci¶niêcie klawisza i je¶li wkompilowano obs³ugê pythona,
+ * przekazuje informacjê o zdarzeniu do skryptu.
+ *
+ *  - meta - przedrostek klawisza.
+ *
+ * zwraca kod klawisza lub -1, je¶li nale¿y go pomin±æ.
+ */
+int ekg_getch(int meta)
+{
+	int ch;
+
+	ekg_wait_for_key();
+
+	ch = wgetch(input);
+
+#ifdef WITH_PYTHON
+	PYTHON_HANDLE_HEADER(keypress, "(ii)", meta, ch)
+	{
+		int dummy;
+
+		PYTHON_HANDLE_RESULT("ii", &dummy, &ch)
+		{
+		}
+	}
+
+	PYTHON_HANDLE_FOOTER()
+
+	if (python_handle_result == 0 || python_handle_result == 2)
+		ch = -1;
+#endif
+
+	return ch;
+}
+
 /*
  * ui_ncurses_loop()
  *
@@ -2303,27 +2340,10 @@ static void ui_ncurses_loop()
 	history[0] = line;
 
 	for (;;) {
-		int ch;
+		int ch = ekg_getch(0);
 
-		ekg_wait_for_key();
-
-		ch = wgetch(input);
-
-#ifdef WITH_PYTHON
-		PYTHON_HANDLE_HEADER(keypress, "(ii)", 0, ch)
-		{
-			int dummy;
-
-			PYTHON_HANDLE_RESULT("ii", &dummy, &ch)
-			{
-			}
-		}
-
-		PYTHON_HANDLE_FOOTER()
-
-		if (python_handle_result == 0 || python_handle_result == 2)
+		if (ch == -1)
 			continue;
-#endif
 
 		if (ch != 27 && binding_map[ch] && binding_map[ch]->action) {
 			command_exec(NULL, binding_map[ch]->action);
@@ -2340,23 +2360,10 @@ static void ui_ncurses_loop()
 				break;
 
 			case 27:
-				ch = wgetch(input);
+				ch = ekg_getch(27);
 
-#ifdef WITH_PYTHON
-				PYTHON_HANDLE_HEADER(keypress, "(ii)", 27, ch)
-				{
-					int dummy;
-
-					PYTHON_HANDLE_RESULT("ii", &dummy, &ch)
-					{
-					}
-				}
-		
-				PYTHON_HANDLE_FOOTER()
-		
-				if (python_handle_result == 0 || python_handle_result == 2)
+				if (ch == -1)
 					continue;
-#endif
 
 				if (binding_map_meta[ch] && binding_map_meta[ch]->action) {
 					command_exec(NULL, binding_map_meta[ch]->action);
@@ -2580,6 +2587,22 @@ static void ui_ncurses_loop()
 
 				break;
 
+			case 'V' - 64:	/* Ctrl-V */
+			{
+				ch = ekg_getch('V' - 64);
+
+				if (ch == -1)
+					continue;
+
+				if (strlen(line) >= LINE_MAXLEN - 1)
+					break;
+				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
+
+				line[line_index++] = ch;
+
+				break;
+			}
+
 			case 'W' - 64:	/* Ctrl-W */
 			{
 				char *p;
@@ -2764,6 +2787,7 @@ static void ui_ncurses_loop()
 				break;
 				
 			default:
+				/* XXX kod jest zdublowany przy Ctrl-V */
 				if (strlen(line) >= LINE_MAXLEN - 1)
 					break;
 				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
