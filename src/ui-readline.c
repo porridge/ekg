@@ -60,6 +60,7 @@ static int windows_sort();
 static int window_query_id(const char *qnick);
 static void window_list();
 static int window_make_query(const char *nick);
+static void window_free();
 
 /* a jak ju¿ przy okienkach jeste¶my... */
 static void window_01() { if (curr_window == 1) return; window_switch(1); }
@@ -636,6 +637,7 @@ static void ui_readline_deinit()
 			printf("\n");
 	}
 
+	window_free();
 }
 
 /*
@@ -1093,6 +1095,23 @@ static int window_make_query(const char *nick)
 	}
 
 	return 0;
+}
+
+static void window_free()
+{
+	list_t l;
+
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data;
+		int i;
+
+		xfree(w->query_nick);
+
+		for (i = 0; i <= MAX_LINES_PER_SCREEN; i++)
+			xfree(w->buff.line[i]);
+	}
+
+	list_destroy(windows, 1);
 }
 
 static char *seq_get_command(char *seq)
