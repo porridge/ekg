@@ -833,7 +833,7 @@ COMMAND(cmd_find)
 {
 	char **argv = NULL;
 	gg_pubdir50_t req;
-	int i, res = 0, all = 0, match = 0;
+	int i, res = 0, all = 0;
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
 		printq("not_connected");
@@ -894,47 +894,47 @@ COMMAND(cmd_find)
 				
 		if (match_arg(arg, 'f', "first", 2) && argv[i + 1]) {
 			gg_pubdir50_add(req, GG_PUBDIR50_FIRSTNAME, argv[++i]);
-			match = 1;
+			continue;
 		}
 
 		if (match_arg(arg, 'l', "last", 2) && argv[i + 1]) {
 			gg_pubdir50_add(req, GG_PUBDIR50_LASTNAME, argv[++i]);
-			match = 1;
+			continue;
 		}
 
 		if (match_arg(arg, 'n', "nickname", 2) && argv[i + 1]) {
 			gg_pubdir50_add(req, GG_PUBDIR50_NICKNAME, argv[++i]);
-			match = 1;
+			continue;
 		}
 		
 		if (match_arg(arg, 'c', "city", 2) && argv[i + 1]) {
 			gg_pubdir50_add(req, GG_PUBDIR50_CITY, argv[++i]);
-			match = 1;
+			continue;
 		}
 
 		if (match_arg(arg, 'u', "uin", 2) && argv[i + 1]) {
 			gg_pubdir50_add(req, GG_PUBDIR50_UIN, argv[++i]);
-			match = 1;
+			continue;
 		}
 		
 		if (match_arg(arg, 's', "start", 3) && argv[i + 1]) {
 			gg_pubdir50_add(req, GG_PUBDIR50_START, argv[++i]);
-			match = 1;
+			continue;
 		}
 		
 		if (match_arg(arg, 'F', "female", 2)) {
 			gg_pubdir50_add(req, GG_PUBDIR50_GENDER, GG_PUBDIR50_GENDER_FEMALE);
-			match = 1;
+			continue;
 		}
 
 		if (match_arg(arg, 'M', "male", 2)) {
 			gg_pubdir50_add(req, GG_PUBDIR50_GENDER, GG_PUBDIR50_GENDER_MALE);
-			match = 1;
+			continue;
 		}
 
 		if (match_arg(arg, 'a', "active", 2)) {
 			gg_pubdir50_add(req, GG_PUBDIR50_ACTIVE, GG_PUBDIR50_ACTIVE_TRUE);
-			match = 1;
+			continue;
 		}
 
 		if (match_arg(arg, 'b', "born", 2) && argv[i + 1]) {
@@ -944,19 +944,19 @@ COMMAND(cmd_find)
 				*foo = ' ';
 
 			gg_pubdir50_add(req, GG_PUBDIR50_BIRTHYEAR, argv[i]);
-			match = 1;
+			continue;
 		}
 
 		if (match_arg(arg, 'A', "all", 3)) {
 			if (!gg_pubdir50_get(req, 0, GG_PUBDIR50_START))
 				gg_pubdir50_add(req, GG_PUBDIR50_START, "0");
 			all = 1;
-			match = 1;
+			continue;
 		}
-	}
 
-	if (!match) {
 		printq("invalid_params", name);
+		array_free(argv);
+		gg_pubdir50_free(req);
 		return -1;
 	}
 
@@ -978,7 +978,7 @@ search:
 
 COMMAND(cmd_change)
 {
-	int i, match = 0;
+	int i;
 	gg_pubdir50_t req;
 
 	if (!sess || sess->state != GG_STATE_CONNECTED) {
@@ -1003,52 +1003,52 @@ COMMAND(cmd_change)
 		for (i = 0; argv[i]; i++) {
 			if (match_arg(argv[i], 'f', "first", 2) && argv[i + 1]) {
 				gg_pubdir50_add(req, GG_PUBDIR50_FIRSTNAME, argv[++i]);
-				match = 1;
+				continue;
 			}
 
 			if (match_arg(argv[i], 'N', "familyname", 7) && argv[i + 1]) {
 				gg_pubdir50_add(req, GG_PUBDIR50_FAMILYNAME, argv[++i]);
-				match = 1;
+				continue;
 			}
 		
 			if (match_arg(argv[i], 'l', "last", 2) && argv[i + 1]) {
 				gg_pubdir50_add(req, GG_PUBDIR50_LASTNAME, argv[++i]);
-				match = 1;
+				continue;
 			}
 		
 			if (match_arg(argv[i], 'n', "nickname", 2) && argv[i + 1]) {
 				gg_pubdir50_add(req, GG_PUBDIR50_NICKNAME, argv[++i]);
-				match = 1;
+				continue;
 			}
 			
 			if (match_arg(argv[i], 'c', "city", 2) && argv[i + 1]) {
 				gg_pubdir50_add(req, GG_PUBDIR50_CITY, argv[++i]);
-				match = 1;
+				continue;
 			}
 			
 			if (match_arg(argv[i], 'C', "familycity", 7) && argv[i + 1]) {
 				gg_pubdir50_add(req, GG_PUBDIR50_FAMILYCITY, argv[++i]);
-				match = 1;
+				continue;
 			}
 			
 			if (match_arg(argv[i], 'b', "born", 2) && argv[i + 1]) {
 				gg_pubdir50_add(req, GG_PUBDIR50_BIRTHYEAR, argv[++i]);
-				match = 1;
+				continue;
 			}
 			
 			if (match_arg(argv[i], 'F', "female", 2)) {
 				gg_pubdir50_add(req, GG_PUBDIR50_GENDER, GG_PUBDIR50_GENDER_FEMALE);
-				match = 1;
+				continue;
 			}
 
 			if (match_arg(argv[i], 'M', "male", 2)) {
 				gg_pubdir50_add(req, GG_PUBDIR50_GENDER, GG_PUBDIR50_GENDER_MALE);
-				match = 1;
+				continue;
 			}
-		}
 
-		if (!match) {
 			printq("invalid_params", name);
+			gg_pubdir50_free(req);
+			array_free(argv);
 			return -1;
 		}
 
@@ -1091,41 +1091,42 @@ COMMAND(cmd_modify)
 			xfree(u->first_name);
 			u->first_name = xstrdup(argv[++i]);
 			modified = 1;
+			continue;
 		}
 		
 		if (match_arg(argv[i], 'l', "last", 2) && argv[i + 1]) {
 			xfree(u->last_name);
 			u->last_name = xstrdup(argv[++i]);
 			modified = 1;
+			continue;
 		}
 		
 		if (match_arg(argv[i], 'n', "nickname", 2) && argv[i + 1]) {
 			xfree(u->nickname);
 			u->nickname = xstrdup(argv[++i]);
 			modified = 1;
+			continue;
 		}
 		
 		if ((match_arg(argv[i], 'p', "phone", 2) || match_arg(argv[i], 'm', "mobile", 2)) && argv[i + 1]) {
 			xfree(u->mobile);
 			u->mobile = xstrdup(argv[++i]);
 			modified = 1;
+			continue;
 		}
 		
 		if (match_arg(argv[i], 'd', "display", 2) && argv[i + 1]) {
 			list_t l;
+			struct userlist *u;
 
 			i++;
 
-			for (l = userlist; l; l = l->next) {
-				struct userlist *u = l->data;
-
-				if (u->display && !strcasecmp(u->display, argv[i])) {
-					printq("user_exists", u->display);
-					array_free(argv);
-					return -1;
-				}
+			if ((u = userlist_find(0, argv[i]))) {
+				printq("user_exists", u->display);
+				array_free(argv);
+				return -1;
 			}
-			
+
 			ui_event("userlist_changed", ((u->display) ? u->display : itoa(u->uin)), argv[i], NULL);
 			remove_send_nick(u->display);
 			xfree(u->display);
@@ -1133,6 +1134,7 @@ COMMAND(cmd_modify)
 			userlist_replace(u);
 			add_send_nick(u->display);
 			modified = 1;
+			continue;
 		}
 		
 		if (match_arg(argv[i], 'g', "group", 2) && argv[i + 1]) {
@@ -1179,6 +1181,7 @@ COMMAND(cmd_modify)
 				}
 
 			array_free(tmp);
+			continue;
 		}
 		
 		if (match_arg(argv[i], 'u', "uin", 2) && argv[i + 1]) {
@@ -1228,6 +1231,7 @@ COMMAND(cmd_modify)
 
 			ui_event("userlist_changed", u->display, u->display, NULL);
 			modified = 1;
+			continue;
 		}
 
 		if (match_arg(argv[i], 'o', "offline", 2)) {
@@ -1236,6 +1240,7 @@ COMMAND(cmd_modify)
 			printq("modify_offline", format_user(u->uin));
 			modified = 2;
 			gg_add_notify_ex(sess, u->uin, userlist_type(u));
+			continue;
 		}
 
 		if (match_arg(argv[i], 'O', "online", 2)) {
@@ -1244,8 +1249,12 @@ COMMAND(cmd_modify)
 			printq("modify_online", format_user(u->uin));
 			modified = 2;
 			gg_add_notify_ex(sess, u->uin, userlist_type(u));
+			continue;
 		}
 
+		printq("invalid_params", name);
+		array_free(argv);
+		return -1;
 	}
 
 	if (strcasecmp(name, "add")) {
