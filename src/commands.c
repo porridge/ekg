@@ -205,7 +205,17 @@ COMMAND(cmd_add)
 	ui_event("command", quiet, "query-current", &__uin, NULL);
 
 	if (params[0] && !match_arg(params[0], 'f', "find", 2) && strcmp(params[0], "$") && !str_to_uin(params[0]) && __uin && (!(u = userlist_find(__uin, NULL)) || !u->display)) {
-		const char *name = params[0], *s1 = params[1], *s2 = params[2];
+		const char *name = NULL, *s1 = NULL, *s2 = NULL;
+
+		if (params[0]) {
+			name = params[0];
+			if (params[1]) {
+				s1 = params[1];
+				if (params[2])
+					s2 = params[2];
+			}
+		}
+					
 		uin = __uin;
 		params_free = 1;
 		params = xmalloc(4 * sizeof(char *));

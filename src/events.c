@@ -62,7 +62,7 @@
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure(), handle_search50(),
 	handle_change50(), handle_status60(), handle_notify60(),
-	handle_userlist();
+	handle_userlist(), handle_image_request(), handle_image_reply();
 
 static int hide_notavail = 0;	/* czy ma ukrywaæ niedostêpnych -- tylko zaraz po po³±czeniu */
 
@@ -85,6 +85,8 @@ static struct handler handlers[] = {
 	{ GG_EVENT_PUBDIR50_SEARCH_REPLY, handle_search50 },
 	{ GG_EVENT_PUBDIR50_WRITE, handle_change50 },
 	{ GG_EVENT_USERLIST, handle_userlist },
+	{ GG_EVENT_IMAGE_REQUEST, handle_image_request },
+	{ GG_EVENT_IMAGE_REPLY, handle_image_reply },
 	{ 0, NULL }
 };
 
@@ -654,12 +656,30 @@ void handle_msg(struct gg_event *e)
 	}
 
 	if (e->event.msg.formats_length > 0) {
+		unsigned char *p = e->event.msg.formats;
 		int i;
 		
 		gg_debug(GG_DEBUG_MISC, "// ekg: received formatting info (len=%d):", e->event.msg.formats_length);
 		for (i = 0; i < e->event.msg.formats_length; i++)
-			gg_debug(GG_DEBUG_MISC, " %.2x", ((unsigned char*)e->event.msg.formats)[i]);
+			gg_debug(GG_DEBUG_MISC, " %.2x", p[i]);
 		gg_debug(GG_DEBUG_MISC, "\n");
+
+		for (i = 0; i < e->event.msg.formats_length; ) {
+			unsigned char font = p[i + 2];
+
+			i += 3;
+
+			if ((font & GG_FONT_IMAGE)) {
+				struct gg_msg_richtext_image *m = (void*) &p[i];
+
+				gg_debug(GG_DEBUG_MISC, "// ekg: inline image: sender=%d, size=%d, crc32=%.8x\n", e->event.msg.sender, m->size, m->crc32);
+
+				i += sizeof(*m);
+			}
+
+			if ((font & GG_FONT_COLOR))
+				i += 3;
+		}
 	}
 }
 
@@ -2017,4 +2037,28 @@ void handle_change50(struct gg_event *e)
 {
 	if (!change_quiet)
 		print("change");
+}
+
+/*
+ * handle_image_request()
+ *
+ * obs³uguje ¿±danie wys³ania obrazków.
+ *
+ *  - e - opis zdarzenia
+ */
+void handle_image_request(struct gg_event *e)
+{
+	gg_debug(GG_DEBUG_MISC, "// ekg: image_request: sender=%d, size=%d, crc32=%.8x\n", e->event.image_request.sender, e->event.image_request.size, e->event.image_request.crc32);
+}
+
+/*
+ * handle_image_reply()
+ *
+ * obs³uguje odpowied¼ obrazków.
+ * 
+ *  - e - opis zdarzenia
+ */
+void handle_image_reply(struct gg_event *e)
+{
+	gg_debug(GG_DEBUG_MISC, "// ekg: image_reply: sender=%d, filename=\"%s\", size=%d, crc32=%.8x\n", e->event.image_reply.sender, e->event.image_reply.filename, e->event.image_reply.size, e->event.image_reply.crc32);
 }

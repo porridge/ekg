@@ -408,13 +408,14 @@ enum gg_event_t {
 
 	GG_EVENT_PUBDIR50_SEARCH_REPLY,	/* odpowiedz wyszukiwania */
 	GG_EVENT_PUBDIR50_READ,		/* odczytano w³asne dane z katalogu */
-	GG_EVENT_PUBDIR50_WRITE,		/* wpisano w³asne dane do katalogu */
+	GG_EVENT_PUBDIR50_WRITE,	/* wpisano w³asne dane do katalogu */
 
 	GG_EVENT_STATUS60,		/* kto¶ zmieni³ stan w GG 6.0 */
 	GG_EVENT_NOTIFY60,		/* kto¶ siê pojawi³ w GG 6.0 */
 	GG_EVENT_USERLIST,		/* odpowied¼ listy kontaktów w GG 6.0 */
 	GG_EVENT_IMAGE_REQUEST,		/* pro¶ba o wys³anie obrazka GG 6.0 */
-	GG_EVENT_IMAGE_REPLY		/* podes³any obrazek GG 6.0 */
+	GG_EVENT_IMAGE_REPLY,		/* podes³any obrazek GG 6.0 */
+	GG_EVENT_DCC_ACK		/* potwierdzenie transmisji */
 };
 
 #define GG_EVENT_SEARCH50_REPLY GG_EVENT_PUBDIR50_SEARCH_REPLY
