@@ -606,15 +606,21 @@ static void window_clear(struct window *w, int full)
 static struct window *window_find(const char *target)
 {
 	list_t l;
+	int status = ((target) ? !strcasecmp(target, "__status") : 0);
+	int current = ((target) ? !strcasecmp(target, "__current") : 0);
 
-	if (!target || !strcasecmp(target, "__current"))
+	/* nie traktujemy nigdy okna debug jako aktualne, piszemy do statusowego */
+	if ((!target || current) && window_current->id)
 		return window_current;
 
-	if (!strcasecmp(target, "__status"))
-		return windows->data;
-		
+	if (current)
+		status = 1;
+
 	for (l = windows; l; l = l->next) {
 		struct window *w = l->data;
+
+		if (status && w->id == 1)
+			return w;
 
 		if (w->target && !strcasecmp(target, w->target))
 			return w;
@@ -1400,7 +1406,7 @@ static void update_statusbar(int commit)
 		for (l = windows; l; l = l->next) {
 			struct window *w = l->data;
 
-			if (!w->act) 
+			if (!w->act || !w->id) 
 				continue;
 
 			if (!first)
