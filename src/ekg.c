@@ -98,7 +98,7 @@ int my_getc(FILE *f)
 		for (l = watches; l; l = l->next) {
 			struct gg_common *w = l->data;
 
-			if (w->state == GG_STATE_ERROR || w->state == GG_STATE_IDLE || w->state == GG_STATE_DONE)
+			if (!w || w->state == GG_STATE_ERROR || w->state == GG_STATE_IDLE || w->state == GG_STATE_DONE)
 				continue;
 			
 			if (w->fd > maxfd)
