@@ -1315,9 +1315,6 @@ void ekg_exit()
 	xfree(last_search_last_name);
 	xfree(last_search_nickname);
 
-	if (GG_S_D(config_status) && !config_reason)
-		config_status = ekg_hide_descr_status(config_status);
-
 	if (config_keep_reason) {
 		array_add(&vars, xstrdup("status"));
 		array_add(&vars, xstrdup("reason"));
