@@ -60,7 +60,7 @@ struct gg_register *gg_register(char *email, char *password, int async)
 		return NULL;
 	}
 
-	form = gg_alloc_sprintf("pwd=%s&email=%s&code=%u", __pwd, __email,
+	form = gg_alloc_sprintf("pwd=%s&email=%s&code=%d", __pwd, __email,
 			gg_http_hash(email, password));
 
 	free(__pwd);
