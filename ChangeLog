@@ -14,6 +14,7 @@ zg³osi³ b³±d.
 - poprawka themów wiadomo¶ci (lordzik/w)
 - poprawka segv przy opcji -f (d)
 - poprawka bindowaniu w ui-readline (d) 
+- dodanie opisu us³ug http do docs/protocol.html (pm/w)
 
 // 2003-02-03
 

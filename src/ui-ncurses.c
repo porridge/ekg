@@ -1639,7 +1639,7 @@ void ui_ncurses_init()
 	ui_beep = ui_ncurses_beep;
 	ui_event = ui_ncurses_event;
 	ui_deinit = ui_ncurses_deinit;
-		
+	
 	initscr();
 	cbreak();
 	noecho();
