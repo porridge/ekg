@@ -1034,7 +1034,7 @@ void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_
 		}
 
 		/* daj znaæ d¿wiêkiem */
-		if (config_beep && config_beep_notify)
+		if (config_beep && config_beep_notify && (!config_events_delay || (time(NULL) - last_conn_event) >= config_events_delay))
 			ui_beep();
 
 		/* i muzyczk± */
