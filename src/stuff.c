@@ -895,7 +895,7 @@ void changed_xxx_reason(const char *var)
 		print("descr_too_long", itoa(strlen(tmp) - GG_STATUS_DESCR_MAXSIZE));
 }
 
-const char *compile_time()
+const char *compile_time(void)
 {
 	return __DATE__ " " __TIME__;
 }
@@ -970,8 +970,8 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 				array_free(nicks);
 				return NULL;
 			}
-			xfree(gname);
 
+			xfree(gname);
 		}
 	}
 
@@ -991,14 +991,30 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 	for (p = nicks, i = 0; *p; p++) {
 		uin_t uin;
+		list_t l;
 
 		if (!strcmp(*p, ""))
 		        continue;
-	
+
 		if (!(uin = get_uin(*p))) {
 			printq("user_not_found", *p);
-			continue;
+			break;
 		}
+
+		if (uin == config_uin)
+			break;
+
+		for (l = c.recipients; l; l = l->next) {
+			uin_t tmp = *((uin_t *)l->data);
+
+			if (tmp == uin) {
+				uin = 0;
+				break;
+			}
+		}
+
+		if (!uin)
+			break;
 
 		list_add(&(c.recipients), &uin, sizeof(uin));
 		i++;
@@ -1008,6 +1024,8 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 	if (i != count) {
 		printq("conferences_not_added", name);
+		if (c.recipients)
+			list_destroy(c.recipients, 1);
 		return NULL;
 	}
 

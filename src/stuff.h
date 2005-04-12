@@ -394,7 +394,7 @@ void changed_theme(const char *var);
 void changed_uin(const char *var);
 void changed_xxx_reason(const char *var);
 
-const char *compile_time();
+const char *compile_time(void);
 
 struct conference *conference_add(const char *string, const char *nicklist, int quiet);
 int conference_remove(const char *name, int quiet);
