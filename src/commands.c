@@ -1789,7 +1789,8 @@ COMMAND(cmd_list)
 		if (u->email)
 			printq("user_info_email", u->email);
 
-		printq("user_info_status", status);
+		if (u->uin != config_uin)
+			printq("user_info_status", status);
 
 		if (group_member(u, "__blocked"))
 			printq("user_info_block", ((u->first_name) ? u->first_name : u->display));
@@ -1824,7 +1825,7 @@ COMMAND(cmd_list)
 			printq("user_info_mobile", u->mobile);
 		if (strcmp(groups, ""))
 			printq("user_info_groups", groups);
-		if (GG_S_NA(u->status)) {
+		if (u->uin != config_uin && GG_S_NA(u->status)) {
 			char buf[100];
 			struct tm *last_seen_time;
 			if (u->last_seen) {
