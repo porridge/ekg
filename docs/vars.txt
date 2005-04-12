@@ -1,5 +1,5 @@
 // ma³y opis dostêpnych zmiennych
-// (c) copyright 2001-2004 wojtek kaniewski <wojtekka@irc.pl>
+// (c) copyright 2001-2005 wojtek kaniewski <wojtekka@irc.pl>
 //                         adam wysocki <gophi@ekg.apcoh.org>
 
 uin
@@ -288,6 +288,15 @@ dcc_ip
 	automatycznie. je¶li chcemy bezproblemowo ³±czyæ siê z klientami
 	z tej samej sieci LAN, dobrze jest podaæ adres IP sieci LAN zamiast
 	zewnêtrznego.
+
+dcc_backups
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	w³±cza lub wy³±cza zapisywanie nowych plików pod nowymi nazwami 
+	w przypadku, je¶li plik o podanej nazwie ju¿ istnieje. nowe nazwy 
+	s± tworzone przez dodanie do nazwy pliku sufiksu .1, .2 itp. a¿ 
+	do .1000.
 
 dcc_dir
 	typ: tekst

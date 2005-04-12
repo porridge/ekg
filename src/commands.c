@@ -3048,7 +3048,38 @@ COMMAND(cmd_dcc)
 		    	path = saprintf("%s/%s", config_dcc_dir, t->filename);
 		else
 		    	path = xstrdup(t->filename);
-		
+
+		if (config_dcc_backups) {
+			struct stat st;
+
+			if (!stat(path, &st)) {
+				int num;
+				char *newpath = NULL;	/* ¿eby nie by³o warninga */
+
+				for (num = 1; num < 1000; num++) {
+					newpath = saprintf("%s.%d", path, num);
+
+					if (stat(newpath, &st) == -1)
+						break;
+
+					xfree(newpath);
+				}
+
+				if (num == 1000) {
+					printq("dcc_get_cant_overwrite", path);
+					gg_free_dcc(t->dcc);
+					list_remove(&transfers, t, 1);
+					xfree(path);
+
+					return -1;
+				} else {
+					printq("dcc_get_backup_made", path, newpath);
+					xfree(path);
+					path = newpath;
+				}
+			}
+		}
+
 		if (params[0][0] == 'r') {
 			t->dcc->file_fd = open(path, O_WRONLY);
 			t->dcc->offset = lseek(t->dcc->file_fd, 0, SEEK_END);

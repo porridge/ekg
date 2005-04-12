@@ -141,6 +141,7 @@ int config_status = GG_STATUS_AVAIL;
 char *reg_password = NULL;
 char *reg_email = NULL;
 int config_dcc = 0;
+int config_dcc_backups = 0;
 char *config_dcc_ip = NULL;
 char *config_dcc_dir = NULL;
 int config_dcc_port = GG_DEFAULT_DCC_PORT;

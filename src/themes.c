@@ -1296,6 +1296,8 @@ void theme_init()
 	format_add("dcc_get_offer_resume", "%) Plik istnieje ju¿ na dysku, wiêc mo¿na wznowiæ pobieranie poleceniem %Tdcc resume #%4%n\n", 1);
 	format_add("dcc_get_getting", "%) Rozpoczêto pobieranie pliku %T%2%n od %1\n", 1);
 	format_add("dcc_get_cant_create", "%! Nie mo¿na utworzyæ pliku %T%1%n\n", 1);
+	format_add("dcc_get_backup_made", "%) Plik %T%1%n istnieje. Pobierany plik zostanie zapisany jako %T%2%n\n", 1);
+	format_add("dcc_get_cant_overwrite", "%! Plik %T%1%n i wszystkie jego kopie istniej±\n", 1);
 	format_add("dcc_not_found", "%! Nie znaleziono po³±czenia %T%1%n\n", 1);
 	format_add("dcc_invalid_ip", "%! Nieprawid³owy adres IP\n", 1);
 	format_add("dcc_user_not_avail", "%! %1 musi byæ aktywn%@1, by móc nawi±zaæ po³±czenie\n", 1);

@@ -155,6 +155,7 @@ void variable_init()
 	variable_add("dcc", "dc", VAR_BOOL, 1, &config_dcc, changed_dcc, NULL, NULL);
 	variable_add("dcc_ip", "di", VAR_STR, 1, &config_dcc_ip, changed_dcc, NULL, dd_dcc);
 	variable_add("dcc_dir", "dd", VAR_STR, 1, &config_dcc_dir, NULL, NULL, dd_dcc);
+	variable_add("dcc_backups", "db", VAR_BOOL, 1, &config_dcc_backups, NULL, NULL, dd_dcc);
 	variable_add("dcc_filter", "df", VAR_BOOL, 1, &config_dcc_filter, NULL, NULL, dd_dcc);
 	variable_add("dcc_limit", "dl", VAR_STR, 1, &config_dcc_limit, NULL, NULL, dd_dcc);
 	variable_add("dcc_port", "dP", VAR_INT, 1, &config_dcc_port, changed_dcc, NULL, dd_dcc);
