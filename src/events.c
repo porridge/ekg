@@ -2300,6 +2300,9 @@ void handle_image_request(struct gg_event *e)
 
 	gg_debug(GG_DEBUG_MISC, "// ekg: image_request: sender=%d, size=%d, crc32=%.8x\n", e->event.image_request.sender, e->event.image_request.size, e->event.image_request.crc32);
 
+	if (e->event.image_request.crc32 != GG_CRC32_INVISIBLE)
+		return;
+
 	u = userlist_find(e->event.image_request.sender, NULL);
 
 	if (u && group_member(u, "spied")) {
@@ -2320,7 +2323,8 @@ void handle_image_request(struct gg_event *e)
 			}
 		}
 
-	} else if (e->event.image_request.crc32 == GG_CRC32_INVISIBLE) {
+	} else {
+
 		if (u)
 			print("user_is_connected", format_user(e->event.image_request.sender), (u->first_name) ? u->first_name : u->display); 
 		else
