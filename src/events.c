@@ -2281,23 +2281,11 @@ void handle_change50(struct gg_event *e)
  */
 void handle_image_request(struct gg_event *e)
 {
-	gg_debug(GG_DEBUG_MISC, "// ekg: image_request: sender=%d, size=%d, crc32=%.8x\n", e->event.image_request.sender, e->event.image_request.size, e->event.image_request.crc32);
-}
-
-/*
- * handle_image_reply()
- *
- * obs³uguje odpowied¼ obrazków.
- * 
- *  - e - opis zdarzenia
- */
-void handle_image_reply(struct gg_event *e)
-{
 	struct userlist *u;
 
-	gg_debug(GG_DEBUG_MISC, "// ekg: image_reply: sender=%d, filename=\"%s\", size=%d, crc32=%.8x\n", e->event.image_reply.sender, e->event.image_reply.filename, e->event.image_reply.size, e->event.image_reply.crc32);
+	gg_debug(GG_DEBUG_MISC, "// ekg: image_request: sender=%d, size=%d, crc32=%.8x\n", e->event.image_request.sender, e->event.image_request.size, e->event.image_request.crc32);
 
-	u = userlist_find(e->event.image_reply.sender, NULL);
+	u = userlist_find(e->event.image_request.sender, NULL);
 
 	if (u && group_member(u, "spied")) {
 		list_t l;
@@ -2319,8 +2307,20 @@ void handle_image_reply(struct gg_event *e)
 
 	} else if (e->event.image_request.crc32 == GG_CRC32_INVISIBLE) {
 		if (u)
-			print("user_is_connected", format_user(e->event.image_reply.sender), (u->first_name) ? u->first_name : u->display); 
+			print("user_is_connected", format_user(e->event.image_request.sender), (u->first_name) ? u->first_name : u->display); 
 		else
-			print("user_is_connected", format_user(e->event.image_reply.sender), itoa(e->event.image_reply.sender)); 
+			print("user_is_connected", format_user(e->event.image_request.sender), itoa(e->event.image_request.sender)); 
 	}
+}
+
+/*
+ * handle_image_reply()
+ *
+ * obs³uguje odpowied¼ obrazków.
+ * 
+ *  - e - opis zdarzenia
+ */
+void handle_image_reply(struct gg_event *e)
+{
+	gg_debug(GG_DEBUG_MISC, "// ekg: image_reply: sender=%d, filename=\"%s\", size=%d, crc32=%.8x\n", e->event.image_reply.sender, e->event.image_reply.filename, e->event.image_reply.size, e->event.image_reply.crc32);
 }

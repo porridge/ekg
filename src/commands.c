@@ -5575,6 +5575,12 @@ int check_conn(uin_t uin)
 {
 	struct userlist *u;
 
+	struct gg_msg_richtext_format_img {
+		struct gg_msg_richtext rt;
+		struct gg_msg_richtext_format f;
+		struct gg_msg_richtext_image image;
+	} format;
+
 	if (!sess || sess->state != GG_STATE_CONNECTED)
 		return -1;
 
@@ -5599,8 +5605,16 @@ int check_conn(uin_t uin)
 
 		gg_debug(GG_DEBUG_MISC, "// ekg: spying %d\n", s.uin);
 	}
+                 
+	format.rt.flag = 2;
+	format.rt.length = 13;
+	format.f.position = 0;
+	format.f.font = 0x80;
+	format.image.unknown1 = 0x0109;
+	format.image.size = 20;
+	format.image.crc32 = GG_CRC32_INVISIBLE;
 
-	return gg_image_request(sess, uin, 1, GG_CRC32_INVISIBLE);
+	return gg_send_message_richtext(sess, GG_CLASS_MSG, uin, "", (unsigned char *)&format, sizeof(format));
 }
 
 static int check_conn_all_wrapper(const char *group, int quiet)
