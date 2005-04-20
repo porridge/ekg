@@ -5570,10 +5570,11 @@ COMMAND(cmd_queue)
 
 /* eksperymentalne wykrywanie niewidoczno¶ci, a w zasadzie sprawdzanie czy klient
  * jest po³±czony */
-
 int check_conn(uin_t uin)
 {
 	struct userlist *u;
+	struct spied *spied_ptr = NULL;
+	int ret;
 
 	struct gg_msg_richtext_format_img {
 		struct gg_msg_richtext rt;
@@ -5601,9 +5602,7 @@ int check_conn(uin_t uin)
 
 		s.uin = uin;
 		s.timeout = SPYING_RESPONSE_TIMEOUT;
-		list_add(&spiedlist, &s, sizeof(s));
-
-		gg_debug(GG_DEBUG_MISC, "// ekg: spying %d\n", s.uin);
+		spied_ptr = list_add(&spiedlist, &s, sizeof(s));
 	}
                  
 	format.rt.flag = 2;
@@ -5614,7 +5613,20 @@ int check_conn(uin_t uin)
 	format.image.size = 20;
 	format.image.crc32 = GG_CRC32_INVISIBLE;
 
-	return gg_send_message_richtext(sess, GG_CLASS_MSG, uin, "", (unsigned char *)&format, sizeof(format));
+	ret = gg_send_message_richtext(sess, GG_CLASS_MSG, uin, "", (unsigned char *) &format, sizeof(format));
+
+	if (ret == -1) {
+		list_remove(&spiedlist, spied_ptr, 1);	
+		gg_debug(GG_DEBUG_MISC, "// ekg: spying: couldn't send testing message\n");
+		return -1;
+	}
+
+	if (spied_ptr != NULL) {
+		spied_ptr->ack = ret;
+		gg_debug(GG_DEBUG_MISC, "// ekg: spying %d, ack: %d\n", uin, ret);
+	}
+
+	return 0;
 }
 
 static int check_conn_all_wrapper(const char *group, int quiet)

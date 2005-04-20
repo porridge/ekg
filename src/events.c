@@ -713,7 +713,22 @@ void handle_ack(struct gg_event *e)
 		event_check((queued) ? EVENT_QUEUED : EVENT_DELIVERED, e->event.ack.recipient, NULL);
 
 	if (u && !queued && GG_S_NA(u->status) && !(ignored_check(u->uin) & IGNORE_STATUS)) {
-		print_window(target, 0, "ack_filtered", format_user(e->event.ack.recipient));
+		list_t l;
+		int print = 1;
+
+		for (l = spiedlist; l; l = l->next) {
+			struct spied *s = l->data;
+
+			if (s->ack == e->event.ack.seq) {
+				list_remove(&spiedlist, s, 1);
+				print = 0;
+				break;
+			}
+		}
+	
+		if (print)
+			print_window(target, 0, "ack_filtered", format_user(e->event.ack.recipient));
+
 		return;
 	}
 
