@@ -149,7 +149,6 @@ struct timer {
 struct spied {
 	uin_t uin;
 	int timeout;
-	int ack;
 };
 
 struct sms_away {
