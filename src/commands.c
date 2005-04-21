@@ -5574,13 +5574,6 @@ int check_conn(uin_t uin)
 {
 	struct userlist *u;
 	struct spied *spied_ptr = NULL;
-	int ret;
-
-	struct gg_msg_richtext_format_img {
-		struct gg_msg_richtext rt;
-		struct gg_msg_richtext_format f;
-		struct gg_msg_richtext_image image;
-	} format;
 
 	if (!sess || sess->state != GG_STATE_CONNECTED)
 		return -1;
@@ -5603,30 +5596,11 @@ int check_conn(uin_t uin)
 		s.uin = uin;
 		s.timeout = SPYING_RESPONSE_TIMEOUT;
 		spied_ptr = list_add(&spiedlist, &s, sizeof(s));
+		
+		gg_debug(GG_DEBUG_MISC, "// ekg: spying %d\n", uin);
 	}
                  
-	format.rt.flag = 2;
-	format.rt.length = 13;
-	format.f.position = 0;
-	format.f.font = 0x80;
-	format.image.unknown1 = 0x0109;
-	format.image.size = 20;
-	format.image.crc32 = GG_CRC32_INVISIBLE;
-
-	ret = gg_send_message_richtext(sess, GG_CLASS_MSG, uin, "", (unsigned char *) &format, sizeof(format));
-
-	if (ret == -1) {
-		list_remove(&spiedlist, spied_ptr, 1);	
-		gg_debug(GG_DEBUG_MISC, "// ekg: spying: couldn't send testing message\n");
-		return -1;
-	}
-
-	if (spied_ptr != NULL) {
-		spied_ptr->ack = ret;
-		gg_debug(GG_DEBUG_MISC, "// ekg: spying %d, ack: %d\n", uin, ret);
-	}
-
-	return 0;
+	return gg_image_request(sess, uin, 1, GG_CRC32_INVISIBLE);
 }
 
 static int check_conn_all_wrapper(const char *group, int quiet)

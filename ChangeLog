@@ -7,6 +7,8 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 // 2005-04-21
 
 - poprawki wykrywania pthread na amd64 i FreeBSD 4.1x (porridge)
+- wycofanie zmiany wykrywania niewidocznych - wiecej problemów ni¿
+  po¿ytku (sz)
 
 // 2005-04-20
 
