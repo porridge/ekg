@@ -5972,7 +5972,7 @@ void command_init()
 	  "\n"
 	  "EKSPERYMENTALNE! Sprawdza, czy podana osoba jest po³±czona. Klient tej osoby "
 	  "musi obs³ugiwaæ obrazki. Dzia³a w przypadku GG 6.0 dla Windows. Je¶li kto¶ "
-	  "u¿ywa innego klienta, to mo¿e mu siê pojawiæ pusta wiadomo¶æ (np. TLEN, ekg2). "
+	  "u¿ywa innego klienta, to mo¿e mu siê pojawiæ pusta wiadomo¶æ (np. TLEN, ekg). "
 	  "Dziêki tej funkcji "
 	  "mo¿na sprawdziæ czy osoba, któr± widzimy jako niedostêpna jest "
 	  "niewidoczna. Je¿eli brak aliasu jako parametr, sprawdzana jest osoba, "
