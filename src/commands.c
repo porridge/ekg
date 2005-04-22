@@ -5573,7 +5573,6 @@ COMMAND(cmd_queue)
 int check_conn(uin_t uin)
 {
 	struct userlist *u;
-	struct spied *spied_ptr = NULL;
 
 	if (!sess || sess->state != GG_STATE_CONNECTED)
 		return -1;
@@ -5595,7 +5594,7 @@ int check_conn(uin_t uin)
 
 		s.uin = uin;
 		s.timeout = SPYING_RESPONSE_TIMEOUT;
-		spied_ptr = list_add(&spiedlist, &s, sizeof(s));
+		list_add(&spiedlist, &s, sizeof(s));
 		
 		gg_debug(GG_DEBUG_MISC, "// ekg: spying %d\n", uin);
 	}
