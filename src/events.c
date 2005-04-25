@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2004 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Piotr Wysocki <wysek@linux.bydg.org>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *                          Piotr Domagalski <szalik@szalik.net>
@@ -989,7 +989,7 @@ void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_
 
 #undef __SAME_GG_S
 
-		if (ignore_status || ignore_notify)
+		if ((ignore_status || ignore_notify) && !config_log_ignored)
 			break;
 
 		/* zaloguj */
@@ -997,6 +997,9 @@ void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_
 			put_log(uin, "status,%ld,%s,%s:%d,%s,%s\n", uin, ((u->display) ? u->display : ""), inet_ntoa(u->ip), u->port, log_timestamp(time(NULL)), s->log);
 		if (config_log_status && GG_S_D(s->status) && descr)
 		    	put_log(uin, "status,%ld,%s,%s:%d,%s,%s,%s\n", uin, ((u->display) ? u->display : ""), inet_ntoa(u->ip), u->port, log_timestamp(time(NULL)), s->log, descr);
+
+		if (ignore_status || ignore_notify)
+			break;
 
 		/* jak dostêpny lub zajêty i mamy go na li¶cie, dopiszmy do taba
 		 * jak niedostêpny, usuñmy. nie dotyczy osób spoza listy. */

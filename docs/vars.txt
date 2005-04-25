@@ -559,7 +559,7 @@ log_ignored
 	typ: liczba
 	domy¶lna warto¶æ: 0
 
-	okre¶la, czy logujemy ignorowane wiadomo¶ci.
+	okre¶la, czy logujemy ignorowane wiadomo¶ci oraz zmiany stanu.
 
 log_status
 	typ: liczba
