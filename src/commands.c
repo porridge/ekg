@@ -6206,7 +6206,7 @@ void command_init()
 	  "li¶cie kontaktów, %T%%2%n bêdzie zast±pione jego pseudonimem. Zamiast %T%%3%n i "
 	  "%T%%4%n wpisana bêdzie tre¶æ wiadomo¶ci, opis u¿ytkownika, ca³kowita liczba "
 	  "nowych wiadomo¶ci e-mail, nazwa pliku, konferencji lub adres serwera - w zale¿no¶ci od zdarzenia. "
-	  "Format %T%%4%n ró¿ni siê od %T%%3%n tym, ¿e wszystkie niebiezpieczne znaki, "
+	  "Format %T%%4%n ró¿ni siê od %T%%3%n tym, ¿e wszystkie niebezpieczne znaki, "
 	  "które mog³yby zostaæ zinterpretowane przez shell, zostan± poprzedzone backslashem. "
 	  "U¿ywanie %T%%3%n w przypadku komendy ,,exec'' jest %Tniebezpieczne%n i, je¶li naprawdê "
 	  "musisz wykorzystaæ tre¶æ wiadomo¶ci lub opis, u¿yj %T\"%%4\"%n (w cudzys³owach).");
