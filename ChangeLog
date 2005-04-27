@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-04-28
+
+- wy³±czenie sprawdzania b³êdów w GCC dot. pthreads przy --disable-shared i
+  reorganzacja tego¿ sprawdzania w acx_pthread.m4 (porridge)
+
 // 2005-04-25
 
 - log_ignored uwzglêdnia tak¿e zmiany stanu (kosma/g)
