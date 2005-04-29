@@ -913,7 +913,7 @@ const char *compile_time(void)
  */
 struct conference *conference_add(const char *name, const char *nicklist, int quiet)
 {
-	struct conference c;
+	struct conference c, *ret;
 	char **nicks, **p;
 	list_t l;
 	int i, count;
@@ -1035,9 +1035,11 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 	add_send_nick(name);
 
+	ret = list_add(&conferences, &c, sizeof(c));
+
 	event_check(EVENT_CONFERENCE, 0, name);
 
-	return list_add(&conferences, &c, sizeof(c));
+	return ret;
 }
 
 /*
