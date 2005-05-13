@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2004 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@o2.pl>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
@@ -1039,7 +1039,22 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 	event_check(EVENT_CONFERENCE, 0, name);
 
-	return ret;
+	/* je¶li na li¶cie zdarzeñ jest usuniêcie konferencji, to ret ju¿ nie 
+	 * wskazuje na nic sensownego. nie tworzymy konferencji. mo¿e trochê 
+	 * ma³o eleganckie rozwi±zanie, ale nie przychodzi mi do g³owy nic 
+	 * lepszego. -- gophi */
+
+	{
+		list_t cur = conferences;
+
+		while (cur) {
+			if ((void *) ret == cur->data)
+				return ret;
+			cur = cur->next;
+		}
+	}
+
+	return (struct conference *) NULL;
 }
 
 /*

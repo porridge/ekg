@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-05-13
+
+- poprawienie kodu konferencji (rodion/g)
+
 // 2005-05-03
 
 - drobna poprawka indentacji w ./configure (gophi)
