@@ -86,5 +86,11 @@ A: Nale¿y wydaæ polecenie ,,/token'', które pobierze z serwera token
    nale¿y podaæ jako ostatni parametr komend ,,/register'', ,,/unregister'',
    ,,/passwd'' lub ,,/remind''.
 
+Q: Co oznacza komunikat "Wiadomo¶æ do <kto¶> najprawdopodobniej nie zosta³a
+   dostarczona"?
+A: Komunikat taki ekg wy¶wietla, gdy dana osoba jest niedostêpna, a serwer
+   twierdzi, ¿e dorêczy³ wiadomo¶æ. Najczê¶ciej sytuacja taka ma miejsce, gdy
+   wiadomo¶æ zosta³a odrzucona przez filtry serwera (np. zawiera adres strony
+   WWW).
 
 $Id$
