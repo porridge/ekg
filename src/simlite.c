@@ -384,8 +384,8 @@ char *sim_message_decrypt(const unsigned char *message, uint32_t uin)
 	unsigned char bf_key_rsa[128];	/* symetryczny szyfrowany RSA */
 	BIO *mbio = NULL, *cbio = NULL, *bbio = NULL;
 	RSA *private = NULL;
-	unsigned char *buf = NULL, *res = NULL, *data;
-	int len;
+	unsigned char *buf = NULL, *res = NULL, *data, *all_data = NULL;
+	int len, all_data_length = 0;
 
 	/* je¶li wiadomo¶æ jest krótsza ni¿ najkrótsza zaszyfrowana,
 	 * nie ma sensu siê bawiæ w próby odszyfrowania. */
@@ -424,6 +424,11 @@ char *sim_message_decrypt(const unsigned char *message, uint32_t uin)
 		goto cleanup;
 	}
 
+	if (!(all_data = malloc(len))) {
+		sim_errno = SIM_ERROR_MEMORY;
+		goto cleanup;
+	}
+
 	if (len < sizeof(head)) {
 		sim_errno = SIM_ERROR_INVALID;
 		goto cleanup;
@@ -434,10 +439,27 @@ char *sim_message_decrypt(const unsigned char *message, uint32_t uin)
 		goto cleanup;
 	}
 
+	all_data_length = len;
+	memcpy(all_data, buf, len);
+	while ((len = BIO_read(bbio, buf, len)) > 0) {
+		unsigned char *tmp = realloc(all_data, all_data_length + len);
+		if (tmp) {
+			all_data = tmp;
+			memcpy(all_data + all_data_length, buf, len);
+			all_data_length += len;
+		}
+		else {
+			sim_errno = SIM_ERROR_MEMORY;
+			goto cleanup;
+		}
+	}
+
 	BIO_free(bbio);
 	bbio = NULL;
 	BIO_free(mbio);
 	mbio = NULL;
+	free(buf);
+	buf = NULL;
 
 	/* odszyfruj blowfisha */
 	mbio = BIO_new(BIO_s_mem());
@@ -445,13 +467,18 @@ char *sim_message_decrypt(const unsigned char *message, uint32_t uin)
 	BIO_set_cipher(cbio, EVP_bf_cbc(), bf_key, ivec, 0);
 	BIO_push(cbio, mbio);
 
-	BIO_write(cbio, buf, len);
+	BIO_write(cbio, all_data, all_data_length);
 	BIO_flush(cbio);
 
-	free(buf);
-	buf = NULL;
+	free(all_data);
+	all_data = NULL;
 
-	len = BIO_get_mem_data(mbio, (unsigned char*) &data);
+	len = BIO_get_mem_data(mbio, &data);
+
+	if (len < sizeof(head)) {
+		sim_errno = SIM_ERROR_INVALID;
+		goto cleanup;
+	}
 
 	memcpy(&head, data, sizeof(head));
 
@@ -481,6 +508,8 @@ cleanup:
 		RSA_free(private);
 	if (buf)
 		free(buf);
+	if (all_data)
+		free(all_data);
 
 	return res;
 }
