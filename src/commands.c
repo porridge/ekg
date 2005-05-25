@@ -6223,7 +6223,7 @@ void command_init()
 	( "play", "f", cmd_play, 0,
 	  " <plik>", "odtwarza plik d¼wiêkowy",
 	  "\n"
-	  "Polecenie wymaga zdefiniowania zmiennej %Tspeech_app%n");
+	  "Polecenie wymaga zdefiniowania zmiennej %Tsound_app%n");
 
 	command_add
 	( "private", "", cmd_away, 0,
