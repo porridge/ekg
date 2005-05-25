@@ -6221,7 +6221,9 @@ void command_init()
 
 	command_add
 	( "play", "f", cmd_play, 0,
-	  " <plik>", "odtwarza plik d¼wiêkowy", "");
+	  " <plik>", "odtwarza plik d¼wiêkowy",
+	  "\n"
+	  "Polecenie wymaga zdefiniowania zmiennej %Tspeech_app%n");
 
 	command_add
 	( "private", "", cmd_away, 0,
