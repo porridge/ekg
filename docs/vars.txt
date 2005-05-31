@@ -861,13 +861,16 @@ wap_enabled
 	WAP.
 
 windows_save
-	typ: bool
+	typ: liczba
 	domy¶lna warto¶æ: 0
 
-	okre¶la, czy ustawienie okienek ma byæ zachowywane przy kolejnym
-	uruchomieniu programu.
-
-
+	okre¶la, czy ustawienie okienek ma byæ zachowywane. je¶li wynosi 0,
+	okienka nie s± zachowywane. dla warto¶ci 1 s± zachowywane przy 
+	wychodzeniu z programu. ustawienie 2 powoduje zapis tylko przy 
+	u¿yciu polecenia /save warto¶æ 3 natomiast sprawia, ¿e ustawienie 
+	okienek jest zapisywane zarówno przy wychodzeniu z programu, jak 
+	przy /save. warto wspomnieæ, ¿e polecenie /reload nie przywraca 
+	stanu okienek. zmienna ma znaczenie tylko w interfejsie ncurses.
 
 status
 	typ: liczba, zmienna wewnêtrzna, ukryta

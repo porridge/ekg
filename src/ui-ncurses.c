@@ -1,10 +1,11 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2002-2003 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2002-2005 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Wojtek Bojdo³ <wojboj@htcon.pl>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *			    Piotr Kupisiewicz <deli@rzepaknet.us>
+ *                          Adam Wysocki <gophi@ekg.apcoh.org>
  *
  *  Aspell support added by Piotr 'Deletek' Kupisiewicz <deli@rzepaknet.us>
  *
@@ -2067,6 +2068,53 @@ static void sigwinch_handler()
 }
 #endif
 
+void save_windows()
+{
+	string_t s = string_init(NULL);
+	int maxid = 0, i;
+	list_t l;
+		
+	xfree(config_windows_layout);
+
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data;
+
+		if (!w->floating && w->id > maxid)
+			maxid = w->id;
+	}
+
+	for (i = 1; i <= maxid; i++) {
+		const char *target = "-";
+			
+		for (l = windows; l; l = l->next) {
+			struct window *w = l->data;
+
+			if (w->id == i) {
+				target = w->target;
+				break;
+			}
+		}
+
+		if (target)
+			string_append(s, target);
+
+		if (i < maxid)
+			string_append_c(s, '|');
+	}
+
+	for (l = windows; l; l = l->next) {
+		struct window *w = l->data;
+
+		if (w->floating && (!w->target || strncmp(w->target, "__", 2))) {
+			char *tmp = saprintf("|*%d,%d,%d,%d,%d,%s", w->left, w->top, w->width, w->height, w->frames, w->target);
+			string_append(s, tmp);
+			xfree(tmp);
+		}
+	}
+
+	config_windows_layout = string_free(s, 0);
+}
+
 /*
  * ui_ncurses_beep()
  *
@@ -2269,50 +2317,8 @@ static void ui_ncurses_deinit()
 
 	done = 1;
 
-	if (config_windows_save) {
-		string_t s = string_init(NULL);
-		int maxid = 0, i;
-		
-		xfree(config_windows_layout);
-
-		for (l = windows; l; l = l->next) {
-			struct window *w = l->data;
-
-			if (!w->floating && w->id > maxid)
-				maxid = w->id;
-		}
-
-		for (i = 1; i <= maxid; i++) {
-			const char *target = "-";
-			
-			for (l = windows; l; l = l->next) {
-				struct window *w = l->data;
-
-				if (w->id == i) {
-					target = w->target;
-					break;
-				}
-			}
-
-			if (target)
-				string_append(s, target);
-
-			if (i < maxid)
-				string_append_c(s, '|');
-		}
-
-		for (l = windows; l; l = l->next) {
-			struct window *w = l->data;
-
-			if (w->floating && (!w->target || strncmp(w->target, "__", 2))) {
-				char *tmp = saprintf("|*%d,%d,%d,%d,%d,%s", w->left, w->top, w->width, w->height, w->frames, w->target);
-				string_append(s, tmp);
-				xfree(tmp);
-			}
-		}
-
-		config_windows_layout = string_free(s, 0);
-	}
+	if (config_windows_save & 1)
+		save_windows();
 
 	for (l = windows; l; ) {
 		struct window *w = l->data;

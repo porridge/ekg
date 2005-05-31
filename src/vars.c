@@ -245,7 +245,7 @@ void variable_init()
 #endif
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
-		variable_add("windows_save", "ws", VAR_BOOL, 1, &config_windows_save, NULL, NULL, NULL);
+		variable_add("windows_save", "ws", VAR_MAP, 1, &config_windows_save, NULL, variable_map(3, 0, 0, "no", 1, 0, "quit", 2, 0, "save"), NULL);
 		variable_add("windows_layout", "wl", VAR_STR, 2, &config_windows_layout, NULL, NULL, NULL);
 	}
 #endif

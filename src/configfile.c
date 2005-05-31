@@ -1,11 +1,12 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@o2.pl>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *                          Piotr Domagalski <szalik@szalik.net>
+ *                          Adam Wysocki <gophi@ekg.apcoh.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -342,6 +343,11 @@ void config_write_main(FILE *f, int base64)
 
 	if (!f)
 		return;
+
+#ifdef WITH_UI_NCURSES
+	if ((config_windows_save & 2) && ui_init == ui_ncurses_init)
+		save_windows();
+#endif
 
 	for (l = variables; l; l = l->next)
 		config_write_variable(f, l->data, base64);

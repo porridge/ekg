@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-05-31
+
+- dodanie do windows_save zapisu stanu okien przy /save (Kosma/g)
+
 // 2005-05-25
 
 - drobna poprawka /help play (gophi)
