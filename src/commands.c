@@ -4282,6 +4282,13 @@ int command_exec(const char *target, const char *xline, int quiet)
 		}
 	}
 
+	/* sprawdzenie, czy nie "/ /foobar" */
+	if (target && strlen(xline) >= 3 && !strncmp(xline, "/ /", 3)) {
+		const char *params[] = {target, xline + 2, NULL};
+		cmd_msg("chat", params, NULL, quiet);
+		return 0;
+	}
+
 	send_nicks_index = 0;
 
 	line = line_save = xstrdup(xline);
