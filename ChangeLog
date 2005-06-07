@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-06-07
+
+- poprawienie ustawiania scie¿ki wyszukiwania modu³ów pythona na systemach
+  zgodnych z SUSv2 (embe/porridge)
+
 // 2005-06-05
 
 - umo¿liwienie wpisywania wiadomo¶ci zaczynaj±cych siê od slasha 
