@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-06-19
+
+- libgadu: poprawka wyrównania dostêpu do pamiêci, która likwiduje SIGBUS
+  na SPARCach (embe/w)
+
 // 2005-06-07
 
 - poprawienie ustawiania scie¿ki wyszukiwania modu³ów pythona na systemach
