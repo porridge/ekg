@@ -461,8 +461,8 @@ era_omnix
 	typ: bool
 	domy¶lna warto¶æ: 0
 
-	pozwala zalogowaæ siê udaj±c klienta Era Omnix, dziêki czemu oryginalny
-	klient widzi nas ,,na niebiesko''.
+	pozwala zalogowaæ siê udaj±c klienta Era Omnix. Oryginalny klient
+	pokazuje wtedy nas status z niebieskim ,,s³oneczkiem''.
 
 header_size
 	typ: liczba
