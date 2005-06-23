@@ -6079,6 +6079,7 @@ void command_init()
 	  "  - descr - ignoruje tylko opisy\n"
 	  "  - notify - nie wy¶wietla zmian stanu\n"
 	  "  - msg - ignoruje wiadomo¶ci\n"
+	  "  - smsaway - nie przesy³a wiadomo¶ci podczas nieobecno¶ci\n"
 	  "  - dcc - ignoruje po³±czenia DCC\n"
 	  "  - events - ignoruje zdarzenia zwi±zane z u¿ytkownikiem\n"
 	  "  - * - wszystkie poziomy\n"

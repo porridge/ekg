@@ -4,6 +4,15 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-06-23
+
+- dodanie zmiennej ,,era_omnix'' (*/sz)
+- libgadu: mo¿liwo¶æ udawania klienta era omnix (*/sz)
+
+// 2005-06-20
+
+- poziom ignorowania ,,smsaway'' (sz)
+
 // 2005-06-19
 
 - libgadu: poprawka wyrównania dostêpu do pamiêci, która likwiduje SIGBUS

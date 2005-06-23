@@ -113,6 +113,7 @@ int config_beep_notify = 1;
 int config_beep_mail = 1;
 int config_display_pl_chars = 1;
 int config_events_delay = 3;
+int config_era_omnix = 0;
 char *config_sound_msg_file = NULL;
 char *config_sound_chat_file = NULL;
 char *config_sound_sysmsg_file = NULL;
@@ -1350,6 +1351,7 @@ void ekg_connect()
 	p.has_audio = 1;
 #endif
 	p.protocol_version = config_protocol;
+	p.era_omnix = config_era_omnix;
 	p.last_sysmsg = config_last_sysmsg;
 
 	if (config_server) {

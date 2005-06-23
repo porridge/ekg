@@ -633,29 +633,31 @@ void handle_msg(struct gg_event *e)
 		event_check((chat) ? EVENT_CHAT : EVENT_MSG, e->event.msg.sender, e->event.msg.message);
 			
 	if (config_sms_away && (GG_S_B(config_status) || (GG_S_I(config_status) && config_sms_away & 4)) && config_sms_app && config_sms_number) {
-		char *foo, sender[100];
+		if (!(ignored_check(e->event.msg.sender) & IGNORE_SMSAWAY)) {
+			char *foo, sender[100];
 
-		sms_away_add(e->event.msg.sender);
+			sms_away_add(e->event.msg.sender);
 
-		if (sms_away_check(e->event.msg.sender)) {
-			if (u && u->display)
-				snprintf(sender, sizeof(sender), "%s/%u", u->display, u->uin);
-			else
-				snprintf(sender, sizeof(sender), "%u", e->event.msg.sender);
+			if (sms_away_check(e->event.msg.sender)) {
+				if (u && u->display)
+					snprintf(sender, sizeof(sender), "%s/%u", u->display, u->uin);
+				else
+					snprintf(sender, sizeof(sender), "%u", e->event.msg.sender);
 
-			if (config_sms_max_length && strlen(e->event.msg.message) > config_sms_max_length)
-				e->event.msg.message[config_sms_max_length] = 0;
+				if (config_sms_max_length && strlen(e->event.msg.message) > config_sms_max_length)
+					e->event.msg.message[config_sms_max_length] = 0;
 
-			if (e->event.msg.recipients_count)
-				foo = format_string(format_find("sms_conf"), sender, e->event.msg.message);
-			else
-				foo = format_string(format_find((chat) ? "sms_chat" : "sms_msg"), sender, e->event.msg.message);
+				if (e->event.msg.recipients_count)
+					foo = format_string(format_find("sms_conf"), sender, e->event.msg.message);
+				else
+					foo = format_string(format_find((chat) ? "sms_chat" : "sms_msg"), sender, e->event.msg.message);
 
-			/* niech nie wysy³a smsów, je¶li brakuje formatów */
-			if (strcmp(foo, ""))
-				send_sms(config_sms_number, foo, 0);
-	
-			xfree(foo);
+				/* niech nie wysy³a smsów, je¶li brakuje formatów */
+				if (strcmp(foo, ""))
+					send_sms(config_sms_number, foo, 0);
+		
+				xfree(foo);
+			}
 		}
 	}
 

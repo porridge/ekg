@@ -266,6 +266,7 @@ int config_emoticons;
 int config_encryption;
 int config_enter_scrolls;
 int config_events_delay;
+int config_era_omnix;
 char *config_interface;
 int config_header_size;
 int config_ignore_unknown_sender;
