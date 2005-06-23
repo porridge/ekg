@@ -462,7 +462,7 @@ era_omnix
 	domy¶lna warto¶æ: 0
 
 	pozwala zalogowaæ siê udaj±c klienta Era Omnix. Oryginalny klient
-	pokazuje wtedy nas status z niebieskim ,,s³oneczkiem''.
+	pokazuje wtedy nasz status z niebieskim ,,s³oneczkiem''.
 
 header_size
 	typ: liczba
