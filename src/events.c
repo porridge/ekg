@@ -2307,6 +2307,7 @@ void handle_image_request(struct gg_event *e)
 void handle_image_reply(struct gg_event *e)
 {
 	struct userlist *u;
+	list_t l;
 
 	gg_debug(GG_DEBUG_MISC, "// ekg: image_reply: sender=%d, filename=\"%s\", size=%d, crc32=%.8x\n", e->event.image_reply.sender, e->event.image_reply.filename, e->event.image_reply.size, e->event.image_reply.crc32);
 
@@ -2315,22 +2316,39 @@ void handle_image_reply(struct gg_event *e)
 
 	u = userlist_find(e->event.image_reply.sender, NULL);
 
+	if (u) {
+		for (l = spiedlist; l; l = l->next) {
+			struct spied *s = l->data;
+
+			if (s->uin == u->uin) {
+				int sec;
+				int msec;
+				struct timeval now;
+
+				gettimeofday(&now, NULL);
+
+				if (now.tv_usec < s->request_sent.tv_usec) {
+					sec = now.tv_sec - s->request_sent.tv_sec - 1;
+					msec = (now.tv_usec - s->request_sent.tv_usec + 1000000) / 1000;
+				} else {
+					sec = now.tv_sec - s->request_sent.tv_sec;
+					msec = (now.tv_usec - s->request_sent.tv_usec) / 1000;
+				}
+
+				gg_debug(GG_DEBUG_MISC, "// ekg: image_reply: round-trip-time %d.%3d\n", sec, msec);
+
+				list_remove(&spiedlist, s, 1);
+				break;
+			}
+		}
+	}
+
 	if (u && group_member(u, "spied")) {
-		list_t l;
 
 		if (GG_S_NA(u->status)) {
 			int status = (GG_S_D(u->status)) ? GG_STATUS_INVISIBLE_DESCR : GG_STATUS_INVISIBLE;
 			iso_to_cp(u->descr);
 			handle_common(u->uin, status, u->descr, time(NULL), u->ip.s_addr, u->port, u->protocol, u->image_size);
-		}
-
-		for (l = spiedlist; l; l = l->next) {
-			struct spied *s = l->data;
-
-			if (s->uin == u->uin) {
-				list_remove(&spiedlist, s, 1);
-				break;
-			}
 		}
 
 	} else {

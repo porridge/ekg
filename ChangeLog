@@ -4,6 +4,12 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-06-24
+
+- uzupe³nienie opisu protoko³u po³±czenia z bramki Era Omnix,
+  uzupe³nienie numerków wersji 6.0 i 6.1 oryginalnego klienta (sz)
+- /list pokazuje, kto ³±czy siê przez bramkê Era Omnix (sz)
+
 // 2005-06-23
 
 - dodanie zmiennej ,,era_omnix'' (*/sz)

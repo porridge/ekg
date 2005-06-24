@@ -757,6 +757,17 @@ void changed_dcc(const char *var)
 }
 
 /*
+ * changed_era_omnix() 
+ *
+ * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,era_omnix''.
+ */
+void changed_era_omnix(const char *var)
+{
+	if (sess && sess->state == GG_STATE_CONNECTED)
+		print("dcc_must_reconnect");
+}
+
+/*
  * changed_local_ip()
  *
  * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,local_ip''.

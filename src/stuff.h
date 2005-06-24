@@ -149,6 +149,7 @@ struct timer {
 struct spied {
 	uin_t uin;
 	int timeout;
+	struct timeval request_sent;
 };
 
 struct sms_away {
@@ -388,6 +389,7 @@ void changed_aspell(const char *var);
 #endif
 void changed_backlog_size(const char *var);
 void changed_dcc(const char *var);
+void changed_era_omnix(const char *var);
 void changed_local_ip(const char *var);
 void changed_mesg(const char *var);
 void changed_proxy(const char *var);

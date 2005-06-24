@@ -1804,6 +1804,8 @@ COMMAND(cmd_list)
 			printq("user_info_ip", ip_str);
 		if ((u->protocol & GG_HAS_AUDIO_MASK))
 			printq("user_info_voip");
+		if ((u->protocol & GG_ERA_OMNIX_MASK))
+			printq("user_info_era_omnix");
 
 		if ((u->protocol & 0x00ffffff)) {
 			int v = u->protocol & 0x00ffffff;
@@ -5584,7 +5586,7 @@ int check_conn(uin_t uin)
 	if (!sess || sess->state != GG_STATE_CONNECTED)
 		return -1;
 
-	if ((u = userlist_find(uin, NULL)) && group_member(u, "spied")) {
+	if ((u = userlist_find(uin, NULL))) {
 		list_t l;
 		struct spied s;
 
@@ -5601,6 +5603,7 @@ int check_conn(uin_t uin)
 
 		s.uin = uin;
 		s.timeout = SPYING_RESPONSE_TIMEOUT;
+		gettimeofday(&(s.request_sent), NULL);
 		list_add(&spiedlist, &s, sizeof(s));
 		
 		gg_debug(GG_DEBUG_MISC, "// ekg: spying %d\n", uin);
