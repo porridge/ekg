@@ -28,7 +28,6 @@ change_timeout %! %RPrzekroczono limit czasu operacji zmiany katalogu publiczneg
 chat_line_first %Y%#%W:%g%[,10]2%W:%n %1\n
 chat_conference_line_first %Y%#%W:%g%[,10]2%W:%n %1\n
 chat_line       %1\n
-chat_line_width -1
 conn_broken %! %c%#%n: %W---/%n%r*%n%W/---%n %RPo³±czenie z serwerem przerwane%n\n
 conn_failed %! %BB³±d podczas ³±czenia:%n %W%1%n\n
 conn_stopped %! %B£±czenie przerwane!%n\n
@@ -64,12 +63,12 @@ list_busy %> %czajêt%@2%n%K.....%n   %W<%n%C?%n%W>%n   %c%[12]1%n |%K%[,-15]3%n|
 list_busy_descr %> %czajêt%@2%n%K.....%n   %W<%n%C?%n%W>%n   %c%[12]1%n |%K%[,-15]3%n| %K[%5]%n\n
 list_empty %> %WTwoja lista jest pusta%n\n
 list_invisible %> %mniewidoczn%@2%n   %W<%n%M*%n%W>%n   %m%[12]1%n |%K...............%n|\n
+list_invisible_descr %> %mniewidoczn%@2%n   %W<%n%M-%n%W>%n   %m%[12]1%n |%K...............%n| %K[%5]%n\n
 list_not_avail %> %Kniedostêpn%@2%n   %W<%n%R-%n%W>%n   %K%[12]1%n |%K...............%n|\n
 list_not_avail_descr %> %Kniedostêpn%@1%n   %W<%n%R-%n%W>%n   %K%[12]1%n |%K...............%n| %K[%5]%n\n
 message_line_first %Y%#%W:%G%[,10]2%W:%n %1\n
 message_conference_line_first %Y%#%W:%G%[,10]2%W:%n %1\n
 message_line       %1\n
-message_line_width -1
 modify_done %> %WDane zmienione%n\n
 not_connected %! %RNie jeste¶ po³±czony z serwerem!%n\n
 not_enough_params %! %RZa ma³o parametrów%n\n
@@ -178,4 +177,3 @@ variable_not_found %! %RNieznana zmienna%n%W:%n %K[%n%W%1%n%K]%n\n
 sent_line_first %Y%#%W:%m%[,10]2%W:%n %1\n
 sent_conference_line_first %Y%#%W:%m%[,10]2%W:%n %1\n
 sent_line       %1\n
-sent_line_width -1
