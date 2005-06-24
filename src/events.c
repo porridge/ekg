@@ -973,6 +973,8 @@ void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_
 		if (GG_S_NA(s->status)) {
 			memset(&u->ip, 0, sizeof(struct in_addr));
 			u->port = 0;
+			u->protocol = 0;
+			u->image_size = 0;
 		}
 
 #define __SAME_GG_S(x, y)	((GG_S_A(x) && GG_S_A(y)) || (GG_S_B(x) && GG_S_B(y)) || (GG_S_I(x) && GG_S_I(y)) || (GG_S_NA(x) && GG_S_NA(y)))
