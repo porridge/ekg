@@ -4,6 +4,12 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-07-04
+
+- mo¿liwo¶æ wstawienia pocz±tkowych spacji w opisie, nale¿y
+  u¿yæ sk³adni /away \ opis ze spacja na poczatku (zigi/sz)
+- libgadu: poprawki dla maszyn Big Endian (mslusarz/sz)
+
 // 2005-06-25
 
 - libgadu: rozpoznawanie GG_HAS_AUDIO_MASK oraz GG_ERA_OMNIX_MAX

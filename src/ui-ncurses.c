@@ -1262,7 +1262,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 					print("window_id_query_started", itoa(w->id), target);
 					print_window(target, 1, "query_started", target);
 					print_window(target, 1, "query_started_window", target);
-					if (!(ignored_check(get_uin(target)) & IGNORE_EVENTS))
+					if (get_uin(target) && !(ignored_check(get_uin(target)) & IGNORE_EVENTS))
 						event_check(EVENT_QUERY, get_uin(target), target);
 					break;
 				}
@@ -1277,7 +1277,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 					print("window_id_query_started", itoa(w->id), target);
 					print_window(target, 1, "query_started", target);
 					print_window(target, 1, "query_started_window", target);
-					if (!(ignored_check(get_uin(target)) & IGNORE_EVENTS))
+					if (get_uin(target) && !(ignored_check(get_uin(target)) & IGNORE_EVENTS))
 						event_check(EVENT_QUERY, get_uin(target), target);
 				}
 			}
@@ -2720,7 +2720,10 @@ void reason_generator(const char *text, int len)
 	if (config_reason && !strncasecmp(text, config_reason, len)) {
 		char *reason;
 		/* brzydkie rozwi±zanie, ¿eby nie ruszaæ opisu przy dope³nianiu */
-		reason = saprintf("\001%s", config_reason);
+		if (xisspace(*config_reason))
+			reason = saprintf("\001\\%s", config_reason);
+		else
+			reason = saprintf("\001%s", config_reason);
 		array_add(&completions, reason);
 	}
 }

@@ -2025,14 +2025,14 @@ void iso_to_ascii(unsigned char *buf)
 /*
  * strip_chars()
  *
- * pozbywa siê podanego znaku na pocz±tku i koñcu ³ancucha
+ * pozbywa siê podanego znaku na pocz±tku i koñcu ³ancucha.
  */
 char *strip_chars(char *line, unsigned char what)
 {
 	while (*line == what)
 		line++;
 
-        if (line[strlen(line) - 1] == what)
+        while (strlen(line) > 1 && line[strlen(line) - 1] == what)
         	line[strlen(line) - 1] = 0;
 
         return line;

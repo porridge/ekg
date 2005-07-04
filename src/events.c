@@ -2337,7 +2337,7 @@ void handle_image_reply(struct gg_event *e)
 					msec = (now.tv_usec - s->request_sent.tv_usec) / 1000;
 				}
 
-				gg_debug(GG_DEBUG_MISC, "// ekg: image_reply: round-trip-time %d.%3d\n", sec, msec);
+				gg_debug(GG_DEBUG_MISC, "// ekg: image_reply: round-trip-time %d.%03d\n", sec, msec);
 
 				list_remove(&spiedlist, s, 1);
 				break;

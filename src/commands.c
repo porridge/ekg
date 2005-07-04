@@ -4250,13 +4250,14 @@ COMMAND(cmd_test_ctcp)
  *
  *  - target - w którym oknie nast±pi³o (NULL je¶li to nie query)
  *  - xline - linia tekstu.
- *  - quiet - mamy ukryæ wynik.
+ *  - quiet - czy mamy ukryæ wynik.
  *
  * 0/-1.
  */
 int command_exec(const char *target, const char *xline, int quiet)
 {
-	char *cmd = NULL, *tmp, *p = NULL, short_cmd[2] = ".", *last_name = NULL, *last_params = NULL, *line_save = NULL, *line = NULL;
+	char *cmd = NULL, *params_string = NULL, *last_name = NULL, *last_params = NULL, *line_save = NULL, *line = NULL;
+	char short_cmd[2];
 	command_func_t *last_abbr = NULL;
 	int abbrs = 0;
 	int correct_command = 0;
@@ -4302,7 +4303,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 
 	/* sprawdzenie, czy nie "/ /foobar" */
 	if (target && strlen(xline) >= 3 && !strncmp(xline, "/ /", 3)) {
-		const char *params[] = {target, xline + 2, NULL};
+		const char *params[] = { target, xline + 2, NULL };
 		cmd_msg("chat", params, NULL, quiet);
 		return 0;
 	}
@@ -4310,7 +4311,8 @@ int command_exec(const char *target, const char *xline, int quiet)
 	send_nicks_index = 0;
 
 	line = line_save = xstrdup(xline);
-	line = strip_spaces(line);
+	while (xisspace(*line))
+		line++;
 
 	if (*line == '/')
 		line++;
@@ -4325,18 +4327,26 @@ int command_exec(const char *target, const char *xline, int quiet)
 
 		if (!isalpha_pl_PL(c->name[0]) && strlen(c->name) == 1 && line[0] == c->name[0]) {
 			short_cmd[0] = c->name[0];
+			short_cmd[1] = 0;
 			cmd = short_cmd;
-			p = line + 1;
+			params_string = line + 1;
 		}
 	}
 
 	if (!cmd) {
-		tmp = cmd = line;
+		char *tmp;
+
+		tmp = line;
+		cmd = line;
+
 		while (*tmp && !xisspace(*tmp))
 			tmp++;
-		p = (*tmp) ? tmp + 1 : tmp;
-		*tmp = 0;
-		p = strip_spaces(p);
+
+		if (*tmp) {
+			*tmp = 0;
+			params_string = tmp + 1;
+		} else
+			params_string = tmp;
 	}
 
 	for (l = commands; l; l = l->next) {
@@ -4349,6 +4359,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 			abbrs = 1;
 			break;
 		}
+		
 		if (!strncasecmp(c->name, cmd, strlen(cmd))) {
 			abbrs++;
 			last_abbr = c->function;
@@ -4365,14 +4376,14 @@ int command_exec(const char *target, const char *xline, int quiet)
 		int res, len = strlen(last_params);
 
 		/*
-		 * dla query potrzeba nam cudzys³owiów, natomiast
+		 * dla query potrzeba nam cudzys³owów, natomiast
 		 * dla ca³ej reszty nie s± one potrzebne (wymaga³oby to
 		 * strippowania w wielu miejscach i zmienienia paru koncepcji
 		 */
-		if(!strcasecmp(last_name, "query")) {
-			par = array_make_quoted(p, " \t", len, 1, 1);
+		if (!strcasecmp(last_name, "query")) {
+			par = array_make_quoted(params_string, " \t", len, 1, 1);
 		} else
-			par = array_make(p, " \t", len, 1, 1);
+			par = array_make(params_string, " \t", len, 1, 1);
 
 		command_processing = 1;
 		res = (last_abbr)(last_name, (const char**) par, target, quiet);
@@ -5970,10 +5981,10 @@ void command_init()
 	  "                %Tniedostêpny%n s± po³±czone z serwerem\n"
 	  "\n"
 	  "EKSPERYMENTALNE! Sprawdza, czy podana osoba jest po³±czona. Klient tej osoby "
-	  "musi obs³ugiwaæ obrazki. Dzia³a w przypadku GG 6.0 dla Windows. Je¶li kto¶ "
-	  "u¿ywa innego klienta, to mo¿e mu siê pojawiæ pusta wiadomo¶æ (np. TLEN, ekg). "
+	  "musi obs³ugiwaæ obrazki. Dzia³a w przypadku GG 6.x dla Windows. Je¶li kto¶ "
+	  "u¿ywa innego klienta, to mo¿e mu siê pojawiæ pusta wiadomo¶æ (np. TLEN). "
 	  "Dziêki tej funkcji "
-	  "mo¿na sprawdziæ czy osoba, któr± widzimy jako niedostêpna jest "
+	  "mo¿na sprawdziæ czy osoba, któr± widzimy jako niedostêpna, jest "
 	  "niewidoczna. Je¿eli brak aliasu jako parametr, sprawdzana jest osoba, "
 	  "z któr± rozmowa znajdujê siê w aktualnym okienku.\n"
 	  "\n"

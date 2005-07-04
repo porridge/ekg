@@ -42,7 +42,7 @@
 
 #define TOGGLE_BIT(x) (1 << (x - 1))
 
-#define GG_CRC32_INVISIBLE 99
+#define GG_CRC32_INVISIBLE 0x63
 #define SPYING_RESPONSE_TIMEOUT 15
 
 enum event_t {
