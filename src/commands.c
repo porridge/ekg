@@ -4311,7 +4311,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 	send_nicks_index = 0;
 
 	line = line_save = xstrdup(xline);
-	strip_spaces(line);
+	line = strip_spaces(line);
 
 	if (*line == '/')
 		line++;
