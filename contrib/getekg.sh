@@ -7,8 +7,13 @@ if [ "$1" == "" ]; then
 	echo "Podaj zmienne (\"--prefix=/usr\" itp.) dla configure'a!"; 
 	exit 1; 
 fi
-echo "Wchodzê do katalogu tymczasowego."
-cd /tmp
+DIR="${TMPDIR:-${TMP:-/tmp}}/getekg-$$"
+if ! mkdir "$DIR"; then
+	echo "Nie udalo sie utworzyc katalogu tymczasowego \"$DIR\"." >&2
+	exit 1
+fi
+echo "Wchodzê do katalogu tymczasowego \"$DIR\"."
+cd "$DIR"
 echo -n "¦ci±gam najnowsz± wersjê."
  if [ ! -x "`which wget`" ]; then \
     if [ ! -x "`which curl`" ]; then \
