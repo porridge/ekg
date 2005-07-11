@@ -1,14 +1,21 @@
+# -*- coding: ISO-8859-2 -*-
 # Skrypt ten uruchamia siê z poziomu ekg (polecenie python) a zadanie jego to
 # wy³apywanie adresów URL w otzymanych wiadomo¶ciach. Mozna by w tym miejscu poopowiadaæ o dzia³aniu skryptu
 # ale my¶le ze skypt jest dosæ rozmowny pozatym by poczytaæ helpa (i nie tylko) wystarczy nacisn±æ F8
 # wszelkie pretensje mo¿na kierowaæ na adres: rmrmg(at)wp(dot)pl
+#
+# poprawki bezpieczeñstwa: wojtekka (2005-07-11)
+
 import re
 import ekg
 import string
 import os
 
+browser="firefox"
 link=re.compile(".*http.*")
 linka=re.compile("http.*")
+linkfile=os.path.expanduser("~/.gg/rmrmg_ekg_url")
+
 def init ():
  ekg.printf("generic", "linkownik")
  return 1
@@ -16,6 +23,17 @@ def init ():
 def deinit ():
  ekg.printf("generic", "linkownik poszed³")
  return 1 
+
+def launch(url, tab):
+    url = string.replace(string.replace(url, ",", "%2c"), "'", "%27");
+    
+    if tab:
+	command = "%s -remote 'openURL(%s, new-tab)'" % (browser, url)
+    else:
+	command = "%s '%s'" % (browser, url)
+
+    #ekg.printf("generic", "[%s]" % (command))
+    os.system(command)
 
 def handle_msg(uin, name, msgclass, text, time, secure):
     #ekg.printf("generic", "echo dzia³a")
@@ -26,7 +44,7 @@ def handle_msg(uin, name, msgclass, text, time, secure):
 		ekg.printf("generic", "znaleziono link: %s" %(x)) 
 		ekg.printf("generic", "by otworzyæ w: nowym oknie wcisnij F7, nowej zak³adce F5, by nie otwierac wci¶nijF6.")
 		ekg.printf("generic", "F8 pokazuje liste przechwyconych linków; F5-F7 dzia³a na pierwszym linku z listy")
-		os.system("echo \"%s\" >> /tmp/rmrmg_ekg_url" %(x))
+		open(linkfile, 'a').write(x + '\n');
 	#ekg.printf("generic","echo tada")
 	return 1
     else:
@@ -42,13 +60,13 @@ def handle_keypress(meta, key):
 	    dlug=len(nurl)
 	    if dlug == 1:
 		ekg.printf("generic", "otwieram %s w nowej zak³adce" %(nurl[0]))
-		os.system("MozillaFirebird -remote 'openURL(%s, new-tab)'" %(nurl[0]))
-		os.system('rm /tmp/rmrmg_ekg_url')
+		launch(nurl[0], True)
+		os.unlink(linkfile)
 	    else:
 		ekg.printf("generic", "linków mam %d" %(dlug))
 		wielejest(nurl)
 		ekg.printf("generic", "otwieram %s w nowej zak³adce" %(nurl[0]))
-		os.system("MozillaFirebird -remote 'openURL(%s, new-tab)'" %(nurl[0]))
+		launch(nurl[0], True)
     elif key == 270:
 	ekg.printf("generic", "wcisniêto F6")
 	nurl=czyjest()
@@ -58,7 +76,7 @@ def handle_keypress(meta, key):
 	    dlug=len(nurl)
 	    if dlug == 1:
 		ekg.printf("generic", "kasuje adres %s" %(nurl[0]))	    
-		os.system('rm /tmp/rmrmg_ekg_url')
+		os.unlink(linkfile)
 	    else:
 		ekg.printf("generic", "jest wiele linków")
 		wielejest(nurl)
@@ -72,8 +90,8 @@ def handle_keypress(meta, key):
 	    dlug=len(nurl)
 	    if dlug == 1:
 		ekg.printf("generic", "otwieram %s w nowym oknie" %(nurl[0]))
-		os.system("MozillaFirebird %s" %(nurl[0]))
-		os.system('rm /tmp/rmrmg_ekg_url')		
+		launch(nurl[0], False)
+		os.unlink(linkfile)
 	    else:
 		ekg.printf("generic", "linków mam %d" %(dlug))
 		wielejest(nurl)
@@ -93,8 +111,8 @@ def handle_keypress(meta, key):
 ###########################################################
 
 def czyjest ():
-    if os.path.exists('/tmp/rmrmg_ekg_url'):
-	wejsc= open ('/tmp/rmrmg_ekg_url')
+    if os.path.exists(linkfile):
+	wejsc= open (linkfile)
 	file = wejsc.readlines()
 	dlug=len(file)
 	wejsc.close()
@@ -104,7 +122,7 @@ def czyjest ():
 	return 0
 	
 def wielejest (buff):
-    file=open('/tmp/rmrmg_ekg_url' , 'w')		
+    file=open(linkfile , 'w')		
     #buff= file.readlines()
     #file.truncate()
     #file.writelines
