@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: ISO-8859-2 -*-
 # ekg-bot 0.1-pre1
 # Copyright (C) 2003 Andrzej Lindna³
 #
