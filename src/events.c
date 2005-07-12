@@ -498,7 +498,7 @@ void handle_msg(struct gg_event *e)
 			if ((font & GG_FONT_IMAGE)) {
 				struct gg_msg_richtext_image *m = (void*) &p[i];
 
-				gg_debug(GG_DEBUG_MISC, "// ekg: inline image: sender=%d, size=%d, crc32=%.8x\n", e->event.msg.sender, m->size, m->crc32);
+				gg_debug(GG_DEBUG_MISC, "// ekg: inline image: sender=%d, size=%d, crc32=%.8x\n", e->event.msg.sender, gg_fix32(m->size), gg_fix32(m->crc32));
 
 				imageno++;
 

@@ -3535,6 +3535,7 @@ COMMAND(cmd_test_imagemsg)
 
 	tmp = gg_crc32(0, image, size);
 	gg_debug(GG_DEBUG_MISC, "// crc32 = 0x%.8x, size = %d\n", tmp, size);
+	tmp = gg_fix32(tmp);
 	memcpy(format + 12, &tmp, 4);
 	tmp = gg_fix32(size);
 	memcpy(format + 8, &tmp, 4);
