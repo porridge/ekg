@@ -1045,6 +1045,7 @@ void theme_init()
 	format_add("ack_queued", "%> Wiadomo¶æ do %1 zostanie dostarczona pó¼niej\n", 1);
 	format_add("ack_delivered", "%> Wiadomo¶æ do %1 zosta³a dostarczona\n", 1);
 	format_add("ack_filtered", "%! %|Wiadomo¶æ do %1 najprawdopodobniej nie zosta³a dostarczona, poniewa¿ dana osoba jest niedostêpna, a serwer twierdzi, ¿e dorêczy³ wiadomo¶æ. Sytuacja taka ma miejsce, gdy wiadomo¶æ zosta³a odrzucona przez filtry serwera (np. zawiera adres strony WWW)\n", 1);
+	format_add("ack_filtered_short", "%! %|Wiadomo¶æ do %1 najprawdopodobniej nie zosta³a dostarczona\n", 1);
 	format_add("message_too_long", "%! Wiadomo¶æ jest zbyt d³uga i zosta³a skrócona\n", 1);
 
 	/* ludzie zmieniaj± stan */
@@ -1203,6 +1204,7 @@ void theme_init()
 	format_add("user_info_last_descr", "%K| %nOstatni opis: %T%1%n\n", 1);
 	format_add("user_info_version", "%K| %nWersja klienta: %T%1%n\n", 1);
 	format_add("user_info_voip", "%K| %nObs³uguje rozmowy g³osowe\n", 1);
+	format_add("user_info_era_omnix", "%K| %nPo³±czony przez bramkê Era Omnix\n", 1);
 	format_add("user_info_last_ip","%K| %nOstatni adres IP: %T%1%n\n", 1);
 	format_add("user_info_footer", "%K`----- ---- --- -- -%n\n", 1);
 
@@ -1296,6 +1298,8 @@ void theme_init()
 	format_add("dcc_get_offer_resume", "%) Plik istnieje ju¿ na dysku, wiêc mo¿na wznowiæ pobieranie poleceniem %Tdcc resume #%4%n\n", 1);
 	format_add("dcc_get_getting", "%) Rozpoczêto pobieranie pliku %T%2%n od %1\n", 1);
 	format_add("dcc_get_cant_create", "%! Nie mo¿na utworzyæ pliku %T%1%n\n", 1);
+	format_add("dcc_get_backup_made", "%) Plik %T%1%n istnieje. Pobierany plik zostanie zapisany jako %T%2%n\n", 1);
+	format_add("dcc_get_cant_overwrite", "%! Plik %T%1%n i wszystkie jego kopie istniej±\n", 1);
 	format_add("dcc_not_found", "%! Nie znaleziono po³±czenia %T%1%n\n", 1);
 	format_add("dcc_invalid_ip", "%! Nieprawid³owy adres IP\n", 1);
 	format_add("dcc_user_not_avail", "%! %1 musi byæ aktywn%@1, by móc nawi±zaæ po³±czenie\n", 1);
@@ -1405,7 +1409,7 @@ void theme_init()
 	/* conference */
 	format_add("conferences_list_empty", "%! Brak konferencji\n", 1);
 	format_add("conferences_list", "%> %T%1%n: %2\n", 1);
-	format_add("conferences_list_ignored", "%> %T%1%n: %2 (%yingorowana%n)\n", 1);
+	format_add("conferences_list_ignored", "%> %T%1%n: %2 (%yignorowana%n)\n", 1);
 	format_add("conferences_add", "%> Utworzono konferencjê %T%1%n\n", 1);
 	format_add("conferences_not_added", "%! Nie utworzono konferencji %T%1%n\n", 1);
 	format_add("conferences_del", "%) Usuniêto konferencjê %T%1%n\n", 1);

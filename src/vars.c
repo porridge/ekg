@@ -155,6 +155,7 @@ void variable_init()
 	variable_add("dcc", "dc", VAR_BOOL, 1, &config_dcc, changed_dcc, NULL, NULL);
 	variable_add("dcc_ip", "di", VAR_STR, 1, &config_dcc_ip, changed_dcc, NULL, dd_dcc);
 	variable_add("dcc_dir", "dd", VAR_STR, 1, &config_dcc_dir, NULL, NULL, dd_dcc);
+	variable_add("dcc_backups", "db", VAR_BOOL, 1, &config_dcc_backups, NULL, NULL, dd_dcc);
 	variable_add("dcc_filter", "df", VAR_BOOL, 1, &config_dcc_filter, NULL, NULL, dd_dcc);
 	variable_add("dcc_limit", "dl", VAR_STR, 1, &config_dcc_limit, NULL, NULL, dd_dcc);
 	variable_add("dcc_port", "dP", VAR_INT, 1, &config_dcc_port, changed_dcc, NULL, dd_dcc);
@@ -180,6 +181,7 @@ void variable_init()
 #ifdef HAVE_OPENSSL
 	variable_add("encryption", "en", VAR_BOOL, 1, &config_encryption, NULL, NULL, NULL);
 #endif
+	variable_add("era_omnix", "eO", VAR_BOOL, 1, &config_era_omnix, changed_era_omnix, NULL, NULL);
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init)
 		variable_add("enter_scrolls", "es", VAR_BOOL, 1, &config_enter_scrolls, NULL, NULL, NULL);
@@ -244,7 +246,7 @@ void variable_init()
 #endif
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
-		variable_add("windows_save", "ws", VAR_BOOL, 1, &config_windows_save, NULL, NULL, NULL);
+		variable_add("windows_save", "ws", VAR_MAP, 1, &config_windows_save, NULL, variable_map(3, 0, 0, "no", 1, 0, "quit", 2, 0, "save"), NULL);
 		variable_add("windows_layout", "wl", VAR_STR, 2, &config_windows_layout, NULL, NULL, NULL);
 	}
 #endif

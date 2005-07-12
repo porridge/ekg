@@ -226,7 +226,12 @@ int python_initialize()
 	/* PyImport_ImportModule spodziewa siê nazwy modu³u, który znajduje
 	 * siê w $PYTHONPATH, wiêc dodajemy tam katalog ~/.gg/scripts. mo¿na
 	 * to zrobiæ w bardziej elegancki sposób, ale po co komplikowaæ sobie
-	 * ¿ycie? */
+	 * ¿ycie?
+	 *
+	 * Argument putenv() nie jest zwalniany xfree(), bo powoduje to
+	 * problemy na systemach, w których putenv() jest zgodne z SUSv2 (np
+	 * niektóre SunOS).
+	 */
 
 	if (getenv("PYTHONPATH")) {
 		char *tmp = saprintf("%s:%s", getenv("PYTHONPATH"), prepare_path("scripts", 0));
@@ -236,7 +241,6 @@ int python_initialize()
 		{
 			char *s = saprintf("PYTHONPATH=%s", tmp);
 			putenv(s);
-			xfree(s);
 		}
 #endif
 		xfree(tmp);
@@ -247,7 +251,6 @@ int python_initialize()
 		{
 			char *s = saprintf("PYTHONPATH=%s", prepare_path("scripts", 0));
 			putenv(s);
-			xfree(s);
 		}
 #endif
 	}

@@ -8,7 +8,7 @@
 #
 # Zmienne dla ~/.ekgnv :
 # WGET= ¶cie¿ka do wget'a
-# EKGTMP= gdzie ma wrzucaæ pliki tymaczasowe
+# EKGTMP= gdzie zostanie utworzony podkatalog na pliki tymaczasowe
 # EKGWWW= adres strony ekg.
 # EKGCONF= co ma podawaæ do configure gdy automatycznie budujesz ekg
 # LASTEKG= ostatnia zainstalowana werja ekg
@@ -40,6 +40,15 @@ fi
 # Wczytaj ustawienia.
   . ~/.ekgnv
 
+# wymyslamy bezpieczny podkatalog
+EKGTMPS="$EKGTMP/ekgnv-$$"
+mkdir "$EKGTMPS"
+if [ "$?" != "0" ]; then
+	echo "Proba utworzenia katalogu tymczasowego \"$EKGTMPS\" nie powiodla sie." >&2
+	echo "Posprzataj \"$EKGTMP\" i sprobuj ponownie." >&2
+	exit 1
+fi
+
 # Czy w systemie jest wget?
 function check_wget {
  if [ ! -x "$WGET" ]; then \
@@ -52,13 +61,13 @@ function check_wget {
 function get_list {
  check_wget
  echo -n "¦ci±gam listê wersji EKG. Poczekaj chwilê. "
-  wget -q -P $EKGTMP $EKGWWW/download.php
+  wget -q -P $EKGTMPS $EKGWWW/download.php
  # to mozna zamienic na odczytywanie pliku ktory bylby automatycznie po
  # twojej stronie generowany, a w ktorym bylby tylko numer najnowszej 
  # werjsji
- LASTES="`grep ekg-20 $EKGTMP/download.php | cut -d\  -f6 | \
+ LASTES="`grep ekg-20 $EKGTMPS/download.php | cut -d\  -f6 | \
   	   cut -d\\" -f2 | tail -1 | sed -e s/.tar.gz//`"
-  rm -f $EKGTMP/download.php*
+  rm -f $EKGTMPS/download.php*
  echo "Gotowe!"
 }
 
@@ -82,13 +91,13 @@ function get_new {
  check_new
   if [ ! -z "$NEW" ]; then \
    echo -n "¦ci±gam j±, poczekaj chwilê. "
-   wget -q -P $EKGTMP $EKGWWW/$LASTES.tar.gz
+   wget -q -P $EKGTMPS $EKGWWW/$LASTES.tar.gz
    cat ~/.ekgnv | sed -e s/$LASTEKG/$LASTES/ > ~/.ekgtmp
  # lub jak ktos nie ma seda to grep -v "LASTEKG" ~/.ekgnv > ~/.ekgtmp
  # echo "export LASTEKG=$LASTES" >> ~/.ekgtmp
    mv -f ~/.ekgtmp ~/.ekgnv
    echo "Gotowe.
-Plik znajduje siê w $EKGTMP/$LASTES.tar.gz"
+Plik znajduje siê w $EKGTMPS/$LASTES.tar.gz"
   else 
    echo 
   fi
@@ -99,11 +108,11 @@ function build_new {
  get_new
   if [ ! -z "$NEW" ]; then \
    echo -n "Buduje nowe EKG. Poczekaj chwilê. "
-   ( cd $EKGTMP ;
+   ( cd $EKGTMPS ;
    tar -zxf $LASTES.tar.gz ; cd $LASTES ;
      ./configure $EKGCONF > /dev/null ; # tylko b³êdy bêd± na konsoli.
       make ; make install > /dev/null ;
-   rm -rf ../$LASTES* ; )
+      cd .. ; rm -rf $LASTES $LATES.tar.gz ; )
    echo "Skoñczy³em. Masz ju¿ najnowsz± wersjê."
   fi
 }

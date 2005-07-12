@@ -1492,7 +1492,7 @@ static int window_make_query(const char *nick)
 				} else
 					print("window_id_query_started", itoa(w->id), nick);
 
-				if (!(ignored_check(get_uin(nick)) & IGNORE_EVENTS))
+				if (get_uin(nick) && !(ignored_check(get_uin(nick)) & IGNORE_EVENTS))
 					event_check(EVENT_QUERY, get_uin(nick), nick);
 				
 				return w->id;
@@ -1510,7 +1510,7 @@ static int window_make_query(const char *nick)
 		
 		print("window_id_query_started", itoa(w->id), nick);
 
-		if (!(ignored_check(get_uin(nick)) & IGNORE_EVENTS))
+		if (get_uin(nick) && !(ignored_check(get_uin(nick)) & IGNORE_EVENTS))
 			event_check(EVENT_QUERY, get_uin(nick), nick);
 			
 		return w->id;
