@@ -25,6 +25,8 @@ import ekg,re,os,string,types,random,math,base64	# Importy
 from urllib import *					# Obs³uga www
 from time import *					# Operacje czasowe
 from random import Random				# Random
+from os import *					# do implementacji popen
+#import sys						# debugowanie implementacji popen
 
 # Konfiguracja
 owner = twojnumer					# Numer gg ownera
@@ -80,7 +82,7 @@ def komenda(uin, text):
 
 	if text[0] == "@":
 		if uin != owner:
-			ekg.command("msg %d Czy Ty, aby na pewno jeste¶ w³a¶cicielem tego bota?;)" % uin)
+			ekg.command("msg %d Czy Ty aby na pewno jeste¶ w³a¶cicielem tego bota?;)" % uin)
 			return
 		tablica = ownerz
 	elif text[0] == "!": tablica = userz
@@ -99,14 +101,17 @@ def komenda(uin, text):
 	try: funkcja, ilosc = tablica[kom]
 	except:	return
 
+	# jesli komenda wymaga argumentow
 	if ilosc > 0:
 		splitarg = arg.split()
 		args = splitarg[:ilosc]
 		if len(splitarg) > ilosc:
 			args.append(string.join(splitarg[ilosc:]))
+	# jesli komenda nie wymaga argumentow
 	elif ilosc == 0:
 		if len(arg) > 0: args = [arg]
 		else: args = []
+	# bledny wpis w liscie komend
 	else: return
 
 	try: funkcja(uin, *args)
@@ -307,17 +312,15 @@ def addnew(uin, duin, nazwa):
 	try: 
 		ekg.command("add %d %s" % (int(duin), nazwa))
 		ekg.command("msg %d Doda³em %s (%s) do listy kontaktów." % (uin, duin, nazwa))
-	except:	ekg.command("msg %d Pierwszy parametro to UIN, a drugi NAZWA." % uin)
+	except:	ekg.command("msg %d Pierwszy parametr to UIN, a drugi NAZWA." % uin)
 
 def freestats(uin):
 	free = os.popen("%s -m" % path_free).read()
 	ekg.command("msg %d %s" % (uin, free))
-	os.popen("%s -m" % path_free).close()
 
 def hddstats(uin):
 	df = os.popen("%s -h" % path_df).read()
 	ekg.command("msg %d %s" % (uin, df))
-	os.popen("%s -h" % path_df).close()
 
 def refstatus(uin):
 	status_ref = strftime("%a, %d %b %Y %H:%M:%S %Z")
@@ -332,9 +335,8 @@ def ciekurl(uin, url):
 	ekg.command("msg %d %s" % (uin, checkurl.info().getheader('Server')))
 
 def ciekhost(uin, host):
-	qmer = os.popen("%s %s" % (path_host, re.escape(host))).read()
+	qmer = safepopen([path_host, host])
 	ekg.command("msg %d %s" % (uin, qmer))
-	os.popen("%s %s" % (path_host, re.escape(host))).close()
 
 def fetchmail(uin):
 	os.popen("%s" % path_fetchmail)
@@ -351,6 +353,7 @@ def killfile(uin, ktos):
 		ekg.command("block %d" % ktos)
 		ekg.command("msg %d %d zosta³ zablokowany" % (uin, ktos))
 	except: ekg.command("msg %d Musisz podaæ parametr jako UIN do zablokowania" % uin)
+
 def unblock(uin, numer):
 	try:
 		numer = int(numer)
@@ -393,16 +396,13 @@ def ciekstatus(uin, kto):
 
 def uname(uin):
 	ekg.command("msg %d %s" % (uin, os.popen("%s -mnrs" % path_uname).read()))
-	os.popen("%s -mnrs" % path_uname).close()
 
 def krot(uin, ile, tekst):
 	ile = int(ile)
 	if ile < 2 or ile > 23:	ekg.command("msg %d Jako pierwszy parametr nale¿y podaæ liczbê z zakresu 2-23." % uin)
 	else:
 		try:
-			cmdline = "%s -ear%d %s" % (path_erecoder, ile, re.escape(tekst))
-			ekg.command("msg %d %s" % (uin, os.popen(cmdline).read()))
-			os.popen(cmdline).close()
+			ekg.command("msg %d %s" % (uin, safepopen([path_erecoder, '-ear'+ile, '--', tekst])))
 		except:	ekg.command("msg %d Jako pierwszy parametr nale¿y podaæ liczbê z zakresu 2-23." % uin)
 
 def drot(uin, ile, tekst):
@@ -410,9 +410,7 @@ def drot(uin, ile, tekst):
 	if ile < 2 or ile > 23: ekg.command("msg %d Jako pierwszy parametr nale¿y podaæ liczbê z zakresu 2 - 23." % uin)
 	else:
 		try:
-			cmdline = "%s -dar%d %s" % (path_erecoder, int(ile), re.escape(tekst))
-			ekg.command("msg %d %s" % (uin, os.popen(cmdline).read()))
-			os.popen(cmdline).close()
+			ekg.command("msg %d %s" % (uin, safepopen([path_erecoder, '-dar'+ile, '--', tekst])))
 		except:	ekg.command("msg %d Jako pierwszy parametr nale¿y podaæ liczbê z zakresu 2-23" % uin)
 
 def kbase(uin, tekst):
@@ -496,6 +494,7 @@ def lottomat(uin, typ):
 		ekg.command("msg %d Wylosowane przez komputer liczby do losowañ Zak³adów Specjalnych to: %s" % (uin, lotto(42,5)))
 	else:
 		ekg.command("msg %d Nieznany parametr! Parametry:\r\nmulti, duzy, express, zaklady" % uin)
+
 def sin(uin, liczba):
 	try: ekg.command("msg %d %s" % (uin, trygonometria('sin', liczba)))
 	except:	ekg.command("msg %d B³êdne wywo³anie." % uin)
@@ -523,14 +522,10 @@ def helpuj(uin):
 		?polecenie. Na przyk³ad: ?status.\r\nAutorem tego bota jest Andrzej Lindna³""" % uin)
 
 def kmorse(uin, tekst):
-	cmdline = "%s -eam -- %s" % (path_erecoder, re.escape(tekst))
-	ekg.command("msg %d %s" % (uin, os.popen(cmdline).read()))
-	os.popen(cmdline).close()
+	ekg.command("msg %d %s" % (uin, safepopen([path_erecoder, '-eam', '--', tekst])))
 
 def dmorse(uin, tekst):
-	cmdline = "%s -dam -- %s" % (path_erecoder, re.escape(tekst))
-	ekg.command("msg %d %s" % (uin, os.popen(cmdline).read()))
-	os.popen(cmdline).close()
+	ekg.command("msg %d %s" % (uin, safepopen([path_erecoder, '-dam', '--', tekst])))
 
 def bmi(uin, masa, wzrost):
 	try:
@@ -561,3 +556,27 @@ def invis(uin, tryb):
 def killme(uin):
 	ekg.command("msg %d Wy³±czam EKG. Aby mnie ponownie w³±czyæ, bêdziesz musia³ zalogowaæ siê na shella niestety;))" % uin)
 	ekg.command("quit")
+
+
+def safepopen(cmd):
+	rfd, wfd = pipe()
+	ret = fork()
+	# child
+	if ret == 0:
+		close(rfd)
+		dup2(wfd, 1)
+		execv(cmd[0], cmd)
+		exit(1)
+	# parent
+	else:
+		close(wfd)
+#		sys.stderr.write('reading..')
+		readstring = read(rfd, 4094)
+#		sys.stderr.write('got it!')
+		while read(rfd, 4096) != '':
+			pass
+#		sys.stderr.write('EOF')
+		waitpid(ret, 0)
+#		sys.stderr.write('reaped')
+		return readstring
+
