@@ -64,6 +64,7 @@ struct ignore_label ignore_labels[IGNORE_LABELS_COUNT + 1] = {
 	{ IGNORE_MSG, "msg" },
 	{ IGNORE_DCC, "dcc" },
 	{ IGNORE_EVENTS, "events" },
+	{ IGNORE_SMSAWAY, "smsaway" },
 	{ 0, NULL }
 };
 

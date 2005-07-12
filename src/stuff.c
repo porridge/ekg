@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2004 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@o2.pl>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
@@ -113,6 +113,7 @@ int config_beep_notify = 1;
 int config_beep_mail = 1;
 int config_display_pl_chars = 1;
 int config_events_delay = 3;
+int config_era_omnix = 0;
 char *config_sound_msg_file = NULL;
 char *config_sound_chat_file = NULL;
 char *config_sound_sysmsg_file = NULL;
@@ -141,6 +142,7 @@ int config_status = GG_STATUS_AVAIL;
 char *reg_password = NULL;
 char *reg_email = NULL;
 int config_dcc = 0;
+int config_dcc_backups = 0;
 char *config_dcc_ip = NULL;
 char *config_dcc_dir = NULL;
 int config_dcc_port = GG_DEFAULT_DCC_PORT;
@@ -755,6 +757,17 @@ void changed_dcc(const char *var)
 }
 
 /*
+ * changed_era_omnix() 
+ *
+ * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,era_omnix''.
+ */
+void changed_era_omnix(const char *var)
+{
+	if (sess && sess->state == GG_STATE_CONNECTED)
+		print("dcc_must_reconnect");
+}
+
+/*
  * changed_local_ip()
  *
  * funkcja wywo³ywana przy zmianie warto¶ci zmiennej ,,local_ip''.
@@ -894,7 +907,7 @@ void changed_xxx_reason(const char *var)
 		print("descr_too_long", itoa(strlen(tmp) - GG_STATUS_DESCR_MAXSIZE));
 }
 
-const char *compile_time()
+const char *compile_time(void)
 {
 	return __DATE__ " " __TIME__;
 }
@@ -912,7 +925,7 @@ const char *compile_time()
  */
 struct conference *conference_add(const char *name, const char *nicklist, int quiet)
 {
-	struct conference c;
+	struct conference c, *ret;
 	char **nicks, **p;
 	list_t l;
 	int i, count;
@@ -969,8 +982,8 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 				array_free(nicks);
 				return NULL;
 			}
-			xfree(gname);
 
+			xfree(gname);
 		}
 	}
 
@@ -990,14 +1003,30 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 	for (p = nicks, i = 0; *p; p++) {
 		uin_t uin;
+		list_t l;
 
 		if (!strcmp(*p, ""))
 		        continue;
-	
+
 		if (!(uin = get_uin(*p))) {
 			printq("user_not_found", *p);
-			continue;
+			break;
 		}
+
+		if (uin == config_uin)
+			break;
+
+		for (l = c.recipients; l; l = l->next) {
+			uin_t tmp = *((uin_t *)l->data);
+
+			if (tmp == uin) {
+				uin = 0;
+				break;
+			}
+		}
+
+		if (!uin)
+			break;
 
 		list_add(&(c.recipients), &uin, sizeof(uin));
 		i++;
@@ -1007,6 +1036,8 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 	if (i != count) {
 		printq("conferences_not_added", name);
+		if (c.recipients)
+			list_destroy(c.recipients, 1);
 		return NULL;
 	}
 
@@ -1016,9 +1047,26 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 	add_send_nick(name);
 
+	ret = list_add(&conferences, &c, sizeof(c));
+
 	event_check(EVENT_CONFERENCE, 0, name);
 
-	return list_add(&conferences, &c, sizeof(c));
+	/* je¶li na li¶cie zdarzeñ jest usuniêcie konferencji, to ret ju¿ nie 
+	 * wskazuje na nic sensownego. nie tworzymy konferencji. mo¿e trochê 
+	 * ma³o eleganckie rozwi±zanie, ale nie przychodzi mi do g³owy nic 
+	 * lepszego. -- gophi */
+
+	{
+		list_t cur = conferences;
+
+		while (cur) {
+			if ((void *) ret == cur->data)
+				return ret;
+			cur = cur->next;
+		}
+	}
+
+	return (struct conference *) NULL;
 }
 
 /*
@@ -1314,6 +1362,7 @@ void ekg_connect()
 	p.has_audio = 1;
 #endif
 	p.protocol_version = config_protocol;
+	p.era_omnix = config_era_omnix;
 	p.last_sysmsg = config_last_sysmsg;
 
 	if (config_server) {
@@ -1976,14 +2025,14 @@ void iso_to_ascii(unsigned char *buf)
 /*
  * strip_chars()
  *
- * pozbywa siê podanego znaku na pocz±tku i koñcu ³ancucha
+ * pozbywa siê podanego znaku na pocz±tku i koñcu ³ancucha.
  */
 char *strip_chars(char *line, unsigned char what)
 {
 	while (*line == what)
 		line++;
 
-        if (line[strlen(line) - 1] == what)
+        while (strlen(line) > 1 && line[strlen(line) - 1] == what)
         	line[strlen(line) - 1] = 0;
 
         return line;

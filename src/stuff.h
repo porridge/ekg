@@ -1,11 +1,12 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@go2.pl>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *                          Piotr Domagalski <szalik@szalik.net>
+ *                          Adam Wysocki <gophi@ekg.apcoh.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -41,7 +42,7 @@
 
 #define TOGGLE_BIT(x) (1 << (x - 1))
 
-#define GG_CRC32_INVISIBLE 99
+#define GG_CRC32_INVISIBLE 0x63
 #define SPYING_RESPONSE_TIMEOUT 15
 
 enum event_t {
@@ -148,6 +149,7 @@ struct timer {
 struct spied {
 	uin_t uin;
 	int timeout;
+	struct timeval request_sent;
 };
 
 struct sms_away {
@@ -242,6 +244,7 @@ char *config_contacts_options;
 int config_contacts_size;
 int config_ctrld_quits;
 int config_dcc;
+int config_dcc_backups;
 char *config_dcc_ip;
 char *config_dcc_dir;
 int config_dcc_filter;
@@ -264,6 +267,7 @@ int config_emoticons;
 int config_encryption;
 int config_enter_scrolls;
 int config_events_delay;
+int config_era_omnix;
 char *config_interface;
 int config_header_size;
 int config_ignore_unknown_sender;
@@ -385,6 +389,7 @@ void changed_aspell(const char *var);
 #endif
 void changed_backlog_size(const char *var);
 void changed_dcc(const char *var);
+void changed_era_omnix(const char *var);
 void changed_local_ip(const char *var);
 void changed_mesg(const char *var);
 void changed_proxy(const char *var);
@@ -392,7 +397,7 @@ void changed_theme(const char *var);
 void changed_uin(const char *var);
 void changed_xxx_reason(const char *var);
 
-const char *compile_time();
+const char *compile_time(void);
 
 struct conference *conference_add(const char *string, const char *nicklist, int quiet);
 int conference_remove(const char *name, int quiet);
@@ -479,6 +484,7 @@ int ekg_hide_descr_status(int status);
 void ekg_wait_for_key();
 void ekg_exit();
 int check_conn(uin_t uin);
+void save_windows();
 
 #ifdef WITH_ASPELL
 void spellcheck_init(void);

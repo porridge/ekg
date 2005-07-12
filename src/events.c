@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2004 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Piotr Wysocki <wysek@linux.bydg.org>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *                          Piotr Domagalski <szalik@szalik.net>
@@ -498,7 +498,7 @@ void handle_msg(struct gg_event *e)
 			if ((font & GG_FONT_IMAGE)) {
 				struct gg_msg_richtext_image *m = (void*) &p[i];
 
-				gg_debug(GG_DEBUG_MISC, "// ekg: inline image: sender=%d, size=%d, crc32=%.8x\n", e->event.msg.sender, m->size, m->crc32);
+				gg_debug(GG_DEBUG_MISC, "// ekg: inline image: sender=%d, size=%d, crc32=%.8x\n", e->event.msg.sender, gg_fix32(m->size), gg_fix32(m->crc32));
 
 				imageno++;
 
@@ -633,29 +633,31 @@ void handle_msg(struct gg_event *e)
 		event_check((chat) ? EVENT_CHAT : EVENT_MSG, e->event.msg.sender, e->event.msg.message);
 			
 	if (config_sms_away && (GG_S_B(config_status) || (GG_S_I(config_status) && config_sms_away & 4)) && config_sms_app && config_sms_number) {
-		char *foo, sender[100];
+		if (!(ignored_check(e->event.msg.sender) & IGNORE_SMSAWAY)) {
+			char *foo, sender[100];
 
-		sms_away_add(e->event.msg.sender);
+			sms_away_add(e->event.msg.sender);
 
-		if (sms_away_check(e->event.msg.sender)) {
-			if (u && u->display)
-				snprintf(sender, sizeof(sender), "%s/%u", u->display, u->uin);
-			else
-				snprintf(sender, sizeof(sender), "%u", e->event.msg.sender);
+			if (sms_away_check(e->event.msg.sender)) {
+				if (u && u->display)
+					snprintf(sender, sizeof(sender), "%s/%u", u->display, u->uin);
+				else
+					snprintf(sender, sizeof(sender), "%u", e->event.msg.sender);
 
-			if (config_sms_max_length && strlen(e->event.msg.message) > config_sms_max_length)
-				e->event.msg.message[config_sms_max_length] = 0;
+				if (config_sms_max_length && strlen(e->event.msg.message) > config_sms_max_length)
+					e->event.msg.message[config_sms_max_length] = 0;
 
-			if (e->event.msg.recipients_count)
-				foo = format_string(format_find("sms_conf"), sender, e->event.msg.message);
-			else
-				foo = format_string(format_find((chat) ? "sms_chat" : "sms_msg"), sender, e->event.msg.message);
+				if (e->event.msg.recipients_count)
+					foo = format_string(format_find("sms_conf"), sender, e->event.msg.message);
+				else
+					foo = format_string(format_find((chat) ? "sms_chat" : "sms_msg"), sender, e->event.msg.message);
 
-			/* niech nie wysy³a smsów, je¶li brakuje formatów */
-			if (strcmp(foo, ""))
-				send_sms(config_sms_number, foo, 0);
-	
-			xfree(foo);
+				/* niech nie wysy³a smsów, je¶li brakuje formatów */
+				if (strcmp(foo, ""))
+					send_sms(config_sms_number, foo, 0);
+		
+				xfree(foo);
+			}
 		}
 	}
 
@@ -703,6 +705,7 @@ void handle_ack(struct gg_event *e)
 	struct userlist *u = userlist_find(e->event.ack.recipient, NULL);
 	int queued = (e->event.ack.status == GG_ACK_QUEUED);
 	const char *tmp, *target = ((u && u->display) ? u->display : itoa(e->event.ack.recipient));
+	static int show_short_ack_filtered = 0;
 
 	if (!e->event.ack.seq)	/* ignorujemy potwierdzenia ctcp */
 		return;
@@ -713,7 +716,14 @@ void handle_ack(struct gg_event *e)
 		event_check((queued) ? EVENT_QUEUED : EVENT_DELIVERED, e->event.ack.recipient, NULL);
 
 	if (u && !queued && GG_S_NA(u->status) && !(ignored_check(u->uin) & IGNORE_STATUS)) {
-		print_window(target, 0, "ack_filtered", format_user(e->event.ack.recipient));
+		char *ack_filtered;
+		if (show_short_ack_filtered) {
+			ack_filtered = "ack_filtered_short";
+		} else {
+			ack_filtered = "ack_filtered";
+			show_short_ack_filtered = 1;
+		}
+		print_window(target, 0, ack_filtered, format_user(e->event.ack.recipient));
 		return;
 	}
 
@@ -963,6 +973,8 @@ void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_
 		if (GG_S_NA(s->status)) {
 			memset(&u->ip, 0, sizeof(struct in_addr));
 			u->port = 0;
+			u->protocol = 0;
+			u->image_size = 0;
 		}
 
 #define __SAME_GG_S(x, y)	((GG_S_A(x) && GG_S_A(y)) || (GG_S_B(x) && GG_S_B(y)) || (GG_S_I(x) && GG_S_I(y)) || (GG_S_NA(x) && GG_S_NA(y)))
@@ -989,7 +1001,7 @@ void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_
 
 #undef __SAME_GG_S
 
-		if (ignore_status || ignore_notify)
+		if ((ignore_status || ignore_notify) && !config_log_ignored)
 			break;
 
 		/* zaloguj */
@@ -997,6 +1009,9 @@ void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_
 			put_log(uin, "status,%ld,%s,%s:%d,%s,%s\n", uin, ((u->display) ? u->display : ""), inet_ntoa(u->ip), u->port, log_timestamp(time(NULL)), s->log);
 		if (config_log_status && GG_S_D(s->status) && descr)
 		    	put_log(uin, "status,%ld,%s,%s:%d,%s,%s,%s\n", uin, ((u->display) ? u->display : ""), inet_ntoa(u->ip), u->port, log_timestamp(time(NULL)), s->log, descr);
+
+		if (ignore_status || ignore_notify)
+			break;
 
 		/* jak dostêpny lub zajêty i mamy go na li¶cie, dopiszmy do taba
 		 * jak niedostêpny, usuñmy. nie dotyczy osób spoza listy. */
@@ -1034,7 +1049,7 @@ void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_
 		}
 
 		/* daj znaæ d¿wiêkiem */
-		if (config_beep && config_beep_notify)
+		if (config_beep && config_beep_notify && (!config_events_delay || (time(NULL) - last_conn_event) >= config_events_delay))
 			ui_beep();
 
 		/* i muzyczk± */
@@ -2294,13 +2309,43 @@ void handle_image_request(struct gg_event *e)
 void handle_image_reply(struct gg_event *e)
 {
 	struct userlist *u;
+	list_t l;
 
 	gg_debug(GG_DEBUG_MISC, "// ekg: image_reply: sender=%d, filename=\"%s\", size=%d, crc32=%.8x\n", e->event.image_reply.sender, e->event.image_reply.filename, e->event.image_reply.size, e->event.image_reply.crc32);
 
+	if (e->event.image_request.crc32 != GG_CRC32_INVISIBLE)
+		return;
+
 	u = userlist_find(e->event.image_reply.sender, NULL);
 
+	if (u) {
+		for (l = spiedlist; l; l = l->next) {
+			struct spied *s = l->data;
+
+			if (s->uin == u->uin) {
+				int sec;
+				int msec;
+				struct timeval now;
+
+				gettimeofday(&now, NULL);
+
+				if (now.tv_usec < s->request_sent.tv_usec) {
+					sec = now.tv_sec - s->request_sent.tv_sec - 1;
+					msec = (now.tv_usec - s->request_sent.tv_usec + 1000000) / 1000;
+				} else {
+					sec = now.tv_sec - s->request_sent.tv_sec;
+					msec = (now.tv_usec - s->request_sent.tv_usec) / 1000;
+				}
+
+				gg_debug(GG_DEBUG_MISC, "// ekg: image_reply: round-trip-time %d.%03d\n", sec, msec);
+
+				list_remove(&spiedlist, s, 1);
+				break;
+			}
+		}
+	}
+
 	if (u && group_member(u, "spied")) {
-		list_t l;
 
 		if (GG_S_NA(u->status)) {
 			int status = (GG_S_D(u->status)) ? GG_STATUS_INVISIBLE_DESCR : GG_STATUS_INVISIBLE;
@@ -2308,16 +2353,8 @@ void handle_image_reply(struct gg_event *e)
 			handle_common(u->uin, status, u->descr, time(NULL), u->ip.s_addr, u->port, u->protocol, u->image_size);
 		}
 
-		for (l = spiedlist; l; l = l->next) {
-			struct spied *s = l->data;
+	} else {
 
-			if (s->uin == u->uin) {
-				list_remove(&spiedlist, s, 1);
-				break;
-			}
-		}
-
-	} else if (e->event.image_request.crc32 == GG_CRC32_INVISIBLE) {
 		if (u)
 			print("user_is_connected", format_user(e->event.image_reply.sender), (u->first_name) ? u->first_name : u->display); 
 		else

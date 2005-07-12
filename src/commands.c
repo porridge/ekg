@@ -1804,6 +1804,8 @@ COMMAND(cmd_list)
 			printq("user_info_ip", ip_str);
 		if ((u->protocol & GG_HAS_AUDIO_MASK))
 			printq("user_info_voip");
+		if ((u->protocol & GG_ERA_OMNIX_MASK))
+			printq("user_info_era_omnix");
 
 		if ((u->protocol & 0x00ffffff)) {
 			int v = u->protocol & 0x00ffffff;
@@ -1811,10 +1813,26 @@ COMMAND(cmd_list)
 
 			if (v < 0x0b)
 				ver = "<= 4.0.x";
-			if (v >= 0x0b && v < 0x11)
+			if (v >= 0x0f && v <= 0x10)
 				ver = "4.5.x";
-			if (v == 0x10)
+			if (v == 0x11)
 				ver = "4.6.x";
+			if (v >= 0x14 && v <= 0x15)
+				ver = "4.8.x";
+			if (v >= 0x16 && v <= 0x17)
+				ver = "4.9.x";
+			if (v >= 0x18 && v <= 0x1b)
+				ver = "5.0.x";
+			if (v >= 0x1c && v <= 0x1e)
+				ver = "5.7";
+			if (v == 0x20)
+				ver = "6.0 (build 129 lub nowszy)" ;
+			if (v == 0x21)
+				ver = "6.0 (build 133 lub nowszy)";
+			if (v == 0x22)
+				ver = "6.0 (build 140 lub nowszy)";
+			if (v == 0x24)
+				ver = "6.1 (build 155 lub nowszy)";
 
 			if (ver)
 				printq("user_info_version", ver);
@@ -3048,7 +3066,38 @@ COMMAND(cmd_dcc)
 		    	path = saprintf("%s/%s", config_dcc_dir, t->filename);
 		else
 		    	path = xstrdup(t->filename);
-		
+
+		if (config_dcc_backups) {
+			struct stat st;
+
+			if (!stat(path, &st)) {
+				int num;
+				char *newpath = NULL;	/* ¿eby nie by³o warninga */
+
+				for (num = 1; num < 1000; num++) {
+					newpath = saprintf("%s.%d", path, num);
+
+					if (stat(newpath, &st) == -1)
+						break;
+
+					xfree(newpath);
+				}
+
+				if (num == 1000) {
+					printq("dcc_get_cant_overwrite", path);
+					gg_free_dcc(t->dcc);
+					list_remove(&transfers, t, 1);
+					xfree(path);
+
+					return -1;
+				} else {
+					printq("dcc_get_backup_made", path, newpath);
+					xfree(path);
+					path = newpath;
+				}
+			}
+		}
+
 		if (params[0][0] == 'r') {
 			t->dcc->file_fd = open(path, O_WRONLY);
 			t->dcc->offset = lseek(t->dcc->file_fd, 0, SEEK_END);
@@ -3486,6 +3535,7 @@ COMMAND(cmd_test_imagemsg)
 
 	tmp = gg_crc32(0, image, size);
 	gg_debug(GG_DEBUG_MISC, "// crc32 = 0x%.8x, size = %d\n", tmp, size);
+	tmp = gg_fix32(tmp);
 	memcpy(format + 12, &tmp, 4);
 	tmp = gg_fix32(size);
 	memcpy(format + 8, &tmp, 4);
@@ -4201,13 +4251,14 @@ COMMAND(cmd_test_ctcp)
  *
  *  - target - w którym oknie nast±pi³o (NULL je¶li to nie query)
  *  - xline - linia tekstu.
- *  - quiet - mamy ukryæ wynik.
+ *  - quiet - czy mamy ukryæ wynik.
  *
  * 0/-1.
  */
 int command_exec(const char *target, const char *xline, int quiet)
 {
-	char *cmd = NULL, *tmp, *p = NULL, short_cmd[2] = ".", *last_name = NULL, *last_params = NULL, *line_save = NULL, *line = NULL;
+	char *cmd = NULL, *params_string = NULL, *last_name = NULL, *last_params = NULL, *line_save = NULL, *line = NULL;
+	char short_cmd[2];
 	command_func_t *last_abbr = NULL;
 	int abbrs = 0;
 	int correct_command = 0;
@@ -4251,6 +4302,13 @@ int command_exec(const char *target, const char *xline, int quiet)
 		}
 	}
 
+	/* sprawdzenie, czy nie "/ /foobar" */
+	if (target && strlen(xline) >= 3 && !strncmp(xline, "/ /", 3)) {
+		const char *params[] = { target, xline + 2, NULL };
+		cmd_msg("chat", params, NULL, quiet);
+		return 0;
+	}
+
 	send_nicks_index = 0;
 
 	line = line_save = xstrdup(xline);
@@ -4269,18 +4327,26 @@ int command_exec(const char *target, const char *xline, int quiet)
 
 		if (!isalpha_pl_PL(c->name[0]) && strlen(c->name) == 1 && line[0] == c->name[0]) {
 			short_cmd[0] = c->name[0];
+			short_cmd[1] = 0;
 			cmd = short_cmd;
-			p = line + 1;
+			params_string = line + 1;
 		}
 	}
 
 	if (!cmd) {
-		tmp = cmd = line;
+		char *tmp;
+
+		tmp = line;
+		cmd = line;
+
 		while (*tmp && !xisspace(*tmp))
 			tmp++;
-		p = (*tmp) ? tmp + 1 : tmp;
-		*tmp = 0;
-		p = strip_spaces(p);
+
+		if (*tmp) {
+			*tmp = 0;
+			params_string = tmp + 1;
+		} else
+			params_string = tmp;
 	}
 
 	for (l = commands; l; l = l->next) {
@@ -4293,6 +4359,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 			abbrs = 1;
 			break;
 		}
+		
 		if (!strncasecmp(c->name, cmd, strlen(cmd))) {
 			abbrs++;
 			last_abbr = c->function;
@@ -4309,14 +4376,14 @@ int command_exec(const char *target, const char *xline, int quiet)
 		int res, len = strlen(last_params);
 
 		/*
-		 * dla query potrzeba nam cudzys³owiów, natomiast
+		 * dla query potrzeba nam cudzys³owów, natomiast
 		 * dla ca³ej reszty nie s± one potrzebne (wymaga³oby to
 		 * strippowania w wielu miejscach i zmienienia paru koncepcji
 		 */
-		if(!strcasecmp(last_name, "query")) {
-			par = array_make_quoted(p, " \t", len, 1, 1);
+		if (!strcasecmp(last_name, "query")) {
+			par = array_make_quoted(params_string, " \t", len, 1, 1);
 		} else
-			par = array_make(p, " \t", len, 1, 1);
+			par = array_make(params_string, " \t", len, 1, 1);
 
 		command_processing = 1;
 		res = (last_abbr)(last_name, (const char**) par, target, quiet);
@@ -5539,7 +5606,6 @@ COMMAND(cmd_queue)
 
 /* eksperymentalne wykrywanie niewidoczno¶ci, a w zasadzie sprawdzanie czy klient
  * jest po³±czony */
-
 int check_conn(uin_t uin)
 {
 	struct userlist *u;
@@ -5547,7 +5613,7 @@ int check_conn(uin_t uin)
 	if (!sess || sess->state != GG_STATE_CONNECTED)
 		return -1;
 
-	if ((u = userlist_find(uin, NULL)) && group_member(u, "spied")) {
+	if ((u = userlist_find(uin, NULL))) {
 		list_t l;
 		struct spied s;
 
@@ -5564,11 +5630,12 @@ int check_conn(uin_t uin)
 
 		s.uin = uin;
 		s.timeout = SPYING_RESPONSE_TIMEOUT;
+		gettimeofday(&(s.request_sent), NULL);
 		list_add(&spiedlist, &s, sizeof(s));
-
-		gg_debug(GG_DEBUG_MISC, "// ekg: spying %d\n", s.uin);
+		
+		gg_debug(GG_DEBUG_MISC, "// ekg: spying %d\n", uin);
 	}
-
+                 
 	return gg_image_request(sess, uin, 1, GG_CRC32_INVISIBLE);
 }
 
@@ -5914,10 +5981,10 @@ void command_init()
 	  "                %Tniedostêpny%n s± po³±czone z serwerem\n"
 	  "\n"
 	  "EKSPERYMENTALNE! Sprawdza, czy podana osoba jest po³±czona. Klient tej osoby "
-	  "musi obs³ugiwaæ obrazki. Dzia³a w przypadku GG 6.0 dla Windows. Je¶li kto¶ "
-	  "u¿ywa innego klienta, to mo¿e mu siê pojawiæ pusta wiadomo¶æ (np. TLEN, ekg2). "
+	  "musi obs³ugiwaæ obrazki. Dzia³a w przypadku GG 6.x dla Windows. Je¶li kto¶ "
+	  "u¿ywa innego klienta, to mo¿e mu siê pojawiæ pusta wiadomo¶æ (np. TLEN). "
 	  "Dziêki tej funkcji "
-	  "mo¿na sprawdziæ czy osoba, któr± widzimy jako niedostêpna jest "
+	  "mo¿na sprawdziæ czy osoba, któr± widzimy jako niedostêpna, jest "
 	  "niewidoczna. Je¿eli brak aliasu jako parametr, sprawdzana jest osoba, "
 	  "z któr± rozmowa znajdujê siê w aktualnym okienku.\n"
 	  "\n"
@@ -6042,6 +6109,7 @@ void command_init()
 	  "  - descr - ignoruje tylko opisy\n"
 	  "  - notify - nie wy¶wietla zmian stanu\n"
 	  "  - msg - ignoruje wiadomo¶ci\n"
+	  "  - smsaway - nie przesy³a wiadomo¶ci podczas nieobecno¶ci\n"
 	  "  - dcc - ignoruje po³±czenia DCC\n"
 	  "  - events - ignoruje zdarzenia zwi±zane z u¿ytkownikiem\n"
 	  "  - * - wszystkie poziomy\n"
@@ -6176,7 +6244,7 @@ void command_init()
 	  "li¶cie kontaktów, %T%%2%n bêdzie zast±pione jego pseudonimem. Zamiast %T%%3%n i "
 	  "%T%%4%n wpisana bêdzie tre¶æ wiadomo¶ci, opis u¿ytkownika, ca³kowita liczba "
 	  "nowych wiadomo¶ci e-mail, nazwa pliku, konferencji lub adres serwera - w zale¿no¶ci od zdarzenia. "
-	  "Format %T%%4%n ró¿ni siê od %T%%3%n tym, ¿e wszystkie niebiezpieczne znaki, "
+	  "Format %T%%4%n ró¿ni siê od %T%%3%n tym, ¿e wszystkie niebezpieczne znaki, "
 	  "które mog³yby zostaæ zinterpretowane przez shell, zostan± poprzedzone backslashem. "
 	  "U¿ywanie %T%%3%n w przypadku komendy ,,exec'' jest %Tniebezpieczne%n i, je¶li naprawdê "
 	  "musisz wykorzystaæ tre¶æ wiadomo¶ci lub opis, u¿yj %T\"%%4\"%n (w cudzys³owach).");
@@ -6191,7 +6259,9 @@ void command_init()
 
 	command_add
 	( "play", "f", cmd_play, 0,
-	  " <plik>", "odtwarza plik d¼wiêkowy", "");
+	  " <plik>", "odtwarza plik d¼wiêkowy",
+	  "\n"
+	  "Polecenie wymaga zdefiniowania zmiennej %Tsound_app%n");
 
 	command_add
 	( "private", "", cmd_away, 0,

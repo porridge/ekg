@@ -431,10 +431,14 @@ char **array_make(const char *string, const char *sep, int max, int trim, int qu
 			last = 1;
 
 		if (trim) {
-			while (*p && strchr(sep, *p))
+			if (*p == '\\') {
 				p++;
-			if (!*p)
-				break;
+			} else {
+				while (*p && strchr(sep, *p))
+					p++;
+				if (!*p)
+					break;
+			}
 		}
 
 		if (!last && quotes && (*p == '\'' || *p == '\"')) {
@@ -549,10 +553,14 @@ char **array_make_quoted(const char *string, const char *sep, int max, int trim,
 			last = 1;
 
 		if (trim) {
-			while (*p && strchr(sep, *p))
+			if (*p == '\\') {
 				p++;
-			if (!*p)
-				break;
+			} else {
+				while (*p && strchr(sep, *p))
+					p++;
+				if (!*p)
+					break;
+			}
 		}
 
 		if (!last && quotes && (*p == '\'' || *p == '\"')) {

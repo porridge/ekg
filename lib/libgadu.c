@@ -408,7 +408,7 @@ int gg_read(struct gg_session *sess, char *buf, int length)
  */
 int gg_write(struct gg_session *sess, const char *buf, int length)
 {
-	int res;
+	int res = 0;
 
 #ifdef __GG_LIBGADU_HAVE_OPENSSL
 	if (sess->ssl) {
@@ -455,13 +455,16 @@ int gg_write(struct gg_session *sess, const char *buf, int length)
  *
  *  - sess - opis sesji
  *
- * w przypadku b³êdu NULL, kod b³êdu w errno.
+ * w przypadku b³êdu NULL, kod b³êdu w errno. nale¿y zwróciæ uwagê, ¿e gdy
+ * po³±czenie jest nieblokuj±ce, a kod b³êdu wynosi EAGAIN, nie uda³o siê
+ * odczytaæ ca³ego pakietu i nie nale¿y tego traktowaæ jako b³±d.
  */
 void *gg_recv_packet(struct gg_session *sess)
 {
 	struct gg_header h;
 	char *buf = NULL;
-	int ret = 0, offset, size = 0;
+	int ret = 0;
+	unsigned int offset, size = 0;
 
 	gg_debug(GG_DEBUG_FUNCTION, "** gg_recv_packet(%p);\n", sess);
 	
@@ -485,7 +488,7 @@ void *gg_recv_packet(struct gg_session *sess)
 			gg_debug(GG_DEBUG_MISC, "// gg_recv_packet() header recv(%d,%p,%d) = %d\n", sess->fd, &h + sess->header_done, sizeof(h) - sess->header_done, ret);
 
 			if (!ret) {
-				errno = 0;
+				errno = ECONNRESET;
 				gg_debug(GG_DEBUG_MISC, "// gg_recv_packet() header recv() failed: connection broken\n");
 				return NULL;
 			}
@@ -524,7 +527,7 @@ void *gg_recv_packet(struct gg_session *sess)
 		memcpy(&h, sess->recv_buf, sizeof(h));
 	
 	/* jakie¶ sensowne limity na rozmiar pakietu */
-	if (h.length < 0 || h.length > 65535) {
+	if (h.length > 65535) {
 		gg_debug(GG_DEBUG_MISC, "// gg_recv_packet() invalid packet length (%d)\n", h.length);
 		errno = ERANGE;
 		return NULL;
@@ -550,11 +553,20 @@ void *gg_recv_packet(struct gg_session *sess)
 	while (size > 0) {
 		ret = gg_read(sess, buf + sizeof(h) + offset, size);
 		gg_debug(GG_DEBUG_MISC, "// gg_recv_packet() body recv(%d,%p,%d) = %d\n", sess->fd, buf + sizeof(h) + offset, size, ret);
+		if (!ret) {
+			gg_debug(GG_DEBUG_MISC, "// gg_recv_packet() body recv() failed: connection broken\n");
+			errno = ECONNRESET;
+			return NULL;
+		}
 		if (ret > -1 && ret <= size) {
 			offset += ret;
 			size -= ret;
 		} else if (ret == -1) {	
+			int errno2 = errno;
+
 			gg_debug(GG_DEBUG_MISC, "// gg_recv_packet() body recv() failed (errno=%d, %s)\n", errno, strerror(errno));
+			errno = errno2;
+
 			if (errno == EAGAIN) {
 				gg_debug(GG_DEBUG_MISC, "// gg_recv_packet() %d bytes received, %d left\n", offset, size);
 				sess->recv_buf = buf;
@@ -605,9 +617,9 @@ int gg_send_packet(struct gg_session *sess, int type, ...)
 {
 	struct gg_header *h;
 	char *tmp;
-	int tmp_length;
+	unsigned int tmp_length;
 	void *payload;
-	int payload_length;
+	unsigned int payload_length;
 	va_list ap;
 	int res;
 
@@ -627,11 +639,8 @@ int gg_send_packet(struct gg_session *sess, int type, ...)
 	while (payload) {
 		char *tmp2;
 
-		payload_length = va_arg(ap, int);
+		payload_length = va_arg(ap, unsigned int);
 
-		if (payload_length < 0)
-			gg_debug(GG_DEBUG_MISC, "// gg_send_packet() invalid payload length (%d)\n", payload_length);
-	
 		if (!(tmp2 = realloc(tmp, tmp_length + payload_length))) {
 			gg_debug(GG_DEBUG_MISC, "// gg_send_packet() not enough memory for payload\n");
 			free(tmp);
@@ -754,6 +763,8 @@ struct gg_session *gg_login(const struct gg_login_params *p)
 	sess->external_port = p->external_port;
 	sess->external_addr = p->external_addr;
 	sess->protocol_version = (p->protocol_version) ? p->protocol_version : GG_DEFAULT_PROTOCOL_VERSION;
+	if (p->era_omnix)
+		sess->protocol_version |= GG_ERA_OMNIX_MASK;
 	if (p->has_audio)
 		sess->protocol_version |= GG_HAS_AUDIO_MASK;
 	sess->client_version = (p->client_version) ? strdup(p->client_version) : NULL;
@@ -1204,7 +1215,7 @@ int gg_image_reply(struct gg_session *sess, uin_t recipient, const char *filenam
 	struct gg_send_msg s;
 	const char *tmp;
 	char buf[1910];
-	int res;
+	int res = -1;
 
 	gg_debug(GG_DEBUG_FUNCTION, "** gg_image_reply(%p, %d, \"%s\", %p, %d);\n", sess, recipient, filename, image, size);
 
