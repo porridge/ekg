@@ -1415,6 +1415,7 @@ void handle_pubdir(struct gg_http *h)
 		
 		if (!config_uin && !config_password && reg_password && !config_email && reg_email) {
 			config_uin = s->uin;
+			changed_uin("uin");
 			
 			config_password = reg_password;
 			reg_password = NULL;
