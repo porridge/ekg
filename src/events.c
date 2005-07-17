@@ -2312,7 +2312,7 @@ void handle_image_reply(struct gg_event *e)
 	struct userlist *u;
 	list_t l;
 
-	gg_debug(GG_DEBUG_MISC, "// ekg: image_reply: sender=%d, filename=\"%s\", size=%d, crc32=%.8x\n", e->event.image_reply.sender, e->event.image_reply.filename, e->event.image_reply.size, e->event.image_reply.crc32);
+	gg_debug(GG_DEBUG_MISC, "// ekg: image_reply: sender=%d, filename=\"%s\", size=%d, crc32=%.8x\n", e->event.image_reply.sender, ((e->event.image_reply.filename) ? e->event.image_reply.filename : "NULL"), e->event.image_reply.size, e->event.image_reply.crc32);
 
 	if (e->event.image_request.crc32 != GG_CRC32_INVISIBLE)
 		return;
