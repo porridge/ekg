@@ -14,7 +14,7 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 - libgadu: poprawka dwóch b³êdów typu integer overflow -- ilo¶æ odbiorców
   wiadomo¶ci wiêksza ni¿ 0x3fffffff spowoduje przekroczenie zakresu zmiennych
   i zaalokowanie zbyt ma³ej ilo¶ci pamiêci przy obs³udze konferencji
-  (mslusarz/w)
+  (CAN-2005-1852) (mslusarz/w)
 
 // 2005-07-13
 
@@ -23,13 +23,15 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 // 2005-07-12
 
 - poprawki bezpieczeñstwa i inne pomniejsze contrib/scripts/ekgbot-pre1.py
-  (porridge)
-- poprawki zachowania komend /_image* na maszynach big-endian (w)
+  (CAN-2005-1851) (porridge)
+- poprawki zachowania komend /_image* na maszynach big-endian
+  (CAN-2005-2369) (w)
 
 // 2005-07-11
 
-- poprawki bezpieczeñstwa skryptów w contrib/ (porridge)
-- poprawki bezpieczeñstwa contrib/scripts/linki.py (eromang/w)
+- poprawki bezpieczeñstwa skryptów w contrib/ (CAN-2005-1850) (porridge)
+- poprawki bezpieczeñstwa contrib/scripts/linki.py (CAN-2005-1916)
+  (eromang/w)
 
 // 2005-07-04
 
@@ -63,7 +65,7 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 // 2005-06-19
 
 - libgadu: poprawka wyrównania dostêpu do pamiêci, która likwiduje SIGBUS
-  na SPARCach (embe/w)
+  na SPARCach (CAN-2005-2370) (embe/w)
 
 // 2005-06-07
 
