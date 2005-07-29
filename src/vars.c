@@ -106,6 +106,8 @@ void variable_init()
 	variable_add("email", "em", VAR_STR, 1, &config_email, NULL, NULL, NULL);
 #ifdef HAVE_VOIP
 	variable_add("audio_device", "ad", VAR_STR, 1, &config_audio_device, NULL, NULL, NULL);
+#else
+	variable_add("audio_device", "ad", VAR_STR, 2, NULL, NULL, NULL, NULL);
 #endif
 	variable_add("auto_away", "aa", VAR_INT, 1, &config_auto_away, NULL, NULL, NULL);
 	variable_add("auto_away_keep_descr", "ak", VAR_BOOL, 1, &config_auto_away_keep_descr, NULL, NULL, NULL);
@@ -118,6 +120,10 @@ void variable_init()
 	variable_add("aspell", "al", VAR_BOOL, 1, &config_aspell, changed_aspell, NULL, NULL);
 	variable_add("aspell_lang", "ag", VAR_STR, 1, &config_aspell_lang, changed_aspell, NULL, NULL);
 	variable_add("aspell_encoding", "an", VAR_STR, 1, &config_aspell_encoding, changed_aspell, NULL, NULL);
+#else
+	variable_add("aspell", "al", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
+	variable_add("aspell_lang", "ag", VAR_STR, 2, NULL, NULL, NULL, NULL);
+	variable_add("aspell_encoding", "an", VAR_STR, 2, NULL, NULL, NULL, NULL);
 #endif
 	variable_add("away_reason", "ar", VAR_STR, 1, &config_away_reason, changed_xxx_reason, NULL, NULL);
 	variable_add("back_reason", "br", VAR_STR, 1, &config_back_reason, changed_xxx_reason, NULL, NULL);
@@ -125,7 +131,13 @@ void variable_init()
 	if (ui_init == ui_ncurses_init) {
 		variable_add("backlog_overlap", "bo", VAR_INT, 1, &config_backlog_overlap, NULL, NULL, NULL);
 		variable_add("backlog_size", "bs", VAR_INT, 1, &config_backlog_size, changed_backlog_size, NULL, NULL);
+	} else {
+		variable_add("backlog_overlap", "bo", VAR_INT, 2, NULL, NULL, NULL, NULL);
+		variable_add("backlog_size", "bs", VAR_INT, 2, NULL, NULL, NULL, NULL);
 	}
+#else
+	variable_add("backlog_overlap", "bo", VAR_INT, 2, NULL, NULL, NULL, NULL);
+	variable_add("backlog_size", "bs", VAR_INT, 2, NULL, NULL, NULL, NULL);
 #endif
 	variable_add("beep", "be", VAR_BOOL, 1, &config_beep, NULL, NULL, NULL);
 	variable_add("beep_msg", "bm", VAR_BOOL, 1, &config_beep_msg, NULL, NULL, dd_beep);
@@ -135,6 +147,10 @@ void variable_init()
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init)
 		variable_add("beep_title", "bt", VAR_INT, 1, &config_beep_title, NULL, NULL, NULL);
+	else
+		variable_add("beep_title", "bt", VAR_INT, 2, NULL, NULL, NULL, NULL);
+#else
+	variable_add("beep_title", "bt", VAR_INT, 2, NULL, NULL, NULL, NULL);
 #endif
 	variable_add("check_mail", "cm", VAR_MAP, 1, &config_check_mail, changed_check_mail, variable_map(4, 0, 0, "no", 1, 2, "mbox", 2, 1, "maildir", 4, 0, "notify"), NULL);
 	variable_add("check_mail_frequency", "cf", VAR_INT, 1, &config_check_mail_frequency, changed_check_mail, NULL, dd_check_mail);
@@ -143,6 +159,10 @@ void variable_init()
 #ifdef WITH_UI_READLINE
 	if (ui_init == ui_readline_init)
 		variable_add("ctrld_quits", "cq", VAR_BOOL, 1, &config_ctrld_quits, NULL, NULL, NULL);
+	else
+		variable_add("ctrld_quits", "cq", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
+#else
+	variable_add("ctrld_quits", "cq", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
 #endif
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
@@ -150,7 +170,17 @@ void variable_init()
 		variable_add("contacts_groups", "cg", VAR_STR, 1, &config_contacts_groups, NULL, NULL, dd_contacts);
 		variable_add("contacts_options", "cO", VAR_STR, 1, &config_contacts_options, NULL, NULL, dd_contacts);
 		variable_add("contacts_size", "cs", VAR_INT, 1, &config_contacts_size, NULL, NULL, dd_contacts);
+	} else {
+		variable_add("contacts", "co", VAR_INT, 2, NULL, NULL, NULL, NULL);
+		variable_add("contacts_groups", "cg", VAR_STR, 2, NULL, NULL, NULL, NULL);
+		variable_add("contacts_options", "cO", VAR_STR, 2, NULL, NULL, NULL, NULL);
+		variable_add("contacts_size", "cs", VAR_INT, 2, NULL, NULL, NULL, NULL);
 	}
+#else
+	variable_add("contacts", "co", VAR_INT, 2, NULL, NULL, NULL, NULL);
+	variable_add("contacts_groups", "cg", VAR_STR, 2, NULL, NULL, NULL, NULL);
+	variable_add("contacts_options", "cO", VAR_STR, 2, NULL, NULL, NULL, NULL);
+	variable_add("contacts_size", "cs", VAR_INT, 2, NULL, NULL, NULL, NULL);
 #endif
 	variable_add("dcc", "dc", VAR_BOOL, 1, &config_dcc, changed_dcc, NULL, NULL);
 	variable_add("dcc_ip", "di", VAR_STR, 1, &config_dcc_ip, changed_dcc, NULL, dd_dcc);
@@ -165,31 +195,51 @@ void variable_init()
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init)
 		variable_add("display_crap", "dr", VAR_BOOL, 1, &config_display_crap, NULL, NULL, NULL);
+	else
+		variable_add("display_crap", "dr", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
+#else
+	variable_add("display_crap", "dr", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
 #endif
 	variable_add("display_notify", "dn", VAR_MAP, 1, &config_display_notify, NULL, variable_map(4, 0, 0, "none", 1, 2, "all", 2, 1, "significant", 4, 0, "unknown"), NULL);
 	variable_add("display_pl_chars", "dp", VAR_BOOL, 1, &config_display_pl_chars, NULL, NULL, NULL);
 	variable_add("display_sent", "ds", VAR_BOOL, 1, &config_display_sent, NULL, NULL, NULL);
 #ifdef HAVE_LIBJPEG
 	variable_add("display_token", "dT", VAR_BOOL, 1, &config_display_token, NULL, NULL, NULL);
+#else
+	variable_add("display_token", "dT", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
 #endif
 	variable_add("display_welcome", "dw", VAR_BOOL, 1, &config_display_welcome, NULL, NULL, NULL);
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init)
 		variable_add("display_transparent", "dt", VAR_BOOL, 1, &config_display_transparent, NULL, NULL, NULL);
+	else
+		variable_add("display_transparent", "dt", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
+#else
+	variable_add("display_transparent", "dt", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
 #endif
 	variable_add("emoticons", "eM", VAR_BOOL, 1, &config_emoticons, NULL, NULL, NULL);
 #ifdef HAVE_OPENSSL
 	variable_add("encryption", "en", VAR_BOOL, 1, &config_encryption, NULL, NULL, NULL);
+#else
+	variable_add("encryption", "en", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
 #endif
 	variable_add("era_omnix", "eO", VAR_BOOL, 1, &config_era_omnix, changed_era_omnix, NULL, NULL);
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init)
 		variable_add("enter_scrolls", "es", VAR_BOOL, 1, &config_enter_scrolls, NULL, NULL, NULL);
+	else
+		variable_add("enter_scrolls", "es", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
+#else
+	variable_add("enter_scrolls", "es", VAR_BOOL, 2, NULL,  NULL, NULL, NULL);
 #endif
 	variable_add("events_delay", "ev", VAR_INT, 1, &config_events_delay, NULL, NULL, NULL);
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init)
 		variable_add("header_size", "hs", VAR_INT, 1, &config_header_size, header_statusbar_resize, NULL, NULL);
+	else
+		variable_add("header_size", "hs", VAR_INT, 2, NULL, NULL, NULL, NULL);
+#else
+	variable_add("header_size", "hs", VAR_INT, 2, NULL, NULL, NULL, NULL);
 #endif
 	variable_add("ignore_unknown_sender", "iu", VAR_BOOL, 1, &config_ignore_unknown_sender, NULL, NULL, NULL);
 	variable_add("ignore_empty_msg", "im", VAR_BOOL, 1, &config_ignore_empty_msg, NULL, NULL, NULL);
@@ -230,12 +280,19 @@ void variable_init()
 	variable_add("speech_app", "SA", VAR_STR, 1, &config_speech_app, NULL, NULL, NULL);
 	variable_add("status_window", "Sw", VAR_INT, 1, &config_status_window, NULL, variable_map(3, 0, 0, "query", 1, 2, "current", 2, 1, "status"), NULL);
 #ifdef WITH_UI_NCURSES
-	if (ui_init == ui_ncurses_init)
-	{
+	if (ui_init == ui_ncurses_init) {
 		variable_add("statusbar_size", "sS", VAR_INT, 1, &config_statusbar_size, header_statusbar_resize, NULL, NULL);
 		variable_add("statusbar_fgcolor", "sF", VAR_INT, 1, &config_statusbar_fgcolor, NULL, NULL, NULL);
 		variable_add("statusbar_bgcolor", "sB", VAR_INT, 1, &config_statusbar_bgcolor, NULL, NULL, NULL);
+	} else {
+		variable_add("statusbar_size", "sS", VAR_INT, 2, NULL, NULL, NULL, NULL);
+		variable_add("statusbar_fgcolor", "sF", VAR_INT, 2, NULL, NULL, NULL, NULL);
+		variable_add("statusbar_bgcolor", "sB", VAR_INT, 2, NULL, NULL, NULL, NULL);
 	}
+#else
+	variable_add("statusbar_size", "sS", VAR_INT, 2, NULL, NULL, NULL, NULL);
+	variable_add("statusbar_fgcolor", "sF", VAR_INT, 2, NULL, NULL, NULL, NULL);
+	variable_add("statusbar_bgcolor", "sB", VAR_INT, 2, NULL, NULL, NULL, NULL);
 #endif
 	variable_add("tab_command", "tc", VAR_STR, 1, &config_tab_command, NULL, NULL, NULL);
 	variable_add("theme", "th", VAR_STR, 1, &config_theme, changed_theme, NULL, NULL);
@@ -243,12 +300,20 @@ void variable_init()
 	variable_add("timestamp", "ts", VAR_STR, 1, &config_timestamp, NULL, NULL, NULL);
 #ifdef WITH_WAP
 	variable_add("wap_enabled", "we", VAR_INT, 1, &config_wap_enabled, NULL, NULL, NULL);
+#else
+	variable_add("wap_enabled", "we", VAR_INT, 2, NULL, NULL, NULL, NULL);
 #endif
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
 		variable_add("windows_save", "ws", VAR_MAP, 1, &config_windows_save, NULL, variable_map(3, 0, 0, "no", 1, 0, "quit", 2, 0, "save"), NULL);
 		variable_add("windows_layout", "wl", VAR_STR, 2, &config_windows_layout, NULL, NULL, NULL);
+	} else {
+		variable_add("windows_save", "ws", VAR_MAP, 2, NULL, NULL, NULL, NULL);
+		variable_add("windows_layout", "wl", VAR_STR, 2, NULL, NULL, NULL, NULL);
 	}
+#else 
+	variable_add("windows_save", "ws", VAR_MAP, 2, NULL, NULL, NULL, NULL);
+	variable_add("windows_layout", "wl", VAR_STR, 2, NULL, NULL, NULL, NULL);
 #endif
 	variable_add("status", "st", VAR_INT, 2, &config_status, NULL, NULL, NULL);
 	variable_add("protocol", "pR", VAR_INT, 2, &config_protocol, NULL, NULL, NULL);
@@ -259,6 +324,9 @@ void variable_init()
 #ifdef WITH_IOCTLD
 	variable_add("ioctld_enable", "Ie", VAR_INT, 1, &config_ioctld_enable, NULL, NULL, NULL);
 	variable_add("ioctld_net_port", "Ip", VAR_INT, 1, &config_ioctld_net_port, NULL, NULL, NULL);
+#else
+	variable_add("ioctld_enable", "Ie", VAR_INT, 2, NULL, NULL, NULL, NULL);
+	variable_add("ioctld_net_port", "Ip", VAR_INT, 2, NULL, NULL, NULL, NULL);
 #endif
 }
 
@@ -305,6 +373,9 @@ struct variable *variable_find(const char *name)
 
 	for (l = variables; l; l = l->next) {
 		struct variable *v = l->data;
+
+		if (!v->ptr)
+			continue;
 
 		if (v->name_hash == hash && !strcasecmp(v->name, name))
 			return v;
@@ -582,7 +653,7 @@ void variable_free()
 
 		xfree(v->name);
 
-		if (v->type == VAR_STR) {
+		if (v->type == VAR_STR && v->ptr) {
 			xfree(*((char**) v->ptr));
 			*((char**) v->ptr) = NULL;
 		}
@@ -618,6 +689,9 @@ char *variable_digest()
 	for (l = variables; l; l = l->next) {
 		struct variable *v = l->data;
 
+		if (!v->ptr)
+			continue;
+
 		if ((v->type == VAR_INT || v->type == VAR_BOOL || v->type == VAR_MAP) && strcmp(v->name, "uin")) {
 			string_append(s, v->short_name);
 			string_append(s, itoa(*(int*)(v->ptr)));
@@ -627,6 +701,9 @@ char *variable_digest()
 	for (l = variables; l; l = l->next) {
 		struct variable *v = l->data;
 		char *val;
+
+		if (!v->ptr)
+			continue;
 
 		if (!v->type == VAR_STR || !strcmp(v->name, "password") || !strcmp(v->name, "local_ip"))
 			continue;

@@ -295,7 +295,7 @@ static char *variable_generator(char *text, int state)
 		
 		l = l->next;
 		
-		if (v->type == VAR_FOREIGN)
+		if (v->type == VAR_FOREIGN || !v->ptr)
 			continue;
 
 		if (*text == '-') {

@@ -2542,7 +2542,7 @@ void variable_generator(const char *text, int len)
 	for (l = variables; l; l = l->next) {
 		struct variable *v = l->data;
 
-		if (v->type == VAR_FOREIGN)
+		if (v->type == VAR_FOREIGN || !v->ptr)
 			continue;
 
 		if (*text == '-') {

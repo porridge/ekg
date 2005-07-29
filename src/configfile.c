@@ -310,7 +310,7 @@ char *config_read_variable(const char *name)
  */
 void config_write_variable(FILE *f, struct variable *v, int base64)
 {
-	if (!f || !v)
+	if (!f || !v || !v->ptr)
 		return;
 
 	if (v->type == VAR_STR) {
