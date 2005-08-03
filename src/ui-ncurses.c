@@ -2143,9 +2143,12 @@ static void ui_ncurses_beep()
  */
 void spellcheck_init(void)
 {
+	int quiet = 0;
         AspellCanHaveError * possible_err;
 	if(config_aspell != 1)
 	    return;
+	if (!config_uin)
+	    quiet = 1;
 	printq("aspell_init");
         spell_config = new_aspell_config();
         aspell_config_replace(spell_config, "encoding", config_aspell_encoding);
