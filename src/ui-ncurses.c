@@ -2144,30 +2144,29 @@ static void ui_ncurses_beep()
 void spellcheck_init(void)
 {
 	int quiet = 0;
-        AspellCanHaveError * possible_err;
-	if(config_aspell != 1)
-	    return;
+	AspellCanHaveError *possible_err;
+	if (!config_aspell)
+		return;
 	if (!config_uin)
-	    quiet = 1;
+		quiet = 1;
 	printq("aspell_init");
 	if (spell_checker)
-	    delete_aspell_speller(spell_checker);
-        spell_config = new_aspell_config();
-        aspell_config_replace(spell_config, "encoding", config_aspell_encoding);
-        aspell_config_replace(spell_config, "lang", config_aspell_lang);
+		delete_aspell_speller(spell_checker);
+	spell_config = new_aspell_config();
+	aspell_config_replace(spell_config, "encoding", config_aspell_encoding);
+	aspell_config_replace(spell_config, "lang", config_aspell_lang);
 	possible_err = new_aspell_speller(spell_config);
 
-        if (aspell_error_number(possible_err) != 0)
-        {
-	    char *err = aspell_error_message(possible_err);
-	    gg_debug(GG_DEBUG_MISC, "Aspell error: %s\n", err);
-	    printq("aspell_init_error", err);
-            config_aspell = 0;
-        }
-        else
-            spell_checker = to_aspell_speller(possible_err);
-
-	printq("aspell_init_success");
+	if (aspell_error_number(possible_err) != 0) {
+		char *err = aspell_error_message(possible_err);
+		gg_debug(GG_DEBUG_MISC, "Aspell error: %s\n", err);
+		spell_checker = NULL;
+		printq("aspell_init_error", err);
+		config_aspell = 0;
+	} else {
+		spell_checker = to_aspell_speller(possible_err);
+		printq("aspell_init_success");
+	}
 }
 #endif
 			    
