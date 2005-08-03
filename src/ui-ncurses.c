@@ -2150,6 +2150,8 @@ void spellcheck_init(void)
 	if (!config_uin)
 	    quiet = 1;
 	printq("aspell_init");
+	if (spell_checker)
+	    delete_aspell_speller(spell_checker);
         spell_config = new_aspell_config();
         aspell_config_replace(spell_config, "encoding", config_aspell_encoding);
         aspell_config_replace(spell_config, "lang", config_aspell_lang);
