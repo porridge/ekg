@@ -2146,6 +2146,7 @@ void spellcheck_init(void)
         AspellCanHaveError * possible_err;
 	if(config_aspell != 1)
 	    return;
+	printq("aspell_init");
         spell_config = new_aspell_config();
         aspell_config_replace(spell_config, "encoding", config_aspell_encoding);
         aspell_config_replace(spell_config, "lang", config_aspell_lang);
@@ -2153,11 +2154,15 @@ void spellcheck_init(void)
 
         if (aspell_error_number(possible_err) != 0)
         {
-	    gg_debug(GG_DEBUG_MISC, "Aspell error: %s\n", aspell_error_message(possible_err));
+	    char *err = aspell_error_message(possible_err);
+	    gg_debug(GG_DEBUG_MISC, "Aspell error: %s\n", err);
+	    printq("aspell_init_error", err);
             config_aspell = 0;
         }
         else
             spell_checker = to_aspell_speller(possible_err);
+
+	printq("aspell_init_success");
 }
 #endif
 			    

@@ -1457,4 +1457,11 @@ void theme_init()
 	format_add("python_not_found", "%! Nie znaleziono skryptu %T%1%n\n", 1);
 	format_add("python_wrong_location", "%! Skrypt nale¿y umie¶ciæ w katalogu %T%1%n\n", 1);
 #endif
+
+#ifdef WITH_ASPELL
+	/* aspell */
+	format_add("aspell_init", "%> Czekaj, inicjujê modu³ sprawdzania pisowni...\n", 1);
+	format_add("aspell_init_success", "%> Zainicjowano modu³ sprawdzania pisowni\n", 1);
+	format_add("aspell_init_error", "%! B³±d modu³u sprawdzania pisowni: %T%1%n\n", 1);
+#endif
 }
