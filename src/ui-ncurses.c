@@ -2307,7 +2307,9 @@ static void ui_ncurses_postinit()
 		array_free(targets);
 	}
 
+#ifdef WITH_ASPELL
 	spellcheck_init();
+#endif
 }
 
 /*
