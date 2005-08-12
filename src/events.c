@@ -1879,6 +1879,13 @@ void handle_dcc(struct gg_dcc *d)
 				print("dcc_spoof", format_user(d->peer_uin), inet_ntoa(u->ip), tmp);
 			}
 
+			t = find_transfer(d);
+			if (t) {
+				t->start = time(NULL);
+				if (t->start == -1)
+					t->start = 0;
+			}
+
 			break;
 		}
 

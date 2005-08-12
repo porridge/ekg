@@ -1282,7 +1282,11 @@ void theme_init()
 	format_add("dcc_show_pending_voice", "%) #%1, %2, rozmowa\n", 1);
 	format_add("dcc_show_active_header", "%> Po³±czenia aktywne:\n", 1);
 	format_add("dcc_show_active_send", "%) #%1, %2, wysy³anie %T%3%n, %T%4b%n z %T%5b%n (%6%%)\n", 1);
+	format_add("dcc_show_active_send_speed_s", "%) #%1, %2, wysy³anie %T%3%n, %T%4b%n z %T%5b%n (%6%%, %T%7%nkB/s, pozosta³o %T%8%ns)\n", 1);
+	format_add("dcc_show_active_send_speed_ms", "%) #%1, %2, wysy³anie %T%3%n, %T%4b%n z %T%5b%n (%6%%, %T%7%nkB/s, pozosta³o %T%8%nm %T%9%ns)\n", 1);
 	format_add("dcc_show_active_get", "%) #%1, %2, odbiór %T%3%n, %T%4b%n z %T%5b%n (%6%%)\n", 1);
+	format_add("dcc_show_active_get_speed_s", "%) #%1, %2, odbiór %T%3%n, %T%4b%n z %T%5b%n (%6%%, %T%7%nkB/s, pozosta³o %T%8%ns)\n", 1);
+	format_add("dcc_show_active_get_speed_ms", "%) #%1, %2, odbiór %T%3%n, %T%4b%n z %T%5b%n (%6%%, %T%7%nkB/s, pozosta³o %T%8%nm %T%9%ns)\n", 1);
 	format_add("dcc_show_active_voice", "%) #%1, %2, rozmowa\n", 1);
 	format_add("dcc_show_empty", "%! Brak bezpo¶rednich po³±czeñ\n", 1);
 	format_add("dcc_receiving_already", "%! Plik %T%1%n od u¿ytkownika %2 jest ju¿ pobierany\n", 1);

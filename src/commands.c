@@ -2786,17 +2786,58 @@ COMMAND(cmd_dcc)
 			struct transfer *t = l->data;
 
 			if (t->dcc && t->dcc->established) {
+				int eta_m = 0, eta_s = 0, speed_kb = 0;
+
 				empty = 0;
 				if (!passed)
 					printq("dcc_show_active_header");
 				passed++;
 
+				if (t->start) {
+					time_t cur, elapsed = 0, eta = 0;
+					int speed = 0;
+
+					cur = time(NULL);
+					if (cur != -1 && cur >= t->start)
+						elapsed = cur - t->start;
+
+					if (elapsed) {
+						speed = t->dcc->offset / elapsed;
+						if (t->dcc->offset && t->dcc->offset <= t->dcc->file_info.size)
+							eta = (t->dcc->file_info.size - t->dcc->offset) * elapsed / t->dcc->offset;
+					}
+
+					/* teraz elapsed zawiera czas, który up³yn±³ 
+					 * od rozpoczêcia transferu, speed prêdko¶æ 
+					 * w bajtach na sekundê a eta estymowany 
+					 * czas, który pozosta³ do przes³ania ca³ego 
+					 * pliku. zamieniamy na bardziej rozs±dne 
+					 * warto¶ci (prêdko¶æ w kB/s a pozosta³y 
+					 * czas w minutach i sekundach). */
+
+					speed_kb = speed / 1024;
+					eta_m = eta / 60;
+					eta_s = eta - eta_m * 60;
+				}
+
 				switch (t->type) {
 					case GG_SESSION_DCC_SEND:
-						printq("dcc_show_active_send", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa((float)100*((float)t->dcc->offset/(float)t->dcc->file_info.size)));
+						if (speed_kb || eta_m || eta_s) {
+							if (eta_m)
+								printq("dcc_show_active_send_speed_ms", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa((float)100*((float)t->dcc->offset/(float)t->dcc->file_info.size)), itoa(speed_kb), itoa(eta_m), itoa(eta_s));
+							else
+								printq("dcc_show_active_send_speed_s", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa((float)100*((float)t->dcc->offset/(float)t->dcc->file_info.size)), itoa(speed_kb), itoa(eta_s));
+						} else
+							printq("dcc_show_active_send", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa((float)100*((float)t->dcc->offset/(float)t->dcc->file_info.size)));
 						break;
 					case GG_SESSION_DCC_GET:
-						printq("dcc_show_active_get", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa((float)100*((float)t->dcc->offset/(float)t->dcc->file_info.size)));
+						if (speed_kb || eta_m || eta_s) {
+							if (eta_m)
+								printq("dcc_show_active_get_speed_ms", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa((float)100*((float)t->dcc->offset/(float)t->dcc->file_info.size)), itoa(speed_kb), itoa(eta_m), itoa(eta_s));
+							else
+								printq("dcc_show_active_get_speed_s", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa((float)100*((float)t->dcc->offset/(float)t->dcc->file_info.size)), itoa(speed_kb), itoa(eta_s));
+						} else
+							printq("dcc_show_active_get", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa((float)100*((float)t->dcc->offset/(float)t->dcc->file_info.size)));
 						break;
 					case GG_SESSION_DCC_VOICE:
 						printq("dcc_show_active_voice", itoa(t->id), format_user(t->uin));
@@ -2858,7 +2899,11 @@ COMMAND(cmd_dcc)
 		t.id = transfer_id();
 		t.type = GG_SESSION_DCC_SEND;
 		t.filename = xstrdup(params[2]);
+		t.start = time(NULL);
 		t.dcc = NULL;
+
+		if (t.start == -1)
+			t.start = 0;
 
 		if (u->port < 10 || !strncasecmp(params[0], "rse", 3)) {
 			/* nie mo¿emy siê z nim po³±czyæ, wiêc on spróbuje */
@@ -2987,6 +3032,9 @@ COMMAND(cmd_dcc)
 		tt.id = transfer_id();
 		tt.type = GG_SESSION_DCC_VOICE;
 		tt.protocol = u->protocol;
+		tt.start = time(NULL);
+		if (tt.start == -1)
+			tt.start = 0;
 
 		if (u->port < 10 || !strncasecmp(params[0], "rvo", 3)) {
 			/* nie mo¿emy siê z nim po³±czyæ, wiêc on spróbuje */
@@ -3061,6 +3109,10 @@ COMMAND(cmd_dcc)
 				return -1;
 			}
 		}
+
+		t->start = time(NULL);
+		if (t->start == -1)
+			t->start = 0;
 
 		if (config_dcc_dir) 
 		    	path = saprintf("%s/%s", config_dcc_dir, t->filename);

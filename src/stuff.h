@@ -97,6 +97,7 @@ struct transfer {
 	uin_t uin;
 	char *filename;
 	struct gg_dcc *dcc;
+	time_t start;
 	int type;
 	int id;
 	int protocol;
