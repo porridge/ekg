@@ -2061,10 +2061,9 @@ static void update_statusbar(int commit)
 }
 
 #ifdef SIGWINCH
-static void sigwinch_handler()
+static void sigwinch_handler(int sig)
 {
 	ui_need_refresh = 1;
-	signal(SIGWINCH, sigwinch_handler);
 }
 #endif
 
@@ -2264,7 +2263,13 @@ void ui_ncurses_init()
 	}
 
 #ifdef SIGWINCH
-	signal(SIGWINCH, sigwinch_handler);
+	{
+		struct sigaction sa;
+
+		memset(&sa, 0, sizeof(sa));
+		sa.sa_handler = sigwinch_handler;
+		sigaction(SIGWINCH, &sa, NULL);
+	}
 #endif
 
 	memset(history, 0, sizeof(history));

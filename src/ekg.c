@@ -99,6 +99,12 @@ static int get_char_from_pipe(struct gg_common *c);
 
 int old_stderr = 0;
 
+static volatile sig_atomic_t do_exit = 0;
+static volatile sig_atomic_t do_handle_sigusr1 = 0;
+static volatile sig_atomic_t do_handle_sigusr2 = 0;
+
+static char sigsegv_msg[1024];
+
 /*
  * usuwanie sesji GG_SESSION_USERx. wystarczy zwolniæ.
  */
@@ -189,7 +195,7 @@ static int get_char_from_pipe(struct gg_common *c)
 	if ((ch == '\n' && !escaped) || (strlen(buf) >= sizeof(buf) - 2)) {
 		command_exec(NULL, buf, 0);
 		memset(buf, 0, sizeof(buf));
-		ui_need_refresh = 1;
+		ui_event("refresh_time", NULL);
 	}
 
 	if (ch == '\\') {
@@ -677,6 +683,49 @@ void ekg_wait_for_key()
 		/* sprawd¼, co siê dzieje */
 
 		ret = select(maxfd + 1, &rd, &wd, NULL, &tv);
+
+		{
+			sigset_t sigset_usr;
+			int do_continue = 0;
+
+			sigemptyset(&sigset_usr);
+			sigaddset(&sigset_usr, SIGUSR1);
+			sigaddset(&sigset_usr, SIGUSR2);
+
+			sigprocmask(SIG_BLOCK, &sigset_usr, NULL);
+
+			if (do_handle_sigusr1) {
+				/*
+				 * dziêki blokadzie, w tym momencie nie
+				 * stracimy sygna³u. mimo wszystko i tak
+				 * obs³uga sygna³ów jest s³aba -- w czasie
+				 * jednej iteracji g³ównej pêtli obs³u¿ymy
+				 * sygna³ maksymalnie jeden raz, niezale¿nie od
+				 * faktyczniej liczby wyst±pieñ.
+				 */
+				do_handle_sigusr1 = 0;
+
+				event_check(EVENT_SIGUSR1, 0, "SIGUSR1");
+				ui_event("refresh_time", NULL);
+				do_continue = 1;
+			}
+
+			if (do_handle_sigusr2) {
+				do_handle_sigusr2 = 0;
+
+				event_check(EVENT_SIGUSR2, 0, "SIGUSR2");
+				ui_event("refresh_time", NULL);
+				do_continue = 1;
+			}
+
+			sigprocmask(SIG_UNBLOCK, &sigset_usr, NULL);
+
+			if (do_continue)
+				continue;
+		}
+
+		if (do_exit)
+			ekg_exit();
 	
 		/* je¶li wyst±pi³ b³±d, daj znaæ */
 
@@ -814,21 +863,19 @@ void ekg_wait_for_key()
 	return;
 }
 
-static void handle_sigusr1()
+static void handle_sigusr1(int sig)
 {
-	event_check(EVENT_SIGUSR1, 0, "SIGUSR1");
-	signal(SIGUSR1, handle_sigusr1);
+	do_handle_sigusr1 = 1;
 }
 
-static void handle_sigusr2()
+static void handle_sigusr2(int sig)
 {
-	event_check(EVENT_SIGUSR2, 0, "SIGUSR2");
-	signal(SIGUSR2, handle_sigusr2);
+	do_handle_sigusr2 = 1;
 }
 
-static void handle_sighup()
+static void handle_sighup(int sig)
 {
-	ekg_exit();
+	do_exit = 1;
 }
 
 /*
@@ -842,9 +889,10 @@ static void ioctld_kill()
                 kill(ioctld_pid, SIGINT);
 }
 
-static void handle_sigsegv()
+static void handle_sigsegv(int sig)
 {
 	static int killing_ui = 0;
+	static struct sigaction sa;
 
 	ioctld_kill();
 
@@ -853,42 +901,19 @@ static void handle_sigsegv()
 		ui_deinit();
 	}
 	
-	signal(SIGSEGV, SIG_DFL);
-
 	if (old_stderr)
 		dup2(old_stderr, 2);
 
-	fprintf(stderr, 
-"\r\n"
-"\r\n"
-"*** Naruszenie ochrony pamiêci ***\r\n"
-"\r\n"
-"Spróbujê zapisaæ ustawienia, ale nie obiecujê, ¿e cokolwiek z tego\r\n"
-"wyjdzie. Trafi± one do plików %s/config.%d\r\n"
-"oraz %s/userlist.%d\r\n"
-"\r\n"
-"Do pliku %s/debug.%d zapiszê ostatanie komunikaty\r\n"
-"z okna debugowania.\r\n"
-"\r\n"
-"Je¶li zostanie utworzony plik %s/core, spróbuj uruchomiæ\r\n"
-"polecenie:\r\n"
-"\r\n"
-"    gdb %s %s/core\r\n"
-"\n"
-"zanotowaæ kilka ostatnich linii, a nastêpnie zanotowaæ wynik polecenia\r\n"
-",,bt''. Dziêki temu autorzy dowiedz± siê, w którym miejscu wyst±pi³ b³±d\r\n"
-"i najprawdopodobniej pozwoli to unikn±æ tego typu sytuacji w przysz³o¶ci.\r\n"
-"Je¶li core nie zosta³ utworzony a problem jest powtarzalny, spróbuj przed\r\n"
-"uruchomieniem ekg wydaæ polecenie ,,ulimit -c unlimited'' i powtórzyæ b³±d.\r\n"
-"Wiêcej szczegó³ów w dokumentacji, w pliku ,,gdb.txt''.\r\n"
-"\r\n",
-config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, argv0, config_dir);
+	write(2, sigsegv_msg, strlen(sigsegv_msg) + 1);
 
 	config_write_crash();
 	userlist_write_crash();
 	debug_write_crash();
 
-	raise(SIGSEGV);			/* niech zrzuci core */
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = SIG_DFL;
+	sigaction(sig, &sa, NULL);
+	kill(getpid(), sig);
 }
 
 /*
@@ -1007,6 +1032,7 @@ int main(int argc, char **argv)
 #ifdef WITH_IOCTLD
 	const char *sock_path = NULL, *ioctld_path = IOCTLD_PATH;
 #endif
+	struct sigaction sa;
 	struct passwd *pw; 
 	struct gg_common si;
 	struct option ekg_options[] = {
@@ -1069,12 +1095,23 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	signal(SIGSEGV, handle_sigsegv);
-	signal(SIGHUP, handle_sighup);
-	signal(SIGUSR1, handle_sigusr1);
-	signal(SIGUSR2, handle_sigusr2);
-	signal(SIGALRM, SIG_IGN);
-	signal(SIGPIPE, SIG_IGN);
+	memset(&sa, 0, sizeof(sa));
+
+	sa.sa_handler = SIG_IGN;
+	sigaction(SIGPIPE, &sa, NULL);
+	sigaction(SIGALRM, &sa, NULL);
+
+	sa.sa_handler = handle_sigsegv;
+	sigaction(SIGSEGV, &sa, NULL);
+
+	sa.sa_handler = handle_sighup;
+	sigaction(SIGHUP, &sa, NULL);
+
+	sa.sa_handler = handle_sigusr1;
+	sigaction(SIGUSR1, &sa, NULL);
+
+	sa.sa_handler = handle_sigusr2;
+	sigaction(SIGUSR2, &sa, NULL);
 
 	while ((c = getopt_long(argc, argv, "b::a::i::pdnc:f:hI:ot:u:vN", ekg_options, NULL)) != -1) {
 		switch (c) {
@@ -1263,6 +1300,32 @@ int main(int argc, char **argv)
 		}
 	}
 #endif
+
+	snprintf(sigsegv_msg, sizeof(sigsegv_msg),
+	"\r\n"
+	"\r\n"
+	"*** Naruszenie ochrony pamiêci ***\r\n"
+	"\r\n"
+	"Spróbujê zapisaæ ustawienia, ale nie obiecujê, ¿e cokolwiek z tego\r\n"
+	"wyjdzie. Trafi± one do plików %s/config.%d\r\n"
+	"oraz %s/userlist.%d\r\n"
+	"\r\n"
+	"Do pliku %s/debug.%d zapiszê ostatanie komunikaty\r\n"
+	"z okna debugowania.\r\n"
+	"\r\n"
+	"Je¶li zostanie utworzony plik %s/core, spróbuj uruchomiæ\r\n"
+	"polecenie:\r\n"
+	"\r\n"
+	"    gdb %s %s/core\r\n"
+	"\n"
+	"zanotowaæ kilka ostatnich linii, a nastêpnie zanotowaæ wynik polecenia\r\n"
+	",,bt''. Dziêki temu autorzy dowiedz± siê, w którym miejscu wyst±pi³ b³±d\r\n"
+	"i najprawdopodobniej pozwoli to unikn±æ tego typu sytuacji w przysz³o¶ci.\r\n"
+	"Je¶li core nie zosta³ utworzony a problem jest powtarzalny, spróbuj przed\r\n"
+	"uruchomieniem ekg wydaæ polecenie ,,ulimit -c unlimited'' i powtórzyæ b³±d.\r\n"
+	"Wiêcej szczegó³ów w dokumentacji, w pliku ,,gdb.txt''.\r\n"
+	"\r\n",
+	config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, argv0, config_dir);
 
 	ui_init();
 	ui_event("theme_init");

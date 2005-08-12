@@ -21,6 +21,8 @@
 #ifndef __UI_H
 #define __UI_H
 
+#include <signal.h>
+
 #include "config.h"
 
 void (*ui_init)(void);
@@ -34,7 +36,7 @@ void (*ui_deinit)(void);
 int ui_screen_width;
 int ui_screen_height;
 
-int ui_need_refresh;
+volatile sig_atomic_t ui_need_refresh;
 
 extern void ui_none_init();
 extern void ui_batch_init();

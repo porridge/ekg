@@ -146,7 +146,6 @@ static int bind_handler_window(int a, int key);
 static void sigcont_handler()
 {
 	rl_forced_update_display();
-	signal(SIGCONT, sigcont_handler);
 }
 
 /*
@@ -160,7 +159,6 @@ static void sigint_handler()
 	rl_point = rl_end = 0;
 	putchar('\n');
 	rl_forced_update_display();
-	signal(SIGINT, sigint_handler);
 }
 
 #ifdef SIGWINCH
@@ -172,7 +170,6 @@ static void sigint_handler()
 static void sigwinch_handler()
 {
 	ui_need_refresh = 1;
-	signal(SIGWINCH, sigwinch_handler);
 }
 #endif
 
@@ -850,6 +847,7 @@ static char *my_readline()
 void ui_readline_init()
 {
 	char c;
+	struct sigaction sa;
 
         window_current = window_add();
         window_refresh();
@@ -880,12 +878,18 @@ void ui_readline_init()
 
 	for (c = '0'; c <= '9'; c++)
 		rl_bind_key_in_map(c, bind_handler_window, emacs_meta_keymap);
-	
-	signal(SIGINT, sigint_handler);
-	signal(SIGCONT, sigcont_handler);
+
+	memset(&sa, 0, sizeof(sa));
+
+	sa.sa_handler = sigint_handler;
+	sigaction(SIGINT, &sa, NULL);
+
+	sa.sa_handler = sigcont_handler;
+	sigaction(SIGCONT, &sa, NULL);
 
 #ifdef SIGWINCH
-	signal(SIGWINCH, sigwinch_handler);
+	sa.sa_handler = sigwinch_handler;
+	sigaction(SIGWINCH, &sa, NULL);
 #endif
 
 	rl_get_screen_size(&screen_lines, &screen_columns);
