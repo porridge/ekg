@@ -2170,12 +2170,27 @@ void spellcheck_init(void)
 
 	if (aspell_error_number(possible_err) != 0) {
 		spell_checker = NULL;
+
+		delete_aspell_config(spell_config);
 		spell_config = NULL;
 		print("aspell_init_error", aspell_error_message(possible_err));
 		config_aspell = 0;
 	} else {
 		spell_checker = to_aspell_speller(possible_err);
 		print("aspell_init_success");
+	}
+}
+
+void spellcheck_deinit()
+{
+	if (spell_checker) {
+		delete_aspell_speller(spell_checker);
+		spell_checker = NULL;
+	}
+
+	if (spell_config) {
+		delete_aspell_config(spell_config);
+		spell_config = NULL;
 	}
 }
 #endif

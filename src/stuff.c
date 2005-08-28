@@ -654,8 +654,11 @@ void changed_auto_save(const char *var)
 #ifdef WITH_ASPELL
 void changed_aspell(const char *var)
 {
-	/* probujemy zainicjowac jeszcze raz aspell'a */
-	spellcheck_init();
+	if (config_aspell == 1) {
+		spellcheck_init();
+	} else {
+		spellcheck_deinit();
+	}
 }
 #endif
 

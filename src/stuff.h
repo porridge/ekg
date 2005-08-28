@@ -489,6 +489,7 @@ void save_windows();
 
 #ifdef WITH_ASPELL
 void spellcheck_init(void);
+void spellcheck_deinit(void);
 #endif
 
 #endif /* __STUFF_H */
