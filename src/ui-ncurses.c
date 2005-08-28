@@ -3793,7 +3793,7 @@ static void spellcheck(const char *line, char *checked)
 
 		start = line;
 
-		while (!strchr(",. \t\r\n", *line))
+		while (isalpha_pl(*line))
 			line++;
 
 #if 0
