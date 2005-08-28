@@ -3775,17 +3775,25 @@ static void spellcheck(const char *line, char *checked)
 
 		if (!strncmp(line, "http://", 7)) {
 			line += 7;
+
+			while (!strchr(" \t\r\n", *line))
+				line++;
+
 			continue;
 		}
 
 		if (!strncmp(line, "ftp://", 6)) {
 			line += 6;
+
+			while (!strchr(" \t\r\n", *line))
+				line++;
+
 			continue;
 		}
 
 		start = line;
 
-		while (!strchr(",. \t", *line))
+		while (!strchr(",. \t\r\n", *line))
 			line++;
 
 #if 0
