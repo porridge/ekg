@@ -75,7 +75,7 @@
 #  include "../compat/strlcpy.h"
 #endif
 #ifdef WITH_ASPELL
-#	include <aspell.h>
+#  include <aspell.h>
 #endif
 #include "stuff.h"
 #include "themes.h"
@@ -240,20 +240,21 @@ static int contacts_update(struct window *w);
 #endif
 
 #ifdef WITH_ASPELL
-#  define ASPELLCHAR 5
+#  define ASPELLBADCHAR 5
 // #  define ASPELL_ALLOWED_CHARS "()[]',.`\"<>!?"
-AspellConfig * spell_config;
-AspellSpeller * spell_checker = 0;
+AspellConfig *spell_config = NULL;
+AspellSpeller *spell_checker = NULL;
 static char *aspell_line;
 #endif
 
 
 /*
- * zamienia podany znak na ma³y je¶li to mo¿liwe
+ * zamienia podany znak na ma³y; je¶li to mo¿liwe
  * obs³uguje polskie znaki
  */
-static int tolower_pl(const unsigned char c) {
-        switch(c) {
+static int tolower_pl(const unsigned char c)
+{
+        switch (c) {
                 case 161: // ¡
                         return 177;
                 case 198: // Æ
@@ -272,27 +273,28 @@ static int tolower_pl(const unsigned char c) {
                         return 191;
                 case 172: // ¬
                         return 188;
-                default: //reszta
+                default: // reszta
                         return tolower(c);
         }
 }
 
 /*
- * porównuje dwa ci±gi o okre¶lonej przez n d³ugo¶ci
- * dzia³a analogicznie do strncasecmp()
- * obs³uguje polskie znaki
+ * strncasecmp_pl()
+ *
+ * porównuje dwa ci±gi o okre¶lonej d³ugo¶ci.
+ * dzia³a analogicznie do strncasecmp(), ale obs³uguje
+ * polskie znaki.
  */
-
-int strncasecmp_pl(const char * cs,const char * ct,size_t count)
+int strncasecmp_pl(const char *cs, const char *ct, size_t count)
 {
-        register signed char __res = 0;
+        register char res = 0;
 
         while (count) {
-                if ((__res = tolower_pl(*cs) - tolower_pl(*ct++)) != 0 || !*cs++)
+                if ((res = tolower_pl(*cs) - tolower_pl(*ct++)) != 0 || !*cs++)
                         break;
                 count--;
         }
-        return __res;
+        return res;
 }
 
 /*
@@ -323,18 +325,23 @@ int contacts_size()
 }
 
 /*
- * sprawdza czy podany znak jest znakiem alphanumerycznym (uwzlglednia polskie znaki)
+ * isalpha_pl() 
+ *
+ * sprawdza, czy podany znak jest znakiem alfanumerycznym (uwzglêdnia polskie znaki).
  */
 int isalpha_pl(unsigned char c)
 {
-/*  gg_debug(GG_DEBUG_MISC, "c: %d\n", c); */
-    if(isalpha(c)) // normalne znaki
-        return 1;
-    else if(c == 177 || c == 230 || c == 234 || c == 179 || c == 241 || c == 243 || c == 182 || c == 191 || c == 188) /* polskie literki */
-	return 1;
-    else if(c == 161 || c == 198 || c == 202 || c == 209 || c == 163 || c == 211 || c == 166 || c == 175 || c == 172) /* wielka litery polskie */
-	return 1;
-    else 
+	if (isalpha(c))
+		return 1;
+
+	/* ma³e litery */
+	if (c == 177 || c == 230 || c == 234 || c == 179 || c == 241 || c == 243 || c == 182 || c == 191 || c == 188)
+		return 1;
+
+	/* wielkie litery */
+	if (c == 161 || c == 198 || c == 202 || c == 209 || c == 163 || c == 211 || c == 166 || c == 175 || c == 172)
+		return 1;
+
 	return 0;
 }
 
@@ -2151,7 +2158,9 @@ void spellcheck_init(void)
 
 	if (spell_checker) {
 		delete_aspell_speller(spell_checker);
+		delete_aspell_config(spell_config);
 		spell_checker = NULL;
+		spell_config = NULL;
 	}
 
 	spell_config = new_aspell_config();
@@ -2161,6 +2170,7 @@ void spellcheck_init(void)
 
 	if (aspell_error_number(possible_err) != 0) {
 		spell_checker = NULL;
+		spell_config = NULL;
 		print("aspell_init_error", aspell_error_message(possible_err));
 		config_aspell = 0;
 	} else {
@@ -2169,8 +2179,6 @@ void spellcheck_init(void)
 	}
 }
 #endif
-			    
-			    
 
 /*
  * ui_ncurses_init()
@@ -2385,6 +2393,7 @@ static void ui_ncurses_deinit()
 	xfree(line);
 #ifdef WITH_ASPELL
 	delete_aspell_speller(spell_checker);
+	delete_aspell_config(spell_config);
 	xfree(aspell_line);
 #endif
 	xfree(yanked);
@@ -3745,100 +3754,48 @@ static void binding_ui_ncurses_debug_toggle(const char *arg)
 
 
 #ifdef WITH_ASPELL
-
 /* 
- * Funkcja sprawdzajaca pisownie
+ * funkcja sprawdzajaca pisowniê.
  */
-
-static void spellcheck(char *what, char *where)
+static void spellcheck(const char *line, char *checked)
 {
-        char *word;             /* aktualny wyraz */
-        register int i = 0;     /* licznik */
-	register int j = 0;     /* licznik */
-	int size;	/* zmienna tymczasowa */
-	
-        /* Sprawdzamy czy nie mamy doczynienia z 47 (wtedy nie sprawdzamy reszty ) */
-        if(what[0] == 47 || what == NULL)
-            return;       /* konczymy funkcje */
-	    
-	for(i = 0; what[i] != '\0' && what[i] != '\n' && what[i] != '\r'; i++)
-	{
-	    if((!isalpha_pl(what[i]) || i == 0 ) && what[i+1] != '\0' ) // separator/koniec lini/koniec stringu
-	    {
-		size = strlen(what) + 1;
-        	word = xmalloc(size);
-        	memset(word, 0, size); /* czyscimy pamiec */
-		
-		for(; what[i] != '\0' && what[i] != '\n' && what[i] != '\r'; i++)
-		{
-		    if(isalpha_pl(what[i])) /* szukamy jakiejs pierwszej literki */
-			break; 
-		}
-		
-		/* trochê poprawiona wydajno¶æ */
-		if(what[i] == '\0' || what[i] == '\n' || what[i] == '\r')
-		{
-			i--;
-			goto aspell_loop_end; /* 
-					       * nie powinno siê u¿ywaæ goto, aczkolwiek s± du¿o szybsze
-					       * ni¿ instrukcje warunkowe i w tym przypadku nie psuj± bardzo
-					       * czytelno¶ci kodu
-					       */
-		}
-		/* sprawdzanie czy nastêpny wyraz nie rozpoczyna adresu www */ 
-		else if (what[i] == 'h' && what[i + 1] && what[i + 1] == 't' && what[i + 2] && what[i + 2] == 't' && what[i + 3] && what[i + 3] == 'p' && what[i + 4] && what[i + 4] == ':' && what[i + 5] && what[i + 5] == '/' && what[i + 6] && what[i + 6] == '/')
-		{
-			for(; what[i] != ' ' && what[i] != '\n' && what[i] != '\r' && what[i] != '\0'; i++);
-			i--;
-			goto aspell_loop_end;
-		}
-		
-		/* sprawdzanie czy nastêpny wyraz nie rozpoczyna adresu ftp */ 
-		else if (what[i] == 'f' && what[i + 1] && what[i + 1] == 't' && what[i + 2] && what[i + 2] == 'p' && what[i + 3] && what[i + 3] == ':' && what[i + 4] && what[i + 4] == '/' && what[i + 5] && what[i + 5] == '/')
-		{
-			for(; what[i] != ' ' && what[i] != '\n' && what[i] != '\r' && what[i] != '\0'; i++);
-			i--;
-			goto aspell_loop_end;
-		}
-		
-		
+	const char *start, *line_start;
 
-		    
-				
-		/* wrzucamy aktualny wyraz do zmiennej word */		    
-		for(j=0; what[i] != '\n' && what[i] != '\0' && isalpha_pl(what[i]); i++)
-		{
-			if(isalpha_pl(what[i]))
-		 	{
-		    		word[j]= what[i];
-				j++;
-		    	}
-		    	else 
-				break;
+	if (!line || *line == '/')
+		return;
+
+	line_start = line;
+
+	while (*line) {
+
+		if (!isalpha_pl(*line)) {
+			line++;
+			continue;
 		}
-		word[j] = '\0';
-		if(i > 0)
-		    i--;
 
-/*		gg_debug(GG_DEBUG_MISC, "Word: %s\n", word);  */
+		if (!strncmp(line, "http://", 7)) {
+			line += 7;
+			continue;
+		}
 
-		/* sprawdzamy pisownie tego wyrazu */
-        	if(aspell_speller_check(spell_checker, word, strlen(word) ) == 0) /* jesli wyraz jest napisany blednie */
-        	{
-			for(j=strlen(word) - 1; j >= 0; j--)
-				where[i - j] = ASPELLCHAR;
-        	}
-        	else /* jesli wyraz jest napisany poprawnie */
-        	{
-			for(j=strlen(word) - 1; j >= 0; j--)
-				where[i - j] = ' ';
-        	}
-aspell_loop_end:
-		xfree(word);
-	    }	
+		if (!strncmp(line, "ftp://", 6)) {
+			line += 6;
+			continue;
+		}
+
+		start = line;
+
+		while (!strchr(",. \t", *line))
+			line++;
+
+#if 0
+		gg_debug(GG_DEBUG_MISC, "checking: %d, %s\n", line - start, start);
+#endif
+
+		if (aspell_speller_check(spell_checker, start, line - start) == 0)
+			memset(&checked[start - line_start], ASPELLBADCHAR, line - start);
 	}
 }
-
 #endif
 
 /*
@@ -3848,9 +3805,6 @@ aspell_loop_end:
  */
 static void ui_ncurses_loop()
 {
-#ifdef WITH_ASPELL
-	int mispelling = 0; /* zmienna pomocnicza */
-#endif	
 	line = xmalloc(LINE_MAXLEN);
 #ifdef WITH_ASPELL
 	aspell_line = xmalloc(LINE_MAXLEN);
@@ -3987,19 +3941,15 @@ redraw_prompt:
 				p = lines[lines_start + i];
 				
 #ifdef WITH_ASPELL
-				/* maly cleanup */
-				memset(aspell_line, 32, LINE_MAXLEN);
-				if(line_start == 0) 
-					mispelling = 0;
+				memset(aspell_line, 0, LINE_MAXLEN);
 				    
 				/* sprawdzamy pisownie */
-				if(config_aspell == 1)
+				if (config_aspell == 1)
 					spellcheck(p, aspell_line);
 
-                                for (j = 0; j + line_start < strlen(p) && j < input->_maxx + 1; j++)
-                                {
+                                for (j = 0; j + line_start < strlen(p) && j < input->_maxx + 1; j++) {
                                     
-				    if(aspell_line[line_start + j] == ASPELLCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
+				    if (aspell_line[line_start + j] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
                                         print_char_underlined(input, i, j, p[line_start + j]);
                                     else /* jesli jest wszystko okey to wyswietlamy normalny */
 				        print_char(input, i, j, p[j + line_start]);
@@ -4017,18 +3967,15 @@ redraw_prompt:
 				mvwaddstr(input, 0, 0, window_current->prompt);
 
 #ifdef WITH_ASPELL			
-			/* maly cleanup */
-			memset(aspell_line, 32, LINE_MAXLEN);
-			if(line_start == 0) 
-				mispelling = 0;
+			memset(aspell_line, 0, LINE_MAXLEN);
 
 			/* sprawdzamy pisownie */
-			if(config_aspell == 1)
+			if (config_aspell == 1)
 		    		spellcheck(line, aspell_line);
 
-                        for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++)
-                        {
-				if(aspell_line[line_start + i] == ASPELLCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
+                        for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++) {
+
+				if (aspell_line[line_start + i] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
                                     print_char_underlined(input, 0, i + window_current->prompt_len, line[line_start + i]);
                                 else /* jesli jest wszystko okey to wyswietlamy normalny */
                                     print_char(input, 0, i + window_current->prompt_len, line[line_start + i]);
