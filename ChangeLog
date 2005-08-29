@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-08-29
+
+- zwalnianie pamiêci po /set aspell 0 (sz)
+
 // 2005-08-28
 
 - kosmetyka zwi±zana z obs³ug± aspell'a (sz)

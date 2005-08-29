@@ -2407,8 +2407,10 @@ static void ui_ncurses_deinit()
 
 	xfree(line);
 #ifdef WITH_ASPELL
-	delete_aspell_speller(spell_checker);
-	delete_aspell_config(spell_config);
+	if (spell_checker)
+		delete_aspell_speller(spell_checker);
+	if (spell_config)
+		delete_aspell_config(spell_config);
 	xfree(aspell_line);
 #endif
 	xfree(yanked);
