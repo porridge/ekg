@@ -97,6 +97,11 @@ oto lista wywo³ywanych funkcji:
   odpowiednie kody. ich listê mo¿na znale¼æ w plikach nag³ówkowych ncurses
   w sta³ych z przedrostkiem KEY_
 
+- handle_command_line(target, line)
+
+  gdy wpisane zostanie linia w oknie ekg. target, je¶li nie puste,
+  zawiera alias/uin u¿ytkownika, z którym trwa rozmowa w aktualnym oknie.
+
 - handle_redraw_header()
 
   gdy nale¿y od¶wie¿yæ nag³ówek okna.

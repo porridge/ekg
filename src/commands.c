@@ -4327,6 +4327,28 @@ int command_exec(const char *target, const char *xline, int quiet)
 		return 0;
 	}
 
+#ifdef WITH_PYTHON
+	PYTHON_HANDLE_HEADER(command_line, "(ss)", target, xline)
+	{
+		char *a, *b;
+
+		PYTHON_HANDLE_RESULT("ss", &a, &b)
+		{
+			target = alloca(strlen(a) + 1);
+			strlcpy((char *) target, a, strlen(a) + 1);
+
+			xline = alloca(strlen(b) + 1);
+			strlcpy((char *) xline, b, strlen(xline) + 1);
+		}
+	}
+
+	PYTHON_HANDLE_FOOTER()
+
+	if (python_handle_result == 0) {
+		return 0;
+	}
+#endif
+
 	if (target && *xline != '/') {
 
 		/* wykrywanie przypadkowo wpisanych poleceñ */
