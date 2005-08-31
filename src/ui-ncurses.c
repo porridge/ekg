@@ -325,27 +325,6 @@ int contacts_size()
 }
 
 /*
- * isalpha_pl() 
- *
- * sprawdza, czy podany znak jest znakiem alfanumerycznym (uwzglêdnia polskie znaki).
- */
-int isalpha_pl(unsigned char c)
-{
-	if (isalpha(c))
-		return 1;
-
-	/* ma³e litery */
-	if (c == 177 || c == 230 || c == 234 || c == 179 || c == 241 || c == 243 || c == 182 || c == 191 || c == 188)
-		return 1;
-
-	/* wielkie litery */
-	if (c == 161 || c == 198 || c == 202 || c == 209 || c == 163 || c == 211 || c == 166 || c == 175 || c == 172)
-		return 1;
-
-	return 0;
-}
-
-/*
  * color_pair()
  *
  * zwraca numer COLOR_PAIR odpowiadaj±cej danej parze atrybutów: kolorze
@@ -3785,7 +3764,7 @@ static void spellcheck(const char *line, char *checked)
 
 	while (*line) {
 
-		if (!isalpha_pl(*line)) {
+		if (!isalpha_pl_PL(*line)) {
 			line++;
 			continue;
 		}
@@ -3810,7 +3789,7 @@ static void spellcheck(const char *line, char *checked)
 
 		start = line;
 
-		while (isalpha_pl(*line))
+		while (isalpha_pl_PL(*line))
 			line++;
 
 #if 0
