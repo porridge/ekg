@@ -1524,7 +1524,13 @@ void ekg_exit()
 	int i;
 
 #ifdef WITH_PYTHON
+	/*
+	 * udawaj, ¿e nie wychodzimy, bo inaczej ewentualny command_exec() 
+	 * bêdziê nas wywo³ywa³ rekurencyjnie.
+	 */
+	quit_command = 0;
 	python_finalize();
+	quit_command = 1;
 #endif
 
 	ekg_logoff(sess, NULL);

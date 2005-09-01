@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-09-01
+
+- w pythonie, ekg.command() dzia³a poprawnie w deinit() (irys/sz)
+
 // 2005-08-30
 
 - mo¿liwo¶æ obs³ugi dowolnych poleceñ w pythonie - handle_command_line()

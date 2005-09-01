@@ -345,6 +345,7 @@ time_t last_conn_event;
 time_t ekg_started;
 int server_index;
 int in_auto_away;
+int quit_command;
 
 int use_proxy;
 int proxy_port;
