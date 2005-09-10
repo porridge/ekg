@@ -1833,9 +1833,16 @@ COMMAND(cmd_list)
 				ver = "6.0 (build 140 lub nowszy)";
 			if (v == 0x24)
 				ver = "6.1 (build 155 lub nowszy)";
+			if (v == 0x26)
+				ver = "7.0 (build 20 lub nowszy)";
 
 			if (ver)
 				printq("user_info_version", ver);
+			else {
+				char *tmp = saprintf("nieznana (%#.2x)", v);
+				printq("user_info_version", tmp);
+				xfree(tmp);
+			}
 		}
 
 		if (u->mobile && strcmp(u->mobile, ""))
