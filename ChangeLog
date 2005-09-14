@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-09-15
+
+- poprawienie wykrywania p³ci podczas niedostêpno¶ci kontaktu, któremu 
+  chcemy wys³aæ plik (met/g)
+
 // 2005-09-10
 
 - rozpoznawanie gg 7.0 w /list i dodanie tej wersji do dokumentacji (sz)

@@ -1306,7 +1306,7 @@ void theme_init()
 	format_add("dcc_get_cant_overwrite", "%! Plik %T%1%n i wszystkie jego kopie istniej±\n", 1);
 	format_add("dcc_not_found", "%! Nie znaleziono po³±czenia %T%1%n\n", 1);
 	format_add("dcc_invalid_ip", "%! Nieprawid³owy adres IP\n", 1);
-	format_add("dcc_user_not_avail", "%! %1 musi byæ aktywn%@1, by móc nawi±zaæ po³±czenie\n", 1);
+	format_add("dcc_user_not_avail", "%! %1 musi byæ aktywn%@2, by móc nawi±zaæ po³±czenie\n", 1);
 	format_add("dcc_must_reconnect", "%) Aby zmiany odnios³y skutek, nale¿y ponownie po³±czyæ siê z serwerem\n", 1);
 
 	/* query */

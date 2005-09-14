@@ -2881,7 +2881,7 @@ COMMAND(cmd_dcc)
 		}
 
 		if (!(GG_S_A(u->status) || GG_S_B(u->status)) && !(ignored_check(uin) & IGNORE_STATUS)) {
-			printq("dcc_user_not_avail", format_user(u->uin));
+			printq("dcc_user_not_avail", format_user(u->uin), (u->first_name) ? u->first_name : u->display);
 			return -1;
 		}
 
@@ -3025,7 +3025,7 @@ COMMAND(cmd_dcc)
 		}
 
 		if (!(GG_S_A(u->status) || GG_S_B(u->status)) && !(ignored_check(uin) & IGNORE_STATUS)) {
-			printq("dcc_user_not_avail", format_user(u->uin));
+			printq("dcc_user_not_avail", format_user(u->uin), (u->first_name) ? u->first_name : u->display);
 			return -1;
 		}
 
