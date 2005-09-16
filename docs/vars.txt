@@ -492,10 +492,10 @@ ioctld_enable
 
 	je¶li 1, odpalany jest lokalny daemon ioctld, który lokalnie mruga
 	diodkami i piszczy speakerem, je¿eli 2, odpalany jest daemon
-	tcp/ip na portcie ioctld_net_port, do którego przekazywane s±
+	tcp/ip na porcie ioctld_net_port, do którego przekazywane s±
 	akcje blink_leds i beeps_spk. dziêki temu, u¿ywaj±c ioctld-client.c
 	z ekg/contrib, mo¿na lokalnie blinkaæ i beepaæ maj±c odpalone ekg
-	na zdalnym ho¶cie. je¿eli 0 za¶, ioctld nie jest uruchamiany wcale.
+	na zdalnym ho¶cie. je¿eli za¶ 0, ioctld nie jest uruchamiany wcale.
 
 ioctld_net_port
 	typ: liczba
