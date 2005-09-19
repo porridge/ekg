@@ -3122,7 +3122,7 @@ static void complete(int *line_start, int *line_index)
 					if(completions[0][0] == '"')
 						common++;
 						
-					if(completions[0][common - 1] == '"')
+					if(common > 0 && completions[0][common - 1] == '"')
 						common--;
 						
 					strncat(line, completions[0], common);
