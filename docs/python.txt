@@ -57,7 +57,7 @@ oto lista wywo³ywanych funkcji:
 - init()
 
   gdy skrypt jest ³adowany. je¶li ta funkcja zwróci 0, skrypt nie zostanie
-  za³adowanych.
+  za³adowany.
 
 - deinit()
 

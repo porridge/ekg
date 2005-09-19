@@ -307,8 +307,10 @@ int alias_add(const char *string, int quiet, int append)
 			return -1;
 		}
 
-		if (!strncasecmp(tmp, c->name, strlen(c->name)))
+		if (!strncasecmp(tmp, c->name, strlen(c->name))) {
 			params = xstrdup(c->params);
+			break;
+		}
 	}
 
 	a.name = xstrdup(string);
@@ -1529,8 +1531,6 @@ int event_add(int flags, const char *target, const char *action, int quiet)
 	if (!target || !action)
 		return -1;
 
-	target = xstrdup(target);
-
 	uin = str_to_uin(target);
 
 	if ((u = userlist_find(uin, target)))
@@ -1590,7 +1590,7 @@ int event_add(int flags, const char *target, const char *action, int quiet)
 	}
 
 	e.name = xstrdup(itoa(f));
-	e.target = (char *) target;
+	e.target = xstrdup(target);
 	e.flags = flags;
 	e.action = xstrdup(action);
 
@@ -1863,7 +1863,9 @@ void event_free()
 	for (l = events; l; l = l->next) {
 		struct event *e = l->data;
 
+		xfree(e->name);
 		xfree(e->action);
+		xfree(e->target);
 	}
 
 	list_destroy(events, 1);
@@ -3009,6 +3011,8 @@ void change_status(int status, const char *xarg, int autom)
 	
 	if (arg && !strcmp(arg, "-")) {
 		xfree(reason);
+		xfree(tmp);
+		tmp = NULL;
 		reason = NULL;
 		status = ekg_hide_descr_status(status);
 	}

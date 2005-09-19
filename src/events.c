@@ -1558,6 +1558,7 @@ void handle_token(struct gg_http *h)
 		goto fail;
 	}
 
+
 	if ((write(fd, h->body, h->body_size) != h->body_size) || (close(fd) != 0)) {
 		print("token_failed", strerror(errno));
 		close(fd);
@@ -1641,6 +1642,10 @@ void handle_token(struct gg_http *h)
 
 
 fail:
+	;	/*
+		 * to nie jest ¿art, bez tej pustej instrukcji zdarza siê,
+		 * ¿e kolejny ifdef nie jest spe³niony...
+		 */
 #ifdef HAVE_MKSTEMP
 	xfree(file);
 #endif

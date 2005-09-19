@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-09-19
+
+- poprawienie kilku b³êdów typu ,,memory leak'' i ,,double free'' (sz)
+
 // 2005-09-16
 
 - poprawienie literówki w /help set ioctl_enable (zigi/g)
