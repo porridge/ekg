@@ -2640,8 +2640,10 @@ void file_generator(const char *text, int len)
 	if ((tmp = strrchr(dname, '/'))) {
 		tmp++;
 		*tmp = 0;
-	} else
+	} else {
+		xfree(dname);
 		dname = NULL;
+	}
 
 	/* `fname' zawiera nazwê szukanego pliku */
 
@@ -2709,6 +2711,8 @@ again:
 		xfree(dname);
 		dname = xstrdup(completions[0]);
 		fname = "";
+		xfree(namelist);
+		namelist = NULL;
 		array_free(completions);
 		completions = NULL;
 
