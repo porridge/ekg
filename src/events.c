@@ -2326,7 +2326,7 @@ void handle_image_reply(struct gg_event *e)
 
 	gg_debug(GG_DEBUG_MISC, "// ekg: image_reply: sender=%d, filename=\"%s\", size=%d, crc32=%.8x\n", e->event.image_reply.sender, ((e->event.image_reply.filename) ? e->event.image_reply.filename : "NULL"), e->event.image_reply.size, e->event.image_reply.crc32);
 
-	if (e->event.image_request.crc32 != GG_CRC32_INVISIBLE)
+	if (e->event.image_reply.size != 0)
 		return;
 
 	u = userlist_find(e->event.image_reply.sender, NULL);
@@ -2358,8 +2358,17 @@ void handle_image_reply(struct gg_event *e)
 		}
 	}
 
-	if (u && group_member(u, "spied")) {
+	/*
+	 * odpowied¼ prawdopodobnie zakolejkowana przez serwer, upewnijmy siê ¿e dana osoba
+	 * rzeczywi¶cie w tej chwili siê ukrywa.
+	 */
+	if (e->event.image_reply.crc32 + SPYING_RESPONSE_TIMEOUT < time(NULL)) {
+		gg_debug(GG_DEBUG_MISC, "// ekg: spying image reply too old for %d, checking again\n", e->event.image_reply.sender);
+		check_conn(e->event.image_reply.sender);
+		return;
+	}
 
+	if (u && group_member(u, "spied")) {
 		if (GG_S_NA(u->status)) {
 			int status = (GG_S_D(u->status)) ? GG_STATUS_INVISIBLE_DESCR : GG_STATUS_INVISIBLE;
 			iso_to_cp(u->descr);
@@ -2367,7 +2376,6 @@ void handle_image_reply(struct gg_event *e)
 		}
 
 	} else {
-
 		if (u)
 			print("user_is_connected", format_user(e->event.image_reply.sender), (u->first_name) ? u->first_name : u->display); 
 		else

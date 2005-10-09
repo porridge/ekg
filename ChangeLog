@@ -4,6 +4,14 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-10-09
+
+- poprawka dzia³ania wykrywania niewidocznych - gdy wy¶lemy zapytanie
+sprawdzaj±ce do osoby, która jest niedostêpna i roz³±czymy siê, a w
+miêdzyczasie klient tej osoby odbierze pakiet oraz odpowie na niego,
+to po naszym powrocie nie dostaniemy b³êdnej, chwilowej informacji o ukrywaniu
+siê tej osoby (sz)
+
 // 2005-09-19
 
 - poprawienie kilku b³êdów typu ,,memory leak'' (sz)

@@ -5720,7 +5720,7 @@ int check_conn(uin_t uin)
 		gg_debug(GG_DEBUG_MISC, "// ekg: spying %d\n", uin);
 	}
                  
-	return gg_image_request(sess, uin, 1, GG_CRC32_INVISIBLE);
+	return gg_image_request(sess, uin, 0, time(NULL));
 }
 
 static int check_conn_all_wrapper(const char *group, int quiet)
