@@ -1,12 +1,13 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *                          Adam Osuchowski <adwol@polsl.gliwice.pl>
  *                          Wojtek Bojdo³ <wojboj@htcon.pl>
  *                          Piotr Domagalski <szalik@szalik.net>
+ *                          Adam Wysocki <gophi@ekg.apcoh.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -103,6 +104,7 @@ int rl_set_key(const char *key, void *function, void *keymap)
 
 struct window {
 	int id, act;
+	time_t act_time;
 	char *query_nick;
 	char *line[MAX_LINES_PER_SCREEN];
 };
@@ -1147,6 +1149,22 @@ static int ui_readline_event(const char *event, ...)
 						window_switch(w->id, quiet);
 				}
 
+			} else if (!strcasecmp(p1, "oldest")) {
+				list_t l;
+				int id = 0;
+				time_t id_time = time(NULL);
+
+				for (l = windows; l; l = l->next) {
+					struct window *w = l->data;
+
+					if (w->act && w->act_time < id_time) {
+						id = w->id;
+						id_time = w->act_time;
+					}
+				}
+
+				if (id)
+					window_switch(id, quiet);
 		        } else if (!strcasecmp(p1, "new")) {
 		                window_add();
  
@@ -1400,7 +1418,10 @@ static int window_write(int id, const char *line)
 		}
 
 	if (w != window_current) {
-		w->act = 1;
+		if (!w->act) {
+			w->act = 1;
+			w->act_time = time(NULL);
+		}
 #ifdef HAVE_RL_SET_PROMPT
 		rl_set_prompt((char *) current_prompt());
 #else

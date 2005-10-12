@@ -4790,7 +4790,6 @@ static int ui_ncurses_event(const char *event, ...)
 					if (w->act && !w->floating && w->id && w->act_time < id_time) {
 						id = w->id;
 						id_time = w->act_time;
-						break;
 					}
 				}
 
