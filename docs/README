@@ -156,6 +156,8 @@ KLAWIATURA
 	Alt-K			zamknij aktualne okno
 	Alt-G			ignoruj aktualnego rozmówcê
 	Alt-Q do Alt-P		prze³±cza do okna 11 do 20
+	Alt-Z			przewijanie listy kontaktów w górê
+	Alt-X			przewijanie listy kontaktów w dó³
 	Ctrl-Fn			prze³±cza do podanego okna (konsola FreeBSD)
 	Ctrl-Enter		przej¶cie do trybu wielolinijkowego
 	Ctrl-P			poprzednie okno
