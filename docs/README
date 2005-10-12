@@ -1,7 +1,7 @@
 
                      Eksperymentalny Klient Gadu-Gadu
 
-          (C) Copyright 2001-2004 Autorzy (pe³na lista poni¿ej)
+          (C) Copyright 2001-2005 Autorzy (pe³na lista poni¿ej)
 
 LICENCJA
 
@@ -150,6 +150,8 @@ KLAWIATURA
 	Page Up, Page Down	przewijanie ekranu
 	Ctrl-F, Ctrl-G		j.w.
 	Alt-A			przejd¼ do pierwszego aktywnego okna
+	Alt-S			przejd¼ do najstarszego aktywnego okna 
+				(okna, które najd³u¿ej jest aktywne)
 	Alt-N			utwórz nowe okno
 	Alt-K			zamknij aktualne okno
 	Alt-G			ignoruj aktualnego rozmówcê

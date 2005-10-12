@@ -145,6 +145,7 @@ struct window {
 	int id;			/* numer okna */
 	int act;		/* czy co¶ siê zmieni³o? */
 	int more;		/* pojawi³o siê co¶ poza ekranem */
+	time_t act_time;	/* timestamp zmiany act */
 
 	char *prompt;		/* sformatowany prompt lub NULL */
 	int prompt_len;		/* d³ugo¶æ prompta lub 0 */
@@ -1285,7 +1286,10 @@ crap:
 		return;
  
 	if (w != window_current && !w->floating) {
-		w->act = 1;
+		if (!w->act) {
+			w->act = 1;
+			w->act_time = time(NULL);
+		}
 		if (!command_processing)
 			update_statusbar(0);
 	}
@@ -4775,6 +4779,26 @@ static int ui_ncurses_event(const char *event, ...)
 				goto cleanup;
 			}
 
+			if (!strcasecmp(p1, "oldest")) {
+				list_t l;
+				int id = 0;
+				time_t id_time = time(NULL);
+		
+				for (l = windows; l; l = l->next) {
+					struct window *w = l->data;
+
+					if (w->act && !w->floating && w->id && w->act_time < id_time) {
+						id = w->id;
+						id_time = w->act_time;
+						break;
+					}
+				}
+
+				if (id)
+					window_switch(id);
+				goto cleanup;
+			}
+
 			if (!strcasecmp(p1, "new")) {
 				struct window *w = window_new(p2, 0);
 				if (!w->floating)
@@ -5078,6 +5102,7 @@ static void binding_default()
 	binding_add("Alt-K", "/window kill", 1, 1);
 	binding_add("Alt-N", "/window new", 1, 1);
 	binding_add("Alt-A", "/window active", 1, 1);
+	binding_add("Alt-S", "/window oldest", 1, 1);
 	binding_add("Alt-G", "ignore-query", 1, 1);
 	binding_add("Alt-B", "backward-word", 1, 1);
 	binding_add("Alt-F", "forward-word", 1, 1);
