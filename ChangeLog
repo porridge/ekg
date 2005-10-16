@@ -74,6 +74,11 @@ siê tej osoby (sz)
   zmienne - dziêki temu eksport/import listy kontaktów wraz z konfiguracj±
   pomiêdzy ró¿nymi instalacjami ekg (np. z ioctld i bez) dzia³a poprawnie (sz)
 
+// 2005-07-18
+
+- libgadu: poprawna reakcja na pakiet GG_NEED_EMAIL (adwol/w)
+- dodanie informacji o pakiecie GG_NEED_EMAIL do opisu protoko³u (adwol/w)
+
 // 2005-07-17
 
 - libgadu: poprawne zdarzenia GG_EVENT_IMAGE_REPLY, gdy klient po drugiej
