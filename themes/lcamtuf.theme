@@ -1,6 +1,0 @@
-# nieoficjalny theme. bazuje na wygl±dzie windhoney.irc i paru sploitów
-# lcamtufa ;)
-
-prompt %B[%R+%B]%n
-error %B[%R!%B]%n
-

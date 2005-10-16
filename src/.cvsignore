@@ -1,9 +1,0 @@
-Makefile
-ekg
-ekg.log
-ioctld
-*.orig
-*.rej
-.DS_Store
-vekg
-.depend
