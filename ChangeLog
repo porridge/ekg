@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-10-21
+
+- dodanie wersji klienta 7.0 (build 1 lub nowszy) (gophi)
+
 // 2005-10-12
 
 - dodanie polecenia /window oldest i skrótu klawiaturowego Alt-S, 
