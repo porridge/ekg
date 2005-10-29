@@ -267,7 +267,6 @@ int config_emoticons;
 int config_encryption;
 int config_enter_scrolls;
 int config_events_delay;
-int config_era_omnix;
 char *config_interface;
 int config_header_size;
 int config_ignore_unknown_sender;
@@ -390,7 +389,6 @@ void changed_aspell(const char *var);
 #endif
 void changed_backlog_size(const char *var);
 void changed_dcc(const char *var);
-void changed_era_omnix(const char *var);
 void changed_local_ip(const char *var);
 void changed_mesg(const char *var);
 void changed_proxy(const char *var);

@@ -223,7 +223,6 @@ void variable_init()
 #else
 	variable_add("encryption", "en", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
 #endif
-	variable_add("era_omnix", "eO", VAR_BOOL, 1, &config_era_omnix, changed_era_omnix, NULL, NULL);
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init)
 		variable_add("enter_scrolls", "es", VAR_BOOL, 1, &config_enter_scrolls, NULL, NULL, NULL);
