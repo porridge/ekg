@@ -457,13 +457,6 @@ events_delay
 	pocz±tkowych informacji o stanie osób po po³±czeniu jako zmianê
 	ich stanu.
 
-era_omnix
-	typ: bool
-	domy¶lna warto¶æ: 0
-
-	pozwala zalogowaæ siê udaj±c klienta Era Omnix. Oryginalny klient
-	pokazuje wtedy nasz status z niebieskim ,,s³oneczkiem''.
-
 header_size
 	typ: liczba
 	domy¶lna warto¶æ: 0
