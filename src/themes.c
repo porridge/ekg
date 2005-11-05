@@ -1204,7 +1204,6 @@ void theme_init()
 	format_add("user_info_last_descr", "%K| %nOstatni opis: %T%1%n\n", 1);
 	format_add("user_info_version", "%K| %nWersja klienta: %T%1%n\n", 1);
 	format_add("user_info_voip", "%K| %nObs³uguje rozmowy g³osowe\n", 1);
-	format_add("user_info_era_omnix", "%K| %nPo³±czony przez bramkê Era Omnix\n", 1);
 	format_add("user_info_last_ip","%K| %nOstatni adres IP: %T%1%n\n", 1);
 	format_add("user_info_footer", "%K`----- ---- --- -- -%n\n", 1);
 

@@ -1804,8 +1804,6 @@ COMMAND(cmd_list)
 			printq("user_info_ip", ip_str);
 		if ((u->protocol & GG_HAS_AUDIO_MASK))
 			printq("user_info_voip");
-		if ((u->protocol & GG_ERA_OMNIX_MASK))
-			printq("user_info_era_omnix");
 
 		if ((u->protocol & 0x00ffffff)) {
 			int v = u->protocol & 0x00ffffff;
