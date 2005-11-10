@@ -2739,7 +2739,7 @@ void python_generator(const char *text, int len)
 
 void window_generator(const char *text, int len)
 {
-	const char *words[] = { "new", "kill", "move", "next", "resize", "prev", "switch", "clear", "refresh", "list", "active", "last", NULL };
+	const char *words[] = { "new", "kill", "move", "next", "resize", "prev", "switch", "clear", "refresh", "list", "active", "last", "dump", NULL };
 	int i;
 
 	for (i = 0; words[i]; i++)
@@ -5005,6 +5005,34 @@ static int ui_ncurses_event(const char *event, ...)
 				window_clear(window_current, 0);
 				window_commit();
 				window_current->more = 0;
+
+				goto cleanup;
+			}
+
+			if (!strcasecmp(p1, "dump")) {
+				FILE *f;
+				int i;
+
+				if (!p2) {
+					printq("not_enough_params", "window");
+					goto cleanup;
+				}
+
+				if (!(f = fopen(p2, "a"))) {
+					printq("window_dump_error", p2);
+					goto cleanup;
+				}
+
+				for (i = window_current->backlog_size - 1; i >= 0; i--) {
+					char ts[100];
+
+					strftime(ts, sizeof(ts), (config_timestamp) ? config_timestamp : "%H:%M ", localtime((time_t*) (&window_current->backlog[i]->ts)));
+					fprintf(f, "%s%s\n", ts, window_current->backlog[i]->str);
+				}
+
+				fclose(f);
+
+				printq("window_dump_done");
 
 				goto cleanup;
 			}

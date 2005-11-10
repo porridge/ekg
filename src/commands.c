@@ -6538,7 +6538,8 @@ void command_init()
 	  "  next                 prze³±cza do nastêpnego okna\n"
 	  "  prev                 prze³±cza do poprzedniego okna\n"
 	  "  switch <numer_okna>  prze³±cza do podanego okna\n"
-	  "  refresh              od¶wie¿a aktualne okno");
+	  "  refresh              od¶wie¿a aktualne okno\n"
+	  "  dump <nazwa_pliku>   zapisuje zawarto¶æ okna do pliku");
 /*
 	  "\n"
 	  "Argumenty dla %Tnew%n to %T*x,y,w,h[,f],/komenda%n, gdzie %Tx%n i "
