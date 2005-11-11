@@ -11,7 +11,7 @@ ekg \- Eksperymentalny Klient Gadu-Gadu
 
 .SH OPIS
 .B ekg
-jest eksperymentalnym klient Gadu-Gadu.
+jest eksperymentalnym klientem Gadu-Gadu.
 
 .SH OPCJE
 .TP
