@@ -6075,7 +6075,7 @@ void command_init()
 	  "Je¶li osoba nale¿y do grupy %Tspied%n, to w miarê mo¿liwo¶ci jej stan jest "
 	  "¶ledzony na bie¿±co, jednak ze wzglêdu na ró¿ne zachowanie oryginalnego klienta, nale¿y co "
 	  "pewien czas dokonywaæ rêcznego sprawdzania czy nasza wiedza o stanie niewidocznym danej osoby "
-	  "jest wci±¿ aktualna. Nale¿y wiêc dodaæ timer, który np. co 60 sekund wywo³a polecnie "
+	  "jest wci±¿ aktualna. Nale¿y wiêc dodaæ timer, który np. co 60 sekund wywo³a polecenie "
 	  "%Tcheck_conn -u%n oraz polecenie %Tcheck_conn -s%n.\n"
 	  "\n"
 	  "Opcja "
@@ -6128,8 +6128,8 @@ void command_init()
 	  "\n"
 	  "Parametry identyczne jak dla komendy %Tquit%n.\n"
 	  "\n"
-	  "Je¶li w³±czona jest opcja %Tauto_reconnect%n, po wywo³aniu "
-	  "tej komendy, program nadal bêdzie próbowa³ siê automatycznie "
+	  "Je¶li w³±czona jest opcja %Tauto_reconnect%n, to po wywo³aniu "
+	  "tej komendy program nadal bêdzie próbowa³ siê automatycznie "
 	  "³±czyæ po okre¶lonym czasie.");
 	  
 	command_add
@@ -6199,7 +6199,7 @@ void command_init()
 	  "  - * - wszystkie poziomy\n"
 	  "\n"
 	  "Poziomy mo¿na ³±czyæ ze sob± za pomoc± przecinka lub ,,%T|%n''. "
-          "Próba dodania osoby ju¿ istniej±cej, spowoduje zmodyfikowanie (dodanie) "
+          "Próba dodania osoby ju¿ istniej±cej spowoduje zmodyfikowanie (dodanie) "
           "poziomów ignorowania.");
 	  
 	command_add
