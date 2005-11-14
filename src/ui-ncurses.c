@@ -5031,7 +5031,7 @@ static int ui_ncurses_event(const char *event, ...)
 				}
 
 				if (fclose(f) == EOF)
-					printq("window_dump_error");
+					printq("window_dump_error", p2);
 				else
 					printq("window_dump_done");
 
