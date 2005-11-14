@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-11-14
+
+- poprawka obs³ugi b³êdów przy zapisie zawarto¶ci okna (porridge/w)
+
 // 2005-11-13
 
 - poprawienie paru literówek w /help (gophi)

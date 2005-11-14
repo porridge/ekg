@@ -1360,7 +1360,7 @@ void theme_init()
 	format_add("window_list_floating", "%) %1: p³ywaj±ce %4x%5 w %2,%3 %T%6%n\n", 1);
 	format_add("window_id_query_started", "%) Rozmowa z %T%2%n rozpoczêta w oknie %T%1%n\n", 1);
 	format_add("window_kill_status", "%! Nie mo¿na zamkn±æ okna stanu\n", 1);
-	format_add("window_dump_error", "%! Nie mo¿na utworzyæ pliku %T%1%n\n", 1);
+	format_add("window_dump_error", "%! B³±d zapisu do pliku %T%1%n\n", 1);
 	format_add("window_dump_done", "%! Zapisano\n", 1);
 
 	/* bind */

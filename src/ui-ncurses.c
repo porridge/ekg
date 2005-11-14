@@ -5030,9 +5030,10 @@ static int ui_ncurses_event(const char *event, ...)
 					fprintf(f, "%s%s\n", ts, window_current->backlog[i]->str);
 				}
 
-				fclose(f);
-
-				printq("window_dump_done");
+				if (fclose(f) == EOF)
+					printq("window_dump_error");
+				else
+					printq("window_dump_done");
 
 				goto cleanup;
 			}
