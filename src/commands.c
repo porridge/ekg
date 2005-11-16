@@ -4386,17 +4386,22 @@ int command_exec(const char *target, const char *xline, int quiet)
 		}
 	}
 
-	/* sprawdzenie, czy nie "/ /foobar" */
-	if (target && strlen(xline) >= 3 && !strncmp(xline, "/ /", 3)) {
-		const char *params[] = { target, xline + 2, NULL };
-		cmd_msg("chat", params, NULL, quiet);
-		return 0;
-	}
-
+	/* czy przepu¶cic co¶ jako wiadomo¶æ mimo, ¿e zaczyna siê od '/' ? */
 	if (target && xline[0] == '/' && strlen(xline) >= 2) {
 		char *p = strchr(xline + 1, '/');
+		int pass = 0;
 
-		if (p && !xisspace(p[-1])) {
+		/* "/ foo" -> "foo" */
+		if (xline[1] == ' ' && xline[2]) {
+			xline += 2;
+
+			pass = 1;
+
+		/* "/bin/sh" -> "/bin/sh" */
+		} else if (p && p[-1] != ' ')
+			pass = 1;
+
+		if (pass) {
 			const char *params[] = { target, xline, NULL };
 			cmd_msg("chat", params, NULL, quiet);
 			return 0;
