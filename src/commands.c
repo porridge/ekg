@@ -4393,6 +4393,16 @@ int command_exec(const char *target, const char *xline, int quiet)
 		return 0;
 	}
 
+	if (target && xline[0] == '/' && strlen(xline) >= 2) {
+		char *p = strchr(xline + 1, '/');
+
+		if (p && !xisspace(p[-1])) {
+			const char *params[] = { target, xline, NULL };
+			cmd_msg("chat", params, NULL, quiet);
+			return 0;
+		}
+	}
+
 	send_nicks_index = 0;
 
 	line = line_save = xstrdup(xline);
