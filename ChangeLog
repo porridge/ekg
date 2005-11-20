@@ -4,6 +4,12 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2005-11-20
+
+- poprawka ostatnich zmian zwi±zanych z odró¿nianiem komend od zwyk³ego
+  tesktu; "/back http://foo.com" w oknie wiadomo¶ci jest traktowane jako
+  komenda (weirdo/sz)
+
 // 2005-11-19
 
 - dopisanie wersji klienta 7.0 (build 22 lub nowszy) (jceel/g)
