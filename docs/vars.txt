@@ -692,6 +692,15 @@ server_save
 	bêdzie automatycznie uaktualniana, a zawarto¶æ wpisana przez
 	u¿ytkownika zostanie usuniêta.
 
+slash_messages
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+	okre¶la, czy wiadomo¶ci zaczynaj±ce siê od ,,/'' maj± byæ traktowane 
+	w pewnych warunkach jak wiadomo¶ci. wy³±czenie tej opcji sprawia, ¿e 
+	wszystko, co zostanie wpisane w oknie rozmowy a zaczyna siê od ,,/'' 
+	zostanie potraktowane jak komenda.
+
 sms_away
 	typ: liczba
 	domy¶lna warto¶æ: 0

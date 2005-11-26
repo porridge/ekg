@@ -264,6 +264,7 @@ void variable_init()
 	variable_add("server", "se", VAR_STR, 1, &config_server, NULL, NULL, NULL);
 	variable_add("server_save", "ss", VAR_BOOL, 1, &config_server_save, NULL, NULL, NULL);
 	variable_add("irssi_set_mode", "is", VAR_BOOL, 1, &config_irssi_set_mode, NULL, NULL, NULL);
+	variable_add("slash_messages", "sM", VAR_BOOL, 1, &config_slash_messages, NULL, NULL, NULL);
 	variable_add("sms_away", "sa", VAR_MAP, 1, &config_sms_away, NULL, variable_map(4, 0, 0, "none", 1, 2, "all", 2, 1, "separate", 4, 0, "invisible"), dd_sms);
 	variable_add("sms_away_limit", "sl", VAR_INT, 1, &config_sms_away_limit, NULL, NULL, dd_sms);
 	variable_add("sms_max_length", "sm", VAR_INT, 1, &config_sms_max_length, NULL, NULL, dd_sms);

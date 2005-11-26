@@ -299,6 +299,7 @@ int config_save_question;
 int config_save_password;
 char *config_server;
 int config_server_save;
+int config_slash_messages;
 char *config_sms_app;
 int config_sms_away;
 int config_sms_away_limit;

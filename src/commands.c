@@ -4389,7 +4389,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 	}
 
 	/* czy przepu¶cic co¶ jako wiadomo¶æ mimo, ¿e zaczyna siê od '/' ? */
-	if (target && xline[0] == '/' && strlen(xline) >= 2) {
+	if (config_slash_messages && target && xline[0] == '/' && strlen(xline) >= 2) {
 		char *p = strchr(xline + 1, '/');
 		char *s = strchr(xline + 1, ' ');
 		int pass = 0;
