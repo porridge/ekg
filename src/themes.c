@@ -885,6 +885,7 @@ void theme_init()
 	format_add("ekg_version", "%) EKG - Eksperymentalny Klient Gadu-Gadu (%T%1%n)\n%) libgadu-%1 (protokó³ %2, klient %3)\n%) skompilowano: %4\n", 1);
 	format_add("secure", "%Y(szyfrowane)%n ", 1);
 	format_add("log_failed", "%! Nie mo¿na zapisaæ do historii: %1\n", 1);
+	format_add("var_not_set", "%! Wymagana zmienna %T%1%n nie zosta³a ustawiona\n", 1);
 
 	/* mail */
 	format_add("new_mail_one", "%) Masz now± wiadomo¶æ email\n", 1);

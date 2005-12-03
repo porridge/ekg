@@ -2668,8 +2668,13 @@ COMMAND(cmd_sms)
 	struct userlist *u;
 	const char *number = NULL;
 
-	if (!params[0] || !params[1] || !config_sms_app) {
+	if (!params[0] || !params[1]) {
 		printq("not_enough_params", name);
+		return -1;
+	}
+
+	if (!config_sms_app) {
+		printq("var_not_set", "sms_send_app");
 		return -1;
 	}
 
@@ -3874,8 +3879,13 @@ COMMAND(cmd_blink_leds)
 
 COMMAND(cmd_play)
 {
-	if (!params[0] || !config_sound_app) {
+	if (!params[0]) {
 		printq("not_enough_params", name);
+		return -1;
+	}
+
+	if (!config_speech_app) {
+		printq("var_not_set", "sound_app");
 		return -1;
 	}
 
@@ -3884,8 +3894,13 @@ COMMAND(cmd_play)
 
 COMMAND(cmd_say)
 {
-	if (!params[0] || !config_speech_app) {
+	if (!params[0]) {
 		printq("not_enough_params", name);
+		return -1;
+	}
+
+	if (!config_speech_app) {
+		printq("var_not_set", "speech_app");
 		return -1;
 	}
 
