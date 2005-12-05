@@ -44,8 +44,8 @@ int userlist_get_config, userlist_put_config;
 
 int command_add(const char *name, const char *params, command_func_t function, int alias, const char *params_help, const char *brief_help, const char *long_help);
 int command_remove(const char *name);
-void command_init();
-void command_free();
+void command_init(void);
+void command_free(void);
 int command_exec(const char *target, const char *line, int quiet);
 
 COMMAND(cmd_alias_exec);

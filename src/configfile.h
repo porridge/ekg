@@ -28,7 +28,7 @@ int config_read(const char *filename);
 char *config_read_variable(const char *var);
 int config_write(const char *filename);
 int config_write_partly(char **vars);
-void config_write_crash();
-void debug_write_crash();
+void config_write_crash(void);
+void debug_write_crash(void);
 
 #endif /* __CONFIGFILE_H */

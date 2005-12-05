@@ -2512,7 +2512,7 @@ COMMAND(cmd_save)
 {
 	last_save = time(NULL);
 
-	if (!userlist_write(NULL) && !config_write(params[0])) {
+	if (!userlist_write() && !config_write(params[0])) {
 		printq("saved");
 		config_changed = 0;
 		config_last_sysmsg_changed = 0;
@@ -3637,7 +3637,7 @@ COMMAND(cmd_test_send)
 	e->event.msg.time = time(NULL);
 	
 	handle_msg(e);
-	event_free(e);
+	event_free();
 
 	return 0;
 }

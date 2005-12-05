@@ -25,7 +25,7 @@
 #define xnew(t) (xcalloc(1, sizeof(t)))
 #define xnew_t(t) (xcalloc(1, sizeof(*t)))
 
-void ekg_oom_handler();
+void ekg_oom_handler(void);
 
 void *xcalloc(size_t nmemb, size_t size);
 void *xmalloc(size_t size);

@@ -52,10 +52,10 @@ const char *format_find(const char *name);
 char *format_string(const char *format, ...);
 const char *format_ansi(char ch);
 
-void theme_init();
+void theme_init(void);
 int theme_read(const char *filename, int replace);
-void theme_cache_reset();
-void theme_free();
+void theme_cache_reset(void);
+void theme_free(void);
 
 fstring_t reformat_string(const char *str);
 

@@ -43,7 +43,7 @@ list_t lasts;
 void last_add(int type, uin_t uin, time_t t, time_t st, const char *msg);
 void last_del(uin_t uin);
 int last_count(uin_t uin);
-void last_free();
+void last_free(void);
 
 void put_log(uin_t uin, const char *format, ...);
 const char *log_timestamp(time_t t);

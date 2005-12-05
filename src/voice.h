@@ -22,8 +22,8 @@
 
 int voice_fd;
 
-int voice_open();
-void voice_close();
+int voice_open(void);
+void voice_close(void);
 int voice_play(const char *buf, int length, int null);
 int voice_record(char *buf, int length, int null);
 

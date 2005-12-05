@@ -88,14 +88,14 @@ int python_handle_result;
 
 list_t modules;
 
-int python_initialize();
-int python_finalize();
+int python_initialize(void);
+int python_finalize(void);
 int python_load(const char *name, int quiet);
 int python_unload(const char *name, int quiet);
 int python_exec(const char *command);
 int python_run(const char *filename, int quiet);
 int python_list(int quiet);
 int python_function(const char *function, const char *arg);
-void python_autorun();
+void python_autorun(void);
 
 #endif /* __PYTHON_H */

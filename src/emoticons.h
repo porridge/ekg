@@ -31,9 +31,9 @@ struct emoticon {
 
 list_t emoticons;
 
-int emoticon_read();
+int emoticon_read(void);
 char *emoticon_expand(const char *s);
-void emoticon_free();
+void emoticon_free(void);
 
 int emoticon_add(const char *name, const char *value);
 int emoticon_remove(const char *name);

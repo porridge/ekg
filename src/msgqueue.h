@@ -44,12 +44,12 @@ list_t msg_queue;
 int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const unsigned char *msg, int secure, const unsigned char *format, int formatlen);
 int msg_queue_remove(int msg_seq);
 int msg_queue_remove_uin(uin_t uin);
-void msg_queue_free();
-int msg_queue_flush();
-int msg_queue_count();
+void msg_queue_free(void);
+int msg_queue_flush(void);
+int msg_queue_count(void);
 int msg_queue_count_uin(uin_t uin);
-int msg_queue_read();
-int msg_queue_write();
+int msg_queue_read(void);
+int msg_queue_write(void);
 
 int find_in_uins(int uin_count, uin_t *uins, uin_t uin);
 

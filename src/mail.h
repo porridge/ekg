@@ -39,11 +39,11 @@ list_t mail_folders;
 int mail_count;
 int last_mail_count;
 
-void check_mail();
-int check_mail_mbox();
-int check_mail_maildir();
+void check_mail(void);
+int check_mail_mbox(void);
+int check_mail_maildir(void);
 int check_mail_update(const char *s, int more);
-void check_mail_free();
+void check_mail_free(void);
 
 void changed_check_mail(const char *var);
 void changed_check_mail_folders(const char *var);

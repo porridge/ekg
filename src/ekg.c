@@ -525,7 +525,7 @@ void ekg_wait_for_key()
 			gg_debug(GG_DEBUG_MISC, "-- autosaving userlist and config after %d seconds.\n", time(NULL) - last_save);
 			last_save = time(NULL);
 
-			if (!userlist_write(NULL) && !config_write(NULL)) {
+			if (!userlist_write() && !config_write(NULL)) {
 				config_changed = 0;
 				print("autosaved");
 			} else
@@ -1575,7 +1575,7 @@ void ekg_exit()
 			if (line[strlen(line) - 1] == '\n')
 				line[strlen(line) - 1] = 0;
 			if (!strcasecmp(line, "tak") || !strcasecmp(line, "yes") || !strcasecmp(line, "t") || !strcasecmp(line, "y")) {
-				if (userlist_write(NULL) || config_write(NULL))
+				if (userlist_write() || config_write(NULL))
 					printf("Wyst±pi³ b³±d podczas zapisu.\n");
 			}
 		} else

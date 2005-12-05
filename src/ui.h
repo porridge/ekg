@@ -38,14 +38,14 @@ int ui_screen_height;
 
 volatile sig_atomic_t ui_need_refresh;
 
-extern void ui_none_init();
-extern void ui_batch_init();
+extern void ui_none_init(void);
+extern void ui_batch_init(void);
 
 #ifdef WITH_UI_READLINE
 
 #define MAX_LINES_PER_SCREEN 50
 
-extern void ui_readline_init();
+extern void ui_readline_init(void);
 #endif
 
 #ifdef WITH_UI_NCURSES
@@ -64,8 +64,8 @@ int window_printat(WINDOW *w, int x, int y, const char *format, void *data_, int
 int config_backlog_overlap;
 int config_backlog_size;
 int config_beep_title;
-extern void ui_ncurses_init();
-extern void header_statusbar_resize();
+extern void ui_ncurses_init(void);
+extern void header_statusbar_resize(const char *name);
 
 #endif
 

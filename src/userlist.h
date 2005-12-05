@@ -82,21 +82,21 @@ struct ignore_label ignore_labels[IGNORE_LABELS_COUNT + 1];
 
 list_t userlist;
 
-int userlist_read();
-int userlist_write();
+int userlist_read(void);
+int userlist_write(void);
 #ifdef WITH_WAP
-int userlist_write_wap();
+int userlist_write_wap(void);
 #endif
-void userlist_write_crash();
+void userlist_write_crash(void);
 void userlist_clear_status(uin_t uin);
 struct userlist *userlist_add(uin_t uin, const char *display);
 int userlist_remove(struct userlist *u, int full);
 int userlist_replace(struct userlist *u);
-void userlist_send();
+void userlist_send(void);
 struct userlist *userlist_find(uin_t uin, const char *display);
 struct userlist *userlist_find_mobile(const char *mobile);
-char *userlist_dump();
-void userlist_clear();
+char *userlist_dump(void);
+void userlist_clear(void);
 #define userlist_free userlist_clear
 int userlist_set(const char *contacts, int config);
 char userlist_type(struct userlist *u);

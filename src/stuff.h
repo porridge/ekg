@@ -370,19 +370,19 @@ int strcoll_usable;
 
 int alias_add(const char *string, int quiet, int append);
 int alias_remove(const char *name, int quiet);
-void alias_free();
+void alias_free(void);
 
 char *base64_encode(const char *buf);
 char *base64_decode(const char *buf);
 
 void binding_list(int quiet, const char *name, int all);
-void binding_free();
+void binding_free(void);
 
 int buffer_add(int type, const char *target, const char *line, int max_lines);
 int buffer_count(int type);
 char *buffer_flush(int type, const char *target);
 char *buffer_tail(int type);
-void buffer_free();
+void buffer_free(void);
 
 void changed_auto_save(const char *var);
 #ifdef WITH_ASPELL
@@ -407,10 +407,10 @@ struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int co
 int conference_set_ignore(const char *name, int flag, int quiet);
 int conference_rename(const char *oldname, const char *newname, int quiet);
 int conference_participant(struct conference *c, uin_t uin);
-void conference_free();
+void conference_free(void);
 
-void ekg_connect();
-void ekg_reconnect();
+void ekg_connect(void);
+void ekg_reconnect(void);
 void ekg_logoff(struct gg_session *sess, const char *reason);
 
 int ekg_hash(const char *name);
@@ -421,7 +421,7 @@ const char *event_format(int flags);
 const char *event_format_target(const char *target);
 int event_flags(const char *events);
 int event_check(int event, uin_t uin, const char *data);
-void event_free();
+void event_free(void);
 
 int mesg_set(int what);
 int msg_encrypt(uin_t uin, unsigned char **msg);
@@ -443,16 +443,16 @@ char *read_file(FILE *f);
 int send_sms(const char *recipient, const char *message, int quiet);
 void sms_away_add(uin_t uin);
 int sms_away_check(uin_t uin);
-void sms_away_free();
+void sms_away_free(void);
 
-int ioctld_socket();
+int ioctld_socket(void);
 int ioctld_send(const char *seq, int act, int quiet);
 int init_control_pipe(const char *path);
 
 const char *timestamp(const char *format);
-void unidle();
+void unidle(void);
 int on_off(const char *value);
-int transfer_id();
+int transfer_id(void);
 char *xstrmid(const char *str, int start, int length);
 const char *http_error_string(int h);
 char color_map(unsigned char r, unsigned char g, unsigned char b);
@@ -472,19 +472,19 @@ time_t parsetimestr(const char *p);
 struct timer *timer_add(time_t period, int persistent, int type, int at, const char *name, const char *command);
 int timer_remove(const char *name, int at, const char *command);
 int timer_remove_user(int at);
-void timer_free();
+void timer_free(void);
 
-void update_status();
-void update_status_myip();
+void update_status(void);
+void update_status_myip(void);
 void change_status(int status, const char *arg, int autom);
 const char *ekg_status_label(int status, const char *prefix);
 int ekg_hide_descr_status(int status);
 
 /* funkcje poza stuff.c */
-void ekg_wait_for_key();
-void ekg_exit();
+void ekg_wait_for_key(void);
+void ekg_exit(void);
 int check_conn(uin_t uin);
-void save_windows();
+void save_windows(void);
 
 #ifdef WITH_ASPELL
 void spellcheck_init(void);

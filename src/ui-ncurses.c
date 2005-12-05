@@ -3836,7 +3836,7 @@ static void ui_ncurses_loop()
 			refresh();
 			keypad(input, TRUE);
 			/* wywo³a wszystko, co potrzebne */
-			header_statusbar_resize();
+			header_statusbar_resize(NULL);
 			changed_backlog_size("backlog_size");
 
 			goto redraw_prompt;
@@ -5056,7 +5056,7 @@ cleanup:
  *
  * zmienia rozmiar paska stanu i/lub nag³ówka okna.
  */
-void header_statusbar_resize()
+void header_statusbar_resize(const char *name)
 {
 	if (!status)
 		return;

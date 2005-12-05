@@ -50,15 +50,15 @@ struct variable {
 
 list_t variables;
 
-void variable_init();
-void variable_set_default();
+void variable_init(void);
+void variable_set_default(void);
 struct variable *variable_find(const char *name);
 struct value_map *variable_map(int count, ...);
 int variable_add(const char *name, const char *short_name, int type, int display, void *ptr, void (*notify)(const char *name), struct value_map *map, int (*dyndisplay)(const char *name));
 int variable_set(const char *name, const char *value, int allow_foreign);
-char *variable_digest();
+char *variable_digest(void);
 int variable_undigest(const char *digest);
 void variable_help(const char *name);
-void variable_free();
+void variable_free(void);
 
 #endif /* __VARS_H */
