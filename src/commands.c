@@ -3884,7 +3884,7 @@ COMMAND(cmd_play)
 		return -1;
 	}
 
-	if (!config_speech_app) {
+	if (!config_sound_app) {
 		printq("var_not_set", "sound_app");
 		return -1;
 	}
