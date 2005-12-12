@@ -63,7 +63,7 @@ struct option
 # ifdef __GNU_LIBRARY__
 extern int getopt (int __argc, char *const *__argv, const char *__shortopts);
 # else /* not __GNU_LIBRARY__ */
-extern int getopt (void);
+extern int getopt ();
 # endif /* __GNU_LIBRARY__ */
 
 # ifndef __need_getopt
@@ -80,12 +80,12 @@ extern int _getopt_internal (int __argc, char *const *__argv,
 			     int __long_only);
 # endif
 #else /* not __STDC__ */
-extern int getopt (void);
+extern int getopt ();
 # ifndef __need_getopt
-extern int getopt_long (void);
-extern int getopt_long_only (void);
+extern int getopt_long ();
+extern int getopt_long_only ();
 
-extern int _getopt_internal (void);
+extern int _getopt_internal ();
 # endif
 #endif /* __STDC__ */
 
