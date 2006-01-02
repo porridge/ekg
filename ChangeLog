@@ -16,7 +16,7 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 
 // 2005-12-03
 
-- odpowiedni komunikat dla polecenia sms, play oraz say, gdy nie ustawino
+- odpowiedni komunikat dla polecenia sms, play oraz say, gdy nie ustawiono
   w³a¶ciwej zmiennej (zigi/sz)
 
 // 2005-11-26
