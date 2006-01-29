@@ -141,9 +141,9 @@ beep
 	domy¶lna warto¶æ: 1
 
 	okre¶la, czy klient ma beepaæ w ró¿nych sytuacjach. wy³±czenie tej
-	opcji spowoduje, ¿e w przypadku ¿adnych zdarzeñ zwi±zanych z GG nie
-	bêdzie podnosiæ alarmu. niestety nie obejmuje to zdarzeñ zwi±zanych
-	z wprowadzanym tekstem i przy tab-completion mo¿e siê to przytrafiæ.
+	opcji spowoduje, ¿e ¿adne zdarzenia zwi±zane z GG nie bêd± podnosi³y 
+	alarmu. niestety nie obejmuje to zdarzeñ zwi±zanych z wprowadzanym 
+	tekstem i przy tab-completion mo¿e siê to przytrafiæ.
 
 beep_msg
 	typ: bool
