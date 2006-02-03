@@ -445,7 +445,7 @@ void sms_away_add(uin_t uin);
 int sms_away_check(uin_t uin);
 void sms_away_free(void);
 
-int ioctld_socket(void);
+int ioctld_socket(const char *path);
 int ioctld_send(const char *seq, int act, int quiet);
 int init_control_pipe(const char *path);
 
