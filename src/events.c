@@ -1603,7 +1603,7 @@ void handle_token(struct gg_http *h)
 		if (setjmp(e.setjmp_buffer)) {
 			char buf[JMSG_LENGTH_MAX];
 			/* If we ended up over here, then it means some call below called longjmp. */
-			(e.pub.format_message)(&j, buf);
+			(e.pub.format_message)((j_common_ptr)&j, buf);
 			print("token_failed", buf);
 			jpeg_destroy_decompress(&j);
 			fclose(f);
