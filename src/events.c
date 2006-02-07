@@ -1649,7 +1649,7 @@ void handle_token(struct gg_http *h)
 		
 		unlink(file);
 	} else
-#else	/* HAVE_LIBJPEG */
+#endif	/* HAVE_LIBJPEG */
 	{
 		char *file2 = saprintf("%s.jpg", file);
 
@@ -1660,7 +1660,6 @@ void handle_token(struct gg_http *h)
 
 		xfree(file2);
 	}
-#endif	/* HAVE_LIBJPEG */
 
 #else	/* HAVE_MKSTEMP */
 	print("token_unsupported");
