@@ -1515,6 +1515,21 @@ char *token_ocr(const char *ocr, int width, int height, int length)
 	return NULL;
 }
 
+#ifdef HAVE_LIBJPEG
+
+struct ekg_jpeg_error_mgr {
+	struct jpeg_error_mgr pub;
+	jmp_buf setjmp_buffer;
+};
+
+void ekg_jpeg_error_exit(j_common_ptr j)
+{
+	struct ekg_jpeg_error_mgr *e = (struct ekg_jpeg_error_mgr *) j->err;
+	/* Return control to the setjmp point */
+	longjmp(e->setjmp_buffer, 1);
+}
+#endif
+
 /*
  * handle_token()
  *
@@ -1569,7 +1584,7 @@ void handle_token(struct gg_http *h)
 #ifdef HAVE_LIBJPEG
 	if (config_display_token) {
 		struct jpeg_decompress_struct j;
-		struct jpeg_error_mgr e;
+		struct ekg_jpeg_error_mgr e;
 		JSAMPROW buf[1];
 		int size;
 		char *token, *tmp;
@@ -1581,7 +1596,18 @@ void handle_token(struct gg_http *h)
 			goto fail;
 		}
 
-		j.err = jpeg_std_error(&e);
+		j.err = jpeg_std_error(&e.pub);
+		e.pub.error_exit = ekg_jpeg_error_exit;
+		/* Establish the setjmp return context for ekg_jpeg_error_exit to use. */
+		if (setjmp(e.setjmp_buffer)) {
+			char buf[JMSG_LENGTH_MAX];
+			/* If we ended up over here, then it means some call below called longjmp. */
+			(e.pub.format_message)(&j, buf);
+			print("token_failed", buf);
+			jpeg_destroy_decompress(&j);
+			fclose(f);
+			goto fail;
+		}
 		jpeg_create_decompress(&j);
 		jpeg_stdio_src(&j, f);
 		jpeg_read_header(&j, TRUE);
