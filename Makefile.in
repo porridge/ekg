@@ -82,6 +82,7 @@ install-ekl2:
 uninstall:	@uninstall_ekg@
 	rm -f $(DESTDIR)$(libdir)/libgadu.{a,so*}
 	rm -f $(DESTDIR)$(includedir)/libgadu{,-config,-stdint}.h
+	rm -f $(DESTDIR)$(libdir)/pkgconfig/libgadu.pc
 
 uninstall-ekg:
 	rm -f $(DESTDIR)$(bindir)/{ekg,ekgwapd,ekl2.{sh,pl}}
