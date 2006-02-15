@@ -279,15 +279,20 @@ dnl  Sprawdzamy OpenSSL
 dnl
 
 AC_CHECK_OPENSSL
+  
+AC_ARG_ENABLE(libgadu-openssl,
+	[  --enable-libgadu-openssl Enable LIBGADU OpenSSL support])
 
 if test "x$have_openssl" = "xyes"; then
 	OBJS="$OBJS simlite.o"
 	LDFLAGS="$OPENSSL_LIBS $LDFLAGS"
-	LIBS_LIBGADU="$LIBS_LIBGADU $OPENSSL_LIBS"
 	CFLAGS="$CFLAGS $OPENSSL_INCLUDES"
-	CFLAGS_LIBGADU="$CFLAGS_LIBGADU $OPENSSL_INCLUDES"
-	PC_REQUIRES="$PC_REQUIRES openssl"
-	AC_LIBGADU_DEFINE([HAVE_OPENSSL])
+	if test "x$enable_libgadu_openssl" != "xno"; then
+		LIBS_LIBGADU="$LIBS_LIBGADU $OPENSSL_LIBS"
+		CFLAGS_LIBGADU="$CFLAGS_LIBGADU $OPENSSL_INCLUDES"
+		PC_REQUIRES="$PC_REQUIRES openssl"
+		AC_LIBGADU_DEFINE([HAVE_OPENSSL])
+	fi
 fi
 
 dnl
@@ -615,6 +620,12 @@ if test "x$lib_shared_enabled" = "xyes"; then
 	fi
 else
 	echo " - shared libgadu: disabled"
+fi
+
+if test "x$enable_libgadu_openssl" != "xno"; then
+	echo " - libgadu_openssl: enabled"
+else
+	echo " - libgadu_openssl: disabled"
 fi
 
 dnl <ekg>
