@@ -26,7 +26,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#ifdef __FreeBSD__
+#if defined (__FreeBSD__) || defined (__DragonFly__)
 #  include <sys/kbio.h>			
 #endif
 #ifdef sun /* Solaris */
@@ -147,7 +147,7 @@ int beeps_spk(int *tone, int *delay)
 		if (tone[s])
 			fprintf(stderr, " %d/%d", tone[s], delay[s]);
 
-#ifdef __FreeBSD__
+#if defined (__FreeBSD__) || defined (__DragonFly__)
 		ioctl(fd, KIOCSOUND, 0);
 #endif
 

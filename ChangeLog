@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2006-02-18
+
+- poprawka kompilacji na DragonFly (arachnist/w)
+
 // 2006-02-15
 
 - dodanie opcji umo¿liwiaj±cej wy³±czenie openssl tylko w libgadu (porridge)
