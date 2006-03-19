@@ -5042,6 +5042,24 @@ static int ui_ncurses_event(const char *event, ...)
 		}
 	}
 
+	if (!strcmp(event, "get_window_list")) {
+		int *windowlist = va_arg(ap, int*);
+		int start = va_arg(ap, int), stop = va_arg(ap, int);
+		list_t l;
+		int index = 0;
+		
+		for (l = windows; l; l = l->next) {
+			struct window *w = l->data;
+			
+			if ((w->id >= start) && (w->id <= stop))
+				windowlist[++index] = w->id;
+		}
+		
+		windowlist[0] = index;
+
+		goto cleanup;
+	}
+
 cleanup:
 	va_end(ap);
 

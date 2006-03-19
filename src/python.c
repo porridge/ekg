@@ -146,6 +146,34 @@ static PyObject* ekg_cmd_window_commit(PyObject *self, PyObject *args)
 	return Py_BuildValue("");
 }
 
+static PyObject* ekg_cmd_window_list(PyObject *self, PyObject *args)
+{
+	int i, start, stop, *windowlist;
+	PyObject *wynik, *val;
+
+	if (!PyArg_ParseTuple(args, "ii", &start, &stop))
+		return NULL;
+
+	if (start < 1 || start > stop)
+		return NULL;
+
+	if (!(windowlist = xmalloc((stop - start + 2) * sizeof(int))))
+		return NULL;
+
+	ui_event("get_window_list", windowlist, start, stop);
+
+	wynik = PyList_New(windowlist[0]);
+
+	for (i = 0; i < windowlist[0]; i++) {
+		val = Py_BuildValue("i", windowlist[i + 1]);
+		PyList_SetItem(wynik, i, val);
+	}
+
+	free(windowlist);
+
+	return wynik;
+}
+
 static PyMethodDef ekg_methods[] = {
 	{ "connect", ekg_cmd_connect, METH_VARARGS, "" },
 	{ "disconnect", ekg_cmd_disconnect, METH_VARARGS, "" },
@@ -155,6 +183,7 @@ static PyMethodDef ekg_methods[] = {
 	{ "print_statusbar", ekg_cmd_print_statusbar, METH_VARARGS, "" },
 	{ "window_printat", ekg_cmd_window_printat, METH_VARARGS, "" },
 	{ "window_commit", ekg_cmd_window_commit, METH_VARARGS, "" },
+	{ "window_list", ekg_cmd_window_list, METH_VARARGS, "" },
 	{ NULL, NULL, 0, NULL }
 };
 
