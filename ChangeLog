@@ -7,6 +7,7 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 // 2006-03-26
 
 - zaktualizowanie listy rzeczy do zrobienia (gophi)
+- libgadu: dodanie GG_FAILURE_INTRUDER, podbicie API (gophi)
 
 // 2006-03-19
 
