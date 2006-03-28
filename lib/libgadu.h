@@ -438,7 +438,8 @@ enum gg_failure_t {
 	GG_FAILURE_404, 		/* XXX nieu¿ywane */
 	GG_FAILURE_TLS,			/* b³±d negocjacji TLS */
 	GG_FAILURE_NEED_EMAIL, 		/* serwer roz³±czy³ nas z pro¶b± o zmianê emaila */
-	GG_FAILURE_INTRUDER		/* za du¿o prób po³±czenia siê z nieprawid³owym has³em */
+	GG_FAILURE_INTRUDER,		/* za du¿o prób po³±czenia siê z nieprawid³owym has³em */
+	GG_FAILURE_UNAVAILABLE		/* serwery s± wy³±czone */
 };
 
 /*

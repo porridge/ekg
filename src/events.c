@@ -1192,6 +1192,7 @@ void handle_failure(struct gg_event *e)
 		{ GG_FAILURE_404, "conn_failed_404" },
 		{ GG_FAILURE_TLS, "conn_failed_tls" },
 		{ GG_FAILURE_INTRUDER, "conn_failed_intruder" },
+		{ GG_FAILURE_UNAVAILABLE, "conn_failed_unavailable" },
 		{ 0, NULL }
 	};
 

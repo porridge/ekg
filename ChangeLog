@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2006-03-28
+
+- libgadu: dodanie GG_FAILURE_UNAVAILABLE, podbicie API (gophi)
+
 // 2006-03-27
 
 - drobna poprawka jêzykowa w /help /on (gophi)
