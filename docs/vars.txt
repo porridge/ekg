@@ -601,6 +601,14 @@ mesg
 	pisanie na nasz terminal. w przypadku warto¶ci 2 u¿ywane s± ustawienia
 	sprzed uruchomienia ekg.
 
+nick
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	ustala nasz nick, wy¶wietlany przy wysy³anych przez nas wiadomo¶ciach 
+	w oknie rozmowy. w przypadku, kiedy mamy swój numerek zapisany na li¶cie, 
+	bêdzie wy¶wietlana pozycja z listy.
+
 proxy
 	typ: tekst
 	domy¶lna warto¶æ: brak

@@ -1,9 +1,10 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2006 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Piotr Domagalski <szalik@szalik.net>
+ *                          Jakub Klama <jceel@apcoh.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -782,9 +783,12 @@ const char *format_user(uin_t uin)
 	struct userlist *u = userlist_find(uin, NULL);
 	static char buf[100], *tmp;
 	
-	if (!u || !u->display)
-		tmp = format_string(format_find("unknown_user"), itoa(uin));
-	else
+	if (!u || !u->display) {
+		if (uin == config_uin && config_nick && *config_nick)
+			tmp = format_string(format_find("known_user"), config_nick, itoa(uin));
+		else
+			tmp = format_string(format_find("unknown_user"), itoa(uin));
+	} else
 		tmp = format_string(format_find("known_user"), u->display, itoa(uin));
 	
 	strlcpy(buf, tmp, sizeof(buf));
