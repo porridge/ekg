@@ -20,6 +20,7 @@
 #ifndef __TOKEN_H
 #define __TOKEN_H
 
+#ifdef HAVE_LIBJPEG
 const int token_char_height = 12; 
 const char token_id_char[] = {"0123456789abcdef"};
 const char token_id[][15] = {
@@ -230,5 +231,14 @@ const char token_id[][15] = {
 "..#..",
 "..#..",
 "..#.."};
+#endif
+
+#ifdef HAVE_LIBUNGIF
+struct token_t {
+	size_t sx, sy, pal_sz;
+	unsigned char *pal;
+	unsigned char *data;
+};
+#endif
 
 #endif /* __TOKEN_H */

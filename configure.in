@@ -447,6 +447,25 @@ if test "x$with_libgsm" != "xno"; then
 fi
 
 dnl
+dnl  Sprawdzamy libungif.so i <gif_lib.h>
+dnl
+  
+AC_ARG_WITH(libungif,
+	[  --without-libungif       Compile without GIF token support])
+
+if test "x$with_libungif" != "xno"; then
+	AC_CHECK_LIB(ungif, DGifSlurp,
+	[ 
+		AC_CHECK_HEADERS(gif_lib.h,
+		[
+			AC_DEFINE(HAVE_LIBUNGIF, 1, [define if you have libungif])
+			LDFLAGS="-lungif $LDFLAGS"
+			have_libungif=yes
+		])
+	])
+fi
+
+dnl
 dnl  Sprawdzamy libjpeg.so i <jpeglib.h>
 dnl
   
@@ -658,6 +677,12 @@ if test "x$have_pthread" = "xyes"; then
 	echo " - pthread: enabled"
 else
 	echo " - pthread: disabled"
+fi
+
+if test "x$have_libungif" = "xyes"; then
+	echo " - libungif: enabled"
+else
+	echo " - libungif: disabled"
 fi
 
 if test "x$have_libjpeg" = "xyes"; then

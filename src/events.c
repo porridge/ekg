@@ -61,6 +61,10 @@
 #ifdef HAVE_JPEGLIB_H
 #  include <jpeglib.h>
 #endif
+#ifdef HAVE_GIF_LIB_H
+#  include <fcntl.h>	/* open() */
+#  include <gif_lib.h>
+#endif
 
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure(), handle_search50(),
@@ -1458,6 +1462,331 @@ fail:
 	gg_free_pubdir(h);
 }
 
+#ifdef HAVE_LIBUNGIF
+
+/*
+ * token_gif_load()
+ *
+ * Wczytuje token z pliku gif. Zwraca -1 je¶li siê nie uda (wtedy w token->data 
+ * bêdzie komunikat o b³êdzie) lub 0. Je¶li token->pal_sz != 0 to znaczy, ¿e 
+ * token zawiera paletê barw, w której nale¿y sprawdzaæ piksele (w kolejno¶ci 
+ * r, g i b). Rozmiar palety w bajtach to pal_sz * 3.
+ *
+ *  - fname - nazwa pliku z gifem do wczytania
+ *  - token - wska¼nik do struktury na token
+ */
+
+int token_gif_load (char *fname, struct token_t *token)
+{
+	char errbuf[512];
+	GifFileType *file;
+	ColorMapObject *pal;
+	int fd;
+
+	fd = open(fname, O_RDONLY);
+	if (fd == -1) {
+		snprintf (errbuf, sizeof(errbuf), "open(%s): %m", fname);
+		goto err;
+	}
+
+	if (!(file = DGifOpenFileHandle(fd))) {
+		snprintf (errbuf, sizeof(errbuf), "DGifOpenFileHandle(): %d", 
+		    GifLastError());
+		goto err2;
+	}
+
+	if (DGifSlurp(file) != GIF_OK) {
+		snprintf (errbuf, sizeof(errbuf), "DGifSlurp(): %d", GifLastError());
+		goto err3;
+	}
+
+	if (file->ImageCount != 1) {
+		snprintf (errbuf, sizeof(errbuf), "ImageCount = %d", file->ImageCount);
+		goto err3;
+	}
+
+	token->pal = NULL;
+	token->pal_sz = 0;
+	pal = file->SavedImages[0].ImageDesc.ColorMap;
+	if (!pal)
+		pal = file->SColorMap;
+
+	if (pal) {
+		token->pal_sz = pal->ColorCount;
+		token->pal = (unsigned char *) xmalloc(token->pal_sz * 3);
+		memcpy (token->pal, pal->Colors, pal->ColorCount);
+	}
+
+	token->sx = file->SavedImages[0].ImageDesc.Width;
+	token->sy = file->SavedImages[0].ImageDesc.Height;
+	token->data = (unsigned char *) xmalloc(token->sx * token->sy);
+
+	memcpy (token->data, file->SavedImages[0].RasterBits, token->sx * token->sy);
+	DGifCloseFile (file);
+
+	return 0;
+
+err3:
+	DGifCloseFile (file);
+err2:
+	close (fd);
+err:
+	token->data = (unsigned char *) xstrdup(errbuf);
+	return -1;
+}
+
+/*
+ * token_gif_free()
+ *
+ * Zwalnia struktury zajmowane przez token (NIE sam± token_t).
+ *
+ *  - token - wska¼nik do struktury z danymi do zwolnienia
+ */
+
+void token_gif_free (struct token_t *token)
+{
+	if (token->data)
+		xfree (token->data);
+
+	if (token->pal)
+		xfree (token->pal);
+
+	token->data = token->pal = NULL;
+}
+
+/*
+ * token_gif_get_pixel()
+ *
+ * Pobiera piksel z podanej pozycji. Je¶li pozycja jest poza zakresem, zwraca 
+ * podany kolor t³a.
+ *
+ *  - token - wska¼nik na strukturê opisuj±c± token
+ *  - x, y - pozyzja piksela
+ *  - backgr_color - numer koloru t³a
+ */
+
+char token_gif_get_pixel (struct token_t *token, size_t x, size_t y, unsigned char backgr_color)
+{
+	return (x < 0 || y < 0 || x >= token->sx || y >= token->sy) ? 
+	    backgr_color : token->data[y * token->sx + x];
+}
+
+/*
+ * token_gif_strip()
+ *
+ * Usuwa z obrazka wszystko, czego nie potrzebujemy (linie, pojedyncze 
+ * piksele i antyaliasing czcionki).
+ *
+ *  - token - wska¼nik na strukturê opisuj±c± token
+ */
+
+void token_gif_strip (struct token_t *token)
+{
+	unsigned char *new_data;
+	size_t i;
+	size_t x, y;
+	unsigned char backgr_color = 0;
+	size_t backgr_counts[256];
+
+	/* Usuwamy wszystkie samotne piksele. Piksel jest uznawany za samotny 
+	 * wtedy, kiedy nie ma w jego najbli¿szym otoczeniu, obejmuj±cym 8 
+	 * pikseli dooko³a niego, przynajmniej trzech pikseli o tym samym 
+	 * kolorze. To usuwa kropki i pojedyncze linie dodawane w celu 
+	 * zaciemnienia obrazu tokena oraz anty-aliasing czcionek w znakach. 
+	 * Otoczenie pikseli brzegowych jest uznawane za kolor t³a tak, jakby 
+	 * t³o zosta³o rozszerzone.
+	 */
+
+	/* Najpierw sprawdzamy kolor t³a. To piksel, którego jest najwiêcej. */
+
+	for (i = 0; i < 256; i++)
+		backgr_counts[i] = 0;
+
+	for (i = 0; i < token->sx * token->sy; i++) {
+		unsigned char pixel = token->data[i];
+		if (++backgr_counts[pixel] > backgr_counts[backgr_color])
+			backgr_color = pixel;
+	}
+
+	new_data = (unsigned char *) xmalloc(token->sx * token->sy);
+	for (y = 0; y < token->sy; y++)
+		for (x = 0; x < token->sx; x++) {
+			int dx, dy;
+			char new_pixel = backgr_color;
+
+			if (token->data[y * token->sx + x] != backgr_color) {
+				int num_pixels = 0;
+
+				/* num_pixels przechowuje liczbê pikseli w otoczeniu 
+				 * badanego piksela (wliczaj±c sam badany piksel) 
+				 * o tym samym kolorze, co badany piksel.
+				 */
+
+				for (dy = -1; dy <= 1; dy++)
+					for (dx = -1; dx <= 1; dx++)
+						if (token_gif_get_pixel(token, x + dx, y + dy, 
+						    backgr_color) == token->data[y * token->sx + x])
+							num_pixels++;
+
+				if (num_pixels >= 4)	/* 4, bo razem z badanym */
+					new_pixel = token->data[y * token->sx + x];
+			}
+
+			new_data[y * token->sx + x] = new_pixel;	// ? 1 : 0;
+	}
+
+	xfree (token->data);
+	token->data = new_data;
+}
+
+/*
+ * token_gif_strip_txt
+ *
+ * Usuwa z podanego bufora tekstowego puste linie na górze i na dole. 
+ * Zwraca nowo zaalokowany bufor.
+ *
+ *  - buf - bufor do stripniêcia
+ */
+
+char *token_gif_strip_txt (char *buf)
+{
+	char *new_buf = NULL;
+	size_t start, end, len;
+
+	len = strlen(buf);
+	for (start = 0; start < len; start++)
+		if (buf[start] != 0x20 && buf[start] != '\n')
+			break;
+
+	if (!buf[start])
+		return NULL;
+
+	while (start && buf[start] != '\n')
+		start--;
+
+	if (start)
+		start++;
+
+	for (end = 0; end < len; end++)
+		if (buf[len - 1 - end] != 0x20 && buf[len - 1 - end] != '\n')
+			break;
+
+	end = len - 1 - end;
+	end--;
+
+	if (end < start)
+		return NULL;
+
+	new_buf = (char *) xmalloc(end - start + 2);
+	memcpy (new_buf, buf + start, end - start);
+	new_buf[end - start - 1] = '\n';
+	new_buf[end - start] = 0;
+
+	return new_buf;
+}
+
+/*
+ * token_gif_to_txt()
+ *
+ * Konwertuje token do postaci tekstowej. Zwraca bufor tekstowy z tokenem 
+ * obróconym tak, ¿eby lepiej zmie¶ciæ siê na ekranie.
+ *
+ *  - token - wska¼nik na strukturê opisuj±c± token
+ */
+
+char *token_gif_to_txt (struct token_t *token)
+{
+	char *buf, *bptr;
+	size_t x, y, i;
+	unsigned char min_rgb[3] = {255, 255, 255};
+	unsigned char max_rgb[3] = {0, 0, 0};
+	unsigned char delta_rgb[3] = {255, 255, 255};
+
+	/* Obliczamy minimalne i maksymalne warto¶ci sk³adowych R, G i B. 
+	 * Przydadz± siê podczas normalizacji - w ten sposób niska jasno¶æ 
+	 * nie bêdzie problemem.
+	 */
+
+	for (i = 0; i < token->sx * token->sy; i++) {
+		unsigned char ofs = token->data[i];
+		unsigned char *pent;
+		size_t pent_i;
+
+		if (ofs >= token->pal_sz)
+			continue;
+
+		pent = token->pal + ofs * 3;
+		for (pent_i = 0; pent_i < 3; pent_i++) {
+			if (pent[pent_i] < min_rgb[pent_i])
+				min_rgb[pent_i] = pent[pent_i];
+
+			if (pent[pent_i] > max_rgb[pent_i])
+				max_rgb[pent_i] = pent[pent_i];
+		}
+	}
+
+	for (i = 0; i < 3; i++)
+		delta_rgb[i] = max_rgb[i] - min_rgb[i];
+
+	bptr = buf = (char *) xmalloc((token->sy + 1) * token->sx + 1);
+
+	for (x = 0; x < token->sx; x++) {
+		for (y = 0; y < token->sy; y++) {
+			int intens;
+			unsigned char ofs;
+			static char intens_chars[] = {
+				'.', '.', '.', '.', '.', '.', '.', '.', 
+				'.', '.', '.', '.', '.', '.', '.', '.', 
+				':', ':', ':', ':', ':', ':', 
+				'*', '*', '*', '*', 
+				'#', '#'
+			};
+			char intens_char;
+
+			/* Obliczamy intensywno¶æ koloru na podstawie palety. Zgodnie 
+		 	 * z zasadami sztuki bierzemy 30%R, 59%G i 11%B. Poniewa¿ kolory 
+			 * s± odwrócone (t³o jest bia³e), musimy zrobiæ negatyw. */
+
+			ofs = token->data[y * token->sx + (token->sx - 1 - x)];
+			if (ofs >= token->pal_sz) {
+				/* Ups... */
+				intens = ofs;	/* XXX: Jaka¶ m±drzejsza decyzja? */
+			} else {
+				unsigned char *pent = token->pal + ofs * 3;
+				unsigned char rgb[3];
+				size_t pent_i;
+
+				/* Normalizujemy rgb */
+				for (pent_i = 0; pent_i < 3; pent_i++)
+					rgb[pent_i] = ((int) pent[pent_i] - min_rgb[pent_i]) 
+					    * 255 / delta_rgb[pent_i];
+
+				intens = 30 * (255 - rgb[0]) 
+				    + 59 * (255 - rgb[1]) 
+				    + 11 * (255 - rgb[2]);
+				intens /= 100;
+			}
+
+			intens_char = intens ? intens_chars[(intens * sizeof(intens_chars)) / 256] : ' ';
+			*bptr++ = intens_char;
+		}
+		*bptr++ = '\n';
+	}
+
+	*bptr = 0;
+
+	bptr = token_gif_strip_txt(buf);
+	if (bptr) {
+		xfree (buf);
+		return bptr;
+	}
+
+	return buf;
+}
+#endif
+
+#ifdef HAVE_LIBJPEG
+
 /*
  * token_check()
  * 
@@ -1517,8 +1846,6 @@ char *token_ocr(const char *ocr, int width, int height, int length)
 
 	return NULL;
 }
-
-#ifdef HAVE_LIBJPEG
 
 struct ekg_jpeg_error_mgr {
 	struct jpeg_error_mgr pub;
@@ -1583,6 +1910,29 @@ void handle_token(struct gg_http *h)
 		unlink(file);
 		goto fail;
 	}
+
+#ifdef HAVE_LIBUNGIF
+	if (config_display_token) {
+		struct token_t token;
+		char *buf;
+
+		if (token_gif_load(file, &token) == -1) {
+			print("token_failed", token.data);
+			xfree (token.data);
+			goto fail;
+		}
+
+		token_gif_strip (&token);
+		buf = token_gif_to_txt(&token);
+		print("token_start");
+		print("token_body", buf);
+		print("token_end");
+		xfree (buf);
+		token_gif_free (&token);
+
+		goto fail;
+	}
+#endif
 
 #ifdef HAVE_LIBJPEG
 	if (config_display_token) {
@@ -1654,7 +2004,7 @@ void handle_token(struct gg_http *h)
 	} else
 #endif	/* HAVE_LIBJPEG */
 	{
-		char *file2 = saprintf("%s.jpg", file);
+		char *file2 = saprintf("%s.gif", file);
 
 		if (rename(file, file2) == -1)
 			print("token", file);
@@ -1675,6 +2025,7 @@ fail:
 		 * ¿e kolejny ifdef nie jest spe³niony...
 		 */
 #ifdef HAVE_MKSTEMP
+	unlink(file);
 	xfree(file);
 #endif
 	list_remove(&watches, h, 0);
