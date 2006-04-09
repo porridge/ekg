@@ -180,6 +180,7 @@ int config_server_save = 0;
 char *config_email = NULL;
 int config_time_deviation = 300;
 int config_mesg = MESG_DEFAULT;
+char *config_nick = NULL;
 int config_display_welcome = 1;
 int config_auto_back = 0;
 int config_display_crap = 1;
