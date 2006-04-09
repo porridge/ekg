@@ -451,7 +451,7 @@ dnl  Sprawdzamy libungif.so i <gif_lib.h>
 dnl
   
 AC_ARG_WITH(libungif,
-	[  --without-libungif       Compile without GIF token support])
+	[  --without-libungif      Compile without GIF token support])
 
 if test "x$with_libungif" != "xno"; then
 	AC_CHECK_LIB(ungif, DGifSlurp,
