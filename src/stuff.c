@@ -203,7 +203,7 @@ int config_ignore_empty_msg = 0;
 #ifdef WITH_WAP
 int config_wap_enabled = 2;
 #endif
-#ifdef HAVE_LIBJPEG
+#if defined HAVE_LIBJPEG || defined HAVE_LIBUNGIF
 int config_display_token = 1;
 #endif
 #ifdef WITH_IOCTLD

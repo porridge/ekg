@@ -203,7 +203,7 @@ void variable_init()
 	variable_add("display_notify", "dn", VAR_MAP, 1, &config_display_notify, NULL, variable_map(4, 0, 0, "none", 1, 2, "all", 2, 1, "significant", 4, 0, "unknown"), NULL);
 	variable_add("display_pl_chars", "dp", VAR_BOOL, 1, &config_display_pl_chars, NULL, NULL, NULL);
 	variable_add("display_sent", "ds", VAR_BOOL, 1, &config_display_sent, NULL, NULL, NULL);
-#ifdef HAVE_LIBJPEG
+#if defined HAVE_LIBJPEG || defined HAVE_LIBUNGIF
 	variable_add("display_token", "dT", VAR_BOOL, 1, &config_display_token, NULL, NULL, NULL);
 #else
 	variable_add("display_token", "dT", VAR_BOOL, 2, NULL, NULL, NULL, NULL);

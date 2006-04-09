@@ -257,7 +257,7 @@ int config_display_crap;
 int config_display_notify;
 int config_display_pl_chars;
 int config_display_sent;
-#ifdef HAVE_LIBJPEG
+#if defined HAVE_LIBJPEG || defined HAVE_LIBUNGIF
 int config_display_token;
 #endif
 int config_display_welcome;
