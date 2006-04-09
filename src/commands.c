@@ -6535,7 +6535,8 @@ void command_init()
 	  "automat. Je¶li system zawiera odpowiednie biblioteki, token "
 	  "zostanie wy¶wietlony na ekranie. W przeciwnym wypadku zostanie "
 	  "podana ¶cie¿ka, pod któr± zapisano plik graficzny zawieraj±cy "
-	  "token.");
+	  "token. Wy¶wietlanie tokenu jest eksperymentalne i mo¿e byæ "
+	  "konieczne kilkukrotne wydanie komendy.");
 
 	command_add
 	( "unignore", "i?", cmd_ignore, 0,
