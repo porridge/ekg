@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2006 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *                          Wojciech Bojdo³ <wojboj@htc.net.pl>
@@ -6536,7 +6536,8 @@ void command_init()
 	  "zostanie wy¶wietlony na ekranie. W przeciwnym wypadku zostanie "
 	  "podana ¶cie¿ka, pod któr± zapisano plik graficzny zawieraj±cy "
 	  "token. Wy¶wietlanie tokenu jest eksperymentalne i mo¿e byæ "
-	  "konieczne kilkukrotne wydanie komendy.");
+	  "konieczne kilkukrotne wydanie komendy. Podczas odczytywania "
+	  "mo¿e byæ przydatne ustawienie zmiennej backlog_overlap.");
 
 	command_add
 	( "unignore", "i?", cmd_ignore, 0,

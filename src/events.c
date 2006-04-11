@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2006 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Piotr Wysocki <wysek@linux.bydg.org>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *                          Piotr Domagalski <szalik@szalik.net>
@@ -1480,7 +1480,9 @@ int token_gif_load (char *fname, struct token_t *token)
 {
 	char errbuf[512];
 	GifFileType *file;
+#ifdef TOKEN_GIF_PAL
 	ColorMapObject *pal;
+#endif
 	int fd;
 
 	fd = open(fname, O_RDONLY);
@@ -1505,6 +1507,7 @@ int token_gif_load (char *fname, struct token_t *token)
 		goto err3;
 	}
 
+#ifdef TOKEN_GIF_PAL
 	token->pal = NULL;
 	token->pal_sz = 0;
 	pal = file->SavedImages[0].ImageDesc.ColorMap;
@@ -1516,6 +1519,7 @@ int token_gif_load (char *fname, struct token_t *token)
 		token->pal = (unsigned char *) xmalloc(token->pal_sz * 3);
 		memcpy (token->pal, pal->Colors, pal->ColorCount);
 	}
+#endif
 
 	token->sx = file->SavedImages[0].ImageDesc.Width;
 	token->sy = file->SavedImages[0].ImageDesc.Height;
@@ -1548,10 +1552,16 @@ void token_gif_free (struct token_t *token)
 	if (token->data)
 		xfree (token->data);
 
+#ifdef TOKEN_GIF_PAL
 	if (token->pal)
 		xfree (token->pal);
+#endif
 
-	token->data = token->pal = NULL;
+	token->data = NULL;
+
+#ifdef TOKEN_GIF_PAL
+	token->pal = NULL;
+#endif
 }
 
 /*
@@ -1697,16 +1707,21 @@ char *token_gif_strip_txt (char *buf)
 char *token_gif_to_txt (struct token_t *token)
 {
 	char *buf, *bptr;
-	size_t x, y, i;
+	size_t x, y, bufsz = 0;
+#ifdef TOKEN_GIF_PAL
+	size_t i;
 	unsigned char min_rgb[3] = {255, 255, 255};
 	unsigned char max_rgb[3] = {0, 0, 0};
 	unsigned char delta_rgb[3] = {255, 255, 255};
+#endif
+	static const char chars[] = " !@#$&*:;-=+?";
+	char mappings[256];
+	int cur_char = 0;	/* Kolejny znaczek z chars[]. */
 
-	/* Obliczamy minimalne i maksymalne warto¶ci sk³adowych R, G i B. 
-	 * Przydadz± siê podczas normalizacji - w ten sposób niska jasno¶æ 
-	 * nie bêdzie problemem.
-	 */
+	memset (mappings, 0, sizeof(mappings));
+	buf = bptr = (char *) xmalloc(token->sx * (token->sy + 1));
 
+#ifdef TOKEN_GIF_PAL
 	for (i = 0; i < token->sx * token->sy; i++) {
 		unsigned char ofs = token->data[i];
 		unsigned char *pent;
@@ -1728,47 +1743,37 @@ char *token_gif_to_txt (struct token_t *token)
 	for (i = 0; i < 3; i++)
 		delta_rgb[i] = max_rgb[i] - min_rgb[i];
 
-	bptr = buf = (char *) xmalloc((token->sy + 1) * token->sx + 1);
+	for (i = 0; i < ((token->pal_sz < 256) ? token->pal_sz : 256); i++) {
+		char rgb[3];
+		size_t ri;
+
+		for (ri = 0; ri < 3; ri++)
+			rgb[ri] = ((int) token->pal[i * 3 + ri] - min_rgb[ri]) 
+			    * 255 / delta_rgb[ri];
+
+		intens[i] = (33 * rgb[0] + 
+		    59 * rgb[1] + 
+		    11 * rgb[2]) >= 50 ? 0 : 1;
+	}
+#endif
 
 	for (x = 0; x < token->sx; x++) {
 		for (y = 0; y < token->sy; y++) {
-			int intens;
-			unsigned char ofs;
-			static char intens_chars[] = {
-				'.', '.', '.', '.', '.', '.', '.', '.', 
-				'.', '.', '.', '.', '.', '.', '.', '.', 
-				':', ':', ':', ':', ':', ':', 
-				'*', '*', '*', '*', 
-				'#', '#'
-			};
-			char intens_char;
+			unsigned char reg;
 
-			/* Obliczamy intensywno¶æ koloru na podstawie palety. Zgodnie 
-		 	 * z zasadami sztuki bierzemy 30%R, 59%G i 11%B. Poniewa¿ kolory 
-			 * s± odwrócone (t³o jest bia³e), musimy zrobiæ negatyw. */
+			reg = token->data[y * token->sx + (token->sx - 1 - x)];
 
-			ofs = token->data[y * token->sx + (token->sx - 1 - x)];
-			if (ofs >= token->pal_sz) {
-				/* Ups... */
-				intens = ofs;	/* XXX: Jaka¶ m±drzejsza decyzja? */
-			} else {
-				unsigned char *pent = token->pal + ofs * 3;
-				unsigned char rgb[3];
-				size_t pent_i;
-
-				/* Normalizujemy rgb */
-				for (pent_i = 0; pent_i < 3; pent_i++)
-					rgb[pent_i] = ((int) pent[pent_i] - min_rgb[pent_i]) 
-					    * 255 / delta_rgb[pent_i];
-
-				intens = 30 * (255 - rgb[0]) 
-				    + 59 * (255 - rgb[1]) 
-				    + 11 * (255 - rgb[2]);
-				intens /= 100;
+			/* Mamy ju¿ mapowanie dla tego koloru? */
+			if (reg && !mappings[reg]) {
+				mappings[reg] = ++cur_char;
+				/* Podzielenie przez drugi sizeof nie jest 
+				 * potrzebne, ale gdyby kto¶ kiedy¶ chcia³ 
+				 * wpa¶æ na pomys³ zmiany typu draw_chars, 
+				 * to dla bezpieczeñstwa lepiej daæ. */
+				cur_char %= sizeof(chars) / sizeof(*chars) - 1;
 			}
 
-			intens_char = intens ? intens_chars[(intens * sizeof(intens_chars)) / 256] : ' ';
-			*bptr++ = intens_char;
+			*bptr++ = reg ? chars[(size_t) mappings[(size_t) reg]] : 0x20;
 		}
 		*bptr++ = '\n';
 	}
