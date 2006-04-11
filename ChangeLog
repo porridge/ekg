@@ -8,6 +8,7 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 
 - zmiana algorytmu przyporz±dkowywania znaków pikselom w tokenach, 
   parê drobnych zmian w obs³udze tokenów (gophi)
+- update /help set display_token (gophi)
 
 // 2006-04-10
 

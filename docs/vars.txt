@@ -1,5 +1,5 @@
 // ma³y opis dostêpnych zmiennych
-// (c) copyright 2001-2005 wojtek kaniewski <wojtekka@irc.pl>
+// (c) copyright 2001-2006 wojtek kaniewski <wojtekka@irc.pl>
 //                         adam wysocki <gophi@ekg.apcoh.org>
 
 uin
@@ -414,7 +414,7 @@ display_token
 	domy¶lna warto¶æ: 1
 
 	zmienna dostêpna tylko gdy w systemie jest biblioteka pozwalaj±ca
-	dekodowaæ pliki JPEG. wy³±czenie jej spowoduje dzia³anie ekg tak,
+	dekodowaæ pliki GIF. wy³±czenie jej spowoduje dzia³anie ekg tak,
 	jakby biblioteki nie by³o, tj. zapisywanie tokenów do pliku.
 
 display_transparent
