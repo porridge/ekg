@@ -1707,7 +1707,7 @@ char *token_gif_strip_txt (char *buf)
 char *token_gif_to_txt (struct token_t *token)
 {
 	char *buf, *bptr;
-	size_t x, y, bufsz = 0;
+	size_t x, y;
 #ifdef TOKEN_GIF_PAL
 	size_t i;
 	unsigned char min_rgb[3] = {255, 255, 255};
