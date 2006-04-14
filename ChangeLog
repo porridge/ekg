@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2006-04-13
+
+- libgadu: poprawienie buga sprawiaj±cego, ¿e czasami zostaj± zombie 
+  po resolverze (czes,kosma/g)
+
 // 2006-04-11
 
 - zmiana algorytmu przyporz±dkowywania znaków pikselom w tokenach, 
