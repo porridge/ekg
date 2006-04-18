@@ -9,7 +9,7 @@ libexecdir = @libexecdir@
 sysconfdir = @sysconfdir@
 
 CC = @CC@ 
-CFLAGS = -I.. -I../lib @CFLAGS@ -Wall -DDATADIR=\"${datadir}/ekg\" -DSYSCONFDIR=\"${sysconfdir}\"
+CFLAGS = -I.. -I../lib @CFLAGS@ -DDATADIR=\"${datadir}/ekg\" -DSYSCONFDIR=\"${sysconfdir}\"
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 

@@ -41,6 +41,13 @@ dnl  Zaczynamy testy...
 dnl
 
 AC_PROG_CC
+
+if test "$GCC"; then 
+	CFLAGS="$CFLAGS -Wall"
+	CFLAGS_LIBGADU="$CFLAGS_LIBGADU -Wall"
+dnl	echo "Whoa!, GNU CC, -Wall"
+fi
+
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_RANLIB
