@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2002-2005 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2002-2006 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Wojtek Bojdo³ <wojboj@htcon.pl>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *			    Piotr Kupisiewicz <deli@rzepaknet.us>
@@ -145,7 +145,8 @@ struct window {
 	int id;			/* numer okna */
 	int act;		/* czy co¶ siê zmieni³o? */
 	int more;		/* pojawi³o siê co¶ poza ekranem */
-	time_t act_time;	/* timestamp zmiany act */
+	time_t first_act_time;	/* timestamp zmiany act */
+	time_t last_act_time;	/* timestamp ostatniej aktywno¶ci */
 
 	char *prompt;		/* sformatowany prompt lub NULL */
 	int prompt_len;		/* d³ugo¶æ prompta lub 0 */
@@ -1111,6 +1112,7 @@ static struct window *window_new(const char *target, int new_id)
 	memset(&w, 0, sizeof(w));
 
 	w.id = id;
+	w.last_act_time = time(NULL);
 
 	/* domy¶lne rozmiary zostan± dostosowane przez window_resize() */
 	w.top = 0;
@@ -1229,6 +1231,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	int count = 0, bottom = 0, prev_count;
 	char *lines, *lines_save, *line2;
 	string_t speech = NULL;
+	time_t cur_time;
 
 	switch (config_make_window) {
 		case 1:
@@ -1284,15 +1287,8 @@ crap:
 	/* albo zaczynamy, albo koñczymy i nie ma okienka ¿adnego */
 	if (!w) 
 		return;
- 
-	if (w != window_current && !w->floating) {
-		if (!w->act) {
-			w->act = 1;
-			w->act_time = time(NULL);
-		}
-		if (!command_processing)
-			update_statusbar(0);
-	}
+
+	cur_time = time(NULL);
 
 	if (config_speech_app)
 		speech = string_init(NULL);
@@ -1301,12 +1297,60 @@ crap:
 		bottom = 1;
 	
 	prev_count = w->lines_count;
-	
+
+	if (config_display_daychanges) {
+		int day_win, day_cur;
+
+		day_win = localtime(&w->last_act_time)->tm_yday;
+		day_cur = localtime(&cur_time)->tm_yday;
+
+		if (cur_time > w->last_act_time && day_win != day_cur) {
+			struct tm *tm;
+			char *tmp, *fmt, *tmp2;
+			char str_win[12], str_cur[12];
+
+			fmt = (config_datestamp) ? config_datestamp : "%Y-%m-%d";
+
+			tm = localtime(&w->last_act_time);
+			strftime (str_win, sizeof(str_win), fmt, tm);
+
+			tm = localtime(&cur_time);
+			strftime (str_cur, sizeof(str_cur), fmt, tm);
+
+			tmp = format_string(format_find("window_day_changed"), 
+			    str_win, str_cur);
+
+			if ((tmp2 = strchr(tmp, '\n')))
+				*tmp2 = 0;
+
+			fs = reformat_string(tmp);
+			fs->ts = cur_time;
+
+			if (config_speech_app) {
+				string_append(speech, fs->str);
+				string_append_c(speech, '\n');
+			}
+
+			count += window_backlog_add(w, fs);
+			xfree(tmp);
+		}
+	}
+
+	w->last_act_time = cur_time;
+	if (w != window_current && !w->floating) {
+		if (!w->act) {
+			w->act = 1;
+			w->first_act_time = w->last_act_time;
+		}
+		if (!command_processing)
+			update_statusbar(0);
+	}
+
 	/* XXX wyrzuciæ dzielenie na linie z ui do ekg */
 	lines = lines_save = xstrdup(line);
 	while ((line2 = gg_get_line(&lines))) {
 		fs = reformat_string(line2);
-		fs->ts = time(NULL);
+		fs->ts = cur_time;
 		if (config_speech_app) {
 			string_append(speech, fs->str);
 			string_append_c(speech, '\n');
@@ -4787,9 +4831,9 @@ static int ui_ncurses_event(const char *event, ...)
 				for (l = windows; l; l = l->next) {
 					struct window *w = l->data;
 
-					if (w->act && !w->floating && w->id && w->act_time < id_time) {
+					if (w->act && !w->floating && w->id && w->first_act_time < id_time) {
 						id = w->id;
-						id_time = w->act_time;
+						id_time = w->first_act_time;
 					}
 				}
 

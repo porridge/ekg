@@ -1367,6 +1367,7 @@ void theme_init()
 	format_add("window_kill_status", "%! Nie mo¿na zamkn±æ okna stanu\n", 1);
 	format_add("window_dump_error", "%! B³±d zapisu do pliku %T%1%n\n", 1);
 	format_add("window_dump_done", "%! Zapisano\n", 1);
+	format_add("window_day_changed", "%) Zmiana daty: %T%1%n -> %T%2%n\n", 1);
 
 	/* bind */
 	format_add("bind_seq_incorrect", "%! Sekwencja %T%1%n jest nieprawid³owa\n", 1); 

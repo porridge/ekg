@@ -193,12 +193,16 @@ void variable_init()
 	variable_add("display_color", "dC", VAR_INT, 1, &config_display_color, NULL, NULL, NULL);
 	variable_add("display_color_map", "dm", VAR_STR, 1, &config_display_color_map, NULL, NULL, dd_color);
 #ifdef WITH_UI_NCURSES
-	if (ui_init == ui_ncurses_init)
+	if (ui_init == ui_ncurses_init) {
 		variable_add("display_crap", "dr", VAR_BOOL, 1, &config_display_crap, NULL, NULL, NULL);
-	else
+		variable_add("display_daychanges", "dD", VAR_BOOL, 1, &config_display_daychanges, NULL, NULL, NULL);
+	} else {
 		variable_add("display_crap", "dr", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
+		variable_add("display_daychanges", "dD", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
+	}
 #else
 	variable_add("display_crap", "dr", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
+	variable_add("display_daychanges", "dD", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
 #endif
 	variable_add("display_notify", "dn", VAR_MAP, 1, &config_display_notify, NULL, variable_map(4, 0, 0, "none", 1, 2, "all", 2, 1, "significant", 4, 0, "unknown"), NULL);
 	variable_add("display_pl_chars", "dp", VAR_BOOL, 1, &config_display_pl_chars, NULL, NULL, NULL);
@@ -308,13 +312,16 @@ void variable_init()
 	if (ui_init == ui_ncurses_init) {
 		variable_add("windows_save", "ws", VAR_MAP, 1, &config_windows_save, NULL, variable_map(3, 0, 0, "no", 1, 0, "quit", 2, 0, "save"), NULL);
 		variable_add("windows_layout", "wl", VAR_STR, 2, &config_windows_layout, NULL, NULL, NULL);
+		variable_add("datestamp", "dS", VAR_STR, 1, &config_datestamp, NULL, NULL, NULL);
 	} else {
 		variable_add("windows_save", "ws", VAR_MAP, 2, NULL, NULL, NULL, NULL);
 		variable_add("windows_layout", "wl", VAR_STR, 2, NULL, NULL, NULL, NULL);
+		variable_add("datestamp", "dS", VAR_STR, 2, NULL, NULL, NULL, NULL);
 	}
 #else 
 	variable_add("windows_save", "ws", VAR_MAP, 2, NULL, NULL, NULL, NULL);
 	variable_add("windows_layout", "wl", VAR_STR, 2, NULL, NULL, NULL, NULL);
+	variable_add("datestamp", "dS", VAR_STR, 2, NULL, NULL, NULL, NULL);
 #endif
 	variable_add("status", "st", VAR_INT, 2, &config_status, NULL, NULL, NULL);
 	variable_add("protocol", "pR", VAR_INT, 2, &config_protocol, NULL, NULL, NULL);

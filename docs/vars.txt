@@ -271,6 +271,15 @@ contacts_size
 	
 	okre¶la szeroko¶æ okienka z list± kontaktów.
 
+datestamp
+	typ: tekst
+	domy¶lna warto¶æ: "%Y-%m-%d"
+
+	w interfejsie ncurses okre¶la format daty wy¶wietlanej, je¶li 
+	jest w³±czona opcja display_daychanges i od ostatniej aktywno¶ci 
+	w oknie zmieni³ siê dzieñ. dok³adny opis formatu zawiera strona 
+	manuala strftime(3).
+
 dcc
 	typ: bool
 	domy¶lna warto¶æ: 0
@@ -372,6 +381,14 @@ display_crap
 	z rozmówc±. je¶li jest równe 0, w oknie rozmowy s± wy¶wietlane tylko
 	wiadomo¶ci i informacje o zmianie stanu rozmówcy. ma znaczenie tylko
 	w interfejsie ncurses.
+
+display_daychanges
+	typ: bool
+	domy¶lna warto¶æ: 1
+
+        okre¶la, czy w interfejsie ncurses bêd± wy¶wietlane zmiany daty. zmiana 
+	jest wy¶wietlana tylko wtedy, kiedy w oknie nast±pi jaka¶ aktywno¶æ. 
+	zobacz te¿ opis zmiennej datestamp.
 
 display_notify
 	typ: liczba
