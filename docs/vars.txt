@@ -386,7 +386,7 @@ display_daychanges
 	typ: bool
 	domy¶lna warto¶æ: 1
 
-        okre¶la, czy w interfejsie ncurses bêd± wy¶wietlane zmiany daty. zmiana 
+	okre¶la, czy w interfejsie ncurses bêd± wy¶wietlane zmiany daty. zmiana 
 	jest wy¶wietlana tylko wtedy, kiedy w oknie nast±pi jaka¶ aktywno¶æ. 
 	zobacz te¿ opis zmiennej datestamp.
 
