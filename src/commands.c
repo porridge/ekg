@@ -580,7 +580,8 @@ COMMAND(cmd_status)
 	xfree(tmp);
 	xfree(priv);
 
-	printq("show_status_footer");
+	if (strcmp(format_find("show_status_footer"), ""))
+		printq("show_status_footer");
 
 	return 0;
 }
