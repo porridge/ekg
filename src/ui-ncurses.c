@@ -5,7 +5,7 @@
  *                          Wojtek Bojdo³ <wojboj@htcon.pl>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *			    Piotr Kupisiewicz <deli@rzepaknet.us>
- *                          Adam Wysocki <gophi@ekg.apcoh.org>
+ *                          Adam Wysocki <gophi@ekg.chmurka.net>
  *
  *  Aspell support added by Piotr 'Deletek' Kupisiewicz <deli@rzepaknet.us>
  *

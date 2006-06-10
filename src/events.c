@@ -6,7 +6,7 @@
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
  *                          Piotr Domagalski <szalik@szalik.net>
  *                          Adam Czerwiñski <acze@acze.net>
- *                          Adam Wysocki <gophi@ekg.apcoh.org>
+ *                          Adam Wysocki <gophi@ekg.chmurka.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as

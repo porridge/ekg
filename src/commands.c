@@ -10,7 +10,7 @@
  *                          Piotr Domagalski <szalik@szalik.net>
  *                          Kuba Kowalski <qbq@kofeina.net>
  *                          Piotr Kupisiewicz <deli@rzepaknet.us>
- *                          Adam Wysocki <gophi@ekg.apcoh.org>
+ *                          Adam Wysocki <gophi@ekg.chmurka.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
