@@ -30,7 +30,7 @@ if [ ! -f ~/.ekgnv ]; then \
   touch ~/.ekgnv
   echo "WGET=`which wget`
 EKGTMP=/tmp
-EKGWWW=http://dev.null.pl/ekg/
+EKGWWW=http://ekg.chmurka.net/
 EKGCONF=\"--prefix=/usr --with-shared --with-ioctl\"
 LASTEKG=ekg-00000000" >> ~/.ekgnv
  echo " Gotowe!"

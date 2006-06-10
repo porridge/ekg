@@ -9,7 +9,7 @@ KAT="/usr/local/share/AutoEKG"
 MAILTO="root"
 
 ## Ponizej juz nic nie zmieniaj!
-URL="http://dev.null.pl/ekg/ekg-current.tar.gz"
+URL="http://ekg.chmurka.net/ekg-current.tar.gz"
 
 # Odznaczamy zmienne bo nie potrafil poprawnie wyciagnac daty
 LC_NUMERIC="POSIX"

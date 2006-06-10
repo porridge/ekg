@@ -21,13 +21,13 @@ echo -n "¦ci±gam najnowsz± wersjê."
             echo "Brak mo¿liwo¶ci ¶ci±gniêcia pliku (chyba, ¿e pod Xami)";
             exit 1;
         else 
-	    lynx -dump http://dev.null.pl/ekg/ekg-current.tar.gz | tar zxvf -
+	    lynx -dump http://ekg.chmurka.net/ekg-current.tar.gz | tar zxvf -
 	fi # lynx
     else
-	curl -s http://dev.null.pl/ekg/ekg-current.tar.gz | tar xzf -
+	curl -s http://ekg.chmurka.net/ekg-current.tar.gz | tar xzf -
     fi #curl
  else
-    wget -q -O - http://dev.null.pl/ekg/ekg-current.tar.gz | tar xzf -
+    wget -q -O - http://ekg.chmurka.net/ekg-current.tar.gz | tar xzf -
  fi #wget
 echo -n " Rozpakowane.";
 cd `ls -1 | grep ekg-`

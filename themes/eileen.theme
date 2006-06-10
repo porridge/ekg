@@ -103,7 +103,7 @@ private_mode_off %> %K.%no%WO %rprivate -> %Ron%n\n
 private_mode_invalid %! %KNieprawid³owa warto¶æ\n
 help %> %R%1%r%2 - %3%4\n
 help_footer  \n%> %KGwiazdka (%n*%K) oznacza, ¿e mo¿na uzyskaæ wiêcej szczegó³ów%n\n\n
-help_quick %> %KWiêcej informacji -> %n"docs/ULOTKA"%K lub %nhttp://dev.null.pl/ekg/%K.\n\n$
+help_quick %> %KWiêcej informacji -> %n"docs/ULOTKA"%K lub %nhttp://ekg.chmurka.net/%K.\n\n$
 
 help_more %) %K%1%n\n
 help_alias %) %K%1 jest aliasem%n\n

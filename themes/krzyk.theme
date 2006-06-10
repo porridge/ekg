@@ -73,7 +73,7 @@ help %> %[10]1 -> %W%2%n %3\n
 help_more %) %|%1%n\n
 help_alias %) %W%1%n jest aliasem i nie posiada opisu\n
 help_footer \n%> Gwiazdka (%W*%n) oznacza, ¿e mo¿na uzyskaæ wiêcej szczegó³ów%n\n%> Poprzedzenie komendy znakiem %W^%n powoduje ukrycie jej wyniku%n\n\n
-help_quick %> %|Przed u¿yciem przeczytaj ulotkê. Plik %Wdocs/ULOTKA%n zawiera krótki przewodnik po za³±czonej dokumentacji. Je¶li go nie masz, mo¿esz ¶ci±gn±æ pakiet ze strony %Whttp://dev.null.pl/ekg/%n\n
+help_quick %> %|Przed u¿yciem przeczytaj ulotkê. Plik %Wdocs/ULOTKA%n zawiera krótki przewodnik po za³±czonej dokumentacji. Je¶li go nie masz, mo¿esz ¶ci±gn±æ pakiet ze strony %Whttp://ekg.chmurka.net/%n\n
 help_set_file_not_found %! %RNie znaleziono opisu zmiennych (nieprawid³owa instalacja)\n
 help_set_var_not_found %! %RNie znaleziono opisu zmiennej %W%1%n \n
 help_set_header %> %W%1%n (%2, domy¶lna warto¶æ: %W%3%n)\n%>%n \n

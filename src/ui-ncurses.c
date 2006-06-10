@@ -2016,7 +2016,7 @@ static void update_statusbar(int commit)
 	__add_format("query_ip", (q && q->ip.s_addr), inet_ntoa(q->ip));
 
 
-	__add_format("url", 1, "http://dev.null.pl/ekg/");
+	__add_format("url", 1, "http://ekg.chmurka.net/");
 	__add_format("version", 1, VERSION);
 
 #undef __add_format

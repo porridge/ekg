@@ -1,4 +1,4 @@
-// Obs逝ga s這wnika aspell w EKG (http://dev.null.pl/ekg)
+// Obs逝ga s這wnika aspell w EKG (http://ekg.chmurka.net)
 // (c) copyright 2004 Piotr Kupisiewicz <deli@rzepaknet.us>
 
 S這wnik do prawid這wego dzia豉nia wymaga zainstalowanego aspell'a. Aby

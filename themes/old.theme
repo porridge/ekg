@@ -49,7 +49,7 @@ help %> %1%2 - %3%4\n
 help_more %) %1\n
 help_alias %) %T%1%n jest aliasem i nie posiada opisu\n
 help_footer  \n%> Gwiazdka (%T*%n) oznacza, ¿e mo¿na uzyskaæ wiêcej szczegó³ów\n\n
-help_quick %> Przed u¿yciem przeczytaj ulotkê. Plik %Tdocs/ULOTKA%n zawiera krótki\n%> przewodnik po za³±czonej dokumentacji. Je¶li go nie masz, mo¿esz\n%> ¶ci±gn±æ pakiet ze strony %Thttp://dev.null.pl/ekg/%n\n
+help_quick %> Przed u¿yciem przeczytaj ulotkê. Plik %Tdocs/ULOTKA%n zawiera krótki\n%> przewodnik po za³±czonej dokumentacji. Je¶li go nie masz, mo¿esz\n%> ¶ci±gn±æ pakiet ze strony %Thttp://ekg.chmurka.net/%n\n
 ignored_added %> Dodano %T%1%n do listy ignorowanych\n
 ignored_deleted %> Usuniêto %1 z listy ignorowanych\n
 ignored_list %> %1\n
