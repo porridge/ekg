@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2006-06-10
+
+- poprawka struct fstring_s.ts z int na time_t (porridge)
+
 // 2006-05-18
 
 - libgadu: poprawienie paru wycieków pamiêci (gj/g)

@@ -20,6 +20,8 @@
 #ifndef __THEMES_H
 #define __THEMES_H
 
+#include <time.h>
+
 #include "dynstuff.h"
 
 struct format {
@@ -31,7 +33,7 @@ struct format {
 struct fstring_s {
 	char *str;	/* znaki, ci±g zakoñczony \0 */
 	char *attr;	/* atrybuty, ci±g o d³ugo¶ci strlen(str) */
-	int ts;		/* timestamp */
+	time_t ts;	/* timestamp */
 
 	int prompt_len;	/* d³ugo¶æ promptu, który bêdzie powtarzany przy i
 			   przej¶ciu do kolejnej linii. */
