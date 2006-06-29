@@ -1,12 +1,13 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2006 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Robert J. Wo¼ny <speedy@ziew.org>
  *                          Arkadiusz Mi¶kiewicz <arekm@pld-linux.org>
  *                          Tomasz Chiliñski <chilek@chilan.com>
  *                          Piotr Wysocki <wysek@linux.bydg.org>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
+ *                          Adam Wysocki <gophi@ekg.chmurka.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License Version
@@ -37,6 +38,7 @@ extern "C" {
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdint.h>
 
 #ifdef __GG_LIBGADU_HAVE_OPENSSL
 #include <openssl/ssl.h>
