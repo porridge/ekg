@@ -7,6 +7,7 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 // 2006-06-30
 
 - libgadu: poprawienie kompilacji na gcc 4.1 (AstralStorm/g)
+- libgadu: cofniêcie poprzedniego commita (wiêcej psuje ni¿ naprawia) (w/g)
 
 // 2006-06-10
 
