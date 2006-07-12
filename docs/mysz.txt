@@ -87,20 +87,20 @@ dodajac button eventy powinno sie pamietac, ze:
 - mouse_area_move() - przesuwa obszar
 - mouse_area_resize() - ustawia nowy rozmiar obszaru
 
-parametry, ktore dostaja te funkcje, nie musza byc alokowane - moga 
-byc lokalne dla wywolujacej funkcji.
+wskazniki, ktore dostaja te funkcje, nie musza byc alokowane - moga 
+wskazywac na obiekty lokalne dla wywolujacej funkcji.
 
 mouse_bevent_add() powinno byc wywolywane na lokalnej strukturze, 
 a dopiero po wszystkich mouse_bevent_add() powinno zostac wywolane 
 mouse_area_add().
 
 mouse_area_resize() jest przydatne podczas zmiany rozmiaru okna, np. 
-po dostaniu przez leb sigwinchem albo zmianie ktorejs zmiennej.
+po dostaniu przez leb sigwinchem albo zmianie wartosci ktorejs zmiennej.
 
 6. przyklad uzycia
 
 przyklad uzycia jest w ui-ncurses.c przy obsludze headera. gdyby ktos 
-chcial bardziej czytelnie dla hipotetycznego okienka "test":
+chcial bardziej czytelnie dla hipotetycznego obszaru "test":
 
 struct mouse_area_t a;
 
@@ -117,8 +117,8 @@ a.name = "test";
 a.start.x = a.start.y = 0;
 a.size.x = a.size.y = 10;
 a.bevents = NULL;
-mouse_bevent_add(&a, BUTTON1_CLICKED, click_hnd);
-mouse_bevent_add(&a, BUTTON1_DOUBLE_CLICKED, click_hnd);
+mouse_bevent_add(&a, BUTTON1_CLICKED, mouse_bevent_test);
+mouse_bevent_add(&a, BUTTON1_DOUBLE_CLICKED, mouse_bevent_test);
 mouse_area_add(&a);
 
 nie trzeba sie troszczyc o zwalnianie niczego, mouse_event("destroy") zrobi 
@@ -134,7 +134,7 @@ zaalokowane przez mouse_area_add().
 8. do zrobienia
 
 - mozliwosc oskryptowania myszy w pythonie
-- mozliwosc bindowania beventow
+- mozliwosc bindowania beventow przez uzytkownika
 - moze obsluga masek, a nie tylko wartosci, w mouse_bevent_add()?
 - pamietac o sigwinch!
 
