@@ -178,6 +178,27 @@ struct format_data {
 	char *text;			/* tre¶æ */
 };
 
+struct mouse_coords_t {
+	int x, y;			/* pozycja punktu na ekranie */
+};
+
+typedef void (*mouse_handler_t) (struct mouse_coords_t *, mmask_t);
+
+struct mouse_bevent_t {
+	mmask_t bstate;			/* stan buttonów zgodnie z MEVENT->bstate */
+	mouse_handler_t handler;	/* handler dla tego stanu buttonów */
+};
+
+struct mouse_area_t {
+	char *name;			/* nazwa obszaru */
+	struct mouse_coords_t start;	/* lewy gorny rog */
+	struct mouse_coords_t size;	/* rozmiar */
+	struct mouse_coords_t end;	/* prawy dolny rog (wypelniane przez funkcje obslugi) */
+	list_t bevents;			/* handlery dla poszczególnych stanów buttonów */
+};
+
+list_t mouse_areas;		/* obszary w których mog± wyst±piæ zdarzenia myszy */
+
 WINDOW *status = NULL;		/* okno stanu */
 WINDOW *header = NULL;		/* okno nag³ówka */
 static WINDOW *input = NULL;		/* okno wpisywania tekstu */
@@ -2223,6 +2244,296 @@ void spellcheck_deinit()
 #endif
 
 /*
+ * mouse_event()
+ *
+ * wywolywane przy zdarzeniach myszy oraz zmianie wartosci zmiennej mouse.
+ *
+ * - event
+ *   - "bevent" - zdarzenie przycisku
+ *   - "enable" - wlacza obsluge myszy
+ *   - "disable" - wylacza obsluge myszy
+ *   - "destroy" - jak disable, ale zwalnia mouse_areas
+ */
+static void mouse_event (const char *event)
+{
+	if (!strcmp(event, "bevent")) {
+		MEVENT e;
+		list_t l;
+		struct mouse_area_t *area;
+
+		if (!config_mouse) {
+			gg_debug(GG_DEBUG_MISC, "// mouse_event(): Safety check engaged!\n");
+			return;
+		}
+
+		if (getmouse(&e) != OK) {
+			gg_debug(GG_DEBUG_MISC, "// mouse_event(): getmouse() failed\n");
+			return;
+		}
+
+		gg_debug(GG_DEBUG_MISC, "// mouse_event(): %d,%d: %d\n", 
+		    e.x, e.y, e.bstate);
+
+		/* Najpierw okre¶lamy obszar w którym nast±pi³o zdarzenie */
+
+		for (l = mouse_areas; l; l = l->next) {
+			area = l->data;
+	
+			if (e.x >= area->start.x && 
+			    e.x <= area->end.x && 
+			    e.y >= area->start.y && 
+			    e.y <= area->end.y)
+				break;
+		}
+
+		if (!l) {
+			gg_debug(GG_DEBUG_MISC, "// mouse_event(): Outside any area.\n");
+			return;
+		}
+
+		/* Mamy obszar. Szukamy handlera zdarzenia. */
+
+		for (l = area->bevents; l; l = l->next) {
+			struct mouse_bevent_t *be = l->data;
+
+			if (be->bstate == e.bstate) {
+				struct mouse_coords_t c;
+
+				c.x = e.x - area->start.x;
+				c.y = e.y - area->start.y;
+
+				be->handler (&c, e.bstate);
+
+				break;
+			}
+		}
+
+		if (!l)
+			gg_debug(GG_DEBUG_MISC, "// mouse_event(): Unhandled button event.\n");
+
+		return;
+	}
+
+	if (!strcmp(event, "enable")) {
+		mousemask(ALL_MOUSE_EVENTS, NULL);
+		return;
+	}
+
+	if (!strcmp(event, "disable")) {
+		mousemask(0, NULL);
+		return;
+	}
+
+	if (!strcmp(event, "destroy")) {
+		list_t l;
+
+		mousemask(0, NULL);
+
+		for (l = mouse_areas; l; l = l->next) {
+			struct mouse_area_t *a = l->data;
+			xfree(a->name);
+			list_destroy(a->bevents, 1);
+		}
+
+		list_destroy(mouse_areas, 1);
+	}
+}
+
+/*
+ * mouse_bevent_add()
+ *
+ * dodaje button event (zdarzenie dla przycisku) do obszaru. jesli to 
+ * pierwszy bevent, to trzeba zapewnic area->bevent == NULL.
+ *
+ * - area: wskaznik do odpowiedniej struktury area_t
+ * - bstate: jak MEVENT->bstate w mouse(3ncurses)
+ * - hnd: odpowiedni handler typu mouse_handler_t
+ *
+ * 0: udalo sie, -1: nie udalo sie
+ */
+static int mouse_bevent_add (struct mouse_area_t *area, mmask_t bstate, mouse_handler_t hnd)
+{
+	struct mouse_bevent_t e;
+
+	if (!area) {
+		gg_debug(GG_DEBUG_MISC, "// mouse_bevent_add(): Safety check engaged!\n");
+		return -1;
+	}
+
+	e.bstate = bstate;
+	e.handler = hnd;
+
+	return list_add(&area->bevents, &e, sizeof(struct mouse_bevent_t)) ? 0 : -1;
+}
+
+/*
+ * mouse_area_add()
+ *
+ * dodaje obszar do mouse_areas.
+ *
+ * - area: struktura mouse_area_t
+ *
+ * zwraca wskaznik do nowozaalokowanego obszaru lub NULL - nie udalo sie.
+ */
+static struct mouse_area_t *mouse_area_add (struct mouse_area_t *area)
+{
+	list_t l;
+
+	/* Sprawdzamy czy nowy obszar nie zachodzi na ¿aden 
+	 * istniej±cy obszar. */
+
+	for (l = mouse_areas; l; l = l->next) {
+		struct mouse_area_t *cur_area = l->data;
+
+		if ((area->start.x >= cur_area->start.x && 
+		    area->start.x <= cur_area->end.x && 
+		    area->start.y >= cur_area->start.y && 
+		    area->start.y >= cur_area->end.y) || 
+		    (area->start.x + area->size.x >= cur_area->start.x && 
+		    area->start.x + area->size.x <= cur_area->end.x && 
+		    area->start.y + area->size.y >= cur_area->start.y && 
+		    area->start.y + area->size.y >= cur_area->end.y)) {
+			gg_debug(GG_DEBUG_MISC, "// mouse_area_add(): %s (%d,%d)-(%d,%d) overlaps with %s (%d,%d)-(%d,%d)\n", 
+			    area->name, 
+			    area->start.x, area->start.y, area->end.x, area->end.y, 
+			    cur_area->name, 
+			    cur_area->start.x, cur_area->start.y, cur_area->end.x, cur_area->end.y);
+			return NULL;
+		}
+	}
+
+	if (!(area = list_add(&mouse_areas, area, sizeof(struct mouse_area_t)))) {
+		gg_debug(GG_DEBUG_MISC, "// mouse_area_add(): list_add() returned NULL\n");
+		return NULL;
+	}
+
+	area->name = xstrdup(area->name);
+	area->end.x = area->start.x + area->size.x;
+	area->end.y = area->start.y + area->size.y;
+
+	return area;
+}
+
+/*
+ * mouse_area_find()
+ *
+ * znajduje obszar po nazwie.
+ *
+ * - name: nazwa do znalezienia
+ *
+ * zwraca wskaznik lub NULL jesli nie znaleziono.
+ */
+static struct mouse_area_t *mouse_area_find (const char *name)
+{
+	list_t l;
+
+	for (l = mouse_areas; l; l = l->next) {
+		struct mouse_area_t *a = l->data;
+
+		if (!strcmp(name, a->name))
+			return a;
+	}
+
+	return NULL;
+}
+
+/*
+ * mouse_area_del()
+ *
+ * usuwa obszar.
+ *
+ * - name: nazwa obszaru
+ *
+ * 0 - udalo sie, -1 - nie udalo sie
+ */
+static int mouse_area_del (const char *name)
+{
+	struct mouse_area_t *a;
+
+	if (!(a = mouse_area_find(name)))
+		return -1;
+
+	xfree(a->name);
+	list_destroy(a->bevents, 1);
+
+	/* Na wypadek, gdyby list_remove sie nie udalo - lepiej nie syfic. */
+	memset (a, 0, sizeof(struct mouse_area_t));
+
+	return list_remove(&mouse_areas, a, 1);
+}
+
+/*
+ * mouse_area_resize()
+ *
+ * zmienia rozmiar obszaru.
+ *
+ * - name: nazwa obszaru
+ * - y, x: nowy rozmiar
+ *
+ * NULL - nie udalo sie, w przeciwnym razie wskaznik na obszar.
+ */
+static struct mouse_area_t *mouse_area_resize (const char *name, int y, int x)
+{
+	struct mouse_area_t *a;
+
+	if (!(a = mouse_area_find(name)))
+		return NULL;
+
+	a->size.x = x;
+	a->size.y = y;
+	a->end.x = a->start.x + a->size.x;
+	a->end.y = a->start.y + a->size.y;
+
+	return a;
+}
+
+/*
+ * mouse_area_move()
+ *
+ * przesuwa obszar.
+ *
+ * - name: nazwa obszaru
+ * - y, x: nowe polozenie
+ *
+ * NULL - nie udalo sie, w przeciwnym razie wskaznik na obszar.
+ */
+static struct mouse_area_t *mouse_area_move (const char *name, int y, int x)
+{
+	struct mouse_area_t *a;
+
+	if (!(a = mouse_area_find(name)))
+		return NULL;
+
+	a->start.x = x;
+	a->start.y = y;
+	a->end.x = a->start.x + a->size.x;
+	a->end.y = a->start.y + a->size.y;
+
+	return a;
+}
+
+/*
+ * mouse_bevent_header()
+ *
+ * bevent na headerze.
+ *
+ * - coords - koordynaty
+ * - bstate - stan przyciskow
+ */
+static void mouse_bevent_header (struct mouse_coords_t *coords, mmask_t bstate)
+{
+	char *tmp;
+
+	if (bstate == BUTTON1_DOUBLE_CLICKED)
+		tmp = saprintf("/find -u %s", window_current->target);
+	else
+		tmp = saprintf("/list %s", window_current->target);
+
+	command_exec(window_current->target, tmp, 0);
+	xfree(tmp);
+}
+
+/*
  * ui_ncurses_init()
  *
  * inicjalizuje ca³± zabawê z ncurses.
@@ -2230,6 +2541,7 @@ void spellcheck_deinit()
 void ui_ncurses_init()
 {
 	int background = COLOR_BLACK;
+	struct mouse_area_t area;
 
 	ui_postinit = ui_ncurses_postinit;
 	ui_print = ui_ncurses_print;
@@ -2261,6 +2573,7 @@ void ui_ncurses_init()
 	input = newwin(1, stdscr->_maxx + 1, stdscr->_maxy, 0);
 	keypad(input, TRUE);
 	nodelay(input, TRUE);
+	mouse_event("disable");
 
 	start_color();
 
@@ -2398,9 +2711,9 @@ static void ui_ncurses_deinit()
 	}
 
 	list_destroy(windows, 1);
-
 	tcsetattr(0, TCSADRAIN, &old_tio);
 
+	mouse_event("destroy");
 	keypad(input, FALSE);
 
 	werase(input);
@@ -3310,6 +3623,11 @@ int ekg_getch(int meta)
 	int ch;
 
 	ch = wgetch(input);
+
+	if (ch == KEY_MOUSE) {
+		mouse_event("bevent");
+		return -2;
+	}
 
 #ifdef WITH_PYTHON
 	PYTHON_HANDLE_HEADER(keypress, "(ii)", meta, ch)
@@ -4590,6 +4908,9 @@ static int ui_ncurses_event(const char *event, ...)
 
 		if (!strncasecmp(name, "contacts", 8))
 			contacts_changed();
+
+		if (!strncasecmp(name, "mouse", 5))
+			mouse_event(config_mouse ? "enable" : "disable");
 	}
 
 	if (!strcmp(event, "conference_rename")) {
@@ -4607,6 +4928,8 @@ static int ui_ncurses_event(const char *event, ...)
 				w->prompt_len = strlen(w->prompt);
 			}
 		}
+
+		goto cleanup;
 	}
 
 	if (!strcmp(event, "userlist_changed")) {
@@ -5136,16 +5459,32 @@ void header_statusbar_resize(const char *name)
 		config_statusbar_size = 5;
 
 	if (config_header_size) {
-		if (!header)
+		if (!header) {
+			struct mouse_area_t a;
+
 			header = newwin(config_header_size, stdscr->_maxx + 1, 0, 0);
-		else
+
+			a.name = "header";
+			a.start.x = 0;
+			a.start.y = 0;
+			a.size.x = stdscr->_maxx + 1;
+			a.size.y = config_header_size;
+			a.bevents = NULL;
+
+			mouse_bevent_add(&a, BUTTON1_CLICKED, mouse_bevent_header);
+			mouse_bevent_add(&a, BUTTON1_DOUBLE_CLICKED, mouse_bevent_header);
+			mouse_area_add(&a);
+		} else {
 			wresize(header, config_header_size, stdscr->_maxx + 1);
+			mouse_area_resize("header", config_header_size, stdscr->_maxx + 1);
+		}
 
 		update_header(0);
 	}
 
 	if (!config_header_size && header) {
 		delwin(header);
+		mouse_area_del("header");
 		header = NULL;
 	}
 

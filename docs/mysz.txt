@@ -1,0 +1,141 @@
+// obsluga myszy w ekg
+// (c) 2006 adam wysocki <gophi@ekg.chmurka.net>
+
+1. wstep
+2. terminologia
+3. struktury i typy danych
+4. rozpoznawane zdarzenia przyciskow
+5. interfejs
+6. przyklad uzycia
+7. aktualne bindingi
+8. do zrobienia
+
+1. wstep
+
+obsluga myszy w ekg jest na razie wstepnym, eksperymentalnym frameworkiem 
+do dalszego obudowania, dzialajacym tylko w interfejsie ncurses. ten plik 
+zawiera opis przydatny podczas dodawania obslugi myszy do kolejnych elementow 
+ekg. gdyby cos z niego bylo nie do konca jasne albo dwuznaczne, nalezy napisac 
+na ekg-users (adres znajduje sie na stronie ekg). poprawki mile widziane.
+
+2. terminologia
+
+- zdarzenie myszy (mouse_event): zmiana wartosci zmiennej mouse, zdarzenie 
+  przycisku myszy lub prosba o zwolnienie pamieci ze strukturami. NIE jest 
+  tozsame ze zdarzeniem myszy w man mouse z ncurses. wszystkie zdarzenia 
+  myszy sa obslugiwane w funkcji mouse_event().
+
+- zdarzenie przycisku myszy (bevent): klikniecie, podwojne klikniecie, 
+  potrojne klikniecie, wcisniecie lub puszczenie przycisku. zdarzenia 
+  przyciskow myszy sa obslugiwane przez odpowiednio dodane handlery.
+
+3. struktury i typy danych
+
+- mouse_area_t - opisuje jeden konkretny obszar na ekranie. obszar jest 
+  prostokatem zdefiniowanym przez polozenie lewego gornego rogu oraz 
+  szerokosc i wysokosc. struktura zawiera takze polozenie prawego dolnego 
+  rogu, ustawiane przez funkcje obslugi myszy. obszar moze, ale nie musi, 
+  miec taki sam rozmiar jak ktores okno (np. header albo statusbar). oprocz 
+  tego kazdy obszar ma swoja nazwe - przydatne do lepszej identyfikacji 
+  w oknie debugowania i podczas zmiany rozmiaru okna.
+
+- mouse_coords_t - struktura opisujaca koordynaty punktu na ekranie. zawiera 
+  zmienne x (numer kolumny) i y (numer wiersza). lewy gorny rog ma koordynaty 
+  0,0.
+
+- mouse_bevent_t - struktura na liscie w mouse_area_t. opisuje zdarzenie 
+  przycisku dla obszaru, do ktorego nalezy (wartosc zdarzenia okreslajaca, 
+  ze np. zostal podwojnie klikniety ktorys przycisk i wskaznik do handlera 
+  mouse_handler_t, ktory obsluzy to zdarzenie).
+
+- mouse_handler_t - wywolywane do obslugi zdarzenia. dostaje maske przycisku 
+  (mmask_t) i wskaznik do opisu koordynatow (mouse_coords_t). maska przycisku 
+  moze sie przydac, gdyby ktos chcial podpiac kilka zdarzen przycisku do 
+  jednego handlera (podobnie jak signo w sighandlerach).
+
+4. rozpoznawane zdarzenia przyciskow
+
+jak w man 3ncurses mouse:
+
+- BUTTONx_PRESSED: przycisk zostal wcisniety i jest trzymany
+- BUTTONx_RELEASED: przycisk zostal puszczony
+- BUTTONx_CLICKED: przycisk zostal klikniety
+- BUTTONx_DOUBLE_CLICKED: przycisk zostal podwojnie klikniety
+- BUTTONx_TRIPLE_CLICKED: przycisk zostal potrojnie
+
+x moze przyjmowac wartosci od 1 do 5 (dla NCURSES_MOUSE_VERSION == 1 tylko 4). 
+dla normalnych myszek 1 to lewy, 2 srodkowy a 3 prawy przycisk. oprocz tego, 
+jesli numer zdarzenia jest zORowany z BUTTON_CTRL, BUTTON_SHIFT lub BUTTON_ALT, 
+oznacza to zdarzenie przy wcisnietym ktoryms z tych klawiszy.
+
+dodajac button eventy powinno sie pamietac, ze:
+
+- niektore terminale maja jakies alternatywne funkcje dla klikniec z ktoryms 
+  z klawiszy ctrl, shift lub alt i nie przekazuja takiego klikniecia do 
+  programu.
+
+- nie kazdy posiada srodkowy przycisk myszki i emulacje przez wcisniecie obu 
+  przyciskow.
+
+5. interfejs
+
+- mouse_event() - obsluguje zdarzenia myszy
+- mouse_bevent_add() - dodaje button event do obszaru
+- mouse_area_add() - dodaje obszar do listy
+- mouse_area_find() - znajduje obszar po nazwie
+- mouse_area_del() - usuwa obszar z listy
+- mouse_area_move() - przesuwa obszar
+- mouse_area_resize() - ustawia nowy rozmiar obszaru
+
+parametry, ktore dostaja te funkcje, nie musza byc alokowane - moga 
+byc lokalne dla wywolujacej funkcji.
+
+mouse_bevent_add() powinno byc wywolywane na lokalnej strukturze, 
+a dopiero po wszystkich mouse_bevent_add() powinno zostac wywolane 
+mouse_area_add().
+
+mouse_area_resize() jest przydatne podczas zmiany rozmiaru okna, np. 
+po dostaniu przez leb sigwinchem albo zmianie ktorejs zmiennej.
+
+6. przyklad uzycia
+
+przyklad uzycia jest w ui-ncurses.c przy obsludze headera. gdyby ktos 
+chcial bardziej czytelnie dla hipotetycznego okienka "test":
+
+struct mouse_area_t a;
+
+static void mouse_bevent_test (struct mouse_coords_t *coords, mmask_t bstate)
+{
+	if (bstate == BUTTON1_CLICKED) {
+		// ...
+	}  else if (bstate == BUTTON1_DOUBLE_CLICKED) {
+		// ...
+	}
+}
+
+a.name = "test";
+a.start.x = a.start.y = 0;
+a.size.x = a.size.y = 10;
+a.bevents = NULL;
+mouse_bevent_add(&a, BUTTON1_CLICKED, click_hnd);
+mouse_bevent_add(&a, BUTTON1_DOUBLE_CLICKED, click_hnd);
+mouse_area_add(&a);
+
+nie trzeba sie troszczyc o zwalnianie niczego, mouse_event("destroy") zrobi 
+to sama, jednak trzeba pamietac zeby przed pierwszym mouse_bevent_add() pole 
+bevents bylo rowne NULL. pole name tez nie musi byc zaalokowane - zostanie 
+zaalokowane przez mouse_area_add().
+
+7. aktualne bindingi (zaszyte w kodzie)
+
+- header: klikniecie: /list osoby z ktora sie rozmawia
+- header: podwojne klikniecie /find osoby z ktora sie rozmawia
+
+8. do zrobienia
+
+- mozliwosc oskryptowania myszy w pythonie
+- mozliwosc bindowania beventow
+- moze obsluga masek, a nie tylko wartosci, w mouse_bevent_add()?
+- pamietac o sigwinch!
+
+// $Id$

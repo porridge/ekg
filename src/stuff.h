@@ -286,6 +286,9 @@ int config_log_status;
 char *config_log_timestamp;
 int config_make_window;
 int config_mesg;
+#ifdef WITH_UI_NCURSES
+int config_mouse;
+#endif
 char *config_nick;
 char *config_password;
 int config_password_cp1250;
