@@ -6568,7 +6568,8 @@ void command_init()
 	  "  kill [numer_okna]    zamyka aktualne lub podane okno\n"
 	  "  last                 prze³±cza do ostatnio wy¶wietlanego\n"
 	  "                       okna\n"
-	  "  list                 wy¶wietla listê okien\n"
+	  "  list [numer_okna]    wy¶wietla listê okien lub informacje\n"
+	  "                       na temat okna o podanym numerze\n"
 /*	  "  new [*opcje]         tworzy nowe okno\n" */
 	  "  new [nazwa]          tworzy nowe okno\n"
 	  "  next                 prze³±cza do nastêpnego okna\n"

@@ -625,7 +625,8 @@ mouse
 	ustala, czy ma byæ w³±czona obs³uga myszy w ekg. dzia³a tylko z interfejsem 
 	ncurses. zmiana warto¶ci tej zmiennej mo¿e te¿ (ale nie musi) zmieniaæ 
 	widoczno¶æ lub kszta³t kursora myszy. wiecej informacji na temat obslugi 
-	myszy w ekg znajduje sie w pliku docs/mysz.txt.
+	myszy w ekg znajduje sie w pliku docs/mysz.txt oraz pod adresem 
+	<http://ekg.chmurka.net/docs/mysz.txt>.
 
 nick
 	typ: tekst

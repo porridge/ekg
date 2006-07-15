@@ -105,6 +105,8 @@ static void binding_add(const char *key, const char *action, int internal, int q
 static void binding_delete(const char *key, int quiet);
 static void binding_default();
 
+static struct mouse_area_t *mouse_area_move (const char *name, int y, int x);
+
 struct screen_line {
 	int len;		/* d³ugo¶æ linii */
 	
@@ -197,7 +199,23 @@ struct mouse_area_t {
 	list_t bevents;			/* handlery dla poszczególnych stanów buttonów */
 };
 
+struct mouse_statusbar_t {		/* opis obszaru paska stanu */
+	char *act_str;				/* lista aktywnych okien (string) */
+	/* [0] oznacza pocz±tek a [1] koniec (NIE rozmiar) */
+	struct mouse_coords_t time_c[2];	/* po³o¿enie zegarka */
+	struct mouse_coords_t uin_c[2];		/* po³o¿enie uinu: (uin/x) */
+	struct mouse_coords_t nick_c[2];	/* po³o¿enie nicka */
+	struct mouse_coords_t more_c[2];	/* po³o¿enie napisu "(more)" */
+	struct mouse_coords_t query_c[2];	/* po³o¿enie informacji na temat rozmówcy */
+	struct mouse_coords_t window_c[2];	/* po³o¿enie numerka aktualnego okna: (win/x:uin) */
+	struct mouse_coords_t act_c[2];		/* po³o¿enie listy aktywnych okien */
+};
+
 list_t mouse_areas;		/* obszary w których mog± wyst±piæ zdarzenia myszy */
+
+/* NULL-ujemy listê windows, ¿eby unikn±æ problemów przy zwalnianiu w update */
+struct mouse_statusbar_t mouse_statusbar = {NULL};	/* act_str */
+struct mouse_statusbar_t mouse_statusbar_pending = {NULL};	/* ...i przed commitem */
 
 WINDOW *status = NULL;		/* okno stanu */
 WINDOW *header = NULL;		/* okno nag³ówka */
@@ -255,8 +273,10 @@ static int window_backlog_split(struct window *w, int full, int removed);
 static void window_redraw(struct window *w);
 static void window_clear(struct window *w, int full);
 static void window_refresh();
+static void binding_forward_page(const char *arg);
 
 static int contacts_update(struct window *w);
+static void mouse_statusbar_commit(void);
 
 #ifndef COLOR_DEFAULT
 #  define COLOR_DEFAULT (-1)
@@ -389,6 +409,7 @@ void window_commit()
 		wnoutrefresh(header);
 
 	wnoutrefresh(status);
+	mouse_statusbar_commit();
 
 	wnoutrefresh(input);
 
@@ -1029,6 +1050,8 @@ static void window_refresh()
 	}
 	
 	mvwin(status, stdscr->_maxy + 1 - input_size - config_statusbar_size, 0);
+	mouse_area_move("status", stdscr->_maxy + 1 - input_size - config_statusbar_size, 0);
+
 	wresize(input, input_size, input->_maxx + 1);
 	mvwin(input, stdscr->_maxy - input_size + 1, 0);
 }
@@ -1944,6 +1967,198 @@ next:
 }
 
 /*
+ * mouse_statusbar_update()
+ *
+ * aktualizuje strukturê mouse_statusbar_pending zgodnie z tym, co zosta³o 
+ * umieszczone na pasku stanu. korzysta mniej wiêcej z tego samego kodu, 
+ * co window_printat(), ale bez przeróbek window_printat() nie da³o siê 
+ * tego zrobiæ ³adniej.
+ *
+ * zmiany zostan± permanentnie wprowadzone po wywo³aniu mouse_statusbar_commit() 
+ * (jest wywo³ywane z window_commit()).
+ *
+ * UWAGA: nie mo¿na w tej funkcji u¿ywaæ gg_debug(), bo gg_debug() zmienia 
+ * statusbar i wychodzi z tego urocza pêtelka :)
+ *
+ * - parametry jak dla window_printat()
+ * - recurse: czy zostali¶my wywo³ani rekurencyjnie?
+ */
+static int mouse_statusbar_update (int x, int y, const char *format_, const void *data_, int recurse)
+{
+	int orig_x = x;
+	char *format = (char*) format_;
+	const char *p;
+	const struct format_data *data = data_;
+
+	p = format;
+
+	if (!recurse) {
+#define __clear_coords(c) { \
+	mouse_statusbar_pending.c[0].x = mouse_statusbar_pending.c[0].y = -1; \
+	mouse_statusbar_pending.c[1].x = mouse_statusbar_pending.c[1].y = -1; \
+}
+
+		__clear_coords(time_c);
+		__clear_coords(uin_c);
+		__clear_coords(nick_c);
+		__clear_coords(more_c);
+		__clear_coords(query_c);
+		__clear_coords(window_c);
+		__clear_coords(act_c);
+
+#undef __clear_coords
+
+		if (mouse_statusbar_pending.act_str) {
+			xfree(mouse_statusbar_pending.act_str);
+			mouse_statusbar_pending.act_str = NULL;
+		}
+	}
+
+	while (*p && *p != '}' && x <= status->_maxx) {
+		int i, nest;
+
+		if (*p != '%') {
+			p++;
+			x++;
+			continue;
+		}
+
+		p++;
+		if (!*p)
+			break;
+
+		if (*p != '{') {
+			switch (*p) {
+				case '|':
+					while (x <= status->_maxx)
+						x++;
+					break;
+				case '}':
+					p++;
+					x++;
+					break;
+				default:
+					break;
+			}
+
+			p++;
+
+			continue;
+		}
+
+		if (*p != '{' && (!config_display_color || config_display_color == 2))
+			continue;
+
+		p++;
+		if (!*p)
+			break;
+
+		for (i = 0; data && data[i].name; i++) {
+			int len;
+
+			if (!data[i].text)
+				continue;
+
+			len = strlen(data[i].name);
+
+			if (!strncmp(p, data[i].name, len) && p[len] == '}') {
+				struct mouse_coords_t *cur;
+
+				if (!strcmp(data[i].name, "time"))
+					cur = mouse_statusbar_pending.time_c;
+				else if (!strcmp(data[i].name, "uin"))
+					cur = mouse_statusbar_pending.uin_c;
+				else if (!strcmp(data[i].name, "nick"))
+					cur = mouse_statusbar_pending.nick_c;
+				else if (!strcmp(data[i].name, "more"))
+					cur = mouse_statusbar_pending.more_c;
+				else if (!strcmp(data[i].name, "query"))
+					cur = mouse_statusbar_pending.query_c;
+				else if (!strcmp(data[i].name, "window"))
+					cur = mouse_statusbar_pending.window_c;
+				else if (!strcmp(data[i].name, "activity")) {
+					cur = mouse_statusbar_pending.act_c;
+					mouse_statusbar_pending.act_str = xstrdup(data[i].text);
+				} else {
+					x += strlen(data[i].text);
+					p += len;
+					goto next;
+				}
+
+				cur[0].x = x;
+				cur[0].y = cur[1].y = 0;
+				x += strlen(data[i].text);
+				cur[1].x = x - 1;
+
+				p += len;
+
+				goto next;
+			}
+		}
+
+		if (*p == '?') {
+			int neg = 0;
+
+			p++;
+			if (!*p)
+				break;
+
+			if (*p == '!') {
+				neg = 1;
+				p++;
+			}
+
+			for (i = 0; data && data[i].name; i++) {
+				int len, matched = ((data[i].text) ? 1 : 0);
+
+				if (neg)
+					matched = !matched;
+
+				len = strlen(data[i].name);
+
+				if (!strncmp(p, data[i].name, len) && p[len] == ' ') {
+					p += len + 1;
+
+					if (matched)
+						x += mouse_statusbar_update(x, y, p, data, 1);
+					goto next;
+				}
+			}
+
+			goto next;
+		}
+
+next:
+		/* uciekamy z naszego poziomu zagnie¿d¿enia */
+
+		nest = 1;
+
+		while (*p && nest) {
+			if (*p == '}')
+				nest--;
+			if (*p == '{')
+				nest++;
+			p++;
+		}
+	}
+
+	return x - orig_x;
+}
+
+/*
+ * mouse_statusbar_commit()
+ *
+ * ostatecznie zatwierdza zmiany zrobione w mouse_statusbar_update().
+ */
+static void mouse_statusbar_commit (void)
+{
+	if (mouse_statusbar.act_str)
+		xfree(mouse_statusbar.act_str);
+	memcpy (&mouse_statusbar, &mouse_statusbar_pending, sizeof(mouse_statusbar));
+	mouse_statusbar.act_str = xstrdup(mouse_statusbar_pending.act_str);
+}
+
+/*
  * update_statusbar()
  *
  * uaktualnia pasek stanu i wy¶wietla go ponownie.
@@ -2076,6 +2291,7 @@ static void update_statusbar(int commit)
 		switch (ui_ncurses_debug) {
 			case 0:
 				window_printat(status, 0, y, p, formats, config_statusbar_fgcolor, 0, config_statusbar_bgcolor, 1);
+				mouse_statusbar_update(0, y, p, formats, 0);
 				break;
 				
 			case 1:
@@ -2083,6 +2299,7 @@ static void update_statusbar(int commit)
 				char *tmp = saprintf(" debug: lines_count=%d start=%d height=%d overflow=%d screen_width=%d", window_current->lines_count, window_current->start, window_current->height, window_current->overflow, ui_screen_width);
 				window_printat(status, 0, y, tmp, formats, config_statusbar_fgcolor, 0, config_statusbar_bgcolor, 1);
 				xfree(tmp);
+				mouse_statusbar_update(0, 0, NULL, NULL, 0);
 				break;
 			}
 
@@ -2091,6 +2308,7 @@ static void update_statusbar(int commit)
 				char *tmp = saprintf(" debug: lines(count=%d,start=%d,index=%d), line(start=%d,index=%d)", array_count(lines), lines_start, lines_index, line_start, line_index);
 				window_printat(status, 0, y, tmp, formats, config_statusbar_fgcolor, 0, config_statusbar_bgcolor, 1);
 				xfree(tmp);
+				mouse_statusbar_update(0, 0, NULL, NULL, 0);
 				break;
 			}
 		}
@@ -2271,8 +2489,10 @@ static void mouse_event (const char *event)
 			return;
 		}
 
+#if 0
 		gg_debug(GG_DEBUG_MISC, "// mouse_event(): %d,%d: %d\n", 
 		    e.x, e.y, e.bstate);
+#endif
 
 		/* Najpierw okre¶lamy obszar w którym nast±pi³o zdarzenie */
 
@@ -2513,6 +2733,32 @@ static struct mouse_area_t *mouse_area_move (const char *name, int y, int x)
 }
 
 /*
+ * mouse_in_area()
+ *
+ * sprawdza, czy punkt nale¿y do obszaru.
+ *
+ * - start - pocz±tek obszaru.
+ * - end - koniec obszaru.
+ * - point - punkt.
+ *
+ * 0 - nie nale¿y, 1 - nale¿y.
+ */
+static int mouse_in_area (struct mouse_coords_t *start, struct mouse_coords_t *end, 
+    struct mouse_coords_t *point)
+{
+#if 0
+	gg_debug(GG_DEBUG_MISC, "// mouse_in_area(): {(%d,%d), (%d,%d)}, (%d,%d)\n", 
+	    start->x, start->y, end->x, end->y, point->x, point->y);
+#endif
+
+	if (start->x == -1 || start->y == -1 || end->x == -1 || end->y == -1)
+		return 0;
+
+	return (point->x >= start->x && point->x <= end->x && 
+	    point->y >= start->y && point->y <= end->y) ? 1 : 0;
+}
+
+/*
  * mouse_bevent_header()
  *
  * bevent na headerze.
@@ -2531,6 +2777,123 @@ static void mouse_bevent_header (struct mouse_coords_t *coords, mmask_t bstate)
 
 	command_exec(window_current->target, tmp, 0);
 	xfree(tmp);
+}
+
+/*
+ * mouse_bevent_statusbar()
+ *
+ * bevent na pasku stanu.
+ *
+ * - coords - koordynaty
+ * - bstate - stan przyciskow
+ */
+static void mouse_bevent_statusbar (struct mouse_coords_t *coords, mmask_t bstate)
+{
+	enum area_t {
+		TIME = 0,
+		UIN,
+		MORE,
+		QUERY,
+		WINDOW,
+		ACT
+	} area;
+	int act_pos = 0;
+	char *cmd = NULL;	/* komenda do wykonania */
+
+	if (mouse_in_area(&mouse_statusbar.time_c[0], &mouse_statusbar.time_c[1], coords))
+		area = TIME;
+	else if (mouse_in_area(&mouse_statusbar.uin_c[0], &mouse_statusbar.uin_c[1], coords))
+		area = UIN;
+	else if (mouse_in_area(&mouse_statusbar.more_c[0], &mouse_statusbar.more_c[1], coords))
+		area = MORE;
+	else if (mouse_in_area(&mouse_statusbar.query_c[0], &mouse_statusbar.query_c[1], coords))
+		area = QUERY;
+	else if (mouse_in_area(&mouse_statusbar.window_c[0], &mouse_statusbar.window_c[1], coords))
+		area = WINDOW;
+	else if (mouse_in_area(&mouse_statusbar.act_c[0], &mouse_statusbar.act_c[1], coords)) {
+		area = ACT;
+		act_pos = coords->x - mouse_statusbar.act_c[0].x;
+		if (act_pos >= strlen(mouse_statusbar.act_str))	{
+			gg_debug(GG_DEBUG_MISC, "// mouse_statusbar_bevent(): Sanity check engaged: %d >= %d\n", act_pos, strlen(mouse_statusbar.act_str));
+			return;
+		}
+	} else {
+		gg_debug(GG_DEBUG_MISC, "// mouse_statusbar_bevent(): Outside any area\n");
+		return;
+	}
+
+#if 0
+	gg_debug(GG_DEBUG_MISC, "// mouse_statusbar_bevent(): area=%d\n", area);
+#endif
+
+	/* teraz area zawiera enum odpowiadaj±cy obszarowi, na którym pojawi³o 
+	 * siê zdarzenie a window zawiera numer okna dla area == ACT */
+
+	if (area == TIME && bstate == BUTTON1_CLICKED)
+		cmd = xstrdup("/exec date");
+	else if (area == UIN) {
+		if (bstate == BUTTON1_CLICKED)
+			cmd = xstrdup("/status");
+		else if (bstate == BUTTON3_CLICKED)
+			cmd = saprintf("/find %d", config_uin);
+	} else if (area == MORE) {
+		binding_forward_page(NULL);
+		return;
+	} else if (area == QUERY) {
+		if (bstate == BUTTON1_CLICKED)
+			cmd = xstrdup("/list $");
+		else if (bstate == BUTTON3_CLICKED)
+			cmd = xstrdup("/find $");
+	} else if (area == WINDOW && bstate == BUTTON1_CLICKED)
+		cmd = xstrdup("/window list $");
+	else if (area == ACT) {
+		char *num_str;
+		int num_start = -1, num_end = -1;
+		int num;
+		int act_str_len = strlen(mouse_statusbar.act_str);
+
+		/* act_pos okre¶la pozycjê w act_str. musimy znale¼æ pocz±tek 
+		 * i koniec numerka w stringu. pocz±tek to przecinek+1 lub 
+		 * pocz±tek stringa, koniec to przecinek lub koniec stringa. */
+
+		if (mouse_statusbar.act_str[act_pos] == ',')
+			return;
+
+		/* najpierw pocz±tek */
+		for (num_start = act_pos; num_start; num_start--)
+			if (mouse_statusbar.act_str[num_start] == ',') {
+				num_start++;
+				break;
+			}
+
+		/* teraz koniec */
+		for (num_end = act_pos; num_end < act_str_len; num_end++)
+			if (mouse_statusbar.act_str[num_end] == ',')
+				break;
+
+		num_str = xmalloc(num_end - num_start + 1);
+		memcpy(num_str, mouse_statusbar.act_str + num_start, num_end - num_start);
+		num_str[num_end - num_start] = 0;
+
+#if 0
+		gg_debug(GG_DEBUG_MISC, "// mouse_statusbar_bevent(): act str: '%s' (%d-%d)\n", num_str, num_start, num_end);
+#endif
+
+		num = atoi(num_str);
+		xfree(num_str);
+
+		if (bstate == BUTTON1_CLICKED)
+			cmd = saprintf("/window list %d", num);
+		else if (bstate == BUTTON3_CLICKED)
+			cmd = saprintf("/window switch %d", num);
+	}
+
+	if (!cmd)
+		return;
+
+	command_exec(window_current->target, cmd, 0);
+
+	xfree(cmd);
 }
 
 /*
@@ -2563,7 +2926,7 @@ void ui_ncurses_init()
 	ui_screen_width = stdscr->_maxx + 1;
 	ui_screen_height = stdscr->_maxy + 1;
 	ui_need_refresh = 0;
-	
+
 #ifndef GG_DEBUG_DISABLE
 	window_new(NULL, -1);
 #endif
@@ -2574,6 +2937,18 @@ void ui_ncurses_init()
 	keypad(input, TRUE);
 	nodelay(input, TRUE);
 	mouse_event("disable");
+
+	area.name = "status";
+	area.size.y = 1;
+	area.size.x = stdscr->_maxx + 1;
+	area.start.y = stdscr->_maxy - 1;
+	area.start.x = 0;
+	area.bevents = NULL;
+
+	mouse_bevent_add(&area, BUTTON1_CLICKED, mouse_bevent_statusbar);
+	mouse_bevent_add(&area, BUTTON1_DOUBLE_CLICKED, mouse_bevent_statusbar);
+	mouse_bevent_add(&area, BUTTON3_CLICKED, mouse_bevent_statusbar);
+	mouse_area_add(&area);
 
 	start_color();
 
@@ -2727,6 +3102,16 @@ static void ui_ncurses_deinit()
 	if (header)
 		delwin(header);
 	endwin();
+
+	if (mouse_statusbar_pending.act_str) {
+		xfree(mouse_statusbar_pending.act_str);
+		mouse_statusbar_pending.act_str = NULL;
+	}
+
+	if (mouse_statusbar.act_str) {
+		xfree(mouse_statusbar.act_str);
+		mouse_statusbar.act_str = NULL;
+	}
 
 	for (i = 0; i < HISTORY_MAX; i++)
 		if (history[i] != line) {
@@ -5109,12 +5494,13 @@ static int ui_ncurses_event(const char *event, ...)
 			char *p1 = va_arg(ap, char*), *p2 = va_arg(ap, char*);
 
 			if (!p1 || !strcasecmp(p1, "list")) {
+				int num = p2 ? atoi(p2) : 0;
 				list_t l;
 
 				for (l = windows; l; l = l->next) {
 					struct window *w = l->data;
 
-					if (w->id) {
+					if (w->id && (!p2 || w->id == num)) {
 						if (w->target) {
 							if (!w->floating)	
 								printq("window_list_query", itoa(w->id), w->target);
@@ -5492,6 +5878,8 @@ void header_statusbar_resize(const char *name)
 
 	wresize(status, config_statusbar_size, stdscr->_maxx + 1);
 	mvwin(status, stdscr->_maxy + 1 - input_size - config_statusbar_size, 0);
+	mouse_area_resize("status", config_statusbar_size, stdscr->_maxx + 1);
+	mouse_area_move("status", stdscr->_maxy + 1 - input_size - config_statusbar_size, 0);
 
 	update_statusbar(0);
 
