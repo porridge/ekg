@@ -165,8 +165,18 @@ zaalokowane przez mouse_area_add().
   to klikniecia):
   - lista: /list <osoba>
   - lista: podwojne: /query <osoba>
+  - rolka: scrollowanie listy (mo¿e ogólnie te¿ dla okna rozmowy?)
   - pasek: query_ip: /exec host <ip>
   - pasek: query_descr i inne odnosnie opisu: /list <osoba>
+- gesty myszy w oknie rozmowy (trzymanie ktoregos przycisku): poziome (delta_x 
+  > 2 * delta_y), pionowe (delta_y > 2 * delta_x) i nierozpoznawalne (else). 
+  mozna tez liczyc kat arctg(), ale to wymaga libm. pomysl na podstawie 
+  http://wouter.coekaerts.be/site/irssi/mouse:
+  - w lewo: /window prev
+  - w prawo: /window next
+  - w gore: /window last
+  - w dol z lewym przyciskiem: /window oldest
+  - w dol z active przyciskiem: /window active
 - pamietac o sigwinch i innych mozliwosciach (zmiany wartosci zmiennych, 
   zdarzenia itd.) zmiany obecnosci, polozenia i rozmiaru obszarow. podczas 
   dodawania obszaru do okna warto grepnac zrodla pod katem wystepowania 
