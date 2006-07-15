@@ -2834,7 +2834,7 @@ static void mouse_bevent_statusbar (struct mouse_coords_t *coords, mmask_t bstat
 	else if (area == UIN) {
 		if (bstate == BUTTON1_CLICKED)
 			cmd = xstrdup("/status");
-		else if (bstate == BUTTON3_CLICKED)
+		else if (bstate == BUTTON1_DOUBLE_CLICKED)
 			cmd = saprintf("/find %d", config_uin);
 	} else if (area == MORE) {
 		binding_forward_page(NULL);
