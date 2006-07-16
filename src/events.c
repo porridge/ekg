@@ -125,6 +125,9 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 	int now_days;
 	struct conference *c = NULL;
 
+	if ((config_make_window & 4) && (chat == 0))
+		separate = 0;
+
 	/* tworzymy mapê formatowanego tekstu. dla ka¿dego znaku wiadomo¶ci
 	 * zapisujemy jeden znak koloru z docs/themes.txt lub \0 je¶li nie
 	 * trzeba niczego zmieniaæ. */
@@ -203,9 +206,9 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 		if (c)
 			target = xstrdup(c->name);
 		else
-			target = xstrdup(((chat == 2) || ((config_make_window & 4) && (chat == 0))) ? "__status" : ((u && u->display) ? u->display : itoa(e->event.msg.sender)));
+			target = xstrdup((chat == 2) ? "__status" : ((u && u->display) ? u->display : itoa(e->event.msg.sender)));
 	} else
-	        target = xstrdup(((chat == 2) || ((config_make_window & 4) && (chat == 0))) ? "__status" : ((u && u->display) ? u->display : itoa(e->event.msg.sender)));
+	        target = xstrdup((chat == 2) ? "__status" : ((u && u->display) ? u->display : itoa(e->event.msg.sender)));
 
 	cname = (c ? c->name : "");
 
