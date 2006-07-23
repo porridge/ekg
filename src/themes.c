@@ -454,12 +454,12 @@ fstring_t reformat_string(const char *str)
 						attr |= 64;
 
 					if (tmp >= 30 && tmp <= 37) {
-						attr &= 127;
+						attr &= 120;
 						attr |= (tmp - 30);
 					}
 
 					if (tmp >= 40 && tmp <= 47) {
-						attr &= 127;
+						attr &= 71;
 						attr |= (tmp - 40) << 3;
 					}
 
