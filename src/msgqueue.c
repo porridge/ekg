@@ -85,7 +85,7 @@ int msg_queue_add(int msg_class, int msg_seq, int uin_count, uin_t *uins, const 
 	m.uin_count = uin_count;
 	m.uins = xmalloc(uin_count * sizeof(uin_t));
 	memmove(m.uins, uins, uin_count * sizeof(uin_t));
-	m.msg = xstrdup(msg);
+	m.msg = (unsigned char *) xstrdup((const char *) msg);
 	m.secure = secure;
 	m.time = time(NULL);
 	m.formatlen = formatlen;
@@ -200,7 +200,7 @@ int msg_queue_flush()
 	for (; l; l = l->next) {
 		struct msg_queue *m = l->data;
 		int new_seq;
-		unsigned char *tmp = xstrdup(m->msg);
+		unsigned char *tmp = (unsigned char *) xstrdup((const char *) m->msg);
 
 		iso_to_cp(tmp);
 
@@ -407,7 +407,7 @@ int msg_queue_read()
 				string_append(msg, "\r\n");
 		}
 
-		m.msg = msg->str;
+		m.msg = (unsigned char *) msg->str;
 
 		string_free(msg, 0);
 

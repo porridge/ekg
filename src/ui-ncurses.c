@@ -1786,7 +1786,7 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 
 	if (!config_display_pl_chars) {
 		format = xstrdup(format);
-		iso_to_ascii(format);
+		iso_to_ascii((unsigned char*) format);
 	}
 
 	p = format;
@@ -1894,7 +1894,7 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 
 				if (!config_display_pl_chars) {
 					text = xstrdup(text);
-					iso_to_ascii(text);
+					iso_to_ascii((unsigned char*) text);
 				}
 
 				for (j = 0; text && j < strlen(text); j++) {
@@ -4799,7 +4799,7 @@ redraw_prompt:
 				if (!lines[lines_start + i])
 					break;
 
-				p = lines[lines_start + i];
+				p = (unsigned char *) lines[lines_start + i];
 				
 #ifdef WITH_ASPELL
 				memset(aspell_line, 0, LINE_MAXLEN);
@@ -4816,7 +4816,7 @@ redraw_prompt:
 				        print_char(input, i, j, p[j + line_start]);
 				}
 #else
-                                for (j = 0; j + line_start < strlen(p) && j < input->_maxx + 1; j++)
+                                for (j = 0; j + line_start < strlen((char*) p) && j < input->_maxx + 1; j++)
                                         print_char(input, i, j, p[j + line_start]);
 #endif
 			}
@@ -5498,7 +5498,7 @@ static int ui_ncurses_event(const char *event, ...)
 		}
 
 		if (!strcasecmp(command, "query-current")) {
-			int *param = va_arg(ap, uin_t*);
+			uin_t *param = va_arg(ap, uin_t*);
 
 			if (window_current->target)
 				*param = get_uin(window_current->target);
