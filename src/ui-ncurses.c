@@ -105,6 +105,7 @@ static void binding_add(const char *key, const char *action, int internal, int q
 static void binding_delete(const char *key, int quiet);
 static void binding_default();
 
+static struct mouse_area_t *mouse_area_resize (const char *name, int y, int x);
 static struct mouse_area_t *mouse_area_move (const char *name, int y, int x);
 
 struct screen_line {
@@ -752,6 +753,11 @@ void window_resize()
 			w->start = w->lines_count - w->height + w->overflow;
 
 		w->redraw = 1;
+	}
+
+	if (window_current) {
+		mouse_area_resize("window_current", window_current->window->_maxy, window_current->window->_maxx);
+		mouse_area_move("window_current", window_current->window->_begy, window_current->window->_begx);
 	}
 
 	ui_screen_width = width;
@@ -2014,7 +2020,7 @@ static int mouse_statusbar_update (int x, int y, const char *format_, const void
 		}
 	}
 
-	while (*p && *p != '}' && x <= status->_maxx) {
+	while (p && *p && *p != '}' && x <= status->_maxx) {
 		int i, nest;
 
 		if (*p != '%') {
@@ -2897,6 +2903,89 @@ static void mouse_bevent_statusbar (struct mouse_coords_t *coords, mmask_t bstat
 }
 
 /*
+ * mouse_bevent_current()
+ *
+ * bevent dla window_current.
+ *
+ * - coords - koordynaty
+ * - bstate - stan przyciskow
+ */
+static void mouse_bevent_current (struct mouse_coords_t *coords, mmask_t bstate)
+{
+	static struct mouse_coords_t saved_coords = {-1, -1};
+	struct mouse_coords_t distance;
+	char *cmd = NULL;
+	enum {
+		DIR_UP = 0,
+		DIR_DOWN,
+		DIR_LEFT,
+		DIR_RIGHT
+	} dir;
+
+	if (bstate == BUTTON1_PRESSED || bstate == BUTTON3_PRESSED) {
+		/* wci¶niêto który¶ przycisk - zapamiêtujemy pozycjê */
+		memcpy(&saved_coords, coords, sizeof(saved_coords));
+		return;
+	}
+
+	/* puszczono który¶ przycisk. sprawdzamy kierunek gestu. */
+
+	if (saved_coords.x == -1 || saved_coords.y == -1) {
+		/* przycisk puszczony dwa razy? mo¿e by³y trzymane dwa */
+		gg_debug(GG_DEBUG_MISC, "// mouse_bevent_current(): Safety check engaged!\n");
+		return;
+	}
+
+	distance.x = coords->x - saved_coords.x;
+	distance.y = coords->y - saved_coords.y;
+
+	/* mamy przyrosty, obliczamy odleg³o¶ci */
+
+#define __negative(x) ((x) < 0)
+#define __value(x) (__negative(x) ? -(x) : (x))
+
+	if (__value(distance.x) > 2 * __value(distance.y)) {
+		/* poziomo */
+		dir = __negative(distance.x) ? DIR_LEFT : DIR_RIGHT;
+	} else if (__value(distance.y) > 2 * __value(distance.x)) {
+		/* pionowo */
+		dir = __negative(distance.y) ? DIR_UP : DIR_DOWN;
+	} else {
+		gg_debug(GG_DEBUG_MISC, "// mouse_bevent_current(): Unknown gesture (distance=(%d,%d))!\n", 
+		    distance.x, distance.y);
+		goto out;
+	}
+
+#undef __value
+#undef __negative
+
+#if 0
+	gg_debug(GG_DEBUG_MISC, "// mouse_bevent_current(): Gesture dir %d\n", dir);
+#endif
+
+	if (dir == DIR_LEFT)
+		cmd = saprintf("/window prev");
+	else if (dir == DIR_RIGHT)
+		cmd = saprintf("/window next");
+	else if (dir == DIR_UP)
+		cmd = saprintf("/window last");
+	else if (dir == DIR_DOWN && bstate == BUTTON1_RELEASED)
+		cmd = saprintf("/window oldest");
+	else if (dir == DIR_DOWN && bstate == BUTTON1_RELEASED)
+		cmd = saprintf("/window active");
+
+	if (!cmd)
+		goto out;
+
+	gg_debug(GG_DEBUG_MISC, "// mouse bevent_current(): Doing command: %s\n", cmd);
+	command_exec(window_current->target, cmd, 0);
+	xfree(cmd);
+
+out:
+	saved_coords.x = saved_coords.y = -1;
+}
+
+/*
  * ui_ncurses_init()
  *
  * inicjalizuje ca³± zabawê z ncurses.
@@ -2948,6 +3037,19 @@ void ui_ncurses_init()
 	mouse_bevent_add(&area, BUTTON1_CLICKED, mouse_bevent_statusbar);
 	mouse_bevent_add(&area, BUTTON1_DOUBLE_CLICKED, mouse_bevent_statusbar);
 	mouse_bevent_add(&area, BUTTON3_CLICKED, mouse_bevent_statusbar);
+	mouse_area_add(&area);
+
+	area.name = "window_current";
+	area.size.y = window_current->window->_maxy;
+	area.size.x = window_current->window->_maxx;
+	area.start.y = window_current->window->_begy;
+	area.start.x = window_current->window->_begx;
+	area.bevents = NULL;
+
+	mouse_bevent_add(&area, BUTTON1_PRESSED, mouse_bevent_current);
+	mouse_bevent_add(&area, BUTTON1_RELEASED, mouse_bevent_current);
+	mouse_bevent_add(&area, BUTTON3_PRESSED, mouse_bevent_current);
+	mouse_bevent_add(&area, BUTTON3_RELEASED, mouse_bevent_current);
 	mouse_area_add(&area);
 
 	start_color();

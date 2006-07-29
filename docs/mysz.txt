@@ -14,11 +14,11 @@
 
 obsluga myszy w ekg jest na razie wstepnym, eksperymentalnym frameworkiem 
 do dalszego obudowania, dzialajacym tylko w interfejsie ncurses. ten plik 
-zawiera opis aktualnych bindingow (czyli obszarow, w ktore mozna kliknac) 
-oraz developerski opis, przydatny podczas dodawania obslugi myszy do 
-kolejnych elementow ekg. gdyby cos z niego bylo nie do konca jasne albo 
-dwuznaczne, nalezy napisac na ekg-users (adres znajduje sie na stronie 
-ekg). poprawki mile widziane.
+zawiera opis aktualnych bindingow (czyli obszarow, w ktore mozna kliknac 
+lub na ktorych mozna wykonac gesty) oraz developerski opis, przydatny 
+podczas dodawania obslugi myszy do kolejnych elementow ekg. gdyby cos 
+z niego bylo nie do konca jasne albo dwuznaczne, nalezy napisac na 
+ekg-users (adres znajduje sie na stronie ekg). poprawki mile widziane.
 
 jesli nie jestes zainteresowany rozwijaniem obslugi myszy w ekg, a jedynie 
 jej uzywaniem, to rozdzial "aktualne bindingi" jest jedynym, ktory powinienes 
@@ -26,7 +26,10 @@ przeczytac.
 
 2. aktualne bindingi
 
-aktualne przyporzadkowania zdarzen myszy:
+aktualne przyporzadkowania zdarzen myszy. gest to przesuniecie myszy 
+podczas trzymania ktoregos przycisku. jesli nie zostalo okreslone 
+inaczej, gest mozna wykonac trzymajac lewy lub prawy przycisk. lpm 
+to lewy przycisk myszy, ppm - prawy.
 
 obszar			| zdarzenie		| polecenie lub opis
 ------------------------+-----------------------+-------------------
@@ -41,6 +44,11 @@ statusbar: more		| klikniecie		| Page Down
 statusbar: win/numer	| klikniecie		| /window list $
 statusbar: act/numer	| klikniecie		| /window list <numer_okna>
 statusbar: act/numer	| podwojne klikniecie	| /window switch <numer_okna>
+rozmowa			| gest w lewo		| /window prev
+rozmowa			| gest w prawo		| /window next
+rozmowa			| gest w gore		| /window last
+rozmowa			| gest w dol z lpm	| /window oldest
+rozmowa			| gest w dol z ppm	| /window active
 
 3. terminologia
 
@@ -52,6 +60,14 @@ statusbar: act/numer	| podwojne klikniecie	| /window switch <numer_okna>
 - zdarzenie przycisku myszy (bevent): klikniecie, podwojne klikniecie, 
   potrojne klikniecie, wcisniecie lub puszczenie przycisku. zdarzenia 
   przyciskow myszy sa obslugiwane przez odpowiednio dodane handlery.
+
+- gest myszy: jest rozpoznawany, gdy przesuniemy mysz trzymajac ktorys 
+  przycisk. gesty stworzone zostaly na podstawie obslugi myszy w irssi 
+  (http://wouter.coekaerts.be/site/irssi/mouse) z ta roznica, ze kierunek 
+  jest obliczany nastepujaco:
+  - odleglosc_x > 2 * odleglosc_y: kierunek poziomy
+  - odleglosc_y > 2 * odleglosc_x: kierunek pionowy
+  - pozostale: gest nierozpoznany
 
 4. struktury i typy danych
 
@@ -168,15 +184,6 @@ zaalokowane przez mouse_area_add().
   - rolka: scrollowanie listy (mo¿e ogólnie te¿ dla okna rozmowy?)
   - pasek: query_ip: /exec host <ip>
   - pasek: query_descr i inne odnosnie opisu: /list <osoba>
-- gesty myszy w oknie rozmowy (trzymanie ktoregos przycisku): poziome (delta_x 
-  > 2 * delta_y), pionowe (delta_y > 2 * delta_x) i nierozpoznawalne (else). 
-  mozna tez liczyc kat arctg(), ale to wymaga libm. pomysl na podstawie 
-  http://wouter.coekaerts.be/site/irssi/mouse:
-  - w lewo: /window prev
-  - w prawo: /window next
-  - w gore: /window last
-  - w dol z lewym przyciskiem: /window oldest
-  - w dol z active przyciskiem: /window active
 - pamietac o sigwinch i innych mozliwosciach (zmiany wartosci zmiennych, 
   zdarzenia itd.) zmiany obecnosci, polozenia i rozmiaru obszarow. podczas 
   dodawania obszaru do okna warto grepnac zrodla pod katem wystepowania 
