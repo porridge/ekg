@@ -935,7 +935,7 @@ static void window_clear(struct window *w, int full)
 static struct window *window_find(const char *target)
 {
 	list_t l;
-	int current = ((target) ? !strcasecmp(target, "__current") : 0);
+	int current = ((target) ? !strcasecmp(target, "$") || !strcasecmp(target, "__current") : 0);
 	int debug = ((target) ? !strcasecmp(target, "__debug") : 0);
 	int status = ((target) ? !strcasecmp(target, "__status") : 0);
 	struct userlist *u = NULL;

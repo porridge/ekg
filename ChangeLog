@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2006-07-29
+
+- poprawienie buga /query numerek; /chat $ wiadomo¶æ (eMBe/g)
+
 // 2006-07-23
 
 - poprawienie wy¶wietlania kolorów (Kosma,eMBe/g)
