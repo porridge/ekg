@@ -289,9 +289,9 @@ int userlist_set(const char *contacts, int config)
 
 		if (sess && sess->state == GG_STATE_CONNECTED) {
 			if (config_reason) {
-				iso_to_cp(config_reason);
+				iso_to_cp((unsigned char *) config_reason);
 				gg_change_status_descr(sess, config_status, config_reason);
-				cp_to_iso(config_reason);
+				cp_to_iso((unsigned char *) config_reason);
 			} else
 				gg_change_status(sess, config_status);
 		}
