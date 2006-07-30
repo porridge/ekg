@@ -255,7 +255,7 @@ void variable_init()
 	variable_add("log_status", "lS", VAR_INT, 1, &config_log_status, NULL, variable_map(3, 0, 0, "no", 1, 2, "yes", 2, 1, "descr"), dd_log);
 	variable_add("log_path", "lp", VAR_STR, 1, &config_log_path, NULL, NULL, dd_log);
 	variable_add("log_timestamp", "lt", VAR_STR, 1, &config_log_timestamp, NULL, NULL, dd_log);
-	variable_add("make_window", "mw", VAR_INT, 1, &config_make_window, NULL, variable_map(3, 0, 0, "none", 1, 2, "usefree", 2, 1, "always"), NULL);
+	variable_add("make_window", "mw", VAR_MAP, 1, &config_make_window, NULL, variable_map(4, 0, 0, "none", 1, 2, "usefree", 2, 1, "always", 4, 0, "nomsg"), NULL);
 	variable_add("mesg", "ma", VAR_INT, 1, &config_mesg, changed_mesg, variable_map(3, 0, 0, "no", 1, 2, "yes", 2, 1, "default"), NULL);
 	variable_add("nick", "ni", VAR_STR, 1, &config_nick, NULL, NULL, NULL);
 	variable_add("proxy", "pr", VAR_STR, 1, &config_proxy, changed_proxy, NULL, NULL);

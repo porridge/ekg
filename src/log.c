@@ -122,7 +122,7 @@ void last_add(int type, uin_t uin, time_t t, time_t st, const char *msg)
 	ll.uin = uin;
 	ll.time = t;
 	ll.sent_time = st;
-	ll.message = xstrdup(msg);
+	ll.message = (unsigned char *) xstrdup(msg);
 	
 	list_add(&lasts, &ll, sizeof(ll));
 
