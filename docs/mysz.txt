@@ -175,7 +175,47 @@ zaalokowane przez mouse_area_add().
 8. do zrobienia
 
 - mozliwosc oskryptowania myszy w pythonie
-- mozliwosc bindowania beventow przez uzytkownika
+- mozliwosc bindowania beventow przez uzytkownika (/mouse_bind?)
+  - -a: przypisanie akcji do pary obszar,zdarzenie
+  - -d: usuniecie akcji dla podanej pary obszar,zdarzenie
+  - [-l]: wylistowanie przypisanych akcji
+  - -L: wylistowanie przypisanych oraz domyslnych akcji
+  - konkurs na nazwe dla pary obszar,zdarzenie :)
+  - definicje:
+    - obszar (w nawiasie znaczenie parametru)
+      - current (konkurs na lepsza nazwe dla obszaru current_window :))
+      - contacts ($1: nick)
+      - header (naglowek jako calosc)
+        - header:query_ip ($1: ip)
+        - header:query_descr ($1: opis)
+      - status (pasek stanu jako calosc)
+        - status:time
+        - status:uin
+        - status:nick
+        - status:more
+        - status:query
+        - status:window
+        - status:act ($1: numer okna)
+        - status:query_ip ($1: ip)
+        - status:query_descr ($1: opis)
+    - zdarzenie (przycisk-czynnosc)
+      - przycisk
+        - left
+        - middle
+        - right
+      - czynnosc
+        - click
+        - double_click
+        - triple_click
+        - gesture_up
+        - gesture_down
+        - gesture_left
+        - gesture_right
+        - roll_up (przycisk ignorowany)
+        - roll_down (przycisk ignorowany)
+    - akcja
+      - wszystkie akcje z /bind
+      - komendy do wykonania (przyjmuja parametry)
 - moze obsluga masek, a nie tylko wartosci, w mouse_bevent_add()?
 - beventy dla listy kontaktow i paska stanu (jesli nie zaznaczono inaczej, 
   to klikniecia):

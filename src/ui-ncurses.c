@@ -2890,7 +2890,7 @@ static void mouse_bevent_statusbar (struct mouse_coords_t *coords, mmask_t bstat
 
 		if (bstate == BUTTON1_CLICKED)
 			cmd = saprintf("/window list %d", num);
-		else if (bstate == BUTTON3_CLICKED)
+		else if (bstate == BUTTON1_DOUBLE_CLICKED)
 			cmd = saprintf("/window switch %d", num);
 	}
 
