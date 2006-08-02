@@ -692,6 +692,15 @@ reason_limit
 	przekracza t± d³ugo¶æ, komendy /away, /back i /invisible nie
 	zostan± wykonane.
 
+receive_images
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	okre¶la, czy chcemy otrzymywaæ obrazki. w³±czenie tej opcji przy 
+	wy³±czonej opcji ignore_empty_msg ujawni nas dla u¿ytkowników 
+	opcji /check_conn. otrzymywane obrazki bêd± zapisywane w katalogu 
+	okre¶lonym zmienn± dcc_dir.
+
 save_question
 	typ: bool
 	domy¶lna warto¶æ: 1
