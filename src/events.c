@@ -2732,6 +2732,7 @@ void handle_image_reply(struct gg_event *e)
 		if (config_receive_images) {
 			char *path;
 			int fd;
+			size_t i, sz;
 			ssize_t rs;
 
 			if (config_dcc_dir)
@@ -2741,6 +2742,11 @@ void handle_image_reply(struct gg_event *e)
 
 			gg_debug(GG_DEBUG_MISC, "// ekg: trying to save image: %s\n", path);
 
+			sz = strlen(path);
+			for (i = 0; i < sz; i++)
+				if (path[i] == '/')
+					path[i] = '_';
+
 			fd = open(path, O_WRONLY | O_CREAT, 0600);
 			if (fd == -1)
 				goto err;
@@ -2749,12 +2755,12 @@ void handle_image_reply(struct gg_event *e)
 			if (rs == -1) {
 				int xerrno = errno;
 				close(fd);
-				unlink(e->event.image_reply.filename);
+				unlink(path);
 				errno = xerrno;
 				goto err;
 			} else if (rs != e->event.image_reply.size) {
 				close(fd);
-				unlink(e->event.image_reply.filename);
+				unlink(path);
 				errno = ENOSPC;
 				goto err;
 			}
