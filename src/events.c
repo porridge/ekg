@@ -2730,22 +2730,28 @@ void handle_image_reply(struct gg_event *e)
 		/* to nie jest spy */
 
 		if (config_receive_images) {
-			char *path;
+			char *fname, *path;
 			int fd;
 			size_t i, sz;
 			ssize_t rs;
 
+			fname = xstrdup(e->event.image_reply.filename);
+			sz = strlen(fname);
+			for (i = 0; i < sz; i++)
+				if (fname[i] < 32 || fname[i] == '\\' || fname[i] == '/')
+					fname[i] = '_';
+
+			if (fname[0] == '.')
+				fname[0] = '_';
+
 			if (config_dcc_dir)
-				path = saprintf("%s/%s", config_dcc_dir, e->event.image_reply.filename);
+				path = saprintf("%s/%s", config_dcc_dir, fname);
 			else
-				path = xstrdup(e->event.image_reply.filename);
+				path = xstrdup(fname);
+
+			xfree(fname);
 
 			gg_debug(GG_DEBUG_MISC, "// ekg: trying to save image: %s\n", path);
-
-			sz = strlen(path);
-			for (i = 0; i < sz; i++)
-				if (path[i] == '/')
-					path[i] = '_';
 
 			fd = open(path, O_WRONLY | O_CREAT, 0600);
 			if (fd == -1)
