@@ -498,7 +498,7 @@ ignore_empty_msg
 
 image_size
 	typ: int
-	domy¶lna warto¶æ: 0
+	domy¶lna warto¶æ: 255
 
 	maksymalny rozmiar akceptowanych przez nas obrazków w KiB. maksymalnie 
 	255. istotne jedynie po w³±czeniu ,,receive_images''.
