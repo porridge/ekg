@@ -496,6 +496,13 @@ ignore_empty_msg
 	obrazek, co mo¿e mieæ miejsce, jesli kto¶ sprawdza, czy jeste¶my
 	niewidoczni.
 
+image_size
+	typ: int
+	domy¶lna warto¶æ: 0
+
+	maksymalny rozmiar akceptowanych przez nas obrazków w KiB. maksymalnie 
+	255. istotne jedynie po w³±czeniu ,,receive_images''.
+
 ioctld_enable
 	typ: liczba
 	domy¶lna warto¶æ: 1
