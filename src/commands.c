@@ -490,9 +490,9 @@ COMMAND(cmd_away)
 			gg_debug(GG_DEBUG_MISC, "-- config_status = 0x%.2x\n", config_status);
 
 			if (config_reason) {
-				iso_to_cp(config_reason);
+				iso_to_cp((unsigned char *) config_reason);
 				gg_change_status_descr(sess, config_status, config_reason);
-				cp_to_iso(config_reason);
+				cp_to_iso((unsigned char *) config_reason);
 			} else
 				gg_change_status(sess, config_status);
 		}
@@ -926,7 +926,7 @@ COMMAND(cmd_find)
 	user = xstrdup(argv[0]);
 
 	for (i = 0; argv[i]; i++)
-		iso_to_cp(argv[i]);
+		iso_to_cp((unsigned char *) argv[i]);
 
 	if (!(req = gg_pubdir50_new(GG_PUBDIR50_SEARCH))) {
 		array_free(argv);
@@ -1061,7 +1061,7 @@ COMMAND(cmd_change)
 		char **argv = array_make(params[0], " \t", 0, 1, 1);
 		
 		for (i = 0; argv[i]; i++)
-			iso_to_cp(argv[i]);
+			iso_to_cp((unsigned char *) argv[i]);
 
 		for (i = 0; argv[i]; i++) {
 			if (match_arg(argv[i], 'f', "first", 2) && argv[i + 1]) {
@@ -1972,7 +1972,7 @@ COMMAND(cmd_list)
 
 		contacts = userlist_dump();
 
-		iso_to_cp(contacts);
+		iso_to_cp((unsigned char *) contacts);
 
 		if (match_arg(params[0], 'P', "put-config", 5)) {
 			string_t s = string_init(contacts);
@@ -2198,7 +2198,7 @@ COMMAND(cmd_msg)
 	if (strlen(params[1]) > 1989)
 		printq("message_too_long");
 	
-	msg = xstrmid(params[1], 0, 1989);
+	msg = (unsigned char *) xstrmid(params[1], 0, 1989);
 
 	nick = xstrdup(params[0]);
 
@@ -2301,7 +2301,7 @@ COMMAND(cmd_msg)
 	/* analizê tekstu zrobimy w osobnym bloku dla porz±dku */
 	{
 		unsigned char attr = 0, last_attr = 0;
-		const unsigned char *p = msg, *end = p + strlen(p);
+		const unsigned char *p = msg, *end = p + strlen((char *) p);
 		int msglen = 0;
 		unsigned char rgb[3], last_rgb[3];
 
@@ -2310,8 +2310,8 @@ COMMAND(cmd_msg)
 				p++;
 
 				if (xisdigit(*p)) {
-					int num = atoi(p);
-					
+					int num = atoi((char *) p);
+
 					if (num < 0 || num > 15)
 						num = 0;
 
@@ -2400,7 +2400,7 @@ COMMAND(cmd_msg)
 		}
 	}
 
-	raw_msg = xstrdup(msg);
+	raw_msg = (unsigned char *) xstrdup((char *) msg);
 	iso_to_cp(msg);
 
 	count = array_count(nicks);
@@ -2419,12 +2419,12 @@ COMMAND(cmd_msg)
 		put_log(uin, "%s,%ld,%s,%s,%s\n", ((chat) ? "chatsend" : "msgsend"), uin, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), raw_msg);
 
 		if (config_last & 4)
-			last_add(1, uin, time(NULL), 0, raw_msg);
+			last_add(1, uin, time(NULL), 0, (char *) raw_msg);
 
 		secure = 0;
 
 		if (!conference) {
-			unsigned char *__msg = xstrdup(msg);
+			unsigned char *__msg = (unsigned char *) xstrdup((char *) msg);
 #ifdef HAVE_OPENSSL
 			int ret = 0;
 			if (config_encryption && (ret = msg_encrypt(uin, &__msg)) > 0)
@@ -2478,7 +2478,7 @@ COMMAND(cmd_msg)
 		memset(&e, 0, sizeof(e));
 		e.type = GG_EVENT_MSG;
 		e.event.msg.sender = config_uin;
-		e.event.msg.message = xstrdup(raw_msg);
+		e.event.msg.message = (unsigned char *) xstrdup((char *) raw_msg);
 		e.event.msg.time = time(NULL);
 		e.event.msg.formats = (format) ? (format + 3) : NULL;
 		e.event.msg.formats_length = (formatlen) ? (formatlen - 3) : 0;
@@ -2936,7 +2936,7 @@ COMMAND(cmd_dcc)
 			}
 
 			remote = xstrdup(params[2]);
-			iso_to_cp(remote);
+			iso_to_cp((unsigned char *) remote);
 			
 			if (gg_dcc_fill_file_info2(d, remote, params[2]) == -1) {
 				printq("dcc_open_error", params[2], strerror(errno));
@@ -3334,7 +3334,7 @@ COMMAND(cmd_key)
 
 		fclose(f);
 
-		if (gg_send_message(sess, GG_CLASS_MSG, uin, s->str) == -1) {
+		if (gg_send_message(sess, GG_CLASS_MSG, uin, (unsigned char *) s->str) == -1) {
 			printq("key_send_error");
 			string_free(s, 1);
 			return -1;
@@ -3506,7 +3506,7 @@ COMMAND(cmd_test_hexmsg)
 		j++;
 	}
 
-	gg_send_message_ctcp(sess, GG_CLASS_MSG, get_uin(params[0]), buf, size);
+	gg_send_message_ctcp(sess, GG_CLASS_MSG, get_uin(params[0]), (unsigned char *) buf, size);
 
 	xfree(buf);
 	
@@ -3603,7 +3603,7 @@ COMMAND(cmd_test_imagemsg)
 
 	close(fd);
 
-	tmp = gg_crc32(0, image, size);
+	tmp = gg_crc32(0, (unsigned char *) image, size);
 	gg_debug(GG_DEBUG_MISC, "// crc32 = 0x%.8x, size = %d\n", tmp, size);
 	tmp = gg_fix32(tmp);
 	memcpy(format + 12, &tmp, 4);
@@ -3612,7 +3612,7 @@ COMMAND(cmd_test_imagemsg)
 	
 	xfree(image);
 
-	return gg_send_message_richtext(sess, GG_CLASS_CHAT, get_uin(params[0]), message, format, sizeof(format));
+	return gg_send_message_richtext(sess, GG_CLASS_CHAT, get_uin(params[0]), (unsigned char *) message, (unsigned char *) format, sizeof(format));
 }
 
 COMMAND(cmd_test_resize)
@@ -3633,7 +3633,7 @@ COMMAND(cmd_test_send)
 	memset(e, 0, sizeof(*e));
 	e->type = GG_EVENT_MSG;
 	e->event.msg.sender = get_uin(params[0]);
-	e->event.msg.message = xstrdup(params[1]);
+	e->event.msg.message = (unsigned char *) xstrdup(params[1]);
 	e->event.msg.msgclass = GG_CLASS_MSG;
 	e->event.msg.time = time(NULL);
 	
@@ -3946,7 +3946,7 @@ COMMAND(cmd_register)
 		}
 
 		passwd = xstrdup(params[1]);
-		iso_to_cp(passwd);
+		iso_to_cp((unsigned char *) passwd);
 	
 		if (!(h = gg_register3(params[0], passwd, last_tokenid, params[2], 1))) {
 			xfree(passwd);
@@ -4036,9 +4036,9 @@ COMMAND(cmd_passwd)
 
 	oldpasswd = xstrdup(config_password);
 	if (oldpasswd && !config_password_cp1250)
-		iso_to_cp(oldpasswd);
+		iso_to_cp((unsigned char *) oldpasswd);
 	newpasswd = xstrdup(params[0]);
-	iso_to_cp(newpasswd);
+	iso_to_cp((unsigned char *) newpasswd);
 
 	if (!(h = gg_change_passwd4(config_uin, config_email, (oldpasswd) ? oldpasswd : "", newpasswd, last_tokenid, params[1], 1))) {
 		xfree(newpasswd);

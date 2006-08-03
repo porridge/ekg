@@ -12,6 +12,8 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 - wyodrêbnienie fix_filename() (gophi)
 - dodanie zmiennej image_size (Kosma/g)
 - przystosowanie Makefile.in do autoconfa 2.60 (eMBe/g)
+- poprawienie warningów signed/unsigned na gcc 4.0.3: commands.c, 
+  stuff.c (gophi)
 
 // 2006-08-02
 

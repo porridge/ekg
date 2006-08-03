@@ -1425,9 +1425,9 @@ skip_server:
 	}
 
 	if (!config_password_cp1250)
-		iso_to_cp(p.password);
+		iso_to_cp((unsigned char *) p.password);
 	if (p.status_descr)
-		iso_to_cp(p.status_descr);
+		iso_to_cp((unsigned char *) p.status_descr);
 
 	if (!(sess = gg_login(&p))) {
 		print("conn_failed", format_find((errno == ENOMEM) ? "conn_failed_memory" : "conn_failed_connecting"));
@@ -1436,9 +1436,9 @@ skip_server:
 		list_add(&watches, sess, 0);
 
 	if (!config_password_cp1250)
-		cp_to_iso(p.password);
+		cp_to_iso((unsigned char *) p.password);
 	if (p.status_descr)
-		cp_to_iso(p.status_descr);
+		cp_to_iso((unsigned char *) p.status_descr);
 }
 
 /*
@@ -1471,7 +1471,7 @@ void ekg_logoff(struct gg_session *sess, const char *reason)
 
 	if (reason) {
 		char *tmp = xstrdup(reason);
-		iso_to_cp(tmp);
+		iso_to_cp((unsigned char *) tmp);
 		gg_change_status_descr(sess, GG_STATUS_NOT_AVAIL_DESCR, tmp);
 		xfree(tmp);
 	} else
@@ -1912,7 +1912,7 @@ int msg_encrypt(uin_t uin, unsigned char **msg)
 {
 #ifdef HAVE_OPENSSL
 	if (config_encryption) {
-		unsigned char *res = sim_message_encrypt(*msg, uin);
+		unsigned char *res = (unsigned char *) sim_message_encrypt(*msg, uin);
 
 		if (res) {
 			int ret = 1;
@@ -1920,7 +1920,7 @@ int msg_encrypt(uin_t uin, unsigned char **msg)
 			xfree(*msg);
 			*msg = res;
 			
-			if (strlen(*msg) > 1989) {
+			if (strlen((char *) *msg) > 1989) {
 				(*msg)[1989] = 0;
 				ret = 2;
 			}
@@ -2877,7 +2877,7 @@ void update_status_myip()
 			u->ip.s_addr = inet_addr(config_dcc_ip);
 		else {
 			struct sockaddr_in foo;
-			int bar = sizeof(foo);
+			socklen_t bar = sizeof(foo);
 
 			if (getsockname(sess->fd, (struct sockaddr *) &foo, &bar))
 				goto fail;
@@ -3058,9 +3058,9 @@ void change_status(int status, const char *xarg, int autom)
 
 	if (sess && sess->state == GG_STATE_CONNECTED) {
 		if (config_reason) {
-		    	iso_to_cp(config_reason);
+		    	iso_to_cp((unsigned char *) config_reason);
 			gg_change_status_descr(sess, config_status, config_reason);
-			cp_to_iso(config_reason);
+			cp_to_iso((unsigned char *) config_reason);
 		} else
 		    	gg_change_status(sess, config_status);
 	}
