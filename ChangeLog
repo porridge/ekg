@@ -11,6 +11,7 @@ d - drg, sz - szalik, del - deletek, g - gophi).
   zwi±zanego z dcc i obrazkami (eMBe/g)
 - wyodrêbnienie fix_filename() (gophi)
 - dodanie zmiennej image_size (Kosma/g)
+- przystosowanie Makefile.in do autoconfa 2.60 (eMBe/g)
 
 // 2006-08-02
 
