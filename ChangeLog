@@ -7,6 +7,9 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 // 2006-08-03
 
 - poprawienie zapisywania obrazkow (eMBe/g)
+- poprawienie signed/unsigned (a przez to psucia polskich znaków) 
+  zwi±zanego z dcc i obrazkami (eMBe/g)
+- wyodrêbnienie fix_filename() (gophi)
 
 // 2006-08-02
 
