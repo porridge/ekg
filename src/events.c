@@ -2227,7 +2227,6 @@ void handle_dcc(struct gg_dcc *d)
 	struct gg_event *e;
 	struct transfer *t, tt;
 	list_t l;
-	char *p;
 
 	if (ignored_check(d->peer_uin) & IGNORE_DCC) {
 		remove_transfer(d);
@@ -2746,7 +2745,7 @@ void handle_image_reply(struct gg_event *e)
 		/* to nie jest spy */
 
 		if (config_receive_images) {
-			unsigned char *fname, *path;
+			unsigned char *fname, *path, *tmp;
 			int fd;
 			ssize_t rs;
 
@@ -2758,8 +2757,17 @@ void handle_image_reply(struct gg_event *e)
 			else
 				path = xstrdup(fname);
 
-			xfree(fname);
 			cp_to_iso(path);
+
+			tmp = unique_name(path);
+			if (!tmp) {
+				print("dcc_get_cant_overwrite", path);
+				goto err;
+			} else if (tmp != path) {
+				print("dcc_get_backup_made", path, tmp);
+				xfree(path);
+				path = tmp;
+			}
 
 			gg_debug(GG_DEBUG_MISC, "// ekg: trying to save image: %s\n", path);
 
@@ -2785,11 +2793,15 @@ void handle_image_reply(struct gg_event *e)
 
 			print("image_saved", format_user(e->event.image_reply.sender), path);
 			xfree(path);
+
+			event_check(EVENT_DCCFINISH, e->event.image_reply.sender, fname);
+			xfree(fname);
 			return;
 
 err:
 			print("image_not_saved", format_user(e->event.image_reply.sender), path, strerror(errno));
 			xfree(path);
+			xfree(fname);
 			return;
 		}
 
