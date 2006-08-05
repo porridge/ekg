@@ -1,6 +1,7 @@
 # $Id$
 
 prefix = @prefix@
+datarootdir = @datarootdir@
 datadir = @datadir@
 mandir = @mandir@
 exec_prefix = @exec_prefix@

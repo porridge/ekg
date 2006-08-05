@@ -496,6 +496,13 @@ ignore_empty_msg
 	obrazek, co mo¿e mieæ miejsce, jesli kto¶ sprawdza, czy jeste¶my
 	niewidoczni.
 
+image_size
+	typ: int
+	domy¶lna warto¶æ: 0
+
+	maksymalny rozmiar akceptowanych przez nas obrazków w KiB. maksymalnie 
+	255. istotne jedynie po w³±czeniu ,,receive_images''.
+
 ioctld_enable
 	typ: liczba
 	domy¶lna warto¶æ: 1
@@ -681,6 +688,15 @@ reason_limit
 	protokó³ limicie. je¶li opcja jest aktywna i d³ugo¶æ opisu
 	przekracza t± d³ugo¶æ, komendy /away, /back i /invisible nie
 	zostan± wykonane.
+
+receive_images
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	okre¶la, czy chcemy otrzymywaæ obrazki. w³±czenie tej opcji przy 
+	wy³±czonej opcji ,,ignore_empty_msg'' mo¿e ujawniæ nas dla u¿ytkowników
+	sprawdzaj±cych, czy jeste¶my niewidoczni. otrzymywane obrazki bêd±
+	zapisywane w katalogu okre¶lonym zmienn± dcc_dir.
 
 save_question
 	typ: bool

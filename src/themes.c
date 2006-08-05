@@ -1440,7 +1440,10 @@ void theme_init()
 	format_add("http_failed_reading", "Serwer zerwa³ po³±czenie", 1);
 	format_add("http_failed_writing", "Serwer zerwa³ po³±czenie", 1);
 	format_add("http_failed_memory", "Brak pamiêci", 1);
-	
+
+	/* obrazki */
+	format_add("image_saved", "%> Zapisano obrazek od %T%1%n do pliku %T%2%n\n", 1);
+	format_add("image_not_saved", "%! B³±d zapisywania obrazka od %T%1%n do pliku %T%2%n: %3!", 1);
 
 #ifdef HAVE_OPENSSL
 	/* szyfrowanie */

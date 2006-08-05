@@ -246,6 +246,7 @@ void variable_init()
 #endif
 	variable_add("ignore_unknown_sender", "iu", VAR_BOOL, 1, &config_ignore_unknown_sender, NULL, NULL, NULL);
 	variable_add("ignore_empty_msg", "im", VAR_BOOL, 1, &config_ignore_empty_msg, NULL, NULL, NULL);
+	variable_add("image_size", "iS", VAR_INT, 1, &config_image_size, NULL, NULL, NULL);
 	variable_add("keep_reason", "kr", VAR_INT, 1, &config_keep_reason, NULL, NULL, NULL);
 	variable_add("last", "la", VAR_MAP, 1, &config_last, NULL, variable_map(4, 0, 0, "none", 1, 2, "all", 2, 1, "separate", 4, 0, "sent"), NULL);
 	variable_add("last_size", "ls", VAR_INT, 1, &config_last_size, NULL, NULL, NULL);
@@ -262,6 +263,7 @@ void variable_init()
 	variable_add("proxy_forwarding", "pf", VAR_STR, 1, &config_proxy_forwarding, NULL, NULL, NULL);
 	variable_add("random_reason", "rr", VAR_MAP, 1, &config_random_reason, NULL, variable_map(5, 0, 0, "none", 1, 0, "away", 2, 0, "notavail", 4, 0, "avail", 8, 0, "invisible"), NULL);
 	variable_add("reason_limit", "rl", VAR_BOOL, 1, &config_reason_limit, NULL, NULL, NULL);
+	variable_add("receive_images", "ra", VAR_BOOL, 1, &config_receive_images, NULL, NULL, NULL);
 	variable_add("quit_reason", "qr", VAR_STR, 1, &config_quit_reason, changed_xxx_reason, NULL, NULL);
 	variable_add("query_commands", "qc", VAR_BOOL, 1, &config_query_commands, NULL, NULL, NULL);
 	variable_add("save_password", "sp", VAR_BOOL, 1, &config_save_password, NULL, NULL, NULL);

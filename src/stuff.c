@@ -167,6 +167,8 @@ char *config_tab_command = NULL;
 int ioctld_sock = -1;
 int config_ctrld_quits = 1;
 int config_save_password = 1;
+int config_receive_images = 0;
+int config_image_size = 255;
 int config_save_question = 1;
 char *config_datestamp = NULL;
 char *config_timestamp = NULL;
@@ -1355,6 +1357,7 @@ void ekg_connect()
 	p.status = config_status;
 	p.status_descr = config_reason;
 	p.async = 1;
+	p.image_size = config_image_size < 255 ? config_image_size : 255;
 #ifdef HAVE_VOIP
 	p.has_audio = 1;
 #endif
