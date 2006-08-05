@@ -582,7 +582,7 @@ void ekg_wait_for_key()
 			
 					if (GG_S_I(u->status)) {
 						int status = (GG_S_D(u->status)) ? GG_STATUS_NOT_AVAIL_DESCR : GG_STATUS_NOT_AVAIL;
-						iso_to_cp((unsigned char *) u->descr);
+						iso_to_cp(u->descr);
 						handle_common(u->uin, status, u->descr, time(NULL), u->ip.s_addr, u->port, u->protocol, u->image_size);
 
 						if (tmp) {
