@@ -365,7 +365,7 @@ display_color_map
 	musi zawieraæ 8 znaków zgodnych ze spisem z pliku docs/themes.txt.
 	ka¿dy z nich okre¶la kolejno kolor dla:
 	- brak atrybutów,
-	- pogrubony,
+	- pogrubiony,
 	- pochy³y,
 	- pochy³y+pogrubiony,
 	- podkre¶lony,
@@ -399,7 +399,7 @@ display_notify
 	tylko zmiany z niedostêpnego na dostêpny i na odwrót. dodanie
 	4 sprawia, ¿e podczas wy¶wietlania brane s± pod uwagê tak¿e
 	osoby z w³±czonym trybem ,,tylko dla znajomych'', które maj±
-	nas na li¶cie kontaktów, a my ich nie mamy. w interfejse ncurses
+	nas na li¶cie kontaktów, a my ich nie mamy. w interfejsie ncurses
 	wiêkszy priorytet ma zmienna ,,contacts'', która przy warto¶ci
 	2 ukrywa zmiany stanu. wszystkie dostêpne warto¶ci to 0, 1, 2, 5, 6.
 
@@ -493,7 +493,7 @@ ignore_empty_msg
 	domy¶lna warto¶æ: 0
 
 	okre¶la, czy bêd± ignorowane puste wiadomo¶ci, zawieraj±ce jedynie
-	obrazek, co mo¿e mieæ miejsce, jesli kto¶ sprawdza, czy jeste¶my
+	obrazek, co mo¿e mieæ miejsce, je¶li kto¶ sprawdza, czy jeste¶my
 	niewidoczni.
 
 image_size
@@ -633,7 +633,7 @@ mouse
 
 	ustala, czy ma byæ w³±czona obs³uga myszy w ekg. dzia³a tylko z interfejsem 
 	ncurses. zmiana warto¶ci tej zmiennej mo¿e te¿ (ale nie musi) zmieniaæ 
-	widoczno¶æ lub kszta³t kursora myszy. wiecej informacji na temat obslugi 
+	widoczno¶æ lub kszta³t kursora myszy. wiêcej informacji na temat obs³ugi 
 	myszy w ekg znajduje sie w pliku docs/mysz.txt oraz pod adresem 
 	<http://ekg.chmurka.net/docs/mysz.txt>.
 
@@ -874,7 +874,7 @@ statusbar_fgcolor
 	domy¶lna warto¶æ: 7
 
 	okre¶la kolor tekstu w pasku stanu. z regu³y jest nadpisany
-	przez themik, wiec ta zmienna jest malo przydatna.
+	przez themik, wiêc ta zmienna jest ma³o przydatna.
 
 statusbar_bgcolor
 	typ: liczba

@@ -74,7 +74,7 @@ U¯YCIE
     Twoim przyjacielem. Je¶li dana komenda ma ró¿ne opcje, pomaga
     ,,help <komenda>''. By wys³aæ kilkulinijkow± wiadomo¶æ w interfejsie
     ncurses, wci¶nij Ctrl-Enter. W readline zamiast tre¶ci wpisz ,,\''
-    (backslash) i zakoñcz lini± z sam± kropk± (szczegó³y poni¿ej, w rodziale
+    (backslash) i zakoñcz lini± z sam± kropk± (szczegó³y poni¿ej, w rozdziale
     ,,KLAWIATURA'').
 
     Program mo¿na skonfigurowaæ pod wieloma wzglêdami, a wszystkie mo¿liwe
