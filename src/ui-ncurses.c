@@ -2836,7 +2836,7 @@ static void mouse_bevent_statusbar (struct mouse_coords_t *coords, mmask_t bstat
 	 * siê zdarzenie a window zawiera numer okna dla area == ACT */
 
 	if (area == TIME && bstate == BUTTON1_CLICKED)
-		cmd = xstrdup("/exec date");
+		cmd = xstrdup("/exec ^date");
 	else if (area == UIN) {
 		if (bstate == BUTTON1_CLICKED)
 			cmd = xstrdup("/status");
