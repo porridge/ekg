@@ -4156,6 +4156,9 @@ void window_kill(struct window *w, int quiet)
 	}
 
 cleanup:
+	if (w == window_current)
+		window_current = NULL;
+
 	if (w->backlog) {
 		int i;
 

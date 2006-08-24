@@ -2751,13 +2751,12 @@ void handle_image_reply(struct gg_event *e)
 
 			fname = xstrdup(e->event.image_reply.filename);
 			fix_filename(fname);
+			cp_to_iso(fname);
 
 			if (config_dcc_dir)
 				path = saprintf("%s/%s", config_dcc_dir, fname);
 			else
 				path = xstrdup(fname);
-
-			cp_to_iso(path);
 
 			tmp = unique_name(path);
 			if (!tmp) {
