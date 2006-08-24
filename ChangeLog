@@ -4,6 +4,48 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2006-08-09
+
+- poprawienie literówek w dokumentacji (embe)
+
+// 2006-08-07
+
+- poprawki obs³ugi b³êdów skryptów Pythona (embe)
+- poprawka konwersji pliterek w ¶cie¿kach do obrazków (embe)
+- poprawienie u¿ycia window_current po free() (embe)
+
+// 2006-08-05
+
+- wyodrêbnienie dcc_backups i zastosowanie do obrazków (gophi)
+- dodanie wywo³ywania zdarzenia dccfinish do obrazków (gophi)
+- dopisanie buga zwi±zanego z dcc_backups do TODO (gophi)
+
+// 2006-08-03
+
+- poprawienie zapisywania obrazkow (eMBe/g)
+- poprawienie signed/unsigned (a przez to psucia polskich znaków) 
+  zwi±zanego z dcc i obrazkami (eMBe/g)
+- wyodrêbnienie fix_filename() (gophi)
+- dodanie zmiennej image_size (Kosma/g)
+- przystosowanie Makefile.in do autoconfa 2.60 (eMBe/g)
+
+// 2006-08-02
+
+- zapisywanie obrazków (Socek,Kosma/g)
+- dopisanie do FAQ kilku punktów (nvm/g)
+
+// 2006-07-29
+
+- poprawienie buga /query numerek; /chat $ wiadomo¶æ (eMBe/g)
+
+// 2006-07-23
+
+- poprawienie wy¶wietlania kolorów (Kosma,eMBe/g)
+
+// 2006-07-16
+
+- dodanie maski nomsg do /set make_window (Kosma/g)
+
 // 2006-06-30
 
 - libgadu: poprawienie kompilacji na gcc 4.1 (AstralStorm/g)

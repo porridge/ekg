@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <setjmp.h>
+#include <fcntl.h>
 #include <unistd.h>
 
 #include "commands.h"
@@ -124,6 +125,9 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 	struct tm *tm;
 	int now_days;
 	struct conference *c = NULL;
+
+	if ((config_make_window & 4) && (chat == 0))
+		separate = 0;
 
 	/* tworzymy mapê formatowanego tekstu. dla ka¿dego znaku wiadomo¶ci
 	 * zapisujemy jeden znak koloru z docs/themes.txt lub \0 je¶li nie
@@ -446,6 +450,7 @@ void handle_msg(struct gg_event *e)
 {
 	struct userlist *u = userlist_find(e->event.msg.sender, NULL);
 	int chat = ((e->event.msg.msgclass & 0x0f) == GG_CLASS_CHAT), secure = 0, hide = 0;
+	list_t image, images = NULL;
 
 	if (!e->event.msg.message)
 		return;
@@ -504,6 +509,8 @@ void handle_msg(struct gg_event *e)
 				struct gg_msg_richtext_image *m = (void*) &p[i];
 
 				gg_debug(GG_DEBUG_MISC, "// ekg: inline image: sender=%d, size=%d, crc32=%.8x\n", e->event.msg.sender, gg_fix32(m->size), gg_fix32(m->crc32));
+				if (config_receive_images)
+					list_add(&images, m, sizeof(*m));
 
 				imageno++;
 
@@ -531,6 +538,15 @@ void handle_msg(struct gg_event *e)
 			gg_debug(GG_DEBUG_MISC, "// ekg: simlite decryption failed: %s\n", sim_strerror(sim_errno));
 	}
 #endif
+
+	for (image = images; image; image = image->next) {
+		struct gg_msg_richtext_image *i = image->data;
+		gg_debug(GG_DEBUG_MISC, "// ekg: requesting image size=%d crc32=%.8x from %d\n", 
+			gg_fix32(i->size), gg_fix32(i->crc32), e->event.msg.sender);
+		gg_image_request(sess, e->event.msg.sender, i->size, i->crc32);
+	}
+
+	list_destroy(images, 1);
 
 	cp_to_iso(e->event.msg.message);
 	
@@ -2135,6 +2151,27 @@ void handle_disconnect(struct gg_event *e)
 }
 
 /*
+ * fix_filename()
+ *
+ * poprawia nazwê pliku do zapisania na dysku, usuwaj±c potencjalnie 
+ * niebezpieczne znaki - elementy ¶cie¿ki oraz znaki o kodach < 32. 
+ * u¿ywane przez obs³ugê dcc oraz obrazków.
+ *
+ * - name - nazwa
+ */
+static void fix_filename (unsigned char *name)
+{
+	unsigned char *p;
+
+	for (p = name; *p; p++)
+		if (*p < 32 || *p == '\\' || *p == '/')
+			*p = '_';
+
+	if (name[0] == '.')
+		name[0] = '_';
+}
+
+/*
  * find_transfer()
  *
  * znajduje strukturê ,,transfer'' dotycz±c± danego po³±czenia.
@@ -2190,7 +2227,6 @@ void handle_dcc(struct gg_dcc *d)
 	struct gg_event *e;
 	struct transfer *t, tt;
 	list_t l;
-	char *p;
 
 	if (ignored_check(d->peer_uin) & IGNORE_DCC) {
 		remove_transfer(d);
@@ -2354,12 +2390,7 @@ void handle_dcc(struct gg_dcc *d)
 				t = list_add(&transfers, &tt, sizeof(tt));
 			}
 
-			for (p = d->file_info.filename; *p; p++)
-				if (*p < 32 || *p == '\\' || *p == '/')
-					*p = '_';
-
-			if (d->file_info.filename[0] == '.')
-				d->file_info.filename[0] = '_';
+			fix_filename(d->file_info.filename);
 
 			t->type = GG_SESSION_DCC_GET;
 			t->filename = xstrdup(d->file_info.filename);
@@ -2710,8 +2741,71 @@ void handle_image_reply(struct gg_event *e)
 
 	gg_debug(GG_DEBUG_MISC, "// ekg: image_reply: sender=%d, filename=\"%s\", size=%d, crc32=%.8x\n", e->event.image_reply.sender, ((e->event.image_reply.filename) ? e->event.image_reply.filename : "NULL"), e->event.image_reply.size, e->event.image_reply.crc32);
 
-	if (e->event.image_reply.size != 0)
+	if (e->event.image_reply.size != 0) {
+		/* to nie jest spy */
+
+		if (config_receive_images) {
+			unsigned char *fname, *path, *tmp;
+			int fd;
+			ssize_t rs;
+
+			fname = xstrdup(e->event.image_reply.filename);
+			fix_filename(fname);
+			cp_to_iso(fname);
+
+			if (config_dcc_dir)
+				path = saprintf("%s/%s", config_dcc_dir, fname);
+			else
+				path = xstrdup(fname);
+
+			tmp = unique_name(path);
+			if (!tmp) {
+				print("dcc_get_cant_overwrite", path);
+				goto err;
+			} else if (tmp != path) {
+				print("dcc_get_backup_made", path, tmp);
+				xfree(path);
+				path = tmp;
+			}
+
+			gg_debug(GG_DEBUG_MISC, "// ekg: trying to save image: %s\n", path);
+
+			fd = open(path, O_WRONLY | O_CREAT, 0600);
+			if (fd == -1)
+				goto err;
+
+			rs = write(fd, e->event.image_reply.image, e->event.image_reply.size);
+			if (rs == -1) {
+				int xerrno = errno;
+				close(fd);
+				unlink(path);
+				errno = xerrno;
+				goto err;
+			} else if (rs != e->event.image_reply.size) {
+				close(fd);
+				unlink(path);
+				errno = ENOSPC;
+				goto err;
+			}
+
+			close(fd);
+
+			print("image_saved", format_user(e->event.image_reply.sender), path);
+			xfree(path);
+
+			event_check(EVENT_DCCFINISH, e->event.image_reply.sender, fname);
+			xfree(fname);
+			return;
+
+err:
+			print("image_not_saved", format_user(e->event.image_reply.sender), path, strerror(errno));
+			xfree(path);
+			xfree(fname);
+			return;
+		}
+
 		return;
+	}
 
 	u = userlist_find(e->event.image_reply.sender, NULL);
 
@@ -2758,7 +2852,6 @@ void handle_image_reply(struct gg_event *e)
 			iso_to_cp(u->descr);
 			handle_common(u->uin, status, u->descr, time(NULL), u->ip.s_addr, u->port, u->protocol, u->image_size);
 		}
-
 	} else {
 		if (u)
 			print("user_is_connected", format_user(e->event.image_reply.sender), (u->first_name) ? u->first_name : u->display); 

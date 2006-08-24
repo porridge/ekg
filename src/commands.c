@@ -3080,7 +3080,7 @@ COMMAND(cmd_dcc)
 
 	if (!strncasecmp(params[0], "g", 1) || !strncasecmp(params[0], "re", 2)) {		/* get */
 		struct transfer *t = NULL;
-		char *path;
+		unsigned char *path, *tmp;
 		
 		for (l = transfers; l; l = l->next) {
 			struct transfer *tt = l->data;
@@ -3137,35 +3137,17 @@ COMMAND(cmd_dcc)
 		else
 		    	path = xstrdup(t->filename);
 
-		if (config_dcc_backups) {
-			struct stat st;
-
-			if (!stat(path, &st)) {
-				int num;
-				char *newpath = NULL;	/* ¿eby nie by³o warninga */
-
-				for (num = 1; num < 1000; num++) {
-					newpath = saprintf("%s.%d", path, num);
-
-					if (stat(newpath, &st) == -1)
-						break;
-
-					xfree(newpath);
-				}
-
-				if (num == 1000) {
-					printq("dcc_get_cant_overwrite", path);
-					gg_free_dcc(t->dcc);
-					list_remove(&transfers, t, 1);
-					xfree(path);
-
-					return -1;
-				} else {
-					printq("dcc_get_backup_made", path, newpath);
-					xfree(path);
-					path = newpath;
-				}
-			}
+		tmp = unique_name(path);
+		if (!tmp) {
+			printq("dcc_get_cant_overwrite", path);
+			gg_free_dcc(t->dcc);
+			list_remove(&transfers, t, 1);
+			xfree(path);
+			return -1;
+		} else if (tmp != path) {
+			printq("dcc_get_backup_made", path, tmp);
+			xfree(path);
+			path = tmp;
 		}
 
 		if (params[0][0] == 'r') {

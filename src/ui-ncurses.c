@@ -893,7 +893,7 @@ static void window_clear(struct window *w, int full)
 static struct window *window_find(const char *target)
 {
 	list_t l;
-	int current = ((target) ? !strcasecmp(target, "__current") : 0);
+	int current = ((target) ? !strcasecmp(target, "$") || !strcasecmp(target, "__current") : 0);
 	int debug = ((target) ? !strcasecmp(target, "__debug") : 0);
 	int status = ((target) ? !strcasecmp(target, "__status") : 0);
 	struct userlist *u = NULL;
@@ -1233,7 +1233,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	string_t speech = NULL;
 	time_t cur_time;
 
-	switch (config_make_window) {
+	switch (config_make_window & 3) {
 		case 1:
 			if ((w = window_find(target)))
 				goto crap;
@@ -4156,6 +4156,9 @@ void window_kill(struct window *w, int quiet)
 	}
 
 cleanup:
+	if (w == window_current)
+		window_current = NULL;
+
 	if (w->backlog) {
 		int i;
 
@@ -4728,7 +4731,7 @@ static int ui_ncurses_event(const char *event, ...)
 					goto cleanup;
 				}
 
-				if (config_make_window == 1) {
+				if ((config_make_window & 3) == 1) {
 					list_t l;
 
 					for (l = windows; l; l = l->next) {
@@ -4747,7 +4750,7 @@ static int ui_ncurses_event(const char *event, ...)
 					window_switch(w->id);
 				}
 
-				if (config_make_window == 2) {
+				if ((config_make_window & 3) == 2) {
 					w = window_new(param, 0);
 					window_switch(w->id);
 				}

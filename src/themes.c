@@ -454,12 +454,12 @@ fstring_t reformat_string(const char *str)
 						attr |= 64;
 
 					if (tmp >= 30 && tmp <= 37) {
-						attr &= 127;
+						attr &= 120;
 						attr |= (tmp - 30);
 					}
 
 					if (tmp >= 40 && tmp <= 47) {
-						attr &= 127;
+						attr &= 71;
 						attr |= (tmp - 40) << 3;
 					}
 
@@ -1440,7 +1440,10 @@ void theme_init()
 	format_add("http_failed_reading", "Serwer zerwa³ po³±czenie", 1);
 	format_add("http_failed_writing", "Serwer zerwa³ po³±czenie", 1);
 	format_add("http_failed_memory", "Brak pamiêci", 1);
-	
+
+	/* obrazki */
+	format_add("image_saved", "%> Zapisano obrazek od %T%1%n do pliku %T%2%n\n", 1);
+	format_add("image_not_saved", "%! B³±d zapisywania obrazka od %T%1%n do pliku %T%2%n: %3!", 1);
 
 #ifdef HAVE_OPENSSL
 	/* szyfrowanie */

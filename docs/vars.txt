@@ -365,7 +365,7 @@ display_color_map
 	musi zawieraæ 8 znaków zgodnych ze spisem z pliku docs/themes.txt.
 	ka¿dy z nich okre¶la kolejno kolor dla:
 	- brak atrybutów,
-	- pogrubony,
+	- pogrubiony,
 	- pochy³y,
 	- pochy³y+pogrubiony,
 	- podkre¶lony,
@@ -399,7 +399,7 @@ display_notify
 	tylko zmiany z niedostêpnego na dostêpny i na odwrót. dodanie
 	4 sprawia, ¿e podczas wy¶wietlania brane s± pod uwagê tak¿e
 	osoby z w³±czonym trybem ,,tylko dla znajomych'', które maj±
-	nas na li¶cie kontaktów, a my ich nie mamy. w interfejse ncurses
+	nas na li¶cie kontaktów, a my ich nie mamy. w interfejsie ncurses
 	wiêkszy priorytet ma zmienna ,,contacts'', która przy warto¶ci
 	2 ukrywa zmiany stanu. wszystkie dostêpne warto¶ci to 0, 1, 2, 5, 6.
 
@@ -493,8 +493,15 @@ ignore_empty_msg
 	domy¶lna warto¶æ: 0
 
 	okre¶la, czy bêd± ignorowane puste wiadomo¶ci, zawieraj±ce jedynie
-	obrazek, co mo¿e mieæ miejsce, jesli kto¶ sprawdza, czy jeste¶my
+	obrazek, co mo¿e mieæ miejsce, je¶li kto¶ sprawdza, czy jeste¶my
 	niewidoczni.
+
+image_size
+	typ: int
+	domy¶lna warto¶æ: 255
+
+	maksymalny rozmiar akceptowanych przez nas obrazków w KiB. maksymalnie 
+	255. istotne jedynie po w³±czeniu ,,receive_images''.
 
 ioctld_enable
 	typ: liczba
@@ -607,7 +614,9 @@ make_window
 	okre¶la, czy bêd± tworzone nowe okienka dla nowych rozmów. dla 1 bêdzie
 	wykorzystane pierwsze wolne okno (na którym z nikim jeszcze siê nie
 	rozmawia), lub tworzone nowe w przypadku braku wolnych. dla 2
-	bezwarunkowo utworzone zostanie nowe okno.
+	bezwarunkowo utworzone zostanie nowe okno. je¶li zostanie dodana 
+	warto¶æ 4, to wiadomo¶ci wysy³ane przez /msg bêd± widoczne w oknie 
+	stanu.
 
 mesg
 	typ: liczba
@@ -679,6 +688,15 @@ reason_limit
 	protokó³ limicie. je¶li opcja jest aktywna i d³ugo¶æ opisu
 	przekracza t± d³ugo¶æ, komendy /away, /back i /invisible nie
 	zostan± wykonane.
+
+receive_images
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	okre¶la, czy chcemy otrzymywaæ obrazki. w³±czenie tej opcji przy 
+	wy³±czonej opcji ,,ignore_empty_msg'' mo¿e ujawniæ nas dla u¿ytkowników
+	sprawdzaj±cych, czy jeste¶my niewidoczni. otrzymywane obrazki bêd±
+	zapisywane w katalogu okre¶lonym zmienn± dcc_dir.
 
 save_question
 	typ: bool
@@ -846,7 +864,7 @@ statusbar_fgcolor
 	domy¶lna warto¶æ: 7
 
 	okre¶la kolor tekstu w pasku stanu. z regu³y jest nadpisany
-	przez themik, wiec ta zmienna jest malo przydatna.
+	przez themik, wiêc ta zmienna jest ma³o przydatna.
 
 statusbar_bgcolor
 	typ: liczba

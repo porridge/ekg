@@ -167,6 +167,8 @@ char *config_tab_command = NULL;
 int ioctld_sock = -1;
 int config_ctrld_quits = 1;
 int config_save_password = 1;
+int config_receive_images = 0;
+int config_image_size = 255;
 int config_save_question = 1;
 char *config_datestamp = NULL;
 char *config_timestamp = NULL;
@@ -1355,6 +1357,7 @@ void ekg_connect()
 	p.status = config_status;
 	p.status_descr = config_reason;
 	p.async = 1;
+	p.image_size = config_image_size < 255 ? config_image_size : 255;
 #ifdef HAVE_VOIP
 	p.has_audio = 1;
 #endif
@@ -3347,3 +3350,38 @@ time_t parsetimestr(const char *p)
 	else
 		return mktime(lt);
 }
+
+/*
+ * unique_name()
+ *
+ * je¶li jest w³±czone config_dcc_backups, to tworzy unikaln± ¶cie¿kê 
+ * do pliku, dodaj±c sufiksy od 1 do 1000.
+ *
+ * - path: ¶cie¿ka do zmiany
+ *
+ * zwraca:
+ *  - NULL: nie uda³o siê utworzyæ backupu
+ *  - path: backup nie by³ potrzebny lub config_dcc_backups == 0
+ *  - pozosta³e warto¶ci: wska¼nik do nowej ¶cie¿ki
+ */
+unsigned char *unique_name (unsigned char *path)
+{
+	struct stat st;
+	int num;
+	unsigned char *newpath = NULL;	/* ¿eby nie by³o warninga */
+
+	if (!config_dcc_backups || stat((char *) path, &st))
+		return path;
+
+	for (num = 1; num < 1000; num++) {
+		newpath = (unsigned char *) saprintf("%s.%d", path, num);
+
+		if (stat((char *) newpath, &st) == -1)
+			break;
+
+		xfree(newpath);
+	}
+
+	return (num == 1000) ? NULL : newpath;
+}
+
