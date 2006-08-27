@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2006-08-27
+
+- dodanie fsync() i sprawdzanie close() przy zapisywaniu obrazka (porridge)
+
 // 2006-08-11
 
 - stan wykonania poleceñ pow³oki wywo³ywanych przez mysz niekoniecznie 

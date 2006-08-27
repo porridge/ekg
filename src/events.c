@@ -2788,7 +2788,20 @@ void handle_image_reply(struct gg_event *e)
 				goto err;
 			}
 
-			close(fd);
+			if (fsync(fd) == -1) {
+				int xerrno = errno;
+				close(fd);
+				unlink(path);
+				errno = xerrno;
+				goto err;
+			}
+
+			if (close(fd) == -1) {
+				int xerrno = errno;
+				unlink(path);
+				errno = xerrno;
+				goto err;
+			}
 
 			print("image_saved", format_user(e->event.image_reply.sender), path);
 			xfree(path);
