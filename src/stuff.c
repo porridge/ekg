@@ -1405,9 +1405,9 @@ void ekg_connect()
 
 		xfree(sserver);
 
+skip_server:
 		array_free(servers);
 	}
-skip_server:
 
 	if (config_proxy_forwarding) {
 		char *fwd = xstrdup(config_proxy_forwarding), *tmp = strchr(fwd, ':');
