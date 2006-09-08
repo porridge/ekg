@@ -77,7 +77,7 @@ struct event_label {
 	char *name;
 };
 
-#define EVENT_LABELS_COUNT 21	/* uaktualniæ ! */
+#define EVENT_LABELS_COUNT 22	/* uaktualniæ ! */
 struct event_label event_labels[EVENT_LABELS_COUNT + 2];
 
 struct process {
