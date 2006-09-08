@@ -6325,6 +6325,7 @@ void command_init()
 	  "  - delivered, queued - wiadomo¶æ dostarczona lub zakolejkowana na serwerze\n"
 	  "  - dcc - kto¶ przysy³a nam plik\n"
 	  "  - dccfinish - odebrano plik\n"
+	  "  - image - odebrano obrazek\n"
 	  "  - sigusr1, sigusr2 - otrzymanie przez ekg danego sygna³u\n"
 	  "  - newmail - otrzymanie nowej wiadomo¶ci e-mail\n"
 	  "  - connected - uda³o siê po³±czyæ z serwerem\n"

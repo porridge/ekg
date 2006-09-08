@@ -248,6 +248,7 @@ struct event_label event_labels[EVENT_LABELS_COUNT + 2] = {
 	{ EVENT_CONNECTED, "connected" },
 	{ EVENT_DISCONNECTED, "disconnected" },
 	{ EVENT_CONNECTIONLOST, "connectionlost" },
+	{ EVENT_IMAGE, "image" },
 
 	{ INACTIVE_EVENT, NULL },
 	{ 0, NULL }

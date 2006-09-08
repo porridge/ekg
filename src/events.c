@@ -2806,7 +2806,7 @@ void handle_image_reply(struct gg_event *e)
 			print("image_saved", format_user(e->event.image_reply.sender), path);
 			xfree(path);
 
-			event_check(EVENT_DCCFINISH, e->event.image_reply.sender, fname);
+			event_check(EVENT_IMAGE, e->event.image_reply.sender, fname);
 			xfree(fname);
 			return;
 
