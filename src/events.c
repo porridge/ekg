@@ -311,7 +311,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 		format = format_first;
 
 		/* zmniejsz d³ugo¶æ pierwszej linii o d³ugo¶æ prefiksu z rozmówc±, timestampem itd. */
-		tmp = format_string(format_find(format), "", format_user(e->event.msg.sender), timestr, cname);
+		tmp = format_string(format_find(format), "", format_user(e->event.msg.sender), timestr, cname, (secure) ? secure_label : "");
 		mem_width = width + strlen(tmp);
 		for (p = tmp; *p && *p != '\n'; p++) {
 			if (*p == 27) {
@@ -416,7 +416,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 			if (config_emoticons)
 				emotted = emoticon_expand(formatted);
 
-			print_window(target, separate, format, (emotted) ? emotted : formatted , format_user(e->event.msg.sender), timestr, cname);
+			print_window(target, separate, format, (emotted) ? emotted : formatted, format_user(e->event.msg.sender), timestr, cname, (secure) ? secure_label : "");
 
 			width = next_width;
 			format = next_format;
