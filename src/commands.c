@@ -3133,9 +3133,9 @@ COMMAND(cmd_dcc)
 			t->start = 0;
 
 		if (config_dcc_dir) 
-		    	path = saprintf("%s/%s", config_dcc_dir, t->filename);
+		    	path = (unsigned char *) saprintf("%s/%s", config_dcc_dir, t->filename);
 		else
-		    	path = xstrdup(t->filename);
+		    	path = (unsigned char *) xstrdup(t->filename);
 
 		tmp = unique_name(path);
 		if (!tmp) {
@@ -3151,10 +3151,10 @@ COMMAND(cmd_dcc)
 		}
 
 		if (params[0][0] == 'r') {
-			t->dcc->file_fd = open(path, O_WRONLY);
+			t->dcc->file_fd = open((char *) path, O_WRONLY);
 			t->dcc->offset = lseek(t->dcc->file_fd, 0, SEEK_END);
 		} else
-			t->dcc->file_fd = open(path, O_WRONLY | O_CREAT, 0600);
+			t->dcc->file_fd = open((char *) path, O_WRONLY | O_CREAT, 0600);
 
 		if (t->dcc->file_fd == -1) {
 			printq("dcc_get_cant_create", path);
