@@ -3340,6 +3340,7 @@ void events_generator(const char *text, int len)
 	for (i = 0; event_labels[i].name; i++)
 		if (!strncasecmp(tmp, event_labels[i].name, len))
 			array_add(&completions, ((tmp == text) ? xstrdup(event_labels[i].name) : saprintf("%s%s", pre, event_labels[i].name)));
+	xfree(pre);
 }
 
 void ignorelevels_generator(const char *text, int len)
@@ -3363,6 +3364,7 @@ void ignorelevels_generator(const char *text, int len)
 	for (i = 0; ignore_labels[i].name; i++)
 		if (!strncasecmp(tmp, ignore_labels[i].name, len))
 			array_add(&completions, ((tmp == text) ? xstrdup(ignore_labels[i].name) : saprintf("%s%s", pre, ignore_labels[i].name)));
+	xfree(pre);
 }
 
 void unknown_uin_generator(const char *text, int len)
