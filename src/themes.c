@@ -1047,6 +1047,8 @@ void theme_init()
 	format_add("ack_delivered", "%> Wiadomo¶æ do %1 zosta³a dostarczona\n", 1);
 	format_add("ack_filtered", "%! %|Wiadomo¶æ do %1 najprawdopodobniej nie zosta³a dostarczona, poniewa¿ dana osoba jest niedostêpna, a serwer twierdzi, ¿e dorêczy³ wiadomo¶æ. Sytuacja taka ma miejsce, gdy wiadomo¶æ zosta³a odrzucona przez filtry serwera (np. zawiera adres strony WWW)\n", 1);
 	format_add("ack_filtered_short", "%! %|Wiadomo¶æ do %1 najprawdopodobniej nie zosta³a dostarczona\n", 1);
+	format_add("ack_mboxfull", "%! Wiadomo¶æ do %1 nie zosta³a dostarczona, u¿ytkownik ma pe³n± skrzynkê\n", 1);
+	format_add("ack_not_delivered", "%! Wiadomo¶æ do %1 nie zosta³a dostarczona\n", 1);
 	format_add("message_too_long", "%! Wiadomo¶æ jest zbyt d³uga i zosta³a skrócona\n", 1);
 
 	/* ludzie zmieniaj± stan */

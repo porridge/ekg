@@ -724,7 +724,6 @@ void handle_msg(struct gg_event *e)
 void handle_ack(struct gg_event *e)
 {
 	struct userlist *u = userlist_find(e->event.ack.recipient, NULL);
-	int queued = (e->event.ack.status == GG_ACK_QUEUED);
 	const char *tmp, *target = ((u && u->display) ? u->display : itoa(e->event.ack.recipient));
 	static int show_short_ack_filtered = 0;
 
@@ -733,31 +732,53 @@ void handle_ack(struct gg_event *e)
 
 	msg_queue_remove(e->event.ack.seq);
 
-	if (!(ignored_check(e->event.ack.recipient) & IGNORE_EVENTS))
-		event_check((queued) ? EVENT_QUEUED : EVENT_DELIVERED, e->event.ack.recipient, NULL);
+	if (!(ignored_check(e->event.ack.recipient) & IGNORE_EVENTS)) {
+		int event;
 
-	if (u && !queued && GG_S_NA(u->status) && !(ignored_check(u->uin) & IGNORE_STATUS)) {
-		char *ack_filtered;
-		if (show_short_ack_filtered) {
-			ack_filtered = "ack_filtered_short";
-		} else {
-			ack_filtered = "ack_filtered";
-			show_short_ack_filtered = 1;
-		}
-		print_window(target, 0, ack_filtered, format_user(e->event.ack.recipient));
-		return;
+		if (e->event.ack.status == GG_ACK_BLOCKED)
+			event = EVENT_FILTERED;
+		else if (e->event.ack.status == GG_ACK_DELIVERED)
+			event = EVENT_DELIVERED;
+		else if (e->event.ack.status == GG_ACK_QUEUED)
+			event = EVENT_QUEUED;
+		else if (e->event.ack.status == GG_ACK_MBOXFULL)
+			event = EVENT_MBOXFULL;
+		else
+			event = EVENT_NOT_DELIVERED;
+
+		event_check(event, e->event.ack.recipient, NULL);
 	}
+
+	if (u && (e->event.ack.status == GG_ACK_DELIVERED) && GG_S_NA(u->status) && !(ignored_check(u->uin) & IGNORE_STATUS))
+		e->event.ack.status = GG_ACK_BLOCKED;
 
 	if (!config_display_ack)
 		return;
 
-	if (config_display_ack == 2 && queued)
+	/* xxx: dopisaæ EVENT_MBOXFULL i EVENT_NOT_DELIVERED do config_display_ack */
+
+	if (config_display_ack == 2 && e->event.ack.status == GG_ACK_QUEUED)
 		return;
 
-	if (config_display_ack == 3 && !queued)
+	if (config_display_ack == 3 && e->event.ack.status == GG_ACK_DELIVERED)
 		return;
 
-	tmp = queued ? "ack_queued" : "ack_delivered";
+	if (e->event.ack.status == GG_ACK_BLOCKED) {
+		if (show_short_ack_filtered)
+			tmp = "ack_filtered_short";
+		else {
+			tmp = "ack_filtered";
+			show_short_ack_filtered = 1;
+		}
+	} else if (e->event.ack.status == GG_ACK_DELIVERED)
+		tmp = "ack_delivered";
+	else if (e->event.ack.status == GG_ACK_QUEUED)
+		tmp = "ack_queued";
+	else if (e->event.ack.status == GG_ACK_MBOXFULL)
+		tmp = "ack_mboxfull";
+	else
+		tmp = "ack_not_delivered";
+
 	print_window(target, 0, tmp, format_user(e->event.ack.recipient));
 }
 
