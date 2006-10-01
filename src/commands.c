@@ -1838,6 +1838,8 @@ COMMAND(cmd_list)
 				ver = "7.0 (build 20 lub nowszy)";
 			if (v == 0x27)
 				ver = "7.0 (build 22 lub nowszy)";
+			if (v == 0x28)
+				ver = "7.5.0 (build 2201 lub nowszy)";
 
 			if (ver)
 				printq("user_info_version", ver);
