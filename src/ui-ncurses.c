@@ -4353,7 +4353,7 @@ static void binding_quoted_insert(const char *arg)
 
 	ch = ekg_getch('V' - 64);	/* XXX */
 
-	if (ch == -1)
+	if (ch < 0)
 		return;
 
 	if (strlen(line) >= LINE_MAXLEN - 1)
@@ -4705,7 +4705,7 @@ static void ui_ncurses_loop()
 			continue;
 
 		if (ch == 27) {
-			if ((ch = ekg_getch(27)) == -2)
+			if ((ch = ekg_getch(27)) < 0)
 				continue;
 
 			b = binding_map_meta[ch];
