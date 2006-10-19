@@ -539,15 +539,6 @@ void handle_msg(struct gg_event *e)
 	}
 #endif
 
-	for (image = images; image; image = image->next) {
-		struct gg_msg_richtext_image *i = image->data;
-		gg_debug(GG_DEBUG_MISC, "// ekg: requesting image size=%d crc32=%.8x from %d\n", 
-			gg_fix32(i->size), gg_fix32(i->crc32), e->event.msg.sender);
-		gg_image_request(sess, e->event.msg.sender, i->size, i->crc32);
-	}
-
-	list_destroy(images, 1);
-
 	cp_to_iso(e->event.msg.message);
 	
 #ifdef WITH_PYTHON
@@ -604,6 +595,15 @@ void handle_msg(struct gg_event *e)
 
 		return;
 	}
+
+	for (image = images; image; image = image->next) {
+		struct gg_msg_richtext_image *i = image->data;
+		gg_debug(GG_DEBUG_MISC, "// ekg: requesting image size=%d crc32=%.8x from %d\n", 
+			gg_fix32(i->size), gg_fix32(i->crc32), e->event.msg.sender);
+		gg_image_request(sess, e->event.msg.sender, i->size, i->crc32);
+	}
+
+	list_destroy(images, 1);
 
 #ifdef HAVE_OPENSSL
 	if (config_encryption && !strncmp(e->event.msg.message, "-----BEGIN RSA PUBLIC KEY-----", 20)) {
