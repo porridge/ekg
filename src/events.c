@@ -522,8 +522,10 @@ void handle_msg(struct gg_event *e)
 		}
 
 		/* ignorujemy wiadomo¶ci bez tre¶ci zawieraj±ce jedynie obrazek(ki) */
-		if (config_ignore_empty_msg && imageno && strlen(e->event.msg.message) == 0)
+		if (config_ignore_empty_msg && imageno && strlen(e->event.msg.message) == 0) {
+			list_destroy(images, 1);
 			return;
+		}
 	}
 
 #ifdef HAVE_OPENSSL
@@ -558,6 +560,7 @@ void handle_msg(struct gg_event *e)
 
 	switch (python_handle_result) {
 		case 0:
+			list_destroy(images, 1);
 			return;
 		case 2:
 			hide = 1;
@@ -577,6 +580,7 @@ void handle_msg(struct gg_event *e)
 			config_last_sysmsg_changed = 1;
 		}
 
+		list_destroy(images, 1);
 		return;
 	}
 	
@@ -585,14 +589,17 @@ void handle_msg(struct gg_event *e)
 			e->event.msg.sender, e->event.msg.recipients,
 			e->event.msg.recipients_count, 0);
 
-		if (c && c->ignore)
+		if (c && c->ignore) {
+			list_destroy(images, 1);
 			return;
+		}
 	}
 
 	if ((!u && config_ignore_unknown_sender) || ignored_check(e->event.msg.sender) & IGNORE_MSG) {
 		if (config_log_ignored)
 			put_log(e->event.msg.sender, "%sign,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), e->event.msg.message);
 
+		list_destroy(images, 1);
 		return;
 	}
 
