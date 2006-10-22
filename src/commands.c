@@ -6329,17 +6329,20 @@ void command_init()
 	  " [opcje] <od> <do> <polecenie>", "wykonanie polecenia w pêtli",
 	  "\n"
 	  "Polecenie zostanie wykonane w pêtli od warto¶ci %Tod%n do "
-	  "warto¶ci %Tdo%n. Opcje:"
+	  "warto¶ci %Tdo%n w³±cznie. Opcje:"
 	  "\n"
 	  "  -s, --step <przyrost>\n"
 	  "  -w, --width\n"
 	  "\n"
 	  "Je¿eli przyrost nie zostanie podany lub zostanie podane 0, "
-	  "to zostanie u¿yty przyrost 1 (dla %Tdo%n wiêkszego od %Tod%n "
-	  "lub -1 (w przeciwnym wypadku). W poleceniu wszystkie stringi "
-	  "%T%%1%n bêd± zamienione na liczbê. Znak procentu mo¿na uzyskaæ "
-	  "pisz±c %T%%%n. Je¿eli zostanie podana opcja %T-w%n, to wszystkie "
-	  "liczby bêd± dope³nione zerami do szeroko¶ci najwiêkszej z nich.");
+	  "to zostanie u¿yty przyrost 1 (dla %Tdo%n wiêkszego od %Tod%n) "
+	  "lub -1 (w przeciwnym przypadku). Je¿eli %Tdo%n bêdzie równe "
+	  "%Tod%n, to polecenie zostanie wykonane tylko raz. W poleceniu "
+	  "wszystkie wyst±pienia %T%%1%n zostan± zamienione na aktualn± "
+	  "warto¶æ zmiennej iteracyjnej (czyli kolejno na wszystkie liczby "
+	  "z podanego zakresu). Znak procentu mo¿na uzyskaæ pisz±c %T%%%%%n. "
+	  "Je¿eli zostanie podana opcja %T-w%n, to wszystkie liczby bêd± "
+	  "dope³nione zerami do szeroko¶ci najwiêkszej z nich.");
 
 	command_add
 	( "help", "cv", cmd_help, 0,
