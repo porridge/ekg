@@ -1042,7 +1042,7 @@ COMMAND(cmd_find)
 COMMAND(cmd_for)
 {
 	int from, to, step = 0;
-	char **argv, **argv2, *cmd;
+	char **argv, *cmd;
 	int equal_width = 0;
 	int width = 0;
 	int ofs = 0;
@@ -1098,9 +1098,11 @@ COMMAND(cmd_for)
 		width = (l1 > l2) ? l1 : l2;
 	}
 
-	argv2 = array_make(params[0], " \t", ofs + 3, 1, 1);
-	cmd = xstrdup(argv2[ofs + 2]);
-	array_free(argv2);
+	array_free(argv);
+
+	argv = array_make(params[0], " \t", ofs + 3, 1, 1);
+	cmd = xstrdup(argv[ofs + 2]);
+	array_free(argv);
 
 //	gg_debug(GG_DEBUG_MISC, "from=%d to=%d step=%d width=%d cmd=%s\n", from, to, step, equal_width, cmd);
 
@@ -1146,6 +1148,9 @@ COMMAND(cmd_for)
 		 * wszystkie wyst±pienia %n na zawarto¶æ bufora (buf) a wyst±pienia %% 
 		 * na %. %co¶innego zostawiamy tak jak jest. */
 
+		if (*cmd != '/')
+			__addch('/');
+
 		for (p = cmd; *p; p++) {
 			if (p[0] == '%' && p[1] == '%') {
 				__addch('%');
@@ -1166,8 +1171,6 @@ COMMAND(cmd_for)
 		xfree(rcmd);
 		from += step;
 	}
-
-	array_free(argv);
 
 	return 0;
 }
@@ -6329,7 +6332,7 @@ void command_init()
 	  " [opcje] <od> <do> <polecenie>", "wykonanie polecenia w pêtli",
 	  "\n"
 	  "Polecenie zostanie wykonane w pêtli od warto¶ci %Tod%n do "
-	  "warto¶ci %Tdo%n w³±cznie. Opcje:"
+	  "warto¶ci %Tdo%n w³±cznie. Opcje\n"
 	  "\n"
 	  "  -s, --step <przyrost>\n"
 	  "  -w, --width\n"
