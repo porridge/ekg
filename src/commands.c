@@ -6336,10 +6336,10 @@ void command_init()
 	  "\n"
 	  "Je¿eli przyrost nie zostanie podany lub zostanie podane 0, "
 	  "to zostanie u¿yty przyrost 1 (dla %Tdo%n wiêkszego od %Tod%n "
-	  "lub -1 (w przeciwnym wypadku). W poleceniu wszystkie znaki "
-	  "procentu (%T%%%n) bêd± zamienione na liczbê. Je¿eli zostanie "
-	  "podana opcja %T-w%n, to wszystkie liczby bêd± dope³nione "
-	  "zerami do szeroko¶ci najwiêkszej z nich.");
+	  "lub -1 (w przeciwnym wypadku). W poleceniu wszystkie stringi "
+	  "%T%%1%n bêd± zamienione na liczbê. Znak procentu mo¿na uzyskaæ "
+	  "pisz±c %T%%%n. Je¿eli zostanie podana opcja %T-w%n, to wszystkie "
+	  "liczby bêd± dope³nione zerami do szeroko¶ci najwiêkszej z nich.");
 
 	command_add
 	( "help", "cv", cmd_help, 0,
