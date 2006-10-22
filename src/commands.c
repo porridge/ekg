@@ -1039,6 +1039,139 @@ COMMAND(cmd_find)
 	return res;
 }
 
+COMMAND(cmd_for)
+{
+	int from, to, step = 0;
+	char **argv, **argv2, *cmd;
+	int equal_width = 0;
+	int width = 0;
+	int ofs = 0;
+	int i;
+
+	if (!params[0]) {
+		printq("not_enough_params", name);
+		return -1;
+	}
+
+	argv = array_make(params[0], " \t", 0, 1, 1);
+
+	for (i = 0; argv[i]; i++) {
+		if (match_arg(argv[i], 's', "step", 2)) { 
+			if (!argv[i + 1]) {
+				printq("invalid_params", name);
+				array_free(argv);
+				return -1;
+			}
+
+			step = atoi(argv[i + 1]);
+			ofs += 2;
+			i++;
+		} else if (match_arg(argv[i], 'w', "width", 2)) {
+			equal_width = 1;
+			ofs++;
+		}
+	}
+
+	if (!argv[ofs] || !argv[ofs + 1] || !argv[ofs + 2]) {
+		printq("not_enough_params", name);
+		array_free(argv);
+		return -1;
+	}
+
+	from = atoi(argv[ofs]);
+	to = atoi(argv[ofs + 1]);
+
+	if ((from > to && step > 0) || (from < to && step < 0)) {
+		printq("invalid_params", name);
+		array_free(argv);
+		return -1;
+	}
+
+	if (!step)
+		step = (from > to) ? -1 : 1;
+
+	if (equal_width) {
+		int l1, l2;
+
+		l1 = strlen(argv[ofs]);
+		l2 = strlen(argv[ofs + 1]);
+		width = (l1 > l2) ? l1 : l2;
+	}
+
+	argv2 = array_make(params[0], " \t", ofs + 3, 1, 1);
+	cmd = xstrdup(argv2[ofs + 2]);
+	array_free(argv2);
+
+//	gg_debug(GG_DEBUG_MISC, "from=%d to=%d step=%d width=%d cmd=%s\n", from, to, step, equal_width, cmd);
+
+	while ((step > 0) ? (from <= to) : (from >= to)) {
+		char *buf = xstrdup(itoa(from));
+		char *rcmd = NULL, *p;
+		int rcmd_len = 0;
+
+		if (equal_width) {
+			int orig_width = strlen(buf);
+			char *buf2 = (char *) xmalloc(width + 1);
+			int start_buf = 0, start_buf2;
+
+			/* zamieniamy: 123 -> 0123, -123 -> -0123 */
+
+			memset(buf2, '0', width);
+			buf2[width] = 0;
+
+			if (buf[0] == '-') {
+				buf2[0] = '-';
+				start_buf++;
+			}
+
+			start_buf2 = (width - orig_width) + start_buf;
+			memcpy(buf2 + start_buf2, buf + start_buf, orig_width - start_buf);
+			xfree(buf);
+			buf = buf2;
+		}
+
+#define __addch(x) do { \
+	rcmd = (char *) xrealloc(rcmd, rcmd_len + 1); \
+	rcmd[rcmd_len++] = x; \
+} while (0)
+
+#define __addstr(x) do { \
+	int xlen = strlen(x); \
+	rcmd = (char *) xrealloc(rcmd, rcmd_len + xlen); \
+	memcpy(rcmd + rcmd_len, x, xlen); \
+	rcmd_len += xlen; \
+} while (0)
+
+		/* cmd wskazuje na stringa, którego nale¿y przepisaæ do rcmd, zamieniaj±c 
+		 * wszystkie wyst±pienia %n na zawarto¶æ bufora (buf) a wyst±pienia %% 
+		 * na %. %co¶innego zostawiamy tak jak jest. */
+
+		for (p = cmd; *p; p++) {
+			if (p[0] == '%' && p[1] == '%') {
+				__addch('%');
+				p++;
+			} else if (p[0] == '%' && p[1] == 'n') {
+				__addstr(buf);
+				p++;
+			} else
+				__addch(*p);
+		}
+
+		__addch(0);
+
+#undef __addstr
+#undef __addch
+
+		command_exec(target, rcmd, quiet);
+		xfree(rcmd);
+		from += step;
+	}
+
+	array_free(argv);
+
+	return 0;
+}
+
 COMMAND(cmd_change)
 {
 	int i;
@@ -4313,7 +4446,7 @@ COMMAND(cmd_test_ctcp)
  *
  * wykonuje polecenie zawarte w linii tekstu.
  *
- *  - target - w którym oknie nast±pi³o (NULL je¶li to nie query)
+ *  - target - w którym oknie nast±pi³o (NULL je¶li to nie query).
  *  - xline - linia tekstu.
  *  - quiet - czy mamy ukryæ wynik.
  *
@@ -4480,7 +4613,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 		/*
 		 * dla query potrzeba nam cudzys³owów, natomiast
 		 * dla ca³ej reszty nie s± one potrzebne (wymaga³oby to
-		 * strippowania w wielu miejscach i zmienienia paru koncepcji
+		 * strippowania w wielu miejscach i zmienienia paru koncepcji)
 		 */
 		if (!strcasecmp(last_name, "query")) {
 			par = array_make_quoted(params_string, " \t", len, 1, 1);
@@ -5859,9 +5992,10 @@ static int command_add_compare(void *data1, void *data2)
  *  - name - nazwa komendy,
  *  - params - definicja parametrów (szczegó³y poni¿ej),
  *  - function - funkcja obs³uguj±ca komendê,
- *  - help_params - opis parametrów,
- *  - help_brief - krótki opis komendy,
- *  - help_long - szczegó³owy opis komendy.
+ *  - alias - czy komenda jest aliasem,
+ *  - params_help - opis parametrów,
+ *  - brief_help - krótki opis komendy,
+ *  - long_help - szczegó³owy opis komendy.
  *
  * 0 je¶li siê uda³o, -1 je¶li b³±d.
  */
@@ -6189,7 +6323,24 @@ void command_init()
 	  "  -s, --start <n>         wy¶wietla od n-tego numeru\n"
 	  "  -A, --all               wy¶wietla wszystkich\n"
 	  "  -S, --stop              zatrzymuje wszystkie poszukiwania");
-	  
+
+	command_add
+	( "for", "?", cmd_for, 0, 
+	  " [opcje] <od> <do> <polecenie>", "wykonanie polecenia w pêtli",
+	  "\n"
+	  "Polecenie zostanie wykonane w pêtli od warto¶ci %Tod%n do "
+	  "warto¶ci %Tdo%n. Opcje:"
+	  "\n"
+	  "  -s, --step <przyrost>\n"
+	  "  -w, --width\n"
+	  "\n"
+	  "Je¿eli przyrost nie zostanie podany lub zostanie podane 0, "
+	  "to zostanie u¿yty przyrost 1 (dla %Tdo%n wiêkszego od %Tod%n "
+	  "lub -1 (w przeciwnym wypadku). W poleceniu wszystkie znaki "
+	  "procentu (%T%%%n) bêd± zamienione na liczbê. Je¿eli zostanie "
+	  "podana opcja %T-w%n, to wszystkie liczby bêd± dope³nione "
+	  "zerami do szeroko¶ci najwiêkszej z nich.");
+
 	command_add
 	( "help", "cv", cmd_help, 0,
 	  " [polecenie] [zmienna]", "wy¶wietla informacjê o poleceniach",
