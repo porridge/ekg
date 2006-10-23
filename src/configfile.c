@@ -57,41 +57,31 @@
 char *config_unescape(const char *text)
 {
 	int state = 0;
-	char *buf = NULL;
-	size_t bufsz = 0;
-
-#define __addch(x) do { \
-	buf = (char *) xrealloc(buf, bufsz + 1); \
-	buf[bufsz++] = x; \
-} while (0)
+	string_t buf = string_init(NULL);
 
 	for (; *text; text++) {
 		char ch = *text;
 
 		if (state == 0) {		/* normalny tekst */
-			if (ch == '\\') {
+			if (ch == '\\' && *(text+1)) {	/* We need to check if we've got smth after '\\' cause it can be last char in string... and it will be never added */
 				state = 1;
 				continue;
 			}
+			string_append_c(buf, ch);
 
-			__addch(ch);
 		} else if (state == 1) {	/* kod ucieczki */
 			if (ch == 'r')
 				ch = '\r';
 			else if (ch == 'n')
 				ch = '\n';
 			else if (ch != '\\')
-				__addch('\\');	/* fallback - nieznany kod */
-
-			__addch(ch);
+				string_append_c(buf, '\\');	/* fallback - nieznany kod */
+			string_append_c(buf, ch);
 			state = 0;
 		}
 	}
 
-	__addch(0);
-#undef __addch
-
-	return buf;
+	return string_free(buf, 0);
 }
 
 /*

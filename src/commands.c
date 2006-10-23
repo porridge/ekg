@@ -1108,8 +1108,8 @@ COMMAND(cmd_for)
 
 	while ((step > 0) ? (from <= to) : (from >= to)) {
 		char *buf = xstrdup(itoa(from));
-		char *rcmd = NULL, *p;
-		int rcmd_len = 0;
+		string_t rcmd;
+		char *p;
 
 		if (equal_width) {
 			int orig_width = strlen(buf);
@@ -1131,44 +1131,28 @@ COMMAND(cmd_for)
 			xfree(buf);
 			buf = buf2;
 		}
-
-#define __addch(x) do { \
-	rcmd = (char *) xrealloc(rcmd, rcmd_len + 1); \
-	rcmd[rcmd_len++] = x; \
-} while (0)
-
-#define __addstr(x) do { \
-	int xlen = strlen(x); \
-	rcmd = (char *) xrealloc(rcmd, rcmd_len + xlen); \
-	memcpy(rcmd + rcmd_len, x, xlen); \
-	rcmd_len += xlen; \
-} while (0)
+		rcmd = string_init(NULL);
 
 		/* cmd wskazuje na stringa, którego nale¿y przepisaæ do rcmd, zamieniaj±c 
 		 * wszystkie wyst±pienia %n na zawarto¶æ bufora (buf) a wyst±pienia %% 
 		 * na %. %co¶innego zostawiamy tak jak jest. */
 
 		if (*cmd != '/')
-			__addch('/');
+			string_append_c(rcmd, '/');
 
 		for (p = cmd; *p; p++) {
 			if (p[0] == '%' && p[1] == '%') {
-				__addch('%');
+				string_append_c(rcmd, '%');
 				p++;
 			} else if (p[0] == '%' && p[1] == 'n') {
-				__addstr(buf);
+				string_append(rcmd, buf);
 				p++;
 			} else
-				__addch(*p);
+				string_append_c(rcmd, *p);
 		}
 
-		__addch(0);
-
-#undef __addstr
-#undef __addch
-
-		command_exec(target, rcmd, quiet);
-		xfree(rcmd);
+		command_exec(target, rcmd->str, quiet);
+		string_free(rcmd, 1);
 		from += step;
 	}
 
@@ -6332,7 +6316,7 @@ void command_init()
 	  " [opcje] <od> <do> <polecenie>", "wykonanie polecenia w pêtli",
 	  "\n"
 	  "Polecenie zostanie wykonane w pêtli od warto¶ci %Tod%n do "
-	  "warto¶ci %Tdo%n w³±cznie. Opcje\n"
+	  "warto¶ci %Tdo%n w³±cznie. Opcje:\n"
 	  "\n"
 	  "  -s, --step <przyrost>\n"
 	  "  -w, --width\n"

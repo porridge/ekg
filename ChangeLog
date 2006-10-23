@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2006-10-23
+
+- zamiana realloków na string_t (darkjames/g)
+
 // 2006-10-22
 
 - dodanie polecenia /for (gophi)
