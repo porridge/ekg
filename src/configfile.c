@@ -63,12 +63,13 @@ char *config_unescape(const char *text)
 		char ch = *text;
 
 		if (state == 0) {		/* normalny tekst */
-			if (ch == '\\' && *(text+1)) {	/* We need to check if we've got smth after '\\' cause it can be last char in string... and it will be never added */
+			/* sprawdzamy czy mamy cos po '\\', bo jezeli to ostatni 
+			 * znak w stringu, to nie zostanie nigdy dodany. */
+			if (ch == '\\' && *(text + 1)) {
 				state = 1;
 				continue;
 			}
 			string_append_c(buf, ch);
-
 		} else if (state == 1) {	/* kod ucieczki */
 			if (ch == 'r')
 				ch = '\r';
