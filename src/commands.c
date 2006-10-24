@@ -6325,7 +6325,7 @@ void command_init()
 	  "to zostanie u¿yty przyrost 1 (dla %Tdo%n wiêkszego od %Tod%n) "
 	  "lub -1 (w przeciwnym przypadku). Je¿eli %Tdo%n bêdzie równe "
 	  "%Tod%n, to polecenie zostanie wykonane tylko raz. W poleceniu "
-	  "wszystkie wyst±pienia %T%%1%n zostan± zamienione na aktualn± "
+	  "wszystkie wyst±pienia %T%%n%n zostan± zamienione na aktualn± "
 	  "warto¶æ zmiennej iteracyjnej (czyli kolejno na wszystkie liczby "
 	  "z podanego zakresu). Znak procentu mo¿na uzyskaæ pisz±c %T%%%%%n. "
 	  "Je¿eli zostanie podana opcja %T-w%n, to wszystkie liczby bêd± "
