@@ -1951,7 +1951,7 @@ COMMAND(cmd_list)
 			if (v == 0x22)
 				ver = "6.0 (build 140 lub nowszy)";
 			if (v == 0x24)
-				ver = "6.1 (build 155 lub nowszy)";
+				ver = "6.1 (build 155 lub nowszy) lub 7.6 (build 1359 lub nowszy)";
 			if (v == 0x25)
 				ver = "7.0 (build 1 lub nowszy)";
 			if (v == 0x26)
