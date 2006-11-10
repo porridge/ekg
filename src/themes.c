@@ -1480,4 +1480,10 @@ void theme_init()
 	format_add("aspell_init_success", "%> Zainicjowano modu³ sprawdzania pisowni\n", 1);
 	format_add("aspell_init_error", "%! B³±d modu³u sprawdzania pisowni: %T%1%n\n", 1);
 #endif
+
+#ifdef HAVE_REGEX_H
+	/* regex */
+	format_add("regex_error", "%! B³±d przetwarzania wyra¿enia regularnego: %T%1%n\n", 1);
+	format_add("regex_none", "%! Brak wyników spe³niaj±cych kryteria wyszukiwania\n", 1);
+#endif
 }

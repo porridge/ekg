@@ -44,6 +44,9 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#ifdef HAVE_REGEX_H
+#  include <regex.h>
+#endif
 
 #include "commands.h"
 #include "configfile.h"
@@ -2004,6 +2007,69 @@ COMMAND(cmd_list)
 			params[0] = NULL;
 		return 0;
 	}
+
+#ifdef HAVE_REGEX_H
+	/* list --regex */
+	if (params[0] && match_arg(params[0], 'r', "regex", 2)) {
+		int rs, flags = REG_NOSUB;
+		char errbuf[512];
+		regex_t reg;
+
+		if (!(config_regex_flags & 1))
+			flags |= REG_EXTENDED;
+
+		if (!(config_regex_flags & 2))
+			flags |= REG_ICASE;
+
+		if ((rs = regcomp(&reg, params[1], flags)))
+			goto err;
+
+		for (l = userlist; l; l = l->next) {
+			struct userlist *u = l->data;
+			int show = 0;
+
+			if (!u->display || !u->uin)
+				continue;
+
+			rs = regexec(&reg, u->display, 0, NULL, 0);
+			if (!rs)
+				show = 1;
+			else if (rs != REG_NOMATCH)
+				goto err;
+
+			if (!show) {
+				rs = regexec(&reg, itoa(u->uin), 0, NULL, 0);
+				if (!rs)
+					show = 1;
+				else if (rs != REG_NOMATCH)
+					goto err;
+			}
+
+			if (!show)
+				continue;
+
+			tmp = ekg_status_label(u->status, "list_");
+
+			if (u->uin == config_uin && sess && sess->state == GG_STATE_CONNECTED && !ignored_check(config_uin))
+				tmp = ekg_status_label(config_status, "list_");
+
+			printq(tmp, format_user(u->uin), (u->first_name) ? u->first_name : u->display, inet_ntoa(u->ip), itoa(u->port), u->descr);
+			count++;
+		}
+
+		if (!count)
+			printq("regex_none");
+
+		regfree(&reg);
+		return 0;
+
+err:
+		regerror(rs, &reg, errbuf, sizeof(errbuf));
+		printq("regex_error", errbuf);
+		regfree(&reg);
+		return -1;
+	}
+#endif
 
 	/* list --get */
 	if (params[0] && (match_arg(params[0], 'g', "get", 2) || match_arg(params[0], 'G', "get-config", 5))) {

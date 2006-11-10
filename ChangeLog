@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2006-11-10
+
+- regexpy w poleceniu /list (met/g)
+
 // 2006-11-06
 
 - 7.6 build 1359 (incu¶/g)

@@ -302,6 +302,9 @@ char *config_proxy_forwarding;
 int config_query_commands;
 char *config_quit_reason;
 int config_random_reason;
+#ifdef HAVE_REGEX_H
+int config_regex_flags;
+#endif
 char *config_reason;
 int config_reason_limit;
 int config_receive_images;

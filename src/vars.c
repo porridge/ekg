@@ -269,6 +269,11 @@ void variable_init()
 	variable_add("random_reason", "rr", VAR_MAP, 1, &config_random_reason, NULL, variable_map(5, 0, 0, "none", 1, 0, "away", 2, 0, "notavail", 4, 0, "avail", 8, 0, "invisible"), NULL);
 	variable_add("reason_limit", "rl", VAR_BOOL, 1, &config_reason_limit, NULL, NULL, NULL);
 	variable_add("receive_images", "ra", VAR_BOOL, 1, &config_receive_images, NULL, NULL, NULL);
+#ifdef HAVE_REGEX_H
+	variable_add("regex_flags", "rf", VAR_MAP, 1, &config_regex_flags, NULL, variable_map(3, 0, 0, "none", 1, 0, "basic", 2, 0, "case"), NULL);
+#else
+	variable_add("regex_flags", "rf", VAR_MAP, 2, NULL, NULL, NULL, NULL);
+#endif
 	variable_add("quit_reason", "qr", VAR_STR, 1, &config_quit_reason, changed_xxx_reason, NULL, NULL);
 	variable_add("query_commands", "qc", VAR_BOOL, 1, &config_query_commands, NULL, NULL, NULL);
 	variable_add("save_password", "sp", VAR_BOOL, 1, &config_save_password, NULL, NULL, NULL);

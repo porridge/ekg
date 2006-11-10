@@ -153,6 +153,9 @@ char *config_quit_reason = NULL;
 char *config_away_reason = NULL;
 char *config_back_reason = NULL;
 int config_random_reason = 0;
+#ifdef HAVE_REGEX_H
+int config_regex_flags = 0;
+#endif
 int config_query_commands = 0;
 char *config_proxy = NULL;
 char *config_server = NULL;

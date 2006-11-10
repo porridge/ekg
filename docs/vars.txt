@@ -708,6 +708,14 @@ receive_images
 	sprawdzaj±cych, czy jeste¶my niewidoczni. otrzymywane obrazki bêd±
 	zapisywane w katalogu okre¶lonym zmienn± dcc_dir.
 
+regex_flags
+	typ: int
+	domy¶lna warto¶æ: 0
+
+	mapa bitowa okre¶laj±ca flagi podczas przetwarzania wyra¿eñ regularnych 
+	w poleceniu /list --regexp. 1 oznacza u¿ywanie podstawowych wyra¿eñ, 2 
+	uwzglêdnianie rozmiaru znaków.
+
 save_question
 	typ: bool
 	domy¶lna warto¶æ: 1
