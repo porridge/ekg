@@ -2015,6 +2015,11 @@ COMMAND(cmd_list)
 		char errbuf[512];
 		regex_t reg;
 
+		if (!params[1]) {
+			printq("not_enough_params", name);
+			return -1;
+		}
+
 		if (!(config_regex_flags & 1))
 			flags |= REG_EXTENDED;
 
