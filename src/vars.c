@@ -257,6 +257,7 @@ void variable_init()
 	variable_add("log_path", "lp", VAR_STR, 1, &config_log_path, NULL, NULL, dd_log);
 	variable_add("log_timestamp", "lt", VAR_STR, 1, &config_log_timestamp, NULL, NULL, dd_log);
 	variable_add("make_window", "mw", VAR_MAP, 1, &config_make_window, NULL, variable_map(4, 0, 0, "none", 1, 2, "usefree", 2, 1, "always", 4, 0, "nomsg"), NULL);
+	variable_add("msg_as_chat", "mc", VAR_INT, 1, &config_msg_as_chat, NULL, variable_map(3, 0, 0, "no", 1, 2, "sendonly", 2, 1, "yes"), NULL);
 	variable_add("mesg", "ma", VAR_INT, 1, &config_mesg, changed_mesg, variable_map(3, 0, 0, "no", 1, 2, "yes", 2, 1, "default"), NULL);
 #ifdef WITH_UI_NCURSES
 	variable_add("mouse", "mo", VAR_BOOL, 1, &config_mouse, NULL, NULL, NULL);

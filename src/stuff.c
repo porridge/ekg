@@ -186,6 +186,7 @@ int config_encryption = 0;
 int config_server_save = 0;
 char *config_email = NULL;
 int config_time_deviation = 300;
+int config_msg_as_chat = 0;
 int config_mesg = MESG_DEFAULT;
 #ifdef WITH_UI_NCURSES
 int config_mouse = 0;

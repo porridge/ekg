@@ -2375,7 +2375,9 @@ COMMAND(cmd_msg)
 	char **nicks = NULL, *nick = NULL, **p = NULL, *add_send = NULL;
 	unsigned char *msg = NULL, *raw_msg = NULL, *format = NULL;
 	uin_t uin;
-	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0, msg_seq, formatlen = 0, conference = 0;
+	int count, valid = 0, secure = 0, msg_seq, formatlen = 0, conference = 0;
+	int chat = (config_msg_as_chat == 2) ? 1 : !strcasecmp(name, "chat");
+	int chatsend = config_msg_as_chat ? 1 : !strcasecmp(name, "chat");
 
 	if (!params[0] || !params[1]) {
 		printq("not_enough_params", name);
@@ -2611,7 +2613,7 @@ COMMAND(cmd_msg)
 		
 	        u = userlist_find(uin, NULL);
 
-		put_log(uin, "%s,%ld,%s,%s,%s\n", ((chat) ? "chatsend" : "msgsend"), uin, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), raw_msg);
+		put_log(uin, "%s,%ld,%s,%s,%s\n", ((chatsend) ? "chatsend" : "msgsend"), uin, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), raw_msg);
 
 		if (config_last & 4)
 			last_add(1, uin, time(NULL), 0, (char *) raw_msg);
@@ -2629,11 +2631,11 @@ COMMAND(cmd_msg)
 				printq("message_too_long");
 #endif
 			if (sess)
-				msg_seq = gg_send_message_richtext(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, __msg, format, formatlen);
+				msg_seq = gg_send_message_richtext(sess, (chatsend) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, __msg, format, formatlen);
 			else
 				msg_seq = -1;
 
-			msg_queue_add(((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG), msg_seq, 1, &uin, raw_msg, secure, format, formatlen);
+			msg_queue_add(((chatsend) ? GG_CLASS_CHAT : GG_CLASS_MSG), msg_seq, 1, &uin, raw_msg, secure, format, formatlen);
 			valid++;
 			xfree(__msg);
 		}
@@ -2652,7 +2654,7 @@ COMMAND(cmd_msg)
 		else
 			msg_seq = -1;
 
-		msg_queue_add(((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG), msg_seq, count, uins, raw_msg, 0, format, formatlen);
+		msg_queue_add(((chatsend) ? GG_CLASS_CHAT : GG_CLASS_MSG), msg_seq, count, uins, raw_msg, 0, format, formatlen);
 		valid++;
 
 		xfree(uins);

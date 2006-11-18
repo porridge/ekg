@@ -289,6 +289,7 @@ char *config_log_path;
 int config_log_status;
 char *config_log_timestamp;
 int config_make_window;
+int config_msg_as_chat;
 int config_mesg;
 #ifdef WITH_UI_NCURSES
 int config_mouse;
