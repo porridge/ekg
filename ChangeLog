@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2006-11-29
+
+- usuniêcie wycieku pamiêci w events.c:handle_dcc:GG_EVENT_DCC_ERROR
+ (darkjames/porridge)
+
 // 2006-11-27
 
 - a gdyby tak ekg umia³o zrzucaæ stos wywo³añ po segfaulcie? :) (gophi)

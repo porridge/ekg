@@ -2511,7 +2511,7 @@ void handle_dcc(struct gg_dcc *d)
 					addr.s_addr = u->ip.s_addr;
 					port = u->port;
 				}
-				tmp = saprintf("%s (%s:%d)", xstrdup(format_user(d->peer_uin)), inet_ntoa(addr), port);
+				tmp = saprintf("%s (%s:%d)", format_user(d->peer_uin), inet_ntoa(addr), port);
 			} else 
 				tmp = saprintf("%s:%d", inet_ntoa(addr), port);
 			
