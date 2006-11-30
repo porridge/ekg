@@ -149,12 +149,12 @@ int userlist_read()
 				entry[i] = NULL;
 			}
 		}
-			
+
 		u.first_name = unescape(entry[0]);
 		u.last_name = unescape(entry[1]);
 		u.nickname = unescape(entry[2]);
 		tmp = unescape(entry[3]);
-		if (*tmp && !valid_nick(tmp)) {
+		if (entry[3] && !valid_nick(tmp)) {
 			u.display = saprintf("_%s", tmp);
 			xfree(tmp);
 		} else
@@ -342,9 +342,15 @@ char *userlist_dump()
 		strings[7] = escape(u->foreign, escstr);
 
 		line = saprintf("%s;%s;%s;%s;%s;%s;%s;%s%s\r\n",
-			strings[0], strings[1], strings[2], strings[3], 
-			strings[4], strings[5], (u->uin) ? itoa(u->uin) : "", 
-			strings[6], strings[7]);
+			(u->first_name) ? strings[0] : "",
+			(u->last_name) ? strings[1] : "",
+			(u->nickname) ? strings[2] : "",
+			(u->display) ? strings[3] : "",
+			(u->mobile) ? strings[4] : "",
+			strings[5],
+			(u->uin) ? itoa(u->uin) : "",
+			(u->email) ? strings[6] : "",
+			(u->foreign) ? strings[7] : "");
 
 		for (i = sizeof(strings) / sizeof(*strings); i > 0; i--)
 			xfree(strings[i - 1]);

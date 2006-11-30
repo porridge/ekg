@@ -822,8 +822,8 @@ char *escape(const char *src, const char *esc)
 {
 	string_t dst;
 
-	if (!src || !*src)
-		return xstrdup("");
+	if (!src)
+		return NULL;
 
 	dst = string_init(NULL);
 
@@ -844,7 +844,7 @@ char *escape(const char *src, const char *esc)
 			string_append_c(dst, '\\');
 		else {
 			char s[5];
-			snprintf(s, sizeof(s), "\\x%02X", (unsigned char) ch);
+			snprintf(s, sizeof(s), "x%02X", (unsigned char) ch);
 			string_append(dst, s);
 		}
 	}
@@ -867,8 +867,8 @@ char *unescape(const char *src)
 	string_t buf = string_init(NULL);
 	unsigned char hex_msb = 0;
 
-	if (!src || !*src)
-		return xstrdup("");
+	if (!src)
+		return NULL;
 
 	for (; *src; src++) {
 		char ch = *src;
