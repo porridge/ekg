@@ -1,8 +1,9 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2001-2006 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Dawid Jarosz <dawjar@poczta.onet.pl>
+ *                          Adam Wysocki <gophi@ekg.chmurka.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License Version 2 as
@@ -69,5 +70,10 @@ void array_free(char **array);
 /* rozszerzenia libców */
 
 const char *itoa(long int i);
+
+/* inne funkcje pomocnicze */
+
+char *escape(const char *src, const char *esc);
+char *unescape(const char *src);
 
 #endif /* __DYNSTUFF_H */

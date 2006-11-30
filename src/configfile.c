@@ -47,45 +47,6 @@
 #endif
 
 /*
- * config_unescape()
- *
- * odeskejpowywuje to, co zosta³o zeskejpowane przez config_fprintf(). 
- * zwraca zaalokowany bufor (nale¿y zwolniæ).
- *
- * - text - tekst do odeskejpowania
- */
-char *config_unescape(const char *text)
-{
-	int state = 0;
-	string_t buf = string_init(NULL);
-
-	for (; *text; text++) {
-		char ch = *text;
-
-		if (state == 0) {		/* normalny tekst */
-			/* sprawdzamy czy mamy cos po '\\', bo jezeli to ostatni 
-			 * znak w stringu, to nie zostanie nigdy dodany. */
-			if (ch == '\\' && *(text + 1)) {
-				state = 1;
-				continue;
-			}
-			string_append_c(buf, ch);
-		} else if (state == 1) {	/* kod ucieczki */
-			if (ch == 'r')
-				ch = '\r';
-			else if (ch == 'n')
-				ch = '\n';
-			else if (ch != '\\')
-				string_append_c(buf, '\\');	/* fallback - nieznany kod */
-			string_append_c(buf, ch);
-			state = 0;
-		}
-	}
-
-	return string_free(buf, 0);
-}
-
-/*
  * config_read()
  *
  * czyta z pliku ~/.gg/config lub podanego konfiguracjê.
@@ -148,7 +109,7 @@ int config_read(const char *filename)
 			continue;
 		}
 
-		foo = config_unescape(buf);
+		foo = unescape(buf);
 		free(buf);
 		buf = foo;
 
@@ -303,7 +264,7 @@ char *config_read_variable(const char *name)
 			continue;
 		}
 
-		tmp = config_unescape(line);
+		tmp = unescape(line);
 		free(line);
 		line = tmp;
 
@@ -607,7 +568,7 @@ int config_write_partly(char **vars)
 	while ((line = read_file(fi))) {
 		char *tmp;
 
-		tmp = config_unescape(line);
+		tmp = unescape(line);
 		free(line);
 		line = tmp;
 
