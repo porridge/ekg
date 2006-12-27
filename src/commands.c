@@ -2748,8 +2748,7 @@ COMMAND(cmd_set)
 	if (arg && val) {
 		char **tmp = array_make(val, "", 0, 0, 1);
 
-		value = tmp[0];
-		tmp[0] = NULL;
+		value = xstrdup(tmp[0]);
 		array_free(tmp);
 	}
 
