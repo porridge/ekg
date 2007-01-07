@@ -6695,7 +6695,7 @@ void command_init()
 
 	command_add
 	( "unregister", "???", cmd_register, 0,
-	  " <uin/alias> <has³o> <token>", "usuwa konto z serwera",
+	  " <numer/alias> <has³o> <token>", "usuwa konto z serwera",
 	  "\n"
 	  "Podanie numeru i has³a jest niezbêdne ze wzglêdów bezpieczeñstwa. "
 	  "Nikt nie chcia³by chyba usun±æ konta przypadkowo, bez ¿adnego "
