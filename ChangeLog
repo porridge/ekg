@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi).
 
+// 2007-01-11
+
+- b³±d w userlist_write_wap() (demreath/g)
+
 // 2007-01-07
 
 - literówka w api.txt (witaæ -> widaæ) (zigi/g)

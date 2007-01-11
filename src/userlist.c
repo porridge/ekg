@@ -429,16 +429,14 @@ int userlist_write_wap()
 
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
-		char *strings[3];
+		char *strings[2];
 		static const char escstr[] = "\r\n:";
 
 		strings[0] = escape(u->display, escstr);
-		strings[1] = escape(u->status, escstr);
-		strings[2] = escape(u->descr, escstr);
+		strings[1] = escape(u->descr, escstr);
 
-		fprintf(f, "%s:%d%s%s\n", strings[0], strings[1] (u->descr) ? ":" : "", strings[2]);
+		fprintf(f, "%s:%d%s%s\n", strings[0], u->status, (u->descr) ? ":" : "", strings[1]);
 
-		xfree(strings[2]);
 		xfree(strings[1]);
 		xfree(strings[0]);
 	}
