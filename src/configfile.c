@@ -330,7 +330,7 @@ void config_fprintf(FILE *f, const char *fmt, ...)
 {
 	va_list ap;
 	int state = 0;
-	char *str;
+	char *str = NULL;
 
 	va_start(ap, fmt);
 
