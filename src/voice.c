@@ -1,7 +1,8 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2002 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2002-2006 Wojtek Kaniewski <wojtekka@irc.pl>
+ *                          Adam Wysocki <gophi@ekg.chmurka.net>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License Version
@@ -177,12 +178,12 @@ int voice_play(const char *buf, int length, int null)
 	}
 
 	while (pos <= (buf + length - 65)) {
-		if (gsm_decode(voice_gsm_dec, (char*) pos, output))
+		if (gsm_decode(voice_gsm_dec, (unsigned char *) pos, output))
 			return -1;
 		if (!null && write(voice_fd, output, 320) != 320)
 			return -1;
 		pos += 33;
-		if (gsm_decode(voice_gsm_dec, (char*) pos, output))
+		if (gsm_decode(voice_gsm_dec, (unsigned char *) pos, output))
 			return -1;
 		if (!null && write(voice_fd, output, 320) != 320)
 			return -1;
@@ -220,12 +221,12 @@ int voice_record(char *buf, int length, int null)
 		if (read(voice_fd, input, 320) != 320)
 			return -1;
 		if (!null)
-			gsm_encode(voice_gsm_enc, input, (char*) pos);
+			gsm_encode(voice_gsm_enc, input, (unsigned char *) pos);
 		pos += 32;
 		if (read(voice_fd, input, 320) != 320)
 			return -1;
 		if (!null)
-			gsm_encode(voice_gsm_enc, input, (char*) pos);
+			gsm_encode(voice_gsm_enc, input, (unsigned char *) pos);
 		pos += 33;
 	}
 
