@@ -2,7 +2,13 @@ Teksty w nawiasach na koñcu linii mówi± o tym, kto dokona³ poprawki.
 Je¶li jest postaci ,,nick'', powinno byæ jasne. Postaæ ,,nick/x''
 oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
-d - drg, sz - szalik, del - deletek, g - gophi).
+d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
+
+// 2007-01-28
+
+- libgadu: common.c: gg_get_line(): drobna optymalizacja; gg_connect: dodane
+  zamykanie gniazda po niepowodzeniu w bind() (mslusarz/p)
+- dodany skrót mojego nicka w changelogu (porridge)
 
 // 2007-01-24
 
@@ -38,7 +44,7 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 // 2006-11-29
 
 - usuniêcie wycieku pamiêci w events.c:handle_dcc:GG_EVENT_DCC_ERROR
- (darkjames/porridge)
+ (darkjames/p)
 
 // 2006-11-27
 
@@ -101,7 +107,7 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 
 // 2006-09-22
 
-- poprawiony wyciek pamiêci w dwu generatorach (darkjames/porridge)
+- poprawiony wyciek pamiêci w dwu generatorach (darkjames/p)
 
 // 2006-09-08
 
@@ -110,7 +116,7 @@ d - drg, sz - szalik, del - deletek, g - gophi).
 
 // 2006-08-29
 
-- poprawiony wyciek pamiêci przy parsowaniu config_server (darkjames/porridge)
+- poprawiony wyciek pamiêci przy parsowaniu config_server (darkjames/p)
 
 // 2006-08-27
 
@@ -318,7 +324,7 @@ musi byæ wy¶wietlany ;) (outsiderek/g)
 
 // 2005-11-02
 
-- umo¿liwienie kompilacji na GNU/kFreeBSD (aurel32/porridge)
+- umo¿liwienie kompilacji na GNU/kFreeBSD (aurel32/p)
 
 // 2005-10-29
 
@@ -469,7 +475,7 @@ siê tej osoby (sz)
 // 2005-06-07
 
 - poprawienie ustawiania scie¿ki wyszukiwania modu³ów pythona na systemach
-  zgodnych z SUSv2 (embe/porridge)
+  zgodnych z SUSv2 (embe/p)
 
 // 2005-06-05
 
@@ -493,7 +499,7 @@ siê tej osoby (sz)
 
 - po pierwszym wy¶wietleniu pe³nego ostrze¿enia o filtrowaniu wiadomo¶ci przez
   serwer, pozosta³e takie bêd± wy¶wietlane w skróconej formie do restartu ekg
-  (joshua/porridge)
+  (joshua/p)
 
 // 2005-05-13
 
