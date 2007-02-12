@@ -1919,7 +1919,7 @@ int mesg_set(int what)
 int msg_encrypt(uin_t uin, unsigned char **msg)
 {
 #ifdef HAVE_OPENSSL
-	if (config_encryption) {
+	if (config_encryption == 1 || config_encryption == 3) {
 		unsigned char *res = (unsigned char *) sim_message_encrypt(*msg, uin);
 
 		if (res) {

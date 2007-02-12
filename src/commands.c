@@ -2624,7 +2624,7 @@ COMMAND(cmd_msg)
 			unsigned char *__msg = (unsigned char *) xstrdup((char *) msg);
 #ifdef HAVE_OPENSSL
 			int ret = 0;
-			if (config_encryption && (ret = msg_encrypt(uin, &__msg)) > 0)
+			if ((config_encryption == 1 || config_encryption == 3) && (ret = msg_encrypt(uin, &__msg)) > 0)
 				secure = 1;
 
 			if (ret == 2)

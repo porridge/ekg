@@ -223,9 +223,9 @@ void variable_init()
 #endif
 	variable_add("emoticons", "eM", VAR_BOOL, 1, &config_emoticons, NULL, NULL, NULL);
 #ifdef HAVE_OPENSSL
-	variable_add("encryption", "en", VAR_BOOL, 1, &config_encryption, NULL, NULL, NULL);
+	variable_add("encryption", "en", VAR_INT, 1, &config_encryption, NULL, variable_map(4, 0, 0, "no", 1, 0, "yes", 2, 0, "recv", 3, 0, "send"), NULL);
 #else
-	variable_add("encryption", "en", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
+	variable_add("encryption", "en", VAR_INT, 2, NULL, NULL, NULL, NULL);
 #endif
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init)

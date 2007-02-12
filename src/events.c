@@ -529,7 +529,7 @@ void handle_msg(struct gg_event *e)
 	}
 
 #ifdef HAVE_OPENSSL
-	if (config_encryption) {
+	if (config_encryption == 1 || config_encryption == 2) {
 		char *msg = sim_message_decrypt(e->event.msg.message, e->event.msg.sender);
 
 		if (msg) {

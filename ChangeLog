@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
+// 2007-02-13
+
+- dodanie /set encryption 2 i 3 (chomzee/g)
+
 // 2007-01-28
 
 - libgadu: common.c: gg_get_line(): drobna optymalizacja; gg_connect: dodane

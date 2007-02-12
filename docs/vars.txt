@@ -449,13 +449,17 @@ emoticons
 	szczegó³ów w pliku docs/files.txt w sekcji 5-tej.
 
 encryption
-	typ: bool
+	typ: liczba
 	domy¶lna warto¶æ: 0
 
 	w³±cza szyfrowanie wiadomo¶ci. je¶li w systemie jest zainstalowana
 	biblioteka OpenSSL, mo¿liwe jest u¿ywanie szyfrowania zgodnego z SIM
-	opisanym na stronie http://gg.wha.la/crypt/
-	
+	opisanym na stronie http://gg.wha.la/crypt/. warto¶æ 0 wy³±cza 
+	szyfrowanie. warto¶æ 1 w³±cza. ustawienie warto¶ci 2 sprawia, ¿e 
+	wysy³ane s± wiadomo¶ci niezaszyfrowane, ale odbierane szyfrowane 
+	s± deszyfrowane. ustawienie 3 sprawia, ¿e wiadomo¶ci odbierane nie 
+	s± deszyfrowane, za to s± szyfrowane wysy³ane.
+
 enter_scrolls
 	typ: bool
 	domy¶lna warto¶æ: 0
