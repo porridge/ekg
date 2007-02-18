@@ -517,8 +517,10 @@ static void save_final_list(struct userlist_t *u)
 	size_t i;
 	struct userlist_entry_t *e = u->entries;
 
-	if (u->fname && !(fp = fopen(u->fname, "w")))
+	if (u->fname && !(fp = fopen(u->fname, "w"))) {
 		fprintf(stderr, "Nie uda³o siê otworzyæ pliku '%s': %s.\n", u->fname, strerror(errno));
+		exit(EXIT_FAILURE);
+	}
 
 	for (i = 0; i < u->num_entries; i++, e++)
 		fprintf(fp, "%s%s", e->line, opt.newline);
