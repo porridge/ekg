@@ -864,11 +864,13 @@ char *escape(const char *src, const char *esc)
 char *unescape(const char *src)
 {
 	int state = 0;
-	string_t buf = string_init(NULL);
+	string_t buf;
 	unsigned char hex_msb = 0;
 
 	if (!src)
 		return NULL;
+
+	buf = string_init(NULL);
 
 	for (; *src; src++) {
 		char ch = *src;
