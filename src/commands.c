@@ -4225,6 +4225,8 @@ COMMAND(cmd_passwd)
 		return -1;
 	}
 
+	xfree(oldpasswd);
+
 	xfree(last_tokenid);
 	last_tokenid = NULL;
 

@@ -9,6 +9,7 @@ d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 - dostosowanie skryptu vekg do nowych wersji valgrinda (w)
 - poprawka off-by-one przy obs³udze tokenów (w)
 - poprawka wycieku pamiêci przy brakuj±cych polach listy kontaktów (w)
+- poprawka potencjalnego wycieku pamiêci przy zmianie has³a (darkjames/w)
 
 // 2007-02-18
 
