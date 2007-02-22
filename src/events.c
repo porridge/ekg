@@ -1763,7 +1763,7 @@ char *token_gif_to_txt (struct token_t *token)
 	int cur_char = 0;	/* Kolejny znaczek z chars[]. */
 
 	memset (mappings, 0, sizeof(mappings));
-	buf = bptr = (char *) xmalloc(token->sx * (token->sy + 1));
+	buf = bptr = (char *) xmalloc(token->sx * (token->sy + 1) + 1);
 
 #ifdef TOKEN_GIF_PAL
 	for (i = 0; i < token->sx * token->sy; i++) {
