@@ -392,13 +392,12 @@ int userlist_write()
 	fchmod(fileno(f), 0600);
 	
 	fputs(contacts, f);
+	xfree(contacts);
 	
 	if (fclose(f) == EOF) {
 		unlink(tmp);
 		return -2;
 	}
-	
-	xfree(contacts);
 
 	if (rename(tmp, filename) == -1)
 		return -2;
