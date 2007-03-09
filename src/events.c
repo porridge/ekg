@@ -1531,23 +1531,28 @@ int token_gif_load (char *fname, struct token_t *token)
 
 	fd = open(fname, O_RDONLY);
 	if (fd == -1) {
-		snprintf (errbuf, sizeof(errbuf), "open(%s): %m", fname);
+		snprintf(errbuf, sizeof(errbuf), "open(%s): %m", fname);
 		goto err;
 	}
 
 	if (!(file = DGifOpenFileHandle(fd))) {
-		snprintf (errbuf, sizeof(errbuf), "DGifOpenFileHandle(): %d", 
+		snprintf(errbuf, sizeof(errbuf), "DGifOpenFileHandle(): %d", 
 		    GifLastError());
 		goto err2;
 	}
 
+	if (file->SWidth <= 0 || file->SWidth > 1024 || file->SHeight <= 0 || file->SHeight > 1024) {
+		snprintf(errbuf, sizeof(errbuf), "Invalid image size: %d,%d", file->SWidth, file->SHeight);
+		goto err3;
+	}
+
 	if (DGifSlurp(file) != GIF_OK) {
-		snprintf (errbuf, sizeof(errbuf), "DGifSlurp(): %d", GifLastError());
+		snprintf(errbuf, sizeof(errbuf), "DGifSlurp(): %d", GifLastError());
 		goto err3;
 	}
 
 	if (file->ImageCount != 1) {
-		snprintf (errbuf, sizeof(errbuf), "ImageCount = %d", file->ImageCount);
+		snprintf(errbuf, sizeof(errbuf), "ImageCount = %d", file->ImageCount);
 		goto err3;
 	}
 
@@ -1561,7 +1566,7 @@ int token_gif_load (char *fname, struct token_t *token)
 	if (pal) {
 		token->pal_sz = pal->ColorCount;
 		token->pal = (unsigned char *) xmalloc(token->pal_sz * 3);
-		memcpy (token->pal, pal->Colors, pal->ColorCount);
+		memcpy(token->pal, pal->Colors, pal->ColorCount);
 	}
 #endif
 
@@ -1569,15 +1574,15 @@ int token_gif_load (char *fname, struct token_t *token)
 	token->sy = file->SavedImages[0].ImageDesc.Height;
 	token->data = (unsigned char *) xmalloc(token->sx * token->sy);
 
-	memcpy (token->data, file->SavedImages[0].RasterBits, token->sx * token->sy);
-	DGifCloseFile (file);
+	memcpy(token->data, file->SavedImages[0].RasterBits, token->sx * token->sy);
+	DGifCloseFile(file);
 
 	return 0;
 
 err3:
-	DGifCloseFile (file);
+	DGifCloseFile(file);
 err2:
-	close (fd);
+	close(fd);
 err:
 	token->data = (unsigned char *) xstrdup(errbuf);
 	return -1;
@@ -1594,11 +1599,11 @@ err:
 void token_gif_free (struct token_t *token)
 {
 	if (token->data)
-		xfree (token->data);
+		xfree(token->data);
 
 #ifdef TOKEN_GIF_PAL
 	if (token->pal)
-		xfree (token->pal);
+		xfree(token->pal);
 #endif
 
 	token->data = NULL;
@@ -1689,7 +1694,7 @@ void token_gif_strip (struct token_t *token)
 			new_data[y * token->sx + x] = new_pixel;	// ? 1 : 0;
 	}
 
-	xfree (token->data);
+	xfree(token->data);
 	token->data = new_data;
 }
 
@@ -1732,7 +1737,7 @@ char *token_gif_strip_txt (char *buf)
 		return NULL;
 
 	new_buf = (char *) xmalloc(end - start + 2);
-	memcpy (new_buf, buf + start, end - start);
+	memcpy(new_buf, buf + start, end - start);
 	new_buf[end - start - 1] = '\n';
 	new_buf[end - start] = 0;
 
@@ -1762,7 +1767,7 @@ char *token_gif_to_txt (struct token_t *token)
 	char mappings[256];
 	int cur_char = 0;	/* Kolejny znaczek z chars[]. */
 
-	memset (mappings, 0, sizeof(mappings));
+	memset(mappings, 0, sizeof(mappings));
 	buf = bptr = (char *) xmalloc(token->sx * (token->sy + 1) + 1);
 
 #ifdef TOKEN_GIF_PAL
@@ -1826,7 +1831,7 @@ char *token_gif_to_txt (struct token_t *token)
 
 	bptr = token_gif_strip_txt(buf);
 	if (bptr) {
-		xfree (buf);
+		xfree(buf);
 		return bptr;
 	}
 
