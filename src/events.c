@@ -311,7 +311,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 		format = format_first;
 
 		/* zmniejsz d³ugo¶æ pierwszej linii o d³ugo¶æ prefiksu z rozmówc±, timestampem itd. */
-		tmp = format_string(format_find(format), "", format_user(e->event.msg.sender), timestr, cname);
+		tmp = format_string(format_find(format), "", format_user(e->event.msg.sender), timestr, cname, (secure) ? secure_label : "");
 		mem_width = width + strlen(tmp);
 		for (p = tmp; *p && *p != '\n'; p++) {
 			if (*p == 27) {
@@ -416,7 +416,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 			if (config_emoticons)
 				emotted = emoticon_expand(formatted);
 
-			print_window(target, separate, format, (emotted) ? emotted : formatted , format_user(e->event.msg.sender), timestr, cname);
+			print_window(target, separate, format, (emotted) ? emotted : formatted, format_user(e->event.msg.sender), timestr, cname, (secure) ? secure_label : "");
 
 			width = next_width;
 			format = next_format;
@@ -522,12 +522,14 @@ void handle_msg(struct gg_event *e)
 		}
 
 		/* ignorujemy wiadomo¶ci bez tre¶ci zawieraj±ce jedynie obrazek(ki) */
-		if (config_ignore_empty_msg && imageno && strlen(e->event.msg.message) == 0)
+		if (config_ignore_empty_msg && imageno && strlen(e->event.msg.message) == 0) {
+			list_destroy(images, 1);
 			return;
+		}
 	}
 
 #ifdef HAVE_OPENSSL
-	if (config_encryption) {
+	if (config_encryption == 1 || config_encryption == 2) {
 		char *msg = sim_message_decrypt(e->event.msg.message, e->event.msg.sender);
 
 		if (msg) {
@@ -538,15 +540,6 @@ void handle_msg(struct gg_event *e)
 			gg_debug(GG_DEBUG_MISC, "// ekg: simlite decryption failed: %s\n", sim_strerror(sim_errno));
 	}
 #endif
-
-	for (image = images; image; image = image->next) {
-		struct gg_msg_richtext_image *i = image->data;
-		gg_debug(GG_DEBUG_MISC, "// ekg: requesting image size=%d crc32=%.8x from %d\n", 
-			gg_fix32(i->size), gg_fix32(i->crc32), e->event.msg.sender);
-		gg_image_request(sess, e->event.msg.sender, i->size, i->crc32);
-	}
-
-	list_destroy(images, 1);
 
 	cp_to_iso(e->event.msg.message);
 	
@@ -567,6 +560,7 @@ void handle_msg(struct gg_event *e)
 
 	switch (python_handle_result) {
 		case 0:
+			list_destroy(images, 1);
 			return;
 		case 2:
 			hide = 1;
@@ -586,6 +580,7 @@ void handle_msg(struct gg_event *e)
 			config_last_sysmsg_changed = 1;
 		}
 
+		list_destroy(images, 1);
 		return;
 	}
 	
@@ -594,16 +589,28 @@ void handle_msg(struct gg_event *e)
 			e->event.msg.sender, e->event.msg.recipients,
 			e->event.msg.recipients_count, 0);
 
-		if (c && c->ignore)
+		if (c && c->ignore) {
+			list_destroy(images, 1);
 			return;
+		}
 	}
 
 	if ((!u && config_ignore_unknown_sender) || ignored_check(e->event.msg.sender) & IGNORE_MSG) {
 		if (config_log_ignored)
 			put_log(e->event.msg.sender, "%sign,%ld,%s,%s,%s,%s\n", (chat) ? "chatrecv" : "msgrecv", e->event.msg.sender, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), log_timestamp(e->event.msg.time), e->event.msg.message);
 
+		list_destroy(images, 1);
 		return;
 	}
+
+	for (image = images; image; image = image->next) {
+		struct gg_msg_richtext_image *i = image->data;
+		gg_debug(GG_DEBUG_MISC, "// ekg: requesting image size=%d crc32=%.8x from %d\n", 
+			gg_fix32(i->size), gg_fix32(i->crc32), e->event.msg.sender);
+		gg_image_request(sess, e->event.msg.sender, i->size, i->crc32);
+	}
+
+	list_destroy(images, 1);
 
 #ifdef HAVE_OPENSSL
 	if (config_encryption && !strncmp(e->event.msg.message, "-----BEGIN RSA PUBLIC KEY-----", 20)) {
@@ -724,7 +731,6 @@ void handle_msg(struct gg_event *e)
 void handle_ack(struct gg_event *e)
 {
 	struct userlist *u = userlist_find(e->event.ack.recipient, NULL);
-	int queued = (e->event.ack.status == GG_ACK_QUEUED);
 	const char *tmp, *target = ((u && u->display) ? u->display : itoa(e->event.ack.recipient));
 	static int show_short_ack_filtered = 0;
 
@@ -733,31 +739,53 @@ void handle_ack(struct gg_event *e)
 
 	msg_queue_remove(e->event.ack.seq);
 
-	if (!(ignored_check(e->event.ack.recipient) & IGNORE_EVENTS))
-		event_check((queued) ? EVENT_QUEUED : EVENT_DELIVERED, e->event.ack.recipient, NULL);
+	if (!(ignored_check(e->event.ack.recipient) & IGNORE_EVENTS)) {
+		int event;
 
-	if (u && !queued && GG_S_NA(u->status) && !(ignored_check(u->uin) & IGNORE_STATUS)) {
-		char *ack_filtered;
-		if (show_short_ack_filtered) {
-			ack_filtered = "ack_filtered_short";
-		} else {
-			ack_filtered = "ack_filtered";
-			show_short_ack_filtered = 1;
-		}
-		print_window(target, 0, ack_filtered, format_user(e->event.ack.recipient));
-		return;
+		if (e->event.ack.status == GG_ACK_BLOCKED)
+			event = EVENT_FILTERED;
+		else if (e->event.ack.status == GG_ACK_DELIVERED)
+			event = EVENT_DELIVERED;
+		else if (e->event.ack.status == GG_ACK_QUEUED)
+			event = EVENT_QUEUED;
+		else if (e->event.ack.status == GG_ACK_MBOXFULL)
+			event = EVENT_MBOXFULL;
+		else
+			event = EVENT_NOT_DELIVERED;
+
+		event_check(event, e->event.ack.recipient, NULL);
 	}
+
+	if (u && (e->event.ack.status == GG_ACK_DELIVERED) && GG_S_NA(u->status) && !(ignored_check(u->uin) & IGNORE_STATUS))
+		e->event.ack.status = GG_ACK_BLOCKED;
 
 	if (!config_display_ack)
 		return;
 
-	if (config_display_ack == 2 && queued)
+	/* xxx: dopisaæ EVENT_MBOXFULL i EVENT_NOT_DELIVERED do config_display_ack */
+
+	if (config_display_ack == 2 && e->event.ack.status == GG_ACK_QUEUED)
 		return;
 
-	if (config_display_ack == 3 && !queued)
+	if (config_display_ack == 3 && e->event.ack.status == GG_ACK_DELIVERED)
 		return;
 
-	tmp = queued ? "ack_queued" : "ack_delivered";
+	if (e->event.ack.status == GG_ACK_BLOCKED) {
+		if (show_short_ack_filtered)
+			tmp = "ack_filtered_short";
+		else {
+			tmp = "ack_filtered";
+			show_short_ack_filtered = 1;
+		}
+	} else if (e->event.ack.status == GG_ACK_DELIVERED)
+		tmp = "ack_delivered";
+	else if (e->event.ack.status == GG_ACK_QUEUED)
+		tmp = "ack_queued";
+	else if (e->event.ack.status == GG_ACK_MBOXFULL)
+		tmp = "ack_mboxfull";
+	else
+		tmp = "ack_not_delivered";
+
 	print_window(target, 0, tmp, format_user(e->event.ack.recipient));
 }
 
@@ -1503,23 +1531,28 @@ int token_gif_load (char *fname, struct token_t *token)
 
 	fd = open(fname, O_RDONLY);
 	if (fd == -1) {
-		snprintf (errbuf, sizeof(errbuf), "open(%s): %m", fname);
+		snprintf(errbuf, sizeof(errbuf), "open(%s): %m", fname);
 		goto err;
 	}
 
 	if (!(file = DGifOpenFileHandle(fd))) {
-		snprintf (errbuf, sizeof(errbuf), "DGifOpenFileHandle(): %d", 
+		snprintf(errbuf, sizeof(errbuf), "DGifOpenFileHandle(): %d", 
 		    GifLastError());
 		goto err2;
 	}
 
+	if (file->SWidth <= 0 || file->SWidth > 1024 || file->SHeight <= 0 || file->SHeight > 1024) {
+		snprintf(errbuf, sizeof(errbuf), "Invalid image size: %d,%d", file->SWidth, file->SHeight);
+		goto err3;
+	}
+
 	if (DGifSlurp(file) != GIF_OK) {
-		snprintf (errbuf, sizeof(errbuf), "DGifSlurp(): %d", GifLastError());
+		snprintf(errbuf, sizeof(errbuf), "DGifSlurp(): %d", GifLastError());
 		goto err3;
 	}
 
 	if (file->ImageCount != 1) {
-		snprintf (errbuf, sizeof(errbuf), "ImageCount = %d", file->ImageCount);
+		snprintf(errbuf, sizeof(errbuf), "ImageCount = %d", file->ImageCount);
 		goto err3;
 	}
 
@@ -1533,7 +1566,7 @@ int token_gif_load (char *fname, struct token_t *token)
 	if (pal) {
 		token->pal_sz = pal->ColorCount;
 		token->pal = (unsigned char *) xmalloc(token->pal_sz * 3);
-		memcpy (token->pal, pal->Colors, pal->ColorCount);
+		memcpy(token->pal, pal->Colors, pal->ColorCount);
 	}
 #endif
 
@@ -1541,15 +1574,15 @@ int token_gif_load (char *fname, struct token_t *token)
 	token->sy = file->SavedImages[0].ImageDesc.Height;
 	token->data = (unsigned char *) xmalloc(token->sx * token->sy);
 
-	memcpy (token->data, file->SavedImages[0].RasterBits, token->sx * token->sy);
-	DGifCloseFile (file);
+	memcpy(token->data, file->SavedImages[0].RasterBits, token->sx * token->sy);
+	DGifCloseFile(file);
 
 	return 0;
 
 err3:
-	DGifCloseFile (file);
+	DGifCloseFile(file);
 err2:
-	close (fd);
+	close(fd);
 err:
 	token->data = (unsigned char *) xstrdup(errbuf);
 	return -1;
@@ -1566,11 +1599,11 @@ err:
 void token_gif_free (struct token_t *token)
 {
 	if (token->data)
-		xfree (token->data);
+		xfree(token->data);
 
 #ifdef TOKEN_GIF_PAL
 	if (token->pal)
-		xfree (token->pal);
+		xfree(token->pal);
 #endif
 
 	token->data = NULL;
@@ -1661,7 +1694,7 @@ void token_gif_strip (struct token_t *token)
 			new_data[y * token->sx + x] = new_pixel;	// ? 1 : 0;
 	}
 
-	xfree (token->data);
+	xfree(token->data);
 	token->data = new_data;
 }
 
@@ -1704,7 +1737,7 @@ char *token_gif_strip_txt (char *buf)
 		return NULL;
 
 	new_buf = (char *) xmalloc(end - start + 2);
-	memcpy (new_buf, buf + start, end - start);
+	memcpy(new_buf, buf + start, end - start);
 	new_buf[end - start - 1] = '\n';
 	new_buf[end - start] = 0;
 
@@ -1734,8 +1767,8 @@ char *token_gif_to_txt (struct token_t *token)
 	char mappings[256];
 	int cur_char = 0;	/* Kolejny znaczek z chars[]. */
 
-	memset (mappings, 0, sizeof(mappings));
-	buf = bptr = (char *) xmalloc(token->sx * (token->sy + 1));
+	memset(mappings, 0, sizeof(mappings));
+	buf = bptr = (char *) xmalloc(token->sx * (token->sy + 1) + 1);
 
 #ifdef TOKEN_GIF_PAL
 	for (i = 0; i < token->sx * token->sy; i++) {
@@ -1798,7 +1831,7 @@ char *token_gif_to_txt (struct token_t *token)
 
 	bptr = token_gif_strip_txt(buf);
 	if (bptr) {
-		xfree (buf);
+		xfree(buf);
 		return bptr;
 	}
 
@@ -2483,7 +2516,7 @@ void handle_dcc(struct gg_dcc *d)
 					addr.s_addr = u->ip.s_addr;
 					port = u->port;
 				}
-				tmp = saprintf("%s (%s:%d)", xstrdup(format_user(d->peer_uin)), inet_ntoa(addr), port);
+				tmp = saprintf("%s (%s:%d)", format_user(d->peer_uin), inet_ntoa(addr), port);
 			} else 
 				tmp = saprintf("%s:%d", inet_ntoa(addr), port);
 			
@@ -2788,12 +2821,25 @@ void handle_image_reply(struct gg_event *e)
 				goto err;
 			}
 
-			close(fd);
+			if (fsync(fd) == -1) {
+				int xerrno = errno;
+				close(fd);
+				unlink(path);
+				errno = xerrno;
+				goto err;
+			}
+
+			if (close(fd) == -1) {
+				int xerrno = errno;
+				unlink(path);
+				errno = xerrno;
+				goto err;
+			}
 
 			print("image_saved", format_user(e->event.image_reply.sender), path);
 			xfree(path);
 
-			event_check(EVENT_DCCFINISH, e->event.image_reply.sender, fname);
+			event_check(EVENT_IMAGE, e->event.image_reply.sender, fname);
 			xfree(fname);
 			return;
 

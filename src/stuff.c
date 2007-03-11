@@ -153,6 +153,9 @@ char *config_quit_reason = NULL;
 char *config_away_reason = NULL;
 char *config_back_reason = NULL;
 int config_random_reason = 0;
+#ifdef HAVE_REGEX_H
+int config_regex_flags = 0;
+#endif
 int config_query_commands = 0;
 char *config_proxy = NULL;
 char *config_server = NULL;
@@ -183,6 +186,7 @@ int config_encryption = 0;
 int config_server_save = 0;
 char *config_email = NULL;
 int config_time_deviation = 300;
+int config_msg_as_chat = 0;
 int config_mesg = MESG_DEFAULT;
 char *config_nick = NULL;
 int config_display_welcome = 1;
@@ -239,12 +243,16 @@ struct event_label event_labels[EVENT_LABELS_COUNT + 2] = {
 	{ EVENT_SIGUSR2, "sigusr2" },
 	{ EVENT_DELIVERED, "delivered" },
 	{ EVENT_QUEUED, "queued" },
+	{ EVENT_FILTERED, "filtered" },
+	{ EVENT_MBOXFULL, "mboxfull" },
+	{ EVENT_NOT_DELIVERED, "not_delivered" },
 	{ EVENT_NEWMAIL, "newmail" },
 	{ EVENT_BLOCKED, "blocked" },
 	{ EVENT_DCCFINISH, "dccfinish" },
 	{ EVENT_CONNECTED, "connected" },
 	{ EVENT_DISCONNECTED, "disconnected" },
 	{ EVENT_CONNECTIONLOST, "connectionlost" },
+	{ EVENT_IMAGE, "image" },
 
 	{ INACTIVE_EVENT, NULL },
 	{ 0, NULL }
@@ -1402,9 +1410,9 @@ void ekg_connect()
 
 		xfree(sserver);
 
+skip_server:
 		array_free(servers);
 	}
-skip_server:
 
 	if (config_proxy_forwarding) {
 		char *fwd = xstrdup(config_proxy_forwarding), *tmp = strchr(fwd, ':');
@@ -1908,7 +1916,7 @@ int mesg_set(int what)
 int msg_encrypt(uin_t uin, unsigned char **msg)
 {
 #ifdef HAVE_OPENSSL
-	if (config_encryption) {
+	if (config_encryption == 1 || config_encryption == 3) {
 		unsigned char *res = sim_message_encrypt(*msg, uin);
 
 		if (res) {
