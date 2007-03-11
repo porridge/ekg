@@ -657,7 +657,7 @@ static void ui_readline_print(const char *target, int separate, const char *xlin
 	if (target && separate)
 		id = window_find_query(target);
 
-	if (config_make_window > 0 && !id && strncmp(target, "__", 2) && separate)
+	if ((config_make_window & 3) > 0 && !id && strncmp(target, "__", 2) && separate)
 		id = window_make_query(target);
 	
 	/* je¶li nie piszemy do aktualnego, to zapisz do bufora i wyjd¼ */
@@ -1498,7 +1498,7 @@ static void window_list()
 static int window_make_query(const char *nick)
 {
 	/* szuka pierwszego wolnego okienka i je zajmuje */
-	if (config_make_window == 1) {
+	if ((config_make_window & 3) == 1) {
 		list_t l;
 
 		for (l = windows; l; l = l->next) {
@@ -1525,7 +1525,7 @@ static int window_make_query(const char *nick)
 		}
 	}
 	
-	if (config_make_window == 1 || config_make_window == 2) {
+	if ((config_make_window & 3) == 1 || (config_make_window & 3) == 2) {
 		struct window *w;
 
 		if (!(w = window_add()))

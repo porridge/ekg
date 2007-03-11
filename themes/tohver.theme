@@ -1,19 +1,21 @@
-message_line_first %g(%w%3%g)%b-%B<%n%r%2%n%B>%n %1
+message_line_first %5%g(%w%3%g)%b-%B<%n%r%2%n%B>%n %1
 message_line         %1\n
-message_conference_line_first %g(%w%3%g)%b-%C<%n%B%2%n%C>%n %1
-chat_line_first %g<%n%B%2%n%g>%n %1\n
-chat_conference_line_first %C<%n%B%2%n%C>%n %1\n
+message_conference_line_first %5%g(%w%3%g)%b-%C<%n%B%2%n%C>%n %1
+chat_line_first %5%g<%n%B%2%n%g>%n %1\n
+chat_conference_line_first %5%C<%n%B%2%n%C>%n %1\n
 chat_line         %1\n
-sent_line_first %B<%n%g%2%n%B>%n %1\n
+sent_line_first %5%B<%n%g%2%n%B>%n %1\n
 sent_line       %1\n
 
-message_line_first,nc %g(%w%3%g)%b-%B<%n%r%2%n%B>%n %1
-message_conference_line_first,nc %g(%w%3%g)%b-%C<%n%2%C>%n %1
+secure %c(secure)-%n
+
+message_line_first,nc %5%g(%w%3%g)%b-%B<%n%r%2%n%B>%n %1
+message_conference_line_first,nc %5%g(%w%3%g)%b-%C<%n%2%C>%n %1
 message_line,nc         %1\n
-chat_line_first,nc %g<%n%B%2%n%g>%n %1\n
-chat_conference_line_first,nc %C<%B%2%C>%n %1\n
+chat_line_first,nc %5%g<%n%B%2%n%g>%n %1\n
+chat_conference_line_first,nc %5%C<%B%2%C>%n %1\n
 chat_line,nc         %1\n
-sent_line_first,nc %B<%n%g%2%n%B>%n %1\n
+sent_line_first,nc %5%B<%n%g%2%n%B>%n %1\n
 sent_line,nc       %1\n
 
 known_user %1%n

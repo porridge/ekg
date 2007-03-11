@@ -60,15 +60,19 @@ enum event_t {
 	EVENT_SIGUSR2 = TOGGLE_BIT(13),
 	EVENT_DELIVERED = TOGGLE_BIT(14),
 	EVENT_QUEUED = TOGGLE_BIT(15),
-	EVENT_NEWMAIL = TOGGLE_BIT(16),
-	EVENT_BLOCKED = TOGGLE_BIT(17),
-	EVENT_DCCFINISH = TOGGLE_BIT(18),
-	EVENT_CONNECTED = TOGGLE_BIT(19),
-	EVENT_DISCONNECTED = TOGGLE_BIT(20),
-	EVENT_CONNECTIONLOST = TOGGLE_BIT(21),
+	EVENT_FILTERED = TOGGLE_BIT(16),
+	EVENT_MBOXFULL = TOGGLE_BIT(17),
+	EVENT_NOT_DELIVERED = TOGGLE_BIT(18),
+	EVENT_NEWMAIL = TOGGLE_BIT(19),
+	EVENT_BLOCKED = TOGGLE_BIT(20),
+	EVENT_DCCFINISH = TOGGLE_BIT(21),
+	EVENT_CONNECTED = TOGGLE_BIT(22),
+	EVENT_DISCONNECTED = TOGGLE_BIT(23),
+	EVENT_CONNECTIONLOST = TOGGLE_BIT(24),
+	EVENT_IMAGE = TOGGLE_BIT(25),
 
-	EVENT_ALL = TOGGLE_BIT(22) - 1,
-	INACTIVE_EVENT = TOGGLE_BIT(22)
+	EVENT_ALL = TOGGLE_BIT(26) - 1,
+	INACTIVE_EVENT = TOGGLE_BIT(26)
 };
 
 struct event_label {
@@ -76,7 +80,7 @@ struct event_label {
 	char *name;
 };
 
-#define EVENT_LABELS_COUNT 21	/* uaktualniæ ! */
+#define EVENT_LABELS_COUNT 25	/* uaktualniæ ! */
 struct event_label event_labels[EVENT_LABELS_COUNT + 2];
 
 struct process {
@@ -285,6 +289,7 @@ char *config_log_path;
 int config_log_status;
 char *config_log_timestamp;
 int config_make_window;
+int config_msg_as_chat;
 int config_mesg;
 char *config_nick;
 char *config_password;
@@ -295,8 +300,13 @@ char *config_proxy_forwarding;
 int config_query_commands;
 char *config_quit_reason;
 int config_random_reason;
+#ifdef HAVE_REGEX_H
+int config_regex_flags;
+#endif
 char *config_reason;
 int config_reason_limit;
+int config_receive_images;
+int config_image_size;
 int config_save_question;
 int config_save_password;
 char *config_server;
@@ -482,6 +492,7 @@ void update_status_myip(void);
 void change_status(int status, const char *arg, int autom);
 const char *ekg_status_label(int status, const char *prefix);
 int ekg_hide_descr_status(int status);
+unsigned char *unique_name (unsigned char *path);
 
 /* funkcje poza stuff.c */
 void ekg_wait_for_key(void);

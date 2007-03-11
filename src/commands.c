@@ -44,6 +44,9 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#ifdef HAVE_REGEX_H
+#  include <regex.h>
+#endif
 
 #include "commands.h"
 #include "configfile.h"
@@ -1039,6 +1042,126 @@ COMMAND(cmd_find)
 	return res;
 }
 
+COMMAND(cmd_for)
+{
+	int from, to, step = 0;
+	char **argv, *cmd;
+	int equal_width = 0;
+	int width = 0;
+	int ofs = 0;
+	int i;
+
+	if (!params[0]) {
+		printq("not_enough_params", name);
+		return -1;
+	}
+
+	argv = array_make(params[0], " \t", 0, 1, 1);
+
+	for (i = 0; argv[i]; i++) {
+		if (match_arg(argv[i], 's', "step", 2)) { 
+			if (!argv[i + 1]) {
+				printq("invalid_params", name);
+				array_free(argv);
+				return -1;
+			}
+
+			step = atoi(argv[i + 1]);
+			ofs += 2;
+			i++;
+		} else if (match_arg(argv[i], 'w', "width", 2)) {
+			equal_width = 1;
+			ofs++;
+		}
+	}
+
+	if (!argv[ofs] || !argv[ofs + 1] || !argv[ofs + 2]) {
+		printq("not_enough_params", name);
+		array_free(argv);
+		return -1;
+	}
+
+	from = atoi(argv[ofs]);
+	to = atoi(argv[ofs + 1]);
+
+	if ((from > to && step > 0) || (from < to && step < 0)) {
+		printq("invalid_params", name);
+		array_free(argv);
+		return -1;
+	}
+
+	if (!step)
+		step = (from > to) ? -1 : 1;
+
+	if (equal_width) {
+		int l1, l2;
+
+		l1 = strlen(argv[ofs]);
+		l2 = strlen(argv[ofs + 1]);
+		width = (l1 > l2) ? l1 : l2;
+	}
+
+	array_free(argv);
+
+	argv = array_make(params[0], " \t", ofs + 3, 1, 1);
+	cmd = xstrdup(argv[ofs + 2]);
+	array_free(argv);
+
+//	gg_debug(GG_DEBUG_MISC, "from=%d to=%d step=%d width=%d cmd=%s\n", from, to, step, equal_width, cmd);
+
+	while ((step > 0) ? (from <= to) : (from >= to)) {
+		char *buf = xstrdup(itoa(from));
+		string_t rcmd;
+		char *p;
+
+		if (equal_width) {
+			int orig_width = strlen(buf);
+			char *buf2 = (char *) xmalloc(width + 1);
+			int start_buf = 0, start_buf2;
+
+			/* zamieniamy: 123 -> 0123, -123 -> -0123 */
+
+			memset(buf2, '0', width);
+			buf2[width] = 0;
+
+			if (buf[0] == '-') {
+				buf2[0] = '-';
+				start_buf++;
+			}
+
+			start_buf2 = (width - orig_width) + start_buf;
+			memcpy(buf2 + start_buf2, buf + start_buf, orig_width - start_buf);
+			xfree(buf);
+			buf = buf2;
+		}
+		rcmd = string_init(NULL);
+
+		/* cmd wskazuje na stringa, którego nale¿y przepisaæ do rcmd, zamieniaj±c 
+		 * wszystkie wyst±pienia %n na zawarto¶æ bufora (buf) a wyst±pienia %% 
+		 * na %. %co¶innego zostawiamy tak jak jest. */
+
+		if (*cmd != '/')
+			string_append_c(rcmd, '/');
+
+		for (p = cmd; *p; p++) {
+			if (p[0] == '%' && p[1] == '%') {
+				string_append_c(rcmd, '%');
+				p++;
+			} else if (p[0] == '%' && p[1] == 'n') {
+				string_append(rcmd, buf);
+				p++;
+			} else
+				string_append_c(rcmd, *p);
+		}
+
+		command_exec(target, rcmd->str, quiet);
+		string_free(rcmd, 1);
+		from += step;
+	}
+
+	return 0;
+}
+
 COMMAND(cmd_change)
 {
 	int i;
@@ -1831,13 +1954,17 @@ COMMAND(cmd_list)
 			if (v == 0x22)
 				ver = "6.0 (build 140 lub nowszy)";
 			if (v == 0x24)
-				ver = "6.1 (build 155 lub nowszy)";
+				ver = "6.1 (build 155 lub nowszy) lub 7.6 (build 1359 lub nowszy)";
 			if (v == 0x25)
 				ver = "7.0 (build 1 lub nowszy)";
 			if (v == 0x26)
 				ver = "7.0 (build 20 lub nowszy)";
 			if (v == 0x27)
 				ver = "7.0 (build 22 lub nowszy)";
+			if (v == 0x28)
+				ver = "7.5.0 (build 2201 lub nowszy)";
+			if (v == 0x29)
+				ver = "7.6 (build 1688 lub nowszy)";
 
 			if (ver)
 				printq("user_info_version", ver);
@@ -1882,6 +2009,74 @@ COMMAND(cmd_list)
 			params[0] = NULL;
 		return 0;
 	}
+
+#ifdef HAVE_REGEX_H
+	/* list --regex */
+	if (params[0] && match_arg(params[0], 'r', "regex", 2)) {
+		int rs, flags = REG_NOSUB;
+		char errbuf[512];
+		regex_t reg;
+
+		if (!params[1]) {
+			printq("not_enough_params", name);
+			return -1;
+		}
+
+		if (!(config_regex_flags & 1))
+			flags |= REG_EXTENDED;
+
+		if (!(config_regex_flags & 2))
+			flags |= REG_ICASE;
+
+		if ((rs = regcomp(&reg, params[1], flags)))
+			goto err;
+
+		for (l = userlist; l; l = l->next) {
+			struct userlist *u = l->data;
+			int show = 0;
+
+			if (!u->display || !u->uin)
+				continue;
+
+			rs = regexec(&reg, u->display, 0, NULL, 0);
+			if (!rs)
+				show = 1;
+			else if (rs != REG_NOMATCH)
+				goto err;
+
+			if (!show) {
+				rs = regexec(&reg, itoa(u->uin), 0, NULL, 0);
+				if (!rs)
+					show = 1;
+				else if (rs != REG_NOMATCH)
+					goto err;
+			}
+
+			if (!show)
+				continue;
+
+			tmp = ekg_status_label(u->status, "list_");
+
+			if (u->uin == config_uin && sess && sess->state == GG_STATE_CONNECTED && !ignored_check(config_uin))
+				tmp = ekg_status_label(config_status, "list_");
+
+			printq(tmp, format_user(u->uin), (u->first_name) ? u->first_name : u->display, inet_ntoa(u->ip), itoa(u->port), u->descr);
+			count++;
+		}
+
+		if (!count)
+			printq("regex_none");
+
+		regfree(&reg);
+		return 0;
+
+err:
+		regerror(rs, &reg, errbuf, sizeof(errbuf));
+		printq("regex_error", errbuf);
+		regfree(&reg);
+		return -1;
+	}
+#endif
 
 	/* list --get */
 	if (params[0] && (match_arg(params[0], 'g', "get", 2) || match_arg(params[0], 'G', "get-config", 5))) {
@@ -2180,7 +2375,9 @@ COMMAND(cmd_msg)
 	char **nicks = NULL, *nick = NULL, **p = NULL, *add_send = NULL;
 	unsigned char *msg = NULL, *raw_msg = NULL, *format = NULL;
 	uin_t uin;
-	int count, valid = 0, chat = (!strcasecmp(name, "chat")), secure = 0, msg_seq, formatlen = 0, conference = 0;
+	int count, valid = 0, secure = 0, msg_seq, formatlen = 0, conference = 0;
+	int chat = (config_msg_as_chat == 2) ? 1 : !strcasecmp(name, "chat");
+	int chatsend = config_msg_as_chat ? 1 : !strcasecmp(name, "chat");
 
 	if (!params[0] || !params[1]) {
 		printq("not_enough_params", name);
@@ -2416,7 +2613,7 @@ COMMAND(cmd_msg)
 		
 	        u = userlist_find(uin, NULL);
 
-		put_log(uin, "%s,%ld,%s,%s,%s\n", ((chat) ? "chatsend" : "msgsend"), uin, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), raw_msg);
+		put_log(uin, "%s,%ld,%s,%s,%s\n", ((chatsend) ? "chatsend" : "msgsend"), uin, ((u && u->display) ? u->display : ""), log_timestamp(time(NULL)), raw_msg);
 
 		if (config_last & 4)
 			last_add(1, uin, time(NULL), 0, raw_msg);
@@ -2427,18 +2624,18 @@ COMMAND(cmd_msg)
 			unsigned char *__msg = xstrdup(msg);
 #ifdef HAVE_OPENSSL
 			int ret = 0;
-			if (config_encryption && (ret = msg_encrypt(uin, &__msg)) > 0)
+			if ((config_encryption == 1 || config_encryption == 3) && (ret = msg_encrypt(uin, &__msg)) > 0)
 				secure = 1;
 
 			if (ret == 2)
 				printq("message_too_long");
 #endif
 			if (sess)
-				msg_seq = gg_send_message_richtext(sess, (chat) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, __msg, format, formatlen);
+				msg_seq = gg_send_message_richtext(sess, (chatsend) ? GG_CLASS_CHAT : GG_CLASS_MSG, uin, __msg, format, formatlen);
 			else
 				msg_seq = -1;
 
-			msg_queue_add(((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG), msg_seq, 1, &uin, raw_msg, secure, format, formatlen);
+			msg_queue_add(((chatsend) ? GG_CLASS_CHAT : GG_CLASS_MSG), msg_seq, 1, &uin, raw_msg, secure, format, formatlen);
 			valid++;
 			xfree(__msg);
 		}
@@ -2457,7 +2654,7 @@ COMMAND(cmd_msg)
 		else
 			msg_seq = -1;
 
-		msg_queue_add(((chat) ? GG_CLASS_CHAT : GG_CLASS_MSG), msg_seq, count, uins, raw_msg, 0, format, formatlen);
+		msg_queue_add(((chatsend) ? GG_CLASS_CHAT : GG_CLASS_MSG), msg_seq, count, uins, raw_msg, 0, format, formatlen);
 		valid++;
 
 		xfree(uins);
@@ -2551,8 +2748,7 @@ COMMAND(cmd_set)
 	if (arg && val) {
 		char **tmp = array_make(val, "", 0, 0, 1);
 
-		value = tmp[0];
-		tmp[0] = NULL;
+		value = xstrdup(tmp[0]);
 		array_free(tmp);
 	}
 
@@ -3080,7 +3276,7 @@ COMMAND(cmd_dcc)
 
 	if (!strncasecmp(params[0], "g", 1) || !strncasecmp(params[0], "re", 2)) {		/* get */
 		struct transfer *t = NULL;
-		char *path;
+		unsigned char *path, *tmp;
 		
 		for (l = transfers; l; l = l->next) {
 			struct transfer *tt = l->data;
@@ -3133,46 +3329,28 @@ COMMAND(cmd_dcc)
 			t->start = 0;
 
 		if (config_dcc_dir) 
-		    	path = saprintf("%s/%s", config_dcc_dir, t->filename);
+		    	path = (unsigned char *) saprintf("%s/%s", config_dcc_dir, t->filename);
 		else
-		    	path = xstrdup(t->filename);
+		    	path = (unsigned char *) xstrdup(t->filename);
 
-		if (config_dcc_backups) {
-			struct stat st;
-
-			if (!stat(path, &st)) {
-				int num;
-				char *newpath = NULL;	/* ¿eby nie by³o warninga */
-
-				for (num = 1; num < 1000; num++) {
-					newpath = saprintf("%s.%d", path, num);
-
-					if (stat(newpath, &st) == -1)
-						break;
-
-					xfree(newpath);
-				}
-
-				if (num == 1000) {
-					printq("dcc_get_cant_overwrite", path);
-					gg_free_dcc(t->dcc);
-					list_remove(&transfers, t, 1);
-					xfree(path);
-
-					return -1;
-				} else {
-					printq("dcc_get_backup_made", path, newpath);
-					xfree(path);
-					path = newpath;
-				}
-			}
+		tmp = unique_name(path);
+		if (!tmp) {
+			printq("dcc_get_cant_overwrite", path);
+			gg_free_dcc(t->dcc);
+			list_remove(&transfers, t, 1);
+			xfree(path);
+			return -1;
+		} else if (tmp != path) {
+			printq("dcc_get_backup_made", path, tmp);
+			xfree(path);
+			path = tmp;
 		}
 
 		if (params[0][0] == 'r') {
-			t->dcc->file_fd = open(path, O_WRONLY);
+			t->dcc->file_fd = open((char *) path, O_WRONLY);
 			t->dcc->offset = lseek(t->dcc->file_fd, 0, SEEK_END);
 		} else
-			t->dcc->file_fd = open(path, O_WRONLY | O_CREAT, 0600);
+			t->dcc->file_fd = open((char *) path, O_WRONLY | O_CREAT, 0600);
 
 		if (t->dcc->file_fd == -1) {
 			printq("dcc_get_cant_create", path);
@@ -4047,6 +4225,8 @@ COMMAND(cmd_passwd)
 		return -1;
 	}
 
+	xfree(oldpasswd);
+
 	xfree(last_tokenid);
 	last_tokenid = NULL;
 
@@ -4329,7 +4509,7 @@ COMMAND(cmd_test_ctcp)
  *
  * wykonuje polecenie zawarte w linii tekstu.
  *
- *  - target - w którym oknie nast±pi³o (NULL je¶li to nie query)
+ *  - target - w którym oknie nast±pi³o (NULL je¶li to nie query).
  *  - xline - linia tekstu.
  *  - quiet - czy mamy ukryæ wynik.
  *
@@ -4496,7 +4676,7 @@ int command_exec(const char *target, const char *xline, int quiet)
 		/*
 		 * dla query potrzeba nam cudzys³owów, natomiast
 		 * dla ca³ej reszty nie s± one potrzebne (wymaga³oby to
-		 * strippowania w wielu miejscach i zmienienia paru koncepcji
+		 * strippowania w wielu miejscach i zmienienia paru koncepcji)
 		 */
 		if (!strcasecmp(last_name, "query")) {
 			par = array_make_quoted(params_string, " \t", len, 1, 1);
@@ -5875,9 +6055,10 @@ static int command_add_compare(void *data1, void *data2)
  *  - name - nazwa komendy,
  *  - params - definicja parametrów (szczegó³y poni¿ej),
  *  - function - funkcja obs³uguj±ca komendê,
- *  - help_params - opis parametrów,
- *  - help_brief - krótki opis komendy,
- *  - help_long - szczegó³owy opis komendy.
+ *  - alias - czy komenda jest aliasem,
+ *  - params_help - opis parametrów,
+ *  - brief_help - krótki opis komendy,
+ *  - long_help - szczegó³owy opis komendy.
  *
  * 0 je¶li siê uda³o, -1 je¶li b³±d.
  */
@@ -6205,7 +6386,27 @@ void command_init()
 	  "  -s, --start <n>         wy¶wietla od n-tego numeru\n"
 	  "  -A, --all               wy¶wietla wszystkich\n"
 	  "  -S, --stop              zatrzymuje wszystkie poszukiwania");
-	  
+
+	command_add
+	( "for", "?", cmd_for, 0, 
+	  " [opcje] <od> <do> <polecenie>", "wykonanie polecenia w pêtli",
+	  "\n"
+	  "Polecenie zostanie wykonane w pêtli od warto¶ci %Tod%n do "
+	  "warto¶ci %Tdo%n w³±cznie. Opcje:\n"
+	  "\n"
+	  "  -s, --step <przyrost>\n"
+	  "  -w, --width\n"
+	  "\n"
+	  "Je¿eli przyrost nie zostanie podany lub zostanie podane 0, "
+	  "to zostanie u¿yty przyrost 1 (dla %Tdo%n wiêkszego od %Tod%n) "
+	  "lub -1 (w przeciwnym przypadku). Je¿eli %Tdo%n bêdzie równe "
+	  "%Tod%n, to polecenie zostanie wykonane tylko raz. W poleceniu "
+	  "wszystkie wyst±pienia %T%%n%n zostan± zamienione na aktualn± "
+	  "warto¶æ zmiennej iteracyjnej (czyli kolejno na wszystkie liczby "
+	  "z podanego zakresu). Znak procentu mo¿na uzyskaæ pisz±c %T%%%%%n. "
+	  "Je¿eli zostanie podana opcja %T-w%n, to wszystkie liczby bêd± "
+	  "dope³nione zerami do szeroko¶ci najwiêkszej z nich.");
+
 	command_add
 	( "help", "cv", cmd_help, 0,
 	  " [polecenie] [zmienna]", "wy¶wietla informacjê o poleceniach",
@@ -6284,6 +6485,9 @@ void command_init()
 	  "  -o, --offline          osoby dla których jeste¶my\n"
 	  "                         niedostêpni\n"
 	  "\n"
+	  "Przeszukanie listy przy pomocy wyra¿enia regularnego: \"list -r\", "
+	  "\"list --regex\" (zobacz te¿: /help /set regex_flags).\n"
+	  "\n"
 	  "Wy¶wietlanie cz³onków grupy: \"list @grupa\". Wy¶wietlanie osób "
 	  "spoza grupy: \"list !@grupa\".\n"
 	  "\n"
@@ -6340,9 +6544,14 @@ void command_init()
 	  "  - msg, chat - wiadomo¶æ\n"
 	  "  - query - nowa rozmowa\n"
           "  - conference - nowa konferencja\n"
-	  "  - delivered, queued - wiadomo¶æ dostarczona lub zakolejkowana na serwerze\n"
+	  "  - delivered - wiadomo¶æ zosta³a dorêczona\n"
+	  "  - queued - wiadomo¶æ zosta³a zakolejkowana na serwerze\n"
+	  "  - filtered - wiadomo¶æ zosta³a usuniêta przez filtry serwera\n"
+	  "  - mboxfull - odbiorca ma pe³n± skrzynkê wiadomo¶ci\n"
+	  "  - not_delivered - wiadomo¶æ nie zosta³a dorêczona\n"
 	  "  - dcc - kto¶ przysy³a nam plik\n"
 	  "  - dccfinish - odebrano plik\n"
+	  "  - image - odebrano obrazek\n"
 	  "  - sigusr1, sigusr2 - otrzymanie przez ekg danego sygna³u\n"
 	  "  - newmail - otrzymanie nowej wiadomo¶ci e-mail\n"
 	  "  - connected - uda³o siê po³±czyæ z serwerem\n"
@@ -6488,7 +6697,7 @@ void command_init()
 
 	command_add
 	( "unregister", "???", cmd_register, 0,
-	  " <uin/alias> <has³o> <token>", "usuwa konto z serwera",
+	  " <numer/alias> <has³o> <token>", "usuwa konto z serwera",
 	  "\n"
 	  "Podanie numeru i has³a jest niezbêdne ze wzglêdów bezpieczeñstwa. "
 	  "Nikt nie chcia³by chyba usun±æ konta przypadkowo, bez ¿adnego "

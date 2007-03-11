@@ -153,6 +153,9 @@ char *config_quit_reason = NULL;
 char *config_away_reason = NULL;
 char *config_back_reason = NULL;
 int config_random_reason = 0;
+#ifdef HAVE_REGEX_H
+int config_regex_flags = 0;
+#endif
 int config_query_commands = 0;
 char *config_proxy = NULL;
 char *config_server = NULL;
@@ -167,6 +170,8 @@ char *config_tab_command = NULL;
 int ioctld_sock = -1;
 int config_ctrld_quits = 1;
 int config_save_password = 1;
+int config_receive_images = 0;
+int config_image_size = 255;
 int config_save_question = 1;
 char *config_datestamp = NULL;
 char *config_timestamp = NULL;
@@ -181,6 +186,7 @@ int config_encryption = 0;
 int config_server_save = 0;
 char *config_email = NULL;
 int config_time_deviation = 300;
+int config_msg_as_chat = 0;
 int config_mesg = MESG_DEFAULT;
 char *config_nick = NULL;
 int config_display_welcome = 1;
@@ -237,12 +243,16 @@ struct event_label event_labels[EVENT_LABELS_COUNT + 2] = {
 	{ EVENT_SIGUSR2, "sigusr2" },
 	{ EVENT_DELIVERED, "delivered" },
 	{ EVENT_QUEUED, "queued" },
+	{ EVENT_FILTERED, "filtered" },
+	{ EVENT_MBOXFULL, "mboxfull" },
+	{ EVENT_NOT_DELIVERED, "not_delivered" },
 	{ EVENT_NEWMAIL, "newmail" },
 	{ EVENT_BLOCKED, "blocked" },
 	{ EVENT_DCCFINISH, "dccfinish" },
 	{ EVENT_CONNECTED, "connected" },
 	{ EVENT_DISCONNECTED, "disconnected" },
 	{ EVENT_CONNECTIONLOST, "connectionlost" },
+	{ EVENT_IMAGE, "image" },
 
 	{ INACTIVE_EVENT, NULL },
 	{ 0, NULL }
@@ -1355,6 +1365,7 @@ void ekg_connect()
 	p.status = config_status;
 	p.status_descr = config_reason;
 	p.async = 1;
+	p.image_size = config_image_size < 255 ? config_image_size : 255;
 #ifdef HAVE_VOIP
 	p.has_audio = 1;
 #endif
@@ -1399,9 +1410,9 @@ void ekg_connect()
 
 		xfree(sserver);
 
+skip_server:
 		array_free(servers);
 	}
-skip_server:
 
 	if (config_proxy_forwarding) {
 		char *fwd = xstrdup(config_proxy_forwarding), *tmp = strchr(fwd, ':');
@@ -1905,7 +1916,7 @@ int mesg_set(int what)
 int msg_encrypt(uin_t uin, unsigned char **msg)
 {
 #ifdef HAVE_OPENSSL
-	if (config_encryption) {
+	if (config_encryption == 1 || config_encryption == 3) {
 		unsigned char *res = sim_message_encrypt(*msg, uin);
 
 		if (res) {
@@ -3347,3 +3358,38 @@ time_t parsetimestr(const char *p)
 	else
 		return mktime(lt);
 }
+
+/*
+ * unique_name()
+ *
+ * je¶li jest w³±czone config_dcc_backups, to tworzy unikaln± ¶cie¿kê 
+ * do pliku, dodaj±c sufiksy od 1 do 1000.
+ *
+ * - path: ¶cie¿ka do zmiany
+ *
+ * zwraca:
+ *  - NULL: nie uda³o siê utworzyæ backupu
+ *  - path: backup nie by³ potrzebny lub config_dcc_backups == 0
+ *  - pozosta³e warto¶ci: wska¼nik do nowej ¶cie¿ki
+ */
+unsigned char *unique_name (unsigned char *path)
+{
+	struct stat st;
+	int num;
+	unsigned char *newpath = NULL;	/* ¿eby nie by³o warninga */
+
+	if (!config_dcc_backups || stat((char *) path, &st))
+		return path;
+
+	for (num = 1; num < 1000; num++) {
+		newpath = (unsigned char *) saprintf("%s.%d", path, num);
+
+		if (stat((char *) newpath, &st) == -1)
+			break;
+
+		xfree(newpath);
+	}
+
+	return (num == 1000) ? NULL : newpath;
+}
+

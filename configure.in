@@ -341,6 +341,12 @@ AC_CHECK_HEADERS(locale.h)
 AC_CHECK_FUNCS(setlocale)
 AC_CHECK_FUNCS(strcoll)
 
+dnl  regexpy
+AC_CHECK_HEADERS(regex.h)
+
+dnl  execinfo
+AC_CHECK_HEADERS(execinfo.h)
+
 AC_CHECK_FUNCS(inet_pton)
 
 AC_ARG_ENABLE(ui-readline,
