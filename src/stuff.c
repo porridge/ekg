@@ -1945,31 +1945,99 @@ int msg_encrypt(uin_t uin, unsigned char **msg)
 }
 
 /*
+ * charmap_prepare()
+ *
+ * przygotowuje mapê znaków do u¿ycia w funkcji charmap_convert() zgodnie ze 
+ * wzorcem convtab. wzorzec musi mieæ parzyst± liczbê pozycji.
+ *
+ * - charmap - bufor do wype³nienia (musi mieæ 256 bajtów),
+ * - convtab - wzorzec konwersji (przyk³ad w cp_to_iso()),
+ * - convtab_sz - rozmiar wzoraca konwersji,
+ * - def - czy przygotowaæ domy¶ln± mapê
+ */
+static void charmap_prepare(unsigned char *charmap, const unsigned char *convtab, size_t convtab_sz, int def)
+{
+	size_t i;
+
+	if (convtab_sz & 1)
+		return;
+
+	if (def)
+		for (i = 0; i < 256; i++)
+			charmap[i] = (unsigned char) i;
+
+	for (i = 0; i < convtab_sz;) {
+		unsigned char from, to;
+
+		from = convtab[i++];
+		to = convtab[i++];
+
+		charmap[from] = to;
+	}
+}
+
+/*
+ * charmap_convert()
+ *
+ * konwertuje bufor zgodnie z podan± map± konwersji.
+ *
+ * - charmap - mapa konwersji (256 bajtów),
+ * - buf - bufor
+ */
+static void charmap_convert(const unsigned char *charmap, unsigned char *buf)
+{
+	if (!buf)
+		return;
+
+	for (; *buf; buf++)
+		*buf = charmap[*buf];
+}
+
+/*
  * cp_to_iso()
  *
  * zamienia krzaczki pisane w cp1250 na iso-8859-2, przy okazji maskuj±c
- * znaki, których nie da siê wy¶wietliæ, za wyj±tkiem \r i \n.
+ * znaki, których nie da siê wy¶wietliæ, za wyj±tkiem \r i \n, oraz 
+ * zamieniaj±c tabulacje na spacje.
  *
  *  - buf.
  */
 void cp_to_iso(unsigned char *buf)
 {
-	if (!buf)
-		return;
+	static unsigned char charmap[256];
+	static int valid = 0;
 
-	while (*buf) {
-		if (*buf == (unsigned char)'¥') *buf = '¡';
-		if (*buf == (unsigned char)'¹') *buf = '±';
-		if (*buf == 140) *buf = '¦';
-		if (*buf == 156) *buf = '¶';
-		if (*buf == 143) *buf = '¬';
-		if (*buf == 159) *buf = '¼';
+	if (!valid) {
+		static const unsigned char conv[] = {
+			0x09, 0x20,	/* \t */
+			0x0A, 0x0A,	/* \n */
+			0x0D, 0x0D,	/* \r */
+			0xB9, 0xB1,	/* ± */
+			0x9C, 0xB6,	/* ¶ */
+			0x9F, 0xBC,	/* ¼ */
+			0xA5, 0xA1,	/* ¡ */
+			0x8C, 0xA6,	/* ¦ */
+			0x8F, 0xAC	/* ¬ */
+		};
+		size_t i;
 
-                if (*buf != 13 && *buf != 10 && (*buf < 32 || (*buf > 127 && *buf < 160)))
-                        *buf = '?';
+		for (i = 0; i < 0x20; i++)
+			charmap[i] = '?';
 
-		buf++;
+		for (i = 0x20; i < 0x80; i++)
+			charmap[i] = (unsigned char) i;
+
+		for (i = 0x80; i < 0xA0; i++)
+			charmap[i] = '?';
+
+		for (i = 0xA0; i < 0x100; i++)
+			charmap[i] = (unsigned char) i;
+
+		charmap_prepare(charmap, conv, sizeof(conv), 0);
+		valid = 1;
 	}
+
+	charmap_convert(charmap, buf);
 }
 
 /*
@@ -1981,18 +2049,24 @@ void cp_to_iso(unsigned char *buf)
  */
 void iso_to_cp(unsigned char *buf)
 {
-	if (!buf)
-		return;
+	static unsigned char charmap[256];
+	static int valid = 0;
 
-	while (*buf) {
-		if (*buf == (unsigned char)'¡') *buf = '¥';
-		if (*buf == (unsigned char)'±') *buf = '¹';
-		if (*buf == (unsigned char)'¦') *buf = 'Œ';
-		if (*buf == (unsigned char)'¶') *buf = 'œ';
-		if (*buf == (unsigned char)'¬') *buf = '';
-		if (*buf == (unsigned char)'¼') *buf = 'Ÿ';
-		buf++;
+	if (!valid) {
+		static const unsigned char conv[] = {
+			0xB1, 0xB9,	/* ± */
+			0xB6, 0x9C,	/* ¶ */
+			0xBC, 0x9F,	/* ¼ */
+			0xA1, 0xA5,	/* ¡ */
+			0xA6, 0x8C,	/* ¦ */
+			0xAC, 0x8F	/* ¬ */
+		};
+
+		charmap_prepare(charmap, conv, sizeof(conv), 1);
+		valid = 1;
 	}
+
+	charmap_convert(charmap, buf);
 }
 
 /*
@@ -2000,36 +2074,40 @@ void iso_to_cp(unsigned char *buf)
  *
  * usuwa polskie litery z tekstu.
  *
- *  - c.
+ *  - buf.
  */
 void iso_to_ascii(unsigned char *buf)
 {
-	if (!buf)
-		return;
+	static unsigned char charmap[256];
+	static int valid = 0;
 
-	while (*buf) {
-		if (*buf == (unsigned char)'±') *buf = 'a';
-		if (*buf == (unsigned char)'ê') *buf = 'e';
-		if (*buf == (unsigned char)'æ') *buf = 'c';
-		if (*buf == (unsigned char)'³') *buf = 'l';
-		if (*buf == (unsigned char)'ñ') *buf = 'n';
-		if (*buf == (unsigned char)'ó') *buf = 'o';
-		if (*buf == (unsigned char)'¶') *buf = 's';
-		if (*buf == (unsigned char)'¿') *buf = 'z';
-		if (*buf == (unsigned char)'¼') *buf = 'z';
+	if (!valid) {
+		static const unsigned char conv[] = {
+			'ê', 'e', 
+			'ó', 'o', 
+			'±', 'a', 
+			'¶', 's', 
+			'³', 'l', 
+			'¿', 'z', 
+			'¼', 'z', 
+			'æ', 'c', 
+			'ñ', 'n', 
+			'Ê', 'E', 
+			'Ó', 'O', 
+			'¡', 'A', 
+			'¦', 'S', 
+			'£', 'L',
+			'¯', 'Z',
+			'¬', 'Z', 
+			'Æ', 'C', 
+			'Ñ', 'N'
+		};
 
-		if (*buf == (unsigned char)'¡') *buf = 'A';
-		if (*buf == (unsigned char)'Ê') *buf = 'E';
-		if (*buf == (unsigned char)'Æ') *buf = 'C';
-		if (*buf == (unsigned char)'£') *buf = 'L';
-		if (*buf == (unsigned char)'Ñ') *buf = 'N';
-		if (*buf == (unsigned char)'Ó') *buf = 'O';
-		if (*buf == (unsigned char)'¦') *buf = 'S';
-		if (*buf == (unsigned char)'¯') *buf = 'Z';
-		if (*buf == (unsigned char)'¬') *buf = 'Z';
-
-		buf++;
+		charmap_prepare(charmap, conv, sizeof(conv), 1);
+		valid = 1;
 	}
+
+	charmap_convert(charmap, buf);
 }
 
 /*
