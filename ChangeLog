@@ -8,6 +8,7 @@ d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
 - konwersja tabulacji na spacjê podczas odbierania wiadomo¶ci (Rodion/g)
 - optymalizacja funkcji konwertuj±cych zestawy znaków (gophi)
+- poprawienie pokazywania czasu kompilacji (adwol/g)
 
 // 2007-03-10
 

@@ -917,11 +917,6 @@ void changed_xxx_reason(const char *var)
 		print("descr_too_long", itoa(strlen(tmp) - GG_STATUS_DESCR_MAXSIZE));
 }
 
-const char *compile_time(void)
-{
-	return __DATE__ " " __TIME__;
-}
-
 /*
  * conference_add()
  *

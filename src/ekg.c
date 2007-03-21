@@ -83,6 +83,7 @@
 #ifdef WITH_PYTHON
 #  include "python.h"
 #endif
+#include "comptime.h"
 
 #ifndef PATH_MAX
 #  define PATH_MAX _POSIX_PATH_MAX
