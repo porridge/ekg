@@ -161,7 +161,8 @@ void quit()
 
 int main(int argc, char **argv) 
 {
-    	int sock, length, netsock = -1, rsock = -1, netport = 0, size, i, on = 1;
+    	int sock, netsock = -1, rsock = -1, netport = 0, i, on = 1;
+	socklen_t size, length;
 	struct sockaddr_un addr;
 	struct sockaddr_in netaddr, rnetaddr;
 	struct action_data data;
