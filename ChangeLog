@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
+// 2007-04-18
+
+- gg 1.7 build 3315 (darkjames/g)
+
 // 2007-04-04
 
 - signedness w ioctld.c (gophi)
