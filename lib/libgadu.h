@@ -888,6 +888,7 @@ extern unsigned long gg_local_ip;
 
 #ifdef __GG_LIBGADU_HAVE_PTHREAD
 int gg_resolve_pthread(int *fd, void **resolver, const char *hostname);
+void gg_resolve_pthread_cleanup(void *resolver, int kill);
 #endif
 
 #ifdef _WIN32

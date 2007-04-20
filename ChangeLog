@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
+// 2007-04-21
+
+- libgadu: poprawienie wycieku deskryptorów w resolverze opartym na 
+  w±tkach (w/g)
+
 // 2007-04-18
 
 - gg 7.7 build 3315 (darkjames/g)
