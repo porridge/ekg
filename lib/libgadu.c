@@ -210,7 +210,6 @@ int gg_resolve(int *fd, int *pid, const char *hostname)
 	}
 
 	if (!res) {
-		signal(SIGTERM, SIG_DFL);
 		close(pipes[0]);
 
 		if ((a.s_addr = inet_addr(hostname)) == INADDR_NONE) {
@@ -975,7 +974,7 @@ void gg_free_session(struct gg_session *sess)
 	}
 #else
 	if (sess->pid != -1) {
-		kill(sess->pid, SIGTERM);
+		kill(sess->pid, SIGKILL);
 		waitpid(sess->pid, NULL, WNOHANG);
 	}
 #endif
@@ -1123,7 +1122,7 @@ void gg_logoff(struct gg_session *sess)
 	}
 #else
 	if (sess->pid != -1) {
-		kill(sess->pid, SIGTERM);
+		kill(sess->pid, SIGKILL);
 		waitpid(sess->pid, NULL, WNOHANG);
 		sess->pid = -1;
 	}
