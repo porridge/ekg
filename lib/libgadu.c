@@ -210,6 +210,7 @@ int gg_resolve(int *fd, int *pid, const char *hostname)
 	}
 
 	if (!res) {
+		signal(SIGTERM, SIG_DFL);
 		close(pipes[0]);
 
 		if ((a.s_addr = inet_addr(hostname)) == INADDR_NONE) {

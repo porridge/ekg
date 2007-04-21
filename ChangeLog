@@ -8,6 +8,8 @@ d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
 - libgadu: poprawienie wycieku deskryptorów w resolverze opartym na 
   w±tkach (w/g)
+- libgadu: poprawienie mo¿liwo¶ci nieprawid³owego zachowania resolvera 
+  opartego na procesach (w/g)
 
 // 2007-04-18
 
