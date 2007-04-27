@@ -120,6 +120,7 @@ char *config_sound_notify_file = NULL;
 char *config_sound_mail_file = NULL;
 char *config_sound_app = NULL;
 int config_uin = 0;
+int config_userlist_backup = 0;
 int config_last_sysmsg = 0;
 int config_last_sysmsg_changed = 0;
 char *config_local_ip = NULL;

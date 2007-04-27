@@ -339,6 +339,7 @@ int config_time_deviation;
 char *config_datestamp;
 char *config_timestamp;
 int config_uin;
+int config_userlist_backup;
 char *config_windows_layout;
 int config_windows_save;
 #ifdef WITH_WAP

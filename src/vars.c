@@ -316,6 +316,7 @@ void variable_init()
 	variable_add("theme", "th", VAR_STR, 1, &config_theme, changed_theme, NULL, NULL);
 	variable_add("time_deviation", "td", VAR_INT, 1, &config_time_deviation, NULL, NULL, NULL);
 	variable_add("timestamp", "ts", VAR_STR, 1, &config_timestamp, NULL, NULL, NULL);
+	variable_add("userlist_backup", "ub", VAR_BOOL, 1, &config_userlist_backup, NULL, NULL, NULL);
 #ifdef WITH_WAP
 	variable_add("wap_enabled", "we", VAR_INT, 1, &config_wap_enabled, NULL, NULL, NULL);
 #else

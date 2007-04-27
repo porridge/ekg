@@ -940,6 +940,16 @@ timestamp
 	pocz±tku ka¿dej linii. dok³adny opis formatu zawiera strona
 	manuala strftime(3).
 
+userlist_backup
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	okre¶la, czy przed zaimportowaniem listy kontaktów z serwera 
+	zapisaæ aktualn± listê w pliku ~/.gg/userlist.pid (gdzie pid 
+	to numer procesu ekg). je¿eli zaimportowana zostanie tak¿e 
+	konfiguracja, to aktualna konfiguracja zostanie zapisana w 
+	pliku ~/.gg/config.pid.
+
 wap_enabled
 	typ: bool
 	domy¶lna warto¶æ: 2

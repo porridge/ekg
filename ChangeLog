@@ -7,6 +7,7 @@ d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 // 2007-04-27
 
 - libgadu: poprawienie obcinania \r w gg_get_line() (darkjames/g)
+- dodanie zmiennej userlist_backup (kanedaaa/g)
 
 // 2007-04-21
 
