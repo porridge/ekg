@@ -223,9 +223,9 @@ void variable_init()
 #endif
 	variable_add("emoticons", "eM", VAR_BOOL, 1, &config_emoticons, NULL, NULL, NULL);
 #ifdef HAVE_OPENSSL
-	variable_add("encryption", "en", VAR_BOOL, 1, &config_encryption, NULL, NULL, NULL);
+	variable_add("encryption", "en", VAR_INT, 1, &config_encryption, NULL, variable_map(4, 0, 0, "no", 1, 0, "yes", 2, 0, "recv", 3, 0, "send"), NULL);
 #else
-	variable_add("encryption", "en", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
+	variable_add("encryption", "en", VAR_INT, 2, NULL, NULL, NULL, NULL);
 #endif
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init)
@@ -246,6 +246,7 @@ void variable_init()
 #endif
 	variable_add("ignore_unknown_sender", "iu", VAR_BOOL, 1, &config_ignore_unknown_sender, NULL, NULL, NULL);
 	variable_add("ignore_empty_msg", "im", VAR_BOOL, 1, &config_ignore_empty_msg, NULL, NULL, NULL);
+	variable_add("image_size", "iS", VAR_INT, 1, &config_image_size, NULL, NULL, NULL);
 	variable_add("keep_reason", "kr", VAR_INT, 1, &config_keep_reason, NULL, NULL, NULL);
 	variable_add("last", "la", VAR_MAP, 1, &config_last, NULL, variable_map(4, 0, 0, "none", 1, 2, "all", 2, 1, "separate", 4, 0, "sent"), NULL);
 	variable_add("last_size", "ls", VAR_INT, 1, &config_last_size, NULL, NULL, NULL);
@@ -255,13 +256,20 @@ void variable_init()
 	variable_add("log_status", "lS", VAR_INT, 1, &config_log_status, NULL, variable_map(3, 0, 0, "no", 1, 2, "yes", 2, 1, "descr"), dd_log);
 	variable_add("log_path", "lp", VAR_STR, 1, &config_log_path, NULL, NULL, dd_log);
 	variable_add("log_timestamp", "lt", VAR_STR, 1, &config_log_timestamp, NULL, NULL, dd_log);
-	variable_add("make_window", "mw", VAR_INT, 1, &config_make_window, NULL, variable_map(3, 0, 0, "none", 1, 2, "usefree", 2, 1, "always"), NULL);
+	variable_add("make_window", "mw", VAR_MAP, 1, &config_make_window, NULL, variable_map(4, 0, 0, "none", 1, 2, "usefree", 2, 1, "always", 4, 0, "nomsg"), NULL);
+	variable_add("msg_as_chat", "mc", VAR_INT, 1, &config_msg_as_chat, NULL, variable_map(3, 0, 0, "no", 1, 2, "sendonly", 2, 1, "yes"), NULL);
 	variable_add("mesg", "ma", VAR_INT, 1, &config_mesg, changed_mesg, variable_map(3, 0, 0, "no", 1, 2, "yes", 2, 1, "default"), NULL);
 	variable_add("nick", "ni", VAR_STR, 1, &config_nick, NULL, NULL, NULL);
 	variable_add("proxy", "pr", VAR_STR, 1, &config_proxy, changed_proxy, NULL, NULL);
 	variable_add("proxy_forwarding", "pf", VAR_STR, 1, &config_proxy_forwarding, NULL, NULL, NULL);
 	variable_add("random_reason", "rr", VAR_MAP, 1, &config_random_reason, NULL, variable_map(5, 0, 0, "none", 1, 0, "away", 2, 0, "notavail", 4, 0, "avail", 8, 0, "invisible"), NULL);
 	variable_add("reason_limit", "rl", VAR_BOOL, 1, &config_reason_limit, NULL, NULL, NULL);
+	variable_add("receive_images", "ra", VAR_BOOL, 1, &config_receive_images, NULL, NULL, NULL);
+#ifdef HAVE_REGEX_H
+	variable_add("regex_flags", "rf", VAR_MAP, 1, &config_regex_flags, NULL, variable_map(3, 0, 0, "none", 1, 0, "basic", 2, 0, "case"), NULL);
+#else
+	variable_add("regex_flags", "rf", VAR_MAP, 2, NULL, NULL, NULL, NULL);
+#endif
 	variable_add("quit_reason", "qr", VAR_STR, 1, &config_quit_reason, changed_xxx_reason, NULL, NULL);
 	variable_add("query_commands", "qc", VAR_BOOL, 1, &config_query_commands, NULL, NULL, NULL);
 	variable_add("save_password", "sp", VAR_BOOL, 1, &config_save_password, NULL, NULL, NULL);
@@ -303,6 +311,7 @@ void variable_init()
 	variable_add("theme", "th", VAR_STR, 1, &config_theme, changed_theme, NULL, NULL);
 	variable_add("time_deviation", "td", VAR_INT, 1, &config_time_deviation, NULL, NULL, NULL);
 	variable_add("timestamp", "ts", VAR_STR, 1, &config_timestamp, NULL, NULL, NULL);
+	variable_add("userlist_backup", "ub", VAR_BOOL, 1, &config_userlist_backup, NULL, NULL, NULL);
 #ifdef WITH_WAP
 	variable_add("wap_enabled", "we", VAR_INT, 1, &config_wap_enabled, NULL, NULL, NULL);
 #else

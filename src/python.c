@@ -154,11 +154,12 @@ static PyObject* ekg_cmd_window_list(PyObject *self, PyObject *args)
 	if (!PyArg_ParseTuple(args, "ii", &start, &stop))
 		return NULL;
 
-	if (start < 1 || start > stop)
+	if (start < 1 || start > stop) {
+		PyErr_SetString(PyExc_ValueError, "invalid range");
 		return NULL;
+	}
 
-	if (!(windowlist = xmalloc((stop - start + 2) * sizeof(int))))
-		return NULL;
+	windowlist = xmalloc((stop - start + 2) * sizeof(int));
 
 	ui_event("get_window_list", windowlist, start, stop);
 
@@ -169,7 +170,7 @@ static PyObject* ekg_cmd_window_list(PyObject *self, PyObject *args)
 		PyList_SetItem(wynik, i, val);
 	}
 
-	free(windowlist);
+	xfree(windowlist);
 
 	return wynik;
 }
@@ -189,20 +190,17 @@ static PyMethodDef ekg_methods[] = {
 
 static PyObject *ekg_config_getattr(PyObject *o, char *name)
 {
-	list_t l;
+	struct variable *v = variable_find(name);
 
-	for (l = variables; l; l = l->next) {
-		struct variable *v = l->data;
-
-		if (!strcmp(v->name, name)) {
-			if (v->type == VAR_BOOL || v->type == VAR_INT || v->type == VAR_MAP)
-				return Py_BuildValue("i", *(int*)(v->ptr));
-			else
-				return Py_BuildValue("s", *(char**)(v->ptr));
-		}
+	if (!v) {
+		PyErr_SetString(PyExc_LookupError, "unknown variable");
+		return NULL;
 	}
 
-	return NULL;
+	if (v->type == VAR_BOOL || v->type == VAR_INT || v->type == VAR_MAP)
+		return Py_BuildValue("i", *(int*)(v->ptr));
+	else
+		return Py_BuildValue("s", *(char**)(v->ptr));
 }
 
 static int ekg_config_setattr(PyObject *o, char *name, PyObject *value)
@@ -214,18 +212,29 @@ static int ekg_config_setattr(PyObject *o, char *name, PyObject *value)
 		return -1;
 	}
 
+        if (value == NULL) {
+		PyErr_SetString(PyExc_TypeError, "can't delete config variables");
+		return -1;
+        }
+
 	if (v->type == VAR_INT || v->type == VAR_BOOL || v->type == VAR_MAP) {
 		if (!PyInt_Check(value)) {
 			PyErr_SetString(PyExc_TypeError, "invalid type");
 			return -1;
 		}
-		variable_set(name, itoa(PyInt_AsLong(value)), 0);
+		if (variable_set(name, itoa(PyInt_AsLong(value)), 0)) {
+			PyErr_SetString(PyExc_ValueError, "invalid value");
+			return -1;
+                }
 	} else {
 		if (!PyString_Check(value)) {
 			PyErr_SetString(PyExc_TypeError, "invalid type");
 			return -1;
 		}
-		variable_set(name, PyString_AsString(value), 0);
+		if (variable_set(name, PyString_AsString(value), 0)) {
+			PyErr_SetString(PyExc_ValueError, "invalid value");
+			return -1;
+                }
 	}
 
 	return 0;

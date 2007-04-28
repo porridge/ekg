@@ -30,6 +30,7 @@
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
@@ -107,6 +108,10 @@ int config_read(const char *filename)
 			xfree(buf);
 			continue;
 		}
+
+		foo = unescape(buf);
+		free(buf);
+		buf = foo;
 
 		if (!(foo = strchr(buf, ' '))) {
 			xfree(buf);
@@ -259,6 +264,10 @@ char *config_read_variable(const char *name)
 			continue;
 		}
 
+		tmp = unescape(line);
+		free(line);
+		line = tmp;
+
 		if (!(tmp = strchr(line, ' '))) {
 			xfree(line);
 			continue;
@@ -300,6 +309,72 @@ char *config_read_variable(const char *name)
 }
 
 /*
+ * config_fprintf()
+ *
+ * odpowiednik fprintf() z tym, ¿e przyjmuje jedynie format %s 
+ * i eskejpuje znaki:
+ * - \  - zamiana na \\
+ * - \n - zamiana na literalne \n
+ * - \r - zamiana na literalne \r
+ *
+ * tekst znajduj±cy siê w stringu formatuj±cym nie jest zmieniany.
+ *
+ * interpretowany jest TYLKO format %s. namieszane, bo nie mo¿emy 
+ * alokowaæ pamiêci.
+ *
+ * - f - plik, do którego piszemy,
+ * - fmt - format,
+ * - reszta - argumenty dla formatu
+ */
+void config_fprintf(FILE *f, const char *fmt, ...)
+{
+	va_list ap;
+	int state = 0;
+	char *str = NULL;
+
+	va_start(ap, fmt);
+
+	for (;;) {
+		if (state == 0) {		/* normalny tekst */
+			char ch = *fmt++;
+
+			if (!ch)
+				break;
+			else if (ch == '%') {
+				state = 1;
+				continue;
+			}
+
+			fputc(ch, f);
+		} else if (state == 1) {	/* eskejpowanie procentem */
+			if (*fmt++ != 's') {
+				fprintf(stderr, "Wewnêtrzny b³±d: Niew³a¶ciwy znak w formacie.\n");
+				exit(EXIT_FAILURE);
+			}
+
+			str = va_arg(ap, char *);
+			state = 2;
+		} else if (state == 2) {	/* string w %s */
+			char ch = *str++;
+
+			if (!ch) {
+				state = 0;
+				continue;
+			} else if (ch == '\\')
+				fprintf(f, "\\\\");
+			else if (ch == '\n')
+				fprintf(f, "\\n");
+			else if (ch == '\r')
+				fprintf(f, "\\r");
+			else
+				fputc(ch, f);
+		}
+	}
+
+	va_end(ap);
+}
+
+/*
  * config_write_variable()
  *
  * zapisuje jedn± zmienn± do pliku konfiguracyjnego.
@@ -318,13 +393,13 @@ void config_write_variable(FILE *f, struct variable *v, int base64)
 			if (!v->display && base64) {
 				char *tmp = base64_encode(*(char**)(v->ptr));
 				if (config_save_password)
-					fprintf(f, "%s \001%s\n", v->name, tmp);
+					config_fprintf(f, "%s \001%s\n", v->name, tmp);
 				xfree(tmp);
 			} else 	
-				fprintf(f, "%s %s\n", v->name, *(char**)(v->ptr));
+				config_fprintf(f, "%s %s\n", v->name, *(char**)(v->ptr));
 		}
 	} else if (v->type == VAR_FOREIGN)
-		fprintf(f, "%s %s\n", v->name, (char*) v->ptr);
+		config_fprintf(f, "%s %s\n", v->name, (char*) v->ptr);
 	else
 		fprintf(f, "%s %d\n", v->name, *(int*)(v->ptr));
 }
@@ -357,13 +432,13 @@ void config_write_main(FILE *f, int base64)
 		list_t m;
 
 		for (m = a->commands; m; m = m->next)
-			fprintf(f, "alias %s %s\n", a->name, (char*) m->data);
+			config_fprintf(f, "alias %s %s\n", a->name, (char*) m->data);
 	}
 
         for (l = events; l; l = l->next) {
                 struct event *e = l->data;
 
-                fprintf(f, "on %s %s %s\n", event_format(e->flags), e->target, e->action);
+		config_fprintf(f, "on %s %s %s\n", event_format(e->flags), e->target, e->action);
         }
 
 	for (l = bindings; l; l = l->next) {
@@ -372,7 +447,7 @@ void config_write_main(FILE *f, int base64)
 		if (b->internal)
 			continue;
 
-		fprintf(f, "bind %s %s\n", b->key, b->action);
+		config_fprintf(f, "bind %s %s\n", b->key, b->action);
 	}
 
 	for (l = timers; l; l = l->next) {
@@ -400,9 +475,9 @@ void config_write_main(FILE *f, int base64)
 			strftime(buf, sizeof(buf), "%G%m%d%H%M.%S", tt);
 
 			if (t->persistent)
-				fprintf(f, "at %s %s/%s %s\n", name, buf, itoa(t->period), t->command);
+				config_fprintf(f, "at %s %s/%s %s\n", name, buf, itoa(t->period), t->command);
 			else
-				fprintf(f, "at %s %s %s\n", name, buf, t->command);
+				config_fprintf(f, "at %s %s %s\n", name, buf, t->command);
 		} else {
 			char *foo;
 
@@ -411,12 +486,11 @@ void config_write_main(FILE *f, int base64)
 			else
 				foo = saprintf("%s", itoa(t->ends.tv_sec));
 
-			fprintf(f, "timer %s %s %s\n", name, foo, t->command);
+			config_fprintf(f, "timer %s %s %s\n", name, foo, t->command);
 
 			xfree(foo);
 		}
 	}
-
 }
 
 /*
@@ -494,6 +568,10 @@ int config_write_partly(char **vars)
 	while ((line = read_file(fi))) {
 		char *tmp;
 
+		tmp = unescape(line);
+		free(line);
+		line = tmp;
+
 		if (line[0] == '#' || line[0] == ';' || (line[0] == '/' && line[1] == '/'))
 			goto pass;
 
@@ -537,7 +615,7 @@ int config_write_partly(char **vars)
 			continue;
 
 pass:
-		fprintf(fo, "%s\n", line);
+		config_fprintf(fo, "%s\n", line);
 		xfree(line);
 	}
 
