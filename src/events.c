@@ -53,6 +53,7 @@
 #include "themes.h"
 #include "ui.h"
 #include "userlist.h"
+#include "configfile.h"
 #include "voice.h"
 #include "xmalloc.h"
 #include "token.h"
@@ -2107,6 +2108,28 @@ void handle_userlist(struct gg_event *e)
 			
 			if (e->event.userlist.reply) {
 				list_t l;
+
+				if (config_userlist_backup) {
+					if (userlist_get_config) {
+						const char *filename;
+						char tmp[32];
+
+						snprintf(tmp, sizeof(tmp), "config.%d", (int) getpid());
+						if ((filename = prepare_path(tmp, 1)) && !config_write(filename))
+							print("config_backup_ok");
+						else {
+							print("config_backup_failed");
+							break;
+						}
+					}
+
+					if (!userlist_write(1))
+						print("userlist_backup_ok");
+					else {
+						print("userlist_backup_failed");
+						break;
+					}
+				}
 
 				for (l = userlist; l; l = l->next) {
 					struct userlist *u = l->data;

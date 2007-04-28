@@ -336,6 +336,7 @@ int config_time_deviation;
 char *config_datestamp;
 char *config_timestamp;
 int config_uin;
+int config_userlist_backup;
 char *config_windows_layout;
 int config_windows_save;
 #ifdef WITH_WAP
@@ -409,8 +410,6 @@ void changed_proxy(const char *var);
 void changed_theme(const char *var);
 void changed_uin(const char *var);
 void changed_xxx_reason(const char *var);
-
-const char *compile_time(void);
 
 struct conference *conference_add(const char *string, const char *nicklist, int quiet);
 int conference_remove(const char *name, int quiet);

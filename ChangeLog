@@ -4,6 +4,41 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
+// 2007-04-27
+
+- libgadu: poprawienie obcinania \r w gg_get_line() (darkjames/g)
+- dodanie zmiennej userlist_backup (kanedaaa/g)
+
+// 2007-04-21
+
+- libgadu: poprawienie wycieku deskryptorów w resolverze opartym na 
+  w±tkach (w/g)
+- libgadu: poprawienie mo¿liwo¶ci nieprawid³owego zachowania resolvera 
+  opartego na procesach (w/g)
+- libgadu: race condition w resolverze opartym na procesy (w/g)
+
+// 2007-04-18
+
+- gg 7.7 build 3315 (darkjames/g)
+
+// 2007-04-04
+
+- signedness w ioctld.c (gophi)
+
+// 2007-03-29
+
+- aktualizacja dokumentacji (gophi)
+
+// 2007-03-24
+
+- dodanie pliku addons.txt (gophi)
+
+// 2007-03-21
+
+- konwersja tabulacji na spacjê podczas odbierania wiadomo¶ci (Rodion/g)
+- optymalizacja funkcji konwertuj±cych zestawy znaków (gophi)
+- poprawienie pokazywania czasu kompilacji (adwol/g)
+
 // 2007-03-10
 
 - poprawienie bezpieczeñstwa przy okazji tokenów (w/g)

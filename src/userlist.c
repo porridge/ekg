@@ -366,23 +366,37 @@ char *userlist_dump()
 /*
  * userlist_write()
  *
- * zapisuje listê kontaktów w pliku ~/.gg/userlist
+ * zapisuje listê kontaktów w pliku ~/.gg/userlist (pid == 0) 
+ * lub ~/.gg/userlist.pid (pid == 1)
  */
-int userlist_write()
+int userlist_write(int pid)
 {
 	const char *filename;
-	char *contacts, tmp[PATH_MAX + 1];
+	char *contacts, tmp[PATH_MAX + 1], *pattern;
 	FILE *f;
 
 	if (!(contacts = userlist_dump()))
 		return -1;
-	
-	if (!(filename = prepare_path("userlist", 1))) {
+
+	if (pid) {
+		pattern = xmalloc(32);
+		snprintf(pattern, 32, "userlist.%d", (int) getpid());
+	} else
+		pattern = "userlist";
+
+	if (!(filename = prepare_path(pattern, 1))) {
+		if (pid)
+			xfree(pattern);
+
 		xfree(contacts);
 		return -1;
 	}
 
-	snprintf(tmp, sizeof(tmp), "%s.%d.%ld", filename, (int) getpid(), (long) time(NULL));
+	if (pid) {
+		xfree(pattern);
+		snprintf(tmp, sizeof(tmp), "%s.%ld", filename, (long) time(NULL));
+	} else
+		snprintf(tmp, sizeof(tmp), "%s.%d.%ld", filename, (int) getpid(), (long) time(NULL));
 	
 	if (!(f = fopen(tmp, "w"))) {
 		xfree(contacts);

@@ -75,6 +75,7 @@
 #ifdef WITH_PYTHON
 #  include "python.h"
 #endif
+#include "comptime.h"
 
 COMMAND(cmd_ignore);
 COMMAND(cmd_msg);
@@ -1965,6 +1966,8 @@ COMMAND(cmd_list)
 				ver = "7.5.0 (build 2201 lub nowszy)";
 			if (v == 0x29)
 				ver = "7.6 (build 1688 lub nowszy)";
+			if (v == 0x2a)
+				ver = "7.7 (build 3315 lub nowszy)";
 
 			if (ver)
 				printq("user_info_version", ver);
@@ -2710,7 +2713,7 @@ COMMAND(cmd_save)
 {
 	last_save = time(NULL);
 
-	if (!userlist_write() && !config_write(params[0])) {
+	if (!userlist_write(0) && !config_write(params[0])) {
 		printq("saved");
 		config_changed = 0;
 		config_last_sysmsg_changed = 0;

@@ -83,7 +83,7 @@ struct ignore_label ignore_labels[IGNORE_LABELS_COUNT + 1];
 list_t userlist;
 
 int userlist_read(void);
-int userlist_write(void);
+int userlist_write(int pid);
 #ifdef WITH_WAP
 int userlist_write_wap(void);
 #endif

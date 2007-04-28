@@ -1346,6 +1346,10 @@ void theme_init()
 	format_add("userlist_config_get_error", "%! B³±d podczas pobierania listy kontaktów i konfiguracji\n", 1);
 	format_add("userlist_config_clear_ok", "%) Usuniêto listê kontaktów i konfiguracjê z serwera\n", 1);
 	format_add("userlist_config_clear_error", "%! B³±d podczas usuwania listy kontaktów i konfiguracji\n", 1);
+	format_add("userlist_backup_ok", "%> Zachowano kopiê bezpieczeñstwa listy kontaktów\n", 1);
+	format_add("userlist_backup_failed", "%! B³±d podczas zachowywania kopii bezpieczeñstwa listy kontaktów\n", 1);
+	format_add("config_backup_ok", "%> Zachowano kopiê bezpieczeñstwa konfiguracji\n", 1);
+	format_add("config_backup_failed", "%! B³±d podczas zachowywania kopii bezpieczeñstwa konfiguracji\n", 1);
 
 	/* szybka lista kontaktów pod F2 */
 	format_add("quick_list", "%)%1\n", 1);
