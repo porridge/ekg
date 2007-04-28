@@ -90,4 +90,34 @@ A: Komunikat taki ekg wy¶wietla, gdy dana osoba jest niedostêpna, a serwer
    wiadomo¶æ zosta³a odrzucona przez filtry serwera (np. zawiera adres strony
    WWW) lub osoba ma pe³n± skrzynkê wiadomo¶ci.
 
+Q: Lista kontaktów jest zbyt w±ska. Jak mo¿na to zmieniæ?
+A: Komenda ,,/set contacts_size 12'' powinna pomóc. W razie potrzeby mo¿na
+   dowolnie zmniejszaæ lub zwiêkszaæ warto¶æ.
+
+Q: Jak mogê zwiêkszyæ ilo¶æ linii rozmowy dostêpnych do przegl±dania?
+A: Przyda siê zmiana ustawienia zmiennej ,,backlog_size'', chocia¿by na 100.
+
+Q: Chcê aby wy¶wietlany format czasu by³ bardziej szczegó³owy, jak to zrobiæ?
+A: ,,/set timestamp %H:%M:%S'' - wy¶wietlane bêd± równie¿ sekundy.
+
+Q: Jak ukryæ siê przed sprawdzaniem czy jestem niewidoczny?
+A: Ustawiæ zmienn± ,,ignore_empty_msg'' na ,,1''.
+
+Q: Jak mogê stworzyæ archiwum rozmów?
+A: Najkrótszy sposób to wydanie komend:
+     set log 2
+     set log_path ~/.gg/archiwum
+   Polecenie ,,/set log_ignored 1'' umo¿liwia logowanie tak¿e ignorowanych 
+   wiadomo¶ci.
+
+Q: Przy rozmowie z wieloma osobami i zamkniêciu jednego okna powstaje ,,luka''
+   w numeracji. Jak mo¿na temu zapobiec?
+A: W tym wypadku nale¿y zmiennej ,,sort_windows'' przypisaæ warto¶æ ,,1''.
+
+Q: Jak w³±czyæ opcjê ,,tylko dla znajomych''?
+A: Wydaj komendê ,,/private on''.
+
+Q: Na mojej li¶cie kontaktów nie widzê osób niedostêpnych. Co mam zrobiæ?
+A: ,,/set contacts_options order=01234''.
+
 $Id$

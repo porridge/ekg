@@ -365,7 +365,7 @@ display_color_map
 	musi zawieraæ 8 znaków zgodnych ze spisem z pliku docs/themes.txt.
 	ka¿dy z nich okre¶la kolejno kolor dla:
 	- brak atrybutów,
-	- pogrubony,
+	- pogrubiony,
 	- pochy³y,
 	- pochy³y+pogrubiony,
 	- podkre¶lony,
@@ -399,7 +399,7 @@ display_notify
 	tylko zmiany z niedostêpnego na dostêpny i na odwrót. dodanie
 	4 sprawia, ¿e podczas wy¶wietlania brane s± pod uwagê tak¿e
 	osoby z w³±czonym trybem ,,tylko dla znajomych'', które maj±
-	nas na li¶cie kontaktów, a my ich nie mamy. w interfejse ncurses
+	nas na li¶cie kontaktów, a my ich nie mamy. w interfejsie ncurses
 	wiêkszy priorytet ma zmienna ,,contacts'', która przy warto¶ci
 	2 ukrywa zmiany stanu. wszystkie dostêpne warto¶ci to 0, 1, 2, 5, 6.
 
@@ -449,13 +449,17 @@ emoticons
 	szczegó³ów w pliku docs/files.txt w sekcji 5-tej.
 
 encryption
-	typ: bool
+	typ: liczba
 	domy¶lna warto¶æ: 0
 
 	w³±cza szyfrowanie wiadomo¶ci. je¶li w systemie jest zainstalowana
 	biblioteka OpenSSL, mo¿liwe jest u¿ywanie szyfrowania zgodnego z SIM
-	opisanym na stronie http://gg.wha.la/crypt/
-	
+	opisanym na stronie http://gg.wha.la/crypt/. warto¶æ 0 wy³±cza 
+	szyfrowanie. warto¶æ 1 w³±cza. ustawienie warto¶ci 2 sprawia, ¿e 
+	wysy³ane s± wiadomo¶ci niezaszyfrowane, ale odbierane szyfrowane 
+	s± deszyfrowane. ustawienie 3 sprawia, ¿e wiadomo¶ci odbierane nie 
+	s± deszyfrowane, za to s± szyfrowane wysy³ane.
+
 enter_scrolls
 	typ: bool
 	domy¶lna warto¶æ: 0
@@ -493,8 +497,15 @@ ignore_empty_msg
 	domy¶lna warto¶æ: 0
 
 	okre¶la, czy bêd± ignorowane puste wiadomo¶ci, zawieraj±ce jedynie
-	obrazek, co mo¿e mieæ miejsce, jesli kto¶ sprawdza, czy jeste¶my
+	obrazek, co mo¿e mieæ miejsce, je¶li kto¶ sprawdza, czy jeste¶my
 	niewidoczni.
+
+image_size
+	typ: int
+	domy¶lna warto¶æ: 255
+
+	maksymalny rozmiar akceptowanych przez nas obrazków w KiB. maksymalnie 
+	255. istotne jedynie po w³±czeniu ,,receive_images''.
 
 ioctld_enable
 	typ: liczba
@@ -607,7 +618,9 @@ make_window
 	okre¶la, czy bêd± tworzone nowe okienka dla nowych rozmów. dla 1 bêdzie
 	wykorzystane pierwsze wolne okno (na którym z nikim jeszcze siê nie
 	rozmawia), lub tworzone nowe w przypadku braku wolnych. dla 2
-	bezwarunkowo utworzone zostanie nowe okno.
+	bezwarunkowo utworzone zostanie nowe okno. je¶li zostanie dodana 
+	warto¶æ 4, to wiadomo¶ci wysy³ane przez /msg bêd± widoczne w oknie 
+	stanu.
 
 mesg
 	typ: liczba
@@ -617,6 +630,20 @@ mesg
 	talk lub wall. dla 0 nie wyra¿amy na to zgody, dla 1 zezwalamy na
 	pisanie na nasz terminal. w przypadku warto¶ci 2 u¿ywane s± ustawienia
 	sprzed uruchomienia ekg.
+
+msg_as_chat
+	typ: int
+	domy¶lna warto¶æ: 0
+
+	okre¶la, czy wiadomo¶ci wysy³ane przy pomocy polecenia /msg maj± byæ 
+	przesy³ane tak, jakby by³y wysy³ane przy pomocy polecenia /chat. dla 
+	warto¶ci 1 inne ró¿nice miêdzy /msg a /chat (np. nie otwieranie nowego 
+	okna rozmowy) nie s± zmieniane. warto¶æ 2 oznacza traktowanie polecenia 
+	/msg jako /chat we wszystkich aspektach. zmienna zosta³a wprowadzona w 
+	celu zapewnienia kompatybilno¶ci z klientami IRC - obecnie praktycznie 
+	¿aden klient nie wysy³a wiadomo¶ci tak, jak robi to polecenie /msg, a 
+	niektórzy u¿ytkownicy, przyzwyczajeni do polecenia /msg w klientach IRC, 
+	nie chc± zmieniaæ przyzwyczajeñ.
 
 nick
 	typ: tekst
@@ -679,6 +706,23 @@ reason_limit
 	protokó³ limicie. je¶li opcja jest aktywna i d³ugo¶æ opisu
 	przekracza t± d³ugo¶æ, komendy /away, /back i /invisible nie
 	zostan± wykonane.
+
+receive_images
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	okre¶la, czy chcemy otrzymywaæ obrazki. w³±czenie tej opcji przy 
+	wy³±czonej opcji ,,ignore_empty_msg'' mo¿e ujawniæ nas dla u¿ytkowników
+	sprawdzaj±cych, czy jeste¶my niewidoczni. otrzymywane obrazki bêd±
+	zapisywane w katalogu okre¶lonym zmienn± dcc_dir.
+
+regex_flags
+	typ: int
+	domy¶lna warto¶æ: 0
+
+	mapa bitowa okre¶laj±ca flagi podczas przetwarzania wyra¿eñ regularnych 
+	w poleceniu /list --regexp. 1 oznacza u¿ywanie podstawowych wyra¿eñ, 2 
+	uwzglêdnianie rozmiaru znaków.
 
 save_question
 	typ: bool
@@ -846,7 +890,7 @@ statusbar_fgcolor
 	domy¶lna warto¶æ: 7
 
 	okre¶la kolor tekstu w pasku stanu. z regu³y jest nadpisany
-	przez themik, wiec ta zmienna jest malo przydatna.
+	przez themik, wiêc ta zmienna jest ma³o przydatna.
 
 statusbar_bgcolor
 	typ: liczba
@@ -885,6 +929,16 @@ timestamp
 	w interfejsie ncurses okre¶la format czasu wy¶wietlanego na
 	pocz±tku ka¿dej linii. dok³adny opis formatu zawiera strona
 	manuala strftime(3).
+
+userlist_backup
+	typ: bool
+	domy¶lna warto¶æ: 0
+
+	okre¶la, czy przed zaimportowaniem listy kontaktów z serwera 
+	zapisaæ aktualn± listê w pliku ~/.gg/userlist.pid (gdzie pid 
+	to numer procesu ekg). je¿eli zaimportowana zostanie tak¿e 
+	konfiguracja, to aktualna konfiguracja zostanie zapisana w 
+	pliku ~/.gg/config.pid.
 
 wap_enabled
 	typ: bool

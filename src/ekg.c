@@ -52,6 +52,9 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#ifdef HAVE_EXECINFO_H
+#  include <execinfo.h>
+#endif
 
 #include "commands.h"
 #include "configfile.h"
@@ -80,6 +83,7 @@
 #ifdef WITH_PYTHON
 #  include "python.h"
 #endif
+#include "comptime.h"
 
 #ifndef PATH_MAX
 #  define PATH_MAX _POSIX_PATH_MAX
@@ -525,7 +529,7 @@ void ekg_wait_for_key()
 			gg_debug(GG_DEBUG_MISC, "-- autosaving userlist and config after %d seconds.\n", time(NULL) - last_save);
 			last_save = time(NULL);
 
-			if (!userlist_write() && !config_write(NULL)) {
+			if (!userlist_write(0) && !config_write(NULL)) {
 				config_changed = 0;
 				print("autosaved");
 			} else
@@ -889,6 +893,27 @@ static void ioctld_kill()
                 kill(ioctld_pid, SIGINT);
 }
 
+#ifdef HAVE_EXECINFO_H
+static void dump_stack(void)
+{
+	char name[32];
+	void *frames[64];
+	size_t sz;
+	int fd;
+
+	if (chdir(config_dir) == -1)
+		return;
+
+	snprintf(name, sizeof(name), "stack.%d", (int) getpid());
+	if ((fd = open(name, O_CREAT | O_WRONLY, 0400)) == -1)
+		return;
+
+	sz = backtrace(frames, sizeof(frames) / sizeof(*frames));
+	backtrace_symbols_fd(frames, sz, fd);
+	close(fd);
+}
+#endif
+
 static void handle_sigsegv(int sig)
 {
 	static int killing_ui = 0;
@@ -909,6 +934,10 @@ static void handle_sigsegv(int sig)
 	config_write_crash();
 	userlist_write_crash();
 	debug_write_crash();
+
+#ifdef HAVE_EXECINFO_H
+	dump_stack();
+#endif
 
 	memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = SIG_DFL;
@@ -1313,6 +1342,19 @@ int main(int argc, char **argv)
 	"Do pliku %s/debug.%d zapiszê ostatanie komunikaty\r\n"
 	"z okna debugowania.\r\n"
 	"\r\n"
+#ifdef HAVE_EXECINFO_H
+	"Je¶li zostanie utworzony plik %s/stack.%d, to uruchom\r\n"
+	"polecenie:\r\n"
+	"\r\n"
+	"    sed -e 's/^.*\\[//' -e 's/\\].*$//' %s/stack.%d | xargs addr2line -e %s\r\n"
+	"\r\n"
+	"i wy¶lij wynik jego dzia³ania na listê ekg-devel. Dziêki temu autorzy\r\n"
+	"dowiedz± siê, w którym miejscu wyst±pi³ b³±d i najprawdopodobniej pozwoli\r\n"
+	"to unikn±æ tego typu sytuacji w przysz³o¶ci.\r\n"
+	"\r\n",
+	config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, (int) getpid(), 
+	config_dir, (int) getpid(), argv0);
+#else
 	"Je¶li zostanie utworzony plik %s/core, spróbuj uruchomiæ\r\n"
 	"polecenie:\r\n"
 	"\r\n"
@@ -1326,6 +1368,7 @@ int main(int argc, char **argv)
 	"Wiêcej szczegó³ów w dokumentacji, w pliku ,,gdb.txt''.\r\n"
 	"\r\n",
 	config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, (int) getpid(), config_dir, argv0, config_dir);
+#endif
 
 	ui_init();
 	ui_event("theme_init");
@@ -1575,7 +1618,7 @@ void ekg_exit()
 			if (line[strlen(line) - 1] == '\n')
 				line[strlen(line) - 1] = 0;
 			if (!strcasecmp(line, "tak") || !strcasecmp(line, "yes") || !strcasecmp(line, "t") || !strcasecmp(line, "y")) {
-				if (userlist_write() || config_write(NULL))
+				if (userlist_write(0) || config_write(NULL))
 					printf("Wyst±pi³ b³±d podczas zapisu.\n");
 			}
 		} else

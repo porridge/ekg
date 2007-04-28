@@ -62,5 +62,7 @@ rozwi±zanie.
   - ignorowanie stanu powinno ukrywaæ adres ip, wersjê itd.
   - ostrzeganie, gdy userlista/blocklista jest pe³na (jest sens?)
   - poprawienie warningow signed/unsigned na gcc-4
+  - nowe nazwy obrazków i dcc (po zmianie przez dcc_backups) powinny byæ prawid³owo 
+    przekazywane do obs³ugi zdarzenia dccfinish (gophi)
 
 $Id$

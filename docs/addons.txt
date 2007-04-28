@@ -1,0 +1,37 @@
+// Obs³uga us³ug dodanych do Gadu-Gadu
+// Copyright (C) 2007 Adam Wysocki <gophi@ekg.chmurka.net>
+
+1. Dlaczego?
+2. Nag³os
+3. Nowo¶ci
+
+1. Dlaczego?
+
+Poniewa¿ chcieliby¶my unikn±æ prze³adowania ekg us³ugami nie zwi±zanymi 
+bezpo¶rednio z komunikacj± przez Gadu-Gadu. Z drugiej strony pewne us³ugi 
+s± dodawane do Gadu-Gadu i kto¶ móg³by chcieæ z nich skorzystaæ. Je¿eli do 
+Gadu-Gadu zostanie wprowadzona jaka¶ nowa us³uga, z której da siê korzystaæ 
+pod uniksami, ale z ró¿nych przyczyn (g³ównie niechêci do zrobienia z ekg 
+koby³y) nie chcemy implementowaæ jej w ekg, to opis jej uruchomienia pojawi 
+siê w tym pliku.
+
+2. Nag³os
+
+Oryginalny komunikator umo¿liwia komunikacjê g³osow± przy pomocy us³ugi 
+pod nazw± "Nag³os". Baseciq na swojej stronie opisa³ sposób wykorzystania 
+tej funkcjonalno¶ci przy pomocy Asteriska:
+
+http://www.baseciq.org/blog/350,Naglos_i_Asterisk.html
+
+3. Nowo¶ci
+
+Oryginalny komunikator udostêpnia feed RSS z informacjami, nowo¶ciami, 
+reklamami itd. Gdyby kto¶ by³ zainteresowany czytaniem tych informacji, 
+to feed znajdzie pod adresem:
+
+http://rss.gadu-gadu.pl/nowosci.xml
+
+Feed kodowany jest przy pomocy CP-1250, wiêc nale¿y przekodowaæ go na 
+odpowiednie dla siebie kodowanie (np. przy pomocy iconv).
+
+// $Id$

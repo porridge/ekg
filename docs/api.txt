@@ -180,7 +180,7 @@ je¶li chcemy siê wylogowaæ, wywo³ujemy ,,gg_logoff()'' i potem zwalniamy
 pamiêæ zwi±zan± z sesj± funkcj± ,,gg_free_session()''.
 
 je¶li chcemy przypomnieæ swoje has³o, wywo³ujemy funkcjê
-,,gg_remind_passwd2()'', a wynikow± struktujê ,,gg_http'' traktujemy
+,,gg_remind_passwd2()'', a wynikow± strukturê ,,gg_http'' traktujemy
 podobnie do ,,gg_session'':
  - sprawdzamy ->fd i ->check,
  - wywo³ujemy ,,gg_remind_passwd_watch_fd()'', gdy co¶ siê dzieje. funkcja
@@ -240,7 +240,7 @@ je¶li chcemy szukaæ:
 
         gg_pubdir50_free(req);
 
-jak witaæ, gg_pubdir50_new() tworzy obiekt opisuj±cy operacjê katalogu,
+jak widaæ, gg_pubdir50_new() tworzy obiekt opisuj±cy operacjê katalogu,
 gg_pubdir50_add() dodaje kolejne parametry. rodzaj parametru jest w
 rzeczywi¶ci sta³± tekstow±, np. GG_PUBDIR50_UIN to "FmNumber". nale¿y
 pamiêtaæ, ¿e wszystkie argumenty s± tekstami. nie trzeba siê bawiæ w ich

@@ -454,12 +454,12 @@ fstring_t reformat_string(const char *str)
 						attr |= 64;
 
 					if (tmp >= 30 && tmp <= 37) {
-						attr &= 127;
+						attr &= 120;
 						attr |= (tmp - 30);
 					}
 
 					if (tmp >= 40 && tmp <= 47) {
-						attr &= 127;
+						attr &= 71;
 						attr |= (tmp - 40) << 3;
 					}
 
@@ -1047,6 +1047,8 @@ void theme_init()
 	format_add("ack_delivered", "%> Wiadomo¶æ do %1 zosta³a dostarczona\n", 1);
 	format_add("ack_filtered", "%! %|Wiadomo¶æ do %1 najprawdopodobniej nie zosta³a dostarczona, poniewa¿ dana osoba jest niedostêpna, a serwer twierdzi, ¿e dorêczy³ wiadomo¶æ. Sytuacja taka ma miejsce, gdy wiadomo¶æ zosta³a odrzucona przez filtry serwera (np. zawiera adres strony WWW)\n", 1);
 	format_add("ack_filtered_short", "%! %|Wiadomo¶æ do %1 najprawdopodobniej nie zosta³a dostarczona\n", 1);
+	format_add("ack_mboxfull", "%! Wiadomo¶æ do %1 nie zosta³a dostarczona, u¿ytkownik ma pe³n± skrzynkê\n", 1);
+	format_add("ack_not_delivered", "%! Wiadomo¶æ do %1 nie zosta³a dostarczona\n", 1);
 	format_add("message_too_long", "%! Wiadomo¶æ jest zbyt d³uga i zosta³a skrócona\n", 1);
 
 	/* ludzie zmieniaj± stan */
@@ -1344,6 +1346,10 @@ void theme_init()
 	format_add("userlist_config_get_error", "%! B³±d podczas pobierania listy kontaktów i konfiguracji\n", 1);
 	format_add("userlist_config_clear_ok", "%) Usuniêto listê kontaktów i konfiguracjê z serwera\n", 1);
 	format_add("userlist_config_clear_error", "%! B³±d podczas usuwania listy kontaktów i konfiguracji\n", 1);
+	format_add("userlist_backup_ok", "%> Zachowano kopiê bezpieczeñstwa listy kontaktów\n", 1);
+	format_add("userlist_backup_failed", "%! B³±d podczas zachowywania kopii bezpieczeñstwa listy kontaktów\n", 1);
+	format_add("config_backup_ok", "%> Zachowano kopiê bezpieczeñstwa konfiguracji\n", 1);
+	format_add("config_backup_failed", "%! B³±d podczas zachowywania kopii bezpieczeñstwa konfiguracji\n", 1);
 
 	/* szybka lista kontaktów pod F2 */
 	format_add("quick_list", "%)%1\n", 1);
@@ -1440,7 +1446,10 @@ void theme_init()
 	format_add("http_failed_reading", "Serwer zerwa³ po³±czenie", 1);
 	format_add("http_failed_writing", "Serwer zerwa³ po³±czenie", 1);
 	format_add("http_failed_memory", "Brak pamiêci", 1);
-	
+
+	/* obrazki */
+	format_add("image_saved", "%> Zapisano obrazek od %T%1%n do pliku %T%2%n\n", 1);
+	format_add("image_not_saved", "%! B³±d zapisywania obrazka od %T%1%n do pliku %T%2%n: %3!", 1);
 
 #ifdef HAVE_OPENSSL
 	/* szyfrowanie */
@@ -1474,5 +1483,11 @@ void theme_init()
 	format_add("aspell_init", "%> Czekaj, inicjujê modu³ sprawdzania pisowni...\n", 1);
 	format_add("aspell_init_success", "%> Zainicjowano modu³ sprawdzania pisowni\n", 1);
 	format_add("aspell_init_error", "%! B³±d modu³u sprawdzania pisowni: %T%1%n\n", 1);
+#endif
+
+#ifdef HAVE_REGEX_H
+	/* regex */
+	format_add("regex_error", "%! B³±d przetwarzania wyra¿enia regularnego: %T%1%n\n", 1);
+	format_add("regex_none", "%! Brak wyników spe³niaj±cych kryteria wyszukiwania\n", 1);
 #endif
 }

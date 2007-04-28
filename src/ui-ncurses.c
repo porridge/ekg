@@ -893,7 +893,7 @@ static void window_clear(struct window *w, int full)
 static struct window *window_find(const char *target)
 {
 	list_t l;
-	int current = ((target) ? !strcasecmp(target, "__current") : 0);
+	int current = ((target) ? !strcasecmp(target, "$") || !strcasecmp(target, "__current") : 0);
 	int debug = ((target) ? !strcasecmp(target, "__debug") : 0);
 	int status = ((target) ? !strcasecmp(target, "__status") : 0);
 	struct userlist *u = NULL;
@@ -1233,7 +1233,7 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 	string_t speech = NULL;
 	time_t cur_time;
 
-	switch (config_make_window) {
+	switch (config_make_window & 3) {
 		case 1:
 			if ((w = window_find(target)))
 				goto crap;
@@ -2540,6 +2540,7 @@ void events_generator(const char *text, int len)
 	for (i = 0; event_labels[i].name; i++)
 		if (!strncasecmp(tmp, event_labels[i].name, len))
 			array_add(&completions, ((tmp == text) ? xstrdup(event_labels[i].name) : saprintf("%s%s", pre, event_labels[i].name)));
+	xfree(pre);
 }
 
 void ignorelevels_generator(const char *text, int len)
@@ -2563,6 +2564,7 @@ void ignorelevels_generator(const char *text, int len)
 	for (i = 0; ignore_labels[i].name; i++)
 		if (!strncasecmp(tmp, ignore_labels[i].name, len))
 			array_add(&completions, ((tmp == text) ? xstrdup(ignore_labels[i].name) : saprintf("%s%s", pre, ignore_labels[i].name)));
+	xfree(pre);
 }
 
 void unknown_uin_generator(const char *text, int len)
@@ -3546,7 +3548,7 @@ static void binding_quoted_insert(const char *arg)
 
 	ch = ekg_getch('V' - 64);	/* XXX */
 
-	if (ch == -1)
+	if (ch < 0)
 		return;
 
 	if (strlen(line) >= LINE_MAXLEN - 1)
@@ -3898,7 +3900,7 @@ static void ui_ncurses_loop()
 			continue;
 
 		if (ch == 27) {
-			if ((ch = ekg_getch(27)) == -2)
+			if ((ch = ekg_getch(27)) < 0)
 				continue;
 
 			b = binding_map_meta[ch];
@@ -4156,6 +4158,9 @@ void window_kill(struct window *w, int quiet)
 	}
 
 cleanup:
+	if (w == window_current)
+		window_current = NULL;
+
 	if (w->backlog) {
 		int i;
 
@@ -4728,7 +4733,7 @@ static int ui_ncurses_event(const char *event, ...)
 					goto cleanup;
 				}
 
-				if (config_make_window == 1) {
+				if ((config_make_window & 3) == 1) {
 					list_t l;
 
 					for (l = windows; l; l = l->next) {
@@ -4747,7 +4752,7 @@ static int ui_ncurses_event(const char *event, ...)
 					window_switch(w->id);
 				}
 
-				if (config_make_window == 2) {
+				if ((config_make_window & 3) == 2) {
 					w = window_new(param, 0);
 					window_switch(w->id);
 				}

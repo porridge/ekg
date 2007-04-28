@@ -116,6 +116,7 @@ int userlist_read()
 	while ((buf = read_file(f))) {
 		struct userlist u;
 		char **entry, *uin;
+		char *tmp;
 		int i, count;
 		
 		memset(&u, 0, sizeof(u));
@@ -148,23 +149,30 @@ int userlist_read()
 				entry[i] = NULL;
 			}
 		}
-			
-		u.first_name = xstrdup(entry[0]);
-		u.last_name = xstrdup(entry[1]);
-		u.nickname = xstrdup(entry[2]);
-		if (entry[3] && !valid_nick(entry[3]))
-			u.display = saprintf("_%s", entry[3]);
-		else
-			u.display = xstrdup(entry[3]);
-		u.mobile = xstrdup(entry[4]);
-		u.groups = group_init(entry[5]);
+
+		u.first_name = unescape(entry[0]);
+		u.last_name = unescape(entry[1]);
+		u.nickname = unescape(entry[2]);
+		tmp = unescape(entry[3]);
+		if (entry[3] && !valid_nick(tmp)) {
+			u.display = saprintf("_%s", tmp);
+			xfree(tmp);
+		} else
+			u.display = tmp;
+		u.mobile = unescape(entry[4]);
+		tmp = unescape(entry[5]);
+		u.groups = group_init(tmp);
+		xfree(tmp);
 		u.status = GG_STATUS_NOT_AVAIL;
 
 		/* mamy adres e-mail? */
 		if (count > 7) {
-			u.email = xstrdup(entry[7]);
-			if (count > 8)
-				u.foreign = saprintf(";%s", entry[8]);
+			u.email = unescape(entry[7]);
+			if (count > 8) {
+				tmp = unescape(entry[8]);
+				u.foreign = saprintf(";%s", tmp);
+				xfree(tmp);
+			}
 		}
 
 		for (i = 0; i < count; i++)
@@ -317,25 +325,40 @@ char *userlist_dump()
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
 		char *groups, *line;
+		char *strings[8];
+		size_t i;
+		static const char escstr[] = "\r\n;";
 
 		groups = group_to_string(u->groups, 1, 0);
-		
+
+		strings[0] = escape(u->first_name, escstr);
+		strings[1] = escape(u->last_name, escstr);
+		strings[2] = escape(u->nickname, escstr);
+		strings[3] = escape(u->display, escstr);
+		strings[4] = escape(u->mobile, escstr);
+		strings[5] = escape(groups, escstr);
+		xfree(groups);
+		strings[6] = escape(u->email, escstr);
+		strings[7] = escape(u->foreign, escstr);
+
 		line = saprintf("%s;%s;%s;%s;%s;%s;%s;%s%s\r\n",
-			(u->first_name) ? u->first_name : "",
-			(u->last_name) ? u->last_name : "",
-			(u->nickname) ? u->nickname : "",
-			(u->display) ? u->display : "",
-			(u->mobile) ? u->mobile : "",
-			groups,
+			(u->first_name) ? strings[0] : "",
+			(u->last_name) ? strings[1] : "",
+			(u->nickname) ? strings[2] : "",
+			(u->display) ? strings[3] : "",
+			(u->mobile) ? strings[4] : "",
+			strings[5],
 			(u->uin) ? itoa(u->uin) : "",
-			(u->email) ? u->email : "",
-			(u->foreign) ? u->foreign : "");
-		
+			(u->email) ? strings[6] : "",
+			(u->foreign) ? strings[7] : "");
+
+		for (i = sizeof(strings) / sizeof(*strings); i > 0; i--)
+			xfree(strings[i - 1]);
+
 		string_append(s, line);
 
 		xfree(line);
-		xfree(groups);
-	}	
+	}
 
 	return string_free(s, 0);
 }
@@ -343,23 +366,37 @@ char *userlist_dump()
 /*
  * userlist_write()
  *
- * zapisuje listê kontaktów w pliku ~/.gg/userlist
+ * zapisuje listê kontaktów w pliku ~/.gg/userlist (pid == 0) 
+ * lub ~/.gg/userlist.pid (pid == 1)
  */
-int userlist_write()
+int userlist_write(int pid)
 {
 	const char *filename;
-	char *contacts, tmp[PATH_MAX + 1];
+	char *contacts, tmp[PATH_MAX + 1], *pattern;
 	FILE *f;
 
 	if (!(contacts = userlist_dump()))
 		return -1;
-	
-	if (!(filename = prepare_path("userlist", 1))) {
+
+	if (pid) {
+		pattern = xmalloc(32);
+		snprintf(pattern, 32, "userlist.%d", (int) getpid());
+	} else
+		pattern = "userlist";
+
+	if (!(filename = prepare_path(pattern, 1))) {
+		if (pid)
+			xfree(pattern);
+
 		xfree(contacts);
 		return -1;
 	}
 
-	snprintf(tmp, sizeof(tmp), "%s.%d.%ld", filename, (int) getpid(), (long) time(NULL));
+	if (pid) {
+		xfree(pattern);
+		snprintf(tmp, sizeof(tmp), "%s.%ld", filename, (long) time(NULL));
+	} else
+		snprintf(tmp, sizeof(tmp), "%s.%d.%ld", filename, (int) getpid(), (long) time(NULL));
 	
 	if (!(f = fopen(tmp, "w"))) {
 		xfree(contacts);
@@ -369,13 +406,12 @@ int userlist_write()
 	fchmod(fileno(f), 0600);
 	
 	fputs(contacts, f);
+	xfree(contacts);
 	
 	if (fclose(f) == EOF) {
 		unlink(tmp);
 		return -2;
 	}
-	
-	xfree(contacts);
 
 	if (rename(tmp, filename) == -1)
 		return -2;
@@ -406,8 +442,16 @@ int userlist_write_wap()
 
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
-		
-		fprintf(f, "%s:%d%s%s\n", u->display, u->status, (u->descr) ? ":" : "", (u->descr) ? u->descr : "");
+		char *strings[2];
+		static const char escstr[] = "\r\n:";
+
+		strings[0] = escape(u->display, escstr);
+		strings[1] = escape(u->descr, escstr);
+
+		fprintf(f, "%s:%d%s%s\n", strings[0], u->status, (u->descr) ? ":" : "", strings[1]);
+
+		xfree(strings[1]);
+		xfree(strings[0]);
 	}
 
 	fclose(f);

@@ -120,6 +120,7 @@ char *config_sound_notify_file = NULL;
 char *config_sound_mail_file = NULL;
 char *config_sound_app = NULL;
 int config_uin = 0;
+int config_userlist_backup = 0;
 int config_last_sysmsg = 0;
 int config_last_sysmsg_changed = 0;
 char *config_local_ip = NULL;
@@ -153,6 +154,9 @@ char *config_quit_reason = NULL;
 char *config_away_reason = NULL;
 char *config_back_reason = NULL;
 int config_random_reason = 0;
+#ifdef HAVE_REGEX_H
+int config_regex_flags = 0;
+#endif
 int config_query_commands = 0;
 char *config_proxy = NULL;
 char *config_server = NULL;
@@ -167,6 +171,8 @@ char *config_tab_command = NULL;
 int ioctld_sock = -1;
 int config_ctrld_quits = 1;
 int config_save_password = 1;
+int config_receive_images = 0;
+int config_image_size = 255;
 int config_save_question = 1;
 char *config_datestamp = NULL;
 char *config_timestamp = NULL;
@@ -181,6 +187,7 @@ int config_encryption = 0;
 int config_server_save = 0;
 char *config_email = NULL;
 int config_time_deviation = 300;
+int config_msg_as_chat = 0;
 int config_mesg = MESG_DEFAULT;
 char *config_nick = NULL;
 int config_display_welcome = 1;
@@ -237,12 +244,16 @@ struct event_label event_labels[EVENT_LABELS_COUNT + 2] = {
 	{ EVENT_SIGUSR2, "sigusr2" },
 	{ EVENT_DELIVERED, "delivered" },
 	{ EVENT_QUEUED, "queued" },
+	{ EVENT_FILTERED, "filtered" },
+	{ EVENT_MBOXFULL, "mboxfull" },
+	{ EVENT_NOT_DELIVERED, "not_delivered" },
 	{ EVENT_NEWMAIL, "newmail" },
 	{ EVENT_BLOCKED, "blocked" },
 	{ EVENT_DCCFINISH, "dccfinish" },
 	{ EVENT_CONNECTED, "connected" },
 	{ EVENT_DISCONNECTED, "disconnected" },
 	{ EVENT_CONNECTIONLOST, "connectionlost" },
+	{ EVENT_IMAGE, "image" },
 
 	{ INACTIVE_EVENT, NULL },
 	{ 0, NULL }
@@ -904,11 +915,6 @@ void changed_xxx_reason(const char *var)
 		print("descr_too_long", itoa(strlen(tmp) - GG_STATUS_DESCR_MAXSIZE));
 }
 
-const char *compile_time(void)
-{
-	return __DATE__ " " __TIME__;
-}
-
 /*
  * conference_add()
  *
@@ -1355,6 +1361,7 @@ void ekg_connect()
 	p.status = config_status;
 	p.status_descr = config_reason;
 	p.async = 1;
+	p.image_size = config_image_size < 255 ? config_image_size : 255;
 #ifdef HAVE_VOIP
 	p.has_audio = 1;
 #endif
@@ -1399,9 +1406,9 @@ void ekg_connect()
 
 		xfree(sserver);
 
+skip_server:
 		array_free(servers);
 	}
-skip_server:
 
 	if (config_proxy_forwarding) {
 		char *fwd = xstrdup(config_proxy_forwarding), *tmp = strchr(fwd, ':');
@@ -1905,7 +1912,7 @@ int mesg_set(int what)
 int msg_encrypt(uin_t uin, unsigned char **msg)
 {
 #ifdef HAVE_OPENSSL
-	if (config_encryption) {
+	if (config_encryption == 1 || config_encryption == 3) {
 		unsigned char *res = sim_message_encrypt(*msg, uin);
 
 		if (res) {
@@ -1931,31 +1938,99 @@ int msg_encrypt(uin_t uin, unsigned char **msg)
 }
 
 /*
+ * charmap_prepare()
+ *
+ * przygotowuje mapê znaków do u¿ycia w funkcji charmap_convert() zgodnie ze 
+ * wzorcem convtab. wzorzec musi mieæ parzyst± liczbê pozycji.
+ *
+ * - charmap - bufor do wype³nienia (musi mieæ 256 bajtów),
+ * - convtab - wzorzec konwersji (przyk³ad w cp_to_iso()),
+ * - convtab_sz - rozmiar wzoraca konwersji,
+ * - def - czy przygotowaæ domy¶ln± mapê
+ */
+static void charmap_prepare(unsigned char *charmap, const unsigned char *convtab, size_t convtab_sz, int def)
+{
+	size_t i;
+
+	if (convtab_sz & 1)
+		return;
+
+	if (def)
+		for (i = 0; i < 256; i++)
+			charmap[i] = (unsigned char) i;
+
+	for (i = 0; i < convtab_sz;) {
+		unsigned char from, to;
+
+		from = convtab[i++];
+		to = convtab[i++];
+
+		charmap[from] = to;
+	}
+}
+
+/*
+ * charmap_convert()
+ *
+ * konwertuje bufor zgodnie z podan± map± konwersji.
+ *
+ * - charmap - mapa konwersji (256 bajtów),
+ * - buf - bufor
+ */
+static void charmap_convert(const unsigned char *charmap, unsigned char *buf)
+{
+	if (!buf)
+		return;
+
+	for (; *buf; buf++)
+		*buf = charmap[*buf];
+}
+
+/*
  * cp_to_iso()
  *
  * zamienia krzaczki pisane w cp1250 na iso-8859-2, przy okazji maskuj±c
- * znaki, których nie da siê wy¶wietliæ, za wyj±tkiem \r i \n.
+ * znaki, których nie da siê wy¶wietliæ, za wyj±tkiem \r i \n, oraz 
+ * zamieniaj±c tabulacje na spacje.
  *
  *  - buf.
  */
 void cp_to_iso(unsigned char *buf)
 {
-	if (!buf)
-		return;
+	static unsigned char charmap[256];
+	static int valid = 0;
 
-	while (*buf) {
-		if (*buf == (unsigned char)'¥') *buf = '¡';
-		if (*buf == (unsigned char)'¹') *buf = '±';
-		if (*buf == 140) *buf = '¦';
-		if (*buf == 156) *buf = '¶';
-		if (*buf == 143) *buf = '¬';
-		if (*buf == 159) *buf = '¼';
+	if (!valid) {
+		static const unsigned char conv[] = {
+			0x09, 0x20,	/* \t */
+			0x0A, 0x0A,	/* \n */
+			0x0D, 0x0D,	/* \r */
+			0xB9, 0xB1,	/* ± */
+			0x9C, 0xB6,	/* ¶ */
+			0x9F, 0xBC,	/* ¼ */
+			0xA5, 0xA1,	/* ¡ */
+			0x8C, 0xA6,	/* ¦ */
+			0x8F, 0xAC	/* ¬ */
+		};
+		size_t i;
 
-                if (*buf != 13 && *buf != 10 && (*buf < 32 || (*buf > 127 && *buf < 160)))
-                        *buf = '?';
+		for (i = 0; i < 0x20; i++)
+			charmap[i] = '?';
 
-		buf++;
+		for (i = 0x20; i < 0x80; i++)
+			charmap[i] = (unsigned char) i;
+
+		for (i = 0x80; i < 0xA0; i++)
+			charmap[i] = '?';
+
+		for (i = 0xA0; i < 0x100; i++)
+			charmap[i] = (unsigned char) i;
+
+		charmap_prepare(charmap, conv, sizeof(conv), 0);
+		valid = 1;
 	}
+
+	charmap_convert(charmap, buf);
 }
 
 /*
@@ -1967,18 +2042,24 @@ void cp_to_iso(unsigned char *buf)
  */
 void iso_to_cp(unsigned char *buf)
 {
-	if (!buf)
-		return;
+	static unsigned char charmap[256];
+	static int valid = 0;
 
-	while (*buf) {
-		if (*buf == (unsigned char)'¡') *buf = '¥';
-		if (*buf == (unsigned char)'±') *buf = '¹';
-		if (*buf == (unsigned char)'¦') *buf = 'Œ';
-		if (*buf == (unsigned char)'¶') *buf = 'œ';
-		if (*buf == (unsigned char)'¬') *buf = '';
-		if (*buf == (unsigned char)'¼') *buf = 'Ÿ';
-		buf++;
+	if (!valid) {
+		static const unsigned char conv[] = {
+			0xB1, 0xB9,	/* ± */
+			0xB6, 0x9C,	/* ¶ */
+			0xBC, 0x9F,	/* ¼ */
+			0xA1, 0xA5,	/* ¡ */
+			0xA6, 0x8C,	/* ¦ */
+			0xAC, 0x8F	/* ¬ */
+		};
+
+		charmap_prepare(charmap, conv, sizeof(conv), 1);
+		valid = 1;
 	}
+
+	charmap_convert(charmap, buf);
 }
 
 /*
@@ -1986,36 +2067,40 @@ void iso_to_cp(unsigned char *buf)
  *
  * usuwa polskie litery z tekstu.
  *
- *  - c.
+ *  - buf.
  */
 void iso_to_ascii(unsigned char *buf)
 {
-	if (!buf)
-		return;
+	static unsigned char charmap[256];
+	static int valid = 0;
 
-	while (*buf) {
-		if (*buf == (unsigned char)'±') *buf = 'a';
-		if (*buf == (unsigned char)'ê') *buf = 'e';
-		if (*buf == (unsigned char)'æ') *buf = 'c';
-		if (*buf == (unsigned char)'³') *buf = 'l';
-		if (*buf == (unsigned char)'ñ') *buf = 'n';
-		if (*buf == (unsigned char)'ó') *buf = 'o';
-		if (*buf == (unsigned char)'¶') *buf = 's';
-		if (*buf == (unsigned char)'¿') *buf = 'z';
-		if (*buf == (unsigned char)'¼') *buf = 'z';
+	if (!valid) {
+		static const unsigned char conv[] = {
+			'ê', 'e', 
+			'ó', 'o', 
+			'±', 'a', 
+			'¶', 's', 
+			'³', 'l', 
+			'¿', 'z', 
+			'¼', 'z', 
+			'æ', 'c', 
+			'ñ', 'n', 
+			'Ê', 'E', 
+			'Ó', 'O', 
+			'¡', 'A', 
+			'¦', 'S', 
+			'£', 'L',
+			'¯', 'Z',
+			'¬', 'Z', 
+			'Æ', 'C', 
+			'Ñ', 'N'
+		};
 
-		if (*buf == (unsigned char)'¡') *buf = 'A';
-		if (*buf == (unsigned char)'Ê') *buf = 'E';
-		if (*buf == (unsigned char)'Æ') *buf = 'C';
-		if (*buf == (unsigned char)'£') *buf = 'L';
-		if (*buf == (unsigned char)'Ñ') *buf = 'N';
-		if (*buf == (unsigned char)'Ó') *buf = 'O';
-		if (*buf == (unsigned char)'¦') *buf = 'S';
-		if (*buf == (unsigned char)'¯') *buf = 'Z';
-		if (*buf == (unsigned char)'¬') *buf = 'Z';
-
-		buf++;
+		charmap_prepare(charmap, conv, sizeof(conv), 1);
+		valid = 1;
 	}
+
+	charmap_convert(charmap, buf);
 }
 
 /*
@@ -3347,3 +3432,38 @@ time_t parsetimestr(const char *p)
 	else
 		return mktime(lt);
 }
+
+/*
+ * unique_name()
+ *
+ * je¶li jest w³±czone config_dcc_backups, to tworzy unikaln± ¶cie¿kê 
+ * do pliku, dodaj±c sufiksy od 1 do 1000.
+ *
+ * - path: ¶cie¿ka do zmiany
+ *
+ * zwraca:
+ *  - NULL: nie uda³o siê utworzyæ backupu
+ *  - path: backup nie by³ potrzebny lub config_dcc_backups == 0
+ *  - pozosta³e warto¶ci: wska¼nik do nowej ¶cie¿ki
+ */
+unsigned char *unique_name (unsigned char *path)
+{
+	struct stat st;
+	int num;
+	unsigned char *newpath = NULL;	/* ¿eby nie by³o warninga */
+
+	if (!config_dcc_backups || stat((char *) path, &st))
+		return path;
+
+	for (num = 1; num < 1000; num++) {
+		newpath = (unsigned char *) saprintf("%s.%d", path, num);
+
+		if (stat((char *) newpath, &st) == -1)
+			break;
+
+		xfree(newpath);
+	}
+
+	return (num == 1000) ? NULL : newpath;
+}
+
