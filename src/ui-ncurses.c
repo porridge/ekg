@@ -5108,7 +5108,7 @@ int binding_key(struct binding *b, const char *key, int add)
 	if (!strncasecmp(key, "Ctrl-", 5)) {
 		unsigned char ch;
 		
-		if (strlen(key) != 6)
+		if (strlen(key) != 6 || !xisalpha(key[5]))
 			return -1;
 
 		ch = xtoupper(key[5]);
