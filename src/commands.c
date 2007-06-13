@@ -3105,12 +3105,12 @@ COMMAND(cmd_dcc)
 			return -1;
 		}
 
+		close(fd);
+
 		if (!stat(params[2], &st) && S_ISDIR(st.st_mode)) {
 			printq("dcc_open_error", params[2], strerror(EISDIR));
 			return -1;
 		}
-
-		close(fd);
 
 		t.uin = uin;
 		t.id = transfer_id();

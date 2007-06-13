@@ -2546,6 +2546,9 @@ int ioctld_socket(const char *path)
 		usleep(usecs);
 	}
 
+	close(ioctld_sock);
+	ioctld_sock = -1;
+
         return -1;
 }
 
