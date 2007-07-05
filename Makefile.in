@@ -15,10 +15,7 @@ INSTALL = @INSTALL@
 
 #
 
-all:	configure libgadu @ekg@ @make_ekgwap@
-
-libgadu:
-	cd lib && $(MAKE) all
+all:	configure @ekg@ @make_ekgwap@
 
 ekg:	
 	cd src && $(MAKE) all
@@ -31,12 +28,7 @@ examples:
 
 #
 
-dep:	dep-libgadu @dep_ekg@
-
-dep-libgadu:
-	cd lib && $(MAKE) dep
-
-dep-ekg:
+dep:
 	cd src && $(MAKE) dep
 
 #
@@ -46,10 +38,7 @@ configure:	configure.in m4/*
 
 #
 
-install:	all install-libgadu @install_ekg@ @install_ekgwap@
-
-install-libgadu:
-	cd lib && $(MAKE) install
+install:	all @install_ekg@ @install_ekgwap@
 
 install-ekg:	install-ekg-data install-ekg-man
 	cd src && $(MAKE) install
@@ -80,11 +69,6 @@ install-ekl2:
 
 #
 
-uninstall:	@uninstall_ekg@
-	rm -f $(DESTDIR)$(libdir)/libgadu.{a,so*}
-	rm -f $(DESTDIR)$(includedir)/libgadu{,-config,-stdint}.h
-	rm -f $(DESTDIR)$(libdir)/pkgconfig/libgadu.pc
-
 uninstall-ekg:
 	rm -f $(DESTDIR)$(bindir)/{ekg,ekgwapd,ekl2.{sh,pl}}
 	rm -f $(DESTDIR)$(libexecdir)/ioctld
@@ -93,10 +77,7 @@ uninstall-ekg:
 
 #
 
-clean:	clean-libgadu @clean_ekg@ clean-examples clean-compat
-
-clean-libgadu:
-	cd lib && $(MAKE) clean
+clean:	@clean_ekg@ clean-examples clean-compat
 
 clean-ekg:
 	cd src && $(MAKE) clean
@@ -109,12 +90,9 @@ clean-compat:
 
 #
 
-distclean:	distclean-libgadu @distclean_ekg@ distclean-examples distclean-compat
+distclean:	@distclean_ekg@ distclean-examples distclean-compat
 	rm -f *~ config.log config.cache config.status config.h Makefile
 	rm -f config.h.in configure aclocal.m4
-
-distclean-libgadu:
-	cd lib && $(MAKE) distclean
 
 distclean-ekg:
 	cd src && $(MAKE) distclean

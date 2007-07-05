@@ -1,0 +1,23 @@
+// $Id$
+// (C) 2007 Adam Wysocki <gophi@ekg.chmurka.net>
+
+Od 5 lipca 2007 biblioteka libgadu, odpowiedzialna za komunikacjê, oraz klient 
+ekg, rozwijane i rozpowszechniane s± oddzielnie. Biblioteka jest jeszcze dostêpna 
+w snapshotach, ale z najbli¿szym pe³nym wydaniem ekg najprawdopodobniej zostanie 
+z nich usuniêta. ¯eby zainstalowaæ ekg, nale¿y najpierw zainstalowaæ libgadu.
+
+- Je¿eli korzystasz ze snapshotów (pobra³e¶ ekg ze strony www):
+  - cd libgadu (bêd±c w katalogu z ekg)
+  - ./configure (opcjonalne parametry, jak --prefix=katalogdomowy)
+  - make
+  - make install (je¿eli instalujesz systemowo, to z uprawnieniami roota)
+
+- Je¿eli korzystasz z CVS:
+  - export CVSROOT=:pserver:anonymous@ekg.chmurka.net:/home/cvs
+  - cvs login (w pytaniu o has³o wci¶nij Enter)
+  - cvs co libgadu
+  - ./autogen.sh (opcje jak przy ./configure)
+  - make
+  - make install
+
+Pytania, skargi i wnioski: http://ekg.chmurka.net/kontakt.php
