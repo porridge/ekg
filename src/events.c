@@ -71,7 +71,8 @@
 void handle_msg(), handle_ack(), handle_status(), handle_notify(),
 	handle_success(), handle_failure(), handle_search50(),
 	handle_change50(), handle_status60(), handle_notify60(),
-	handle_userlist(), handle_image_request(), handle_image_reply();
+	handle_userlist(), handle_image_request(), handle_image_reply(),
+	handle_dcc7_new(), handle_dcc7_accept(), handle_dcc7_reject();
 
 static int hide_notavail = 0;	/* czy ma ukrywaæ niedostêpnych -- tylko zaraz po po³±czeniu */
 
@@ -96,6 +97,9 @@ static struct handler handlers[] = {
 	{ GG_EVENT_USERLIST, handle_userlist },
 	{ GG_EVENT_IMAGE_REQUEST, handle_image_request },
 	{ GG_EVENT_IMAGE_REPLY, handle_image_reply },
+	{ GG_EVENT_DCC7_NEW, handle_dcc7_new },
+	{ GG_EVENT_DCC7_ACCEPT, handle_dcc7_accept },
+	{ GG_EVENT_DCC7_REJECT, handle_dcc7_reject },
 	{ 0, NULL }
 };
 
@@ -2232,18 +2236,18 @@ static void fix_filename (unsigned char *name)
  *
  * znajduje strukturê ,,transfer'' dotycz±c± danego po³±czenia.
  *
- *  - d - struktura gg_dcc, której szukamy.
+ *  - d - struktura gg_dcc lub gg_dcc7, której szukamy.
  *
  * wska¼nik do struktury ,,transfer'' lub NULL, je¶li nie znalaz³.
  */
-static struct transfer *find_transfer(struct gg_dcc *d)
+static struct transfer *find_transfer(void *d)
 {
 	list_t l;
 
 	for (l = transfers; l; l = l->next) {
 		struct transfer *t = l->data;
 
-		if (t->dcc == d)
+		if (t->dcc == d || t->dcc7 == d)
 			return t;
 	}
 
@@ -2259,7 +2263,7 @@ static struct transfer *find_transfer(struct gg_dcc *d)
  *
  * nie zwraca nic.
  */
-void remove_transfer(struct gg_dcc *d)
+void remove_transfer(void *d)
 {
 	struct transfer *t = find_transfer(d);
 
@@ -2267,6 +2271,60 @@ void remove_transfer(struct gg_dcc *d)
 		xfree(t->filename);
 		list_remove(&transfers, t, 1);
 	}
+}
+
+/*
+ * check_dcc_limit()
+ *
+ * sprawdza czy nie przekroczono limitu po³±czeñ bezpo¶rednich. je¶li tak,
+ * wy³±cza je i zwalnia strukturê gg_dcc przekazan± w zdarzeniu.
+ *
+ *  - e - struktura zdarzenia.
+ *
+ * 0/-1.
+ */
+static int check_dcc_limit(struct gg_event *e)
+{
+	int c, t = 60;
+	char *tmp;
+
+	if (!config_dcc_limit)
+		return 0;
+
+	if ((tmp = strchr(config_dcc_limit, '/')))
+		t = atoi(tmp + 1);
+
+	c = atoi(config_dcc_limit);
+
+	if (time(NULL) - dcc_limit_time > t) {
+		dcc_limit_time = time(NULL);
+		dcc_limit_count = 0;
+	}
+
+	dcc_limit_count++;
+
+	if (dcc_limit_count > c) {
+		print("dcc_limit");
+		config_dcc = 0;
+		changed_dcc("dcc");
+
+		dcc_limit_time = 0;
+		dcc_limit_count = 0;
+
+		if (e->type == GG_EVENT_DCC_NEW) {
+			gg_dcc_free(e->event.dcc_new);
+			e->event.dcc_new = NULL;
+		}
+
+		if (e->type == GG_EVENT_DCC7_NEW) {
+			gg_dcc7_free(e->event.dcc7_new);
+			e->event.dcc7_new = NULL;
+		}
+
+		return -1;
+	}
+
+	return 0;
 }
 
 /*
@@ -2303,37 +2361,10 @@ void handle_dcc(struct gg_dcc *d)
 
 	switch (e->type) {
 		case GG_EVENT_DCC_NEW:
-			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_CLIENT_NEW\n");
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_NEW\n");
 
-			if (config_dcc_limit) {
-				int c, t = 60;
-				char *tmp;
-				
-				if ((tmp = strchr(config_dcc_limit, '/')))
-					t = atoi(tmp + 1);
-
-				c = atoi(config_dcc_limit);
-
-				if (time(NULL) - dcc_limit_time > t) {
-					dcc_limit_time = time(NULL);
-					dcc_limit_count = 0;
-				}
-
-				dcc_limit_count++;
-
-				if (dcc_limit_count > c) {
-					print("dcc_limit");
-					config_dcc = 0;
-					changed_dcc("dcc");
-
-					dcc_limit_time = 0;
-					dcc_limit_count = 0;
-
-					gg_dcc_free(e->event.dcc_new);
-					e->event.dcc_new = NULL;
-					break;
-				}
-			}
+			if (check_dcc_limit(e) == -1)
+				break;
 
 			list_add(&watches, e->event.dcc_new, 0);
 			e->event.dcc_new = NULL;
@@ -2567,6 +2598,236 @@ void handle_dcc(struct gg_dcc *d)
 			remove_transfer(d);
 			list_remove(&watches, d, 0);
 			gg_free_dcc(d);
+
+			break;
+		}
+	}
+
+	gg_event_free(e);
+	
+	return;
+}
+
+/*
+ * handle_dcc7()
+ *
+ * funkcja zajmuje siê obs³ug± zdarzeñ zwi±zanych z DCC 7.x.
+ *
+ *  - d - struktura danego po³±czenia.
+ *
+ * nie zwraca niczego.
+ */
+void handle_dcc7(struct gg_dcc7 *d)
+{
+	struct gg_event *e;
+	struct transfer *t;
+
+	if (ignored_check(d->peer_uin) & IGNORE_DCC) {
+		remove_transfer(d);
+		list_remove(&watches, d, 0);
+		gg_dcc7_free(d);
+		return;
+	}
+	
+	if (!(e = gg_dcc7_watch_fd(d))) {
+		print("dcc_error", strerror(errno));
+		if (d->type != GG_SESSION_DCC7_SOCKET) {
+			remove_transfer(d);
+			list_remove(&watches, d, 0);
+			gg_dcc7_free(d);
+		}
+		return;
+	}
+
+	switch (e->type) {
+#if 0
+		case GG_EVENT_DCC_CLIENT_ACCEPT:
+		{
+			struct userlist *u;
+			
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_CLIENT_ACCEPT\n");
+			
+			if (!(u = userlist_find(d->peer_uin, NULL)) || config_uin != d->uin) {
+				gg_debug(GG_DEBUG_MISC, "## unauthorized client (uin=%ld), closing connection\n", d->peer_uin);
+				list_remove(&watches, d, 0);
+				gg_free_dcc(d);
+				return;
+			}
+
+			if (config_dcc_filter && d->remote_addr != u->ip.s_addr) {
+				char tmp[20];
+
+				snprintf(tmp, sizeof(tmp), "%s", inet_ntoa(*((struct in_addr*) &d->remote_addr)));
+				
+				print("dcc_spoof", format_user(d->peer_uin), inet_ntoa(u->ip), tmp);
+			}
+
+			t = find_transfer(d);
+			if (t) {
+				t->start = time(NULL);
+				if (t->start == -1)
+					t->start = 0;
+			}
+
+			break;
+		}
+
+		case GG_EVENT_DCC_CALLBACK:
+		{
+			int found = 0;
+			
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_CALLBACK\n");
+			
+			for (l = transfers; l; l = l->next) {
+				struct transfer *t = l->data;
+
+				gg_debug(GG_DEBUG_MISC, "// transfer id=%d, uin=%d, type=%d\n", t->id, t->uin, t->type);
+
+				if (t->uin == d->peer_uin && !t->dcc) {
+					gg_debug(GG_DEBUG_MISC, "## found transfer, uin=%d, type=%d\n", d->peer_uin, t->type);
+					t->dcc = d;
+					gg_dcc_set_type(d, t->type);
+					found = 1;
+					break;
+				}
+			}
+			
+			if (!found) {
+				gg_debug(GG_DEBUG_MISC, "## connection from %d not found\n", d->peer_uin);
+				list_remove(&watches, d, 0);
+				gg_dcc_free(d);
+			}
+			
+			break;	
+		}
+
+		case GG_EVENT_DCC_NEED_FILE_INFO:
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_NEED_FILE_INFO\n");
+
+			for (l = transfers; l; l = l->next) {
+				struct transfer *t = l->data;
+
+				if (t->dcc == d) {
+					char *remote;
+
+					remote = xstrdup(t->filename);
+					iso_to_cp(remote);
+
+					if (gg_dcc_fill_file_info2(d, remote, t->filename) == -1) {
+						gg_debug(GG_DEBUG_MISC, "## gg_dcc_fill_file_info() failed (%s)\n", strerror(errno));
+						print("dcc_open_error", t->filename);
+						remove_transfer(d);
+						list_remove(&watches, d, 0);
+						gg_free_dcc(d);
+						xfree(remote);
+						break;
+					}
+
+					xfree(remote);
+					
+					break;
+				}
+			}
+			break;
+			
+		case GG_EVENT_DCC_NEED_VOICE_ACK:
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_NEED_VOICE_ACK\n");
+#ifdef HAVE_VOIP
+			/* ¿eby nie sprawdza³o, póki luser nie odpowie */
+			list_remove(&watches, d, 0);
+
+			if (!(t = find_transfer(d))) {
+				tt.uin = d->peer_uin;
+				tt.type = GG_SESSION_DCC_VOICE;
+				tt.filename = NULL;
+				tt.dcc = d;
+				tt.id = transfer_id();
+				if (!(t = list_add(&transfers, &tt, sizeof(tt)))) {
+					gg_free_dcc(d);
+					break;
+				}
+			}
+			
+			t->type = GG_SESSION_DCC_VOICE;
+
+			print("dcc_voice_offer", format_user(t->uin), itoa(t->id));
+#else
+			list_remove(&watches, d, 0);
+			remove_transfer(d);
+			gg_free_dcc(d);
+#endif
+			break;
+
+		case GG_EVENT_DCC_VOICE_DATA:
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC_VOICE_DATA\n");
+
+#ifdef HAVE_VOIP
+			voice_open();
+			voice_play(e->event.dcc_voice_data.data, e->event.dcc_voice_data.length, 0);
+#endif
+			break;
+	
+#endif
+		case GG_EVENT_DCC7_DONE:
+			gg_debug(GG_DEBUG_MISC, "## GG_EVENT_DCC7_DONE\n");
+
+			if (!(t = find_transfer(d))) {
+				gg_dcc7_free(d);
+				break;
+			}
+
+			event_check(EVENT_DCCFINISH, t->uin, t->filename);
+
+			print((t->dcc7->type == GG_SESSION_DCC7_SEND) ? "dcc_done_send" : "dcc_done_get", format_user(t->uin), t->filename);
+			
+			remove_transfer(d);
+			list_remove(&watches, d, 0);
+			gg_dcc7_free(d);
+
+			break;
+			
+		case GG_EVENT_DCC7_ERROR:
+		{
+			struct in_addr addr;
+			unsigned short port = d->remote_port;
+			char *tmp;
+		
+			addr.s_addr = d->remote_addr;
+
+			if (d->peer_uin) {
+				struct userlist *u = userlist_find(d->peer_uin, NULL);
+				if (!addr.s_addr && u) {
+					addr.s_addr = u->ip.s_addr;
+					port = u->port;
+				}
+				tmp = saprintf("%s (%s:%d)", format_user(d->peer_uin), inet_ntoa(addr), port);
+			} else 
+				tmp = saprintf("%s:%d", inet_ntoa(addr), port);
+			
+			switch (e->event.dcc7_error) {
+				case GG_ERROR_DCC7_HANDSHAKE:
+					print("dcc_error_handshake", tmp);
+					break;
+				case GG_ERROR_DCC7_NET:
+					print("dcc_error_network", tmp);
+					break;
+				case GG_ERROR_DCC7_REFUSED:
+					print("dcc_error_refused", tmp);
+					break;
+				default:
+					print("dcc_error_unknown", tmp);
+			}
+
+			xfree(tmp);
+
+#ifdef HAVE_VOIP
+			if (d->type == GG_SESSION_DCC7_VOICE)
+				voice_close();
+#endif  /* HAVE_VOIP */
+
+			remove_transfer(d);
+			list_remove(&watches, d, 0);
+			gg_dcc7_free(d);
 
 			break;
 		}
@@ -2928,3 +3189,116 @@ err:
 			print("user_is_connected", format_user(e->event.image_reply.sender), itoa(e->event.image_reply.sender)); 
 	}
 }
+
+/*
+ * handle_dcc7_new()
+ *
+ * obs³uguje nowe po³±czenie dcc.
+ * 
+ *  - e - opis zdarzenia
+ */
+void handle_dcc7_new(struct gg_event *e)
+{
+	struct gg_dcc7 *dcc = e->event.dcc7_new;
+	struct transfer t;
+
+	if (!config_dcc) {
+		gg_dcc7_reject(dcc, GG_DCC7_REJECT_USER);
+		gg_dcc7_free(dcc);
+		e->event.dcc7_new = NULL;
+		return;
+	}
+
+	if (check_dcc_limit(e) == -1)
+		return;
+
+	memset(&t, 0, sizeof(t));
+	t.id = transfer_id();
+	t.uin = dcc->peer_uin;
+	t.dcc7 = dcc;
+
+	switch (dcc->dcc_type) {
+		case GG_DCC7_TYPE_FILE:
+		{
+			struct stat st;
+			char *path;
+
+			t.type = GG_SESSION_DCC7_GET;
+			t.filename = xstrdup(dcc->filename);
+			cp_to_iso(t.filename);
+			fix_filename(t.filename);
+
+			print("dcc_get_offer", format_user(t.uin), t.filename, itoa(dcc->size), itoa(t.id));
+
+			if (config_dcc_dir)
+				path = saprintf("%s/%s", config_dcc_dir, t.filename);
+			else
+				path = xstrdup(t.filename);
+
+			if (!stat(path, &st) && st.st_size < dcc->size)
+				print("dcc_get_offer_resume", format_user(t.uin), t.filename, itoa(dcc->size), itoa(t.id));
+			
+			xfree(path);
+
+			break;
+		}
+
+		case GG_DCC7_TYPE_VOICE:
+#ifdef HAVE_VOIP
+			t.type = GG_SESSION_DCC7_VOICE;
+
+			print("dcc_voice_offer", format_user(t.uin), itoa(t.id));
+			break;
+#else
+			gg_dcc7_free(dcc);
+			e->event.dcc7_new = NULL;
+			return;
+#endif
+
+		default:
+			gg_debug_session(sess, GG_DEBUG_MISC, "// gg_handle_dcc7_new() unknown type %d\n", dcc->type);
+
+	}
+
+	list_add(&transfers, &t, sizeof(t));
+
+	if (!(ignored_check(t.uin) & IGNORE_EVENTS))
+		event_check(EVENT_DCC, t.uin, t.filename);
+}
+
+/*
+ * handle_dcc7_accept()
+ *
+ * obs³uguje akceptacjê po³±czenia dcc.
+ * 
+ *  - e - opis zdarzenia
+ */
+void handle_dcc7_accept(struct gg_event *e)
+{
+
+
+}
+
+/*
+ * handle_dcc7_reject()
+ *
+ * obs³uguje odrzucenie po³±czenia dcc.
+ * 
+ *  - e - opis zdarzenia
+ */
+void handle_dcc7_reject(struct gg_event *e)
+{
+	struct gg_dcc7 *d = e->event.dcc7_accept.dcc7;
+
+	print("dcc_error_refused", format_user(d->peer_uin));
+
+#ifdef HAVE_VOIP
+	if (d->type == GG_SESSION_DCC7_VOICE)
+		voice_close();
+#endif  /* HAVE_VOIP */
+
+	remove_transfer(d);
+	list_remove(&watches, d, 0);
+	gg_dcc7_free(d);
+}
+

@@ -100,6 +100,7 @@ struct transfer {
 	uin_t uin;
 	char *filename;
 	struct gg_dcc *dcc;
+	struct gg_dcc7 *dcc7;
 	time_t start;
 	int type;
 	int id;

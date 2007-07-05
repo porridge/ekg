@@ -149,6 +149,10 @@ static struct {
 	EKG_HANDLER(GG_SESSION_DCC_SEND, handle_dcc, gg_dcc_free)
 	EKG_HANDLER(GG_SESSION_DCC_GET, handle_dcc, gg_dcc_free)
 	EKG_HANDLER(GG_SESSION_DCC_VOICE, handle_dcc, gg_dcc_free)
+	EKG_HANDLER(GG_SESSION_DCC7_SOCKET, handle_dcc7, gg_dcc7_free)
+	EKG_HANDLER(GG_SESSION_DCC7_SEND, handle_dcc7, gg_dcc7_free)
+	EKG_HANDLER(GG_SESSION_DCC7_GET, handle_dcc7, gg_dcc7_free)
+	EKG_HANDLER(GG_SESSION_DCC7_VOICE, handle_dcc7, gg_dcc7_free)
 	EKG_HANDLER(GG_SESSION_REGISTER, handle_pubdir, gg_register_free)
 	EKG_HANDLER(GG_SESSION_UNREGISTER, handle_pubdir, gg_pubdir_free)
 	EKG_HANDLER(GG_SESSION_PASSWD, handle_pubdir, gg_change_passwd_free)
@@ -404,6 +408,7 @@ void ekg_wait_for_key()
 			struct gg_common *c = l->data;
 			struct gg_http *h = l->data;
 			struct gg_dcc *d = l->data;
+			struct gg_dcc7 *d7 = l->data;
 			static time_t last_check = 0;
 
 			if (!c || c->timeout == -1 || time(NULL) == last_check)
@@ -496,6 +501,32 @@ void ekg_wait_for_key()
 					remove_transfer(d);
 					list_remove(&watches, d, 0);
 					gg_free_dcc(d);
+					break;
+				}
+
+				case GG_SESSION_DCC7_GET:
+				case GG_SESSION_DCC7_SEND:
+				{
+					struct in_addr addr;
+					unsigned short port = d7->remote_port;
+					char *tmp;
+			
+					addr.s_addr = d7->remote_addr;
+
+					if (d7->peer_uin) {
+						struct userlist *u = userlist_find(d7->peer_uin, NULL);
+						if (!addr.s_addr && u) {
+							addr.s_addr = u->ip.s_addr;
+							port = u->port;
+						}
+						tmp = saprintf("%s (%s:%d)", format_user(d7->peer_uin), inet_ntoa(addr), port);
+					} else 
+						tmp = saprintf("%s:%d", inet_ntoa(addr), port);
+					print("dcc_timeout", tmp);
+					xfree(tmp);
+					remove_transfer(d7);
+					list_remove(&watches, d7, 0);
+					gg_dcc7_free(d7);
 					break;
 				}
 			}
@@ -1533,6 +1564,7 @@ int main(int argc, char **argv)
 #endif
 
 	changed_dcc("dcc");
+	changed_dcc("dcc_ip");
 
 #ifdef WITH_PYTHON
 	python_autorun();

@@ -10,7 +10,7 @@ libexecdir = @libexecdir@
 sysconfdir = @sysconfdir@
 
 CC = @CC@ 
-CFLAGS = -I.. -I../lib @CFLAGS@ -DDATADIR=\"${datadir}/ekg\" -DSYSCONFDIR=\"${sysconfdir}\"
+CFLAGS = -I.. @CFLAGS@ -DDATADIR=\"${datadir}/ekg\" -DSYSCONFDIR=\"${sysconfdir}\"
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 
@@ -28,7 +28,7 @@ all:	dep ekg @ioctld@
 
 ekg:	$(OBJS) comptime.c
 	$(CC) $(CFLAGS) -c -o comptime.o comptime.c
-	$(CC) $(CFLAGS) -o ekg $(OBJS) comptime.o -L../lib $(LDFLAGS) $(LIBS)
+	$(CC) $(CFLAGS) -o ekg $(OBJS) comptime.o $(LDFLAGS) $(LIBS)
 
 ioctld:	ioctld.c
 	$(CC) $(CFLAGS) ioctld.c -o ioctld $(LIBS) @IOCTLD_OBJS@

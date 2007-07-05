@@ -31,6 +31,7 @@ struct handler {
 
 void handle_event(struct gg_session *s);
 void handle_dcc(struct gg_dcc *s);
+void handle_dcc7(struct gg_dcc7 *s);
 void handle_msg(struct gg_event *e);
 void handle_voice(struct gg_common *c);
 
@@ -41,7 +42,7 @@ void handle_disconnect(struct gg_event *e);
 
 void print_message(struct gg_event *e, struct userlist *u, int chat, int secure);
 
-void remove_transfer(struct gg_dcc *d);
+void remove_transfer(void *d);
 
 void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_t ip, uint16_t port, int version, int image_size);
 

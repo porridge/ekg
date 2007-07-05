@@ -2978,7 +2978,7 @@ COMMAND(cmd_dcc)
 		for (l = transfers; l; l = l->next) {
 			struct transfer *t = l->data;
 
-			if (!t->dcc || !t->dcc->established) {
+			if ((!t->dcc && !t->dcc7) || (t->dcc && !t->dcc->established) || (t->dcc7 && !t->dcc7->established)) {
 				empty = 0;
 				if (!passed)
 					printq("dcc_show_pending_header");
@@ -2986,12 +2986,15 @@ COMMAND(cmd_dcc)
 
 				switch (t->type) {
 					case GG_SESSION_DCC_SEND:
+					case GG_SESSION_DCC7_SEND:
 						printq("dcc_show_pending_send", itoa(t->id), format_user(t->uin), t->filename);
 						break;
 					case GG_SESSION_DCC_GET:
+					case GG_SESSION_DCC7_GET:
 						printq("dcc_show_pending_get", itoa(t->id), format_user(t->uin), t->filename);
 						break;
 					case GG_SESSION_DCC_VOICE:
+					case GG_SESSION_DCC7_VOICE:
 						printq("dcc_show_pending_voice", itoa(t->id), format_user(t->uin));
 				}
 			}
@@ -3002,8 +3005,22 @@ COMMAND(cmd_dcc)
 		for (l = transfers; l; l = l->next) {
 			struct transfer *t = l->data;
 
-			if (t->dcc && t->dcc->established) {
+			if ((t->dcc && t->dcc->established) || (t->dcc7 && t->dcc7->established)) {
 				int eta_m = 0, eta_s = 0, speed_kb = 0;
+				unsigned int size = 0, offset = 0;
+
+				if (t->dcc) {
+					size = t->dcc->file_info.size;
+					offset = t->dcc->offset;
+				}
+
+				if (t->dcc7) {
+					size = t->dcc7->size;
+					offset = t->dcc7->offset;
+				}
+
+				if (!size)
+					size = 1;	// dzielimy przez size
 
 				empty = 0;
 				if (!passed)
@@ -3019,9 +3036,9 @@ COMMAND(cmd_dcc)
 						elapsed = cur - t->start;
 
 					if (elapsed) {
-						speed = t->dcc->offset / elapsed;
-						if (t->dcc->offset && t->dcc->offset <= t->dcc->file_info.size)
-							eta = (t->dcc->file_info.size - t->dcc->offset) * elapsed / t->dcc->offset;
+						speed = offset / elapsed;
+						if (offset && offset <= size)
+							eta = (size - offset) * elapsed / offset;
 					}
 
 					/* teraz elapsed zawiera czas, który up³yn±³ 
@@ -3039,24 +3056,29 @@ COMMAND(cmd_dcc)
 
 				switch (t->type) {
 					case GG_SESSION_DCC_SEND:
+					case GG_SESSION_DCC7_SEND:
 						if (speed_kb || eta_m || eta_s) {
 							if (eta_m)
-								printq("dcc_show_active_send_speed_ms", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa((float)100*((float)t->dcc->offset/(float)t->dcc->file_info.size)), itoa(speed_kb), itoa(eta_m), itoa(eta_s));
+								printq("dcc_show_active_send_speed_ms", itoa(t->id), format_user(t->uin), t->filename, itoa(offset), itoa(size), itoa((float)100*((float)offset/(float)size)), itoa(speed_kb), itoa(eta_m), itoa(eta_s));
 							else
-								printq("dcc_show_active_send_speed_s", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa((float)100*((float)t->dcc->offset/(float)t->dcc->file_info.size)), itoa(speed_kb), itoa(eta_s));
+								printq("dcc_show_active_send_speed_s", itoa(t->id), format_user(t->uin), t->filename, itoa(offset), itoa(size), itoa((float)100*((float)offset/(float)size)), itoa(speed_kb), itoa(eta_s));
 						} else
-							printq("dcc_show_active_send", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa((float)100*((float)t->dcc->offset/(float)t->dcc->file_info.size)));
+							printq("dcc_show_active_send", itoa(t->id), format_user(t->uin), t->filename, itoa(offset), itoa(size), itoa((float)100*((float)offset/(float)size)));
 						break;
+
 					case GG_SESSION_DCC_GET:
+					case GG_SESSION_DCC7_GET:
 						if (speed_kb || eta_m || eta_s) {
 							if (eta_m)
-								printq("dcc_show_active_get_speed_ms", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa((float)100*((float)t->dcc->offset/(float)t->dcc->file_info.size)), itoa(speed_kb), itoa(eta_m), itoa(eta_s));
+								printq("dcc_show_active_get_speed_ms", itoa(t->id), format_user(t->uin), t->filename, itoa(offset), itoa(size), itoa((float)100*((float)offset/(float)size)), itoa(speed_kb), itoa(eta_m), itoa(eta_s));
 							else
-								printq("dcc_show_active_get_speed_s", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa((float)100*((float)t->dcc->offset/(float)t->dcc->file_info.size)), itoa(speed_kb), itoa(eta_s));
+								printq("dcc_show_active_get_speed_s", itoa(t->id), format_user(t->uin), t->filename, itoa(offset), itoa(size), itoa((float)100*((float)offset/(float)size)), itoa(speed_kb), itoa(eta_s));
 						} else
-							printq("dcc_show_active_get", itoa(t->id), format_user(t->uin), t->filename, itoa(t->dcc->offset), itoa(t->dcc->file_info.size), itoa((float)100*((float)t->dcc->offset/(float)t->dcc->file_info.size)));
+							printq("dcc_show_active_get", itoa(t->id), format_user(t->uin), t->filename, itoa(offset), itoa(size), itoa((float)100*((float)offset/(float)size)));
 						break;
+
 					case GG_SESSION_DCC_VOICE:
+					case GG_SESSION_DCC7_VOICE:
 						printq("dcc_show_active_voice", itoa(t->id), format_user(t->uin));
 				}
 			}
@@ -3089,13 +3111,13 @@ COMMAND(cmd_dcc)
 			printq("not_connected");
 			return -1;
 		}
-
+		
 		if (!(GG_S_A(u->status) || GG_S_B(u->status)) && !(ignored_check(uin) & IGNORE_STATUS)) {
 			printq("dcc_user_not_avail", format_user(u->uin), (u->first_name) ? u->first_name : u->display);
 			return -1;
 		}
 
-		if (!u->ip.s_addr && params[0][0] != 'r') {
+		if ((u->protocol < 0x2a && !u->ip.s_addr && params[0][0] != 'r') || (u->protocol >= 0x2a && !u->port)) {
 			printq("dcc_user_aint_dcc", format_user(u->uin));
 			return -1;
 		}
@@ -3122,33 +3144,50 @@ COMMAND(cmd_dcc)
 		if (t.start == -1)
 			t.start = 0;
 
-		if (u->port < 10 || !strncasecmp(params[0], "rse", 3)) {
-			/* nie mo¿emy siê z nim po³±czyæ, wiêc on spróbuje */
-			gg_dcc_request(sess, uin);
+		if (u->protocol < 0x2a) {
+			if (u->port < 10 || !strncasecmp(params[0], "rse", 3)) {
+				/* nie mo¿emy siê z nim po³±czyæ, wiêc on spróbuje */
+				gg_dcc_request(sess, uin);
+			} else {
+				struct gg_dcc *d;
+				char *remote;
+				
+				if (!(d = gg_dcc_send_file(u->ip.s_addr, u->port, config_uin, uin))) {
+					printq("dcc_error", strerror(errno));
+					return -1;
+				}
+
+				remote = xstrdup(params[2]);
+				iso_to_cp((unsigned char *) remote);
+				
+				if (gg_dcc_fill_file_info2(d, remote, params[2]) == -1) {
+					printq("dcc_open_error", params[2], strerror(errno));
+					gg_free_dcc(d);
+					xfree(remote);
+					return -1;
+				}
+
+				xfree(remote);
+
+				list_add(&watches, d, 0);
+
+				t.dcc = d;
+			}
 		} else {
-			struct gg_dcc *d;
+			struct gg_dcc7 *d;
 			char *remote;
-			
-			if (!(d = gg_dcc_send_file(u->ip.s_addr, u->port, config_uin, uin))) {
+
+			remote = xstrdup(t.filename);
+			iso_to_cp((unsigned char *) remote);
+
+			if (!(d = gg_dcc7_send_file(sess, u->uin, t.filename, remote, NULL))) {
 				printq("dcc_error", strerror(errno));
 				return -1;
 			}
 
-			remote = xstrdup(params[2]);
-			iso_to_cp((unsigned char *) remote);
-			
-			if (gg_dcc_fill_file_info2(d, remote, params[2]) == -1) {
-				printq("dcc_open_error", params[2], strerror(errno));
-				gg_free_dcc(d);
-				xfree(remote);
-				return -1;
-			}
-
-			xfree(remote);
-
 			list_add(&watches, d, 0);
 
-			t.dcc = d;
+			t.dcc7 = d;
 		}
 
 		list_add(&transfers, &t, sizeof(t));
@@ -3280,16 +3319,27 @@ COMMAND(cmd_dcc)
 	if (!strncasecmp(params[0], "g", 1) || !strncasecmp(params[0], "re", 2)) {		/* get */
 		struct transfer *t = NULL;
 		unsigned char *path, *tmp;
+		int fd;
+		unsigned int offset;
 		
 		for (l = transfers; l; l = l->next) {
 			struct transfer *tt = l->data;
 			struct userlist *u;
 
-			if (!tt->dcc || tt->type != GG_SESSION_DCC_GET || !tt->filename)
+			if (!tt->dcc && !tt->dcc7)
+				continue;
+
+			if (tt->dcc && tt->type != GG_SESSION_DCC_GET)
+				continue;
+
+			if (tt->dcc7 && tt->type != GG_SESSION_DCC7_GET)
+				continue;
+
+			if (!tt->filename)
 				continue;
 			
 			if (!params[1]) {
-				if (tt->dcc->established)
+				if ((tt->dcc && tt->dcc->established) || (tt->dcc7 && tt->dcc7->established))
 					continue;
 
 				t = tt;
@@ -3302,7 +3352,7 @@ COMMAND(cmd_dcc)
 			}
 
 			if ((u = userlist_find(tt->uin, NULL))) {
-				if (tt->dcc->established)
+				if ((tt->dcc && tt->dcc->established) || (tt->dcc7 && tt->dcc7->established))
 					continue;
 
 				if (!strcasecmp(params[1], itoa(u->uin)) || (u->display && !strcasecmp(params[1], u->display))) {
@@ -3312,16 +3362,15 @@ COMMAND(cmd_dcc)
 			}
 		}
 
-		if (!t || !t->dcc) {
+		if (!t || (!t->dcc && !t->dcc7)) {
 			printq("dcc_not_found", (params[1]) ? params[1] : "");
 			return -1;
 		}
 
 		for (l = watches; l; l = l->next) {
 			struct gg_common *c = l->data;
-			struct gg_dcc *d = l->data;
 
-			if (c->type == GG_SESSION_DCC_GET && t->dcc == d) {
+			if ((c->type == GG_SESSION_DCC_GET && t->dcc == l->data) || (c->type == GG_SESSION_DCC7_GET && t->dcc7 == l->data)) {
 				printq("dcc_receiving_already", t->filename, format_user(t->uin));
 				return -1;
 			}
@@ -3339,7 +3388,10 @@ COMMAND(cmd_dcc)
 		tmp = unique_name(path);
 		if (!tmp) {
 			printq("dcc_get_cant_overwrite", path);
-			gg_free_dcc(t->dcc);
+			if (t->dcc)
+				gg_dcc_free(t->dcc);
+			if (t->dcc7)
+				gg_dcc7_free(t->dcc7);
 			list_remove(&transfers, t, 1);
 			xfree(path);
 			return -1;
@@ -3350,25 +3402,49 @@ COMMAND(cmd_dcc)
 		}
 
 		if (params[0][0] == 'r') {
-			t->dcc->file_fd = open((char *) path, O_WRONLY);
-			t->dcc->offset = lseek(t->dcc->file_fd, 0, SEEK_END);
-		} else
-			t->dcc->file_fd = open((char *) path, O_WRONLY | O_CREAT, 0600);
+			fd = open((char *) path, O_WRONLY);
+			offset = lseek(fd, 0, SEEK_END);
+		} else {
+			fd = open((char *) path, O_WRONLY | O_CREAT, 0600);
+			offset = 0;
+		}
 
-		if (t->dcc->file_fd == -1) {
+		if (fd == -1) {
 			printq("dcc_get_cant_create", path);
-			gg_free_dcc(t->dcc);
+			if (t->dcc)
+				gg_dcc_free(t->dcc);
+			if (t->dcc7) {
+				gg_dcc7_reject(t->dcc7, GG_DCC7_REJECT_USER);
+				gg_dcc7_free(t->dcc7);
+			}
 			list_remove(&transfers, t, 1);
 			xfree(path);
 			
 			return -1;
+		}
+
+		if (t->dcc) {
+			t->dcc->file_fd = fd;
+			t->dcc->offset = offset;
+		}
+
+		if (t->dcc7) {
+			t->dcc7->file_fd = fd;
+			t->dcc7->offset = offset;
+			{ char buf[256]; sprintf(buf, "%p %d", t->dcc7, t->dcc7->file_fd); print("generic", buf); }
 		}
 		
 		xfree(path);
 		
 		printq("dcc_get_getting", format_user(t->uin), t->filename);
 		
-		list_add(&watches, t->dcc, 0);
+		if (t->dcc)
+			list_add(&watches, t->dcc, 0);
+			
+		if (t->dcc7) {
+			gg_dcc7_accept(t->dcc7, offset);
+			list_add(&watches, t->dcc7, 0);
+		}
 
 		return 0;
 	}
@@ -3403,13 +3479,20 @@ COMMAND(cmd_dcc)
 			return -1;
 		}
 
+		if (t->dcc7) {
+			if (!t->dcc7->established)
+				gg_dcc7_reject(t->dcc7, GG_DCC7_REJECT_USER);
+			list_remove(&watches, t->dcc7, 0);
+			gg_dcc7_free(t->dcc7);
+		}
+
 		if (t->dcc) {
 			list_remove(&watches, t->dcc, 0);
 			gg_dcc_free(t->dcc);
 		}
 
 #ifdef HAVE_VOIP
-		if (t->type == GG_SESSION_DCC_VOICE)
+		if (t->type == GG_SESSION_DCC_VOICE || t->type == GG_SESSION_DCC7_VOICE)
 			voice_close();
 #endif
 
