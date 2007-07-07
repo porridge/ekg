@@ -3405,7 +3405,7 @@ COMMAND(cmd_dcc)
 			fd = open((char *) path, O_WRONLY);
 			offset = lseek(fd, 0, SEEK_END);
 		} else {
-			fd = open((char *) path, O_WRONLY | O_CREAT, 0600);
+			fd = open((char *) path, O_WRONLY | O_CREAT, config_files_mode_received);
 			offset = 0;
 		}
 

@@ -3087,7 +3087,7 @@ void handle_image_reply(struct gg_event *e)
 
 			gg_debug(GG_DEBUG_MISC, "// ekg: trying to save image: %s\n", path);
 
-			fd = open(path, O_WRONLY | O_CREAT, 0600);
+			fd = open(path, O_WRONLY | O_CREAT, config_files_mode_received);
 			if (fd == -1)
 				goto err;
 

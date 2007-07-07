@@ -8,6 +8,7 @@ d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
 - dopisanie do docs/libgadu.txt instrukcji dla libgadu instalowanego 
   lokalnie (zigi/g)
+- dodanie zmiennych files_mode_config, files_mode_received (Socek/g)
 
 // 2007-07-05
 

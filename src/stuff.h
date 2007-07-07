@@ -273,6 +273,10 @@ int config_emoticons;
 int config_encryption;
 int config_enter_scrolls;
 int config_events_delay;
+int config_files_mode_config;
+int config_files_mode_received;
+int config_files_mode_config_int;
+int config_files_mode_received_int;
 char *config_interface;
 int config_header_size;
 int config_ignore_unknown_sender;
@@ -414,6 +418,7 @@ void changed_proxy(const char *var);
 void changed_theme(const char *var);
 void changed_uin(const char *var);
 void changed_xxx_reason(const char *var);
+void changed_files_mode(const char *var);
 
 struct conference *conference_add(const char *string, const char *nicklist, int quiet);
 int conference_remove(const char *name, int quiet);

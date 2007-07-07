@@ -513,7 +513,7 @@ int config_write(const char *filename)
 	if (!(f = fopen(tmp, "w")))
 		return -1;
 	
-	fchmod(fileno(f), 0600);
+	fchmod(fileno(f), config_files_mode_config);
 
 	config_write_main(f, 1);
 
@@ -563,7 +563,7 @@ int config_write_partly(char **vars)
 	
 	wrote = xcalloc(array_count(vars) + 1, sizeof(int));
 	
-	fchmod(fileno(fo), 0600);
+	fchmod(fileno(fo), config_files_mode_config);
 
 	while ((line = read_file(fi))) {
 		char *tmp;

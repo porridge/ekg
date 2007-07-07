@@ -310,7 +310,7 @@ int msg_queue_write()
 		fprintf(f, "%s", m->msg);
 
 		fclose(f);
-		chmod(fn, 0600);
+		chmod(fn, config_files_mode_config);
 		xfree(fn);
 	}
 

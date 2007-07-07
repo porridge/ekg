@@ -113,6 +113,10 @@ int config_beep_notify = 1;
 int config_beep_mail = 1;
 int config_display_pl_chars = 1;
 int config_events_delay = 3;
+int config_files_mode_config_int = 600;	/* nie 0600, bo jest zamieniane z dec na oct */
+int config_files_mode_config = 0600;		/* wartosc oktalna files_mode_config */
+int config_files_mode_received_int = 600;
+int config_files_mode_received = 0600;
 char *config_sound_msg_file = NULL;
 char *config_sound_chat_file = NULL;
 char *config_sound_sysmsg_file = NULL;
@@ -916,6 +920,22 @@ void changed_xxx_reason(const char *var)
 
 	if (strlen(tmp) > GG_STATUS_DESCR_MAXSIZE)
 		print("descr_too_long", itoa(strlen(tmp) - GG_STATUS_DESCR_MAXSIZE));
+}
+
+/*
+ * changed_files_mode()
+ *
+ * funkcja wywo³wana przy zmianie config_files_mode_*_int
+ */
+void changed_files_mode(const char *var)
+{
+	char mode[16];
+
+	snprintf(mode, sizeof(mode), "%d", config_files_mode_config_int);
+	config_files_mode_config = strtol(mode, NULL, 8);
+
+	snprintf(mode, sizeof(mode), "%d", config_files_mode_received_int);
+	config_files_mode_received = strtol(mode, NULL, 8);
 }
 
 /*
@@ -2613,7 +2633,7 @@ int init_control_pipe(const char *pipe_file)
 	if (!stat(pipe_file, &st) && !S_ISFIFO(st.st_mode))
 		err_str = saprintf("Plik %s nie jest potokiem. Ignorujê.\n", pipe_file);
 
-	if (mkfifo(pipe_file, 0600) < 0 && errno != EEXIST)
+	if (mkfifo(pipe_file, config_files_mode_config) < 0 && errno != EEXIST)
 		err_str = saprintf("Nie mogê stworzyæ potoku %s: %s. Ignorujê.\n", pipe_file, strerror(errno));
 
 	if ((fd = open(pipe_file, O_RDWR | O_NONBLOCK)) < 0)

@@ -236,6 +236,8 @@ void variable_init()
 	variable_add("enter_scrolls", "es", VAR_BOOL, 2, NULL,  NULL, NULL, NULL);
 #endif
 	variable_add("events_delay", "ev", VAR_INT, 1, &config_events_delay, NULL, NULL, NULL);
+	variable_add("files_mode_config", "Mc", VAR_INT, 1, &config_files_mode_config_int, changed_files_mode, NULL, NULL);
+	variable_add("files_mode_received", "Mr", VAR_INT, 1, &config_files_mode_received_int, changed_files_mode, NULL, NULL);
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init)
 		variable_add("header_size", "hs", VAR_INT, 1, &config_header_size, header_statusbar_resize, NULL, NULL);

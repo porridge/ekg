@@ -478,6 +478,26 @@ events_delay
 	pocz±tkowych informacji o stanie osób po po³±czeniu jako zmianê
 	ich stanu.
 
+files_mode_config
+	typ: int
+	domy¶lna warto¶æ: 600
+
+	okre¶la tryby dostêpu do plików konfiguracyjnych ekg (config, userlist, 
+	debug, history, kolejka wiadomo¶ci, pliki wymieniane z ekgwap). warto¶æ 
+	nie wp³ywa na tryby plików tworzonych podczas generowania crashdumpów 
+	oraz na tryby katalogów tworzonych podczas u¿ywania ekg. UWAGA: nieprawid³owe 
+	u¿ycie tej zmiennej mo¿e umo¿liwiæ dostêp do konfiguracji (w tym has³a) oraz 
+	archiwum osobom niepowo³anym. przed u¿yciem przeczytaj man chmod.
+
+files_mode_received
+	typ: int
+	domy¶lna warto¶æ: 600
+
+	okre¶la tryby dostêpu do plików tworzonych przez ekg podczas odbierania 
+	danych od innych u¿ytkowników (dcc oraz obrazki). domy¶lna warto¶æ 600 
+	oznacza, ¿e pliki s± dostêpne jedynie dla u¿ytkownika, który uruchomi³ 
+	ekg. wiêcej na temat uprawnieñ: man chmod.
+
 header_size
 	typ: liczba
 	domy¶lna warto¶æ: 0

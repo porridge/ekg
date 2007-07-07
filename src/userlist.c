@@ -403,7 +403,7 @@ int userlist_write(int pid)
 		return -2;
 	}
 
-	fchmod(fileno(f), 0600);
+	fchmod(fileno(f), config_files_mode_config);
 	
 	fputs(contacts, f);
 	xfree(contacts);
@@ -437,7 +437,7 @@ int userlist_write_wap()
 	if (!(f = fopen(filename, "w")))
 		return -1;
 
-	fchmod(fileno(f), 0600);
+	fchmod(fileno(f), config_files_mode_config);
 	fprintf(f, "%s\n", (sess) ? "C" : "D");
 
 	for (l = userlist; l; l = l->next) {

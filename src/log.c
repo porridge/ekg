@@ -390,7 +390,7 @@ void put_log(uin_t uin, const char *format, ...)
 			if (gzclose(f) != Z_OK)
 				goto fail;
 
-			chmod(path, 0600);
+			chmod(path, config_files_mode_config);
 
 			goto cleanup;
 		}
@@ -402,7 +402,7 @@ void put_log(uin_t uin, const char *format, ...)
 	fputs(buf, f);
 	if (fclose(f) != 0)
 		goto fail;
-	chmod(path, 0600);
+	chmod(path, config_files_mode_config);
 
 cleanup:
 	xfree(buf);
