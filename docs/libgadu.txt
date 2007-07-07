@@ -1,23 +1,59 @@
 // $Id$
 // (C) 2007 Adam Wysocki <gophi@ekg.chmurka.net>
 
-Od 5 lipca 2007 biblioteka libgadu, odpowiedzialna za komunikacjê, oraz klient 
-ekg, rozwijane i rozpowszechniane s± oddzielnie. Biblioteka jest jeszcze dostêpna 
-w snapshotach, ale z najbli¿szym pe³nym wydaniem ekg najprawdopodobniej zostanie 
-z nich usuniêta. ¯eby zainstalowaæ ekg, nale¿y najpierw zainstalowaæ libgadu.
+Od 5 lipca 2007 biblioteka libgadu, odpowiedzialna za komunikacjê, oraz 
+klient ekg, rozwijane i rozpowszechniane s± oddzielnie. Biblioteka jest 
+jeszcze dostêpna w snapshotach, ale z najbli¿szym pe³nym wydaniem ekg 
+najprawdopodobniej zostanie z nich usuniêta. ¯eby zainstalowaæ ekg, 
+nale¿y najpierw zainstalowaæ libgadu.
 
 - Je¿eli korzystasz ze snapshotów (pobra³e¶ ekg ze strony www):
-  - cd libgadu (bêd±c w katalogu z ekg)
-  - ./configure (opcjonalne parametry, jak --prefix=katalogdomowy)
+  - cd libgadu
+    (bêd±c w katalogu z ekg)
+  - ./configure
+    (opcjonalne parametry, jak --prefix=katalog-domowy)
   - make
-  - make install (je¿eli instalujesz systemowo, to z uprawnieniami roota)
+  - make install
+    (je¿eli instalujesz systemowo, to z uprawnieniami roota)
 
 - Je¿eli korzystasz z CVS:
   - export CVSROOT=:pserver:anonymous@ekg.chmurka.net:/home/cvs
-  - cvs login (w pytaniu o has³o wci¶nij Enter)
+    (lub inna metoda eksportu zmiennej, zale¿nie od pow³oki)
+  - cvs login
+    (w pytaniu o has³o wci¶nij Enter)
   - cvs co libgadu
-  - ./autogen.sh (opcje jak przy ./configure)
+  - cd libgadu
+  - ./autogen.sh 
+    (opcje jak przy ./configure)
   - make
   - make install
+
+Je¿eli nie zainstalowa³e¶ libgadu systemowo (tylko np. w katalogu 
+domowym), to przed wykonaniem ./configure w katalogu ekg musisz 
+podaæ ¶cie¿kê do plików nag³ówkowych oraz biblioteki libgadu 
+eksportuj±c odpowiednie zmienne. Przyk³ad dla pow³oki bash:
+
+export CFLAGS=-I¶cie¿ka-do-include
+export LDFLAGS=-L¶cie¿ka-do-lib
+./configure
+
+Przyk³adowo:
+
+export CFLAGS=-I/home/user/libgadu/include
+export LDFLAGS=-L/home/user/libgadu/lib
+
+Ponadto przed uruchomieniem ekg bêdzie potrzebne ustawienie ¶cie¿ki 
+dla loadera:
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:¶cie¿ka-do-lib
+
+Przyk³adowo:
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/libgadu/lib
+
+Najlepiej wstawiæ t± linijkê do .bashrc lub odpowiedniego pliku 
+uruchamianego przez pow³okê przy starcie (w zale¿no¶ci od pow³oki 
+eksportowanie zmiennych mo¿e odbywaæ siê w inny sposób - nale¿y 
+sprawdziæ w dokumentacji pow³oki).
 
 Pytania, skargi i wnioski: http://ekg.chmurka.net/kontakt.php
