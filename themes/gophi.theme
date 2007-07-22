@@ -1,0 +1,11 @@
+# $Id$
+#
+# theme bazuj±cy na podstawowym. zmiany:
+# - usuniêcie numerka je¿eli u¿ytkownik jest na li¶cie ("gophi/1234" -> "gophi")
+# - zamiana tekstu "(szyfrowane)" na "(s)"
+# - ustawienie "<<" i ">>" w /last obok tekstu (¿eby wygodniej siê czyta³o)
+
+known_user %T%1%n
+secure %Y(s)%n 
+last_list_in %) %n [%1] %2 %Y<<%n %3\n
+last_list_out %) %n [%1] %2 %G>>%n %3\n
