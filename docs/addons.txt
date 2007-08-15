@@ -4,6 +4,7 @@
 1. Dlaczego?
 2. Nag³os
 3. Nowo¶ci
+4. Rejestracja
 
 1. Dlaczego?
 
@@ -33,5 +34,10 @@ http://rss.gadu-gadu.pl/nowosci.xml
 
 Feed kodowany jest przy pomocy CP-1250, wiêc nale¿y przekodowaæ go na 
 odpowiednie dla siebie kodowanie (np. przy pomocy iconv).
+
+4. Rejestracja
+
+Nowy numer, oprócz polecenia /register w ekg, mo¿na za³o¿yæ korzystaj±c 
+z interfejsu WWW: http://register.gadu-gadu.pl/reg.html
 
 // $Id$
