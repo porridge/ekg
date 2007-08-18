@@ -230,13 +230,13 @@ typu <tt>0x0001</tt>, który na potrzeby tego dokumentu nazwiemy:
 </div>
 
 <p>
-Reszta pakietu zawiera liczbê, na podstawie której liczony jest hash z has³a
-klienta:
+Reszta pakietu zawiera ziarno -- warto¶æ, któr± razem z has³em przekazuje siê
+do funkcji skrótu by uzyskaæ skrót has³a:
 </p>
 
 <div class="c">
 <pre>struct gg_welcome {
-	int seed;	<i>/* klucz szyfrowania has³a */</i>
+	int seed;	<i>/* ziarno */</i>
 };</pre>
 </div>
 
@@ -245,11 +245,12 @@ Kiedy mamy ju¿ t± warto¶æ mo¿emy odes³aæ pakiet logowania:
 </p>
 
 <div class="c">
-<pre>#define GG_LOGIN60 0x0015
+<pre>#define GG_LOGIN70 0x0019
 
-struct gg_login60 {
+struct gg_login70 {
 	int uin;              <i>/* mój numerek */</i>
-        int hash;             <i>/* hash has³a */</i>
+	char hash_type;       <i>/* rodzaj funkcji skrótu has³a */</i>
+        char hash[64];        <i>/* skrót has³a */</i>
         int status;           <i>/* status na dzieñ dobry */</i>
         int version;          <i>/* moja wersja klienta */</i>
         char unknown1;        <i>/* 0x00 */</i>
@@ -265,7 +266,18 @@ struct gg_login60 {
 </div>
 
 <p>
-Hash has³a mo¿na obliczyæ nastêpuj±c± funkcj± jêzyka C:
+Skrót has³a mo¿na liczyæ na dwa sposoby:
+</p>
+
+<div class="c">
+<pre>#define GG_LOGIN_HASH_GG32 0x01
+#define GG_LOGIN_HASH_SHA1 0x02</pre>
+</div>
+
+<p>
+Pierwszy algorytm &mdash; <pre>GG_LOGIN_HASH_GG32</pre> &mdash; zosta³
+wymy¶lony na potrzeby Gadu-Gadu i zwraca 32-bitow± dla danego ziarna i has³a.
+Jej implementacja w jêzyku C wygl±da nastêpuj±co:
 </p>
 
 <div class="example">
@@ -293,6 +305,14 @@ Hash has³a mo¿na obliczyæ nastêpuj±c± funkcj± jêzyka C:
 	return y;
 }</pre>
 </div>
+
+<p>
+Ze wzglêdu na niewielki zakres warto¶ci wyj¶ciowych, istnieje
+prawdopodobieñstwo, ¿e inne has³o przy odpowiednim ziarnie da taki sam wynik.
+Z tego powodu zalecane jest u¿ywane algorytmu
+<a href="http://pl.wikipedia.org/wiki/SHA-1">SHA-1</a>, którego implementacje
+s± dostêpne dla wiêkszo¶ci wspó³czesnych systemów operacyjnych.
+</p>
 
 <p>
 Liczba oznaczaj±ca wersjê mo¿e byæ jedn± z poni¿szych:
