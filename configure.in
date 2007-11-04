@@ -152,6 +152,7 @@ AC_CHECK_HEADERS(regex.h)
 
 dnl  execinfo
 AC_CHECK_HEADERS(execinfo.h)
+AC_CHECK_FUNCS(backtrace)
 
 dnl  libgadu
 AC_CHECK_LIB(gadu, gg_login, LIBS="$LIBS -lgadu", 

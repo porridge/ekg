@@ -924,7 +924,7 @@ static void ioctld_kill()
                 kill(ioctld_pid, SIGINT);
 }
 
-#ifdef HAVE_EXECINFO_H
+#ifdef HAVE_BACKTRACE
 static void dump_stack(void)
 {
 	char name[32];
@@ -966,7 +966,7 @@ static void handle_sigsegv(int sig)
 	userlist_write_crash();
 	debug_write_crash();
 
-#ifdef HAVE_EXECINFO_H
+#ifdef HAVE_BACKTRACE
 	dump_stack();
 #endif
 
@@ -1373,7 +1373,7 @@ int main(int argc, char **argv)
 	"Do pliku %s/debug.%d zapiszê ostatanie komunikaty\r\n"
 	"z okna debugowania.\r\n"
 	"\r\n"
-#ifdef HAVE_EXECINFO_H
+#ifdef HAVE_BACKTRACE
 	"Je¶li zostanie utworzony plik %s/stack.%d, to uruchom\r\n"
 	"polecenie:\r\n"
 	"\r\n"
