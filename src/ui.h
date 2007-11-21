@@ -69,4 +69,9 @@ extern void header_statusbar_resize(const char *name);
 
 #endif
 
+#ifdef WITH_UI_GTK
+extern void ui_gtk_init(void);
+/* rest in ui-gtk.h */
+#endif
+
 #endif /* __UI_H */

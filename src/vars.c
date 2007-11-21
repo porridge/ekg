@@ -164,8 +164,20 @@ void variable_init()
 #else
 	variable_add("ctrld_quits", "cq", VAR_BOOL, 2, NULL, NULL, NULL, NULL);
 #endif
+#if defined WITH_UI_NCURSES || defined WITH_UI_GTK
+	if (
 #ifdef WITH_UI_NCURSES
-	if (ui_init == ui_ncurses_init) {
+		ui_init == ui_ncurses_init
+#endif
+
+#if defined WITH_UI_NCURSES && defined WITH_UI_GTK
+						||
+#endif
+
+#ifdef WITH_UI_GTK
+							ui_init == ui_gtk_init
+#endif
+		) {
 		variable_add("contacts", "co", VAR_INT, 1, &config_contacts, NULL, NULL, NULL);
 		variable_add("contacts_groups", "cg", VAR_STR, 1, &config_contacts_groups, NULL, NULL, dd_contacts);
 		variable_add("contacts_options", "cO", VAR_STR, 1, &config_contacts_options, NULL, NULL, dd_contacts);

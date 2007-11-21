@@ -2669,6 +2669,29 @@ const char *timestamp(const char *format)
 }
 
 /*
+ * timestamp_time()
+ *
+ * jak wyzej, ale na podstawie podanego czasu.
+ *
+ * - format
+ * - czas
+ */
+const char *timestamp_time(const char *format, time_t t)
+{
+	struct tm *tm;
+	static char buf[100];
+
+	if (!format || format[0] == '\0')
+		return itoa(t);
+
+	tm = localtime(&t);
+
+	if (!strftime(buf, sizeof(buf), format, tm))
+		return "TOOLONG";
+	return buf;
+}
+
+/*
  * unidle()
  *
  * uaktualnia licznik czasu ostatniej akcji, ¿eby przypadkiem nie zrobi³o

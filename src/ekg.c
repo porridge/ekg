@@ -668,10 +668,17 @@ void ekg_wait_for_key()
 				FD_SET(w->fd, &wd);
 		}
 
+#ifdef WITH_UI_GTK
+		if (ui_init == ui_gtk_init) {
+			tv.tv_sec = 0;
+			tv.tv_usec = 20000;
+		} else 
+#endif
+		{
 		/* domy¶lny timeout to 1s */
-		
-		tv.tv_sec = 1;
-		tv.tv_usec = 0;
+			tv.tv_sec = 1;
+			tv.tv_usec = 0;
+		}
 
 		/* ale je¶li który¶ timer ma wyst±piæ wcze¶niej ni¿ za sekundê
 		 * to skróæmy odpowiednio czas oczekiwania */
@@ -776,7 +783,10 @@ void ekg_wait_for_key()
 		if (!ret) {
 			if (batch_mode && !batch_line)
 				break;
-
+#ifdef WITH_UI_GTK
+			if (ui_init == ui_gtk_init)
+				break;
+#endif
 			continue;
 		}
 
@@ -892,7 +902,6 @@ void ekg_wait_for_key()
 				}
 			}
 		}
-
 	}
 	
 	return;
@@ -1074,6 +1083,10 @@ static int ekg_ui_set(const char *name)
 	else if (!strcasecmp(name, "ncurses"))
 		ui_init = ui_ncurses_init;
 #endif
+#ifdef WITH_UI_GTK
+	else if (!strcasecmp(name, "gtk"))
+		ui_init = ui_gtk_init;
+#endif
 	else
 		return -1;
 
@@ -1126,6 +1139,8 @@ int main(int argc, char **argv)
 	ui_init = ui_readline_init;
 #elif defined(WITH_UI_NCURSES)
 	ui_init = ui_ncurses_init;
+#elif defined(WITH_UI_GTK)
+	ui_init = ui_gtk_init;
 #else
 	ui_init = ui_batch_init;
 #endif
@@ -1232,6 +1247,9 @@ int main(int argc, char **argv)
 #endif
 #ifdef WITH_UI_NCURSES
 ", ncurses"
+#endif
+#ifdef WITH_UI_GTK
+", gtk"
 #endif
 ")\n"
 "\n", argv[0]);

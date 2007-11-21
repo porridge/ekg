@@ -371,6 +371,11 @@ char *va_format_string(const char *format, va_list ap)
 	if (!config_display_pl_chars)
 		iso_to_ascii((unsigned char *) buf->str);
 
+#ifdef WITH_UI_GTK
+		if (ui_init == ui_gtk_init)
+			iso_to_ascii((unsigned char *) buf->str);
+#endif
+
 	return string_free(buf, 0);
 }
 
