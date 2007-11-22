@@ -522,7 +522,14 @@ static int ui_gtk_event_variable_changed(const char *name, va_list ap) {
 		contacts_changed();
 
 #endif
+	if (!strcmp(name, "uin")) {
+		/* XXX, for each window */
+		gtk_label_set_label(GTK_LABEL(gtk_private_ui(window_status)->nick_label), itoa(config_uin));
+	}
 }
+
+extern gboolean mg_populate_userlist(window_t *sess);
+extern gboolean fe_userlist_rehash(window_t *sess, struct userlist *u);
 
 static int ui_gtk_event(const char *event, ...)
 {
@@ -542,6 +549,14 @@ static int ui_gtk_event(const char *event, ...)
 		char *name = va_arg(ap, char*);
 		
 		ui_gtk_event_variable_changed(name, ap);
+
+	} else if (!strcmp(event, "status")) {		/* uin, display, status, descr */
+		uin_t uin = va_arg(ap, uin_t);
+
+		struct userlist *u = userlist_find(uin, NULL);
+
+		if (u && u->display)
+			ui_gtk_foreach_window_data(fe_userlist_rehash, u);
 	}
 
 	va_end(ap);
@@ -554,6 +569,7 @@ static int ui_gtk_event(const char *event, ...)
  *
  * uruchamiana po wczytaniu konfiguracji.
  */
+
 static void ui_gtk_postinit()
 {
 #if 0
@@ -581,6 +597,42 @@ static void ui_gtk_postinit()
 	mg_apply_setup();
 
 	mg_switch_page(FALSE, window_current->id);
+
+	ui_gtk_foreach_window(mg_populate_userlist);
+}
+
+void ui_gtk_foreach_window_data(int (*func)(struct window *, void *data), void *data) {
+	list_t l;
+	int once = 0;
+
+	for (l = windows; l; l = l->next) {
+		window_t *w = l->data;
+
+		if (w->gui->is_tab) {
+			if (!once) once = 1;
+			else continue;
+		}
+
+		if (func(w, data))
+			return;
+	}
+}
+
+void ui_gtk_foreach_window(int (*func)(struct window *)) {
+	list_t l;
+	int once = 0;
+
+	for (l = windows; l; l = l->next) {
+		window_t *w = l->data;
+
+		if (w->gui->is_tab) {
+			if (!once) once = 1;
+			else continue;
+		}
+
+		if (func(w))
+			return;
+	}
 }
 
 /* function copied from ui-ncurses */
@@ -772,13 +824,10 @@ void ui_gtk_init()
 	ui_loop = ui_gtk_loop;
 	ui_beep = ui_gtk_beep;
 
-
 	ui_postinit = ui_gtk_postinit;
 	ui_event    = ui_gtk_event;
 	ui_print    = ui_gtk_print;
 	ui_deinit   = ui_gtk_deinit;
-#if 0
-	ui_print = ui_ncurses_print;
-	ui_event = ui_ncurses_event;
-#endif
+
+	pixmaps_init();
 }

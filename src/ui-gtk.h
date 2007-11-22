@@ -130,6 +130,7 @@ void ui_gtk_init(void);
 void gtk_window_switch(int id);
 void gtk_window_kill(struct window *w, int quiet);
 void gtk_binding_init();
+void ui_gtk_foreach_window(int (*func)(struct window *));
 
 int key_handle_key_press(GtkWidget *wid, GdkEventKey *evt, window_t *sess);
 

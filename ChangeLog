@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
+// 2007-11-22
+
+- kilka zmian w gtk (darkjames/g)
+
 // 2007-11-21
 
 - dodanie eksperymentalnego ui GTK (tak, ekg na iksach!). kawa³ dobrej 

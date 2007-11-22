@@ -80,6 +80,8 @@
 #include <gtk/gtkcontainer.h>
 #include <gtk/gtksignal.h>
 
+#include "libgadu.h"		/* potrzebne dla stalych ze stanami */
+
 #include "commands.h"
 #include "userlist.h"
 #include "xmalloc.h"
@@ -96,7 +98,7 @@
 /* extern */
 
 void fe_userlist_numbers(window_t *sess);
-void fe_userlist_insert(window_t *sess, struct userlist *u, GdkPixbuf **pixmaps);
+void fe_userlist_insert(window_t *sess, struct userlist *u);
 
 /* forward */
 void mg_changui_new(window_t *sess, int tab, int focus);
@@ -148,7 +150,23 @@ static PangoAttrList *nickseen_list;
 static PangoAttrList *newmsg_list;
 static PangoAttrList *plain_list = NULL;
 
-#define show_descr_in_userlist_config 1
+enum {
+	USERLIST_PIXMAP = 0,
+	USERLIST_NICKNAME,
+	USERLIST_DESCRIPTION,
+	USERLIST_USER,
+	USERLIST_COLOR,
+
+	USERLIST_COLS
+};
+
+#define show_descr_in_userlist_config 0		/* XXX!!! */
+
+/* REMOVED:
+ * 	userlist_select() ->>  select a row in the userlist by nick-name 
+ *      fe_uselect()
+ */
+
 
 /************************************************* MENU    *****************************/
 #if 0
@@ -888,35 +906,6 @@ menu_chan_join(GtkWidget *menu, char *chan)
 		snprintf(tbuf, sizeof tbuf, "join %s", chan);
 		handle_command(current_sess, tbuf, FALSE);
 	}
-}
-
-void
-menu_chanmenu(struct session *sess, GdkEventButton * event, char *chan)
-{
-	GtkWidget *menu;
-	int is_joined = FALSE;
-
-	if (find_channel(sess->server, chan))
-		is_joined = TRUE;
-
-	if (str_copy)
-		free(str_copy);
-	str_copy = strdup(chan);
-
-	menu = gtk_menu_new();
-
-	menu_quick_item(0, chan, menu, XCMENU_SHADED, str_copy, 0);
-	menu_quick_item(0, 0, menu, XCMENU_SHADED, str_copy, 0);
-
-	if (!is_joined)
-		menu_quick_item_with_callback(menu_chan_join, _("Join Channel"), menu, str_copy);
-	else {
-		menu_quick_item_with_callback(menu_chan_part, _("Part Channel"), menu, str_copy);
-		menu_quick_item_with_callback(menu_chan_cycle, _("Cycle Channel"), menu, str_copy);
-	}
-
-	menu_add_plugin_items(menu, "\x5$CHAN", str_copy);
-	menu_popup(menu, event, NULL);
 }
 
 static void
@@ -1918,6 +1907,29 @@ menu_create_main(void *accel_group, int bar, int away, int toplevel, GtkWidget *
 
 /********************************************* USERLISTGUI ****************************/
 
+static gint userlist_sort_func(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer userdata) {
+	GdkPixbuf *a1, *b1;
+
+	gint sortcol = GPOINTER_TO_INT(userdata);
+
+	if (sortcol != USERLIST_PIXMAP) {
+		printf("userlist_sort_func() IE\n");
+		return;
+	}
+
+/* XXX, sequence should match sequence in contacts_options */
+
+	gtk_tree_model_get(model, a, USERLIST_PIXMAP, &a1, -1);
+	gtk_tree_model_get(model, b, USERLIST_PIXMAP, &b1, -1);
+
+/* yeah, i know, i'm lazy */
+	if (a1 < b1)
+		return -1;
+	else if (a1 > b1)
+		return 1;
+	else	return 0;
+}
+
 void fe_userlist_numbers(window_t *sess) {
 	if (sess == window_current || !gtk_private_ui(sess)->is_tab) {
 #if 0
@@ -1937,47 +1949,6 @@ void fe_userlist_numbers(window_t *sess) {
 		gtk_label_set_text(GTK_LABEL(gtk_private_ui(sess)->namelistinfo), "%d avail %d not avail....");
 	}
 }
-
-#if 0
-
-static void scroll_to_iter(GtkTreeIter * iter, GtkTreeView * treeview, GtkTreeModel * model)
-{
-	GtkTreePath *path = gtk_tree_model_get_path(model, iter);
-	if (path) {
-		gtk_tree_view_scroll_to_cell(treeview, path, NULL, TRUE, 0.5, 0.5);
-		gtk_tree_path_free(path);
-	}
-}
-
-/* select a row in the userlist by nick-name */
-
-void userlist_select(session *sess, char *name)
-{
-	GtkTreeIter iter;
-	GtkTreeView *treeview = GTK_TREE_VIEW(sess->gui->user_tree);
-	GtkTreeModel *model = gtk_tree_view_get_model(treeview);
-	GtkTreeSelection *selection = gtk_tree_view_get_selection(treeview);
-	struct User *row_user;
-
-	if (gtk_tree_model_get_iter_first(model, &iter)) {
-		do {
-			gtk_tree_model_get(model, &iter, 3, &row_user, -1);
-			if (sess->server->p_cmp(row_user->nick, name) == 0) {
-				if (gtk_tree_selection_iter_is_selected(selection, &iter))
-					gtk_tree_selection_unselect_iter(selection, &iter);
-				else
-					gtk_tree_selection_select_iter(selection, &iter);
-
-				/* and make sure it's visible */
-				scroll_to_iter(&iter, treeview, model);
-				return;
-			}
-		}
-		while (gtk_tree_model_iter_next(model, &iter));
-	}
-}
-
-#endif
 
 char **userlist_selection_list(GtkWidget *widget, int *num_ret) {
 	GtkTreeIter iter;
@@ -2044,8 +2015,9 @@ void fe_userlist_set_selected(struct session *sess)
 	}
 }
 
-static GtkTreeIter *find_row(GtkTreeView * treeview, GtkTreeModel * model, struct User *user,
-			     int *selected)
+#endif
+
+static GtkTreeIter *find_row(GtkTreeView *treeview, GtkTreeModel *model, struct userlist *user, int *selected)
 {
 	static GtkTreeIter iter;
 	struct User *row_user;
@@ -2068,8 +2040,6 @@ static GtkTreeIter *find_row(GtkTreeView * treeview, GtkTreeModel * model, struc
 
 	return NULL;
 }
-
-#endif
 
 void userlist_set_value(GtkWidget *treeview, gfloat val)
 {
@@ -2112,47 +2082,61 @@ int fe_userlist_remove(session *sess, struct User *user)
 	return sel;
 }
 
-void fe_userlist_rehash(session *sess, struct User *user)
+#endif
+
+gboolean fe_userlist_rehash(window_t *sess, struct userlist *u)
 {
 	GtkTreeIter *iter;
 	int sel;
 	int do_away = TRUE;
 
-	iter = find_row(GTK_TREE_VIEW(sess->gui->user_tree), sess->res->user_model, user, &sel);
-	if (!iter)
-		return;
+	GdkPixbuf *pix;
 
+	if (!(iter = find_row(GTK_TREE_VIEW(sess->gui->user_tree), sess->user_model, u, &sel)))
+		return 0;
+
+	if (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)		pix = gg_pixs[PIXBUF_NOTAVAIL];
+	else if (u->status == GG_STATUS_AVAIL || u->status == GG_STATUS_AVAIL_DESCR)		pix = gg_pixs[PIXBUF_AVAIL];
+	else if (u->status == GG_STATUS_BUSY || u->status == GG_STATUS_BUSY_DESCR)		pix = gg_pixs[PIXBUF_AWAY];
+	else if (u->status == GG_STATUS_INVISIBLE || u->status == GG_STATUS_INVISIBLE_DESCR)	pix = gg_pixs[PIXBUF_INVISIBLE];
+	/* XXX, BLOCKED? */
+	else {
+		printf("BAD u->status! [%d]\n", u->status);
+		pix = gg_pixs[PIXBUF_NOTAVAIL];
+	}
+
+#if 0
 	if (prefs.away_size_max < 1 || !prefs.away_track)
 		do_away = FALSE;
-
-	gtk_list_store_set(GTK_LIST_STORE(sess->res->user_model), iter,
-			   2, user->hostname, 4, (do_away)
-			   ? (user->away ? &colors[COL_AWAY] : NULL)
-			   : (NULL), -1);
+#endif
+	gtk_list_store_set(GTK_LIST_STORE(sess->user_model), iter,
+					  USERLIST_PIXMAP, pix,
+					  USERLIST_NICKNAME, u->nickname,
+					  /* XXX, u->uid */
+					  USERLIST_DESCRIPTION, u->descr,
+//					  USERLIST_COLOR, /* (do_away) */ FALSE, ? (newuser->away ? &colors[COL_AWAY] : NULL) : */ (NULL),
+					  -1);
+	
+	return 0;
 }
 
-#endif
-
-#warning "fe_userlist_rehash() dobre do zmian stanow"
-
-/* void fe_userlist_insert(window_t *sess, struct User *newuser, int row, int sel)  */
-void fe_userlist_insert(window_t *sess, struct userlist *u, GdkPixbuf **pixmaps)
+void fe_userlist_insert(window_t *sess, struct userlist *u)
 {
 	GtkTreeModel *model = gtk_private(sess)->user_model;
-	GdkPixbuf *pix = NULL;	/* get_user_icon (sess->server, newuser); */
+	GdkPixbuf *pix;
 	GtkTreeIter iter;
 	int do_away = TRUE;
 
 	int sel = 0;
 
-	if (pixmaps) {
-		if (u->status >= 0 && u->status < STATUS_PIXBUFS) {
-			pix = pixmaps[u->status];
-		} else {
-			printf("BAD u->status! [%d]\n", u->status);
-			pix = pixmaps[PIXBUF_NOTAVAIL];
-		}
-
+	if (u->status == GG_STATUS_NOT_AVAIL || u->status == GG_STATUS_NOT_AVAIL_DESCR)		pix = gg_pixs[PIXBUF_NOTAVAIL];
+	else if (u->status == GG_STATUS_AVAIL || u->status == GG_STATUS_AVAIL_DESCR)		pix = gg_pixs[PIXBUF_AVAIL];
+	else if (u->status == GG_STATUS_BUSY || u->status == GG_STATUS_BUSY_DESCR)		pix = gg_pixs[PIXBUF_AWAY];
+	else if (u->status == GG_STATUS_INVISIBLE || u->status == GG_STATUS_INVISIBLE_DESCR)	pix = gg_pixs[PIXBUF_INVISIBLE];
+	/* XXX, BLOCKED? */
+	else {
+		printf("BAD u->status! [%d]\n", u->status);
+		pix = gg_pixs[PIXBUF_NOTAVAIL];
 	}
 
 #if 0
@@ -2160,14 +2144,13 @@ void fe_userlist_insert(window_t *sess, struct userlist *u, GdkPixbuf **pixmaps)
 		do_away = FALSE;
 
 #endif
-	gtk_list_store_insert_with_values(GTK_LIST_STORE(model), &iter, 0, /* row, */
-					  0, pix,
-					  1, u->nickname,
+	gtk_list_store_insert_with_values(GTK_LIST_STORE(model), &iter, -1,
+					  USERLIST_PIXMAP, pix,
+					  USERLIST_NICKNAME, u->nickname,
 					  /* XXX, u->uid */
-					  2, u->descr,
-//					  3, /* newuser, */ NULL,
-//					  4, /* (do_away) */ FALSE,
-//					  /* ? (newuser->away ? &colors[COL_AWAY] : NULL) : */ (NULL),
+					  USERLIST_DESCRIPTION, u->descr,
+					  USERLIST_USER, u,
+//					  USERLIST_COLOR, /* (do_away) */ FALSE, ? (newuser->away ? &colors[COL_AWAY] : NULL) : */ (NULL),
 					  -1);
 
 #if DARK
@@ -2190,47 +2173,44 @@ void fe_userlist_insert(window_t *sess, struct userlist *u, GdkPixbuf **pixmaps)
 	}
 }
 
-#if 0
-
-void fe_userlist_move(session *sess, struct User *user, int new_row)
-{
-	fe_userlist_insert(sess, user, new_row, fe_userlist_remove(sess, user));
-}
-#endif
-
-void fe_userlist_clear(window_t *sess)
-{
+void fe_userlist_clear(window_t *sess) {
 	gtk_list_store_clear(gtk_private(sess)->user_model);
 }
 
 void *userlist_create_model(void)
 {
-	return gtk_list_store_new(5, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING,
-				  G_TYPE_POINTER, GDK_TYPE_COLOR);
+	GtkTreeSortable *sortable;
+
+	void *liststore;
+
+	liststore = gtk_list_store_new(USERLIST_COLS, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_POINTER, GDK_TYPE_COLOR);
+
+	sortable = GTK_TREE_SORTABLE(liststore);
+	
+	gtk_tree_sortable_set_sort_func(sortable, USERLIST_PIXMAP, userlist_sort_func, GINT_TO_POINTER(USERLIST_PIXMAP), NULL);
+
+/* initial sort */
+	gtk_tree_sortable_set_sort_column_id(sortable, USERLIST_PIXMAP, GTK_SORT_ASCENDING);
+
+	return liststore;
 }
 
-static void userlist_add_columns(GtkTreeView * treeview)
-{
+static void userlist_add_columns(GtkTreeView * treeview) {
 	GtkCellRenderer *renderer;
 
 	/* icon column */
 	renderer = gtk_cell_renderer_pixbuf_new();
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(treeview),
-						    -1, NULL, renderer, "pixbuf", 0, NULL);
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(treeview), -1, NULL, renderer, "pixbuf", USERLIST_PIXMAP, NULL);
 
 	/* nick column */
 	renderer = gtk_cell_renderer_text_new();
 	gtk_cell_renderer_text_set_fixed_height_from_font(GTK_CELL_RENDERER_TEXT(renderer), 1);
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(treeview),
-						    -1, NULL, renderer,
-						    "text", 1, "foreground-gdk", 4, NULL);
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(treeview), -1, NULL, renderer, "text", USERLIST_NICKNAME, "foreground-gdk", USERLIST_COLOR, NULL);
+	/* description column (?) */
 	if (show_descr_in_userlist_config) {
-		/* hostname column */
 		renderer = gtk_cell_renderer_text_new();
-		gtk_cell_renderer_text_set_fixed_height_from_font(GTK_CELL_RENDERER_TEXT(renderer),
-								  1);
-		gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(treeview), -1, NULL,
-							    renderer, "text", 2, NULL);
+		gtk_cell_renderer_text_set_fixed_height_from_font(GTK_CELL_RENDERER_TEXT(renderer), 1);
+		gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(treeview), -1, NULL, renderer, "text", USERLIST_DESCRIPTION, NULL);
 	}
 }
 
@@ -2351,43 +2331,6 @@ void userlist_show(window_t *sess)
 {
 	gtk_tree_view_set_model(GTK_TREE_VIEW(gtk_private_ui(sess)->user_tree), gtk_private(sess)->user_model);
 }
-
-#if 0
-
-void fe_uselect(session *sess, char *word[], int do_clear, int scroll_to)
-{
-	int thisname;
-	char *name;
-	GtkTreeIter iter;
-	GtkTreeView *treeview = GTK_TREE_VIEW(sess->gui->user_tree);
-	GtkTreeModel *model = gtk_tree_view_get_model(treeview);
-	GtkTreeSelection *selection = gtk_tree_view_get_selection(treeview);
-	struct User *row_user;
-
-	if (gtk_tree_model_get_iter_first(model, &iter)) {
-		if (do_clear)
-			gtk_tree_selection_unselect_all(selection);
-
-		do {
-			if (*word[0]) {
-				gtk_tree_model_get(model, &iter, 3, &row_user, -1);
-				thisname = 0;
-				while (*(name = word[thisname++])) {
-					if (sess->server->p_cmp(row_user->nick, name) == 0) {
-						gtk_tree_selection_select_iter(selection, &iter);
-						if (scroll_to)
-							scroll_to_iter(&iter, treeview, model);
-						break;
-					}
-				}
-			}
-
-		}
-		while (gtk_tree_model_iter_next(model, &iter));
-	}
-}
-
-#endif
 
 /********************************************* GTKUTIL ********************************/
 
@@ -2878,20 +2821,11 @@ static void mg_userlist_toggle_cb(GtkWidget *button, gpointer userdata) {
 	gtk_widget_grab_focus(gtk_private_ui(window_current)->input_box);
 }
 
-static void *ul_tag = NULL;
-
-static gboolean mg_populate_userlist(window_t *sess) {
-#warning DARKEKG
-#if DARKEKG
+gboolean mg_populate_userlist(window_t *sess) {
 	gtk_window_ui_t *gui;
 	list_t l;
-	if (!sess)
-		sess = window_current;
 
-#warning "mg_populate_userlist() hack, slowdown"
 	fe_userlist_clear(sess);
-
-#warning "xchat->ekg2, mg_populate_userlist() xchat here check if param is valid window_t, XXX"
 
 	for (l = userlist; l; l = l->next) {
 		struct userlist *u = l->data;
@@ -2899,31 +2833,19 @@ static gboolean mg_populate_userlist(window_t *sess) {
 		if (!u || !u->display || !u->uin)
 			continue;
 
-		fe_userlist_insert(sess, u, gg_pixs);
+		fe_userlist_insert(sess, u);
 	}
 
-
-//	if (is_session(sess)) 	-> if (window_find_ptr(sess)
-	if (1)
-	{
-		gui = gtk_private_ui(sess);
+	gui = gtk_private_ui(sess);
 #if 0
-		if (sess->type == SESS_DIALOG)
-			mg_set_access_icon(sess->gui, NULL, sess->server->is_away);
-		else
-			mg_set_access_icon(sess->gui, get_user_icon(sess->server, sess->me),
-					   sess->server->is_away);
+	if (sess->type == SESS_DIALOG)
+		mg_set_access_icon(sess->gui, NULL, sess->server->is_away);
+	else
+		mg_set_access_icon(sess->gui, get_user_icon(sess->server, sess->me),
+				sess->server->is_away);
 #endif
-		userlist_show(sess);
-		userlist_set_value(gtk_private_ui(sess)->user_tree, gtk_private(sess)->old_ul_value);
-	}
-#endif
-	return 0;
-}
-
-static gboolean mg_populate_userlist_idle(window_t *sess) {
-	mg_populate_userlist(sess);
-	ul_tag = NULL;
+	userlist_show(sess);
+	userlist_set_value(gtk_private_ui(sess)->user_tree, gtk_private(sess)->old_ul_value);
 	return 0;
 }
 
@@ -2986,13 +2908,6 @@ static gboolean mg_populate_userlist_idle(window_t *sess) {
 	mg_focus(sess);
 	fe_set_title(sess);
 
-	/* this is slow, so make it a timeout event */
-	if (!gui->is_tab) {
-		mg_populate_userlist(sess);
-	} else {
-		if (ul_tag == NULL)
-			ul_tag = g_idle_add((GSourceFunc)mg_populate_userlist_idle, NULL);
-	}
 	fe_userlist_numbers(sess);
 #if 0
 	/* menu items */
@@ -3895,13 +3810,6 @@ mg_create_center(window_t *sess, gtk_window_ui_t *gui, GtkWidget *box)
 	g_idle_add ((GSourceFunc)mg_add_pane_signals, gui);
 }
 
-static void mg_sessionclick_cb(GtkWidget *button, gpointer userdata) {
-#warning "xchat->ekg: mg_sessionclick_cb() change uid?"
-	/* xchat: 
-	 *      fe_get_str (_("Enter new nickname:"), current_sess->server->nick, mg_change_nick, NULL);
-	 */
-}
-
 /* make sure chanview and userlist positions are sane */
 
 static void
@@ -4049,7 +3957,7 @@ mg_inputbox_rightclick(GtkEntry * entry, GtkWidget *menu)
 static void
 mg_create_entry(window_t *sess, GtkWidget *box)
 {
-	GtkWidget *hbox, *but, *entry;
+	GtkWidget *hbox, *entry;
 	gtk_window_ui_t *gui = gtk_private_ui(sess);
 
 	hbox = gtk_hbox_new(FALSE, 0);
@@ -4057,14 +3965,9 @@ mg_create_entry(window_t *sess, GtkWidget *box)
 
 	gui->nick_box = gtk_hbox_new(FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox), gui->nick_box, 0, 0, 0);
-#if DARK
-# warning "XXX?"
-#endif
-	gui->nick_label = but =	gtk_button_new_with_label("gg:1234");
-	gtk_button_set_relief(GTK_BUTTON(but), GTK_RELIEF_NONE);
-	GTK_WIDGET_UNSET_FLAGS(but, GTK_CAN_FOCUS);
-	gtk_box_pack_end(GTK_BOX(gui->nick_box), but, 0, 0, 0);
-	g_signal_connect(G_OBJECT(but), "clicked", G_CALLBACK(mg_sessionclick_cb), NULL);
+
+	gui->nick_label = gtk_label_new(itoa(config_uin));		/* XXX, change when uin changes */
+	gtk_box_pack_end(GTK_BOX(gui->nick_box), gui->nick_label, 0, 0, 0);
 
 	gui->input_box = entry = gtk_entry_new();
 	gtk_entry_set_max_length(GTK_ENTRY(gui->input_box), 2048);
@@ -4292,7 +4195,7 @@ static void mg_create_tabwindow(window_t *sess) {
 
 	mg_create_irctab(sess, table);
 	mg_create_tabs(gtk_private_ui(sess));
-	/* vvvvvv sess->server->is_away */
+						/* vvvvvv sess->server->is_away */
 	mg_create_menu(gtk_private_ui(sess), table, 0);
 
 	mg_focus(sess);
