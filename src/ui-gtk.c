@@ -206,6 +206,11 @@ static void window_prev()
 	window_switch(prev->id);
 }
 
+void gtk_window_clear(struct window *w)
+{
+	gtk_xtext_clear(gtk_private(window_current)->buffer);
+}
+
 
 /*
  * window_new_compare()
@@ -506,7 +511,7 @@ static int ui_gtk_event_command(const char *command, int quiet, va_list ap) {
 		}
 			
 		if (!strcasecmp(p1, "clear")) {
-			gtk_xtext_clear(gtk_private(window_current)->buffer);
+			gtk_window_clear(window_current);
 			return 0;
 		}
 			
@@ -514,6 +519,76 @@ static int ui_gtk_event_command(const char *command, int quiet, va_list ap) {
 		printq("invalid_params", "window");
 		return -1;
 	}
+
+	if (!strcasecmp(command, "query")) {
+		char *param = va_arg(ap, char*);
+
+		if (!param && !window_current->target)
+			return -1;
+
+		if (param) {
+			struct window *w;
+
+			if ((w = window_find(param))) {
+				window_switch(w->id);
+				return -1;
+			}
+
+			if ((config_make_window & 3) == 1) {
+				list_t l;
+
+				for (l = windows; l; l = l->next) {
+					struct window *v = l->data;
+
+					if (v->id < 2 || v->target)
+						continue;
+
+					w = v;
+					break;
+				}
+
+				if (!w)
+					w = window_new(param, 0);
+
+				window_switch(w->id);
+			}
+
+			if ((config_make_window & 3) == 2) {
+				w = window_new(param, 0);
+				window_switch(w->id);
+			}
+
+			xfree(window_current->target);
+			xfree(window_current->prompt);
+			window_current->target = xstrdup(param);
+			window_current->prompt = format_string(format_find("ncurses_prompt_query"), param);
+			window_current->prompt_len = strlen(window_current->prompt);
+
+			if (!quiet) {
+				print_window(param, 0, "query_started", param);
+				print_window(param, 0, "query_started_window", param);
+			}
+		} else {
+			const char *f = format_find("ncurses_prompt_none");
+
+			printq("query_finished", window_current->target);
+
+			xfree(window_current->target);
+			xfree(window_current->prompt);
+			window_current->target = NULL;
+			window_current->prompt = NULL;
+			window_current->prompt_len = 0;
+
+			if (strcmp(f, "")) {
+				window_current->prompt = xstrdup(f);
+				window_current->prompt_len = strlen(f);
+			}
+		}
+
+		return -1;
+	}
+
+	return 0;
 }
 
 static int ui_gtk_event_variable_changed(const char *name, va_list ap) {
@@ -526,10 +601,12 @@ static int ui_gtk_event_variable_changed(const char *name, va_list ap) {
 		/* XXX, for each window */
 		gtk_label_set_label(GTK_LABEL(gtk_private_ui(window_status)->nick_label), itoa(config_uin));
 	}
+
+	return 0;
 }
 
 extern gboolean mg_populate_userlist(window_t *sess);
-extern gboolean fe_userlist_rehash(window_t *sess, struct userlist *u);
+extern gboolean fe_userlist_rehash(struct window *sess, void *data);
 
 static int ui_gtk_event(const char *event, ...)
 {
@@ -545,6 +622,7 @@ static int ui_gtk_event(const char *event, ...)
 		char *command = va_arg(ap, char*);
 
 		ui_gtk_event_command(command, quiet, ap);
+
 	} else if (!strcmp(event, "variable_changed")) {
 		char *name = va_arg(ap, char*);
 		
@@ -557,6 +635,16 @@ static int ui_gtk_event(const char *event, ...)
 
 		if (u && u->display)
 			ui_gtk_foreach_window_data(fe_userlist_rehash, u);
+
+	} else if (!strcmp(event, "userlist_changed")) {	/* nick, uin, NULL */
+		/* XXX,
+		 * 	w handle_userlist()::GG_USERLIST_GET_REPLY
+		 * 	nie informujemy o tym ze userow kasujemy.
+		 * 	Tylko dodajemy nowych. W zwiazku z tym trzeba zrobic przebudowanie calej userlist
+		 *
+		 * 	W sumie nic strasznego, bo nawet taki /del * jest (przynajmniej u mnie) atomowy.
+		 */
+		ui_gtk_foreach_window(mg_populate_userlist);
 	}
 
 	va_end(ap);

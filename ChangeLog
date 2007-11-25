@@ -4,6 +4,18 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
+// 2007-11-25
+
+- gtk: poprawki warningów (darkjames/g)
+- gtk: reagowanie na event "userlist_changed" (darkjames/g)
+- gtk: reagowanie na komendê /query (skopiowane z ncurses) (darkjames/g)
+- gtk: dodanie kilku rzeczy do menu (darkjames/g)
+- gtk: mo¿na dodawaæ kolory przy pisaniu (darkjames/g)
+- gtk: cleanup, zmiana stylu kodowania (darkjames/g)
+- gtk: o programie (darkjames/g)
+- gtk: informacje o uzytkowniku prawoklikniêtym na userli¶cie (darkjames/g)
+- gtk: dwuklik na u¿ytkowniku robi na nim /query (darkjames/g)
+
 // 2007-11-22
 
 - kilka zmian w gtk (darkjames/g)

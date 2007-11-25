@@ -4791,6 +4791,35 @@ int command_exec(const char *target, const char *xline, int quiet)
 	return -1;
 }
 
+/*
+ * command_exec_format()
+ *
+ * formatuje string w formacie @a i wykonuje sformatowane polecenie. ekwiwalent:
+ *   char *tmp = saprintf(format, ...);
+ *   command_exec(target, tmp, quiet);
+ *   xfree(tmp);
+ *
+ * 0 - format byl NULL
+ * -1 - polecenie nie zostalo znalezione (wynik command_exec())
+ * else - wynik dzialania handlera polecenia
+ */
+int command_exec_format(const char *target, int quiet, const char *format, ...) {
+	char *command;
+	va_list ap;
+	int res;
+	
+	va_start(ap, format);
+	command = gg_vsaprintf(format, ap);
+	va_end(ap);
+	
+	if (!command) 
+		return 0;
+
+	res = command_exec(target, command, quiet);
+	xfree(command);
+	return res;
+}
+
 int binding_help(int a, int b)
 {
 	print("help_quick");  
