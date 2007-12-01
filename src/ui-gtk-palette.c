@@ -179,7 +179,6 @@ GdkPixbuf *gg_pixs[STATUS_PIXBUFS];
 
 void pixmaps_init(void)
 {
-	const char *userpath;
 	pix_ekg = NULL;
 
 	memset(gg_pixs, 0, sizeof(gg_pixs));
@@ -197,8 +196,6 @@ void pixmaps_init(void)
 		{0, NULL}
 	}, *ppix;
 
-	userpath = prepare_path(NULL, 0);
-
 	for (ppix = pix; ppix->path; ++ppix) {
 		gg_pixs[ppix->index] = gdk_pixbuf_new_from_file(prepare_path(ppix->path, 0), 0);
 		if (!gg_pixs[ppix->index]) {
@@ -207,8 +204,10 @@ void pixmaps_init(void)
 			gg_pixs[ppix->index] = gdk_pixbuf_new_from_file(buf, 0);
 		}
 
-		if (!gg_pixs[ppix->index])
+		if (!gg_pixs[ppix->index]) {
+			const char *userpath = prepare_path(NULL, 0);
 			printf("UWAGA: Nie znaleziono ani %s/%s ani " DATADIR "/%s - nie bedziesz mial ikonki w userliscie\n", 
 			    userpath, ppix->path, ppix->path);
+		}
 	}
 }
