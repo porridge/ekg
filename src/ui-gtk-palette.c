@@ -197,17 +197,17 @@ void pixmaps_init(void)
 	}, *ppix;
 
 	for (ppix = pix; ppix->path; ++ppix) {
-		gg_pixs[ppix->index] = gdk_pixbuf_new_from_file(prepare_path(ppix->path, 0), 0);
+		const char *user_path = prepare_path(ppix->path, 0);
+
+		gg_pixs[ppix->index] = gdk_pixbuf_new_from_file(user_path, 0);
 		if (!gg_pixs[ppix->index]) {
 			char buf[512];
 			snprintf(buf, sizeof(buf), DATADIR "/%s", ppix->path);
 			gg_pixs[ppix->index] = gdk_pixbuf_new_from_file(buf, 0);
 		}
 
-		if (!gg_pixs[ppix->index]) {
-			const char *userpath = prepare_path(NULL, 0);
-			printf("UWAGA: Nie znaleziono ani %s/%s ani " DATADIR "/%s - nie bedziesz mial ikonki w userliscie\n", 
-			    userpath, ppix->path, ppix->path);
-		}
+		if (!gg_pixs[ppix->index])
+			printf("UWAGA: Nie znaleziono ani %s ani " DATADIR "/%s - nie bedziesz mial ikonki w userliscie\n", 
+			    user_path, ppix->path);
 	}
 }
