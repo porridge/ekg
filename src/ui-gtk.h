@@ -105,6 +105,7 @@ extern int tab_pos_config;
 extern int gui_pane_left_size_config;
 extern int gui_pane_right_size_config;
 extern int thin_separator_config;
+extern int new_window_in_tab_config;
 
 #define mainwindow_left_config 0
 #define mainwindow_top_config 0
@@ -127,10 +128,11 @@ extern int thin_separator_config;
 
 void ui_gtk_init(void);
 
-void gtk_window_switch(int id);
-void gtk_window_kill(struct window *w, int quiet);
-void gtk_window_clear(struct window *w);
-void gtk_binding_init();
+void ui_gtk_window_switch(int id);
+void ui_gtk_window_new(const char *target, int new_id);
+void ui_gtk_window_kill(struct window *w, int quiet);
+void ui_gtk_window_clear(struct window *w);
+void ui_gtk_binding_init();
 
 void ui_gtk_foreach_window(int (*func)(struct window *));
 void ui_gtk_foreach_window_data(int (*func)(struct window *, void *data), void *data);

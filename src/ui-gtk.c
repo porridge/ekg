@@ -66,6 +66,8 @@ int gui_pane_right_size_config	= 100;
 /* ekg2-core var */
 #define config_timestamp_show 1
 
+int new_window_in_tab_config	= 1;
+
 /* forward */
 void fe_set_tab_color(window_t *sess, int col);
 void mg_switch_page(int relative, int num);
@@ -206,8 +208,7 @@ static void window_prev()
 	window_switch(prev->id);
 }
 
-void gtk_window_clear(struct window *w)
-{
+void ui_gtk_window_clear(struct window *w) {
 	gtk_xtext_clear(gtk_private(window_current)->buffer);
 }
 
@@ -322,13 +323,7 @@ static struct window *window_new(const char *target, int new_id)
 	result = list_add_sorted(&windows, &w, sizeof(w), window_new_compare);
 
 	/* w.window */
-	{
-		int tab = TRUE;
-
-		/* tab == new_window_in_tab */
-
-		mg_changui_new(result, tab, 0);
-	}
+	mg_changui_new(result, new_window_in_tab_config, 0);
 
 	return result;
 }
@@ -511,7 +506,7 @@ static int ui_gtk_event_command(const char *command, int quiet, va_list ap) {
 		}
 			
 		if (!strcasecmp(p1, "clear")) {
-			gtk_window_clear(window_current);
+			ui_gtk_window_clear(window_current);
 			return 0;
 		}
 			
@@ -885,8 +880,9 @@ static void ui_gtk_deinit()
 	}
 }
 
-void gtk_window_switch(int id)				{ window_switch(id); }
-void gtk_window_kill(struct window *w, int quiet)	{ window_kill(w, quiet); }
+void ui_gtk_window_switch(int id)			{ window_switch(id); }
+void ui_gtk_window_kill(struct window *w, int quiet)	{ window_kill(w, quiet); }
+void ui_gtk_window_new(const char *target, int new_id)	{ window_new(target, new_id); }
 
 void ui_gtk_init()
 {

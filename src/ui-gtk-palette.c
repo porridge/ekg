@@ -50,9 +50,10 @@
 #include <gdk-pixbuf/gdk-pixdata.h>
 #include <gtk/gtkstock.h>
 
+#include "stuff.h"
+
 #include "ui.h"
 #include "ui-gtk-palette.h"
-#include "ui-gtk-inline_pngs_gg.h"
 
 /* XXX, todo: colors[0..15] are ok, than colors[16..31] are not ok [duplication of above], invistigate xchat sources if they needed, fix and remove. */
 #warning "XXX, colors[16..31] remove!"
@@ -159,7 +160,6 @@ GdkColor colors[] = {
 
 #define MAX_COL 40
 
-
 void palette_alloc(GtkWidget *widget)
 {
 	int i;
@@ -179,16 +179,36 @@ GdkPixbuf *gg_pixs[STATUS_PIXBUFS];
 
 void pixmaps_init(void)
 {
-	/* XXX, here load from file, or inline from .h */
-		/* gdk_pixbuf_new_from_file() */
-		/* gdk_pixbuf_new_from_inline() */
+	const char *userpath;
 	pix_ekg = NULL;
 
 	memset(gg_pixs, 0, sizeof(gg_pixs));
 
-	gg_pixs[PIXBUF_AVAIL] = gdk_pixbuf_new_from_inline(-1, gg_avail, FALSE, 0);
-	gg_pixs[PIXBUF_AWAY] = gdk_pixbuf_new_from_inline(-1, gg_away, FALSE, 0);
-	gg_pixs[PIXBUF_INVISIBLE] = gdk_pixbuf_new_from_inline(-1, gg_invisible, FALSE, 0);
-	gg_pixs[PIXBUF_NOTAVAIL] = gdk_pixbuf_new_from_inline(-1, gg_notavail, FALSE, 0);
-}
+	/* Ladowanie grafik z symbolu: gdk_pixbuf_new_from_inline(-1, gg_avail, FALSE, 0); */
+	struct {
+		size_t index;
+		const char *path;
+	} pix[] = {
+		{PIXBUF_AVAIL, "gg-avail.png"},
+		{PIXBUF_AWAY, "gg-away.png"},
+		{PIXBUF_INVISIBLE, "gg-invisible.png"},
+		{PIXBUF_BLOCKED, "gg-blocked.png"},
+		{PIXBUF_NOTAVAIL, "gg-notavail.png"},
+		{0, NULL}
+	}, *ppix;
 
+	userpath = prepare_path(NULL, 0);
+
+	for (ppix = pix; ppix->path; ++ppix) {
+		gg_pixs[ppix->index] = gdk_pixbuf_new_from_file(prepare_path(ppix->path, 0), 0);
+		if (!gg_pixs[ppix->index]) {
+			char buf[512];
+			snprintf(buf, sizeof(buf), DATADIR "/%s", ppix->path);
+			gg_pixs[ppix->index] = gdk_pixbuf_new_from_file(buf, 0);
+		}
+
+		if (!gg_pixs[ppix->index])
+			printf("UWAGA: Nie znaleziono ani %s/%s ani " DATADIR "/%s - nie bedziesz mial ikonki w userliscie\n", 
+			    userpath, ppix->path, ppix->path);
+	}
+}
