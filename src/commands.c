@@ -4807,11 +4807,14 @@ int command_exec_format(const char *target, int quiet, const char *format, ...) 
 	char *command;
 	va_list ap;
 	int res;
-	
+
+	if (!format)
+		return 0;
+
 	va_start(ap, format);
 	command = gg_vsaprintf(format, ap);
 	va_end(ap);
-	
+
 	if (!command) 
 		return 0;
 

@@ -177,15 +177,10 @@ void palette_alloc(GtkWidget *widget)
 GdkPixbuf *pix_ekg;
 GdkPixbuf *gg_pixs[STATUS_PIXBUFS];
 
-void pixmaps_init(void)
-{
-	pix_ekg = NULL;
-
-	memset(gg_pixs, 0, sizeof(gg_pixs));
-
+void pixmaps_init(void) {
 	/* Ladowanie grafik z symbolu: gdk_pixbuf_new_from_inline(-1, gg_avail, FALSE, 0); */
 	struct {
-		size_t index;
+		int index;
 		const char *path;
 	} pix[] = {
 		{PIXBUF_AVAIL, "gg-avail.png"},
@@ -195,6 +190,10 @@ void pixmaps_init(void)
 		{PIXBUF_NOTAVAIL, "gg-notavail.png"},
 		{0, NULL}
 	}, *ppix;
+
+	pix_ekg = NULL;
+
+	memset(gg_pixs, 0, sizeof(gg_pixs));
 
 	for (ppix = pix; ppix->path; ++ppix) {
 		const char *user_path = prepare_path(ppix->path, 0);

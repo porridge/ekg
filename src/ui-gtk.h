@@ -107,13 +107,13 @@ extern int gui_pane_right_size_config;
 extern int thin_separator_config;
 extern int new_window_in_tab_config;
 
+extern int hidemenu_config;
+
 #define mainwindow_left_config 0
 #define mainwindow_top_config 0
 #define chanmodebuttons_config -1
 
 #define gui_win_state_config 0
-#define hidemenu_config 0
-#define topicbar_config 1
 #define newtabstofront_config 2
 #define gui_quit_dialog_config -1
 #define truncchans_config 20

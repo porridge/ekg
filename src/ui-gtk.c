@@ -59,8 +59,8 @@ int thin_separator_config	= 1;
 
 int gui_pane_left_size_config	= 100;
 int gui_pane_right_size_config	= 100;
-#define hidemenu_config 0
-#define topicbar_config 1
+
+int hidemenu_config		= 0;
 #define newtabstofront_config 2
 
 /* ekg2-core var */

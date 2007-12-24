@@ -958,6 +958,26 @@ gboolean key_handle_key_press(GtkWidget *wid, GdkEventKey * evt, window_t *sess)
 	else if (((keyval == GDK_F) || (keyval == GDK_f)) && mod == STATE_CTRL)	n = key_action_scroll_page(wid, evt, "up", sess);
 	else if (((keyval == GDK_G) || (keyval == GDK_g)) && mod == STATE_CTRL)	n = key_action_scroll_page(wid, evt, "down", sess);
 
+	/* BINDINGI XCHATOWE */
+	/* Najwazniejszy jest: F9 + kolorki. */
+#if 0
+	"C\no\nInsert in Buffer\nD1:\nD2!\n\n"\
+	"C\nb\nInsert in Buffer\nD1:\nD2!\n\n"\
+	"C\nk\nInsert in Buffer\nD1:\nD2!\n\n"\
+	"S\nNext\nChange Selected Nick\nD1!\nD2!\n\n"\
+	"S\nPrior\nChange Selected Nick\nD1:Up\nD2!\n\n"\
+	"None\nNext\nScroll Page\nD1:Down\nD2!\n\n"\
+	"None\nPrior\nScroll Page\nD1:Up\nD2!\n\n"\
+	"None\nspace\nCheck For Replace\nD1!\nD2!\n\n"\
+	"None\nReturn\nCheck For Replace\nD1!\nD2!\n\n"\
+	"None\nKP_Enter\nCheck For Replace\nD1!\nD2!\n\n"\
+	"A\nLeft\nMove front tab left\nD1!\nD2!\n\n"\
+	"A\nRight\nMove front tab right\nD1!\nD2!\n\n"\
+	"CS\nPrior\nMove tab family left\nD1!\nD2!\n\n"\
+	"CS\nNext\nMove tab family right\nD1!\nD2!\n\n"\
+	"None\nF9\nRun Command\nD1:/GUI MENU TOGGLE\nD2!\n\n"
+#endif
+
 #if 0
 	binding_add("Alt-S", "/window oldest", 1, 1);
 	binding_add("Alt-G", "ignore-query", 1, 1);
@@ -987,11 +1007,8 @@ gboolean key_handle_key_press(GtkWidget *wid, GdkEventKey * evt, window_t *sess)
 	binding_add("Left", "backward-char", 1, 1);
 	binding_add("Up", "previous-history", 1, 1);
 	binding_add("Down", "next-history", 1, 1);
-	binding_add("PageUp", "backward-page", 1, 1);
 	binding_add("Ctrl-F", "backward-page", 1, 1);
-	binding_add("PageDown", "forward-page", 1, 1);
 	binding_add("Ctrl-G", "forward-page", 1, 1);
-	binding_add("F1", "/help", 1, 1);
 	binding_add("F2", "quick-list", 1, 1);
 	binding_add("F3", "toggle-contacts", 1, 1);
 	binding_add("F4", "next-contacts-group", 1, 1);
