@@ -1027,6 +1027,7 @@ static void debug_handler(int level, const char *format, va_list ap)
 {
 	static string_t line = NULL;
 	char *tmp;
+	char *theme_format;
 
 	tmp = gg_vsaprintf(format, ap);
 
@@ -1050,11 +1051,40 @@ static void debug_handler(int level, const char *format, va_list ap)
 	if (!tmp)
 		return;
 
+	switch(level) {
+		/* nieuzywane? */
+		/*
+		case /* GG_DEBUG_NET */ 	 1:
+			theme_format = "debug";
+			break;
+		*/
+
+		case /* GG_DEBUG_TRAFFIC */ 	 2:
+			theme_format = "iodebug";
+			break;
+
+		case /* GG_DEBUG_DUMP */	 4:
+			theme_format = "iodebug";
+		 	break;
+
+		case /* GG_DEBUG_FUNCTION */	 8:
+			theme_format = "fdebug";
+		 	break;
+
+		case /* GG_DEBUG_MISC */	16:
+			theme_format = "debug";
+			break;
+
+		default:
+			theme_format = "debug";
+			break;
+	}
+
 	tmp[strlen(tmp) - 1] = 0;
 
 	buffer_add(BUFFER_DEBUG, NULL, tmp, DEBUG_MAX_LINES);
 	if (ui_print)
-		print_window("__debug", 0, "debug", tmp);
+		print_window("__debug", 0, theme_format, tmp);
 	xfree(tmp);
 }
 #endif

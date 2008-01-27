@@ -877,7 +877,11 @@ void theme_init()
 	format_add("generic", "%> %1\n", 1);
 	format_add("generic2", "%) %1\n", 1);
 	format_add("generic_error", "%! %1\n", 1);
-	format_add("debug", "%n%1\n", 1);
+	format_add("debug", 	"%n%1\n", 1);
+	format_add("fdebug",	"%b%1\n", 1);
+	format_add("iodebug",	"%y%1\n", 1);
+	format_add("iorecvdebug", "%Y%1\n", 1);
+	format_add("edebug",	"%R%1\n", 1);
 	format_add("not_enough_params", "%! Za ma³o parametrów. Spróbuj %Thelp %1%n\n", 1);
 	format_add("invalid_params", "%! Nieprawid³owe parametry. Spróbuj %Thelp %1%n\n", 1);
 	format_add("invalid_uin", "%! Nieprawid³owy numer u¿ytkownika\n", 1);

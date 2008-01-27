@@ -4,6 +4,15 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
+// 2008-01-27
+
+- niech nie robi lseek(-1, 0, SEEK_END); (darkjames/g)
+- kolorki w debug, skopiowane z ekg2 i pluginu gg :) (zamiast stalych z libgadu 
+  sa uzyte numeryczne, zeby nie bylo bledow kompilacji w przypadku niezgodnosci 
+  wersji libgadu z oczekiwana) (darkjames/g)
+- jesli ekg nie ma obslugi voipa, to jak dostaje rozmowe glosowa, niech robi 
+  wczesniej gg_dcc7_reject() (darkjames/g)
+
 // 2008-01-26
 
 - gtk: poprawka nazwy kontaktu (darkjames/g)
