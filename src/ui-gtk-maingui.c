@@ -635,8 +635,18 @@ void menu_nickmenu(window_t *sess, GdkEventButton *event, char *nick, int num_se
 			menu_quick_item(0, buf, submenu, XCMENU_MARKUP, 0, 0);
 
 		/* XXX, <separator> ? */
-
 		/* XXX, stworzyc funkcje ktora to bedzie automatyzowac? */
+
+			/* XXX, wyswietl: u->status, u->descr */
+
+			if (user->nickname && strcmp(user->nickname, nick)) {
+				char *real = g_markup_escape_text(user->nickname, -1);
+				snprintf(buf, sizeof(buf), fmt, "Nick:", real);
+				g_free(real);
+
+				menu_quick_item(0, buf, submenu, XCMENU_MARKUP, 0, 0);
+			}
+
 		/* XXX, imie i nazwisko razem? */
 			if (user->first_name) {
 				char *real = g_markup_escape_text(user->first_name, -1);
@@ -700,7 +710,7 @@ void menu_nickmenu(window_t *sess, GdkEventButton *event, char *nick, int num_se
 					snprintf(buf, sizeof(buf), fmt, "Ostatnio widziano:", min);
 					menu_quick_item(0, buf, submenu, XCMENU_MARKUP, 0, 0);
 
-					/* XXX, last->descr */
+					/* XXX, last_descr */
 					if (user->last_ip.s_addr) {
 						snprintf(buf, sizeof(buf), fmtip, "Ostatnie IP:", inet_ntoa(user->last_ip), user->last_port);
 
@@ -713,9 +723,7 @@ void menu_nickmenu(window_t *sess, GdkEventButton *event, char *nick, int num_se
 					
 			}
 
-			/* ... */
-
-			/* XXX, wyswietl: u->status, u->descr, u->protocol (?) */
+			/* u->protocol (?) */
 			/* u->image_size (?) */
 
 			menu_quick_endsub();
@@ -2091,7 +2099,7 @@ gboolean fe_userlist_rehash(window_t *sess, struct userlist *u) {
 #endif
 	gtk_list_store_set(GTK_LIST_STORE(sess->user_model), iter,
 					  USERLIST_STATUS, u->status,
-					  USERLIST_NICKNAME, u->nickname,
+					  USERLIST_NICKNAME, u->display,
 					  USERLIST_UIN, u->uin,
 					  USERLIST_DESCRIPTION, u->descr,
 //					  USERLIST_COLOR, /* (do_away) */ FALSE, ? (newuser->away ? &colors[COL_AWAY] : NULL) : */ (NULL),
@@ -2111,7 +2119,7 @@ void fe_userlist_insert(window_t *sess, struct userlist *u) {
 #endif
 	gtk_list_store_insert_with_values(GTK_LIST_STORE(model), &iter, -1,
 					  USERLIST_STATUS, u->status,
-					  USERLIST_NICKNAME, u->nickname,
+					  USERLIST_NICKNAME, u->display,
 					  USERLIST_UIN, u->uin,
 					  USERLIST_DESCRIPTION, u->descr,
 					  USERLIST_USER, u,
@@ -3366,13 +3374,13 @@ static void mg_add_chan(window_t *sess) {
 	}
 }
 
-#if 0
-
 /* mg_userlist_button() do przemyslenia */
 /* mg_create_userlistbuttons() */
 
+#if 0
 static void mg_topic_cb(GtkWidget *entry, gpointer userdata) {
 	session *sess = current_sess;
+
 	char *text;
 
 	if (sess->channel[0] && sess->server->connected && sess->type == SESS_CHANNEL) {
@@ -3386,7 +3394,6 @@ static void mg_topic_cb(GtkWidget *entry, gpointer userdata) {
 	   likely be */
 	gtk_widget_grab_focus(sess->gui->input_box);
 }
-
 #endif
 
 static void mg_tabwindow_kill_cb(GtkWidget *win, gpointer userdata) {
@@ -3788,6 +3795,9 @@ static void mg_place_userlist_and_chanview_real(gtk_window_ui_t *gui, GtkWidget 
 	}
 
 	if (chanview) {
+		/* incase the previous pos was POS_HIDDEN */
+		gtk_widget_show(chanview);
+
 		gtk_table_set_row_spacing(GTK_TABLE(gui->main_table), 1, 0);
 		gtk_table_set_row_spacing(GTK_TABLE(gui->main_table), 2, 2);
 
@@ -3811,6 +3821,12 @@ static void mg_place_userlist_and_chanview_real(gtk_window_ui_t *gui, GtkWidget 
 					 1, 2, 1, 2, GTK_FILL, GTK_FILL, 0, 0);
 			break;
 		case POS_HIDDEN:
+			gtk_widget_hide(chanview);
+			/* always attach it to something to avoid ref_count=0 */
+			if (gui_ulist_pos_config == POS_TOP)
+				gtk_table_attach(GTK_TABLE(gui->main_table), chanview, 1, 2, 3, 4, GTK_FILL, GTK_FILL, 0, 0);
+			else
+				gtk_table_attach(GTK_TABLE(gui->main_table), chanview, 1, 2, 1, 2, GTK_FILL, GTK_FILL, 0, 0);
 			break;
 		default:	/* POS_BOTTOM */
 			gtk_table_set_row_spacing(GTK_TABLE(gui->main_table), 2, 3);
@@ -3830,8 +3846,8 @@ static void mg_place_userlist_and_chanview_real(gtk_window_ui_t *gui, GtkWidget 
 		case POS_BOTTOMRIGHT:
 			gtk_paned_pack2(GTK_PANED(gui->vpane_right), userlist, FALSE, TRUE);
 			break;
-		case POS_HIDDEN:
-			break;
+/*		case POS_HIDDEN:
+			break; */	/* Hide using the VIEW menu instead */
 		default:	/* POS_TOPRIGHT */
 			gtk_paned_pack1(GTK_PANED(gui->vpane_right), userlist, FALSE, TRUE);
 		}

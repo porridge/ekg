@@ -4,6 +4,13 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
+// 2008-01-26
+
+- gtk: poprawka nazwy kontaktu (darkjames/g)
+- gtk: jak mamy debug, to logujmy do okienka (darkjames/g)
+- gtk: poprawka z xchata (darkjames/g)
+- gtk: cleanup strukturki i tworzenia okienka gtkowego (darkjames/g)
+
 // 2007-12-24
 
 - gtk: RMB na userze pokazuje wiêcej informacji (grupy, ip, ostatnio widziano, 

@@ -1353,6 +1353,16 @@ int main(int argc, char **argv)
 	}
 #endif
 
+#ifdef WITH_UI_GTK
+	if (ui_init == ui_gtk_init) {
+#ifndef GG_DEBUG_DISABLE
+		if (!gg_debug_file)
+			gg_debug_handler = debug_handler;
+#endif
+		gg_debug_level = 255;
+	}
+#endif
+
         ekg_pid = getpid();
 	mesg_startup = mesg_set(MESG_CHECK);
 

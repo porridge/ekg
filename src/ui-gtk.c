@@ -30,14 +30,6 @@ list_t windows = NULL;		/* lista okien */
 char *history[HISTORY_MAX];	/* zapamiętane linie */
 int history_index = 0;		/* offset w historii */
 
-/* two different types of tabs */
-#define TAG_IRC 0		/* server, channel, dialog */
-#define TAG_UTIL 1		/* dcc, notify, chanlist */
-
-#define GUI_SPACING (3)
-#define GUI_BORDER (0)
-#define SCROLLBAR_SPACING (2)
-
 /* vars */
 const char font_normal_config[] = "Monospace 9";
 int mainwindow_width_config	= 640;
@@ -71,6 +63,7 @@ int new_window_in_tab_config	= 1;
 /* forward */
 void fe_set_tab_color(window_t *sess, int col);
 void mg_switch_page(int relative, int num);
+void mg_apply_setup(void);
 
 
 /* BUGS/ FEATURES NOT IMPLEMENTED,
@@ -235,7 +228,7 @@ static int window_new_compare(void *data1, void *data2)
  */
 static struct window *window_new(const char *target, int new_id)
 {
-	struct window w, *result = NULL;
+	struct window *w;
 	int id = 1, done = 0;
 	list_t l;
 	struct userlist *u = NULL;
@@ -275,57 +268,53 @@ static struct window *window_new(const char *target, int new_id)
 	if (id == -1)
 		id = 0;
 	
-	memset(&w, 0, sizeof(w));
+	w = xmalloc(sizeof(struct window));
 
-	w.id = id;
-	w.last_act_time = time(NULL);
+	w->id = id;
+	w->last_act_time = time(NULL);
 
 	if (target) {
 		if (*target == '+' && !u) {
-			w.doodle = 1;
-			w.target = xstrdup(target + 1);
-		}
-		
-		if (*target == '*' && !u) {
+/*			w->doodle = 1; */
+			w->target = xstrdup(target + 1);
+		} else if (*target == '*' && !u) {
 			const char *tmp = strchr(target, '/');
-			char **argv, **arg;
 			
 			if (!tmp)
 				tmp = "";
 				
-			w.target = xstrdup(tmp);
+			w->target = xstrdup(tmp);
+
+	/* ui-gtk windows don't support frames */
+/*
+			char **argv, **arg;
 
 			argv = arg = array_make(target + 1, ",", 5, 0, 0);
 
 			if (*arg && *arg[0] != '/')
-				w.frames = atoi(*arg);
-
+				w->frames = atoi(*arg);
 			array_free(argv);
-
+ */
+		} else {
+			w->target = xstrdup(target);
+			w->prompt = format_string(format_find("ncurses_prompt_query"), target);
+			w->prompt_len = strlen(w->prompt);
 		}
-		
-		if (!w.target) {
-			w.target = xstrdup(target);
-			w.prompt = format_string(format_find("ncurses_prompt_query"), target);
-			w.prompt_len = strlen(w.prompt);
-		}
-	}
-	
-	if (!target) {
+	} else {
 		const char *f = format_find("ncurses_prompt_none");
 
 		if (strcmp(f, "")) {
-			w.prompt = xstrdup(f);
-			w.prompt_len = strlen(w.prompt);
+			w->prompt = xstrdup(f);
+			w->prompt_len = strlen(w->prompt);
 		}
 	}
 
-	result = list_add_sorted(&windows, &w, sizeof(w), window_new_compare);
+	list_add_sorted(&windows, w, 0, window_new_compare);
 
 	/* w.window */
-	mg_changui_new(result, new_window_in_tab_config, 0);
+	mg_changui_new(w, new_window_in_tab_config, 0);
 
-	return result;
+	return w;
 }
 
 /*

@@ -30,12 +30,7 @@ typedef struct {
 } gtk_window_ui_t;
 
 typedef struct window {
-	int doodle;		/* czy do gryzmolenia? */
-	int frames;		/* informacje o ramkach */
-	int edge;		/* okienko brzegowe */
 	int last_update;	/* czas ostatniego uaktualnienia */
-	int nowrap;		/* nie zawijamy linii */
-	int hide;		/* ukrywamy, bo jest zbyt duże */
 	
 	char *target;		/* nick query albo inna nazwa albo NULL */
 	
@@ -46,9 +41,6 @@ typedef struct window {
 
 	char *prompt;		/* sformatowany prompt lub NULL */
 	int prompt_len;		/* długość prompta lub 0 */
-
-	int margin_left, margin_right, margin_top, margin_bottom;
-				/* marginesy */
 
 /* gtk window */
 	gtk_window_ui_t *gui;
