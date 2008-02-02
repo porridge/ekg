@@ -1054,7 +1054,7 @@ static void debug_handler(int level, const char *format, va_list ap)
 	switch(level) {
 		/* nieuzywane? */
 		/*
-		case /* GG_DEBUG_NET */ 	 1:
+		case GG_DEBUG_NET 	 1:
 			theme_format = "debug";
 			break;
 		*/
