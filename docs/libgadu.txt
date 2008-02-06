@@ -16,12 +16,8 @@ nale¿y najpierw zainstalowaæ libgadu.
   - make install
     (je¿eli instalujesz systemowo, to z uprawnieniami roota)
 
-- Je¿eli korzystasz z CVS:
-  - export CVSROOT=:pserver:anonymous@ekg.chmurka.net:/home/cvs
-    (lub inna metoda eksportu zmiennej, zale¿nie od pow³oki)
-  - cvs login
-    (w pytaniu o has³o wci¶nij Enter)
-  - cvs co libgadu
+- Je¿eli korzystasz z SVN:
+  - svn co http://toxygen.net/svn/libgadu/trunk libgadu
   - cd libgadu
   - ./autogen.sh 
     (opcje jak przy ./configure)

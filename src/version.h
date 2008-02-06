@@ -20,6 +20,6 @@
 #ifndef __VERSION_H
 #define __VERSION_H
 
-#define VERSION "CVS"
+#define VERSION "SVN"
 
 #endif /* __VERSION_H */
