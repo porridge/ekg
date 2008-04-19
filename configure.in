@@ -464,12 +464,6 @@ else
 	echo " - zlib: disabled"
 fi
 
-if test "x$have_pthread" = "xyes"; then
-	echo " - pthread: enabled"
-else
-	echo " - pthread: disabled"
-fi
-
 if test "x$have_libungif" = "xyes"; then
 	echo " - libungif: enabled"
 else
