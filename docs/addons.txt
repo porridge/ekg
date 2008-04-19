@@ -1,9 +1,10 @@
 // Obs³uga us³ug dodanych do Gadu-Gadu
-// Copyright (C) 2007-2008 Adam Wysocki <gophi@ekg.chmurka.net>
+// Copyright (C) 2007 Adam Wysocki <gophi@ekg.chmurka.net>
 
 1. Dlaczego?
 2. Nag³os
 3. Nowo¶ci
+4. Rejestracja
 
 1. Dlaczego?
 
@@ -21,7 +22,7 @@ Oryginalny komunikator umo¿liwia komunikacjê g³osow± przy pomocy us³ugi
 pod nazw± "Nag³os". Baseciq na swojej stronie opisa³ sposób wykorzystania 
 tej funkcjonalno¶ci przy pomocy Asteriska:
 
-http://www.baseciq.org/voip/asterisk/naglos.html
+http://www.baseciq.org/blog/350,Naglos_i_Asterisk.html
 
 3. Nowo¶ci
 
@@ -33,5 +34,10 @@ http://rss.gadu-gadu.pl/nowosci.xml
 
 Feed kodowany jest przy pomocy CP-1250, wiêc nale¿y przekodowaæ go na 
 odpowiednie dla siebie kodowanie (np. przy pomocy iconv).
+
+4. Rejestracja
+
+Nowy numer, oprócz polecenia /register w ekg, mo¿na za³o¿yæ korzystaj±c 
+z interfejsu WWW: http://register.gadu-gadu.pl/reg.html
 
 // $Id$

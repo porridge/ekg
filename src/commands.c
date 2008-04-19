@@ -3320,7 +3320,7 @@ COMMAND(cmd_dcc)
 		struct transfer *t = NULL;
 		unsigned char *path, *tmp;
 		int fd;
-		unsigned int offset = 0;
+		unsigned int offset;
 		
 		for (l = transfers; l; l = l->next) {
 			struct transfer *tt = l->data;
@@ -3403,10 +3403,10 @@ COMMAND(cmd_dcc)
 
 		if (params[0][0] == 'r') {
 			fd = open((char *) path, O_WRONLY);
-			if (fd != -1) 
-				offset = lseek(fd, 0, SEEK_END);
+			offset = lseek(fd, 0, SEEK_END);
 		} else {
 			fd = open((char *) path, O_WRONLY | O_CREAT, config_files_mode_received);
+			offset = 0;
 		}
 
 		if (fd == -1) {
@@ -4789,38 +4789,6 @@ int command_exec(const char *target, const char *xline, int quiet)
 	xfree(line_save);
 
 	return -1;
-}
-
-/*
- * command_exec_format()
- *
- * formatuje string w formacie @a i wykonuje sformatowane polecenie. ekwiwalent:
- *   char *tmp = saprintf(format, ...);
- *   command_exec(target, tmp, quiet);
- *   xfree(tmp);
- *
- * 0 - format byl NULL
- * -1 - polecenie nie zostalo znalezione (wynik command_exec())
- * else - wynik dzialania handlera polecenia
- */
-int command_exec_format(const char *target, int quiet, const char *format, ...) {
-	char *command;
-	va_list ap;
-	int res;
-
-	if (!format)
-		return 0;
-
-	va_start(ap, format);
-	command = gg_vsaprintf(format, ap);
-	va_end(ap);
-
-	if (!command) 
-		return 0;
-
-	res = command_exec(target, command, quiet);
-	xfree(command);
-	return res;
 }
 
 int binding_help(int a, int b)

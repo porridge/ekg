@@ -471,7 +471,6 @@ int ioctld_send(const char *seq, int act, int quiet);
 int init_control_pipe(const char *path);
 
 const char *timestamp(const char *format);
-const char *timestamp_time(const char *format, time_t t);
 void unidle(void);
 int on_off(const char *value);
 int transfer_id(void);

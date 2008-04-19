@@ -371,11 +371,6 @@ char *va_format_string(const char *format, va_list ap)
 	if (!config_display_pl_chars)
 		iso_to_ascii((unsigned char *) buf->str);
 
-#ifdef WITH_UI_GTK
-		if (ui_init == ui_gtk_init)
-			iso_to_ascii((unsigned char *) buf->str);
-#endif
-
 	return string_free(buf, 0);
 }
 
@@ -877,11 +872,7 @@ void theme_init()
 	format_add("generic", "%> %1\n", 1);
 	format_add("generic2", "%) %1\n", 1);
 	format_add("generic_error", "%! %1\n", 1);
-	format_add("debug", 	"%n%1\n", 1);
-	format_add("fdebug",	"%b%1\n", 1);
-	format_add("iodebug",	"%y%1\n", 1);
-	format_add("iorecvdebug", "%Y%1\n", 1);
-	format_add("edebug",	"%R%1\n", 1);
+	format_add("debug", "%n%1\n", 1);
 	format_add("not_enough_params", "%! Za ma³o parametrów. Spróbuj %Thelp %1%n\n", 1);
 	format_add("invalid_params", "%! Nieprawid³owe parametry. Spróbuj %Thelp %1%n\n", 1);
 	format_add("invalid_uin", "%! Nieprawid³owy numer u¿ytkownika\n", 1);

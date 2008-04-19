@@ -3250,7 +3250,6 @@ void handle_dcc7_new(struct gg_event *e)
 			print("dcc_voice_offer", format_user(t.uin), itoa(t.id));
 			break;
 #else
-			gg_dcc7_reject(dcc, GG_DCC7_REJECT_USER);
 			gg_dcc7_free(dcc);
 			e->event.dcc7_new = NULL;
 			return;
