@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # historia:
 # v1 (7.03.2002) grywalny skrypt, spelniajacy jako tako swoja funkcje
