@@ -3320,7 +3320,7 @@ COMMAND(cmd_dcc)
 		struct transfer *t = NULL;
 		unsigned char *path, *tmp;
 		int fd;
-		unsigned int offset;
+		unsigned int offset = 0;
 		
 		for (l = transfers; l; l = l->next) {
 			struct transfer *tt = l->data;
@@ -3403,10 +3403,10 @@ COMMAND(cmd_dcc)
 
 		if (params[0][0] == 'r') {
 			fd = open((char *) path, O_WRONLY);
-			offset = lseek(fd, 0, SEEK_END);
+			if (fd != -1) 
+				offset = lseek(fd, 0, SEEK_END);
 		} else {
 			fd = open((char *) path, O_WRONLY | O_CREAT, config_files_mode_received);
-			offset = 0;
 		}
 
 		if (fd == -1) {

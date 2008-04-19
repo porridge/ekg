@@ -1,7 +1,7 @@
 dnl Rewritten from scratch. --wojtekka
 dnl $Id$
 
-AC_DEFUN(AC_CHECK_NCURSES,
+AC_DEFUN([AC_CHECK_NCURSES],
 [
 	AC_SUBST(CURSES_LIBS)
 	AC_SUBST(CURSES_INCLUDES)
