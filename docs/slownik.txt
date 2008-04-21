@@ -12,7 +12,7 @@ Polski s³ownik mo¿na znale¼æ tutaj:
 http://ftp.gnu.org/gnu/aspell/dict/pl/
 
 Jak skompilowaæ i zainstalowaæ aspell'a nale¿y przeczytaæ tutaj:
-http://aspell.net/man-html/2_Getting.html#SECTION00350000000000000000
+http://aspell.net/man-html/Installing.html
 
 Po prawid³owym zainstalowaniu s³ownika, nale¿y skompilowaæ ekg z obs³ug±
 aspell'a. Aby to zrobiæ, nale¿y podczas kompilacji dodaæ prze³±cznik

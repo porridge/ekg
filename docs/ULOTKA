@@ -4,7 +4,8 @@
                  minister do spraw informatyzacji i Windows [1]
 
 
-czyli krótki przewodnik po dokumentacji:
+czyli krótki przewodnik po dokumentacji, w kolejno¶ci od najwa¿niejszych
+informacji, do najbardziej technicznych:
 
 README		opis programu. g³ówny plik dokumentacji.
 
@@ -21,26 +22,41 @@ TODO		lista rzeczy, które czekaj± w kolejce na realizacjê. je¶li
 ChangeLog	lista zmian w kolejnych wersjach. czêsto zawiera informacje
 		wa¿ne, a nie wymienione w innych plikach.
 
+libgadu.txt	informacja na temat instalacji i u¿ycia libgadu
+
+ui-ncurses.txt	opis interfejsu ncurses oraz ustawieñ/mo¿liwo¶ci wystêpuj±cych
+		wy³±cznie w tym interfejsie.
+
 vars.txt	opis zmiennych u¿ywanych przez program.
+
+mysz.txt	obs³uga myszy
+
+slownik.txt	obs³uga s³ownika aspell
+
+addons.txt	krótki opis korzystania z niektórych us³ug obecnych w Gadu-Gadu 
+		a (celowo) nie zaimplementowanych w ekg.
 
 files.txt	opis formatów plików: listy kontaktów, konfiguracji,
 		historii, emotikonów.
 
-themes.txt	opis dotycz±cy zmiany wygl±du klienta. przydatny dla tych,
-		którzy lubi± bawiæ siê w kolorki.
-
-protocol.html	opis protoko³u u¿ywanego przez klienty Gadu-Gadu przy
-		po³±czeniach z serwerem, protoko³u bezpo¶rednich
-		po³±czeñ miêdzy klientami oraz us³ug HTTP. niestety s±
-		niekompletne, ze wzglêdu na ci±g³e zmiany w protokole.
-
-api.txt		krótki opis api biblioteki libgadu. powinien wystarczyæ
-		na pocz±tek. reszty niestety trzeba szukaæ w ¼ród³ach
-		klienta.
+emoticons.ansi
+emoticons.sample
+		przyk³adowe emoticony
 
 dcc.txt		opis wykorzystania bezpo¶rednich po³±czeñ do przesy³ania
 		plików. ich obs³uga nie jest jeszcze kompletna i ma prawo
 		dzia³aæ nieprawid³owo. dodatkowo zawiera opis api kodu.
+
+voip.txt	informacja na temat konfiguracji rozmów g³osowych
+
+sim.txt		wskazówki dotycz±ce korzystania z szyfrowania wiadomo¶ci.
+
+themes.txt	opis dotycz±cy zmiany wygl±du klienta. przydatny dla tych,
+		którzy lubi± bawiæ siê w kolorki.
+
+gdb.txt		szybki kurs obs³ugi gdb.
+
+python.txt	krótki opis mo¿liwo¶ci obs³ugi skryptów w pythonie przez ekg.
 
 devel-hints.txt	wskazówki dla tych, którzy chc± co¶ poprawiæ w ekg/libgadu.
 
@@ -48,19 +64,7 @@ przenosny-kod.txt
 		kilka wskazówek na temat pisania kodu przeno¶nego miêdzy
 		ró¿nymi uniksami.
 
-gdb.txt		szybki kurs obs³ugi gdb.
-
 ui.txt		wskazówki dla developerów chc±cych dodaæ nowe ui.
-
-ui-ncurses.txt	opis interfejsu ncurses oraz ustawieñ/mo¿liwo¶ci wystêpuj±cych
-		wy³±cznie w tym interfejsie.
-
-sim.txt		wskazówki dotycz±ce korzystania z szyfrowania wiadomo¶ci.
-
-python.txt	krótki opis mo¿liwo¶ci obs³ugi skryptów w pythonie przez ekg.
-
-addons.txt	krótki opis korzystania z niektórych us³ug obecnych w Gadu-Gadu 
-		a (celowo) nie zaimplementowanych w ekg.
 
 
 [1] autor Jacek Pop³awski, <slrnaor068.54v.jp@darkwood.somewhere>

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # w ~/.gg/config:
 # log_path na ~/.gg/history

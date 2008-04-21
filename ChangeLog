@@ -4,6 +4,17 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
+// 2008-04-21
+
+- aktualizacja odsy³acza do informacji o instalacji aspella (zigi/p)
+- drobna poprawka dokumentacji /list -I (zigi/p)
+
+// 2008-04-19
+
+- porz±dki w dokumentacji w zwi±zku z wydzieleniem libgadu (p)
+- usuniêcie z configure bezu¿ytecznej informacji o pthread (p)
+- poprawienie deklaracji pow³oki w skryptach wymagaj±cych basha (p)
+
 // 2008-03-24
 
 - aktualizacja dokumentacji (gophi)
