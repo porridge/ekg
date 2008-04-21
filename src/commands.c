@@ -6560,7 +6560,7 @@ void command_init()
 	( "list", "u?", cmd_list, 0,
           " [alias|@grupa|opcje]", "zarz±dzanie list± kontaktów",
 	  "\n"
-	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i|-B|-d|-m|-o]\":\n"
+	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i|-I|-B|-d|-m|-o]\":\n"
 	  "  -a, --active           dostêpne\n"
 	  "  -b, --busy             zajête\n"
 	  "  -i, --inactive         niedostêpne\n"
