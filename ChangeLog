@@ -4,6 +4,11 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
+// 2008-05-13
+
+- dodanie docs/protocol.html zawieraj±cego jedynie odno¶nik do strony libgadu;
+  usuniêcie tego pliku spowodowa³o brzydkie 404 na stronie WWW ekg (darkjames/p)
+
 // 2008-04-21
 
 - aktualizacja odsy³acza do informacji o instalacji aspella (zigi/p)
