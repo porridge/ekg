@@ -21,8 +21,12 @@ Q: Jak zarejestrowaæ nowego u¿ytkownika?
 A: U¿yæ polecenia ,,token'' i ,,register <email> <has³o> <token>''.
 
 Q: Kiedy zrobicie w ekg wsparcie dla UTF-8?
-A: Jest w planach. Póki co mo¿na wykorzystaæ screena. Ctrl-A, dwukropek, 
-   encoding iso8859-2 utf-8, enter, Ctrl-L.
+A: Jest w planach. Póki co jest kilka obej¶æ:
+   - screen jednorazowo: Ctrl-A, dwukropek, encoding iso8859-2 utf-8, 
+     enter, Ctrl-L
+   - screen na sta³e: dopisanie 'bind i encoding iso8859-2 utf-8' do 
+     ~/.screenrc i ¿eby aktywowaæ: Ctrl-A i
+   - luit (zadzia³a w bashu): LANG=pl_PL luit ekg
 
 Q: Jak wys³aæ smsy?
 A: Patrz pierwsza odpowied¼. Jest opisane w dokumentacji.
