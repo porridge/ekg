@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2002-2006 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2002-2008 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Wojtek Bojdo³ <wojboj@htcon.pl>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *			    Piotr Kupisiewicz <deli@rzepaknet.us>
@@ -3585,7 +3585,7 @@ void python_generator(const char *text, int len)
 
 void window_generator(const char *text, int len)
 {
-	const char *words[] = { "new", "kill", "move", "next", "resize", "prev", "switch", "clear", "refresh", "list", "active", "last", "dump", NULL };
+	const char *words[] = { "new", "kill", "move", "next", "resize", "prev", "switch", "clear", "refresh", "list", "active", "last", "dump", "swap", NULL };
 	int i;
 
 	for (i = 0; words[i]; i++)
@@ -5894,6 +5894,75 @@ static int ui_ncurses_event(const char *event, ...)
 					printq("window_dump_error", p2);
 				else
 					printq("window_dump_done");
+
+				goto cleanup;
+			}
+
+			if (!strcasecmp(p1, "swap")) {
+				char **argv;
+				struct window *w[2] = {NULL, NULL};
+				struct window tmpwin;
+				int tmpid;
+				int i;
+
+				if (!p2) {
+					printq("not_enough_params", "window");
+					goto cleanup;
+				}
+
+				argv = array_make(p2, " ,", 2, 0, 0);
+
+				if (array_count(argv) < 2) {
+					printq("not_enough_params", "window");
+					array_free(argv);
+					goto cleanup;
+				}
+
+				for (i = 0; i < 2; ++i) {
+					list_t l;
+
+					for (l = windows; l; l = l->next) {
+						struct window *v = l->data;
+
+						if (v->id == atoi(argv[i])) {
+							w[i] = v;
+							break;
+						}
+					}
+				}
+
+				array_free(argv);
+
+				if (!w[0] || !w[1]) {
+					printq("window_noexist");
+					goto cleanup;
+				}
+
+				/* pozwalamy na zmiane okna statusu, to nie jest blad */
+
+				if (w[0] == w[1] || !w[0]->id || !w[1]->id || 
+				    (w[0]->target && (!strcasecmp(w[0]->target, "__contacts") || !strcasecmp(w[0]->target, "__debug"))) || 
+				    (w[1]->target && (!strcasecmp(w[1]->target, "__contacts") || !strcasecmp(w[1]->target, "__debug")))) {
+					printq("invalid_params", "window");
+					goto cleanup;
+				}
+
+				tmpid = w[0]->id;
+				w[0]->id = w[1]->id;
+				w[1]->id = tmpid;
+
+				/* podmiana takze zawartosci struktur zeby /window list dzialalo dobrze */
+
+				memcpy(&tmpwin, w[0], sizeof(struct window));
+				memcpy(w[0], w[1], sizeof(struct window));
+				memcpy(w[1], &tmpwin, sizeof(struct window));
+
+				/* jezeli jedno z zamienianych okien bylo oknem aktualnym to przelaczamy sie do niego */
+
+				if (window_current == w[0])
+					window_switch(w[1]->id);
+				else if (window_current == w[1])
+					window_switch(w[0]->id);
 
 				goto cleanup;
 			}
