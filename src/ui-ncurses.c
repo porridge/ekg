@@ -5964,6 +5964,8 @@ static int ui_ncurses_event(const char *event, ...)
 				else if (window_current == w[1])
 					window_switch(w[0]->id);
 
+				printq("window_swapped", itoa(w[0]->id), itoa(w[1]->id));
+
 				goto cleanup;
 			}
 			
