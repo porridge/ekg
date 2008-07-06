@@ -6,8 +6,6 @@ rozwi±zanie.
 
 * klient:
   - dostosowanie do UTF-8 (wielu)
-  - "low priority" okienka, gdy zosta³o w nim wypisane co¶ innego ni¿ wiadomo¶æ 
-    (shog, tree)
   - poprawiæ wysy³anie d³ugich szyfrowanych wiadomo¶ci (co¶ siê zmieni³o i 
     wiadomo¶æ jest dzielona na dwie, z czego druga nie jest ju¿ deszyfrowana, 
     poza tym obcinanie za d³ugiej wiadomo¶ci przy wy¶wietlaniu kuleje - jest 

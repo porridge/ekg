@@ -1388,10 +1388,36 @@ crap:
 
 	w->last_act_time = cur_time;
 	if (w != window_current && !w->floating) {
-		if (!w->act) {
-			w->act = 1;
-			w->first_act_time = w->last_act_time;
+		// xxx brzydki hack - rozpoznawanie, czy okno jest rozmow±, 
+		// po separate
+
+		// w->act == 0 - brak aktywno¶ci
+		// w->act == 1 - aktywno¶æ ma³a
+		// w->act == 2 - aktywno¶æ du¿a
+
+		// w->act == 0, separate == 0 -> w->act = 1, aktualizujemy czas
+		// w->act == 0, separate == 1 -> w->act = 2, aktualizujemy czas
+		// w->act == 1, separate == 0 -> no-op
+		// w->act == 1, separate == 1 -> w->act = 2, aktualizujemy czas
+		// w->act == 2 -> no-op
+
+		switch (w->act) {
+			case 0:
+				w->act = separate ? 2 : 1;
+				w->first_act_time = w->last_act_time;
+				break;
+
+			case 1:
+				if (separate) {
+					w->act = 2;
+					w->first_act_time = w->last_act_time;
+				}
+				break;
+
+			default:
+				break;
 		}
+
 		if (!command_processing)
 			update_statusbar(0);
 	}
@@ -1870,9 +1896,6 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 			
 			continue;
 		}
-#undef __fgcolor
-#undef __bgcolor
-
 		if (*p != '{' && !config_display_color)
 			continue;
 
@@ -1889,6 +1912,8 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 			len = strlen(data[i].name);
 
 			if (!strncmp(p, data[i].name, len) && p[len] == '}') {
+				/* pozwoliæ wszêdzie? */
+				int percent_ok = !strcmp(data[i].name, "activity");	
 				char *text = data[i].text;
 				int j;
 
@@ -1897,19 +1922,45 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 					iso_to_ascii((unsigned char*) text);
 				}
 
-				for (j = 0; text && j < strlen(text); j++) {
-					if (text[j] != 10) {
-						waddch(w, (unsigned char) text[j]);
-						continue;
-					}
+				for (j = 0; text && text[j]; j++) {
+					if (text[j] == 10) {
+						wattrset(w, color_pair(COLOR_BLACK, 1, bgcolor));
+						waddch(w, '|');
+						wattrset(w, color_pair(fgcolor, bold, bgcolor));
+						x++;
+					} else if (text[j] == '%' && percent_ok) {
+						switch (text[++j]) {
+							__fgcolor('k', 'K', COLOR_BLACK);
+							__fgcolor('r', 'R', COLOR_RED);
+							__fgcolor('g', 'G', COLOR_GREEN);
+							__fgcolor('y', 'Y', COLOR_YELLOW);
+							__fgcolor('b', 'B', COLOR_BLUE);
+							__fgcolor('m', 'M', COLOR_MAGENTA);
+							__fgcolor('c', 'C', COLOR_CYAN);
+							__fgcolor('w', 'W', COLOR_WHITE);
+							__bgcolor('l', COLOR_BLACK);
+							__bgcolor('s', COLOR_RED);
+							__bgcolor('h', COLOR_GREEN);
+							__bgcolor('z', COLOR_YELLOW);
+							__bgcolor('e', COLOR_BLUE);
+							__bgcolor('q', COLOR_MAGENTA);
+							__bgcolor('d', COLOR_CYAN);
+							__bgcolor('x', COLOR_WHITE);
+							case 'n':
+								bgcolor = COLOR_BLUE;
+								fgcolor = COLOR_WHITE;
+								bold = 0;
+							break;
+						}
 
-					wattrset(w, color_pair(COLOR_BLACK, 1, bgcolor));
-					waddch(w, '|');
-					wattrset(w, color_pair(fgcolor, bold, bgcolor));
+						wattrset(w, color_pair(fgcolor, bold, bgcolor));
+					} else {
+						waddch(w, (unsigned char) text[j]);
+						x++;
+					}
 				}
 
 				p += len;
-				x += strlen(data[i].text);
 				
 				if (!config_display_pl_chars)
 					xfree(text);
@@ -1917,7 +1968,8 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 				goto next;
 			}
 		}
-
+#undef __fgcolor
+#undef __bgcolor
 		if (*p == '?') {
 			int neg = 0;
 
@@ -2230,7 +2282,8 @@ static void update_statusbar(int commit)
 
 			if (!first)
 				string_append_c(s, ',');
-			
+
+			string_append(s, (w->act == 2) ? "%W" : "%K");
 			string_append(s, itoa(w->id));
 			first = 0;
 			act = 1;

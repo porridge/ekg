@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
+// 2008-06-06
+
+- d³ugo oczekiwane rozró¿nianie typu aktywno¶ci w okienku (darkjames/g)
+
 // 2008-05-18
 
 - dodanie komunikatu o zamianie okien miejscami (Marcin Rybak/g)
