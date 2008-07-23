@@ -372,8 +372,9 @@ char *va_format_string(const char *format, va_list ap)
 		iso_to_ascii((unsigned char *) buf->str);
 
 #ifdef WITH_UI_GTK
-		if (ui_init == ui_gtk_init)
-			iso_to_ascii((unsigned char *) buf->str);
+	if (ui_init == ui_gtk_init) {
+		buf->str = iso_to_utf8(buf->str);
+	}
 #endif
 
 	return string_free(buf, 0);

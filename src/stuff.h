@@ -447,8 +447,10 @@ void event_free(void);
 int mesg_set(int what);
 int msg_encrypt(uin_t uin, unsigned char **msg);
 void cp_to_iso(unsigned char *buf);
+char *utf8_to_iso(char *buf);
 void iso_to_cp(unsigned char *buf);
 void iso_to_ascii(unsigned char *buf);
+char *iso_to_utf8(char *buf);
 char *strip_chars(char *line, unsigned char what); 
 char *strip_spaces(char *line);
 

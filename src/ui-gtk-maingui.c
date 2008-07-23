@@ -2577,9 +2577,6 @@ void mg_inputbox_cb(GtkWidget *igad, gtk_window_ui_t *gui) {
 	}
 
 	if (sess) {
-		/* XXX, recode from utf-8 to latin2 */
-		command_exec(sess->target, cmd, 0);
-
 		history[0] = cmd;
 		xfree(history[HISTORY_MAX - 1]);
 
@@ -2587,6 +2584,11 @@ void mg_inputbox_cb(GtkWidget *igad, gtk_window_ui_t *gui) {
 
 		history_index = 0;
 		history[0] = NULL;
+
+		cmd = utf8_to_iso(xstrdup(cmd));
+		command_exec(sess->target, cmd, 0);
+
+		xfree(cmd);
 
 		return;
 	}
