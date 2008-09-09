@@ -5690,10 +5690,13 @@ static int ui_ncurses_event(const char *event, ...)
 					struct window *w = l->data;
 
 					if (w->act && !w->floating && w->id) {
-						if (w->act == 1)
-							idlow = w->id;
-						else if (w->act == 2)
-							idhigh = w->id;
+						if (w->act == 1) {
+							if (!idlow)
+								idlow = w->id;
+						} else if (w->act == 2) {
+							if (!idhigh)
+								idhigh = w->id;
+						}
 
 						if (idlow && idhigh)
 							break;
