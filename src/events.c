@@ -1382,7 +1382,6 @@ void handle_event(struct gg_session *s)
 		print("conn_broken");
 
 		addr.s_addr = sess->server_addr;
-		event_check(EVENT_DISCONNECTED, 0, inet_ntoa(addr));
 
 		list_remove(&watches, sess, 0);
 		gg_logoff(sess);
@@ -1391,6 +1390,9 @@ void handle_event(struct gg_session *s)
 		userlist_clear_status(0);
 		ui_event("disconnected");
 		last_conn_event = time(NULL);
+
+		event_check(EVENT_DISCONNECTED, 0, inet_ntoa(addr));
+
 		ekg_reconnect();
 
 		return;
@@ -2199,7 +2201,6 @@ void handle_disconnect(struct gg_event *e)
 	ui_event("disconnected");
 
 	addr.s_addr = sess->server_addr;
-	event_check(EVENT_CONNECTIONLOST, 0, inet_ntoa(addr));
 
 	gg_logoff(sess);	/* a zobacz.. mo¿e siê uda ;> */
 	list_remove(&watches, sess, 0);
@@ -2208,6 +2209,8 @@ void handle_disconnect(struct gg_event *e)
 	userlist_clear_status(0);
 	update_status();
 	last_conn_event = time(NULL);
+
+	event_check(EVENT_CONNECTIONLOST, 0, inet_ntoa(addr));
 }
 
 /*

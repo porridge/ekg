@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
+// 2008-12-07
+
+- poprawienie obs³ugi eventów disconnected i connectionlost (gophi)
+
 // 2008-09-09
 
 - poprawienie poprawki (gophi)
