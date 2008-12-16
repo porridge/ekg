@@ -1,5 +1,5 @@
 // $Id$
-// (C) 2007 Adam Wysocki <gophi@ekg.chmurka.net>
+// (C) 2007-2008 Adam Wysocki <gophi@ekg.chmurka.net>
 
 Od 5 lipca 2007 biblioteka libgadu, odpowiedzialna za komunikacjê, oraz 
 klient ekg, rozwijane i rozpowszechniane s± oddzielnie. ¯eby zainstalowaæ
@@ -24,26 +24,22 @@ ekg, nale¿y najpierw zainstalowaæ libgadu.
 
 Je¿eli nie zainstalowa³e¶ libgadu systemowo (tylko np. w katalogu 
 domowym), to przed wykonaniem ./configure w katalogu ekg musisz 
-podaæ ¶cie¿kê do plików nag³ówkowych oraz biblioteki libgadu 
-eksportuj±c odpowiednie zmienne. Przyk³ad dla pow³oki bash:
+podaæ ¶cie¿kê do plików nag³ówkowych oraz biblioteki libgadu:
 
-export CFLAGS=-I¶cie¿ka-do-include
-export LDFLAGS=-L¶cie¿ka-do-lib
-./configure
+./configure "CFLAGS=-I ¶cie¿ka_do_include" "LDFLAGS=-L ¶cie¿ka_do_lib"
 
 Przyk³adowo:
 
-export CFLAGS=-I/home/user/libgadu/include
-export LDFLAGS=-L/home/user/libgadu/lib
+./configure "CFLAGS=-I $HOME/libgadu/include" "LDFLAGS=-L $HOME/libgadu/lib"
 
 Ponadto przed uruchomieniem ekg bêdzie potrzebne ustawienie ¶cie¿ki 
 dla loadera:
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:¶cie¿ka-do-lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:¶cie¿ka_do_lib
 
 Przyk³adowo:
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/libgadu/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/libgadu/lib
 
 Najlepiej wstawiæ t± linijkê do .bashrc lub odpowiedniego pliku 
 uruchamianego przez pow³okê przy starcie (w zale¿no¶ci od pow³oki 
