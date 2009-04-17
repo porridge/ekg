@@ -1968,6 +1968,10 @@ COMMAND(cmd_list)
 				ver = "7.6 (build 1688 lub nowszy)";
 			if (v == 0x2a)
 				ver = "7.7 (build 3315 lub nowszy)";
+			if (v == 0x2d)
+				ver = "Nowe Gadu-Gadu (build 4881 lub nowszy)";
+			if (v == 0x2e)
+				ver = "Nowe Gadu-Gadu (build 8283 lub nowszy)";
 
 			if (ver)
 				printq("user_info_version", ver);
