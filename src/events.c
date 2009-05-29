@@ -826,6 +826,10 @@ void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_
 		{ GG_STATUS_AVAIL_DESCR, EVENT_AVAIL, "avail", "status_avail_descr" },
 		{ GG_STATUS_BUSY, EVENT_AWAY, "busy", "status_busy" },
 		{ GG_STATUS_BUSY_DESCR, EVENT_AWAY, "busy", "status_busy_descr" },
+		{ GG_STATUS_DND, EVENT_DND, "dnd", "status_dnd" },
+		{ GG_STATUS_DND_DESCR, EVENT_DND, "dnd", "status_dnd_descr" },
+		{ GG_STATUS_FFC, EVENT_FFC, "ffc", "status_ffc" },
+		{ GG_STATUS_FFC_DESCR, EVENT_FFC, "ffc", "status_ffc_descr" },
 		{ GG_STATUS_INVISIBLE, EVENT_INVISIBLE, "invisible", "status_invisible" },
 		{ GG_STATUS_INVISIBLE_DESCR, EVENT_INVISIBLE, "invisible", "status_invisible_descr" },
 		{ GG_STATUS_NOT_AVAIL, EVENT_NOT_AVAIL, "notavail", "status_not_avail" },
@@ -2964,6 +2968,14 @@ void handle_search50(struct gg_event *e)
 			case GG_STATUS_BUSY:
 			case GG_STATUS_BUSY_DESCR:
 				active = format_string(format_find(__format("_busy")), (__firstname) ? __firstname : nickname);
+				break;
+			case GG_STATUS_DND:
+			case GG_STATUS_DND_DESCR:
+				active = format_string(format_find(__format("_dnd")), (__firstname) ? __firstname : nickname);
+				break;
+			case GG_STATUS_FFC:
+			case GG_STATUS_FFC_DESCR:
+				active = format_string(format_find(__format("_ffc")), (__firstname) ? __firstname : nickname);
 				break;
 			case GG_STATUS_INVISIBLE:
 			case GG_STATUS_INVISIBLE_DESCR:

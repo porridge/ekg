@@ -127,6 +127,8 @@ void variable_init()
 #endif
 	variable_add("away_reason", "ar", VAR_STR, 1, &config_away_reason, changed_xxx_reason, NULL, NULL);
 	variable_add("back_reason", "br", VAR_STR, 1, &config_back_reason, changed_xxx_reason, NULL, NULL);
+	variable_add("ffc_reason", "fr", VAR_STR, 1, &config_ffc_reason, changed_xxx_reason, NULL, NULL);
+	variable_add("dnd_reason", "dR", VAR_STR, 1, &config_dnd_reason, changed_xxx_reason, NULL, NULL);
 #ifdef WITH_UI_NCURSES
 	if (ui_init == ui_ncurses_init) {
 		variable_add("backlog_overlap", "bo", VAR_INT, 1, &config_backlog_overlap, NULL, NULL, NULL);

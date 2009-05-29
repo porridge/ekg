@@ -70,9 +70,11 @@ enum event_t {
 	EVENT_DISCONNECTED = TOGGLE_BIT(23),
 	EVENT_CONNECTIONLOST = TOGGLE_BIT(24),
 	EVENT_IMAGE = TOGGLE_BIT(25),
+	EVENT_DND = TOGGLE_BIT(26),
+	EVENT_FFC = TOGGLE_BIT(27),
 
-	EVENT_ALL = TOGGLE_BIT(26) - 1,
-	INACTIVE_EVENT = TOGGLE_BIT(26)
+	EVENT_ALL = TOGGLE_BIT(28) - 1,
+	INACTIVE_EVENT = TOGGLE_BIT(28)
 };
 
 struct event_label {
@@ -234,6 +236,8 @@ char *config_aspell_lang;
 char *config_aspell_encoding;
 #endif
 char *config_back_reason;
+char *config_ffc_reason;
+char *config_dnd_reason;
 int config_beep;
 int config_beep_msg;
 int config_beep_chat;
