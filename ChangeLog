@@ -4,6 +4,10 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
+// 2009-05-29
+
+- poprawienie buga z pobieraniem userlisty (Dominik Bia³y/g)
+
 // 2009-04-17
 
 - dodanie dwóch buildów nowego gg (nie jestem pewien czy powinno nazywaæ siê 
