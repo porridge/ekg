@@ -46,6 +46,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include <gtk/gtk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gdk-pixbuf/gdk-pixdata.h>
 #include <gtk/gtkstock.h>
