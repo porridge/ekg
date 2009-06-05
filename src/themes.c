@@ -964,9 +964,9 @@ void theme_init()
 	format_add("list_busy", "%> %1 %G(zajêt%@2)%n %b%3:%4%n\n", 1);
 	format_add("list_busy_descr", "%> %1 %G(zajêt%@2: %n%5%G)%n %b%3:%4%n\n", 1);
 	format_add("list_ffc", "%> %1 %y(poGGadaj ze mn±)%n %b%3:%4%n\n", 1);
-	format_add("list_ffc_descr", "%> %1 %y(poGGadaj ze mn±: %n%5%Y)%n %b%3:%4%n\n", 1);
+	format_add("list_ffc_descr", "%> %1 %y(poGGadaj ze mn±: %n%5%y)%n %b%3:%4%n\n", 1);
 	format_add("list_dnd", "%> %1 %g(nie przeszkadzaæ)%n %b%3:%4%n\n", 1);
-	format_add("list_dnd_descr", "%> %1 %g(nie przeszkadzaæ: %n%5%G)%n %b%3:%4%n\n", 1);
+	format_add("list_dnd_descr", "%> %1 %g(nie przeszkadzaæ: %n%5%g)%n %b%3:%4%n\n", 1);
 	format_add("list_not_avail", "%> %1 %r(niedostêpn%@2)%n\n", 1);
 	format_add("list_not_avail_descr", "%> %1 %r(niedostêpn%@2: %n%5%r)%n\n", 1);
 	format_add("list_invisible", "%> %1 %c(niewidoczn%@2)%n %b%3:%4%n\n", 1);
