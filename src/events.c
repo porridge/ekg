@@ -1347,9 +1347,6 @@ void handle_success(struct gg_event *e)
 
 	hide_notavail = 1;
 	 
-	/* ustawiamy swój status */
-	change_status(config_status, config_reason, 2);
-
 	update_status();
 	update_status_myip();
 
