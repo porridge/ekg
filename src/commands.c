@@ -1831,6 +1831,7 @@ COMMAND(cmd_list)
 	list_t l;
 	int count = 0, show_all = 1, show_busy = 0, show_active = 0, show_group_inverted = 0;
 	int show_inactive = 0, show_invisible = 0, show_descr = 0, show_blocked = 0, show_offline = 0, j;
+	int show_ffc = 0, show_dnd = 0;
 	char **argv = NULL, *show_group = NULL, *ip_str;
 	const char *tmp;
 	int params_null = 0;
@@ -2255,6 +2256,16 @@ err:
 				show_busy = 1;
 			}
 			
+			if (match_arg(argv[i], 'f', "ffc", 2)) {
+				show_all = 0;
+				show_ffc = 1;
+			}
+			
+			if (match_arg(argv[i], 'D', "dnd", 2)) {
+				show_all = 0;
+				show_dnd = 1;
+			}
+			
 			if (match_arg(argv[i], 'I', "invisible", 2)) {
 				show_all = 0;
 				show_invisible = 1;
@@ -2319,10 +2330,16 @@ err:
 
 		show = show_all;
 
-		if (show_busy && GG_S_B(u->status))
+		if (show_busy && GG_S_B(u->status) && !GG_S_DD(u->status))
 			show = 1;
 
-		if (show_active && GG_S_A(u->status))
+		if (show_ffc && GG_S_FF(u->status))
+			show = 1;
+
+		if (show_dnd && GG_S_DD(u->status))
+			show = 1;
+
+		if (show_active && GG_S_A(u->status) && !GG_S_FF(u->status))
 			show = 1;
 
 		if (show_inactive && GG_S_NA(u->status))
@@ -6631,6 +6648,8 @@ void command_init()
 	  "Wy¶wietlanie osób o podanym stanie \"list [-a|-b|-i|-I|-B|-d|-m|-o]\":\n"
 	  "  -a, --active           dostêpne\n"
 	  "  -b, --busy             zajête\n"
+	  "  -f, --ffc              chc±ce poGGadaæ\n"
+	  "  -D, --dnd              nie chc±ce, ¿eby im przeszkadzano\n"
 	  "  -i, --inactive         niedostêpne\n"
 	  "  -I, --invisible        niewidoczne\n"
 	  "  -B, --blocked          blokuj±ce nas\n"
