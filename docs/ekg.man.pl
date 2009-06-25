@@ -31,6 +31,9 @@ konfiguracjami.
 .BI \-c\ plik\ [\-\-control-pipe\ plik]
 Tworzy nazwany potok (ang. named pipe) umo¿liwiaj±cy sterowanie klientem.
 .TP
+.BI \-o\ plik\ [\-\-no-pipe]
+Nie tworzy nazwanego potoku.
+.TP
 .BI \-n\ [\-\-no-auto]
 Nie ³±cz siê automagicznie. Po uruchomieniu nie ³±czy siê automatycznie 
 z serwerami gg. 
@@ -45,6 +48,12 @@ Po po³±czeniu zmienia stan na ,,zajêty''.
 .BI \-b\ [\-\-back[=opis]]
 Po po³±czeniu zmienia stan na ,,dostêpny''.
 .TP 
+.BI \-F\ [\-\-ffc[=opis]]
+Po po³±czeniu zmienia stan na ,,poGGadaj ze mn±''.
+.TP
+.BI \-d\ [\-\-dnd[=opis]]
+Po po³±czeniu zmienia stan na ,,nie przeszkadzaæ''.
+.TP
 .BI \-i\ [\-\-invisible[=opis]]
 Po po³±czeniu zmienia stan na ,,niewidoczny''.
 .TP

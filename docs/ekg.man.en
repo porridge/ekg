@@ -31,6 +31,9 @@ Loads theme from the specified file.
 .BI \-c\ file\ [\-\-control-pipe\ file]
 Creates a named pipe that can be used to control the client.
 .TP
+.BI \-o\ [\-\-no-pipe]
+Disables named pipe creation.
+.TP
 .BI \-n\ [\-\-no-auto]
 Don't connect automagically. After starting program won't automatically 
 connect to the gg servers. 
@@ -44,6 +47,12 @@ After connecting sets the status to "away".
 .TP
 .BI \-b\ [\-\-back[=description]]
 After connecting sets the status to "back".
+.TP
+.BI \-F\ [\-\-ffc[=description]]
+After connecting sets the status to "free for chat".
+.TP
+.BI \-d\ [\-\-dnd[=description]]
+After connecting sets the status to "do not disturb".
 .TP
 .BI \-i\ [\-\-invisible[=description]]
 After connecting sets the status to "invisible".
