@@ -1396,6 +1396,7 @@ void ekg_connect()
 #endif
 	p.protocol_version = config_protocol;
 	p.last_sysmsg = config_last_sysmsg;
+	p.protocol_features = GG_FEATURE_STATUS80 | GG_FEATURE_DND_FFC;	/* bez GG_FEATURE_MSG80 */
 
 	if (config_server) {
 		char *server, *sserver, *tmp, **servers = array_make(config_server, ",; ", 0, 1, 0);
