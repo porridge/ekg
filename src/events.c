@@ -845,6 +845,9 @@ void handle_common(uin_t uin, int status, const char *idescr, int dtime, uint32_
 	list_t l;
 #endif
 
+	/* w gg 8.0 status ma czasami maske 0x4000, usuwamy */
+	status = GG_S(status);
+
 	/* nie pokazujemy nieznajomych, chyba ze display_notify & 4 */
 	if (!(u = userlist_find(uin, NULL))) {
 		if (!(config_display_notify & 4))
@@ -1344,9 +1347,6 @@ void handle_success(struct gg_event *e)
 
 	hide_notavail = 1;
 	 
-	/* ustawiamy swój status */
-	change_status(config_status, config_reason, 2);
-
 	update_status();
 	update_status_myip();
 

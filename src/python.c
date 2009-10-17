@@ -486,7 +486,8 @@ int python_load(const char *name, int quiet)
 				}
 
 				Py_XDECREF(result);
-			}
+			} else
+				PyErr_Print();
 		}
 
 		Py_XDECREF(init);

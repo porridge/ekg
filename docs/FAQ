@@ -124,4 +124,9 @@ A: Wydaj komendê ,,/private on''.
 Q: Na mojej li¶cie kontaktów nie widzê osób niedostêpnych. Co mam zrobiæ?
 A: ,,/set contacts_options order=01234''.
 
+Q: Mam najnowsze ekg (current) z /dnd i /ffc ale gdy kto¶ zmienia stan na "poGGadaj 
+   ze mn±" to widzê ¿e zmieni³ na dostêpny, a gdy na "nie przeszkadzaæ" - zajêty.
+A: Wpisz ,,/set protocol 0x2E''. Jest to konieczne do czasu wydania nowego stabilnego 
+   libgadu.
+
 $Id$

@@ -2295,6 +2295,8 @@ static void update_statusbar(int commit)
 	}
 
 	__add_format("debug", (!window_current->id), "");
+	__add_format("ffc", (sess && sess->state == GG_STATE_CONNECTED && GG_S_FF(config_status)), "");
+	__add_format("dnd", (sess && sess->state == GG_STATE_CONNECTED && GG_S_DD(config_status)), "");
 	__add_format("away", (sess && sess->state == GG_STATE_CONNECTED && GG_S_B(config_status)), "");
 	__add_format("busy", (sess && sess->state == GG_STATE_CONNECTED && GG_S_B(config_status)), "");
 	__add_format("avail", (sess && sess->state == GG_STATE_CONNECTED && GG_S_A(config_status)), "");
@@ -2303,6 +2305,8 @@ static void update_statusbar(int commit)
 	__add_format("more", (window_current->more), "");
 
 	__add_format("query_descr", (q && GG_S_D(q->status)), q->descr);
+	__add_format("query_ffc", (q && GG_S_FF(q->status)), "");
+	__add_format("query_dnd", (q && GG_S_DD(q->status)), "");
 	__add_format("query_away", (q && GG_S_B(q->status)), "");
 	__add_format("query_busy", (q && GG_S_B(q->status)), "");
 	__add_format("query_avail", (q && GG_S_A(q->status)), "");

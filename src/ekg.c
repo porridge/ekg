@@ -1205,7 +1205,7 @@ int main(int argc, char **argv)
 	sa.sa_handler = handle_sigusr2;
 	sigaction(SIGUSR2, &sa, NULL);
 
-	while ((c = getopt_long(argc, argv, "b::a::i::pdnc:f:hI:ot:u:vN", ekg_options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "b::a::i::F::d::pnc:f:hI:ot:u:vN", ekg_options, NULL)) != -1) {
 		switch (c) {
 			case 'b':
 				if (!optarg && argv[optind] && argv[optind][0] != '-')
