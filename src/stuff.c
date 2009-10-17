@@ -157,6 +157,8 @@ char *home_dir = NULL;
 char *config_quit_reason = NULL;
 char *config_away_reason = NULL;
 char *config_back_reason = NULL;
+char *config_ffc_reason = NULL;
+char *config_dnd_reason = NULL;
 int config_random_reason = 0;
 #ifdef HAVE_REGEX_H
 int config_regex_flags = 0;
@@ -912,6 +914,10 @@ void changed_xxx_reason(const char *var)
 		tmp = config_away_reason;
 	if (!strcmp(var, "back_reason"))
 		tmp = config_back_reason;
+	if (!strcmp(var, "dnd_reason"))
+		tmp = config_dnd_reason;
+	if (!strcmp(var, "ffc_reason"))
+		tmp = config_ffc_reason;
 	if (!strcmp(var, "quit_reason"))
 		tmp = config_quit_reason;
 
@@ -3051,6 +3057,28 @@ void change_status(int status, const char *xarg, int autom)
 			auto_format = "auto_back";
 			auto_format_descr = "auto_back_descr";
 			break;
+		case GG_STATUS_DND:
+		case GG_STATUS_DND_DESCR:
+			status_descr = GG_STATUS_DND_DESCR;
+			random_mask = 4;
+			filename = "dnd.reasons";
+			config_x_reason = config_dnd_reason;
+			format = "dnd";
+			format_descr = "dnd_descr";
+			auto_format = "auto_dnd";
+			auto_format_descr = "auto_dnd_descr";
+			break;
+		case GG_STATUS_FFC:
+		case GG_STATUS_FFC_DESCR:
+			status_descr = GG_STATUS_FFC_DESCR;
+			random_mask = 4;
+			filename = "ffc.reasons";
+			config_x_reason = config_ffc_reason;
+			format = "ffc";
+			format_descr = "ffc_descr";
+			auto_format = "auto_ffc";
+			auto_format_descr = "auto_ffc_descr";
+			break;
 		case GG_STATUS_INVISIBLE:
 		case GG_STATUS_INVISIBLE_DESCR:
 			status_descr = GG_STATUS_INVISIBLE_DESCR;
@@ -3209,6 +3237,18 @@ const char *ekg_status_label(int status, const char *prefix)
 			break;
 		case GG_STATUS_BUSY_DESCR:
 			label = "busy_descr";
+			break;
+		case GG_STATUS_FFC:
+			label = "ffc";
+			break;
+		case GG_STATUS_FFC_DESCR:
+			label = "ffc_descr";
+			break;
+		case GG_STATUS_DND:
+			label = "dnd";
+			break;
+		case GG_STATUS_DND_DESCR:
+			label = "dnd_descr";
 			break;
 		case GG_STATUS_INVISIBLE:
 			label = "invisible";

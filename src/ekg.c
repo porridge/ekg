@@ -1128,6 +1128,8 @@ int main(int argc, char **argv)
 	struct option ekg_options[] = {
 		{ "back", optional_argument, 0, 'b' },
 		{ "away", optional_argument, 0, 'a' },
+		{ "ffc", optional_argument, 0, 'F' },
+		{ "dnd", optional_argument, 0, 'd' },
 		{ "invisible", optional_argument, 0, 'i' },
 		{ "private", no_argument, 0, 'p' },
 		{ "no-auto", no_argument, 0, 'n' },
@@ -1221,6 +1223,22 @@ int main(int argc, char **argv)
 				xfree(new_reason);
 				new_reason = xstrdup(optarg);
 			        break;
+			case 'F':
+				if (!optarg && argv[optind] && argv[optind][0] != '-')
+					optarg = argv[optind++];
+
+				new_status = (optarg) ? GG_STATUS_FFC_DESCR : GG_STATUS_FFC;
+				xfree(new_reason);
+				new_reason = xstrdup(optarg);
+			        break;
+			case 'd':
+				if (!optarg && argv[optind] && argv[optind][0] != '-')
+					optarg = argv[optind++];
+
+				new_status = (optarg) ? GG_STATUS_DND_DESCR : GG_STATUS_DND;
+				xfree(new_reason);
+				new_reason = xstrdup(optarg);
+			        break;
 			case 'i':
 				if (!optarg && argv[optind] && argv[optind][0] != '-')
 					optarg = argv[optind++];
@@ -1249,6 +1267,8 @@ int main(int argc, char **argv)
 "  -n, --no-auto              nie ³±czy siê automatycznie z serwerem\n"
 "  -a, --away[=OPIS]          domy¶lnie zmienia stan na ,,zajêty''\n"
 "  -b, --back[=OPIS]          domy¶lnie zmienia stan na ,,dostêpny''\n"
+"  -F, --ffc[=OPIS]           domy¶lnie zmienia stan na ,,poGGadaj ze mn±''\n"
+"  -d, --dnd[=OPIS]           domy¶lnie zmienia stan na ,,nie przeszkadzaæ''\n"
 "  -i, --invisible[=OPIS]     domy¶lnie zmienia stan na ,,niewidoczny''\n"
 "  -p, --private              domy¶lnie ustawia tryb ,,tylko dla znajomych''\n"
 "  -v, --version              wy¶wietla wersje programu i wychodzi\n"

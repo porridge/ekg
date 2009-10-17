@@ -4,6 +4,34 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
+// 2009-05-29
+
+- poprawienie buga z pobieraniem userlisty (Dominik Bia³y/g)
+- nowe opisy z libgadu: poGGadaj ze mn± i nie przeszkadzaæ (gophi)
+
+// 2009-04-17
+
+- dodanie dwóch buildów nowego gg (nie jestem pewien czy powinno nazywaæ siê 
+  "nowe gadu-gadu", ale skoro gg samo tak nazywa ten produkt to chyba tak...) 
+  (darkjames/g)
+
+// 2008-12-16
+
+- poprawki w dokumentacji (zigi/g)
+
+// 2008-12-07
+
+- poprawienie obs³ugi eventów disconnected i connectionlost (gophi)
+
+// 2008-09-09
+
+- poprawienie poprawki (gophi)
+
+// 2008-09-08
+
+- poprawienie alt-a przy ró¿nych typach aktywno¶ci okienek (gophi)
+- poprawienie changeloga (Kosma/g)
+
 // 2008-07-06
 
 - d³ugo oczekiwane rozró¿nianie typu aktywno¶ci w okienku (darkjames/g)

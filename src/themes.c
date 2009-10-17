@@ -908,6 +908,10 @@ void theme_init()
 	format_add("away_descr", "%> Zmieniono stan na zajêty: %T%1%n%2\n", 1);
 	format_add("back", "%> Zmieniono stan na dostêpny\n", 1);
 	format_add("back_descr", "%> Zmieniono stan na dostêpny: %T%1%n%2%n\n", 1);
+	format_add("dnd", "%> Zmieniono stan na nie przeszkadzaæ\n", 1);
+	format_add("dnd_descr", "%> Zmieniono stan na nie przeszkadzaæ: %T%1%n%2%n\n", 1);
+	format_add("ffc", "%> Zmieniono stan na poGGadaj ze mn±\n", 1);
+	format_add("ffc_descr", "%> Zmieniono stan na poGGadaj ze mn±: %T%1%n%2%n\n", 1);
 	format_add("invisible", "%> Zmieniono stan na niewidoczny\n", 1);
 	format_add("invisible_descr", "%> Zmieniono stan na niewidoczny: %T%1%n%2\n", 1);
 	format_add("private_mode_is_on", "%> Tryb ,,tylko dla znajomych'' jest w³±czony\n", 1);
@@ -953,6 +957,10 @@ void theme_init()
 	format_add("list_avail_descr", "%> %1 %Y(dostêpn%@2: %n%5%Y)%n %b%3:%4%n\n", 1);
 	format_add("list_busy", "%> %1 %G(zajêt%@2)%n %b%3:%4%n\n", 1);
 	format_add("list_busy_descr", "%> %1 %G(zajêt%@2: %n%5%G)%n %b%3:%4%n\n", 1);
+	format_add("list_ffc", "%> %1 %y(poGGadaj ze mn±)%n %b%3:%4%n\n", 1);
+	format_add("list_ffc_descr", "%> %1 %y(poGGadaj ze mn±: %n%5%Y)%n %b%3:%4%n\n", 1);
+	format_add("list_dnd", "%> %1 %g(nie przeszkadzaæ)%n %b%3:%4%n\n", 1);
+	format_add("list_dnd_descr", "%> %1 %g(nie przeszkadzaæ: %n%5%G)%n %b%3:%4%n\n", 1);
 	format_add("list_not_avail", "%> %1 %r(niedostêpn%@2)%n\n", 1);
 	format_add("list_not_avail_descr", "%> %1 %r(niedostêpn%@2: %n%5%r)%n\n", 1);
 	format_add("list_invisible", "%> %1 %c(niewidoczn%@2)%n %b%3:%4%n\n", 1);
@@ -978,6 +986,16 @@ void theme_init()
 	format_add("contacts_busy_descr", "%Ki%G%1%n", 1);
 	format_add("contacts_busy_descr_full", "%Ki%G%1%n %2", 1);
 	format_add("contacts_busy_footer", "", 1);
+	format_add("contacts_ffc_header", "", 1);
+	format_add("contacts_ffc", " %Y%1%n", 1);
+	format_add("contacts_ffc_descr", "%Ki%y%1%n", 1);
+	format_add("contacts_ffc_descr_full", "%Ki%y%1%n %2", 1);
+	format_add("contacts_ffc_footer", "", 1);
+	format_add("contacts_dnd_header", "", 1);
+	format_add("contacts_dnd", " %G%1%n", 1);
+	format_add("contacts_dnd_descr", "%Ki%g%1%n", 1);
+	format_add("contacts_dnd_descr_full", "%Ki%g%1%n %2", 1);
+	format_add("contacts_dnd_footer", "", 1);
 	format_add("contacts_not_avail_header", "", 1);
 	format_add("contacts_not_avail", " %r%1%n", 1);
 	format_add("contacts_not_avail_descr", "%Ki%r%1%n", 1);
@@ -1060,6 +1078,10 @@ void theme_init()
 	format_add("status_avail_descr", "%> %1 jest dostêpn%@2: %T%3%n\n", 1);
 	format_add("status_busy", "%> %1 jest zajêt%@2\n", 1);
 	format_add("status_busy_descr", "%> %1 jest zajêt%@2: %T%3%n\n", 1);
+	format_add("status_dnd", "%> %1 jest nie przeszkadzaæ\n", 1);
+	format_add("status_dnd_descr", "%> %1 jest nie przeszkadzaæ: %T%3%n\n", 1);
+	format_add("status_ffc", "%> %1 chce poGGadaæ\n", 1);
+	format_add("status_ffc_descr", "%> %1 chce poGGadaæ: %T%3%n\n", 1);
 	format_add("status_not_avail", "%> %1 jest niedostêpn%@2\n", 1);
 	format_add("status_not_avail_descr", "%> %1 jest niedostêpn%@2: %T%3%n\n", 1);
 	format_add("status_invisible", "%> %1 jest niewidoczn%@2\n", 1);
@@ -1070,6 +1092,10 @@ void theme_init()
 	format_add("auto_away_descr", "%> Automagicznie zmieniono stan na zajêty po %1 nieaktywno¶ci: %T%2%n%3\n", 1);
 	format_add("auto_back", "%> Automagicznie zmieniono stan na dostêpny\n", 1);
 	format_add("auto_back_descr", "%> Automagicznie zmieniono stan na dostêpny: %T%2%n%3\n", 1);
+	format_add("auto_dnd", "%> Automagicznie zmieniono stan na nie przeszkadzaæ\n", 1);
+	format_add("auto_dnd_descr", "%> Automagicznie zmieniono stan na nie przeszkadzaæ: %T%2%n%3\n", 1);
+	format_add("auto_ffc", "%> Automagicznie zmieniono stan na poGGadaj ze mn±\n", 1);
+	format_add("auto_ffc_descr", "%> Automagicznie zmieniono stan na poGGadaj ze mn±: %T%2%n%3\n", 1);
 
 	/* po³±czenie z serwerem */
 	format_add("connecting", "%> £±czê siê z serwerem...\n", 1);
@@ -1222,6 +1248,10 @@ void theme_init()
 	format_add("user_info_avail_descr", "%Ydostêpn%@1%n (%2)", 1);
 	format_add("user_info_busy", "%Gzajêt%@1%n", 1);
 	format_add("user_info_busy_descr", "%Gzajêt%@1%n (%2)", 1);
+	format_add("user_info_ffc", "%ypoGGadaj ze mn±%n", 1);
+	format_add("user_info_ffc_descr", "%ypoGGadaj ze mn±%n (%2)", 1);
+	format_add("user_info_dnd", "%gnie przeszkadzaæ%n", 1);
+	format_add("user_info_dnd_descr", "%gnie przeszkadzaæ%n (%2)", 1);
 	format_add("user_info_not_avail", "%rniedostêpn%@1%n", 1);
 	format_add("user_info_not_avail_descr", "%rniedostêpn%@1%n (%2)", 1);
 	format_add("user_info_invisible", "%cniewidoczn%@1%n", 1);
@@ -1246,6 +1276,10 @@ void theme_init()
 	format_add("show_status_avail_descr", "%Ydostêpny%n (%T%1%n%2)", 1);
 	format_add("show_status_busy", "%Gzajêty%n", 1);
 	format_add("show_status_busy_descr", "%Gzajêty%n (%T%1%n%2)", 1);
+	format_add("show_status_dnd", "%gnie przeszkadzaæ%n", 1);
+	format_add("show_status_dnd_descr", "%gnie przeszkadzaæ%n (%T%1%n%2)", 1);
+	format_add("show_status_ffc", "%ypoGGadaj ze mn±%n", 1);
+	format_add("show_status_ffc_descr", "%ypoGGadaj ze mn±%n (%T%1%n%2)", 1);
 	format_add("show_status_invisible", "%cniewidoczny%n", 1);
 	format_add("show_status_invisible_descr", "%cniewidoczny%n (%T%1%n%2)", 1);
 	format_add("show_status_not_avail", "%rniedostêpny%n", 1);
@@ -1363,6 +1397,10 @@ void theme_init()
 	format_add("quick_list_avail,speech", "%1 jest dostêpny, ", 1);
 	format_add("quick_list_busy", " %G%1%n", 1);
 	format_add("quick_list_busy,speech", "%1 jest zajêty, ", 1);
+	format_add("quick_list_ffc", " %y%1%n", 1);
+	format_add("quick_list_ffc,speech", "%1 jest poggadaj ze mn±, ", 1);
+	format_add("quick_list_dnd", " %g%1%n", 1);
+	format_add("quick_list_dnd,speech", "%1 jest nie przeszkadzaæ, ", 1);
 	format_add("quick_list_invisible", " %c%1%n", 1);
 
 	/* window */

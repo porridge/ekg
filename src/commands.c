@@ -466,6 +466,12 @@ COMMAND(cmd_away)
 		sms_away_free();
 	}
 
+	if (!strcasecmp(name, "ffc"))
+		change_status(GG_STATUS_FFC, params[0], q);
+
+	if (!strcasecmp(name, "dnd"))
+		change_status(GG_STATUS_DND, params[0], q);
+
 	if (!strcasecmp(name, "private")) {
 		int tmp;
 
@@ -1968,6 +1974,10 @@ COMMAND(cmd_list)
 				ver = "7.6 (build 1688 lub nowszy)";
 			if (v == 0x2a)
 				ver = "7.7 (build 3315 lub nowszy)";
+			if (v == 0x2d)
+				ver = "Nowe Gadu-Gadu (build 4881 lub nowszy)";
+			if (v == 0x2e)
+				ver = "Nowe Gadu-Gadu (build 8283 lub nowszy)";
 
 			if (ver)
 				printq("user_info_version", ver);
@@ -4826,6 +4836,14 @@ int binding_quick_list(int a, int b)
 			case GG_STATUS_BUSY_DESCR:
 				format = format_find("quick_list_busy");
 				break;
+			case GG_STATUS_FFC:
+			case GG_STATUS_FFC_DESCR:
+				format = format_find("quick_list_ffc");
+				break;
+			case GG_STATUS_DND:
+			case GG_STATUS_DND_DESCR:
+				format = format_find("quick_list_dnd");
+				break;
 			case GG_STATUS_INVISIBLE:
 			case GG_STATUS_INVISIBLE_DESCR:
 				format = format_find("quick_list_invisible");
@@ -6434,6 +6452,15 @@ void command_init()
 	  "³±czyæ po okre¶lonym czasie.");
 	  
 	command_add
+	( "dnd", "r", cmd_away, 0,
+	  " [powód/-]", "zmienia stan na nie przeszkadzaæ",
+	  "\n"
+          "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie "
+	  "podano powodu, zostanie wylosowany z pliku %Tdnd.reasons%n. "
+	  "Podanie ,,%T-%n'' zamiast powodu spowoduje wyczyszczenie bez "
+	  "wzglêdu na ustawienia zmiennych.");
+
+	command_add
 	( "echo", "?", cmd_echo, 0,
 	  " [tekst]", "wy¶wietla podany tekst",
 	  "");
@@ -6455,6 +6482,15 @@ void command_init()
 	( "!", "?", cmd_exec, 0,
 	  " [opcje] <polecenie>", "synonim dla %Texec%n",
 	  "");
+
+	command_add
+	( "ffc", "r", cmd_away, 0,
+	  " [powód/-]", "zmienia stan na poGGadaj ze mn±",
+	  "\n"
+          "Je¶li w³±czona jest odpowiednia opcja %Trandom_reason%n i nie "
+	  "podano powodu, zostanie wylosowany z pliku %Tffc.reasons%n. "
+	  "Podanie ,,%T-%n'' zamiast powodu spowoduje wyczyszczenie bez "
+	  "wzglêdu na ustawienia zmiennych.");
 
 	command_add
 	( "find", "u", cmd_find, 0,
@@ -6623,7 +6659,7 @@ void command_init()
 	  " [-l, --list] [numer]         wy¶wietla listê zdarzeñ\n"
 	  "\n"
 	  "Dostêpne zdarzenia to:\n"
-	  "  - avail, away, notavail, invisible - zmiana stanu na podany (bez przypadku ,,online'')\n"
+	  "  - avail, away, notavail, dnd, ffc, invisible - zmiana stanu na podany (bez przypadku ,,online'')\n"
 	  "  - online - zmiana stanu z ,,niedostêpny'' na ,,dostêpny''\n"
 	  "  - descr - zmiana opisu\n"
 	  "  - blocked - zostali¶my zablokowani\n"

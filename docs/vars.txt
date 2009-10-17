@@ -441,6 +441,13 @@ display_transparent
 	mówi, czy w interfejsie ncurses t³o ma byæ przezroczyste. zmiany
 	odnios± skutek po ponownym uruchomieniu.
 
+dnd_reason
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	domy¶lny opis stanu nie przeszkadzaæ, ustawiany przy zmianie bez 
+	podania parametru.
+
 emoticons
 	typ: bool
 	domy¶lna warto¶æ: 1
@@ -477,6 +484,13 @@ events_delay
 	informacje o niedostêpno¶ci osób. Chodzi o to, aby nie traktowaæ
 	pocz±tkowych informacji o stanie osób po po³±czeniu jako zmianê
 	ich stanu.
+
+ffc_reason
+	typ: tekst
+	domy¶lna warto¶æ: brak
+
+	domy¶lny opis stanu poGGadaj ze mn±, ustawiany przy zmianie bez 
+	podania parametru.
 
 files_mode_config
 	typ: int

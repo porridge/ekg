@@ -215,7 +215,8 @@ int userlist_set(const char *contacts, int config)
 		struct userlist u;
 		char **entry, *uin;
 		int i, count;
-		
+		char *tmp;
+
 		memset(&u, 0, sizeof(u));
 			
 		if (buf[0] == '#' || (buf[0] == '/' && buf[1] == '/'))
@@ -260,22 +261,30 @@ int userlist_set(const char *contacts, int config)
 			}
 		}
 
-		u.first_name = xstrdup(entry[0]);
-		u.last_name = xstrdup(entry[1]);
-		u.nickname = xstrdup(entry[2]);
-		if (entry[3] && !valid_nick(entry[3]))
-			u.display = saprintf("_%s", entry[3]);
-		else
-			u.display = xstrdup(entry[3]);
-		u.mobile = xstrdup(entry[4]);
-		u.groups = group_init(entry[5]);
+		u.first_name = unescape(entry[0]);
+		u.last_name = unescape(entry[1]);
+		u.nickname = unescape(entry[2]);
+		u.display = unescape(entry[3]);
+		if (u.display && !valid_nick(u.display)) {
+			tmp = u.display;
+			u.display = saprintf("_%s", tmp);
+			free(tmp);
+		}
+		u.mobile = unescape(entry[4]);
+		tmp = unescape(entry[5]);
+		u.groups = group_init(tmp);
+		free(tmp);
 		u.status = GG_STATUS_NOT_AVAIL;
 
 		/* mamy adres e-mail? */
 		if (count > 7) {
-			u.email = xstrdup(entry[7]);
+			u.email = unescape(entry[7]);
 			if (count > 8)
-				u.foreign = saprintf(";%s", entry[8]);
+			{
+				tmp = unescape(entry[8]);
+				u.foreign = saprintf(";%s", tmp);
+				free(tmp);
+			}
 		}
 
 		array_free(entry);

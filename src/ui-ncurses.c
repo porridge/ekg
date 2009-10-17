@@ -5676,19 +5676,38 @@ static int ui_ncurses_event(const char *event, ...)
 
 			if (!strcasecmp(p1, "active")) {
 				list_t l;
-				int id = 0;
-		
+				int idlow = 0, idhigh = 0;
+
+				// w->act == 0 - brak aktywno¶ci
+				// w->act == 1 - aktywno¶æ ma³a
+				// w->act == 2 - aktywno¶æ du¿a
+
+				// przelatujemy przez wszystkie aktywno¶ci, zapisujemy ma³± 
+				// i du¿±. je¿eli by³a jaka¶ du¿a to wykorzystujemy du¿±, 
+				// je¿eli nie, to wykorzystujemy ma³±.
+
 				for (l = windows; l; l = l->next) {
 					struct window *w = l->data;
 
 					if (w->act && !w->floating && w->id) {
-						id = w->id;
-						break;
+						if (w->act == 1) {
+							if (!idlow)
+								idlow = w->id;
+						} else if (w->act == 2) {
+							if (!idhigh)
+								idhigh = w->id;
+						}
+
+						if (idlow && idhigh)
+							break;
 					}
 				}
 
-				if (id)
-					window_switch(id);
+				if (idhigh)
+					window_switch(idhigh);
+				else if (idlow)
+					window_switch(idlow);
+
 				goto cleanup;
 			}
 
