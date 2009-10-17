@@ -4,15 +4,13 @@ z nich dostaæ bêd± albo ignorowane, albo odpowied¼ mo¿e byæ nieprzyjemna.
 Zwykle im dana sprawa jest wy¿ej na li¶cie, tym wa¿niejsze jest jej
 rozwi±zanie.
 
-* biblioteka:
-  - komunikacja miêdzy klientami, bezpo¶rednie rozmowy,
-  - sniffn±æ rejestracjê konta, zmieni³a siê (Carol)
-
 * klient:
-  - po pierwszym wy¶wietleniu: 
-	 ::: Wiadomo¶æ do [...] najprawdopodobniej nie zosta³a...
-	ma siê pojawiaæ zamiast tego komunikatu jego skrócona wersja (joshua)
-  - po roz³±czeniu z serwerem nie aktualizowana jest lista kontaktów (x)
+  - dostosowanie do UTF-8 (wielu)
+  - poprawiæ wysy³anie d³ugich szyfrowanych wiadomo¶ci (co¶ siê zmieni³o i 
+    wiadomo¶æ jest dzielona na dwie, z czego druga nie jest ju¿ deszyfrowana, 
+    poza tym obcinanie za d³ugiej wiadomo¶ci przy wy¶wietlaniu kuleje - jest 
+    obcinana tak jakby nie by³a szyfrowana) (gophi)
+  - mo¿liwo¶æ bindowania myszy (gophi)
   - informacja o opisie w /find (scooty/w)
   - zawijanie linijek w wielolinijkowym (?)
   - wykrywanie niewidocznych jako opcja (wielu)
@@ -30,21 +28,14 @@ rozwi±zanie.
     zadañ w windowsach (w)
   - mo¿liwo¶æ blokowania terminala po d³u¿szym czasie nieaktywno¶ci (Gambler)
   - okienka oparte o kolejne wywo³ania xterma (fidor)
-  - obs³uga myszy (mateusza)
   - logowanie w³asnych statusów (ramzes)
-  - zapisywanie wielolinijkowego opisu (przy wyj¶ciu) (met)
   - /reload i wypisanie informacji o konieczno¶ci ponownego po³±czenia (zmienne 
     dotycz±ce dcc) (zigi)
   - przekierowanie wyniku komend do pliku, rozmowy itp.
   - /set ignoruj±cy wszystkie konferencje (rodion)
   - przegl±darka historii
   - zdarzenia ze spacjami w nazwie (ramzes)
-  - pluginy (jest w ogole sens?)
-  - /set nick zamiast dodawania siebie do listy (petros)
-  - "low priority" okienka, gdy zosta³o w nim wypisane co¶ innego ni¿ wiadomo¶æ 
-    (shog, tree)
   - potwierdzenia dostarczenia wiadomosci w konferencji w jej oknie (kip, jceel)
-  - /window swap (gamster)
   - wielolinijkowe /on i opisy - nie dzia³a zapis w konfigu
   - "19:37:22 -- autosaving userlist and config after 1989 seconds." (jaki¶ 
     overflow?)

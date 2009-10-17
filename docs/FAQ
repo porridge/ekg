@@ -12,10 +12,6 @@ A: Najprawdopodobniej nie masz narzêdzi i pakietów potrzebnych do
    C, narzêdzia takie jak make, install, bibliotekê ncurses i
    odpowiednie pliki nag³ówkowe.
 
-Q: ekg wygl±da jako¶ inaczej. Co zrobiæ, ¿eby wróciæ do poprzedniego?
-A: Uruchomiæ ,,./configure --disable-ui-ncurses'' potem ,,make clean''
-   i ,,make''.
-
 Q: Jak wys³aæ wiadomo¶æ do kogo¶ ze spacj± w nazwie?
 A: Wpisaæ nazwê w cudzys³owach. Niestety dope³nianie jeszcze nie dzia³a
    jak trzeba. ¯eby siê nie mêczyæ, mo¿na zmieniæ w li¶cie kontaktów jego
@@ -23,6 +19,14 @@ A: Wpisaæ nazwê w cudzys³owach. Niestety dope³nianie jeszcze nie dzia³a
  
 Q: Jak zarejestrowaæ nowego u¿ytkownika?
 A: U¿yæ polecenia ,,token'' i ,,register <email> <has³o> <token>''.
+
+Q: Kiedy zrobicie w ekg wsparcie dla UTF-8?
+A: Jest w planach. Póki co jest kilka obej¶æ:
+   - screen jednorazowo: Ctrl-A, dwukropek, encoding iso8859-2 utf-8, 
+     enter, Ctrl-L
+   - screen na sta³e: dopisanie 'bind i encoding iso8859-2 utf-8' do 
+     ~/.screenrc i ¿eby aktywowaæ: Ctrl-A i
+   - luit (zadzia³a w bashu): LANG=pl_PL luit ekg
 
 Q: Jak wys³aæ smsy?
 A: Patrz pierwsza odpowied¼. Jest opisane w dokumentacji.
@@ -47,7 +51,7 @@ A: Najwyra¼niej pad³ jeden z serwerów. Wpisz ,,set server 217.17.41.x'',
    gdzie x to warto¶æ od 82 do 89 i spróbuj po³±czyæ siê jeszcze raz.
 
 Q: Jak usun±æ zmienn±?
-A: ,,set -zmienna''
+A: ,,set -zmienna''.
 
 Q: ekg ¼le rozpoznaje p³eæ!
 A: Wpisz imiê do listy kontaktów. Wiêcej szczegó³ów w README.
@@ -67,7 +71,7 @@ A: Masz star± wersjê biblioteki ncurses. Zainstaluj nowsz± wersjê lub
    popro¶ o to administratora systemu.
 
 Q: Jak wy¶wietlaæ wiadomo¶ci, które wysy³am?
-A: /set display_sent 1
+A: ,,/set display_sent 1''.
 
 Q: Nie mam kolorów w ekg, co robiæ?
 A: Najprawdopodobniej masz ustawiony nieprawid³owy typ terminala. Spróbuj

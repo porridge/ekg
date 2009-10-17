@@ -4,6 +4,28 @@ oznacza, ¿e ,,nick'' jest pomys³odawc± lub podes³a³ patcha, a zrobi³
 to kto¶ oznaczony przez ,,x'' (w - wojtekka, s - speedy, a - arekm,
 d - drg, sz - szalik, del - deletek, g - gophi, p - porridge).
 
+// 2008-07-06
+
+- d³ugo oczekiwane rozró¿nianie typu aktywno¶ci w okienku (darkjames/g)
+
+// 2008-05-18
+
+- dodanie komunikatu o zamianie okien miejscami (Marcin Rybak/g)
+
+// 2008-05-18
+
+- dodanie /window swap (gamster,Marcin Rybak/g)
+
+// 2008-05-17
+
+- dopisanie do FAQ informacji na temat UTF-8 (demreath/g)
+- inne drobne aktualizacje FAQ (gophi)
+- kolejne informacje o UTF-8 (Kosma,porridge/g)
+
+// 2008-05-15
+
+- aktualizacja TODO (gophi)
+
 // 2008-04-21
 
 - aktualizacja odsy³acza do informacji o instalacji aspella (zigi/p)

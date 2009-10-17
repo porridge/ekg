@@ -1,7 +1,7 @@
 /* $Id$ */
 
 /*
- *  (C) Copyright 2002-2006 Wojtek Kaniewski <wojtekka@irc.pl>
+ *  (C) Copyright 2002-2008 Wojtek Kaniewski <wojtekka@irc.pl>
  *                          Wojtek Bojdo³ <wojboj@htcon.pl>
  *                          Pawe³ Maziarz <drg@infomex.pl>
  *			    Piotr Kupisiewicz <deli@rzepaknet.us>
@@ -1388,10 +1388,36 @@ crap:
 
 	w->last_act_time = cur_time;
 	if (w != window_current && !w->floating) {
-		if (!w->act) {
-			w->act = 1;
-			w->first_act_time = w->last_act_time;
+		// xxx brzydki hack - rozpoznawanie, czy okno jest rozmow±, 
+		// po separate
+
+		// w->act == 0 - brak aktywno¶ci
+		// w->act == 1 - aktywno¶æ ma³a
+		// w->act == 2 - aktywno¶æ du¿a
+
+		// w->act == 0, separate == 0 -> w->act = 1, aktualizujemy czas
+		// w->act == 0, separate == 1 -> w->act = 2, aktualizujemy czas
+		// w->act == 1, separate == 0 -> no-op
+		// w->act == 1, separate == 1 -> w->act = 2, aktualizujemy czas
+		// w->act == 2 -> no-op
+
+		switch (w->act) {
+			case 0:
+				w->act = separate ? 2 : 1;
+				w->first_act_time = w->last_act_time;
+				break;
+
+			case 1:
+				if (separate) {
+					w->act = 2;
+					w->first_act_time = w->last_act_time;
+				}
+				break;
+
+			default:
+				break;
 		}
+
 		if (!command_processing)
 			update_statusbar(0);
 	}
@@ -1870,9 +1896,6 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 			
 			continue;
 		}
-#undef __fgcolor
-#undef __bgcolor
-
 		if (*p != '{' && !config_display_color)
 			continue;
 
@@ -1889,6 +1912,8 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 			len = strlen(data[i].name);
 
 			if (!strncmp(p, data[i].name, len) && p[len] == '}') {
+				/* pozwoliæ wszêdzie? */
+				int percent_ok = !strcmp(data[i].name, "activity");	
 				char *text = data[i].text;
 				int j;
 
@@ -1897,19 +1922,45 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 					iso_to_ascii((unsigned char*) text);
 				}
 
-				for (j = 0; text && j < strlen(text); j++) {
-					if (text[j] != 10) {
-						waddch(w, (unsigned char) text[j]);
-						continue;
-					}
+				for (j = 0; text && text[j]; j++) {
+					if (text[j] == 10) {
+						wattrset(w, color_pair(COLOR_BLACK, 1, bgcolor));
+						waddch(w, '|');
+						wattrset(w, color_pair(fgcolor, bold, bgcolor));
+						x++;
+					} else if (text[j] == '%' && percent_ok) {
+						switch (text[++j]) {
+							__fgcolor('k', 'K', COLOR_BLACK);
+							__fgcolor('r', 'R', COLOR_RED);
+							__fgcolor('g', 'G', COLOR_GREEN);
+							__fgcolor('y', 'Y', COLOR_YELLOW);
+							__fgcolor('b', 'B', COLOR_BLUE);
+							__fgcolor('m', 'M', COLOR_MAGENTA);
+							__fgcolor('c', 'C', COLOR_CYAN);
+							__fgcolor('w', 'W', COLOR_WHITE);
+							__bgcolor('l', COLOR_BLACK);
+							__bgcolor('s', COLOR_RED);
+							__bgcolor('h', COLOR_GREEN);
+							__bgcolor('z', COLOR_YELLOW);
+							__bgcolor('e', COLOR_BLUE);
+							__bgcolor('q', COLOR_MAGENTA);
+							__bgcolor('d', COLOR_CYAN);
+							__bgcolor('x', COLOR_WHITE);
+							case 'n':
+								bgcolor = COLOR_BLUE;
+								fgcolor = COLOR_WHITE;
+								bold = 0;
+							break;
+						}
 
-					wattrset(w, color_pair(COLOR_BLACK, 1, bgcolor));
-					waddch(w, '|');
-					wattrset(w, color_pair(fgcolor, bold, bgcolor));
+						wattrset(w, color_pair(fgcolor, bold, bgcolor));
+					} else {
+						waddch(w, (unsigned char) text[j]);
+						x++;
+					}
 				}
 
 				p += len;
-				x += strlen(data[i].text);
 				
 				if (!config_display_pl_chars)
 					xfree(text);
@@ -1917,7 +1968,8 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 				goto next;
 			}
 		}
-
+#undef __fgcolor
+#undef __bgcolor
 		if (*p == '?') {
 			int neg = 0;
 
@@ -2230,7 +2282,8 @@ static void update_statusbar(int commit)
 
 			if (!first)
 				string_append_c(s, ',');
-			
+
+			string_append(s, (w->act == 2) ? "%W" : "%K");
 			string_append(s, itoa(w->id));
 			first = 0;
 			act = 1;
@@ -3585,7 +3638,7 @@ void python_generator(const char *text, int len)
 
 void window_generator(const char *text, int len)
 {
-	const char *words[] = { "new", "kill", "move", "next", "resize", "prev", "switch", "clear", "refresh", "list", "active", "last", "dump", NULL };
+	const char *words[] = { "new", "kill", "move", "next", "resize", "prev", "switch", "clear", "refresh", "list", "active", "last", "dump", "swap", NULL };
 	int i;
 
 	for (i = 0; words[i]; i++)
@@ -5894,6 +5947,77 @@ static int ui_ncurses_event(const char *event, ...)
 					printq("window_dump_error", p2);
 				else
 					printq("window_dump_done");
+
+				goto cleanup;
+			}
+
+			if (!strcasecmp(p1, "swap")) {
+				char **argv;
+				struct window *w[2] = {NULL, NULL};
+				struct window tmpwin;
+				int tmpid;
+				int i;
+
+				if (!p2) {
+					printq("not_enough_params", "window");
+					goto cleanup;
+				}
+
+				argv = array_make(p2, " ,", 2, 0, 0);
+
+				if (array_count(argv) < 2) {
+					printq("not_enough_params", "window");
+					array_free(argv);
+					goto cleanup;
+				}
+
+				for (i = 0; i < 2; ++i) {
+					list_t l;
+
+					for (l = windows; l; l = l->next) {
+						struct window *v = l->data;
+
+						if (v->id == atoi(argv[i])) {
+							w[i] = v;
+							break;
+						}
+					}
+				}
+
+				array_free(argv);
+
+				if (!w[0] || !w[1]) {
+					printq("window_noexist");
+					goto cleanup;
+				}
+
+				/* pozwalamy na zmiane okna statusu, to nie jest blad */
+
+				if (w[0] == w[1] || !w[0]->id || !w[1]->id || 
+				    (w[0]->target && (!strcasecmp(w[0]->target, "__contacts") || !strcasecmp(w[0]->target, "__debug"))) || 
+				    (w[1]->target && (!strcasecmp(w[1]->target, "__contacts") || !strcasecmp(w[1]->target, "__debug")))) {
+					printq("invalid_params", "window");
+					goto cleanup;
+				}
+
+				tmpid = w[0]->id;
+				w[0]->id = w[1]->id;
+				w[1]->id = tmpid;
+
+				/* podmiana takze zawartosci struktur zeby /window list dzialalo dobrze */
+
+				memcpy(&tmpwin, w[0], sizeof(struct window));
+				memcpy(w[0], w[1], sizeof(struct window));
+				memcpy(w[1], &tmpwin, sizeof(struct window));
+
+				/* jezeli jedno z zamienianych okien bylo oknem aktualnym to przelaczamy sie do niego */
+
+				if (window_current == w[0])
+					window_switch(w[1]->id);
+				else if (window_current == w[1])
+					window_switch(w[0]->id);
+
+				printq("window_swapped", itoa(w[0]->id), itoa(w[1]->id));
 
 				goto cleanup;
 			}
