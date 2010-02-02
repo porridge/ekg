@@ -993,12 +993,12 @@ void theme_init()
 	format_add("contacts_busy_descr_full", "%Ki%G%1%n %2", 1);
 	format_add("contacts_busy_footer", "", 1);
 	format_add("contacts_ffc_header", "", 1);
-	format_add("contacts_ffc", " %Y%1%n", 1);
+	format_add("contacts_ffc", " %y%1%n", 1);
 	format_add("contacts_ffc_descr", "%Ki%y%1%n", 1);
 	format_add("contacts_ffc_descr_full", "%Ki%y%1%n %2", 1);
 	format_add("contacts_ffc_footer", "", 1);
 	format_add("contacts_dnd_header", "", 1);
-	format_add("contacts_dnd", " %G%1%n", 1);
+	format_add("contacts_dnd", " %g%1%n", 1);
 	format_add("contacts_dnd_descr", "%Ki%g%1%n", 1);
 	format_add("contacts_dnd_descr_full", "%Ki%g%1%n %2", 1);
 	format_add("contacts_dnd_footer", "", 1);
