@@ -251,10 +251,10 @@ contacts_options
 	domy¶lna warto¶æ: brak
 
 	opcje listy kontaktów oddzielone przecinkiem lub spacj±. domy¶lne
-	ustawienia to ,,right, frame, margin=1, nowrap, nodescr, order=0123''.
+	ustawienia to ,,right, frame, margin=1, nowrap, nodescr, order=501623''.
 	mo¿liwe stany to: 0 - dostêpni, 1 - zajêci, 2 - niewidoczni, 3 -
-	blokuj±cy, 4 - niedostêpni). mo¿na pomin±æ niektóre stany -- nie
-	bêd± po prostu wy¶wietlane na li¶cie.
+	blokuj±cy, 4 - niedostêpni, 5 - poGGadaj ze mn±, 6 - nie przeszkadzaæ.
+	mo¿na pomin±æ niektóre stany -- nie bêd± po prostu wy¶wietlane na li¶cie.
 	
 	lista dostêpnych opcji:
 	- left, right, top, bottom - po³o¿enie listy kontaktów na ekranie,

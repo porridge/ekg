@@ -260,7 +260,7 @@ static int contacts_edge = WF_RIGHT;
 static int contacts_frame = WF_LEFT;
 static int contacts_descr = 0;
 static int contacts_wrap = 0;
-static int contacts_order[5] = { 0, 1, 2, 3, -1 };
+static int contacts_order[7] = { 5, 0, 1, 6, 2, 3, -1 };
 static int contacts_framecolor = 4;
 static int contacts_group_index = 0;
 static int contacts_count = 0;
@@ -1479,12 +1479,14 @@ static int contacts_update(struct window *w)
 	struct {
 		int status1, status2;
 		char *format, *format_descr, *format_descr_full, *format_header, *format_footer;
-	} table[5] = {
+	} table[7] = {
 		{ GG_STATUS_AVAIL, GG_STATUS_AVAIL_DESCR, "contacts_avail", "contacts_avail_descr", "contacts_avail_descr_full", "contacts_avail_header", "contacts_avail_footer" },
 		{ GG_STATUS_BUSY, GG_STATUS_BUSY_DESCR, "contacts_busy", "contacts_busy_descr", "contacts_busy_descr_full", "contacts_busy_header", "contacts_busy_footer" },
 		{ GG_STATUS_INVISIBLE, GG_STATUS_INVISIBLE_DESCR, "contacts_invisible", "contacts_invisible_descr", "contacts_invisible_descr_full", "contacts_invisible_header", "contacts_invisible_footer" },
 		{ GG_STATUS_BLOCKED, -1, "contacts_blocking", "contacts_blocking", "contacts_blocking", "contacts_blocking_header", "contacts_blocking_footer" },
 		{ GG_STATUS_NOT_AVAIL, GG_STATUS_NOT_AVAIL_DESCR, "contacts_not_avail", "contacts_not_avail_descr", "contacts_not_avail_descr_full", "contacts_not_avail_header", "contacts_not_avail_footer" },
+		{ GG_STATUS_FFC, GG_STATUS_FFC_DESCR, "contacts_ffc", "contacts_ffc_descr", "contacts_ffc_descr_full", "contacts_ffc_header", "contacts_ffc_footer" },
+		{ GG_STATUS_DND, GG_STATUS_DND_DESCR, "contacts_dnd", "contacts_dnd_descr", "contacts_dnd_descr_full", "contacts_dnd_header", "contacts_dnd_footer" },
 	};
 	const char *header = NULL, *footer = NULL;
 	char *group = NULL;
@@ -1538,12 +1540,12 @@ static int contacts_update(struct window *w)
 	}
 
 	contacts_count = 0;
-	for (j = 0; j < 5; j++) {
+	for (j = 0; j < 7; j++) {
 		const char *header, *footer;
 		int i = contacts_order[j], count;
 		list_t l;
 
-		if (i < 0 || i > 4)
+		if (i < 0 || i > 6)
 			continue;
 
 		header = format_find(table[i].format_header);
@@ -1630,11 +1632,13 @@ void contacts_changed()
 	contacts_margin = 1;
 	contacts_edge = WF_RIGHT;
 	contacts_frame = WF_LEFT;
-	contacts_order[0] = 0;
-	contacts_order[1] = 1;
-	contacts_order[2] = 2;
-	contacts_order[3] = 3;
-	contacts_order[4] = -1;
+	contacts_order[0] = 5;
+	contacts_order[1] = 0;
+	contacts_order[2] = 1;
+	contacts_order[3] = 6;
+	contacts_order[4] = 2;
+	contacts_order[5] = 3;
+	contacts_order[6] = -1;
 	contacts_wrap = 0;
 	contacts_descr = 0;
 	contacts_offset = 0;
@@ -1723,9 +1727,11 @@ void contacts_changed()
 				contacts_order[2] = -1;
 				contacts_order[3] = -1;
 				contacts_order[4] = -1;
+				contacts_order[5] = -1;
+				contacts_order[6] = -1;
 				
-				for (j = 0; args[i][j + 6] && j < 5; j++)
-					if (args[i][j + 6] >= '0' && args[i][j + 6] <= '4')
+				for (j = 0; args[i][j + 6] && j < 7; j++)
+					if (args[i][j + 6] >= '0' && args[i][j + 6] <= '6')
 						contacts_order[j] = args[i][j + 6] - '0';	
 			}
 		}
