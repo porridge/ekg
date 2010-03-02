@@ -96,6 +96,7 @@ list_t spiedlist = NULL;
 
 int command_processing = 0;
 int in_autoexec = 0;
+int no_autorun = 0;
 int in_auto_away = 0;
 int config_auto_reconnect = 10;
 int reconnect_timer = 0;

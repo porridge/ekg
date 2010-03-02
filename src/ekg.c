@@ -1155,6 +1155,7 @@ int main(int argc, char **argv)
 		{ "user", required_argument, 0, 'u' },
 		{ "version", no_argument, 0, 'v' },
 		{ "no-global-config", no_argument, 0, 'N' },
+		{ "no-autorun", no_argument, 0, 'A' },
 		{ 0, 0, 0, 0 }
 	};
 
@@ -1220,7 +1221,7 @@ int main(int argc, char **argv)
 	sa.sa_handler = handle_sigusr2;
 	sigaction(SIGUSR2, &sa, NULL);
 
-	while ((c = getopt_long(argc, argv, "b::a::i::F::d::pnc:f:hI:ot:u:vN", ekg_options, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "b::a::i::F::d::pnc:f:hI:ot:u:vNA", ekg_options, NULL)) != -1) {
 		switch (c) {
 			case 'b':
 				if (!optarg && argv[optind] && argv[optind][0] != '-')
@@ -1275,6 +1276,7 @@ int main(int argc, char **argv)
 				printf(""
 "u¿ycie: %s [OPCJE] [KOMENDY]\n"
 "  -N, --no-global-config     ignoruje globalny plik konfiguracyjny\n"
+"  -A, --no-autorun           nie uruchamia aliasu ,,autorun'' przy starcie\n"
 "  -u, --user=NAZWA           korzysta z profilu u¿ytkownika o podanej nazwie\n"
 "  -t, --theme=PLIK           ³aduje opis wygl±du z podanego pliku\n"
 "  -c, --control-pipe=PLIK    potok nazwany sterowania\n"
@@ -1320,10 +1322,13 @@ int main(int argc, char **argv)
 			case 'v':
 			    	printf("ekg-%s\nlibgadu-%s (headers %s, protocol 0x%.2x, client \"%s\")\ncompile time: %s\n", VERSION, gg_libgadu_version(), GG_LIBGADU_VERSION, GG_DEFAULT_PROTOCOL_VERSION, GG_DEFAULT_CLIENT_VERSION, compile_time());
 				return 0;
+			case 'A':
+				no_autorun = 1;
+				break;
 #ifdef WITH_IOCTLD
 			case 'I':
 				ioctld_path = optarg;
-			break;
+				break;
 #endif
 			case 'f':
 				ui_set = 1;
@@ -1647,6 +1652,19 @@ int main(int argc, char **argv)
 #ifdef WITH_PYTHON
 	python_autorun();
 #endif
+
+	if (!no_autorun) {
+		list_t l;
+
+		for (l = aliases; l; l = l->next) {
+			struct alias *a = l->data;
+			
+			if (!strcasecmp("autorun", a->name)) {
+				command_exec(NULL, "/autorun", 0);
+				break;
+			}
+		}
+	}
 
 	if (config_uin && config_password && auto_connect) {
 		print("connecting");

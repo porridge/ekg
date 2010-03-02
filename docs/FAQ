@@ -133,4 +133,10 @@ Q: Mam najnowsze ekg (current), ale nie widzê na li¶cie kontaktów osób z dnd i f
    Co zrobiæ?
 A: ,,/set contacts_options order=5016234''.
 
+Q: Czy jest mo¿liwo¶æ ¿eby okre¶lone polecenia by³y wykonywane po starcie programu?
+A: Tak, s³u¿y do tego alias ,,autorun''.
+
+Q: Zepsu³em, alias ,,autorun'' uniemo¿liwia korzystanie z programu!
+A: U¿yj opcji -A i usuñ ten alias.
+
 $Id$

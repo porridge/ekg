@@ -363,6 +363,7 @@ char *home_dir;
 char *config_dir;
 int command_processing;
 int in_autoexec;
+int no_autorun;
 int reconnect_timer;
 time_t last_action;
 int connecting;
