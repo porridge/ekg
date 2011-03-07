@@ -68,6 +68,7 @@ enum ignore_t {
 	IGNORE_EVENTS = TOGGLE_BIT(5),
 	IGNORE_NOTIFY = TOGGLE_BIT(6),
 	IGNORE_SMSAWAY = TOGGLE_BIT(7),
+	IGNORE_DISPLAY = TOGGLE_BIT(8),
 	
 	IGNORE_ALL = 255
 };
@@ -77,7 +78,7 @@ struct ignore_label {
 	char *name;
 };
 
-#define	IGNORE_LABELS_COUNT 7
+#define	IGNORE_LABELS_COUNT 8
 struct ignore_label ignore_labels[IGNORE_LABELS_COUNT + 1];
 
 list_t userlist;

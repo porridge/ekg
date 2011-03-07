@@ -1559,6 +1559,9 @@ static int contacts_update(struct window *w)
 
 			if ((u->status != table[i].status1 && u->status != table[i].status2) || !u->display || !u->uin)
 				continue;
+            
+			if (ignored_check(u->uin) & IGNORE_DISPLAY)
+				continue;
 
 			if (group && !group_member(u, group))
 				continue;

@@ -6600,6 +6600,7 @@ void command_init()
 	  "  - notify - nie wy¶wietla zmian stanu\n"
 	  "  - msg - ignoruje wiadomo¶ci\n"
 	  "  - smsaway - nie przesy³a wiadomo¶ci podczas nieobecno¶ci\n"
+	  "  - display - nie wypisuje osoby na li¶cie kontaktów (w ncurses)\n"
 	  "  - dcc - ignoruje po³±czenia DCC\n"
 	  "  - events - ignoruje zdarzenia zwi±zane z u¿ytkownikiem\n"
 	  "  - * - wszystkie poziomy\n"
