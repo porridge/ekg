@@ -1529,7 +1529,7 @@ COMMAND(cmd_help)
 
 					foo = bar;
 
-					while ((tmp = gg_get_line(&foo)))
+					while ((tmp = get_line(&foo)))
 						printq("help_more", tmp);
 
 					xfree(bar);

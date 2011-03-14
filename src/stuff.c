@@ -420,6 +420,8 @@ void alias_free()
 	aliases = NULL;
 }
 
+static const char base64_charset[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
 /*
  * base64_encode()
  *
@@ -427,15 +429,52 @@ void alias_free()
  */
 char *base64_encode(const char *buf)
 {
-	char *tmp = gg_base64_encode(buf);
+	char *out, *res;
+	unsigned int i = 0, j = 0, k = 0, len;
 
 	if (!buf)
 		return xstrdup("");
 
-	if (!tmp)
-		ekg_oom_handler();
+	len = strlen(buf);
 
-	return tmp;
+	res = out = xmalloc((len / 3 + 1) * 4 + 2);
+
+	while (j <= len) {
+		switch (i % 4) {
+			case 0:
+				k = (buf[j] & 252) >> 2;
+				break;
+			case 1:
+				if (j < len)
+					k = ((buf[j] & 3) << 4) | ((buf[j + 1] & 240) >> 4);
+				else
+					k = (buf[j] & 3) << 4;
+
+				j++;
+				break;
+			case 2:
+				if (j < len)
+					k = ((buf[j] & 15) << 2) | ((buf[j + 1] & 192) >> 6);
+				else
+					k = (buf[j] & 15) << 2;
+
+				j++;
+				break;
+			case 3:
+				k = buf[j++] & 63;
+				break;
+		}
+		*out++ = base64_charset[k];
+		i++;
+	}
+
+	if (i % 4)
+		for (j = 0; j < 4 - (i % 4); j++, out++)
+			*out = '=';
+
+	*out = 0;
+
+	return res;
 }
 
 /*
@@ -445,15 +484,48 @@ char *base64_encode(const char *buf)
  */
 char *base64_decode(const char *buf)
 {
-	char *tmp = gg_base64_decode(buf);
+	char *res, *save, val;
+	const char *foo;
+	const char *end;
+	unsigned int index = 0;
 
 	if (!buf)
 		return xstrdup("");
 
-	if (!tmp)
-		ekg_oom_handler();
+	save = res = xcalloc(1, (strlen(buf) / 4 + 1) * 3 + 2);
+	end = buf + strlen(buf);
 
-	return tmp;
+	while (*buf && buf < end) {
+		if (*buf == '\r' || *buf == '\n') {
+			buf++;
+			continue;
+		}
+		if (!(foo = strchr(base64_charset, *buf)))
+			foo = base64_charset;
+		val = (int)(foo - base64_charset);
+		buf++;
+		switch (index) {
+			case 0:
+				*res |= val << 2;
+				break;
+			case 1:
+				*res++ |= val >> 4;
+				*res |= val << 4;
+				break;
+			case 2:
+				*res++ |= val >> 2;
+				*res |= val << 6;
+				break;
+			case 3:
+				*res++ |= val;
+				break;
+		}
+		index++;
+		index %= 4;
+	}
+	*res = 0;
+
+	return save;
 }
 
 /*
@@ -3715,7 +3787,7 @@ time_t parsetimestr(const char *p)
  *  - path: backup nie by³ potrzebny lub config_dcc_backups == 0
  *  - pozosta³e warto¶ci: wska¼nik do nowej ¶cie¿ki
  */
-unsigned char *unique_name (unsigned char *path)
+unsigned char *unique_name(unsigned char *path)
 {
 	struct stat st;
 	int num;
@@ -3736,3 +3808,41 @@ unsigned char *unique_name (unsigned char *path)
 	return (num == 1000) ? NULL : newpath;
 }
 
+/*
+ * get_line()
+ *
+ * pobiera liniê tekstu z bufora. funkcja niszczy bufor ¼ród³owy 
+ * bezpowrotnie, dziel±c go na kolejne ci±gi znaków i obcina znaki 
+ * koñca linii.
+ *
+ * - ptr - wska¼nik do zmiennej, która przechowuje aktualne po³o¿enie
+ *   w analizowanym buforze.
+ *
+ * wska¼nik do kolejnej linii tekstu lub NULL, je¿eli to ju¿ koniec
+ * bufora.
+ */
+
+char *get_line(char **ptr)
+{
+	char *foo, *res;
+
+	if (!ptr || !*ptr || !strcmp(*ptr, ""))
+		return NULL;
+
+	res = *ptr;
+
+	if (!(foo = strchr(*ptr, '\n')))
+		*ptr += strlen(*ptr);
+	else {
+		size_t len;
+		*ptr = foo + 1;
+		*foo = 0;
+
+		len = strlen(res);
+
+		if (len > 1 && res[len - 1] == '\r')
+			res[len - 1] = 0;
+	}
+
+	return res;
+}

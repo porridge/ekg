@@ -212,7 +212,7 @@ int userlist_set(const char *contacts, int config)
 	
 	contsave = cont = xstrdup(contacts);
 	
-	while ((buf = gg_get_line(&cont))) {
+	while ((buf = get_line(&cont))) {
 		struct userlist u;
 		char **entry, *uin;
 		int i, count;

@@ -508,7 +508,9 @@ void update_status_myip(void);
 void change_status(int status, const char *arg, int autom);
 const char *ekg_status_label(int status, const char *prefix);
 int ekg_hide_descr_status(int status);
-unsigned char *unique_name (unsigned char *path);
+unsigned char *unique_name(unsigned char *path);
+
+char *get_line(char **ptr);
 
 /* funkcje poza stuff.c */
 void ekg_wait_for_key(void);

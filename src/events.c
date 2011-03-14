@@ -341,7 +341,7 @@ void print_message(struct gg_event *e, struct userlist *u, int chat, int secure)
 		if (mesg[i] == '\t')
 			mesg[i] = ' ';
 	
-	while ((line = gg_get_line(&mesg))) {
+	while ((line = get_line(&mesg))) {
 		const char *last_format_ansi = "";
 		int buf_offset;
 

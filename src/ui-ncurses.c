@@ -1424,7 +1424,7 @@ crap:
 
 	/* XXX wyrzuciæ dzielenie na linie z ui do ekg */
 	lines = lines_save = xstrdup(line);
-	while ((line2 = gg_get_line(&lines))) {
+	while ((line2 = get_line(&lines))) {
 		fs = reformat_string(line2);
 		fs->ts = cur_time;
 		if (config_speech_app) {
