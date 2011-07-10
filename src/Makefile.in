@@ -1,5 +1,6 @@
 # $Id$
 
+srcdir= @srcdir@
 prefix = @prefix@
 datarootdir = @datarootdir@
 datadir = @datadir@
@@ -10,7 +11,7 @@ libexecdir = @libexecdir@
 sysconfdir = @sysconfdir@
 
 CC = @CC@ 
-CFLAGS = -I.. @CFLAGS@ -DDATADIR=\"${datadir}/ekg\" -DSYSCONFDIR=\"${sysconfdir}\"
+CFLAGS = -I.. -I$(srcdir) -I$(srcdir)/.. @CFLAGS@ -DDATADIR=\"${datadir}/ekg\" -DSYSCONFDIR=\"${sysconfdir}\"
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 
@@ -20,18 +21,23 @@ INSTALL = @INSTALL@
 STRIP = @STRIP@
 
 OBJS = stuff.o commands.o events.o themes.o vars.o dynstuff.o userlist.o ekg.o xmalloc.o mail.o msgqueue.o emoticons.o configfile.o @OBJS@ ui-batch.o ui-none.o log.o
-SRCS = $(OBJS:.o=.c) comptime.c
+SRCS = $(patsubst %.o,$(srcdir)/%.c,$(OBJS)) $(srcdir)/comptime.c
 
+%.o: $(srcdir)/%.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -o $@ $<
+
+../compat/%.o: $(srcdir)/../compat/%.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -o $@ $<
 #
 
 all:	dep ekg @ioctld@
 
-ekg:	$(OBJS) comptime.c
-	$(CC) $(CFLAGS) -c -o comptime.o comptime.c
+ekg:	$(OBJS) $(srcdir)/comptime.c
+	$(CC) $(CFLAGS) -c -o comptime.o $(srcdir)/comptime.c
 	$(CC) $(CFLAGS) -o ekg $(OBJS) comptime.o $(LDFLAGS) $(LIBS)
 
-ioctld:	ioctld.c
-	$(CC) $(CFLAGS) ioctld.c -o ioctld $(LIBS) @IOCTLD_OBJS@
+ioctld:	$(srcdir)/ioctld.c
+	$(CC) $(CFLAGS) $< -o $@ $(LIBS) @IOCTLD_OBJS@
 
 dep:	.depend
 

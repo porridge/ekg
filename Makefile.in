@@ -1,5 +1,6 @@
 # $Id$
 
+srcdir = @srcdir@
 prefix = @prefix@
 datarootdir = @datarootdir@
 datadir = @datadir@
@@ -15,7 +16,7 @@ INSTALL = @INSTALL@
 
 #
 
-all:	configure @ekg@ @make_ekgwap@
+all:	configure compat @ekg@ @make_ekgwap@
 
 ekg:	
 	cd src && $(MAKE) all
@@ -25,6 +26,9 @@ make-ekgwap:
 
 examples:
 	cd examples && $(MAKE) all
+
+compat:
+	mkdir -p $@
 
 #
 
@@ -45,14 +49,14 @@ install-ekg:	install-ekg-data install-ekg-man
 
 install-ekg-data:
 	$(INSTALL) -d $(DESTDIR)$(datadir)/ekg/themes
-	$(INSTALL) -m 644 themes/*.theme $(DESTDIR)$(datadir)/ekg/themes
-	$(INSTALL) -m 644 docs/vars.txt $(DESTDIR)$(datadir)/ekg
+	$(INSTALL) -m 644 $(srcdir)/themes/*.theme $(DESTDIR)$(datadir)/ekg/themes
+	$(INSTALL) -m 644 $(srcdir)/docs/vars.txt $(DESTDIR)$(datadir)/ekg
 
 install-ekg-man:
 	$(INSTALL) -d $(DESTDIR)$(mandir)/man1
-	$(INSTALL) -m 644 docs/ekg.man.en $(DESTDIR)$(mandir)/man1/ekg.1
+	$(INSTALL) -m 644 $(srcdir)/docs/ekg.man.en $(DESTDIR)$(mandir)/man1/ekg.1
 	$(INSTALL) -d $(DESTDIR)$(mandir)/pl/man1
-	$(INSTALL) -m 644 docs/ekg.man.pl $(DESTDIR)$(mandir)/pl/man1/ekg.1
+	$(INSTALL) -m 644 $(srcdir)/docs/ekg.man.pl $(DESTDIR)$(mandir)/pl/man1/ekg.1
 
 install-ekgwap:
 	$(INSTALL) -d $(DESTDIR)$(bindir)
@@ -60,12 +64,12 @@ install-ekgwap:
 
 install-ekl2:
 	$(INSTALL) -d $(DESTDIR)$(bindir)
-	$(INSTALL) -m 755 contrib/ekl2.pl $(DESTDIR)$(bindir)
-	$(INSTALL) -m 755 contrib/ekl2.sh $(DESTDIR)$(bindir)
+	$(INSTALL) -m 755 $(srcdir)/contrib/ekl2.pl $(DESTDIR)$(bindir)
+	$(INSTALL) -m 755 $(srcdir)/contrib/ekl2.sh $(DESTDIR)$(bindir)
 	$(INSTALL) -d $(DESTDIR)$(mandir)/man1
-	$(INSTALL) -m 644 docs/ekl2.man.en $(DESTDIR)$(mandir)/man1/ekl2.1
+	$(INSTALL) -m 644 $(srcdir)/docs/ekl2.man.en $(DESTDIR)$(mandir)/man1/ekl2.1
 	$(INSTALL) -d $(DESTDIR)$(mandir)/pl/man1
-	$(INSTALL) -m 644 docs/ekl2.man.pl $(DESTDIR)$(mandir)/pl/man1/ekl2.1
+	$(INSTALL) -m 644 $(srcdir)/docs/ekl2.man.pl $(DESTDIR)$(mandir)/pl/man1/ekl2.1
 
 #
 
