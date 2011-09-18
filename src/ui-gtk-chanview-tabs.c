@@ -210,6 +210,9 @@ static GtkWidget *make_sbutton(GtkArrowType type, void *click_cb, void *userdata
 	return button;
 }
 
+/* only defined in ui-gtk-maingui.c */
+GtkWidget *gtkutil_button(GtkWidget *box, char *stock, char *tip, void *callback, void *userdata, char *labeltext);
+
 static void cv_tabs_init(chanview * cv)
 {
 	GtkWidget *box, *hbox = NULL;
