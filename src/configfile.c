@@ -132,7 +132,7 @@ int config_read(const char *filename)
 
 			if (ret)
 				gg_debug(GG_DEBUG_MISC, "\tunknown variable %s\n", foo);
-		
+
 		} else if (!strcasecmp(buf, "alias")) {
 			gg_debug(GG_DEBUG_MISC, "\talias %s\n", foo);
 			ret = alias_add(foo, 1, 1);
@@ -190,7 +190,7 @@ int config_read(const char *filename)
 					period = atoi(p[1]) - time(NULL);
 					period_str = saprintf("%ld", (long) period);
 				}
-		
+
 				if (period > 0) {
 					tmp = saprintf("/timer --add %s %s %s", (name) ? name : "", period_str, p[2]);
 					ret = command_exec(NULL, tmp, 1);
@@ -217,7 +217,7 @@ int config_read(const char *filename)
 
 		xfree(buf);
 	}
-	
+
 	fclose(f);
 
 	if (!good_file && !home && !in_autoexec) {
@@ -225,7 +225,7 @@ int config_read(const char *filename)
 		errno = EINVAL;
 		return -2;
 	}
-	
+
 	return 0;
 }
 
@@ -247,7 +247,7 @@ char *config_read_variable(const char *name)
 
 	if (!name)
 		return NULL;
-	
+
 	if (!(filename = prepare_path("config", 0)))
 		return NULL;
 
@@ -299,10 +299,10 @@ char *config_read_variable(const char *name)
 				return result;
 			}
 		}
-		
+
 		xfree(line);
 	}
-	
+
 	fclose(f);
 
 	return NULL;
@@ -311,7 +311,7 @@ char *config_read_variable(const char *name)
 /*
  * config_fprintf()
  *
- * odpowiednik fprintf() z tym, ¿e przyjmuje jedynie format %s 
+ * odpowiednik fprintf() z tym, ¿e przyjmuje jedynie format %s
  * i eskejpuje znaki:
  * - \  - zamiana na \\
  * - \n - zamiana na literalne \n
@@ -319,7 +319,7 @@ char *config_read_variable(const char *name)
  *
  * tekst znajduj±cy siê w stringu formatuj±cym nie jest zmieniany.
  *
- * interpretowany jest TYLKO format %s. namieszane, bo nie mo¿emy 
+ * interpretowany jest TYLKO format %s. namieszane, bo nie mo¿emy
  * alokowaæ pamiêci.
  *
  * - f - plik, do którego piszemy,
@@ -392,10 +392,10 @@ void config_write_variable(FILE *f, struct variable *v, int base64)
 		if (*(char**)(v->ptr)) {
 			if (!v->display && base64) {
 				char *tmp = base64_encode(*(char**)(v->ptr));
-				if (config_save_password)
+				if (config_save_password && strcmp(v->name, "key_password"))
 					config_fprintf(f, "%s \001%s\n", v->name, tmp);
 				xfree(tmp);
-			} else 	
+			} else
 				config_fprintf(f, "%s %s\n", v->name, *(char**)(v->ptr));
 		}
 	} else if (v->type == VAR_FOREIGN)
@@ -509,10 +509,10 @@ int config_write(const char *filename)
 		return -1;
 
 	snprintf(tmp, sizeof(tmp), "%s.%d.%ld", filename, (int) getpid(), (long) time(NULL));
-	
+
 	if (!(f = fopen(tmp, "w")))
 		return -1;
-	
+
 	fchmod(fileno(f), config_files_mode_config);
 
 	config_write_main(f, 1);
@@ -524,7 +524,7 @@ int config_write(const char *filename)
 
 	if (rename(tmp, filename) == -1)
 		return -1;
-	
+
 	return 0;
 }
 
@@ -532,9 +532,9 @@ int config_write(const char *filename)
  * config_write_partly()
  *
  * zapisuje podane zmienne, nie zmieniaj±c reszty konfiguracji.
- *  
+ *
  *  - vars - tablica z nazwami zmiennych do zapisania.
- * 
+ *
  * 0/-1
  */
 int config_write_partly(char **vars)
@@ -549,7 +549,7 @@ int config_write_partly(char **vars)
 
 	if (!(filename = prepare_path("config", 1)))
 		return -1;
-	
+
 	if (!(fi = fopen(filename, "r")))
 		return -1;
 
@@ -560,9 +560,9 @@ int config_write_partly(char **vars)
 		fclose(fi);
 		return -1;
 	}
-	
+
 	wrote = xcalloc(array_count(vars) + 1, sizeof(int));
-	
+
 	fchmod(fileno(fo), config_files_mode_config);
 
 	while ((line = read_file(fi))) {
@@ -591,7 +591,7 @@ int config_write_partly(char **vars)
 
 		if (!strncasecmp(tmp, "set ", 4))
 			tmp += 4;
-		
+
 		for (i = 0; vars[i]; i++) {
 			int len = strlen(vars[i]);
 
@@ -600,14 +600,14 @@ int config_write_partly(char **vars)
 
 			if (strncasecmp(tmp, vars[i], len) || tmp[len] != ' ')
 				continue;
-			
+
 			config_write_variable(fo, variable_find(vars[i]), 1);
 
 			wrote[i] = 1;
-			
+
 			xfree(line);
 			line = NULL;
-			
+
 			break;
 		}
 
@@ -627,7 +627,7 @@ pass:
 	}
 
 	xfree(wrote);
-	
+
 	fclose(fi);
 
 	if (fclose(fo) == EOF) {
@@ -635,7 +635,7 @@ pass:
 		xfree(newfn);
 		return -1;
 	}
-	
+
 	if (rename(newfn, filename) == -1) {
 		xfree(newfn);
 		return -1;
@@ -664,9 +664,9 @@ void config_write_crash()
 		return;
 
 	chmod(name, 0400);
-	
+
 	config_write_main(f, 0);
-	
+
 	fclose(f);
 }
 
@@ -688,13 +688,13 @@ void debug_write_crash()
 		return;
 
 	chmod(name, 0400);
-	
+
 	for (l = buffers; l; l = l->next) {
 		struct buffer *b = l->data;
 
 		if (b->type == BUFFER_DEBUG)
 			fprintf(f, "%s\n", b->line);
 	}
-	
+
 	fclose(f);
 }

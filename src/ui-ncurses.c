@@ -279,6 +279,7 @@ static void binding_forward_page(const char *arg);
 static int contacts_update(struct window *w);
 static void mouse_statusbar_commit(void);
 static void reset_tsm_region();
+static int is_tsm_region_on();
 
 #ifndef COLOR_DEFAULT
 #  define COLOR_DEFAULT (-1)
@@ -4376,19 +4377,25 @@ static void binding_accept_line(const char *arg)
 
 	command_exec(window_current->target, line, 0);
 
-	if (strcmp(line, "")) {
-		if (history[0] != line)
-			xfree(history[0]);
-		history[0] = xstrdup(line);
-		xfree(history[HISTORY_MAX - 1]);
-		memmove(&history[1], &history[0], sizeof(history) - sizeof(history[0]));
-	} else {
-		if (config_enter_scrolls)
-			print("none", "");
-	}
 
-	history[0] = line;
-	history_index = 0;
+        if (strcmp(line, "")) {
+            if( !is_tsm_region_on() ) { // nie zapamiêtuj zagwiazdkowanych linii w historii
+                if (history[0] != line)
+                    xfree(history[0]);
+                history[0] = xstrdup(line);
+                xfree(history[HISTORY_MAX - 1]);
+                memmove(&history[1], &history[0], sizeof(history) - sizeof(history[0]));
+            }
+        } else {
+		if (config_enter_scrolls)
+                    print("none", "");
+        }
+
+        if( !is_tsm_region_on() )
+        {
+            history[0] = line;
+            history_index = 0;
+        }
 	line[0] = 0;
         reset_tsm_region();
         transient_star_mode = 0;
@@ -4693,6 +4700,11 @@ static void stop_tsm_region()
 static void reset_tsm_region()
 {
     tsm_rs = tsm_re = -1;
+}
+
+static int is_tsm_region_on()
+{
+    return tsm_rs>=0;
 }
 
 static int in_tsm_region(int p)

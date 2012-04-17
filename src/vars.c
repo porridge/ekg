@@ -49,7 +49,7 @@ list_t variables = NULL;
  *
  * funkcje informuj±ce, czy dana grupa zmiennych ma zostaæ wy¶wietlona.
  * równie dobrze mo¿na by³o przekazaæ wska¼nik do zmiennej, która musi
- * byæ ró¿na od zera, ale dziêki funkcjom nie trzeba bêdzie mieszaæ w 
+ * byæ ró¿na od zera, ale dziêki funkcjom nie trzeba bêdzie mieszaæ w
  * przysz³o¶ci.
  */
 static int dd_beep(const char *name)
@@ -103,6 +103,7 @@ void variable_init()
 {
 	variable_add("uin", "ui", VAR_INT, 1, &config_uin, changed_uin, NULL, NULL);
 	variable_add("password", "pa", VAR_STR, 0, &config_password, NULL, NULL, NULL);
+        variable_add("key_password", "kpa", VAR_STR, 0, &config_key_password, NULL, NULL, NULL);
 	variable_add("email", "em", VAR_STR, 1, &config_email, NULL, NULL, NULL);
 #ifdef HAVE_VOIP
 	variable_add("audio_device", "ad", VAR_STR, 1, &config_audio_device, NULL, NULL, NULL);
@@ -348,7 +349,7 @@ void variable_init()
 		variable_add("windows_layout", "wl", VAR_STR, 2, NULL, NULL, NULL, NULL);
 		variable_add("datestamp", "dS", VAR_STR, 2, NULL, NULL, NULL, NULL);
 	}
-#else 
+#else
 	variable_add("windows_save", "ws", VAR_MAP, 2, NULL, NULL, NULL, NULL);
 	variable_add("windows_layout", "wl", VAR_STR, 2, NULL, NULL, NULL, NULL);
 	variable_add("datestamp", "dS", VAR_STR, 2, NULL, NULL, NULL, NULL);
@@ -386,7 +387,7 @@ void variable_set_default()
 #ifdef WITH_ASPELL
 	xfree(config_aspell_lang);
 	xfree(config_aspell_encoding);
-	
+
 	config_aspell_lang = xstrdup("pl");
 	config_aspell_encoding = xstrdup("iso8859-2");
 #endif
@@ -441,7 +442,7 @@ struct value_map *variable_map(int count, ...)
 	int i;
 
 	res = xcalloc(count + 1, sizeof(struct value_map));
-	
+
 	va_start(ap, count);
 
 	for (i = 0; i < count; i++) {
@@ -449,7 +450,7 @@ struct value_map *variable_map(int count, ...)
 		res[i].conflicts = va_arg(ap, int);
 		res[i].label = xstrdup(va_arg(ap, char*));
 	}
-	
+
 	va_end(ap);
 
 	return res;
@@ -594,14 +595,14 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 			}
 
 			p = value;
-				
+
 			if ((hex = !strncasecmp(p, "0x", 2)))
 				p += 2;
 
 			while (*p && *p != ' ') {
 				if (hex && !xisxdigit(*p))
 					return -2;
-				
+
 				if (!hex && !xisdigit(*p))
 					return -2;
 				p++;
@@ -625,17 +626,17 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 
 			if (ui_event)
 				ui_event("variable_changed", v->name);
-			
+
 			return 0;
 		}
 
 		case VAR_BOOL:
 		{
 			int tmp;
-		
+
 			if (!value)
 				return -2;
-		
+
 			if ((tmp = on_off(value)) == -1)
 				return -2;
 
@@ -646,16 +647,16 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 
 			if (ui_event)
 				ui_event("variable_changed", v->name);
-		
+
 			return 0;
 		}
 
 		case VAR_STR:
 		{
 			char **tmp = (char**)(v->ptr);
-			
+
 			xfree(*tmp);
-			
+
 			if (value) {
 				if (*value == 1)
 					*tmp = base64_decode(value + 1);
@@ -663,7 +664,7 @@ int variable_set(const char *name, const char *value, int allow_foreign)
 					*tmp = xstrdup(value);
 			} else
 				*tmp = NULL;
-	
+
 			if (v->notify)
 				(v->notify)(v->name);
 
@@ -745,7 +746,7 @@ char *variable_digest()
 
 		if (!v->type == VAR_STR || !strcmp(v->name, "password") || !strcmp(v->name, "local_ip"))
 			continue;
-	
+
 		val = *((char**)v->ptr);
 
 		string_append(s, v->short_name);
@@ -766,7 +767,7 @@ char *variable_digest()
 			string_append_c(s, ':');
 		}
 	}
-	
+
 	return string_free(s, 0);
 }
 
@@ -810,7 +811,7 @@ int variable_undigest(const char *digest)
 		if (v->type == VAR_INT || v->type == VAR_BOOL || v->type == VAR_MAP) {
 			char *end;
 			int val;
-			
+
 			val = strtol(p, &end, 10);
 
 			variable_set(v->name, itoa(val), 0);
@@ -820,7 +821,7 @@ int variable_undigest(const char *digest)
 
 		if (v->type == VAR_STR) {
 			char *val = NULL;
-			
+
 			if (*p == '-') {
 				val = NULL;
 				p++;
@@ -833,7 +834,7 @@ int variable_undigest(const char *digest)
 					base64 = 1;
 					p++;
 				}
-				
+
 				for (q = p; *q && *q != ':'; q++, len++)
 					;
 
@@ -853,7 +854,7 @@ int variable_undigest(const char *digest)
 			gg_debug(GG_DEBUG_MISC, "// setting variable %s = \"%s\"\n", v->name, ((val) ? val : "(null)"));
 
 			variable_set(v->name, val, 0);
-			
+
 			xfree(val);
 		}
 	}
@@ -903,16 +904,16 @@ void variable_help(const char *name)
 	}
 
 	line = read_file(f);
-	
+
 	if ((tmp = strstr(line, ": ")))
 		type = xstrdup(tmp + 2);
 	else
 		type = xstrdup("?");
-	
+
 	xfree(line);
 
 	tmp = NULL;
-	
+
 	line = read_file(f);
 	if ((tmp = strstr(line, ": ")))
 		def = xstrdup(tmp + 2);
@@ -938,7 +939,7 @@ void variable_help(const char *name)
 			print("help_set_body", s->str);
 			string_clear(s);
 		}
-		
+
 		string_append(s, line + 1);
 
 		if (line[strlen(line) - 1] != ' ')
@@ -951,7 +952,7 @@ void variable_help(const char *name)
 		print("help_set_body", s->str);
 
 	string_free(s, 1);
-	
+
 	if (strcmp(format_find("help_set_footer"), ""))
 		print("help_set_footer", name);
 

@@ -130,6 +130,7 @@ int config_last_sysmsg = 0;
 int config_last_sysmsg_changed = 0;
 char *config_local_ip = NULL;
 char *config_password = NULL;
+char *config_key_password = NULL;
 int config_slash_messages = 1;
 int config_sms_away = 0;
 int config_sms_away_limit = 0;
@@ -303,7 +304,7 @@ int alias_add(const char *string, int quiet, int append)
 				list_t l;
 
 				list_add(&j->commands, cmd, strlen(cmd) + 1);
-				
+
 				/* przy wielu komendach trudno dope³niaæ, bo wed³ug której? */
 				for (l = commands; l; l = l->next) {
 					struct command *c = l->data;
@@ -314,7 +315,7 @@ int alias_add(const char *string, int quiet, int append)
 						break;
 					}
 				}
-			
+
 				printq("aliases_append", string);
 
 				return 0;
@@ -343,7 +344,7 @@ int alias_add(const char *string, int quiet, int append)
 	list_add(&aliases, &a, sizeof(a));
 
 	command_add(a.name, ((params) ? params: "?"), cmd_alias_exec, 1, "", "", "");
-	
+
 	xfree(params);
 
 	printq("aliases_add", a.name, "");
@@ -411,7 +412,7 @@ void alias_free()
 
 	for (l = aliases; l; l = l->next) {
 		struct alias *a = l->data;
-		
+
 		xfree(a->name);
 		list_destroy(a->commands, 1);
 	}
@@ -425,7 +426,7 @@ static const char base64_charset[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnop
 /*
  * base64_encode()
  *
- * zapisuje ci±g znaków w base64. alokuje pamiêæ. 
+ * zapisuje ci±g znaków w base64. alokuje pamiêæ.
  */
 char *base64_encode(const char *buf)
 {
@@ -533,7 +534,7 @@ char *base64_decode(const char *buf)
  *
  * wy¶wietla listê przypisanych komend.
  */
-void binding_list(int quiet, const char *name, int all) 
+void binding_list(int quiet, const char *name, int all)
 {
 	list_t l;
 	int found = 0;
@@ -572,7 +573,7 @@ void binding_list(int quiet, const char *name, int all)
  *
  * zwalnia pamiêæ po li¶cie przypisanych klawiszy.
  */
-void binding_free() 
+void binding_free()
 {
 	list_t l;
 
@@ -623,7 +624,7 @@ int buffer_add(int type, const char *target, const char *line, int max_lines)
 	return ((list_add(&buffers, &b, sizeof(b)) ? 0 : -1));
 }
 
-/* 
+/*
  * buffer_flush()
  *
  * zwraca zaalokowany ³ancuch zawieraj±cy wszystkie linie
@@ -675,7 +676,7 @@ int buffer_count(int type)
 
 		if (b->type == type)
 			count++;
-	}	
+	}
 
 	return count;
 }
@@ -697,7 +698,7 @@ char *buffer_tail(int type)
 
 		if (type != b->type)
 			continue;
-		
+
 		str = xstrdup(b->line);
 
 		xfree(b->target);
@@ -711,7 +712,7 @@ char *buffer_tail(int type)
 
 /*
  * buffer_free()
- * 
+ *
  * zwalnia pamiêæ po buforach.
  */
 void buffer_free()
@@ -783,25 +784,25 @@ void changed_dcc(const char *var)
 {
 	struct gg_dcc *dcc = NULL;
 	list_t l;
-	
+
 	if (!config_uin)
 		return;
-	
+
 	if (!strcmp(var, "dcc")) {
 		for (l = watches; l; l = l->next) {
 			struct gg_common *c = l->data;
-	
+
 			if (c->type == GG_SESSION_DCC_SOCKET)
 				dcc = l->data;
 		}
-	
+
 		if (!config_dcc && dcc) {
 			list_remove(&watches, dcc, 0);
 			gg_free_dcc(dcc);
 			gg_dcc_ip = 0;
 			gg_dcc_port = 0;
 		}
-	
+
 		if (config_dcc && !dcc) {
 			if (!(dcc = gg_dcc_socket_create(config_uin, config_dcc_port))) {
 				print("dcc_create_error", strerror(errno));
@@ -832,17 +833,17 @@ void changed_dcc(const char *var)
 	if (!strcmp(var, "dcc_port")) {
 		for (l = watches; l; l = l->next) {
 			struct gg_common *c = l->data;
-	
+
 			if (c->type == GG_SESSION_DCC_SOCKET)
 				dcc = l->data;
 		}
-		
+
 		if (config_dcc && dcc && (dcc->port != config_dcc_port)) {
 			list_remove(&watches, dcc, 0);
 			gg_free_dcc(dcc);
 			gg_dcc_ip = 0;
 			gg_dcc_port = 0;
-		
+
 			if (!(dcc = gg_dcc_socket_create(config_uin, config_dcc_port))) {
 				print("dcc_create_error", strerror(errno));
 			} else {
@@ -853,7 +854,7 @@ void changed_dcc(const char *var)
 
 	if (sess && sess->state == GG_STATE_CONNECTED)
 		print("dcc_must_reconnect");
-	
+
 	update_status_myip();
 }
 
@@ -869,7 +870,7 @@ void changed_local_ip(const char *var)
 	else {
 #ifdef HAVE_INET_PTON
 		int tmp = inet_pton(AF_INET, config_local_ip, &gg_local_ip);
-		
+
 		if (tmp == 0 || tmp == -1) {
 		    	print("invalid_local_ip");
 			xfree(config_local_ip);
@@ -894,7 +895,7 @@ void changed_mesg(const char *var)
 	else
 		mesg_set(config_mesg);
 }
-	
+
 /*
  * changed_proxy()
  *
@@ -903,7 +904,7 @@ void changed_mesg(const char *var)
 void changed_proxy(const char *var)
 {
 	char **auth, **userpass = NULL, **hostport = NULL;
-	
+
 	gg_proxy_port = 0;
 	xfree(gg_proxy_host);
 	gg_proxy_host = NULL;
@@ -911,7 +912,7 @@ void changed_proxy(const char *var)
 	gg_proxy_username = NULL;
 	xfree(gg_proxy_password);
 	gg_proxy_password = NULL;
-	gg_proxy_enabled = 0;	
+	gg_proxy_enabled = 0;
 
 	if (!config_proxy)
 		return;
@@ -920,9 +921,9 @@ void changed_proxy(const char *var)
 
 	if (!auth[0] || !strcmp(auth[0], "")) {
 		array_free(auth);
-		return; 
+		return;
 	}
-	
+
 	gg_proxy_enabled = 1;
 
 	if (auth[0] && auth[1]) {
@@ -930,7 +931,7 @@ void changed_proxy(const char *var)
 		hostport = array_make(auth[1], ":", 0, 0, 0);
 	} else
 		hostport = array_make(auth[0], ":", 0, 0, 0);
-	
+
 	if (userpass && userpass[0] && userpass[1]) {
 		gg_proxy_username = xstrdup(userpass[0]);
 		gg_proxy_password = xstrdup(userpass[1]);
@@ -1096,7 +1097,7 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 	for (l = conferences; l; l = l->next) {
 		struct conference *cf = l->data;
-		
+
 		if (!strcasecmp(name, cf->name)) {
 			printq("conferences_exist", name);
 
@@ -1156,9 +1157,9 @@ struct conference *conference_add(const char *name, const char *nicklist, int qu
 
 	event_check(EVENT_CONFERENCE, 0, name);
 
-	/* je¶li na li¶cie zdarzeñ jest usuniêcie konferencji, to ret ju¿ nie 
-	 * wskazuje na nic sensownego. nie tworzymy konferencji. mo¿e trochê 
-	 * ma³o eleganckie rozwi±zanie, ale nie przychodzi mi do g³owy nic 
+	/* je¶li na li¶cie zdarzeñ jest usuniêcie konferencji, to ret ju¿ nie
+	 * wskazuje na nic sensownego. nie tworzymy konferencji. mo¿e trochê
+	 * ma³o eleganckie rozwi±zanie, ale nie przychodzi mi do g³owy nic
 	 * lepszego. -- gophi */
 
 	{
@@ -1210,7 +1211,7 @@ int conference_remove(const char *name, int quiet)
 			printq("conferences_noexist", name);
 		else
 			printq("conferences_list_empty");
-		
+
 		return -1;
 	}
 
@@ -1248,7 +1249,7 @@ struct conference *conference_create(const char *nicks)
  *
  *  - name - nazwa konferencji.
  */
-struct conference *conference_find(const char *name) 
+struct conference *conference_find(const char *name)
 {
 	list_t l;
 
@@ -1258,7 +1259,7 @@ struct conference *conference_find(const char *name)
 		if (!strcmp(c->name, name))
 			return c;
 	}
-	
+
 	return NULL;
 }
 
@@ -1275,7 +1276,7 @@ struct conference *conference_find(const char *name)
 int conference_participant(struct conference *c, uin_t uin)
 {
 	list_t l;
-	
+
 	for (l = c->recipients; l; l = l->next) {
 		uin_t *u = l->data;
 
@@ -1293,13 +1294,13 @@ int conference_participant(struct conference *c, uin_t uin)
  * znajduje konferencjê, do której nale¿± podane uiny. je¿eli nie znaleziono,
  * zwracany jest NULL. je¶li numerów jest wiêcej, zostan± dodane do
  * konferencji, bo najwyra¼niej kto¶ do niej do³±czy³.
- * 
+ *
  *  - from - kto jest nadawc± wiadomo¶ci,
  *  - recipients - tablica numerów nale¿±cych do konferencji,
  *  - count - ilo¶æ numerów,
  *  - quiet.
  */
-struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int count, int quiet) 
+struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int count, int quiet)
 {
 	int i;
 	list_t l;
@@ -1331,7 +1332,7 @@ struct conference *conference_find_by_uins(uin_t from, uin_t *recipients, int co
 			for (i = 0; i < count; i++) {
 				if (recipients[i] != config_uin && !conference_participant(c, recipients[i])) {
 					list_add(&c->recipients, &recipients[i], sizeof(recipients[0]));
-			
+
 					if (comma++)
 						string_append(new, ", ");
 					string_append(new, format_user(recipients[i]));
@@ -1381,7 +1382,7 @@ int conference_set_ignore(const char *name, int flag, int quiet)
  * conference_rename()
  *
  * zmienia nazwê instniej±cej konferencji.
- * 
+ *
  *  - oldname - stara nazwa,
  *  - newname - nowa nazwa,
  *  - quiet.
@@ -1391,7 +1392,7 @@ int conference_set_ignore(const char *name, int flag, int quiet)
 int conference_rename(const char *oldname, const char *newname, int quiet)
 {
 	struct conference *c;
-	
+
 	if (conference_find(newname)) {
 		printq("conferences_exist", newname);
 		return -1;
@@ -1406,11 +1407,11 @@ int conference_rename(const char *oldname, const char *newname, int quiet)
 	c->name = xstrdup(newname);
 	remove_send_nick(oldname);
 	add_send_nick(newname);
-	
+
 	printq("conferences_rename", oldname, newname);
 
 	ui_event("conference_rename", oldname, newname, NULL);
-	
+
 	return 0;
 }
 
@@ -1428,7 +1429,7 @@ void conference_free()
 
 	for (l = conferences; l; l = l->next) {
 		struct conference *c = l->data;
-		
+
 		xfree(c->name);
 		list_destroy(c->recipients, 1);
 	}
@@ -1449,10 +1450,10 @@ void ekg_connect()
 
 	for (l = watches; l; l = l->next) {
 		struct gg_dcc *d = l->data;
-		
+
 		if (d->type == GG_SESSION_DCC_SOCKET) {
 			gg_dcc_port = d->port;
-			
+
 		}
 	}
 
@@ -1495,9 +1496,9 @@ void ekg_connect()
 #endif
 			server += 4;
 		}
-			
+
 		tmp = strchr(server, ':');
-			
+
 		if (tmp) {
 			p.server_port = atoi(tmp + 1);
 			*tmp = 0;
@@ -1676,7 +1677,7 @@ int event_add(int flags, const char *target, const char *action, int quiet)
 
 	for (f = 1; ; f++) {
 		int taken = 0;
-		
+
 		for (l = events; l; l = l->next) {
 			struct event *e = l->data;
 
@@ -1715,7 +1716,7 @@ int event_remove(const char *name, int quiet)
 {
 	list_t l;
 	int removed = 0, remove_all;
-	
+
 	if (!name)
 		return -1;
 
@@ -1884,7 +1885,7 @@ int event_check(int event, uin_t uin, const char *data)
 
 		if (e->flags & INACTIVE_EVENT)
 			return 0;
-		
+
                 if (e->flags & event) {
 
 			if (!strcmp(e->target, "*") || uin == 0)
@@ -1911,7 +1912,7 @@ int event_check(int event, uin_t uin, const char *data)
 			else
 				size++;
 		}
-		
+
 		edata = xmalloc(size);
 
 		for (p = data, q = edata; *p; p++, q++) {
@@ -1935,7 +1936,7 @@ int event_check(int event, uin_t uin, const char *data)
 
 	actions = array_make(action, ";", 0, 0, 1);
 
-	for (i = 0; actions && actions[i]; i++) {	
+	for (i = 0; actions && actions[i]; i++) {
 		char *tmp = format_string(actions[i], uin_number, uin_display, ((data) ? data : ""), ((edata) ? edata : ""));
 
 		gg_debug(GG_DEBUG_MISC, "// event_check() uin: %s event: \"%s\" doing: \"%s\"\n", uin_number, event_format(event), tmp);
@@ -1979,7 +1980,7 @@ void event_free()
  * w³±cza/wy³±cza/sprawdza mo¿liwo¶æ pisania do naszego terminala.
  *
  *  - what - MESG_ON, MESG_OFF lub MESG_CHECK
- * 
+ *
  * -1 je¶li b³ad, lub aktualny stan: MESG_ON/MESG_OFF
 */
 int mesg_set(int what)
@@ -2002,13 +2003,13 @@ int mesg_set(int what)
 		case MESG_CHECK:
 			return ((s.st_mode & S_IWGRP) ? MESG_ON : MESG_OFF);
 	}
-	
+
 	return 0;
 }
 
 /*
  * msg_encrypt()
- * 
+ *
  * je¶li mo¿na, podmienia wiadomo¶æ na wiadomo¶æ
  * zaszyfrowan±.
  */
@@ -2023,12 +2024,12 @@ int msg_encrypt(uin_t uin, unsigned char **msg)
 
 			xfree(*msg);
 			*msg = res;
-			
+
 			if (strlen((char *) *msg) > 1989) {
 				(*msg)[1989] = 0;
 				ret = 2;
 			}
-			
+
 			gg_debug(GG_DEBUG_MISC, "// ekg: simlite encrypted: %s\n", res);
 			return ret;
 		}
@@ -2043,7 +2044,7 @@ int msg_encrypt(uin_t uin, unsigned char **msg)
 /*
  * charmap_prepare()
  *
- * przygotowuje mapê znaków do u¿ycia w funkcji charmap_convert() zgodnie ze 
+ * przygotowuje mapê znaków do u¿ycia w funkcji charmap_convert() zgodnie ze
  * wzorcem convtab. wzorzec musi mieæ parzyst± liczbê pozycji.
  *
  * - charmap - bufor do wype³nienia (musi mieæ 256 bajtów),
@@ -2093,7 +2094,7 @@ static void charmap_convert(const unsigned char *charmap, unsigned char *buf)
  * cp_to_iso()
  *
  * zamienia krzaczki pisane w cp1250 na iso-8859-2, przy okazji maskuj±c
- * znaki, których nie da siê wy¶wietliæ, za wyj±tkiem \r i \n, oraz 
+ * znaki, których nie da siê wy¶wietliæ, za wyj±tkiem \r i \n, oraz
  * zamieniaj±c tabulacje na spacje.
  *
  *  - buf.
@@ -2176,7 +2177,7 @@ static int utf8_helper(unsigned char *s, int n, unsigned short *ch)
 		return 1;
 	}
 
-	if (c < 0xc2) 
+	if (c < 0xc2)
 		goto invalid;
 
 	if (c < 0xe0) {
@@ -2186,8 +2187,8 @@ static int utf8_helper(unsigned char *s, int n, unsigned short *ch)
 			goto invalid;
 		*ch = ((unsigned short) (c & 0x1f) << 6) | (unsigned short) (s[1] ^ 0x80);
 		return 2;
-	} 
-	
+	}
+
 	if (c < 0xf0) {
 		if (n < 3)
 			goto invalid;
@@ -2357,23 +2358,23 @@ void iso_to_ascii(unsigned char *buf)
 
 	if (!valid) {
 		static const unsigned char conv[] = {
-			'ê', 'e', 
-			'ó', 'o', 
-			'±', 'a', 
-			'¶', 's', 
-			'³', 'l', 
-			'¿', 'z', 
-			'¼', 'z', 
-			'æ', 'c', 
-			'ñ', 'n', 
-			'Ê', 'E', 
-			'Ó', 'O', 
-			'¡', 'A', 
-			'¦', 'S', 
+			'ê', 'e',
+			'ó', 'o',
+			'±', 'a',
+			'¶', 's',
+			'³', 'l',
+			'¿', 'z',
+			'¼', 'z',
+			'æ', 'c',
+			'ñ', 'n',
+			'Ê', 'E',
+			'Ó', 'O',
+			'¡', 'A',
+			'¦', 'S',
 			'£', 'L',
 			'¯', 'Z',
-			'¬', 'Z', 
-			'Æ', 'C', 
+			'¬', 'Z',
+			'Æ', 'C',
 			'Ñ', 'N'
 		};
 
@@ -2454,7 +2455,7 @@ int process_add(int pid, const char *name)
 	p.pid = pid;
 	p.name = xstrdup(name);
 	p.died = 0;
-	
+
 	return (list_add(&children, &p, sizeof(p)) ? 0 : -1);
 }
 
@@ -2464,7 +2465,7 @@ int process_add(int pid, const char *name)
  * usuwa proces z listy dzieciaków.
  *
  *  - pid.
- * 
+ *
  * 0/-1
  */
 int process_remove(int pid)
@@ -2511,12 +2512,12 @@ const char *prepare_path(const char *filename, int do_mkdir)
 		if (mkdir(config_dir, 0700) && errno != EEXIST)
 			return NULL;
 	}
-	
+
 	if (!filename || !*filename)
 		snprintf(path, sizeof(path), "%s", config_dir);
 	else
 		snprintf(path, sizeof(path), "%s/%s", config_dir, filename);
-	
+
 	return path;
 }
 
@@ -2531,7 +2532,7 @@ char *random_line(const char *path)
 
 	if ((f = fopen(path, "r")) == NULL)
 		return NULL;
-	
+
 	while ((line = read_file(f))) {
 		xfree(line);
 		max++;
@@ -2612,7 +2613,7 @@ int send_sms(const char *recipient, const char *message, int quiet)
 
 	if (pipe(fd))
 		return -1;
-		
+
 	if (!(pid = fork())) {
 		dup2(open("/dev/null", O_RDONLY), 0);
 
@@ -2621,7 +2622,7 @@ int send_sms(const char *recipient, const char *message, int quiet)
 			dup2(fd[1], 2);
 			dup2(fd[1], 1);
 			close(fd[1]);
-		}	
+		}
 
 		execlp(config_sms_app, config_sms_app, recipient, message, (void *) NULL);
 		exit(1);
@@ -2634,7 +2635,7 @@ int send_sms(const char *recipient, const char *message, int quiet)
 	}
 
 	memset(&s, 0, sizeof(s));
-	
+
 	s.fd = fd[0];
 	s.check = GG_CHECK_READ;
 	s.state = GG_STATE_READING_DATA;
@@ -2647,7 +2648,7 @@ int send_sms(const char *recipient, const char *message, int quiet)
 
 	list_add(&watches, &s, sizeof(s));
 	close(fd[1]);
-	
+
 	tmp = saprintf(((quiet) ? "\002%s" : "\001%s"), recipient);
 	process_add(pid, tmp);
 	xfree(tmp);
@@ -2659,7 +2660,7 @@ int send_sms(const char *recipient, const char *message, int quiet)
  * sms_away_add()
  *
  * dodaje osobê do listy delikwentów, od których wiadomo¶æ wys³ano sms'em
- * podczas naszej nieobecno¶ci. je¶li jest ju¿ na li¶cie, to zwiêksza 
+ * podczas naszej nieobecno¶ci. je¶li jest ju¿ na li¶cie, to zwiêksza
  * przyporz±dkowany mu licznik.
  *
  *  - uin.
@@ -2713,7 +2714,7 @@ int sms_away_check(uin_t uin)
 
 			x += s->count;
 		}
-		
+
 		if (x > config_sms_away_limit)
 			return 0;
 		else
@@ -2727,7 +2728,7 @@ int sms_away_check(uin_t uin)
 		if (s->uin == uin) {
 			if (s->count > config_sms_away_limit)
 				return 0;
-			else 
+			else
 				return 1;
 		}
 	}
@@ -2776,13 +2777,13 @@ int ioctld_parse_seq(const char *seq, struct action_data *data)
 	for (i = 0; entries[i] && i < IOCTLD_MAX_ITEMS; i++) {
 		int delay;
 		char *tmp;
-		
+
 		if ((tmp = strchr(entries[i], '/'))) {
 			*tmp = 0;
 			delay = atoi(tmp + 1);
 		} else
 			delay = IOCTLD_DEFAULT_DELAY;
-			
+
 		data->value[i] = atoi(entries[i]);
 		data->delay[i] = delay;
 	}
@@ -3081,7 +3082,7 @@ int timer_remove(const char *name, int at, const char *command)
 
 		l = l->next;
 
-		if ((at == t->at) && ((name && !strcasecmp(name, t->name)) || (command && !strcasecmp(command, t->command)))) { 
+		if ((at == t->at) && ((name && !strcasecmp(name, t->name)) || (command && !strcasecmp(command, t->command)))) {
 			xfree(t->name);
 			xfree(t->command);
 			xfree(t->id);
@@ -3112,7 +3113,7 @@ int timer_remove_user(int at)
 
 		l = l->next;
 
-		if (t->type == TIMER_COMMAND && (at == -1 || at == t->at)) { 
+		if (t->type == TIMER_COMMAND && (at == -1 || at == t->at)) {
 			xfree(t->name);
 			xfree(t->command);
 			xfree(t->id);
@@ -3135,7 +3136,7 @@ void timer_free()
 
 	for (l = timers; l; l = l->next) {
 		struct timer *t = l->data;
-		
+
 		xfree(t->name);
 		xfree(t->command);
 		xfree(t->id);
@@ -3145,7 +3146,7 @@ void timer_free()
 	timers = NULL;
 }
 
-/* 
+/*
  * xstrmid()
  *
  * wycina fragment tekstu alokuj±c dla niego pamiêæ.
@@ -3173,9 +3174,9 @@ char *xstrmid(const char *str, int start, int length)
 
 	if (length > strlen(str) - start)
 		length = strlen(str) - start;
-	
+
 	res = xmalloc(length + 1);
-	
+
 	for (p = str + start, q = res; length; p++, q++, length--)
 		*q = *p;
 
@@ -3255,7 +3256,7 @@ void update_status_myip()
 
 	if (!sess || sess->state != GG_STATE_CONNECTED)
 		goto fail;
-	
+
 	if (config_dcc && config_dcc_ip && config_dcc_port) {
 		list_t l;
 
@@ -3268,7 +3269,7 @@ void update_status_myip()
 			if (getsockname(sess->fd, (struct sockaddr *) &foo, &bar))
 				goto fail;
 
-			u->ip.s_addr = foo.sin_addr.s_addr; 
+			u->ip.s_addr = foo.sin_addr.s_addr;
 		}
 
 		u->port = 0;
@@ -3400,7 +3401,7 @@ void change_status(int status, const char *xarg, int autom)
 		tmp = saprintf("%dm", config_auto_away / 60);
 	else
 		tmp = saprintf("%ds", config_auto_away);
-								
+
 	if (!arg) {
 		if (config_random_reason & random_mask) {
 			reason = random_line(prepare_path(filename, 0));
@@ -3413,7 +3414,7 @@ void change_status(int status, const char *xarg, int autom)
 
 	if (!reason && config_keep_reason && config_reason)
 		reason = xstrdup(config_reason);
-	
+
 	if (arg && !strcmp(arg, "-")) {
 		xfree(reason);
 		reason = NULL;
@@ -3439,7 +3440,7 @@ void change_status(int status, const char *xarg, int autom)
 			case 2:
 				break;
 		}
-	
+
 		xfree(reason);
 		reason = r1;
 
@@ -3472,7 +3473,7 @@ void change_status(int status, const char *xarg, int autom)
 		} else
 		    	gg_change_status(sess, config_status);
 	}
-	
+
 	xfree(tmp);
 	xfree(arg);
 
@@ -3493,7 +3494,7 @@ const char *ekg_status_label(int status, const char *prefix)
 {
 	static char buf[100];
 	const char *label = "unknown";
-	
+
 	switch (GG_S(status)) {
 		case GG_STATUS_AVAIL:
 			label = "avail";
@@ -3593,7 +3594,7 @@ struct color_map default_color_map[26] = {
 	{ 'M', 255, 128, 255, },
 	{ 'B', 128, 128, 255, },
 	{ 'R', 255, 128, 128, },
-	{ 'Y', 255, 255, 128, }, 
+	{ 'Y', 255, 255, 128, },
 	{ 'm', 168, 128, 168, },
 	{ 'c', 128, 168, 168, },
 	{ 'g', 64, 168, 64, },
@@ -3630,7 +3631,7 @@ char color_map(unsigned char r, unsigned char g, unsigned char b)
 
 /*	gg_debug(GG_DEBUG_MISC, "mindist=%ld, color=%c\n", mindist, ch); */
 
-	return ch;	
+	return ch;
 }
 
 /*
@@ -3754,7 +3755,7 @@ time_t parsetimestr(const char *p)
 				ret = sscanf(foo, "%2d%2d%2d", &lt->tm_mday, &lt->tm_hour, &lt->tm_min);
 				if (ret != 3)
 					wrong = 1;
-				break;	
+				break;
 			case 4:
 				ret = sscanf(foo, "%2d%2d", &lt->tm_hour, &lt->tm_min);
 				if (ret != 2)
@@ -3777,7 +3778,7 @@ time_t parsetimestr(const char *p)
 /*
  * unique_name()
  *
- * je¶li jest w³±czone config_dcc_backups, to tworzy unikaln± ¶cie¿kê 
+ * je¶li jest w³±czone config_dcc_backups, to tworzy unikaln± ¶cie¿kê
  * do pliku, dodaj±c sufiksy od 1 do 1000.
  *
  * - path: ¶cie¿ka do zmiany
@@ -3811,8 +3812,8 @@ unsigned char *unique_name(unsigned char *path)
 /*
  * get_line()
  *
- * pobiera liniê tekstu z bufora. funkcja niszczy bufor ¼ród³owy 
- * bezpowrotnie, dziel±c go na kolejne ci±gi znaków i obcina znaki 
+ * pobiera liniê tekstu z bufora. funkcja niszczy bufor ¼ród³owy
+ * bezpowrotnie, dziel±c go na kolejne ci±gi znaków i obcina znaki
  * koñca linii.
  *
  * - ptr - wska¼nik do zmiennej, która przechowuje aktualne po³o¿enie
