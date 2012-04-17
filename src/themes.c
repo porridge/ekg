@@ -68,34 +68,34 @@ const char *format_find(const char *name)
 	if (config_speech_app && !strchr(name, ',')) {
 		char *name2 = saprintf("%s,speech", name);
 		const char *tmp;
-		
+
 		if (strcmp((tmp = format_find(name2)), "")) {
 			xfree(name2);
 			return tmp;
 		}
-		
+
 		xfree(name2);
 	}
 
 	if (config_theme && (tmp = strchr(config_theme, ',')) && !strchr(name, ',')) {
 		char *name2 = saprintf("%s,%s", name, tmp + 1);
 		const char *tmp;
-		
+
 		if (strcmp((tmp = format_find(name2)), "")) {
 			xfree(name2);
 			return tmp;
 		}
-		
+
 		xfree(name2);
 	}
-	
+
 	for (l = formats; l; l = l->next) {
 		struct format *f = l->data;
 
 		if (hash == f->name_hash && !strcasecmp(f->name, name))
 			return f->value;
 	}
-	
+
 	return "";
 }
 
@@ -197,7 +197,7 @@ char *va_format_string(const char *format, va_list ap)
 
 			if ((*p - '0') > argc)
 				argc = *p - '0';
-			
+
 		} else if (*p == '(' || *p == '[') {
 			if (*p == '(') {
 				while (*p && *p != ')')
@@ -209,10 +209,10 @@ char *va_format_string(const char *format, va_list ap)
 
 			if (*p)
 				p++;
-			
+
 			if (!*p)
 				break;
-			
+
 			if ((*p - '0') > argc)
 				argc = *p - '0';
 		} else {
@@ -248,9 +248,9 @@ char *va_format_string(const char *format, va_list ap)
 		}
 		dont_resolve = 0;
 	}
-	
+
 	p = format;
-	
+
 	while (*p) {
 		if (*p == '%') {
 			int fill_before, fill_after, fill_soft, fill_length;
@@ -354,7 +354,7 @@ char *va_format_string(const char *format, va_list ap)
 
 				string_append_n(buf, str, len);
 
-				if (fill_after) 
+				if (fill_after)
 					for (i = 0; i < fill_length; i++)
 						string_append_c(buf, fill_char);
 
@@ -386,7 +386,7 @@ char *va_format_string(const char *format, va_list ap)
  * zamienia sformatowany ci±g znaków ansi na Nowy-i-Lepszy(tm).
  *
  *  - str - ci±g znaków,
- * 
+ *
  * zwraca zaalokowan± fstring_t.
  */
 fstring_t reformat_string(const char *str)
@@ -394,7 +394,7 @@ fstring_t reformat_string(const char *str)
 	fstring_t res = xnew(struct fstring_s);
 	unsigned char attr = 128;
 	int i, j, len = 0;
-	
+
 	for (i = 0; str[i]; i++) {
 		if (str[i] == 27) {
 			if (str[i + 1] != '[')
@@ -404,7 +404,7 @@ fstring_t reformat_string(const char *str)
 				i++;
 
 			i--;
-			
+
 			continue;
 		}
 
@@ -434,7 +434,7 @@ fstring_t reformat_string(const char *str)
 			i += 2;
 
 			/* obs³uguje tylko "\033[...m", tak ma byæ */
-			
+
 			for (; str[i]; i++) {
 				if (str[i] >= '0' && str[i] <= '9') {
 					tmp *= 10;
@@ -516,7 +516,7 @@ char *format_string(const char *format, ...)
 {
 	va_list ap;
 	char *tmp;
-	
+
 	va_start(ap, format);
 	tmp = va_format_string(format, ap);
 	va_end(ap);
@@ -534,12 +534,12 @@ void print(const char *theme, ...)
 {
 	va_list ap;
 	char *tmp;
-	
+
 	va_start(ap, theme);
 	tmp = va_format_string(format_find(theme), ap);
-	
+
 	ui_print("__current", 0, (tmp) ? tmp : "");
-	
+
 	xfree(tmp);
 	va_end(ap);
 }
@@ -553,12 +553,12 @@ void print_status(const char *theme, ...)
 {
 	va_list ap;
 	char *tmp;
-	
+
 	va_start(ap, theme);
 	tmp = va_format_string(format_find(theme), ap);
-	
+
 	ui_print("__status", 0, (tmp) ? tmp : "");
-	
+
 	xfree(tmp);
 	va_end(ap);
 }
@@ -567,7 +567,7 @@ void print_status(const char *theme, ...)
  * print_window()
  *
  * wy¶wietla tekst w podanym oknie.
- *  
+ *
  *  - target - nazwa okna,
  *  - separate - czy niezbêdne jest otwieranie nowego okna?
  *  - theme, ... - tre¶æ.
@@ -576,15 +576,15 @@ void print_window(const char *target, int separate, const char *theme, ...)
 {
 	va_list ap;
 	char *tmp;
-	
+
 	if (!target)
 		target = "__current";
 
 	va_start(ap, theme);
 	tmp = va_format_string(format_find(theme), ap);
-	
+
 	ui_print(target, separate, (tmp) ? tmp : "");
-	
+
 	xfree(tmp);
 	va_end(ap);
 }
@@ -599,7 +599,7 @@ void theme_cache_reset()
 	xfree(prompt_cache);
 	xfree(prompt2_cache);
 	xfree(error_cache);
-	
+
 	prompt_cache = prompt2_cache = error_cache = NULL;
 	timestamp_cache = NULL;
 }
@@ -628,7 +628,7 @@ int format_add(const char *name, const char *value, int replace)
 		no_prompt_cache = 1;
 		return 0;
 	}
-	
+
 	for (l = formats; l; l = l->next) {
 		struct format *g = l->data;
 
@@ -670,7 +670,7 @@ int format_remove(const char *name)
 			xfree(f->value);
 			xfree(f->name);
 			list_remove(&formats, f, 1);
-		
+
 			return 0;
 		}
 	}
@@ -710,7 +710,7 @@ static FILE *try_open(FILE *prevfd, const char *prefix, const char *filename)
 		snprintf(buf, sizeof(buf), "%s.theme", filename);
 
 	save_errno = errno;
-	
+
 	if ((f = fopen(buf, "r")))
 		return f;
 
@@ -723,7 +723,7 @@ static FILE *try_open(FILE *prevfd, const char *prefix, const char *filename)
 /*
  * theme_read()
  *
- * wczytuje opis wygl±du z podanego pliku. 
+ * wczytuje opis wygl±du z podanego pliku.
  *
  *  - filename - nazwa pliku z opisem,
  *  - replace - czy zastêpowaæ istniej±ce wpisy.
@@ -744,7 +744,7 @@ int theme_read(const char *filename, int replace)
 
 		if ((tmp = strchr(fn, ',')))
 			*tmp = 0;
-		
+
 		errno = ENOENT;
 		f = try_open(NULL, NULL, fn);
 
@@ -818,7 +818,7 @@ void theme_free()
 
 		xfree(f->name);
 		xfree(f->value);
-	}	
+	}
 
 	list_destroy(formats, 1);
 	formats = NULL;
@@ -844,7 +844,7 @@ void theme_init()
 	format_add("error,speech", "b³±d!", 1);
 	format_add("timestamp", "%H:%M", 1);
 	format_add("timestamp,speech", " ", 1);
-	
+
 	/* prompty dla ui-readline */
 	format_add("readline_prompt", "% ", 1);
 	format_add("readline_prompt_away", "/ ", 1);
@@ -858,13 +858,13 @@ void theme_init()
 	format_add("readline_prompt_away_win_act", "%1 (act/%2)/ ", 1);
 	format_add("readline_prompt_invisible_win_act", "%1 (act/%2). ", 1);
 	format_add("readline_prompt_query_win_act", "%2:%1 (act/%3)> ", 1);
-					
+
 	format_add("readline_more", "-- Wci¶nij Enter by kontynuowaæ lub Ctrl-D by przerwaæ --", 1);
 
 	/* prompty i statusy dla ui-ncurses */
 	format_add("ncurses_prompt_none", "", 1);
 	format_add("ncurses_prompt_query", "[%1] ", 1);
-	format_add("statusbar", " %c(%w%{time}%c)%w %{?uin %c(%w%{?!nick uin}%{nick}%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) }%c%{?window (%wwin%c/%w%{window}}%{?query %c:%W%{query}}%{?debug %c(%Cdebug}%c)%w%{?activity  %c(%wact%c/%w}%{activity}%{?activity %c)%w}%{?mail  %c(%wmail%c/%w}%{mail}%{?mail %c)}%{?more  %c(%Gmore%c)}", 1);
+	format_add("statusbar", " %c(%w%{time}%c)%w %{?uin %c(%w%{?!nick uin}%{nick}%c/%{?away %w}%{?avail %W}%{?invisible %K}%{?notavail %k}%{uin}%c) }%c%{?window (%wwin%c/%w%{window}}%{?query %c:%W%{query}}%{?debug %c(%Cdebug}%c)%w%{?activity  %c(%wact%c/%w}%{activity}%{?activity %c)%w}%{?mail  %c(%wmail%c/%w}%{mail}%{?mail %c)}%{?more  %c(%Gmore%c)} %{star_mode}", 1);
 	format_add("header", " %{?query %c(%{?query_away %w}%{?query_avail %W}%{?query_invisible %K}%{?query_notavail %k}%{query}%{?query_descr %c/%w%{query_descr}}%c) %{?query_ip (%wip%c/%w%{query_ip}%c)}}%{?!query %c(%wekg%c/%w%{version}%c) (%w%{url}%c)}", 1);
 	format_add("ncurses_timestamp", "%H:%M", 1);
 
@@ -872,7 +872,7 @@ void theme_init()
 	format_add("known_user", "%T%1%n/%2", 1);
 	format_add("known_user,speech", "%1", 1);
 	format_add("unknown_user", "%T%1%n", 1);
-	
+
 	/* czêsto wykorzystywane, ró¿ne, przydatne itd. */
 	format_add("none", "%1\n", 1);
 	format_add("generic", "%> %1\n", 1);
@@ -926,7 +926,7 @@ void theme_init()
 	format_add("private_mode_off", "%> Wy³±czono tryb ,,tylko dla znajomych''\n", 1);
 	format_add("private_mode_invalid", "%! Nieprawid³owa warto¶æ\n", 1);
 	format_add("descr_too_long", "%! D³ugo¶æ opisu przekracza limit. Ilo¶æ uciêtych znaków: %T%1%n\n", 1);
-	
+
 	/* pomoc */
 	format_add("help", "%> %T%1%n%2 - %3\n", 1);
 	format_add("help_more", "%) %|%1\n", 1);
@@ -1017,7 +1017,7 @@ void theme_init()
 	format_add("contacts_blocking_footer", "", 1);
 	format_add("contacts_footer", "", 1);
 	format_add("contacts_footer_group", "", 1);
-		
+
 	/* ¿egnamy siê, zapisujemy konfiguracjê */
 	format_add("quit", "%> Papa\n", 1);
 	format_add("quit_descr", "%> Papa: %T%1%n%2\n", 1);
@@ -1064,7 +1064,7 @@ void theme_init()
 	format_add("sysmsg_header", "%m.-- %TWiadomo¶æ systemowa%m --- -- -%n\n", 1);
 	format_add("sysmsg_line", "%m|%n %|%1%n\n", 1);
 	format_add("sysmsg_line_width", "-8", 1);
-	format_add("sysmsg_footer", "%m`----- ---- --- -- -%n\n", 1);	
+	format_add("sysmsg_footer", "%m`----- ---- --- -- -%n\n", 1);
 
 	format_add("sysmsg_header,speech", "wiadomo¶æ systemowa:", 1);
 	format_add("sysmsg_line,speech", "%1\n", 1);
@@ -1129,7 +1129,7 @@ void theme_init()
 	format_add("not_connected", "%! Brak po³±czenia z serwerem. Wpisz %Tconnect%n\n", 1);
 	format_add("not_connected_msg_queued", "%! Brak po³±czenia z serwerem. Wiadomo¶æ bêdzie wys³ana po po³±czeniu.%n\n", 1);
 	format_add("invalid_local_ip", "%! Nieprawid³owy adres lokalny.\n", 1);
-	
+
 	/* obs³uga motywów */
 	format_add("theme_loaded", "%> Wczytano motyw %T%1%n\n", 1);
 	format_add("theme_default", "%> Ustawiono domy¶lny motyw\n", 1);
@@ -1145,7 +1145,7 @@ void theme_init()
 	format_add("config_read_success", "%> Wczytano plik konfiguracyjny %T%1%n\n", 1);
         format_add("config_line_incorrect", "%! Nieprawid³owa linia '%T%1%n', pomijam\n", 1);
 	format_add("autosaved", "%> Automatycznie zapisano ustawienia\n", 1);
-	
+
 	/* rejestracja nowego numeru */
 	format_add("register", "%> Rejestracja poprawna. Wygrany numerek: %T%1%n\n", 1);
 	format_add("register_failed", "%! B³±d podczas rejestracji: %1\n", 1);
@@ -1158,22 +1158,22 @@ void theme_init()
 	format_add("unregister_timeout", "%! Przekroczono limit czasu operacji usuwania konta\n", 1);
 	format_add("unregister_bad_uin", "%! Niepoprawny numer: %T%1%n\n", 1);
 	format_add("unregister_failed", "%! B³±d podczas usuwania konta: %1\n", 1);
-	
+
 	/* przypomnienie has³a */
 	format_add("remind", "%> Has³o zosta³o wys³ane\n", 1);
 	format_add("remind_failed", "%! B³±d podczas wysy³ania has³a: %1\n", 1);
 	format_add("remind_timeout", "%! Przekroczono limit czasu operacji wys³ania has³a\n", 1);
-	
+
 	/* zmiana has³a */
 	format_add("passwd", "%> Has³o zosta³o zmienione\n", 1);
 	format_add("passwd_failed", "%! B³±d podczas zmiany has³a: %1\n", 1);
 	format_add("passwd_timeout", "%! Przekroczono limit czasu operacji zmiany has³a\n", 1);
 	format_add("passwd_email", "%! Nale¿y ustawiæ zmienn± %Temail%n\n", 1);
-	
+
 	/* zmiana informacji w katalogu publicznym */
 	format_add("change", "%> Informacje w katalogu publicznym zosta³y zmienione\n", 1);
 	format_add("change_failed", "%! B³±d podczas zmiany informacji w katalogu publicznym\n", 1);
-	
+
 	/* pobieranie tokenu */
 	format_add("token", "%> Token zapisano do pliku %T%1%n\n", 1);
 	format_add("token_ocr", "%> Token: %T%1%n\n", 1);
@@ -1426,9 +1426,9 @@ void theme_init()
 	format_add("window_swapped", "%) Okna %T%1%n i %T%2%n zamienione miejscami\n", 1);
 
 	/* bind */
-	format_add("bind_seq_incorrect", "%! Sekwencja %T%1%n jest nieprawid³owa\n", 1); 
+	format_add("bind_seq_incorrect", "%! Sekwencja %T%1%n jest nieprawid³owa\n", 1);
 	format_add("bind_seq_add", "%> Dodano sekwencjê %T%1%n\n", 1);
-	format_add("bind_seq_remove", "%) Usuniêto sekwencjê %T%1%n\n", 1);	
+	format_add("bind_seq_remove", "%) Usuniêto sekwencjê %T%1%n\n", 1);
 	format_add("bind_seq_list", "%> %1: %T%2%n\n", 1);
 	format_add("bind_seq_exist", "%! Sekwencja %T%1%n ma ju¿ przypisan± akcjê\n", 1);
 	format_add("bind_seq_list_empty", "%! Brak przypisanych akcji\n", 1);
@@ -1489,7 +1489,7 @@ void theme_init()
 	format_add("conferences_unignore", "%> Konferencja %T%1%n nie bêdzie ignorowana\n", 1);
 	format_add("conferences_joined", "%> Do³±czono %1 do konferencji %T%2%n\n", 1);
 	format_add("conferences_already_joined", "%> %1 uczestniczy ju¿ w konferencji %T%2%n\n", 1);
-	
+
 	/* wspólne dla us³ug http */
 	format_add("http_failed_resolving", "Nie znaleziono serwera", 1);
 	format_add("http_failed_connecting", "Nie mo¿na po³±czyæ siê z serwerem", 1);
