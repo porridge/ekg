@@ -130,6 +130,7 @@ int config_last_sysmsg = 0;
 int config_last_sysmsg_changed = 0;
 char *config_local_ip = NULL;
 char *config_password = NULL;
+char *config_key_password = NULL;
 int config_slash_messages = 1;
 int config_sms_away = 0;
 int config_sms_away_limit = 0;

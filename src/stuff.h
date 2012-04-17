@@ -305,6 +305,7 @@ int config_mouse;
 #endif
 char *config_nick;
 char *config_password;
+char *config_key_password;
 int config_password_cp1250;
 int config_protocol;
 char *config_proxy;
