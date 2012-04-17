@@ -278,6 +278,7 @@ static void binding_forward_page(const char *arg);
 
 static int contacts_update(struct window *w);
 static void mouse_statusbar_commit(void);
+static void reset_mask_region();
 
 #ifndef COLOR_DEFAULT
 #  define COLOR_DEFAULT (-1)
@@ -4389,6 +4390,8 @@ static void binding_accept_line(const char *arg)
 	history[0] = line;
 	history_index = 0;
 	line[0] = 0;
+        reset_mask_region();
+        transient_star_mask_mode = 0;
 	line_adjust();
 }
 
@@ -4675,9 +4678,39 @@ static void binding_ui_ncurses_debug_toggle(const char *arg)
 	update_statusbar(1);
 }
 
+static int tmsm_rs=-1, tmsm_re=-1;
+static void start_mask_region()
+{
+    tmsm_rs = strlen(line);
+    tmsm_re = LINE_MAXLEN;
+}
+
+static void stop_mask_region()
+{
+    tmsm_re = strlen(line);
+}
+
+static void reset_mask_region()
+{
+    tmsm_rs = tmsm_re = -1;
+}
+
+static int in_mask_region(int p)
+{
+    if( p >= tmsm_rs && p<tmsm_re )
+        return 1;
+    else
+        return 0;
+}
+
+
 static void binding_toggle_transient_star_mode(const char *arg)
 {
     transient_star_mask_mode = !transient_star_mask_mode;
+    if( transient_star_mask_mode )
+        start_mask_region();
+    else
+        stop_mask_region();
     update_statusbar(1);
 }
 
@@ -4916,7 +4949,7 @@ redraw_prompt:
 				if (aspell_line[line_start + i] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
                                     print_char_underlined(input, 0, i + window_current->prompt_len, line[line_start + i]);
                                 else /* jesli jest wszystko okey to wyswietlamy normalny */
-                                    print_char(input, 0, i + window_current->prompt_len, line[line_start + i]);
+                                    print_char(input, 0, i + window_current->prompt_len, in_mask_region(line_start + i) ? '*':line[line_start + i]);
 			}
 #else
                         for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++)
