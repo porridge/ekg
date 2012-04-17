@@ -278,7 +278,7 @@ static void binding_forward_page(const char *arg);
 
 static int contacts_update(struct window *w);
 static void mouse_statusbar_commit(void);
-static void reset_mask_region();
+static void reset_tsm_region();
 
 #ifndef COLOR_DEFAULT
 #  define COLOR_DEFAULT (-1)
@@ -292,7 +292,7 @@ AspellSpeller *spell_checker = NULL;
 static char *aspell_line;
 #endif
 
-static int transient_star_mask_mode = 0;
+static int transient_star_mode = 0;
 
 /*
  * zamienia podany znak na ma³y; je¶li to mo¿liwe
@@ -2328,7 +2328,7 @@ static void update_statusbar(int commit)
 
 	__add_format("url", 1, "http://ekg.chmurka.net/");
 	__add_format("version", 1, VERSION);
-        __add_format("star_mode", transient_star_mask_mode, "*");
+        __add_format("star_mode", transient_star_mode, "*");
 
 #undef __add_format
 
@@ -4390,8 +4390,8 @@ static void binding_accept_line(const char *arg)
 	history[0] = line;
 	history_index = 0;
 	line[0] = 0;
-        reset_mask_region();
-        transient_star_mask_mode = 0;
+        reset_tsm_region();
+        transient_star_mode = 0;
 	line_adjust();
 }
 
@@ -4678,26 +4678,38 @@ static void binding_ui_ncurses_debug_toggle(const char *arg)
 	update_statusbar(1);
 }
 
-static int tmsm_rs=-1, tmsm_re=-1;
-static void start_mask_region()
+static int tsm_rs=-1, tsm_re=-1;
+static void start_tsm_region()
 {
-    tmsm_rs = strlen(line);
-    tmsm_re = LINE_MAXLEN;
+    tsm_rs = strlen(line);
+    tsm_re = LINE_MAXLEN;
 }
 
-static void stop_mask_region()
+static void stop_tsm_region()
 {
-    tmsm_re = strlen(line);
+    tsm_re = strlen(line);
 }
 
-static void reset_mask_region()
+static void reset_tsm_region()
 {
-    tmsm_rs = tmsm_re = -1;
+    tsm_rs = tsm_re = -1;
 }
 
-static int in_mask_region(int p)
+static int in_tsm_region(int p)
 {
-    if( p >= tmsm_rs && p<tmsm_re )
+    const int len = strlen(line);
+
+    if( len < tsm_rs )
+    {
+        reset_tsm_region();
+        transient_star_mode = 0;
+        update_statusbar(1);
+    }
+    else if( !transient_star_mode )
+        if( len<tsm_re )
+            tsm_re = len;
+
+    if( p>=tsm_rs && p<tsm_re )
         return 1;
     else
         return 0;
@@ -4706,11 +4718,11 @@ static int in_mask_region(int p)
 
 static void binding_toggle_transient_star_mode(const char *arg)
 {
-    transient_star_mask_mode = !transient_star_mask_mode;
-    if( transient_star_mask_mode )
-        start_mask_region();
+    transient_star_mode = !transient_star_mode;
+    if( transient_star_mode )
+        start_tsm_region();
     else
-        stop_mask_region();
+        stop_tsm_region();
     update_statusbar(1);
 }
 
@@ -4946,14 +4958,14 @@ redraw_prompt:
 
                         for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++) {
 
-				if (aspell_line[line_start + i] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
+				if (!in_tsm_region(line_start + i) && aspell_line[line_start + i] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
                                     print_char_underlined(input, 0, i + window_current->prompt_len, line[line_start + i]);
                                 else /* jesli jest wszystko okey to wyswietlamy normalny */
-                                    print_char(input, 0, i + window_current->prompt_len, in_mask_region(line_start + i) ? '*':line[line_start + i]);
+                                    print_char(input, 0, i + window_current->prompt_len, in_tsm_region(line_start + i) ? '*':line[line_start + i]);
 			}
 #else
                         for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++)
-                                print_char(input, 0, i + window_current->prompt_len, line[line_start + i]);
+                                print_char(input, 0, i + window_current->prompt_len, in_tsm_region(line_start + i) ? '*':line[line_start + i]);
 #endif
 
 			wattrset(input, color_pair(COLOR_BLACK, 1, COLOR_BLACK));
