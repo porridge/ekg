@@ -4555,11 +4555,13 @@ static void binding_previous_history(const char *arg)
 	}
 
 	if (history[history_index + 1]) {
+            if( !is_tsm_region_on() ) {
 		if (history_index == 0)
 			history[0] = xstrdup(line);
 		history_index++;
-		strlcpy(line, history[history_index], LINE_MAXLEN);
-		line_adjust();
+            }
+            strlcpy(line, history[history_index], LINE_MAXLEN);
+            line_adjust();
 	}
 }
 
