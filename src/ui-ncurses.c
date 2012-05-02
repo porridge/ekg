@@ -4687,11 +4687,12 @@ static void binding_ui_ncurses_debug_toggle(const char *arg)
 	update_statusbar(1);
 }
 
-static int tsm_rs=-1, tsm_re=-1;
+static int tsm_rs=-1, tsm_re=-1, tsm_line=-1;
 static void start_tsm_region()
 {
-    tsm_rs = strlen(line);
-    tsm_re = LINE_MAXLEN;
+    tsm_rs   = strlen(line);
+    tsm_re   = LINE_MAXLEN;
+    tsm_line = lines ? lines_index : 0;
 }
 
 static void stop_tsm_region()
@@ -4701,7 +4702,7 @@ static void stop_tsm_region()
 
 static void reset_tsm_region()
 {
-    tsm_rs = tsm_re = -1;
+    tsm_rs = tsm_re = tsm_line = -1;
 }
 
 static int is_tsm_region_on()
@@ -4709,9 +4710,13 @@ static int is_tsm_region_on()
     return tsm_rs>=0;
 }
 
-static int in_tsm_region(int p)
+static int in_tsm_region(int p, int ln_idx)
 {
-    const int len = strlen(line);
+    if( lines && ln_idx != tsm_line )
+        return 0;
+
+    const char* ln = lines ? lines[ln_idx] : line;
+    const int len  = strlen(ln);
 
     if( len < tsm_rs )
     {
@@ -4946,10 +4951,10 @@ redraw_prompt:
 
                                 for (j = 0; j + line_start < strlen(p) && j < input->_maxx + 1; j++) {
 
-				    if (aspell_line[line_start + j] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
+				    if (!in_tsm_region(line_start + j, lines_start+i) && aspell_line[line_start + j] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
                                         print_char_underlined(input, i, j, p[line_start + j]);
                                     else /* jesli jest wszystko okey to wyswietlamy normalny */
-				        print_char(input, i, j, p[j + line_start]);
+				        print_char(input, i, j, in_tsm_region(line_start + j, lines_start+i) ? '*':p[j + line_start]);
 				}
 #else
                                 for (j = 0; j + line_start < strlen((char*) p) && j < input->_maxx + 1; j++)
@@ -4972,14 +4977,14 @@ redraw_prompt:
 
                         for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++) {
 
-				if (!in_tsm_region(line_start + i) && aspell_line[line_start + i] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
+                            if (!in_tsm_region(line_start + i, 0) && aspell_line[line_start + i] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
                                     print_char_underlined(input, 0, i + window_current->prompt_len, line[line_start + i]);
                                 else /* jesli jest wszystko okey to wyswietlamy normalny */
-                                    print_char(input, 0, i + window_current->prompt_len, in_tsm_region(line_start + i) ? '*':line[line_start + i]);
+                                    print_char(input, 0, i + window_current->prompt_len, in_tsm_region(line_start + i, 0) ? '*':line[line_start + i]);
 			}
 #else
                         for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++)
-                                print_char(input, 0, i + window_current->prompt_len, in_tsm_region(line_start + i) ? '*':line[line_start + i]);
+                            print_char(input, 0, i + window_current->prompt_len, in_tsm_region(line_start + i, 0) ? '*':line[line_start + i]);
 #endif
 
 			wattrset(input, color_pair(COLOR_BLACK, 1, COLOR_BLACK));
