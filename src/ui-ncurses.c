@@ -4315,7 +4315,7 @@ static void binding_backward_delete_char(const char *arg)
 	if (strlen(line) > 0 && line_index > 0) {
 		memmove(line + line_index - 1, line + line_index, LINE_MAXLEN - line_index);
 		line[LINE_MAXLEN - 1] = 0;
-                delchar_in_tsm_region(line_index, 0);
+                delchar_in_tsm_region(line_index, lines ? lines_index:0);
 		line_index--;
 	}
         else
@@ -4868,7 +4868,7 @@ static void ui_ncurses_loop()
 			} else if (ch < 255 && strlen(line) < LINE_MAXLEN - 1) {
 
 				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
-                                inschar_in_tsm_region(line_index, 0);
+                                inschar_in_tsm_region(line_index, lines ? lines_index:0);
 				line[line_index++] = ch;
 
 			}
@@ -6318,7 +6318,8 @@ static int tsm_check_constraints(int p, int ln_idx)
 
 static int in_tsm_region(int p, int ln_idx)
 {
-    tsm_check_constraints(p, ln_idx);
+    if( tsm_check_constraints(p, ln_idx)<= 0 )
+        return 0;
 
     if( p>=tsm_rs && p<tsm_re )
         return 1;
@@ -6345,7 +6346,8 @@ static void delchar_in_tsm_region(int p, int ln_idx)
     else
     {
         --tsm_rs;
-        --tsm_re;
+        if( tsm_re != LINE_MAXLEN )
+            --tsm_re;
     }
 }
 
@@ -6362,6 +6364,7 @@ static void inschar_in_tsm_region(int p, int ln_idx)
     else
     {
         ++tsm_rs;
-        ++tsm_re;
+        if( tsm_re != LINE_MAXLEN )
+            ++tsm_re;
     }
 }
