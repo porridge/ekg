@@ -280,6 +280,12 @@ static int contacts_update(struct window *w);
 static void mouse_statusbar_commit(void);
 static void reset_tsm_region();
 static int is_tsm_region_on();
+static void delchar_in_tsm_region(int p, int ln_idx);
+static int in_tsm_region(int p, int ln_idx);
+static int is_tsm_region_on();
+static void stop_tsm_region();
+static void start_tsm_region();
+static void inschar_in_tsm_region(int p, int ln_idx);
 
 #ifndef COLOR_DEFAULT
 #  define COLOR_DEFAULT (-1)
@@ -4309,8 +4315,11 @@ static void binding_backward_delete_char(const char *arg)
 	if (strlen(line) > 0 && line_index > 0) {
 		memmove(line + line_index - 1, line + line_index, LINE_MAXLEN - line_index);
 		line[LINE_MAXLEN - 1] = 0;
+                delchar_in_tsm_region(line_index, 0);
 		line_index--;
 	}
+        else
+            delchar_in_tsm_region(0, 0);
 }
 
 static void binding_kill_line(const char *arg)
@@ -4349,6 +4358,7 @@ static void binding_delete_char(const char *arg)
 	if (line_index < strlen(line)) {
 		memmove(line + line_index, line + line_index + 1, LINE_MAXLEN - line_index - 1);
 		line[LINE_MAXLEN - 1] = 0;
+                delchar_in_tsm_region(line_index, 0);
 	}
 }
 
@@ -4687,53 +4697,6 @@ static void binding_ui_ncurses_debug_toggle(const char *arg)
 	update_statusbar(1);
 }
 
-static int tsm_rs=-1, tsm_re=-1, tsm_line=-1;
-static void start_tsm_region()
-{
-    tsm_rs   = strlen(line);
-    tsm_re   = LINE_MAXLEN;
-    tsm_line = lines ? lines_index : 0;
-}
-
-static void stop_tsm_region()
-{
-    tsm_re = strlen(line);
-}
-
-static void reset_tsm_region()
-{
-    tsm_rs = tsm_re = tsm_line = -1;
-}
-
-static int is_tsm_region_on()
-{
-    return tsm_rs>=0;
-}
-
-static int in_tsm_region(int p, int ln_idx)
-{
-    if( lines && ln_idx != tsm_line )
-        return 0;
-
-    const char* ln = lines ? lines[ln_idx] : line;
-    const int len  = strlen(ln);
-
-    if( len < tsm_rs )
-    {
-        reset_tsm_region();
-        transient_star_mode = 0;
-        update_statusbar(1);
-    }
-    else if( !transient_star_mode )
-        if( len<tsm_re )
-            tsm_re = len;
-
-    if( p>=tsm_rs && p<tsm_re )
-        return 1;
-    else
-        return 0;
-}
-
 
 static void binding_toggle_transient_star_mode(const char *arg)
 {
@@ -4905,7 +4868,7 @@ static void ui_ncurses_loop()
 			} else if (ch < 255 && strlen(line) < LINE_MAXLEN - 1) {
 
 				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
-
+                                inschar_in_tsm_region(line_index, 0);
 				line[line_index++] = ch;
 
 			}
@@ -6302,4 +6265,103 @@ static void binding_default()
 	binding_add("Alt-Z", "contacts-scroll-up", 1, 1);
 	binding_add("Alt-X", "contacts-scroll-down", 1, 1);
         binding_add("Ctrl-B", "toggle-transient-star-mode", 1, 1);
+}
+
+
+static int tsm_rs=-1, tsm_re=-1, tsm_line=-1;
+static void start_tsm_region()
+{
+    tsm_rs   = strlen(line);
+    tsm_re   = LINE_MAXLEN;
+    tsm_line = lines ? lines_index : 0;
+}
+
+static void stop_tsm_region()
+{
+    tsm_re = strlen(line);
+}
+
+static void reset_tsm_region()
+{
+    tsm_rs = tsm_re = tsm_line = -1;
+}
+
+static int is_tsm_region_on()
+{
+    return tsm_rs>=0;
+}
+
+static int tsm_check_constraints(int p, int ln_idx)
+{
+    if( lines && ln_idx != tsm_line )
+        return 0;  //no tsm region here
+
+    const char* ln = lines ? lines[ln_idx] : line;
+    const int len  = strlen(ln);
+
+    if( len < tsm_rs )
+    {
+        reset_tsm_region();
+        transient_star_mode = 0;
+        update_statusbar(1);
+        return -1;  //tsm region reset
+    }
+    else if( !transient_star_mode )
+        if( len<tsm_re )
+        {
+            tsm_re = len;
+            return 1; //tsm region updated
+        }
+
+    return 2;  //tsm region not updated
+}
+
+static int in_tsm_region(int p, int ln_idx)
+{
+    tsm_check_constraints(p, ln_idx);
+
+    if( p>=tsm_rs && p<tsm_re )
+        return 1;
+    else
+        return 0;
+}
+
+static void delchar_in_tsm_region(int p, int ln_idx)
+{
+    const int cc = tsm_check_constraints(p, ln_idx);
+    if( cc <= 0 || p >= tsm_re )
+        return;
+
+    if( p>=tsm_rs )
+    {
+        --tsm_re;
+        if( tsm_re<=tsm_rs )
+        {
+            reset_tsm_region();
+            transient_star_mode = 0;
+            update_statusbar(1);
+        }
+    }
+    else
+    {
+        --tsm_rs;
+        --tsm_re;
+    }
+}
+
+static void inschar_in_tsm_region(int p, int ln_idx)
+{
+    const int cc = tsm_check_constraints(p, ln_idx);
+    if( cc <= 0 || p >= tsm_re )
+        return;
+
+    if( p>=tsm_rs )
+    {
+        ++tsm_re;
+    }
+    else
+    {
+        ++tsm_rs;
+        ++tsm_re;
+    }
 }
