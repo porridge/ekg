@@ -280,7 +280,7 @@ static int contacts_update(struct window *w);
 static void mouse_statusbar_commit(void);
 static void reset_tsm_region();
 static int is_tsm_region_on();
-static void delchar_in_tsm_region(int p, int ln_idx);
+static void delchar_in_tsm_region(int p, int ln_idx, int at_eol);
 static int in_tsm_region(int p, int ln_idx);
 static int is_tsm_region_on();
 static void stop_tsm_region();
@@ -4320,11 +4320,9 @@ static void binding_backward_delete_char(const char *arg)
 	if (strlen(line) > 0 && line_index > 0) {
 		memmove(line + line_index - 1, line + line_index, LINE_MAXLEN - line_index);
 		line[LINE_MAXLEN - 1] = 0;
-                delchar_in_tsm_region(line_index, lines ? lines_index:0);
+                delchar_in_tsm_region(line_index, lines ? lines_index:0, 0);
 		line_index--;
 	}
-        else
-            delchar_in_tsm_region(0, 0);
 }
 
 static void binding_kill_line(const char *arg)
@@ -4346,6 +4344,8 @@ static void binding_delete_char(const char *arg)
 	if (line_index == strlen(line) && lines_index < array_count(lines) - 1 && strlen(line) + strlen(lines[lines_index + 1]) < LINE_MAXLEN) {
 		int i;
 
+                delchar_in_tsm_region(line_index, lines ? lines_index:0, 1);
+
 		strlcat(line, lines[lines_index + 1], LINE_MAXLEN);
 
 		xfree(lines[lines_index + 1]);
@@ -4356,7 +4356,6 @@ static void binding_delete_char(const char *arg)
 		lines = xrealloc(lines, (array_count(lines) + 1) * sizeof(char*));
 
 		lines_adjust();
-                tsm_del_whole_line(lines_index);
 
 		return;
 	}
@@ -4364,7 +4363,7 @@ static void binding_delete_char(const char *arg)
 	if (line_index < strlen(line)) {
 		memmove(line + line_index, line + line_index + 1, LINE_MAXLEN - line_index - 1);
 		line[LINE_MAXLEN - 1] = 0;
-                delchar_in_tsm_region(line_index, lines ? lines_index:0);
+                delchar_in_tsm_region(line_index, lines ? lines_index:0, 0);
 	}
 }
 
@@ -6333,8 +6332,23 @@ static int in_tsm_region(int p, int ln_idx)
         return 0;
 }
 
-static void delchar_in_tsm_region(int p, int ln_idx)
+static void delchar_in_tsm_region(int p, int ln_idx, int at_eol)
 {
+    if( at_eol && tsm_line > ln_idx )
+    {
+        gg_debug(GG_DEBUG_MISC, "// delchar_in_tsm_region(): %d %d %d\n", tsm_line, ln_idx, strlen(lines[ln_idx]));
+        if( tsm_line-1 == ln_idx )
+        {
+            tsm_rs += strlen(lines[ln_idx]);
+            if( tsm_re != LINE_MAXLEN )
+                tsm_re += strlen(lines[ln_idx]);
+        }
+        --tsm_line;
+        return;
+    }
+    else if( at_eol )
+        return;
+
     const int cc = tsm_check_constraints(p, ln_idx);
     if( cc <= 0 || p >= tsm_re )
         return;
@@ -6374,6 +6388,32 @@ static void inschar_in_tsm_region(int p, int ln_idx)
             ++tsm_re;
     }
 }
+/*  check if at eol and concat
+ */
+static void bkw_delchar_in_tsm_region(int p, int ln_idx)
+{
+    const int cc = tsm_check_constraints(p, ln_idx);
+    if( cc <= 0 || p >= tsm_re )
+        return;
+
+    if( p>=tsm_rs )
+    {
+        --tsm_re;
+        if( tsm_re<=tsm_rs )
+        {
+            reset_tsm_region();
+            transient_star_mode = 0;
+            update_statusbar(1);
+        }
+    }
+    else
+    {
+        --tsm_rs;
+        if( tsm_re != LINE_MAXLEN )
+            --tsm_re;
+    }
+}
+
 
 static void delword_in_tsm_region(int p, int ln_idx, int wsize)
 {
@@ -6382,7 +6422,7 @@ static void delword_in_tsm_region(int p, int ln_idx, int wsize)
 
     int i;
     for(i=0; i<wsize; ++i)
-        delchar_in_tsm_region(p, ln_idx);
+        delchar_in_tsm_region(p, ln_idx, 0);
 }
 
 static void tsm_del_whole_line(int ln_idx)
