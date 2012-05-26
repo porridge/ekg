@@ -6281,13 +6281,14 @@ static int tsm_rs=-1, tsm_re=-1, tsm_line=-1;
 static void start_tsm_region()
 {
     tsm_rs   = line_index;
-    tsm_re   = line_index+1;
+    tsm_re   = line_index;
     tsm_line = lines ? lines_index : 0;
 }
 
 static void stop_tsm_region()
 {
-    tsm_re = line_index+1;
+    /* if( tsm_rs != tsm_re ) */
+    /*     tsm_re = line_index+1; */
 }
 
 static void reset_tsm_region()
@@ -6344,8 +6345,7 @@ static void delchar_in_tsm_region(int p, int ln_idx, int at_eol)
         if( tsm_line-1 == ln_idx )
         {
             tsm_rs += strlen(lines[ln_idx]);
-            if( tsm_re != LINE_MAXLEN )
-                tsm_re += strlen(lines[ln_idx]);
+            tsm_re += strlen(lines[ln_idx]);
         }
         --tsm_line;
         return;
@@ -6370,8 +6370,7 @@ static void delchar_in_tsm_region(int p, int ln_idx, int at_eol)
     else
     {
         --tsm_rs;
-        if( tsm_re != LINE_MAXLEN )
-            --tsm_re;
+        --tsm_re;
     }
 }
 
@@ -6433,7 +6432,7 @@ static void inschar_in_tsm_region(int p, int ln_idx, int nl)
             ++tsm_line;
     }
     const int cc = tsm_check_constraints(p, ln_idx);
-    if( cc <= 0 || p >= tsm_re )
+    if( cc <= 0 || (!transient_star_mode && p >= tsm_re) || (transient_star_mode && p > tsm_re) )
         return;
 
     if( p>=tsm_rs )
@@ -6443,8 +6442,7 @@ static void inschar_in_tsm_region(int p, int ln_idx, int nl)
     else
     {
         ++tsm_rs;
-        if( tsm_re != LINE_MAXLEN )
-            ++tsm_re;
+        ++tsm_re;
     }
 }
 
