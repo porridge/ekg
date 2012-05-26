@@ -6341,7 +6341,7 @@ static void delchar_in_tsm_region(int p, int ln_idx, int at_eol)
 {
     if( at_eol && tsm_line > ln_idx )
     {
-        gg_debug(GG_DEBUG_MISC, "// delchar_in_tsm_region(): %d %d %d\n", tsm_line, ln_idx, strlen(lines[ln_idx]));
+        /* gg_debug(GG_DEBUG_MISC, "// delchar_in_tsm_region(): %d %d %d\n", tsm_line, ln_idx, strlen(lines[ln_idx])); */
         if( tsm_line-1 == ln_idx )
         {
             tsm_rs += strlen(lines[ln_idx]);
@@ -6383,8 +6383,7 @@ static void bkw_delchar_in_tsm_region(int p, int ln_idx, int at_bol)
         if( tsm_line == ln_idx )
         {
             tsm_rs += strlen(lines[ln_idx-1]);
-            if( tsm_re != LINE_MAXLEN )
-                tsm_re += strlen(lines[ln_idx-1]);
+            tsm_re += strlen(lines[ln_idx-1]);
         }
         --tsm_line;
         return;
@@ -6396,7 +6395,7 @@ static void bkw_delchar_in_tsm_region(int p, int ln_idx, int at_bol)
     if( cc <= 0 || p >= tsm_re )
         return;
 
-    if( p>=tsm_rs )
+    if( p>tsm_rs )
     {
         --tsm_re;
         if( tsm_re<=tsm_rs )
@@ -6409,8 +6408,7 @@ static void bkw_delchar_in_tsm_region(int p, int ln_idx, int at_bol)
     else
     {
         --tsm_rs;
-        if( tsm_re != LINE_MAXLEN )
-            --tsm_re;
+        --tsm_re;
     }
 }
 
@@ -6419,7 +6417,7 @@ static void inschar_in_tsm_region(int p, int ln_idx, int nl)
     if( nl && tsm_line >= ln_idx )
     {
         const bool this_ln = tsm_line == ln_idx;
-        const bool in_stars = p > tsm_rs && p <= tsm_re;
+        const bool in_stars = p > tsm_rs && p < tsm_re;
         if( this_ln && in_stars )
             tsm_re = p;
         else if( this_ln && p <= tsm_rs )
@@ -6437,6 +6435,8 @@ static void inschar_in_tsm_region(int p, int ln_idx, int nl)
 
     if( p>=tsm_rs )
     {
+        if( p==tsm_rs && !transient_star_mode )
+            ++tsm_rs;
         ++tsm_re;
     }
     else
