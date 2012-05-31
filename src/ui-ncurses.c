@@ -276,18 +276,21 @@ static void window_clear(struct window *w, int full);
 static void window_refresh();
 static void binding_forward_page(const char *arg);
 
-static int contacts_update(struct window *w);
+static int  contacts_update(struct window *w);
 static void mouse_statusbar_commit(void);
-static void reset_tsm_region();
-static int is_tsm_region_on();
-static void delchar_in_tsm_region(int p, int ln_idx, int at_eol);
-static int in_tsm_region(int p, int ln_idx);
-static int is_tsm_region_on();
-static void stop_tsm_region();
-static void start_tsm_region();
-static void inschar_in_tsm_region(int p, int ln_idx, int nl);
-static void delword_in_tsm_region(int p, int ln_idx, int wsize);
-static void bkw_delchar_in_tsm_region(int p, int ln_idx, int at_bol);
+
+// Funkcje do "gwiazdkowania"
+static void tsm_reset_region();
+static int  tsm_is_region_on();
+static void tsm_delchar_in_region(int p, int ln_idx, int at_eol);
+static int  tsm_in_region(int p, int ln_idx);
+static void tsm_stop_region();
+static void tsm_start_region();
+static void tsm_inschar_in_region(int p, int ln_idx, int nl);
+static void tsm_delword_in_region(int p, int ln_idx, int wsize);
+static void tsm_bkw_delchar_in_region(int p, int ln_idx, int at_bol);
+
+static int transient_star_mode = 0;
 
 #ifndef COLOR_DEFAULT
 #  define COLOR_DEFAULT (-1)
@@ -301,7 +304,6 @@ AspellSpeller *spell_checker = NULL;
 static char *aspell_line;
 #endif
 
-static int transient_star_mode = 0;
 
 /*
  * zamienia podany znak na ma³y; je¶li to mo¿liwe
@@ -4252,7 +4254,7 @@ static void binding_kill_word(const char *arg)
 	}
 
 	memmove(line + line_index, line + line_index + eaten, strlen(line) - line_index - eaten + 1);
-        delword_in_tsm_region(line_index, lines ? lines_index:0, eaten);
+        tsm_delword_in_region(line_index, lines ? lines_index:0, eaten);
 }
 
 static void binding_toggle_input(const char *arg)
@@ -4283,8 +4285,7 @@ static void binding_toggle_input(const char *arg)
 
 		command_exec(window_current->target, tmp, 0);
 		xfree(tmp);
-                reset_tsm_region();
-                transient_star_mode = 0;
+                tsm_reset_region();
 	}
 }
 
@@ -4301,7 +4302,7 @@ static void binding_backward_delete_char(const char *arg)
 	if (lines && line_index == 0 && lines_index > 0 && strlen(lines[lines_index]) + strlen(lines[lines_index - 1]) < LINE_MAXLEN) {
 		int i;
 
-                bkw_delchar_in_tsm_region(0, lines_index, 1);
+                tsm_bkw_delchar_in_region(0, lines_index, 1);
 
 		line_index = strlen(lines[lines_index - 1]);
 		strlcat(lines[lines_index - 1], lines[lines_index], LINE_MAXLEN);
@@ -4322,7 +4323,7 @@ static void binding_backward_delete_char(const char *arg)
 	if (strlen(line) > 0 && line_index > 0) {
 		memmove(line + line_index - 1, line + line_index, LINE_MAXLEN - line_index);
 		line[LINE_MAXLEN - 1] = 0;
-                bkw_delchar_in_tsm_region(line_index, lines ? lines_index:0, 0);
+                tsm_bkw_delchar_in_region(line_index, lines ? lines_index:0, 0);
 		line_index--;
 	}
 }
@@ -4346,7 +4347,7 @@ static void binding_delete_char(const char *arg)
 	if (line_index == strlen(line) && lines_index < array_count(lines) - 1 && strlen(line) + strlen(lines[lines_index + 1]) < LINE_MAXLEN) {
 		int i;
 
-                delchar_in_tsm_region(line_index, lines ? lines_index:0, 1);
+                tsm_delchar_in_region(line_index, lines ? lines_index:0, 1);
 
 		strlcat(line, lines[lines_index + 1], LINE_MAXLEN);
 
@@ -4365,7 +4366,7 @@ static void binding_delete_char(const char *arg)
 	if (line_index < strlen(line)) {
 		memmove(line + line_index, line + line_index + 1, LINE_MAXLEN - line_index - 1);
 		line[LINE_MAXLEN - 1] = 0;
-                delchar_in_tsm_region(line_index, lines ? lines_index:0, 0);
+                tsm_delchar_in_region(line_index, lines ? lines_index:0, 0);
 	}
 }
 
@@ -4374,7 +4375,7 @@ static void binding_accept_line(const char *arg)
 	if (lines) {
 		int i;
 
-                inschar_in_tsm_region(line_index, lines_index, 1);
+                tsm_inschar_in_region(line_index, lines_index, 1);
 
 		lines = xrealloc(lines, (array_count(lines) + 2) * sizeof(char*));
 
@@ -4398,7 +4399,7 @@ static void binding_accept_line(const char *arg)
 
 
         if (strcmp(line, "")) {
-            if( !is_tsm_region_on() ) { // nie zapamiêtuj zagwiazdkowanych linii w historii
+            if( !tsm_is_region_on() ) { // nie zapamiêtuj zagwiazdkowanych linii w historii
                 if (history[0] != line)
                     xfree(history[0]);
                 history[0] = xstrdup(line);
@@ -4410,14 +4411,13 @@ static void binding_accept_line(const char *arg)
                     print("none", "");
         }
 
-        if( !is_tsm_region_on() )
+        if( !tsm_is_region_on() )
         {
             history[0] = line;
             history_index = 0;
         }
 	line[0] = 0;
-        reset_tsm_region();
-        transient_star_mode = 0;
+        tsm_reset_region();
 	line_adjust();
 }
 
@@ -4574,7 +4574,7 @@ static void binding_previous_history(const char *arg)
 	}
 
 	if (history[history_index + 1]) {
-            if( !is_tsm_region_on() ) {
+            if( !tsm_is_region_on() ) {
 		if (history_index == 0)
 			history[0] = xstrdup(line);
 		history_index++;
@@ -4711,9 +4711,9 @@ static void binding_toggle_transient_star_mode(const char *arg)
 {
     transient_star_mode = !transient_star_mode;
     if( transient_star_mode )
-        start_tsm_region();
+        tsm_start_region();
     else
-        stop_tsm_region();
+        tsm_stop_region();
     update_statusbar(1);
 }
 
@@ -4877,7 +4877,7 @@ static void ui_ncurses_loop()
 			} else if (ch < 255 && strlen(line) < LINE_MAXLEN - 1) {
 
 				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
-                                inschar_in_tsm_region(line_index, lines ? lines_index:0, 0);
+                                tsm_inschar_in_region(line_index, lines ? lines_index:0, 0);
 				line[line_index++] = ch;
 
 			}
@@ -4923,10 +4923,10 @@ redraw_prompt:
 
                                 for (j = 0; j + line_start < strlen(p) && j < input->_maxx + 1; j++) {
 
-				    if (!in_tsm_region(line_start + j, lines_start+i) && aspell_line[line_start + j] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
+				    if (!tsm_in_region(line_start + j, lines_start+i) && aspell_line[line_start + j] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
                                         print_char_underlined(input, i, j, p[line_start + j]);
                                     else /* jesli jest wszystko okey to wyswietlamy normalny */
-				        print_char(input, i, j, in_tsm_region(line_start + j, lines_start+i) ? '*':p[j + line_start]);
+				        print_char(input, i, j, tsm_in_region(line_start + j, lines_start+i) ? '*':p[j + line_start]);
 				}
 #else
                                 for (j = 0; j + line_start < strlen((char*) p) && j < input->_maxx + 1; j++)
@@ -4949,14 +4949,14 @@ redraw_prompt:
 
                         for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++) {
 
-                            if (!in_tsm_region(line_start + i, 0) && aspell_line[line_start + i] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
+                            if (!tsm_in_region(line_start + i, 0) && aspell_line[line_start + i] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
                                     print_char_underlined(input, 0, i + window_current->prompt_len, line[line_start + i]);
                                 else /* jesli jest wszystko okey to wyswietlamy normalny */
-                                    print_char(input, 0, i + window_current->prompt_len, in_tsm_region(line_start + i, 0) ? '*':line[line_start + i]);
+                                    print_char(input, 0, i + window_current->prompt_len, tsm_in_region(line_start + i, 0) ? '*':line[line_start + i]);
 			}
 #else
                         for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++)
-                            print_char(input, 0, i + window_current->prompt_len, in_tsm_region(line_start + i, 0) ? '*':line[line_start + i]);
+                            print_char(input, 0, i + window_current->prompt_len, tsm_in_region(line_start + i, 0) ? '*':line[line_start + i]);
 #endif
 
 			wattrset(input, color_pair(COLOR_BLACK, 1, COLOR_BLACK));
@@ -6278,32 +6278,30 @@ static void binding_default()
 
 
 static int tsm_rs=-1, tsm_re=-1, tsm_line=-1;
-static void start_tsm_region()
+static void tsm_start_region()
 {
     tsm_rs   = line_index;
     tsm_re   = line_index;
     tsm_line = lines ? lines_index : 0;
 }
 
-static void stop_tsm_region()
-{
-    /* if( tsm_rs != tsm_re ) */
-    /*     tsm_re = line_index+1; */
-}
+static void tsm_stop_region()
+{}
 
-static void reset_tsm_region()
+static void tsm_reset_region()
 {
     tsm_rs = tsm_re = tsm_line = -1;
+    transient_star_mode = 0;
 }
 
-static int is_tsm_region_on()
+static int tsm_is_region_on()
 {
     return tsm_rs>=0;
 }
 
 static int tsm_check_constraints(int p, int ln_idx)
 {
-    if( !is_tsm_region_on() || (lines && ln_idx != tsm_line) )
+    if( !tsm_is_region_on() || (lines && ln_idx != tsm_line) )
         return 0;  //no tsm region here
 
     const char* ln = lines ? lines[ln_idx] : line;
@@ -6311,8 +6309,7 @@ static int tsm_check_constraints(int p, int ln_idx)
 
     if( len < tsm_rs )
     {
-        reset_tsm_region();
-        transient_star_mode = 0;
+        tsm_reset_region();
         update_statusbar(1);
         return -1;  //tsm region reset
     }
@@ -6326,7 +6323,7 @@ static int tsm_check_constraints(int p, int ln_idx)
     return 2;  //tsm region not updated
 }
 
-static int in_tsm_region(int p, int ln_idx)
+static int tsm_in_region(int p, int ln_idx)
 {
     if( tsm_check_constraints(p, ln_idx)<= 0 )
         return 0;
@@ -6337,11 +6334,10 @@ static int in_tsm_region(int p, int ln_idx)
         return 0;
 }
 
-static void delchar_in_tsm_region(int p, int ln_idx, int at_eol)
+static void tsm_delchar_in_region(int p, int ln_idx, int at_eol)
 {
     if( at_eol && tsm_line > ln_idx )
     {
-        /* gg_debug(GG_DEBUG_MISC, "// delchar_in_tsm_region(): %d %d %d\n", tsm_line, ln_idx, strlen(lines[ln_idx])); */
         if( tsm_line-1 == ln_idx )
         {
             tsm_rs += strlen(lines[ln_idx]);
@@ -6362,8 +6358,7 @@ static void delchar_in_tsm_region(int p, int ln_idx, int at_eol)
         --tsm_re;
         if( tsm_re<=tsm_rs )
         {
-            reset_tsm_region();
-            transient_star_mode = 0;
+            tsm_reset_region();
             update_statusbar(1);
         }
     }
@@ -6376,7 +6371,7 @@ static void delchar_in_tsm_region(int p, int ln_idx, int at_eol)
 
 /*  check if at eol and concat
  */
-static void bkw_delchar_in_tsm_region(int p, int ln_idx, int at_bol)
+static void tsm_bkw_delchar_in_region(int p, int ln_idx, int at_bol)
 {
     if( at_bol && tsm_line >= ln_idx && ln_idx>0 )
     {
@@ -6400,8 +6395,7 @@ static void bkw_delchar_in_tsm_region(int p, int ln_idx, int at_bol)
         --tsm_re;
         if( tsm_re<=tsm_rs )
         {
-            reset_tsm_region();
-            transient_star_mode = 0;
+            tsm_reset_region();
             update_statusbar(1);
         }
     }
@@ -6412,7 +6406,7 @@ static void bkw_delchar_in_tsm_region(int p, int ln_idx, int at_bol)
     }
 }
 
-static void inschar_in_tsm_region(int p, int ln_idx, int nl)
+static void tsm_inschar_in_region(int p, int ln_idx, int nl)
 {
     if( nl && tsm_line >= ln_idx )
     {
@@ -6446,12 +6440,12 @@ static void inschar_in_tsm_region(int p, int ln_idx, int nl)
     }
 }
 
-static void delword_in_tsm_region(int p, int ln_idx, int wsize)
+static void tsm_delword_in_region(int p, int ln_idx, int wsize)
 {
-    if( !is_tsm_region_on() )
+    if( !tsm_is_region_on() )
         return;
 
     int i;
     for(i=0; i<wsize; ++i)
-        delchar_in_tsm_region(p, ln_idx, 0);
+        tsm_delchar_in_region(p, ln_idx, 0);
 }
