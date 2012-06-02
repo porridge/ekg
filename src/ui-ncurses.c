@@ -6387,7 +6387,7 @@ static void tsm_bkw_delchar_in_region(int p, int ln_idx, int at_bol)
         return;
 
     const int cc = tsm_check_constraints(p, ln_idx);
-    if( cc <= 0 || p >= tsm_re )
+    if( cc <= 0 || p > tsm_re )
         return;
 
     if( p>tsm_rs )
