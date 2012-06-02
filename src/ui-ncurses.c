@@ -284,6 +284,7 @@ static void tsm_reset_region();
 static int  tsm_is_region_on();
 static void tsm_delchar_in_region(int p, int ln_idx, int at_eol);
 static int  tsm_in_region(int p, int ln_idx);
+static int  tsm_in_region_ext(int p, int ln_idx);
 static void tsm_stop_region();
 static void tsm_start_region();
 static void tsm_inschar_in_region(int p, int ln_idx, int nl);
@@ -4489,6 +4490,9 @@ static void binding_word_rubout(const char *arg)
 
 static void binding_complete(const char *arg)
 {
+        if( tsm_in_region_ext(line_index, lines ? lines_start:0) )
+            return;
+
 	if (!lines)
 		complete(&line_start, &line_index);
 	else {
@@ -4709,6 +4713,8 @@ static void binding_ui_ncurses_debug_toggle(const char *arg)
 
 static void binding_toggle_transient_star_mode(const char *arg)
 {
+    if( !transient_star_mode && tsm_is_region_on() )
+        return; //dopuszczalny tylko 1 region
     transient_star_mode = !transient_star_mode;
     if( transient_star_mode )
         tsm_start_region();
@@ -6314,9 +6320,9 @@ static int tsm_check_constraints(int p, int ln_idx)
         return -1;  //tsm region reset
     }
     else if( !transient_star_mode )
-        if( len<tsm_re )
+        if( len+1<tsm_re ) //tsm_re pokazuje ostatni znak regionu +1
         {
-            tsm_re = len;
+            tsm_re = len+1;
             return 1; //tsm region updated
         }
 
@@ -6329,6 +6335,17 @@ static int tsm_in_region(int p, int ln_idx)
         return 0;
 
     if( p>=tsm_rs && p<tsm_re )
+        return 1;
+    else
+        return 0;
+}
+
+static int tsm_in_region_ext(int p, int ln_idx)
+{
+    if( tsm_check_constraints(p, ln_idx)<= 0 )
+        return 0;
+
+    if( p>=tsm_rs && p<=tsm_re )
         return 1;
     else
         return 0;
