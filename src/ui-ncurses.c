@@ -4490,8 +4490,8 @@ static void binding_word_rubout(const char *arg)
 
 static void binding_complete(const char *arg)
 {
-        if( tsm_in_region_ext(line_index, lines ? lines_start:0) )
-            return;
+    if( tsm_in_region_ext(line_index, lines ? lines_start:0) )
+        return;
 
 	if (!lines)
 		complete(&line_start, &line_index);
@@ -6292,7 +6292,10 @@ static void tsm_start_region()
 }
 
 static void tsm_stop_region()
-{}
+{
+    if( tsm_rs == tsm_re )
+        tsm_reset_region();
+}
 
 static void tsm_reset_region()
 {
@@ -6320,9 +6323,9 @@ static int tsm_check_constraints(int p, int ln_idx)
         return -1;  //tsm region reset
     }
     else if( !transient_star_mode )
-        if( len+1<tsm_re ) //tsm_re pokazuje ostatni znak regionu +1
+        if( len<tsm_re )
         {
-            tsm_re = len+1;
+            tsm_re = len+1; //tsm_re pokazuje ostatni znak regionu +1
             return 1; //tsm region updated
         }
 
@@ -6386,7 +6389,7 @@ static void tsm_delchar_in_region(int p, int ln_idx, int at_eol)
     }
 }
 
-/*  check if at eol and concat
+/*  check if at bol and concat
  */
 static void tsm_bkw_delchar_in_region(int p, int ln_idx, int at_bol)
 {
