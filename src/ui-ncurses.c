@@ -290,6 +290,8 @@ static void tsm_start_region();
 static void tsm_inschar_in_region(int p, int ln_idx, int nl);
 static void tsm_delword_in_region(int p, int ln_idx, int wsize);
 static void tsm_bkw_delchar_in_region(int p, int ln_idx, int at_bol);
+static void tsm_yank_in_region(int p, int ln_idx, int ysize);
+static int  tsm_check_constraints(int p, int ln_idx);
 
 static int transient_star_mode = 0;
 
@@ -4332,6 +4334,7 @@ static void binding_backward_delete_char(const char *arg)
 static void binding_kill_line(const char *arg)
 {
 	line[line_index] = 0;
+    tsm_check_constraints(0, lines ? lines_index:0);
 }
 
 static void binding_yank(const char *arg)
@@ -4339,7 +4342,9 @@ static void binding_yank(const char *arg)
 	if (yanked && strlen(yanked) + strlen(line) + 1 < LINE_MAXLEN) {
 		memmove(line + line_index + strlen(yanked), line + line_index, LINE_MAXLEN - line_index - strlen(yanked));
 		memcpy(line + line_index, yanked, strlen(yanked));
+        tsm_yank_in_region(line_index, lines ? lines_index:0, strlen(yanked));
 		line_index += strlen(yanked);
+
 	}
 }
 
@@ -4428,10 +4433,12 @@ static void binding_line_discard(const char *arg)
 	yanked = strdup(line);
 	line[0] = 0;
 	line_adjust();
+    tsm_check_constraints(0, lines ? lines_index:0);
 
 	if (lines && lines_index < array_count(lines) - 1) {
 		int i;
 
+        tsm_delchar_in_region(0, lines_index, 1);
 		xfree(lines[lines_index]);
 
 		for (i = lines_index; i < array_count(lines); i++)
@@ -4490,11 +4497,12 @@ static void binding_word_rubout(const char *arg)
 
 static void binding_complete(const char *arg)
 {
-    if( tsm_in_region_ext(line_index, lines ? lines_start:0) )
-        return;
-
 	if (!lines)
+    {
+        if( tsm_in_region_ext(line_index, lines ? lines_start:0) )
+            return;
 		complete(&line_start, &line_index);
+    }
 	else {
 		int i, count = 8 - (line_index % 8);
 
@@ -4504,7 +4512,10 @@ static void binding_complete(const char *arg)
 		memmove(line + line_index + count, line + line_index, LINE_MAXLEN - line_index - count);
 
 		for (i = line_index; i < line_index + count; i++)
+        {
 			line[i] = ' ';
+            tsm_inschar_in_region(line_index, lines_index, 0);
+        }
 
 		line_index += count;
 	}
@@ -6428,35 +6439,41 @@ static void tsm_bkw_delchar_in_region(int p, int ln_idx, int at_bol)
 
 static void tsm_inschar_in_region(int p, int ln_idx, int nl)
 {
-    if( nl && tsm_line >= ln_idx )
+    if( nl )
     {
-        const bool this_ln = tsm_line == ln_idx;
-        const bool in_stars = p > tsm_rs && p < tsm_re;
-        if( this_ln && in_stars )
-            tsm_re = p;
-        else if( this_ln && p <= tsm_rs )
+        if(tsm_line >= ln_idx )
         {
-            tsm_rs -= p;
-            tsm_re -= p;
-            ++tsm_line;
+            const bool this_ln = tsm_line == ln_idx;
+            const bool in_stars = p > tsm_rs && p < tsm_re;
+            if( this_ln && in_stars )
+                tsm_re = p;
+            else if( this_ln && p <= tsm_rs )
+            {
+                tsm_rs -= p;
+                tsm_re -= p;
+                ++tsm_line;
+            }
+            else if( !this_ln )
+                ++tsm_line;
         }
-        else if( !this_ln )
-            ++tsm_line;
-    }
-    const int cc = tsm_check_constraints(p, ln_idx);
-    if( cc <= 0 || (!transient_star_mode && p >= tsm_re) || (transient_star_mode && p > tsm_re) )
-        return;
-
-    if( p>=tsm_rs )
-    {
-        if( p==tsm_rs && !transient_star_mode )
-            ++tsm_rs;
-        ++tsm_re;
     }
     else
     {
-        ++tsm_rs;
-        ++tsm_re;
+        const int cc = tsm_check_constraints(p, ln_idx);
+        if( cc <= 0 || (!transient_star_mode && p >= tsm_re) || (transient_star_mode && p > tsm_re) )
+            return;
+
+        if( p>=tsm_rs )
+        {
+            if( p==tsm_rs && !transient_star_mode )
+                ++tsm_rs;
+            ++tsm_re;
+        }
+        else
+        {
+            ++tsm_rs;
+            ++tsm_re;
+        }
     }
 }
 
@@ -6468,4 +6485,15 @@ static void tsm_delword_in_region(int p, int ln_idx, int wsize)
     int i;
     for(i=0; i<wsize; ++i)
         tsm_delchar_in_region(p, ln_idx, 0);
+}
+
+
+static void tsm_yank_in_region(int p, int ln_idx, int ysize)
+{
+    if( !tsm_is_region_on() )
+        return;
+
+    int i;
+    for(i=0; i<ysize; ++i)
+        tsm_inschar_in_region(p+i, ln_idx, 0);
 }
