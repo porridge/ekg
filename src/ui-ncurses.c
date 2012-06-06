@@ -4256,8 +4256,8 @@ static void binding_kill_word(const char *arg)
 		eaten++;
 	}
 
-	memmove(line + line_index, line + line_index + eaten, strlen(line) - line_index - eaten + 1);
         tsm_delword_in_region(line_index, lines ? lines_index:0, eaten);
+	memmove(line + line_index, line + line_index + eaten, strlen(line) - line_index - eaten + 1);
 }
 
 static void binding_toggle_input(const char *arg)
