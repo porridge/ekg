@@ -120,7 +120,7 @@ int sim_key_generate(uint32_t uin, int pass)
         const EVP_CIPHER *enc    = pass ? EVP_aes_256_ofb():NULL;
         pem_password_cb  *key_cb = pass ? private_key_cb:NULL;
 	if (!PEM_write_RSAPrivateKey(f, keys, enc, NULL, 0, key_cb, NULL)) {
-		sim_errno = SIM_ERROR_PUBLIC;
+		sim_errno = SIM_ERROR_PRIVATE;
 		goto cleanup;
 	}
 
@@ -540,7 +540,7 @@ int sim_private_key_ok()
         snprintf(path, sizeof(path), "%s/private.pem", sim_key_path);
 
 	if (!(f = fopen(path, "r")))
-		return 1;
+		return 0;
 
         key = PEM_read_RSAPrivateKey(f, NULL, private_key_cb, NULL);
 

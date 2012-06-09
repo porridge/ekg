@@ -2870,7 +2870,8 @@ COMMAND(cmd_set)
 				const char *my_params[2] = { (!unset) ? params[0] : params[0] + 1, NULL };
 
 				cmd_set("set-show", my_params, NULL, quiet);
-				config_changed = 1;
+                                if( strcmp(arg, "key_password") ) //zapisywanie w pliku has³a do pliku mija siê z celem
+                                    config_changed = 1;
 				last_save = time(NULL);
 				break;
 			}
