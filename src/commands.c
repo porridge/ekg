@@ -3555,7 +3555,7 @@ COMMAND(cmd_version)
 COMMAND(cmd_key)
 {
 	if (match_arg(params[0], 'g', "generate", 2)) {
-		char *tmp, *tmp2;
+        char *tmp, *tmp2, *pass = params[1];
 		struct stat st;
 
 		if (!config_uin)
@@ -3579,9 +3579,16 @@ COMMAND(cmd_key)
 		xfree(tmp);
 		xfree(tmp2);
 
+        if( pass )
+            if( !config_key_password || strcmp(pass, config_key_password) ) {
+                printq("key_private_mismatch");
+                return -1;
+            }
+
+
 		printq("key_generating");
 
-		if (sim_key_generate(config_uin, 0)) {
+		if (sim_key_generate(config_uin, pass)) {
 			printq("key_generating_error", "sim_key_generate()");
 			return -1;
 		}
@@ -6624,7 +6631,7 @@ void command_init()
 	( "key", "uu", cmd_key, 0,
 	  " [opcje]", "zarz±dzanie kluczami dla SIM",
 	  "\n"
-	  "  -g, --generate              generuje parê kluczy u¿ytkownika\n"
+	  "  -g, --generate [has³o]      generuje parê kluczy u¿ytkownika; je¶li podano - zabezpiecza klucz prywatny has³em\n"
 	  "  -s, --send <numer/alias>    wysy³a nasz klucz publiczny\n"
 	  "  -d, --delete <numer/alias>  usuwa klucz publiczny\n"
 	  "  [-l, --list] [numer/alias]  wy¶wietla posiadane klucze publiczne");

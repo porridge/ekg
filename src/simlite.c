@@ -531,18 +531,21 @@ pem_password_cb* sim_set_private_key_cb(pem_password_cb *new_cb)
     return old_cb;
 }
 
+/*
+ * Sprawdza czy (je¶li istnieje) da siê czytaæ klucz prywatny
+ */
 int sim_private_key_ok()
 {
 	char path[PATH_MAX + 1];
 	FILE *f;
 	RSA *key;
 
-        snprintf(path, sizeof(path), "%s/private.pem", sim_key_path);
+    snprintf(path, sizeof(path), "%s/private.pem", sim_key_path);
 
 	if (!(f = fopen(path, "r")))
-		return 0;
+		return 1; /* brak klucza czyli brak przeszkód do dzia³ania */
 
-        key = PEM_read_RSAPrivateKey(f, NULL, private_key_cb, NULL);
+    key = PEM_read_RSAPrivateKey(f, NULL, private_key_cb, NULL);
 
 	fclose(f);
 

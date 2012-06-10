@@ -1516,6 +1516,8 @@ void theme_init()
 	format_add("key_send_error", "%! B³±d podczas wysy³ania klucza publicznego\n", 1);
 	format_add("key_list", "%> %1 (%3)\n%) %2\n", 1);
 	format_add("key_list_timestamp", "%Y-%m-%d %H:%M", 1);
+    format_add("key_private_mismatch", "podane has³o nie pasuje do has³a w zmiennej `key_password'\n", 1);
+    format_add("key_private_read_error", "b³±d wczytywania klucza prywatnego (b³êdne has³o?)\n", 1);
 #endif
 
 #ifdef WITH_PYTHON
