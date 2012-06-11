@@ -1139,7 +1139,7 @@ void theme_init()
 	format_add("variable", "%> %1 = %2\n", 1);
 	format_add("variable_not_found", "%! Nieznana zmienna: %T%1%n\n", 1);
 	format_add("variable_invalid", "%! Nieprawid³owa warto¶æ zmiennej\n", 1);
-	format_add("no_config", "%! Niekompletna konfiguracja. Wpisz:\n%!   %Tset uin <numerek-gg>%n\n%!   %Tset password <has³o>%n\n%!   %Tset email <adres-email>%n\n%!   %Tsave%n\n%! Nastêpnie wydaj polecenie:\n%!   %Tconnect%n\n%! Je¶li nie masz swojego numerka, wpisz:\n%!   %Ttoken%n\n%!   %Tregister <e-mail> <has³o> <token>%n\n\n%> %|Po po³±czeniu, nowe okna rozmowy bêd± tworzone automatycznie, gdy kto¶ przy¶le wiadomo¶æ. Aby przej¶æ do okna o podanym numerze nale¿y wcisn±æ %TAlt-numer%n lub %TEsc%n, a nastêpnie cyfrê. Aby rozpocz±æ rozmowê, nale¿y u¿yæ polecenia %Tquery%n. Aby dodaæ kogo¶ do listy kontaktów, nale¿y u¿yæ polecenia %Tadd%n. Wszystkie kombinacje klawiszy s± opisane w pliku %TREADME%n, a listê komend wy¶wietla polecenie %Thelp%n.\n\n", 2);
+	format_add("no_config", "%! Niekompletna konfiguracja. Wpisz:\n%!   %Tset uin <numerek-gg>%n\n%!   %Tset password <has³o>%n\n%!   %Tset key_password <has³o> (je¶li zabezpieczy³e¶ klucz prywatny has³em)%n\n%!   %Tset email <adres-email>%n\n%!   %Tsave%n\n%! Nastêpnie wydaj polecenie:\n%!   %Tconnect%n\n%! Je¶li nie masz swojego numerka, wpisz:\n%!   %Ttoken%n\n%!   %Tregister <e-mail> <has³o> <token>%n\n\n%> %|Po po³±czeniu, nowe okna rozmowy bêd± tworzone automatycznie, gdy kto¶ przy¶le wiadomo¶æ. Aby przej¶æ do okna o podanym numerze nale¿y wcisn±æ %TAlt-numer%n lub %TEsc%n, a nastêpnie cyfrê. Aby rozpocz±æ rozmowê, nale¿y u¿yæ polecenia %Tquery%n. Aby dodaæ kogo¶ do listy kontaktów, nale¿y u¿yæ polecenia %Tadd%n. Wszystkie kombinacje klawiszy s± opisane w pliku %TREADME%n, a listê komend wy¶wietla polecenie %Thelp%n.\n\n", 2);
 	format_add("no_config,speech", "niekompletna konfiguracja. wpisz set uin, a potem numer gadu-gadu, potem set pas³ord, za tym swoje has³o, a nastêpnie set imejl (bez my¶lnika), a za tym swój adres imejl. wpisz sejf, ¿eby zapisaæ ustawienia. wpisz konekt by siê po³±czyæ. niestety rejestracja wymaga odczytania z ekranu wys³anego przez serwer tokenu. po po³±czeniu, nowe okna rozmowy bêd± tworzone automatycznie, gdy kto¶ przy¶le wiadomo¶æ. aby przej¶æ do okna o podanym numerze, nale¿y wcisn±æ alt-numer lub eskejp, a nastêpnie cyfrê. aby rozpocz±æ rozmowê, nale¿y u¿yæ polecenia k³ery. aby dodaæ kogo¶ do listy kontaktów, nale¿y u¿yæ polecenia edd. wszystkie kombinacje klawiszy s± opisane w pliku ridmi, a listê komend wy¶wietla polecenie help.", 1);
 	format_add("error_reading_config", "%! Nie mo¿na odczytaæ pliku konfiguracyjnego: %1\n", 1);
 	format_add("config_read_success", "%> Wczytano plik konfiguracyjny %T%1%n\n", 1);
@@ -1516,6 +1516,8 @@ void theme_init()
 	format_add("key_send_error", "%! B³±d podczas wysy³ania klucza publicznego\n", 1);
 	format_add("key_list", "%> %1 (%3)\n%) %2\n", 1);
 	format_add("key_list_timestamp", "%Y-%m-%d %H:%M", 1);
+    format_add("key_private_mismatch", "podane has³o nie pasuje do has³a w zmiennej `key_password'\n", 1);
+    format_add("key_private_read_error", "b³±d wczytywania klucza prywatnego (b³êdne has³o?)\n", 1);
 #endif
 
 #ifdef WITH_PYTHON

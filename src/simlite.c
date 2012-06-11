@@ -44,6 +44,9 @@
 
 char *sim_key_path = NULL;
 int sim_errno = 0;
+static pem_password_cb *private_key_cb = NULL;
+static char *pem_password_buffer = NULL;
+static int   pem_password_len = 0;
 
 /*
  * sim_seed_prng()
@@ -73,10 +76,11 @@ static int sim_seed_prng()
  * tworzy parê kluczy i zapisuje je na dysku.
  *
  *  - uin - numer, dla którego generujemy klucze.
+ *  - pass - 0/1 bez/z has³em dla klucza prywatnego
  *
  * 0/-1
  */
-int sim_key_generate(uint32_t uin)
+int sim_key_generate(uint32_t uin, int pass)
 {
 	char path[PATH_MAX + 1];
 	RSA *keys = NULL;
@@ -113,8 +117,10 @@ int sim_key_generate(uint32_t uin)
 		goto cleanup;
 	}
 
-	if (!PEM_write_RSAPrivateKey(f, keys, NULL, NULL, 0, NULL, NULL)) {
-		sim_errno = SIM_ERROR_PUBLIC;
+        const EVP_CIPHER *enc    = pass ? EVP_aes_256_ofb():NULL;
+        pem_password_cb  *key_cb = pass ? private_key_cb:NULL;
+	if (!PEM_write_RSAPrivateKey(f, keys, enc, NULL, 0, key_cb, NULL)) {
+		sim_errno = SIM_ERROR_PRIVATE;
 		goto cleanup;
 	}
 
@@ -122,7 +128,7 @@ int sim_key_generate(uint32_t uin)
 	f = NULL;
 
 	res = 0;
-	
+
 cleanup:
 	if (keys)
 		RSA_free(keys);
@@ -155,12 +161,12 @@ static RSA *sim_key_read(uint32_t uin)
 
 	if (!(f = fopen(path, "r")))
 		return NULL;
-	
+
 	if (uin)
 		key = PEM_read_RSAPublicKey(f, NULL, NULL, NULL);
 	else
-		key = PEM_read_RSAPrivateKey(f, NULL, NULL, NULL);
-	
+		key = PEM_read_RSAPrivateKey(f, NULL, private_key_cb, NULL);
+
 	fclose(f);
 
 	return key;
@@ -200,8 +206,8 @@ char *sim_key_fingerprint(uint32_t uin)
 		size = i2d_RSAPublicKey(key, &newbuf);
 	else
 		size = i2d_RSAPrivateKey(key, &newbuf);
-	
-	EVP_DigestInit(&ctx, EVP_sha1());	
+
+	EVP_DigestInit(&ctx, EVP_sha1());
 	EVP_DigestUpdate(&ctx, buf, size);
 	EVP_DigestFinal(&ctx, md_value, &md_len);
 
@@ -233,7 +239,7 @@ cleanup:
 const char *sim_strerror(int error)
 {
 	const char *result = "Unknown error";
-	
+
 	switch (error) {
 		case SIM_ERROR_SUCCESS:
 			result = "Success";
@@ -393,13 +399,13 @@ char *sim_message_decrypt(const unsigned char *message, uint32_t uin)
 		sim_errno = SIM_ERROR_INVALID;
 		goto cleanup;
 	}
-	
+
 	/* wczytaj klucz prywatny */
 	if (!(private = sim_key_read(0))) {
 		sim_errno = SIM_ERROR_PRIVATE;
 		goto cleanup;
 	}
-	
+
 	mbio = BIO_new(BIO_s_mem());
 	bbio = BIO_new(BIO_f_base64());
 	BIO_set_flags(bbio, BIO_FLAGS_BASE64_NO_NL);
@@ -433,7 +439,7 @@ char *sim_message_decrypt(const unsigned char *message, uint32_t uin)
 		sim_errno = SIM_ERROR_INVALID;
 		goto cleanup;
 	}
-	
+
 	if ((len = BIO_read(bbio, buf, len)) == -1) {
 		sim_errno = SIM_ERROR_INVALID;
 		goto cleanup;
@@ -493,10 +499,10 @@ char *sim_message_decrypt(const unsigned char *message, uint32_t uin)
 		sim_errno = SIM_ERROR_MEMORY;
 		goto cleanup;
 	}
-	
+
 	memcpy(res, data + sizeof(head), len);
 	res[len] = 0;
-	
+
 cleanup:
 	if (cbio)
 		BIO_free(cbio);
@@ -512,4 +518,36 @@ cleanup:
 		free(all_data);
 
 	return (char *) res;
+}
+
+/*
+ * Ustawia calback UI do wczytywania has³a
+ */
+pem_password_cb* sim_set_private_key_cb(pem_password_cb *new_cb)
+{
+    OpenSSL_add_all_algorithms();
+    pem_password_cb *old_cb = private_key_cb;
+    private_key_cb = new_cb;
+    return old_cb;
+}
+
+/*
+ * Sprawdza czy (je¶li istnieje) da siê czytaæ klucz prywatny
+ */
+int sim_private_key_ok()
+{
+	char path[PATH_MAX + 1];
+	FILE *f;
+	RSA *key;
+
+    snprintf(path, sizeof(path), "%s/private.pem", sim_key_path);
+
+	if (!(f = fopen(path, "r")))
+		return 1; /* brak klucza czyli brak przeszkód do dzia³ania */
+
+    key = PEM_read_RSAPrivateKey(f, NULL, private_key_cb, NULL);
+
+	fclose(f);
+
+	return key ? 1:0;
 }

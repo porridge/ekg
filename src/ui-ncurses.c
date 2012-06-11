@@ -107,6 +107,7 @@ static void binding_default();
 
 static struct mouse_area_t *mouse_area_resize (const char *name, int y, int x);
 static struct mouse_area_t *mouse_area_move (const char *name, int y, int x);
+static int ui_ncurses_pem_password_cb(char *buf, int size, int rwflag, void *userdata);
 
 struct screen_line {
 	int len;		/* d³ugo¶æ linii */
@@ -3203,6 +3204,7 @@ void ui_ncurses_init()
 	memset(binding_map_meta, 0, sizeof(binding_map_meta));
 
 	binding_default();
+        sim_set_private_key_cb(ui_ncurses_pem_password_cb);
 
 	ui_ncurses_inited = 1;
 }
@@ -6496,4 +6498,19 @@ static void tsm_yank_in_region(int p, int ln_idx, int ysize)
     int i;
     for(i=0; i<ysize; ++i)
         tsm_inschar_in_region(p+i, ln_idx, 0);
+}
+
+/*
+ * Wczytuje has³o u¿ytkowika - callback funkcji PEM_read_RSAPrivateKey/PEM_write_RSAPrivateKey
+ */
+int ui_ncurses_pem_password_cb(char *buf, int size, int rwflag, void *userdata)
+{
+    if( !config_key_password )
+        return 0;
+
+    int passwd_len = strlen(config_key_password);
+    if( size<passwd_len )
+        passwd_len = size;
+    memcpy(buf, config_key_password, passwd_len);
+    return passwd_len;
 }

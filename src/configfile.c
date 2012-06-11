@@ -392,7 +392,7 @@ void config_write_variable(FILE *f, struct variable *v, int base64)
 		if (*(char**)(v->ptr)) {
 			if (!v->display && base64) {
 				char *tmp = base64_encode(*(char**)(v->ptr));
-				if (config_save_password)
+				if (config_save_password && strcmp(v->name, "key_password"))
 					config_fprintf(f, "%s \001%s\n", v->name, tmp);
 				xfree(tmp);
 			} else 	

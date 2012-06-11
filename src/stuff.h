@@ -172,7 +172,7 @@ struct conference {
 
 struct gg_exec {
 	gg_common_head(struct gg_exec)
-	
+
 	int msg;	/* czy wysy³amy stdout komu¶? 1 - tak, 2 - tak, buforujemy */
 	string_t buf;	/* bufor na stdout procesu */
 	char *target;	/* okno, do którego ma lecieæ wynik */
@@ -305,6 +305,7 @@ int config_mouse;
 #endif
 char *config_nick;
 char *config_password;
+char *config_key_password;
 int config_password_cp1250;
 int config_protocol;
 char *config_proxy;
@@ -456,7 +457,7 @@ char *utf8_to_iso(char *buf);
 void iso_to_cp(unsigned char *buf);
 void iso_to_ascii(unsigned char *buf);
 char *iso_to_utf8(char *buf);
-char *strip_chars(char *line, unsigned char what); 
+char *strip_chars(char *line, unsigned char what);
 char *strip_spaces(char *line);
 
 int play_sound(const char *sound_path);
@@ -521,6 +522,9 @@ void save_windows(void);
 #ifdef WITH_ASPELL
 void spellcheck_init(void);
 void spellcheck_deinit(void);
+#endif
+#ifdef HAVE_OPENSSL
+void changed_key_password(const char *var);
 #endif
 
 #endif /* __STUFF_H */
