@@ -45,8 +45,6 @@
 char *sim_key_path = NULL;
 int sim_errno = 0;
 static pem_password_cb *private_key_cb = NULL;
-static char *pem_password_buffer = NULL;
-static int   pem_password_len = 0;
 
 /*
  * sim_seed_prng()

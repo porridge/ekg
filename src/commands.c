@@ -611,8 +611,11 @@ COMMAND(cmd_connect)
 
 		if (params && params[0] && !params[1])
 			variable_set("password", params[0], 0);
-
-                if (config_uin && config_password && sim_private_key_ok() ) {
+#ifdef HAVE_OPENSSL
+                if (config_uin && config_password && sim_private_key_ok()) {
+#else
+                if (config_uin && config_password) {
+#endif
 			printq("connecting");
 			connecting = 1;
 			ekg_connect();
@@ -2870,8 +2873,10 @@ COMMAND(cmd_set)
 				const char *my_params[2] = { (!unset) ? params[0] : params[0] + 1, NULL };
 
 				cmd_set("set-show", my_params, NULL, quiet);
-                                if( strcmp(arg, "key_password") ) //zapisywanie w pliku has³a do pliku mija siê z celem
-                                    config_changed = 1;
+#ifdef HAVE_OPENSSL
+                if( strcmp(arg, "key_password") ) //zapisywanie w pliku has³a do pliku mija siê z celem
+#endif
+                    config_changed = 1;
 				last_save = time(NULL);
 				break;
 			}
@@ -3555,7 +3560,8 @@ COMMAND(cmd_version)
 COMMAND(cmd_key)
 {
 	if (match_arg(params[0], 'g', "generate", 2)) {
-        char *tmp, *tmp2, *pass = params[1];
+        char *tmp, *tmp2;
+        const char *pass = params[1];
 		struct stat st;
 
 		if (!config_uin)
@@ -3588,7 +3594,7 @@ COMMAND(cmd_key)
 
 		printq("key_generating");
 
-		if (sim_key_generate(config_uin, pass)) {
+		if (sim_key_generate(config_uin, pass ? 1:0)) {
 			printq("key_generating_error", "sim_key_generate()");
 			return -1;
 		}

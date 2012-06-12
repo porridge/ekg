@@ -305,7 +305,9 @@ int config_mouse;
 #endif
 char *config_nick;
 char *config_password;
+#ifdef HAVE_OPENSSL
 char *config_key_password;
+#endif
 int config_password_cp1250;
 int config_protocol;
 char *config_proxy;
