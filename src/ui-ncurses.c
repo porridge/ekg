@@ -6294,7 +6294,14 @@ static void binding_default()
 }
 
 
+/*
+ * pierwszy znak regionu, ostatni znak +1 regionu, linia regionu
+ */
 static int tsm_rs=-1, tsm_re=-1, tsm_line=-1;
+
+/*
+ * otwórz region
+ */
 static void tsm_start_region()
 {
     tsm_rs   = line_index;
@@ -6302,27 +6309,39 @@ static void tsm_start_region()
     tsm_line = lines ? lines_index : 0;
 }
 
+/*
+ * zamknij region
+ */
 static void tsm_stop_region()
 {
     if( tsm_rs == tsm_re )
         tsm_reset_region();
 }
 
+/*
+ * resetuj region
+ */
 static void tsm_reset_region()
 {
     tsm_rs = tsm_re = tsm_line = -1;
     transient_star_mode = 0;
 }
 
+/*
+ * czy region jest gdzie¶ aktywny
+ */
 static int tsm_is_region_on()
 {
     return tsm_rs>=0;
 }
 
+/*
+ * sprawdzenie poprawno¶ci regionu
+ */
 static int tsm_check_constraints(int p, int ln_idx)
 {
     if( !tsm_is_region_on() || (lines && ln_idx != tsm_line) )
-        return 0;  //no tsm region here
+        return 0;  // brak regionu w zadanej linii
 
     const char* ln = lines ? lines[ln_idx] : line;
     const int len  = strlen(ln);
@@ -6331,18 +6350,21 @@ static int tsm_check_constraints(int p, int ln_idx)
     {
         tsm_reset_region();
         update_statusbar(1);
-        return -1;  //tsm region reset
+        return -1;  // region zresetowany
     }
     else if( !transient_star_mode )
         if( len<tsm_re )
         {
             tsm_re = len+1; //tsm_re pokazuje ostatni znak regionu +1
-            return 1; //tsm region updated
+            return 1; // region istnieje i zosta³ zaktualizowany
         }
 
-    return 2;  //tsm region not updated
+    return 2;  // region istnieje
 }
 
+/*
+ * czy zadany znak znajduje siê w regionie
+ */
 static int tsm_in_region(int p, int ln_idx)
 {
     if( tsm_check_constraints(p, ln_idx)<= 0 )
@@ -6354,6 +6376,9 @@ static int tsm_in_region(int p, int ln_idx)
         return 0;
 }
 
+/*
+ * czy zadany znak znajduje siê w regionie lub od razu za nim
+ */
 static int tsm_in_region_ext(int p, int ln_idx)
 {
     if( tsm_check_constraints(p, ln_idx)<= 0 )
@@ -6365,6 +6390,9 @@ static int tsm_in_region_ext(int p, int ln_idx)
         return 0;
 }
 
+/*
+ * aktualizuj region po delete
+ */
 static void tsm_delchar_in_region(int p, int ln_idx, int at_eol)
 {
     if( at_eol && tsm_line > ln_idx )
@@ -6400,7 +6428,9 @@ static void tsm_delchar_in_region(int p, int ln_idx, int at_eol)
     }
 }
 
-/*  check if at bol and concat
+
+/*
+ * aktualizuj region po backspace
  */
 static void tsm_bkw_delchar_in_region(int p, int ln_idx, int at_bol)
 {
@@ -6437,6 +6467,9 @@ static void tsm_bkw_delchar_in_region(int p, int ln_idx, int at_bol)
     }
 }
 
+/*
+ * aktualizuj region po wprowadzeniu nowego znaku
+ */
 static void tsm_inschar_in_region(int p, int ln_idx, int nl)
 {
     if( nl )
@@ -6477,6 +6510,9 @@ static void tsm_inschar_in_region(int p, int ln_idx, int nl)
     }
 }
 
+/*
+ * aktualizuj region po skasowaniu s³owa
+ */
 static void tsm_delword_in_region(int p, int ln_idx, int wsize)
 {
     if( !tsm_is_region_on() )
@@ -6488,6 +6524,9 @@ static void tsm_delword_in_region(int p, int ln_idx, int wsize)
 }
 
 
+/*
+ * aktualizuj region po yank
+ */
 static void tsm_yank_in_region(int p, int ln_idx, int ysize)
 {
     if( !tsm_is_region_on() )
