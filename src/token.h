@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: token.h 2616 2006-04-11 10:41:51Z gophi $ */
 
 /*
  *  (C) Copyright 2003 Adam Czerwiñski <acze@acze.net>

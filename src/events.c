@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: events.c 2844 2011-03-14 00:14:33Z gophi $ */
 
 /*
  *  (C) Copyright 2001-2006 Wojtek Kaniewski <wojtekka@irc.pl>

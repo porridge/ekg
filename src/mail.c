@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: mail.c 2629 2006-06-10 20:56:28Z gophi $ */
 
 /*
  *  (C) Copyright 2001-2004 Piotr Domagalski <szalik@szalik.net>

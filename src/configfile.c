@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: configfile.c 2773 2007-07-07 15:45:57Z gophi $ */
 
 /*
  *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>
@@ -392,7 +392,11 @@ void config_write_variable(FILE *f, struct variable *v, int base64)
 		if (*(char**)(v->ptr)) {
 			if (!v->display && base64) {
 				char *tmp = base64_encode(*(char**)(v->ptr));
+#ifdef HAVE_OPENSSL
+				if (config_save_password && strcmp(v->name, "key_password"))
+#else
 				if (config_save_password)
+#endif
 					config_fprintf(f, "%s \001%s\n", v->name, tmp);
 				xfree(tmp);
 			} else 	

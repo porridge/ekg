@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: commands.h 2784 2007-11-25 20:39:04Z gophi $ */
 
 /*
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>

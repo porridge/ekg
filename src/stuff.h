@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: stuff.h 2844 2011-03-14 00:14:33Z gophi $ */
 
 /*
  *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>
@@ -305,6 +305,9 @@ int config_mouse;
 #endif
 char *config_nick;
 char *config_password;
+#ifdef HAVE_OPENSSL
+char *config_key_password;
+#endif
 int config_password_cp1250;
 int config_protocol;
 char *config_proxy;
@@ -521,6 +524,9 @@ void save_windows(void);
 #ifdef WITH_ASPELL
 void spellcheck_init(void);
 void spellcheck_deinit(void);
+#endif
+#ifdef HAVE_OPENSSL
+void changed_key_password(const char *var);
 #endif
 
 #endif /* __STUFF_H */

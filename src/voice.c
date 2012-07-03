@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: voice.c 2725 2007-01-24 02:46:54Z gophi $ */
 
 /*
  *  (C) Copyright 2002-2006 Wojtek Kaniewski <wojtekka@irc.pl>

@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: ui-ncurses.c 2844 2011-03-14 00:14:33Z gophi $ */
 
 /*
  *  (C) Copyright 2002-2008 Wojtek Kaniewski <wojtekka@irc.pl>
@@ -87,6 +87,9 @@
 #ifdef WITH_PYTHON
 #  include "python.h"
 #endif
+#ifdef HAVE_OPENSSL
+#include "simlite.h"
+#endif
 
 /* nadpisujemy funkcjê strncasecmp() odpowiednikiem z obs³ug± polskich znaków */
 #define strncasecmp(x...) strncasecmp_pl(x)
@@ -107,6 +110,9 @@ static void binding_default();
 
 static struct mouse_area_t *mouse_area_resize (const char *name, int y, int x);
 static struct mouse_area_t *mouse_area_move (const char *name, int y, int x);
+#ifdef HAVE_OPENSSL
+static int ui_ncurses_pem_password_cb(char *buf, int size, int rwflag, void *userdata);
+#endif
 
 struct screen_line {
 	int len;		/* d³ugo¶æ linii */
@@ -278,6 +284,22 @@ static void binding_forward_page(const char *arg);
 
 static int contacts_update(struct window *w);
 static void mouse_statusbar_commit(void);
+
+// Funkcje do "gwiazdkowania"
+static void tsm_reset_region();
+static int  tsm_is_region_on();
+static void tsm_delchar_in_region(int p, int ln_idx, int at_eol);
+static int  tsm_in_region(int p, int ln_idx);
+static int  tsm_in_region_ext(int p, int ln_idx);
+static void tsm_stop_region();
+static void tsm_start_region();
+static void tsm_inschar_in_region(int p, int ln_idx, int nl);
+static void tsm_delword_in_region(int p, int ln_idx, int wsize);
+static void tsm_bkw_delchar_in_region(int p, int ln_idx, int at_bol);
+static void tsm_yank_in_region(int p, int ln_idx, int ysize);
+static int  tsm_check_constraints(int p, int ln_idx);
+
+static int transient_star_mode = 0;
 
 #ifndef COLOR_DEFAULT
 #  define COLOR_DEFAULT (-1)
@@ -2326,6 +2348,7 @@ static void update_statusbar(int commit)
 
 	__add_format("url", 1, "http://ekg.chmurka.net/");
 	__add_format("version", 1, VERSION);
+        __add_format("star_mode", transient_star_mode, "*");
 
 #undef __add_format
 
@@ -3186,6 +3209,9 @@ void ui_ncurses_init()
 	memset(binding_map_meta, 0, sizeof(binding_map_meta));
 
 	binding_default();
+#ifdef HAVE_OPENSSL
+    sim_set_private_key_cb(ui_ncurses_pem_password_cb);
+#endif
 
 	ui_ncurses_inited = 1;
 }
@@ -4239,6 +4265,7 @@ static void binding_kill_word(const char *arg)
 		eaten++;
 	}
 
+        tsm_delword_in_region(line_index, lines ? lines_index:0, eaten);
 	memmove(line + line_index, line + line_index + eaten, strlen(line) - line_index - eaten + 1);
 }
 
@@ -4270,6 +4297,7 @@ static void binding_toggle_input(const char *arg)
 
 		command_exec(window_current->target, tmp, 0);
 		xfree(tmp);
+                tsm_reset_region();
 	}
 }
 
@@ -4285,6 +4313,8 @@ static void binding_backward_delete_char(const char *arg)
 {
 	if (lines && line_index == 0 && lines_index > 0 && strlen(lines[lines_index]) + strlen(lines[lines_index - 1]) < LINE_MAXLEN) {
 		int i;
+
+                tsm_bkw_delchar_in_region(0, lines_index, 1);
 
 		line_index = strlen(lines[lines_index - 1]);
 		strlcat(lines[lines_index - 1], lines[lines_index], LINE_MAXLEN);
@@ -4305,6 +4335,7 @@ static void binding_backward_delete_char(const char *arg)
 	if (strlen(line) > 0 && line_index > 0) {
 		memmove(line + line_index - 1, line + line_index, LINE_MAXLEN - line_index);
 		line[LINE_MAXLEN - 1] = 0;
+                tsm_bkw_delchar_in_region(line_index, lines ? lines_index:0, 0);
 		line_index--;
 	}
 }
@@ -4312,6 +4343,7 @@ static void binding_backward_delete_char(const char *arg)
 static void binding_kill_line(const char *arg)
 {
 	line[line_index] = 0;
+    tsm_check_constraints(0, lines ? lines_index:0);
 }
 
 static void binding_yank(const char *arg)
@@ -4319,7 +4351,9 @@ static void binding_yank(const char *arg)
 	if (yanked && strlen(yanked) + strlen(line) + 1 < LINE_MAXLEN) {
 		memmove(line + line_index + strlen(yanked), line + line_index, LINE_MAXLEN - line_index - strlen(yanked));
 		memcpy(line + line_index, yanked, strlen(yanked));
+        tsm_yank_in_region(line_index, lines ? lines_index:0, strlen(yanked));
 		line_index += strlen(yanked);
+
 	}
 }
 
@@ -4327,6 +4361,8 @@ static void binding_delete_char(const char *arg)
 {
 	if (line_index == strlen(line) && lines_index < array_count(lines) - 1 && strlen(line) + strlen(lines[lines_index + 1]) < LINE_MAXLEN) {
 		int i;
+
+                tsm_delchar_in_region(line_index, lines ? lines_index:0, 1);
 
 		strlcat(line, lines[lines_index + 1], LINE_MAXLEN);
 
@@ -4345,6 +4381,7 @@ static void binding_delete_char(const char *arg)
 	if (line_index < strlen(line)) {
 		memmove(line + line_index, line + line_index + 1, LINE_MAXLEN - line_index - 1);
 		line[LINE_MAXLEN - 1] = 0;
+                tsm_delchar_in_region(line_index, lines ? lines_index:0, 0);
 	}
 }
 				
@@ -4352,6 +4389,8 @@ static void binding_accept_line(const char *arg)
 {
 	if (lines) {
 		int i;
+
+                tsm_inschar_in_region(line_index, lines_index, 1);
 
 		lines = xrealloc(lines, (array_count(lines) + 2) * sizeof(char*));
 
@@ -4373,20 +4412,27 @@ static void binding_accept_line(const char *arg)
 				
 	command_exec(window_current->target, line, 0);
 
-	if (strcmp(line, "")) {
+
+        if (strcmp(line, "")) {
+            if( !tsm_is_region_on() ) { // nie zapamiêtuj zagwiazdkowanych linii w historii
 		if (history[0] != line)
 			xfree(history[0]);
 		history[0] = xstrdup(line);
 		xfree(history[HISTORY_MAX - 1]);
 		memmove(&history[1], &history[0], sizeof(history) - sizeof(history[0]));
+            }
 	} else {
 		if (config_enter_scrolls)
 			print("none", "");
 	}
 
-	history[0] = line;
-	history_index = 0;
+        if( !tsm_is_region_on() )
+        {
+            history[0] = line;
+            history_index = 0;
+        }
 	line[0] = 0;
+        tsm_reset_region();
 	line_adjust();
 }
 
@@ -4396,10 +4442,12 @@ static void binding_line_discard(const char *arg)
 	yanked = strdup(line);
 	line[0] = 0;
 	line_adjust();
+    tsm_check_constraints(0, lines ? lines_index:0);
 
 	if (lines && lines_index < array_count(lines) - 1) {
 		int i;
 
+        tsm_delchar_in_region(0, lines_index, 1);
 		xfree(lines[lines_index]);
 
 		for (i = lines_index; i < array_count(lines); i++)
@@ -4459,7 +4507,11 @@ static void binding_word_rubout(const char *arg)
 static void binding_complete(const char *arg)
 {
 	if (!lines)
+    {
+        if( tsm_in_region_ext(line_index, lines ? lines_start:0) )
+            return;
 		complete(&line_start, &line_index);
+    }
 	else {
 		int i, count = 8 - (line_index % 8);
 
@@ -4469,7 +4521,10 @@ static void binding_complete(const char *arg)
 		memmove(line + line_index + count, line + line_index, LINE_MAXLEN - line_index - count);
 
 		for (i = line_index; i < line_index + count; i++)
+        {
 			line[i] = ' ';
+            tsm_inschar_in_region(line_index, lines_index, 0);
+        }
 
 		line_index += count;
 	}
@@ -4543,9 +4598,11 @@ static void binding_previous_history(const char *arg)
 	}
 				
 	if (history[history_index + 1]) {
+            if( !tsm_is_region_on() ) {
 		if (history_index == 0)
 			history[0] = xstrdup(line);
 		history_index++;
+            }
 		strlcpy(line, history[history_index], LINE_MAXLEN);
 		line_adjust();
 	}
@@ -4671,6 +4728,19 @@ static void binding_ui_ncurses_debug_toggle(const char *arg)
 		ui_ncurses_debug = 0;
 
 	update_statusbar(1);
+}
+
+
+static void binding_toggle_transient_star_mode(const char *arg)
+{
+    if( !transient_star_mode && tsm_is_region_on() )
+        return; //dopuszczalny tylko 1 region
+    transient_star_mode = !transient_star_mode;
+    if( transient_star_mode )
+        tsm_start_region();
+    else
+        tsm_stop_region();
+    update_statusbar(1);
 }
 
 
@@ -4833,8 +4903,9 @@ static void ui_ncurses_loop()
 			} else if (ch < 255 && strlen(line) < LINE_MAXLEN - 1) {
 					
 				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
-
+                                tsm_inschar_in_region(line_index, lines ? lines_index:0, 0);
 				line[line_index++] = ch;
+
 			}
 		}
 
@@ -4878,10 +4949,10 @@ redraw_prompt:
 
                                 for (j = 0; j + line_start < strlen(p) && j < input->_maxx + 1; j++) {
                                     
-				    if (aspell_line[line_start + j] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
+				    if (!tsm_in_region(line_start + j, lines_start+i) && aspell_line[line_start + j] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
                                         print_char_underlined(input, i, j, p[line_start + j]);
                                     else /* jesli jest wszystko okey to wyswietlamy normalny */
-				        print_char(input, i, j, p[j + line_start]);
+				        print_char(input, i, j, tsm_in_region(line_start + j, lines_start+i) ? '*':p[j + line_start]);
 				}
 #else
                                 for (j = 0; j + line_start < strlen((char*) p) && j < input->_maxx + 1; j++)
@@ -4904,14 +4975,14 @@ redraw_prompt:
 
                         for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++) {
 
-				if (aspell_line[line_start + i] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
+                            if (!tsm_in_region(line_start + i, 0) && aspell_line[line_start + i] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
                                     print_char_underlined(input, 0, i + window_current->prompt_len, line[line_start + i]);
                                 else /* jesli jest wszystko okey to wyswietlamy normalny */
-                                    print_char(input, 0, i + window_current->prompt_len, line[line_start + i]);
+                                    print_char(input, 0, i + window_current->prompt_len, tsm_in_region(line_start + i, 0) ? '*':line[line_start + i]);
 			}
 #else
                         for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++)
-                                print_char(input, 0, i + window_current->prompt_len, line[line_start + i]);
+                            print_char(input, 0, i + window_current->prompt_len, tsm_in_region(line_start + i, 0) ? '*':line[line_start + i]);
 #endif
 
 			wattrset(input, color_pair(COLOR_BLACK, 1, COLOR_BLACK));
@@ -5121,6 +5192,7 @@ static void binding_parse(struct binding *b, const char *action)
 	__action("ui-ncurses-debug-toggle", binding_ui_ncurses_debug_toggle);
 	__action("contacts-scroll-up", binding_contacts_scrollup);
 	__action("contacts-scroll-down", binding_contacts_scrolldown);
+        __action("toggle-transient-star-mode", binding_toggle_transient_star_mode);
 
 #undef __action
 
@@ -6227,4 +6299,266 @@ static void binding_default()
 	binding_add("F11", "ui-ncurses-debug-toggle", 1, 1);
 	binding_add("Alt-Z", "contacts-scroll-up", 1, 1);
 	binding_add("Alt-X", "contacts-scroll-down", 1, 1);
+        binding_add("Ctrl-B", "toggle-transient-star-mode", 1, 1);
 }
+
+
+/*
+ * pierwszy znak regionu, ostatni znak +1 regionu, linia regionu
+ */
+static int tsm_rs=-1, tsm_re=-1, tsm_line=-1;
+
+/*
+ * otwórz region
+ */
+static void tsm_start_region()
+{
+    tsm_rs   = line_index;
+    tsm_re   = line_index;
+    tsm_line = lines ? lines_index : 0;
+}
+
+/*
+ * zamknij region
+ */
+static void tsm_stop_region()
+{
+    if( tsm_rs == tsm_re )
+        tsm_reset_region();
+}
+
+/*
+ * resetuj region
+ */
+static void tsm_reset_region()
+{
+    tsm_rs = tsm_re = tsm_line = -1;
+    transient_star_mode = 0;
+}
+
+/*
+ * czy region jest gdzie¶ aktywny
+ */
+static int tsm_is_region_on()
+{
+    return tsm_rs>=0;
+}
+
+/*
+ * sprawdzenie poprawno¶ci regionu
+ */
+static int tsm_check_constraints(int p, int ln_idx)
+{
+    if( !tsm_is_region_on() || (lines && ln_idx != tsm_line) )
+        return 0;  // brak regionu w zadanej linii
+
+    const char* ln = lines ? lines[ln_idx] : line;
+    const int len  = strlen(ln);
+
+    if( len < tsm_rs )
+    {
+        tsm_reset_region();
+        update_statusbar(1);
+        return -1;  // region zresetowany
+    }
+    else if( !transient_star_mode )
+        if( len<tsm_re )
+        {
+            tsm_re = len+1; //tsm_re pokazuje ostatni znak regionu +1
+            return 1; // region istnieje i zosta³ zaktualizowany
+        }
+
+    return 2;  // region istnieje
+}
+
+/*
+ * czy zadany znak znajduje siê w regionie
+ */
+static int tsm_in_region(int p, int ln_idx)
+{
+    if( tsm_check_constraints(p, ln_idx)<= 0 )
+        return 0;
+
+    if( p>=tsm_rs && p<tsm_re )
+        return 1;
+    else
+        return 0;
+}
+
+/*
+ * czy zadany znak znajduje siê w regionie lub od razu za nim
+ */
+static int tsm_in_region_ext(int p, int ln_idx)
+{
+    if( tsm_check_constraints(p, ln_idx)<= 0 )
+        return 0;
+
+    if( p>=tsm_rs && p<=tsm_re )
+        return 1;
+    else
+        return 0;
+}
+
+/*
+ * aktualizuj region po delete
+ */
+static void tsm_delchar_in_region(int p, int ln_idx, int at_eol)
+{
+    if( at_eol && tsm_line > ln_idx )
+    {
+        if( tsm_line-1 == ln_idx )
+        {
+            tsm_rs += strlen(lines[ln_idx]);
+            tsm_re += strlen(lines[ln_idx]);
+        }
+        --tsm_line;
+        return;
+    }
+    else if( at_eol )
+        return;
+
+    const int cc = tsm_check_constraints(p, ln_idx);
+    if( cc <= 0 || p >= tsm_re )
+        return;
+
+    if( p>=tsm_rs )
+    {
+        --tsm_re;
+        if( tsm_re<=tsm_rs )
+        {
+            tsm_reset_region();
+            update_statusbar(1);
+        }
+    }
+    else
+    {
+        --tsm_rs;
+        --tsm_re;
+    }
+}
+
+
+/*
+ * aktualizuj region po backspace
+ */
+static void tsm_bkw_delchar_in_region(int p, int ln_idx, int at_bol)
+{
+    if( at_bol && tsm_line >= ln_idx && ln_idx>0 )
+    {
+        if( tsm_line == ln_idx )
+        {
+            tsm_rs += strlen(lines[ln_idx-1]);
+            tsm_re += strlen(lines[ln_idx-1]);
+        }
+        --tsm_line;
+        return;
+    }
+    else if( at_bol )
+        return;
+
+    const int cc = tsm_check_constraints(p, ln_idx);
+    if( cc <= 0 || p > tsm_re )
+        return;
+
+    if( p>tsm_rs )
+    {
+        --tsm_re;
+        if( tsm_re<=tsm_rs )
+        {
+            tsm_reset_region();
+            update_statusbar(1);
+        }
+    }
+    else
+    {
+        --tsm_rs;
+        --tsm_re;
+    }
+}
+
+/*
+ * aktualizuj region po wprowadzeniu nowego znaku
+ */
+static void tsm_inschar_in_region(int p, int ln_idx, int nl)
+{
+    if( nl )
+    {
+        if(tsm_line >= ln_idx )
+        {
+            const bool this_ln = tsm_line == ln_idx;
+            const bool in_stars = p > tsm_rs && p < tsm_re;
+            if( this_ln && in_stars )
+                tsm_re = p;
+            else if( this_ln && p <= tsm_rs )
+            {
+                tsm_rs -= p;
+                tsm_re -= p;
+                ++tsm_line;
+            }
+            else if( !this_ln )
+                ++tsm_line;
+        }
+    }
+    else
+    {
+        const int cc = tsm_check_constraints(p, ln_idx);
+        if( cc <= 0 || (!transient_star_mode && p >= tsm_re) || (transient_star_mode && p > tsm_re) )
+            return;
+
+        if( p>=tsm_rs )
+        {
+            if( p==tsm_rs && !transient_star_mode )
+                ++tsm_rs;
+            ++tsm_re;
+        }
+        else
+        {
+            ++tsm_rs;
+            ++tsm_re;
+        }
+    }
+}
+
+/*
+ * aktualizuj region po skasowaniu s³owa
+ */
+static void tsm_delword_in_region(int p, int ln_idx, int wsize)
+{
+    if( !tsm_is_region_on() )
+        return;
+
+    int i;
+    for(i=0; i<wsize; ++i)
+        tsm_delchar_in_region(p, ln_idx, 0);
+}
+
+
+/*
+ * aktualizuj region po yank
+ */
+static void tsm_yank_in_region(int p, int ln_idx, int ysize)
+{
+    if( !tsm_is_region_on() )
+        return;
+
+    int i;
+    for(i=0; i<ysize; ++i)
+        tsm_inschar_in_region(p+i, ln_idx, 0);
+}
+
+#ifdef HAVE_OPENSSL
+/*
+ * Wczytuje has³o u¿ytkowika - callback funkcji PEM_read_RSAPrivateKey/PEM_write_RSAPrivateKey
+ */
+int ui_ncurses_pem_password_cb(char *buf, int size, int rwflag, void *userdata)
+{
+    if( !config_key_password )
+        return 0;
+
+    int passwd_len = strlen(config_key_password);
+    if( size<passwd_len )
+        passwd_len = size;
+    memcpy(buf, config_key_password, passwd_len);
+    return passwd_len;
+}
+#endif

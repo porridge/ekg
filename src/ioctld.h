@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: ioctld.h 1562 2003-02-08 10:09:55Z szalik $ */
 
 /*
  *  (C) Copyright 2002  Pawel Maziarz <drg@go2.pl>

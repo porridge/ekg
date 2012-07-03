@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: dynstuff.h 2717 2006-11-30 02:28:55Z gophi $ */
 
 /*
  *  (C) Copyright 2001-2006 Wojtek Kaniewski <wojtekka@irc.pl>

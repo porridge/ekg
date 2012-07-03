@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: comptime.h 2744 2007-03-21 04:51:06Z gophi $ */
 
 /*
  *  (C) Copyright 2007 Adam Wysocki <gophi@ekg.chmurka.net>

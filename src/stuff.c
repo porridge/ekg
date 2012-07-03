@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: stuff.c 2844 2011-03-14 00:14:33Z gophi $ */
 
 /*
  *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>
@@ -130,6 +130,9 @@ int config_last_sysmsg = 0;
 int config_last_sysmsg_changed = 0;
 char *config_local_ip = NULL;
 char *config_password = NULL;
+#ifdef HAVE_OPENSSL
+char *config_key_password = NULL;
+#endif
 int config_slash_messages = 1;
 int config_sms_away = 0;
 int config_sms_away_limit = 0;
@@ -3846,3 +3849,15 @@ char *get_line(char **ptr)
 
 	return res;
 }
+
+/*
+ * wywo³ywane po zmianie warto¶ci zmiennej ,,key_password''.
+ */
+#ifdef HAVE_OPENSSL
+void changed_key_password(const char *var)
+{
+    int quiet=0;
+    if( !sim_private_key_ok() )
+        printq("key_private_read_error");
+}
+#endif

@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: themes.h 2627 2006-06-10 08:36:42Z porridge $ */
 
 /*
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>

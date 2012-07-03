@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: python.h 2590 2005-12-05 20:20:10Z wojtekka $ */
 
 /*
  *  (C) Copyright 2002-2003 Wojtek Kaniewski <wojtekka@irc.pl>

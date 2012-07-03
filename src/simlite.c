@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: simlite.c 2647 2006-07-29 18:31:02Z gophi $ */
 
 /*
  *  (C) Copyright 2003 Wojtek Kaniewski <wojtekka@irc.pl>
@@ -44,6 +44,7 @@
 
 char *sim_key_path = NULL;
 int sim_errno = 0;
+static pem_password_cb *private_key_cb = NULL;
 
 /*
  * sim_seed_prng()
@@ -73,10 +74,11 @@ static int sim_seed_prng()
  * tworzy parê kluczy i zapisuje je na dysku.
  *
  *  - uin - numer, dla którego generujemy klucze.
+ *  - pass - 0/1 bez/z has³em dla klucza prywatnego
  *
  * 0/-1
  */
-int sim_key_generate(uint32_t uin)
+int sim_key_generate(uint32_t uin, int pass)
 {
 	char path[PATH_MAX + 1];
 	RSA *keys = NULL;
@@ -113,8 +115,10 @@ int sim_key_generate(uint32_t uin)
 		goto cleanup;
 	}
 
-	if (!PEM_write_RSAPrivateKey(f, keys, NULL, NULL, 0, NULL, NULL)) {
-		sim_errno = SIM_ERROR_PUBLIC;
+        const EVP_CIPHER *enc    = pass ? EVP_aes_256_ofb():NULL;
+        pem_password_cb  *key_cb = pass ? private_key_cb:NULL;
+	if (!PEM_write_RSAPrivateKey(f, keys, enc, NULL, 0, key_cb, NULL)) {
+		sim_errno = SIM_ERROR_PRIVATE;
 		goto cleanup;
 	}
 
@@ -159,7 +163,7 @@ static RSA *sim_key_read(uint32_t uin)
 	if (uin)
 		key = PEM_read_RSAPublicKey(f, NULL, NULL, NULL);
 	else
-		key = PEM_read_RSAPrivateKey(f, NULL, NULL, NULL);
+		key = PEM_read_RSAPrivateKey(f, NULL, private_key_cb, NULL);
 	
 	fclose(f);
 
@@ -512,4 +516,36 @@ cleanup:
 		free(all_data);
 
 	return (char *) res;
+}
+
+/*
+ * Ustawia calback UI do wczytywania has³a
+ */
+pem_password_cb* sim_set_private_key_cb(pem_password_cb *new_cb)
+{
+    OpenSSL_add_all_algorithms();
+    pem_password_cb *old_cb = private_key_cb;
+    private_key_cb = new_cb;
+    return old_cb;
+}
+
+/*
+ * Sprawdza czy (je¶li istnieje) da siê czytaæ klucz prywatny
+ */
+int sim_private_key_ok()
+{
+	char path[PATH_MAX + 1];
+	FILE *f;
+	RSA *key;
+
+    snprintf(path, sizeof(path), "%s/private.pem", sim_key_path);
+
+	if (!(f = fopen(path, "r")))
+		return 1; /* brak klucza czyli brak przeszkód do dzia³ania */
+
+    key = PEM_read_RSAPrivateKey(f, NULL, private_key_cb, NULL);
+
+	fclose(f);
+
+	return key ? 1:0;
 }

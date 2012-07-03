@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: ui-batch.c 1744 2003-03-07 17:27:44Z szalik $ */
 
 /*
  *  (C) Copyright 2002 Wojtek Kaniewski <wojtekka@irc.pl>

@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: python.c 2832 2009-06-26 20:39:26Z gophi $ */
 
 /*
  *  (C) Copyright 2002-2003 Wojtek Kaniewski <wojtekka@irc.pl>

@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: userlist.h 2843 2011-03-07 12:31:05Z gophi $ */
 
 /*
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>
