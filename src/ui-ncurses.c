@@ -87,6 +87,9 @@
 #ifdef WITH_PYTHON
 #  include "python.h"
 #endif
+#ifdef HAVE_OPENSSL
+#include "simlite.h"
+#endif
 
 /* nadpisujemy funkcjê strncasecmp() odpowiednikiem z obs³ug± polskich znaków */
 #define strncasecmp(x...) strncasecmp_pl(x)
@@ -107,7 +110,9 @@ static void binding_default();
 
 static struct mouse_area_t *mouse_area_resize (const char *name, int y, int x);
 static struct mouse_area_t *mouse_area_move (const char *name, int y, int x);
+#ifdef HAVE_OPENSSL
 static int ui_ncurses_pem_password_cb(char *buf, int size, int rwflag, void *userdata);
+#endif
 
 struct screen_line {
 	int len;		/* d³ugo¶æ linii */
@@ -3204,7 +3209,9 @@ void ui_ncurses_init()
 	memset(binding_map_meta, 0, sizeof(binding_map_meta));
 
 	binding_default();
-        sim_set_private_key_cb(ui_ncurses_pem_password_cb);
+#ifdef HAVE_OPENSSL
+    sim_set_private_key_cb(ui_ncurses_pem_password_cb);
+#endif
 
 	ui_ncurses_inited = 1;
 }
@@ -6500,6 +6507,7 @@ static void tsm_yank_in_region(int p, int ln_idx, int ysize)
         tsm_inschar_in_region(p+i, ln_idx, 0);
 }
 
+#ifdef HAVE_OPENSSL
 /*
  * Wczytuje has³o u¿ytkowika - callback funkcji PEM_read_RSAPrivateKey/PEM_write_RSAPrivateKey
  */
@@ -6514,3 +6522,4 @@ int ui_ncurses_pem_password_cb(char *buf, int size, int rwflag, void *userdata)
     memcpy(buf, config_key_password, passwd_len);
     return passwd_len;
 }
+#endif
