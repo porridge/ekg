@@ -1,4 +1,4 @@
-/* $Id: events.h 2771 2007-07-05 04:12:14Z gophi $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>

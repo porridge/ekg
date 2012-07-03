@@ -1,4 +1,4 @@
-/* $Id: ui-readline.c 2639 2006-07-16 11:06:43Z gophi $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>

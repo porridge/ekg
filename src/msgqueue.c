@@ -1,4 +1,4 @@
-/* $Id: msgqueue.c 2773 2007-07-07 15:45:57Z gophi $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2001-2002 Piotr Domagalski <szalik@szalik.net>

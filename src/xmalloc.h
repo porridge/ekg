@@ -1,4 +1,4 @@
-/* $Id: xmalloc.h 2590 2005-12-05 20:20:10Z wojtekka $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>

@@ -1,4 +1,4 @@
-/* $Id: log.c 2773 2007-07-07 15:45:57Z gophi $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>

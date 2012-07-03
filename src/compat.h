@@ -1,4 +1,4 @@
-/* $Id: compat.h 2770 2007-07-05 03:20:03Z gophi $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>

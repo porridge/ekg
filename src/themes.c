@@ -1,4 +1,4 @@
-/* $Id: themes.c 2840 2010-02-02 22:19:14Z gophi $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2001-2007 Wojtek Kaniewski <wojtekka@irc.pl>

@@ -1,4 +1,4 @@
-/* $Id: ui-none.c 2007 2003-05-17 14:33:41Z wojtekka $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2002 Wojtek Kaniewski <wojtekka@irc.pl>

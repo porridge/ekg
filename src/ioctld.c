@@ -1,4 +1,4 @@
-/* $Id: ioctld.c 2753 2007-04-04 01:00:35Z gophi $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2002-2004 Pawe³ Maziarz <drg@hehe.pl>

@@ -1,4 +1,4 @@
-/* $Id: simlite.c 2647 2006-07-29 18:31:02Z gophi $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2003 Wojtek Kaniewski <wojtekka@irc.pl>

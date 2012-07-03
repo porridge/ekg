@@ -1,4 +1,4 @@
-/* $Id: version.h 2792 2008-02-06 18:09:11Z gophi $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2001-2002 Wojtek Kaniewski <wojtekka@irc.pl>

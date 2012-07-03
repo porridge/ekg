@@ -1,4 +1,4 @@
-/* $Id: vars.c 2822 2009-05-29 19:22:57Z gophi $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>

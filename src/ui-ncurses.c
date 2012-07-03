@@ -1,4 +1,4 @@
-/* $Id: ui-ncurses.c 2844 2011-03-14 00:14:33Z gophi $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2002-2008 Wojtek Kaniewski <wojtekka@irc.pl>

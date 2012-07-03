@@ -1,4 +1,4 @@
-/* $Id: xmalloc.c 1889 2003-04-03 13:39:07Z szalik $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>

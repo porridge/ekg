@@ -1,4 +1,4 @@
-/* $Id: ekg.c 2842 2010-03-02 11:52:32Z gophi $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2001-2005 Wojtek Kaniewski <wojtekka@irc.pl>

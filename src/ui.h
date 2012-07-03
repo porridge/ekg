@@ -1,4 +1,4 @@
-/* $Id: ui.h 2781 2007-11-21 13:03:43Z gophi $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2002-2004 Wojtek Kaniewski <wojtekka@irc.pl>

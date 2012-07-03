@@ -1,4 +1,4 @@
-/* $Id: emoticons.c 1998 2003-05-16 12:26:22Z szalik $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2001-2003 Wojtek Kaniewski <wojtekka@irc.pl>

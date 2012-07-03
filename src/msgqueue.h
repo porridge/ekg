@@ -1,4 +1,4 @@
-/* $Id: msgqueue.h 2590 2005-12-05 20:20:10Z wojtekka $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2001-2002 Piotr Domagalski <szalik@szalik.net>

@@ -1,4 +1,4 @@
-/* $Id: dynstuff.c 2734 2007-02-22 12:47:18Z wojtekka $ */
+/* $Id$ */
 
 /*
  *  (C) Copyright 2001-2006 Wojtek Kaniewski <wojtekka@irc.pl>
