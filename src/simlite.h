@@ -49,8 +49,10 @@ sim_message_header;
 
 char *sim_message_decrypt(const unsigned char *message, uint32_t uin);
 char *sim_message_encrypt(const unsigned char *message, uint32_t uin);
-int sim_key_generate(uint32_t uin);
+int sim_key_generate(uint32_t uin, int pass);
 char *sim_key_fingerprint(uint32_t uin);
+int sim_private_key_ok();
+pem_password_cb* sim_set_private_key_cb(pem_password_cb *new_cb);
 
 const char *sim_strerror(int error);
 

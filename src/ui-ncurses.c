@@ -87,6 +87,9 @@
 #ifdef WITH_PYTHON
 #  include "python.h"
 #endif
+#ifdef HAVE_OPENSSL
+#include "simlite.h"
+#endif
 
 /* nadpisujemy funkcjê strncasecmp() odpowiednikiem z obs³ug± polskich znaków */
 #define strncasecmp(x...) strncasecmp_pl(x)
@@ -107,17 +110,20 @@ static void binding_default();
 
 static struct mouse_area_t *mouse_area_resize (const char *name, int y, int x);
 static struct mouse_area_t *mouse_area_move (const char *name, int y, int x);
+#ifdef HAVE_OPENSSL
+static int ui_ncurses_pem_password_cb(char *buf, int size, int rwflag, void *userdata);
+#endif
 
 struct screen_line {
 	int len;		/* d³ugo¶æ linii */
-	
+
 	char *str;		/* tre¶æ */
 	char *attr;		/* atrybuty */
-	
+
 	char *prompt_str;	/* tre¶æ promptu */
 	char *prompt_attr;	/* atrybuty promptu */
 	int prompt_len;		/* d³ugo¶æ promptu */
-	
+
 	char *ts;		/* timestamp */
 	int ts_len;		/* d³ugo¶æ timestampu */
 
@@ -142,9 +148,9 @@ struct window {
 	int last_update;	/* czas ostatniego uaktualnienia */
 	int nowrap;		/* nie zawijamy linii */
 	int hide;		/* ukrywamy, bo jest zbyt du¿e */
-	
+
 	char *target;		/* nick query albo inna nazwa albo NULL */
-	
+
 	int id;			/* numer okna */
 	int act;		/* czy co¶ siê zmieni³o? */
 	int more;		/* pojawi³o siê co¶ poza ekranem */
@@ -167,7 +173,7 @@ struct window {
 
 	int start;		/* od której linii zaczyna siê wy¶wietlanie */
 	int lines_count;	/* ilo¶æ linii ekranowych w backlogu */
-	struct screen_line *lines;	
+	struct screen_line *lines;
 				/* linie ekranowe */
 
 	int overflow;		/* ilo¶æ nadmiarowych linii w okienku */
@@ -278,6 +284,22 @@ static void binding_forward_page(const char *arg);
 
 static int contacts_update(struct window *w);
 static void mouse_statusbar_commit(void);
+
+// Funkcje do "gwiazdkowania"
+static void tsm_reset_region();
+static int  tsm_is_region_on();
+static void tsm_delchar_in_region(int p, int ln_idx, int at_eol);
+static int  tsm_in_region(int p, int ln_idx);
+static int  tsm_in_region_ext(int p, int ln_idx);
+static void tsm_stop_region();
+static void tsm_start_region();
+static void tsm_inschar_in_region(int p, int ln_idx, int nl);
+static void tsm_delword_in_region(int p, int ln_idx, int wsize);
+static void tsm_bkw_delchar_in_region(int p, int ln_idx, int at_bol);
+static void tsm_yank_in_region(int p, int ln_idx, int ysize);
+static int  tsm_check_constraints(int p, int ln_idx);
+
+static int transient_star_mode = 0;
 
 #ifndef COLOR_DEFAULT
 #  define COLOR_DEFAULT (-1)
@@ -393,7 +415,7 @@ static int color_pair(int fg, int bold, int bg)
 		else
 			return A_NORMAL | ((bold) ? A_BOLD : 0);
 	}
-		
+
 	return COLOR_PAIR(fg + 8 * bg) | ((bold) ? A_BOLD : 0);
 }
 
@@ -431,7 +453,7 @@ void window_commit()
 int window_backlog_add(struct window *w, fstring_t str)
 {
 	int i, removed = 0;
-	
+
 	if (!w)
 		return 0;
 
@@ -449,7 +471,7 @@ int window_backlog_add(struct window *w, fstring_t str)
 		xfree(fs);
 
 		w->backlog_size--;
-	} else 
+	} else
 		w->backlog = xrealloc(w->backlog, (w->backlog_size + 1) * sizeof(fstring_t));
 
 	memmove(&w->backlog[1], &w->backlog[0], w->backlog_size * sizeof(fstring_t));
@@ -485,7 +507,7 @@ int window_backlog_split(struct window *w, int full, int removed)
 	 * na koñcu na podstawie ilo¶ci linii mieszcz±cych siê na ekranie. */
 	if (full && w->start == w->lines_count - w->height)
 		bottom = 1;
-	
+
 	/* mamy usun±æ co¶ z góry, bo wywalono liniê z backloga. */
 	if (removed) {
 		for (i = 0; i < removed && i < w->lines_count; i++)
@@ -556,7 +578,7 @@ int window_backlog_split(struct window *w, int full, int removed)
 
 			if (l->len < width)
 				break;
-			
+
 			for (j = 0, word = 0; j < l->len; j++) {
 
 				if (str[j] == ' ' && !w->nowrap)
@@ -581,7 +603,7 @@ int window_backlog_split(struct window *w, int full, int removed)
 
 				break;
 			}
-		
+
 			str += l->len;
 			attr += l->len;
 
@@ -597,7 +619,7 @@ int window_backlog_split(struct window *w, int full, int removed)
 	}
 
 	if (full) {
-		if (window_current && window_current->id == w->id) 
+		if (window_current && window_current->id == w->id)
 			window_redraw(w);
 		else
 			w->redraw = 1;
@@ -690,7 +712,7 @@ void window_resize()
 		mvwin(w->window, w->top, w->left);
 
 /*		ui_debug("edge window id=%d resized to (%d,%d,%d,%d)\n", w->id, w->left, w->top, w->width, w->height); */
-		
+
 		w->redraw = 1;
 	}
 
@@ -729,7 +751,7 @@ void window_resize()
 		}
 
 		w->width = width;
-		
+
 		wresize(w->window, w->height, w->width);
 
 		w->top = top;
@@ -774,7 +796,7 @@ void window_resize()
 void window_redraw(struct window *w)
 {
 	int x, y, left = w->margin_left, top = w->margin_top, height = w->height - w->margin_top - w->margin_bottom;
-	
+
 	if (w->doodle) {
 		w->redraw = 0;
 		return;
@@ -787,7 +809,7 @@ void window_redraw(struct window *w)
 		if (w->handle_redraw(w) == -1)
 			return;
 	}
-	
+
 	werase(w->window);
 	wattrset(w->window, color_pair(contacts_framecolor, 0, COLOR_BLACK));
 
@@ -803,7 +825,7 @@ void window_redraw(struct window *w)
 			for (y = 0; y < w->height; y++)
 				mvwaddch(w->window, y, w->width - 1 - w->margin_right, ACS_VLINE);
 		}
-			
+
 		if ((w->frames & WF_TOP)) {
 			top++;
 			height--;
@@ -846,11 +868,11 @@ void window_redraw(struct window *w)
 		for (x = 0; x < l->prompt_len + l->len; x++) {
 			int attr = A_NORMAL;
 			unsigned char ch, chattr;
-			
+
 			if (x < l->prompt_len) {
 				if (!l->prompt_str)
 					continue;
-				
+
 				ch = l->prompt_str[x];
 				chattr = l->prompt_attr[x];
 			} else {
@@ -921,7 +943,7 @@ static void window_clear(struct window *w, int full)
 
 		for (i = 0; i < w->lines_count; i++)
 			xfree(w->lines[i].ts);
-		
+
 		xfree(w->lines);
 
 		w->lines = NULL;
@@ -1002,7 +1024,7 @@ static void window_floating_update(int n)
 		/* je¶li ma w³asn± obs³ugê od¶wie¿ania, nie ruszamy */
 		if (w->handle_redraw)
 			continue;
-		
+
 		if (w->last_update == time(NULL))
 			continue;
 
@@ -1054,7 +1076,7 @@ static void window_refresh()
 		touchwin(w->window);
 		wnoutrefresh(w->window);
 	}
-	
+
 	mvwin(status, stdscr->_maxy + 1 - input_size - config_statusbar_size, 0);
 	mouse_area_move("status", stdscr->_maxy + 1 - input_size - config_statusbar_size, 0);
 
@@ -1083,7 +1105,7 @@ static void window_switch(int id)
 		window_current = w;
 
 		w->act = 0;
-		
+
 		if (w->redraw)
 			window_redraw(w);
 
@@ -1158,7 +1180,7 @@ static struct window *window_new(const char *target, int new_id)
 	/* okno z debug'iem */
 	if (id == -1)
 		id = 0;
-	
+
 	memset(&w, 0, sizeof(w));
 
 	w.id = id;
@@ -1204,16 +1226,16 @@ static struct window *window_new(const char *target, int new_id)
 			w.doodle = 1;
 			w.target = xstrdup(target + 1);
 		}
-		
+
 		if (*target == '*' && !u) {
 			const char *tmp = strchr(target, '/');
 			char **argv, **arg;
-			
+
 			w.floating = 1;
-			
+
 			if (!tmp)
 				tmp = "";
-				
+
 			w.target = xstrdup(tmp);
 
 			argv = arg = array_make(target + 1, ",", 5, 0, 0);
@@ -1243,14 +1265,14 @@ static struct window *window_new(const char *target, int new_id)
 			if (w.top + w.height > stdscr->_maxy)
 				w.height = stdscr->_maxy + 1 - w.top;
 		}
-		
+
 		if (!w.target) {
 			w.target = xstrdup(target);
 			w.prompt = format_string(format_find("ncurses_prompt_query"), target);
 			w.prompt_len = strlen(w.prompt);
 		}
 	}
-	
+
 	if (!target) {
 		const char *f = format_find("ncurses_prompt_none");
 
@@ -1325,9 +1347,9 @@ static void ui_ncurses_print(const char *target, int separate, const char *line)
 crap:
 			if (!config_display_crap && target && !strcmp(target, "__current"))
 				w = window_find("__status");
-			
+
 			break;
-			
+
 		default:
 			/* je¶li nie ma okna, rzuæ do statusowego. */
 			if (!(w = window_find(target)))
@@ -1335,17 +1357,17 @@ crap:
 	}
 
 	/* albo zaczynamy, albo koñczymy i nie ma okienka ¿adnego */
-	if (!w) 
+	if (!w)
 		return;
 
 	cur_time = time(NULL);
 
 	if (config_speech_app)
 		speech = string_init(NULL);
-	
+
 	if (w->start == w->lines_count - w->height || (w->start == 0 && w->lines_count <= w->height))
 		bottom = 1;
-	
+
 	prev_count = w->lines_count;
 
 	if (config_display_daychanges) {
@@ -1367,7 +1389,7 @@ crap:
 			tm = localtime(&cur_time);
 			strftime (str_cur, sizeof(str_cur), fmt, tm);
 
-			tmp = format_string(format_find("window_day_changed"), 
+			tmp = format_string(format_find("window_day_changed"),
 			    str_win, str_cur);
 
 			if ((tmp2 = strchr(tmp, '\n')))
@@ -1388,7 +1410,7 @@ crap:
 
 	w->last_act_time = cur_time;
 	if (w != window_current && !w->floating) {
-		// xxx brzydki hack - rozpoznawanie, czy okno jest rozmow±, 
+		// xxx brzydki hack - rozpoznawanie, czy okno jest rozmow±,
 		// po separate
 
 		// w->act == 0 - brak aktywno¶ci
@@ -1492,13 +1514,13 @@ static int contacts_update(struct window *w)
 	char *group = NULL;
 	int j;
 	int offset = contacts_offset;
-		
+
 	if (!w) {
 		list_t l;
 
 		for (l = windows; l; l = l->next) {
 			struct window *v = l->data;
-			
+
 			if (v->target && !strcmp(v->target, "__contacts")) {
 				w = v;
 				break;
@@ -1508,7 +1530,7 @@ static int contacts_update(struct window *w)
 		if (!w)
 			return -1;
 	}
-	
+
 	window_clear(w, 1);
 
 	if (config_contacts_groups) {
@@ -1532,7 +1554,7 @@ static int contacts_update(struct window *w)
 		header = format_find("contacts_header");
 		footer = format_find("contacts_footer");
 	}
-	
+
 	if (strcmp(header, "")) {
 		char *tmp = format_string(header, group);
 		window_backlog_add(w, reformat_string(tmp));
@@ -1559,7 +1581,7 @@ static int contacts_update(struct window *w)
 
 			if ((u->status != table[i].status1 && u->status != table[i].status2) || !u->display || !u->uin)
 				continue;
-            
+
 			if (ignored_check(u->uin) & IGNORE_DISPLAY)
 				continue;
 
@@ -1625,13 +1647,13 @@ void contacts_changed()
 
 	if (config_contacts_size < 0)
 		config_contacts_size = 0;
-	
-	if (config_contacts_size == 0) 
+
+	if (config_contacts_size == 0)
 		config_contacts = 0;
-		
+
 	if (config_contacts_size > 1000)
 		config_contacts_size = 1000;
-	
+
 	contacts_margin = 1;
 	contacts_edge = WF_RIGHT;
 	contacts_frame = WF_LEFT;
@@ -1724,7 +1746,7 @@ void contacts_changed()
 
 			if (!strncasecmp(args[i], "order=", 6)) {
 				int j;
-				
+
 				contacts_order[0] = -1;
 				contacts_order[1] = -1;
 				contacts_order[2] = -1;
@@ -1732,10 +1754,10 @@ void contacts_changed()
 				contacts_order[4] = -1;
 				contacts_order[5] = -1;
 				contacts_order[6] = -1;
-				
+
 				for (j = 0; args[i][j + 6] && j < 7; j++)
 					if (args[i][j + 6] >= '0' && args[i][j + 6] <= '6')
-						contacts_order[j] = args[i][j + 6] - '0';	
+						contacts_order[j] = args[i][j + 6] - '0';
 			}
 		}
 
@@ -1744,7 +1766,7 @@ void contacts_changed()
 
 		array_free(args);
 	}
-	
+
 	for (l = windows; l; l = l->next) {
 		struct window *v = l->data;
 
@@ -1761,7 +1783,7 @@ void contacts_changed()
 
 	if (config_contacts && !w)
 		window_new("__contacts", 1000);
-	
+
 	contacts_update(NULL);
 	window_commit();
 }
@@ -1784,7 +1806,7 @@ static void update_header(int commit)
 
 	for (y = 0; y < config_header_size; y++) {
 		int x;
-		
+
 		wmove(header, y, 0);
 
 		for (x = 0; x <= status->_maxx; x++)
@@ -1794,7 +1816,7 @@ static void update_header(int commit)
 	if (commit)
 		window_commit();
 }
-		
+
 /*
  * window_printat()
  *
@@ -1828,7 +1850,7 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 
 	if (status && config_display_color == 2)
 		config_display_color = 0;
-	
+
 	if (status && x == 0) {
 		int i;
 
@@ -1841,7 +1863,7 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 	}
 
 	wmove(w, y, x);
-			
+
 	while (*p && *p != '}' && x <= w->_maxx) {
 		int i, nest;
 
@@ -1902,7 +1924,7 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 			p++;
 
 			wattrset(w, color_pair(fgcolor, bold, bgcolor));
-			
+
 			continue;
 		}
 		if (*p != '{' && !config_display_color)
@@ -1922,7 +1944,7 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 
 			if (!strncmp(p, data[i].name, len) && p[len] == '}') {
 				/* pozwoliæ wszêdzie? */
-				int percent_ok = !strcmp(data[i].name, "activity");	
+				int percent_ok = !strcmp(data[i].name, "activity");
 				char *text = data[i].text;
 				int j;
 
@@ -1970,10 +1992,10 @@ int window_printat(WINDOW *w, int x, int y, const char *format_, void *data_, in
 				}
 
 				p += len;
-				
+
 				if (!config_display_pl_chars)
 					xfree(text);
-				
+
 				goto next;
 			}
 		}
@@ -2036,15 +2058,15 @@ next:
 /*
  * mouse_statusbar_update()
  *
- * aktualizuje strukturê mouse_statusbar_pending zgodnie z tym, co zosta³o 
- * umieszczone na pasku stanu. korzysta mniej wiêcej z tego samego kodu, 
- * co window_printat(), ale bez przeróbek window_printat() nie da³o siê 
+ * aktualizuje strukturê mouse_statusbar_pending zgodnie z tym, co zosta³o
+ * umieszczone na pasku stanu. korzysta mniej wiêcej z tego samego kodu,
+ * co window_printat(), ale bez przeróbek window_printat() nie da³o siê
  * tego zrobiæ ³adniej.
  *
- * zmiany zostan± permanentnie wprowadzone po wywo³aniu mouse_statusbar_commit() 
+ * zmiany zostan± permanentnie wprowadzone po wywo³aniu mouse_statusbar_commit()
  * (jest wywo³ywane z window_commit()).
  *
- * UWAGA: nie mo¿na w tej funkcji u¿ywaæ gg_debug(), bo gg_debug() zmienia 
+ * UWAGA: nie mo¿na w tej funkcji u¿ywaæ gg_debug(), bo gg_debug() zmienia
  * statusbar i wychodzi z tego urocza pêtelka :)
  *
  * - parametry jak dla window_printat()
@@ -2258,7 +2280,7 @@ static void update_statusbar(int commit)
 		formats_count++; \
 		formats[formats_count].name = NULL; \
 		formats[formats_count].text = NULL; \
-	} 
+	}
 
 	{
 		time_t t = time(NULL);
@@ -2268,7 +2290,7 @@ static void update_statusbar(int commit)
 		tm = localtime(&t);
 
 		strftime(tmp, sizeof(tmp), format_find("ncurses_timestamp"), tm);
-		
+
 		__add_format("time", 1, tmp);
 	}
 
@@ -2286,7 +2308,7 @@ static void update_statusbar(int commit)
 		for (l = windows; l; l = l->next) {
 			struct window *w = l->data;
 
-			if (!w->act || !w->id) 
+			if (!w->act || !w->id)
 				continue;
 
 			if (!first)
@@ -2297,7 +2319,7 @@ static void update_statusbar(int commit)
 			first = 0;
 			act = 1;
 		}
-		
+
 		__add_format("activity", (act), s->str);
 
 		string_free(s, 1);
@@ -2326,6 +2348,7 @@ static void update_statusbar(int commit)
 
 	__add_format("url", 1, "http://ekg.chmurka.net/");
 	__add_format("version", 1, VERSION);
+        __add_format("star_mode", transient_star_mode, "*");
 
 #undef __add_format
 
@@ -2365,7 +2388,7 @@ static void update_statusbar(int commit)
 				window_printat(status, 0, y, p, formats, config_statusbar_fgcolor, 0, config_statusbar_bgcolor, 1);
 				mouse_statusbar_update(0, y, p, formats, 0);
 				break;
-				
+
 			case 1:
 			{
 				char *tmp = saprintf(" debug: lines_count=%d start=%d height=%d overflow=%d screen_width=%d", window_current->lines_count, window_current->start, window_current->height, window_current->overflow, ui_screen_width);
@@ -2395,12 +2418,12 @@ static void update_statusbar(int commit)
 	PYTHON_HANDLE_HEADER(redraw_header, "")
 	;
 	PYTHON_HANDLE_FOOTER()
-	
+
 	PYTHON_HANDLE_HEADER(redraw_statusbar, "")
 	;
 	PYTHON_HANDLE_FOOTER()
 #endif
-	
+
 	if (commit)
 		window_commit();
 }
@@ -2417,7 +2440,7 @@ void save_windows()
 	string_t s = string_init(NULL);
 	int maxid = 0, i;
 	list_t l;
-		
+
 	xfree(config_windows_layout);
 
 	for (l = windows; l; l = l->next) {
@@ -2429,7 +2452,7 @@ void save_windows()
 
 	for (i = 1; i <= maxid; i++) {
 		const char *target = "-";
-			
+
 		for (l = windows; l; l = l->next) {
 			struct window *w = l->data;
 
@@ -2562,7 +2585,7 @@ static void mouse_event (const char *event)
 		}
 
 #if 0
-		gg_debug(GG_DEBUG_MISC, "// mouse_event(): %d,%d: %d\n", 
+		gg_debug(GG_DEBUG_MISC, "// mouse_event(): %d,%d: %d\n",
 		    e.x, e.y, e.bstate);
 #endif
 
@@ -2570,10 +2593,10 @@ static void mouse_event (const char *event)
 
 		for (l = mouse_areas; l; l = l->next) {
 			area = l->data;
-	
-			if (e.x >= area->start.x && 
-			    e.x <= area->end.x && 
-			    e.y >= area->start.y && 
+
+			if (e.x >= area->start.x &&
+			    e.x <= area->end.x &&
+			    e.y >= area->start.y &&
 			    e.y <= area->end.y)
 				break;
 		}
@@ -2634,7 +2657,7 @@ static void mouse_event (const char *event)
 /*
  * mouse_bevent_add()
  *
- * dodaje button event (zdarzenie dla przycisku) do obszaru. jesli to 
+ * dodaje button event (zdarzenie dla przycisku) do obszaru. jesli to
  * pierwszy bevent, to trzeba zapewnic area->bevent == NULL.
  *
  * - area: wskaznik do odpowiedniej struktury area_t
@@ -2671,24 +2694,24 @@ static struct mouse_area_t *mouse_area_add (struct mouse_area_t *area)
 {
 	list_t l;
 
-	/* Sprawdzamy czy nowy obszar nie zachodzi na ¿aden 
+	/* Sprawdzamy czy nowy obszar nie zachodzi na ¿aden
 	 * istniej±cy obszar. */
 
 	for (l = mouse_areas; l; l = l->next) {
 		struct mouse_area_t *cur_area = l->data;
 
-		if ((area->start.x >= cur_area->start.x && 
-		    area->start.x <= cur_area->end.x && 
-		    area->start.y >= cur_area->start.y && 
-		    area->start.y >= cur_area->end.y) || 
-		    (area->start.x + area->size.x >= cur_area->start.x && 
-		    area->start.x + area->size.x <= cur_area->end.x && 
-		    area->start.y + area->size.y >= cur_area->start.y && 
+		if ((area->start.x >= cur_area->start.x &&
+		    area->start.x <= cur_area->end.x &&
+		    area->start.y >= cur_area->start.y &&
+		    area->start.y >= cur_area->end.y) ||
+		    (area->start.x + area->size.x >= cur_area->start.x &&
+		    area->start.x + area->size.x <= cur_area->end.x &&
+		    area->start.y + area->size.y >= cur_area->start.y &&
 		    area->start.y + area->size.y >= cur_area->end.y)) {
-			gg_debug(GG_DEBUG_MISC, "// mouse_area_add(): %s (%d,%d)-(%d,%d) overlaps with %s (%d,%d)-(%d,%d)\n", 
-			    area->name, 
-			    area->start.x, area->start.y, area->end.x, area->end.y, 
-			    cur_area->name, 
+			gg_debug(GG_DEBUG_MISC, "// mouse_area_add(): %s (%d,%d)-(%d,%d) overlaps with %s (%d,%d)-(%d,%d)\n",
+			    area->name,
+			    area->start.x, area->start.y, area->end.x, area->end.y,
+			    cur_area->name,
 			    cur_area->start.x, cur_area->start.y, cur_area->end.x, cur_area->end.y);
 			return NULL;
 		}
@@ -2815,18 +2838,18 @@ static struct mouse_area_t *mouse_area_move (const char *name, int y, int x)
  *
  * 0 - nie nale¿y, 1 - nale¿y.
  */
-static int mouse_in_area (struct mouse_coords_t *start, struct mouse_coords_t *end, 
+static int mouse_in_area (struct mouse_coords_t *start, struct mouse_coords_t *end,
     struct mouse_coords_t *point)
 {
 #if 0
-	gg_debug(GG_DEBUG_MISC, "// mouse_in_area(): {(%d,%d), (%d,%d)}, (%d,%d)\n", 
+	gg_debug(GG_DEBUG_MISC, "// mouse_in_area(): {(%d,%d), (%d,%d)}, (%d,%d)\n",
 	    start->x, start->y, end->x, end->y, point->x, point->y);
 #endif
 
 	if (start->x == -1 || start->y == -1 || end->x == -1 || end->y == -1)
 		return 0;
 
-	return (point->x >= start->x && point->x <= end->x && 
+	return (point->x >= start->x && point->x <= end->x &&
 	    point->y >= start->y && point->y <= end->y) ? 1 : 0;
 }
 
@@ -2898,7 +2921,7 @@ static void mouse_bevent_statusbar (struct mouse_coords_t *coords, mmask_t bstat
 	gg_debug(GG_DEBUG_MISC, "// mouse_statusbar_bevent(): area=%d\n", area);
 #endif
 
-	/* teraz area zawiera enum odpowiadaj±cy obszarowi, na którym pojawi³o 
+	/* teraz area zawiera enum odpowiadaj±cy obszarowi, na którym pojawi³o
 	 * siê zdarzenie a window zawiera numer okna dla area == ACT */
 
 	if (area == TIME && bstate == BUTTON1_CLICKED)
@@ -2924,8 +2947,8 @@ static void mouse_bevent_statusbar (struct mouse_coords_t *coords, mmask_t bstat
 		int num;
 		int act_str_len = strlen(mouse_statusbar.act_str);
 
-		/* act_pos okre¶la pozycjê w act_str. musimy znale¼æ pocz±tek 
-		 * i koniec numerka w stringu. pocz±tek to przecinek+1 lub 
+		/* act_pos okre¶la pozycjê w act_str. musimy znale¼æ pocz±tek
+		 * i koniec numerka w stringu. pocz±tek to przecinek+1 lub
 		 * pocz±tek stringa, koniec to przecinek lub koniec stringa. */
 
 		if (mouse_statusbar.act_str[act_pos] == ',')
@@ -3017,7 +3040,7 @@ static void mouse_bevent_current (struct mouse_coords_t *coords, mmask_t bstate)
 		/* pionowo */
 		dir = __negative(distance.y) ? DIR_UP : DIR_DOWN;
 	} else {
-		gg_debug(GG_DEBUG_MISC, "// mouse_bevent_current(): Unknown gesture (distance=(%d,%d))!\n", 
+		gg_debug(GG_DEBUG_MISC, "// mouse_bevent_current(): Unknown gesture (distance=(%d,%d))!\n",
 		    distance.x, distance.y);
 		goto out;
 	}
@@ -3067,7 +3090,7 @@ void ui_ncurses_init()
 	ui_beep = ui_ncurses_beep;
 	ui_event = ui_ncurses_event;
 	ui_deinit = ui_ncurses_deinit;
-	
+
 	initscr();
 	cbreak();
 	noecho();
@@ -3186,6 +3209,9 @@ void ui_ncurses_init()
 	memset(binding_map_meta, 0, sizeof(binding_map_meta));
 
 	binding_default();
+#ifdef HAVE_OPENSSL
+    sim_set_private_key_cb(ui_ncurses_pem_password_cb);
+#endif
 
 	ui_ncurses_inited = 1;
 }
@@ -3376,7 +3402,7 @@ void command_generator(const char *text, int len)
 
 	if (window_current->target)
 		slash = "/";
-			
+
 	for (l = commands; l; l = l->next) {
 		struct command *c = l->data;
 
@@ -3572,7 +3598,7 @@ void file_generator(const char *text, int len)
 
 again:
 	/* zbierzmy listê plików w ¿±danym katalogu */
-	
+
 	count = scandir((dname) ? dname : ".", &namelist, NULL, alphasort);
 
 	ui_debug("dname=\"%s\", fname=\"%s\", count=%d\n", (dname) ? dname : "(null)", (fname) ? fname : "(null)", count);
@@ -3594,7 +3620,7 @@ again:
 
 		/* je¶li mamy `..', sprawd¼ czy katalog sk³ada siê z
 		 * `../../../' lub czego¶ takiego. */
-		
+
 		if (!strcmp(name, "..")) {
 			const char *p;
 			int omit = 0;
@@ -3611,7 +3637,7 @@ again:
 				continue;
 			}
 		}
-		
+
 		if (!strncmp(name, fname, strlen(fname))) {
 			name = saprintf("%s%s%s", (dname) ? dname : "", name, (isdir) ? "/" : "");
 			array_add(&completions, name);
@@ -3697,18 +3723,18 @@ static struct {
  * complete()
  *
  * funkcja obs³uguj±ca dope³nianie klawiszem tab.
- * 
+ *
  * Dzia³anie:
  * - Wprowadzona linia dzielona jest na wyrazy (uwzglêdniaj±c przecinki i znaki cudzyslowia)
  * - nastêpnie znaki separacji znajduj±ce siê miêdzy tymi wyrazami wrzucane s± do tablicy separators
  * - dalej sprawdzane jest za pomoc± zmiennej word_current (okre¶laj±cej aktualny wyraz bez uwzglêdnienia
- *   przecinków - po to, aby wiedzieæ czy w przypadku np funkcji /query ma byæ szukane dope³nienie 
+ *   przecinków - po to, aby wiedzieæ czy w przypadku np funkcji /query ma byæ szukane dope³nienie
  * - zmienna word odpowiada za aktualny wyraz (*z* uwzglêdnieniem przecinków)
  * - words - tablica zawieraj± wszystkie wyrazy
- * - gdy jest to mo¿liwe szukane jest dope³nienie 
+ * - gdy jest to mo¿liwe szukane jest dope³nienie
  * - gdy dope³nieñ jest wiêcej ni¿ jedno (count > 1) wy¶wietlamy tylko "wspóln±" czê¶æ wszystkich dope³nieñ
- *   np ,,que'' w przypadku funkcji /query i /queue 
- * - gdy dope³nienie jest tylko jedno wy¶wietlamy owo dope³nienie 
+ *   np ,,que'' w przypadku funkcji /query i /queue
+ * - gdy dope³nienie jest tylko jedno wy¶wietlamy owo dope³nienie
  * - przy wy¶wietlaniu dope³nienia ca³a linijka konstruowana jest od nowa, poniewa¿ nie wiadomo w którym miejscu
  *   podany wyraz ma zostañ "wsadzony", st±d konieczna jest tablica separatorów, tablica wszystkich wyrazów itd ...
  */
@@ -3716,11 +3742,11 @@ static void complete(int *line_start, int *line_index)
 {
 	char *start, *cmd, **words, *separators;
 	int i, count, word, j, words_count, word_current, open_quote;
-	
+
 	start = xmalloc(strlen(line) + 1);
-	
-	/* 
-	 * je¶li uzbierano ju¿ co¶ to próbujemy wy¶wietliæ wszystkie mo¿liwo¶ci 
+
+	/*
+	 * je¶li uzbierano ju¿ co¶ to próbujemy wy¶wietliæ wszystkie mo¿liwo¶ci
 	 */
 	if (completions) {
 		int maxlen = 0, cols, rows;
@@ -3749,7 +3775,7 @@ static void complete(int *line_start, int *line_index)
 				if (cell < array_count(completions)) {
 					int k;
 
-					strcat(tmp, completions[cell]); 
+					strcat(tmp, completions[cell]);
 
 					for (k = 0; k < maxlen - strlen(completions[cell]); k++)
 						strcat(tmp, " ");
@@ -3765,7 +3791,7 @@ static void complete(int *line_start, int *line_index)
 		xfree(start);
 		return;
 	}
-	
+
 	/* zerujemy co mamy */
 	words = NULL;
 
@@ -3777,7 +3803,7 @@ static void complete(int *line_start, int *line_index)
 			if (i == strlen(line))
 				open_quote = 1;
 		} else
-			for(j = 0; i < strlen(line) && !xisspace(line[i]) && line[i] != ','; j++, i++) 
+			for(j = 0; i < strlen(line) && !xisspace(line[i]) && line[i] != ','; j++, i++)
 				start[j] = line[i];
 		start[j] = '\0';
 		/* "przewijamy" wiêksz± ilo¶æ spacji */
@@ -3798,14 +3824,14 @@ static void complete(int *line_start, int *line_index)
 		separators = xmalloc(array_count(words) + 1);
 	else
 		separators = NULL;
-		
+
 	/* sprawd¼, gdzie jeste¶my (uwzgêdniaj±c cudzys³owia) i dodaj separatory*/
 	for (word = 0, i = 0; i < strlen(line); i++, word++) {
 		if(line[i] == '"')  {
 			for(j = 0, i++; i < strlen(line) && line[i] != '"'; j++, i++)
 				start[j] = line[i];
 		} else {
-			for(j = 0; i < strlen(line) && !xisspace(line[i]) && line[i] != ','; j++, i++) 
+			for(j = 0; i < strlen(line) && !xisspace(line[i]) && line[i] != ','; j++, i++)
 				start[j] = line[i];
 		}
 		/* "przewijamy */
@@ -3821,12 +3847,12 @@ static void complete(int *line_start, int *line_index)
                 if(i >= *line_index)
             		break;
 	}
-	
+
 	/* dodajmy separatory - pewne rzeczy podobne do pêtli powy¿ej */
 	for (i = 0, j = 0; i < strlen(line); i++, j++) {
 		if(line[i] == '"')  {
 			for(i++; i < strlen(line) && line[i] != '"'; i++);
-			if(i < strlen(line)) 
+			if(i < strlen(line))
 				separators[j] = line[i + 1];
 		} else {
 			for(; i < strlen(line) && !xisspace(line[i]) && line[i] != ','; i++);
@@ -3838,12 +3864,12 @@ static void complete(int *line_start, int *line_index)
 	}
 
 	if (separators)
-		separators[j] = '\0'; // koniec ciagu 	
-	
+		separators[j] = '\0'; // koniec ciagu
+
 	/* aktualny wyraz bez uwzgledniania przecinkow */
 	for (i = 0, words_count = 0, word_current = 0; i < strlen(line); i++, words_count++) {
 		for(; i < strlen(line) && !xisspace(line[i]); i++)
-			if(line[i] == '"') 
+			if(line[i] == '"')
 				for(i++; i < strlen(line) && line[i] != '"'; i++);
 		for(i++; i < strlen(line) && xisspace(line[i]); i++);
 		if(i >= strlen(line))
@@ -3857,24 +3883,24 @@ static void complete(int *line_start, int *line_index)
 
 	/* trzeba pododawaæ trochê do liczników w spefycicznych (patrz warunki) sytuacjach */
 	if (strlen(line) > 1) {
-		if((xisspace(line[strlen(line) - 1]) || line[strlen(line) - 1] == ',') && word + 1== array_count(words) -1 ) 
+		if((xisspace(line[strlen(line) - 1]) || line[strlen(line) - 1] == ',') && word + 1== array_count(words) -1 )
 			word++;
-		if(xisspace(line[strlen(line) - 1]) && words_count == word_current) 
+		if(xisspace(line[strlen(line) - 1]) && words_count == word_current)
 			word_current++;
-		if(xisspace(line[strlen(line) - 1])) 
+		if(xisspace(line[strlen(line) - 1]))
 			words_count++;
 	}
-		
+
 /*	gg_debug(GG_DEBUG_MISC, "word = %d\n", word);
-	gg_debug(GG_DEBUG_MISC, "start = \"%s\"\n", start);   
-	gg_debug(GG_DEBUG_MISC, "words_count = %d\n", words_count);	
+	gg_debug(GG_DEBUG_MISC, "start = \"%s\"\n", start);
+	gg_debug(GG_DEBUG_MISC, "words_count = %d\n", words_count);
 	gg_debug(GG_DEBUG_MISC, "word_current = %d\n", word_current); */
-	
+
 /*	 for(i = 0; i < strlen(separators); i++)
-		gg_debug(GG_DEBUG_MISC, "separators[i = %d] = \"%c\"\n", i, separators[i]);  */ 
-	
+		gg_debug(GG_DEBUG_MISC, "separators[i = %d] = \"%c\"\n", i, separators[i]);  */
+
 	cmd = saprintf("/%s ", (config_tab_command) ? config_tab_command : "chat");
-	
+
 	/* nietypowe dope³nienie nicków przy rozmowach */
 	if (!strcmp(line, "") || (!strncasecmp(line, cmd, strlen(cmd)) && word == 2 && send_nicks_count > 0) || (!strcasecmp(line, cmd) && send_nicks_count > 0)) {
 		if (send_nicks_index >= send_nicks_count)
@@ -3926,7 +3952,7 @@ static void complete(int *line_start, int *line_index)
 				if (params && abbrs == 1)
 					break;
 		}
-		
+
 		if (params && abbrs == 1) {
 			for (i = 0; generators[i].ch; i++) {
 				if (generators[i].ch == params[word_current - 2]) {
@@ -3939,7 +3965,7 @@ static void complete(int *line_start, int *line_index)
 
 						if (!strchr(completions[j], '"') && !strchr(completions[j], '\\') && !strchr(completions[j], ' '))
 							continue;
-						
+
 						s = string_init("\"");
 						string_append(s, completions[j]);
 						string_append_c(s, '\"');
@@ -3949,20 +3975,20 @@ static void complete(int *line_start, int *line_index)
 					}
 					break;
 				}
-			} 
+			}
 
 		}
 	}
-	
+
 	count = array_count(completions);
 
-	/* 
-	 * je¶li jest tylko jedna mo¿lwio¶æ na dope³nienie to drukujemy co mamy, 
-	 * ewentualnie bierzemy czê¶æ wyrazów w cudzys³owia ... 
-	 * i uwa¿amy oczywi¶cie na \001 (patrz funkcje wy¿ej 
+	/*
+	 * je¶li jest tylko jedna mo¿lwio¶æ na dope³nienie to drukujemy co mamy,
+	 * ewentualnie bierzemy czê¶æ wyrazów w cudzys³owia ...
+	 * i uwa¿amy oczywi¶cie na \001 (patrz funkcje wy¿ej
 	 */
 	if (count == 1) {
-		line[0] = '\0';		
+		line[0] = '\0';
 		for(i = 0; i < array_count(words); i++) {
 			if(i == word) {
 				if(strchr(completions[0],  '\001')) {
@@ -3993,10 +4019,10 @@ static void complete(int *line_start, int *line_index)
 		completions = NULL;
 	}
 
-	/* 
+	/*
 	 * gdy jest wiêcej mo¿liwo¶ci to robimy podobnie jak wy¿ej tyle, ¿e czasem
 	 * trzeba u¿yæ cudzys³owia tylko z jednej storny, no i trzeba dope³niæ do pewnego miejsca
-	 * w sumie proste rzeczy, ale jak widaæ jest trochê opcji ... 
+	 * w sumie proste rzeczy, ale jak widaæ jest trochê opcji ...
 	 */
 	if (count > 1) {
 		int common = 0;
@@ -4006,11 +4032,11 @@ static void complete(int *line_start, int *line_index)
 
                 if (*s1 =='"')
                       s1++;
-		/* 
-		 * mo¿e nie za ³adne programowanie, ale skuteczne i w sumie jedyne w 100% spe³niaj±ce	
+		/*
+		 * mo¿e nie za ³adne programowanie, ale skuteczne i w sumie jedyne w 100% spe³niaj±ce
 	 	 * wymagania dope³niania (uwzglêdnianie cudzyws³owiów itp...)
 		 */
-		for(i=1, j = 0; ; i++, common++) { 
+		for(i=1, j = 0; ; i++, common++) {
 			for(j=0; j < count; j++) {
 		                char *s2;
 
@@ -4028,23 +4054,23 @@ static void complete(int *line_start, int *line_index)
                                 break;
                 }
 
-		
+
 		/* gg_debug(GG_DEBUG_MISC,"common :%d\n", common); */
 
 		if (strlen(line) + common < LINE_MAXLEN) {
-		
-			line[0] = '\0';		
+
+			line[0] = '\0';
 			for(i = 0; i < array_count(words); i++) {
 				if(i == word) {
-					if(quotes == 1 && completions[0][0] != '"') 
+					if(quotes == 1 && completions[0][0] != '"')
 						strcat(line, "\"");
-						
+
 					if(completions[0][0] == '"')
 						common++;
-						
+
 					if(common > 0 && completions[0][common - 1] == '"')
 						common--;
-						
+
 					strncat(line, completions[0], common);
 					*line_index = strlen(line);
 				} else {
@@ -4056,7 +4082,7 @@ static void complete(int *line_start, int *line_index)
 					} else
 						strcat(line, words[i]);
 				}
-				
+
 				if (separators[i]) {
 					size_t slen = strlen(line);
 					line[slen] = separators[i];
@@ -4082,7 +4108,7 @@ static void update_input()
 {
 	if (input_size == 1) {
 		int i;
-		
+
 		for (i = 0; lines[i]; i++)
 			xfree(lines[i]);
 		xfree(lines);
@@ -4093,7 +4119,7 @@ static void update_input()
 		history[0] = line;
 
 		line_start = 0;
-		line_index = 0; 
+		line_index = 0;
 		lines_start = 0;
 		lines_index = 0;
 	} else {
@@ -4107,7 +4133,7 @@ static void update_input()
 		lines_start = 0;
 		lines_index = 0;
 	}
-	
+
 	window_resize();
 
 	window_redraw(window_current);
@@ -4163,7 +4189,7 @@ void print_char_underlined(WINDOW *w, int y, int x, unsigned char ch)
 }
 
 
-/* 
+/*
  * ekg_getch()
  *
  * czeka na wci¶niêcie klawisza i je¶li wkompilowano obs³ugê pythona,
@@ -4239,6 +4265,7 @@ static void binding_kill_word(const char *arg)
 		eaten++;
 	}
 
+        tsm_delword_in_region(line_index, lines ? lines_index:0, eaten);
 	memmove(line + line_index, line + line_index + eaten, strlen(line) - line_index - eaten + 1);
 }
 
@@ -4251,7 +4278,7 @@ static void binding_toggle_input(const char *arg)
 		string_t s = string_init("");
 		char *tmp;
 		int i;
-	
+
 		for (i = 0; lines[i]; i++) {
 			if (!strcmp(lines[i], "") && !lines[i + 1])
 				break;
@@ -4270,6 +4297,7 @@ static void binding_toggle_input(const char *arg)
 
 		command_exec(window_current->target, tmp, 0);
 		xfree(tmp);
+                tsm_reset_region();
 	}
 }
 
@@ -4286,9 +4314,11 @@ static void binding_backward_delete_char(const char *arg)
 	if (lines && line_index == 0 && lines_index > 0 && strlen(lines[lines_index]) + strlen(lines[lines_index - 1]) < LINE_MAXLEN) {
 		int i;
 
+                tsm_bkw_delchar_in_region(0, lines_index, TRUE);
+
 		line_index = strlen(lines[lines_index - 1]);
 		strlcat(lines[lines_index - 1], lines[lines_index], LINE_MAXLEN);
-		
+
 		xfree(lines[lines_index]);
 
 		for (i = lines_index; i < array_count(lines); i++)
@@ -4305,6 +4335,7 @@ static void binding_backward_delete_char(const char *arg)
 	if (strlen(line) > 0 && line_index > 0) {
 		memmove(line + line_index - 1, line + line_index, LINE_MAXLEN - line_index);
 		line[LINE_MAXLEN - 1] = 0;
+        tsm_bkw_delchar_in_region(line_index, lines ? lines_index:0, FALSE);
 		line_index--;
 	}
 }
@@ -4312,6 +4343,7 @@ static void binding_backward_delete_char(const char *arg)
 static void binding_kill_line(const char *arg)
 {
 	line[line_index] = 0;
+    tsm_check_constraints(0, lines ? lines_index:0);
 }
 
 static void binding_yank(const char *arg)
@@ -4319,7 +4351,9 @@ static void binding_yank(const char *arg)
 	if (yanked && strlen(yanked) + strlen(line) + 1 < LINE_MAXLEN) {
 		memmove(line + line_index + strlen(yanked), line + line_index, LINE_MAXLEN - line_index - strlen(yanked));
 		memcpy(line + line_index, yanked, strlen(yanked));
+        tsm_yank_in_region(line_index, lines ? lines_index:0, strlen(yanked));
 		line_index += strlen(yanked);
+
 	}
 }
 
@@ -4327,6 +4361,8 @@ static void binding_delete_char(const char *arg)
 {
 	if (line_index == strlen(line) && lines_index < array_count(lines) - 1 && strlen(line) + strlen(lines[lines_index + 1]) < LINE_MAXLEN) {
 		int i;
+
+                tsm_delchar_in_region(line_index, lines ? lines_index:0, TRUE);
 
 		strlcat(line, lines[lines_index + 1], LINE_MAXLEN);
 
@@ -4338,20 +4374,23 @@ static void binding_delete_char(const char *arg)
 		lines = xrealloc(lines, (array_count(lines) + 1) * sizeof(char*));
 
 		lines_adjust();
-	
+
 		return;
 	}
-				
+
 	if (line_index < strlen(line)) {
 		memmove(line + line_index, line + line_index + 1, LINE_MAXLEN - line_index - 1);
 		line[LINE_MAXLEN - 1] = 0;
+        tsm_delchar_in_region(line_index, lines ? lines_index:0, FALSE);
 	}
 }
-				
+
 static void binding_accept_line(const char *arg)
 {
 	if (lines) {
 		int i;
+
+        tsm_inschar_in_region(line_index, lines_index, TRUE);
 
 		lines = xrealloc(lines, (array_count(lines) + 2) * sizeof(char*));
 
@@ -4361,32 +4400,39 @@ static void binding_accept_line(const char *arg)
 		lines[lines_index + 1] = xmalloc(LINE_MAXLEN);
 		strlcpy(lines[lines_index + 1], line + line_index, LINE_MAXLEN);
 		line[line_index] = 0;
-		
+
 		line_index = 0;
 		line_start = 0;
 		lines_index++;
 
 		lines_adjust();
-	
+
 		return;
 	}
-				
+
 	command_exec(window_current->target, line, 0);
 
-	if (strcmp(line, "")) {
+
+        if (strcmp(line, "")) {
+            if( !tsm_is_region_on() ) { // nie zapamiêtuj zagwiazdkowanych linii w historii
 		if (history[0] != line)
 			xfree(history[0]);
 		history[0] = xstrdup(line);
 		xfree(history[HISTORY_MAX - 1]);
 		memmove(&history[1], &history[0], sizeof(history) - sizeof(history[0]));
+            }
 	} else {
 		if (config_enter_scrolls)
 			print("none", "");
 	}
 
-	history[0] = line;
-	history_index = 0;
+        if( !tsm_is_region_on() )
+        {
+            history[0] = line;
+            history_index = 0;
+        }
 	line[0] = 0;
+        tsm_reset_region();
 	line_adjust();
 }
 
@@ -4396,10 +4442,12 @@ static void binding_line_discard(const char *arg)
 	yanked = strdup(line);
 	line[0] = 0;
 	line_adjust();
+    tsm_check_constraints(0, lines ? lines_index:0);
 
 	if (lines && lines_index < array_count(lines) - 1) {
 		int i;
 
+        tsm_delchar_in_region(0, lines_index, TRUE);
 		xfree(lines[lines_index]);
 
 		for (i = lines_index; i < array_count(lines); i++)
@@ -4459,7 +4507,11 @@ static void binding_word_rubout(const char *arg)
 static void binding_complete(const char *arg)
 {
 	if (!lines)
+    {
+        if( tsm_in_region_ext(line_index, lines ? lines_start:0) )
+            return;
 		complete(&line_start, &line_index);
+    }
 	else {
 		int i, count = 8 - (line_index % 8);
 
@@ -4469,7 +4521,10 @@ static void binding_complete(const char *arg)
 		memmove(line + line_index + count, line + line_index, LINE_MAXLEN - line_index - count);
 
 		for (i = line_index; i < line_index + count; i++)
+        {
 			line[i] = ' ';
+            tsm_inschar_in_region(line_index, lines_index, FALSE);
+        }
 
 		line_index += count;
 	}
@@ -4541,11 +4596,13 @@ static void binding_previous_history(const char *arg)
 
 		return;
 	}
-				
+
 	if (history[history_index + 1]) {
+            if( !tsm_is_region_on() ) {
 		if (history_index == 0)
 			history[0] = xstrdup(line);
 		history_index++;
+            }
 		strlcpy(line, history[history_index], LINE_MAXLEN);
 		line_adjust();
 	}
@@ -4621,10 +4678,10 @@ static void binding_forward_page(const char *arg)
 static void binding_ignore_query(const char *arg)
 {
 	char *tmp;
-	
+
 	if (!window_current->target)
 		return;
-	
+
 	tmp = saprintf("/ignore %s", window_current->target);
 	command_exec(window_current->target, tmp, 0);
 	xfree(tmp);
@@ -4674,8 +4731,21 @@ static void binding_ui_ncurses_debug_toggle(const char *arg)
 }
 
 
+static void binding_toggle_transient_star_mode(const char *arg)
+{
+    if( !transient_star_mode && tsm_is_region_on() )
+        return; //dopuszczalny tylko 1 region
+    transient_star_mode = !transient_star_mode;
+    if( transient_star_mode )
+        tsm_start_region();
+    else
+        tsm_stop_region();
+    update_statusbar(1);
+}
+
+
 #ifdef WITH_ASPELL
-/* 
+/*
  * funkcja sprawdzajaca pisowniê.
  */
 static void spellcheck(const char *line, char *checked)
@@ -4831,10 +4901,11 @@ static void ui_ncurses_loop()
 					xfree(tmp);
 				}
 			} else if (ch < 255 && strlen(line) < LINE_MAXLEN - 1) {
-					
-				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
 
+				memmove(line + line_index + 1, line + line_index, LINE_MAXLEN - line_index - 1);
+                                tsm_inschar_in_region(line_index, lines ? lines_index:0, FALSE);
 				line[line_index++] = ch;
+
 			}
 		}
 
@@ -4853,13 +4924,13 @@ redraw_prompt:
 			if (line_start < 0)
 				line_start = 0;
 		}
-		
+
 		werase(input);
 		wattrset(input, color_pair(COLOR_WHITE, 0, COLOR_BLACK));
 
 		if (lines) {
 			int i;
-			
+
 			for (i = 0; i < 5; i++) {
 				unsigned char *p;
 				int j;
@@ -4868,20 +4939,20 @@ redraw_prompt:
 					break;
 
 				p = (unsigned char *) lines[lines_start + i];
-				
+
 #ifdef WITH_ASPELL
 				memset(aspell_line, 0, LINE_MAXLEN);
-				    
+
 				/* sprawdzamy pisownie */
 				if (config_aspell == 1)
 					spellcheck(p, aspell_line);
 
                                 for (j = 0; j + line_start < strlen(p) && j < input->_maxx + 1; j++) {
-                                    
-				    if (aspell_line[line_start + j] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
+
+				    if (!tsm_in_region(line_start + j, lines_start+i) && aspell_line[line_start + j] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
                                         print_char_underlined(input, i, j, p[line_start + j]);
                                     else /* jesli jest wszystko okey to wyswietlamy normalny */
-				        print_char(input, i, j, p[j + line_start]);
+				        print_char(input, i, j, tsm_in_region(line_start + j, lines_start+i) ? '*':p[j + line_start]);
 				}
 #else
                                 for (j = 0; j + line_start < strlen((char*) p) && j < input->_maxx + 1; j++)
@@ -4895,7 +4966,7 @@ redraw_prompt:
 			if (window_current->prompt)
 				mvwaddstr(input, 0, 0, window_current->prompt);
 
-#ifdef WITH_ASPELL			
+#ifdef WITH_ASPELL
 			memset(aspell_line, 0, LINE_MAXLEN);
 
 			/* sprawdzamy pisownie */
@@ -4904,14 +4975,14 @@ redraw_prompt:
 
                         for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++) {
 
-				if (aspell_line[line_start + i] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
+                            if (!tsm_in_region(line_start + i, 0) && aspell_line[line_start + i] == ASPELLBADCHAR) /* jesli b³êdny to wy¶wietlamy podkre¶lony */
                                     print_char_underlined(input, 0, i + window_current->prompt_len, line[line_start + i]);
                                 else /* jesli jest wszystko okey to wyswietlamy normalny */
-                                    print_char(input, 0, i + window_current->prompt_len, line[line_start + i]);
+                                    print_char(input, 0, i + window_current->prompt_len, tsm_in_region(line_start + i, 0) ? '*':line[line_start + i]);
 			}
 #else
                         for (i = 0; i < input->_maxx + 1 - window_current->prompt_len && i < strlen(line) - line_start; i++)
-                                print_char(input, 0, i + window_current->prompt_len, line[line_start + i]);
+                            print_char(input, 0, i + window_current->prompt_len, tsm_in_region(line_start + i, 0) ? '*':line[line_start + i]);
 #endif
 
 			wattrset(input, color_pair(COLOR_BLACK, 1, COLOR_BLACK));
@@ -4922,7 +4993,7 @@ redraw_prompt:
 			wattrset(input, color_pair(COLOR_WHITE, 0, COLOR_BLACK));
 			wmove(input, 0, line_index - line_start + window_current->prompt_len);
 		}
-		
+
 		window_commit();
 	}
 }
@@ -4990,7 +5061,7 @@ void window_kill(struct window *w, int quiet)
 {
 	int id = w->id;
 
-	if (quiet) 
+	if (quiet)
 		goto cleanup;
 
 	if (id == 1 && w->target) {
@@ -5002,7 +5073,7 @@ void window_kill(struct window *w, int quiet)
 		window_current->prompt_len = 0;
 		return;
 	}
-	
+
 	if (id == 1) {
 		printq("window_kill_status");
 		return;
@@ -5010,7 +5081,7 @@ void window_kill(struct window *w, int quiet)
 
 	if (id == 0)
 		return;
-	
+
 	if (w == window_current)
 		window_prev();
 
@@ -5049,10 +5120,10 @@ cleanup:
 
 		for (i = 0; i < w->lines_count; i++)
 			xfree(w->lines[i].ts);
-		
+
 		xfree(w->lines);
 	}
-		
+
 	xfree(w->target);
 	xfree(w->prompt);
 	delwin(w->window);
@@ -5085,12 +5156,12 @@ static void binding_parse(struct binding *b, const char *action)
 		array_free(args);
 		return;
 	}
-	
+
 #define __action(x,y) \
 	if (!strcmp(args[0], x)) { \
 		b->function = y; \
 		b->arg = xstrdup(args[1]); \
-	} 
+	}
 
 	__action("backward-word", binding_backward_word);
 	__action("forward-word", binding_forward_word);
@@ -5121,6 +5192,7 @@ static void binding_parse(struct binding *b, const char *action)
 	__action("ui-ncurses-debug-toggle", binding_ui_ncurses_debug_toggle);
 	__action("contacts-scroll-up", binding_contacts_scrollup);
 	__action("contacts-scroll-down", binding_contacts_scrolldown);
+        __action("toggle-transient-star-mode", binding_toggle_transient_star_mode);
 
 #undef __action
 
@@ -5157,7 +5229,7 @@ int binding_key(struct binding *b, const char *key, int add)
 
 		if (strlen(key) != 5)
 			return -1;
-	
+
 		ch = xtoupper(key[4]);
 
 		b->key = saprintf("Alt-%c", ch);
@@ -5173,7 +5245,7 @@ int binding_key(struct binding *b, const char *key, int add)
 
 	if (!strncasecmp(key, "Ctrl-", 5)) {
 		unsigned char ch;
-		
+
 		if (strlen(key) != 6 || !xisalpha(key[5]))
 			return -1;
 
@@ -5182,7 +5254,7 @@ int binding_key(struct binding *b, const char *key, int add)
 
 		if (add)
 			binding_map[ch - 64] = list_add(&bindings, b, sizeof(struct binding));
-		
+
 		return 0;
 	}
 
@@ -5193,10 +5265,10 @@ int binding_key(struct binding *b, const char *key, int add)
 			return -1;
 
 		b->key = saprintf("F%d", f);
-		
+
 		if (add)
 			binding_map[KEY_F(f)] = list_add(&bindings, b, sizeof(struct binding));
-		
+
 		return 0;
 	}
 
@@ -5245,14 +5317,14 @@ static void binding_add(const char *key, const char *action, int internal, int q
 {
 	struct binding b, *c = NULL;
 	list_t l;
-	
+
 	if (!key || !action)
 		return;
-	
+
 	memset(&b, 0, sizeof(b));
 
 	b.internal = internal;
-	
+
 	for (l = bindings; l; l = l->next) {
 		struct binding *d = l->data;
 
@@ -5327,7 +5399,7 @@ static void binding_delete(const char *key, int quiet)
 
 		xfree(b->action);
 		xfree(b->arg);
-		
+
 		if (b->default_action) {
 			b->action = xstrdup(b->default_action);
 			b->arg = xstrdup(b->default_arg);
@@ -5348,7 +5420,7 @@ static void binding_delete(const char *key, int quiet)
 		config_changed = 1;
 
 		printq("bind_seq_remove", key);
-		
+
 		return;
 	}
 
@@ -5383,7 +5455,7 @@ static int ui_ncurses_event(const char *event, ...)
 
 	if (!strcasecmp(event, "commit"))
 		window_commit();
-		
+
 	if (!strcasecmp(event, "printat")) {
 		char *target = va_arg(ap, char*);
 		int id = va_arg(ap, int), x = va_arg(ap, int), y = va_arg(ap, int);
@@ -5422,7 +5494,7 @@ static int ui_ncurses_event(const char *event, ...)
 
 				if (w->floating)
 					continue;
-				
+
 				if (w->id > 1)
 					w->id = id++;
 			}
@@ -5433,10 +5505,10 @@ static int ui_ncurses_event(const char *event, ...)
 
 			for (l = windows; l; l = l->next) {
 				struct window *w = l->data;
-				
+
 				window_backlog_split(w, 1, 0);
 			}
-			
+
 			window_resize();
 		}
 
@@ -5446,10 +5518,10 @@ static int ui_ncurses_event(const char *event, ...)
 			for (l = windows; l; l = l->next) {
 				struct window *w = l->data;
 				int i;
-				
+
 				if (w->backlog_size <= config_backlog_size)
 					continue;
-				
+
 				for (i = config_backlog_size; i < w->backlog_size; i++) {
 					xfree(w->backlog[i]->str);
 					xfree(w->backlog[i]->attr);
@@ -5542,7 +5614,7 @@ static int ui_ncurses_event(const char *event, ...)
 
 		if (!strcasecmp(command, "find")) {
 			char *tmp = NULL;
-			
+
 			if (window_current->target) {
 				struct userlist *u = userlist_find(0, window_current->target);
 				struct conference *c = conference_find(window_current->target);
@@ -5614,7 +5686,7 @@ static int ui_ncurses_event(const char *event, ...)
 
 					for (l = windows; l; l = l->next) {
 						struct window *v = l->data;
-	
+
 						if (v->id < 2 || v->floating || v->target)
 							continue;
 
@@ -5653,7 +5725,7 @@ static int ui_ncurses_event(const char *event, ...)
 				window_current->target = NULL;
 				window_current->prompt = NULL;
 				window_current->prompt_len = 0;
-				
+
 				if (strcmp(f, "")) {
 					window_current->prompt = xstrdup(f);
 					window_current->prompt_len = strlen(f);
@@ -5675,7 +5747,7 @@ static int ui_ncurses_event(const char *event, ...)
 
 					if (w->id && (!p2 || w->id == num)) {
 						if (w->target) {
-							if (!w->floating)	
+							if (!w->floating)
 								printq("window_list_query", itoa(w->id), w->target);
 							else
 								printq("window_list_floating", itoa(w->id), itoa(w->left), itoa(w->top), itoa(w->width), itoa(w->height), w->target);
@@ -5695,8 +5767,8 @@ static int ui_ncurses_event(const char *event, ...)
 				// w->act == 1 - aktywno¶æ ma³a
 				// w->act == 2 - aktywno¶æ du¿a
 
-				// przelatujemy przez wszystkie aktywno¶ci, zapisujemy ma³± 
-				// i du¿±. je¿eli by³a jaka¶ du¿a to wykorzystujemy du¿±, 
+				// przelatujemy przez wszystkie aktywno¶ci, zapisujemy ma³±
+				// i du¿±. je¿eli by³a jaka¶ du¿a to wykorzystujemy du¿±,
 				// je¿eli nie, to wykorzystujemy ma³±.
 
 				for (l = windows; l; l = l->next) {
@@ -5728,7 +5800,7 @@ static int ui_ncurses_event(const char *event, ...)
 				list_t l;
 				int id = 0;
 				time_t id_time = time(NULL);
-		
+
 				for (l = windows; l; l = l->next) {
 					struct window *w = l->data;
 
@@ -5757,13 +5829,13 @@ static int ui_ncurses_event(const char *event, ...)
 				}
 				window_switch(atoi(p2));
 				goto cleanup;
-			}			
+			}
 
 			if (!strcasecmp(p1, "last")) {
 				window_switch(window_last_id);
 				goto cleanup;
 			}
-			
+
 			if (!strcasecmp(p1, "kill")) {
 				struct window *w = window_current;
 
@@ -5793,12 +5865,12 @@ static int ui_ncurses_event(const char *event, ...)
 				window_next();
 				goto cleanup;
 			}
-			
+
 			if (!strcasecmp(p1, "prev")) {
 				window_prev();
 				goto cleanup;
 			}
-			
+
 			if (!strcasecmp(p1, "move")) {
 				struct window *w = NULL;
 				char **argv;
@@ -5855,13 +5927,13 @@ static int ui_ncurses_event(const char *event, ...)
 				}
 
 				array_free(argv);
-					
+
 				if (w->left + w->width > stdscr->_maxx + 1)
 					w->left = stdscr->_maxx + 1 - w->width;
-				
+
 				if (w->top + w->height > stdscr->_maxy + 1)
 					w->top = stdscr->_maxy + 1 - w->height;
-				
+
 				if (w->floating)
 					mvwin(w->window, w->top, w->left);
 
@@ -5928,7 +6000,7 @@ static int ui_ncurses_event(const char *event, ...)
 				}
 
 				array_free(argv);
-					
+
 				if (w->floating) {
 					wresize(w->window, w->height, w->width);
 					window_backlog_split(w, 1, 0);
@@ -5939,7 +6011,7 @@ static int ui_ncurses_event(const char *event, ...)
 
 				goto cleanup;
 			}
-			
+
 			if (!strcasecmp(p1, "refresh")) {
 				window_floating_update(0);
 				wrefresh(curscr);
@@ -6025,8 +6097,8 @@ static int ui_ncurses_event(const char *event, ...)
 
 				/* pozwalamy na zmiane okna statusu, to nie jest blad */
 
-				if (w[0] == w[1] || !w[0]->id || !w[1]->id || 
-				    (w[0]->target && (!strcasecmp(w[0]->target, "__contacts") || !strcasecmp(w[0]->target, "__debug"))) || 
+				if (w[0] == w[1] || !w[0]->id || !w[1]->id ||
+				    (w[0]->target && (!strcasecmp(w[0]->target, "__contacts") || !strcasecmp(w[0]->target, "__debug"))) ||
 				    (w[1]->target && (!strcasecmp(w[1]->target, "__contacts") || !strcasecmp(w[1]->target, "__debug")))) {
 					printq("invalid_params", "window");
 					goto cleanup;
@@ -6053,7 +6125,7 @@ static int ui_ncurses_event(const char *event, ...)
 
 				goto cleanup;
 			}
-			
+
 			printq("invalid_params", "window");
 		}
 	}
@@ -6063,14 +6135,14 @@ static int ui_ncurses_event(const char *event, ...)
 		int start = va_arg(ap, int), stop = va_arg(ap, int);
 		list_t l;
 		int index = 0;
-		
+
 		for (l = windows; l; l = l->next) {
 			struct window *w = l->data;
-			
+
 			if ((w->id >= start) && (w->id <= stop))
 				windowlist[++index] = w->id;
 		}
-		
+
 		windowlist[0] = index;
 
 		goto cleanup;
@@ -6081,7 +6153,7 @@ cleanup:
 
 	contacts_update(NULL);
 	update_statusbar(1);
-	
+
 	return 0;
 }
 
@@ -6094,7 +6166,7 @@ void header_statusbar_resize(const char *name)
 {
 	if (!status)
 		return;
-	
+
 	if (config_header_size < 0)
 		config_header_size = 0;
 
@@ -6227,4 +6299,288 @@ static void binding_default()
 	binding_add("F11", "ui-ncurses-debug-toggle", 1, 1);
 	binding_add("Alt-Z", "contacts-scroll-up", 1, 1);
 	binding_add("Alt-X", "contacts-scroll-down", 1, 1);
+        binding_add("Ctrl-B", "toggle-transient-star-mode", 1, 1);
 }
+
+
+/*
+ * pierwszy znak regionu, ostatni znak +1 regionu, linia regionu
+ * uwagi: tsm_rs==tsm_re oznacza pusty region
+ */
+static int tsm_rs=-1, tsm_re=-1, tsm_line=-1;
+
+/*
+ * otwórz region
+ */
+static void tsm_start_region()
+{
+    tsm_rs   = line_index;
+    tsm_re   = line_index; /* tsm_rs==tsm_re => region pocz±tkowo jest pusty */
+    tsm_line = lines ? lines_index : 0;
+}
+
+/*
+ * zamknij region
+ */
+static void tsm_stop_region()
+{
+    if( tsm_rs == tsm_re )
+        tsm_reset_region();
+}
+
+/*
+ * resetuj region
+ */
+static void tsm_reset_region()
+{
+    tsm_rs = tsm_re = tsm_line = -1;
+    transient_star_mode = 0;
+}
+
+/*
+ * czy region jest gdzie¶ aktywny
+ */
+static int tsm_is_region_on()
+{
+    return tsm_rs>=0;
+}
+
+/*
+ * sprawdzenie poprawno¶ci regionu
+ * p: pozycja w linii
+ * ln_idx: indeks linii
+ */
+static int tsm_check_constraints(int p, int ln_idx)
+{
+    if( !tsm_is_region_on() || (lines && ln_idx != tsm_line) )
+        return 0;  // brak regionu w zadanej linii
+
+    const char* ln = lines ? lines[ln_idx] : line;
+    const int len  = strlen(ln);
+
+    if( len < tsm_rs )
+    {
+        tsm_reset_region();
+        update_statusbar(1);
+        return -1;  // region zresetowany
+    }
+    else if( !transient_star_mode )
+        if( len<tsm_re )
+        {
+            tsm_re = len+1; //tsm_re pokazuje ostatni znak regionu +1
+            return 1; // region istnieje i zosta³ zaktualizowany
+        }
+
+    return 2;  // region istnieje
+}
+
+/*
+ * czy zadany znak znajduje siê w regionie
+ * p: pozycja w linii
+ * ln_idx: indeks linii
+ */
+static int tsm_in_region(int p, int ln_idx)
+{
+    if( tsm_check_constraints(p, ln_idx)<= 0 )
+        return 0;
+
+    if( p>=tsm_rs && p<tsm_re )
+        return 1;
+    else
+        return 0;
+}
+
+/*
+ * czy zadany znak znajduje siê w regionie lub od razu za nim
+ * p: pozycja w linii
+ * ln_idx: indeks linii
+ */
+static int tsm_in_region_ext(int p, int ln_idx)
+{
+    if( tsm_check_constraints(p, ln_idx)<= 0 )
+        return 0;
+
+    if( p>=tsm_rs && p<=tsm_re )
+        return 1;
+    else
+        return 0;
+}
+
+/*
+ * aktualizuj region po delete
+ * p: pozycja w linii
+ * ln_idx: indeks linii
+ * at_eol: flaga koñca linii
+ */
+static void tsm_delchar_in_region(int p, int ln_idx, int at_eol)
+{
+    if( at_eol && tsm_line > ln_idx )
+    {
+        if( tsm_line-1 == ln_idx )
+        {
+            tsm_rs += strlen(lines[ln_idx]);
+            tsm_re += strlen(lines[ln_idx]);
+        }
+        --tsm_line;
+        return;
+    }
+    else if( at_eol )
+        return;
+
+    const int cc = tsm_check_constraints(p, ln_idx);
+    if( cc <= 0 || p >= tsm_re )
+        return;
+
+    if( p>=tsm_rs )
+    {
+        --tsm_re;
+        if( tsm_re<=tsm_rs )
+        {
+            tsm_reset_region();
+            update_statusbar(1);
+        }
+    }
+    else
+    {
+        --tsm_rs;
+        --tsm_re;
+    }
+}
+
+
+/*
+ * aktualizuj region po backspace
+ * p: pozycja w linii
+ * ln_idx: indeks linii
+ * at_bol: flaga pocz±tku linii
+ */
+static void tsm_bkw_delchar_in_region(int p, int ln_idx, int at_bol)
+{
+    if( at_bol && tsm_line >= ln_idx && ln_idx>0 )
+    {
+        if( tsm_line == ln_idx )
+        {
+            tsm_rs += strlen(lines[ln_idx-1]);
+            tsm_re += strlen(lines[ln_idx-1]);
+        }
+        --tsm_line;
+        return;
+    }
+    else if( at_bol )
+        return;
+
+    const int cc = tsm_check_constraints(p, ln_idx);
+    if( cc <= 0 || p > tsm_re )
+        return;
+
+    if( p>tsm_rs )
+    {
+        --tsm_re;
+        if( tsm_re<=tsm_rs )
+        {
+            tsm_reset_region();
+            update_statusbar(1);
+        }
+    }
+    else
+    {
+        --tsm_rs;
+        --tsm_re;
+    }
+}
+
+/*
+ * aktualizuj region po wprowadzeniu nowego znaku
+ * p: pozycja w linii
+ * ln_idx: indeks linii
+ * nl: flaga nowej linii (<enter>) typu bool
+ */
+static void tsm_inschar_in_region(int p, int ln_idx, int nl)
+{
+    if( nl )
+    {
+        if(tsm_line >= ln_idx )
+        {
+            const bool this_ln = tsm_line == ln_idx;
+            const bool in_stars = p > tsm_rs && p < tsm_re;
+            if( this_ln && in_stars )
+                tsm_re = p;
+            else if( this_ln && p <= tsm_rs )
+            {
+                tsm_rs -= p;
+                tsm_re -= p;
+                ++tsm_line;
+            }
+            else if( !this_ln )
+                ++tsm_line;
+        }
+    }
+    else
+    {
+        const int cc = tsm_check_constraints(p, ln_idx);
+        if( cc <= 0 || (!transient_star_mode && p >= tsm_re) || (transient_star_mode && p > tsm_re) )
+            return;
+
+        if( p>=tsm_rs )
+        {
+            if( p==tsm_rs && !transient_star_mode )
+                ++tsm_rs;
+            ++tsm_re;
+        }
+        else
+        {
+            ++tsm_rs;
+            ++tsm_re;
+        }
+    }
+}
+
+/*
+ * aktualizuj region po skasowaniu s³owa
+ * p: pozycja w linii
+ * ln_idx: indeks linii
+ * wsize: liczba znaków s³owa
+ */
+static void tsm_delword_in_region(int p, int ln_idx, int wsize)
+{
+    if( !tsm_is_region_on() )
+        return;
+
+    int i;
+    for(i=0; i<wsize; ++i)
+        tsm_delchar_in_region(p, ln_idx, FALSE);
+}
+
+
+/*
+ * aktualizuj region po yank
+ * p: pozycja w linii
+ * ln_idx: indeks linii
+ * ysize: liczba znaków operacji yank
+ */
+static void tsm_yank_in_region(int p, int ln_idx, int ysize)
+{
+    if( !tsm_is_region_on() )
+        return;
+
+    int i;
+    for(i=0; i<ysize; ++i)
+        tsm_inschar_in_region(p+i, ln_idx, 0);
+}
+
+#ifdef HAVE_OPENSSL
+/*
+ * Wczytuje has³o u¿ytkowika - callback funkcji PEM_read_RSAPrivateKey/PEM_write_RSAPrivateKey
+ */
+int ui_ncurses_pem_password_cb(char *buf, int size, int rwflag, void *userdata)
+{
+    if( !config_key_password )
+        return 0;
+
+    int passwd_len = strlen(config_key_password);
+    if( size<passwd_len )
+        passwd_len = size;
+    memcpy(buf, config_key_password, passwd_len);
+    return passwd_len;
+}
+#endif
